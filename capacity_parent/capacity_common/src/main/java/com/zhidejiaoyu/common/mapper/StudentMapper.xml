@@ -1,0 +1,1184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.StudentMapper">
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Student">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="account" property="account" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="account_time" property="accountTime" jdbcType="TIMESTAMP"/>
+        <result column="province" property="province" jdbcType="VARCHAR"/>
+        <result column="city" property="city" jdbcType="VARCHAR"/>
+        <result column="area" property="area" jdbcType="VARCHAR"/>
+        <result column="school_name" property="schoolName" jdbcType="VARCHAR"/>
+        <result column="student_name" property="studentName" jdbcType="VARCHAR"/>
+        <result column="sex" property="sex" jdbcType="INTEGER"/>
+        <result column="nickname" property="nickname" jdbcType="VARCHAR"/>
+        <result column="birth_date" property="birthDate" jdbcType="DATE"/>
+        <result column="register_date" property="registerDate" jdbcType="TIMESTAMP"/>
+        <result column="grade" property="grade" jdbcType="VARCHAR"/>
+        <result column="squad" property="squad" jdbcType="VARCHAR"/>
+        <result column="wish" property="wish" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="patriarch_phone" property="patriarchPhone" jdbcType="VARCHAR"/>
+        <result column="mail" property="mail" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="head_url" property="headUrl" jdbcType="VARCHAR"/>
+        <result column="head_name" property="headName" jdbcType="VARCHAR"/>
+        <result column="part_url" property="partUrl" jdbcType="VARCHAR"/>
+        <result column="pet_name" property="petName" jdbcType="VARCHAR" />
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="qq" property="qq" jdbcType="VARCHAR"/>
+        <result column="practical_school" property="practicalSchool" jdbcType="VARCHAR"/>
+        <result column="referrer" property="referrer" jdbcType="VARCHAR"/>
+        <result column="offline_gold" property="offlineGold" jdbcType="DOUBLE"/>
+        <result column="system_gold" property="systemGold" jdbcType="DOUBLE"/>
+        <result column="school_gold_first_time" property="schoolGoldFirstTime" jdbcType="TIMESTAMP"/>
+        <result column="country_gold_first_time" property="countryGoldFirstTime" jdbcType="TIMESTAMP"/>
+        <result column="worship_first_time" property="worshipFirstTime" jdbcType="TIMESTAMP"/>
+        <result column="`rank`" property="rank" jdbcType="INTEGER"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="role" property="role" jdbcType="INTEGER"/>
+        <result column="version" property="version" jdbcType="VARCHAR"/>
+        <result column="first_study_time" property="firstStudyTime" jdbcType="TIMESTAMP"/>
+        <result column="course_id" property="courseId" jdbcType="BIGINT"/>
+        <result column="unit_id" property="unitId" jdbcType="BIGINT"/>
+        <result column="course_name" property="courseName" jdbcType="VARCHAR"/>
+        <result column="unit_name" property="unitName" jdbcType="VARCHAR"/>
+        <result column="sentence_course_id" property="sentenceCourseId" jdbcType="BIGINT"/>
+        <result column="sentence_unit_id" property="sentenceUnitId" jdbcType="INTEGER"/>
+        <result column="sentence_course_name" property="sentenceCourseName" jdbcType="VARCHAR"/>
+        <result column="sentence_unit_name" property="sentenceUnitName" jdbcType="VARCHAR"/>
+        <result column="show_capacity" property="showCapacity"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, account, password, account_time, province, city, area, school_name, student_name,
+            sex, nickname, birth_date, register_date, grade, squad, wish, phone, patriarch_phone,
+            mail, status, head_url, head_name, part_url, pet_name, address, qq, practical_school, referrer,
+            offline_gold, system_gold, school_gold_first_time, country_gold_first_time, worship_first_time, `rank`,
+            update_time, role,
+            version, first_study_time, course_id,
+            unit_id, course_name, unit_name, sentence_course_id, sentence_unit_id, sentence_course_name,
+            sentence_unit_name
+    </sql>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.StudentExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from student
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from student
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from student
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.StudentExample">
+        delete from student
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <delete id="deleteByPrimaryKeys" parameterType="map">
+        update student set `status` = 3 where id in (
+        <foreach collection="ids" separator="," item="id">
+            #{id}
+        </foreach>
+        )
+    </delete>
+    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.Student">
+        insert into student (id, account, password,
+                             account_time, province, city,
+                             area, school_name, student_name,
+                             sex, nickname, birth_date,
+                             register_date, grade, squad,
+                             wish, phone, patriarch_phone,
+                             mail, status, head_url,
+                             head_name, part_url, pet_name,
+                             address, qq, practical_school,
+                             referrer, offline_gold, system_gold,
+                             school_gold_first_time, country_gold_first_time,
+                             worship_first_time, rank, update_time,
+                             role, version, first_study_time,
+                             course_id, unit_id, course_name,
+                             unit_name, sentence_course_id, sentence_unit_id,
+                             sentence_course_name, sentence_unit_name, show_capacity
+        )
+        values (#{id,jdbcType=BIGINT}, #{account,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
+                                       #{accountTime,jdbcType=TIMESTAMP}, #{province,jdbcType=VARCHAR},
+                                       #{city,jdbcType=VARCHAR},
+                                       #{area,jdbcType=VARCHAR}, #{schoolName,jdbcType=VARCHAR},
+                                       #{studentName,jdbcType=VARCHAR},
+                                       #{sex,jdbcType=INTEGER}, #{nickname,jdbcType=VARCHAR},
+            #{birthDate,jdbcType=DATE},
+            #{registerDate,jdbcType=TIMESTAMP}, #{grade,jdbcType=VARCHAR}, #{squad,jdbcType=VARCHAR},
+            #{wish,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{patriarchPhone,jdbcType=VARCHAR},
+            #{mail,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{headUrl,jdbcType=VARCHAR},
+            #{headName,jdbcType=VARCHAR}, #{partUrl,jdbcType=VARCHAR}, #{petName,jdbcType=VARCHAR},
+            #{address,jdbcType=VARCHAR}, #{qq,jdbcType=VARCHAR}, #{practicalSchool,jdbcType=VARCHAR},
+            #{referrer,jdbcType=VARCHAR}, #{offlineGold,jdbcType=DOUBLE}, #{systemGold,jdbcType=DOUBLE},
+            #{schoolGoldFirstTime,jdbcType=TIMESTAMP}, #{countryGoldFirstTime,jdbcType=TIMESTAMP},
+                                                       #{worshipFirstTime,jdbcType=TIMESTAMP}, #{rank,jdbcType=INTEGER},
+                                                       #{updateTime,jdbcType=TIMESTAMP},
+                                                       #{role,jdbcType=INTEGER}, #{version,jdbcType=VARCHAR},
+                                                       #{firstStudyTime,jdbcType=TIMESTAMP},
+                                                       #{courseId,jdbcType=BIGINT}, #{unitId,jdbcType=BIGINT},
+                                                       #{courseName,jdbcType=VARCHAR},
+                #{unitName,jdbcType=VARCHAR}, #{sentenceCourseId,jdbcType=BIGINT}, #{sentenceUnitId,jdbcType=INTEGER},
+                #{sentenceCourseName,jdbcType=VARCHAR}, #{sentenceUnitName,jdbcType=VARCHAR},
+                #{showCapacity,jdbcType=TINYINT}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Student" >
+        insert into student
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                id,
+            </if>
+            <if test="account != null" >
+                account,
+            </if>
+            <if test="password != null" >
+                password,
+            </if>
+            <if test="accountTime != null" >
+                account_time,
+            </if>
+            <if test="province != null" >
+                province,
+            </if>
+            <if test="city != null" >
+                city,
+            </if>
+            <if test="area != null" >
+                area,
+            </if>
+            <if test="schoolName != null" >
+                school_name,
+            </if>
+            <if test="studentName != null" >
+                student_name,
+            </if>
+            <if test="sex != null" >
+                sex,
+            </if>
+            <if test="nickname != null" >
+                nickname,
+            </if>
+            <if test="birthDate != null" >
+                birth_date,
+            </if>
+            <if test="registerDate != null" >
+                register_date,
+            </if>
+            <if test="grade != null" >
+                grade,
+            </if>
+            <if test="squad != null" >
+                squad,
+            </if>
+            <if test="wish != null" >
+                wish,
+            </if>
+            <if test="phone != null" >
+                phone,
+            </if>
+            <if test="patriarchPhone != null" >
+                patriarch_phone,
+            </if>
+            <if test="mail != null" >
+                mail,
+            </if>
+            <if test="status != null" >
+                status,
+            </if>
+            <if test="headUrl != null" >
+                head_url,
+            </if>
+            <if test="headName != null" >
+                head_name,
+            </if>
+            <if test="partUrl != null" >
+                part_url,
+            </if>
+            <if test="petName != null" >
+                pet_name,
+            </if>
+            <if test="address != null" >
+                address,
+            </if>
+            <if test="qq != null" >
+                qq,
+            </if>
+            <if test="practicalSchool != null" >
+                practical_school,
+            </if>
+            <if test="referrer != null" >
+                referrer,
+            </if>
+            <if test="offlineGold != null" >
+                offline_gold,
+            </if>
+            <if test="systemGold != null" >
+                system_gold,
+            </if>
+            <if test="schoolGoldFirstTime != null" >
+                school_gold_first_time,
+            </if>
+            <if test="countryGoldFirstTime != null" >
+                country_gold_first_time,
+            </if>
+            <if test="worshipFirstTime != null" >
+                worship_first_time,
+            </if>
+            <if test="rank != null" >
+               `rank`,
+            </if>
+            <if test="updateTime != null" >
+                update_time,
+            </if>
+            <if test="role != null" >
+                role,
+            </if>
+            <if test="version != null" >
+                version,
+            </if>
+            <if test="firstStudyTime != null" >
+                first_study_time,
+            </if>
+            <if test="courseId != null" >
+                course_id,
+            </if>
+            <if test="unitId != null" >
+                unit_id,
+            </if>
+            <if test="courseName != null" >
+                course_name,
+            </if>
+            <if test="unitName != null" >
+                unit_name,
+            </if>
+            <if test="sentenceCourseId != null" >
+                sentence_course_id,
+            </if>
+            <if test="sentenceUnitId != null" >
+                sentence_unit_id,
+            </if>
+            <if test="sentenceCourseName != null" >
+                sentence_course_name,
+            </if>
+            <if test="sentenceUnitName != null" >
+                sentence_unit_name,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="account != null" >
+                #{account,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null" >
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="accountTime != null" >
+                #{accountTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="province != null" >
+                #{province,jdbcType=VARCHAR},
+            </if>
+            <if test="city != null" >
+                #{city,jdbcType=VARCHAR},
+            </if>
+            <if test="area != null" >
+                #{area,jdbcType=VARCHAR},
+            </if>
+            <if test="schoolName != null" >
+                #{schoolName,jdbcType=VARCHAR},
+            </if>
+            <if test="studentName != null" >
+                #{studentName,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null" >
+                #{sex,jdbcType=INTEGER},
+            </if>
+            <if test="nickname != null" >
+                #{nickname,jdbcType=VARCHAR},
+            </if>
+            <if test="birthDate != null" >
+                #{birthDate,jdbcType=DATE},
+            </if>
+            <if test="registerDate != null" >
+                #{registerDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="grade != null" >
+                #{grade,jdbcType=VARCHAR},
+            </if>
+            <if test="squad != null" >
+                #{squad,jdbcType=VARCHAR},
+            </if>
+            <if test="wish != null" >
+                #{wish,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null" >
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="patriarchPhone != null" >
+                #{patriarchPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="mail != null" >
+                #{mail,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null" >
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="headUrl != null" >
+                #{headUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="headName != null" >
+                #{headName,jdbcType=VARCHAR},
+            </if>
+            <if test="partUrl != null" >
+                #{partUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="petName != null" >
+                #{petName,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null" >
+                #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="qq != null" >
+                #{qq,jdbcType=VARCHAR},
+            </if>
+            <if test="practicalSchool != null" >
+                #{practicalSchool,jdbcType=VARCHAR},
+            </if>
+            <if test="referrer != null" >
+                #{referrer,jdbcType=VARCHAR},
+            </if>
+            <if test="offlineGold != null" >
+                #{offlineGold,jdbcType=DOUBLE},
+            </if>
+            <if test="systemGold != null" >
+                #{systemGold,jdbcType=DOUBLE},
+            </if>
+            <if test="schoolGoldFirstTime != null" >
+                #{schoolGoldFirstTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="countryGoldFirstTime != null" >
+                #{countryGoldFirstTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="worshipFirstTime != null" >
+                #{worshipFirstTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="rank != null" >
+                #{rank,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null" >
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="role != null" >
+                #{role,jdbcType=INTEGER},
+            </if>
+            <if test="version != null" >
+                #{version,jdbcType=VARCHAR},
+            </if>
+            <if test="firstStudyTime != null" >
+                #{firstStudyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="courseId != null" >
+                #{courseId,jdbcType=BIGINT},
+            </if>
+            <if test="unitId != null" >
+                #{unitId,jdbcType=BIGINT},
+            </if>
+            <if test="courseName != null" >
+                #{courseName,jdbcType=VARCHAR},
+            </if>
+            <if test="unitName != null" >
+                #{unitName,jdbcType=VARCHAR},
+            </if>
+            <if test="sentenceCourseId != null" >
+                #{sentenceCourseId,jdbcType=BIGINT},
+            </if>
+            <if test="sentenceUnitId != null" >
+                #{sentenceUnitId,jdbcType=INTEGER},
+            </if>
+            <if test="sentenceCourseName != null" >
+                #{sentenceCourseName,jdbcType=VARCHAR},
+            </if>
+            <if test="sentenceUnitName != null" >
+                #{sentenceUnitName,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.StudentExample"
+            resultType="java.lang.Integer">
+        select count(*) from student
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map" >
+        update student
+        <set >
+            <if test="record.id != null" >
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.account != null" >
+                `account` = #{record.account,jdbcType=VARCHAR},
+            </if>
+            <if test="record.password != null" >
+                `password` = #{record.password,jdbcType=VARCHAR},
+            </if>
+            <if test="record.accountTime != null" >
+                account_time = #{record.accountTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.province != null" >
+                province = #{record.province,jdbcType=VARCHAR},
+            </if>
+            <if test="record.city != null" >
+                city = #{record.city,jdbcType=VARCHAR},
+            </if>
+            <if test="record.area != null" >
+                area = #{record.area,jdbcType=VARCHAR},
+            </if>
+            <if test="record.schoolName != null" >
+                school_name = #{record.schoolName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.studentName != null" >
+                student_name = #{record.studentName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.sex != null" >
+                sex = #{record.sex,jdbcType=INTEGER},
+            </if>
+            <if test="record.nickname != null" >
+                nickname = #{record.nickname,jdbcType=VARCHAR},
+            </if>
+            <if test="record.birthDate != null" >
+                birth_date = #{record.birthDate,jdbcType=DATE},
+            </if>
+            <if test="record.registerDate != null" >
+                register_date = #{record.registerDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.grade != null" >
+                grade = #{record.grade,jdbcType=VARCHAR},
+            </if>
+            <if test="record.squad != null" >
+                squad = #{record.squad,jdbcType=VARCHAR},
+            </if>
+            <if test="record.wish != null" >
+                wish = #{record.wish,jdbcType=VARCHAR},
+            </if>
+            <if test="record.phone != null" >
+                phone = #{record.phone,jdbcType=VARCHAR},
+            </if>
+            <if test="record.patriarchPhone != null" >
+                patriarch_phone = #{record.patriarchPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="record.mail != null" >
+                mail = #{record.mail,jdbcType=VARCHAR},
+            </if>
+            <if test="record.status != null" >
+                `status` = #{record.status,jdbcType=INTEGER},
+            </if>
+            <if test="record.headUrl != null" >
+                head_url = #{record.headUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="record.headName != null" >
+                head_name = #{record.headName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.partUrl != null" >
+                part_url = #{record.partUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="record.petName != null" >
+                pet_name = #{record.petName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.address != null" >
+                address = #{record.address,jdbcType=VARCHAR},
+            </if>
+            <if test="record.qq != null" >
+                qq = #{record.qq,jdbcType=VARCHAR},
+            </if>
+            <if test="record.practicalSchool != null" >
+                practical_school = #{record.practicalSchool,jdbcType=VARCHAR},
+            </if>
+            <if test="record.referrer != null" >
+                referrer = #{record.referrer,jdbcType=VARCHAR},
+            </if>
+            <if test="record.offlineGold != null" >
+                offline_gold = #{record.offlineGold,jdbcType=DOUBLE},
+            </if>
+            <if test="record.systemGold != null" >
+                system_gold = #{record.systemGold,jdbcType=DOUBLE},
+            </if>
+            <if test="record.schoolGoldFirstTime != null" >
+                school_gold_first_time = #{record.schoolGoldFirstTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.countryGoldFirstTime != null" >
+                country_gold_first_time = #{record.countryGoldFirstTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.worshipFirstTime != null" >
+                worship_first_time = #{record.worshipFirstTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.rank != null" >
+                `rank` = #{record.rank,jdbcType=INTEGER},
+            </if>
+            <if test="record.updateTime != null" >
+                update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.role != null" >
+                role = #{record.role,jdbcType=INTEGER},
+            </if>
+            <if test="record.version != null" >
+                version = #{record.version,jdbcType=VARCHAR},
+            </if>
+            <if test="record.firstStudyTime != null" >
+                first_study_time = #{record.firstStudyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.courseId != null" >
+                course_id = #{record.courseId,jdbcType=BIGINT},
+            </if>
+            <if test="record.unitId != null" >
+                unit_id = #{record.unitId,jdbcType=BIGINT},
+            </if>
+            <if test="record.courseName != null" >
+                course_name = #{record.courseName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.unitName != null" >
+                unit_name = #{record.unitName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.sentenceCourseId != null" >
+                sentence_course_id = #{record.sentenceCourseId,jdbcType=BIGINT},
+            </if>
+            <if test="record.sentenceUnitId != null" >
+                sentence_unit_id = #{record.sentenceUnitId,jdbcType=INTEGER},
+            </if>
+            <if test="record.sentenceCourseName != null" >
+                sentence_course_name = #{record.sentenceCourseName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.sentenceUnitName != null" >
+                sentence_unit_name = #{record.sentenceUnitName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null" >
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map" >
+        update student
+        set id = #{record.id,jdbcType=BIGINT},
+        account = #{record.account,jdbcType=VARCHAR},
+        password = #{record.password,jdbcType=VARCHAR},
+        account_time = #{record.accountTime,jdbcType=TIMESTAMP},
+        province = #{record.province,jdbcType=VARCHAR},
+        city = #{record.city,jdbcType=VARCHAR},
+        area = #{record.area,jdbcType=VARCHAR},
+        school_name = #{record.schoolName,jdbcType=VARCHAR},
+        student_name = #{record.studentName,jdbcType=VARCHAR},
+        sex = #{record.sex,jdbcType=INTEGER},
+        nickname = #{record.nickname,jdbcType=VARCHAR},
+        birth_date = #{record.birthDate,jdbcType=DATE},
+        register_date = #{record.registerDate,jdbcType=TIMESTAMP},
+        grade = #{record.grade,jdbcType=VARCHAR},
+        squad = #{record.squad,jdbcType=VARCHAR},
+        wish = #{record.wish,jdbcType=VARCHAR},
+        phone = #{record.phone,jdbcType=VARCHAR},
+        patriarch_phone = #{record.patriarchPhone,jdbcType=VARCHAR},
+        mail = #{record.mail,jdbcType=VARCHAR},
+        `status` = #{record.status,jdbcType=INTEGER},
+        head_url = #{record.headUrl,jdbcType=VARCHAR},
+        head_name = #{record.headName,jdbcType=VARCHAR},
+        part_url = #{record.partUrl,jdbcType=VARCHAR},
+        pet_name = #{record.petName,jdbcType=VARCHAR},
+        address = #{record.address,jdbcType=VARCHAR},
+        qq = #{record.qq,jdbcType=VARCHAR},
+        practical_school = #{record.practicalSchool,jdbcType=VARCHAR},
+        referrer = #{record.referrer,jdbcType=VARCHAR},
+        offline_gold = #{record.offlineGold,jdbcType=DOUBLE},
+        system_gold = #{record.systemGold,jdbcType=DOUBLE},
+        school_gold_first_time = #{record.schoolGoldFirstTime,jdbcType=TIMESTAMP},
+        country_gold_first_time = #{record.countryGoldFirstTime,jdbcType=TIMESTAMP},
+        worship_first_time = #{record.worshipFirstTime,jdbcType=TIMESTAMP},
+        `rank` = #{record.rank,jdbcType=INTEGER},
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+        role = #{record.role,jdbcType=INTEGER},
+        version = #{record.version,jdbcType=VARCHAR},
+        first_study_time = #{record.firstStudyTime,jdbcType=TIMESTAMP},
+        course_id = #{record.courseId,jdbcType=BIGINT},
+        unit_id = #{record.unitId,jdbcType=BIGINT},
+        course_name = #{record.courseName,jdbcType=VARCHAR},
+        unit_name = #{record.unitName,jdbcType=VARCHAR},
+        sentence_course_id = #{record.sentenceCourseId,jdbcType=BIGINT},
+        sentence_unit_id = #{record.sentenceUnitId,jdbcType=INTEGER},
+        sentence_course_name = #{record.sentenceCourseName,jdbcType=VARCHAR},
+        sentence_unit_name = #{record.sentenceUnitName,jdbcType=VARCHAR}
+        <if test="_parameter != null" >
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.Student" >
+        update student
+        <set >
+            <if test="account != null" >
+                account = #{account,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null" >
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="accountTime != null" >
+                account_time = #{accountTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="province != null" >
+                province = #{province,jdbcType=VARCHAR},
+            </if>
+            <if test="city != null" >
+                city = #{city,jdbcType=VARCHAR},
+            </if>
+            <if test="area != null" >
+                area = #{area,jdbcType=VARCHAR},
+            </if>
+            <if test="schoolName != null" >
+                school_name = #{schoolName,jdbcType=VARCHAR},
+            </if>
+            <if test="studentName != null" >
+                student_name = #{studentName,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null" >
+                sex = #{sex,jdbcType=INTEGER},
+            </if>
+            <if test="nickname != null" >
+                nickname = #{nickname,jdbcType=VARCHAR},
+            </if>
+            <if test="birthDate != null" >
+                birth_date = #{birthDate,jdbcType=DATE},
+            </if>
+            <if test="registerDate != null" >
+                register_date = #{registerDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="grade != null" >
+                grade = #{grade,jdbcType=VARCHAR},
+            </if>
+            <if test="squad != null" >
+                squad = #{squad,jdbcType=VARCHAR},
+            </if>
+            <if test="wish != null" >
+                wish = #{wish,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null" >
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="patriarchPhone != null" >
+                patriarch_phone = #{patriarchPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="mail != null" >
+                mail = #{mail,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null" >
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="headUrl != null" >
+                head_url = #{headUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="headName != null" >
+                head_name = #{headName,jdbcType=VARCHAR},
+            </if>
+            <if test="partUrl != null" >
+                part_url = #{partUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="petName != null" >
+                pet_name = #{petName,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null" >
+                address = #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="qq != null" >
+                qq = #{qq,jdbcType=VARCHAR},
+            </if>
+            <if test="practicalSchool != null" >
+                practical_school = #{practicalSchool,jdbcType=VARCHAR},
+            </if>
+            <if test="referrer != null" >
+                referrer = #{referrer,jdbcType=VARCHAR},
+            </if>
+            <if test="offlineGold != null" >
+                offline_gold = #{offlineGold,jdbcType=DOUBLE},
+            </if>
+            <if test="systemGold != null" >
+                system_gold = #{systemGold,jdbcType=DOUBLE},
+            </if>
+            <if test="schoolGoldFirstTime != null" >
+                school_gold_first_time = #{schoolGoldFirstTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="countryGoldFirstTime != null" >
+                country_gold_first_time = #{countryGoldFirstTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="worshipFirstTime != null" >
+                worship_first_time = #{worshipFirstTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="rank != null" >
+                `rank` = #{rank,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null" >
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="role != null" >
+                role = #{role,jdbcType=INTEGER},
+            </if>
+            <if test="version != null" >
+                version = #{version,jdbcType=VARCHAR},
+            </if>
+            <if test="firstStudyTime != null" >
+                first_study_time = #{firstStudyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="courseId != null" >
+                course_id = #{courseId,jdbcType=BIGINT},
+            </if>
+            <if test="unitId != null" >
+                unit_id = #{unitId,jdbcType=BIGINT},
+            </if>
+            <if test="courseName != null" >
+                course_name = #{courseName,jdbcType=VARCHAR},
+            </if>
+            <if test="unitName != null" >
+                unit_name = #{unitName,jdbcType=VARCHAR},
+            </if>
+            <if test="sentenceCourseId != null" >
+                sentence_course_id = #{sentenceCourseId,jdbcType=BIGINT},
+            </if>
+            <if test="sentenceUnitId != null" >
+                sentence_unit_id = #{sentenceUnitId,jdbcType=INTEGER},
+            </if>
+            <if test="sentenceCourseName != null" >
+                sentence_course_name = #{sentenceCourseName,jdbcType=VARCHAR},
+            </if>
+            <if test="sentenceUnitName != null" >
+                sentence_unit_name = #{sentenceUnitName,jdbcType=VARCHAR},
+            </if>
+            <if test="showCapacity != null">
+                show_capacity = #{showCapacity}
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.Student" >
+        update student
+        set account = #{account,jdbcType=VARCHAR},
+            password = #{password,jdbcType=VARCHAR},
+            account_time = #{accountTime,jdbcType=TIMESTAMP},
+            province = #{province,jdbcType=VARCHAR},
+            city = #{city,jdbcType=VARCHAR},
+            area = #{area,jdbcType=VARCHAR},
+            school_name = #{schoolName,jdbcType=VARCHAR},
+            student_name = #{studentName,jdbcType=VARCHAR},
+            sex = #{sex,jdbcType=INTEGER},
+            nickname = #{nickname,jdbcType=VARCHAR},
+            birth_date = #{birthDate,jdbcType=DATE},
+            register_date = #{registerDate,jdbcType=TIMESTAMP},
+            grade = #{grade,jdbcType=VARCHAR},
+            squad = #{squad,jdbcType=VARCHAR},
+            wish = #{wish,jdbcType=VARCHAR},
+            phone = #{phone,jdbcType=VARCHAR},
+            patriarch_phone = #{patriarchPhone,jdbcType=VARCHAR},
+            mail = #{mail,jdbcType=VARCHAR},
+            status = #{status,jdbcType=INTEGER},
+            head_url = #{headUrl,jdbcType=VARCHAR},
+            head_name = #{headName,jdbcType=VARCHAR},
+            part_url = #{partUrl,jdbcType=VARCHAR},
+            pet_name = #{petName,jdbcType=VARCHAR},
+            address = #{address,jdbcType=VARCHAR},
+            qq = #{qq,jdbcType=VARCHAR},
+            practical_school = #{practicalSchool,jdbcType=VARCHAR},
+            referrer = #{referrer,jdbcType=VARCHAR},
+            offline_gold = #{offlineGold,jdbcType=DOUBLE},
+            system_gold = #{systemGold,jdbcType=DOUBLE},
+            school_gold_first_time = #{schoolGoldFirstTime,jdbcType=TIMESTAMP},
+            country_gold_first_time = #{countryGoldFirstTime,jdbcType=TIMESTAMP},
+            worship_first_time = #{worshipFirstTime,jdbcType=TIMESTAMP},
+            `rank` = #{rank,jdbcType=INTEGER},
+            update_time = #{updateTime,jdbcType=TIMESTAMP},
+            role = #{role,jdbcType=INTEGER},
+            version = #{version,jdbcType=VARCHAR},
+            first_study_time = #{firstStudyTime,jdbcType=TIMESTAMP},
+            course_id = #{courseId,jdbcType=BIGINT},
+            unit_id = #{unitId,jdbcType=BIGINT},
+            course_name = #{courseName,jdbcType=VARCHAR},
+            unit_name = #{unitName,jdbcType=VARCHAR},
+            sentence_course_id = #{sentenceCourseId,jdbcType=BIGINT},
+            sentence_unit_id = #{sentenceUnitId,jdbcType=INTEGER},
+            sentence_course_name = #{sentenceCourseName,jdbcType=VARCHAR},
+            sentence_unit_name = #{sentenceUnitName,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <!-- 根据学生id数据批量修改有效期和到期时间 -->
+    <update id="updateRankAndAccountTimeByIds" parameterType="map">
+        update student set `rank`=#{rank},account_time=#{accountTime} where id
+        in
+        <foreach collection="idArr" item="id" open="(" close=")"
+                 separator=",">
+            #{id}
+        </foreach>
+    </update>
+    <update id="updateByPrimarykeys" parameterType="map">
+        update student
+        <set>
+            grade =
+            <foreach collection="students" item="student" separator=" " open="case ID" close="end">
+                when #{student.id} then #{student.grade,jdbcType=VARCHAR}
+            </foreach>
+            where id in
+            <foreach collection="students" item="student" separator="," open="(" close=")">
+                #{student.id}
+            </foreach>
+        </set>
+    </update>
+    <update id="updateDelStatus" parameterType="map">
+        update student set `status` = 1 where id in (
+        <foreach collection="stuIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </update>
+    <update id="updateSchoolGoldFirstTimeToNull" parameterType="map">
+        update student set school_gold_first_time = null where id in (
+        <foreach collection="students" separator="," item="student">
+            #{student.id}
+        </foreach>
+        )
+    </update>
+
+    <select id="LoginJudge" parameterType="com.zhidejiaoyu.common.pojo.Student"
+            resultMap="BaseResultMap">
+        select *
+        from student
+        where account = #{account} and
+              password = #{password}
+    </select>
+
+    <select id="indexData" parameterType="long"
+            resultMap="BaseResultMap">
+        select *
+        from student
+        where id = #{student_id}
+    </select>
+
+    <sql id="ID_GRADE">
+        id, grade, version
+    </sql>
+    <select id="selectIdAndGradeAndVersion" resultType="com.zhidejiaoyu.common.pojo.Student">
+        select
+        <include refid="ID_GRADE"/>
+        from student where version is not null and version != '' and grade is not null and grade !=''
+        and head_url is not null and head_url != '' and account_time &gt;= now()
+    </select>
+    <select id="selectAccountTimeLessThreeDays" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from student where to_days(account_time) - to_days(now()) &lt;= 3 and to_days(account_time) - to_days(now())
+        &gt;= 0
+    </select>
+    <select id="selectLevelByStuId" resultType="java.util.Map" parameterType="map">
+        SELECT
+        s.id id,
+        CASE
+        WHEN @preRank = s.system_gold THEN
+        @curRank
+        WHEN @preRank := s.system_gold THEN
+        @curRank :=@curRank + 1
+        END AS `rank`
+        FROM
+        student s,
+        (
+        SELECT
+        @curRank := 0 ,@preRank := 0
+        ) r
+        <where>
+            <if test="flag == 2 or flag == 1">
+                AND s.province = #{student.province}
+                AND s.area = #{student.area}
+                AND s.city = #{student.city}
+                AND s.school_name = #{student.schoolName}
+            </if>
+            <if test="flag == 1">
+                AND s.grade = #{student.grade}
+                <if test="student.squad != '' and student.squad != null ">
+                  AND s.squad = #{student.squad}
+                </if>
+            </if>
+        </where>
+        ORDER BY
+        system_gold + offline_gold DESC
+    </select>
+    <select id="selectRankByStudentIds" resultType="java.util.Map" parameterType="map">
+        SELECT
+        s.id id,
+        CASE
+        WHEN @preRank = s.system_gold THEN
+        @curRank
+        WHEN @preRank := s.system_gold THEN
+        @curRank :=@curRank + 1
+        END AS `rank`
+        FROM
+        student s,
+        (
+        SELECT
+        @curRank := 0 ,@preRank := NULL
+        ) r
+        <where>
+            <foreach collection="students" item="student" separator="or" open="(" close=")">
+                s.id = #{student.id}
+                AND s.province = #{student.province}
+                AND s.area = #{student.area}
+                AND s.city = #{student.city}
+                AND s.school_name = #{student.schoolName}
+                AND s.grade = #{student.grade}
+                AND s.squad = #{student.squad}
+            </foreach>
+        </where>
+        ORDER BY
+        system_gold DESC
+    </select>
+    <insert id="insertStudentList" parameterType="java.util.List">
+        insert into student (id, account, password,
+        account_time, province,
+        city,
+        area, school_name, student_name,
+        sex, nickname, birth_date,
+        register_date, grade, squad,
+        wish, phone, patriarch_phone,
+        mail, status,
+        head_url,
+        head_name, address, qq,
+        practical_school, referrer,
+        offline_gold,
+        system_gold, `rank`, update_time,
+        role,
+        version
+        )
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id,jdbcType=BIGINT},
+            #{item.account,jdbcType=VARCHAR}, #{item.password,jdbcType=VARCHAR},
+            #{item.accountTime,jdbcType=TIMESTAMP},
+            #{item.province,jdbcType=VARCHAR}, #{item.city,jdbcType=VARCHAR},
+            #{item.area,jdbcType=VARCHAR}, #{item.schoolName,jdbcType=VARCHAR},
+            #{item.studentName,jdbcType=VARCHAR},
+            #{item.sex,jdbcType=INTEGER},
+            #{item.nickname,jdbcType=VARCHAR}, #{item.birthDate,jdbcType=DATE},
+            #{item.registerDate,jdbcType=TIMESTAMP},
+            #{item.grade,jdbcType=VARCHAR}, #{item.squad,jdbcType=VARCHAR},
+            #{item.wish,jdbcType=VARCHAR}, #{item.phone,jdbcType=VARCHAR},
+            #{item.patriarchPhone,jdbcType=VARCHAR},
+            #{item.mail,jdbcType=VARCHAR}, #{item.status,jdbcType=INTEGER},
+            #{item.headUrl,jdbcType=VARCHAR},
+            #{item.headName,jdbcType=VARCHAR},
+            #{item.address,jdbcType=VARCHAR}, #{item.qq,jdbcType=VARCHAR},
+            #{item.practicalSchool,jdbcType=VARCHAR},
+            #{item.referrer,jdbcType=VARCHAR},
+            #{item.offlineGold,jdbcType=INTEGER},
+            #{item.systemGold,jdbcType=INTEGER}, #{item.rank,jdbcType=INTEGER},
+            #{item.updateTime,jdbcType=TIMESTAMP},
+            #{item.role,jdbcType=INTEGER},
+            #{item.version,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <sql id="selectSeniority_model_sql">
+        <!-- 本班 -->
+        <if test="model == '1' or model == 1">
+            where s.area = #{area} AND s.school_name = #{school_name} AND s.grade = #{grade} AND s.squad = #{squad}
+        </if>
+        <!-- 本校 -->
+        <if test="model == '2' or model == 2">
+            where s.area = #{area} AND s.school_name = #{school_name}
+        </if>
+    </sql>
+    <select id="selectSeniority" parameterType="map" resultType="map">
+        <!--SELECT
+        s.id, s.student_name as studentName, s.head_url, s.province, s.city, s.area, (s.offline_gold + s.system_gold) AS gold,
+        c.zs,
+        w.mb
+        FROM
+        student s,
+        (
+        SELECT
+        COUNT(c.id) AS zs
+        FROM
+        ccie c, student stu
+        WHERE
+        c.student_id = stu.id
+        ) c,
+        (
+        SELECT
+        COUNT(w.id) AS mb
+        FROM
+        worship w,student stu
+        WHERE
+        w.student_id_by_worship = stu.id
+        ) w
+        <include refid="selectSeniority_model_sql"/>
+        GROUP BY s.id-->
+        SELECT
+        s.id,
+        s.student_name AS studentName,
+        s.head_url,
+        s.province,
+        s.city,
+        s.area,
+        (
+        s.offline_gold + s.system_gold
+        ) AS gold
+        FROM
+        student s
+        <include refid="selectSeniority_model_sql"/>
+    </select>
+    <select id="selectxz" resultType="map">
+        select
+            t.sid           id,
+            count(t.sid) AS xz
+        from (select
+                  s.id                 sid,
+                  count(m.parent_name) tc,
+                  m.parent_name        p
+              from student s, award a, medal m
+              where a.medal_type = m.id and a.get_flag = 1 and s.id = a.student_id
+              GROUP BY m.parent_name, s.id) t
+        where t.tc % 5 = 0
+    </select>
+
+    <select id="getCourseIdAndUnitId" parameterType="map" resultType="map">
+    	select course_id, unit_id, sentence_course_id, sentence_unit_id from student where id = #{studentId}
+    </select>
+    <select id="selectHasStudyRecord" resultType="java.util.Map" parameterType="map">
+        select s.account, s.student_name studentName from student s, learn l where l.student_id = s.id and l.student_id
+        in (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+        group by l.student_id
+    </select>
+    <select id="countByPhaseAndVersion" resultType="java.lang.Integer" parameterType="map">
+        select count(id) from student where version = #{student.version} and grade in (
+            <if test="phase == '高中'">
+                '高一','高二','高三'
+            </if>
+            <if test="phase == '初中'">
+                '七年级','八年级','九年级'
+            </if>
+        )
+    </select>
+    <select id="getSchools" resultType="java.lang.String" parameterType="boolean">
+        select distinct(s.school_name) from student s
+        <where>
+            <if test="isNewStudentSchool == true">
+                and s.sex is null
+            </if>
+            and s.`status` &lt;&gt; 3
+            and s.school_name is not null
+            and s.school_name &lt;&gt; ''
+        </where>
+    </select>
+    <select id="schoolHeadcountNationwide" resultType="java.lang.Integer">
+        select count(id) from student
+        where
+        <if test="study_paragraph == '初中' "> grade in ('七年级', '八年级', '九年级', '初一', '初二', '初三') </if>
+        <if test="study_paragraph == '高中' "> grade in ('高一', '高二', '高三', '高中') </if>
+        and version = #{version}
+    </select>
+
+    <select id="selectMaxGoldForSchool" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM student
+        WHERE school_name = #{schoolName}
+        AND school_gold_first_time is not null
+        ORDER BY system_gold + offline_gold DESC
+        LIMIT 1
+    </select>
+    <select id="selectMaxGoldForGold" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM student
+        WHERE school_name = #{schoolName}
+        AND system_gold + offline_gold = #{maxGold}
+
+    </select>
+    <select id="getStudentAccountTime" resultType="map" parameterType="map">
+        select id, account, student_name, DATE_FORMAT(account_time,'%Y-%m-%d') AS account_time from student where id = #{studentId}
+    </select>
+</mapper>

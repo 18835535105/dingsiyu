@@ -21,11 +21,10 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-
-target
-/capacity_parent/capacity_front/target/
-/capacity_parent/capacity_common/capacity_common.iml
-/capacity_parent/capacity_common/common.iml
-/capacity_parent/capacity_common/target/
-/capacity_parent/capacity_common/.idea/
-/.idea/
+/capacity_front/capacity_front.iml
+/parent.iml
+/capacity_parent.iml
+/capacity_front/zdjy_ (1).iml
+/capacity_front/simple_front.iml
+/capacity_common/log/
+/capacity_common/d:/

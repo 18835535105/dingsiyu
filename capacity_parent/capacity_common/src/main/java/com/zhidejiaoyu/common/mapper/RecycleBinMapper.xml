@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.RecycleBinMapper">
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.RecycleBin">
+        <id property="id" column="id"/>
+        <result property="operateUserId" column="operate_user_id"/>
+        <result property="operateUserName" column="operate_user_name"/>
+        <result property="studentId" column="student_id"/>
+        <result property="delStatus" column="del_status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="recoverUserId" column="recover_user_id"/>
+        <result property="recoverUserName" column="recover_user_name"/>
+    </resultMap>
+
+    <sql id="Base_Sql">
+        id, operate_user_id, operate_user_id, student_id, del_status, create_time, update_time, recover_user_id, recover_user_name
+    </sql>
+
+    <insert id="insertByList" parameterType="map">
+        insert into recycle_bin (operate_user_id, operate_user_name, student_id, create_time) values
+        <foreach collection="recycleBins" item="r" separator=",">
+            (
+            <if test="r.operateUserId != null">
+                #{r.operateUserId},
+            </if>
+            <if test="r.operateUserName != null and r.operateUserName != ''">
+                #{r.operateUserName},
+            </if>
+            <if test="r.studentId != null">
+                #{r.studentId},
+            </if>
+            now())
+        </foreach>
+    </insert>
+    <update id="updateDelStatusByIds" parameterType="map">
+        update recycle_bin set del_status = 2, update_time = now(), recover_user_id = #{admin.id} , recover_user_name =
+        #{admin.name} where id in (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </update>
+    <select id="selectRecycle" resultType="map" parameterType="map">
+        select
+        r.id id, r.create_time createTime, s.account account, s.student_name studentName,
+        s.school_name schoolName, s.grade grade, s.squad squad, s.account_time accountTime,
+        s.status status, r.operate_user_name operateUserName
+        from student s, recycle_bin r
+        where r.student_id = s.id
+        and r.operate_user_id = #{adminId}
+        <if test="createTimeBegin != null and createTimeBegin != ''">
+            and r.create_time &gt;= #{createTimeBegin}
+        </if>
+        <if test="createTimeEnd != null and createTimeEnd != ''">
+            and r.create_time &lt;= #{createTimeEnd}
+        </if>
+        <if test="account != null and account != ''">
+            and s.account like concat ('%',#{account},'%')
+        </if>
+        <if test="schoolName != null and schoolName != '' and schoolName != '全部'">
+            and s.school_name like concat ('%',#{schoolName},'%')
+        </if>
+        <if test="squad != null and squad != ''">
+            and s.squad like concat ('%',#{squad},'%')
+        </if>
+        <if test="grade != null and grade != '' and grade != '全部'">
+            and s.grade = #{grade}
+        </if>
+        and r.del_status = 1
+        order by r.create_time desc
+    </select>
+    <select id="selectByIds" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Sql"/>
+        from recycle_bin
+        where id in (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </select>
+</mapper>

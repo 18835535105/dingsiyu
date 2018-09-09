@@ -1,0 +1,224 @@
+package com.zhidejiaoyu.student.controller;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.*;
+
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.service.PersonalCentreService;
+
+import java.text.ParseException;
+
+/**
+ * 个人中心
+ * 
+ * @author qizhentao
+ * @version 1.0
+ */
+@RestController
+@RequestMapping("/personal")
+@SuppressWarnings("all")
+public class PersonalCentreController {
+
+	@Autowired
+	private PersonalCentreService personalCentreService;
+	
+	/**
+	 * 点击个人中心
+	 * 	1.消息中心红点是否显示
+	 * 	2.学生姓名,等级
+	 * 
+	 * @return read 消息中心是否有未读消息, true有未读消息  false无未读消息
+	 */
+	@RequestMapping("/personal")
+	public ServerResponse<Object> PersonalIndex(HttpSession session) {
+		return personalCentreService.PersonalIndex(session);
+	}
+	
+	
+	/**
+	 * 消息中心
+	 * 	1.消息通知
+	 * 
+	 * @return news数据
+	 */
+	@RequestMapping("/news")
+	public ServerResponse<Object> newsCentre(HttpSession session) {
+		return personalCentreService.newsCentre(session);
+	}
+	
+	/**
+	 * 消息中心
+	 * 	2.消息通知里边功能
+	 * 
+	 * 1.删除
+	 * 2.根据通知id标记为已读
+	 * 3.全部标记为已读
+	 * 
+	 * @param state 类型  1=删除, 2=标记为已读, 3=全部标记为已读
+	 * @param id 删除[] / 标记为已读[]
+	 * 
+	 * 参数说明: state用户选择的是那个选项 (1=删除, 2=标记为已读, 3=全部标记为已读)
+	 * 		  id是用户选择列的id(多选放数组中)
+	 */
+	@RequestMapping("/newsupdate")
+	public ServerResponse<String> newsupdate(HttpSession session, Integer state, Integer[] id) {
+		return personalCentreService.newsupdate(session, state, id);
+	}
+	
+	
+	/**
+	 * 我的报告 - 无分页
+	 * 	1.每周时长
+	 */
+	@RequestMapping("/weekDuration")
+	public ServerResponse<Object> weekDurationIndex(HttpSession session){
+		return personalCentreService.weekDurationIndex(session);
+	}
+
+	/**
+	 * 我的报告 - 分页
+	 * 	1.每周时长
+	 * @year 0=全部, 2018=指定年份
+	 */
+	@RequestMapping("/weekDurationPage")
+	public ServerResponse<Object> weekDurationIndexTest(HttpSession session, int page, int rows, Integer year){
+		return personalCentreService.weekDurationIndexPage(session, page, rows, year);
+	}
+
+	/**
+	 * 我的报告 - 无分页
+	 *  2.每周学习量
+	 */
+	@RequestMapping("/weekQuantity")
+	public ServerResponse<Object> weekQuantity(HttpSession session){
+		return personalCentreService.weekQuantity(session);
+	}
+
+	/**
+	 * 我的报告 - 分页
+	 *  2.每周学习量
+	 * @param 0=全部, 2018=指定年份
+	 */
+	@RequestMapping("/weekQuantityPage")
+	public ServerResponse<Object> weekQuantityPage(HttpSession session, int page, int rows, Integer year){
+		return personalCentreService.weekQuantityPage(session, page, rows, year);
+	}
+
+	/**
+	 * 我的报告
+	 * 	3.课程统计
+	 */
+	@RequestMapping("/CourseStatistics")
+	public ServerResponse<Object> CourseStatistics(HttpSession session, int page, int rows){
+		return personalCentreService.CourseStatistics(session, page , rows);
+	} 
+	
+	/**
+	 * 我的报告
+	 * 	3.课程统计
+	 * 	点击某个课程某个模块下的某个单元 显示 已学/单词总量
+	 *
+	 * @param session
+	 * @param model 模块: 1=慧记忆，2=慧听写，3=慧默写，4=例句听力，5=例句翻译，6=例句默写
+	 * @param unitId 单元id
+	 * @return
+	 */
+	@RequestMapping("/CourseStatisticsCount")
+	public ServerResponse<Object> CourseStatisticsCount(HttpSession session, Integer unitId, Integer model){
+		// return personalCentreService.courseStatisticsCount(session, courseId, model, unitNumber);
+		return personalCentreService.courseStatisticsCountTrue(session, unitId, model);
+	}
+
+	/**
+	 * 我的排名
+	 *  @param model 
+	 *  	本班排行模块  model = 1
+	 *  	本校模块 model = 2
+	 *  	全国模块 model = 3
+	 * @param queryType 空代表全部查询，1=今日排行 2=本周排行 3=本月排行
+	 *  @param gold 金币 1=正序 2=倒叙  - 默认金币倒叙排行
+	 *  @param badge 勋章 1=正序 2=倒叙
+	 *  @param certificate 证书 1=正序 2=倒叙
+	 *  @param worship 膜拜 1=正序 2=倒叙
+	 */
+	@RequestMapping(value = "/classSeniority", method = RequestMethod.POST)
+	public ServerResponse<Object> classSeniority(HttpSession session, Integer page, Integer rows,@RequestParam(required = false, defaultValue = "1") String model, String gold, String badge, String certificate, String worship, Integer queryType) {
+		return personalCentreService.classSeniority(session, page, rows, gold, badge, certificate, worship, model, queryType);
+	} 
+	
+	/**
+	 * 我的证书
+	 *
+	 * @param session
+	 * @param model 默认0全部显示, 点击的那个模块(7个模块) 1：慧记忆；2：慧听写；3：慧默写；4：例句听力；5：例句翻译；6：例句默写；7：五维测试;
+	 * @return
+	 */
+	@RequestMapping("/ccie")
+	public ServerResponse<Object> showCcie(HttpSession session, @RequestParam(required = false, defaultValue = "0") Integer model){
+		return personalCentreService.showCcie(session, model);
+	}
+
+	/**
+	 * 进度排行榜
+     *  区分版本和初高中！
+	 *
+	 * @param session 存放着学生信息
+     * @param page 当前页
+     * @param rows 显示多少条数据
+	 * @param model 默认1
+	 * 	 本班排行模块  model = 1
+	 * 	 本校模块 model = 2
+	 * 	 全国模块 model = 3
+	 * @param haveUnit 已学单元 1=正序 2=倒叙 默认haveUnit=2倒叙
+	 * @param haveTest 已做测试 1=正序 2=倒叙
+	 * @param haveTime 学习时长 1=正序 2=倒叙
+	 * @return
+	 */
+	@RequestMapping("/durationSeniority")
+	public ServerResponse<Object> durationSeniority(HttpSession session, @RequestParam(required = false, defaultValue = "1") Integer model, Integer haveUnit, Integer haveTest, Integer haveTime, Integer page, Integer rows){
+		return personalCentreService.durationSeniority(session, model, haveUnit, haveTest, haveTime, page, rows);
+	}
+
+	/**
+	 * 我的报告下拉年份显示
+	 * @param studentId 学生id
+	 */
+	@PostMapping("getYear")
+	public ServerResponse<Object> getYear(long studentId){
+		return personalCentreService.getYear(studentId);
+	}
+
+    /**
+     * 充值卡首页
+     * @param studentId
+     * @return 学生信息
+     */
+    @PostMapping("/payCardIndex")
+    public ServerResponse<Object> payCardIndex(long studentId){
+        return personalCentreService.payCardIndex(studentId);
+    }
+
+    /**
+     * 使用充值卡
+     * @param studentId
+     * @return
+     */
+	@PostMapping("/postPayCard")
+    public ServerResponse<Object> postPayCard(long studentId, String card) throws ParseException {
+	    return personalCentreService.postPayCard(studentId, card);
+    }
+
+    /**
+     * 充值卡记录
+     * @param studentId
+     * @return
+     */
+    @PostMapping("/getPayCard")
+    public ServerResponse<Object> getPayCard(long studentId, int page, int rows){
+        return personalCentreService.getPayCard(studentId, page, rows);
+    }
+
+}

@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.AwardMapper">
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Award">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="student_id" property="studentId" jdbcType="BIGINT"/>
+        <result column="medal_type" property="medalType" jdbcType="BIGINT"/>
+        <result column="award_content_type" property="awardContentType" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="VARCHAR"/>
+        <result column="can_get" property="canGet" jdbcType="INTEGER"/>
+        <result column="get_flag" property="getFlag" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="get_time" property="getTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, student_id, medal_type, award_content_type, type, can_get, get_flag, get_time, create_time
+    </sql>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.AwardExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from award
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from award
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from award
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.AwardExample">
+        delete from award
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.Award" useGeneratedKeys="true" keyColumn="id"
+            keyProperty="id">
+        insert into award (id, student_id, medal_type,
+                           award_content_type,
+                           type,
+                           can_get,
+                           get_flag,
+                           create_time,
+                           get_time)
+        values (#{id,jdbcType=BIGINT}, #{studentId,jdbcType=BIGINT}, #{medalType,jdbcType=BIGINT},
+                #{awardContentType,jdbcType=INTEGER}, #{type,jdbcType=VARCHAR}, #{canGet,jdbcType=INTEGER},
+                #{getFlag,jdbcType=INTEGER},
+                #{createTime,jdbcType=TIMESTAMP},
+                #{getTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Award">
+        insert into award
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="studentId != null">
+                student_id,
+            </if>
+            <if test="medalType != null">
+                medal_type,
+            </if>
+            <if test="awardContentType != null">
+                award_content_type,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="canGet != null">
+                can_get,
+            </if>
+            <if test="getFlag != null">
+                get_flag,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="getTime != null">
+                get_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="studentId != null">
+                #{studentId,jdbcType=BIGINT},
+            </if>
+            <if test="medalType != null">
+                #{medalType,jdbcType=BIGINT},
+            </if>
+            <if test="awardContentType != null">
+                #{awardContentType,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="canGet != null">
+                #{canGet,jdbcType=INTEGER},
+            </if>
+            <if test="getFlag != null">
+                #{getFlag,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="getTime != null">
+                #{getTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertList" parameterType="map" useGeneratedKeys="true" keyProperty="id">
+        insert into award (id, student_id, medal_type,
+        award_content_type, type, can_get,
+        get_flag, create_time, get_time)
+        values
+        <foreach collection="awardList" item="award" separator="," close=")" open="(">
+            #{award.id,jdbcType=BIGINT}, #{award.studentId,jdbcType=BIGINT}, #{award.medalType,jdbcType=BIGINT},
+            #{award.awardContentType,jdbcType=INTEGER}, #{award.type,jdbcType=VARCHAR},
+            #{award.canGet,jdbcType=INTEGER},
+            #{award.getFlag,jdbcType=INTEGER}, #{award.getCreateTime,jdbcType=TIMESTAMP},
+            #{award.getTime,jdbcType=TIMESTAMP}
+        </foreach>
+
+    </insert>
+    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.AwardExample" resultType="java.lang.Integer">
+        select count(*) from award
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <select id="selectByAwardContentTypeAndType" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from award
+        where
+        student_id = #{studentId}
+        <if test="type == 1">
+            and to_days(create_time) = to_days(now())
+        </if>
+        and type = #{type} and
+        award_content_type = #{awardContentType}
+    </select>
+    <select id="selectByIdAndStuId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from award where id = #{awareId} and student_id = #{stuId}
+    </select>
+    <select id="selectMedalByStudentIdAndMedalType" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        award
+        WHERE
+        student_id = #{student.id}
+        AND medal_type IN (
+        <foreach collection="children" item="medal" separator=",">
+            #{medal.id}
+        </foreach>
+        )
+    </select>
+    <select id="selectDailyAwardByStudentId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from award where type = 1 and to_days(create_time) = to_days(now()) and student_id = #{studentId} and can_get =
+        1
+    </select>
+    <select id="selectMedalByStudentsIdAndMedalType" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        award
+        WHERE
+        <foreach collection="conditionList" item="condition" separator="or">
+            #{condition}
+        </foreach>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update award
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.studentId != null">
+                student_id = #{record.studentId,jdbcType=BIGINT},
+            </if>
+            <if test="record.medalType != null">
+                medal_type = #{record.medalType,jdbcType=BIGINT},
+            </if>
+            <if test="record.awardContentType != null">
+                award_content_type = #{record.awardContentType,jdbcType=INTEGER},
+            </if>
+            <if test="record.type != null">
+                type = #{record.type,jdbcType=VARCHAR},
+            </if>
+            <if test="record.canGet != null">
+                can_get = #{record.canGet,jdbcType=INTEGER},
+            </if>
+            <if test="record.getFlag != null">
+                get_flag = #{record.getFlag,jdbcType=INTEGER},
+            </if>
+            <if test="record.createTime != null">
+                create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.getTime != null">
+                get_time = #{record.getTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update award
+        set id = #{record.id,jdbcType=BIGINT},
+        student_id = #{record.studentId,jdbcType=BIGINT},
+        medal_type = #{record.medalType,jdbcType=BIGINT},
+        award_content_type = #{record.awardContentType,jdbcType=INTEGER},
+        type = #{record.type,jdbcType=VARCHAR},
+        can_get = #{record.canGet,jdbcType=INTEGER},
+        get_flag = #{record.getFlag,jdbcType=INTEGER},
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+        get_time = #{record.getTime,jdbcType=TIMESTAMP}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.Award">
+        update award
+        <set>
+            <if test="studentId != null">
+                student_id = #{studentId,jdbcType=BIGINT},
+            </if>
+            <if test="medalType != null">
+                medal_type = #{medalType,jdbcType=BIGINT},
+            </if>
+            <if test="awardContentType != null">
+                award_content_type = #{awardContentType,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="canGet != null">
+                can_get = #{canGet,jdbcType=INTEGER},
+            </if>
+            <if test="getFlag != null">
+                get_flag = #{getFlag,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="getTime != null">
+                get_time = #{getTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.Award">
+        update award
+        set student_id         = #{studentId,jdbcType=BIGINT},
+            medal_type         = #{medalType,jdbcType=BIGINT},
+            award_content_type = #{awardContentType,jdbcType=INTEGER},
+            type               = #{type,jdbcType=VARCHAR},
+            can_get            = #{canGet,jdbcType=INTEGER},
+            get_flag           = #{getFlag,jdbcType=INTEGER},
+            create_time        = #{createTime,jdbcType=TIMESTAMP},
+            get_time           = #{getTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="resetDayAward">
+        update award
+        set can_get = 2, get_flag = 2, get_time = null
+    </update>
+</mapper>

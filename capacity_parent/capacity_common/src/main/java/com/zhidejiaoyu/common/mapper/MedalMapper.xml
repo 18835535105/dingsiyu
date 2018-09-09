@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.MedalMapper">
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Medal">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="parent_name" property="parentName" jdbcType="VARCHAR"/>
+        <result column="next_parent" property="nextParent" jdbcType="BIGINT"/>
+        <result column="child_name" property="childName" jdbcType="VARCHAR"/>
+        <result column="next_child" property="nextChild" jdbcType="BIGINT"/>
+        <result column="explain" property="explain" jdbcType="VARCHAR"/>
+        <result column="marked_words" property="markedWords" jdbcType="VARCHAR"/>
+        <result column="child_img_url" property="childImgUrl" jdbcType="VARCHAR"/>
+        <result column="parent_img_url" property="parentImgUrl" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, parent_name, next_parent, child_name, next_child,`explain`, marked_words, child_img_url,
+        parent_img_url
+    </sql>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.MedalExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from medal
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from medal
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from medal
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.MedalExample">
+        delete from medal
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.Medal">
+        insert into medal (id, parent_name, next_parent,
+                           child_name, next_child, explain,
+                           marked_words, child_img_url, parent_img_url
+        )
+        values (#{id,jdbcType=BIGINT}, #{parentName,jdbcType=VARCHAR}, #{nextParent,jdbcType=BIGINT},
+                #{childName,jdbcType=VARCHAR}, #{nextChild,jdbcType=BIGINT}, #{explain,jdbcType=VARCHAR},
+                #{markedWords,jdbcType=VARCHAR}, #{childImgUrl,jdbcType=VARCHAR}, #{parentImgUrl,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Medal">
+        insert into medal
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="parentName != null">
+                parent_name,
+            </if>
+            <if test="nextParent != null">
+                next_parent,
+            </if>
+            <if test="childName != null">
+                child_name,
+            </if>
+            <if test="nextChild != null">
+                next_child,
+            </if>
+            <if test="explain != null">
+                explain,
+            </if>
+            <if test="markedWords != null">
+                marked_words,
+            </if>
+            <if test="childImgUrl != null">
+                child_img_url,
+            </if>
+            <if test="parentImgUrl != null">
+                parent_img_url,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="parentName != null">
+                #{parentName,jdbcType=VARCHAR},
+            </if>
+            <if test="nextParent != null">
+                #{nextParent,jdbcType=BIGINT},
+            </if>
+            <if test="childName != null">
+                #{childName,jdbcType=VARCHAR},
+            </if>
+            <if test="nextChild != null">
+                #{nextChild,jdbcType=BIGINT},
+            </if>
+            <if test="explain != null">
+                #{explain,jdbcType=VARCHAR},
+            </if>
+            <if test="markedWords != null">
+                #{markedWords,jdbcType=VARCHAR},
+            </if>
+            <if test="childImgUrl != null">
+                #{childImgUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="parentImgUrl != null">
+                #{parentImgUrl,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.MedalExample" resultType="java.lang.Integer">
+        select count(*) from medal
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update medal
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.parentName != null">
+                parent_name = #{record.parentName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.nextParent != null">
+                next_parent = #{record.nextParent,jdbcType=BIGINT},
+            </if>
+            <if test="record.childName != null">
+                child_name = #{record.childName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.nextChild != null">
+                next_child = #{record.nextChild,jdbcType=BIGINT},
+            </if>
+            <if test="record.explain != null">
+                explain = #{record.explain,jdbcType=VARCHAR},
+            </if>
+            <if test="record.markedWords != null">
+                marked_words = #{record.markedWords,jdbcType=VARCHAR},
+            </if>
+            <if test="record.childImgUrl != null">
+                child_img_url = #{record.childImgUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="record.parentImgUrl != null">
+                parent_img_url = #{record.parentImgUrl,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update medal
+        set id = #{record.id,jdbcType=BIGINT},
+        parent_name = #{record.parentName,jdbcType=VARCHAR},
+        next_parent = #{record.nextParent,jdbcType=BIGINT},
+        child_name = #{record.childName,jdbcType=VARCHAR},
+        next_child = #{record.nextChild,jdbcType=BIGINT},
+        explain = #{record.explain,jdbcType=VARCHAR},
+        marked_words = #{record.markedWords,jdbcType=VARCHAR},
+        child_img_url = #{record.childImgUrl,jdbcType=VARCHAR},
+        parent_img_url = #{record.parentImgUrl,jdbcType=VARCHAR}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.Medal">
+        update medal
+        <set>
+            <if test="parentName != null">
+                parent_name = #{parentName,jdbcType=VARCHAR},
+            </if>
+            <if test="nextParent != null">
+                next_parent = #{nextParent,jdbcType=BIGINT},
+            </if>
+            <if test="childName != null">
+                child_name = #{childName,jdbcType=VARCHAR},
+            </if>
+            <if test="nextChild != null">
+                next_child = #{nextChild,jdbcType=BIGINT},
+            </if>
+            <if test="explain != null">
+                explain = #{explain,jdbcType=VARCHAR},
+            </if>
+            <if test="markedWords != null">
+                marked_words = #{markedWords,jdbcType=VARCHAR},
+            </if>
+            <if test="childImgUrl != null">
+                child_img_url = #{childImgUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="parentImgUrl != null">
+                parent_img_url = #{parentImgUrl,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.Medal">
+        update medal
+        set parent_name    = #{parentName,jdbcType=VARCHAR},
+            next_parent    = #{nextParent,jdbcType=BIGINT},
+            child_name     = #{childName,jdbcType=VARCHAR},
+            next_child     = #{nextChild,jdbcType=BIGINT},
+            explain        = #{explain,jdbcType=VARCHAR},
+            marked_words   = #{markedWords,jdbcType=VARCHAR},
+            child_img_url  = #{childImgUrl,jdbcType=VARCHAR},
+            parent_img_url = #{parentImgUrl,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="countChildByIds" resultType="java.util.Map" parameterType="java.util.List">
+        SELECT
+        parent_name parentName,
+        COUNT(child_name) child
+        FROM
+        medal
+        WHERE
+        parent_name IN (
+        SELECT
+        parent_name
+        FROM
+        medal
+        WHERE
+        id IN (
+        <foreach collection="ids" separator="," item="id">
+            #{id}
+        </foreach>
+        )
+        )
+        GROUP BY
+        parent_name
+        ORDER BY id ASC
+    </select>
+    <select id="countGetCountByStudentId" resultType="java.util.Map" parameterType="map">
+        SELECT
+            m.parent_name       parentName,
+            count(m.child_name) getCount
+        FROM
+            award a,
+            medal m
+        WHERE
+            a.medal_type = m.id
+            AND student_id = #{studentId}
+        GROUP BY
+            m.parent_name;
+    </select>
+    <select id="selectChildrenIdByParentId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from medal where parent_name = (select parent_name from medal where id = #{parentId}) order by id asc
+    </select>
+</mapper>

@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.MessageBoardMapper" >
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.MessageBoard">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="student_id" property="studentId" jdbcType="BIGINT"/>
+        <result column="student_name" property="studentName" jdbcType="VARCHAR"/>
+        <result column="student_account" property="studentAccount" jdbcType="VARCHAR"/>
+        <result column="school_name" property="schoolName" jdbcType="VARCHAR"/>
+        <result column="reply_user_id" property="replyUserId" jdbcType="BIGINT"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="time" property="time" jdbcType="TIMESTAMP"/>
+        <result column="read_flag" property="readFlag" jdbcType="INTEGER"/>
+        <result column="accept_flag" property="acceptFlag" jdbcType="INTEGER"/>
+        <result column="award_gold" property="awardGold" jdbcType="INTEGER"/>
+        <result column="hint_flag" property="hintFlag" jdbcType="INTEGER"/>
+        <result column="role" property="role" jdbcType="INTEGER"/>
+        <result column="stop_speak_end_time" property="stopSpeakEndTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, student_id, student_name, student_account, school_name, reply_user_id, content,
+        time, read_flag, accept_flag, award_gold, hint_flag, role, stop_speak_end_time
+    </sql>
+    <sql id="multi_table_list">
+        m.id, m.student_id student_id, m.student_name student_name, m.student_account student_account, m.school_name school_name,
+        m.reply_user_id reply_user_id, m.content content,
+        m.time time, m.read_flag read_flag, m.accept_flag accept_flag, m.award_gold award_gold, m.hint_flag hint_flag,
+        m.role role, m.stop_speak_end_time stop_speak_end_time
+    </sql>
+
+    <select id="selectByExample" resultMap="BaseResultMap"
+            parameterType="com.zhidejiaoyu.common.pojo.MessageBoardExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from message_board
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from message_board
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from message_board
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.MessageBoardExample">
+        delete from message_board
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.MessageBoard">
+        insert into message_board (id,
+                                   student_id,
+                                   student_name,
+                                   student_account,
+                                   school_name,
+                                   reply_user_id,
+                                   content,
+                                   time,
+                                   read_flag,
+                                   accept_flag,
+                                   award_gold,
+                                   hint_flag,
+                                   role,
+                                   stop_speak_end_time)
+        values (#{id,jdbcType=BIGINT},
+                #{studentId,jdbcType=BIGINT},
+                #{studentName,jdbcType=VARCHAR},
+                #{studentAccount,jdbcType=VARCHAR},
+                #{schoolName,jdbcType=VARCHAR},
+                #{replyUserId,jdbcType=BIGINT},
+                #{content,jdbcType=VARCHAR},
+                #{time,jdbcType=TIMESTAMP},
+                #{readFlag,jdbcType=INTEGER},
+                #{acceptFlag,jdbcType=INTEGER},
+                #{awardGold,jdbcType=INTEGER},
+                #{hintFlag,jdbcType=INTEGER},
+                #{role,jdbcType=INTEGER},
+                #{stopSpeakEndTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.MessageBoard">
+        insert into message_board
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="studentId != null">
+                student_id,
+            </if>
+            <if test="studentName != null">
+                student_name,
+            </if>
+            <if test="studentAccount != null">
+                student_account,
+            </if>
+            <if test="schoolName != null">
+                school_name,
+            </if>
+            <if test="replyUserId != null">
+                reply_user_id,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="time != null">
+                time,
+            </if>
+            <if test="readFlag != null">
+                read_flag,
+            </if>
+            <if test="acceptFlag != null">
+                accept_flag,
+            </if>
+            <if test="awardGold != null">
+                award_gold,
+            </if>
+            <if test="hintFlag != null">
+                hint_flag,
+            </if>
+            <if test="role != null">
+                role,
+            </if>
+            <if test="stopSpeakEndTime != null">
+                stop_speak_end_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="studentId != null">
+                #{studentId,jdbcType=BIGINT},
+            </if>
+            <if test="studentName != null">
+                #{studentName,jdbcType=VARCHAR},
+            </if>
+            <if test="studentAccount != null">
+                #{studentAccount,jdbcType=VARCHAR},
+            </if>
+            <if test="schoolName != null">
+                #{schoolName,jdbcType=VARCHAR},
+            </if>
+            <if test="replyUserId != null">
+                #{replyUserId,jdbcType=BIGINT},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="time != null">
+                #{time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="readFlag != null">
+                #{readFlag,jdbcType=INTEGER},
+            </if>
+            <if test="acceptFlag != null">
+                #{acceptFlag,jdbcType=INTEGER},
+            </if>
+            <if test="awardGold != null">
+                #{awardGold,jdbcType=INTEGER},
+            </if>
+            <if test="hintFlag != null">
+                #{hintFlag,jdbcType=INTEGER},
+            </if>
+            <if test="role != null">
+                #{role,jdbcType=INTEGER},
+            </if>
+            <if test="stopSpeakEndTime != null">
+                #{stopSpeakEndTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.MessageBoardExample"
+            resultType="java.lang.Integer">
+        select count(*) from message_board
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update message_board
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.studentId != null">
+                student_id = #{record.studentId,jdbcType=BIGINT},
+            </if>
+            <if test="record.studentName != null">
+                student_name = #{record.studentName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.studentAccount != null">
+                student_account = #{record.studentAccount,jdbcType=VARCHAR},
+            </if>
+            <if test="record.schoolName != null">
+                school_name = #{record.schoolName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.replyUserId != null">
+                reply_user_id = #{record.replyUserId,jdbcType=BIGINT},
+            </if>
+            <if test="record.content != null">
+                content = #{record.content,jdbcType=VARCHAR},
+            </if>
+            <if test="record.time != null">
+                time = #{record.time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.readFlag != null">
+                read_flag = #{record.readFlag,jdbcType=INTEGER},
+            </if>
+            <if test="record.acceptFlag != null">
+                accept_flag = #{record.acceptFlag,jdbcType=INTEGER},
+            </if>
+            <if test="record.awardGold != null">
+                award_gold = #{record.awardGold,jdbcType=INTEGER},
+            </if>
+            <if test="record.hintFlag != null">
+                hint_flag = #{record.hintFlag,jdbcType=INTEGER},
+            </if>
+            <if test="record.role != null">
+                role = #{record.role,jdbcType=INTEGER},
+            </if>
+            <if test="record.stopSpeakEndTime != null">
+                stop_speak_end_time = #{record.stopSpeakEndTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update message_board
+        set id = #{record.id,jdbcType=BIGINT},
+        student_id = #{record.studentId,jdbcType=BIGINT},
+        student_name = #{record.studentName,jdbcType=VARCHAR},
+        student_account = #{record.studentAccount,jdbcType=VARCHAR},
+        school_name = #{record.schoolName,jdbcType=VARCHAR},
+        reply_user_id = #{record.replyUserId,jdbcType=BIGINT},
+        content = #{record.content,jdbcType=VARCHAR},
+        time = #{record.time,jdbcType=TIMESTAMP},
+        read_flag = #{record.readFlag,jdbcType=INTEGER},
+        accept_flag = #{record.acceptFlag,jdbcType=INTEGER},
+        award_gold = #{record.awardGold,jdbcType=INTEGER},
+        hint_flag = #{record.hintFlag,jdbcType=INTEGER},
+        role = #{record.role,jdbcType=INTEGER},
+        stop_speak_end_time = #{record.stopSpeakEndTime,jdbcType=TIMESTAMP}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.MessageBoard">
+        update message_board
+        <set>
+            <if test="studentId != null">
+                student_id = #{studentId,jdbcType=BIGINT},
+            </if>
+            <if test="studentName != null">
+                student_name = #{studentName,jdbcType=VARCHAR},
+            </if>
+            <if test="studentAccount != null">
+                student_account = #{studentAccount,jdbcType=VARCHAR},
+            </if>
+            <if test="schoolName != null">
+                school_name = #{schoolName,jdbcType=VARCHAR},
+            </if>
+            <if test="replyUserId != null">
+                reply_user_id = #{replyUserId,jdbcType=BIGINT},
+            </if>
+            <if test="content != null">
+                content = #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="time != null">
+                time = #{time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="readFlag != null">
+                read_flag = #{readFlag,jdbcType=INTEGER},
+            </if>
+            <if test="acceptFlag != null">
+                accept_flag = #{acceptFlag,jdbcType=INTEGER},
+            </if>
+            <if test="awardGold != null">
+                award_gold = #{awardGold,jdbcType=INTEGER},
+            </if>
+            <if test="hintFlag != null">
+                hint_flag = #{hintFlag,jdbcType=INTEGER},
+            </if>
+            <if test="role != null">
+                role = #{role,jdbcType=INTEGER},
+            </if>
+            <if test="stopSpeakEndTime != null">
+                stop_speak_end_time = #{stopSpeakEndTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.MessageBoard">
+        update message_board
+        set student_id          = #{studentId,jdbcType=BIGINT},
+            student_name        = #{studentName,jdbcType=VARCHAR},
+            student_account     = #{studentAccount,jdbcType=VARCHAR},
+            school_name         = #{schoolName,jdbcType=VARCHAR},
+            reply_user_id       = #{replyUserId,jdbcType=BIGINT},
+            content             = #{content,jdbcType=VARCHAR},
+            time                = #{time,jdbcType=TIMESTAMP},
+            read_flag           = #{readFlag,jdbcType=INTEGER},
+            accept_flag         = #{acceptFlag,jdbcType=INTEGER},
+            award_gold          = #{awardGold,jdbcType=INTEGER},
+            hint_flag           = #{hintFlag,jdbcType=INTEGER},
+            role                = #{role,jdbcType=INTEGER},
+            stop_speak_end_time = #{stopSpeakEndTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateStopSpeakTime" parameterType="map">
+        UPDATE message_board
+        SET stop_speak_end_time = #{endDate}
+        WHERE student_id = #{studentId}
+    </update>
+    <update id="updateReadFlag" parameterType="map">
+        update message_board
+        set read_flag = #{flag}
+        where student_id = #{stuId}
+    </update>
+    <update id="updateHintFlag" parameterType="map">
+        update message_board set hint_flag = #{flag} where student_id = #{studentId} and
+        hint_flag &lt;&gt; #{flag}
+    </update>
+
+    <select id="selectMessageList" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="multi_table_list"/>
+        FROM
+        message_board m,
+        (
+        SELECT
+        MAX( id ) id,
+        MAX( time )
+        FROM
+        message_board
+        WHERE
+        role = 0
+        GROUP BY
+        student_id
+        ) s
+        WHERE
+        s.id = m.id
+        <if test="account != null and account != ''">
+            and student_account like concat(concat('%',#{account}),'%')
+        </if>
+        <if test="status != 0 and status != null">
+            and read_flag like concat(concat('%',#{status}),'%')
+        </if>
+        <if test="studentName != null and studentName != ''">
+            and student_name like concat(concat('%',#{studentName}),'%')
+        </if>
+        <if test="feedBackTimeBegin != null and feedBackTimeBegin != ''">
+            and time &gt;= #{feedBackTimeBegin}
+        </if>
+        <if test="feedBackTimeEnd != null and feedBackTimeEnd != ''">
+            and time &lt;= #{feedBackTimeEnd}
+        </if>
+        ORDER BY m.id desc
+    </select>
+    <select id="selectFeedBackCount" resultType="java.util.Map" parameterType="map">
+        SELECT
+        m.student_id studentId,
+        count( student_id ) count
+        FROM
+        message_board m
+        WHERE
+        role = 0
+        AND student_id in (
+        <foreach collection="studentIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+        GROUP BY
+        student_id
+    </select>
+    <select id="selectFeedBackStatus" resultType="java.util.Map" parameterType="map">
+        SELECT m.student_id studentId, m.read_flag readFlag
+        FROM message_board m,
+        (SELECT MAX(id) id, MAX(time) FROM message_board GROUP BY student_id) s
+        WHERE s.id = m.id and m.student_id in (
+        <foreach collection="studentIds" separator="," item="id">
+            #{id}
+        </foreach>
+        )
+    </select>
+    <select id="selectStopSpeakTime" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from message_board where student_id = #{stuId} and stop_speak_end_time &gt;= now() order by id desc
+    </select>
+</mapper>

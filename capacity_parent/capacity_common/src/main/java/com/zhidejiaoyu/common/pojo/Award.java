@@ -1,0 +1,46 @@
+package com.zhidejiaoyu.common.pojo;
+
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
+
+@Data
+public class Award implements Serializable {
+    private Long id;
+
+    private Long studentId;
+
+    /**
+     * 勋章信息id
+     */
+    private Long medalType;
+
+    /**
+     * 奖励内容类型
+     */
+    private Integer awardContentType;
+
+    /**
+     * 是否可领取：1：可领取；2：不可领取
+     */
+    private Integer canGet;
+
+    /**
+     * 奖励类型 1:日奖励；2：任务奖励；3：勋章
+     */
+    private Integer type;
+
+    /**
+     * 领取状态：1，已领取；2，未领取
+     */
+    private Integer getFlag;
+
+    /**
+     * 奖励生成时间
+     */
+    private Date createTime;
+
+    private Date getTime;
+
+}

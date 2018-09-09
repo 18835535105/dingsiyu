@@ -1,0 +1,84 @@
+package com.zhidejiaoyu.common.pojo;
+
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * 测试记录表
+ */
+@Data
+public class TestRecord implements Serializable {
+    private Long id;
+
+    private Long studentId;
+
+    private Long courseId;
+
+    private Long unitId;
+
+    /**
+     * 测试类型（学前游戏测试，等级测试，单元闯关测试，效果检测，阶段测试，复习测试，学后测试, 测试中心(已学测试,生词测试,熟词测试,五维测试)
+     */
+    private String genre;
+
+    /**
+     * 测试开始时间
+     */
+    private Date testStartTime;
+
+    /**
+     * 测试结束时间
+     */
+    private Date testEndTime;
+
+    /**
+     * 得分
+     */
+    private Integer point;
+    /**
+     * 历史最高分
+     */
+    private Integer historyBestPoint;
+
+    /**
+     * 历史最低分
+     */
+    private Integer historyBadPoint;
+
+    /**
+     * 题量
+     */
+    private Integer quantity;
+
+    /**
+     * 说明
+     */
+    private String explain;
+
+    /**
+     * 错题数
+     */
+    private Integer errorCount;
+
+    /**
+     * 对题数
+     */
+    private Integer rightCount;
+
+    /**
+     * 学习模块 （单词图鉴，慧记忆，慧听写，慧默写，例句听力，例句翻译，例句默写）
+     */
+    private String studyModel;
+
+    /**
+     * 测试奖励金币数
+     */
+    private Integer awardGold;
+
+    /**
+     * 测试成绩大于历史最高分的次数，用于计算当次测试应该奖励的金币个数
+     */
+    private Integer betterCount;
+}

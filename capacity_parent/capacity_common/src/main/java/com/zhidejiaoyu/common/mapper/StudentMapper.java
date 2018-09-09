@@ -1,0 +1,255 @@
+package com.zhidejiaoyu.common.mapper;
+
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.StudentExample;
+import org.apache.ibatis.annotations.MapKey;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+public interface StudentMapper {
+    int countByExample(StudentExample example);
+
+    int deleteByExample(StudentExample example);
+
+    int deleteByPrimaryKey(Long id);
+
+    int insert(Student record);
+
+    int insertSelective(Student record);
+
+    List<Student> selectByExample(StudentExample example);
+
+    Student selectByPrimaryKey(Long id);
+
+    int updateByExampleSelective(@Param("record") Student record, @Param("example") StudentExample example);
+
+    int updateByExample(@Param("record") Student record, @Param("example") StudentExample example);
+
+    int updateByPrimaryKeySelective(Student record);
+
+    int updateByPrimaryKey(Student record);
+
+    /**
+     * 查询最大id对应的记录
+     *
+     * @return
+     */
+    @Select("select * from student where id = (select max(id) from student)")
+    Student selectStudentByMaxId();
+
+    /**
+     * 批量增加学生信息
+     *
+     * @param students
+     */
+    int insertStudentList(List<Student> students);
+
+    /**
+     * 去重获取所有学校名称
+     *
+     * @param isNewStudentSchool 是否是新生成账号所属的学校
+     *                           <code>true</code> 只查询新生成的账号中的学校名称
+     *                           <code>false</code> 查询所有学校名称
+     * @return
+     */
+    List<String> getSchools(@Param("isNewStudentSchool") Boolean isNewStudentSchool);
+
+    Student LoginJudge(Student st);
+
+    @Select("select role from student where id = #{id}")
+    Integer judgeUser(@Param("id") Long id);
+
+    /**
+     * 根据学生id数据批量修改有效期和到期时间
+     *
+     * @param idArr       学生id数组
+     * @param rank        有效期
+     * @param accountTime 到期时间
+     */
+    int updateRankAndAccountTimeByIds(@Param("idArr") Long[] idArr, @Param("rank") Integer rank, @Param("accountTime") Date accountTime);
+
+
+    /**
+     * 查询所有学生的年级跟id,过滤掉已过期、未完善必填信息的学生
+     *
+     * @return
+     */
+    List<Student> selectIdAndGradeAndVersion();
+
+    /**
+     * 批量修改学生信息
+     *
+     * @param students
+     * @return
+     */
+    int updateByPrimarykeys(@Param("students") List<Student> students);
+
+    @Update("update student set password = #{password} where id = #{id} and account = #{account}")
+    Integer updatePassword(@Param("account") String account, @Param("password") String password, @Param("id") Long id);
+
+    /**
+     * 查询有效期等于3天的学生
+     *
+     * @return
+     */
+    List<Student> selectAccountTimeLessThreeDays();
+
+    Student indexData(Long student_id);
+
+    /**
+     * 单词unit
+     *
+     * @param student_id
+     * @return
+     */
+    /**
+     * 获取学生排名
+     * <p>如果当前班级或者学校或者全国只有一名学生，返回字符串"null"</p>
+     *
+     * @param student
+     * @param flag    1:班级排名；2：学校排名；3：全国排名
+     * @return map key:学生id value:map key:学生id value:rank double类型 排名
+     */
+    @MapKey("id")
+    Map<Long, Map<String, Object>> selectLevelByStuId(@Param("student") Student student, @Param("flag") int flag);
+
+    @Select("SELECT unit_id from student where id = #{student_id}")
+    Integer selectUnit_id(@Param("student_id") Long student_id);
+
+    /**
+     * 例句unit
+     *
+     * @param student_id
+     * @return
+     */
+    @Select("SELECT sentence_unit_id from student where id = #{student_id}")
+    Integer selectSentenceUnit_id(Long student_id);
+
+    /**
+     * 查询当前这些学生的排名
+     *
+     * @param students 学生id集合
+     * @return
+     */
+    @MapKey("id")
+    Map<Long, Map<Long, String>> selectRankByStudentIds(@Param("students") List<Student> students);
+
+    /**
+     * 学生的信息, 证书, 膜拜
+     *
+     * @param model
+     * @param squad
+     * @param grade
+     * @param school_name
+     * @param area
+     * @return
+     */
+    //List<StudentSeniority> selectSeniority();
+    List<Map<String, Object>> selectSeniority(@Param("model") String model, @Param("area") String area, @Param("school_name") String school_name, @Param("grade") String grade, @Param("squad") String squad);
+
+    @MapKey("id")
+    Map<Long, Map<Long, Object>> selectxz();
+
+    @Select("select (offline_gold+system_gold)AS jb from student where id = #{id} ")
+    Double myGold(@Param("id") Long id);
+
+    @Select("select count(*) AS mb from worship where student_id_by_worship = #{id} ")
+    int myMb(@Param("id") Long id);
+
+    @Update("update student set unit_name = #{amendName} where unit_id = #{unitId}")
+    Integer updateByUnitNameAndWord(@Param("unitId") Integer unitId, @Param("amendName") String amendName);
+
+    @Update("update student set sentence_unit_name = #{amendName} where sentence_unit_id = #{unitId}")
+    void updateByUnitNameAndSentence(Integer unitId, String amendName);
+
+    Map<String, Object> getCourseIdAndUnitId(@Param("studentId") long studentId);
+
+    @Select("select system_gold from student where id = #{studentId}")
+    Integer getSystem_gold(Long studentId);
+
+    @Update("update student set system_gold = #{i} where id = #{studentId}")
+    int updateBySystem_gold(@Param("i") int i, @Param("studentId") Long studentId);
+
+    @Update("update student set unit_id = #{unitId} where id = #{studentId}")
+    void updateUnitId(@Param("studentId") long studentId,@Param("unitId") int unitId);
+
+    @Update("update student set sentence_unit_id = #{unitId} where id = #{studentId}")
+    void updatesentenceUnitId(@Param("studentId") long studentId,@Param("unitId") int unitId);
+
+    /**
+     * 批量删除学生信息
+     *
+     * @param ids   学生id集合
+     */
+    void deleteByPrimaryKeys(@Param("ids") Long[] ids);
+
+    /**
+     * 查询已有学习记录的学生账号和姓名
+     *
+     * @param ids
+     * @return
+     */
+    List<Map<String, String>> selectHasStudyRecord(@Param("ids") Long[] ids);
+
+    /**
+     * 批量更新学生删除状态为开启状态
+     *
+     * @param stuIds    学生id集合
+     */
+    void updateDelStatus(@Param("stuIds") List<Long> stuIds);
+
+    /**
+     * 当前学段学习当前版本的所有学生个数
+     *
+     * @param phase
+     * @param student
+     * @return
+     */
+    int countByPhaseAndVersion(@Param("phase") String phase, @Param("student") Student student);
+
+    @Select("select count(id) from student where area = #{area} and school_name = #{school_name} and version = #{version}")
+    Integer schoolHeadcount(@Param("area") String area, @Param("school_name")String school_name, @Param("version") String version);
+
+    Integer schoolHeadcountNationwide(@Param("study_paragraph") String study_paragraph, @Param("version") String version);
+
+    /**
+     * 查询当前学校金币数最高的学生信息
+     *
+     * @param schoolName
+     * @return
+     */
+    Student selectMaxGoldForSchool(@Param("schoolName") String schoolName);
+
+    /**
+     * 获取本校所有总金币数为 maxGold 的学生信息
+     *
+     * @param schoolName
+     * @param maxGold
+     * @return
+     */
+    List<Student> selectMaxGoldForGold(@Param("schoolName") String schoolName, @Param("maxGold") double maxGold);
+
+    /**
+     * 将学生第一次获取全校第一名标识置为null
+     *
+     * @param notGetModalStudents
+     * @return
+     */
+    int updateSchoolGoldFirstTimeToNull(@Param("students") List<Student> notGetModalStudents);
+
+    @Select("select DATE_FORMAT(register_date,'%Y') from student where id = #{studentId}")
+    int getYear(@Param("studentId") long studentId);
+
+    Map getStudentAccountTime(@Param("studentId") long studentId);
+
+    @Select("select account_time from student where id = #{studentId}")
+    String getStudentAccountTimeByStudentId(long studentId);
+
+    @Update("update student set account_time = #{format} where id = #{studentId}")
+    int updateAccountTimeByStudentId(@Param("studentId") long studentId, @Param("format") String format);
+}

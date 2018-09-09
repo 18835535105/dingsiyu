@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.UnitSentenceMapper" >
+  <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.UnitSentence" >
+    <result column="unit_id" property="unitId" jdbcType="BIGINT" />
+    <result column="sentence_id" property="sentenceId" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    unit_id, sentence_id
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.UnitSentenceExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from unit_sentence
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.UnitSentenceExample" >
+    delete from unit_sentence
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.UnitSentence" >
+    insert into unit_sentence (unit_id, sentence_id)
+    values (#{unitId,jdbcType=BIGINT}, #{sentenceId,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.UnitSentence" >
+    insert into unit_sentence
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="unitId != null" >
+        unit_id,
+      </if>
+      <if test="sentenceId != null" >
+        sentence_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="unitId != null" >
+        #{unitId,jdbcType=BIGINT},
+      </if>
+      <if test="sentenceId != null" >
+        #{sentenceId,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.UnitSentenceExample" resultType="java.lang.Integer" >
+    select count(*) from unit_sentence
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+    <select id="countSentenceByUnitIds" resultType="java.lang.Integer" parameterType="map">
+        select count(distinct uv.sentence_id) from unit_sentence uv where uv.unit_id in (
+        <foreach collection="unitIds" item="unitId" separator=",">
+            #{unitId}
+        </foreach>
+        )
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+    update unit_sentence
+    <set >
+      <if test="record.unitId != null" >
+        unit_id = #{record.unitId,jdbcType=BIGINT},
+      </if>
+      <if test="record.sentenceId != null" >
+        sentence_id = #{record.sentenceId,jdbcType=BIGINT},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update unit_sentence
+    set unit_id = #{record.unitId,jdbcType=BIGINT},
+      sentence_id = #{record.sentenceId,jdbcType=BIGINT}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+</mapper>
