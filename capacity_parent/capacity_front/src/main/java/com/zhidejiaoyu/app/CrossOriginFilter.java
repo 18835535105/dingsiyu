@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 过滤器，用于解决跨域问题
+ * 过滤器，用于解决跨域问题1
  *
  * @author wuchenxi
  * @date 2018/5/28 14:18
