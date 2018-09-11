@@ -39,6 +39,8 @@
         <!--springboot核心-->
         <spring-boot-starter.version>2.0.0.RELEASE</spring-boot-starter.version>
 
+        <spring-session-data-redis.version>2.0.0.BUILD-SNAPSHOT</spring-session-data-redis.version>
+
         <!--mysql-->
         <mysql-connector-java.version>5.1.46</mysql-connector-java.version>
         <mybatis.version>1.1.1</mybatis.version>
@@ -85,6 +87,24 @@
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring-boot-starter.version}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-redis</artifactId>
+                <version>${spring-boot-starter.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.session</groupId>
+                <artifactId>spring-session-data-redis</artifactId>
+                <version>${spring-session-data-redis.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.session</groupId>
+                <artifactId>spring-session</artifactId>
+                <version>${spring-session.version}</version>
             </dependency>
 
             <!-- jdbc -->
@@ -248,12 +268,6 @@
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-core</artifactId>
                 <version>${shiro-core.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.session</groupId>
-                <artifactId>spring-session</artifactId>
-                <version>${spring-session.version}</version>
             </dependency>
 
         </dependencies>
