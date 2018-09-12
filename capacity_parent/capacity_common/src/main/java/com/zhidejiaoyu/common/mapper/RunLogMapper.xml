@@ -128,14 +128,6 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.RunLog" >
-        insert into run_log (id, operate_user_id, course_id,
-                             unit_id, type, create_time,
-                             log_content)
-        values (#{id,jdbcType=BIGINT}, #{operateUserId,jdbcType=BIGINT}, #{courseId,jdbcType=BIGINT},
-                #{unitId,jdbcType=BIGINT}, #{type,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
-                #{logContent,jdbcType=LONGVARCHAR})
-    </insert>
     <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.RunLog" >
         insert into run_log
         <trim prefix="(" suffix=")" suffixOverrides="," >
@@ -263,6 +255,7 @@
             </where>
           GROUP BY studentId ORDER BY jb desc
     </select>
+
     <select id="getAllQueryType" resultType="java.lang.Integer" parameterType="map">
         select z.studentId from (select operate_user_id AS studentId, SUM(substring_index(t.s,'#',1)) AS jb from (SELECT operate_user_id, substring_index(log_content, '#', -2) s, create_time from run_log where type = 4 and log_content like '%#%' AND create_time >= #{date}) t GROUP BY studentId ORDER BY jb desc) z
          JOIN student s ON z.studentId = s.id
@@ -281,6 +274,7 @@
             </if>
         </where>
     </select>
+
     <select id="getMapKeyStudentrunLog" resultType="java.util.Map">
         select operate_user_id as id, COUNT(*) as count  from run_log where type = 7 GROUP BY operate_user_id
     </select>

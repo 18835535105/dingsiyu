@@ -1,19 +1,18 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.OpenUnitLog;
 import com.zhidejiaoyu.common.pojo.OpenUnitLogExample;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface OpenUnitLogMapper {
+public interface OpenUnitLogMapper extends BaseMapper<OpenUnitLog> {
     int countByExample(OpenUnitLogExample example);
 
     int deleteByExample(OpenUnitLogExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(OpenUnitLog record);
 
     int insertSelective(OpenUnitLog record);
 

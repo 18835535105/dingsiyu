@@ -1,8 +1,19 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
 import java.util.Date;
 
-public class PayLog {
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class PayLog extends Model<PayLog> {
+
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     private Long studentId;
@@ -15,51 +26,8 @@ public class PayLog {
 
     private Date foundDate;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getStudentId() {
-        return studentId;
-    }
-
-    public void setStudentId(Long studentId) {
-        this.studentId = studentId;
-    }
-
-    public Date getRecharge() {
-        return recharge;
-    }
-
-    public void setRecharge(Date recharge) {
-        this.recharge = recharge;
-    }
-
-    public String getCardNo() {
-        return cardNo;
-    }
-
-    public void setCardNo(String cardNo) {
-        this.cardNo = cardNo == null ? null : cardNo.trim();
-    }
-
-    public Integer getCardDate() {
-        return cardDate;
-    }
-
-    public void setCardDate(Integer cardDate) {
-        this.cardDate = cardDate;
-    }
-
-    public Date getFoundDate() {
-        return foundDate;
-    }
-
-    public void setFoundDate(Date foundDate) {
-        this.foundDate = foundDate;
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

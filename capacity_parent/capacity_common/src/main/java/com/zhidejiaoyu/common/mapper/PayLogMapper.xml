@@ -100,14 +100,6 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.PayLog" >
-    insert into pay_log (id, student_id, recharge, 
-      card_no, card_date, found_date
-      )
-    values (#{id,jdbcType=BIGINT}, #{studentId,jdbcType=BIGINT}, #{recharge,jdbcType=DATE}, 
-      #{cardNo,jdbcType=VARCHAR}, #{cardDate,jdbcType=INTEGER}, #{foundDate,jdbcType=TIMESTAMP}
-      )
-  </insert>
   <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.PayLog" >
     insert into pay_log
     <trim prefix="(" suffix=")" suffixOverrides="," >

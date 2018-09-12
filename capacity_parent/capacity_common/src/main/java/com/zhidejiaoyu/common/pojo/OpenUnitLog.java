@@ -1,8 +1,19 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
 import java.util.Date;
 
-public class OpenUnitLog {
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class OpenUnitLog extends Model<OpenUnitLog> {
+
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     private Long studentId;
@@ -13,43 +24,8 @@ public class OpenUnitLog {
 
     private Date createTime;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getStudentId() {
-        return studentId;
-    }
-
-    public void setStudentId(Long studentId) {
-        this.studentId = studentId;
-    }
-
-    public Long getCurrentUnitId() {
-        return currentUnitId;
-    }
-
-    public void setCurrentUnitId(Long currentUnitId) {
-        this.currentUnitId = currentUnitId;
-    }
-
-    public Long getNextUnitId() {
-        return nextUnitId;
-    }
-
-    public void setNextUnitId(Long nextUnitId) {
-        this.nextUnitId = nextUnitId;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

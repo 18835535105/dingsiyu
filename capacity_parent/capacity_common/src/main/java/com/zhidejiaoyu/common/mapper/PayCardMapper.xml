@@ -106,16 +106,6 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.PayCard" >
-    insert into pay_card (id, order_no, card_no, 
-      validity_time, create_time, use_time, 
-      use_user, create_user, goods_user, 
-      card_num, can_use)
-    values (#{id,jdbcType=BIGINT}, #{orderNo,jdbcType=VARCHAR}, #{cardNo,jdbcType=VARCHAR}, 
-      #{validityTime,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{useTime,jdbcType=TIMESTAMP}, 
-      #{useUser,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{goodsUser,jdbcType=VARCHAR}, 
-      #{cardNum,jdbcType=INTEGER}, #{canUse,jdbcType=INTEGER})
-  </insert>
   <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.PayCard" >
     insert into pay_card
     <trim prefix="(" suffix=")" suffixOverrides="," >

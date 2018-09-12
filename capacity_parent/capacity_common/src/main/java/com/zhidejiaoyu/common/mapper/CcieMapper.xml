@@ -105,16 +105,6 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.Ccie" >
-    insert into ccie (id, student_id, unit_id,
-                      student_name, get_time, test_type,
-                      study_model, ccie_no, encourage_word,
-                      read_flag)
-    values (#{id,jdbcType=BIGINT}, #{studentId,jdbcType=BIGINT}, #{unitId,jdbcType=BIGINT},
-            #{studentName,jdbcType=VARCHAR}, #{getTime,jdbcType=TIMESTAMP}, #{testType,jdbcType=INTEGER},
-            #{studyModel,jdbcType=INTEGER}, #{ccieNo,jdbcType=VARCHAR}, #{encourageWord,jdbcType=VARCHAR},
-            #{readFlag,jdbcType=INTEGER})
-  </insert>
   <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Ccie" >
     insert into ccie
     <trim prefix="(" suffix=")" suffixOverrides="," >
@@ -303,6 +293,7 @@
 		  AND a.study_model = #{model}
         </if>
   </select>
+
     <select id="selectLastCcie" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="Base_Column_List"/>

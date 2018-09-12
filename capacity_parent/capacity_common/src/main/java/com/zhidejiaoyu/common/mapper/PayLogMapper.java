@@ -1,20 +1,20 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.PayLog;
 import com.zhidejiaoyu.common.pojo.PayLogExample;
 import org.apache.ibatis.annotations.Param;
 
+import javax.validation.Payload;
 import java.util.List;
 import java.util.Map;
 
-public interface PayLogMapper {
+public interface PayLogMapper extends BaseMapper<PayLog> {
     int countByExample(PayLogExample example);
 
     int deleteByExample(PayLogExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(PayLog record);
 
     int insertSelective(PayLog record);
 

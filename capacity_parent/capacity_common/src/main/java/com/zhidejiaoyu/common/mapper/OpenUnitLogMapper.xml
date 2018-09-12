@@ -155,12 +155,14 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </select>
+
     <select id="countTodayOpenCount" resultType="java.lang.Integer" parameterType="map">
         select count(distinct current_unit_id)
         from open_unit_log
         where to_days(create_time) = to_days(now())
           and student_id = #{studentId}
     </select>
+
     <update id="updateByExampleSelective" parameterType="map">
         update open_unit_log
         <set>

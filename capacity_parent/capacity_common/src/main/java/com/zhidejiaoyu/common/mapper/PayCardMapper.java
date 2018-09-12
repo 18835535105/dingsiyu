@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.PayCard;
 import com.zhidejiaoyu.common.pojo.PayCardExample;
 
@@ -9,14 +10,12 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-public interface PayCardMapper {
+public interface PayCardMapper extends BaseMapper<PayCard> {
     int countByExample(PayCardExample example);
 
     int deleteByExample(PayCardExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(PayCard record);
 
     int insertSelective(PayCard record);
 

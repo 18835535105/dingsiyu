@@ -237,6 +237,7 @@
         from award where type = 1 and to_days(create_time) = to_days(now()) and student_id = #{studentId} and can_get =
         1
     </select>
+
     <select id="selectMedalByStudentsIdAndMedalType" resultMap="BaseResultMap" parameterType="map">
         SELECT
         <include refid="Base_Column_List"/>
@@ -247,6 +248,7 @@
             #{condition}
         </foreach>
     </select>
+
     <update id="updateByExampleSelective" parameterType="map">
         update award
         <set>

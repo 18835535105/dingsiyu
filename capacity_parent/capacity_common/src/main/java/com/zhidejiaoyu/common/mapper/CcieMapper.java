@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Ccie;
 import com.zhidejiaoyu.common.pojo.CcieExample;
 import org.apache.ibatis.annotations.MapKey;
@@ -10,14 +11,12 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public interface CcieMapper {
+public interface CcieMapper extends BaseMapper<Ccie> {
     int countByExample(CcieExample example);
 
     int deleteByExample(CcieExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(Ccie record);
 
     int insertSelective(Ccie record);
 

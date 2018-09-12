@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.RunLog;
 import com.zhidejiaoyu.common.pojo.RunLogExample;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -10,14 +11,12 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 import java.util.Map;
 
-public interface RunLogMapper {
+public interface RunLogMapper extends BaseMapper<RunLog> {
     int countByExample(RunLogExample example);
 
     int deleteByExample(RunLogExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(RunLog record);
 
     int insertSelective(RunLog record);
 

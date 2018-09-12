@@ -911,6 +911,7 @@
         </foreach>
         )
     </update>
+
     <update id="updateSchoolGoldFirstTimeToNull" parameterType="map">
         update student set school_gold_first_time = null where id in (
         <foreach collection="students" separator="," item="student">
@@ -1170,14 +1171,15 @@
         ORDER BY system_gold + offline_gold DESC
         LIMIT 1
     </select>
+
     <select id="selectMaxGoldForGold" resultMap="BaseResultMap" parameterType="map">
         SELECT
         <include refid="Base_Column_List"/>
         FROM student
         WHERE school_name = #{schoolName}
         AND system_gold + offline_gold = #{maxGold}
-
     </select>
+
     <select id="getStudentAccountTime" resultType="map" parameterType="map">
         select id, account, student_name, DATE_FORMAT(account_time,'%Y-%m-%d') AS account_time from student where id = #{studentId}
     </select>
