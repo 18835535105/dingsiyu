@@ -2,7 +2,7 @@ package com.zhidejiaoyu.student.constant;
 
 /**
  * 宠物提示语 MP3 名称常量类
- *
+ *  数组顺序 "李糖心", "威士顿", "大明白", "无名"
  * @author wuchenxi
  * @date 2018/7/25
  */
@@ -92,4 +92,52 @@ public class PetMP3Constant {
      * 五维测试,得分为80-100分
      */
     public static final int[] FIVE_TEST_EIGHTY_TO_HUNDRED = {81, 82, 83, 84};
+
+    /*=============================================*/
+    /*================ 清学版宠物录音 ===============*/
+    /*=============================================*/
+    /**
+     * 课程前测，课程后测 0-80分
+     */
+    public static final int[] COURSE_TEST_LESS_EIGHTY = {61, 58, 59, 60};
+    /**
+     * 课程前测，课程后测 80-100分
+     */
+    public static final int[] COURSE_TEST_EIGHTY_TO_HUNDRED = {53, 54, 55, 56};
+
+    /**
+     * 单元前测 0-80
+     */
+    public static final int[] BEFORE_UNIT_TEST_LESS_EIGHTY = {65, 66, 67, 68};
+    /**
+     * 单元前测 0-90
+     */
+    public static final int[] BEFORE_UNIT_EIGHTY_TO_NINETY = {69, 70, 71, 72};
+    /**
+     * 单元前测 90-100
+     */
+    public static final int[] BEFORE_UNIT_NINETY_TO_HUNDRED = {73, 74, 75, 76};
+
+    /**
+     * 单元后测 0-80
+     */
+    public static final int[] AFTER_UNIT_TEST_LESS_EIGHTY = {37, 38, 39, 40};
+    /**
+     * 单元后测 0-90
+     */
+    public static final int[] AFTER_UNIT_EIGHTY_TO_NINETY = {41, 42, 43, 44};
+    /**
+     * 单元后测 90-100
+     */
+    public static final int[] AFTER_UNIT_NINETY_TO_HUNDRED = {45, 46, 47, 48};
+
+    /**
+     * 词汇量测试 0-80
+     */
+    public static final int[] WORD_TEST_LESS_EIGHTY = {57, 78, 79, 80};
+    /**
+     * 词汇量测试 80-100分
+     */
+    public static final int[] WORD_TEST_EIGHTY_TO_HUNDRED = {81, 82, 83, 84};
+
 }
