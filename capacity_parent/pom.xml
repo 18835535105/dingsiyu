@@ -67,6 +67,8 @@
         <commons-pool2.version>2.4.2</commons-pool2.version>
         <commons-lang.version>2.4</commons-lang.version>
         <shiro-core.version>1.4.0</shiro-core.version>
+
+        <spring-session-data-redis.version>2.1.0.BUILD-SNAPSHOT</spring-session-data-redis.version>
     </properties>
 
     <dependencyManagement>
@@ -118,12 +120,12 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!--mybatis -->
-            <!-- <dependency>
-                 <groupId>org.mybatis.spring.boot</groupId>
-                 <artifactId>mybatis-spring-boot-starter</artifactId>
-                 <version>${mybatis.version}</version>
-             </dependency>-->
+            <dependency>
+                <groupId>org.springframework.session</groupId>
+                <artifactId>spring-session-data-redis</artifactId>
+                <version>${spring-session-data-redis.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatisplus-spring-boot-starter</artifactId>
