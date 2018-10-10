@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.app;
 
+import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,6 +23,7 @@ import static org.springframework.boot.SpringApplication.run;
  * @EnableScheduling 开启定时任务
  * @EnableRedisHttpSession(redisNamespace = "spring:session:student") redis中存储学生session的命名空间
  */
+@Slf4j
 @EnableAsync
 @EnableCaching
 @EnableScheduling
@@ -37,5 +39,6 @@ public class ZdjyFrontApplication {
     @SuppressWarnings("unused")
     public static void main(String[] args) {
         ConfigurableApplicationContext run = run(ZdjyFrontApplication.class, args);
+        log.info("application is started");
     }
 }
