@@ -35,7 +35,7 @@
         <result column="school_gold_first_time" property="schoolGoldFirstTime" jdbcType="TIMESTAMP"/>
         <result column="country_gold_first_time" property="countryGoldFirstTime" jdbcType="TIMESTAMP"/>
         <result column="worship_first_time" property="worshipFirstTime" jdbcType="TIMESTAMP"/>
-        <result column="`rank`" property="rank" jdbcType="INTEGER"/>
+        <result column="rank" property="rank" jdbcType="INTEGER"/>
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
         <result column="role" property="role" jdbcType="INTEGER"/>
         <result column="version" property="version" jdbcType="VARCHAR"/>
@@ -922,7 +922,7 @@
 
     <select id="LoginJudge" parameterType="com.zhidejiaoyu.common.pojo.Student"
             resultMap="BaseResultMap">
-        select *
+        select <include refid="Base_Column_List"/>
         from student
         where account = #{account} and
               password = #{password}
