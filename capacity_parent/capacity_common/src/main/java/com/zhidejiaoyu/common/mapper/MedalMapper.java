@@ -64,4 +64,12 @@ public interface MedalMapper {
      */
     @Select("select child_img_url url from medal m, award a where m.id = a.medal_type and a.student_id = #{student.id} and get_flag = 1 order by a.id desc")
     List<String> selectLastMedalUrl(@Param("student") Student student);
+
+    /**
+     * 查询父id下的所有子id
+     *
+     * @param parentIds
+     * @return
+     */
+    List<Long> selectAllIdsByParentIds(@Param("parentIds") List<Long> parentIds);
 }

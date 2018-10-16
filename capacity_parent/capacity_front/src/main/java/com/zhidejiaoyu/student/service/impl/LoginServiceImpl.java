@@ -99,6 +99,9 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
     private UnitSentenceMapper unitSentenceMapper;
 
     @Autowired
+    private MedalMapper medalMapper;
+
+    @Autowired
     private CountMyGoldUtil countMyGoldUtil;
 
     @Autowired
@@ -619,6 +622,10 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
             return ServerResponse.createByErrorMessage("此账号已被删除");
             // 3.正确
         } else {
+
+            // 学生首次登陆系统，初始化其账号有效期，勋章信息
+            initAccountTime(stu);
+
             // 账号有效期
             Date date = stu.getAccountTime();
             // 当前时间
@@ -713,6 +720,54 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
 
             // 正常登陆
             return ServerResponse.createBySuccess("1", result);
+        }
+    }
+
+    /**
+     * 学生首次登陆系统初始化其账号有效期
+     *
+     * @param stu
+     */
+    private void initAccountTime(Student stu) {
+        Long stuId = stu.getId();
+        Integer count = runLogMapper.selectLoginCountByStudentId(stuId);
+        if (count == 0) {
+            stu.setAccountTime(new Date(System.currentTimeMillis() + stu.getRank() * 24 * 60 * 60 * 1000));
+
+            // 初始化学生勋章信息
+            initMedalInfo(stuId, stu);
+        }
+    }
+
+    private void initMedalInfo(Long stuId, Student stu) {
+        List<Long> parentIds = new ArrayList<>();
+        parentIds.add(1L);
+        parentIds.add(6L);
+        parentIds.add(11L);
+        parentIds.add(17L);
+        parentIds.add(23L);
+        parentIds.add(37L);
+        parentIds.add(47L);
+        parentIds.add(67L);
+        parentIds.add(72L);
+        parentIds.add(87L);
+        parentIds.add(97L);
+        List<Long> ids = medalMapper.selectAllIdsByParentIds(parentIds);
+        List<Award> awards = new ArrayList<>(ids.size());
+        ids.forEach(id -> {
+            Award award = new Award();
+            award.setCanGet(2);
+            award.setGetFlag(2);
+            award.setType(3);
+            award.setMedalType(id);
+            award.setStudentId(stuId);
+            awards.add(award);
+        });
+
+        try {
+            awardMapper.insertList(awards);
+        } catch (Exception e) {
+            logger.error("初始化学生 [{}]->[{}] 勋章信息失败", stuId, stu.getStudentName(), e);
         }
     }
 

@@ -317,4 +317,16 @@
         <include refid="Base_Column_List"/>
         from medal where parent_name = (select parent_name from medal where id = #{parentId}) order by id asc
     </select>
+
+    <select id="selectAllIdsByParentIds" resultType="java.lang.Long" parameterType="map">
+        select id
+        from medal
+        where parent_name in (select parent_name from medal where id in(
+        <foreach collection="parentIds" item="parentId" separator=",">
+            #{parentId}
+        </foreach>
+        )
+        )
+        order by id asc
+    </select>
 </mapper>
