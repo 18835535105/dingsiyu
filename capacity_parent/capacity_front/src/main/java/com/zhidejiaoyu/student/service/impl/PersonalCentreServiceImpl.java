@@ -12,6 +12,11 @@ import com.zhidejiaoyu.common.utils.dateUtlis.TimeUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.PersonalCentreService;
+import com.zhidejiaoyu.student.service.impl.PersonalCentreServiceImpl.MapGoldDesc;
+import com.zhidejiaoyu.student.service.impl.PersonalCentreServiceImpl.MapMbDesc;
+import com.zhidejiaoyu.student.service.impl.PersonalCentreServiceImpl.MapXzDesc;
+import com.zhidejiaoyu.student.service.impl.PersonalCentreServiceImpl.MapZsDesc;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -611,294 +616,303 @@ public class PersonalCentreServiceImpl implements PersonalCentreService {
     }
 
     /**
-     * 我的排名
-     *
-     * @param model        本班排行模块  model = 1
-     *                     本校模块 model = 2
-     *                     全国模块 model = 3
-     * @param queryType    空代表全部查询，1=今日排行 2=本周排行 3=本月排行
-     * @param golds        金币 1=正序 2=倒叙  - 默认金币倒叙排行
-     * @param badges       勋章 1=正序 2=倒叙
-     * @param certificates 证书 1=正序 2=倒叙
-     * @param worships     膜拜 1=正序 2=倒叙
-     */
-    @SuppressWarnings("unlikely-arg-type")
-    @Override
-    public ServerResponse<Object> classSeniority(HttpSession session, Integer page, Integer rows,
-                                                 String golds, String badges, String certificates, String worships, String model, Integer queryType) {
+	 * 我的排名
+	 *
+	 * @param model        本班排行模块  model = 1
+	 *                     本校模块 model = 2
+	 *                     全国模块 model = 3
+	 * @param queryType    空代表全部查询，1=今日排行 2=本周排行 3=本月排行
+	 * @param golds        金币 1=正序 2=倒叙  - 默认金币倒叙排行
+	 * @param badges       勋章 1=正序 2=倒叙
+	 * @param certificates 证书 1=正序 2=倒叙
+	 * @param worships     膜拜 1=正序 2=倒叙
+	 */
+	@SuppressWarnings("unlikely-arg-type")
+	@Override
+	public ServerResponse<Object> classSeniority(HttpSession session, Integer page, Integer rows,
+												 String golds, String badges, String certificates, String worships, String model, Integer queryType) {
 
-        Map<String, Object> result = new HashMap<>();
+		Map<String, Object> result = new HashMap<>();
 
-        // 默认本班排行
+		// 默认本班排行
 		/*if(StringUtils.isEmpty(model)) {
 			model = "1";
 		}*/
 
-        // 获取当前学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        // 区
-        String area = student.getArea();
-        // 学校
-        String school_name = student.getSchoolName();
-        // 年级
-        String grade = student.getGrade();
-        // 班级
-        String squad = student.getSquad();
+		// 获取当前学生信息
+		Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+		// 区
+		//String area = student.getArea();
+		// 学校
+		//String school_name = student.getSchoolName();
+		// 年级
+		//String grade = student.getGrade();
+		// 班级
+		//String squad = student.getSquad();
+		
+		// 教师id
+		Long teacherId = student.getTeacherId();
+		// 班级id
+		Long classId = student.getClassId();
 
-        // 获取 `每个学生的信息`
-        List<Map<String, Object>> students = studentMapper.selectSeniority(model, area, school_name, grade, squad);
+		// 获取 `每个学生的信息`
+		List<Map<String, Object>> students = studentMapper.selectSeniority(model, teacherId, classId);
 
-        // 获取等级规则
-        List<Map<String, Object>> levels = levelMapper.selectAll();
+		// 获取等级规则
+		List<Map<String, Object>> levels = levelMapper.selectAll();
 
-        // 用于封装我的排名,我的金币,我的等级,我被膜拜
-        Map<String, Object> myMap = new HashMap<String, Object>();
+		// 用于封装我的排名,我的金币,我的等级,我被膜拜
+		Map<String, Object> myMap = new HashMap<String, Object>();
 
-        // 我的排名(全部)
-        Map<Long, Map<String, Object>> classLevel = null;
-        if (queryType == null) {
-            if ("3".equals(model)) {
-                // 全国排名
-                classLevel = studentMapper.selectLevelByStuId(student, 3);
-            } else if ("2".equals(model)) {
-                // 学校排名
-                classLevel = studentMapper.selectLevelByStuId(student, 2);
-            } else {
-                // 班级排名
-                classLevel = studentMapper.selectLevelByStuId(student, 1);
-            }
-            String myRankingDouble = (classLevel.get(student.getId())).get("rank") + "";
-            if (myRankingDouble.contains(".")) {
-                myMap.put("myRanking", myRankingDouble.substring(0, myRankingDouble.indexOf("."))); // 我的排名
-            } else {
-                myMap.put("myRanking", myRankingDouble); // 我的排名
-            }
-        }
+		// 我的排名(全部)
+		Map<Long, Map<String, Object>> classLevel = null;
+		if (queryType == null) {
+			if ("3".equals(model)) {
+				// 全国排名
+				classLevel = studentMapper.selectLevelByStuId(student, 3);
+			} else if ("2".equals(model)) {
+				// 学校排名
+				classLevel = studentMapper.selectLevelByStuId(student, 2);
+			} else {
+				// 班级排名
+				classLevel = studentMapper.selectLevelByStuId(student, 1);
+			}
+			if(classLevel == null || classLevel.get(student.getId()) == null) {
+				return ServerResponse.createBySuccess("无排行数据");
+			}
+			String myRankingDouble = (classLevel.get(student.getId())).get("rank") + "";
+			if (myRankingDouble.contains(".")) {
+				myMap.put("myRanking", myRankingDouble.substring(0, myRankingDouble.indexOf("."))); // 我的排名
+			} else {
+				myMap.put("myRanking", myRankingDouble); // 我的排名
+			}
+		}
 
-        // 我的排行 今日，本周，本月
-        if (queryType != null) {
-            // 查出来的顺序金币是从大到小
-            List<Integer> queryTypeList = new ArrayList<>();
+		// 我的排行 今日，本周，本月
+		if (queryType != null) {
+			// 查出来的顺序金币是从大到小
+			List<Integer> queryTypeList = new ArrayList<>();
 
-            // 我的排名(今日)
-            if (queryType == 1) {
-                queryTypeList = runLogMapper.getAllQueryType(DateUtil.formatYYYYMMDD(new Date()), model, student);
-            }
-            // 我的排名(本周)
-            if (queryType == 2) {
-                Date week = WeekUtil.getFirstDayOfWeek(new Date());
-                queryTypeList = runLogMapper.getAllQueryType(week.toString(), model, student);
-            }
-            // 我的排名(本月)
-            if (queryType == 3) {
-                queryTypeList = runLogMapper.getAllQueryType(WeekUtil.getMonthOne(new Date()), model, student);
-            }
+			// 我的排名(今日)
+			if (queryType == 1) {
+				queryTypeList = runLogMapper.getAllQueryType(DateUtil.formatYYYYMMDD(new Date()), model, student);
+			}
+			// 我的排名(本周)
+			if (queryType == 2) {
+				Date week = WeekUtil.getFirstDayOfWeek(new Date());
+				queryTypeList = runLogMapper.getAllQueryType(week.toString(), model, student);
+			}
+			// 我的排名(本月)
+			if (queryType == 3) {
+				queryTypeList = runLogMapper.getAllQueryType(WeekUtil.getMonthOne(new Date()), model, student);
+			}
 
-            if (queryTypeList.contains(student.getId().intValue())) {
-                myMap.put("myRanking", queryTypeList.lastIndexOf(student.getId().intValue())); // 我的金币排名
-            } else {
-                myMap.put("myRanking", "未上榜"); // 我的排名
-            }
-        }
+			if (queryTypeList.contains(student.getId().intValue())) {
+				myMap.put("myRanking", queryTypeList.lastIndexOf(student.getId().intValue())); // 我的金币排名
+			} else {
+				myMap.put("myRanking", "未上榜"); // 我的排名
+			}
+		}
 
-        // 我的金币myGold
-        int myGold = 0;
-        // 全部排行
-        if (queryType == null) {
-            Double myGoldD = studentMapper.myGold(student.getId());
-            BigDecimal mybd = new BigDecimal(myGoldD).setScale(0, BigDecimal.ROUND_HALF_UP);
-            myGold = Integer.parseInt(mybd.toString());
-        } else {
-            // 今日，本周，本月排行
-            // 我的排名(今日)
-            Map<Long, Map<String, Object>> m = new HashMap();
-            if (queryType == 1) {
-                m = runLogMapper.getGoldByStudentId(DateUtil.formatYYYYMMDD(new Date()), model, student);
-            }
-            // 我的排名(本周)
-            if (queryType == 2) {
-                Date week = WeekUtil.getFirstDayOfWeek(new Date());
-                m = runLogMapper.getGoldByStudentId(week.toString(), model, student);
-            }
-            // 我的排名(本月)
-            if (queryType == 3) {
-                m = runLogMapper.getGoldByStudentId(WeekUtil.getMonthOne(new Date()), model, student);
-            }
+		// 我的金币myGold
+		int myGold = 0;
+		// 全部排行
+		if (queryType == null) {
+			Double myGoldD = studentMapper.myGold(student.getId());
+			BigDecimal mybd = new BigDecimal(myGoldD).setScale(0, BigDecimal.ROUND_HALF_UP);
+			myGold = Integer.parseInt(mybd.toString());
+		} else {
+			// 今日，本周，本月排行
+			// 我的排名(今日)
+			Map<Long, Map<String, Object>> m = new HashMap();
+			if (queryType == 1) {
+				m = runLogMapper.getGoldByStudentId(DateUtil.formatYYYYMMDD(new Date()), model, student);
+			}
+			// 我的排名(本周)
+			if (queryType == 2) {
+				Date week = WeekUtil.getFirstDayOfWeek(new Date());
+				m = runLogMapper.getGoldByStudentId(week.toString(), model, student);
+			}
+			// 我的排名(本月)
+			if (queryType == 3) {
+				m = runLogMapper.getGoldByStudentId(WeekUtil.getMonthOne(new Date()), model, student);
+			}
 
-            if (m.containsKey(student.getId())) {
-                myGold = Integer.parseInt(m.get(student.getId()).get("jb").toString());
-            }
-        }
+			if (m.containsKey(student.getId())) {
+				myGold = Integer.parseInt(m.get(student.getId()).get("jb").toString());
+			}
+		}
 
-        // 我被膜拜myMb
-        int myMb = studentMapper.myMb(student.getId());
-        // 我的等级myChildName
-        String myChildName = "";
-        if (myGold >= 50) {
-            int myrecord = 0;
-            int myauto = 1;
-            for (int i = 0; i < levels.size(); i++) {
-                // 循环的当前等级分数
-                int levelGold = (int) levels.get(i).get("gold");
-                // 下一等级分数
-                int xlevelGold = (int) levels.get((i + 1) < levels.size() ? (i + 1) : i).get("gold");
+		// 我被膜拜myMb
+		int myMb = studentMapper.myMb(student.getId());
+		// 我的等级myChildName
+		String myChildName = "";
+		if (myGold >= 50) {
+			int myrecord = 0;
+			int myauto = 1;
+			for (int i = 0; i < levels.size(); i++) {
+				// 循环的当前等级分数
+				int levelGold = (int) levels.get(i).get("gold");
+				// 下一等级分数
+				int xlevelGold = (int) levels.get((i + 1) < levels.size() ? (i + 1) : i).get("gold");
 
-                if (myGold >= myrecord && myGold < xlevelGold) {
-                    myChildName = levels.get(i).get("child_name").toString();
-                    break;
-                    // 等级循环完还没有确定等级 = 最高等级
-                } else if (myauto == levels.size()) {
-                    myChildName = levels.get(i).get("child_name").toString();
-                    break;
-                }
-                myrecord = levelGold;
-                myauto++;
-            }
-            myrecord = 0;
-            myauto = 0;
-        }
+				if (myGold >= myrecord && myGold < xlevelGold) {
+					myChildName = levels.get(i).get("child_name").toString();
+					break;
+					// 等级循环完还没有确定等级 = 最高等级
+				} else if (myauto == levels.size()) {
+					myChildName = levels.get(i).get("child_name").toString();
+					break;
+				}
+				myrecord = levelGold;
+				myauto++;
+			}
+			myrecord = 0;
+			myauto = 0;
+		}
 
-        myMap.put("myGold", myGold); // 我的金币
-        myMap.put("myMb", myMb); // 我被膜拜
-        myMap.put("myChildName", myChildName); // 我的等级
+		myMap.put("myGold", myGold); // 我的金币
+		myMap.put("myMb", myMb); // 我被膜拜
+		myMap.put("myChildName", myChildName); // 我的等级
+		myMap.put("stuId", student.getId());
 
+		//    	-- 学生对应证书
+		Map<Long, Map<String, Long>> ccieCount = ccieMapper.getMapKeyStudentCCie();
+		//		-- 膜拜数据
+		Map<Long, Map<String, Long>> worshipCount = worshipMapper.getMapKeyStudentWorship();
+		//		-- 学生勋章
+		Map<Long, Map<String, Long>> runLogCount = runLogMapper.getMapKeyStudentrunLog();
 
-        //    	-- 学生对应证书
-        Map<Long, Map<String, Long>> ccieCount = ccieMapper.getMapKeyStudentCCie();
-        //		-- 膜拜数据
-        Map<Long, Map<String, Long>> worshipCount = worshipMapper.getMapKeyStudentWorship();
-        //		-- 学生勋章
-        Map<Long, Map<String, Long>> runLogCount = runLogMapper.getMapKeyStudentrunLog();
+		// 遍历学生信息, 并初始化学生证书，膜拜，勋章，等级
+		for (Map<String, Object> stu : students) {
+			// 学生id
+			Long id = (Long) stu.get("id");
 
-        // 遍历学生信息, 并初始化学生证书，膜拜，勋章，等级
-        for (Map<String, Object> stu : students) {
-            // 学生id
-            Long id = (Long) stu.get("id");
+			// 获取当前学生证书数量
+			//int ccieCount = ccieMapper.getCountCcieByStudentId(id);
+			//stu.put("zs", ccieCount);
+			if (ccieCount.containsKey(id)) {
+				stu.put("zs", ccieCount.get(id).get("count"));
+			} else {
+				stu.put("zs", 0);
+			}
 
-            // 获取当前学生证书数量
-            //int ccieCount = ccieMapper.getCountCcieByStudentId(id);
-            //stu.put("zs", ccieCount);
-            if (ccieCount.containsKey(id)) {
-                stu.put("zs", ccieCount.get(id).get("count"));
-            } else {
-                stu.put("zs", 0);
-            }
+			// 获取当前学生膜拜数量
+			//int worship = worshipMapper.getCountWorshipByStudentId(id);
+			//stu.put("mb", worship);
+			if (worshipCount.containsKey(id)) {
+				stu.put("mb", worshipCount.get(id).get("count"));
+			} else {
+				stu.put("mb", 0);
+			}
 
-            // 获取当前学生膜拜数量
-            //int worship = worshipMapper.getCountWorshipByStudentId(id);
-            //stu.put("mb", worship);
-            if (worshipCount.containsKey(id)) {
-                stu.put("mb", worshipCount.get(id).get("count"));
-            } else {
-                stu.put("mb", 0);
-            }
+			// 当前学生勋章个数
+			//int xz = runLogMapper.getCountXZByStudentId(id);
+			//stu.put("xz", 0);
+			if (runLogCount.containsKey(id)) {
+				stu.put("xz", runLogCount.get(id).get("count"));
+			} else {
+				stu.put("xz", 0);
+			}
 
-            // 当前学生勋章个数
-            //int xz = runLogMapper.getCountXZByStudentId(id);
-            //stu.put("xz", 0);
-            if (runLogCount.containsKey(id)) {
-                stu.put("xz", runLogCount.get(id).get("count"));
-            } else {
-                stu.put("xz", 0);
-            }
+			// 学生金币
+			Double goldd = (Double) stu.get("gold");
+			int gold = Integer.parseInt(new BigDecimal(goldd).setScale(0, BigDecimal.ROUND_HALF_UP).toString());
+			stu.put("gold", gold);
+			stu.put("headUrl", stu.get("head_url"));
 
-            // 学生金币
-            Double goldd = (Double) stu.get("gold");
-            int gold = Integer.parseInt(new BigDecimal(goldd).setScale(0, BigDecimal.ROUND_HALF_UP).toString());
-            stu.put("gold", gold);
-            stu.put("headUrl", stu.get("head_url"));
+			// 等级计算
+			if (gold >= 50) {
+				int record = 0;
+				// 用于记录是不是最大值
+				int auto = 1;
 
-            // 等级计算
-            if (gold >= 50) {
-                int record = 0;
-                // 用于记录是不是最大值
-                int auto = 1;
+				for (int i = 0; i < levels.size(); i++) {
+					// 循环的当前等级分数
+					int levelGold = (int) levels.get(i).get("gold");
+					// 下一等级分数
+					int xlevelGold = (int) levels.get((i + 1) < levels.size() ? (i + 1) : i).get("gold");
 
-                for (int i = 0; i < levels.size(); i++) {
-                    // 循环的当前等级分数
-                    int levelGold = (int) levels.get(i).get("gold");
-                    // 下一等级分数
-                    int xlevelGold = (int) levels.get((i + 1) < levels.size() ? (i + 1) : i).get("gold");
+					if (gold >= record && gold < xlevelGold) {
+						stu.put("childName", levels.get(i).get("child_name"));
+						break;
+						// 等级循环完还没有确定等级 = 最高等级
+					} else if (auto == levels.size()) {
+						stu.put("childName", levels.get(i).get("child_name"));
+						break;
+					}
+					
+					record = levelGold;
+					auto++;
+				}
+				record = 0;
+				auto = 0;
+			} else {
+				stu.put("childName", levels.get(0).get("child_name"));
+			}
+		}
 
-                    if (gold >= record && gold < xlevelGold) {
-                        stu.put("childName", levels.get(i).get("child_name"));
-                        break;
-                        // 等级循环完还没有确定等级 = 最高等级
-                    } else if (auto == levels.size()) {
-                        stu.put("childName", levels.get(i).get("child_name"));
-                        break;
-                    }
-                    record = levelGold;
-                    auto++;
-                }
-                record = 0;
-                auto = 0;
-            } else {
-                stu.put("childName", null);
-            }
-        }
+		// 排序
+		if ("1".equals(golds)) { // 按照金币
+			//Collections.sort(students, new MapGoldAsc());
+			Collections.sort(students, new MapGoldDesc());
+		} else if ("2".equals(golds)) {
+			Collections.sort(students, new MapGoldDesc());
 
-        // 排序
-        if ("1".equals(golds)) { // 按照金币
-            //Collections.sort(students, new MapGoldAsc());
-            Collections.sort(students, new MapGoldDesc());
-        } else if ("2".equals(golds)) {
-            Collections.sort(students, new MapGoldDesc());
+		} else if ("1".equals(badges)) {// 按照勋章
+			//Collections.sort(students, new MapXzAsc());
+			Collections.sort(students, new MapXzDesc());
+		} else if ("2".equals(badges)) {
+			Collections.sort(students, new MapXzDesc());
 
-        } else if ("1".equals(badges)) {// 按照勋章
-            //Collections.sort(students, new MapXzAsc());
-            Collections.sort(students, new MapXzDesc());
-        } else if ("2".equals(badges)) {
-            Collections.sort(students, new MapXzDesc());
+		} else if ("1".equals(certificates)) {// 按照证书
+			//Collections.sort(students, new MapZsAsc());
+			Collections.sort(students, new MapZsDesc());
+		} else if ("2".equals(certificates)) {
+			Collections.sort(students, new MapZsDesc());
 
-        } else if ("1".equals(certificates)) {// 按照证书
-            //Collections.sort(students, new MapZsAsc());
-            Collections.sort(students, new MapZsDesc());
-        } else if ("2".equals(certificates)) {
-            Collections.sort(students, new MapZsDesc());
+		} else if ("1".equals(worships)) {// 按照膜拜
+			//Collections.sort(students, new MapMbAsc());
+			Collections.sort(students, new MapMbDesc());
+		} else if ("2".equals(worships)) {
+			Collections.sort(students, new MapMbDesc());
+		} else {
+			// 默认本班金币倒叙
+			Collections.sort(students, new MapGoldDesc());
+		}
 
-        } else if ("1".equals(worships)) {// 按照膜拜
-            //Collections.sort(students, new MapMbAsc());
-            Collections.sort(students, new MapMbDesc());
-        } else if ("2".equals(worships)) {
-            Collections.sort(students, new MapMbDesc());
-        } else {
-            // 默认本班金币倒叙
-            Collections.sort(students, new MapGoldDesc());
-        }
+		// list最大限制到100
+		List<Map<String, Object>> lista = students.subList(0, students.size() > 100 ? 100 : students.size());
 
-        // list最大限制到100
-        List<Map<String, Object>> lista = students.subList(0, students.size() > 100 ? 100 : students.size());
+		// 总参与人数
+		myMap.put("number", lista.size());
+		result.put("myDate", myMap); // 把我的信息封装到返回结果集中
 
-        // 总参与人数
-        myMap.put("number", lista.size());
-        result.put("myDate", myMap); // 把我的信息封装到返回结果集中
+		// 我的排名,根据选项实时更换排行
+		int aa = 0;
+		Long id = student.getId();
+		for (Map m : lista) {
+			aa++;
+			if (m.get("id").equals(id)) {
+				myMap.put("myRanking", aa);
+			}
+		}
 
-        // 我的排名,根据选项实时更换排行
-        int aa = 0;
-        Long id = student.getId();
-        for (Map m : lista) {
-            aa++;
-            if (m.get("id").equals(id)) {
-                myMap.put("myRanking", aa);
-            }
-        }
+		result.put("page", page);
+		if (lista.size() % rows == 0) {
+			result.put("total", lista.size() / rows);
+		} else {
+			result.put("total", lista.size() / rows + 1);
+		}
 
-        result.put("page", page);
-        if (lista.size() % rows == 0) {
-            result.put("total", lista.size() / rows);
-        } else {
-            result.put("total", lista.size() / rows + 1);
-        }
+		// 对list分页
+		page = (page - 1) * rows;
+		rows = page + rows;
+		List<Map<String, Object>> list = lista.subList(page > lista.size() ? lista.size() : page, lista.size() > rows ? rows : lista.size());
+		result.put("phDate", list); // 把排行数据放到返回结果集中
 
-        // 对list分页
-        page = (page - 1) * rows;
-        rows = page + rows;
-        List<Map<String, Object>> list = lista.subList(page > lista.size() ? lista.size() : page, lista.size() > rows ? rows : lista.size());
-        result.put("phDate", list); // 把排行数据放到返回结果集中
-
-        return ServerResponse.createBySuccess(result);
-    }
+		return ServerResponse.createBySuccess(result);
+	}
 
     // 金币降序
     static class MapGoldDesc implements Comparator<Map<String, Object>> {
@@ -1317,21 +1331,28 @@ public class PersonalCentreServiceImpl implements PersonalCentreService {
         // 姓名
         String studentName = student.getStudentName();
         // 区
-        String area = student.getArea();
+       // String area = student.getArea();
         // 学校
-        String school_name = student.getSchoolName();
+       // String school_name = student.getSchoolName();
+        // 班级
+       // String squad = student.getSquad();
         // 年级
         String grade = student.getGrade();
-        // 班级
-        String squad = student.getSquad();
         // 版本
         String version = student.getVersion();
+     
+    	// 教师id - 学校
+ 		Long teacherId = student.getTeacherId();
+ 		// 班级id - 班级
+ 		Long classId = student.getClassId();
 
         // 学段
         String study_paragraph = null;
         if ("七年级".equals(grade) || "八年级".equals(grade) || "九年级".equals(grade)) {
             study_paragraph = "初中";
-        } else {
+        } else if("小学".equals(grade)){
+        	study_paragraph = "小学";
+        }else {
             study_paragraph = "高中";
         }
 
@@ -1343,13 +1364,13 @@ public class PersonalCentreServiceImpl implements PersonalCentreService {
         if (model == 1 || model == null) {
             // 已学单元
             if (haveUnit != null && haveUnit > 0) {
-                list = studentUnitMapper.planSeniority(area, school_name, grade, squad, study_paragraph, haveUnit, version);
+                list = studentUnitMapper.planSeniority(grade, study_paragraph, haveUnit, version, classId);
                 // 已做测试
             } else if (haveTest != null && haveTest > 0) {
-                list = testRecordMapper.planSeniority(area, school_name, grade, squad, study_paragraph, haveTest, version);
+                list = testRecordMapper.planSeniority(grade, study_paragraph, haveTest, version, classId);
                 // 学习时长
             } else if (haveTime != null && haveTime > 0) {
-                list = durationMapper.planSeniority(area, school_name, grade, squad, study_paragraph, haveTime, version);
+                list = durationMapper.planSeniority(grade, study_paragraph, haveTime, version, classId);
             }
 
 			// 班级总参与人数
@@ -1359,17 +1380,17 @@ public class PersonalCentreServiceImpl implements PersonalCentreService {
         } else if (model == 2) {
             // 已学单元
             if (haveUnit != null && haveUnit > 0) {
-                list = studentUnitMapper.planSenioritySchool(area, school_name, study_paragraph, haveUnit, version);
+                list = studentUnitMapper.planSenioritySchool(study_paragraph, haveUnit, version, teacherId);
                 // 已做测试
             } else if (haveTest != null && haveTest > 0) {
-                list = testRecordMapper.planSenioritySchool(area, school_name, study_paragraph, haveTest, version);
+                list = testRecordMapper.planSenioritySchool(study_paragraph, haveTest, version, teacherId);
                 // 学习时长
             } else if (haveTime != null && haveTime > 0) {
-                list = durationMapper.planSenioritySchool(area, school_name, study_paragraph, haveTime, version);
+                list = durationMapper.planSenioritySchool(study_paragraph, haveTime, version, teacherId);
             }
 
 			// 学校总参与人数
-			result.put("atNumber", studentMapper.schoolHeadcount(area, school_name, version));
+			result.put("atNumber", studentMapper.schoolHeadcount(teacherId, version));
 
             // 全国排行
         } else {

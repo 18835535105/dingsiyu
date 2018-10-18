@@ -361,7 +361,7 @@
         JOIN student b ON a.student_id = b.id
         JOIN course c ON a.course_id = c.id
         AND c.study_paragraph = #{study_paragraph} AND c.version = #{version}
-        AND b.area = #{area} AND b.school_name = #{school_name} AND b.grade = #{grade} AND b.squad = #{squad}
+        AND b.grade = #{grade} AND b.class_id = #{classId}
         GROUP BY
         a.student_id
         ORDER BY
@@ -398,7 +398,7 @@
         JOIN student b ON a.student_id = b.id
         JOIN course c ON a.course_id = c.id
         AND c.study_paragraph = #{study_paragraph} AND c.version = #{version}
-        AND b.area = #{area} AND b.school_name = #{school_name}
+		AND b.teacher_id = #{teacherId}
         GROUP BY
         a.student_id
         ORDER BY

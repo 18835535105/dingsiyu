@@ -20,6 +20,15 @@ public class Student implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;
+    
+    /**
+     * 老师id
+     */
+    private Long teacherId;
+    /**
+     * 班级id
+     */
+    private Long classId;
 
     /**
      * 账号

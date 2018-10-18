@@ -150,7 +150,7 @@ public interface StudentMapper {
      * @return
      */
     //List<StudentSeniority> selectSeniority();
-    List<Map<String, Object>> selectSeniority(@Param("model") String model, @Param("area") String area, @Param("school_name") String school_name, @Param("grade") String grade, @Param("squad") String squad);
+    List<Map<String, Object>> selectSeniority(@Param("model") String model, @Param("teacherId") Long teacherId,@Param("classId") Long classId);
 
     @MapKey("id")
     Map<Long, Map<Long, Object>> selectxz();
@@ -212,8 +212,8 @@ public interface StudentMapper {
      */
     int countByPhaseAndVersion(@Param("phase") String phase, @Param("student") Student student);
 
-    @Select("select count(id) from student where area = #{area} and school_name = #{school_name} and version = #{version}")
-    Integer schoolHeadcount(@Param("area") String area, @Param("school_name")String school_name, @Param("version") String version);
+    @Select("select count(id) from student where teacher_id = #{teacherId} and version = #{version}")
+    Integer schoolHeadcount(@Param("teacherId")Long teacherId, @Param("version") String version);
 
     Integer schoolHeadcountNationwide(@Param("study_paragraph") String study_paragraph, @Param("version") String version);
 
@@ -252,4 +252,5 @@ public interface StudentMapper {
 
     @Update("update student set account_time = #{format} where id = #{studentId}")
     int updateAccountTimeByStudentId(@Param("studentId") long studentId, @Param("format") String format);
+
 }

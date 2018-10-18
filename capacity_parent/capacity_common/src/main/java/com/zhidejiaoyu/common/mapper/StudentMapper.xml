@@ -35,7 +35,7 @@
         <result column="school_gold_first_time" property="schoolGoldFirstTime" jdbcType="TIMESTAMP"/>
         <result column="country_gold_first_time" property="countryGoldFirstTime" jdbcType="TIMESTAMP"/>
         <result column="worship_first_time" property="worshipFirstTime" jdbcType="TIMESTAMP"/>
-        <result column="`rank`" property="rank" jdbcType="INTEGER"/>
+        <result column="rank" property="rank" jdbcType="INTEGER"/>
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
         <result column="role" property="role" jdbcType="INTEGER"/>
         <result column="version" property="version" jdbcType="VARCHAR"/>
@@ -922,7 +922,7 @@
 
     <select id="LoginJudge" parameterType="com.zhidejiaoyu.common.pojo.Student"
             resultMap="BaseResultMap">
-        select *
+        select <include refid="Base_Column_List"/>
         from student
         where account = #{account} and
               password = #{password}
@@ -950,7 +950,7 @@
         from student where to_days(account_time) - to_days(now()) &lt;= 3 and to_days(account_time) - to_days(now())
         &gt;= 0
     </select>
-    <select id="selectLevelByStuId" resultType="java.util.Map" parameterType="map">
+     <select id="selectLevelByStuId" resultType="java.util.Map" parameterType="map">
         SELECT
         s.id id,
         CASE
@@ -966,17 +966,16 @@
         @curRank := 0 ,@preRank := 0
         ) r
         <where>
-            <if test="flag == 2 or flag == 1">
-                AND s.province = #{student.province}
-                AND s.area = #{student.area}
-                AND s.city = #{student.city}
-                AND s.school_name = #{student.schoolName}
+            <if test="flag == 2">
+               and teacher_id = #{student.teacherId}
             </if>
             <if test="flag == 1">
-                AND s.grade = #{student.grade}
-                <if test="student.squad != '' and student.squad != null ">
-                  AND s.squad = #{student.squad}
-                </if>
+            	<if test="student.classId != null and student.classId != '' ">
+               		and class_id = #{student.classId}
+               	</if>
+            	<if test="student.classId == null or student.classId == '' ">
+               		and teacher_id = #{student.teacherId} and class_id is null
+               	</if>
             </if>
         </where>
         ORDER BY
@@ -1058,23 +1057,29 @@
         </foreach>
     </insert>
 
-    <sql id="selectSeniority_model_sql">
+   <sql id="selectSeniority_model_sql">
         <!-- 本班 -->
         <if test="model == '1' or model == 1">
-            where s.area = #{area} AND s.school_name = #{school_name} AND s.grade = #{grade} AND s.squad = #{squad}
+            <if test="classId != '' and classId != null ">
+            	where class_id = #{classId}
+            </if>
+            <if test="classId == '' or classId == null ">
+            	where teacher_id = #{teacherId} and class_id is null
+            </if>
         </if>
         <!-- 本校 -->
         <if test="model == '2' or model == 2">
-            where s.area = #{area} AND s.school_name = #{school_name}
+            where teacher_id = #{teacherId}
         </if>
     </sql>
     <select id="selectSeniority" parameterType="map" resultType="map">
-        <!--SELECT
-        s.id, s.student_name as studentName, s.head_url, s.province, s.city, s.area, (s.offline_gold + s.system_gold) AS gold,
+        SELECT
+        s.id, s.nickname as studentName, s.head_url, s.province, s.city, s.area, (s.offline_gold + s.system_gold) AS gold,
         c.zs,
         w.mb
         FROM
         student s,
+        <!-- ccie c, -->
         (
         SELECT
         COUNT(c.id) AS zs
@@ -1092,20 +1097,7 @@
         w.student_id_by_worship = stu.id
         ) w
         <include refid="selectSeniority_model_sql"/>
-        GROUP BY s.id-->
-        SELECT
-        s.id,
-        s.student_name AS studentName,
-        s.head_url,
-        s.province,
-        s.city,
-        s.area,
-        (
-        s.offline_gold + s.system_gold
-        ) AS gold
-        FROM
-        student s
-        <include refid="selectSeniority_model_sql"/>
+        GROUP BY s.id
     </select>
     <select id="selectxz" resultType="map">
         select

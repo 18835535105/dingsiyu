@@ -106,6 +106,9 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
 
     @Autowired
     private InitRedPointThread initRedPointThread;
+    
+    @Autowired
+    private StudentFlowMapper studentFlowMapper;
 
     @Override
     public Student LoginJudge(String account, String password) {
@@ -218,7 +221,7 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         // 单词图鉴模块, 单元下共有多少带图片的单词
         Long countWord = null;
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 7; i++) {
             Map<String, Object> a = new HashMap<String, Object>();
             //-- 如果 2 = NULL 就跳过4步执行5步   condition = 3(方框为空)
             //-- 如果 2 != NULL 执行4步跳过第5步 , 如果第2步>=80 condition = 1(方框为√), 如果第3步<80 condition = 2(方框为×)
@@ -304,6 +307,18 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
         result.put("amount2", b);
         result.put("amount3", c);
         result.put("amount0", d);
+        // 听力模块许复习量
+        cr.setClassify("4");
+        Integer e = capacityMapper.countCapacity_memory(cr);
+        // 翻译模块许复习量
+        cr.setClassify("5");
+        Integer f = capacityMapper.countCapacity_memory(cr);
+        // 默写模块许复习量
+        cr.setClassify("6");
+        Integer g = capacityMapper.countCapacity_memory(cr);
+        result.put("amount4", e);
+        result.put("amount5", f);
+        result.put("amount6", g);
         // 是否需要隐藏学习模块
         if (a >= 20 || b >= 10 || c >= 10 || d >=10) {
             result.put("hide", true);
@@ -319,7 +334,10 @@ public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
             result.put("nodeId", flow.getId());
             result.put("nodeName", flow.getFlowName());
         }
-
+        
+        // 学生当前节点模块名
+        result.put("flowName", studentFlowMapper.getStudentFlow(stu.getId()));
+        
         return ServerResponse.createBySuccess(result);
     }
 

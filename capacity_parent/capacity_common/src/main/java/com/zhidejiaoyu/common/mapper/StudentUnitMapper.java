@@ -142,12 +142,12 @@ public interface StudentUnitMapper {
     @Select("select count(id) from student_unit where course_id = #{courseIdw} and student_id = #{studentId} and sentence_status = 1")
     int getCountUnitSentenceStatus(@Param("courseIdw")Long courseIdw,@Param("studentId") Long studentId);
 
-    List<SeniorityVo> planSeniority(@Param("area") String area, @Param("school_name") String school_name, @Param("grade") String grade, @Param("squad") String squad, @Param("study_paragraph") String study_paragraph, @Param("haveUnit") Integer haveUnit, @Param("version") String version);
-
+    List<SeniorityVo> planSeniority(@Param("grade") String grade,  @Param("study_paragraph") String study_paragraph, @Param("haveUnit") Integer haveUnit, @Param("version") String version, @Param("classId")Long classId);
+    
     @Select("select SUM(word_status) AS sumUnit FROM student_unit WHERE student_id = #{stuId} GROUP BY student_id")
     Integer onePlanSeniority(@Param("stuId") Long stuId);
 
-    List<SeniorityVo> planSenioritySchool(@Param("area") String area, @Param("school_name") String school_name, @Param("study_paragraph") String study_paragraph, @Param("haveUnit") Integer haveUnit, @Param("version") String version);
+    List<SeniorityVo> planSenioritySchool(@Param("study_paragraph") String study_paragraph, @Param("haveUnit") Integer haveUnit, @Param("version") String version, @Param("teacherId")Long teacherId);
 
     List<SeniorityVo> planSeniorityNationwide(@Param("study_paragraph") String study_paragraph, @Param("haveUnit") Integer haveUnit, @Param("version") String version);
 
@@ -171,4 +171,5 @@ public interface StudentUnitMapper {
 
     @Select("select unit_id FROM student_unit WHERE student_id = #{studentId} AND course_id = #{courseId} AND word_status = 1 ORDER BY id DESC LIMIT 1")
     long getFinallyLearnUnitByStudentIdAndCourseId(@Param("studentId") long studentId, @Param("courseId") long courseId);
+
 }
