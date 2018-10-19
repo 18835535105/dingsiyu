@@ -40,10 +40,16 @@ public class TestServiceImpl implements TestService {
     private static Logger LOGGER = LoggerFactory.getLogger(TestServiceImpl.class);
 
     /**
-     * 80，90，100 分
+     * 80分
      */
     private static final int PASS = 80;
+    /**
+     * 90分
+     */
     private static final int NINETY_POINT = 90;
+    /**
+     * 100分
+     */
     private static final int FULL_MARK = 100;
 
 
@@ -85,6 +91,9 @@ public class TestServiceImpl implements TestService {
 
     @Autowired
     private CcieUtil ccieUtil;
+    
+    @Autowired
+    private DurationMapper durationMapper;
 
     /**
      * 游戏测试题目获取，获取20个单词供测试
@@ -719,8 +728,23 @@ public class TestServiceImpl implements TestService {
      * @return 学生应奖励金币数
      */
     private Integer saveGold(boolean isFirst, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord) {
-        int point = wordUnitTestDTO.getPoint();
-        int goldCount = 0;
+    	int point = wordUnitTestDTO.getPoint();
+    	int goldCount = 0;
+    	
+    	// 总有效时间是否小于俩小时 = 17流程金币奖励规则
+    	int timeByStudentId = durationMapper.labelValidTimeByStudentId(student.getId());
+    	if(timeByStudentId < 2) {
+    		if(point < PASS) {
+    			goldCount = TestAwardGoldConstant.FLOW_TEST_EIGHT_ZERO;
+    		}else if(point >= PASS && point < NINETY_POINT) {
+    			goldCount = TestAwardGoldConstant.FLOW_TEST_EIGHTY_TO_FULL;
+    		}else {
+    			goldCount = TestAwardGoldConstant.FLOW_TEST_NINETY_TO_FULL;
+    		}
+    		this.saveLog(student, goldCount, wordUnitTestDTO, null);
+    		return goldCount;
+    	}
+        
         if (isFirst) {
             if (point >= PASS) {
                 if (point < FULL_MARK) {
@@ -921,10 +945,11 @@ public class TestServiceImpl implements TestService {
     public ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, TestRecord testRecord) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         TestResultVo vo = new TestResultVo();
+        vo.setPetUrl(student.getPartUrl());
         // 游戏测试开始时间
         Date gameStartTime = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
-
+        
         testRecord.setStudentId(student.getId());
         testRecord.setCourseId(student.getCourseId());
         testRecord.setTestStartTime(gameStartTime);

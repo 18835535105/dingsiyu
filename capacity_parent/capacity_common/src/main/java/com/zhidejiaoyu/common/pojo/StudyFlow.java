@@ -12,8 +12,59 @@ public class StudyFlow {
     private String flowName;
 
     private Integer type;
+    
+    private Long courseId;
+    
+    private Long unitId;
+    
+    private String courseName;
+    
+    private String unitName;
+    
+    /** true代表是新生, 需要走独立的奖励规则*/
+    private boolean neogenesis;
+    
+    public boolean getNeogenesis() {
+		return neogenesis;
+	}
 
-    public Long getId() {
+	public void setNeogenesis(boolean neogenesis) {
+		this.neogenesis = neogenesis;
+	}
+
+	public String getCourseName() {
+		return courseName;
+	}
+
+	public void setCourseName(String courseName) {
+		this.courseName = courseName;
+	}
+
+	public String getUnitName() {
+		return unitName;
+	}
+
+	public void setUnitName(String unitName) {
+		this.unitName = unitName;
+	}
+
+	public Long getCourseId() {
+		return courseId;
+	}
+
+	public void setCourseId(Long courseId) {
+		this.courseId = courseId;
+	}
+
+	public Long getUnitId() {
+		return unitId;
+	}
+
+	public void setUnitId(Long unitId) {
+		this.unitId = unitId;
+	}
+
+	public Long getId() {
         return id;
     }
 

@@ -1504,6 +1504,7 @@ public class PersonalCentreServiceImpl implements PersonalCentreService {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
         Date date = new Date();
         int endYear = Integer.parseInt(sdf.format(date));
+        year.add("全部");
         year.add(endYear);
 
         while (true) {
@@ -1605,5 +1606,5 @@ public class PersonalCentreServiceImpl implements PersonalCentreService {
 
         return ServerResponse.createBySuccess(resut);
     }
-
+	
 }

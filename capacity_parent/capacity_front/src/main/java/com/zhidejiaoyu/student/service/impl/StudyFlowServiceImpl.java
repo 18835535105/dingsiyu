@@ -53,6 +53,9 @@ public class StudyFlowServiceImpl implements StudyFlowService {
 
     @Resource
     private OpenUnitLogMapper openUnitLogMapper;
+    
+    @Resource
+    private DurationMapper durationMapper;
 
     /**
      * 节点学完, 把下一节初始化到student_flow表, 并把下一节点返回
@@ -75,6 +78,26 @@ public class StudyFlowServiceImpl implements StudyFlowService {
 
         // 学习下一单元, 前端需要一个弹框提示!!!
         if("学习下一单元".equals(flow.getModelName()) || "0".equals(flow.getNextTrueFlow().toString())){
+        	
+        	// 查询当前用户是否是新生, 有效时间小于2小时
+        	int labelValidTimeByStudentId = durationMapper.labelValidTimeByStudentId(st.getId());
+        	// 当前用户是新生继续17流程
+        	if(labelValidTimeByStudentId < 2) {
+        		// 开启下一单元
+        		unlockNextUnit(st, courseId, unitId, session);
+        		// 初始化17流程
+        		studentFlowMapper.updateFlowByStudentId(studentId, 463);
+        		// 获取流程信息
+        		StudyFlow byPrimaryKey = studyFlowMapper.selectByPrimaryKey(463L);
+        		Student studentCourseUnit = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        		byPrimaryKey.setCourseId(studentCourseUnit.getCourseId());
+        		byPrimaryKey.setUnitId(studentCourseUnit.getUnitId());
+        		byPrimaryKey.setCourseName(studentCourseUnit.getCourseName());
+        		byPrimaryKey.setUnitName(studentCourseUnit.getUnitName());
+        		return ServerResponse.createBySuccess("true", byPrimaryKey);
+        	}
+        	
+        	
             // 执行一级二级标签初始化流程
             Map flowNameData = studyFlowName.getFlowName(studentId);
             // 流程名
@@ -153,10 +176,18 @@ public class StudyFlowServiceImpl implements StudyFlowService {
             }
             flowInfo.setNextFalseFlow(null);
             flowInfo.setNextTrueFlow(null);
+            
+            // 下一节点需要学习的课程id,和单元id
+            Student studentCourseUnit = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+            flowInfo.setCourseId(studentCourseUnit.getCourseId());
+            flowInfo.setUnitId(studentCourseUnit.getUnitId());
+            flowInfo.setCourseName(studentCourseUnit.getCourseName());
+            flowInfo.setUnitName(studentCourseUnit.getUnitName());
+            
             return ServerResponse.createBySuccess("true", flowInfo); // 开启下一单元
             // return ServerResponse.createBySuccess(flowInfo);
         }
-
+        
         // 下一节点id
         long nodeId = 0;
         // 判断测试类型
@@ -211,10 +242,17 @@ public class StudyFlowServiceImpl implements StudyFlowService {
         int i = studentFlowMapper.updateFlowByStudentId(studentId, nextNode.getId());
         nextNode.setNextFalseFlow(null);
         nextNode.setNextTrueFlow(null);
+        
+        // 下一节点需要学习的课程id,和单元id
+        Student studentCourseUnit = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        nextNode.setCourseId(studentCourseUnit.getCourseId());
+        nextNode.setUnitId(studentCourseUnit.getUnitId());
+        nextNode.setCourseName(studentCourseUnit.getCourseName());
+        nextNode.setUnitName(studentCourseUnit.getUnitName());
+        
         return ServerResponse.createBySuccess("false", nextNode); // 继续学习, 不开启下一单元
     }
-
-
+    
 
     /**
      * 删除精华版学习产生的数据, 重新学习精华版
