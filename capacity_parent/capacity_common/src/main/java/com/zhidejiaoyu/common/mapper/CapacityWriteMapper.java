@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.pojo.CapacityWriteExample;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -101,4 +102,24 @@ public interface CapacityWriteMapper {
 	 * @return
 	 */
     Integer countNeedReviewByStudentIdAndUnitId(@Param("studentId") Long stuId, @Param("unitId") Long unitId);
+
+	/**
+     * 获取单词错误次数
+     *
+     * @param id
+     * @param vocabularyId
+     * @return
+     */
+    @Select("select fault_time from capacity_write where student_id = #{studentId} AND vocabulary_id = #{vocabularyId}")
+	Integer getFaultTime(@Param("studentId")Long id, @Param("vocabularyId")Long vocabularyId);
+
+    /**
+     * 黄金记忆时间加指定的3小时
+     *
+     * @param id
+     * @param vocabularyId
+     * @param pushRise
+     */
+    @Update("update simple_capacity set push = date_add(push, interval ${pushRise} hour) where student_id = #{studentId} AND vocabulary_id = #{vocabularyId}")
+	void updatePush(@Param("studentId")Long id, @Param("vocabularyId")Long vocabularyId, @Param("pushRise")int pushRise);
 }

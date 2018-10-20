@@ -38,7 +38,14 @@ import java.util.*;
 public class TestServiceImpl implements TestService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(TestServiceImpl.class);
-
+    /**
+     * 50分
+     */
+    private static final int FIVE = 50;
+    /**
+     * 60分
+     */
+    private static final int SIX = 60;
     /**
      * 80分
      */
@@ -569,12 +576,12 @@ public class TestServiceImpl implements TestService {
         } else if (flag == 2) {
             return ServerResponse.createByError(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
         }
-        // 获取当前单元下的所有单词
+        // 获取当前单元下的所有单词 limit 20
         List<Vocabulary> vocabularies = vocabularyMapper.selectByUnitId(student.getId(), unitId);
         Integer subjectNum = vocabularies.size();
         String[] type;
         if ("慧记忆".equals(studyModel)) {
-            type = new String[]{"英译汉","汉译英","听力理解"};
+            type = new String[]{"英译汉","汉译英"};
         } else {
             type = new String[]{"听力理解"};
         }
@@ -674,16 +681,43 @@ public class TestServiceImpl implements TestService {
         }
 
         String msg;
-        if (point < PASS) {
-            msg = "很遗憾，闯关失败，再接再厉。";
-            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
-        } else if (point < FULL_MARK) {
-            msg = "闯关成功，独孤求败！";
-            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
-        } else {
-            msg = "恭喜你刷新了纪录！";
-            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+        // 默写
+        if(classify == 3 || classify == 6) {
+        	if (point < FIVE) {
+	            msg = "很遗憾，闯关失败，再接再厉。";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
+	        } else if (point < FULL_MARK) {
+	            msg = "闯关成功，独孤求败！";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
+	        } else {
+	            msg = "恭喜你刷新了纪录！";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+	        }
+        	// 听力
+        }else if(classify == 4 || classify == 2) {
+        	if (point < SIX) {
+	            msg = "很遗憾，闯关失败，再接再厉。";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
+	        } else if (point < FULL_MARK) {
+	            msg = "闯关成功，独孤求败！";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
+	        } else {
+	            msg = "恭喜你刷新了纪录！";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+	        }
+        }else {
+	        if (point < PASS) {
+	            msg = "很遗憾，闯关失败，再接再厉。";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
+	        } else if (point < FULL_MARK) {
+	            msg = "闯关成功，独孤求败！";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
+	        } else {
+	            msg = "恭喜你刷新了纪录！";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+	        }
         }
+       
         vo.setMsg(msg);
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
         vo.setGold(goldCount);
@@ -854,7 +888,7 @@ public class TestServiceImpl implements TestService {
         } else if (flag == 2) {
             return ServerResponse.createByError(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
         }
-        // 获取当前单元下的所有例句
+        // 获取当前单元下的所有例句 limit 20
         List<Sentence> sentences = sentenceMapper.selectByUnitId(student.getId(), unitId);
         List<SentenceTranslateVo> sentenceTestResults = testResultUtil.getSentenceTestResults(sentences, studyModel, type);
         return ServerResponse.createBySuccess(sentenceTestResults);

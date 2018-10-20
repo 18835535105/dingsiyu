@@ -40,7 +40,7 @@ public class WordWriteController {
 
     /**
      * 保存慧默写学习记录 流程： 1.前端先发送保存学生学习信息的请求 2.然后根据后台响应数据再发送获取慧记忆学习的单词信息
-     *
+     * 	默写模块错过三次在记忆时间上再加长三小时
      * @param session
      * @param learn
      * @param isKnown  单词会与否，true：熟悉，保存为熟词；false：不熟悉，保存为生词

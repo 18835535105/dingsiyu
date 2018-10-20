@@ -74,7 +74,7 @@
         where su.unit_id = us.unit_id
         and s.id = us.sentence_id
         and student_id = #{studentId}
-        and su.unit_id = #{unitId}
+        and su.unit_id = #{unitId} limit 20;
     </select>
 
     <!-- 分页数据 -->
