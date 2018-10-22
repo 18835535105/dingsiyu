@@ -38,12 +38,25 @@ import java.util.*;
 public class TestServiceImpl implements TestService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(TestServiceImpl.class);
-
     /**
-     * 80，90，100 分
+     * 50分
+     */
+    private static final int FIVE = 50;
+    /**
+     * 60分
+     */
+    private static final int SIX = 60;
+    /**
+     * 80分
      */
     private static final int PASS = 80;
+    /**
+     * 90分
+     */
     private static final int NINETY_POINT = 90;
+    /**
+     * 100分
+     */
     private static final int FULL_MARK = 100;
 
 
@@ -85,6 +98,9 @@ public class TestServiceImpl implements TestService {
 
     @Autowired
     private CcieUtil ccieUtil;
+    
+    @Autowired
+    private DurationMapper durationMapper;
 
     /**
      * 游戏测试题目获取，获取20个单词供测试
@@ -560,12 +576,12 @@ public class TestServiceImpl implements TestService {
         } else if (flag == 2) {
             return ServerResponse.createByError(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
         }
-        // 获取当前单元下的所有单词
+        // 获取当前单元下的所有单词 limit 20
         List<Vocabulary> vocabularies = vocabularyMapper.selectByUnitId(student.getId(), unitId);
         Integer subjectNum = vocabularies.size();
         String[] type;
         if ("慧记忆".equals(studyModel)) {
-            type = new String[]{"英译汉","汉译英","听力理解"};
+            type = new String[]{"英译汉","汉译英"};
         } else {
             type = new String[]{"听力理解"};
         }
@@ -665,16 +681,43 @@ public class TestServiceImpl implements TestService {
         }
 
         String msg;
-        if (point < PASS) {
-            msg = "很遗憾，闯关失败，再接再厉。";
-            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
-        } else if (point < FULL_MARK) {
-            msg = "闯关成功，独孤求败！";
-            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
-        } else {
-            msg = "恭喜你刷新了纪录！";
-            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+        // 默写
+        if(classify == 3 || classify == 6) {
+        	if (point < FIVE) {
+	            msg = "很遗憾，闯关失败，再接再厉。";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
+	        } else if (point < FULL_MARK) {
+	            msg = "闯关成功，独孤求败！";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
+	        } else {
+	            msg = "恭喜你刷新了纪录！";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+	        }
+        	// 听力
+        }else if(classify == 4 || classify == 2) {
+        	if (point < SIX) {
+	            msg = "很遗憾，闯关失败，再接再厉。";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
+	        } else if (point < FULL_MARK) {
+	            msg = "闯关成功，独孤求败！";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
+	        } else {
+	            msg = "恭喜你刷新了纪录！";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+	        }
+        }else {
+	        if (point < PASS) {
+	            msg = "很遗憾，闯关失败，再接再厉。";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
+	        } else if (point < FULL_MARK) {
+	            msg = "闯关成功，独孤求败！";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
+	        } else {
+	            msg = "恭喜你刷新了纪录！";
+	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+	        }
         }
+       
         vo.setMsg(msg);
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
         vo.setGold(goldCount);
@@ -719,8 +762,23 @@ public class TestServiceImpl implements TestService {
      * @return 学生应奖励金币数
      */
     private Integer saveGold(boolean isFirst, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord) {
-        int point = wordUnitTestDTO.getPoint();
-        int goldCount = 0;
+    	int point = wordUnitTestDTO.getPoint();
+    	int goldCount = 0;
+    	
+    	// 总有效时间是否小于俩小时 = 17流程金币奖励规则
+    	int timeByStudentId = durationMapper.labelValidTimeByStudentId(student.getId());
+    	if(timeByStudentId < 2) {
+    		if(point < PASS) {
+    			goldCount = TestAwardGoldConstant.FLOW_TEST_EIGHT_ZERO;
+    		}else if(point >= PASS && point < NINETY_POINT) {
+    			goldCount = TestAwardGoldConstant.FLOW_TEST_EIGHTY_TO_FULL;
+    		}else {
+    			goldCount = TestAwardGoldConstant.FLOW_TEST_NINETY_TO_FULL;
+    		}
+    		this.saveLog(student, goldCount, wordUnitTestDTO, null);
+    		return goldCount;
+    	}
+        
         if (isFirst) {
             if (point >= PASS) {
                 if (point < FULL_MARK) {
@@ -830,7 +888,7 @@ public class TestServiceImpl implements TestService {
         } else if (flag == 2) {
             return ServerResponse.createByError(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
         }
-        // 获取当前单元下的所有例句
+        // 获取当前单元下的所有例句 limit 20
         List<Sentence> sentences = sentenceMapper.selectByUnitId(student.getId(), unitId);
         List<SentenceTranslateVo> sentenceTestResults = testResultUtil.getSentenceTestResults(sentences, studyModel, type);
         return ServerResponse.createBySuccess(sentenceTestResults);
@@ -921,10 +979,11 @@ public class TestServiceImpl implements TestService {
     public ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, TestRecord testRecord) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         TestResultVo vo = new TestResultVo();
+        vo.setPetUrl(student.getPartUrl());
         // 游戏测试开始时间
         Date gameStartTime = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
-
+        
         testRecord.setStudentId(student.getId());
         testRecord.setCourseId(student.getCourseId());
         testRecord.setTestStartTime(gameStartTime);

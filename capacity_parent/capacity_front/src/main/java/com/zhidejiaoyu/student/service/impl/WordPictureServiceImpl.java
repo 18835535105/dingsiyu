@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
@@ -68,6 +69,9 @@ public class WordPictureServiceImpl implements WordPictureService {
 
     @Autowired
     private TestRecordMapper testRecordMapper;
+    
+    @Value("${ftp.prefix}")
+    private String ftpPrefix;
 
     /**
      * 获取单词图鉴学习数据
@@ -99,6 +103,9 @@ public class WordPictureServiceImpl implements WordPictureService {
         // 1.1 去慧记忆中查询单词图鉴是否有需要复习的单词
         Map<String, Object> correct = capacityPictureMapper.selectNeedReviewWord(unitId, studentId, DateUtil.DateTime());
 
+        // 图片前缀
+        correct.put("ftpPrefix", ftpPrefix);
+        
         // 没有需要复习的
         if (correct == null) {
             // 获取新词

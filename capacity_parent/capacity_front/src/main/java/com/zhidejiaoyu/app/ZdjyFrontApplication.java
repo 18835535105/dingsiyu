@@ -38,7 +38,7 @@ public class ZdjyFrontApplication {
 
     @SuppressWarnings("unused")
     public static void main(String[] args) {
-        ConfigurableApplicationContext run = run(ZdjyFrontApplication.class, args);
+        run(ZdjyFrontApplication.class, args);
         log.info("application is started");
     }
 }

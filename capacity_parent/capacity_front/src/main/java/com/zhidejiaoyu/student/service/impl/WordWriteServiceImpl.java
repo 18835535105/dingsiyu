@@ -29,6 +29,8 @@ public class WordWriteServiceImpl implements WordWriteService {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
+    private final int pushRise = 3;
+    
     @Autowired
     private MemoryDifficultyUtil memoryDifficultyUtil;
 
@@ -284,10 +286,24 @@ public class WordWriteServiceImpl implements WordWriteService {
             currentLearn.setLearnCount(maxCount);
             currentLearn.setUpdateTime(now);
             int i = learnMapper.updateByPrimaryKeySelective(currentLearn);
+            
+            // 默写模块错过三次在记忆时间上再加长三小时
+            if(classify == 3) {
+            	// 查询错误次数>=3 
+            	Integer faultTime = capacityWriteMapper.getFaultTime(studentId, learn.getVocabularyId());
+            	if(faultTime != null && faultTime >= 3) {
+            		// 如果错误次数>=3, 黄金记忆时间推迟3小时
+            		capacityWriteMapper.updatePush(studentId, learn.getVocabularyId(), pushRise);
+            	}
+            }
+            
             if (i > 0) {
                 return ServerResponse.createBySuccess();
             }
         }
+        
+        
+        
         return ServerResponse.createByErrorMessage("学习记录保存失败");
     }
 

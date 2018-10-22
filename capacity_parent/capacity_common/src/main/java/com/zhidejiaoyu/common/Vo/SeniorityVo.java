@@ -18,6 +18,9 @@ public class SeniorityVo {
 
     /** 姓名 */
     private String student_name;
+    
+    /** 头像 */
+    private String headUrl;
 
     /** 班级 */
     private String squad;

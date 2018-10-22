@@ -18,7 +18,7 @@ public class WebLogAspect {
 	
 	@Pointcut("execution(public * com.zhidejiaoyu.*.controller..*.*(..))")
 	public void webLog(){
-		
+		System.out.println("啦啦啦啦啦啦啦啦啦啦");
 	}
 	
 //	@Before("webLog()")

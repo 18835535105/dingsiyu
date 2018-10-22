@@ -37,6 +37,11 @@ public class SentenceServiceImpl implements SentenceService {
 
     private Logger log = LoggerFactory.getLogger(SentenceService.class);
 
+    /**
+     * 三小时
+     */
+    private final int pushRise = 3;
+    
     @Autowired
     private MemoryDifficultyUtil memoryDifficultyUtil;
 
@@ -295,6 +300,17 @@ public class SentenceServiceImpl implements SentenceService {
             currentLearn.setLearnCount(maxCount);
             currentLearn.setUpdateTime(now);
             int i = learnMapper.updateByPrimaryKeySelective(currentLearn);
+            
+            // 默写模块错过三次在记忆时间上再加长三小时
+            if("例句默写".equals(classify)) {
+            	// 查询错误次数>=3 
+            	Integer faultTime = sentenceWriteMapper.getFaultTime(studentId, learn.getExampleId());
+            	if(faultTime != null && faultTime >= 3) {
+            		// 如果错误次数>=3, 黄金记忆时间推迟3小时
+            		sentenceWriteMapper.updatePush(studentId, learn.getExampleId(), pushRise);
+            	}
+            }
+            
             if (i > 0) {
                 return ServerResponse.createBySuccess();
             }

@@ -7,7 +7,21 @@ package com.zhidejiaoyu.student.constant;
  * @date 2018/8/7
  */
 public class TestAwardGoldConstant {
-    /**
+	
+	/**
+	 * 新生 流程17 point < 80
+	 */
+	public static final int FLOW_TEST_EIGHT_ZERO = 2;
+	/**
+	 * 新生 流程17 point >= 80 && point < 90
+	 */
+	public static final int FLOW_TEST_EIGHTY_TO_FULL = 5;
+	/**
+	 * 新生 流程17 point >= 90 
+	 */
+	public static final int FLOW_TEST_NINETY_TO_FULL = 10;
+	
+	/**
      * 单元闯关测试分数  point >= 80 && point < 100
      */
     public static final int UNIT_TEST_EIGHTY_TO_FULL = 2;
