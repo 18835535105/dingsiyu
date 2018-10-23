@@ -103,9 +103,6 @@ public class WordPictureServiceImpl implements WordPictureService {
         // 1.1 去慧记忆中查询单词图鉴是否有需要复习的单词
         Map<String, Object> correct = capacityPictureMapper.selectNeedReviewWord(unitId, studentId, DateUtil.DateTime());
 
-        // 图片前缀
-        correct.put("ftpPrefix", ftpPrefix);
-        
         // 没有需要复习的
         if (correct == null) {
             // 获取新词
@@ -120,6 +117,8 @@ public class WordPictureServiceImpl implements WordPictureService {
             // 记忆强度
             correct.put("memoryStrength", correct.get("memory_strength"));
         }
+        // 图片前缀
+        correct.put("ftpPrefix", ftpPrefix);
 
         // 记录学生开始学习的时间
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
