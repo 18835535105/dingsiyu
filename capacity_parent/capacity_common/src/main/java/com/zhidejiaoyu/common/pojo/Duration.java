@@ -1,5 +1,11 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -15,7 +21,10 @@ import java.util.Date;
  * @author wuchenxi
  * @date 2018年5月10日
  */
-public class Duration implements Serializable {
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class Duration extends Model<Duration> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long studentId;
@@ -49,90 +58,8 @@ public class Duration implements Serializable {
      */
     private Integer studyModel;
 
-    public Long getCourseId() {
-        return courseId;
-    }
-
-    public void setCourseId(Long courseId) {
-        this.courseId = courseId;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getStudentId() {
-        return studentId;
-    }
-
-    public void setStudentId(Long studentId) {
-        this.studentId = studentId;
-    }
-
-    public Long getValidTime() {
-        return validTime;
-    }
-
-    public void setValidTime(Long validTime) {
-        this.validTime = validTime;
-    }
-
-    public Long getOnlineTime() {
-        return onlineTime;
-    }
-
-    public void setOnlineTime(Long onlineTime) {
-        this.onlineTime = onlineTime;
-    }
-
-    public Date getLoginTime() {
-        return loginTime;
-    }
-
-    public void setLoginTime(Date loginTime) {
-        this.loginTime = loginTime;
-    }
-
-    public Date getLoginOutTime() {
-        return loginOutTime;
-    }
-
-    public void setLoginOutTime(Date loginOutTime) {
-        this.loginOutTime = loginOutTime;
-    }
-
-    public Integer getStudyModel() {
-        return studyModel;
-    }
-
-    public void setStudyModel(Integer studyModel) {
-        this.studyModel = studyModel;
-    }
-
     @Override
-    public String toString() {
-        return "Duration{" +
-                "id=" + id +
-                ", studentId=" + studentId +
-                ", courseId=" + courseId +
-                ", unitId=" + unitId +
-                ", validTime=" + validTime +
-                ", onlineTime=" + onlineTime +
-                ", loginTime=" + loginTime +
-                ", loginOutTime=" + loginOutTime +
-                ", studyModel=" + studyModel +
-                '}';
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

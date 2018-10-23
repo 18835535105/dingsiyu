@@ -18,7 +18,7 @@ public interface GoodVoiceService {
      *
      * @param session
      * @param unitId
-     * @param type
+     * @param type 1：单词；2：例句
      * @return
      */
     ServerResponse getSubjects(HttpSession session, Long unitId, Integer type);

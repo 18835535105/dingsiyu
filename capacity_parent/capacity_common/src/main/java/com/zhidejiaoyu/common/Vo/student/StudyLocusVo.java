@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.Vo.student;
 import com.github.pagehelper.PageInfo;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -13,11 +14,11 @@ import java.util.Map;
  * @date 2018/8/27
  */
 @Data
-public class StudyLocusVo {
+public class StudyLocusVo implements Serializable {
     /**
      * 当前单元获取的证书
      */
-    private PageInfo<CcieVo> cciePageInfo;
+    private List<CcieVo> cciePageInfo;
 
     /**
      * 当前单元获取的勋章

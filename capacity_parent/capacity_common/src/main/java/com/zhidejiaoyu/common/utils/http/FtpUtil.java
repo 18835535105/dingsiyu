@@ -376,4 +376,49 @@ public class FtpUtil {
 		this.ftpClient = ftpClient;
 	}
 
+    /**
+     * 上传好声音音频文件到FTP服务器
+     *
+     * @param file
+     *            上传到服务器的文件
+     * @param ftpDirectory
+     *            FTP目录如:/path1/pathb2/,如果目录不存在会自动创建目录
+     * @return 上传到服务器上的文件名
+     */
+    public String uploadGoodVoice(MultipartFile file, String ftpDirectory) {
+        this.open();
+        if (!ftpClient.isConnected()) {
+            return null;
+        }
+        // 文件后缀名
+        String ftpFileName  = UUID.randomUUID().toString().replace("-","") + ".mp3";
+        boolean flag = false;
+        if (ftpClient != null) {
+            FileInputStream fis = null;
+            try {
+                fis = (FileInputStream) file.getInputStream();
+                changeDir(ftpDirectory);
+
+                ftpClient.setBufferSize(100000);
+                ftpClient.setControlEncoding("UTF-8");
+                // 设置文件类型（二进制）
+                ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
+                // 上传
+                flag = ftpClient.storeFile(new String(ftpFileName.getBytes(), "iso-8859-1"), fis);
+            } catch (Exception e) {
+                this.close();
+                e.printStackTrace();
+                return null;
+            } finally {
+                try {
+                    if (fis != null) {
+                        fis.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return flag ? ftpFileName : null;
+    }
 }
