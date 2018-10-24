@@ -577,6 +577,7 @@ public class TestServiceImpl implements TestService {
             return ServerResponse.createByError(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
         }
         // 获取当前单元下的所有单词 limit 20
+        PageHelper.startPage(1, 20);
         List<Vocabulary> vocabularies = vocabularyMapper.selectByUnitId(student.getId(), unitId);
         Integer subjectNum = vocabularies.size();
         String[] type;
