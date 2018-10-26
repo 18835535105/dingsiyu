@@ -70,8 +70,8 @@ public class CcieVo extends Ccie {
             return "";
         }
 
-        int[] type = {0, 1, 2, 3, 4, 5, 6, 7};
-        String[] name = {"单词图鉴", "慧记忆", "慧听写", "生词测试", "熟词测试", "五维测试"};
+        int[] type = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+        String[] name = {"单词图鉴", "慧记忆", "慧听写", "慧默写", "例句听力", "例句翻译", "生词测试", "例句默写", "五维测试"};
 
         int length = type.length;
         for (int i = 0; i < length; i++) {

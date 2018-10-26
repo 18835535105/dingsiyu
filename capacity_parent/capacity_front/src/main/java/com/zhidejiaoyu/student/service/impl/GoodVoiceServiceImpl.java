@@ -121,9 +121,8 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl implements GoodVoiceSe
     public ServerResponse saveVoice(HttpSession session, Long unitId, Long wordId, String word, Integer type, MultipartFile audio) {
 
         Student student = getStudent(session);
-
         // 上传录音文件
-        String fileName = FileConstant.GOOD_VOICE + ftpUtil.upload(audio, FileConstant.GOOD_VOICE, "");
+        String fileName = FileConstant.GOOD_VOICE + ftpUtil.uploadGoodVoice(audio, FileConstant.GOOD_VOICE);
         String url = prefix + fileName;
         int score;
         Map<String, Object> map;

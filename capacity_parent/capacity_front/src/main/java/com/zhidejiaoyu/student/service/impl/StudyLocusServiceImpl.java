@@ -56,7 +56,7 @@ public class StudyLocusServiceImpl implements StudyLocusService {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         StudyLocusVo studyLocusVo = new StudyLocusVo();
 
-        if (unitId == null) {
+        if (unitId == null || unitId == 0L) {
             // 获取当前学生的所有课程信息
             List<Map<String, Object>> courseList = getCourseInfo(session, studyLocusVo);
 
@@ -159,7 +159,6 @@ public class StudyLocusServiceImpl implements StudyLocusService {
     }
 
     private void getCcieInfo(Student student, StudyLocusVo studyLocusVo, Long unitId) {
-        PageHelper.startPage(1, 1);
         List<Ccie> ccie = ccieMapper.selectLastCcie(student, unitId);
         List<CcieVo> ccieVos = new ArrayList<>(ccie.size());
         CcieVo ccieVo;
@@ -167,11 +166,7 @@ public class StudyLocusServiceImpl implements StudyLocusService {
             ccieVo = new CcieVo(ccie1);
             ccieVos.add(ccieVo);
         }
-        PageInfo<Ccie> cciePageInfo = new PageInfo<>(ccie);
-        PageInfo<CcieVo> ccieVoPageInfo = new PageInfo<>(ccieVos);
-        ccieVoPageInfo.setTotal(cciePageInfo.getTotal());
-        ccieVoPageInfo.setPages(cciePageInfo.getPages());
-        studyLocusVo.setCciePageInfo(ccieVoPageInfo);
+        studyLocusVo.setCciePageInfo(ccieVos);
     }
 
     private PageInfo<Map<String, Object>> getUnitsInfo(HttpSession session, StudyLocusVo studyLocusVo, List<Map<String, Object>> courseList) {
@@ -217,7 +212,7 @@ public class StudyLocusServiceImpl implements StudyLocusService {
     }
 
     private List<Map<String, Object>> getCourseInfo(HttpSession session, StudyLocusVo studyLocusVo) {
-        ServerResponse<List<Map<String, Object>>> allCourses = courseService.getAllCourses(session, 2);
+        ServerResponse<List<Map<String, Object>>> allCourses = courseService.getAllCourses(session, 1);
         List<Map<String, Object>> courseList = allCourses.getData();
         courseList.remove(0);
         for (Map<String, Object> stringObjectMap : courseList) {
