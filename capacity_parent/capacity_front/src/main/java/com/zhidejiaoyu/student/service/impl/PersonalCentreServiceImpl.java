@@ -557,6 +557,10 @@ public class PersonalCentreServiceImpl implements PersonalCentreService {
 
                         a = 3;
                     }
+                    
+                    if(!mm.containsKey("colour")) {
+                    	mm.put("colour", 3); // 还未做单元测试3
+                    }
                     li.add(mm);
                 }
                 // 课程所有单元状态

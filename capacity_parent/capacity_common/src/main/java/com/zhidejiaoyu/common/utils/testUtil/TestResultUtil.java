@@ -147,7 +147,7 @@ public class TestResultUtil implements Serializable {
      * @return
      */
     public List<TestResult> getWordTestesForUnit(String[] type, Integer subjectNum, List<Vocabulary> target, Long unitId) {
-        if (type == null || type.length == 0) {
+    	if (type == null || type.length == 0) {
             throw new RuntimeException("测试题类型不能为空！");
         }
         if (target == null || target.size() == 0) {
@@ -219,7 +219,7 @@ public class TestResultUtil implements Serializable {
      */
     private void toGetSubject(String[] type, Integer subjectNum, List<Vocabulary> target, List<TestResult> results,
                               Map<Long, Vocabulary> map, Map<Long, Map<Long, String>> chineseMap, Iterator<Long> iterator) {
-        String wordChinese;
+    	String wordChinese;
         String chinese;
         for (int i = 0; i < type.length; i++) {
             // 控制每类题型的数量
@@ -256,29 +256,29 @@ public class TestResultUtil implements Serializable {
                     // 选项凑够4个单词翻译
                     int record = 0;
                     int nextInt = new Random().nextInt(100);
-                    if(target.size()==1){
+                    if (target.size() == 1) {
                         // 需要三道 - 查四道题防止和正确答案重复
                         List<String> chinese_ = vocabularyMapper.getThreeChinese(nextInt, 4);
-                        for(String chine : chinese_){
-                            if(!map2.containsKey(chine) && record < 3) {
+                        for (String chine : chinese_) {
+                            if (!map2.containsKey(chine) && record < 3) {
                                 map2.put(chine, false);
                                 record++;
                             }
                         }
-                    }else if(target.size()==2){
+                    } else if (target.size() == 2) {
                         // 需要两道
                         List<String> chinese_ = vocabularyMapper.getThreeChinese(nextInt, 3);
-                        for(String chine : chinese_){
-                            if(!map2.containsKey(chine) && record < 2) {
+                        for (String chine : chinese_) {
+                            if (!map2.containsKey(chine) && record < 2) {
                                 map2.put(chine, false);
                                 record++;
                             }
                         }
-                    }else if(target.size()==3){
+                    } else if (target.size() == 3) {
                         // 需要三道
                         List<String> chinese_ = vocabularyMapper.getThreeChinese(nextInt, 2);
-                        for(String chine : chinese_){
-                            if(!map2.containsKey(chine) && record < 1) {
+                        for (String chine : chinese_) {
+                            if (!map2.containsKey(chine) && record < 1) {
                                 map2.put(chine, false);
                                 record++;
                             }
@@ -304,29 +304,29 @@ public class TestResultUtil implements Serializable {
                     // 选项凑够4个单词
                     int record = 0;
                     int nextInt = new Random().nextInt(100);
-                    if(target.size()==1){
+                    if (target.size() == 1) {
                         // 需要三道
                         List<String> word = vocabularyMapper.getThreeWord(nextInt, 4);
-                        for(String word_ : word){
-                            if(!map2.containsKey(word_) && record < 3){
+                        for (String word_ : word) {
+                            if (!map2.containsKey(word_) && record < 3) {
                                 map2.put(word_, false);
                                 record++;
                             }
                         }
-                    }else if(target.size()==2){
+                    } else if (target.size() == 2) {
                         // 需要两道
                         List<String> word = vocabularyMapper.getThreeWord(nextInt, 3);
-                        for(String word_ : word){
-                            if(!map2.containsKey(word_) && record < 2) {
+                        for (String word_ : word) {
+                            if (!map2.containsKey(word_) && record < 2) {
                                 map2.put(word_, false);
                                 record++;
                             }
                         }
-                    }else if(target.size()==3){
+                    } else if (target.size() == 3) {
                         // 需要三道
                         List<String> word = vocabularyMapper.getThreeWord(nextInt, 2);
-                        for(String word_ : word){
-                            if(!map2.containsKey(word_) && record < 1) {
+                        for (String word_ : word) {
+                            if (!map2.containsKey(word_) && record < 1) {
                                 map2.put(word_, false);
                                 record++;
                             }
@@ -337,8 +337,16 @@ public class TestResultUtil implements Serializable {
                 testResult.setSubject(map2);
                 results.add(testResult);
                 if (type.length == 3) {
+                    // 只有三种类型的题目时，判断是否需要进行题目类型切换
                     boolean canBreak = (i < 2 && j == Math.round(subjectNum * 0.3)
                             || (i == 2 && j == (subjectNum - Math.round(subjectNum * 0.3) - Math.round(subjectNum * 0.3))));
+                    if (canBreak) {
+                        break;
+                    }
+                } else if (type.length == 2) {
+                    // 只有两种类型的题目时，判断是否需要进行题目类型切换
+                    boolean canBreak = (i < 1 && j == Math.round(subjectNum * 0.5)
+                            || (i == 1 && j == (subjectNum - Math.round(subjectNum * 0.5))));
                     if (canBreak) {
                         break;
                     }
