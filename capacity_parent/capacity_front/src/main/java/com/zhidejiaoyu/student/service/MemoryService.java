@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.service;
 
 import com.zhidejiaoyu.common.pojo.Learn;
+import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.vo.MemoryStudyVo;
 import com.zhidejiaoyu.student.vo.WordIntensifyVo;
@@ -13,7 +14,7 @@ import javax.servlet.http.HttpSession;
  * @author wuchenxi
  * @date 2018年5月10日
  */
-public interface MemoryService {
+public interface MemoryService extends BaseService<Vocabulary> {
 
 	/**
 	 * 获取慧记忆学习的单词信息

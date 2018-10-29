@@ -16,7 +16,7 @@ import java.util.Map;
  * @author qizhentao
  * @version 1.0
  */
-public interface LoginService {
+public interface LoginService extends BaseService<Student>{
 
     Student LoginJudge(String account, String password);
 

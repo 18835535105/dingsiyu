@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service;
 
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,7 +12,7 @@ import javax.servlet.http.HttpSession;
  * @author wuchenxi
  * @date 2018/8/29
  */
-public interface GoodVoiceService {
+public interface GoodVoiceService extends BaseService<Student> {
 
     /**
      * 获取好声音题目

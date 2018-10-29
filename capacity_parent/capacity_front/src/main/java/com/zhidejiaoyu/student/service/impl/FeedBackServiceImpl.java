@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.service.impl;
 import com.zhidejiaoyu.common.constant.FileConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.MessageBoardMapper;
+import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.pojo.MessageBoard;
 import com.zhidejiaoyu.common.pojo.MessageBoardExample;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -31,7 +32,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class FeedBackServiceImpl extends BaseServiceImpl implements FeedBackService {
+public class FeedBackServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements FeedBackService {
 
     @Value("${ftp.prefix}")
     private String ftpPrefix;

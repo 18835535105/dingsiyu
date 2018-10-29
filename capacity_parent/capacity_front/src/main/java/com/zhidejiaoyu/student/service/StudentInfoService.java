@@ -11,7 +11,7 @@ import javax.servlet.http.HttpSession;
  * @author wuchenxi
  * @date 2018年5月8日
  */
-public interface StudentInfoService {
+public interface StudentInfoService extends BaseService<Student>{
 
     /**
      * 学生完善个人信息，保存学生信息

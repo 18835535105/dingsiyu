@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class LoginServiceImpl extends BaseServiceImpl implements LoginService {
+public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements LoginService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 

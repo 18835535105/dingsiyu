@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.UnitVocabulary;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
@@ -10,14 +11,12 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
-public interface VocabularyMapper {
+public interface VocabularyMapper extends BaseMapper<Vocabulary> {
     int countByExample(VocabularyExample example);
 
     int deleteByExample(VocabularyExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(Vocabulary record);
 
     int insertSelective(Vocabulary record);
 

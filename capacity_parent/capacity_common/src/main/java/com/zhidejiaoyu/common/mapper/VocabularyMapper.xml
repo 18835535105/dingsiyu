@@ -366,22 +366,6 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert"
-            parameterType="com.zhidejiaoyu.common.pojo.Vocabulary">
-        insert into vocabulary (id, word, word_chinese,
-                                example_english, example_chinese, explain_,
-                                create_time,
-                                update_time,
-                                course_unit)
-        values (#{id,jdbcType=BIGINT},
-                #{word,jdbcType=VARCHAR},
-                #{wordChinese,jdbcType=VARCHAR},
-                #{exampleEnglish,jdbcType=VARCHAR},
-                #{exampleChinese,jdbcType=VARCHAR}, #{explain_,jdbcType=VARCHAR},
-                #{createTime,jdbcType=TIMESTAMP},
-                #{updateTime,jdbcType=TIMESTAMP},
-                #{courseUnit,jdbcType=VARCHAR})
-    </insert>
     <insert id="insertSelective"
             parameterType="com.zhidejiaoyu.common.pojo.Vocabulary">
         insert into vocabulary

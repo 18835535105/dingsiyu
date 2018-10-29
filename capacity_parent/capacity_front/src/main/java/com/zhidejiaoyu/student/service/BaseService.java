@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service;
 
+import com.baomidou.mybatisplus.service.IService;
 import com.zhidejiaoyu.common.pojo.Student;
 
 import javax.servlet.http.HttpSession;
@@ -10,7 +11,7 @@ import javax.servlet.http.HttpSession;
  * @author wuchenxi
  * @date 2018/8/29
  */
-public interface BaseService {
+public interface BaseService<T> extends IService<T> {
 
     /**
      * 从session中获取学生信息

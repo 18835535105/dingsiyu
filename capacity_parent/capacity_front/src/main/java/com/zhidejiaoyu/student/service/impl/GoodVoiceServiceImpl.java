@@ -3,10 +3,7 @@ package com.zhidejiaoyu.student.service.impl;
 import com.zhidejiaoyu.common.Vo.student.voice.VoiceRankVo;
 import com.zhidejiaoyu.common.Vo.student.voice.VoiceVo;
 import com.zhidejiaoyu.common.constant.FileConstant;
-import com.zhidejiaoyu.common.mapper.SentenceMapper;
-import com.zhidejiaoyu.common.mapper.UnitMapper;
-import com.zhidejiaoyu.common.mapper.VocabularyMapper;
-import com.zhidejiaoyu.common.mapper.VoiceMapper;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
@@ -30,7 +27,7 @@ import java.util.*;
  * @date 2018/8/29
  */
 @Service
-public class GoodVoiceServiceImpl extends BaseServiceImpl implements GoodVoiceService {
+public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements GoodVoiceService {
 
     @Autowired
     private VocabularyMapper vocabularyMapper;

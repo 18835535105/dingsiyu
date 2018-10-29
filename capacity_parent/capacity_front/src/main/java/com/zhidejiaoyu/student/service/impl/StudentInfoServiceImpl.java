@@ -22,7 +22,7 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @Service
-public class StudentInfoServiceImpl extends BaseServiceImpl implements StudentInfoService {
+public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements StudentInfoService {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
     private RunLog runLog;

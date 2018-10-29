@@ -157,49 +157,6 @@
         </foreach>
         )
     </delete>
-    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.Student">
-        insert into student (id, account, password,
-                             account_time, province, city,
-                             area, school_name, student_name,
-                             sex, nickname, birth_date,
-                             register_date, grade, squad,
-                             wish, phone, patriarch_phone,
-                             mail, status, head_url,
-                             head_name, part_url, pet_name,
-                             address, qq, practical_school,
-                             referrer, offline_gold, system_gold,
-                             school_gold_first_time, country_gold_first_time,
-                             worship_first_time, rank, update_time,
-                             role, version, first_study_time,
-                             course_id, unit_id, course_name,
-                             unit_name, sentence_course_id, sentence_unit_id,
-                             sentence_course_name, sentence_unit_name, show_capacity
-        )
-        values (#{id,jdbcType=BIGINT}, #{account,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
-                                       #{accountTime,jdbcType=TIMESTAMP}, #{province,jdbcType=VARCHAR},
-                                       #{city,jdbcType=VARCHAR},
-                                       #{area,jdbcType=VARCHAR}, #{schoolName,jdbcType=VARCHAR},
-                                       #{studentName,jdbcType=VARCHAR},
-                                       #{sex,jdbcType=INTEGER}, #{nickname,jdbcType=VARCHAR},
-            #{birthDate,jdbcType=DATE},
-            #{registerDate,jdbcType=TIMESTAMP}, #{grade,jdbcType=VARCHAR}, #{squad,jdbcType=VARCHAR},
-            #{wish,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{patriarchPhone,jdbcType=VARCHAR},
-            #{mail,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{headUrl,jdbcType=VARCHAR},
-            #{headName,jdbcType=VARCHAR}, #{partUrl,jdbcType=VARCHAR}, #{petName,jdbcType=VARCHAR},
-            #{address,jdbcType=VARCHAR}, #{qq,jdbcType=VARCHAR}, #{practicalSchool,jdbcType=VARCHAR},
-            #{referrer,jdbcType=VARCHAR}, #{offlineGold,jdbcType=DOUBLE}, #{systemGold,jdbcType=DOUBLE},
-            #{schoolGoldFirstTime,jdbcType=TIMESTAMP}, #{countryGoldFirstTime,jdbcType=TIMESTAMP},
-                                                       #{worshipFirstTime,jdbcType=TIMESTAMP}, #{rank,jdbcType=INTEGER},
-                                                       #{updateTime,jdbcType=TIMESTAMP},
-                                                       #{role,jdbcType=INTEGER}, #{version,jdbcType=VARCHAR},
-                                                       #{firstStudyTime,jdbcType=TIMESTAMP},
-                                                       #{courseId,jdbcType=BIGINT}, #{unitId,jdbcType=BIGINT},
-                                                       #{courseName,jdbcType=VARCHAR},
-                #{unitName,jdbcType=VARCHAR}, #{sentenceCourseId,jdbcType=BIGINT}, #{sentenceUnitId,jdbcType=INTEGER},
-                #{sentenceCourseName,jdbcType=VARCHAR}, #{sentenceUnitName,jdbcType=VARCHAR},
-                #{showCapacity,jdbcType=TINYINT}
-        )
-    </insert>
     <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Student" >
         insert into student
         <trim prefix="(" suffix=")" suffixOverrides="," >

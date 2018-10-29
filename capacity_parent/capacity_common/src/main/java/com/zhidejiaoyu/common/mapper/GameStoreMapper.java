@@ -1,31 +1,20 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.GameStore;
-import com.zhidejiaoyu.common.pojo.GameStoreExample;
-import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
-public interface GameStoreMapper {
-    int countByExample(GameStoreExample example);
+public interface GameStoreMapper extends BaseMapper<GameStore> {
 
-    int deleteByExample(GameStoreExample example);
-
-    int deleteByPrimaryKey(Long id);
-
-    int insert(GameStore record);
-
-    int insertSelective(GameStore record);
-
-    List<GameStore> selectByExample(GameStoreExample example);
-
-    GameStore selectByPrimaryKey(Long id);
-
-    int updateByExampleSelective(@Param("record") GameStore record, @Param("example") GameStoreExample example);
-
-    int updateByExample(@Param("record") GameStore record, @Param("example") GameStoreExample example);
-
-    int updateByPrimaryKeySelective(GameStore record);
-
-    int updateByPrimaryKey(GameStore record);
+    /**
+     * 从当前正在学习的课程已学习的单词中随机查找15个单词
+     *
+     * @param stuId
+     * @return key word, String wordChinese
+     */
+    @Select("SELECT v.word_chinese,v.word FROM vocabulary v,learn l WHERE v.delStatus=1 AND v.id=l.vocabulary_id AND l.course_id=(SELECT course_id FROM learn WHERE student_id=#{stuId} ORDER BY id DESC LIMIT 1) GROUP BY v.id ORDER BY rand() LIMIT 15")
+    List<Map<String, String>> selectGameOneSubjects(Long stuId);
 }

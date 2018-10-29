@@ -96,10 +96,6 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.GameStore" >
-    insert into game_store (id, game_name)
-    values (#{id,jdbcType=BIGINT}, #{gameName,jdbcType=VARCHAR})
-  </insert>
   <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.GameStore" >
     insert into game_store
     <trim prefix="(" suffix=")" suffixOverrides="," >

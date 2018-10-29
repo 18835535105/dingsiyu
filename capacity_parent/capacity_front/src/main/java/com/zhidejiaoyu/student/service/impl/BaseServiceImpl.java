@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.DurationMapper;
@@ -14,7 +16,7 @@ import java.util.Date;
  * @author wuchenxi
  * @date 2018/8/29
  */
-public class BaseServiceImpl implements BaseService {
+public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, T> implements BaseService<T> {
 
     @Autowired
     private DurationMapper durationMapper;

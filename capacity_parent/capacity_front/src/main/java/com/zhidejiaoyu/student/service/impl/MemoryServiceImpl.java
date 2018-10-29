@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class MemoryServiceImpl extends BaseServiceImpl implements MemoryService {
+public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabulary> implements MemoryService {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
