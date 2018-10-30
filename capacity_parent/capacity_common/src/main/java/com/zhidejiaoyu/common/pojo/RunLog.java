@@ -1,5 +1,8 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +14,8 @@ import java.util.Date;
  */
 @Data
 @NoArgsConstructor
-public class RunLog implements Serializable {
+public class RunLog extends Model<RunLog> {
+	@TableId(type = IdType.AUTO)
 	private Long id;
 
 	/** 操作人id，0：系统；其余为学生、教师、管理员、学校等人员id */
@@ -43,4 +47,8 @@ public class RunLog implements Serializable {
 		this.createTime = createTime;
 	}
 
+	@Override
+	protected Serializable pkVal() {
+		return this.id;
+	}
 }
