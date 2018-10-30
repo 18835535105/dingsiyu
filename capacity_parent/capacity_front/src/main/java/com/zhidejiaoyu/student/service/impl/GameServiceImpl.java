@@ -126,7 +126,7 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<String> saveGameTwo(HttpSession session, GameScore gameScore) {
         Student student = getStudent(session);
-        GameStore gameStore = gameStoreMapper.selectById(2L);
+        GameStore gameStore = gameStoreMapper.selectById(gameScore.getGameId());
         saveGameScore(session, gameScore, student, gameStore);
 
         RunLog runLog = new RunLog(student.getId(), 4, "学生[" + student.getStudentName() + "]在游戏《"
