@@ -355,4 +355,4 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
 
     @Select("select c.id, c.word, c.word_chinese as wordChinese from unit a JOIN unit_vocabulary b ON a.id = b.unit_id JOIN vocabulary c ON b.vocabulary_id = c.id AND a.course_id = #{courseId} AND c.delStatus = 1 GROUP BY vocabulary_id  order by rand() LIMIT 30")
     List<Vocabulary> getRandomCourseThirty(@Param("courseId") Long courseId);
-}
+ }

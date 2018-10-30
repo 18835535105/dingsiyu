@@ -1,13 +1,12 @@
 package com.zhidejiaoyu.student.service;
 
-import com.baomidou.mybatisplus.service.IService;
 import com.zhidejiaoyu.common.Vo.game.GameOneVo;
+import com.zhidejiaoyu.common.Vo.game.GameTwoVo;
 import com.zhidejiaoyu.common.pojo.GameStore;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author wuchenxi
@@ -22,4 +21,13 @@ public interface GameService extends BaseService<GameStore> {
      * @return
      */
     ServerResponse<GameOneVo> getGameOne(HttpSession session);
+
+    /**
+     * 获取游戏《桌牌捕音》试题
+     *
+     * @param session
+     * @return
+     */
+    ServerResponse<List<GameTwoVo>> getGameTwo(HttpSession session);
 }
+

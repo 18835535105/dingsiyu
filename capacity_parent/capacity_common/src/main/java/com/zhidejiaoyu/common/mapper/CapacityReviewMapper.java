@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Select;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 记忆追踪mapper
@@ -236,4 +237,40 @@ public interface CapacityReviewMapper {
 	 * @return
 	 */
 	List<CapacityReview> selectSentenceCapacity(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("classify") int classify);
+
+    /**
+     * 获取当前所学课程下单词图鉴需要复习的单词
+     *
+     * @param stuId
+     * @return
+     */
+    List<Map<String, Object>> selectPictureNeedReviewInCurrentCourse(@Param("stuId") Long stuId);
+
+
+    /**
+     * 获取当前所学课程下慧记忆需要复习的单词
+     *
+     * @param stuId
+     * @param wordIds
+     * @return
+     */
+    List<Map<String, Object>> selectMemoryNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds);
+
+    /**
+     * 获取当前所学课程下慧听力需要复习的单词
+     *
+     * @param stuId
+     * @param wordIds
+     * @return
+     */
+    List<Map<String, Object>> selectListenNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds);
+
+    /**
+     * 获取当前所学课程下慧默写需要复习的单词
+     *
+     * @param stuId
+     * @param wordIds
+     * @return
+     */
+    List<Map<String, Object>> selectWriteNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds);
 }

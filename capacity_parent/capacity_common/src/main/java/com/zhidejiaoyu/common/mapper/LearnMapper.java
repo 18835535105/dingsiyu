@@ -697,4 +697,13 @@ public interface LearnMapper {
 
     @Select("select unit_id from learn where student_id = #{studentId} GROUP BY unit_id ORDER BY id DESC LIMIT 1")
     String getEndUnitIdByStudentId(@Param("studentId") Long studentId);
+
+    /**
+     * 随机获取学生当前学习的课程下的110个单词
+     *
+     * @param stuId
+     * @param wordIds   需要过滤掉的单词id
+     * @return
+     */
+    List<String> selectWordInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds);
 }
