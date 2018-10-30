@@ -50,16 +50,25 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         // 从当前正在学习的课程已学习的单词中随机查找15个单词
         List<Map<String, String>> wordMap = gameStoreMapper.selectGameOneSubjects(student.getId());
 
-        List<String> subjects = new ArrayList<>(30);
-        wordMap.forEach(map -> map.forEach((key, value) -> {
-            subjects.add(value);
-        }));
+        List<Map<String, String>> subjects = new ArrayList<>(30);
+
+        wordMap.forEach(map -> {
+            Map<String, String> subjectMap1 = new HashMap<>(16);
+            subjectMap1.put("title", map.get("wordChinese"));
+            subjectMap1.put("value", map.get("word"));
+
+            Map<String, String> subjectMap2 = new HashMap<>(16);
+            subjectMap2.put("title", map.get("word"));
+            subjectMap2.put("value", map.get("wordChinese"));
+
+            subjects.add(subjectMap1);
+            subjects.add(subjectMap2);
+        });
 
         Collections.shuffle(subjects);
 
         GameOneVo gameOneVo = new GameOneVo();
-        gameOneVo.setMatchKeyValue(wordMap);
-        gameOneVo.setSubjects(subjects);
+        gameOneVo.setMatchKeyValue(subjects);
 
         return ServerResponse.createBySuccess(gameOneVo);
     }

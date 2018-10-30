@@ -14,14 +14,8 @@ import java.util.Map;
  */
 @Data
 public class GameOneVo implements Serializable {
-
     /**
      * 试题集合：key 英文；value 中文翻译；
      */
     private List<Map<String, String>> matchKeyValue;
-
-    /**
-     * 将中英文打散并打乱顺序的集合
-     */
-    private List<String> subjects;
 }
