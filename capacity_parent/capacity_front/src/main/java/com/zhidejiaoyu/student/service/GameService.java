@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.service;
 
 import com.zhidejiaoyu.common.Vo.game.GameOneVo;
 import com.zhidejiaoyu.common.Vo.game.GameTwoVo;
+import com.zhidejiaoyu.common.pojo.GameScore;
 import com.zhidejiaoyu.common.pojo.GameStore;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
@@ -29,5 +30,14 @@ public interface GameService extends BaseService<GameStore> {
      * @return
      */
     ServerResponse<List<GameTwoVo>> getGameTwo(HttpSession session);
+
+    /**
+     * 保存《桌牌捕音》游戏数据
+     *
+     * @param session
+     * @param gameScore
+     * @return
+     */
+    ServerResponse<String> saveGameTwo(HttpSession session, GameScore gameScore);
 }
 

@@ -12,6 +12,10 @@ public class TimeConstant {
      * 学习当前单词/句子的时间，用于保存学习/测试记录数据
      */
     public static final String BEGIN_START_TIME = "BEGIN_START_TIME";
+    /**
+     * 游戏测试开始时间
+     */
+    public static final String GAME_BEGIN_START_TIME = "GAME_BEGIN_START_TIME";
 
     /**************************** 登录相关常量 ***********************************/
     /**

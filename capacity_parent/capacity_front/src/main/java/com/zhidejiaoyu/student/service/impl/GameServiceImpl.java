@@ -2,16 +2,18 @@ package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.common.Vo.game.GameOneVo;
 import com.zhidejiaoyu.common.Vo.game.GameTwoVo;
-import com.zhidejiaoyu.common.mapper.CapacityReviewMapper;
-import com.zhidejiaoyu.common.mapper.GameStoreMapper;
-import com.zhidejiaoyu.common.mapper.LearnMapper;
+import com.zhidejiaoyu.common.constant.TimeConstant;
+import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.pojo.GameScore;
 import com.zhidejiaoyu.common.pojo.GameStore;
+import com.zhidejiaoyu.common.pojo.RunLog;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
@@ -31,6 +33,12 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
 
     @Autowired
     private LearnMapper learnMapper;
+
+    @Autowired
+    private GameScoreMapper gameScoreMapper;
+
+    @Autowired
+    private RunLogMapper runLogMapper;
 
     @Autowired
     private BaiduSpeak baiduSpeak;
@@ -103,6 +111,42 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         }
 
         return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ServerResponse<String> saveGameTwo(HttpSession session, GameScore gameScore) {
+        Student student = getStudent(session);
+        GameStore gameStore = gameStoreMapper.selectById(2L);
+        saveGameScore(session, gameScore, student, gameStore);
+
+        RunLog runLog = new RunLog(student.getId(), 4, "学生[" + student.getStudentName() + "]在游戏《"
+                + gameStore.getGameName() + "》中奖励#" + gameScore.getAwardGold() + "#枚金币", new Date());
+        runLogMapper.insert(runLog);
+
+        return ServerResponse.createBySuccess();
+    }
+
+    /**
+     * 保存游戏记录
+     *
+     * @param session
+     * @param gameScore
+     * @param student
+     * @param gameStore
+     */
+    private void saveGameScore(HttpSession session, GameScore gameScore, Student student, GameStore gameStore) {
+        gameScore.setStudentId(student.getId());
+        gameScore.setGameId(gameStore.getId());
+        gameScore.setGameName(gameStore.getGameName());
+        gameScore.setGameStartTime((Date) session.getAttribute(TimeConstant.GAME_BEGIN_START_TIME));
+        gameScore.setGameEndTime(new Date());
+        if (gameScore.getScore() < 60) {
+            gameScore.setPassFlag(0);
+        } else {
+            gameScore.setPassFlag(1);
+        }
+        gameScoreMapper.insert(gameScore);
     }
 
     /**
