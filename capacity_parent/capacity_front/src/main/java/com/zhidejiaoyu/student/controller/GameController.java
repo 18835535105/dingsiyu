@@ -53,7 +53,7 @@ public class GameController {
     }
 
     /**
-     * 保存《桌牌捕音》游戏数据
+     * 保存游戏数据
      *
      * @param session
      * @param gameScore

@@ -3,11 +3,13 @@ package com.zhidejiaoyu.student.service.impl;
 import com.zhidejiaoyu.common.Vo.game.GameOneVo;
 import com.zhidejiaoyu.common.Vo.game.GameTwoVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
+import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.GameScore;
 import com.zhidejiaoyu.common.pojo.GameStore;
 import com.zhidejiaoyu.common.pojo.RunLog;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.GameService;
@@ -39,6 +41,9 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
 
     @Autowired
     private RunLogMapper runLogMapper;
+
+    @Autowired
+    private StudentMapper studentMapper;
 
     @Autowired
     private BaiduSpeak baiduSpeak;
@@ -132,6 +137,12 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         RunLog runLog = new RunLog(student.getId(), 4, "学生[" + student.getStudentName() + "]在游戏《"
                 + gameStore.getGameName() + "》中奖励#" + gameScore.getAwardGold() + "#枚金币", new Date());
         runLogMapper.insert(runLog);
+
+        if (gameScore.getAwardGold() > 0) {
+            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gameScore.getAwardGold()));
+            studentMapper.updateById(student);
+            session.setAttribute(UserConstant.CURRENT_STUDENT, student);
+        }
 
         return ServerResponse.createBySuccess();
     }
