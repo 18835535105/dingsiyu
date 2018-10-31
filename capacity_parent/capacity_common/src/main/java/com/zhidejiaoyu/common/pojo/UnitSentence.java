@@ -2,7 +2,7 @@ package com.zhidejiaoyu.common.pojo;
 
 import java.io.Serializable;
 
-public class UnitSentence implements Serializable {
+public class UnitSentence implements Serializable{
     private Long unitId;
 
     private Long sentenceId;

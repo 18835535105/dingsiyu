@@ -1,6 +1,10 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,7 +16,9 @@ import java.util.Date;
  * @date 2018年5月10日
  */
 @Data
-public class Learn implements Serializable {
+@EqualsAndHashCode(callSuper = false)
+public class Learn extends Model<Learn> {
+    @TableId(type = IdType.AUTO)
 	private Long id;
 
 	private Long studentId;
@@ -49,4 +55,9 @@ public class Learn implements Serializable {
      * 第一次学习该单词是否是熟词，1：熟词；0：生词
      */
 	private Integer firstIsKnown;
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
+    }
 }

@@ -1,5 +1,9 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -9,9 +13,10 @@ import java.util.Date;
  * @author qizhentao
  * @version 1.0
  */
-public class News implements Serializable {
+public class News extends Model<News> {
 	
 	/** 消息通知id*/
+	@TableId(type = IdType.AUTO)
     private Long id;
 
     /** 学生id */
@@ -108,5 +113,10 @@ public class News implements Serializable {
 
     public void setRead(Integer read) {
         this.read = read;
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

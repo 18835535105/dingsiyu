@@ -1,13 +1,18 @@
 package com.zhidejiaoyu.common.pojo;
 
-import java.util.Date;
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
+import java.io.Serializable;
 
 /**
  * 学生-课程关系表
  * 我的课程中需要展示的课程信息
  * @date 2018-06-28
  */
-public class StudentCourse {
+public class StudentCourse extends Model<StudentCourse> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long studentId;
@@ -72,5 +77,10 @@ public class StudentCourse {
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

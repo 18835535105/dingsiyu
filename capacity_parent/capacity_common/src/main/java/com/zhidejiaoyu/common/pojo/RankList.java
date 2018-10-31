@@ -1,8 +1,13 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
 import java.io.Serializable;
 
-public class RankList implements Serializable {
+public class RankList extends Model<RankList> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long studentId;
@@ -71,5 +76,10 @@ public class RankList implements Serializable {
 
     public void setCountryWeekRank(Integer countryWeekRank) {
         this.countryWeekRank = countryWeekRank;
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

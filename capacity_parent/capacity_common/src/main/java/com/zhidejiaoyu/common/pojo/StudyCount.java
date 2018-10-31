@@ -1,8 +1,13 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
 import java.io.Serializable;
 
-public class StudyCount implements Serializable {
+public class StudyCount extends Model<StudyCount> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long studentId;
@@ -51,5 +56,10 @@ public class StudyCount implements Serializable {
 
     public void setStudyCount(Integer studyCount) {
         this.studyCount = studyCount;
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

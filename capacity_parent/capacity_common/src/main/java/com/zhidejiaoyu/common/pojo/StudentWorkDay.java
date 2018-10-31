@@ -1,6 +1,13 @@
 package com.zhidejiaoyu.common.pojo;
 
-public class StudentWorkDay {
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
+import java.io.Serializable;
+
+public class StudentWorkDay extends Model<StudentWorkDay> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long studentId;
@@ -39,5 +46,10 @@ public class StudentWorkDay {
 
     public void setWorkDayEnd(String workDayEnd) {
         this.workDayEnd = workDayEnd == null ? null : workDayEnd.trim();
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

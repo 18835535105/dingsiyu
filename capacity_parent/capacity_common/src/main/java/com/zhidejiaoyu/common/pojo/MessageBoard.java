@@ -1,5 +1,8 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,7 +18,9 @@ import java.util.Date;
 @Getter
 @Setter
 @ToString
-public class MessageBoard implements Serializable {
+public class MessageBoard extends Model<MessageBoard> {
+
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
@@ -79,4 +84,9 @@ public class MessageBoard implements Serializable {
      * 禁言结束时间
      */
     private Date stopSpeakEndTime;
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
+    }
 }

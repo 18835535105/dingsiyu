@@ -1,5 +1,9 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -9,7 +13,8 @@ import java.util.Date;
  * @author wuchenxi
  * @date 2018年5月10日
  */
-public class CapacityMemory implements Serializable {
+public class CapacityMemory extends Model<CapacityMemory> {
+	@TableId(type = IdType.AUTO)
 	public Long id;
 
 	public Long studentId;
@@ -121,5 +126,10 @@ public class CapacityMemory implements Serializable {
 
 	public void setPush(Date push) {
 		this.push = push;
+	}
+
+	@Override
+	protected Serializable pkVal() {
+		return this.id;
 	}
 }

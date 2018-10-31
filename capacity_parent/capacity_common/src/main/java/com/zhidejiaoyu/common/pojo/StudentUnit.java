@@ -1,8 +1,13 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
 import java.io.Serializable;
 
-public class StudentUnit implements Serializable {
+public class StudentUnit extends Model<StudentUnit> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long studentId;
@@ -67,5 +72,10 @@ public class StudentUnit implements Serializable {
 
     public void setSentenceStatus(Integer sentenceStatus) {
         this.sentenceStatus = sentenceStatus;
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

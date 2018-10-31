@@ -1,9 +1,14 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
 import java.io.Serializable;
 import java.util.Date;
 
-public class SentenceListen implements Serializable {
+public class SentenceListen extends Model<SentenceListen> {
+    @TableId(type = IdType.AUTO)
     public Long id;
 
     public Long studentId;
@@ -102,5 +107,10 @@ public class SentenceListen implements Serializable {
 
     public void setPush(Date push) {
         this.push = push;
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

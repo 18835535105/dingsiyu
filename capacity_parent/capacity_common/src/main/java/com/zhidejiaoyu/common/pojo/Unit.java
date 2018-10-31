@@ -1,5 +1,9 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
 import java.io.Serializable;
 
 /***
@@ -7,8 +11,9 @@ import java.io.Serializable;
  * 
  * @author Administrator
  */
-public class Unit implements Serializable {
+public class Unit extends Model<Unit> {
 	/** id */
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /** 课程主建 */
@@ -80,5 +85,10 @@ public class Unit implements Serializable {
 
     public void setJointName(String jointName) {
         this.jointName = jointName == null ? null : jointName.trim();
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

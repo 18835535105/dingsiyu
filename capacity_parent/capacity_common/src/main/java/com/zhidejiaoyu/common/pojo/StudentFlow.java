@@ -1,6 +1,13 @@
 package com.zhidejiaoyu.common.pojo;
 
-public class StudentFlow {
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
+import java.io.Serializable;
+
+public class StudentFlow extends Model<StudentFlow> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long studentId;
@@ -59,5 +66,10 @@ public class StudentFlow {
 
     public void setPresentFlow(Integer presentFlow) {
         this.presentFlow = presentFlow;
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

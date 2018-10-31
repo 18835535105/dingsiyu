@@ -1,9 +1,14 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
 import java.io.Serializable;
 import java.util.Date;
 
-public class Example implements Serializable {
+public class Example extends Model<Example> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private String exampleEnglish;
@@ -93,6 +98,10 @@ public class Example implements Serializable {
 				+ ", explain=" + explain + ", status=" + status + ", createTime=" + createTime + ", updateTiem="
 				+ updateTiem + ", courseUnit=" + courseUnit + "]";
 	}
-    
-    
+
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
+    }
 }

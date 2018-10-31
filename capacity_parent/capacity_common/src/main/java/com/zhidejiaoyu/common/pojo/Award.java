@@ -1,12 +1,18 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class Award implements Serializable {
+@EqualsAndHashCode(callSuper = false)
+public class Award extends Model<Award> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long studentId;
@@ -43,4 +49,8 @@ public class Award implements Serializable {
 
     private Date getTime;
 
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
+    }
 }

@@ -1,9 +1,14 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
 import java.io.Serializable;
 import java.util.Date;
 
-public class Worship implements Serializable {
+public class Worship extends Model<Worship> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long studentIdWorship;
@@ -42,5 +47,10 @@ public class Worship implements Serializable {
 
     public void setWorshipTime(Date worshipTime) {
         this.worshipTime = worshipTime;
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

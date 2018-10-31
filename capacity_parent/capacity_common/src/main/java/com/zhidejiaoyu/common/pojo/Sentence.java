@@ -1,9 +1,14 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
 import java.io.Serializable;
 
-public class Sentence implements Serializable {
+public class Sentence extends Model<Sentence> {
 	/** 例句主建id */
+    @TableId(type = IdType.AUTO)
     private Long id;
     /** 例句英文 */
     private String centreExample;
@@ -63,5 +68,9 @@ public class Sentence implements Serializable {
 	public void setCentreTranslate(String centreTranslate) {
 		this.centreTranslate = centreTranslate;
 	}
-	
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
+    }
 }

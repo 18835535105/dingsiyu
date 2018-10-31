@@ -1,8 +1,12 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
@@ -11,8 +15,10 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class Ccie implements Serializable {
+public class Ccie extends Model<Ccie> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long studentId;
@@ -50,4 +56,9 @@ public class Ccie implements Serializable {
      * 学生是否查看过该证书 1：已查看；0：未查看
      */
     private Integer readFlag;
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
+    }
 }

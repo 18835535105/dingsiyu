@@ -1,5 +1,9 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -9,7 +13,8 @@ import java.util.Date;
  * @author wuchenxi
  * @date 2018/7/16
  */
-public class RecycleBin implements Serializable {
+public class RecycleBin extends Model<RecycleBin> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
@@ -119,5 +124,10 @@ public class RecycleBin implements Serializable {
 
     public void setRecoverUserName(String recoverUserName) {
         this.recoverUserName = recoverUserName;
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

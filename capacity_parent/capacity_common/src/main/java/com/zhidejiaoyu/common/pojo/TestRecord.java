@@ -1,6 +1,10 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -9,7 +13,9 @@ import java.util.Date;
  * 测试记录表
  */
 @Data
-public class TestRecord implements Serializable {
+@EqualsAndHashCode(callSuper = false)
+public class TestRecord extends Model<TestRecord> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long studentId;
@@ -81,4 +87,9 @@ public class TestRecord implements Serializable {
      * 测试成绩大于历史最高分的次数，用于计算当次测试应该奖励的金币个数
      */
     private Integer betterCount;
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
+    }
 }

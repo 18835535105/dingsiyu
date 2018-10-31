@@ -1,7 +1,12 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -9,7 +14,9 @@ import java.util.Date;
  * @author wuchenxi
  */
 @Data
-public class GameScore {
+@EqualsAndHashCode(callSuper = false)
+public class GameScore extends Model<GameScore> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long studentId;
@@ -32,4 +39,9 @@ public class GameScore {
     private Integer passFlag;
 
     private String explain;
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
+    }
 }

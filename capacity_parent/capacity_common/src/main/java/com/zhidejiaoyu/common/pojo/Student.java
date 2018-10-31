@@ -1,6 +1,10 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
@@ -12,13 +16,15 @@ import java.util.Date;
  * @author wuchenxi
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-public class Student implements Serializable {
+public class Student extends Model<Student> {
     /**
      *
      */
     private static final long serialVersionUID = 1L;
 
+    @TableId(type = IdType.AUTO)
     private Long id;
     
     /**
@@ -259,5 +265,10 @@ public class Student implements Serializable {
 
     public Student(String petName) {
         this.petName = petName;
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

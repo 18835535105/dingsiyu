@@ -1,6 +1,13 @@
 package com.zhidejiaoyu.common.pojo;
 
-public class StudyFlow {
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
+import java.io.Serializable;
+
+public class StudyFlow extends Model<StudyFlow> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Integer nextTrueFlow;
@@ -110,5 +117,10 @@ public class StudyFlow {
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

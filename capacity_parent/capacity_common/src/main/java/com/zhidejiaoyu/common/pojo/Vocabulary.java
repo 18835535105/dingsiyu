@@ -1,5 +1,9 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
 import java.io.Serializable;
 
 /**
@@ -7,8 +11,8 @@ import java.io.Serializable;
  * 
  * @author Administrator
  */
-public class Vocabulary implements Serializable {
-
+public class Vocabulary extends Model<Vocabulary> {
+	@TableId(type = IdType.AUTO)
 	private Long id;
 
 	/** 单词 */
@@ -320,5 +324,10 @@ public class Vocabulary implements Serializable {
 
 	public void setCourseUnit(String courseUnit) {
 		this.courseUnit = courseUnit == null ? null : courseUnit.trim();
+	}
+
+	@Override
+	protected Serializable pkVal() {
+		return this.id;
 	}
 }

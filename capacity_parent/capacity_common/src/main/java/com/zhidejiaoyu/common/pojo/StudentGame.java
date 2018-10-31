@@ -1,6 +1,13 @@
 package com.zhidejiaoyu.common.pojo;
 
-public class StudentGame {
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+
+import java.io.Serializable;
+
+public class StudentGame extends Model<StudentGame> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long studentId;
@@ -29,5 +36,10 @@ public class StudentGame {
 
     public void setGameId(Long gameId) {
         this.gameId = gameId;
+    }
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }
