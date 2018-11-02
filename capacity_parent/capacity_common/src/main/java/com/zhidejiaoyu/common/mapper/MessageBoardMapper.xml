@@ -120,36 +120,6 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.MessageBoard">
-        insert into message_board (id,
-                                   student_id,
-                                   student_name,
-                                   student_account,
-                                   school_name,
-                                   reply_user_id,
-                                   content,
-                                   time,
-                                   read_flag,
-                                   accept_flag,
-                                   award_gold,
-                                   hint_flag,
-                                   role,
-                                   stop_speak_end_time)
-        values (#{id,jdbcType=BIGINT},
-                #{studentId,jdbcType=BIGINT},
-                #{studentName,jdbcType=VARCHAR},
-                #{studentAccount,jdbcType=VARCHAR},
-                #{schoolName,jdbcType=VARCHAR},
-                #{replyUserId,jdbcType=BIGINT},
-                #{content,jdbcType=VARCHAR},
-                #{time,jdbcType=TIMESTAMP},
-                #{readFlag,jdbcType=INTEGER},
-                #{acceptFlag,jdbcType=INTEGER},
-                #{awardGold,jdbcType=INTEGER},
-                #{hintFlag,jdbcType=INTEGER},
-                #{role,jdbcType=INTEGER},
-                #{stopSpeakEndTime,jdbcType=TIMESTAMP})
-    </insert>
     <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.MessageBoard">
         insert into message_board
         <trim prefix="(" suffix=")" suffixOverrides=",">

@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.MessageBoard;
 import com.zhidejiaoyu.common.pojo.MessageBoardExample;
 import org.apache.ibatis.annotations.MapKey;
@@ -9,14 +10,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public interface MessageBoardMapper {
+public interface MessageBoardMapper extends BaseMapper<MessageBoard> {
     int countByExample(MessageBoardExample example);
 
     int deleteByExample(MessageBoardExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(MessageBoard record);
 
     int insertSelective(MessageBoard record);
 

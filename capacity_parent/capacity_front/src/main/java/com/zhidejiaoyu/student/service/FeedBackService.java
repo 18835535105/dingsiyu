@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service;
 
+import com.zhidejiaoyu.common.pojo.MessageBoard;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.vo.feedbackvo.FeedBackInfoVO;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,7 +13,7 @@ import javax.servlet.http.HttpSession;
  * @author wuchenxi
  * @date 2018/8/13
  */
-public interface FeedBackService {
+public interface FeedBackService extends BaseService<MessageBoard> {
 
     /**
      * 学生发起意见反馈页面数据获取
@@ -29,8 +30,17 @@ public interface FeedBackService {
      *
      * @param session
      * @param content 反馈内容
-     * @param files   上传的图片
      * @return
      */
-    ServerResponse saveFeedBack(HttpSession session, String content, MultipartFile[] files);
+    ServerResponse saveFeedBack(HttpSession session, String content);
+
+    /**
+     * 提交意见反馈之前校验文字信息并上传文件
+     *
+     * @param session
+     * @param content 反馈内容
+     * @param files   上传的图片
+     * @return 返回图片在服务器中的地址路径
+     */
+    ServerResponse checkFeedBack(HttpSession session, String content, MultipartFile[] files);
 }

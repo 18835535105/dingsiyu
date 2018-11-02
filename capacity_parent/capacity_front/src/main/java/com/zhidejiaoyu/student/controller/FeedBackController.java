@@ -3,14 +3,12 @@ package com.zhidejiaoyu.student.controller;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.FeedBackService;
 import com.zhidejiaoyu.student.vo.feedbackvo.FeedBackInfoVO;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 
 /**
  * 意见反馈
@@ -18,7 +16,6 @@ import javax.validation.constraints.Size;
  * @author wuchenxi
  * @date 2018/8/13
  */
-@Validated
 @RestController
 @RequestMapping("/feedBack")
 public class FeedBackController {
@@ -63,16 +60,37 @@ public class FeedBackController {
      *
      * @param session
      * @param content 反馈内容
-     * @param files   上传的图片
      * @return
      */
     @PostMapping("/saveFeedBack")
-    public ServerResponse saveFeedBack(HttpSession session, @NotEmpty String content,
-                                       @Size(max = 20) @RequestParam(required = false) MultipartFile[] files) {
+    public ServerResponse saveFeedBack(HttpSession session, String content) {
+        if (StringUtils.isEmpty(content)) {
+            return ServerResponse.createByErrorMessage("反馈内容不能为空！");
+        }
+        return feedBackService.saveFeedBack(session, content);
+    }
+
+    /**
+     * 提交意见反馈之前校验文字信息并上传文件
+     *
+     * @param session
+     * @param content 反馈内容
+     * @param files   上传的图片
+     * @return 返回图片在服务器中的地址路径
+     */
+    @PostMapping("/checkFeedBack")
+    public ServerResponse checkFeedBack(HttpSession session, String content, @RequestParam(required = false) MultipartFile[] files) {
         // 上传图片不能超过20张
         if (files != null && files.length > 20) {
             return ServerResponse.createByErrorMessage("反馈图片不能超过20张，请修改后重新提交！");
         }
-        return feedBackService.saveFeedBack(session, content, files);
+        if (StringUtils.isEmpty(content)) {
+            return ServerResponse.createByErrorMessage("反馈内容不能为空！");
+        }
+        // 反馈文字不能超过200个
+        if (content.length() > 200) {
+            return ServerResponse.createByErrorMessage("输入文字过长！");
+        }
+        return feedBackService.checkFeedBack(session, content, files);
     }
 }

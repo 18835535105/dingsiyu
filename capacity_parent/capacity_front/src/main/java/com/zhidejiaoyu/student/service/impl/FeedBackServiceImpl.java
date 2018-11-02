@@ -1,9 +1,7 @@
 package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.common.constant.FileConstant;
-import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.MessageBoardMapper;
-import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.pojo.MessageBoard;
 import com.zhidejiaoyu.common.pojo.MessageBoardExample;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -32,7 +30,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class FeedBackServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements FeedBackService {
+public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, MessageBoard> implements FeedBackService {
 
     @Value("${ftp.prefix}")
     private String ftpPrefix;
@@ -52,14 +50,6 @@ public class FeedBackServiceImpl extends BaseServiceImpl<StudentMapper, Student>
 
         // 获取当前学生所有的反馈及被回复信息
         List<MessageBoard> messageBoards = getMessageBoards(student.getId());
-
-        try {
-            // 将管理员回复之后，学生还未查阅的信息置为学生已读状态
-            messageBoardMapper.updateReadFlag(student.getId(), 4);
-        } catch (Exception e) {
-            log.error("学生 {}->{} 更新已读状态出错！", student.getId(), student.getStudentName());
-        }
-
         if (messageBoards.size() > 0) {
             return ServerResponse.createBySuccess(packageFeedBackInfoVO(messageBoards, student.getHeadUrl()));
         }
@@ -68,14 +58,28 @@ public class FeedBackServiceImpl extends BaseServiceImpl<StudentMapper, Student>
 
     @Override
     public ServerResponse cancelHint(HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         messageBoardMapper.updateHintFlag(student.getId(), 2);
         return ServerResponse.createBySuccess();
     }
 
     @Override
-    public ServerResponse saveFeedBack(HttpSession session, String content, MultipartFile[] files) {
+    public ServerResponse saveFeedBack(HttpSession session, String content) {
 
+        Student student = getStudent(session);
+
+        // 保存反馈内容
+        try {
+            saveFeedBackContent(content, student);
+        } catch (Exception e) {
+            log.error("保存学生 {}->{} 意见反馈失败！", student.getId(), student.getStudentName(), e);
+            return ServerResponse.createByErrorMessage("提交失败！");
+        }
+        return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    public ServerResponse checkFeedBack(HttpSession session, String content, MultipartFile[] files) {
         Student student = getStudent(session);
         // 如果当前学生在禁言期，无法发起反馈
         List<MessageBoard> messageBoards = messageBoardMapper.selectStopSpeakTime(student.getId());
@@ -105,15 +109,6 @@ public class FeedBackServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                 }
                 return ServerResponse.createBySuccess(returnFileNames);
             }
-        }
-
-        // 保存反馈内容
-        try {
-            saveFeedBackContent(content, student);
-        } catch (Exception e) {
-            log.error("保存学生 {}->{} 意见反馈失败！", student.getId(), student.getStudentName());
-            e.printStackTrace();
-            return ServerResponse.createByErrorMessage("提交失败！");
         }
         return ServerResponse.createBySuccess();
     }
