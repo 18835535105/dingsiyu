@@ -102,6 +102,9 @@ public class TestServiceImpl implements TestService {
     @Autowired
     private DurationMapper durationMapper;
 
+    @Autowired
+    private StudentFlowMapper studentFlowMapper;
+
     /**
      * 游戏测试题目获取，获取20个单词供测试
      *
@@ -131,13 +134,13 @@ public class TestServiceImpl implements TestService {
 
         // 设置游戏测试开始时间
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-        List<Vocabulary> vocabularies;
+        List<Vocabulary> vocabularies = vocabularyMapper.selectByCourseId(2751L);
         // 根据当前学生所学学段去对应的单词预科库中查找对应的单词和释义
         String grade = student.getGrade();
         String phase = commonMethod.getPhase(grade);
 
         // todo: 以下取题以后改为从预科库中获取
-        if ("初中".equals(phase)) {
+        /*if ("初中".equals(phase)) {
             // 前往初中预科库查询简单单词
             vocabularies = vocabularyMapper.selectByStudentPhase(student, 1);
         } else {
@@ -146,7 +149,7 @@ public class TestServiceImpl implements TestService {
             if (vocabularies.size() == 0) {
                 vocabularies = vocabularyMapper.selectByStudentPhase(student, 3);
             }
-        }
+        }*/
 
         String[] type = {"汉译英"};
         // 游戏测试从取当前学段的预科库中的单词25个,其中有5个未预备单词，即可以直接跳过
@@ -192,9 +195,34 @@ public class TestServiceImpl implements TestService {
             // 无游戏测试记录，新增记录
             createGameTestRecord(testRecord, student, map);
         }
+
+        // 根据游戏分数初始化不同流程
+        this.initStudentFlow(student, testRecord.getPoint());
+
         countMyGoldUtil.countMyGold(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(map);
+    }
+
+    /**
+     * 游戏结束初始化学习流程
+     *
+     * @param student
+     * @param point
+     */
+    private void initStudentFlow(Student student, Integer point) {
+        StudentFlow studentFlow = new StudentFlow();
+        studentFlow.setStudentId(student.getId());
+        studentFlow.setTimeMachine(0);
+        studentFlow.setPresentFlow(1);
+        if (point >= PASS) {
+            // 流程2
+            studentFlow.setCurrentFlowId(24L);
+        } else {
+            // 流程1
+            studentFlow.setCurrentFlowId(11L);
+        }
+        studentFlowMapper.insert(studentFlow);
     }
 
     /**

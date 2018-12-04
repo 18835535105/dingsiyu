@@ -1,238 +1,285 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.zhidejiaoyu.common.mapper.StudyFlowMapper" >
-  <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudyFlow" >
-    <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="next_true_flow" property="nextTrueFlow" jdbcType="INTEGER" />
-    <result column="next_false_flow" property="nextFalseFlow" jdbcType="INTEGER" />
-    <result column="model_name" property="modelName" jdbcType="VARCHAR" />
-    <result column="flow_name" property="flowName" jdbcType="VARCHAR" />
-    <result column="type" property="type" jdbcType="INTEGER" />
-  </resultMap>
-  <sql id="Example_Where_Clause" >
-    <where >
-      <foreach collection="oredCriteria" item="criteria" separator="or" >
-        <if test="criteria.valid" >
-          <trim prefix="(" suffix=")" prefixOverrides="and" >
-            <foreach collection="criteria.criteria" item="criterion" >
-              <choose >
-                <when test="criterion.noValue" >
-                  and ${criterion.condition}
-                </when>
-                <when test="criterion.singleValue" >
-                  and ${criterion.condition} #{criterion.value}
-                </when>
-                <when test="criterion.betweenValue" >
-                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
-                </when>
-                <when test="criterion.listValue" >
-                  and ${criterion.condition}
-                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
-                    #{listItem}
-                  </foreach>
-                </when>
-              </choose>
+<mapper namespace="com.zhidejiaoyu.common.mapper.StudyFlowMapper">
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudyFlow">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="next_true_flow" property="nextTrueFlow" jdbcType="INTEGER"/>
+        <result column="next_false_flow" property="nextFalseFlow" jdbcType="INTEGER"/>
+        <result column="model_name" property="modelName" jdbcType="VARCHAR"/>
+        <result column="flow_name" property="flowName" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
             </foreach>
-          </trim>
-        </if>
-      </foreach>
-    </where>
-  </sql>
-  <sql id="Update_By_Example_Where_Clause" >
-    <where >
-      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
-        <if test="criteria.valid" >
-          <trim prefix="(" suffix=")" prefixOverrides="and" >
-            <foreach collection="criteria.criteria" item="criterion" >
-              <choose >
-                <when test="criterion.noValue" >
-                  and ${criterion.condition}
-                </when>
-                <when test="criterion.singleValue" >
-                  and ${criterion.condition} #{criterion.value}
-                </when>
-                <when test="criterion.betweenValue" >
-                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
-                </when>
-                <when test="criterion.listValue" >
-                  and ${criterion.condition}
-                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
-                    #{listItem}
-                  </foreach>
-                </when>
-              </choose>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
             </foreach>
-          </trim>
-        </if>
-      </foreach>
-    </where>
-  </sql>
-  <sql id="Base_Column_List" >
-    id, next_true_flow, next_false_flow, model_name, flow_name, type
-  </sql>
-  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.StudyFlowExample" >
-    select
-    <if test="distinct" >
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    from study_flow
-    <if test="_parameter != null" >
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null" >
-      order by ${orderByClause}
-    </if>
-  </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
-    select 
-    <include refid="Base_Column_List" />
-    from study_flow
-    where id = #{id,jdbcType=BIGINT}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
-    delete from study_flow
-    where id = #{id,jdbcType=BIGINT}
-  </delete>
-  <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.StudyFlowExample" >
-    delete from study_flow
-    <if test="_parameter != null" >
-      <include refid="Example_Where_Clause" />
-    </if>
-  </delete>
-  <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.StudyFlow" >
-    insert into study_flow (id, next_true_flow, next_false_flow, 
-      model_name, flow_name, type
-      )
-    values (#{id,jdbcType=BIGINT}, #{nextTrueFlow,jdbcType=INTEGER}, #{nextFalseFlow,jdbcType=INTEGER}, 
-      #{modelName,jdbcType=VARCHAR}, #{flowName,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}
-      )
-  </insert>
-  <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.StudyFlow" >
-    insert into study_flow
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
         id,
-      </if>
-      <if test="nextTrueFlow != null" >
         next_true_flow,
-      </if>
-      <if test="nextFalseFlow != null" >
         next_false_flow,
-      </if>
-      <if test="modelName != null" >
         model_name,
-      </if>
-      <if test="flowName != null" >
         flow_name,
-      </if>
-      <if test="type != null" >
-        type,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=BIGINT},
-      </if>
-      <if test="nextTrueFlow != null" >
-        #{nextTrueFlow,jdbcType=INTEGER},
-      </if>
-      <if test="nextFalseFlow != null" >
-        #{nextFalseFlow,jdbcType=INTEGER},
-      </if>
-      <if test="modelName != null" >
-        #{modelName,jdbcType=VARCHAR},
-      </if>
-      <if test="flowName != null" >
-        #{flowName,jdbcType=VARCHAR},
-      </if>
-      <if test="type != null" >
-        #{type,jdbcType=INTEGER},
-      </if>
-    </trim>
-  </insert>
-  <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.StudyFlowExample" resultType="java.lang.Integer" >
-    select count(*) from study_flow
-    <if test="_parameter != null" >
-      <include refid="Example_Where_Clause" />
-    </if>
-  </select>
-    <select id="getNodeByNodeName" parameterType="map" resultMap="BaseResultMap">
-      select * from study_flow where flow_name = #{nodeName} limit 0,1
+        type
+    </sql>
+
+    <!--多表查询返回字段-->
+    <sql id="more_table_column_list">
+        sf
+        .
+        id,
+        sf
+        .
+        next_true_flow,
+        sf
+        .
+        next_false_flow,
+        sf
+        .
+        model_name,
+        sf
+        .
+        flow_name,
+        sf
+        .
+        type
+    </sql>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.StudyFlowExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from study_flow
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
     </select>
-  <select id="getFlowInfoByStudentId" parameterType="map" resultMap="BaseResultMap">
-      select b.* from student_flow a JOIN study_flow b ON a.current_flow_id = b.id AND a.student_id = #{studentId}
-  </select>
-  <update id="updateByExampleSelective" parameterType="map" >
-    update study_flow
-    <set >
-      <if test="record.id != null" >
-        id = #{record.id,jdbcType=BIGINT},
-      </if>
-      <if test="record.nextTrueFlow != null" >
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from study_flow
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from study_flow
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.StudyFlowExample">
+        delete from study_flow
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.StudyFlow">
+        insert into study_flow (id, next_true_flow, next_false_flow,
+                                model_name, flow_name, type)
+        values (#{id,jdbcType=BIGINT}, #{nextTrueFlow,jdbcType=INTEGER}, #{nextFalseFlow,jdbcType=INTEGER},
+                #{modelName,jdbcType=VARCHAR}, #{flowName,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.StudyFlow">
+        insert into study_flow
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="nextTrueFlow != null">
+                next_true_flow,
+            </if>
+            <if test="nextFalseFlow != null">
+                next_false_flow,
+            </if>
+            <if test="modelName != null">
+                model_name,
+            </if>
+            <if test="flowName != null">
+                flow_name,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="nextTrueFlow != null">
+                #{nextTrueFlow,jdbcType=INTEGER},
+            </if>
+            <if test="nextFalseFlow != null">
+                #{nextFalseFlow,jdbcType=INTEGER},
+            </if>
+            <if test="modelName != null">
+                #{modelName,jdbcType=VARCHAR},
+            </if>
+            <if test="flowName != null">
+                #{flowName,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.StudyFlowExample"
+            resultType="java.lang.Integer">
+        select count(*) from study_flow
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <select id="getNodeByNodeName" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from study_flow where flow_name = #{nodeName} limit 1
+    </select>
+    <select id="getFlowInfoByStudentId" parameterType="map" resultMap="BaseResultMap">
+        select b.*
+        from student_flow a
+                 JOIN study_flow b ON a.current_flow_id = b.id AND a.student_id = #{studentId}
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update study_flow
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.nextTrueFlow != null">
+                next_true_flow = #{record.nextTrueFlow,jdbcType=INTEGER},
+            </if>
+            <if test="record.nextFalseFlow != null">
+                next_false_flow = #{record.nextFalseFlow,jdbcType=INTEGER},
+            </if>
+            <if test="record.modelName != null">
+                model_name = #{record.modelName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.flowName != null">
+                flow_name = #{record.flowName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.type != null">
+                type = #{record.type,jdbcType=INTEGER},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update study_flow
+        set id = #{record.id,jdbcType=BIGINT},
         next_true_flow = #{record.nextTrueFlow,jdbcType=INTEGER},
-      </if>
-      <if test="record.nextFalseFlow != null" >
         next_false_flow = #{record.nextFalseFlow,jdbcType=INTEGER},
-      </if>
-      <if test="record.modelName != null" >
         model_name = #{record.modelName,jdbcType=VARCHAR},
-      </if>
-      <if test="record.flowName != null" >
         flow_name = #{record.flowName,jdbcType=VARCHAR},
-      </if>
-      <if test="record.type != null" >
-        type = #{record.type,jdbcType=INTEGER},
-      </if>
-    </set>
-    <if test="_parameter != null" >
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
-  </update>
-  <update id="updateByExample" parameterType="map" >
-    update study_flow
-    set id = #{record.id,jdbcType=BIGINT},
-      next_true_flow = #{record.nextTrueFlow,jdbcType=INTEGER},
-      next_false_flow = #{record.nextFalseFlow,jdbcType=INTEGER},
-      model_name = #{record.modelName,jdbcType=VARCHAR},
-      flow_name = #{record.flowName,jdbcType=VARCHAR},
-      type = #{record.type,jdbcType=INTEGER}
-    <if test="_parameter != null" >
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
-  </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.StudyFlow" >
-    update study_flow
-    <set >
-      <if test="nextTrueFlow != null" >
-        next_true_flow = #{nextTrueFlow,jdbcType=INTEGER},
-      </if>
-      <if test="nextFalseFlow != null" >
-        next_false_flow = #{nextFalseFlow,jdbcType=INTEGER},
-      </if>
-      <if test="modelName != null" >
-        model_name = #{modelName,jdbcType=VARCHAR},
-      </if>
-      <if test="flowName != null" >
-        flow_name = #{flowName,jdbcType=VARCHAR},
-      </if>
-      <if test="type != null" >
-        type = #{type,jdbcType=INTEGER},
-      </if>
-    </set>
-    where id = #{id,jdbcType=BIGINT}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.StudyFlow" >
-    update study_flow
-    set next_true_flow = #{nextTrueFlow,jdbcType=INTEGER},
-      next_false_flow = #{nextFalseFlow,jdbcType=INTEGER},
-      model_name = #{modelName,jdbcType=VARCHAR},
-      flow_name = #{flowName,jdbcType=VARCHAR},
-      type = #{type,jdbcType=INTEGER}
-    where id = #{id,jdbcType=BIGINT}
-  </update>
-  <select id="getLimitOneDataByFlowName" resultMap="BaseResultMap" parameterType="string">
-     select * from study_flow where flow_name = #{flowName} LIMIT 1
-  </select>
+        type = #{record.type,jdbcType=INTEGER}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.StudyFlow">
+        update study_flow
+        <set>
+            <if test="nextTrueFlow != null">
+                next_true_flow = #{nextTrueFlow,jdbcType=INTEGER},
+            </if>
+            <if test="nextFalseFlow != null">
+                next_false_flow = #{nextFalseFlow,jdbcType=INTEGER},
+            </if>
+            <if test="modelName != null">
+                model_name = #{modelName,jdbcType=VARCHAR},
+            </if>
+            <if test="flowName != null">
+                flow_name = #{flowName,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.StudyFlow">
+        update study_flow
+        set next_true_flow  = #{nextTrueFlow,jdbcType=INTEGER},
+            next_false_flow = #{nextFalseFlow,jdbcType=INTEGER},
+            model_name      = #{modelName,jdbcType=VARCHAR},
+            flow_name       = #{flowName,jdbcType=VARCHAR},
+            type            = #{type,jdbcType=INTEGER}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <select id="getLimitOneDataByFlowName" resultMap="BaseResultMap" parameterType="string">
+        select *
+        from study_flow
+        where flow_name = #{flowName}
+        LIMIT 1
+    </select>
+
+    <select id="selectStudentCurrentFlow" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_column_list"/>
+        from study_flow sf,
+        student_flow stf
+        where stf.current_flow_id = sf.id
+        and stf.student_id = #{studentId}
+        and stf.present_flow = #{presentFlow}
+        limit 1
+    </select>
 
 </mapper>

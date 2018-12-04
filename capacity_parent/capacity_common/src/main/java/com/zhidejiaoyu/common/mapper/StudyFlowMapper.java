@@ -1,19 +1,18 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.StudyFlow;
 import com.zhidejiaoyu.common.pojo.StudyFlowExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-public interface StudyFlowMapper {
+public interface StudyFlowMapper extends BaseMapper<StudyFlow> {
     int countByExample(StudyFlowExample example);
 
     int deleteByExample(StudyFlowExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(StudyFlow record);
 
     int insertSelective(StudyFlow record);
 
@@ -39,4 +38,13 @@ public interface StudyFlowMapper {
     StudyFlow getFlowInfoByStudentId(@Param("studentId") Long studentId);
 
     StudyFlow getLimitOneDataByFlowName(String flowName);
+
+    /**
+     * 获取学生流程节点
+     *
+     * @param studentId
+     * @param presentFlow   1：当前节点；2：不是当前节点
+     * @return
+     */
+    StudyFlow selectStudentCurrentFlow(@Param("studentId") Long studentId, @Param("presentFlow") int presentFlow);
 }

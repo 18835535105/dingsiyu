@@ -273,4 +273,13 @@ public interface CapacityReviewMapper {
      * @return
      */
     List<Map<String, Object>> selectWriteNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds);
+
+	/**
+	 * 查看学生是否有需要复习的单词
+	 *
+	 * @param stu
+	 * @param date
+	 * @return
+	 */
+	Map<String, Long> countNeedReviewWithStudent(@Param("stu") Student stu, @Param("date") Date date);
 }

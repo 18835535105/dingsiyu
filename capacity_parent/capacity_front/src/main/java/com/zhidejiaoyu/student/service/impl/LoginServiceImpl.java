@@ -15,6 +15,7 @@ import com.zhidejiaoyu.student.common.personal.InitRedPointThread;
 import com.zhidejiaoyu.student.service.LoginService;
 import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.mapping.ResultMap;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -109,6 +110,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     
     @Autowired
     private StudentFlowMapper studentFlowMapper;
+
+    @Autowired
+    private CapacityReviewMapper capacityReviewMapper;
 
     @Override
     public Student LoginJudge(String account, String password) {
@@ -222,7 +226,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         Long countWord = null;
 
         for (int i = 0; i < 7; i++) {
-            Map<String, Object> a = new HashMap<String, Object>();
+            Map<String, Object> a = new HashMap<>(16);
             //-- 如果 2 = NULL 就跳过4步执行5步   condition = 3(方框为空)
             //-- 如果 2 != NULL 执行4步跳过第5步 , 如果第2步>=80 condition = 1(方框为√), 如果第3步<80 condition = 2(方框为×)
 
@@ -259,23 +263,30 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             Integer speed = (int) (BigDecimalUtil.div(sum, sumValid)*3600);
 
             // 封装返回结果
-            if (point != null && sum != null) { // 已做单元闯关
-                a.put("point", point + ""); // 分数
-                a.put("speed", speed + ""); // 速度
-                if (point >= 80) {       // 方框状态
+            // 已做单元闯关
+            if (point != null) {
+                // 分数
+                a.put("point", point + "");
+                // 速度
+                a.put("speed", speed + "");
+                // 方框状态
+                if (point >= 80) {
                     a.put("condition", 1);
                 } else {
                     a.put("condition", 2);
                 }
-                a.put("sum", ""); // ./
-                a.put("countWord", ""); // /.
+                a.put("sum", "");
+                a.put("countWord", "");
             } else { // 未做单元闯关
 
-                a.put("sum", sum + ""); // ./
-                a.put("countWord", countWord + ""); // /.
-                a.put("condition", 3); // 方框状态
-                a.put("point", ""); // 分数
-                a.put("speed", speed + ""); // 速度
+                a.put("sum", sum + "");
+                a.put("countWord", countWord + "");
+                // 方框状态
+                a.put("condition", 3);
+                // 分数
+                a.put("point", "");
+                // 速度
+                a.put("speed", speed + "");
             }
             result.put(i + "", a);
 
@@ -328,18 +339,55 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             result.put("hide", false);
         }
 
-        // 获取智能化节点数据
-        StudyFlow flow = studyFlowMapper.getFlowInfoByStudentId(student_id);
-        if(flow!=null){
-            result.put("nodeId", flow.getId());
-            result.put("nodeName", flow.getFlowName());
+        // 提示学生需要进行智能复习
+        if (a > 0 || b > 0 || c > 0 || d > 0) {
+            result.put("needReview", true);
+        } else {
+            result.put("needReview", false);
         }
-        
-        // 学生当前节点模块名
-        result.put("flowName", studentFlowMapper.getStudentFlow(stu.getId()));
-        
+        // 获取学生需要执行的节点信息
+        getNode(session, result, stu);
+
         return ServerResponse.createBySuccess(result);
     }
+
+    /**
+     * 获取学生需要执行的节点信息
+     *
+     * @param session
+     * @param result
+     * @param stu
+     */
+    private void getNode(HttpSession session, Map<String, Object> result, Student stu) {
+        // 判断学生是否需要进行智能复习
+        if (session.getAttribute("needCapacityReview") != null) {
+            StudyFlow studyFlow;
+            Map<String, Long> map = capacityReviewMapper.countNeedReviewWithStudent(stu, new Date());
+            if (map.get("cl") > 10 || map.get("cw") > 20 || map.get("cm") > 20 || map.get("sl") > 20 || map.get("sw") > 20
+                    || map.get("st") > 20) {
+                // 需要进行智能复习
+                studyFlow = studyFlowMapper.selectById(7);
+            } else {
+                // 不需要进行智能复习
+                studyFlow = studyFlowMapper.getFlowInfoByStudentId(stu.getId());
+            }
+            result.put("nodeId", studyFlow.getId());
+            result.put("nodeName", studyFlow.getFlowName());
+            result.put("flowName", studyFlow.getModelName());
+            session.removeAttribute("needCapacityReview");
+        } else {
+            // 获取智能化节点数据
+            StudyFlow flow = studyFlowMapper.getFlowInfoByStudentId(stu.getId());
+            if(flow != null){
+                result.put("nodeId", flow.getId());
+                result.put("nodeName", flow.getFlowName());
+            }
+
+            // 学生当前节点模块名
+            result.put("flowName", studentFlowMapper.getStudentFlow(stu.getId()));
+        }
+    }
+
 
     /**
      * 例句首页数据
@@ -610,11 +658,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Override
     public ServerResponse LoginJudge(String account, String password, HttpSession session, String code) {
-        /*Object verifyCode = session.getAttribute("validateCode");
-        if(verifyCode == null || !verifyCode.equals(code)){
-            return ServerResponse.createByErrorMessage("验证码错误");
-        }*/
-
         removeSessionAttribute(session);
 
         // 封装返回数据
@@ -697,7 +740,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 result.put("account_time", stu.getAccountTime());
 
                 // 学生首次登陆系统，为其初始化7个工作日,以便判断其二级标签
-                initStudentWorkDay(stu);
+               // initStudentWorkDay(stu);
 
                 // 2.1 跳到完善个人信息页面
                 return ServerResponse.createBySuccess("2", result);
@@ -726,7 +769,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                     return ServerResponse.createBySuccess("5", result);
                 } else{
                     // 接进入摸底测试
-                    return ServerResponse.createBySuccess("4", result);
+                   // return ServerResponse.createBySuccess("4", result);
                 }
 
             }
@@ -735,6 +778,10 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             redisTemplate.opsForHash().put("loginSession", stu.getId(), session.getId());
 
             countMyGoldUtil.countMyGold(stu);
+
+            // 判断学生是否需要进行智能复习,学生登录时在session中增加该字段，在接口 /login/vocabularyIndex 如果获取到该字段不为空，
+            // 判断学生是否需要进行智能复习，如果该字段为空不再判断是否需要进行智能复习
+            session.setAttribute("needCapacityReview", true);
 
             // 正常登陆
             return ServerResponse.createBySuccess("1", result);

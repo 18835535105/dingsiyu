@@ -2,10 +2,12 @@ package com.zhidejiaoyu.common.study;
 
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -13,13 +15,12 @@ import java.util.*;
 /**
  * 单词图鉴测试题,随机选择题
  */
+@Slf4j
 @Component
 public class WordPictureUtil {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    @Autowired
-    private BaiduSpeak baiduSpeak;
+    @Value("${ftp.prefix}")
+    private String prefix;
 
     /**
      * 分配题型‘看词选图’、‘听音选图’、‘看图选词’3:3:4  listSelect的长度要是list的三倍
@@ -33,11 +34,13 @@ public class WordPictureUtil {
         Collections.shuffle(list);
 
         // 题的比例
-        int size = list.size();
-        int a = (int) Math.round(size*0.3);
-        int b = (int) Math.round(size*0.3);
-        int c = size - (int) Math.round(size*0.3) * 2;
-        if(size <= 5){
+//        int size = list.size();
+//        int a = (int) Math.round(size*0.3);
+//        int b = (int) Math.round(size*0.3);
+//        int c = size - (int) Math.round(size*0.3) * 2;
+//
+        int c = list.size();
+        /*if(size <= 5){
             if(size == 5){
                 a = 1;
                 b = 2;
@@ -59,13 +62,13 @@ public class WordPictureUtil {
                 b = 0;
                 c = 0;
             }
-        }
+        }*/
 
         Map result = new HashMap();
 
         int max = listSelect.size();
 
-        if(a != 0){
+        /*if(a != 0){
             List<Map<String, Object>> listMapa = new ArrayList<>();
             List<Vocabulary> lista = list.subList(0, a);
             // 遍历每一道题
@@ -83,15 +86,15 @@ public class WordPictureUtil {
                 m.put("id", vo.getId());
                 m.put("chinese", vo.getWordChinese());
                 m.put("title", vo.getWord());
-                m.put("recordpicurl", vo.getRecordpicurl());
+                m.put("recordpicurl", prefix + vo.getRecordpicurl());
                 m.put("word", vo.getWord());
                 for (int i = 0; i < 4; i++) {
                     if(i==0){
-                        t.put(vo.getRecordpicurl(), true);
+                        t.put(prefix + vo.getRecordpicurl(), true);
                     }else{
                         max -- ;
-                        if(!listSelect.get(max).getRecordpicurl().equals(vo.getRecordpicurl())){
-                            t.put(listSelect.get(max).getRecordpicurl(), false);
+                        if(!(prefix + listSelect.get(max).getRecordpicurl()).equals(prefix + vo.getRecordpicurl())){
+                            t.put(prefix + listSelect.get(max).getRecordpicurl(), false);
                         }else{
                             i--;
                         }
@@ -120,17 +123,17 @@ public class WordPictureUtil {
                 m.put("type", "听音选图");
                 m.put("id", vo.getId());
                 m.put("chinese", vo.getWordChinese());
-                m.put("recordpicurl", vo.getRecordpicurl());
+                m.put("recordpicurl", prefix + vo.getRecordpicurl());
                 m.put("word", vo.getWord());
                 // 读音url
                 m.put("title", baiduSpeak.getLanguagePath(vo.getWord()));
                 for (int i = 0; i < 4; i++) {
                     if(i==0){
-                        t.put(vo.getRecordpicurl(), true);
+                        t.put(prefix + vo.getRecordpicurl(), true);
                     }else{
                         max -- ;
-                        if(!listSelect.get(max).getRecordpicurl().equals(vo.getRecordpicurl())){
-                            t.put(listSelect.get(max).getRecordpicurl(), false);
+                        if(!(prefix + listSelect.get(max).getRecordpicurl()).equals(prefix + vo.getRecordpicurl())){
+                            t.put(prefix + listSelect.get(max).getRecordpicurl(), false);
                         }else{
                             i--;
                         }
@@ -141,15 +144,15 @@ public class WordPictureUtil {
             }
             result.put("two", listMapb);
         }
-
+*/
         if(c > 0){
             List<Map<String, Object>> listMapc = new ArrayList<>();
-            List<Vocabulary> listc = list.subList(a+b, a+b+c);
-            Map m = null;
-            Map t = null;
-            for (Vocabulary vo : listc){
-                m = new HashMap();
-                t = new HashMap();
+//            List<Vocabulary> listc = list.subList(a+b, a+b+c);
+            Map m;
+            Map t;
+            for (Vocabulary vo : list){
+                m = new HashMap(16);
+                t = new HashMap(16);
 
                 // 封装单元id
                 if(longMapMap != null && longMapMap.containsKey(vo.getId())){
@@ -158,9 +161,9 @@ public class WordPictureUtil {
                 m.put("type", "看图选词");
                 m.put("id", vo.getId());
                 m.put("chinese", vo.getWordChinese());
-                m.put("title", vo.getRecordpicurl());
+                m.put("title", prefix + vo.getRecordpicurl());
                 m.put("word", vo.getWord());
-                m.put("recordpicurl", vo.getRecordpicurl());
+                m.put("recordpicurl", prefix + vo.getRecordpicurl());
                 for (int i = 0; i < 4; i++) {
                     if(i==0){
                         t.put(vo.getWord(), true);

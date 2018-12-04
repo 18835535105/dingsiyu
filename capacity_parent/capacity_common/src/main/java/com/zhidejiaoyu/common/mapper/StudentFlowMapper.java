@@ -43,6 +43,4 @@ public interface StudentFlowMapper {
      */
     @Select("select b.model_name from student_flow a join study_flow b ON a.current_flow_id = b.id AND a.student_id = #{id}")
 	String getStudentFlow(Long id);
-
-
 }

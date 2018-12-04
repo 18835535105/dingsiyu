@@ -154,10 +154,6 @@ public class WordPictureServiceImpl implements WordPictureService {
             }
             // 读音url
             correct.put("readUrl", baiduSpeak.getLanguagePath(correct.get("word").toString()));
-            // 词性
-            // String explains = resultMap.get("explains");
-            //String exp = explains.substring(2, explains.indexOf(".") + 1);
-            //map.put("exp", exp);
         } catch (Exception e) {
             log.error("WordPictureServiceImpl.ServerResponse(有道翻译)");
         }
@@ -171,21 +167,21 @@ public class WordPictureServiceImpl implements WordPictureService {
         Map subject = new HashMap();
         for(Map m : mapErrorVocabulary){
 
-            Boolean b = false;
+            boolean b = false;
             if(m.get("word").equals(correct.get("word"))){
                 b = true;
             }
 
-            if(i == 1){
-                correct.put("type", 1);
-                subject.put(m.get("recordpicurl"), b);
-            }else if(i == 2){
+//            if(i == 1){
+//                correct.put("type", 1);
+//                subject.put(m.get("recordpicurl"), b);
+//            }else if(i == 2){
                 correct.put("type", 2);
                 subject.put(m.get("word"), b);
-            }else {
-                correct.put("type", 3);
-                subject.put(m.get("recordpicurl"), b);
-            }
+//            }else {
+//                correct.put("type", 3);
+//                subject.put(m.get("recordpicurl"), b);
+//            }
         }
         // 把四个选项添加到correct正确答案数据中
         correct.put("subject", subject);

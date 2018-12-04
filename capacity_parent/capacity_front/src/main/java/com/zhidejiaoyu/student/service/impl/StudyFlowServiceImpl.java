@@ -15,11 +15,12 @@ import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @Transactional
 @Slf4j
-public class StudyFlowServiceImpl implements StudyFlowService {
+public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, StudyFlow> implements StudyFlowService {
 
     @Resource
     private StudyFlowMapper studyFlowMapper;
@@ -71,14 +72,14 @@ public class StudyFlowServiceImpl implements StudyFlowService {
      */
     @Override
     public ServerResponse<Object> initializeNode(long studentId, long courseId, long unitId, long node, Long grade, HttpSession session) {
-        // 获取当前节点信息
+        /*// 获取当前节点信息
         StudyFlow flow = studyFlowMapper.selectByPrimaryKey(node);
 
         Student st = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
 
         // 学习下一单元, 前端需要一个弹框提示!!!
         if("学习下一单元".equals(flow.getModelName()) || "0".equals(flow.getNextTrueFlow().toString())){
-        	
+
         	// 查询当前用户是否是新生, 有效时间小于2小时
         	int labelValidTimeByStudentId = durationMapper.labelValidTimeByStudentId(st.getId());
         	// 当前用户是新生继续17流程
@@ -96,8 +97,8 @@ public class StudyFlowServiceImpl implements StudyFlowService {
         		byPrimaryKey.setUnitName(studentCourseUnit.getUnitName());
         		return ServerResponse.createBySuccess("true", byPrimaryKey);
         	}
-        	
-        	
+
+
             // 执行一级二级标签初始化流程
             Map flowNameData = studyFlowName.getFlowName(studentId);
             // 流程名
@@ -176,18 +177,18 @@ public class StudyFlowServiceImpl implements StudyFlowService {
             }
             flowInfo.setNextFalseFlow(null);
             flowInfo.setNextTrueFlow(null);
-            
+
             // 下一节点需要学习的课程id,和单元id
             Student studentCourseUnit = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
             flowInfo.setCourseId(studentCourseUnit.getCourseId());
             flowInfo.setUnitId(studentCourseUnit.getUnitId());
             flowInfo.setCourseName(studentCourseUnit.getCourseName());
             flowInfo.setUnitName(studentCourseUnit.getUnitName());
-            
+
             return ServerResponse.createBySuccess("true", flowInfo); // 开启下一单元
             // return ServerResponse.createBySuccess(flowInfo);
         }
-        
+
         // 下一节点id
         long nodeId = 0;
         // 判断测试类型
@@ -242,23 +243,119 @@ public class StudyFlowServiceImpl implements StudyFlowService {
         int i = studentFlowMapper.updateFlowByStudentId(studentId, nextNode.getId());
         nextNode.setNextFalseFlow(null);
         nextNode.setNextTrueFlow(null);
-        
+
         // 下一节点需要学习的课程id,和单元id
         Student studentCourseUnit = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         nextNode.setCourseId(studentCourseUnit.getCourseId());
         nextNode.setUnitId(studentCourseUnit.getUnitId());
         nextNode.setCourseName(studentCourseUnit.getCourseName());
         nextNode.setUnitName(studentCourseUnit.getUnitName());
-        
-        return ServerResponse.createBySuccess("false", nextNode); // 继续学习, 不开启下一单元
+
+        return ServerResponse.createBySuccess("false", nextNode); // 继续学习, 不开启下一单元*/
+        return null;
     }
-    
+
+    @Override
+    public ServerResponse<Object> getNode(Long courseId, Long unitId, Long nodeId, Long grade, HttpSession session) {
+        Student student = getStudent(session);
+        StudyFlow studyFlow = studyFlowMapper.selectById(nodeId);
+
+        if (studyFlow != null) {
+            // 学习下一单元, 前端需要一个弹框提示
+            if (studyFlow.getNextTrueFlow() == 0) {
+                // 开启下一单元并且返回需要学习的流程信息
+                return openNextUnitAndReturn(courseId, unitId, session, student, studyFlow);
+            } else if (Objects.equals(-1, studyFlow.getNextTrueFlow())) {
+                // 进入流程2
+                this.unlockNextUnit(student, courseId, unitId, session);
+                return toAnotherFlow(student, 24);
+            } else if (Objects.equals(-3, studyFlow.getNextTrueFlow())) {
+                // 进入流程1
+                this.unlockNextUnit(student, courseId, unitId, session);
+                return toAnotherFlow(student, 11);
+            } else if (Objects.equals(-2, studyFlow.getNextTrueFlow())) {
+                // 继续上次流程
+                StudyFlow lastStudyFlow = studyFlowMapper.selectStudentCurrentFlow(student.getId(), 1);
+                return ServerResponse.createBySuccess("true", lastStudyFlow);
+            } else {
+                // 其余正常流程
+                if (studyFlow.getNextFalseFlow() == null) {
+                    // 直接进入下个流程节点
+                    return this.toAnotherFlow(student, studyFlow.getNextTrueFlow());
+                } else {
+                    if (Objects.equals(2, studyFlow.getType())) {
+                        // 分数>=80分走 nextTrue 流程，否则走 nextFalse 流程
+                        if (grade != null) {
+                            if (grade >= 80) {
+                                return toAnotherFlow(student, studyFlow.getNextTrueFlow());
+                            } else {
+                                return toAnotherFlow(student, studyFlow.getNextFalseFlow());
+                            }
+                        }
+                    } else if (Objects.equals(1, studyFlow.getType())) {
+                        // 分数>=60分走 nextTrue 流程，否则走 nextFalse 流程
+                        if (grade != null) {
+                            if (grade >= 60) {
+                                return toAnotherFlow(student, studyFlow.getNextTrueFlow());
+                            } else {
+                                return toAnotherFlow(student, studyFlow.getNextFalseFlow());
+                            }
+                        }
+                    } else {
+                        // 判断是否进行单词好声音
+                        return ServerResponse.createBySuccess("true", studyFlow);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 进入其他流程
+     *
+     * @param student
+     * @param flowId  其他流程初始流程id
+     * @return
+     */
+    private ServerResponse<Object> toAnotherFlow(Student student, int flowId) {
+        studentFlowMapper.updateFlowByStudentId(student.getId(), flowId);
+        StudyFlow byPrimaryKey = studyFlowMapper.selectById(flowId);
+        byPrimaryKey.setCourseId(student.getCourseId());
+        byPrimaryKey.setUnitId(student.getUnitId());
+        byPrimaryKey.setCourseName(student.getCourseName());
+        byPrimaryKey.setUnitName(student.getUnitName());
+        return ServerResponse.createBySuccess("true", byPrimaryKey);
+    }
+
+    /**
+     * 开启下一单元并且返回需要学习的流程信息
+     *
+     * @param courseId
+     * @param unitId
+     * @param session
+     * @param student
+     * @param studyFlow
+     * @return
+     */
+    private ServerResponse<Object> openNextUnitAndReturn(Long courseId, Long unitId, HttpSession session, Student student,
+                                                         StudyFlow studyFlow) {
+        // 开启下一单元
+        unlockNextUnit(student, courseId, unitId, session);
+
+        // 获取流程信息
+        if ("流程1".equals(studyFlow.getFlowName())) {
+            return this.toAnotherFlow(student, 11);
+        } else {
+            return this.toAnotherFlow(student, 24);
+        }
+    }
 
     /**
      * 删除精华版学习产生的数据, 重新学习精华版
      * @param studentId
      * @param courseId
-     */
+     *//*
     private void deleteEssenceVersionLearn(long studentId, long courseId) {
         // 删除learn, test_record, 7个记忆追踪数据
         LearnExample learnExampler = new LearnExample();
@@ -275,14 +372,14 @@ public class StudyFlowServiceImpl implements StudyFlowService {
 
     }
 
-    /**
+    *//**
      * 升级规则, 精华版课程学完才进行升级规则
      * @param studentId
      * @param courseId
      * @param unitId
      * @param st
      * @return 1 = 升级, 0不升级
-     */
+     *//*
     private int upgradeRules(long studentId, long courseId, long unitId, Student st, HttpSession session) {
         if(st.getVersion().contains("小学精华版") || st.getVersion().contains("初一精华版") ||
                 st.getVersion().contains("中考精华版") || st.getVersion().contains("高一精华版") ||
@@ -318,9 +415,9 @@ public class StudyFlowServiceImpl implements StudyFlowService {
         return 0;
     }
 
-    /**
+    *//**
      * 降级规则, 并把对应的精华版本更新到学生表, 根据课程判断掌握度进行降级
-     */
+     *//*
     private int flowDropRules(long studentId, long courseId, Student student, HttpSession session){
         // 1.查询是否到达降级条件
         // 已学单元
@@ -420,7 +517,7 @@ public class StudyFlowServiceImpl implements StudyFlowService {
         return 0;
     }
 
-    /**
+    *//**
      * 当前流程学习完毕后开启下一单元
      *
      * @param courseId 课程id
