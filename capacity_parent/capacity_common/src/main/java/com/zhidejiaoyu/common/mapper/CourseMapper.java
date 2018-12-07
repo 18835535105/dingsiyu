@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Course;
 import com.zhidejiaoyu.common.pojo.CourseExample;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -10,14 +11,14 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
-public interface CourseMapper {
+public interface CourseMapper extends BaseMapper<Course> {
     int countByExample(CourseExample example);
 
     int deleteByExample(CourseExample example);
 
     int deleteByPrimaryKey(Long id);
 
-    int insert(Course record);
+    //int insert(Course record);
 
     int insertSelective(Course record);
 

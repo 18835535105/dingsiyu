@@ -30,6 +30,17 @@ public class GameController {
     private GameService gameService;
 
     /**
+     * 获取需要进行的游戏名称，游戏流程开始之旅是调用
+     *
+     * @param session
+     * @return
+     */
+    @GetMapping("/getGameName")
+    public ServerResponse<String> getGameName(HttpSession session) {
+        return gameService.getGameName(session);
+    }
+
+    /**
      * 获取游戏《冰火两重界》试题
      *
      * @param session

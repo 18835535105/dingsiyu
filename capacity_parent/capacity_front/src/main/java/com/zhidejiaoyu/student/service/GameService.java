@@ -39,5 +39,13 @@ public interface GameService extends BaseService<GameStore> {
      * @return
      */
     ServerResponse<String> saveGameTwo(HttpSession session, GameScore gameScore);
+
+    /**
+     * 获取需要进行的游戏名称，游戏流程开始之旅是调用
+     *
+     * @param session
+     * @return
+     */
+    ServerResponse<String> getGameName(HttpSession session);
 }
 

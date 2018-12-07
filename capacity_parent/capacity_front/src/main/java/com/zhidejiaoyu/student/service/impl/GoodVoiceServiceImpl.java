@@ -61,7 +61,10 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
         Student student = getStudent(session);
         List<VoiceVo> voiceVos;
         if (type == 1) {
-            List<Vocabulary> vocabularies = vocabularyMapper.selectByUnitId(student.getId(), unitId);
+            List<Vocabulary> vocabularies = vocabularyMapper.selectWordVoice(student.getId(), unitId);
+            if (vocabularies.size() == 0) {
+                return ServerResponse.createBySuccess("当前单元没有待学习的单词。");
+            }
             voiceVos = new ArrayList<>(vocabularies.size());
             VoiceVo voiceVo;
             for (Vocabulary vocabulary : vocabularies) {
@@ -77,7 +80,10 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
             Collections.shuffle(voiceVos);
             return ServerResponse.createBySuccess(voiceVos);
         } else {
-            List<Sentence> sentences = sentenceMapper.selectByUnitId(student.getId(), unitId);
+            List<Sentence> sentences = sentenceMapper.selectSentenceVoice(student.getId(), unitId);
+            if (sentences.size() == 0) {
+                return ServerResponse.createBySuccess("当前单元没有待学习的句型。");
+            }
             voiceVos = new ArrayList<>(sentences.size());
             VoiceVo voiceVo;
             for (Sentence sentence : sentences) {

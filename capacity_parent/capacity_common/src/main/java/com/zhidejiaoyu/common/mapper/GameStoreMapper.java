@@ -18,4 +18,11 @@ public interface GameStoreMapper extends BaseMapper<GameStore> {
     @Select("SELECT v.word_chinese wordChinese,v.word FROM vocabulary v,learn l WHERE v.delStatus=1 AND v.id=l.vocabulary_id AND l.course_id=(SELECT course_id FROM learn WHERE student_id=#{stuId} ORDER BY id DESC LIMIT 1) GROUP BY v.id ORDER BY rand() LIMIT 15")
     List<Map<String, String>> selectGameOneSubjects(Long stuId);
 
+    /**
+     * 获取第一个游戏游戏名称
+     *
+     * @return
+     */
+    @Select("select game_name from game_store order by id asc limit 1")
+    String selectFirstGameName();
 }

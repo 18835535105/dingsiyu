@@ -256,7 +256,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     }
 
     @Override
-    public ServerResponse<Object> getNode(Long courseId, Long unitId, Long nodeId, Long grade, HttpSession session) {
+    public ServerResponse<Object> getNode(Long courseId, Long unitId, Long nodeId, Long grade, String isTrueFlow, HttpSession session) {
         Student student = getStudent(session);
         StudyFlow studyFlow = studyFlowMapper.selectById(nodeId);
 
@@ -283,6 +283,13 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                     // 直接进入下个流程节点
                     return this.toAnotherFlow(student, studyFlow.getNextTrueFlow());
                 } else {
+                    if (isTrueFlow != null) {
+                        if (Objects.equals("true", isTrueFlow)) {
+                            return toAnotherFlow(student, studyFlow.getNextTrueFlow());
+                        } else {
+                            return toAnotherFlow(student, studyFlow.getNextFalseFlow());
+                        }
+                    }
                     if (Objects.equals(2, studyFlow.getType())) {
                         // 分数>=80分走 nextTrue 流程，否则走 nextFalse 流程
                         if (grade != null) {
@@ -548,10 +555,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         } else {
             // 本课程已学习完
             // 查找学生可学习的下一课程
-            List<Course> courses = studentUnitMapper.selectNextCourse(student, courseId);
-            if (courses.size() != 0) {
-                Course course = courses.get(0);
-                List<Unit> units = unitMapper.selectUnitsByCourseId(course.getId());
+            List<StudentUnit> studentUnits = studentUnitMapper.selectNextCourse(student, courseId);
+            if (studentUnits.size() != 0) {
+                StudentUnit studentUnit = studentUnits.get(0);
+                List<Unit> units = unitMapper.selectUnitsByCourseId(studentUnit.getCourseId());
                 Unit unit;
                 if (units.size() > 0) {
                     unit = units.get(0);

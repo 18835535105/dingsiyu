@@ -24,6 +24,7 @@
                 jdbcType="VARCHAR"/>
         <result column="delStatus" property="delStatus"
                 jdbcType="VARCHAR"/>
+        <result column="sound_mark" property="soundMark"/>
     </resultMap>
     <sql id="insertWord_sql">
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -236,7 +237,11 @@
         id, word, word_chinese, example_english, example_chinese,
         explain_,
         create_time,
-        update_time, course_unit, syllable, delStatus
+        update_time,
+        course_unit,
+        syllable,
+        delStatus,
+        sound_mark
     </sql>
 
     <!-- 多表查询返回结果 -->
@@ -977,5 +982,19 @@
             AND a.unit_id = #{unitId}
         </if>
 
+    </select>
+    <select id="selectWordVoice" resultType="com.zhidejiaoyu.common.pojo.Vocabulary" parameterType="map">
+        SELECT
+        distinct
+        <include refid="unite_Column_List"/>
+        FROM vocabulary
+        v, unit_vocabulary uv,
+        student_unit su
+        where su.unit_id = uv.unit_id and su.student_id = #{studentId} and uv.unit_id = #{unitId}
+        AND v.id
+        =
+        uv.vocabulary_id AND v.delStatus = 1
+        and v.id not in (select word_id from voice where student_id = #{studentId} and unit_id = #{unitId}
+        and type = 1)
     </select>
 </mapper>

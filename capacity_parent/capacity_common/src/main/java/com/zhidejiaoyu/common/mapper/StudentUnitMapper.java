@@ -124,7 +124,7 @@ public interface StudentUnitMapper {
      * @param courseId
      * @return  剩余的所有可学习的课程，集合中第一个课程即为下个课程
      */
-    List<Course> selectNextCourse(@Param("student") Student student, @Param("courseId") Long courseId);
+    List<StudentUnit> selectNextCourse(@Param("student") Student student, @Param("courseId") Long courseId);
 
     /**
      * 根据课程查询单词模块开启了几个单元

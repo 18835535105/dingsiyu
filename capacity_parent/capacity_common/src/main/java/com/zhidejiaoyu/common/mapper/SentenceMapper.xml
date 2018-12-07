@@ -230,5 +230,20 @@
             unit_sentence
         where sentence_id = #{id} ${unit_id}
     </delete>
+
+    <select id="selectSentenceVoice" parameterType="java.lang.Long"
+            resultType="com.zhidejiaoyu.common.pojo.Sentence">
+        select
+        <include refid="relevance_base_sql"/>
+        from sentence s,
+        unit_sentence us,
+        student_unit su
+        where su.unit_id = us.unit_id
+        and s.id = us.sentence_id
+        and student_id = #{studentId}
+        and su.unit_id = #{unitId}
+        and s.id not in (select word_id from voice where student_id = #{studentId} and unit_id = #{unitId} and word_id =
+        and type = 2)
+    </select>
     
 </mapper>

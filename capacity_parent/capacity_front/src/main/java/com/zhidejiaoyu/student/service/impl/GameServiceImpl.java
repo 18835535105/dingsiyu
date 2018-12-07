@@ -147,6 +147,29 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         return ServerResponse.createBySuccess();
     }
 
+    @Override
+    public ServerResponse<String> getGameName(HttpSession session) {
+        Student student = getStudent(session);
+        Long gameId = gameScoreMapper.selectGameNameList(student);
+        String gameName;
+        if (gameId == null) {
+            // 获取第一个游戏游戏名
+            gameName = gameStoreMapper.selectFirstGameName();
+            return ServerResponse.createBySuccess(gameName);
+        } else {
+            long nextGameId = gameId + 1;
+            GameStore gameStore = gameStoreMapper.selectById(nextGameId);
+            if (gameStore == null) {
+                // 当前游戏时最后一个游戏，获取第一个游戏名
+                gameName = gameStoreMapper.selectFirstGameName();
+                return ServerResponse.createBySuccess(gameName);
+            } else {
+                // 获取下一个游戏的游戏名称
+                return ServerResponse.createBySuccess(gameStore.getGameName());
+            }
+        }
+    }
+
     /**
      * 保存游戏记录
      *
@@ -176,50 +199,58 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
      * @return
      */
     private List<Map<String, Object>> getNeedReviewWord(Student student) {
+        try {
+            // 获取当前所学课程下单词图鉴需要复习的单词
+            List<Map<String, Object>> pictureMapList = capacityReviewMapper.selectPictureNeedReviewInCurrentCourse(student.getId());
+            if (pictureMapList.size() == 10) {
+                return pictureMapList;
+            }
 
-        // 获取当前所学课程下单词图鉴需要复习的单词
-        List<Map<String, Object>> pictureMapList = capacityReviewMapper.selectPictureNeedReviewInCurrentCourse(student.getId());
-        if (pictureMapList.size() == 10) {
-            return pictureMapList;
+            // 存储需要排除的单词id
+            List<Long> wordIds = new ArrayList<>();
+            if (pictureMapList.size() > 0) {
+                pictureMapList.forEach(pictureMap -> wordIds.add(Long.valueOf(pictureMap.get("id").toString())));
+            }
+
+            // 获取当前所学课程下慧记忆需要复习的单词
+            List<Map<String, Object>> memoryMapList = capacityReviewMapper.selectMemoryNeedReviewInCurrentCourse(student.getId(), wordIds);
+            pictureMapList.addAll(memoryMapList);
+
+            if (pictureMapList.size() == 10) {
+                return pictureMapList;
+            }
+
+            if (pictureMapList.size() > 0) {
+                pictureMapList.forEach(pictureMap -> wordIds.add(Long.valueOf(pictureMap.get("id").toString())));
+            }
+
+            // 获取当前所学课程下慧听力需要复习的单词
+            List<Map<String, Object>> listenMapList = capacityReviewMapper.selectListenNeedReviewInCurrentCourse(student.getId(), wordIds);
+            pictureMapList.addAll(listenMapList);
+
+            if (pictureMapList.size() == 10) {
+                return pictureMapList;
+            }
+
+            if (pictureMapList.size() > 0) {
+                pictureMapList.forEach(pictureMap -> wordIds.add(Long.valueOf(pictureMap.get("id").toString())));
+            }
+
+            // 获取当前所学课程下慧默写需要复习的单词
+            List<Map<String, Object>> writeMapList = capacityReviewMapper.selectWriteNeedReviewInCurrentCourse(student.getId(), wordIds);
+            pictureMapList.addAll(writeMapList);
+
+            if (pictureMapList.size() == 10) {
+                return pictureMapList;
+            }
+            return new ArrayList<>();
+        } catch (Exception e) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("500", 500);
+            ArrayList<Map<String, Object>> objects = new ArrayList<>();
+            objects.add(map);
+            return objects;
         }
-
-        // 存储需要排除的单词id
-        List<Long> wordIds = new ArrayList<>();
-        if (pictureMapList.size() > 0) {
-            pictureMapList.forEach(pictureMap -> wordIds.add(Long.valueOf(pictureMap.get("id").toString())));
-        }
-
-        // 获取当前所学课程下慧记忆需要复习的单词
-        List<Map<String, Object>> memoryMapList = capacityReviewMapper.selectMemoryNeedReviewInCurrentCourse(student.getId(), wordIds);
-        pictureMapList.addAll(memoryMapList);
-
-        if (pictureMapList.size() == 10) {
-            return pictureMapList;
-        }
-
-        if (pictureMapList.size() > 0) {
-            pictureMapList.forEach(pictureMap -> wordIds.add(Long.valueOf(pictureMap.get("id").toString())));
-        }
-
-        // 获取当前所学课程下慧听力需要复习的单词
-        List<Map<String, Object>> listenMapList = capacityReviewMapper.selectListenNeedReviewInCurrentCourse(student.getId(), wordIds);
-        pictureMapList.addAll(listenMapList);
-
-        if (pictureMapList.size() == 10) {
-            return pictureMapList;
-        }
-
-        if (pictureMapList.size() > 0) {
-            pictureMapList.forEach(pictureMap -> wordIds.add(Long.valueOf(pictureMap.get("id").toString())));
-        }
-
-        // 获取当前所学课程下慧默写需要复习的单词
-        List<Map<String, Object>> writeMapList = capacityReviewMapper.selectWriteNeedReviewInCurrentCourse(student.getId(), wordIds);
-        pictureMapList.addAll(writeMapList);
-
-        if (pictureMapList.size() == 10) {
-            return pictureMapList;
-        }
-        return new ArrayList<>();
     }
+
 }

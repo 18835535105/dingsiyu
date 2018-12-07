@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.Sentence;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -230,4 +231,13 @@ public interface SentenceMapper {
      * @return
      */
     List<Sentence> selectByUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+
+    /**
+     * 获取句型好声音题目
+     *
+     * @param studentId
+     * @param unitId
+     * @return
+     */
+    List<Sentence> selectSentenceVoice(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 }

@@ -111,22 +111,11 @@ public class DictationServiceImpl implements DictationService {
 		}
 		// 音标,读音url,词性
 		try {
-			Map<String, String> resultMap = youDaoTranslate.getResultMap(vocabulary.getWord());
-			// 音标
-			String phonetic = resultMap.get("phonetic");
-			if(StringUtils.isNotBlank(phonetic) && !"null".equals(phonetic)) {
-				map.put("soundmark", "[" + phonetic + "]");
-			}else {
-				map.put("soundmark", null);
-			}
+			map.put("soundmark", vocabulary.getSoundMark());
 			// 读音url
 			map.put("readUrl", baiduSpeak.getLanguagePath(vocabulary.getWord()));
-			// 词性
-			String explains = resultMap.get("explains");
-			String exp = explains.substring(2, explains.indexOf(".") + 1);
-			map.put("exp", exp);
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 		
 		// 3. count单元表单词有多少个    /.

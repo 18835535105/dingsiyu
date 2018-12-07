@@ -87,7 +87,7 @@ public interface CapacityListenMapper {
      */
     int countNeedReviewByStudentIdAndCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
 
-    @Select("select a.id, b.word, b.word_chinese AS wordChinese, a.syllable, b.memory_strength from vocabulary a INNER JOIN capacity_listen b on a.id = b.vocabulary_id and b.unit_id = #{unit_id} and b.student_id = #{id} and b.push < #{dateTime} and b.memory_strength < 1 and a.delStatus = 1 ORDER BY b.push asc LIMIT 0,1")
+    @Select("select a.id, b.word, b.word_chinese AS wordChinese, a.syllable, b.memory_strength, a.sound_mark soundMark from vocabulary a INNER JOIN capacity_listen b on a.id = b.vocabulary_id and b.unit_id = #{unit_id} and b.student_id = #{id} and b.push < #{dateTime} and b.memory_strength < 1 and a.delStatus = 1 ORDER BY b.push asc LIMIT 0,1")
     Vocabulary showCapacity_listen(@Param("unit_id") String unit_id, @Param("id") Long id, @Param("dateTime") String dateTime);
 
     @Select("select count(a.id) from capacity_listen a where a.student_id = #{id} and a.unit_id = #{unit_id}")

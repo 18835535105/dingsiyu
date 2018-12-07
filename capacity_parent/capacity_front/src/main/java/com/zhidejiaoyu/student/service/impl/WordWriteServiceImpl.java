@@ -115,7 +115,7 @@ public class WordWriteServiceImpl implements WordWriteService {
         // 获取当前学习进度的下一个单词
         if (wordCount - 1 >= plan) {
             // 查询学习记录本模块学习过的所有单词id
-            List<Long> wordIds = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "慧默写", maxCount);
+            List<Long> wordIds = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "慧默写", maxCount == null ? 1 : maxCount);
 
             WordWriteStudyVo wordWriteStudyVo = new WordWriteStudyVo();
             Vocabulary currentStudyWord = vocabularyMapper.selectOneWordNotInIds(wordIds, unitId);
@@ -246,7 +246,8 @@ public class WordWriteServiceImpl implements WordWriteService {
             }
             count = learnMapper.insertSelective(learn);
             if (count > 0 && total == (plan + 1)) {
-                return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
+                return ServerResponse.createBySuccess();
+//                return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
             }
             if (count > 0) {
                 return ServerResponse.createBySuccess();

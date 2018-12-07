@@ -215,9 +215,7 @@
         from student s,
              voice v
         where s.id = v.student_id
-          and s.province = #{student.province}
-          and s.city = #{student.city}
-          and s.area = #{student.area}
+          and s.class_id = #{student.classId}
           and v.unit_id = #{unitId}
           and v.type = #{type}
         order by v.score desc

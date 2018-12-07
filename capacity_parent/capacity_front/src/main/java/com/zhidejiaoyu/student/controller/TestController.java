@@ -52,7 +52,7 @@ public class TestController {
      * @return
      */
     @PostMapping("/saveGameTestRecord")
-    public ServerResponse<Map<String, Object>> saveGameTestRecord(HttpSession session, TestRecord testRecord) {
+    public ServerResponse<Map<String, Object>> saveGameTestRecord(HttpSession session,  TestRecord testRecord) {
         return testService.saveGameTestRecord(session, testRecord);
     }
 

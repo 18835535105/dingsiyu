@@ -110,7 +110,7 @@ public interface CapacityWriteMapper {
      * @param vocabularyId
      * @return
      */
-    @Select("select fault_time from capacity_write where student_id = #{studentId} AND vocabulary_id = #{vocabularyId}")
+    @Select("select fault_time from capacity_write where student_id = #{studentId} AND vocabulary_id = #{vocabularyId} limit 1")
 	Integer getFaultTime(@Param("studentId")Long id, @Param("vocabularyId")Long vocabularyId);
 
     /**
