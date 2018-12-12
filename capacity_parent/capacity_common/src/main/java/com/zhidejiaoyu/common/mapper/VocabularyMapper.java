@@ -134,7 +134,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @param unitId
      * @return
      */
-    List<Vocabulary> selectByUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+    List<Vocabulary> selectByUnitId(@Param("unitId") Long unitId);
 
     /**
      * 根据单词id查询该单词的中文意思

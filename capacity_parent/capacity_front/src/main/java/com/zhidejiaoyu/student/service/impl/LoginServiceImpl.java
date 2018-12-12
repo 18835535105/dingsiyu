@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.zhidejiaoyu.common.MacIpUtil;
 import com.zhidejiaoyu.common.constant.SaltConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
@@ -12,10 +13,10 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.personal.InitRedPointThread;
+import com.zhidejiaoyu.student.listener.SessionListener;
 import com.zhidejiaoyu.student.service.LoginService;
 import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
 import org.apache.commons.lang.StringUtils;
-import org.apache.ibatis.mapping.ResultMap;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -24,9 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -192,8 +193,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         Integer valid = getValidTime(student_id, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
         // 在线时长 !
         Integer online = getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
-        result.put("online", LearnTimeUtil.valid_onlineTime(online));
-        result.put("valid", LearnTimeUtil.valid_onlineTime(valid));
+        result.put("online", online);
+        result.put("valid", valid);
         // 今日学习效率 !
         if (valid != null && online != null) {
             String efficiency = LearnTimeUtil.efficiency(valid, online);
@@ -204,23 +205,15 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         // i参数 1=慧记忆，2=慧听写，3=慧默写，4=例句听力，5=例句翻译，6=例句默写
         //-- 1.学生当前单词模块学的那个单元
-        Integer unit_id = stu.getUnitId() == null ? 0 : stu.getUnitId().intValue();
+        Integer unitId = null;
+        if (stu.getUnitId() != null) {
+            unitId = stu.getUnitId().intValue();
+        }
 
         // 查询是否需要阶段测试-隐藏单词学习模块
         TestRecordExample testRecordExample = new TestRecordExample();
         testRecordExample.createCriteria().andStudentIdEqualTo(student_id).andGenreEqualTo("阶段测试")
                 .andCourseIdEqualTo(stu.getCourseId());
-        /*int testCount = 30;
-        // 查询所学课程已学多少单词
-        int count = learnMapper.countLearnWordByStudentIdAndCourseIdAndStudyModel(student_id, stu.getCourseId(), 1);
-        if(testCount == count) {
-            // 强制去阶段
-        	result.put("stage", true);
-        	// 宠物图片
-            // result.put("partWGUrl", "../../static/img/edit-user-msg/tips1-6.png");
-        } else {
-            result.put("stage", false);
-        }*/
 
         // 单词图鉴模块, 单元下共有多少带图片的单词
         Long countWord = null;
@@ -230,23 +223,23 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             //-- 如果 2 = NULL 就跳过4步执行5步   condition = 3(方框为空)
             //-- 如果 2 != NULL 执行4步跳过第5步 , 如果第2步>=80 condition = 1(方框为√), 如果第3步<80 condition = 2(方框为×)
 
-            if (unit_id == null) {
+            if (unitId == null) {
                 return ServerResponse.createBySuccess(result);
             }
 
             if(i == 0){
                 // 单词图鉴单元总单词数
-                countWord = unitVocabularyMapper.selectWordPicCountByUnitId(unit_id);
+                countWord = unitVocabularyMapper.selectWordPicCountByUnitId(unitId);
             }else if(i == 1){
                 // 单元下一共有多少单词
-                countWord = unitVocabularyMapper.selectWordCountByUnitId((long) unit_id);
+                countWord = unitVocabularyMapper.selectWordCountByUnitId((long) unitId);
             }
 
             //-- 2.某学生某单元某模块单元闯关测试得了多少分max
-            Integer point = testRecordMapper.selectPoint(student_id, unit_id, "单元闯关测试", i);
+            Integer point = testRecordMapper.selectPoint(student_id, unitId, "单元闯关测试", i);
 
             //-- 3.某学生某单元某模块单词 学了多少 ./
-            Integer sum = learnMapper.selectNumberByStudentId(student_id, unit_id, i);
+            Integer sum = learnMapper.selectNumberByStudentId(student_id, unitId, i);
 
             if(countWord.equals(sum)){
                 a.put("state", true);
@@ -256,7 +249,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
             //-- 4.某学生某单元某模块学习速度;  
             //select SUM(valid_time) from duration where unit_id = 1 and student_id = 1 and study_model = '1'
-            Integer sumValid = durationMapper.valid_timeIndex(student_id, unit_id, i);
+            Integer sumValid = durationMapper.valid_timeIndex(student_id, unitId, i);
             if (sumValid == null) {
             	sumValid = 0;
             }
@@ -299,7 +292,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         String datetime = s.format(new Date());
 
         CapacityReview cr = new CapacityReview();
-        cr.setUnit_id(Long.valueOf(unit_id));
+        cr.setUnit_id(Long.valueOf(unitId));
         cr.setStudent_id(Long.valueOf(student_id));
         cr.setPush(datetime);
         // 慧记忆模块需复习量
@@ -333,17 +326,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 是否需要隐藏学习模块
         if (a >= 20 || b >= 10 || c >= 10 || d >=10) {
             result.put("hide", true);
-         // 温故宠物图片
-            // result.put("partWGUrl", "../../static/img/edit-user-msg/tips1-5.png");
         } else {
             result.put("hide", false);
-        }
-
-        // 提示学生需要进行智能复习
-        if (a > 0 || b > 0 || c > 0 || d > 0) {
-            result.put("needReview", true);
-        } else {
-            result.put("needReview", false);
         }
         // 获取学生需要执行的节点信息
         getNode(session, result, stu);
@@ -362,15 +346,35 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 判断学生是否需要进行智能复习
         if (session.getAttribute("needCapacityReview") != null) {
             StudyFlow studyFlow;
-            Map<String, Long> map = capacityReviewMapper.countNeedReviewWithStudent(stu, new Date());
-            if (map.get("cl") > 10 || map.get("cw") > 20 || map.get("cm") > 20 || map.get("sl") > 20 || map.get("sw") > 20
-                    || map.get("st") > 20) {
-                // 需要进行智能复习
-                studyFlow = studyFlowMapper.selectById(7);
-            } else {
+            StringBuilder sb = new StringBuilder();
+            // 上次登录期间学生的单词学习信息
+            Duration duration = durationMapper.selectLastLoginDuration(stu.getId());
+            if (duration != null) {
+                List<Learn> learns = learnMapper.selectLastLoginStudy(stu.getId(), duration.getLoginTime(), duration.getLoginOutTime());
+                if (learns.size() > 0) {
+                    // 存储单词id及单元
+                    List<Map<String, Object>> maps = ReviewServiceImpl.packageLastLoginLearnWordIds(learns);
+
+                    String[] str = {"单词图鉴", "慧记忆", "慧听写", "慧默写"};
+                    Integer memoryCount;
+                    for (int i = 0; i < 3; i++) {
+                        memoryCount = capacityReviewMapper.countCapacityByUnitIdAndWordId(stu.getId(), maps, i);
+                        if (memoryCount != null && memoryCount > 0) {
+                            sb.append(str[i]).append("-");
+                        }
+                    }
+                }
+            }
+
+            String needReviewStr = sb.toString();
+            if (needReviewStr.length() == 0) {
                 // 不需要进行智能复习
                 studyFlow = studyFlowMapper.getFlowInfoByStudentId(stu.getId());
+            } else {
+                // 需要进行智能复习
+                studyFlow = studyFlowMapper.selectById(7);
             }
+            result.put("needReview", needReviewStr);
             result.put("nodeId", studyFlow.getId());
             result.put("nodeName", studyFlow.getFlowName());
             result.put("flowName", studyFlow.getModelName());
@@ -383,6 +387,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 result.put("nodeName", flow.getFlowName());
             }
 
+            result.put("needReview", "");
             // 学生当前节点模块名
             result.put("flowName", studentFlowMapper.getStudentFlow(stu.getId()));
         }
@@ -399,7 +404,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         Long student_id = StudentIdBySession(session);
 
         // 封装返回数据
-        Map<String, Object> result = new HashMap<String, Object>(16);
+        Map<String, Object> result = new HashMap<>(16);
 
         // 判断个人中心按钮是否需要红点提示
         initRedPointThread.redPoint(getStudent(session), result);
@@ -439,8 +444,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         Integer valid = getValidTime(student_id, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
         // 在线时长 !
         Integer online = getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
-        result.put("online", LearnTimeUtil.valid_onlineTime(online));
-        result.put("valid", LearnTimeUtil.valid_onlineTime(valid));
+        result.put("online", online);
+        result.put("valid", valid);
         // 今日学习效率 !
         if (valid != null && online != null) {
             String efficiency = LearnTimeUtil.efficiency(valid, online);
@@ -452,24 +457,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // i参数 1=慧记忆，2=慧听写，3=慧默写，4=例句听力，5=例句翻译，6=例句默写
         //-- 1.查询学生当前单词模块学的那个单元
         Integer unit_id = stu.getSentenceUnitId();
-
-        // 查看黄金记忆点是否需要隐藏单词学习模块
-        // 当前时间
-        //String dateTime = DateUtil.DateTime();
-        // 1.例句
-        //Integer count_a = capacityMemoryMapper.selectCountPush(student_id, unit_id, dateTime, 4);
-        // 2.例句
-        //Integer count_b = capacityMemoryMapper.selectCountPush(student_id, unit_id, dateTime, 5);
-        // 3.例句
-        //Integer count_c = capacityMemoryMapper.selectCountPush(student_id, unit_id, dateTime, 6);
-        // 是否需要隐藏学习模块
-        //if (count_a >= 10 || count_b >= 10 || count_c >= 10) {
-        //    result.put("hide", true);
-            // 宠物图片
-        //    result.put("partWGUrl", "../../static/img/edit-user-msg/tips1-6.png");
-        //} else {
-        //    result.put("hide", false);
-        //}
 
         // 一共有多少例句/.
         Long countWord = unitSentenceMapper.selectSentenceCountByUnitId((long) unit_id);
@@ -497,24 +484,30 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 Integer sumValid = durationMapper.valid_timeIndex(student_id, unit_id, i);
 
                 Integer speed = sumValid == null ? 0 : (int) (BigDecimalUtil.div(sum, sumValid)*3600);
-                a.put("point", point + ""); // 分数
-                a.put("speed", speed + ""); // 速度
-                if (point >= 80) {       // 方框状态
+                // 分数
+                a.put("point", point + "");
+                // 速度
+                a.put("speed", speed + "");
+                // 方框状态
+                if (point >= 80) {
                     a.put("condition", 1);
                 } else {
                     a.put("condition", 2);
                 }
-                a.put("sum", ""); // ./
-                a.put("countWord", ""); // /.
+                a.put("sum", "");
+                a.put("countWord", "");
             } else {
-                a.put("sum", sum + ""); // ./
-                a.put("countWord", countWord + ""); // /.
-                a.put("condition", 3); // 方框状态
-                a.put("point", ""); // 分数
+                a.put("sum", sum + "");
+                a.put("countWord", countWord + "");
+                // 方框状态
+                a.put("condition", 3);
+                // 分数
+                a.put("point", "");
                 // 计算学习速度
                 Integer sumValid = durationMapper.valid_timeIndex(student_id, unit_id, i);
                 Integer speed = (int) (BigDecimalUtil.div(sum, sumValid == null ? 0 : sumValid) * 3600);
-                a.put("speed", speed); // 速度
+                // 速度
+                a.put("speed", speed);
             }
 
             result.put(i + "", a);
@@ -642,13 +635,14 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         // 获取今日获得金币 date_format(learn_time, '%Y-%m-%d')
         List<String> list = runLogMapper.getStudentGold(DateUtil.formatYYYYMMDD(new Date()), studentId);
-        int count = 0;
+        double count = 0.0;
         String regex = "#(.*)#";
         Pattern pattern = Pattern.compile(regex);
         for (String str : list) {
-            Matcher matcher = pattern.matcher(str);//匹配类
+            // 匹配类
+            Matcher matcher = pattern.matcher(str);
             while (matcher.find()) {
-                count += Integer.parseInt(matcher.group(1));
+                count += Double.parseDouble(matcher.group(1));
             }
         }
         map.put("myThisGold", count);
@@ -658,7 +652,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Override
     public ServerResponse LoginJudge(String account, String password, HttpSession session, String code) {
-        removeSessionAttribute(session);
+//        removeSessionAttribute(session);
 
         // 封装返回数据
         Map<String, Object> result = new HashMap<>(16);
@@ -767,15 +761,11 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 if (count == 1) {
                     // 进行游戏测试
                     return ServerResponse.createBySuccess("5", result);
-                } else{
-                    // 接进入摸底测试
-                   // return ServerResponse.createBySuccess("4", result);
                 }
-
             }
 
             // 一个账户只能登陆一台
-            redisTemplate.opsForHash().put("loginSession", stu.getId(), session.getId());
+            judgeMultipleLogin(session, stu);
 
             countMyGoldUtil.countMyGold(stu);
 
@@ -786,6 +776,21 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 正常登陆
             return ServerResponse.createBySuccess("1", result);
         }
+    }
+
+    private void judgeMultipleLogin(HttpSession session, Student stu) {
+        Object object = redisTemplate.opsForHash().get("loginSession", stu.getId());
+        HttpSession oldSession;
+        if (object != null) {
+            oldSession = SessionListener.getSessionById(object.toString());
+            // 如果账号登录的session不同，保存前一个session的信息
+            if (oldSession != null && !Objects.equals(object, session.getId())) {
+                saveDurationInfo(stu, oldSession);
+                saveLogoutLog(stu, runLogMapper, logger);
+            }
+        }
+        SessionListener.putSession(session);
+        redisTemplate.opsForHash().put("loginSession", stu.getId(), session.getId());
     }
 
     /**
@@ -896,6 +901,63 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
     }
 
+
+    public static void saveLogoutLog(Student stu, RunLogMapper runLogMapper, Logger logger) {
+        RunLog runLog = new RunLog(stu.getId(), 1, "学生[" + stu.getStudentName() + "]退出登录", new Date());
+        try {
+            runLogMapper.insert(runLog);
+        } catch (Exception e) {
+            logger.error("记录学生 [{}]->[{}] 退出登录信息失败！", stu.getId(), stu.getStudentName(), e);
+        }
+    }
+
+    @Override
+    public void loginOut(HttpSession session, HttpServletRequest request) {
+        Student student = getStudent(session);
+        if (student != null) {
+            String ip = null;
+            try {
+                ip = MacIpUtil.getIpAddr(request);
+            } catch (Exception e) {
+                logger.error("获取学生[{}]-[{}]登录IP失败！error=[{}]", student.getId(), student.getStudentName(), e.getMessage());
+            }
+            RunLog runLog = new RunLog(student.getId(), 1, "学生[" + student.getStudentName() + "]通过退出按钮退出登录, ip=[" + ip + "]", new Date());
+            try {
+                runLogMapper.insert(runLog);
+            } catch (Exception e) {
+                logger.error("记录学生 [{}]->[{}] 退出登录信息失败！", student.getId(), student.getStudentName(), e);
+            }
+
+            // 保存学生时长信息
+            saveDurationInfo(student, session);
+            // 删除学生登录信息
+            SessionListener.removeSessionById(session.getId());
+            redisTemplate.opsForHash().delete("loginSession", student.getId());
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveDurationInfo(Student student, HttpSession session) {
+        Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
+        Date loginOutTime = DateUtil.parseYYYYMMDDHHMMSS(new Date());
+        if (loginTime != null && loginOutTime != null) {
+            // 判断当前登录时间是否已经记录有在线时长信息，如果没有插入记录，如果有无操作
+            int count = durationMapper.countOnlineTimeWithLoginTime(student, loginTime);
+            if (count <= 0) {
+                Long onlineTime = (loginOutTime.getTime() - loginTime.getTime()) / 1000;
+                Duration duration = new Duration();
+                duration.setStudentId(student.getId());
+                duration.setOnlineTime(onlineTime);
+                duration.setLoginTime(loginTime);
+                duration.setLoginOutTime(loginOutTime);
+                duration.setValidTime(0L);
+                durationMapper.insert(duration);
+                removeSessionAttributes(session);
+            }
+        }
+    }
+
     /**
      * 判断当前用户是否已登录，防止用户正常登录期间通过url再次登录导致更新时长表信息出错问题
      * <ul>
@@ -905,10 +967,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      *
      * @param session
      */
-    private void removeSessionAttribute(HttpSession session) {
+    private void removeSessionAttributes(HttpSession session) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         if (student != null) {
-            saveDuration(session);
             Enumeration<String> attributeNames = session.getAttributeNames();
             StringBuilder sb = new StringBuilder();
             while (attributeNames.hasMoreElements()) {
@@ -921,29 +982,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 }
             }
         }
-    }
-
-    @Override
-    public void loginOut(HttpSession session) {
-        session.invalidate();
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void saveDuration(HttpSession session) {
-
-        if (session.getAttribute(TimeConstant.LOGIN_TIME) == null) {
-            return;
-        }
-
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-
-        saveLogoutInfo(student);
-
-        Map<Integer, Duration> map = (Map<Integer, Duration>) session.getAttribute(TimeConstant.TOTAL_VALID_TIME);
-        Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
-
-        saveDurationInfo(student, map, loginTime);
     }
 
     /**
@@ -960,36 +998,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
     }
 
-    @Override
-    public void saveDurationInfo(Student student, Map<Integer, Duration> map, Date loginTime) {
-        Date loginOutTime = DateUtil.parseYYYYMMDDHHMMSS(new Date());
-        Assert.notNull(loginOutTime, "loginOutTime is null");
-        Long onlineTime = (loginOutTime.getTime() - loginTime.getTime()) / 1000;
-
-        if (map != null) {
-            // 在线时长只保留一个即可，防止重复累计
-            final int[] i = {0};
-
-            map.forEach((key, value) -> {
-                value.setLoginOutTime(loginOutTime);
-                if (i[0] == 0) {
-                    value.setOnlineTime(onlineTime);
-                } else {
-                    value.setOnlineTime(0L);
-                }
-                i[0] = i[0]++;
-                durationMapper.updateByPrimaryKeySelective(value);
-            });
-        } else {
-            Duration duration = new Duration();
-            duration.setStudentId(student.getId());
-            duration.setOnlineTime(onlineTime);
-            duration.setLoginTime(loginTime);
-            duration.setLoginOutTime(loginOutTime);
-            duration.setValidTime(0L);
-            durationMapper.insert(duration);
-        }
-    }
 
     @Override
     public void getValidateCode(HttpSession session, HttpServletResponse response) throws IOException {
@@ -1004,7 +1012,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         session.setAttribute("validateCode", vCode.getCode());
         vCode.write(response.getOutputStream());
     }
-
 
     @Test
     public void add() {

@@ -211,4 +211,7 @@ public interface UnitVocabularyMapper {
      */
     @MapKey("id")
     Map<Long, Map<Long, Object>> selectWordChineseMapByCourseIdAndWordIds(@Param("courseId") Long courseId, @Param("idSet") Set<Long> idSet);
+
+    @Select("SELECT count(DISTINCT(c.id)) FROM	unit a JOIN unit_vocabulary b ON a.id = b.unit_id JOIN vocabulary c ON b.vocabulary_id = c.id AND a.course_id = #{courseId} AND c.delStatus = 1 ")
+    int getAllCountWordByCourse(Long courseId);
 }

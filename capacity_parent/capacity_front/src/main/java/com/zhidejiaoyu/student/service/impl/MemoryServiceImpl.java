@@ -417,8 +417,8 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         Integer valid = getValidTime(id, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
         // 在线时长 !
         Integer online = getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
-        result.put("online", LearnTimeUtil.valid_onlineTime(online));
-        result.put("valid", LearnTimeUtil.valid_onlineTime(valid));
+        result.put("online", online);
+        result.put("valid", valid);
         // 今日学习效率 !
         if (valid != null) {
             String efficiency = LearnTimeUtil.efficiency(valid, online);

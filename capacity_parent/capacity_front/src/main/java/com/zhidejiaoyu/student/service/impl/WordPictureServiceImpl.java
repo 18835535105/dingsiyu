@@ -95,10 +95,6 @@ public class WordPictureServiceImpl implements WordPictureService {
             return x;
         }
 
-        // 用于判断哪个题型
-        Random random = new Random();
-        int i = random.nextInt(3)+1;
-
         // 1. 根据随机数获取题型, 并查出一道正确的题
         // 1.1 去慧记忆中查询单词图鉴是否有需要复习的单词
         Map<String, Object> correct = capacityPictureMapper.selectNeedReviewWord(unitId, studentId, DateUtil.DateTime());
@@ -143,7 +139,7 @@ public class WordPictureServiceImpl implements WordPictureService {
         Integer hard = memoryDifficultyUtil.getMemoryDifficulty(cp, 1);
         correct.put("memoryDifficulty", hard);
 
-        try {
+        try {/**/
             Map<String, String> resultMap = youDaoTranslate.getResultMap(correct.get("word").toString());
             // 音标
             String phonetic = resultMap.get("phonetic");
@@ -152,6 +148,7 @@ public class WordPictureServiceImpl implements WordPictureService {
             }else {
                 correct.put("soundmark", null);
             }
+//            vocabularyMapper.
             // 读音url
             correct.put("readUrl", baiduSpeak.getLanguagePath(correct.get("word").toString()));
         } catch (Exception e) {

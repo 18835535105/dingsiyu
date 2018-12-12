@@ -40,8 +40,8 @@
         <spring-boot-starter.version>2.0.0.RELEASE</spring-boot-starter.version>
 
         <!--mysql-->
-        <mysql-connector-java.version>5.1.46</mysql-connector-java.version>
-        <mybatis.version>1.1.1</mybatis.version>
+        <mysql-connector-java.version>8.0.13</mysql-connector-java.version>
+        <mybatis.version>3.4.6</mybatis.version>
         <mybatis-plus-boot-starter.version>1.0.5</mybatis-plus-boot-starter.version>
         <velocity-engine-core.version>2.0</velocity-engine-core.version>
         <pagehelper.version>5.0.0</pagehelper.version>
@@ -54,7 +54,7 @@
         <fastjson.version>1.2.41</fastjson.version>
         <jackson-annotations.version>2.9.5</jackson-annotations.version>
 
-        <commons-dbcp.version>1.2.1</commons-dbcp.version>
+        <durid.version>1.1.9</durid.version>
 
         <!--excel-->
         <poi.version>3.12</poi.version>
@@ -68,7 +68,6 @@
         <commons-lang.version>2.4</commons-lang.version>
         <shiro-core.version>1.4.0</shiro-core.version>
 
-        <spring-session-data-redis.version>2.1.0.BUILD-SNAPSHOT</spring-session-data-redis.version>
     </properties>
 
     <dependencyManagement>
@@ -86,18 +85,12 @@
                 <scope>test</scope>
             </dependency>
 
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-data-redis</artifactId>
-                <version>${spring-boot-starter.version}</version>
-            </dependency>
-
             <!-- jdbc -->
-            <dependency>
+            <!--<dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-jdbc</artifactId>
                 <version>${spring-boot-starter.version}</version>
-            </dependency>
+            </dependency>-->
 
             <!-- mysql -->
             <dependency>
@@ -108,22 +101,16 @@
 
             <!-- 连接池 -->
             <dependency>
-                <groupId>commons-dbcp</groupId>
-                <artifactId>commons-dbcp</artifactId>
-                <version>${commons-dbcp.version}</version>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${durid.version}</version>
             </dependency>
 
             <!-- tomcat jsp支持 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-tomcat</artifactId>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.session</groupId>
-                <artifactId>spring-session-data-redis</artifactId>
-                <version>${spring-session-data-redis.version}</version>
+                <!--<scope>provided</scope>-->
             </dependency>
 
             <dependency>

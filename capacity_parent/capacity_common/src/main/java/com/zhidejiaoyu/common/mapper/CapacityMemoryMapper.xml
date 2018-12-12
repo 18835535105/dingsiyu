@@ -172,16 +172,6 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.CapacityMemory">
-        insert into capacity_memory (id, student_id, course_id,
-                                     unit_id, vocabulary_id, word,
-                                     syllable, word_chinese, fault_time,
-                                     push, memory_strength)
-        values (#{id,jdbcType=BIGINT}, #{studentId,jdbcType=BIGINT}, #{courseId,jdbcType=BIGINT},
-            #{unitId,jdbcType=BIGINT}, #{vocabularyId,jdbcType=BIGINT}, #{word,jdbcType=VARCHAR},
-            #{syllable,jdbcType=VARCHAR}, #{wordChinese,jdbcType=VARCHAR}, #{faultTime,jdbcType=INTEGER},
-            #{push,jdbcType=TIMESTAMP}, #{memoryStrength,jdbcType=DOUBLE})
-    </insert>
     <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.CapacityMemory">
         insert into capacity_memory
         <trim prefix="(" suffix=")" suffixOverrides=",">

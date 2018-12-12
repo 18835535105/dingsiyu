@@ -87,7 +87,7 @@ public class BookServiceImpl implements BookService {
             List<Vocabulary> vocabularies = null;
             if (condition == totalWord) {
                 // 总单词
-                vocabularies = unitId != 0 ? vocabularyMapper.selectByUnitId(studentId, unitId) : vocabularyMapper.selectByCourseId(courseId);
+                vocabularies = unitId != 0 ? vocabularyMapper.selectByUnitId(unitId) : vocabularyMapper.selectByCourseId(courseId);
             } else if (condition == unknownWord || condition == knownWord) {
                 // 2:生词，3：熟词
                 vocabularies = unitId != 0 ? vocabularyMapper.selectUnknownWordByUnitId(studentId, unitId, studyModel, condition)
@@ -262,7 +262,7 @@ public class BookServiceImpl implements BookService {
         List<BookVo> bookVos = new ArrayList<>();
         if (type == 1) {
             // 查询当前单元/课程下的所有单词
-            List<Vocabulary> vocabularies = unitId != 0 ? vocabularyMapper.selectByUnitId(student.getId(), unitId) : vocabularyMapper.selectByCourseId(courseId);
+            List<Vocabulary> vocabularies = unitId != 0 ? vocabularyMapper.selectByUnitId(unitId) : vocabularyMapper.selectByCourseId(courseId);
             if (vocabularies.size() > 0) {
                 bookVos = this.getVocabularyBooKVo(vocabularies, bookVos, unitId, courseId, null);
                 playerVo.setTotal(vocabularies.size());

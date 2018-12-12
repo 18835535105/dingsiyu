@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -140,4 +141,31 @@ public interface DurationMapper {
      */
     Double selectStudyEfficiency(@Param("studentWorkDay") StudentWorkDay studentWorkDay);
 
+    /**
+     * 查询学生上次的登录时间和退出时间
+     *
+     * @param studentId
+     * @return
+     */
+    Duration selectLastLoginDuration(@Param("studentId") Long studentId);
+
+    /**
+     * 查看学生当前登录记录的在线时长个数
+     *
+     * @param student
+     * @param loginTime
+     * @return
+     */
+    int countOnlineTimeWithLoginTime(@Param("student") Student student, @Param("loginTime") Date loginTime);
+
+    /**
+     * 统计今日学生当前模块下当前单元的总有效时长
+     *
+     * @param stuId
+     * @param model  学习模块
+     * @param unitId
+     * @return  有效时长，单位：秒
+     */
+    @Select("select sum(valid_time) from duration where to_days(now()) = to_days(login_time) and student_id = #{stuId} and study_model = #{model} and unit_id = #{unitId}")
+    Long sumTodayModelValidTime(@Param("stuId") Long stuId, @Param("model") int model, @Param("unitId") Long unitId);
 }

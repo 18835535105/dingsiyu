@@ -275,11 +275,32 @@ public interface CapacityReviewMapper {
     List<Map<String, Object>> selectWriteNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds);
 
 	/**
-	 * 查看学生是否有需要复习的单词
+	 * 获取学生指定单元下指定单词需要复习的个数
 	 *
-	 * @param stu
-	 * @param date
+	 * @param studentId
+	 * @param maps
+	 * @param classify
 	 * @return
 	 */
-	Map<String, Long> countNeedReviewWithStudent(@Param("stu") Student stu, @Param("date") Date date);
+	Integer countCapacityByUnitIdAndWordId(@Param("studentId") Long studentId, @Param("maps") List<Map<String, Object>> maps, @Param("classify") int classify);
+
+	/**
+	 * 查询上次登录期间需要复习的生词(取黄金记忆点最大的一个)
+	 *
+	 * @param studentId
+	 * @param maps
+	 * @param classify
+	 * @return
+	 */
+	Map<String, Object> selectLastLoginNeedReview(@Param("studentId") Long studentId, @Param("maps") List<Map<String, Object>> maps, @Param("classify") int classify);
+
+	/**
+	 * 查询上次登录期间需要复习的生词个数
+	 *
+	 * @param studentId
+	 * @param maps
+	 * @param classify
+	 * @return
+	 */
+	int countLastLoginNeedReview(@Param("studentId") Long studentId, @Param("maps") List<Map<String, Object>> maps, @Param("classify") int classify);
 }

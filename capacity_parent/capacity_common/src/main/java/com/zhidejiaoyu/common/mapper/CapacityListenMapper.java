@@ -112,4 +112,13 @@ public interface CapacityListenMapper {
      * @return  记忆追踪信息
      */
     List<CapacityListen> selectByCapacityListen(CapacityListen capacityListen);
+
+    /**
+     * 删除学生当前单元的记忆追踪信息
+     *
+     * @param studentId
+     * @param unitId
+     */
+    @Delete("delete from capacity_listen where student_id = #{studentId} and unit_id = #{unitId}")
+    void deleteByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 }

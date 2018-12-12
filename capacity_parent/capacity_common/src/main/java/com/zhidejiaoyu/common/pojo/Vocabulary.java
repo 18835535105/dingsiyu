@@ -27,28 +27,30 @@ public class Vocabulary extends Model<Vocabulary> {
 	private String wordChinese;
 
 	/** 例句英文 */
+	@TableField("centreExample")
 	private String exampleEnglish;
 
 	/** 例句中文 */
 	private String exampleChinese;
 
 	/** 初中例句英文 */
+	@TableField("centreExample")
 	private String centreExample;
 
 	/** 初中例句中文 */
+	@TableField("centreTranslate")
 	private String centreTranslate;
 
 	/** 高中例句英文 */
+	@TableField("tallExample")
 	private String tallExample;
 
 	/** 高中例句中文 */
+	@TableField("tallTranslate")
 	private String tallTranslate;
 
 	/** 拓展 */
 	private String explain_;
-
-	/** 单词状态 1 = 开启（默认）， 2 = 关闭 */
-	private Integer status;
 
 	/** 用法 */
 	private String upage;
@@ -72,6 +74,7 @@ public class Vocabulary extends Model<Vocabulary> {
 	private String discriminate;
 
 	/** 开启状态中文 */
+	@TableField(exist = false)
 	private String stat;
 
 	/** 创建时间 */
@@ -80,15 +83,24 @@ public class Vocabulary extends Model<Vocabulary> {
 	private String updateTime;
 
 	private String courseUnit;
+
+	@TableField(exist = false)
 	private String course_id;
+
+	@TableField(exist = false)
 	private String joint_name;
+
+	@TableField(exist = false)
 	private String strClassify;
+
+	@TableField(exist = false)
 	private Double memory_strength;
 	
 	/** 音节 */
 	private String syllable;
 
 	/** 删除 1 = 开启（默认）， 2 = 关闭*/
+	@TableField("delStatus")
 	private Integer delStatus;
 
 	/**

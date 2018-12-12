@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.service;
 
 import javax.servlet.http.HttpSession;
 
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
 import java.text.ParseException;
@@ -12,7 +13,7 @@ import java.text.ParseException;
  * @author qizhentao
  * @version 1.0
  */
-public interface PersonalCentreService {
+public interface PersonalCentreService extends BaseService<Student> {
 
 	ServerResponse<Object> newsCentre(HttpSession session);
 

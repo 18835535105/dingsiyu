@@ -706,4 +706,23 @@ public interface LearnMapper {
      * @return
      */
     List<String> selectWordInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds);
+
+    /**
+     * 获取学生上次登录期间单词的学习信息
+     *
+     * @param studentId
+     * @param loginTime
+     * @param loginOutTime
+     * @return
+     */
+    List<Learn> selectLastLoginStudy(@Param("studentId") Long studentId, @Param("loginTime") Date loginTime, @Param("loginOutTime") Date loginOutTime);
+
+    /**
+     * 删除学生当前单元的学习记录
+     *
+     * @param studentId
+     * @param unitId
+     */
+    @Delete("delete from learn where student_id = #{studentId} and unit_id = #{unitId}")
+    void deleteByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 }

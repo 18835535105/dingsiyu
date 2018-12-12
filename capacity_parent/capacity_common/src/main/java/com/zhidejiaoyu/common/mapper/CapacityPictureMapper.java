@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.CapacityPicture;
 import com.zhidejiaoyu.common.pojo.CapacityPictureExample;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -82,4 +83,13 @@ public interface CapacityPictureMapper {
     int countNeedReviewByStudentIdAndCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
 
     void deleteAllMemory(@Param("studentId") long studentId, @Param("courseId") long courseId, @Param("model") int model);
+
+    /**
+     * 删除学生当前单元的记忆追踪信息
+     *
+     * @param studentId
+     * @param unitId
+     */
+    @Delete("delete from capacity_picture where student_id = #{studentId} and unit_id = #{unitId}")
+    void deleteByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 }

@@ -249,6 +249,17 @@
         </foreach>
     </select>
 
+    <select id="getMapKeyStudentXZ" resultType="java.util.Map">
+        select a.student_id AS id, count(a.id) as count
+        from award a
+                 join student b ON a.student_id = b.id
+        where a.type = 3
+          and a.can_get = 1
+          and a.get_flag = 1
+          AND b.role = 1
+        GROUP BY a.student_id
+    </select>
+
     <update id="updateByExampleSelective" parameterType="map">
         update award
         <set>

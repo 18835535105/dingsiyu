@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.StudentInfoService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import java.util.Date;
  * @author wuchenxi
  * @date 2018年5月8日
  */
+@Slf4j
 @RestController
 @RequestMapping("/student")
 @Validated
@@ -226,18 +228,29 @@ public class StudentInfoController {
      *
      * @param session
      * @param classify
-     *                  学习模块(有效时长)，区分各个学习模块的时长，0 : 单词图鉴 ; 1：慧记忆；2：慧听写；3：慧默写；4：例句听力；5：例句翻译；
-     *                  6：例句默写；7：单元闯关测试；8：复习测试；9：已学测试； 10：熟词测试；11：生词测试；12:五维测试
+     *                  学习模块(有效时长)，区分各个学习模块的时长，7：单元闯关测试；8：复习测试；9：已学测试；10：熟词测试；11：生词测试；
+     *                  12：五维测试；13：任务课程；'14:单词辨音; 15:词组辨音; 16:单词认读; 17:词组认读; 18:词汇考点; 19:句型认读;
+     *                  20:语法辨析; 21单词拼写; 22:词组拼写;
      * @param courseId
      * @param unitId
      * @return
      */
     @PostMapping("/endValidTime")
-    public ServerResponse<String> endValidTime(HttpSession session, @NotNull(message = "classify 不能为空！") Integer classify,
-                                               Long courseId, @RequestParam(required = false, defaultValue = "0") Long unitId) {
-        if (courseId == null) {
-            return ServerResponse.createByErrorMessage("courseId can't be null!");
+    public ServerResponse<String> endValidTime(HttpSession session, Integer classify,
+                                               Long courseId, Long unitId, String validTime) {
+        if (classify == null || courseId == null) {
+            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
         }
-        return studentInfoService.calculateValidTime(session, classify, courseId, unitId);
+        // TODO：validTime 修改为string，查找NAN问题
+        // 有效时长数字
+        long valid = 0L;
+        if (!StringUtils.isEmpty(validTime)) {
+            try {
+                valid = Long.valueOf(validTime);
+            } catch (Exception e) {
+                log.error("有效时长入参类型错误：学习模块[{}]，validTime[{}]，error=[{}]", classify, validTime, e.getMessage());
+            }
+        }
+        return studentInfoService.calculateValidTime(session, classify, courseId, unitId, valid);
     }
 }

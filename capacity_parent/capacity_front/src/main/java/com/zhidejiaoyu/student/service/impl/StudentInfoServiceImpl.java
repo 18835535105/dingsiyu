@@ -278,65 +278,57 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     }
 
     @Override
-    public ServerResponse<String> calculateValidTime(HttpSession session, Integer classify, Long courseId, Long unitId) {
+    @SuppressWarnings("unchecked")
+    public ServerResponse<String> calculateValidTime(HttpSession session, Integer classify, Long courseId, Long unitId,
+                                                     Long validTime) {
         // key: 学习模块
         Map<Integer, Duration> map;
         Duration duration;
 
-        Object beginTime = session.getAttribute(TimeConstant.BEGIN_VALID_TIME);
-        if (beginTime == null) {
-            return ServerResponse.createByErrorMessage("非法操作！");
-        }
-
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+
+        // 学生超过30分钟无操作后，session过期会导致student为空，点击退出按钮会出现NPE，在此进行处理
+        if (student == null) {
+            return ServerResponse.createBySuccess();
+        }
         Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
-        Long startTime = ((Date) beginTime).getTime();
-        Long nowTime = System.currentTimeMillis();
-        Long second = (nowTime - startTime) / 1000;
 
         // session 中还没有学生的学习有效时长
         if (session.getAttribute(TimeConstant.TOTAL_VALID_TIME) == null) {
             map = new HashMap<>(16);
-            duration = new Duration();
-            duration.setStudentId(student.getId());
-            duration.setCourseId(courseId);
-            duration.setStudyModel(classify);
-            duration.setUnitId(unitId);
-            duration.setValidTime(second);
-            duration.setLoginTime(loginTime);
-            duration.setOnlineTime(0L);
-            duration.setStudentId(student.getId());
-            map.put(classify, duration);
+            packageDuration(classify, courseId, unitId, validTime, map, student, loginTime);
             session.setAttribute(TimeConstant.TOTAL_VALID_TIME, map);
         } else {
             // session 中已经有学生的学习有效时长，如果没有当前模块增加当前模块的有效时长；如果有当前模块的有效时长，将有效时长相加
             map = (Map<Integer, Duration>) session.getAttribute(TimeConstant.TOTAL_VALID_TIME);
             if (map.containsKey(classify)) {
                 duration = map.get(classify);
-                duration.setValidTime(duration.getValidTime() + second);
+                duration.setValidTime(duration.getValidTime() + validTime);
                 duration.setLoginTime(loginTime);
                 duration.setOnlineTime(0L);
                 map.put(classify, duration);
             } else {
-                duration = new Duration();
-                duration.setCourseId(courseId);
-                duration.setStudyModel(classify);
-                duration.setUnitId(unitId);
-                duration.setValidTime(second);
-                duration.setLoginTime(loginTime);
-                duration.setOnlineTime(0L);
-                duration.setStudentId(student.getId());
-                map.put(classify, duration);
+                packageDuration(classify, courseId, unitId, validTime, map, student, loginTime);
             }
             session.setAttribute(TimeConstant.TOTAL_VALID_TIME, map);
         }
-        String tip = null;
-        if (classify <= 6) {
-            tip = saveGoldAward(session, classify, second, loginTime);
-            countMyGoldUtil.countMyGold(student);
-        }
+
+        String tip = "";
         saveDuration(session, map, loginTime);
+        session.removeAttribute(TimeConstant.BEGIN_VALID_TIME);
         return ServerResponse.createBySuccessMessage(tip);
+    }
+
+    private void packageDuration(Integer classify, Long courseId, Long unitId, Long validTime, Map<Integer, Duration> map, Student student, Date loginTime) {
+        Duration duration = new Duration();
+        duration.setCourseId(courseId);
+        duration.setStudyModel(classify);
+        duration.setUnitId(unitId);
+        duration.setValidTime(validTime);
+        duration.setLoginTime(loginTime);
+        duration.setStudentId(student.getId());
+        duration.setOnlineTime(0L);
+        map.put(classify, duration);
     }
 
     @Override

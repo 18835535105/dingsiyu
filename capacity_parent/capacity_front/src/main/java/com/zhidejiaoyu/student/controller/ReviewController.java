@@ -233,6 +233,23 @@ public class ReviewController {
     }
 
     /**
+     * 获取智能复习题目，上次登录期间需要复习的单词
+     *
+     * @param classify   0=单词图鉴 1=慧记忆 2=慧听写 3=慧默写
+     * @param totalCount 需要复习的数据总数量，为空时从后台计算总数并返回，不为空时后台使用该数值直接返回
+     * @param session
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/getCapacityReview")
+    public ServerResponse<Map<String, Object>> getCapacityReview(Integer classify, Integer totalCount, HttpSession session) {
+        if (classify == 0 || classify == 1 || classify == 2 || classify == 3) {
+            return reviewService.getWordReview(session, classify, totalCount);
+        }
+        return ServerResponse.createBySuccess();
+    }
+
+    /**
      * 测试中心首页需要的数据
      *
      * @param model 1=单词模块;2=例句模块

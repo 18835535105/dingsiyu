@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -137,8 +138,8 @@ public class LoginController {
      * @param session
      */
     @PostMapping("/loginOut")
-    public void loginOut(HttpSession session) {
-        loginService.loginOut(session);
+    public void loginOut(HttpSession session, HttpServletRequest request) {
+        loginService.loginOut(session, request);
     }
 
     /**

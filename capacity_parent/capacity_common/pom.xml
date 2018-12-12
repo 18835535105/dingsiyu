@@ -27,10 +27,10 @@
 		</dependency>
 
 		<!-- jdbc -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jdbc</artifactId>
-		</dependency>
+		<!-- <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-starter-jdbc</artifactId>
+         </dependency>-->
 
 		<!-- mysql -->
 		<dependency>
@@ -40,8 +40,8 @@
 
 		<!-- 连接池 -->
 		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid-spring-boot-starter</artifactId>
 		</dependency>
 
 		<!--mybatis -->
@@ -154,9 +154,14 @@
 			<artifactId>jsoup</artifactId>
 		</dependency>
 
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.session</groupId>
+			<artifactId>spring-session-data-redis</artifactId>
 		</dependency>
 
 		<!-- servlet依赖 -->
@@ -211,7 +216,7 @@
 
 	<build>
 		<defaultGoal>compile</defaultGoal>
-		<finalName>capacity_common</finalName>
+		<finalName>simple_common</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/java</directory>

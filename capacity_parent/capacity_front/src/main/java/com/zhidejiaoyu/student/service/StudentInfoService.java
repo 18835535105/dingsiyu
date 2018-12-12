@@ -34,12 +34,15 @@ public interface StudentInfoService extends BaseService<Student>{
 
     /**
      *  学生退出学习页面，记录本次在学习页面学习时长
-     *  @param session
-     * @param classify 学习模块，区分各个学习模块的时长，1：慧记忆；2：慧听写；3：慧默写；4：例句听力；5：例句翻译；6：例句默写
+     * @param session
+     * @param classify 学习模块(有效时长)，区分各个学习模块的时长，7：单元闯关测试；8：复习测试；9：已学测试；10：熟词测试；11：生词测试；
+     *                       12：五维测试；13：任务课程；'14:单词辨音; 15:词组辨音; 16:单词认读; 17:词组认读; 18:词汇考点; 19:句型认读;
+     *                       20:语法辨析; 21单词拼写; 22:词组拼写;
      * @param courseId
      * @param unitId
+     * @param validTime 学生学习的有效时长，单位：秒
      */
-    ServerResponse<String> calculateValidTime(HttpSession session, Integer classify, Long courseId, Long unitId);
+    ServerResponse<String> calculateValidTime(HttpSession session, Integer classify, Long courseId, Long unitId, Long validTime);
 
     /**
      * 验证原密码是否正确

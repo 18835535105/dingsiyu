@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.StudentMessageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentMessage">
+        <id column="id" property="id"/>
+        <result column="teacher_id" property="teacherId"/>
+        <result column="student_id" property="studentId"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="receiver_id" property="receiverId"/>
+        <result column="receiver_name" property="receiverName"/>
+        <result column="receiver_account" property="receiverAccount"/>
+        <result column="state" property="state"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="base_sql">
+        id,
+        teacher_id,
+        student_id,
+        title,
+        content,
+        receiver_id,
+        receiver_name,
+        receiver_account,
+        state,
+        create_time,
+        update_time
+    </sql>
+
+    <select id="selectMessageList" resultType="com.zhidejiaoyu.common.Vo.studentMessage.StudentMessageListVo"
+            parameterType="map">
+        select
+            id,
+            teacher_id  teacherId,
+            student_id  studentId,
+            title,
+            content,
+            state,
+            create_time createTime
+        from student_message
+        where (student_id = #{studentId} or receiver_id = #{studentId})
+          and state = 1
+        order by create_time desc
+    </select>
+
+    <select id="selectByStudentIdAndMessageId" resultType="com.zhidejiaoyu.common.pojo.StudentMessage"
+            parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from student_message where id = #{messageId} and student_id = #{studentId} limit 1
+    </select>
+
+</mapper>

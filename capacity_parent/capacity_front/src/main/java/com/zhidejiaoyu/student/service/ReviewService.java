@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service;
 
+import com.zhidejiaoyu.common.pojo.CapacityMemory;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.student.vo.TestResultVo;
@@ -14,7 +15,7 @@ import java.util.Map;
  * @author qizhentao
  * @version 1.0
  */
-public interface ReviewService {
+public interface ReviewService extends BaseService<CapacityMemory> {
 
     /**
      * 根据单元id, 学生id查询智能复习数
@@ -127,4 +128,13 @@ public interface ReviewService {
      * @return
      */
     ServerResponse<List<SentenceTranslateVo>> getSentenceReviewTest(HttpSession session, Long unitId, Integer classify, Integer type, boolean pattern);
+
+    /**
+     * 获取智能复习中单词图鉴需要复习的单词（范围是上次登录期间需要复习的单词）
+     *
+     * @param session
+     * @param totalCount
+     * @return
+     */
+    ServerResponse<Map<String, Object>> getWordReview(HttpSession session, Integer classify, Integer totalCount);
 }

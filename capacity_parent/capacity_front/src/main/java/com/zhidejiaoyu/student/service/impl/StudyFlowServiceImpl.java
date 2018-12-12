@@ -4,9 +4,9 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.common.StudyFlowName;
 import com.zhidejiaoyu.student.service.StudyFlowService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +14,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -35,9 +34,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     private UnitMapper unitMapper;
 
     @Resource
-    private StudyFlowName studyFlowName;
-
-    @Resource
     private StudentMapper studentMapper;
 
     @Resource
@@ -51,6 +47,15 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
     @Resource
     private CapacityPictureMapper capacityPictureMapper;
+
+    @Autowired
+    private CapacityMemoryMapper capacityMemoryMapper;
+
+    @Autowired
+    private CapacityWriteMapper capacityWriteMapper;
+
+    @Autowired
+    private CapacityListenMapper capacityListenMapper;
 
     @Resource
     private OpenUnitLogMapper openUnitLogMapper;
@@ -283,39 +288,104 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                     // 直接进入下个流程节点
                     return this.toAnotherFlow(student, studyFlow.getNextTrueFlow());
                 } else {
-                    if (isTrueFlow != null) {
-                        if (Objects.equals("true", isTrueFlow)) {
-                            return toAnotherFlow(student, studyFlow.getNextTrueFlow());
-                        } else {
-                            return toAnotherFlow(student, studyFlow.getNextFalseFlow());
-                        }
-                    }
-                    if (Objects.equals(2, studyFlow.getType())) {
-                        // 分数>=80分走 nextTrue 流程，否则走 nextFalse 流程
-                        if (grade != null) {
-                            if (grade >= 80) {
-                                return toAnotherFlow(student, studyFlow.getNextTrueFlow());
-                            } else {
-                                return toAnotherFlow(student, studyFlow.getNextFalseFlow());
-                            }
-                        }
-                    } else if (Objects.equals(1, studyFlow.getType())) {
-                        // 分数>=60分走 nextTrue 流程，否则走 nextFalse 流程
-                        if (grade != null) {
-                            if (grade >= 60) {
-                                return toAnotherFlow(student, studyFlow.getNextTrueFlow());
-                            } else {
-                                return toAnotherFlow(student, studyFlow.getNextFalseFlow());
-                            }
-                        }
-                    } else {
-                        // 判断是否进行单词好声音
-                        return ServerResponse.createBySuccess("true", studyFlow);
+                    // 判断下个节点
+                    ServerResponse<Object> x = judgeNextNode(student, grade, isTrueFlow, studyFlow);
+                    if (x != null) {
+                        return x;
                     }
                 }
             }
         }
         return null;
+    }
+
+    private ServerResponse<Object> judgeNextNode(Student student, Long grade, String isTrueFlow, StudyFlow studyFlow) {
+        // 学生选择项，是否进行下一个节点， true：进行下一个节点；否则跳过下个节点
+        if (isTrueFlow != null) {
+            if (Objects.equals("true", isTrueFlow)) {
+                return toAnotherFlow(student, studyFlow.getNextTrueFlow());
+            } else {
+                return toAnotherFlow(student, studyFlow.getNextFalseFlow());
+            }
+        }
+
+        // 判断学生是否在当前分数段
+        if (studyFlow.getType() != null) {
+            StudyFlow falseFlow = studyFlowMapper.selectById(studyFlow.getNextFalseFlow());
+            StudyFlow trueFlow = studyFlowMapper.selectById(studyFlow.getNextTrueFlow());
+            if (Objects.equals(3, falseFlow.getType())) {
+                ServerResponse<Object> x = toNextNode(student, grade, falseFlow);
+                if (x != null) {
+                    return x;
+                }
+            } else if (Objects.equals(3, trueFlow.getType())) {
+                ServerResponse<Object> x = toNextNode(student, grade, trueFlow);
+                if (x != null) {
+                    return x;
+                }
+            }
+        }
+
+        if (Objects.equals(2, studyFlow.getType())) {
+            // 分数>=80分走 nextTrue 流程，否则走 nextFalse 流程
+            if (grade != null) {
+                if (grade >= 80) {
+                    return toAnotherFlow(student, studyFlow.getNextTrueFlow());
+                } else {
+                    return toAnotherFlow(student, studyFlow.getNextFalseFlow());
+                }
+            }
+        } else if (Objects.equals(1, studyFlow.getType())) {
+            // 分数>=60分走 nextTrue 流程，否则走 nextFalse 流程
+            if (grade != null) {
+                if (grade >= 60) {
+                    return toAnotherFlow(student, studyFlow.getNextTrueFlow());
+                } else {
+                    return toAnotherFlow(student, studyFlow.getNextFalseFlow());
+                }
+            }
+        } else {
+            // 判断是否进行单词好声音
+            return ServerResponse.createBySuccess("true", studyFlow);
+        }
+        return null;
+    }
+
+    /**
+     * 注意：该方法将删除学生学习相关信息
+     *
+     * @param student
+     * @param grade
+     * @param flow
+     * @return
+     */
+    private ServerResponse<Object> toNextNode(Student student, Long grade, StudyFlow flow) {
+        if (grade != null) {
+            // 50 <= 分数 < 80分走 nextTrue 流程，分数 < 50 走 nextFalse 流程
+            if (grade >= 50 && grade < 80) {
+                return toAnotherFlow(student, flow.getNextTrueFlow());
+            } else if (grade < 50) {
+                clearLearnRecord(student);
+                return toAnotherFlow(student, flow.getNextFalseFlow());
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 清除学生当前单元学习、测试、记忆追踪信息
+     *
+     * @param student
+     */
+    private void clearLearnRecord(Student student) {
+        Long unitId = student.getUnitId();
+        Long studentId = student.getId();
+
+        learnMapper.deleteByStudentIdAndUnitId(studentId, unitId);
+        capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, unitId);
+        capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, unitId);
+        capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, unitId);
+        capacityListenMapper.deleteByStudentIdAndUnitId(studentId, unitId);
     }
 
     /**

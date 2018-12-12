@@ -492,55 +492,53 @@
             10
         </if>
     </select>
-
-    <select id="countNeedReviewWithStudent" resultType="java.util.Map" parameterType="map">
-        select cl.c cl, cm.c cm, cw.c cw, sl.c sl, st.c st, sw.c sw
+    <select id="countCapacityByUnitIdAndWordId" resultType="java.lang.Integer" parameterType="map">
+        select
+        count(id)
         from
-            (select count(cm.id) c
-             from capacity_memory cm,
-                  vocabulary v
-             where cm.vocabulary_id = v.id
-               and v.delStatus = 1
-               and cm.student_id = #{stu.id}
-               and cm.memory_strength &lt; 1
-               and cm.push &lt;= #{date}) cm,
-            (select count(cm.id) c
-             from capacity_listen cm,
-                  vocabulary v
-             where cm.vocabulary_id = v.id
-               and v.delStatus = 1
-               and cm.student_id = #{stu.id}
-               and cm.memory_strength &lt; 1
-               and cm.push &lt;= #{date}) cl,
-            (select count(cm.id) c
-             from capacity_write cm,
-                  vocabulary v
-             where cm.vocabulary_id = v.id
-               and v.delStatus = 1
-               and cm.student_id = #{stu.id}
-               and cm.memory_strength &lt; 1
-               and cm.push &lt;= #{date}) cw,
-            (select count(cm.id) c
-             from sentence_listen cm,
-                  sentence s
-             where cm.vocabulary_id = s.id
-               and cm.student_id = #{stu.id}
-               and cm.memory_strength &lt; 1
-               and cm.push &lt;= #{date}) sl,
-            (select count(cm.id) c
-             from sentence_translate cm,
-                  sentence s
-             where cm.vocabulary_id = s.id
-               and cm.student_id = #{stu.id}
-               and cm.memory_strength &lt; 1
-               and cm.push &lt;= #{date}) st,
-            (select count(cm.id) c
-             from sentence_write cm,
-                  sentence s
-             where cm.vocabulary_id = s.id
-               and cm.student_id = #{stu.id}
-               and cm.memory_strength &lt; 1
-               and cm.push &lt;= #{date}) sw
+        <include refid="classify_sql"/>
+        where student_id = #{studentId} and unit_id in (
+        <foreach collection="maps" separator="," item="map">
+            #{map.unitId}
+        </foreach>
+        )
+        and vocabulary_id in (
+        <foreach collection="maps" item="map" separator=",">
+            #{map.wordId}
+        </foreach>
+        ) and push &lt;= now() and memory_strength &lt; 1
     </select>
 
+    <select id="selectLastLoginNeedReview" resultType="java.util.Map" parameterType="map">
+        select
+        memory_strength memoryStrength, fault_time, vocabulary_id id, unit_id, word, word_chinese
+        from
+        <include refid="classify_sql"/>
+        where student_id = #{studentId} and unit_id in (
+        <foreach collection="maps" separator="," item="map">
+            #{map.unitId}
+        </foreach>
+        )
+        and vocabulary_id in (
+        <foreach collection="maps" item="map" separator=",">
+            #{map.wordId}
+        </foreach>
+        ) and push &lt;= now() and memory_strength &lt; 1 order by push asc limit 1
+    </select>
+    <select id="countLastLoginNeedReview" resultType="java.lang.Integer" parameterType="map">
+        select
+        count(id)
+        from
+        <include refid="classify_sql"/>
+        where student_id = #{studentId} and unit_id in (
+        <foreach collection="maps" separator="," item="map">
+            #{map.unitId}
+        </foreach>
+        )
+        and vocabulary_id in (
+        <foreach collection="maps" item="map" separator=",">
+            #{map.wordId}
+        </foreach>
+        ) and push &lt;= now() and memory_strength &lt; 1
+    </select>
 </mapper>

@@ -1310,4 +1310,11 @@
         )
         order by rand() limit 110
     </select>
+
+    <select id="selectLastLoginStudy" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from learn where student_id = #{studentId} and vocabulary_id is not null and learn_time between #{loginTime} and
+        #{loginOutTime}
+    </select>
 </mapper>

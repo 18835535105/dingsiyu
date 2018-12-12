@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.CapacityMemory;
 import com.zhidejiaoyu.common.pojo.CapacityMemoryExample;
 import org.apache.ibatis.annotations.Delete;
@@ -9,14 +10,12 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 import java.util.Map;
 
-public interface CapacityMemoryMapper {
+public interface CapacityMemoryMapper extends BaseMapper<CapacityMemory> {
 	int countByExample(CapacityMemoryExample example);
 
 	int deleteByExample(CapacityMemoryExample example);
 
 	int deleteByPrimaryKey(Long id);
-
-	int insert(CapacityMemory record);
 
 	int insertSelective(CapacityMemory record);
 
@@ -124,4 +123,13 @@ public interface CapacityMemoryMapper {
     Integer countNeedReviewByStudentIdAndUnitId(@Param("studentId") Long stuId, @Param("unitId") Long unitId);
 
     void delWord(@Param("id") String id, @Param("status") int status);
+
+	/**
+	 * 删除学生当前单元的记忆追踪信息
+	 *
+	 * @param studentId
+	 * @param unitId
+	 */
+	@Delete("delete from capacity_memory where student_id = #{studentId} and unit_id = #{unitId}")
+	void deleteByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 }

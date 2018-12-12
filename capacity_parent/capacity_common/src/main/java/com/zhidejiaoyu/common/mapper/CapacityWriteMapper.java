@@ -122,4 +122,13 @@ public interface CapacityWriteMapper {
      */
     @Update("update simple_capacity set push = date_add(push, interval ${pushRise} hour) where student_id = #{studentId} AND vocabulary_id = #{vocabularyId}")
 	void updatePush(@Param("studentId")Long id, @Param("vocabularyId")Long vocabularyId, @Param("pushRise")int pushRise);
+
+	/**
+	 * 删除学生当前单元记忆追踪信息
+	 *
+	 * @param studentId
+	 * @param unitId
+	 */
+	@Delete("delete from capacity_write where student_id = #{studentId} and unit_id = #{unitId}")
+	void deleteByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 }

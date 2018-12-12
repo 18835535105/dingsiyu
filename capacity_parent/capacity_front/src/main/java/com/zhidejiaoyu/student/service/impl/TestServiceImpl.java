@@ -606,7 +606,7 @@ public class TestServiceImpl implements TestService {
         }
         // 获取当前单元下的所有单词 limit 20
         PageHelper.startPage(1, 20);
-        List<Vocabulary> vocabularies = vocabularyMapper.selectByUnitId(student.getId(), unitId);
+        List<Vocabulary> vocabularies = vocabularyMapper.selectByUnitId(unitId);
         Integer subjectNum = vocabularies.size();
         String[] type;
         if ("慧记忆".equals(studyModel)) {
@@ -751,7 +751,7 @@ public class TestServiceImpl implements TestService {
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
         vo.setGold(goldCount);
         countMyGoldUtil.countMyGold(student);
-        ccieUtil.saveCcieTest(student, 1, 1);
+        ccieUtil.saveCcieTest(student, 1, 1, classify);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(vo);
     }

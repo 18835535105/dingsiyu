@@ -4,9 +4,11 @@ import com.zhidejiaoyu.common.pojo.Award;
 import com.zhidejiaoyu.common.pojo.AwardExample;
 import com.zhidejiaoyu.common.pojo.Medal;
 import com.zhidejiaoyu.common.pojo.Student;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AwardMapper {
     int countByExample(AwardExample example);
@@ -90,4 +92,7 @@ public interface AwardMapper {
      * @return
      */
     List<Award> selectMedalByStudentsIdAndMedalType(@Param("conditionList") List<String> conditionList, @Param("children") List<Medal> children);
+
+    @MapKey("id")
+    Map<Long, Map<String, Long>> getMapKeyStudentXZ();
 }
