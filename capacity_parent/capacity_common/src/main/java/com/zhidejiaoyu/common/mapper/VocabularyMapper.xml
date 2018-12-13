@@ -312,13 +312,14 @@
     <select id="selectByUnitId" resultMap="BaseResultMap"
             parameterType="java.lang.Long">
         SELECT
-        distinct <include refid="unite_Column_List"/>
+        distinct
+        <include refid="unite_Column_List"/>
         FROM vocabulary
         v, unit_vocabulary uv
         where uv.unit_id = #{unitId}
         AND v.id
         =
-        uv.vocabulary_id AND v.delStatus = 1 limit 20
+        uv.vocabulary_id AND v.delStatus = 1
     </select>
 
     <select id="selectByExample" resultMap="BaseResultMap"
@@ -989,7 +990,7 @@
         FROM vocabulary
         v, unit_vocabulary uv,
         student_unit su
-        where su.unit_id = uv.unit_id and su.student_id = #{studentId} and uv.unit_id = #{unitId}
+        where su.type = 1 and su.unit_id = uv.unit_id and su.student_id = #{studentId} and uv.unit_id = #{unitId}
         AND v.id
         =
         uv.vocabulary_id AND v.delStatus = 1

@@ -257,8 +257,10 @@
     </select>
 
     <select id="getAllQueryType" resultType="java.lang.Integer" parameterType="map">
-        select z.studentId from (select operate_user_id AS studentId, SUM(substring_index(t.s,'#',1)) AS jb from (SELECT operate_user_id, substring_index(log_content, '#', -2) s, create_time from run_log where type = 4 and log_content like '%#%' AND create_time >= #{date}) t GROUP BY studentId ORDER BY jb desc) z
-         JOIN student s ON z.studentId = s.id
+        select z.studentId from (select operate_user_id AS studentId, SUM(substring_index(t.s,'#',1)) AS jb from (SELECT
+        operate_user_id, substring_index(log_content, '#', -2) s, create_time from run_log where type = 4 and
+        log_content like '%#%' AND create_time >= #{date}) t GROUP BY studentId ORDER BY jb desc) z
+        JOIN student s ON z.studentId = s.id
         <where>
             <if test="model == '2' or model == '1'">
                 AND s.province = #{student.province}

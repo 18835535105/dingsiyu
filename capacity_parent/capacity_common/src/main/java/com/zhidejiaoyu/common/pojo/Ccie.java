@@ -57,6 +57,11 @@ public class Ccie extends Model<Ccie> {
      */
     private Integer readFlag;
 
+    /**
+     * 课程证书中课程名称
+     */
+    private String courseName;
+
     @Override
     protected Serializable pkVal() {
         return this.id;

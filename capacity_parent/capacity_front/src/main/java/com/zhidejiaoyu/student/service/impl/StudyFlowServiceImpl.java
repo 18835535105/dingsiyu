@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.StudyFlowService;
+import com.zhidejiaoyu.student.utils.CcieUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -63,6 +64,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     @Resource
     private DurationMapper durationMapper;
 
+    @Autowired
+    private CcieUtil ccieUtil;
     /**
      * 节点学完, 把下一节初始化到student_flow表, 并把下一节点返回
      *
@@ -624,6 +627,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
         } else {
             // 本课程已学习完
+            // 奖励学生课程证书
+            ccieUtil.saveCourseCcie(student);
             // 查找学生可学习的下一课程
             List<StudentUnit> studentUnits = studentUnitMapper.selectNextCourse(student, courseId);
             if (studentUnits.size() != 0) {

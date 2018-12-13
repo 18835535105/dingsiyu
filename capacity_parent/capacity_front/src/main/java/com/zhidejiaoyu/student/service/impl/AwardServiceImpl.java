@@ -16,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.lang.Integer.parseInt;
 
@@ -793,6 +790,23 @@ public class AwardServiceImpl implements AwardService {
         // 某些任务的总进度
         int[] totalPlan = {1, 20, 30, 50, 10};
 
+        // 用于存储当前奖励是否已经可领取，如果可领取不再重新计算当前奖励
+        Map<Integer, Boolean> map = new HashMap<>(16);
+        if (awards.size() == 0) {
+            for (int i = 0; i < 5; i++) {
+                map.put(i, false);
+            }
+        } else {
+            for (int i = 0; i < awards.size(); i++) {
+                Award award = awards.get(i);
+                if (award.getCanGet() == 1) {
+                    map.put(i, true);
+                } else {
+                    map.put(i, false);
+                }
+            }
+        }
+
         long count = awards.stream().filter(award -> award.getCanGet() == 1).count();
         if (count == children.size()) {
             // 当前勋章所有任务都已完成
@@ -808,11 +822,20 @@ public class AwardServiceImpl implements AwardService {
             Integer countryWeekRank = rankList.getCountryWeekRank();
             Integer schoolLowestRank = rankList.getSchoolLowestRank();
 
+            // 学生当前全校排名
             Map<Long, Map<String, Object>> currentSchoolRank = studentMapper.selectLevelByStuId(student, 2);
+            // 学生当前全国排名
             Map<Long, Map<String, Object>> currentCountryRank = studentMapper.selectLevelByStuId(student, 3);
 
-            double schoolRank = Double.parseDouble(currentSchoolRank.get(student.getId()).get("rank").toString());
-            double countryRank = Double.parseDouble(currentCountryRank.get(student.getId()).get("rank").toString());
+            double schoolRank = 0;
+            if (currentSchoolRank != null && currentSchoolRank.get(student.getId()) != null && currentSchoolRank.get(student.getId()).get("rank") != null) {
+                schoolRank = Double.parseDouble(currentSchoolRank.get(student.getId()).get("rank").toString());
+            }
+
+            double countryRank = 0;
+            if (currentCountryRank != null && currentCountryRank.get(student.getId()) != null && currentCountryRank.get(student.getId()).get("rank") != null) {
+                countryRank = Double.parseDouble(currentCountryRank.get(student.getId()).get("rank").toString());
+            }
 
             if (schoolDayRank - schoolRank >= 1) {
                 complete[0] = 1;
@@ -1076,6 +1099,10 @@ public class AwardServiceImpl implements AwardService {
             RankList rankList = rankLists.get(0);
             // 查询学生当前学校排名
             Map<Long, Map<String, Object>> schoolLevelMap = studentMapper.selectLevelByStuId(student, 2);
+            if (schoolLevelMap.get(student.getId()) == null || schoolLevelMap.get(student.getId()).get("rank") == null) {
+                log.error("学生[{}]-[{}]暂无学校排行数据！", student.getId(), student.getStudentName());
+                return;
+            }
             int nowLevel = parseInt(schoolLevelMap.get(student.getId()).get("rank").toString().split("\\.")[0]);
             int upLevel = rankList.getSchoolDayRank() - nowLevel;
             int ten = 10;

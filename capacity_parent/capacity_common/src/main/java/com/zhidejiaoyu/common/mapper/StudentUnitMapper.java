@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
 import com.zhidejiaoyu.common.pojo.Course;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -13,24 +14,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 import java.util.Map;
 
-public interface StudentUnitMapper {
-    int countByExample(StudentUnitExample example);
-
-    int deleteByExample(StudentUnitExample example);
-
-    int deleteByPrimaryKey(Long id);
-
-    int insert(StudentUnit record);
-
-    int insertSelective(StudentUnit record);
-
-    List<StudentUnit> selectByExample(StudentUnitExample example);
-
-    StudentUnit selectByPrimaryKey(Long id);
-
-    int updateByPrimaryKeySelective(StudentUnit record);
-
-    int updateByPrimaryKey(StudentUnit record);
+public interface StudentUnitMapper extends BaseMapper<StudentUnit> {
 
     /**
      * 批量增加学生与课程、单元的对应关系

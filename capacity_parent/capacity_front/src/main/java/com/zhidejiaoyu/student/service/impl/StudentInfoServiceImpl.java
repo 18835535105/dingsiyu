@@ -313,7 +313,11 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             session.setAttribute(TimeConstant.TOTAL_VALID_TIME, map);
         }
 
-        String tip = "";
+        String tip = null;
+        if (classify <= 6) {
+            tip = saveGoldAward(session, classify, validTime, loginTime);
+            countMyGoldUtil.countMyGold(student);
+        }
         saveDuration(session, map, loginTime);
         session.removeAttribute(TimeConstant.BEGIN_VALID_TIME);
         return ServerResponse.createBySuccessMessage(tip);
@@ -368,7 +372,12 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         student = studentMapper.selectByPrimaryKey(student.getId());
         String learnType = commonMethod.getTestType(classify);
         // 金币数
-        int gold = 0;
+        double gold = 0;
+        if (student.getBonusExpires() != null) {
+            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
+                gold += 0.2;
+            }
+        }
         // 提示语
         StringBuilder tip = new StringBuilder("本次学习获得金币：");
         gold += saveNewLearnAward(classify, loginTime, learnType, student);

@@ -751,7 +751,7 @@ public class TestServiceImpl implements TestService {
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
         vo.setGold(goldCount);
         countMyGoldUtil.countMyGold(student);
-        ccieUtil.saveCcieTest(student, 1, 1, classify);
+        ccieUtil.saveCcieTest(student, 1, classify);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(vo);
     }
@@ -795,7 +795,7 @@ public class TestServiceImpl implements TestService {
     	int goldCount = 0;
     	
     	// 总有效时间是否小于俩小时 = 17流程金币奖励规则
-    	int timeByStudentId = durationMapper.labelValidTimeByStudentId(student.getId());
+    	/*int timeByStudentId = durationMapper.labelValidTimeByStudentId(student.getId());
     	if(timeByStudentId < 2) {
     		if(point < PASS) {
     			goldCount = TestAwardGoldConstant.FLOW_TEST_EIGHT_ZERO;
@@ -806,7 +806,7 @@ public class TestServiceImpl implements TestService {
     		}
     		this.saveLog(student, goldCount, wordUnitTestDTO, null);
     		return goldCount;
-    	}
+    	}*/
         
         if (isFirst) {
             if (point >= PASS) {

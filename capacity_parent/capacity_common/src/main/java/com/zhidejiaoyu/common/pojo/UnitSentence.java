@@ -1,25 +1,28 @@
 package com.zhidejiaoyu.common.pojo;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
+@Data
 public class UnitSentence implements Serializable{
     private Long unitId;
 
     private Long sentenceId;
 
-    public Long getUnitId() {
-        return unitId;
-    }
+    /**
+     * 例句翻译
+     */
+    private String chinese;
 
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
+    /**
+     * 例句英文干扰项
+     */
+    private String englishDisturb;
 
-    public Long getSentenceId() {
-        return sentenceId;
-    }
+    /**
+     * 例句中文干扰项
+     */
+    private String chineseDisturb;
 
-    public void setSentenceId(Long sentenceId) {
-        this.sentenceId = sentenceId;
-    }
 }

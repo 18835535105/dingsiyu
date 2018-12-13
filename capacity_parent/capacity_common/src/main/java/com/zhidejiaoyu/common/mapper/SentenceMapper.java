@@ -1,12 +1,13 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Sentence;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface SentenceMapper {
+public interface SentenceMapper extends BaseMapper<Sentence> {
 
     /**
      * 分页数据

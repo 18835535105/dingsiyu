@@ -187,14 +187,6 @@ public interface CourseMapper extends BaseMapper<Course> {
     Long selectIdByUnitId(Long unitId);
 
     /**
-     * 查询学生的所有课程
-     *
-     * @param stuId
-     * @return
-     */
-    List<Course> selectByStudentId(@Param("stuId") Long stuId);
-
-    /**
      * 获取当前课程下的所有单词个数
      *
      * @param courses 当前课程信息
@@ -321,4 +313,12 @@ public interface CourseMapper extends BaseMapper<Course> {
      * @return
      */
     List<Map<String, Object>> getAllCourseInfoWithSentence(@Param("student") Student student);
+
+    /**
+     * 查询学生所有课程的id和名称
+     *
+     * @param studentId
+     * @return
+     */
+    List<Map<String, Object>> selectCourseIdAndCourseNameByStudentId(@Param("studentId") Long studentId);
 }

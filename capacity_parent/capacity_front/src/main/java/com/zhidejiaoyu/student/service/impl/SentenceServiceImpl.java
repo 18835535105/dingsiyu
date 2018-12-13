@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
+import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -23,9 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -33,7 +32,7 @@ import java.util.stream.Collectors;
  * @date 2018/5/21 15:15
  */
 @Service
-public class SentenceServiceImpl implements SentenceService {
+public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentence> implements SentenceService {
 
     private Logger log = LoggerFactory.getLogger(SentenceService.class);
 
@@ -61,7 +60,16 @@ public class SentenceServiceImpl implements SentenceService {
     private LearnMapper learnMapper;
 
     @Autowired
+    private CourseMapper courseMapper;
+
+    @Autowired
+    private UnitSentenceMapper unitSentenceMapper;
+
+    @Autowired
     private SentenceTranslateMapper sentenceTranslateMapper;
+
+    @Autowired
+    private TestRecordMapper testRecordMapper;
 
     /**
      * 例句听力mapper
@@ -92,6 +100,9 @@ public class SentenceServiceImpl implements SentenceService {
 
     @Autowired
     private UnitVocabularyMapper unitVocabularyMapper;
+
+    @Autowired
+    private CapacityStudentUnitMapper capacityStudentUnitMapper;
 
     @Override
     public ServerResponse<SentenceTranslateVo> getSentenceTranslate(HttpSession session, Long unitId, int Intclassify, Integer type) {
@@ -410,6 +421,69 @@ public class SentenceServiceImpl implements SentenceService {
         }
 
         return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    public ServerResponse<List<CourseUnitVo>> getLearnCourseAndUnit(HttpSession session, Integer type) {
+        Student student = getStudent(session);
+        Long studentId = student.getId();
+        List<CourseUnitVo> courseUnitVos = new ArrayList<>();
+        CourseUnitVo courseUnitVo;
+        List<Map<String, Object>> resultMap;
+
+        // 学生所有课程id及课程名
+        List<Map<String, Object>> courses = courseMapper.selectCourseIdAndCourseNameByStudentId(studentId);
+
+        // 学生课程下所有例句的单元id及单元名
+        if (courses.size() > 0) {
+            List<Long> courseIds = new ArrayList<>(courses.size());
+            courses.forEach(map -> courseIds.add((Long) map.get("id")));
+
+            // 获取课程下所有例句的单元信息
+            List<Map<String, Object>> sentenceUnits = unitSentenceMapper.selectUnitIdAndNameByCourseIds(studentId, courseIds);
+
+            // 已经进行过单元闯关的单元
+            Map<Long, Map<Long, Long>> testMap = null;
+            // 还没有学习的单元
+            Map<Long, Map<Long, Long>> unLearnMap = null;
+            if (sentenceUnits.size() > 0) {
+                List<Long> unitIds = new ArrayList<>(sentenceUnits.size());
+                sentenceUnits.forEach(map -> unitIds.add((Long) map.get("id")));
+                testMap = testRecordMapper.selectHasUnitTest(studentId, unitIds);
+                unLearnMap = learnMapper.selectUnlearnUnit(studentId, unitIds);
+            }
+
+            for (Map<String, Object> courseMap : courses) {
+                courseUnitVo = new CourseUnitVo();
+                resultMap = new ArrayList<>();
+                courseUnitVo.setCourseId((Long) courseMap.get("id"));
+                courseUnitVo.setCourseName(courseMap.get("courseName").toString());
+
+                // 存放单元信息
+                Map<String, Object> unitInfoMap;
+                for (Map<String, Object> unitMap : sentenceUnits) {
+                    unitInfoMap = new HashMap<>(16);
+                    unitInfoMap.put("unitId", unitMap.get("id"));
+                    unitInfoMap.put("unitName", unitMap.get("unitName"));
+                    if (Objects.equals(courseMap.get("id"), unitMap.get("courseId"))) {
+                        if (testMap != null && testMap.containsKey(unitMap.get("id"))) {
+                            // 当前单元已进行过单元闯关，标记为已学习
+                            unitInfoMap.put("state", 4);
+                        } else if (unLearnMap != null && unLearnMap.containsKey(unitMap.get("id"))) {
+                            // 当前单元还未学习
+                            unitInfoMap.put("state", 1);
+                        } else {
+                            // 正在学习
+                            unitInfoMap.put("state", 3);
+                        }
+                    }
+                    resultMap.add(unitInfoMap);
+                }
+                courseUnitVo.setUnitVos(resultMap);
+                courseUnitVos.add(courseUnitVo);
+            }
+        }
+        return ServerResponse.createBySuccess(courseUnitVos);
     }
 
     /**

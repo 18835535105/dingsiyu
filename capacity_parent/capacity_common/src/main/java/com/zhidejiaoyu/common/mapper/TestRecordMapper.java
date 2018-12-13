@@ -196,4 +196,13 @@ public interface TestRecordMapper {
      */
     Double selectVictoryRate(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 
+    /**
+     * 获取学生已经进行过单元闯关测试的例句单元
+     *
+     * @param studentId
+     * @param unitIds
+     * @return  key 单元id
+     */
+    @MapKey("unitId")
+    Map<Long, Map<Long, Long>> selectHasUnitTest(@Param("studentId") Long studentId, @Param("unitIds") List<Long> unitIds);
 }

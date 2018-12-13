@@ -725,4 +725,14 @@ public interface LearnMapper {
      */
     @Delete("delete from learn where student_id = #{studentId} and unit_id = #{unitId}")
     void deleteByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+
+    /**
+     * 查找学生还没有学习的单元
+     *
+     * @param studentId
+     * @param unitIds
+     * @return  key unitId value:courseId
+     */
+    @MapKey("unitId")
+    Map<Long, Map<Long, Long>> selectUnlearnUnit(@Param("studentId") Long studentId, @Param("unitIds") List<Long> unitIds);
 }

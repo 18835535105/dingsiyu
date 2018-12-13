@@ -440,22 +440,7 @@
 		from student a INNER JOIN course b on a.version = b.version join unit c ON b.id = c.course_id
  			and a.id = #{id} and b.grade = #{grade} and b.delStatus = 1 and b.`status` = 1 GROUP BY b.id
     </select>
-    <select id="selectByStudentId" resultMap="BaseResultMap" parameterType="java.lang.Long">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM
-        course
-        WHERE
-        id IN (
-        SELECT DISTINCT su.course_id
-        FROM
-        student_unit su
-        WHERE
-        su.student_id = #{stuId}
-        )
-        ORDER BY
-        id ASC
-    </select>
+
     <select id="selectWordCountByCourseId" resultType="java.util.Map" parameterType="java.util.List">
         SELECT
         u.course_id id,
@@ -538,6 +523,7 @@
           and c.delStatus = 1
           and u.delStatus = 1
           and v.delStatus = 1
+          and su.type = 1
           and su.student_id = #{student.id}
         group by c.id
         order by c.id asc
@@ -555,8 +541,21 @@
           and us.unit_id = u.id
           and c.delStatus = 1
           and u.delStatus = 1
+          and su.type = 1
           and su.student_id = #{student.id}
         group by c.id
         order by c.id asc
+    </select>
+    <select id="selectCourseIdAndCourseNameByStudentId" resultType="java.util.Map" parameterType="map">
+        select c.id, c.course_name courseName
+        from
+            course c,
+            student_unit su
+        where c.id = su.course_id
+          and su.student_id = #{studentId}
+          and su.type = 1
+        group by c.id
+        ORDER BY
+            c.id ASC
     </select>
 </mapper>

@@ -1,15 +1,18 @@
 package com.zhidejiaoyu.student.controller;
 
+import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
+import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.SentenceService;
-import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.student.vo.SentenceWordInfoVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 /**
  * 例句相关controller
@@ -17,6 +20,7 @@ import javax.servlet.http.HttpSession;
  * @author wuchenxi
  * @date 2018/5/21 14:59
  */
+@Slf4j
 @RestController
 @RequestMapping("/sentence")
 public class SentenceController {
@@ -90,9 +94,31 @@ public class SentenceController {
      */
     @PostMapping("/saveUnknownWord")
     public ServerResponse<String> saveUnknownWord(HttpSession session, Long unitId, Long courseId, Long wordId) {
-        Assert.notNull(unitId, "unitId 不能为空！");
-        Assert.notNull(courseId, "courseId 不能为空");
-        Assert.notNull(wordId, "wordId 不能为空！");
+        if (unitId == null) {
+            log.error("单词添加生词本失败:unitId=null");
+            return ServerResponse.createBySuccess();
+        }
+        if (courseId == null) {
+            log.error("单词添加生词本失败:courseId=null");
+            return ServerResponse.createBySuccess();
+        }
+        if (wordId == null) {
+            log.error("单词添加生词本失败:wordId=null");
+            return ServerResponse.createBySuccess();
+        }
         return sentenceService.saveUnknownWord(session, unitId, courseId, wordId);
+    }
+
+    /**
+     * 进入句型学习页获取学生所有课程及单元，并标记当前学习、未学习、已学习状态
+     *
+     * @param session
+     * @param type    2：例句听力；3：例句默写；4：例句翻译
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/getLearnCourseAndUnit")
+    public ServerResponse<List<CourseUnitVo>> getLearnCourseAndUnit(HttpSession session, Integer type) {
+        return sentenceService.getLearnCourseAndUnit(session, type);
     }
 }

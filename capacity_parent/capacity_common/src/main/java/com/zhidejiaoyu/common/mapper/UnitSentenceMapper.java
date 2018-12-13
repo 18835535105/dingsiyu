@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UnitSentenceMapper {
     int countByExample(UnitSentenceExample example);
@@ -62,4 +63,14 @@ public interface UnitSentenceMapper {
      */
     @Select("select count(distinct uv.sentence_id) from unit_sentence uv where uv.unit_id = #{unitId}")
     Long selectSentenceCountByUnitId(@Param("unitId") long unitId);
+
+    /**
+     * 获取课程下所有例句的单元信息
+     *
+     *
+     * @param studentId
+     * @param courseIds
+     * @return
+     */
+    List<Map<String, Object>> selectUnitIdAndNameByCourseIds(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds);
 }

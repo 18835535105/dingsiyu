@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.pojo.CcieExample;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.io.Serializable;
 import java.util.List;
@@ -37,9 +38,10 @@ public interface CcieMapper extends BaseMapper<Ccie> {
      *
      * @param studentId
      * @param model
+     * @param type  1:牛人证书 2：课程证书
      * @return
      */
-	List<Map<String, Object>> selectAllCcieByStudentIdAndDate(@Param("studentId")Long studentId, @Param("model")Integer model);
+	List<Map<String, Object>> selectAllCcieByStudentIdAndDate(@Param("studentId") Long studentId, @Param("model") Integer model, @Param("type") Integer type);
 
     /**
      * 获取当天指定类型最大证书编号
@@ -68,4 +70,14 @@ public interface CcieMapper extends BaseMapper<Ccie> {
      */
     @MapKey("id")
     Map<Long,Map<String,Long>> getMapKeyStudentCCie();
+
+    /**
+     * 更新证书是否已读状态
+     *
+     * @param studentId 学生id
+     * @param readFlag  0：未读；1：已读
+     * @return
+     */
+    @Update("update ccie set read_flag = #{readFlag} where student_id = #{studentId}")
+    int updateReadFlag(@Param("studentId") Long studentId, @Param("readFlag") int readFlag);
 }

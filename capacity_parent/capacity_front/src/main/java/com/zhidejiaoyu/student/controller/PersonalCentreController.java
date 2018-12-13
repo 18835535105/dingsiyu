@@ -1,15 +1,16 @@
 package com.zhidejiaoyu.student.controller;
 
-import javax.servlet.http.HttpSession;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.*;
-
+import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.PersonalCentreService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.text.ParseException;
+import java.util.Objects;
 
 /**
  * 个人中心
@@ -17,6 +18,7 @@ import java.text.ParseException;
  * @author qizhentao
  * @version 1.0
  */
+@Slf4j
 @RestController
 @RequestMapping("/personal")
 @SuppressWarnings("all")
@@ -65,6 +67,11 @@ public class PersonalCentreController {
 	 */
 	@RequestMapping("/newsupdate")
 	public ServerResponse<String> newsupdate(HttpSession session, Integer state, Integer[] id) {
+		if (!Objects.equals(state, 3) && (id == null || id.length == 0)) {
+			Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+			log.error("学生修改消息失败：原因id=null, studentId=[{}], studentName=[{}], state=[{}]", student.getId(), student.getStudentName(), state);
+			return ServerResponse.createBySuccess();
+		}
 		return personalCentreService.newsupdate(session, state, id);
 	}
 	
@@ -134,18 +141,20 @@ public class PersonalCentreController {
 
 	/**
 	 * 我的排名
-	 *  @param model 
-	 *  	本班排行模块  model = 1
-	 *  	本校模块 model = 2
-	 *  	全国模块 model = 3
-	 * @param queryType 空代表全部查询，1=今日排行 2=本周排行 3=本月排行
-	 *  @param gold 金币 1=正序 2=倒叙  - 默认金币倒叙排行
-	 *  @param badge 勋章 1=正序 2=倒叙
-	 *  @param certificate 证书 1=正序 2=倒叙
-	 *  @param worship 膜拜 1=正序 2=倒叙
+	 *
+	 * @param model       本班排行模块  model = 1
+	 *                    本校模块 model = 2
+	 *                    全国模块 model = 3
+	 * @param queryType   空代表全部查询，1=今日排行 2=本周排行 3=本月排行
+	 * @param gold        金币 1=正序 2=倒叙  - 默认金币倒叙排行
+	 * @param badge       勋章 1=正序 2=倒叙
+	 * @param certificate 证书 1=正序 2=倒叙
+	 * @param worship     膜拜 1=正序 2=倒叙
 	 */
 	@RequestMapping(value = "/classSeniority", method = RequestMethod.POST)
-	public ServerResponse<Object> classSeniority(HttpSession session, Integer page, Integer rows,@RequestParam(required = false, defaultValue = "1") String model, String gold, String badge, String certificate, String worship, Integer queryType) {
+	public ServerResponse<Object> classSeniority(HttpSession session, Integer page, Integer rows,
+												 @RequestParam(required = false, defaultValue = "1") String model, String gold,
+												 String badge, String certificate, String worship, Integer queryType) {
 		return personalCentreService.classSeniority(session, page, rows, gold, badge, certificate, worship, model, queryType);
 	} 
 	
@@ -154,11 +163,13 @@ public class PersonalCentreController {
 	 *
 	 * @param session
 	 * @param model 默认0全部显示, 点击的那个模块(7个模块) 1：慧记忆；2：慧听写；3：慧默写；4：例句听力；5：例句翻译；6：例句默写；7：五维测试;
+	 * @param type 1:牛人证书；2：课程证书
 	 * @return
 	 */
 	@RequestMapping("/ccie")
-	public ServerResponse<Object> showCcie(HttpSession session, @RequestParam(required = false, defaultValue = "0") Integer model){
-		return personalCentreService.showCcie(session, model);
+	public ServerResponse<Object> showCcie(HttpSession session, @RequestParam(required = false, defaultValue = "0") Integer model,
+										   Integer type){
+		return personalCentreService.showCcie(session, model, type);
 	}
 
 	/**
@@ -178,7 +189,9 @@ public class PersonalCentreController {
 	 * @return
 	 */
 	@RequestMapping("/durationSeniority")
-	public ServerResponse<Object> durationSeniority(HttpSession session, @RequestParam(required = false, defaultValue = "1") Integer model, Integer haveUnit, Integer haveTest, Integer haveTime, Integer page, Integer rows){
+	public ServerResponse<Object> durationSeniority(HttpSession session,
+													@RequestParam(required = false, defaultValue = "1") Integer model,
+													Integer haveUnit, Integer haveTest, Integer haveTime, Integer page, Integer rows){
 		return personalCentreService.durationSeniority(session, model, haveUnit, haveTest, haveTime, page, rows);
 	}
 
@@ -220,5 +233,17 @@ public class PersonalCentreController {
     public ServerResponse<Object> getPayCard(long studentId, int page, int rows){
         return personalCentreService.getPayCard(studentId, page, rows);
     }
+
+	/**
+	 * 将证书的是否已读状态更新为“已读”状态
+	 *
+	 * @param session
+	 * @param ccieId  证书id
+	 * @return
+	 */
+	@PostMapping("/updateCcie")
+	public ServerResponse updateCcie(HttpSession session) {
+		return personalCentreService.updateCcie(session);
+	}
 
 }

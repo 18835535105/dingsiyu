@@ -198,6 +198,13 @@
             #{item}
         </foreach>
     </select>
+
+    <select id="selectByStudentId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from news where studentId = #{studentId} order by time desc
+    </select>
+
     <update id="updateByExampleSelective" parameterType="map">
         update news
         <set>

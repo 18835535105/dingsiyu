@@ -1281,7 +1281,7 @@
                                                                        AND study_model = '单元闯关测试') learned,
                    (
 #                    学生总单元数
-                   SELECT count(id) c FROM student_unit WHERE student_id = #{stuId}) total) lt,
+                   SELECT count(id) c FROM student_unit WHERE student_id = #{stuId} and type = 1) total) lt,
              (
 #              有效学习总次数(有效学习总次数为产生有效时长的登录次数)
              SELECT count(d.vt) t
@@ -1316,5 +1316,12 @@
         <include refid="Base_Column_List"/>
         from learn where student_id = #{studentId} and vocabulary_id is not null and learn_time between #{loginTime} and
         #{loginOutTime}
+    </select>
+    <select id="selectUnlearnUnit" resultType="java.util.Map" parameterType="map">
+        select unit_id unitId, course_id courseId from learn where student_id = #{studentId} and unit_id in (
+        <foreach collection="unitIds" item="unitId" separator=",">
+            #{unitId}
+        </foreach>
+        )
     </select>
 </mapper>

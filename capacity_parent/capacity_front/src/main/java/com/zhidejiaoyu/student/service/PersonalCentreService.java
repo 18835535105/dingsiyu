@@ -69,7 +69,15 @@ public interface PersonalCentreService extends BaseService<Student> {
 	 */
 	ServerResponse<Object> classSeniority(HttpSession session, Integer page, Integer rows, String gold, String badge, String certificate, String worship, String model, Integer queryType);
 
-	ServerResponse<Object> showCcie(HttpSession session, Integer model);
+	/**
+	 * 我的证书
+	 *
+	 * @param session
+	 * @param model 默认0全部显示, 点击的那个模块(7个模块) 1：慧记忆；2：慧听写；3：慧默写；4：例句听力；5：例句翻译；6：例句默写；7：五维测试;
+	 * @param type 1:牛人证书；2：课程证书
+	 * @return
+	 */
+	ServerResponse<Object> showCcie(HttpSession session, Integer model, Integer type);
 
 	ServerResponse<Object> weekDurationIndexPage(HttpSession session, int page, int rows, Integer year);
 
@@ -86,4 +94,12 @@ public interface PersonalCentreService extends BaseService<Student> {
 	ServerResponse<Object> postPayCard(long studentId, String card) throws ParseException;
 
 	ServerResponse<Object> getPayCard(long studentId, int page, int rows);
+
+	/**
+	 * 将证书的是否已读状态更新为“已读”状态
+	 *
+	 * @param session
+	 * @return
+	 */
+	ServerResponse updateCcie(HttpSession session);
 }

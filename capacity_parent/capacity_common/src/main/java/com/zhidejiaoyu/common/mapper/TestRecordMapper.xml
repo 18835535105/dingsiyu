@@ -737,4 +737,12 @@
              (select count(id) c from test_record where student_id = 3169
                                                     and unit_id = 13702) a
     </select>
+
+    <select id="selectHasUnitTest" resultType="java.util.Map" parameterType="map">
+        select unit_id unitId, course_id courseId  from test_record where student_id = #{studentId} and genre = '单元闯关测试' and unit_id in (
+        <foreach collection="unitIds" separator="," item="unitId">
+            #{unitId}
+        </foreach>
+        )
+    </select>
 </mapper>

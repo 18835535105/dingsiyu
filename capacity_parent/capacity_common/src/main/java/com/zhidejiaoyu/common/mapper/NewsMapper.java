@@ -50,7 +50,7 @@ public interface NewsMapper {
     /**
      * 根据学生id标记为已读
      */
-    @Update("update news set read = 1 where studentId = #{studentId}")
+    @Update("update news set `read` = 1 where studentId = #{studentId}")
     void updateByRead(@Param("studentId") Long studentId);
 
     /**
@@ -60,4 +60,12 @@ public interface NewsMapper {
      * @return
      */
     List<News> selectByStuIds(@Param("list") List<Long> stuIds);
+
+    /**
+     * 获取学生所有的消息
+     *
+     * @param studentId
+     * @return
+     */
+    List<News> selectByStudentId(@Param("studentId") Long studentId);
 }

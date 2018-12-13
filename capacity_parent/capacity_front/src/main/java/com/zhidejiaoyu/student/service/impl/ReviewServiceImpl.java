@@ -1366,7 +1366,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     gold = decideFiveD(point, genre, student, msg, studyModel, testRecord);
                 }
             }
-            ccieUtil.saveCcieTest(student, 6, 1, classify);
+            ccieUtil.saveCcieTest(student, 6,  classify);
         } else if ("已学测试".equals(genre) || "生词测试".equals(genre) || "熟词测试".equals(genre)) {
             // 判断学生之前是否已经在当前课程有过“已学测试”或者“生词测试”或者“熟词测试”
             List<TestRecord> testRecords = testRecordMapper.selectMaxPointByStudyModel(stuId, courseId, genre, studyModel);
@@ -1392,7 +1392,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             } else if ("熟词测试".equals(genre)) {
                 testType = 5;
             }
-            ccieUtil.saveCcieTest(student, testType, 1, classify);
+            ccieUtil.saveCcieTest(student, testType, classify);
         } else if ("复习测试".equals(genre)) {
             // 判断学生之前是否已经在当前课程有过“已学测试”或者“生词测试”或者“熟词测试”
             List<TestRecord> testRecords = testRecordMapper.selectMaxPointByStudyModel(stuId, courseId, genre, studyModel);
@@ -1408,7 +1408,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             }
             // 奖励金币信息
             gold = reviewGold(point, genre, student, msg, studyModel, testRecord);
-            ccieUtil.saveCcieTest(student, 2, 1, classify);
+            ccieUtil.saveCcieTest(student, 2,  classify);
         }
 
         studentMapper.updateByPrimaryKeySelective(student);

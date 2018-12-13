@@ -1,17 +1,20 @@
 package com.zhidejiaoyu.student.service;
 
+import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.common.pojo.Learn;
+import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.student.vo.SentenceWordInfoVo;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 /**
  * @author wuchenxi
  * @date 2018/5/21 15:13
  */
-public interface SentenceService {
+public interface SentenceService extends BaseService<Sentence> {
     /**
      * 获取例句翻译学习题目
      *
@@ -57,4 +60,13 @@ public interface SentenceService {
      * @return ServerResponse
      */
     ServerResponse<String> saveUnknownWord(HttpSession session, Long unitId, Long courseId, Long wordId);
+
+    /**
+     * 进入句型学习页获取学生所有课程及单元，并标记当前学习、未学习、已学习状态
+     *
+     * @param session
+     * @param type    2：例句听力；3：例句默写；4：例句翻译
+     * @return
+     */
+    ServerResponse<List<CourseUnitVo>> getLearnCourseAndUnit(HttpSession session, Integer type);
 }

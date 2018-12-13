@@ -127,6 +127,7 @@ public class QuartzServiceImpl implements QuartzService {
                 news.setStudentid(student.getId());
                 news.setType("提醒消息");
                 news.setRobotspeak("我们还会再见面了吗？在不续费我们就挥手再见了。");
+                news.setRead(2);
                 insertList.add(news);
             }
         }

@@ -12,6 +12,7 @@
     <result column="ccie_no" property="ccieNo" jdbcType="VARCHAR" />
     <result column="encourage_word" property="encourageWord" jdbcType="VARCHAR" />
     <result column="read_flag" property="readFlag" jdbcType="INTEGER" />
+    <result column="course_name" property="courseName" jdbcType="VARCHAR"/>
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -73,7 +74,9 @@
   </sql>
   <sql id="Base_Column_List" >
     id, student_id, unit_id, student_name, get_time, test_type, study_model, ccie_no,
-    encourage_word, read_flag
+    encourage_word,
+    read_flag,
+    course_name
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.CcieExample" >
     select
@@ -286,12 +289,18 @@
     when 6
     then '五维测试' end) testName,
  		 (case a.study_model when 1 then '慧记忆' when 2 then '慧听写' when 3 then '慧默写' when 4 then '例句听力'  when 5 then '例句翻译'  when 6 then '例句默写'  when 7 then '五维测试' end) AS model,
-    a.ccie_no, a.encourage_word encourageWord
+    a.ccie_no, a.encourage_word encourageWord, a.course_name courseName
 	from 
 		ccie a where a.student_id = #{studentId}
 		<if test="model != 0">
 		  AND a.study_model = #{model}
         </if>
+    <if test="type == 1">
+      and ccie_no like 'N%'
+    </if>
+    <if test="type == 2">
+      and ccie_no like 'K%'
+    </if>
   </select>
 
     <select id="selectLastCcie" resultMap="BaseResultMap" parameterType="map">

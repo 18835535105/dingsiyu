@@ -13,11 +13,6 @@ import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.PersonalCentreService;
-import com.zhidejiaoyu.student.service.impl.PersonalCentreServiceImpl.MapGoldDesc;
-import com.zhidejiaoyu.student.service.impl.PersonalCentreServiceImpl.MapMbDesc;
-import com.zhidejiaoyu.student.service.impl.PersonalCentreServiceImpl.MapXzDesc;
-import com.zhidejiaoyu.student.service.impl.PersonalCentreServiceImpl.MapZsDesc;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +25,8 @@ import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -198,12 +193,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     public ServerResponse<Object> newsCentre(HttpSession session) {
         // 获取当前学生信息
         Long id = StudentIdBySession(session);
-
-        NewsExample example = new NewsExample();
-        example.createCriteria().andStudentidEqualTo(id);
-        PageHelper.startPage(1, 30);
-        List<News> list = newsMapper.selectByExample(example);
-
+        List<News> list = newsMapper.selectByStudentId(id);
         return ServerResponse.createBySuccess(list);
     }
 
@@ -216,7 +206,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     @Override
     public ServerResponse<String> newsupdate(HttpSession session, Integer state, Integer[] id) {
         // 获取当前学生信息
-        Long student_id = StudentIdBySession(session);
+        Long studentId = StudentIdBySession(session);
 
         // 1.删除(根据消息通知id)
         if (state == 1) {
@@ -224,8 +214,8 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
                 newsMapper.deleteByPrimaryKey(Long.valueOf(intId));
             }
             return ServerResponse.createBySuccessMessage("删除完成");
-            // 2.根据通知id标记为已读(根据消息通知id)
         } else if (state == 2) {
+            // 2.根据通知id标记为已读(根据消息通知id)
             News ne = new News();
             for (Integer intId : id) {
                 ne.setId(Long.valueOf(intId));
@@ -233,9 +223,9 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
                 newsMapper.updateByPrimaryKeySelective(ne);
             }
             return ServerResponse.createBySuccessMessage("已标记为已读");
-            // 3.全部标记为已读(根据学生id)
         } else if (state == 3) {
-            newsMapper.updateByRead(student_id);
+            // 3.全部标记为已读(根据学生id)
+            newsMapper.updateByRead(studentId);
             return ServerResponse.createBySuccessMessage("已全部标记为已读");
         }
 
@@ -656,15 +646,10 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
 	public ServerResponse<Object> classSeniority(HttpSession session, Integer page, Integer rows,
 												 String golds, String badges, String certificates, String worships, String model, Integer queryType) {
 
-		Map<String, Object> result = new HashMap<>(16);
+        Map<String, Object> result = new HashMap<>(16);
 
-		// 默认本班排行
-		/*if(StringUtils.isEmpty(model)) {
-			model = "1";
-		}*/
-
-		// 获取当前学生信息
-		Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        // 获取当前学生信息
+        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
 
         final String KEY = "capacity_student_rank";
         final String FIELD = "condition:" + student.getId() + ":" + page + ":" + rows + ":" + golds + ":" + badges + ":" + certificates + ":" + worships + ":" + model + ":" + queryType;
@@ -677,31 +662,23 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         } catch (Exception e) {
             log.error("排行榜类型转换错误，学生[{}]-[{}]排行榜类型转换错误，error=[{}]", student.getId(), student.getStudentName(), e.getMessage());
         }
-		// 区
-		//String area = student.getArea();
-		// 学校
-		//String school_name = student.getSchoolName();
-		// 年级
-		//String grade = student.getGrade();
-		// 班级
-		//String squad = student.getSquad();
-		
-		// 教师id
+
+        // 教师id
         Long teacherId = student.getTeacherId();
         // 班级id
         Long classId = student.getClassId();
 
-        // 获取 `清学版每个学生的信息`
+        // 获取 `每个学生的信息`
         List<Map<String, Object>> students = studentMapper.selectSeniority(model, teacherId, classId);
 
         // 获取等级规则
-        List<Map<String, Object>> levels = redisOpt.getAllLevel();
+        List<Map<String, Object>> levels = levelMapper.selectAll();
 
         // 用于封装我的排名,我的金币,我的等级,我被膜拜
         Map<String, Object> myMap = new HashMap<>(16);
 
         // 我的排名(全部)
-        Map<Long, Map<String, Object>> classLevel;
+        Map<Long, Map<String, Object>> classLevel = null;
         if (queryType == null) {
             if ("3".equals(model)) {
                 // 全国排名
@@ -718,15 +695,11 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
             }
             String myRankingDouble = (classLevel.get(student.getId())).get("rank") + "";
             if (myRankingDouble.contains(".")) {
-                myRankingDouble = myRankingDouble.substring(0, myRankingDouble.indexOf("."));
-            }
-            // 我的排名
-            // 全国排行未进入前100名标记为 未上榜
-            if (Objects.equals("3", model) && com.baomidou.mybatisplus.toolkit.StringUtils.isNotEmpty(myRankingDouble) && Integer.valueOf(myRankingDouble) > 100) {
-                myMap.put("myRanking", "未上榜");
+                // 我的排名
+                myMap.put("myRanking", myRankingDouble.substring(0, myRankingDouble.indexOf(".")));
             } else {
+                // 我的排名
                 myMap.put("myRanking", myRankingDouble);
-
             }
         }
 
@@ -750,11 +723,9 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
             }
 
             if (queryTypeList.contains(student.getId().intValue())) {
-                // 我的金币排名
-                myMap.put("myRanking", queryTypeList.lastIndexOf(student.getId().intValue()));
+                myMap.put("myRanking", queryTypeList.lastIndexOf(student.getId().intValue())); // 我的金币排名
             } else {
-                // 我的排名
-                myMap.put("myRanking", "未上榜");
+                myMap.put("myRanking", "未上榜"); // 我的排名
             }
         }
 
@@ -768,7 +739,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         } else {
             // 今日，本周，本月排行
             // 我的排名(今日)
-            Map<Long, Map<String, Object>> m = new HashMap<>(16);
+            Map<Long, Map<String, Object>> m = new HashMap();
             if (queryType == 1) {
                 m = runLogMapper.getGoldByStudentId(DateUtil.formatYYYYMMDD(new Date()), model, student);
             }
@@ -811,14 +782,13 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
                 myrecord = levelGold;
                 myauto++;
             }
+            myrecord = 0;
+            myauto = 0;
         }
 
-        // 我的金币
-        myMap.put("myGold", myGold);
-        // 我被膜拜
-        myMap.put("myMb", myMb);
-        // 我的等级
-        myMap.put("myChildName", myChildName);
+        myMap.put("myGold", myGold); // 我的金币
+        myMap.put("myMb", myMb); // 我被膜拜
+        myMap.put("myChildName", myChildName); // 我的等级
         myMap.put("stuId", student.getId());
 
         //    	-- 学生对应证书
@@ -826,7 +796,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         //		-- 膜拜数据
         Map<Long, Map<String, Long>> worshipCount = worshipMapper.getMapKeyStudentWorship();
         //		-- 学生勋章
-        Map<Long, Map<String, Long>> runLogCount = awardMapper.getMapKeyStudentXZ();
+        Map<Long, Map<String, Long>> runLogCount = runLogMapper.getMapKeyStudentrunLog();
 
         // 遍历学生信息, 并初始化学生证书，膜拜，勋章，等级
         for (Map<String, Object> stu : students) {
@@ -834,6 +804,8 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
             Long id = (Long) stu.get("id");
 
             // 获取当前学生证书数量
+            //int ccieCount = ccieMapper.getCountCcieByStudentId(id);
+            //stu.put("zs", ccieCount);
             if (ccieCount.containsKey(id)) {
                 stu.put("zs", ccieCount.get(id).get("count"));
             } else {
@@ -841,6 +813,8 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
             }
 
             // 获取当前学生膜拜数量
+            //int worship = worshipMapper.getCountWorshipByStudentId(id);
+            //stu.put("mb", worship);
             if (worshipCount.containsKey(id)) {
                 stu.put("mb", worshipCount.get(id).get("count"));
             } else {
@@ -848,6 +822,8 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
             }
 
             // 当前学生勋章个数
+            //int xz = runLogMapper.getCountXZByStudentId(id);
+            //stu.put("xz", 0);
             if (runLogCount.containsKey(id)) {
                 stu.put("xz", runLogCount.get(id).get("count"));
             } else {
@@ -884,6 +860,8 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
                     record = levelGold;
                     auto++;
                 }
+                record = 0;
+                auto = 0;
             } else {
                 stu.put("childName", levels.get(0).get("child_name"));
             }
@@ -892,24 +870,28 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         // 排序
         if ("1".equals(golds)) {
             // 按照金币
+            //Collections.sort(students, new MapGoldAsc());
             Collections.sort(students, new MapGoldDesc());
         } else if ("2".equals(golds)) {
             Collections.sort(students, new MapGoldDesc());
 
         } else if ("1".equals(badges)) {
             // 按照勋章
+            //Collections.sort(students, new MapXzAsc());
             Collections.sort(students, new MapXzDesc());
         } else if ("2".equals(badges)) {
             Collections.sort(students, new MapXzDesc());
 
         } else if ("1".equals(certificates)) {
             // 按照证书
+            //Collections.sort(students, new MapZsAsc());
             Collections.sort(students, new MapZsDesc());
         } else if ("2".equals(certificates)) {
             Collections.sort(students, new MapZsDesc());
 
         } else if ("1".equals(worships)) {
             // 按照膜拜
+            //Collections.sort(students, new MapMbAsc());
             Collections.sort(students, new MapMbDesc());
         } else if ("2".equals(worships)) {
             Collections.sort(students, new MapMbDesc());
@@ -923,9 +905,6 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
 
         // 总参与人数
         myMap.put("number", lista.size());
-        if("3".equals(model)) {
-            myMap.put("number", "99999+");
-        }
         // 把我的信息封装到返回结果集中
         result.put("myDate", myMap);
 
@@ -1071,12 +1050,12 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     }
 
     @Override
-    public ServerResponse<Object> showCcie(HttpSession session, Integer model) {
+    public ServerResponse<Object> showCcie(HttpSession session, Integer model, Integer type) {
         // 获取当前学生信息
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         Long studentId = student.getId();
 
-        List<Map<String, Object>> listCcie = ccieMapper.selectAllCcieByStudentIdAndDate(studentId, model);
+        List<Map<String, Object>> listCcie = ccieMapper.selectAllCcieByStudentIdAndDate(studentId, model, type);
         if (listCcie.size() == 0) {
             return ServerResponse.createByErrorMessage("暂无证书！");
         }
@@ -1094,9 +1073,15 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
 
             time = map.get("time").toString().split("-");
             sb.setLength(0);
-            sb.append("于").append(time[0]).append("年").append(time[1]).append("月").append(time[2])
-                    .append("日，在“智慧英语平台”完成").append(map.get("testName"))
-                    .append("。").append(map.get("encourageWord")).append("，特发此证，以资鼓励。");
+            if (type == 2) {
+                sb.append("恭喜上神于").append(time[0]).append("年").append(time[1]).append("月").append(time[2])
+                        .append("日，修完“").append(map.get("courseName")).append("”课程，特此颁发证书，以资鼓励。");
+            } else {
+                sb.append("于").append(time[0]).append("年").append(time[1]).append("月").append(time[2])
+                        .append("日，在“智慧英语平台”完成").append(map.get("testName"))
+                        .append("。").append(map.get("encourageWord")).append("，特发此证，以资鼓励。");
+            }
+
             map.put("content", sb.toString());
             map.put("ccie_no", "证书编号：" + map.get("ccie_no"));
 
@@ -1391,21 +1376,21 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
  		Long classId = student.getClassId();
 
         // 学段
-        String study_paragraph = null;
+        String study_paragraph;
         if ("七年级".equals(grade) || "八年级".equals(grade) || "九年级".equals(grade)) {
             study_paragraph = "初中";
-        } else if("小学".equals(grade)){
-        	study_paragraph = "小学";
-        }else {
+        } else if ("小学".equals(grade)) {
+            study_paragraph = "小学";
+        } else {
             study_paragraph = "高中";
         }
 
         // 响应数据
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(16);
         List<SeniorityVo> list = null;
 
         // 默认本班排行
-        if (model == 1 || model == null) {
+        if (model == 1) {
             // 已学单元
             if (haveUnit != null && haveUnit > 0) {
                 list = studentUnitMapper.planSeniority(grade, study_paragraph, haveUnit, version, classId);
@@ -1418,7 +1403,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
             }
 
 			// 班级总参与人数
-			result.put("atNumber", list.size());
+			result.put("atNumber", list == null ? 0 : list.size());
 
             // 本校排行
         } else if (model == 2) {
@@ -1490,7 +1475,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         // 对list分页
         page = (page - 1) * rows;
         rows = page + rows;
-        List<SeniorityVo> resultList = list.subList(page > list.size() ? list.size() : page, list.size() < rows ? list.size() : rows);
+        List<SeniorityVo> resultList = new ArrayList<>(list.subList(page > list.size() ? list.size() : page, list.size() < rows ? list.size() : rows));
         result.put("pageDate", resultList);
 
 		// 当前学生排行等数据,
@@ -1524,8 +1509,8 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         // 根据单元id 查询课程单元名
         String name = unitMapper.getCourseNameByunitId(unitId);
 
-        map.put("toLearn", unitAllStudyModel); // ./
-        map.put("countUnit", count); // /.
+        map.put("toLearn", unitAllStudyModel);
+        map.put("countUnit", count);
         map.put("name", name);
 
         return ServerResponse.createBySuccess(map);
@@ -1650,5 +1635,12 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
 
         return ServerResponse.createBySuccess(resut);
     }
-	
+
+    @Override
+    public ServerResponse updateCcie(HttpSession session) {
+        Long studentId = getStudentId(session);
+        ccieMapper.updateReadFlag(studentId, 1);
+        return ServerResponse.createBySuccess();
+    }
+
 }

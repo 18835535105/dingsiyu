@@ -3,9 +3,17 @@ package com.zhidejiaoyu.common.pojo;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.Serializable;
 
+/**
+ * 学生可以学习的课程和单元
+ */
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class StudentUnit extends Model<StudentUnit> {
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -26,53 +34,10 @@ public class StudentUnit extends Model<StudentUnit> {
      */
     private Integer sentenceStatus;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getStudentId() {
-        return studentId;
-    }
-
-    public void setStudentId(Long studentId) {
-        this.studentId = studentId;
-    }
-
-    public Long getCourseId() {
-        return courseId;
-    }
-
-    public void setCourseId(Long courseId) {
-        this.courseId = courseId;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public Integer getWordStatus() {
-        return wordStatus;
-    }
-
-    public void setWordStatus(Integer wordStatus) {
-        this.wordStatus = wordStatus;
-    }
-
-    public Integer getSentenceStatus() {
-        return sentenceStatus;
-    }
-
-    public void setSentenceStatus(Integer sentenceStatus) {
-        this.sentenceStatus = sentenceStatus;
-    }
+    /**
+     * 学生学习课程版本 1,智能版  2,清学版
+     */
+    private Integer type;
 
     @Override
     protected Serializable pkVal() {

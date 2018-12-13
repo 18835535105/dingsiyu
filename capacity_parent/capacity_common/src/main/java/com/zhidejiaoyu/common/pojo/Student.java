@@ -263,6 +263,21 @@ public class Student extends Model<Student> {
      */
     private String version;
 
+    /**
+     * 能量数字   每天凌晨12点能量清零
+     */
+    private Integer energy;
+
+    /**
+     * 钻石数量
+     */
+    private Integer diamond;
+
+    /**
+     *金币加成到期时间
+     */
+    private Date bonusExpires;
+
     public Student(String petName) {
         this.petName = petName;
     }
