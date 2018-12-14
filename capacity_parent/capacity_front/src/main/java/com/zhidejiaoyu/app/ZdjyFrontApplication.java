@@ -38,6 +38,7 @@ public class ZdjyFrontApplication {
 
     @SuppressWarnings("unused")
     public static void main(String[] args) {
+
         run(ZdjyFrontApplication.class, args);
         log.info("application is started");
     }
