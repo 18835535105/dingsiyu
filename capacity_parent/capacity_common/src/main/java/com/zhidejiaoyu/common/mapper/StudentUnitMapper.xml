@@ -264,6 +264,23 @@
         countUnit DESC
         LIMIT 50;
     </select>
+    <select id="selectCourseIdsByStudentId" resultType="java.lang.Long" parameterType="map">
+        select course_id
+        from student_unit
+        where student_id = #{studentId}
+          and type = 1
+        group by course_id
+    </select>
+    <select id="selectCourseInfo" resultType="java.util.Map" parameterType="map">
+        select c.id, c.course_name courseName
+        from student_unit su,
+             course c
+        where su.course_id = c.id
+          and su.student_id = #{studentId}
+          and su.type = 1
+        group by c.id
+        order by c.id asc
+    </select>
 
     <update id="updateStatus" parameterType="map">
         update student_unit

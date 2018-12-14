@@ -19,4 +19,13 @@ import java.util.Map;
  */
 public interface TeksMapper extends BaseMapper<Teks> {
     List<Teks> selTeksByUnitId(Integer unitId);
+
+    /**
+     * 获取学生课程下所有单元信息
+     *
+     * @param studentId
+     * @param courseIds
+     * @return
+     */
+    List<Map<String, Object>> selectUnitIdAndNameByCourseIds(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds);
 }

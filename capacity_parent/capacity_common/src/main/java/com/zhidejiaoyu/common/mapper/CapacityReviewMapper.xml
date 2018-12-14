@@ -541,4 +541,35 @@
         </foreach>
         ) and push &lt;= now() and memory_strength &lt; 1
     </select>
+
+    <sql id="testCenterSql">
+        select count(id)
+        from learn
+        where student_id = #{studentId}
+        and study_model = #{classify}
+        <if test="classify >= 4">
+            and vocabulary_id is null
+        </if>
+        <if test="classify &lt; 4">
+            and example_id is null
+        </if>
+        <if test="courseIds.size > 0">
+            and course_id in (
+            <foreach collection="courseIds" separator="," item="courseId">
+                #{courseId}
+            </foreach>
+            )
+        </if>
+    </sql>
+    <select id="countAlreadyStudyWord" resultType="java.lang.Integer" parameterType="map">
+        <include refid="testCenterSql"/>
+    </select>
+    <select id="countAccrueWord" resultType="java.lang.Integer" parameterType="map">
+        <include refid="testCenterSql"/>
+        and status = 0
+    </select>
+    <select id="countRipeWord" resultType="java.lang.Integer" parameterType="map">
+        <include refid="testCenterSql"/>
+        and status = 1
+    </select>
 </mapper>

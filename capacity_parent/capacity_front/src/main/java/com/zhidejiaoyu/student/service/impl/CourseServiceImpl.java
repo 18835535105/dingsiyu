@@ -29,7 +29,7 @@ import java.util.*;
  */
 @Service
 @Transactional
-public class CourseServiceImpl implements CourseService {
+public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> implements CourseService {
 
     /**
      * 注入课程mapper
@@ -830,6 +830,22 @@ public class CourseServiceImpl implements CourseService {
         List<Map<String,Object>> map = unitMapper.selectUnitIdAndUnitNameByCourseIdAndStudentId(courseId, student.getId());
         PageInfo<Map<String, Object>> mapPageInfo = new PageInfo<>(map);
         return ServerResponse.createBySuccess(mapPageInfo);
+    }
+
+    @Override
+    public ServerResponse<List<Map<String, Object>>> getAllCoursesInfo(HttpSession session) {
+        Student student = getStudent(session);
+        Long studentId = student.getId();
+
+        List<Map<String, Object>> courseMaps = studentUnitMapper.selectCourseInfo(studentId);
+
+        Map<String, Object> map = new HashMap<>(16);
+        map.put("courseName", "全部课程");
+        map.put("id", 0);
+
+        courseMaps.add(0, map);
+
+        return ServerResponse.createBySuccess(courseMaps);
     }
 
 }

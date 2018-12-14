@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
+import com.zhidejiaoyu.common.Vo.student.testCenter.TestCenterVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -117,6 +118,9 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
     @Autowired
     private DurationMapper durationMapper;
+
+    @Autowired
+    private StudentUnitMapper studentUnitMapper;
 
     @Autowired
     private CcieUtil ccieUtil;
@@ -472,50 +476,43 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     }
 
     @Override
-    public ServerResponse<List> testcentreindex(int model, String unitId, HttpSession session) {
+    public ServerResponse<List<TestCenterVo>> testCentreIndex(Long courseId, HttpSession session) {
         // 获取当前学生信息
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        Long student_id = student.getId();
+        Long studentId = student.getId();
 
-        // 返回结果集
-        List<Map<String, Object>> list = new ArrayList<>();
-
-        // 单词模块
-        if (model == 1) {
-            for (int i = 1; i <= 4; i++) {
-                Map<String, Object> map = new LinkedHashMap<>();
-                String classify = commonMethod.getTestType(i == 4 ? 0 : i); // 0是单词图鉴
-                // 1.已学
-                Integer a = capacityMapper.alreadyStudyWord(student_id, unitId, classify);
-                // 2.生词
-                Integer b = capacityMapper.accrueWord(student_id, unitId, classify);
-                // 3.熟词
-                Integer c = capacityMapper.ripeWord(student_id, unitId, classify);
-                map.put("classify", i == 4 ? 0 : i);
-                map.put("alreadyStudy", a);
-                map.put("accrue", b);
-                map.put("ripe", c);
-                list.add(map);
-            }
-        }else{ // 例句模块
-            for (int i = 4; i <= 6; i++) {
-                Map<String, Object> map = new LinkedHashMap<>();
-                String classify = commonMethod.getTestType(i);
-                // 1.已学
-                Integer a = capacityMapper.alreadyStudyWord(student_id, unitId, classify);
-                // 2.生词
-                Integer b = capacityMapper.accrueWord(student_id, unitId, classify);
-                // 3.熟词
-                Integer c = capacityMapper.ripeWord(student_id, unitId, classify);
-                map.put("classify", i);
-                map.put("alreadyStudy", a);
-                map.put("accrue", b);
-                map.put("ripe", c);
-                list.add(map);
-            }
+        List<Long> courseIds;
+        if (courseId == 0) {
+            // 学生所有课程id
+            courseIds = studentUnitMapper.selectCourseIdsByStudentId(studentId);
+        } else {
+            courseIds = new ArrayList<>();
+            courseIds.add(courseId);
         }
 
-        return ServerResponse.createBySuccess(list);
+        List<TestCenterVo> testCenterVos = new ArrayList<>();
+        TestCenterVo testCenterVo;
+
+        // 单词模块
+        for (int i = 0; i <= 6; i++) {
+            testCenterVo = new TestCenterVo();
+            String classify = commonMethod.getTestType(i);
+            // 已学
+            Integer learnCount = capacityMapper.countAlreadyStudyWord(studentId, courseIds, classify);
+            // 生词
+            Integer unknownCount = capacityMapper.countAccrueWord(studentId, courseIds, classify);
+            // 熟词
+            Integer knownCount = capacityMapper.countRipeWord(studentId, courseIds, classify);
+
+            testCenterVo.setClassify(i);
+            testCenterVo.setAlreadyStudy(learnCount);
+            testCenterVo.setAccrue(unknownCount);
+            testCenterVo.setRipe(knownCount);
+
+            testCenterVos.add(testCenterVo);
+        }
+
+        return ServerResponse.createBySuccess(testCenterVos);
     }
 
     /**

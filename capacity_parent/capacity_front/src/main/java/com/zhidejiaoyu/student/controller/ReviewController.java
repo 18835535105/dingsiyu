@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.controller;
 
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
+import com.zhidejiaoyu.common.Vo.student.testCenter.TestCenterVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -249,17 +250,19 @@ public class ReviewController {
         return ServerResponse.createBySuccess();
     }
 
+
+
     /**
      * 测试中心首页需要的数据
      *
-     * @param model 1=单词模块;2=例句模块
-     * @param unitId 改为单元id    !!!!!!!!!!!!!!!!!!!!!!!!
-     * @return 六个模块可以测试数量
+     * @param courseId 课程id，默认为全部课程
+     * @return
      */
     @ResponseBody
     @RequestMapping(value = "/testcentreindex")
-    public ServerResponse<List> testcentreindex(int model,String unitId, HttpSession session) {
-        return reviewService.testcentreindex(model, unitId, session);
+    public ServerResponse<List<TestCenterVo>> testCentreIndex(@RequestParam(required = false, defaultValue = "0") Long courseId,
+                                                              HttpSession session) {
+        return reviewService.testCentreIndex(courseId, session);
     }
 
     /**

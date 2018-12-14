@@ -65,8 +65,7 @@ public interface SentenceService extends BaseService<Sentence> {
      * 进入句型学习页获取学生所有课程及单元，并标记当前学习、未学习、已学习状态
      *
      * @param session
-     * @param type    2：例句听力；3：例句默写；4：例句翻译
      * @return
      */
-    ServerResponse<List<CourseUnitVo>> getLearnCourseAndUnit(HttpSession session, Integer type);
+    ServerResponse<List<CourseUnitVo>> getLearnCourseAndUnit(HttpSession session);
 }

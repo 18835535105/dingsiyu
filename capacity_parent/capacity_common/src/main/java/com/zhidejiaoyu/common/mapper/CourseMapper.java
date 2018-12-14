@@ -315,10 +315,18 @@ public interface CourseMapper extends BaseMapper<Course> {
     List<Map<String, Object>> getAllCourseInfoWithSentence(@Param("student") Student student);
 
     /**
-     * 查询学生所有课程的id和名称
+     * 查询学生句型所有课程的id和名称
      *
      * @param studentId
      * @return
      */
-    List<Map<String, Object>> selectCourseIdAndCourseNameByStudentId(@Param("studentId") Long studentId);
+    List<Map<String, Object>> selectSentenceCourseIdAndCourseNameByStudentId(@Param("studentId") Long studentId);
+
+    /**
+     * 查询学生课文所有课程id和名称
+     *
+     * @param studentId
+     * @return
+     */
+    List<Map<String, Object>> selectTextCourseIdAndCourseNameByStudentId(Long studentId);
 }
