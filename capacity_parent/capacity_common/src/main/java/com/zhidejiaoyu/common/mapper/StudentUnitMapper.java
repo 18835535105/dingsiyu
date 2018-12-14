@@ -156,4 +156,18 @@ public interface StudentUnitMapper extends BaseMapper<StudentUnit> {
     @Select("select unit_id FROM student_unit WHERE student_id = #{studentId} AND course_id = #{courseId} AND word_status = 1 ORDER BY id DESC LIMIT 1")
     long getFinallyLearnUnitByStudentIdAndCourseId(@Param("studentId") long studentId, @Param("courseId") long courseId);
 
+    /**
+     * 学生所有课程id
+     * @param studentId
+     * @return
+     */
+    List<Long> selectCourseIdsByStudentId(@Param("studentId") Long studentId);
+
+    /**
+     * 获取学生所有课程名称及id
+     *
+     * @param studentId
+     * @return
+     */
+    List<Map<String, Object>> selectCourseInfo(Long studentId);
 }

@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service;
 
+import com.zhidejiaoyu.common.Vo.student.testCenter.TestCenterVo;
 import com.zhidejiaoyu.common.pojo.CapacityMemory;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
@@ -54,7 +55,14 @@ public interface ReviewService extends BaseService<CapacityMemory> {
      */
     Object ReviewSentence_listen(Long stuId, String unit_id, int classify, String course_id, boolean pattern, Integer type);
 
-    ServerResponse<List> testcentreindex(int model, String course_id, HttpSession session);
+    /**
+     * 测试中心页数据展示
+     *
+     * @param courseId
+     * @param session
+     * @return
+     */
+    ServerResponse<List<TestCenterVo>> testCentreIndex(Long courseId, HttpSession session);
 
     ServerResponse<Object> testcentre(String courseId, String unitId, int select, int classify, Boolean isTrue, HttpSession session);
 

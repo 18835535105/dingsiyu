@@ -15,7 +15,7 @@ import java.util.Map;
  * @author qizhentao
  * @version 1.0
  */
-public interface CourseService {
+public interface CourseService extends BaseService<Course> {
 
     /**
      * 点击所有课程 查询学生绑定版本下的所有年级 标签
@@ -90,4 +90,12 @@ public interface CourseService {
      * @return
      */
     ServerResponse<PageInfo<Map<String,Object>>> getUnitPage(HttpSession session, Long courseId, Integer pageNum, Integer pageSize);
+
+    /**
+     * 获取学生所有课程id及课程名称
+     *
+     * @param session
+     * @return
+     */
+    ServerResponse<List<Map<String, Object>>> getAllCoursesInfo(HttpSession session);
 }

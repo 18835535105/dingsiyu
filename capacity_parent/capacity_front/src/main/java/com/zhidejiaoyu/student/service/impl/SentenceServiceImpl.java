@@ -424,7 +424,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     }
 
     @Override
-    public ServerResponse<List<CourseUnitVo>> getLearnCourseAndUnit(HttpSession session, Integer type) {
+    public ServerResponse<List<CourseUnitVo>> getLearnCourseAndUnit(HttpSession session) {
         Student student = getStudent(session);
         Long studentId = student.getId();
         List<CourseUnitVo> courseUnitVos = new ArrayList<>();
@@ -432,7 +432,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         List<Map<String, Object>> resultMap;
 
         // 学生所有课程id及课程名
-        List<Map<String, Object>> courses = courseMapper.selectCourseIdAndCourseNameByStudentId(studentId);
+        List<Map<String, Object>> courses = courseMapper.selectSentenceCourseIdAndCourseNameByStudentId(studentId);
 
         // 学生课程下所有例句的单元id及单元名
         if (courses.size() > 0) {
@@ -463,9 +463,9 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 Map<String, Object> unitInfoMap;
                 for (Map<String, Object> unitMap : sentenceUnits) {
                     unitInfoMap = new HashMap<>(16);
-                    unitInfoMap.put("unitId", unitMap.get("id"));
-                    unitInfoMap.put("unitName", unitMap.get("unitName"));
                     if (Objects.equals(courseMap.get("id"), unitMap.get("courseId"))) {
+                        unitInfoMap.put("unitId", unitMap.get("id"));
+                        unitInfoMap.put("unitName", unitMap.get("unitName"));
                         if (testMap != null && testMap.containsKey(unitMap.get("id"))) {
                             // 当前单元已进行过单元闯关，标记为已学习
                             unitInfoMap.put("state", 4);
@@ -476,8 +476,8 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                             // 正在学习
                             unitInfoMap.put("state", 3);
                         }
+                        resultMap.add(unitInfoMap);
                     }
-                    resultMap.add(unitInfoMap);
                 }
                 courseUnitVo.setUnitVos(resultMap);
                 courseUnitVos.add(courseUnitVo);

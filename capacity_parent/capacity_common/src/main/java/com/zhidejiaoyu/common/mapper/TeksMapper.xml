@@ -22,5 +22,17 @@
         select <include refid="Base_Column_List"></include> from teks t where  t.unit_id=#{unitId}
     </select>
 
+    <select id="selectUnitIdAndNameByCourseIds" resultType="java.util.Map" parameterType="map">
+        select u.id, u.unit_name unitName, u.course_id courseId from unit u, teks t, student_unit su where
+        su.unit_id = u.id and su.student_id = #{studentId} and su.type = 1 and u.id = t.unit_id and
+        u.course_id in (
+        <foreach collection="courseIds" separator="," item="courseId">
+            #{courseId}
+        </foreach>
+        )
+        group by u.id
+        order by u.course_id asc, u.id asc
+    </select>
+
 
 </mapper>

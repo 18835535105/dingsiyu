@@ -57,17 +57,35 @@ public interface CapacityReviewMapper {
 	@Select("select id from sentence where centreExample = #{word} or tallExample = #{word}")
 	Integer selectSentenceId(@Param("word") String word);
 
-	// 已学
-	@Select("select count(id) from learn where student_id = #{student_id} and unit_id = #{unit_id} and study_model = #{classify}")
-	Integer alreadyStudyWord(@Param("student_id") Long student_id, @Param("unit_id") String unit_id, @Param("classify") String classify);
+	/**
+	 * 学生当前课程下已学单词数
+	 *
+	 * @param studentId
+	 * @param courseIds
+	 * @param classify
+	 * @return
+	 */
+	Integer countAlreadyStudyWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds, @Param("classify") String classify);
 
-	// 生词
-	@Select("select count(id) from learn where student_id = #{student_id} and unit_id = #{unit_id} and study_model = #{classify} and status = 0")
-	Integer accrueWord(@Param("student_id") Long student_id, @Param("unit_id") String unit_id, @Param("classify") String classify);
+	/**
+	 * 学生当前课程下已学生词数
+	 *
+	 * @param studentId
+	 * @param courseIds
+	 * @param classify
+	 * @return
+	 */
+	Integer countAccrueWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds, @Param("classify") String classify);
 
-	// 熟词
-	@Select("select count(id) from learn where student_id = #{student_id} and unit_id = #{unit_id} and study_model = #{classify} and status = 1")
-	Integer ripeWord(@Param("student_id") Long student_id, @Param("unit_id") String unit_id, @Param("classify") String classify);
+	/**
+	 * 学生当前课程下已学熟词数
+	 *
+	 * @param studentId
+	 * @param courseIds
+	 * @param classify
+	 * @return
+	 */
+	Integer countRipeWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds, @Param("classify") String classify);
 
 	// 模块1已学题
 	@Select("select a.id, a.word, a.word_chinese as wordChinese, a.recordpicurl from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id	and b.unit_id = #{unit_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id  AND a.delStatus = 1")

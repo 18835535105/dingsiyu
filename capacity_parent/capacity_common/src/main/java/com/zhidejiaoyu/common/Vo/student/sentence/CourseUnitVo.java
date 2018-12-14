@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 进入例句学习页时展示学生所有课程和单元及其学习状态
+ * 进入例句/课文学习页时展示学生所有课程和单元及其学习状态
  *
  * @author wuchenxi
  * @date 2018-12-12

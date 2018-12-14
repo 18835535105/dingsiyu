@@ -30,6 +30,18 @@ public class CourseController {
     @Autowired
     private CourseService courseService;
 
+    /**
+     * 获取学生所有课程id和课程名
+     *
+     * @param session
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/getAllCourseInfo")
+    public ServerResponse<List<Map<String, Object>>> getAllCourse(HttpSession session) {
+        return courseService.getAllCoursesInfo(session);
+    }
+
 
     /**
      * (学生 版本字段不为空)
