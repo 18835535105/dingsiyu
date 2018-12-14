@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.common.mapper.TeksMapper;
 import com.zhidejiaoyu.common.pojo.Teks;
+import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.TeksService;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 @Service
 public class TeksServiceImpl implements TeksService {
 
@@ -21,6 +23,8 @@ public class TeksServiceImpl implements TeksService {
     private TeksMapper teksMapper;
     @Autowired
     private BaiduSpeak baiduSpeak;
+    @Autowired
+    private CommonMethod commonMethod;
 
     @Override
     public ServerResponse<List<Teks>> selTeksByUnitId(Integer unitId) {
@@ -46,13 +50,13 @@ public class TeksServiceImpl implements TeksService {
                 map.put("chinese",teks1.getParaphrase());
                 map.put("pronunciation",baiduSpeak.getLanguagePath(teks1.getSentence()));
                 map.put("sentence",teks1.getSentence());
+                map.put("id",teks1.getId());
                 int count=0;
                 count+=StringUtils.countMatches(teks1.getSentence(),",");
                 count+=StringUtils.countMatches(teks1.getSentence(),"!");
                 count+=StringUtils.countMatches(teks1.getSentence(),"?");
                 count+=StringUtils.countMatches(teks1.getSentence(),".");
                 String[] sentenceList = teks1.getSentence().split(" ");
-                String[] vocabularyArray = new String[sentenceList.length];
                 String[] blankSentenceArray=new String[sentenceList.length+count];
                 int index=0;
                 for(int i=0;i<sentenceList.length;i++){
@@ -63,50 +67,43 @@ public class TeksServiceImpl implements TeksService {
                     if(s>0){
                         int u=StringUtils.countMatches(sentenceList[i],",");
                         if(u>0){
-                            String[] split = sentenceList[i].split(",");
-                            vocabularyArray[i]=split[0];
                             blankSentenceArray[index]=null;
                             index+=1;
-                            blankSentenceArray[index]=split[1];
+                            blankSentenceArray[index]=",";
                             index+=1;
                         }
                         int p=StringUtils.countMatches(sentenceList[i],"!");
                         if(p>0){
-                            String[] split = sentenceList[i].split("!");
-                            vocabularyArray[i]=split[0];
                             blankSentenceArray[index]=null;
                             index+=1;
-                            blankSentenceArray[index]=split[1];
+                            blankSentenceArray[index]="!";
                             index+=1;
                         }
                         int q=StringUtils.countMatches(sentenceList[i],"?");
                         if(q>0){
-                            String[] split = sentenceList[i].split("\\?");
-                            vocabularyArray[i]=split[0];
                             blankSentenceArray[index]=null;
                             index+=1;
-                            blankSentenceArray[index]=split[1];
+                            blankSentenceArray[index]="?";
                             index+=1;
                         }
                         int e=StringUtils.countMatches(sentenceList[i],".");
                         if(e>0){
-                            String[] split = sentenceList[i].split(".");
-                            vocabularyArray[i]=split[0];
                             blankSentenceArray[index]=null;
                             index+=1;
-                            blankSentenceArray[index]=split[1];
+                            blankSentenceArray[index]=".";
                             index+=1;
                         }
                     }else{
-                        vocabularyArray[i]=sentenceList[i];
+
                         blankSentenceArray[index]=null;
                         index+=1;
                     }
-                    map.put("vocabularyArray",vocabularyArray);
+                    map.put("vocabularyArray",commonMethod.getOrderEnglishList(teks1.getSentence(),null));
                     map.put("blankSentenceArray",blankSentenceArray);
-                    resultList.add(map);
                 }
+                resultList.add(map);
             }
+            return ServerResponse.createBySuccess(resultList);
         }
         return ServerResponse.createByError();
     }
