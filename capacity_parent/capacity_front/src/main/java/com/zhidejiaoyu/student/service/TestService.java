@@ -5,7 +5,6 @@ import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
-import com.zhidejiaoyu.student.dto.sentence.SentenceUnitTestDto;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 
 import javax.servlet.http.HttpSession;

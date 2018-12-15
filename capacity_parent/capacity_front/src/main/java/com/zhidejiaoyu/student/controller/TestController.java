@@ -7,7 +7,6 @@ import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
-import com.zhidejiaoyu.student.dto.sentence.SentenceUnitTestDto;
 import com.zhidejiaoyu.student.service.TestService;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 import org.springframework.beans.factory.annotation.Autowired;

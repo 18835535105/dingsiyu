@@ -19,7 +19,6 @@ import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
-import com.zhidejiaoyu.student.dto.sentence.SentenceUnitTestDto;
 import com.zhidejiaoyu.student.service.TestService;
 import com.zhidejiaoyu.student.utils.CcieUtil;
 import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
