@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.TestRecord;
@@ -12,14 +13,12 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 import java.util.Map;
 
-public interface TestRecordMapper {
+public interface TestRecordMapper extends BaseMapper<TestRecord> {
     int countByExample(TestRecordExample example);
 
     int deleteByExample(TestRecordExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(TestRecord record);
 
     int insertSelective(TestRecord record);
 

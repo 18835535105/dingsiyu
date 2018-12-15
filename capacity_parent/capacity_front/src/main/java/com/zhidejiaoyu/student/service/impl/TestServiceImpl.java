@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.math.MathUtil;
 import com.zhidejiaoyu.common.utils.server.GoldResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
@@ -18,6 +19,7 @@ import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
+import com.zhidejiaoyu.student.dto.sentence.SentenceUnitTestDto;
 import com.zhidejiaoyu.student.service.TestService;
 import com.zhidejiaoyu.student.utils.CcieUtil;
 import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
@@ -35,7 +37,7 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @Service
-public class TestServiceImpl implements TestService {
+public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecord> implements TestService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(TestServiceImpl.class);
     /**
@@ -666,6 +668,53 @@ public class TestServiceImpl implements TestService {
         return 0;
     }
 
+
+    @Override
+    public ServerResponse saveSentenceUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
+        Student student = getStudent(session);
+        TestRecord testRecord;
+
+        wordUnitTestDTO.setClassify(5);
+
+        // 判断当前单元是不是首次进行测试
+        boolean isFirst = false;
+        TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
+                wordUnitTestDTO.getUnitId()[0], "单元闯关测试", "例句翻译");
+        if (testRecordOld == null) {
+            isFirst = true;
+        }
+
+        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld);
+        if (testRecordOld == null) {
+            testRecord = new TestRecord();
+            // 首次测试大于或等于80分，超过历史最高分次数 +1
+            if (wordUnitTestDTO.getPoint() >= PASS) {
+                testRecord.setBetterCount(1);
+            } else {
+                testRecord.setBetterCount(0);
+            }
+        } else {
+            testRecord = new TestRecord();
+            testRecord.setBetterCount(testRecordOld.getBetterCount());
+        }
+
+        testRecord.setCourseId(wordUnitTestDTO.getCourseId());
+        testRecord.setUnitId(wordUnitTestDTO.getUnitId()[0]);
+        testRecord.setPoint(wordUnitTestDTO.getPoint());
+        testRecord.setErrorCount(wordUnitTestDTO.getErrorCount());
+        testRecord.setRightCount(wordUnitTestDTO.getRightCount());
+        testRecord.setGenre("单元闯关测试");
+        testRecord.setStudentId(student.getId());
+        testRecord.setTestEndTime(new Date());
+        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+        testRecord.setQuantity(wordUnitTestDTO.getErrorCount() + wordUnitTestDTO.getRightCount());
+        testRecord.setAwardGold(goldCount);
+        testRecord.setStudyModel("例句翻译");
+        testRecordMapper.insert(testRecord);
+        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
+        return ServerResponse.createBySuccess();
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
@@ -820,7 +869,8 @@ public class TestServiceImpl implements TestService {
             }
         } else {
             // 查询当前单元测试历史最高分数
-            int betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), wordUnitTestDTO.getUnitId()[0], wordUnitTestDTO.getClassify());
+            int betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), wordUnitTestDTO.getUnitId()[0],
+                    wordUnitTestDTO.getClassify());
 
             // 非首次测试成绩大于或等于80分并且本次测试成绩大于历史最高分，超过历史最高分次数 +1并且金币奖励翻倍
             if (point >= PASS && betterPoint < wordUnitTestDTO.getPoint()) {
@@ -904,22 +954,17 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId, Integer studyModel,
-                                                                         Boolean isSure, Integer type) {
+    public ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId, Integer type, Integer pageNum) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         student = studentMapper.selectByPrimaryKey(student.getId());
-        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-
-        // 判断学生当前单元有无进行单元闯关测试记录，如果已参加过单元闯关测试，提示其需要花费金币购买测试机会，如果还没有测试记录可以免费进行测试
-        int flag = this.isFirstTest(student, unitId, commonMethod.getTestType(studyModel), isSure);
-        if (flag == 1) {
-            return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该单元闯关测试，再次参加需扣除1金币。");
-        } else if (flag == 2) {
-            return ServerResponse.createByError(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
+        if (session.getAttribute(TimeConstant.BEGIN_START_TIME) == null) {
+            session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         }
-        // 获取当前单元下的所有例句 limit 20
-        List<Sentence> sentences = sentenceMapper.selectByUnitId(student.getId(), unitId);
-        List<SentenceTranslateVo> sentenceTestResults = testResultUtil.getSentenceTestResults(sentences, studyModel, type);
+
+        // 获取当前单元下其中一个例句
+        PageHelper.startPage(pageNum, 1);
+        List<Sentence> sentences = sentenceMapper.selectOneByUnitId(student.getId(), unitId);
+        List<SentenceTranslateVo> sentenceTestResults = testResultUtil.getSentenceTestResults(sentences, MathUtil.getRandom(4, 6), type);
         return ServerResponse.createBySuccess(sentenceTestResults);
     }
 
@@ -1050,5 +1095,4 @@ public class TestServiceImpl implements TestService {
 
         return ServerResponse.createBySuccess(vo);
     }
-
 }

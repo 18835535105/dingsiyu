@@ -498,11 +498,11 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             testCenterVo = new TestCenterVo();
             String classify = commonMethod.getTestType(i);
             // 已学
-            Integer learnCount = capacityMapper.countAlreadyStudyWord(studentId, courseIds, classify);
+            Integer learnCount = capacityMapper.countAlreadyStudyWord(studentId, courseIds, classify, i);
             // 生词
-            Integer unknownCount = capacityMapper.countAccrueWord(studentId, courseIds, classify);
+            Integer unknownCount = capacityMapper.countAccrueWord(studentId, courseIds, classify, i);
             // 熟词
-            Integer knownCount = capacityMapper.countRipeWord(studentId, courseIds, classify);
+            Integer knownCount = capacityMapper.countRipeWord(studentId, courseIds, classify, i);
 
             testCenterVo.setClassify(i);
             testCenterVo.setAlreadyStudy(learnCount);

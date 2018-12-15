@@ -234,6 +234,15 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
     List<Sentence> selectByUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 
     /**
+     * 获取当前单元下未测试的一个句型
+     *
+     * @param studentId
+     * @param unitId
+     * @return
+     */
+    List<Sentence> selectOneByUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+
+    /**
      * 获取句型好声音题目
      *
      * @param studentId

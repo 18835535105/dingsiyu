@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
+import com.zhidejiaoyu.student.dto.sentence.SentenceUnitTestDto;
 import com.zhidejiaoyu.student.service.TestService;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,22 +117,32 @@ public class TestController {
      *
      * @param session
      * @param unitId
-     * @param studyModel 学习模块（4=例句听力，5=例句翻译，6=例句默写）
-     * @param isTrue     是否确认消费1金币进行测试 true:是；false：否
      * @param type 1:普通模式；2：暴走模式
      * @return
      */
     @GetMapping("/getSentenceUnitTest")
-    public ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId, Integer studyModel,
-                                                                         @RequestParam(required = false, defaultValue = "false") Boolean isTrue,
-                                                                         @RequestParam(required = false, defaultValue = "1") Integer type) {
+    public ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId,
+                                                                         @RequestParam(required = false, defaultValue = "1") Integer type,
+                                                                         @RequestParam(required = false, defaultValue = "1") Integer pageNum) {
         if (unitId == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), "unitId 不能为 null");
         }
-        if (StringUtils.isEmpty(studyModel)) {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), "unitId 不能为空");
+        return testService.getSentenceUnitTest(session, unitId, type, pageNum);
+    }
+
+    /**
+     * 保存句型单元闯关测试记录
+     *
+     * @param session
+     * @param wordUnitTestDTO
+     * @return
+     */
+    @PostMapping("/saveSentenceUnitTest")
+    public ServerResponse saveSentenceUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
+        if (wordUnitTestDTO.getUnitId() == null) {
+            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
         }
-        return testService.getSentenceUnitTest(session, unitId, studyModel, isTrue, type);
+        return testService.saveSentenceUnitTest(session, wordUnitTestDTO);
     }
 
     /**

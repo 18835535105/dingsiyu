@@ -547,10 +547,10 @@
         from learn
         where student_id = #{studentId}
         and study_model = #{classify}
-        <if test="classify >= 4">
+        <if test="flag >= 4">
             and vocabulary_id is null
         </if>
-        <if test="classify &lt; 4">
+        <if test="flag &lt; 4">
             and example_id is null
         </if>
         <if test="courseIds.size > 0">

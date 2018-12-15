@@ -63,9 +63,11 @@ public interface CapacityReviewMapper {
 	 * @param studentId
 	 * @param courseIds
 	 * @param classify
+	 * @param flag
 	 * @return
 	 */
-	Integer countAlreadyStudyWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds, @Param("classify") String classify);
+	Integer countAlreadyStudyWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds,
+								  @Param("classify") String classify, @Param("flag") int flag);
 
 	/**
 	 * 学生当前课程下已学生词数
@@ -73,9 +75,11 @@ public interface CapacityReviewMapper {
 	 * @param studentId
 	 * @param courseIds
 	 * @param classify
+	 * @param flag
 	 * @return
 	 */
-	Integer countAccrueWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds, @Param("classify") String classify);
+	Integer countAccrueWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds,
+							@Param("classify") String classify,  @Param("flag") int flag);
 
 	/**
 	 * 学生当前课程下已学熟词数
@@ -83,9 +87,11 @@ public interface CapacityReviewMapper {
 	 * @param studentId
 	 * @param courseIds
 	 * @param classify
+	 * @param flag
 	 * @return
 	 */
-	Integer countRipeWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds, @Param("classify") String classify);
+	Integer countRipeWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds,
+						  @Param("classify") String classify,  @Param("flag") int flag);
 
 	// 模块1已学题
 	@Select("select a.id, a.word, a.word_chinese as wordChinese, a.recordpicurl from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id	and b.unit_id = #{unit_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id  AND a.delStatus = 1")
