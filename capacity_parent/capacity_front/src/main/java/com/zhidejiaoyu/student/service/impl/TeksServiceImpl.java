@@ -4,7 +4,6 @@ import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.common.mapper.CourseMapper;
 import com.zhidejiaoyu.common.mapper.TeksMapper;
 import com.zhidejiaoyu.common.mapper.TestRecordMapper;
-import com.zhidejiaoyu.common.mapper.UnitSentenceMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Teks;
 import com.zhidejiaoyu.common.study.CommonMethod;
@@ -53,6 +52,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Override
     public ServerResponse<Object> selChooseTeks(Integer unitId) {
+
         List<Teks> teks = teksMapper.selTeksByUnitId(unitId);
         if(teks.size()>0){
             List<Map<String,Object>> resultList=new ArrayList<>();
@@ -114,6 +114,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 }
                 resultList.add(map);
             }
+
             return ServerResponse.createBySuccess(resultList);
         }
         return ServerResponse.createByError();
@@ -176,4 +177,100 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         }
         return ServerResponse.createBySuccess(courseUnitVos);
     }
+
+    @Override
+    public ServerResponse<Object> selWriteTeks(Integer unitId) {
+        List<Teks> listTeks = teksMapper.selTeksByUnitId(unitId);
+        List<Object> resultTeks=new ArrayList<>();
+        if(listTeks.size()>0){
+            for(Teks teks:listTeks){
+                Map<String,Object> map=new HashMap<>();
+                map.put("chinese",teks.getParaphrase());
+                map.put("pronunciation",baiduSpeak.getLanguagePath(teks.getSentence()));
+                map.put("sentence",teks.getSentence());
+                map.put("id",teks.getId());
+                String[] sentenceList = teks.getSentence().split(" ");
+                int[] integers;
+                if(sentenceList.length>3){
+                    integers=wirterBlank(sentenceList.length,2);
+                }else{
+                    integers=wirterBlank(sentenceList.length,1);
+                }
+                List<String> blanceSentence=new ArrayList<>();
+                List<String> vocabulary=new ArrayList<>();
+                if(integers.length==1){
+                    for(int i=0;i<sentenceList.length;i++){
+                        if(i==(integers[0]-1)){
+                            addList(sentenceList[i],blanceSentence,vocabulary);
+                        }else{
+                            blanceSentence.add(sentenceList[i]);
+                        }
+                    }
+                    map.put("blanceSentence",blanceSentence);
+                    map.put("vocabulary",vocabulary);
+                }else{
+                    for(int i=0;i<sentenceList.length;i++){
+                        if(i==(integers[0]-1)||i==(integers[1]-1)){
+                           addList(sentenceList[i],blanceSentence,vocabulary);
+                        }else{
+                            blanceSentence.add(sentenceList[i]);
+                        }
+                    }
+                    map.put("blanceSentence",blanceSentence);
+                    map.put("vocabulary",vocabulary);
+                }
+
+                resultTeks.add(map);
+            }
+            return ServerResponse.createBySuccess(resultTeks);
+        }
+
+
+        return ServerResponse.createByError();
+    }
+
+
+    //判断空格出现位置
+    public int[] wirterBlank(Integer number , Integer choose ){
+        int[] integers=new int[choose];
+        int s=0;
+        while (integers[choose-1]==0){
+            int i=((int)(Math.random()*number))+1;
+            if(choose==2&&s==1){
+                if(i!=integers[0]){
+                    integers[s]=i;
+                }
+            }else{
+                integers[s] = i;
+            }
+            if(s!=1){
+                s++;
+            }
+        }
+
+        return integers;
+    }
+
+    public void addList(String str, List<String> blanceSentence,List<String> vocabulary){
+        if(str.endsWith(",")||str.endsWith(".")||str.endsWith("?")||str.endsWith("!")){
+            vocabulary.add(str.substring(0,str.length()-1));
+            blanceSentence.add(null);
+            blanceSentence.add(str.substring(str.length()-1));
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

@@ -49,7 +49,12 @@ public class TeksController  {
     }
 
 
-
+    //选择课文单词
+    @PostMapping("selWriteTeks")
+    @ResponseBody
+    public Object selWriteTeks(Integer unitId){
+        return teksService.selWriteTeks(unitId);
+    }
 
 
 
