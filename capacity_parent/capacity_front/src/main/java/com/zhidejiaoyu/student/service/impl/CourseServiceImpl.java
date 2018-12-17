@@ -86,10 +86,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
     private StudentUnitMapper studentUnitMapper;
 
     @Autowired
-    private CapacityPictureMapper capacityPictureMapper;
-
-    @Autowired
-    private CapacityStudentUnitMapper capacityStudentUnitMapper;
+    private CapacityReviewMapper capacityReviewMapper;
 
     @Override
     public List chooseGrade(HttpSession session) {
@@ -377,16 +374,22 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
     @Override
     public ServerResponse<Object> buildReview(HttpSession session) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        Long student_id = student.getId();
+        Long studentId = student.getId();
 
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>(16);
+        String now = DateUtil.DateTime();
 
-        Integer capacityMemory = capacityMemoryMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
-        Integer capacityListen = capacityListenMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
-        Integer capacityWrite = capacityWriteMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
-        Integer sentenceListen = sentenceListenMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
-        Integer sentenceTranslate = sentenceTranslateMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
-        Integer sentenceWrite = sentenceWriteMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
+        int count;
+        for (int i = 0; i < 6; i++) {
+            count = capacityReviewMapper.countByPushByCourseId(studentId, now, i);
+        }
+
+        Integer capacityMemory = capacityMemoryMapper.countByPushByCourseid(studentId, now);
+        Integer capacityListen = capacityListenMapper.countByPushByCourseid(studentId, now);
+        Integer capacityWrite = capacityWriteMapper.countByPushByCourseid(studentId, now);
+        Integer sentenceListen = sentenceListenMapper.countByPushByCourseid(studentId, now);
+        Integer sentenceTranslate = sentenceTranslateMapper.countByPushByCourseid(studentId, now);
+        Integer sentenceWrite = sentenceWriteMapper.countByPushByCourseid(studentId, now);
         result.put("capacityMemory", capacityMemory);
         result.put("capacityListen", capacityListen);
         result.put("capacityWrite", capacityWrite);

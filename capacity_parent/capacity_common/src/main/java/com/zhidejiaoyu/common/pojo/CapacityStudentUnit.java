@@ -38,6 +38,8 @@ public class CapacityStudentUnit extends Model<CapacityStudentUnit> {
 
     private String courseName;
 
+    private String version;
+
     @Override
     protected Serializable pkVal() {
         return this.id;

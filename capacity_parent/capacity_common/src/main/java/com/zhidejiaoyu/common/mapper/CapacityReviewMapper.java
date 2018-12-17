@@ -327,4 +327,14 @@ public interface CapacityReviewMapper {
 	 * @return
 	 */
 	int countLastLoginNeedReview(@Param("studentId") Long studentId, @Param("maps") List<Map<String, Object>> maps, @Param("classify") int classify);
+
+	/**
+	 * 统计各个模块需要进行复习的个数
+	 *
+	 * @param studentId
+	 * @param now
+	 * @param i	学习模块 0：单词图鉴，1：慧记忆 2：慧听写 3：慧默写 4：例句听力 5：例句翻译 6：例句默写
+	 * @return
+	 */
+    int countByPushByCourseId(@Param("studentId") Long studentId, @Param("now") String now, @Param("i") int i);
 }

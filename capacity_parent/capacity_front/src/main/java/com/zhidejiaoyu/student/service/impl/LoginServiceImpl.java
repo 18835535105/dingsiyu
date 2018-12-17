@@ -182,6 +182,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         result.put("unit_id", capacityStudentUnit.getUnitId());
         // 根据单元id查询单元名 - 需要根据学生单元id实时去查询单元名
         result.put("unit_name", capacityStudentUnit.getUnitName());
+        result.put("version", capacityStudentUnit.getVersion());
         // 账号
         result.put("account", stu.getAccount());
         // 姓名

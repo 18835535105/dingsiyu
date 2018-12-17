@@ -126,7 +126,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     private CcieUtil ccieUtil;
 
     @Override
-    public Map<String, Integer> testReview(String unit_id, String student_id) {
+    public Map<String, Integer> testReview(String unit_id, String studentId) {
         // 封装返回的数据 - 智能记忆智能复习数量
         Map<String, Integer> map = new HashMap<String, Integer>();
 
@@ -136,7 +136,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
         CapacityReview cr = new CapacityReview();
         cr.setUnit_id(Long.valueOf(unit_id));
-        cr.setStudent_id(Long.valueOf(student_id));
+        cr.setStudent_id(Long.valueOf(studentId));
         cr.setPush(dateTime);
         // 慧记忆模块许复习量
         cr.setClassify("1");
@@ -178,7 +178,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         Long id = student.getId();
 
         // 复习测试上一单元
-        if(pattern){
+        if (pattern) {
             unit_id = learnMapper.getEndUnitIdByStudentId(id);
         }
 
@@ -230,7 +230,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 		/*else if() {
 			// 查询记忆追踪需要复习的例句
 			CapacityReview ca = new CapacityReview();
-			ca.setStudent_id(id);
+			ca.setstudentId(id);
 			ca.setUnit_id(Long.valueOf(unit_id));
 			ca.setClassify(classify+"");
 			vocabularies = capacityMapper.selectCapacity(ca);
@@ -246,7 +246,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     public Map<String, Object> ReviewCapacity_memory(Long id, String unit_id, int classify, String course_id, boolean pattern) {
 
         // 复习上单元
-        if(pattern){
+        if (pattern) {
             unit_id = learnMapper.getEndUnitIdByStudentId(id);
         }
 
@@ -275,7 +275,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             map.put("plan", count_);
 
             // count单元表单词有多少个
-    		Integer count = unitMapper.countWordByUnitid(unit_id);
+            Integer count = unitMapper.countWordByUnitid(unit_id);
             map.put("wordCount", count);
         }
         // 任务课程-复习, 根据课程查询
@@ -317,7 +317,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         map.put("wordChinese", vo.getWord_chinese());
         // 音节
         map.put("wordyj", vo.getSyllable());
-        if(StringUtils.isBlank(unit_id)){
+        if (StringUtils.isBlank(unit_id)) {
             map.put("unitId", vo.getUnit_id());
             unit_id = vo.getUnit_id().toString();
         }
@@ -354,7 +354,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     public Object ReviewSentence_listen(Long stuId, String unit_id, int classify, String course_id, boolean pattern, Integer type) {
 
         // 复习上单元
-        if(pattern){
+        if (pattern) {
             unit_id = learnMapper.getEndUnitIdByStudentId(stuId);
         }
 
@@ -417,7 +417,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         }
 
         if (vo == null) {
-            logger.info("courseid:{}->unitId:{} 下没有需要复习的句型",course_id, unit_id);
+            logger.info("courseid:{}->unitId:{} 下没有需要复习的句型", course_id, unit_id);
             return null;
         }
         // 2.通过记忆追踪中的例句id-获取例句信息 (vo.getVocabulary_id()是例句id)
@@ -429,9 +429,9 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 例句id
         map.put("id", sentence.getId());
         // 例句id
-        if(unit_id == null){ // 任务课程复习
+        if (unit_id == null) { // 任务课程复习
             map.put("unitId", vo.getUnit_id());
-        }else{// 智能复习
+        } else {// 智能复习
             map.put("unitId", unit_id);
         }
         // 例句读音
@@ -444,26 +444,26 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         map.put("memoryStrength", vo.getMemory_strength());
         //if (classify != 6) {
         if (type == 2) {
-            if(nextInt == 1){
+            if (nextInt == 1) {
                 // 例句英文乱序集合
                 map.put("order", commonMethod.getOrderEnglishList(sentence.getCentreExample(), sentence.getExampleDisturb()));
                 // 例句英文正序集合，含有标点
                 map.put("rateList", commonMethod.getEnglishList(sentence.getCentreExample()));
             }
-            if(nextInt == 2){
+            if (nextInt == 2) {
                 // 例句翻译中含有乱序的中文解释和干扰项
                 map.put("order", commonMethod.getOrderChineseList(sentence.getCentreTranslate(), sentence.getTranslateDisturb()));
                 // 正确顺序翻译
                 map.put("rateList", commonMethod.getChineseList(sentence.getCentreTranslate()));
             }
         } else {
-            if(nextInt == 1){
+            if (nextInt == 1) {
                 // 例句英文乱序集合
                 map.put("order", commonMethod.getOrderEnglishList(sentence.getCentreExample(), null));
                 // 例句英文正序集合，含有标点
                 map.put("rateList", commonMethod.getEnglishList(sentence.getCentreExample()));
             }
-            if(nextInt == 2){
+            if (nextInt == 2) {
                 // 例句翻译中含有乱序的中文解释和干扰项
                 map.put("order", commonMethod.getOrderChineseList(sentence.getCentreTranslate(), null));
                 // 正确顺序翻译
@@ -523,23 +523,23 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 获取当前学生信息
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         // 学生id
-        Long student_id = student.getId();
+        Long studentId = student.getId();
 
         // true 扣除一金币
-        if(isTrue){
+        if (isTrue) {
             // 1.查询学生剩余金币
-            Integer gold = studentMapper.getSystem_gold(student_id);
-            if(gold != null && gold>0){
+            Integer gold = studentMapper.getSystem_gold(studentId);
+            if (gold != null && gold > 0) {
                 // 扣除1金币
-                int state = studentMapper.updateBySystem_gold((gold-1), student_id);
-            }else{
+                int state = studentMapper.updateBySystem_gold((gold - 1), studentId);
+            } else {
                 // 金币不足
                 return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
             }
             // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
-        }else{
-            Integer judgeTest = testRecordMapper.selectJudgeTestToModel(course_id, student_id, classify, select);
-            if(judgeTest != null){
+        } else {
+            Integer judgeTest = testRecordMapper.selectJudgeTestToModel(course_id, studentId, classify, select);
+            if (judgeTest != null) {
                 // 已经测试过, 提示扣除金币是否测试
                 return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
             }
@@ -567,28 +567,28 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             // select: 1=已学, 2=生词, 3=熟词
             if (select == 1) {
                 // 2.获取已学需要出的测试题
-                vocabularies = capacityMapper.alreadyWordStrOne(student_id, unitId, classifyStr);
+                vocabularies = capacityMapper.alreadyWordStrOne(studentId, unitId, classifyStr);
             } else if (select == 2) {
                 // 3.获取生词需要出的测试题
-                vocabularies = capacityMapper.accrueWordStrOne(student_id, unitId, classifyStr);
+                vocabularies = capacityMapper.accrueWordStrOne(studentId, unitId, classifyStr);
             } else if (select == 3) {
                 // 4.获取熟词需要出的测试题
-                vocabularies = capacityMapper.ripeWordStrOne(student_id, unitId, classifyStr);
+                vocabularies = capacityMapper.ripeWordStrOne(studentId, unitId, classifyStr);
             }
 
             // 处理结果
             List<TestResult> testResults = testResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, Long.valueOf(course_id));
 
             // 获取课程下的单词id-单元id
-            List<Long> ids = learnMapper.selectVocabularyIdByStudentIdAndCourseId(student_id, Long.valueOf(course_id), 1);
-            Map<Long, Map<Long, Long>> longMapMap = unitMapper.selectIdMapByCourseIdAndWordIds(Long.valueOf(course_id), ids, student_id, classify);
+            List<Long> ids = learnMapper.selectVocabularyIdByStudentIdAndCourseId(studentId, Long.valueOf(course_id), 1);
+            Map<Long, Map<Long, Long>> longMapMap = unitMapper.selectIdMapByCourseIdAndWordIds(Long.valueOf(course_id), ids, studentId, classify);
 
             // 处理结果添加单元id
-            for(TestResult reList: testResults){
+            for (TestResult reList : testResults) {
                 // 单词id
                 Long wordId = reList.getId();
                 // 封装单元id
-                if(longMapMap.containsKey(wordId)){
+                if (longMapMap.containsKey(wordId)) {
                     reList.setUnitId(longMapMap.get(wordId).get("unitId"));
                 }
             }
@@ -599,42 +599,45 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             // select: 1=已学, 2=生词, 3=熟词
             if (select == 1) {
                 // 2.获取已学需要出的测试题
-                vocabularies = capacityMapper.alreadyWordStr(student_id, unitId, classifyStr);
+                vocabularies = capacityMapper.alreadyWordStr(studentId, unitId, classifyStr);
             } else if (select == 2) {
                 // 3.获取生词需要出的测试题
-                vocabularies = capacityMapper.accrueWordStr(student_id, unitId, classifyStr);
+                vocabularies = capacityMapper.accrueWordStr(studentId, unitId, classifyStr);
             } else if (select == 3) {
                 // 4.获取熟词需要出的测试题
-                vocabularies = capacityMapper.ripeWordStr(student_id, unitId, classifyStr);
+                vocabularies = capacityMapper.ripeWordStr(studentId, unitId, classifyStr);
             }
 
             // 慧听写 封装读音
 
-                // 封装所有听写题
-                List<Map<String, Object>> li = new ArrayList<>();
-                for (Vocabulary vo : vocabularies) {
-                    // 封装一条听力题
-                    Map map = new HashMap();
-                    map.put("id",vo.getId()); // 单词id
-                    map.put("word", vo.getWord()); // 单词
-                    map.put("unitId", unitId); // 单元id
+            // 封装所有听写题
+            List<Map<String, Object>> li = new ArrayList<>();
+            for (Vocabulary vo : vocabularies) {
+                // 封装一条听力题
+                Map map = new HashMap();
+                // 单词id
+                map.put("id", vo.getId());
+                // 单词
+                map.put("word", vo.getWord());
+                // 单元id
+                map.put("unitId", unitId);
 
-                    if(classify == 2) {
-                        try {
-                            // 单词读音
-                            map.put("readUrl", baiduSpeak.getLanguagePath(vo.getWord()));
-                        } catch (Exception e) {
-                            logger.error("获取单词" + vo.getWord() + "读音报错!");
-                        }
-                    }else{
-                        map.put("chinese", vo.getWordChinese()); // 单词翻译
+                if (classify == 2) {
+                    try {
+                        // 单词读音
+                        map.put("readUrl", baiduSpeak.getLanguagePath(vo.getWord()));
+                    } catch (Exception e) {
+                        logger.error("获取单词" + vo.getWord() + "读音报错!");
                     }
-
-                    li.add(map);
+                } else {
+                    // 单词翻译
+                    map.put("chinese", vo.getWordChinese());
                 }
 
-                return ServerResponse.createBySuccess(li);
-            //return ServerResponse.createBySuccess(vocabularies);
+                li.add(map);
+            }
+
+            return ServerResponse.createBySuccess(li);
         }
 
         return null;
@@ -647,7 +650,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 获取当前学生信息
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         // 学生id
-        Long student_id = student.getId();
+        Long studentId = student.getId();
         // 学生年级
         String grade = student.getGrade();
 
@@ -666,13 +669,13 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 已学
         if (select == 1) {
             // 查询 例句,例句翻译
-            sentences = capacityMapper.centreReviewSentence_listen(student_id, unitId, classifyStr);
+            sentences = capacityMapper.centreReviewSentence_listen(studentId, unitId, classifyStr);
             // 生词
         } else if (select == 2) {
-            sentences = capacityMapper.accrueCentreReviewSentence_listen(student_id, unitId, classifyStr);
+            sentences = capacityMapper.accrueCentreReviewSentence_listen(studentId, unitId, classifyStr);
             // 熟词
         } else if (select == 3) {
-            sentences = capacityMapper.ripeCentreReviewSentence_listen(student_id, unitId, classifyStr);
+            sentences = capacityMapper.ripeCentreReviewSentence_listen(studentId, unitId, classifyStr);
         }
 
         return testResultUtil.getSentenceTestResults(sentences, classify, type);
@@ -686,13 +689,13 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 获取当前学生信息
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         // 学生id
-        Long student_id = student.getId();
+        Long studentId = student.getId();
 
         // 1.题类型
         String[] type = {"英译汉", "汉译英", "听力理解"};
 
         //
-        List<Vocabulary> vocabularies = capacityMapper.testeffect(course_id, student_id);
+        List<Vocabulary> vocabularies = capacityMapper.testeffect(course_id, studentId);
 
         // 处理结果
         List<TestResult> testResults = testResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, Long.valueOf(course_id));
@@ -708,54 +711,54 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         Long studentId = student.getId();
 
         // true 扣除一金币
-        if(isTrue){
+        if (isTrue) {
             // 1.查询学生剩余金币
             Integer gold = studentMapper.getSystem_gold(studentId);
-            if(gold != null && gold>0){
+            if (gold != null && gold > 0) {
                 // 扣除1金币
-                int state = studentMapper.updateBySystem_gold((gold-1), studentId);
-            }else{
+                int state = studentMapper.updateBySystem_gold((gold - 1), studentId);
+            } else {
                 // 金币不足
                 return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
             }
             // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
-        }else{
+        } else {
             Integer judgeTest = testRecordMapper.selectJudgeTest(course_id, studentId, "单词五维测试");
-            if(judgeTest != null){
+            if (judgeTest != null) {
                 // 已经测试过, 提示扣除金币是否测试
                 return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
             }
         }
 
         Map<String, Object> result = new LinkedHashMap<String, Object>();
-        
+
         // 查询课程下边一共有多少单词
         Integer countWord = unitMapper.countWordByCourse(course_id);
-        if(countWord==0){
-            return ServerResponse.createByError(500,"该课程下没有单词!");
+        if (countWord == 0) {
+            return ServerResponse.createByError(500, "该课程下没有单词!");
         }
-        
-        if(countWord>50) {
-        	countWord = 50;
+
+        if (countWord > 50) {
+            countWord = 50;
         }
-        
+
         // 平均分配题量 - b:英译汉,汉译英,听力理解需要的题数量, c:听力,默写需要的题数量
         int count = countWord;// 总题量
-        int aa = count/5; // 分五份
-        int b = aa*3; // 1,2,3
-        int c = aa*2; // 4听力,5默写
+        int aa = count / 5; // 分五份
+        int b = aa * 3; // 1,2,3
+        int c = aa * 2; // 4听力,5默写
         // 获取count/5剩余的数量, 加到b,c中
-        int countBC = 0; 
-    	if(count > (b+c)) {
-    		countBC = count - (b+c);
-    	}
-    	if(countBC == 4) {
-    		b+=3;
-    		c+=1;
-    	}else if(countBC < 4 && countBC >0) {
-    		b+=countBC;
-    	}
-        
+        int countBC = 0;
+        if (count > (b + c)) {
+            countBC = count - (b + c);
+        }
+        if (countBC == 4) {
+            b += 3;
+            c += 1;
+        } else if (countBC < 4 && countBC > 0) {
+            b += countBC;
+        }
+
         // 从课程中查出*个单词 - 英译汉,汉译英,听力理解 limit 0,b
         //List<Vocabulary> vocabularies = capacityMapper.fiveDimensionTest(course_id, b);
 
@@ -765,21 +768,21 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 1. 获取课程下的所有打乱顺序的单词
         List<Vocabulary> list = capacityMapper.fiveDimensionTestAll(course_id);
 
-    	// 2.1 从课程中查出*个单词 - 英译汉,汉译英,听力理解 limit 0,b
+        // 2.1 从课程中查出*个单词 - 英译汉,汉译英,听力理解 limit 0,b
         List<Vocabulary> vocabularies = list.subList(0, b);
 
         // 2.2 从课程中查出*个单词 - 听写,默写 limit b,c
         List<Vocabulary> vocabulariesTwo = list.subList(b, b + c);
-                // 1.英译汉 2.汉译英 3.听力理解
+        // 1.英译汉 2.汉译英 3.听力理解
         String[] type_a = {"英译汉"};
         String[] type_b = {"汉译英"};
         String[] type_c = {"听力理解"};
-        List<TestResult> testResults_a = testResultUtil.getWordTestesForCourse(type_a, vocabularies.subList(0, vocabularies.size()/3).size(),
-                vocabularies.subList(0,vocabularies.size()/3), Long.valueOf(course_id));
-        List<TestResult> testResults_b = testResultUtil.getWordTestesForCourse(type_b, vocabularies.subList(vocabularies.size()/3, (int)BigDecimalUtil.div((double)vocabularies.size(),1.5,0)).size(),
-                vocabularies.subList(vocabularies.size()/3, (int)BigDecimalUtil.div((double)vocabularies.size(),1.5,0)), Long.valueOf(course_id));
-        List<TestResult> testResults_c = testResultUtil.getWordTestesForCourse(type_c, vocabularies.subList((int)BigDecimalUtil.div((double)vocabularies.size(),1.5,0), vocabularies.size()).size(),
-                vocabularies.subList((int)BigDecimalUtil.div((double)vocabularies.size(),1.5,0), vocabularies.size()), Long.valueOf(course_id));
+        List<TestResult> testResults_a = testResultUtil.getWordTestesForCourse(type_a, vocabularies.subList(0, vocabularies.size() / 3).size(),
+                vocabularies.subList(0, vocabularies.size() / 3), Long.valueOf(course_id));
+        List<TestResult> testResults_b = testResultUtil.getWordTestesForCourse(type_b, vocabularies.subList(vocabularies.size() / 3, (int) BigDecimalUtil.div((double) vocabularies.size(), 1.5, 0)).size(),
+                vocabularies.subList(vocabularies.size() / 3, (int) BigDecimalUtil.div((double) vocabularies.size(), 1.5, 0)), Long.valueOf(course_id));
+        List<TestResult> testResults_c = testResultUtil.getWordTestesForCourse(type_c, vocabularies.subList((int) BigDecimalUtil.div((double) vocabularies.size(), 1.5, 0), vocabularies.size()).size(),
+                vocabularies.subList((int) BigDecimalUtil.div((double) vocabularies.size(), 1.5, 0), vocabularies.size()), Long.valueOf(course_id));
 
         result.put("testResults_a", testResults_a);
         result.put("testResults_b", testResults_b);
@@ -789,22 +792,22 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         List<Map<String, Object>> hearList = new ArrayList<>();
         // 5.默写
         List<Map<String, Object>> writeList = new ArrayList<>();
-        
+
         int a = 0;
-        for (Vocabulary vo : vocabulariesTwo){
+        for (Vocabulary vo : vocabulariesTwo) {
             // 用于封装一道题
             Map m = new LinkedHashMap();
-            
+
             // 听写
-            if (a < (vocabulariesTwo.size()/2)) {
+            if (a < (vocabulariesTwo.size() / 2)) {
                 m.put("type", "听写");
                 m.put("id", vo.getId());
                 m.put("word", vo.getWord());
                 try {
                     // 单词读音
                     m.put("readUrl", baiduSpeak.getLanguagePath(vo.getWord()));
-                }catch (Exception e){
-                    logger.error("获取单词"+vo.getWord()+"读音报错!");
+                } catch (Exception e) {
+                    logger.error("获取单词" + vo.getWord() + "读音报错!");
                 }
                 hearList.add(m);
             } else {
@@ -817,10 +820,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             }
             a++;
         }
-        
+
         result.put("hear", hearList);
         result.put("write", writeList);
-        
+
         return ServerResponse.createBySuccess(result);
     }
 
@@ -956,9 +959,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
     /**
      * 单词图鉴智能复习模块
+     *
      * @param studentId 学生id
-     * @param unitId 单元id
-     * @param model 1=单词图鉴模块
+     * @param unitId    单元id
+     * @param model     1=单词图鉴模块
      * @param course_id 课程id
      * @return
      */
@@ -966,17 +970,17 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     public ServerResponse<Map<String, Object>> Reviewcapacity_picture(Long studentId, String unitId, int model, String course_id, String judge, boolean pattern) {
 
         // 复习上单元
-        if(pattern){
+        if (pattern) {
             unitId = learnMapper.getEndUnitIdByStudentId(studentId);
         }
 
         // 1. 根据随机数获取题型, 并查出一道正确的题
         // 1.1 去慧记忆中查询单词图鉴是否有需要复习的单词
         Map<String, Object> correct;
-        if(judge != null && StringUtils.isNotEmpty(unitId)){
+        if (judge != null && StringUtils.isNotEmpty(unitId)) {
             // 根据单元查询
             correct = capacityPictureMapper.selectNeedReviewWord(Long.valueOf(unitId), studentId, DateUtil.DateTime());
-        }else{
+        } else {
             // 根据课程查询 课程复习模块
             correct = capacityPictureMapper.selectNeedReviewWordCourse(course_id, studentId, DateUtil.DateTime());
             if (correct != null) {
@@ -985,7 +989,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         }
 
         // 没有需要复习的了
-        if(correct == null){
+        if (correct == null) {
             return ServerResponse.createBySuccess();
         }
         correct.put("recordpicurl", ftpPrefix + correct.get("recordpicurl"));
@@ -999,14 +1003,14 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         cp.setVocabularyId(Long.valueOf(correct.get("id").toString()));
         Object fault_time = correct.get("fault_time");
         Object memory_strength = correct.get("memory_strength");
-        if(fault_time==null){
+        if (fault_time == null) {
             cp.setFaultTime(0);
-        }else {
+        } else {
             cp.setFaultTime(Integer.parseInt(fault_time.toString()));
         }
-        if(memory_strength==null){
+        if (memory_strength == null) {
             cp.setMemoryStrength(0.0);
-        }else {
+        } else {
             cp.setMemoryStrength(Double.parseDouble(memory_strength.toString()));
         }
         Integer hard = memoryDifficultyUtil.getMemoryDifficulty(cp, 1);
@@ -1036,10 +1040,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
         // 封装四个选项
         Map<Object, Object> subject = new HashMap<>(16);
-        for(Map m : mapErrorVocabulary){
+        for (Map m : mapErrorVocabulary) {
 
             boolean b = false;
-            if(m.get("word").equals(correct.get("word"))){
+            if (m.get("word").equals(correct.get("word"))) {
                 b = true;
             }
 
@@ -1064,6 +1068,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
     /**
      * 单词图鉴测试复习
+     *
      * @param unit_id
      * @param classify
      * @param session
@@ -1075,7 +1080,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         Long studentId = student.getId();
 
         // 复习测试上一单元
-        if(pattern){
+        if (pattern) {
             unit_id = learnMapper.getEndUnitIdByStudentId(studentId);
         }
 
@@ -1094,32 +1099,32 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
      *
      * @param courseId
      * @param unitId
-     * @param select 选择: 1=已学, 2=生词, 3=熟词
+     * @param select   选择: 1=已学, 2=生词, 3=熟词
      * @param classify 0=WordPicModel
      * @param isTrue
      * @param session
      * @return
      */
     @Override
-    public ServerResponse<Object>  testWordPic(String courseId, String unitId, int select, int classify, Boolean isTrue, HttpSession session) {
+    public ServerResponse<Object> testWordPic(String courseId, String unitId, int select, int classify, Boolean isTrue, HttpSession session) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        Long student_id = student.getId();
+        Long studentId = student.getId();
 
         // true 扣除一金币
-        if(isTrue){
+        if (isTrue) {
             // 1.查询学生剩余金币
-            Integer gold = studentMapper.getSystem_gold(student_id);
-            if(gold != null && gold>0){
+            Integer gold = studentMapper.getSystem_gold(studentId);
+            if (gold != null && gold > 0) {
                 // 扣除1金币
-                int state = studentMapper.updateBySystem_gold((gold-1), student_id);
-            }else{
+                int state = studentMapper.updateBySystem_gold((gold - 1), studentId);
+            } else {
                 // 金币不足
                 return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
             }
             // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
-        }else{
-            Integer judgeTest = testRecordMapper.selectJudgeTestToModel(courseId, student_id, 0, select);
-            if(judgeTest != null){
+        } else {
+            Integer judgeTest = testRecordMapper.selectJudgeTestToModel(courseId, studentId, 0, select);
+            if (judgeTest != null) {
                 // 已经测试过, 提示扣除金币是否测试
                 return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
             }
@@ -1129,13 +1134,13 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // select: 1=已学, 2=生词, 3=熟词
         if (select == 1) {
             // 2.获取已学需要出的测试题
-            vocabularies = capacityMapper.alreadyWordStrOne(student_id, unitId, "单词图鉴");
+            vocabularies = capacityMapper.alreadyWordStrOne(studentId, unitId, "单词图鉴");
         } else if (select == 2) {
             // 3.获取生词需要出的测试题
-            vocabularies = capacityMapper.accrueWordStrOne(student_id, unitId, "单词图鉴");
+            vocabularies = capacityMapper.accrueWordStrOne(studentId, unitId, "单词图鉴");
         } else if (select == 3) {
             // 4.获取熟词需要出的测试题
-            vocabularies = capacityMapper.ripeWordStrOne(student_id, unitId, "单词图鉴");
+            vocabularies = capacityMapper.ripeWordStrOne(studentId, unitId, "单词图鉴");
         }
 
         // 随机获取带图片的单词, 正确答案的三倍
@@ -1145,8 +1150,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         //return ServerResponse.createBySuccess(allocationWord(list, listSelect));
 
         // 获取课程下的单词id-单元id
-        List<Long> ids = learnMapper.selectVocabularyIdByStudentIdAndCourseId(student_id, Long.valueOf(courseId), 0);
-        Map<Long, Map<Long, Long>> longMapMap = unitMapper.selectIdMapByCourseIdAndWordIds(Long.valueOf(courseId), ids, student_id, classify);
+        List<Long> ids = learnMapper.selectVocabularyIdByStudentIdAndCourseId(studentId, Long.valueOf(courseId), 0);
+        Map<Long, Map<Long, Long>> longMapMap = unitMapper.selectIdMapByCourseIdAndWordIds(Long.valueOf(courseId), ids, studentId, classify);
 
         // 分题工具类
         Map<String, Object> map = wordPictureUtil.allocationWord(vocabularies, listSelect, longMapMap);
@@ -1159,7 +1164,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
 
         // 复习测试上一单元
-        if(pattern){
+        if (pattern) {
             unitId = Long.parseLong(learnMapper.getEndUnitIdByStudentId(student.getId()));
         }
 
@@ -1363,7 +1368,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     gold = decideFiveD(point, genre, student, msg, studyModel, testRecord);
                 }
             }
-            ccieUtil.saveCcieTest(student, 6,  classify);
+            ccieUtil.saveCcieTest(student, 6, classify);
         } else if ("已学测试".equals(genre) || "生词测试".equals(genre) || "熟词测试".equals(genre)) {
             // 判断学生之前是否已经在当前课程有过“已学测试”或者“生词测试”或者“熟词测试”
             List<TestRecord> testRecords = testRecordMapper.selectMaxPointByStudyModel(stuId, courseId, genre, studyModel);
@@ -1405,7 +1410,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             }
             // 奖励金币信息
             gold = reviewGold(point, genre, student, msg, studyModel, testRecord);
-            ccieUtil.saveCcieTest(student, 2,  classify);
+            ccieUtil.saveCcieTest(student, 2, classify);
         }
 
         studentMapper.updateByPrimaryKeySelective(student);

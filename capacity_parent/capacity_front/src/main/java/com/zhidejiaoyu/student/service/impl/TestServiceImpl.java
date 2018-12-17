@@ -730,7 +730,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Long[] unitId = wordUnitTestDTO.getUnitId();
         Long courseId = unitMapper.selectCourseIdByUnitId(unitId[0]);
         Integer classify = wordUnitTestDTO.getClassify();
-        int count;
         String type = commonMethod.getTestType(wordUnitTestDTO.getClassify());
 
         Integer point = wordUnitTestDTO.getPoint();
@@ -742,20 +741,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (testRecord == null) {
             isFirst = true;
         }
-
-        ServerResponse<String> serverResponse = saveTestLearnAndCapacity.saveLearnAndCapacity(correctWord, errorWord,
-                correctWordId, errorWordId, session, student, unitId, classify);
-        if (serverResponse != null) {
-            throw new RuntimeException("无当前模块的学习记录");
-        }
+        saveTestLearnAndCapacity.saveTestAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, unitId, classify);
 
         // 根据不同分数奖励学生金币
         int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord);
 
-        count = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, testRecord, goldCount);
-        if (count == 0) {
-            return ServerResponse.createByError();
-        }
+        this.saveTestRecord(courseId, student, session, wordUnitTestDTO, testRecord, goldCount);
 
         String msg;
         // 默写

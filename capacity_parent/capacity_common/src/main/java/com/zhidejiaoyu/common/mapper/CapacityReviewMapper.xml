@@ -572,4 +572,9 @@
         <include refid="testCenterSql"/>
         and status = 1
     </select>
+    <select id="countByPushByCourseId" resultType="java.lang.Integer" parameterType="map">
+        select count(id) from
+        <include refid="classify_sql"/>
+        where student_id = #{studentId} and course_id = #{course} and push &lt; #{now} and memory_strength &lt; 1
+    </select>
 </mapper>
