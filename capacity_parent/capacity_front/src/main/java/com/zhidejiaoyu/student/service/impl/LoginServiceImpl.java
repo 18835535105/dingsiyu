@@ -115,6 +115,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Autowired
     private CapacityReviewMapper capacityReviewMapper;
 
+    @Autowired
+    private CapacityStudentUnitMapper capacityStudentUnitMapper;
+
     @Override
     public Student LoginJudge(String account, String password) {
         Student st = new Student();
@@ -167,16 +170,18 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             result.put("role", "1");
         }
 
+        // 获取学生当前正在学习的单元信息
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student_id, 1);
         // 学生id
         result.put("student_id", stu.getId());
         // 当前单词所学课程id
-        result.put("course_id", stu.getCourseId());
+        result.put("course_id", capacityStudentUnit.getCourseId());
         // 当前单词所学课程名
-        result.put("course_name", stu.getCourseName());
+        result.put("course_name", capacityStudentUnit.getCourseName());
         // 当前单词所学单元id
-        result.put("unit_id", stu.getUnitId());
+        result.put("unit_id", capacityStudentUnit.getUnitId());
         // 根据单元id查询单元名 - 需要根据学生单元id实时去查询单元名
-        result.put("unit_name", unitMapper.getUnitNameByUnitId(stu.getUnitId()));
+        result.put("unit_name", capacityStudentUnit.getUnitName());
         // 账号
         result.put("account", stu.getAccount());
         // 姓名

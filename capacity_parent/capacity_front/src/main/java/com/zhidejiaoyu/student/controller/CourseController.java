@@ -30,6 +30,18 @@ public class CourseController {
     @Autowired
     private CourseService courseService;
 
+    @ResponseBody
+    @GetMapping("/getVersion")
+    public ServerResponse<List<Map<String, Object>>> getVersion(HttpSession session) {
+        return courseService.getVersion(session);
+    }
+
+    @ResponseBody
+    @GetMapping("/getCourseByVersion")
+    public ServerResponse<List<Map<String, Object>>> getCourseByVersion(HttpSession session, String versionName) {
+        return courseService.getCourseByVersion(session, versionName);
+    }
+
     /**
      * 获取学生所有课程id和课程名
      *
@@ -199,7 +211,8 @@ public class CourseController {
     }
 
     /**
-     * 保存选择的课程
+     * 保存选择的课程(该接口已废弃）
+     *
      * @Param courseId 课程id
      * @param model 1=单词, 2=例句
      */
@@ -211,7 +224,7 @@ public class CourseController {
     
     
     /**
-     * 我的课程
+     * 我的课程(该接口已废弃)
      * 	点击学习
      * @param courseId 课程id
      */

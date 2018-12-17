@@ -364,4 +364,13 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     List<Vocabulary> selectWordVoice(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+
+    /**
+     * 查询单词本中单词播放机还未学习的单词
+     *
+     * @param studentId
+     * @param unitId
+     * @return
+     */
+    List<Vocabulary> selectUnlearnInBookPlayer(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 }

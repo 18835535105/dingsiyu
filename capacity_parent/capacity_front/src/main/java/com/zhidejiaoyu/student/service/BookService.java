@@ -1,6 +1,8 @@
 package com.zhidejiaoyu.student.service;
 
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.common.pojo.Player;
+import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.vo.BookInfoVo;
 import com.zhidejiaoyu.student.vo.BookVo;
@@ -14,7 +16,7 @@ import javax.servlet.http.HttpSession;
  * @author wuchenxi
  * @date 2018年5月19日 下午4:21:01
  */
-public interface BookService {
+public interface BookService extends BaseService<Vocabulary> {
 
     /**
      * 获取单词本/句子本列表信息
@@ -70,4 +72,23 @@ public interface BookService {
      * @return ServerResponse<String>
      */
     ServerResponse<String> restudy(HttpSession session, Long courseId, Long unitId, Long[] wordIds, Integer studyModel);
+
+    /**
+     * 保存播放机学习记录
+     *
+     * @param session
+     * @param player
+     * @return
+     */
+    ServerResponse savePlayer(HttpSession session, Player player);
+
+    /**
+     * 获取单词本中单词播放机内容
+     *
+     * @param session
+     * @param unitId
+     * @param order
+     * @return
+     */
+    ServerResponse<PlayerVo> getBookPlayer(HttpSession session, Long unitId, Integer order);
 }

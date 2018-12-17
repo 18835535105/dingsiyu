@@ -98,4 +98,21 @@ public interface CourseService extends BaseService<Course> {
      * @return
      */
     ServerResponse<List<Map<String, Object>>> getAllCoursesInfo(HttpSession session);
+
+    /**
+     * 获取学生所有可学习的版本名称
+     *
+     * @param session
+     * @return
+     */
+    ServerResponse<List<Map<String, Object>>> getVersion(HttpSession session);
+
+    /**
+     * 获取版本下所有课程信息
+     *
+     * @param session
+     * @param versionName
+     * @return
+     */
+    ServerResponse<List<Map<String, Object>>> getCourseByVersion(HttpSession session, String versionName);
 }

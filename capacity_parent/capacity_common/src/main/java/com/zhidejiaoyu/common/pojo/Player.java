@@ -8,35 +8,38 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
- * 智能版学生当前学习课程和单元记录表
+ * 播放机学习记录表
  * </p>
  *
  * @author zdjy
- * @since 2018-12-12
+ * @since 2018-12-15
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class CapacityStudentUnit extends Model<CapacityStudentUnit> {
+public class Player extends Model<Player> {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private Long id;
     private Long studentId;
     private Long courseId;
     private Long unitId;
     /**
-     * 学习模块：1：单词模块；2：例句听力；3：例句默写；4：例句翻译
+     * 单词或例句id
+     */
+    private Long wordId;
+    /**
+     * 1:单词流程中播放机学习记录；2：单词本中播放机学习记录；3：句型本中播放机学习记录
      */
     private Integer type;
+    private Date updateTime;
 
-    private String unitName;
-
-    private String courseName;
 
     @Override
     protected Serializable pkVal() {

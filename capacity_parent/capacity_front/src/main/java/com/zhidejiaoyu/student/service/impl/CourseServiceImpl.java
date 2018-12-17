@@ -88,6 +88,9 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
     @Autowired
     private CapacityPictureMapper capacityPictureMapper;
 
+    @Autowired
+    private CapacityStudentUnitMapper capacityStudentUnitMapper;
+
     @Override
     public List chooseGrade(HttpSession session) {
 
@@ -459,7 +462,6 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
             student.setSentenceCourseId((long) courseId);
             student.setSentenceUnitId(Integer.parseInt(map.get("id").toString()));
             student.setSentenceCourseName(map.get("course_name").toString());
-            //student.setSentenceUnitName(map.get("unit_name").toString());
         }
         student.setId(id);
         studentMapper.updateByPrimaryKeySelective(student);
@@ -846,6 +848,20 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
         courseMaps.add(0, map);
 
         return ServerResponse.createBySuccess(courseMaps);
+    }
+
+    @Override
+    public ServerResponse<List<Map<String, Object>>> getVersion(HttpSession session) {
+        Student student = getStudent(session);
+        List<Map<String, Object>> versionList = courseMapper.selectVersionByStudent(student);
+        return ServerResponse.createBySuccess(versionList);
+    }
+
+    @Override
+    public ServerResponse<List<Map<String, Object>>> getCourseByVersion(HttpSession session, String versionName) {
+        Student student = getStudent(session);
+        List<Map<String, Object>> courses = courseMapper.selectCourseByVersion(student, versionName);
+        return ServerResponse.createBySuccess(courses);
     }
 
 }

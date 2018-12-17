@@ -23,7 +23,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"teacher","sys_user"};
+        String[] tableName = {"player"};
 
         /**
          * 配置：
