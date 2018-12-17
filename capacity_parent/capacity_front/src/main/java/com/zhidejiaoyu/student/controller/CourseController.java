@@ -24,7 +24,8 @@ import java.util.Map;
 @RequestMapping("/course")
 public class CourseController {
 
-    /**breakthrough
+    /**
+     * breakthrough
      * 课程业务接口
      */
     @Autowired
@@ -114,7 +115,7 @@ public class CourseController {
      *
      * @param session
      * @param courseId
-     * @param type 学习进度分类：1：单词类学习进度；2：句子类学习进度
+     * @param type     学习进度分类：1：单词类学习进度；2：句子类学习进度
      * @return
      */
     @ResponseBody
@@ -128,13 +129,13 @@ public class CourseController {
 
     /**
      * 1.1任务课程 - 展示当前用户六个模块复习量达到10/20的信息和一键复习每个模块的总复习
-     * 	 	当某个课程‘智能记忆’模块下的待复习量达到20个时，该课程会出现在‘任务课程’内，让学生抓紧复习。其他模块都是待复习量达到10个即可。
+     * 当某个课程‘智能记忆’模块下的待复习量达到20个时，该课程会出现在‘任务课程’内，让学生抓紧复习。其他模块都是待复习量达到10个即可。
      *
-     *@param model 1=单词模块  2=例句模块
+     * @param model 1=单词模块  2=例句模块
      */
     @ResponseBody
-    @RequestMapping(value="/taskCourse")
-    public ServerResponse<Object> taskCourse(HttpSession session, Integer model){
+    @RequestMapping(value = "/taskCourse")
+    public ServerResponse<Object> taskCourse(HttpSession session, Integer model) {
         return courseService.taskCourse(session, model);
     }
 
@@ -142,34 +143,33 @@ public class CourseController {
      * 1.2 任务课程中 - 一键复习  每个模块数量
      */
     @ResponseBody
-    @RequestMapping(value="/buildReview")
-    public ServerResponse<Object> buildReview(HttpSession session){
+    @RequestMapping(value = "/buildReview")
+    public ServerResponse<Object> buildReview(HttpSession session) {
         return courseService.buildReview(session);
     }
 
     /**
      * 我的课程
-     * 	学过的课程
-     * 
-     * @return course_id 课程id
-     * 			course_name 课程名称
-     * 			learn_time 最后学习时间
-     * 
+     * 学过的课程
+     *
      * @param model 1=单词模块 2=例句模块
-     * @param sort 排序 1=时间从大到小 , 2相反; 默认1
+     * @param sort  排序 1=时间从大到小 , 2相反; 默认1
+     * @return course_id 课程id
+     * course_name 课程名称
+     * learn_time 最后学习时间
      */
     @ResponseBody
-    @RequestMapping(value="/myCourse")
-    public ServerResponse<Object> myCourse(HttpSession session, Integer model, Integer sort){
+    @RequestMapping(value = "/myCourse")
+    public ServerResponse<Object> myCourse(HttpSession session, Integer model, Integer sort) {
         if (model == null) {
             return ServerResponse.createByErrorMessage("model can't be null!");
         }
         if (sort == null) {
             return ServerResponse.createByErrorMessage("sort can't be null!");
         }
-    	return  courseService.myCourse(session, model, sort);
+        return courseService.myCourse(session, model, sort);
     }
-    
+
     /**
      * 根据课程id获取所有单元信息
      *
@@ -177,15 +177,15 @@ public class CourseController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value="/allUnit")
-    public ServerResponse<Object> allUnit(Integer courseId){
+    @RequestMapping(value = "/allUnit")
+    public ServerResponse<Object> allUnit(Integer courseId) {
         return courseService.allUnit(courseId);
     }
 
     /**
      * 获取课程下的所有单元信息及每单元的单词数量
      *
-     * @param courseId  课程id
+     * @param courseId 课程id
      * @return
      */
     @ResponseBody
@@ -213,36 +213,38 @@ public class CourseController {
     /**
      * 保存选择的课程(该接口已废弃）
      *
-     * @Param courseId 课程id
      * @param model 1=单词, 2=例句
+     * @Param courseId 课程id
      */
     @ResponseBody
-    @RequestMapping(value="/postCourse")
-    public ServerResponse<Object> postStudentByCourse(Integer courseId, Integer model, HttpSession session){
-    	return courseService.postStudentByCourse(courseId, model, session);
+    @RequestMapping(value = "/postCourse")
+    public ServerResponse<Object> postStudentByCourse(Integer courseId, Integer model, HttpSession session) {
+        return courseService.postStudentByCourse(courseId, model, session);
     }
-    
-    
+
+
     /**
      * 我的课程(该接口已废弃)
-     * 	点击学习
+     * 点击学习
+     *
      * @param courseId 课程id
      */
     @ResponseBody
-    @RequestMapping(value="/clickLearn")
-    public ServerResponse<Object> clickLearn(Integer courseId, int model, HttpSession session){
+    @RequestMapping(value = "/clickLearn")
+    public ServerResponse<Object> clickLearn(Integer courseId, int model, HttpSession session) {
         Assert.notNull(courseId, "courseId can't be null!");
-    	return courseService.clickLearn(courseId, model, session);
-    } 
-    
+        return courseService.clickLearn(courseId, model, session);
+    }
+
     /**
      * 点击单元 - 单元闯关展示
+     *
      * @param model 单词/例句模块   1=单词 2=例句
      */
     @ResponseBody
-    @RequestMapping(value="/breakthrough")
-    public ServerResponse<Object> breakthrough(HttpSession session, Integer model){
-    	return courseService.breakthrough(session, model);
+    @RequestMapping(value = "/breakthrough")
+    public ServerResponse<Object> breakthrough(HttpSession session, Integer model) {
+        return courseService.breakthrough(session, model);
     }
 
     /**
@@ -250,12 +252,12 @@ public class CourseController {
      *
      * @param session
      * @param unitId
-     * @param model 单词模块:1  例句模块:2
+     * @param model   单词模块:1  例句模块:2
      * @return
      */
     @ResponseBody
-    @PostMapping(value="/postUnit")
-    public ServerResponse<Object> postUnit(HttpSession session, int unitId, int model){
+    @PostMapping(value = "/postUnit")
+    public ServerResponse<Object> postUnit(HttpSession session, int unitId, int model) {
         return courseService.postUnit(session, unitId, model);
     }
 
@@ -268,7 +270,7 @@ public class CourseController {
      */
     @ResponseBody
     @GetMapping("/getUnitPage")
-    public ServerResponse<PageInfo<Map<String,Object>>> getUnitPage(HttpSession session, Long courseId,
+    public ServerResponse<PageInfo<Map<String, Object>>> getUnitPage(HttpSession session, Long courseId,
                                                                      @RequestParam(required = false, defaultValue = "1") Integer pageNum,
                                                                      @RequestParam(required = false, defaultValue = "12") Integer pageSize) {
         if (courseId == null) {

@@ -161,7 +161,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
         for (Sentence sentence : sentences) {
             vo = new BookVo();
             vo.setId(sentence.getId());
-            vo.setChinese(sentence.getCentreTranslate().replace("*",""));
+            vo.setChinese(sentence.getCentreTranslate().replace("*", ""));
             vo.setContent(sentence.getCentreExample().replace("#", " "));
             vo.setReadUrl(baiduSpeak
                     .getLanguagePath(sentence.getCentreExample().replace("#", " ")));
@@ -174,7 +174,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
      * 封装单词本信息
      *
      * @param vocabularies 单词信息
-     * @param unitId    单元id
+     * @param unitId       单元id
      * @param studyModel
      * @return
      */
@@ -236,7 +236,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
             if (flag) {
                 // 查看单词本摘要信息
                 total = unitVocabularyMapper.countByCourseId(courseId);
-            } else if (WORD_PICTURE.equals(studyModel)){
+            } else if (WORD_PICTURE.equals(studyModel)) {
                 // 单词图鉴只查询有图片的单词总个数
                 total = unitVocabularyMapper.countByCourseIdAndStudyModel(courseId, studyModel);
             } else {

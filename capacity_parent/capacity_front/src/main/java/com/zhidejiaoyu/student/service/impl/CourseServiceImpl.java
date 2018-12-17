@@ -230,10 +230,10 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                 List<Map<String, Object>> map = capacityMemoryMapper.selectStatusBigTenNine(studentId, course_id, 1, time);
                 for (Map<String, Object> map2 : map) {
                     int fxl = Integer.parseInt(map2.get("fxl").toString());
-                    if(fxl >= 20){
+                    if (fxl >= 20) {
                         map2.put("state", true);
                         capacityMemory += fxl;
-                    }else{
+                    } else {
                         map2.put("state", false);
                     }
                     list.add(map2);
@@ -251,10 +251,10 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                 List<Map<String, Object>> map = capacityMemoryMapper.selectStatusBigTenNine(studentId, course_id, 0, time);
                 for (Map map2 : map) {
                     int fxl = Integer.parseInt(map2.get("fxl").toString());
-                    if(fxl >= 10){
+                    if (fxl >= 10) {
                         map2.put("state", true);
                         capacityPicture += fxl;
-                    }else{
+                    } else {
                         map2.put("state", false);
                     }
                     list.add(map2);
@@ -270,10 +270,10 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                 List<Map<String, Object>> map = capacityMemoryMapper.selectStatusBigTenNine(studentId, course_id, 2, time);
                 for (Map<String, Object> map2 : map) {
                     int fxl = Integer.parseInt(map2.get("fxl").toString());
-                    if(fxl >= 10){
+                    if (fxl >= 10) {
                         map2.put("state", true);
                         capacityListen += fxl;
-                    }else{
+                    } else {
                         map2.put("state", false);
                     }
                     list.add(map2);
@@ -288,14 +288,14 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                 List<Map<String, Object>> map = capacityMemoryMapper.selectStatusBigTenNine(studentId, course_id, 3, time);
                 for (Map<String, Object> map2 : map) {
                     int fxl = Integer.parseInt(map2.get("fxl").toString());
-                    if(fxl >= 10){
+                    if (fxl >= 10) {
                         map2.put("state", true);
                         capacityWrite += fxl;
-                    }else{
+                    } else {
                         map2.put("state", false);
                     }
                     list.add(map2);
-                   // capacityWrite += fxl;
+                    // capacityWrite += fxl;
                 }
             }
             // 一键复习复习量
@@ -312,10 +312,10 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                 List<Map<String, Object>> map = capacityMemoryMapper.selectStatusBigTenNine(studentId, course_id, 4, time);
                 for (Map<String, Object> map2 : map) {
                     int fxl = Integer.parseInt(map2.get("fxl").toString());
-                    if(fxl >= 10){
+                    if (fxl >= 10) {
                         map2.put("state", true);
                         sentenceListen += fxl;
-                    }else{
+                    } else {
                         map2.put("state", false);
                     }
                     list.add(map2);
@@ -330,14 +330,14 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                 List<Map<String, Object>> map = capacityMemoryMapper.selectStatusBigTenNine(studentId, course_id, 5, time);
                 for (Map<String, Object> map2 : map) {
                     int fxl = Integer.parseInt(map2.get("fxl").toString());
-                    if(fxl >= 10){
+                    if (fxl >= 10) {
                         map2.put("state", true);
                         sentenceTranslate += fxl;
-                    }else{
+                    } else {
                         map2.put("state", false);
                     }
                     list.add(map2);
-                   // sentenceTranslate += fxl;
+                    // sentenceTranslate += fxl;
                 }
             }
             // 例句默写
@@ -348,14 +348,14 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                 List<Map<String, Object>> map = capacityMemoryMapper.selectStatusBigTenNine(studentId, course_id, 6, time);
                 for (Map<String, Object> map2 : map) {
                     int fxl = Integer.parseInt(map2.get("fxl").toString());
-                    if(fxl >= 10){
+                    if (fxl >= 10) {
                         map2.put("state", true);
                         sentenceWrite += fxl;
-                    }else{
+                    } else {
                         map2.put("state", false);
                     }
                     list.add(map2);
-                   // sentenceWrite += fxl;
+                    // sentenceWrite += fxl;
                 }
             }
             // 一键复习每个模块的总复习量
@@ -408,25 +408,25 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
         List<StudentCourse> courseId = studentCourseMapper.selectCourse(student_id, model);
         for (StudentCourse StudentCourse : courseId) {
             Map<String, String> map = new HashMap<>();
-            map.put("course_id", StudentCourse.getCourseId()+"");
-            map.put("course_name", StudentCourse.getCourseName()+"");
+            map.put("course_id", StudentCourse.getCourseId() + "");
+            map.put("course_name", StudentCourse.getCourseName() + "");
             // 通过课程名查找learn表中最大的学习时间
             String learn_time = learnMapper.selectBylLearn_time(StudentCourse.getCourseId(), student_id);
             if (learn_time == null) {
                 learn_time = StudentCourse.getUpdateTime();
             }
-            map.put("learn_time", CalculateTimeUtil.CalculateTime(learn_time)+"");
+            map.put("learn_time", CalculateTimeUtil.CalculateTime(learn_time) + "");
 
             // sort用于时间排序
             learn_time = learn_time.replaceAll("[\\pP\\pS\\pZ]", "");
-            map.put("sort", learn_time+"");
+            map.put("sort", learn_time + "");
             result.add(map);
         }
 
         // 排序-时间从大到小
-        if(ifSort == null || ifSort == 1){
+        if (ifSort == null || ifSort == 1) {
             result.sort((b, a) -> (Long.valueOf(a.get("sort").toString()).compareTo(Long.valueOf(b.get("sort").toString()))));
-        }else{
+        } else {
             result.sort((a, b) -> (Long.valueOf(a.get("sort").toString()).compareTo(Long.valueOf(b.get("sort").toString()))));
         }
 
@@ -509,11 +509,11 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
         // 通过课程id,学生id查询learn中正在学的单元id
         Integer unitId = learnMapper.selectMaxUnitId(studentId, courseId);
 
-        if(unitId == null) {
-        	// 去课程中取出最小单元
-        	unitId = unitMapper.getMinUnit(courseId);
+        if (unitId == null) {
+            // 去课程中取出最小单元
+            unitId = unitMapper.getMinUnit(courseId);
         }
-        
+
         // 通过单元id和课程id查询出课程名和单元名  course_name, unit_name
         Map<String, String> map = unitMapper.getCourseNameAndUnitName(courseId, unitId);
 
@@ -608,8 +608,8 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                             map.put("dctj", "闯关"); // 闯关
                         } else {
                             map.put("dctj", "单词图鉴"); // 慧记忆
-                            if(countWord>0){
-                                map.put("dctj", countWord+"/"+count);// 学习进度
+                            if (countWord > 0) {
+                                map.put("dctj", countWord + "/" + count);// 学习进度
                             }
                         }
                     }
@@ -625,8 +625,8 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                             map.put("hjy", "闯关"); // 闯关
                         } else {
                             map.put("hjy", "慧记忆"); // 慧记忆
-                            if(countWord>0){
-                                map.put("hjy", countWord+"/"+count);// 学习进度
+                            if (countWord > 0) {
+                                map.put("hjy", countWord + "/" + count);// 学习进度
                             }
                         }
                     }
@@ -642,8 +642,8 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                             map.put("htx", "闯关"); // 闯关
                         } else {
                             map.put("htx", "慧听写"); // 慧听写
-                            if(countWord>0){
-                                map.put("htx", countWord+"/"+count);// 学习进度
+                            if (countWord > 0) {
+                                map.put("htx", countWord + "/" + count);// 学习进度
                             }
                         }
                     }
@@ -659,8 +659,8 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                             map.put("hmx", "闯关"); // 闯关
                         } else {
                             map.put("hmx", "慧默写"); // 慧默写
-                            if(countWord>0){
-                                map.put("hmx", countWord+"/"+count);// 学习进度
+                            if (countWord > 0) {
+                                map.put("hmx", countWord + "/" + count);// 学习进度
                             }
                         }
                     }
@@ -715,7 +715,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                     Integer count = unitSentenceMapper.countByUnitId(unitId);
 
                     // 例句听力
-                    if (ljtl != null && ljtl.toString().length()>0) {
+                    if (ljtl != null && ljtl.toString().length() > 0) {
                         map.put("ljtl", ljtl + "分");
                     } else {
                         // 查询例句听力模块单词是否学完
@@ -728,7 +728,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                     }
 
                     // 例句翻译
-                    if (ljfy != null || ljfy.toString().length()>0) {
+                    if (ljfy != null || ljfy.toString().length() > 0) {
                         map.put("ljfy", ljtl + "分");
                     } else {
                         // 查询慧听写模块单词是否学完
@@ -741,7 +741,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                     }
 
                     // 例句默写
-                    if (ljmx != null || ljmx.toString().length()>0) {
+                    if (ljmx != null || ljmx.toString().length() > 0) {
                         map.put("ljmx", ljtl + "分");
                     } else {
                         // 查询慧默写模块单词是否学完
@@ -792,11 +792,11 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
         // 学生id
         long studentId = StudentIdBySession(session);
         // 单词模块
-        if (model == 1){
+        if (model == 1) {
             studentMapper.updateUnitId(studentId, unitId);
             // 例句模块
             return ServerResponse.createBySuccess();
-        }else{
+        } else {
             studentMapper.updatesentenceUnitId(studentId, unitId);
             return ServerResponse.createBySuccess();
         }
@@ -829,7 +829,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
     public ServerResponse<PageInfo<Map<String, Object>>> getUnitPage(HttpSession session, Long courseId, Integer pageNum, Integer pageSize) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         PageHelper.startPage(pageNum, pageSize);
-        List<Map<String,Object>> map = unitMapper.selectUnitIdAndUnitNameByCourseIdAndStudentId(courseId, student.getId());
+        List<Map<String, Object>> map = unitMapper.selectUnitIdAndUnitNameByCourseIdAndStudentId(courseId, student.getId());
         PageInfo<Map<String, Object>> mapPageInfo = new PageInfo<>(map);
         return ServerResponse.createBySuccess(mapPageInfo);
     }
