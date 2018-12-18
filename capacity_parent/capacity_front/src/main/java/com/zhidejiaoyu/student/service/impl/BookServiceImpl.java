@@ -11,6 +11,7 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.BookService;
 import com.zhidejiaoyu.student.vo.BookInfoVo;
 import com.zhidejiaoyu.student.vo.BookVo;
@@ -70,6 +71,9 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
     @Autowired
     private PlayerMapper playerMapper;
 
+    @Autowired
+    private RedisOpt redisOpt;
+
     private final String WORD_MEMORY = "慧记忆";
     private final String WORD_LISTEN = "慧听写";
     private final String WORD_WRITE = "慧默写";
@@ -105,7 +109,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
 
             if (vocabularies != null && vocabularies.size() > 0) {
                 pageInfo = new PageInfo<>(vocabularies);
-                bookVos = this.getVocabularyBooKVo(vocabularies, unitId, studyModel);
+                bookVos = this.getVocabularyBooKVo(vocabularies, unitId);
             }
         } else if (WORD_PICTURE.equals(studyModel)) {
             List<Vocabulary> vocabularies = null;
@@ -122,13 +126,13 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
 
             if (vocabularies != null && vocabularies.size() > 0) {
                 pageInfo = new PageInfo<>(vocabularies);
-                bookVos = this.getVocabularyBooKVo(vocabularies, unitId, studyModel);
+                bookVos = this.getVocabularyBooKVo(vocabularies, unitId);
             }
         } else {
             List<Sentence> sentences = null;
             if (condition == totalWord) {
                 // 总句子
-                sentences = sentenceMapper.selectByUnitId(studentId, unitId);
+                sentences = sentenceMapper.selectByUnitId(unitId);
             } else if (condition == unknownWord || condition == knownWord) {
                 // 2:生句，3：熟句
                 sentences = sentenceMapper.selectUnKnowSentenceByUnitId(studentId, unitId, studyModel, condition);
@@ -175,10 +179,9 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
      *
      * @param vocabularies 单词信息
      * @param unitId       单元id
-     * @param studyModel
      * @return
      */
-    private List<BookVo> getVocabularyBooKVo(List<Vocabulary> vocabularies, Long unitId, String studyModel) {
+    private List<BookVo> getVocabularyBooKVo(List<Vocabulary> vocabularies, Long unitId) {
         List<BookVo> list = new ArrayList<>(vocabularies.size());
         Map<Long, Map<Long, String>> map = unitVocabularyMapper.selectWordChineseMapByUnitId(unitId);
         BookVo vo;
@@ -259,39 +262,53 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
     }
 
     @Override
-    public ServerResponse<PlayerVo> getPlayer(HttpSession session, Long courseId, Long unitId, Integer type, Integer order) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+    public ServerResponse<PlayerVo> getPlayer(HttpSession session, Long courseId, Long unitId, Integer order) {
         PlayerVo playerVo = new PlayerVo();
         List<BookVo> bookVos = null;
-        if (type == 1) {
-            // 查询当前单元/课程下的所有单词
-            List<Vocabulary> vocabularies = vocabularyMapper.selectByUnitId(unitId);
-            if (vocabularies.size() > 0) {
-                bookVos = this.getVocabularyBooKVo(vocabularies, unitId, null);
-                playerVo.setTotal(vocabularies.size());
-            }
-        } else {
-            // 查询当前单元/课程下的所有例句
-            List<Sentence> sentences = sentenceMapper.selectByUnitId(student.getId(), unitId);
-            if (sentences.size() > 0) {
-                bookVos = this.getSentenceBookVo(sentences);
-                playerVo.setTotal(sentences.size());
-            }
+        // 查询当前单元下的所有单词
+        List<Vocabulary> vocabularies = redisOpt.getWordInfoInUnit(unitId);
+        if (vocabularies.size() > 0) {
+            bookVos = this.getVocabularyBooKVo(vocabularies, unitId);
+            playerVo.setTotal(vocabularies.size());
         }
         return orderThePlayer(order, playerVo, bookVos);
     }
 
     @Override
-    public ServerResponse<PlayerVo> getBookPlayer(HttpSession session, Long unitId, Integer order) {
+    public ServerResponse<PlayerVo> getBookPlayer(HttpSession session, Long unitId, Integer type, Integer order) {
         Student student = getStudent(session);
         Long studentId = student.getId();
         PlayerVo playerVo = new PlayerVo();
         List<BookVo> bookVos = null;
-        // 查询当前单元单词播放机还未学习的单词信息
-        List<Vocabulary> vocabularies = vocabularyMapper.selectUnlearnInBookPlayer(studentId, unitId);
-        if (vocabularies.size() > 0) {
-            bookVos = this.getVocabularyBooKVo(vocabularies, unitId, null);
-            playerVo.setTotal(vocabularies.size());
+        if (type == 2) {
+            // 如果单元当前所学单词大于当前单元总单词数删除播放机学习记录
+            List<Vocabulary> vocabularies = redisOpt.getWordInfoInUnit(unitId);
+            int learnedWord = playerMapper.countLearnedWord(studentId, unitId, 2);
+            if (vocabularies.size() <= learnedWord) {
+                playerMapper.deleteRecord(studentId, unitId, 2);
+            } else {
+                // 查询当前单元单词播放机还未学习的单词信息
+                vocabularies = vocabularyMapper.selectUnlearnInBookPlayer(studentId, unitId);
+            }
+
+            if (vocabularies.size() > 0) {
+                bookVos = this.getVocabularyBooKVo(vocabularies, unitId);
+                playerVo.setTotal(vocabularies.size());
+            }
+        } else {
+            List<Sentence> sentences = redisOpt.getSentenceInfoInUnit(unitId);
+            int learnedWord = playerMapper.countLearnedWord(studentId, unitId, 3);
+            if (sentences.size() <= learnedWord) {
+                playerMapper.deleteRecord(studentId, unitId, 3);
+            } else {
+                // 查询当前单元句型播放机还未学习的句型信息
+                sentences = sentenceMapper.selectUnlearnInBookPlayer(studentId, unitId);
+            }
+
+            if (sentences.size() > 0) {
+                bookVos = this.getSentenceBookVo(sentences);
+                playerVo.setTotal(sentences.size());
+            }
         }
         return orderThePlayer(order, playerVo, bookVos);
     }

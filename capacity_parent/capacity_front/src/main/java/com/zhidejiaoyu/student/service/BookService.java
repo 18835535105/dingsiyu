@@ -23,7 +23,7 @@ public interface BookService extends BaseService<Vocabulary> {
      *
      * @param session
      * @param courseId
-     *@param unitId    单元id
+     * @param unitId    单元id
      * @param condition 查询条件 1：总单词（默认）；2：生词；3：熟词；4：剩余   @return
      */
     ServerResponse<PageInfo<BookVo>> getWordBookList(HttpSession session, Long courseId, Long unitId, String studyModel,
@@ -43,14 +43,13 @@ public interface BookService extends BaseService<Vocabulary> {
     /**
      * 获取单词播放机、句子播放机播放内容和答案列表
      *
-     * @param session session
+     * @param session  session
      * @param courseId 当前课程id
-     * @param unitId  当前单元id
-     * @param type    播放机类型。	1：单词播放机（默认） 2：句子播放机
-     *                @param order 单词播放顺序(默认顺序播放) 1：顺序播放；2：随机播放；3：倒序播放
+     * @param unitId   当前单元id
+     * @param order    单词播放顺序(默认顺序播放) 1：顺序播放；2：随机播放；3：倒序播放
      * @return
      */
-    ServerResponse<PlayerVo> getPlayer(HttpSession session, Long courseId, Long unitId, Integer type, Integer order);
+    ServerResponse<PlayerVo> getPlayer(HttpSession session, Long courseId, Long unitId, Integer order);
 
     /**
      * 再学一遍
@@ -87,8 +86,9 @@ public interface BookService extends BaseService<Vocabulary> {
      *
      * @param session
      * @param unitId
+     * @param type
      * @param order
      * @return
      */
-    ServerResponse<PlayerVo> getBookPlayer(HttpSession session, Long unitId, Integer order);
+    ServerResponse<PlayerVo> getBookPlayer(HttpSession session, Long unitId, Integer type, Integer order);
 }

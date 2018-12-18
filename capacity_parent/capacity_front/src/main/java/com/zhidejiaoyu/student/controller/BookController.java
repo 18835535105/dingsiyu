@@ -74,40 +74,41 @@ public class BookController {
     }
 
     /**
-     * 获取单词播放机、句子播放机播放内容和答案列表
+     * 获取单词播放机播放内容和答案列表
      * 该接口的单词播放机适用于单词流程中学习单词播放机节点，不适用于单词本中单词播放机
      *
      * @param session session
      * @param courseId 当前课程id
      * @param unitId  当前单元id
-     * @param type    播放机类型。	1：单词播放机（默认） 2：句子播放机
      *                @param order 单词播放顺序(默认顺序播放) 1：顺序播放；2：随机播放；3：倒序播放
      * @return
      */
     @GetMapping("/getPlayer")
     public ServerResponse<PlayerVo> getPlayer(HttpSession session, Long courseId, Long unitId,
-                                              @RequestParam(defaultValue = "1") Integer type,
                                               @RequestParam(defaultValue = "1") Integer order) {
         if (unitId == null) {
             return ServerResponse.createByErrorMessage("unitId can't be null!");
         }
-        return bookService.getPlayer(session, courseId, unitId, type, order);
+        return bookService.getPlayer(session, courseId, unitId, order);
     }
 
     /**
-     * 获取单词本中单词播放机内容
+     * 获取单词本中单词播放机、句型播放机内容
      *
      * @param session
      * @param unitId
+     * @param type 播放机类型。	2：单词播放机（默认） 3：句子播放机
      * @param order
      * @return 单词播放顺序(默认顺序播放) 1：顺序播放；2：随机播放；3：倒序播放
      */
     @GetMapping("/getBookPlayer")
-    public ServerResponse<PlayerVo> getBookPlayer(HttpSession session, Long unitId, @RequestParam(defaultValue = "1") Integer order) {
+    public ServerResponse<PlayerVo> getBookPlayer(HttpSession session, Long unitId,
+                                                  @RequestParam(required = false, defaultValue = "2") Integer type,
+                                                  @RequestParam(defaultValue = "1") Integer order) {
         if (unitId == null) {
             return ServerResponse.createByErrorMessage("unitId can't be null!");
         }
-        return bookService.getBookPlayer(session, unitId, order);
+        return bookService.getBookPlayer(session, unitId, type, order);
     }
 
     /**

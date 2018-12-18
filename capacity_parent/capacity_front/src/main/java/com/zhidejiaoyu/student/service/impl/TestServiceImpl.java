@@ -15,6 +15,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
 import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
+import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.constant.TestAwardGoldConstant;
@@ -105,6 +106,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     @Autowired
     private StudentFlowMapper studentFlowMapper;
+
+    @Autowired
+    private RedisOpt redisOpt;
 
     /**
      * 游戏测试题目获取，获取20个单词供测试
@@ -607,7 +611,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
         // 获取当前单元下的所有单词 limit 20
         PageHelper.startPage(1, 20);
-        List<Vocabulary> vocabularies = vocabularyMapper.selectByUnitId(unitId);
+        List<Vocabulary> vocabularies = redisOpt.getWordInfoInUnit(unitId);
         Integer subjectNum = vocabularies.size();
         String[] type;
         if ("慧记忆".equals(studyModel)) {

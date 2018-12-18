@@ -40,6 +40,7 @@ public class Player extends Model<Player> {
     private Integer type;
     private Date updateTime;
 
+    private Integer learnCount;
 
     @Override
     protected Serializable pkVal() {

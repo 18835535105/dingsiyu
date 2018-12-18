@@ -6,11 +6,45 @@
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Player">
         <id column="id" property="id" />
         <result column="student_id" property="studentId" />
-        <result column="course_id" property="courseId" />
+        <result column="student_id" property="courseId"/>
         <result column="unit_id" property="unitId" />
         <result column="word_id" property="wordId" />
         <result column="type" property="type" />
+        <result column="learn_count" property="learnCount"/>
         <result column="update_time" property="updateTime" />
     </resultMap>
+
+    <sql id="base_sql">
+        id,
+        student_id,
+        student_id,
+        unit_id,
+        word_id,
+        type,
+        learn_count,
+        update_time
+    </sql>
+
+    <delete id="deleteRecord" parameterType="map">
+        delete
+        from player
+        where student_id = #{studentId}
+          and unit_id = #{unitId}
+          and type = #{type}
+    </delete>
+    <select id="countLearnedWord" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from player
+        where student_id = #{studentId}
+          and unit_id = #{unitId}
+          and type = #{type}
+    </select>
+    <select id="selectMaxLearnCount" resultType="java.lang.Integer" parameterType="map">
+        select max(learn_count)
+        from player
+        where student_id = #{studentId}
+          and unit_id = #{unitId}
+          and type = #{type}
+    </select>
 
 </mapper>

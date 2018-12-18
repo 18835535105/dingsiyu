@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.pojo.UnitVocabulary;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.pojo.VocabularyExample;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;

@@ -69,13 +69,10 @@
         select
         <include refid="relevance_base_sql"/>
         from sentence s,
-        unit_sentence us,
-        student_unit su
-        where su.unit_id = us.unit_id
-        and s.id = us.sentence_id
-        and su.type = 1
-        and student_id = #{studentId}
-        and su.unit_id = #{unitId} limit 20;
+        unit_sentence us
+        where
+         s.id = us.sentence_id
+        and us.unit_id = #{unitId}
     </select>
 
     <!-- 分页数据 -->
@@ -257,6 +254,19 @@
         and su.type = 1
         and student_id = #{studentId}
         and su.unit_id = #{unitId}
+        order by s.id asc
+    </select>
+
+    <select id="selectUnlearnInBookPlayer" resultType="com.zhidejiaoyu.common.pojo.Sentence" parameterType="map">
+        select
+        <include refid="relevance_base_sql"/>
+        from unit_sentence us,
+        sentence s
+        where us.sentence_id = s.id
+        and us.unit_id = #{unitId}
+        and s.id not in (
+        select word_id from player where student_id = #{studentId} and unit_id = us.unit_id and type = 3
+        )
         order by s.id asc
     </select>
 

@@ -402,12 +402,13 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
      * @return
      */
     private ServerResponse<Object> toAnotherFlow(Student student, int flowId) {
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
         studentFlowMapper.updateFlowByStudentId(student.getId(), flowId);
         StudyFlow byPrimaryKey = studyFlowMapper.selectById(flowId);
-        byPrimaryKey.setCourseId(student.getCourseId());
-        byPrimaryKey.setUnitId(student.getUnitId());
-        byPrimaryKey.setCourseName(student.getCourseName());
-        byPrimaryKey.setUnitName(student.getUnitName());
+        byPrimaryKey.setCourseId(capacityStudentUnit.getCourseId());
+        byPrimaryKey.setUnitId(capacityStudentUnit.getUnitId());
+        byPrimaryKey.setCourseName(capacityStudentUnit.getCourseName());
+        byPrimaryKey.setUnitName(capacityStudentUnit.getUnitName());
         return ServerResponse.createBySuccess("true", byPrimaryKey);
     }
 
