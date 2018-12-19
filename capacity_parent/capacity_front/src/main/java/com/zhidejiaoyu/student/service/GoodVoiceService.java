@@ -45,5 +45,5 @@ public interface GoodVoiceService extends BaseService<Student> {
      * @param audio
      * @return
      */
-    ServerResponse saveVoice(HttpSession session, Long unitId, Long wordId, String word, Integer type, MultipartFile audio);
+    ServerResponse saveVoice(HttpSession session, Long unitId, Long wordId, String word, Integer type,Integer count, MultipartFile audio);
 }

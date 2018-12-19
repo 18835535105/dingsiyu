@@ -51,7 +51,7 @@ public class WordUnitTestDTO {
      */
     @NotNull(message = "测试类型不能为空")
     @Min(value = 0, message = "测试类型最小值为0")
-    @Max(value = 6, message = "测试类型最大值为6")
+    @Max(value = 7, message = "测试类型最大值为7")
     private Integer classify;
 
     /**

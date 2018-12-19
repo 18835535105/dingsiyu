@@ -829,7 +829,16 @@
                 sentence_unit_name = #{sentenceUnitName,jdbcType=VARCHAR},
             </if>
             <if test="showCapacity != null">
-                show_capacity = #{showCapacity}
+                show_capacity = #{showCapacity},
+            </if>
+            <if test="energy != null">
+                energy = #{energy},
+            </if>
+            <if test="diamond != null">
+                diamond = #{diamond},
+            </if>
+            <if test="bonusExpires != null">
+                bonus_expires = #{bonusExpires}
             </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
@@ -881,6 +890,9 @@
             sentence_unit_id        = #{sentenceUnitId,jdbcType=INTEGER},
             sentence_course_name    = #{sentenceCourseName,jdbcType=VARCHAR},
             sentence_unit_name      = #{sentenceUnitName,jdbcType=VARCHAR}
+            energy                  = #{energy,jdbcType=INTEGER}
+            diamond                 = #{diamond,jdbcType=INTEGER}
+            bonus_expires           = #{bonusExpires,jdbcType=TIMESTAMP}
         where id = #{id,jdbcType=BIGINT}
     </update>
 

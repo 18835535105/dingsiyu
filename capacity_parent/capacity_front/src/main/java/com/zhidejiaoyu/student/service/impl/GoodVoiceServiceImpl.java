@@ -14,6 +14,8 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.GoodVoiceService;
 import com.zhidejiaoyu.student.utils.GoodVoiceUtil;
+import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ import java.util.*;
  * @date 2018/8/29
  */
 @Service
+@Log4j
 public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements GoodVoiceService {
 
     @Autowired
@@ -121,11 +124,12 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
     }
 
     @Override
-    public ServerResponse saveVoice(HttpSession session, Long unitId, Long wordId, String word, Integer type, MultipartFile audio) {
+    public ServerResponse saveVoice(HttpSession session, Long unitId, Long wordId, String word, Integer type,Integer count, MultipartFile audio) {
 
         Student student = getStudent(session);
         // 上传录音文件
         String fileName = FileConstant.GOOD_VOICE + ftpUtil.uploadGoodVoice(audio, FileConstant.GOOD_VOICE);
+        log.info("上传数据 wordId :"+wordId+"  word :"+word+"    type :"+type+"   count"+count+"  audio :"+audio);
         String url = prefix + fileName;
         int score;
         Map<String, Object> map;
@@ -140,13 +144,13 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
         Long courseId = unitMapper.selectCourseIdByUnitId(unitId);
 
-        saveVoice(unitId, wordId, type, student, fileName, score, courseId);
+        saveVoice(unitId, wordId, type, student, fileName, score, courseId,count);
 
 
         return ServerResponse.createBySuccess(map);
     }
 
-    private void saveVoice(Long unitId, Long wordId, Integer type, Student student, String fileName, int record, Long courseId) {
+    private void saveVoice(Long unitId, Long wordId, Integer type, Student student, String fileName, int record, Long courseId,Integer count) {
         Voice voice = new Voice();
         voice.setCourseId(courseId);
         voice.setCreateTime(new Date());
@@ -157,6 +161,7 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
         voice.setUnitId(unitId);
         voice.setVoiceUrl(fileName);
         voice.setWordId(wordId);
+        voice.setCount(count);
         voiceMapper.insert(voice);
     }
 

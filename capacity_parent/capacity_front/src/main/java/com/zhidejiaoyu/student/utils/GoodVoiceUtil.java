@@ -55,7 +55,8 @@ public class GoodVoiceUtil {
      * <p>
      */
     public Map<String, Object> getSentenceEvaluationRecord(String text, String fileUrl) {
-        String result = speechEvaluation.getEvaluationResult(text, fileUrl);;
+        String findText = text.replace("!", ",").replace("?", ",").replace(".", ",");
+        String result = speechEvaluation.getEvaluationResult(findText, fileUrl);
         if (result != null) {
 
             JSONObject readChapter = getReadChapterJsonObject(result);
@@ -67,22 +68,70 @@ public class GoodVoiceUtil {
             map.put("totalScore", (int) Math.round(Double.valueOf(readChapter.getString("total_score")) * 20));
             map.put("heart", getHeart((int) map.get("totalScore")));
 
-            JSONArray sentenceArray = readChapter.getJSONArray("sentence");
+            log.info("readChapter:[{}]", readChapter);
+
+
             int score;
-            for (Object object : sentenceArray) {
-                JSONArray wordArray = ((JSONObject) object).getJSONArray("word");
-                for (Object wordObject : wordArray) {
-                    JSONObject wordJsonObject = (JSONObject) wordObject;
+//            for (Object object : sentenceArray) {
+            String[] s = text.split(" ");
+
+            if (s.length > 1) {
+                Map<Integer,Integer> ifMap=new HashMap<>();
+                JSONObject sentenceObject = readChapter.getJSONObject("sentence");
+                JSONArray wordArray = sentenceObject.getJSONArray("word");
+                int j = 0;
+                for (int i = 0; i < wordArray.size(); i++) {
+                    JSONObject wordJsonObject = (JSONObject) wordArray.get(i);
+                    log.error("wordJsonObject:[{}]", wordJsonObject);
+                    log.info("index[{}]", wordJsonObject.getInteger("index"));
+                    Integer index = wordJsonObject.getInteger("index");
+                    if (index == null) {
+                        continue;
+                    }
+                    if(ifMap.get(index)!=null){
+                        continue;
+                    }
+                    ifMap.put(index,index);
                     if (StringUtils.isNotEmpty(wordJsonObject.getString("total_score"))) {
                         score = (int) Math.round(Double.valueOf(wordJsonObject.getString("total_score")) * 20);
                         wordMap = new HashMap<>(16);
-                        wordMap.put("word", wordJsonObject.getString("content"));
+                        if (s[j].endsWith(",") || s[j].endsWith("!") || s[j].endsWith("?") || s[j].endsWith(".")) {
+                            wordMap.put("word", s[j].substring(0, s[j].length() - 1));
+                        } else {
+                            wordMap.put("word", s[j]);
+                        }
                         wordMap.put("score", score);
                         wordMap.put("color", getColor(score));
                         mapList.add(wordMap);
                     }
+                    log.info("数组长度:[{}]", j);
+                    log.info("句子长度[{}]", s.length);
+                    // todo:数组下标越界异常
+
+                    if (s[j].endsWith(",") || s[j].endsWith("!") || s[j].endsWith("?") || s[j].endsWith(".")) {
+                        wordMap = new HashMap<>(16);
+                        wordMap.put("word", s[j].substring(s[j].length() - 1));
+                        wordMap.put("color", "#fff");
+                        mapList.add(wordMap);
+                    }
+                    j++;
+
+
                 }
+            } else {
+                wordMap = new HashMap<>(16);
+                score = (int) Math.round(Double.valueOf(getReadChapterJsonObject(result).getString("total_score")) * 20);
+                wordMap.put("word", s[0].substring(0, s[0].length() - 1));
+                wordMap.put("score", score);
+                wordMap.put("color", getColor(score));
+                wordMap.put("heart", getHeart(score));
+                mapList.add(wordMap);
+                Map<String, Object> msm = new HashMap<>();
+                msm.put("word", s[0].substring(s[0].length() - 1));
+                msm.put("color", "#fff");
+                mapList.add(msm);
             }
+
             map.put("word", mapList);
             return map;
         }

@@ -12,6 +12,7 @@
     <result column="score" property="score" jdbcType="DOUBLE" />
     <result column="voice_url" property="voiceUrl" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="count" property="count" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -120,7 +121,8 @@
                          type,
                          score,
                          voice_url,
-                         create_time)
+                         create_time,
+                         count)
       values (#{id,jdbcType=BIGINT},
               #{studentId,jdbcType=BIGINT},
               #{courseId,jdbcType=BIGINT},
@@ -130,7 +132,8 @@
               #{type,jdbcType=INTEGER},
               #{score,jdbcType=DOUBLE},
               #{voiceUrl,jdbcType=VARCHAR},
-              #{createTime,jdbcType=TIMESTAMP})
+              #{createTime,jdbcType=TIMESTAMP},
+              #{count,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Voice" >
     insert into voice
@@ -221,6 +224,27 @@
         order by v.score desc
         limit 10
     </select>
+  <select id="selectTeksRankSchool" resultType="java.util.Map" parameterType="java.util.Map">
+    select * from
+      (select ROUND(AVG(DISTINCT vo.score)) avgscore , stu.student_name studentName ,  stu.school_name schoolName
+      , stu.part_url url
+      from voice vo  right join student stu on vo.student_id=stu.id
+      where stu.school_name = #{schoolName}
+			and vo.type = 2
+        and vo.unit_id = #{unitId}
+        GROUP BY vo.student_id
+        ) score  order by score.avgscore desc limit 6
+  </select>
+  <select id="selectTeksRank" resultType="java.util.Map" parameterType="java.util.Map">
+    select * from
+      (select ROUND(AVG(DISTINCT vo.score)) avgscore , stu.student_name studentName ,  stu.school_name schoolName
+       , stu.part_url url
+      from voice vo  right join student stu on vo.student_id=stu.id
+      where vo.type = 2
+        and vo.unit_id = #{unitId}
+        GROUP BY vo.student_id
+        ) score  order by score.avgscore desc limit 6
+  </select>
     <update id="updateByExampleSelective" parameterType="map">
     update voice
     <set >
@@ -321,4 +345,8 @@
           create_time  = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <select id="selMaxCountByUnitIdAndStudentId" parameterType="java.util.Map" resultType="java.lang.Integer">
+      select Max(count) from voice  where unit_id=#{unitId} and student_id=#{studentId}
+  </select>
+
 </mapper>

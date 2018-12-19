@@ -8,7 +8,6 @@
         <result column="unit_id" property="unitId" jdbcType="BIGINT"/>
         <result column="word_status" property="wordStatus" jdbcType="INTEGER"/>
         <result column="sentence_status" property="sentenceStatus" jdbcType="INTEGER"/>
-        <result column="type" property="type" jdbcType="INTEGER"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>

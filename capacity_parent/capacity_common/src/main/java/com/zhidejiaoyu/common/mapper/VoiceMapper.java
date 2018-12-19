@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.pojo.VoiceExample;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface VoiceMapper {
     int countByExample(VoiceExample example);
@@ -50,4 +51,16 @@ public interface VoiceMapper {
      * @return
      */
     List<Voice> selectClassRank(@Param("student") Student student, @Param("unitId") Long unitId, @Param("wordId") Long wordId, @Param("type") Integer type);
+
+    Integer selMaxCountByUnitIdAndStudentId(Map<String, Object> getMap);
+
+    /**
+     * 查询课文好声音全校排名
+     */
+    List<Map<String,Object>> selectTeksRankSchool(Map<String,Object> map);
+    /**
+     * 查询课文好声音全国排名
+     */
+    List<Map<String,Object>> selectTeksRank(Map<String,Object> map);
+
 }

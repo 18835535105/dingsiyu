@@ -28,4 +28,10 @@ public interface TeksMapper extends BaseMapper<Teks> {
      * @return
      */
     List<Map<String, Object>> selectUnitIdAndNameByCourseIds(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds);
+
+    List<Map<String, Object>> selHistoryPronunciation(Map<String,Object> maps);
+
+    List<Map<String, Object>> selHistoryByCountAndUnitId(Map<String, Object> maps);
+
+    Integer isHistoryPronunciation(Map<String, Object> maps);
 }

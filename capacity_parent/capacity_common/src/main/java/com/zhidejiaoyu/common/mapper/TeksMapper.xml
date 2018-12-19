@@ -4,13 +4,13 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Teks">
-        <id column="id" property="id" />
-        <result column="sentence" property="sentence" />
-        <result column="speaker" property="speaker" />
-        <result column="paraphrase" property="paraphrase" />
-        <result column="unit_id" property="unitId" />
-        <result column="pronunciation" property="pronunciation" />
-        <result column="status" property="status" />
+        <id column="id" property="id"/>
+        <result column="sentence" property="sentence"/>
+        <result column="speaker" property="speaker"/>
+        <result column="paraphrase" property="paraphrase"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="pronunciation" property="pronunciation"/>
+        <result column="status" property="status"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -19,12 +19,15 @@
     </sql>
 
     <select id="selTeksByUnitId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
-        select <include refid="Base_Column_List"></include> from teks t where  t.unit_id=#{unitId}
+        select <include refid="Base_Column_List"></include> from teks t where t.unit_id=#{unitId}
     </select>
 
     <select id="selectUnitIdAndNameByCourseIds" resultType="java.util.Map" parameterType="map">
-        select u.id, u.unit_name unitName, u.course_id courseId from unit u, teks t, student_unit su where
-        su.unit_id = u.id and su.student_id = #{studentId} and su.type = 1 and u.id = t.unit_id and
+        select u.id id,count(t.id) number , u.unit_name unitName,u.course_id courseId from unit u
+        left join test_record t on u.id=t.unit_id
+        join student_unit su on su.unit_id =u.id
+        where su.student_id = #{studentId}
+        and su.type = 1 and
         u.course_id in (
         <foreach collection="courseIds" separator="," item="courseId">
             #{courseId}
@@ -33,6 +36,34 @@
         group by u.id
         order by u.course_id asc, u.id asc
     </select>
+    <select id="selHistoryPronunciation" resultType="java.util.Map" parameterType="java.util.Map">
+        select DISTINCT voice.word_id wordId ,teks.id,teks.sentence,teks.paraphrase,voice.score,voice.voice_url url ,voice.create_time time
+        from teks teks
+        join voice voice on teks.id= voice.word_id
+        where teks.unit_id=#{unitId}
+        and voice.student_id= #{studentId}
+        GROUP BY voice.word_id
+        ORDER BY teks.id,voice.create_time desc
 
+    </select>
+
+    <select id="selHistoryByCountAndUnitId" resultType="java.util.Map" parameterType="java.util.Map">
+        select DISTINCT voice.word_id wordId ,teks.id,teks.sentence,teks.paraphrase,voice.score,voice.voice_url url ,voice.create_time time
+        from teks teks
+        join voice voice on teks.id= voice.word_id
+        where teks.unit_id=#{unitId}
+        and voice.student_id= #{studentId}
+        and count= #{count}
+        GROUP BY voice.word_id
+        ORDER BY voice.create_time,teks.id desc
+    </select>
+
+    <select id="isHistoryPronunciation" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select max(count) count
+        from teks teks
+        join voice voice on teks.id= voice.word_id
+        where teks.unit_id=#{unitId}
+        and voice.student_id= #{studentId}
+    </select>
 
 </mapper>

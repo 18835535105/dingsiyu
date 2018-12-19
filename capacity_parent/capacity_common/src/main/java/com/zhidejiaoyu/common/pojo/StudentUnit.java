@@ -34,10 +34,6 @@ public class StudentUnit extends Model<StudentUnit> {
      */
     private Integer sentenceStatus;
 
-    /**
-     * 学生学习课程版本 1,智能版  2,清学版
-     */
-    private Integer type;
 
     @Override
     protected Serializable pkVal() {

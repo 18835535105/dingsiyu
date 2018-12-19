@@ -745,4 +745,8 @@
         </foreach>
         )
     </select>
+
+    <select id="selectMaxPointByUnitStudentModel" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select Max(point) from test_record where unit_id=#{unitId} and student_id=#{studentId} and study_model=#{model}
+    </select>
 </mapper>
