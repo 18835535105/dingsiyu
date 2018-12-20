@@ -3,20 +3,19 @@ package com.zhidejiaoyu.common.mapper;
 import java.util.List;
 import java.util.Map;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import com.zhidejiaoyu.common.pojo.Level;
 import com.zhidejiaoyu.common.pojo.LevelExample;
 
-public interface LevelMapper {
+public interface LevelMapper extends BaseMapper<Level> {
     int countByExample(LevelExample example);
 
     int deleteByExample(LevelExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(Level record);
 
     int insertSelective(Level record);
 

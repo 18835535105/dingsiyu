@@ -1,5 +1,10 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.common.Vo.student.level.ChildMedalVo;
+import com.zhidejiaoyu.common.Vo.student.level.LevelVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -7,6 +12,7 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.StudentInfoService;
@@ -48,6 +54,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
     @Autowired
     private LearnMapper learnMapper;
+
+    @Autowired
+    private LevelMapper levelMapper;
 
     @Autowired
     private CommonMethod commonMethod;
@@ -356,6 +365,228 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         student = studentMapper.selectByPrimaryKey(currentStudent.getId());
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    public ServerResponse<LevelVo> getLevel(HttpSession session, Long stuId, Integer pageNum, Integer pageSize) {
+        Student student;
+        boolean showFist = true;
+        if (stuId == null) {
+            student = getStudent(session);
+        } else {
+            student = studentMapper.selectById(stuId);
+            Student currentStudent = getStudent(session);
+
+            List<Worship> worships = worshipMapper.selectSevenDaysInfoByStudent(currentStudent);
+            if (worships.size() > 0) {
+                // 上次膜拜时间
+                long lastWorshipTime = worships.get(0).getWorshipTime().getTime();
+                long now = System.currentTimeMillis();
+                if (now - lastWorshipTime < 86400000) {
+                    // 上次膜拜时间距现在不足24小时
+                    showFist = false;
+                }
+                long count = worships.stream().filter(worship -> worship.getStudentIdByWorship().equals(student.getId())).count();
+                if (count > 0) {
+                    // 本周已膜拜过该同学，不能再次膜拜
+                    showFist = false;
+                }
+            }
+        }
+
+        LevelVo levelVo = new LevelVo();
+        levelVo.setHeadUrl(student.getHeadUrl());
+        levelVo.setShowFist(showFist);
+        levelVo.setNickname(student.getNickname());
+        // 获取当前勋章父勋章的索引
+        Map<String, String> parentMap = new HashMap<>(16);
+
+        // 获取学生当前的等级信息
+        Map<String, String> childMap = getLevelInfo(levelVo, student, parentMap);
+
+        levelVo.setChildLevelIndex(childMap == null ? 1 : childMap.size());
+        levelVo.setParentLevelIndex(parentMap.size() == 0 ? 1 : parentMap.size());
+
+        // 获取学生已获取的勋章图片url
+        PageInfo<String> pageInfo = getHadMedalByPage(pageNum, pageSize, student);
+        levelVo.setMedalImgUrl(pageInfo);
+
+        return ServerResponse.createBySuccess(levelVo);
+    }
+
+    @Override
+    public ServerResponse<PageInfo<String>> getMedalByPage(HttpSession session, Long stuId, Integer pageNum, Integer pageSize) {
+        Student student;
+        if (stuId == null) {
+            student = getStudent(session);
+        } else {
+            student = studentMapper.selectByPrimaryKey(stuId);
+        }
+
+        Integer sex = student.getSex();
+        PageHelper.startPage(pageNum, pageSize);
+        List<String> urlList = medalMapper.selectHadBigMedalImgUrl(student);
+        PageInfo<String> pageInfo1 = new PageInfo<>(urlList);
+
+        List<String> urls = new ArrayList<>(urlList.size());
+        urlList.forEach(url -> {
+            if (url != null && url.contains("#")) {
+                urls.add(sex == 1 ? url.split("#")[0] : url.split("#")[1]);
+            } else {
+                urls.add(url);
+            }
+        });
+        PageInfo<String> pageInfo = new PageInfo<>(urls);
+        pageInfo.setPages(pageInfo1.getPages());
+        pageInfo.setTotal(pageInfo1.getTotal());
+        return ServerResponse.createBySuccess(pageInfo);
+    }
+
+    @Override
+    public ServerResponse<Map<String, Object>> getAllMedal(HttpSession session, Long stuId, Integer pageNum, Integer pageSize) {
+        Student student;
+        if (stuId == null) {
+            student = getStudent(session);
+        } else {
+            student = studentMapper.selectByPrimaryKey(stuId);
+        }
+        PageHelper.startPage(pageNum, pageSize);
+        List<Map<String, Object>> medalImgUrlList = medalMapper.selectMedalImgUrl(student);
+        List<Map<String, Object>> medalImgUrlListTemp = getAllMedalImgUrl(student, medalImgUrlList);
+
+        PageInfo<Map<String, Object>> mapPageInfo = new PageInfo<>(medalImgUrlList);
+        PageInfo<Map<String, Object>> mapPageInfo1 = new PageInfo<>(medalImgUrlListTemp);
+        mapPageInfo1.setTotal(mapPageInfo.getTotal());
+        mapPageInfo1.setPages(mapPageInfo.getPages());
+
+        Map<String, Object> map = new HashMap<>(16);
+        map.put("petName", student.getPetName());
+        map.put("list", mapPageInfo1);
+
+        return ServerResponse.createBySuccess(map);
+    }
+
+    @Override
+    public ServerResponse<ChildMedalVo> getChildMedal(HttpSession session, Long stuId, Long medalId) {
+        Student student;
+        if (stuId == null) {
+            student = getStudent(session);
+        } else {
+            student = studentMapper.selectByPrimaryKey(stuId);
+        }
+        ChildMedalVo childMedalInfo = getChildMedalInfo(student, medalId);
+        return ServerResponse.createBySuccess(childMedalInfo);
+    }
+
+    @Override
+    public ServerResponse<Map<String, Object>> getWorship(HttpSession session, Integer type, Integer pageNum, Integer pageSize) {
+        Student student = getStudent(session);
+        Map<String, Object> map = new HashMap<>(16);
+        // 本周我被膜拜的次数
+        Date date = new Date();
+        Date firstDayOfWeek = WeekUtil.getFirstDayOfWeek(date);
+        Date lastDayOfWeek = WeekUtil.getLastDayOfWeek(date);
+        int count = worshipMapper.countByWorshipedThisWeed(student, DateUtil.formatYYYYMMDD(firstDayOfWeek), DateUtil.formatYYYYMMDD(lastDayOfWeek));
+        map.put("count", count);
+
+        // 膜拜记录
+        PageHelper.startPage(pageNum, pageSize);
+        List<Map<String, String>> mapList = worshipMapper.selectStudentNameAndTime(student, type);
+        map.put("list", new PageInfo<>(mapList));
+
+        return ServerResponse.createBySuccess(map);
+    }
+
+    /**
+     * 获取已经获取的勋章图片
+     *
+     * @param pageNum
+     * @param pageSize
+     * @param student
+     * @return
+     */
+    private PageInfo<String> getHadMedalByPage(Integer pageNum, Integer pageSize, Student student) {
+        Integer sex = student.getSex();
+        PageHelper.startPage(pageNum, pageSize);
+        List<String> urlList = medalMapper.selectHadMedalImgUrl(student);
+        List<String> urls = new ArrayList<>(urlList.size());
+        urlList.forEach(url -> {
+            if (url != null && url.contains("#")) {
+                urls.add(sex == 1 ? url.split("#")[0] : url.split("#")[1]);
+            } else {
+                urls.add(url);
+            }
+        });
+        return new PageInfo<>(urls);
+    }
+
+    private List<Map<String, Object>> getAllMedalImgUrl(Student student, List<Map<String, Object>> medalImgUrlList) {
+        List<Map<String, Object>> medalImgUrlListTemp = new ArrayList<>(medalImgUrlList.size());
+        Integer sex = student.getSex();
+        medalImgUrlList.forEach(map -> {
+            Map<String, Object> mapTemp = new HashMap<>(16);
+            if (map.get("imgUrl").toString().contains("#")) {
+                mapTemp.put("imgUrl", sex == 1 ? map.get("imgUrl").toString().split("#")[0] : map.get("imgUrl").toString().split("#")[1]);
+            } else {
+                mapTemp.put("imgUrl", map.get("imgUrl"));
+            }
+            mapTemp.put("id", map.get("id"));
+            medalImgUrlListTemp.add(mapTemp);
+        });
+
+        return medalImgUrlListTemp;
+    }
+
+    private ChildMedalVo getChildMedalInfo(Student student, long medalId) {
+        List<Map<String, String>> childInfo = medalMapper.selectChildrenInfo(student, medalId);
+
+        List<String> medalImgUrl = new ArrayList<>(childInfo.size());
+        StringBuilder sb = new StringBuilder();
+        childInfo.forEach(info -> {
+            medalImgUrl.add(info.get("imgUrl"));
+            sb.append(info.get("content"));
+        });
+
+        ChildMedalVo childMedalVo = new ChildMedalVo();
+        childMedalVo.setMedalImgUrl(medalImgUrl);
+        childMedalVo.setContent(sb.toString());
+        return childMedalVo;
+    }
+
+    private Map<String, String> getLevelInfo(LevelVo levelVo, Student student, Map<String, String> parentMap) {
+        List<Level> levels = levelMapper.selectList(new EntityWrapper<Level>().orderBy("id", true));
+        double gold = BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
+        // 获取当前勋章子勋章索引
+        Map<String, String> childMap = null;
+        int size = levels.size();
+        int preSize = size - 1;
+        Level level;
+        Level nextLevel;
+        for (int i = 0; i < size; i++) {
+            level = levels.get(i);
+            if (!parentMap.containsKey(level.getLevelName())) {
+                childMap = new HashMap<>(16);
+                parentMap.put(level.getLevelName(), level.getLevelName());
+            }
+            if (childMap != null) {
+                childMap.put(level.getChildName(), level.getChildName());
+            }
+            if (i < preSize) {
+                nextLevel = levels.get(i + 1);
+                // 判断当前金币所处的等级
+                boolean flag = ((i == 0 && gold < level.getGold()) || gold >= level.getGold()) && gold < nextLevel.getGold();
+                if (flag) {
+                    levelVo.setLevelImgUrl(level.getImgUrlLevel());
+                    levelVo.setChildName(level.getImgUrlWord());
+                    break;
+                }
+            } else {
+                levelVo.setLevelImgUrl(level.getImgUrlLevel());
+                levelVo.setChildName(level.getImgUrlWord());
+                break;
+            }
+        }
+        return childMap;
     }
 
     /**

@@ -100,14 +100,6 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.Level" >
-    insert into level (id, level_name, child_name, 
-      next_id, gold, img_url
-      )
-    values (#{id,jdbcType=BIGINT}, #{levelName,jdbcType=VARCHAR}, #{childName,jdbcType=VARCHAR}, 
-      #{nextId,jdbcType=BIGINT}, #{gold,jdbcType=INTEGER}, #{imgUrl,jdbcType=VARCHAR}
-      )
-  </insert>
   <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Level" >
     insert into level
     <trim prefix="(" suffix=")" suffixOverrides="," >

@@ -159,7 +159,29 @@
   <select id="getMapKeyStudentWorship" resultType="java.util.Map">
     	select student_id_worship as id, count(*) as count FROM worship GROUP BY student_id_worship
   </select>
-  <update id="updateByExampleSelective" parameterType="map" >
+    <select id="selectStudentNameAndTime" resultType="java.util.Map" parameterType="map">
+      select
+      s.nickname, date_format(w.worship_time, '%Y.%m.%d') time
+      <if test="type == 1">
+        , w.student_id_worship stuId
+      </if>
+      <if test="type == 2">
+        , w.student_id_by_worship stuId
+      </if>
+      from worship w, student s
+      <where>
+        <if test="type == 2">
+          and w.student_id_worship = #{student.id}
+          and s.id = w.student_id_by_worship
+        </if>
+        <if test="type == 1">
+          and w.student_id_by_worship = #{student.id}
+          and s.id = w.student_id_worship
+        </if>
+      </where>
+      order by w.worship_time desc
+    </select>
+    <update id="updateByExampleSelective" parameterType="map" >
     update worship
     <set >
       <if test="record.id != null" >

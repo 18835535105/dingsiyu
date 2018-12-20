@@ -1,5 +1,8 @@
 package com.zhidejiaoyu.student.controller;
 
+import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.common.Vo.student.level.ChildMedalVo;
+import com.zhidejiaoyu.common.Vo.student.level.LevelVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -15,9 +18,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.constraints.NotNull;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 获取学生信息相关controller
@@ -252,5 +255,83 @@ public class StudentInfoController {
             }
         }
         return studentInfoService.calculateValidTime(session, classify, courseId, unitId, valid);
+    }
+
+    /**
+     * 获取学生的等级信息
+     *
+     * @param stuId 为空时查看当前学生的等级信息；不为空时查看选中的学生的等级信息
+     * @param session
+     * @return
+     */
+    @GetMapping("/getLevel")
+    public ServerResponse<LevelVo> getLevel(HttpSession session, @RequestParam(required = false) Long stuId,
+                                            @RequestParam(required = false, defaultValue = "1") Integer pageNum,
+                                            @RequestParam(required = false, defaultValue = "12") Integer pageSize) {
+        return studentInfoService.getLevel(session, stuId, pageNum, pageSize);
+    }
+
+    /**
+     * 分页获取学生已领取的勋章信息
+     *
+     * @param session
+     * @param stuId 为空时查看当前学生勋章信息，不为空时查询选中的学生的勋章信息
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @GetMapping("/getMedalByPage")
+    public ServerResponse<PageInfo<String>> getMedalByPage(HttpSession session, @RequestParam(required = false) Long stuId,
+                                                           @RequestParam(required = false, defaultValue = "1") Integer pageNum,
+                                                           @RequestParam(required = false, defaultValue = "2") Integer pageSize) {
+        return studentInfoService.getMedalByPage(session, stuId, pageNum, pageSize);
+    }
+
+    /**
+     * 分页获取所有勋章信息
+     *
+     * @param session
+     * @param stuId 为空时查看当前学生所有勋章信息；否则查看指定学生勋章信息
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @GetMapping("/getAllMedal")
+    public ServerResponse<Map<String, Object>> getAllMedal(HttpSession session, @RequestParam(required = false) Long stuId,
+                                                           @RequestParam(required = false, defaultValue = "1") Integer pageNum,
+                                                           @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+        return studentInfoService.getAllMedal(session, stuId, pageNum, pageSize);
+    }
+
+    /**
+     * 点击父勋章获取子勋章信息
+     *
+     * @param session
+     * @param stuId 为空时查看当前学生子勋章信息；否则查看指定学生的子勋章信息
+     * @param medalId   勋章id
+     * @return
+     */
+    @GetMapping("/getChildMedal")
+    public ServerResponse<ChildMedalVo> getChildMedal(HttpSession session, @RequestParam(required = false) Long stuId, Long medalId) {
+        if (medalId == null) {
+            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
+        }
+        return studentInfoService.getChildMedal(session, stuId, medalId);
+    }
+
+    /**
+     * 获取学生膜拜数据
+     *
+     * @param session
+     * @param type     1：我被膜拜的数据；2：我膜拜别人的数据
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @GetMapping("/getWorship")
+    public ServerResponse<Map<String, Object>> getWorship(HttpSession session, @RequestParam(required = false, defaultValue = "1") Integer type,
+                                                          @RequestParam(required = false, defaultValue = "1") Integer pageNum,
+                                                          @RequestParam(required = false, defaultValue = "18") Integer pageSize) {
+        return studentInfoService.getWorship(session, type, pageNum, pageSize);
     }
 }

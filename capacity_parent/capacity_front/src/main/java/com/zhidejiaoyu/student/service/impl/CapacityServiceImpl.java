@@ -155,9 +155,6 @@ public class CapacityServiceImpl implements CapacityService {
                                                                 Long unitId, Long id) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         Long studentId = student.getId();
-
-        CapacityContentVo capacityContentVo = new CapacityContentVo();
-
         String chinese;
         Integer studyCount;
 
@@ -187,6 +184,7 @@ public class CapacityServiceImpl implements CapacityService {
         }
 
         CapacityReview capacityReview = capacityReviewMapper.selectByCourseIdOrUnitId(student, courseId, unitId, id, studyModel);
+        CapacityContentVo capacityContentVo = new CapacityContentVo();
         capacityContentVo.setFaultCount(capacityReview.getFault_time());
         capacityContentVo.setMemoryStrength(capacityReview.getMemory_strength());
         capacityContentVo.setPush(this.getPushTime(DateUtil.parseYYYYMMDDHHMMSS(capacityReview.getPush())));

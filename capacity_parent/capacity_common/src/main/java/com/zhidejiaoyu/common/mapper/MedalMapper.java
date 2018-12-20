@@ -72,4 +72,41 @@ public interface MedalMapper {
      * @return
      */
     List<Long> selectAllIdsByParentIds(@Param("parentIds") List<Long> parentIds);
+
+    /**
+     * 获取已获取的勋章的大图片路径
+     *
+     * @param student
+     * @return
+     */
+    List<String> selectHadMedalImgUrl(@Param("student") Student student);
+
+    /**
+     * 获取子勋章图片
+     * 已经获取的勋章获取金色图片
+     * 未获取的勋章获取灰色图片
+     *
+     * @param student
+     * @param medalId
+     * @return key： imgUrl，content(勋章说明文字)
+     */
+    List<Map<String, String>> selectChildrenInfo(@Param("student") Student student, @Param("medalId") long medalId);
+
+    /**
+     * 获取已获取的勋章的大图片路径
+     *
+     * @param student
+     * @return
+     */
+    List<String> selectHadBigMedalImgUrl(@Param("student") Student student);
+
+    /**
+     * 获取勋章图片
+     * 已经获取的勋章获取金色图片
+     * 未获取的勋章获取灰色图片
+     *
+     * @param student
+     * @return key： imgUrl，id(勋章id)
+     */
+    List<Map<String, Object>> selectMedalImgUrl(@Param("student") Student student);
 }

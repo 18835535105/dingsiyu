@@ -329,4 +329,47 @@
         )
         order by id asc
     </select>
+    <select id="selectHadMedalImgUrl" resultType="java.lang.String" parameterType="map">
+        select t.imgUrl
+        from (select if(sum(a.get_flag) > 2, if(sum(a.get_flag) = 5, m.big_gold_img_url, m.gray_img_url),
+                        if(sum(a.get_flag) = 1, m.big_gold_img_url, m.gray_img_url)) imgUrl
+              from medal m,
+                   award a
+              where a.medal_type = m.id
+                and a.student_id = #{student.id}
+              group by m.parent_name
+              order by m.id asc) t
+        where t.imgUrl not like '%no-light%'
+    </select>
+    <select id="selectChildrenInfo" resultType="java.util.Map" parameterType="map">
+        select if(a.get_flag = 1, m.gold_img_url, m.gray_img_url) imgUrl, m.marked_words content
+        from medal m,
+             award a
+        where parent_name = (select parent_name from medal where id = #{medalId})
+          and m.id = a.medal_type
+          and student_id = #{student.id}
+        order by m.id asc
+    </select>
+    <select id="selectHadBigMedalImgUrl" resultType="java.lang.String" parameterType="map">
+        select t.imgUrl
+        from (select if(sum(a.get_flag) > 2, if(sum(a.get_flag) = 5, m.big_gold_img_url, m.gray_img_url),
+                        if(sum(a.get_flag) = 1, m.big_gold_img_url, m.gray_img_url)) imgUrl
+              from medal m,
+                   award a
+              where a.medal_type = m.id
+                and a.student_id = #{student.id}
+              group by m.parent_name
+              order by m.id asc) t
+        where t.imgUrl not like '%no-light%'
+    </select>
+    <select id="selectMedalImgUrl" resultType="java.util.Map" parameterType="map">
+        select if(sum(a.get_flag) > 2, if(sum(a.get_flag) = 5, m.gold_img_url, m.gray_img_url),
+                  if(sum(a.get_flag) = 1, m.gold_img_url, m.gray_img_url)) imgUrl, m.id
+        from medal m,
+             award a
+        where a.medal_type = m.id
+          and a.student_id = #{student.id}
+        group by m.parent_name
+        order by m.id asc
+    </select>
 </mapper>

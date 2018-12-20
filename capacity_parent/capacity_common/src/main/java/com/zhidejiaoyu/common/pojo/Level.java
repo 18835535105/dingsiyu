@@ -1,8 +1,17 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 
-public class Level implements Serializable {
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class Level extends Model<Level> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private String levelName;
@@ -15,51 +24,18 @@ public class Level implements Serializable {
 
     private String imgUrl;
 
-    public Long getId() {
-        return id;
-    }
+    /**
+     * 等级图片，用于学生查看等级和勋章的页面展示
+     */
+    private String imgUrlLevel;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    /**
+     * 等级金色文字图片
+     */
+    private String imgUrlWord;
 
-    public String getLevelName() {
-        return levelName;
-    }
-
-    public void setLevelName(String levelName) {
-        this.levelName = levelName == null ? null : levelName.trim();
-    }
-
-    public String getChildName() {
-        return childName;
-    }
-
-    public void setChildName(String childName) {
-        this.childName = childName == null ? null : childName.trim();
-    }
-
-    public Long getNextId() {
-        return nextId;
-    }
-
-    public void setNextId(Long nextId) {
-        this.nextId = nextId;
-    }
-
-    public Integer getGold() {
-        return gold;
-    }
-
-    public void setGold(Integer gold) {
-        this.gold = gold;
-    }
-
-    public String getImgUrl() {
-        return imgUrl;
-    }
-
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl == null ? null : imgUrl.trim();
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }
