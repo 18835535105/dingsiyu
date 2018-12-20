@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.controller;
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.GoodVoiceService;
+import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -75,6 +76,18 @@ public class GoodVoiceController {
                                     @NotNull(message = "type 不能为空！") @Min(1) @Max(2) Integer type,
                                     @NotNull(message = "录音不能为空！") MultipartFile audio) {
 
-        return goodVoiceService.saveVoice(session, unitId, wordId, word, type, audio);
+        return goodVoiceService.saveVoice(session, unitId, wordId, word, type, 0,audio);
+    }
+
+    /**
+     * 课文好声音
+     */
+    @PostMapping("/saveTeks")
+    public ServerResponse saveTeks(HttpSession session, @NotNull(message = "unitId 不能为空！") Long unitId,
+                                   @NotNull(message = "wordId 不能为空！") Long sentenceId,
+                                   @NotEmpty(message = "word 不能为空！") String sentence,
+                                   @NotNull(message = "type 不能为空！") @Min(1) @Max(2) Integer type,
+                                   @NotNull(message = "录音不能为空！") MultipartFile audio, Integer count){
+        return goodVoiceService.saveVoice(session, unitId, sentenceId, sentence, type, count,audio);
     }
 }

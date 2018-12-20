@@ -483,6 +483,8 @@ public class CommonMethod implements Serializable {
                 return "例句翻译";
             } else if (6 == classify) {
                 return "例句默写";
+            } else if (7 == classify){
+                return "课文测试";
             }
         }
         return null;

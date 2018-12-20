@@ -204,4 +204,6 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      */
     @MapKey("unitId")
     Map<Long, Map<Long, Long>> selectHasUnitTest(@Param("studentId") Long studentId, @Param("unitIds") List<Long> unitIds);
+
+    Integer selectMaxPointByUnitStudentModel(Map<String, Object> selMap);
 }

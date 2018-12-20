@@ -33,6 +33,8 @@ public class Voice extends Model<Voice> {
 
     private String studentName;
 
+    private Integer count;
+
     @Override
     protected Serializable pkVal() {
         return this.id;
