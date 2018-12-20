@@ -78,7 +78,9 @@ public class ServerResponse<T> implements Serializable {
 		return new ServerResponse<T>(code, msg);
 	}
 
-	// 请求成功的接口。避免了T类型data不能包括String数据的问题。
+	/**
+	 * 请求成功的接口。避免了T类型data不能包括String数据的问题。
+	 */
 	public static <T> ServerResponse<T> createBySuccess() {
 		return new ServerResponse<T>(ResponseCode.SUCCESS.getCode());
 	}

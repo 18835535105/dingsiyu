@@ -9,6 +9,9 @@
         <result column="course_id" property="courseId"/>
         <result column="unit_id" property="unitId"/>
         <result column="type" property="type"/>
+        <result column="unit_name" property="unitName"/>
+        <result column="course_name" property="courseName"/>
+        <result column="version" property="version"/>
     </resultMap>
 
     <sql id="base_sql">
@@ -16,7 +19,10 @@
         student_id,
         course_id,
         unit_id,
-        type
+        type,
+        unit_name,
+        course_name,
+        version
     </sql>
 
     <select id="selectCurrentUnitIdByStudentIdAndType"

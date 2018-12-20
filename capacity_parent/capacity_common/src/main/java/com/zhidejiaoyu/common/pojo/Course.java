@@ -1,8 +1,11 @@
 package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,11 +15,8 @@ import java.util.Date;
  * 
  * @author Administrator
  */
-
-/**
- * @author Administrator
- *
- */
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class Course extends Model<Course> {
 
     @TableId(type = IdType.AUTO)
@@ -48,38 +48,15 @@ public class Course extends Model<Course> {
     private String courseName;
 
     /** 删除状态 */
+    @TableField("delStatus")
     private int delStatus;
     
 	/** ! 单元数 */
+	@TableField(exist = false)
     private int unitCount;
     /** ! 开启状态中文 */
+    @TableField(exist = false)
     private String stat;
-    
-
-    public int getDelStatus() {
-		return delStatus;
-	}
-
-	public void setDelStatus(int delStatus) {
-		this.delStatus = delStatus;
-	}
-
-    
-    public String getStat() {
-		return stat;
-	}
-
-	public void setStat(String stat) {
-		this.stat = stat;
-	}
-
-	public int getUnitCount() {
-		return unitCount;
-	}
-
-	public void setUnitCount(int unitCount) {
-		this.unitCount = unitCount;
-	}
 
 	/** 状态 */
     private Integer status;
@@ -89,102 +66,6 @@ public class Course extends Model<Course> {
 
     /** 更新时间 */
     private Date updateTime;
-
-	@Override
-	public String toString() {
-		return "Course [id=" + id + ", studyParagraph=" + studyParagraph + ", grade=" + grade + ", version=" + version
-				+ ", label=" + label + ", pictureName=" + pictureName + ", pictureUrl=" + pictureUrl + ", courseName="
-				+ courseName + ", unitCount=" + unitCount + ", stat=" + stat + ", status=" + status + ", createTime="
-				+ createTime + ", updateTime=" + updateTime + "]";
-	}
-
-	public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getStudyParagraph() {
-        return studyParagraph;
-    }
-
-    public void setStudyParagraph(String studyParagraph) {
-        this.studyParagraph = studyParagraph == null ? null : studyParagraph.trim();
-    }
-
-    public String getGrade() {
-        return grade;
-    }
-
-    public void setGrade(String grade) {
-        this.grade = grade == null ? null : grade.trim();
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version == null ? null : version.trim();
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label == null ? null : label.trim();
-    }
-
-    public String getPictureName() {
-        return pictureName;
-    }
-
-    public void setPictureName(String pictureName) {
-        this.pictureName = pictureName == null ? null : pictureName.trim();
-    }
-
-    public String getPictureUrl() {
-        return pictureUrl;
-    }
-
-    public void setPictureUrl(String pictureUrl) {
-        this.pictureUrl = pictureUrl == null ? null : pictureUrl.trim();
-    }
-
-    public String getCourseName() {
-        return courseName;
-    }
-
-    public void setCourseName(String courseName) {
-        this.courseName = courseName == null ? null : courseName.trim();
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public String getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
 
     @Override
     protected Serializable pkVal() {

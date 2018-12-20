@@ -12,6 +12,7 @@ import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
+import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.student.service.SentenceService;
@@ -105,32 +106,33 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
 
     @Override
-    public ServerResponse<SentenceTranslateVo> getSentenceTranslate(HttpSession session, Long unitId, int Intclassify, Integer type) {
+    public ServerResponse<SentenceTranslateVo> getSentenceTranslate(HttpSession session, Long unitId, int classifyInt, Integer type) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
 
-        // 转换类型
-        String classify = commonMethod.getTestType(Intclassify);
-
-        boolean firstStudy = commonMethod.isFirst(student.getId(), classify);
-        if (firstStudy) {
-            Learn learn = new Learn();
-            learn.setStudentId(student.getId());
-            learn.setStudyModel(classify);
-            learnMapper.insert(learn);
-        }
-
-        // 记录学生开始学习该例句的时间
-        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
+        // 获取当前单元下的所有例句的总个数
+        Long sentenceCount = sentenceMapper.countByUnitId(unitId);
 
         Long courseId = unitMapper.selectCourseIdByUnitId(unitId);
         // 查询当前课程的学习遍数
         Integer learnCount = studyCountMapper.selectMaxCountByCourseId(student.getId(), courseId);
 
+        // 转换类型
+        String classify = commonMethod.getTestType(classifyInt);
+
+        // 判断是否可以学习当前句型模块
+        boolean canLearn = this.canLearn(student, unitId, classifyInt, sentenceCount, learnCount);
+        if (!canLearn) {
+            return ServerResponse.createBySuccess(ResponseCode.PREVIOUS_FLOW_UN_OVER.getCode(), classify + "模块还没有完成！");
+        }
+
+        boolean firstStudy = isFirstStudy(student, classify);
+
+        // 记录学生开始学习该例句的时间
+        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
+
         // 查询学生当前单元下已学习例句的个数，即学习进度
         Long plan = learnMapper.countLearnWord(student.getId(), unitId, classify, learnCount == null ? 1 : learnCount);
 
-        // 获取当前单元下的所有例句的总个数
-        Long sentenceCount = sentenceMapper.countByUnitId(unitId);
         if (sentenceCount == 0) {
             log.error("单元 {} 下没有例句信息！", unitId);
             return ServerResponse.createByErrorMessage("当前单元下没有例句！");
@@ -208,6 +210,36 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             return getSentenceTranslateVoServerResponse(firstStudy, plan, sentenceCount, sentence, type);
         }
         return null;
+    }
+
+    private boolean isFirstStudy(Student student, String classify) {
+        boolean firstStudy = commonMethod.isFirst(student.getId(), classify);
+        if (firstStudy) {
+            Learn learn = new Learn();
+            learn.setStudentId(student.getId());
+            learn.setStudyModel(classify);
+            learnMapper.insert(learn);
+        }
+        return firstStudy;
+    }
+
+    /**
+     * 判断是否可以学习当前模块的句型（流程：句型翻译-句型听力-音译练习）
+     *
+     * @param student
+     * @param unitId
+     * @param classifyInt
+     * @param sentenceCount 当前单元下例句总个数
+     * @param learnCount
+     * @return
+     */
+    private boolean canLearn(Student student, Long unitId, int classifyInt, Long sentenceCount, Integer learnCount) {
+        long plan = 0;
+        if (classifyInt > 4) {
+            // 判断句型翻译模块是否已经学习完
+            plan = learnMapper.countLearnWord(student.getId(), unitId, commonMethod.getTestType(classifyInt - 1), learnCount == null ? 1 : learnCount);
+        }
+        return plan >= sentenceCount;
     }
 
     private ServerResponse<SentenceTranslateVo> getSentenceTranslateVoServerResponse(boolean firstStudy, Long plan, Long sentenceCount, Sentence sentence, Integer type) {

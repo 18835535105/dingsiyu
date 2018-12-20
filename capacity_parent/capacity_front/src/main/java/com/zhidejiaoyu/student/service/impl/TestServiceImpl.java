@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
@@ -9,12 +11,15 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.math.MathUtil;
 import com.zhidejiaoyu.common.utils.server.GoldResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
 import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
+import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
+import com.zhidejiaoyu.student.constant.PetImageConstant;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
@@ -35,7 +40,7 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @Service
-public class TestServiceImpl implements TestService {
+public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecord> implements TestService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(TestServiceImpl.class);
     /**
@@ -103,7 +108,13 @@ public class TestServiceImpl implements TestService {
     private DurationMapper durationMapper;
 
     @Autowired
+    private TestRecordInfoMapper testRecordInfoMapper;
+
+    @Autowired
     private StudentFlowMapper studentFlowMapper;
+
+    @Autowired
+    private RedisOpt redisOpt;
 
     /**
      * 游戏测试题目获取，获取20个单词供测试
@@ -200,6 +211,7 @@ public class TestServiceImpl implements TestService {
         this.initStudentFlow(student, testRecord.getPoint());
 
         countMyGoldUtil.countMyGold(student);
+        studentMapper.updateByPrimaryKeySelective(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(map);
     }
@@ -578,7 +590,7 @@ public class TestServiceImpl implements TestService {
             String courseName = this.pushCourse(point, student, "学前摸底测试");
             vo.setGold(gold);
             vo.setMsg(courseName);
-
+            studentMapper.updateByPrimaryKeySelective(student);
             return ServerResponse.createBySuccess(vo);
         } else {
             String errMsg = "id为 " + student.getId() + " 的学生 " + student.getStudentName() + " 摸底测试记录保存失败！";
@@ -604,15 +616,21 @@ public class TestServiceImpl implements TestService {
         } else if (flag == 2) {
             return ServerResponse.createByError(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
         }
-        // 获取当前单元下的所有单词 limit 20
-        PageHelper.startPage(1, 20);
-        List<Vocabulary> vocabularies = vocabularyMapper.selectByUnitId(unitId);
-        Integer subjectNum = vocabularies.size();
+        // 获取当前单元下的所有单词
+        List<Vocabulary> vocabularies = redisOpt.getWordInfoInUnit(unitId);
         String[] type;
         if ("慧记忆".equals(studyModel)) {
             type = new String[]{"英译汉","汉译英"};
         } else {
             type = new String[]{"听力理解"};
+        }
+
+        // 需要封装的测试题个数
+        int subjectNum;
+        if (vocabularies.size() < 20) {
+            subjectNum = vocabularies.size();
+        } else {
+            subjectNum = 20;
         }
 
         List<TestResult> results = testResultUtil.getWordTestesForUnit(type, subjectNum, vocabularies, unitId);
@@ -666,11 +684,64 @@ public class TestServiceImpl implements TestService {
         return 0;
     }
 
+
+    @Override
+    public ServerResponse saveSentenceUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
+        Student student = getStudent(session);
+        TestRecord testRecord;
+
+        wordUnitTestDTO.setClassify(5);
+
+        // 判断当前单元是不是首次进行测试
+        boolean isFirst = false;
+        TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
+                wordUnitTestDTO.getUnitId()[0], "单元闯关测试", "例句翻译");
+        if (testRecordOld == null) {
+            isFirst = true;
+        }
+
+        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld);
+        if (testRecordOld == null) {
+            testRecord = new TestRecord();
+            // 首次测试大于或等于80分，超过历史最高分次数 +1
+            if (wordUnitTestDTO.getPoint() >= PASS) {
+                testRecord.setBetterCount(1);
+            } else {
+                testRecord.setBetterCount(0);
+            }
+        } else {
+            testRecord = new TestRecord();
+            testRecord.setBetterCount(testRecordOld.getBetterCount());
+        }
+
+        testRecord.setCourseId(wordUnitTestDTO.getCourseId());
+        testRecord.setUnitId(wordUnitTestDTO.getUnitId()[0]);
+        testRecord.setPoint(wordUnitTestDTO.getPoint());
+        testRecord.setErrorCount(wordUnitTestDTO.getErrorCount());
+        testRecord.setRightCount(wordUnitTestDTO.getRightCount());
+        testRecord.setGenre("单元闯关测试");
+        testRecord.setStudentId(student.getId());
+        testRecord.setTestEndTime(new Date());
+        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+        testRecord.setQuantity(wordUnitTestDTO.getErrorCount() + wordUnitTestDTO.getRightCount());
+        testRecord.setAwardGold(goldCount);
+        testRecord.setStudyModel("例句翻译");
+        testRecordMapper.insert(testRecord);
+        studentMapper.updateByPrimaryKeySelective(student);
+        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
+        return ServerResponse.createBySuccess();
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
+    public ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO, String testDetail) {
 
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        if (StringUtils.isEmpty(student.getPetName())) {
+            student.setPetName("大明白");
+            student.setPartUrl(PetImageConstant.DEFAULT_IMAGE);
+        }
+
         TestResultVo vo = new TestResultVo();
         // 是否是第一次进行当前模块下的单元闯关测试标识
         boolean isFirst = false;
@@ -682,7 +753,6 @@ public class TestServiceImpl implements TestService {
         Long[] unitId = wordUnitTestDTO.getUnitId();
         Long courseId = unitMapper.selectCourseIdByUnitId(unitId[0]);
         Integer classify = wordUnitTestDTO.getClassify();
-        int count;
         String type = commonMethod.getTestType(wordUnitTestDTO.getClassify());
 
         Integer point = wordUnitTestDTO.getPoint();
@@ -694,57 +764,27 @@ public class TestServiceImpl implements TestService {
         if (testRecord == null) {
             isFirst = true;
         }
-
-        ServerResponse<String> serverResponse = saveTestLearnAndCapacity.saveLearnAndCapacity(correctWord, errorWord,
-                correctWordId, errorWordId, session, student, unitId, classify);
-        if (serverResponse != null) {
-            throw new RuntimeException("无当前模块的学习记录");
-        }
+        saveTestLearnAndCapacity.saveTestAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, unitId, classify);
 
         // 根据不同分数奖励学生金币
         int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord);
 
-        count = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, testRecord, goldCount);
-        if (count == 0) {
-            return ServerResponse.createByError();
-        }
+        Long testId = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, testRecord, goldCount);
 
         String msg;
         // 默写
         if(classify == 3 || classify == 6) {
-        	if (point < FIVE) {
-	            msg = "很遗憾，闯关失败，再接再厉。";
-	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
-	        } else if (point < FULL_MARK) {
-	            msg = "闯关成功，独孤求败！";
-	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
-	        } else {
-	            msg = "恭喜你刷新了纪录！";
-	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
-	        }
-        	// 听力
+            msg = getMessage(student, vo, point, FIVE);
         }else if(classify == 4 || classify == 2) {
-        	if (point < SIX) {
-	            msg = "很遗憾，闯关失败，再接再厉。";
-	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
-	        } else if (point < FULL_MARK) {
-	            msg = "闯关成功，独孤求败！";
-	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
-	        } else {
-	            msg = "恭喜你刷新了纪录！";
-	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
-	        }
+            // 听力
+            msg = getMessage(student, vo, point, SIX);
         }else {
-	        if (point < PASS) {
-	            msg = "很遗憾，闯关失败，再接再厉。";
-	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
-	        } else if (point < FULL_MARK) {
-	            msg = "闯关成功，独孤求败！";
-	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
-	        } else {
-	            msg = "恭喜你刷新了纪录！";
-	            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
-	        }
+            msg = getMessage(student, vo, point, PASS);
+        }
+
+        // 保存测试记录详情
+        if (testDetail != null) {
+            this.saveTestDetail(testDetail, testId, classify, student);
         }
        
         vo.setMsg(msg);
@@ -752,9 +792,134 @@ public class TestServiceImpl implements TestService {
         vo.setGold(goldCount);
         countMyGoldUtil.countMyGold(student);
         ccieUtil.saveCcieTest(student, 1, classify);
+        studentMapper.updateByPrimaryKeySelective(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(vo);
     }
+
+    /**
+     * 根据学生分数获取响应的说明语
+     *
+     * @param student
+     * @param vo
+     * @param point
+     * @param pass  及格分数
+     * @return
+     */
+    private String getMessage(Student student, TestResultVo vo, Integer point, int pass) {
+        String msg;
+        if (point < pass) {
+            msg = "很遗憾，闯关失败，再接再厉。";
+            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
+        } else if (point < FULL_MARK) {
+            msg = "闯关成功，独孤求败！";
+            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
+        } else {
+            msg = "恭喜你刷新了纪录！";
+            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+        }
+        return msg;
+    }
+
+    /**
+     * @param testDetail
+     * @param testRecordId
+     * @param modelType    1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写; 20:能力值测试
+     */
+    private void saveTestDetail(String testDetail, Long testRecordId, int modelType, Student student) {
+        if (StringUtils.isEmpty(testDetail)) {
+            return;
+        }
+        JSONArray jsonArray = JSONObject.parseArray(testDetail);
+        if (jsonArray != null && jsonArray.size() > 0) {
+            JSONObject object;
+            List<TestRecordInfo> testRecordInfos = new ArrayList<>(20);
+            TestRecordInfo testRecordInfo;
+            for (Object aJsonArray : jsonArray) {
+                testRecordInfo = new TestRecordInfo();
+
+                object = (JSONObject) aJsonArray;
+                String word = object.getString("title");
+                final String[] selected = {null};
+                if (modelType != 8 && modelType != 9) {
+                    // 试卷题目
+                    JSONObject subject = object.getJSONObject("subject");
+                    final int[] j = {0};
+                    TestRecordInfo finalTestRecordInfo = testRecordInfo;
+                    JSONObject finalObject = object;
+                    subject.forEach((key, val) -> {
+                        if (Objects.equals(subject.get(key), true)) {
+                            finalTestRecordInfo.setAnswer(matchSelected(j[0]));
+                        }
+                        this.setOptions(finalTestRecordInfo, j[0], key);
+                        if (finalObject.getJSONObject("userInput") != null) {
+                            selected[0] = this.matchSelected(finalObject.getJSONObject("userInput").getInteger("optionIndex"));
+                        }
+                        finalTestRecordInfo.setWord(word);
+                        j[0]++;
+                    });
+                } else {
+                    selected[0] = object.getString("userInput");
+                    String chinese = object.getString("chinese");
+                    testRecordInfo.setWord(chinese);
+                    testRecordInfo.setAnswer(word);
+                }
+
+                testRecordInfo.setTestId(testRecordId);
+                testRecordInfo.setSelected(selected[0]);
+                testRecordInfos.add(testRecordInfo);
+            }
+            if (testRecordInfos.size() > 0) {
+                try {
+                    testRecordInfoMapper.insertList(testRecordInfos);
+                } catch (Exception e) {
+                    LOGGER.error("学生测试记录详情保存失败：studentId=[{}], testId=[{}], modelType=[{}], error=[{}]",
+                            student.getId(), testRecordId, modelType, e.getMessage());
+                }
+            }
+        }
+    }
+
+
+    private void setOptions(TestRecordInfo testRecordInfo, int j, String option) {
+        switch (j) {
+            case 0:
+                testRecordInfo.setOptionA(option);
+                break;
+            case 1:
+                testRecordInfo.setOptionB(option);
+                break;
+            case 2:
+                testRecordInfo.setOptionC(option);
+                break;
+            case 3:
+                testRecordInfo.setOptionD(option);
+                break;
+            default:
+        }
+    }
+
+    /**
+     * 匹配选项
+     *
+     * @param integer
+     * @return
+     */
+    private String matchSelected(Integer integer) {
+        switch (integer) {
+            case 0:
+                return "A";
+            case 1:
+                return "B";
+            case 2:
+                return "C";
+            case 3:
+                return "D";
+            default:
+                return null;
+        }
+    }
+
 
     /**
      * 保存金币变化日志信息
@@ -766,7 +931,6 @@ public class TestServiceImpl implements TestService {
      */
     private void saveLog(Student student, int goldCount, WordUnitTestDTO wordUnitTestDTO, String model) {
         student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldCount));
-        studentMapper.updateByPrimaryKeySelective(student);
         String msg;
         if (wordUnitTestDTO != null) {
             msg = "id为：" + student.getId() + "的学生在" + commonMethod.getTestType(wordUnitTestDTO.getClassify())
@@ -820,7 +984,8 @@ public class TestServiceImpl implements TestService {
             }
         } else {
             // 查询当前单元测试历史最高分数
-            int betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), wordUnitTestDTO.getUnitId()[0], wordUnitTestDTO.getClassify());
+            int betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), wordUnitTestDTO.getUnitId()[0],
+                    wordUnitTestDTO.getClassify());
 
             // 非首次测试成绩大于或等于80分并且本次测试成绩大于历史最高分，超过历史最高分次数 +1并且金币奖励翻倍
             if (point >= PASS && betterPoint < wordUnitTestDTO.getPoint()) {
@@ -849,7 +1014,7 @@ public class TestServiceImpl implements TestService {
      * @param goldCount       奖励的金币数
      * @return
      */
-    private int saveTestRecord(Long courseId, Student student, HttpSession session, WordUnitTestDTO wordUnitTestDTO,
+    private Long saveTestRecord(Long courseId, Student student, HttpSession session, WordUnitTestDTO wordUnitTestDTO,
                                TestRecord testRecordOld, Integer goldCount) {
         // 新生成的测试记录
         TestRecord testRecord;
@@ -890,7 +1055,8 @@ public class TestServiceImpl implements TestService {
         testRecord.setAwardGold(goldCount);
 
         getUnitTestMsg(testRecord, point);
-        return testRecordMapper.insert(testRecord);
+        testRecordMapper.insert(testRecord);
+        return testRecord.getId();
     }
 
     private void getUnitTestMsg(TestRecord testRecord, int point) {
@@ -904,22 +1070,17 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId, Integer studyModel,
-                                                                         Boolean isSure, Integer type) {
+    public ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId, Integer type, Integer pageNum) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         student = studentMapper.selectByPrimaryKey(student.getId());
-        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-
-        // 判断学生当前单元有无进行单元闯关测试记录，如果已参加过单元闯关测试，提示其需要花费金币购买测试机会，如果还没有测试记录可以免费进行测试
-        int flag = this.isFirstTest(student, unitId, commonMethod.getTestType(studyModel), isSure);
-        if (flag == 1) {
-            return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该单元闯关测试，再次参加需扣除1金币。");
-        } else if (flag == 2) {
-            return ServerResponse.createByError(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
+        if (session.getAttribute(TimeConstant.BEGIN_START_TIME) == null) {
+            session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         }
-        // 获取当前单元下的所有例句 limit 20
-        List<Sentence> sentences = sentenceMapper.selectByUnitId(student.getId(), unitId);
-        List<SentenceTranslateVo> sentenceTestResults = testResultUtil.getSentenceTestResults(sentences, studyModel, type);
+
+        // 获取当前单元下其中一个例句
+        PageHelper.startPage(pageNum, 1);
+        List<Sentence> sentences = sentenceMapper.selectOneByUnitId(student.getId(), unitId);
+        List<SentenceTranslateVo> sentenceTestResults = testResultUtil.getSentenceTestResults(sentences, MathUtil.getRandom(4, 6), type);
         return ServerResponse.createBySuccess(sentenceTestResults);
     }
 
@@ -1047,8 +1208,7 @@ public class TestServiceImpl implements TestService {
 
         // 保存摸底测试记录
         int count = testRecordMapper.insertSelective(testRecord);
-
+        studentMapper.updateByPrimaryKeySelective(student);
         return ServerResponse.createBySuccess(vo);
     }
-
 }

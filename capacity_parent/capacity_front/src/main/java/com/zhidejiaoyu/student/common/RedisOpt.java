@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.common;
 
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ public class RedisOpt {
     @Autowired
     private LevelMapper levelMapper;
 
+    @Autowired
+    private SentenceMapper sentenceMapper;
+
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
@@ -62,8 +66,14 @@ public class RedisOpt {
         return count;
     }
 
+    /**
+     * 当前单元下所有单词信息
+     *
+     * @param unitId
+     * @return
+     */
     public List<Vocabulary> getWordInfoInUnit(Long unitId) {
-        String hKey = RedisKeysConst.WORD_INFO__IN_UNIT + unitId;
+        String hKey = RedisKeysConst.WORD_INFO_IN_UNIT + unitId;
         List<Vocabulary> vocabularies;
         Object object = getRedisObject(hKey);
         if (object == null) {
@@ -78,6 +88,29 @@ public class RedisOpt {
             }
         }
         return vocabularies;
+    }
+
+    /**
+     * 当前单元下所有句型信息
+     *
+     * @param unitId
+     * @return
+     */
+    public List<Sentence> getSentenceInfoInUnit(Long unitId) {
+        String hKey = RedisKeysConst.SENTENCE_INFO_IN_UNIT + unitId;
+        List<Sentence> sentences;
+        Object redisObject = getRedisObject(hKey);
+        if (redisObject == null) {
+            sentences = sentenceMapper.selectByUnitId(unitId);
+        } else {
+            try {
+                sentences = (List<Sentence>) redisObject;
+            } catch (Exception e) {
+                log.error("类型转换错误，object=[{}], unitId=[{}], error=[{}]", redisObject, unitId, e.getMessage());
+                sentences = sentenceMapper.selectByUnitId(unitId);
+            }
+        }
+        return sentences;
     }
 
     /**

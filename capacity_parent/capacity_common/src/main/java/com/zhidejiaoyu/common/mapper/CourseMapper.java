@@ -18,8 +18,6 @@ public interface CourseMapper extends BaseMapper<Course> {
 
     int deleteByPrimaryKey(Long id);
 
-    //int insert(Course record);
-
     int insertSelective(Course record);
 
     List<Course> selectByExample(CourseExample example);
@@ -329,4 +327,20 @@ public interface CourseMapper extends BaseMapper<Course> {
      * @return
      */
     List<Map<String, Object>> selectTextCourseIdAndCourseNameByStudentId(Long studentId);
+
+    /**
+     * 获取学生
+     * @param student
+     * @return
+     */
+    List<Map<String, Object>> selectVersionByStudent(@Param("student") Student student);
+
+    /**
+     * 获取学生当前版本下所有课程信息 id，courseName
+     *
+     * @param student
+     * @param versionName
+     * @return
+     */
+    List<Map<String, Object>> selectCourseByVersion(@Param("student") Student student, @Param("versionName") String versionName);
 }

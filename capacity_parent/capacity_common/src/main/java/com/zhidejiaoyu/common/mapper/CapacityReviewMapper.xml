@@ -547,10 +547,10 @@
         from learn
         where student_id = #{studentId}
         and study_model = #{classify}
-        <if test="classify >= 4">
+        <if test="flag >= 4">
             and vocabulary_id is null
         </if>
-        <if test="classify &lt; 4">
+        <if test="flag &lt; 4">
             and example_id is null
         </if>
         <if test="courseIds.size > 0">
@@ -571,5 +571,10 @@
     <select id="countRipeWord" resultType="java.lang.Integer" parameterType="map">
         <include refid="testCenterSql"/>
         and status = 1
+    </select>
+    <select id="countByPushByCourseId" resultType="java.lang.Integer" parameterType="map">
+        select count(id) from
+        <include refid="classify_sql"/>
+        where student_id = #{studentId} and course_id = #{course} and push &lt; #{now} and memory_strength &lt; 1
     </select>
 </mapper>

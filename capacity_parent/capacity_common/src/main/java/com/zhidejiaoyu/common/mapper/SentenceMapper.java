@@ -227,11 +227,19 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
     /**
      * 获取当前单元下所有例句信息
      *
+     * @param unitId
+     * @return
+     */
+    List<Sentence> selectByUnitId(@Param("unitId") Long unitId);
+
+    /**
+     * 获取当前单元下未测试的一个句型
+     *
      * @param studentId
      * @param unitId
      * @return
      */
-    List<Sentence> selectByUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+    List<Sentence> selectOneByUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 
     /**
      * 获取句型好声音题目
@@ -241,4 +249,13 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
      * @return
      */
     List<Sentence> selectSentenceVoice(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+
+    /**
+     * 获取当前单元还未学习过的句型信息
+     *
+     * @param studentId
+     * @param unitId
+     * @return
+     */
+    List<Sentence> selectUnlearnInBookPlayer(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 }

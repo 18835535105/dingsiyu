@@ -17,7 +17,7 @@ import java.util.Map;
  * @author wuchenxi
  * @date 2018年5月8日
  */
-public interface TestService {
+public interface TestService extends BaseService<TestRecord> {
 
     /**
      * 获取测试题
@@ -67,23 +67,22 @@ public interface TestService {
 
     /**
      * 保存单元测试记录，学习记录，更新记忆追踪数据(包括单词和例句单元测试)
-     *  @param session
+     * @param session
      * @param wordUnitTestDTO 需要保存的数据的参数
+     * @param testDetail
      */
-    ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO);
+    ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO, String testDetail);
 
     /**
      * 获取单元闯关的测试题
      *
      * @param session
      * @param unitId
-     * @param studyModel 学习模块（例句听力，例句翻译，例句默写）
-     * @param isSure     是否确认消费1金币进行测试 true:是；false：否
      * @param type 1:普通模式；2：暴走模式
+     * @param pageNum
      * @return
      */
-    ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId, Integer studyModel,
-                                                                  Boolean isSure, Integer type);
+    ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId, Integer type, Integer pageNum);
 
     ServerResponse<Object> showRecord(String course_id, HttpSession session, Integer page, Integer rows);
 
@@ -100,4 +99,13 @@ public interface TestService {
     ServerResponse<Object> getPreSchoolTest(HttpSession session);
 
     ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, TestRecord testRecord);
+
+    /**
+     * 保存句型单元闯关测试
+     *
+     * @param session
+     * @param dto
+     * @return
+     */
+    ServerResponse saveSentenceUnitTest(HttpSession session, WordUnitTestDTO dto);
 }

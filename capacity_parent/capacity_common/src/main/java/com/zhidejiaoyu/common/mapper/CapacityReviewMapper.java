@@ -63,9 +63,11 @@ public interface CapacityReviewMapper {
 	 * @param studentId
 	 * @param courseIds
 	 * @param classify
+	 * @param flag
 	 * @return
 	 */
-	Integer countAlreadyStudyWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds, @Param("classify") String classify);
+	Integer countAlreadyStudyWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds,
+								  @Param("classify") String classify, @Param("flag") int flag);
 
 	/**
 	 * 学生当前课程下已学生词数
@@ -73,9 +75,11 @@ public interface CapacityReviewMapper {
 	 * @param studentId
 	 * @param courseIds
 	 * @param classify
+	 * @param flag
 	 * @return
 	 */
-	Integer countAccrueWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds, @Param("classify") String classify);
+	Integer countAccrueWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds,
+							@Param("classify") String classify,  @Param("flag") int flag);
 
 	/**
 	 * 学生当前课程下已学熟词数
@@ -83,9 +87,11 @@ public interface CapacityReviewMapper {
 	 * @param studentId
 	 * @param courseIds
 	 * @param classify
+	 * @param flag
 	 * @return
 	 */
-	Integer countRipeWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds, @Param("classify") String classify);
+	Integer countRipeWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds,
+						  @Param("classify") String classify,  @Param("flag") int flag);
 
 	// 模块1已学题
 	@Select("select a.id, a.word, a.word_chinese as wordChinese, a.recordpicurl from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id	and b.unit_id = #{unit_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id  AND a.delStatus = 1")
@@ -321,4 +327,14 @@ public interface CapacityReviewMapper {
 	 * @return
 	 */
 	int countLastLoginNeedReview(@Param("studentId") Long studentId, @Param("maps") List<Map<String, Object>> maps, @Param("classify") int classify);
+
+	/**
+	 * 统计各个模块需要进行复习的个数
+	 *
+	 * @param studentId
+	 * @param now
+	 * @param i	学习模块 0：单词图鉴，1：慧记忆 2：慧听写 3：慧默写 4：例句听力 5：例句翻译 6：例句默写
+	 * @return
+	 */
+    int countByPushByCourseId(@Param("studentId") Long studentId, @Param("now") String now, @Param("i") int i);
 }

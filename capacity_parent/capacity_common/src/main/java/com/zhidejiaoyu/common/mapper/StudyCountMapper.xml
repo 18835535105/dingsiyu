@@ -102,12 +102,6 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.StudyCount">
-        insert into study_count (id, student_id, course_id,
-                                 count, study_count)
-        values (#{id,jdbcType=BIGINT}, #{studentId,jdbcType=BIGINT}, #{courseId,jdbcType=BIGINT},
-                #{count,jdbcType=INTEGER}, #{studyCount,jdbcType=INTEGER})
-    </insert>
     <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.StudyCount">
         insert into study_count
         <trim prefix="(" suffix=")" suffixOverrides=",">

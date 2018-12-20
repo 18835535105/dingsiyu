@@ -65,6 +65,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     private DurationMapper durationMapper;
 
     @Autowired
+    private CapacityStudentUnitMapper capacityStudentUnitMapper;
+
+    @Autowired
     private CcieUtil ccieUtil;
     /**
      * 节点学完, 把下一节初始化到student_flow表, 并把下一节点返回
@@ -381,8 +384,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
      * @param student
      */
     private void clearLearnRecord(Student student) {
-        Long unitId = student.getUnitId();
         Long studentId = student.getId();
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
+        Long unitId = capacityStudentUnit.getUnitId();
 
         learnMapper.deleteByStudentIdAndUnitId(studentId, unitId);
         capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, unitId);
@@ -399,12 +403,13 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
      * @return
      */
     private ServerResponse<Object> toAnotherFlow(Student student, int flowId) {
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
         studentFlowMapper.updateFlowByStudentId(student.getId(), flowId);
         StudyFlow byPrimaryKey = studyFlowMapper.selectById(flowId);
-        byPrimaryKey.setCourseId(student.getCourseId());
-        byPrimaryKey.setUnitId(student.getUnitId());
-        byPrimaryKey.setCourseName(student.getCourseName());
-        byPrimaryKey.setUnitName(student.getUnitName());
+        byPrimaryKey.setCourseId(capacityStudentUnit.getCourseId());
+        byPrimaryKey.setUnitId(capacityStudentUnit.getUnitId());
+        byPrimaryKey.setCourseName(capacityStudentUnit.getCourseName());
+        byPrimaryKey.setUnitName(capacityStudentUnit.getUnitName());
         return ServerResponse.createBySuccess("true", byPrimaryKey);
     }
 
@@ -617,14 +622,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             // 根据学生id，课程id和下一个单元id开启下个单元
             studentUnitMapper.updateStatus(student.getId(), courseId, nextUnitId);
 
-            // 更新学生信息
-            // 单词类
-            student.setUnitId(nextUnitId);
-            student.setUnitName(unit.getUnitName());
-            student.setSentenceUnitName(unit.getUnitName());
-            student.setSentenceUnitId(Integer.valueOf(nextUnitId.toString()));
-            studentMapper.updateByPrimaryKeySelective(student);
-
+            // 记录学生开启的单元信息
+            saveCurrentCourseAndUnitInfo(student, courseId, nextUnitId, unit);
         } else {
             // 本课程已学习完
             // 奖励学生课程证书
@@ -638,13 +637,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 if (units.size() > 0) {
                     unit = units.get(0);
                     nextUnitId = unit.getId();
-                    // 更新学生信息
-                    // 单词类
-                    student.setUnitId(unit.getId());
-                    student.setUnitName(unit.getUnitName());
-                    student.setSentenceUnitName(unit.getUnitName());
-                    student.setSentenceUnitId(Integer.valueOf(unit.getId().toString()));
-                    studentMapper.updateByPrimaryKeySelective(student);
+
+                    // 记录学生开启的单元信息
+                    saveCurrentCourseAndUnitInfo(student, courseId, nextUnitId, unit);
                 }
             }
         }
@@ -653,6 +648,32 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         // 更新学生session
         Student student1 = studentMapper.selectByPrimaryKey(student.getId());
         session.setAttribute(UserConstant.CURRENT_STUDENT, student1);
+    }
+
+    private void saveCurrentCourseAndUnitInfo(Student student, Long courseId, Long nextUnitId, Unit unit) {
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+        if (capacityStudentUnit == null) {
+            // 没有学生当前学习的单元信息，保存
+            capacityStudentUnit = packageCapacityStudentUnit(student, courseId, nextUnitId, unit);
+            capacityStudentUnitMapper.insert(capacityStudentUnit);
+        } else {
+            // 已有当前学习的单元信息，更新
+            CapacityStudentUnit capacityStudentUnit1 = packageCapacityStudentUnit(student, unit.getCourseId(), nextUnitId, unit);
+            capacityStudentUnit1.setId(capacityStudentUnit.getId());
+            capacityStudentUnitMapper.updateById(capacityStudentUnit1);
+        }
+    }
+
+    private CapacityStudentUnit packageCapacityStudentUnit(Student student, Long courseId, Long nextUnitId, Unit unit) {
+        CapacityStudentUnit capacityStudentUnit = new CapacityStudentUnit();
+        Course course = courseMapper.selectById(courseId);
+        capacityStudentUnit.setCourseId(courseId);
+        capacityStudentUnit.setStudentId(student.getId());
+        capacityStudentUnit.setType(1);
+        capacityStudentUnit.setUnitId(nextUnitId);
+        capacityStudentUnit.setUnitName(unit.getUnitName());
+        capacityStudentUnit.setCourseName(course.getCourseName());
+        return capacityStudentUnit;
     }
 
     private void saveOpenUnitLog(Student student, Long unitId, Long nextUnitId) {

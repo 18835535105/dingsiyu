@@ -62,4 +62,13 @@ public class WordUnitTestDTO {
     @Max(value = 100, message = "分数最大值为100")
     private Integer point;
 
+    /**
+     * 错题数量(用于例句单元闯关测试)
+     */
+    private Integer errorCount;
+
+    /**
+     * 正确题数量(用于例句单元闯关测试)
+     */
+    private Integer rightCount;
 }

@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.common;
 
 import com.zhidejiaoyu.common.constant.TimeConstant;
+import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
@@ -8,6 +9,7 @@ import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,6 +24,7 @@ import java.util.Date;
  * @author wuchenxi
  * @date 2018/6/29 14:25
  */
+@Slf4j
 @Component
 public class SaveTestLearnAndCapacity {
 
@@ -123,6 +126,54 @@ public class SaveTestLearnAndCapacity {
     }
 
     /**
+     * 测试模块 保存学习记录和记忆追踪信息
+     *
+     * @param correctWord  答对的单词/例句
+     * @param errorWord     答错的单词/例句
+     * @param correctWordId 答对的单词/例句 id
+     * @param errorWordId   答错的单词/例句 id
+     * @param session       session信息
+     * @param unitId        如果单元id长度为1，说明当前测试是以单元为单位的测试；如果长度大于1，说明当前测试是以课程为单位的测试
+     * @param type   1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写;
+     * @return 响应信息
+     */
+    public void saveTestAndCapacity(String[] correctWord, String[] errorWord, Integer[] correctWordId,
+                                    Integer[] errorWordId, HttpSession session,
+                                    Long[] unitId, Integer type) {
+
+        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+
+        log.info("======== 测试模块 保存学习记录和记忆追踪信息 ========");
+        log.info("correctWordId:{}; errorWordId:{}; studentId:{}; unitId:{}; type:{};", correctWordId, errorWordId, student.getId(), unitId, type);
+
+        // 保存正确单词/例句的学习记录和记忆追踪信息
+        if (correctWord != null && correctWordId != null && correctWord.length > 0
+                && correctWord.length == correctWordId.length) {
+            int correctWordLength = correctWord.length;
+            for (int i = 0; i < correctWordLength; i++) {
+                if (unitId.length == 1) {
+                    this.saveLearnAndCapacity(session, student, unitId[0], correctWordId[i], type, true);
+                } else {
+                    this.saveLearnAndCapacity(session, student, unitId[i], correctWordId[i], type, true);
+                }
+            }
+        }
+
+        // 保存错误单词/例句的学习记录和记忆追踪信息
+        if (errorWord != null && errorWordId != null && errorWord.length > 0
+                && errorWord.length == errorWordId.length) {
+            int errorWordLength = errorWord.length;
+            for (int i = 0; i < errorWordLength; i++) {
+                if (unitId.length == 1) {
+                    this.saveLearnAndCapacity(session, student, unitId[0], Integer.valueOf(errorWordId[i].toString()), type, false);
+                } else {
+                    this.saveLearnAndCapacity(session, student, unitId[i], Integer.valueOf(errorWordId[i].toString()), type, false);
+                }
+            }
+        }
+    }
+
+    /**
      * 保存学习记录和记忆追踪记录
      *
      * @param session session 信息
@@ -149,6 +200,7 @@ public class SaveTestLearnAndCapacity {
 
         if (learn == null) {
             // 无学习记录
+            log.error("学生[{}]-[{}]没有当前模块学习记录：单元id[{}],单词id[{}],模块type[{}]", student.getId(), student.getStudentName(), unitId, id, classify);
             return 0;
         }
         // 保存记忆追踪信息

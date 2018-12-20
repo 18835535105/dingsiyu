@@ -57,17 +57,17 @@ public interface CourseService extends BaseService<Course> {
 
     ServerResponse<Object> postStudentByCourse(Integer unitId, Integer model, HttpSession session);
 
-	ServerResponse<Object> clickLearn(Integer courseId, int model, HttpSession session);
+    ServerResponse<Object> clickLearn(Integer courseId, int model, HttpSession session);
 
-	ServerResponse<Object> breakthrough(HttpSession session, Integer model);
+    ServerResponse<Object> breakthrough(HttpSession session, Integer model);
 
     /**
      * 获取课程下的所有单元信息及每单元的单词数量
      *
-     * @param courseId  课程id
+     * @param courseId 课程id
      * @return
      */
-    ServerResponse<List<Map<String,Object>>> getAllUnit(Long courseId);
+    ServerResponse<List<Map<String, Object>>> getAllUnit(Long courseId);
 
     ServerResponse<Object> postUnit(HttpSession session, int unitId, int model);
 
@@ -75,7 +75,7 @@ public interface CourseService extends BaseService<Course> {
      * 获取学生可学习的所有课程及课程下单词/例句数量
      *
      * @param session
-     * @param type 1:单词；2：句子
+     * @param type    1:单词；2：句子
      * @return
      */
     ServerResponse<List<Map<String, Object>>> getAllCourses(HttpSession session, Integer type);
@@ -89,7 +89,7 @@ public interface CourseService extends BaseService<Course> {
      * @param pageSize
      * @return
      */
-    ServerResponse<PageInfo<Map<String,Object>>> getUnitPage(HttpSession session, Long courseId, Integer pageNum, Integer pageSize);
+    ServerResponse<PageInfo<Map<String, Object>>> getUnitPage(HttpSession session, Long courseId, Integer pageNum, Integer pageSize);
 
     /**
      * 获取学生所有课程id及课程名称
@@ -98,4 +98,21 @@ public interface CourseService extends BaseService<Course> {
      * @return
      */
     ServerResponse<List<Map<String, Object>>> getAllCoursesInfo(HttpSession session);
+
+    /**
+     * 获取学生所有可学习的版本名称
+     *
+     * @param session
+     * @return
+     */
+    ServerResponse<List<Map<String, Object>>> getVersion(HttpSession session);
+
+    /**
+     * 获取版本下所有课程信息
+     *
+     * @param session
+     * @param versionName
+     * @return
+     */
+    ServerResponse<List<Map<String, Object>>> getCourseByVersion(HttpSession session, String versionName);
 }

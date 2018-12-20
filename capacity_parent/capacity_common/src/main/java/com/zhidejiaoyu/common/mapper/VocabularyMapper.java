@@ -192,7 +192,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * 获取当前课程下的单词总量
      *
      * @param courseId
-     * @param flag 1：单词图鉴 2：其他
+     * @param flag     1：单词图鉴 2：其他
      * @return
      */
     int countByCourseId(@Param("courseId") Long courseId, @Param("flag") Integer flag);
@@ -308,7 +308,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
 
     List<Map<String, Object>> getWordIdByCourse(@Param("correctWordId") Long correctWordId, @Param("courseId") Long courseId, @Param("unidId") Long unidId);
 
-    Map<String,Object> getNotNeedReviewWord(@Param("unitId") Long unidId,@Param("studentId") Long studentId);
+    Map<String, Object> getNotNeedReviewWord(@Param("unitId") Long unidId, @Param("studentId") Long studentId);
 
     List<Vocabulary> getWordPicAll(@Param("unitId") Long unitId);
 
@@ -316,7 +316,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
 
     List<Vocabulary> getWordIdByAll(@Param("size") int size);
 
-    List<Map<String,Object>> getWordIdByUnit(@Param("id") Long id, @Param("unitId")String unitId);
+    List<Map<String, Object>> getWordIdByUnit(@Param("id") Long id, @Param("unitId") String unitId);
 
     List<Vocabulary> getMemoryWordPicAll(@Param("unit_id") long unit_id, @Param("studentId") Long studentId, @Param("data") String data);
 
@@ -332,7 +332,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
     /**
      * 查询当前单元指定模块的单词个数
      *
-     * @param courseId     单元id
+     * @param courseId   单元id
      * @param studyModel 学习模块 （慧记忆，慧听写，慧默写，单词图鉴）
      * @return
      */
@@ -364,4 +364,13 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     List<Vocabulary> selectWordVoice(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+
+    /**
+     * 查询单词本中单词播放机还未学习的单词
+     *
+     * @param studentId
+     * @param unitId
+     * @return
+     */
+    List<Vocabulary> selectUnlearnInBookPlayer(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 }

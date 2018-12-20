@@ -167,20 +167,6 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.TestRecord" >
-        insert into test_record (id, student_id, course_id,
-                                 unit_id, genre, test_start_time,
-                                 test_end_time, point, history_best_point,
-                                 history_bad_point, quantity, `explain`,
-                                 error_count, right_count, study_model,
-                                 award_gold, better_count)
-        values (#{id,jdbcType=BIGINT}, #{studentId,jdbcType=BIGINT}, #{courseId,jdbcType=BIGINT},
-                #{unitId,jdbcType=BIGINT}, #{genre,jdbcType=VARCHAR}, #{testStartTime,jdbcType=TIMESTAMP},
-                #{testEndTime,jdbcType=TIMESTAMP}, #{point,jdbcType=INTEGER}, #{historyBestPoint,jdbcType=INTEGER},
-                #{historyBadPoint,jdbcType=INTEGER}, #{quantity,jdbcType=INTEGER}, #{explain,jdbcType=VARCHAR},
-                #{errorCount,jdbcType=INTEGER}, #{rightCount,jdbcType=INTEGER}, #{studyModel,jdbcType=VARCHAR},
-                #{awardGold,jdbcType=INTEGER}, #{betterCount,jdbcType=INTEGER})
-    </insert>
     <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.TestRecord" >
         insert into test_record
         <trim prefix="(" suffix=")" suffixOverrides="," >

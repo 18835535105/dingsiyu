@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.zhidejiaoyu.common.pojo.CapacityStudentUnit;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.CapacityStudentUnit;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -18,7 +18,7 @@ public interface CapacityStudentUnitMapper extends BaseMapper<CapacityStudentUni
      * 获取学生当前模块正在学习的课程和单元
      *
      * @param studentId
-     * @param type
+     * @param type  学习模块：1：单词模块；2：例句听力；3：例句默写；4：例句翻译
      * @return
      */
     CapacityStudentUnit selectCurrentUnitIdByStudentIdAndType(@Param("studentId") Long studentId, @Param("type") Integer type);
