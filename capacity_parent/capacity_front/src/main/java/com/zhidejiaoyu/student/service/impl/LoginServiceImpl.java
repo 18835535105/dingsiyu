@@ -763,11 +763,11 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 
                 // 第二次登陆
                 // 游戏测试次数
-                int count = Integer.parseInt(testRecords.get(0).getExplain().split("#")[1]);
+                /*int count = Integer.parseInt(testRecords.get(0).getExplain().split("#")[1]);
                 if (count == 1) {
                     // 进行游戏测试
                     return ServerResponse.createBySuccess("5", result);
-                }
+                }*/
             }
 
             // 一个账户只能登陆一台

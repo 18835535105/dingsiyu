@@ -153,10 +153,10 @@ public class TestController {
      */
     @PostMapping("/saveWordUnitTest")
     public ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, @Valid WordUnitTestDTO wordUnitTestDTO,
-                                                         BindingResult bindingResult) {
+                                                         BindingResult bindingResult, String testDetail) {
         String msg = ValidateUtil.validate(bindingResult);
         if ("ok".equals(msg)) {
-            return testService.saveWordUnitTest(session, wordUnitTestDTO);
+            return testService.saveWordUnitTest(session, wordUnitTestDTO, testDetail);
         }
         return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), msg);
     }

@@ -67,10 +67,11 @@ public interface TestService extends BaseService<TestRecord> {
 
     /**
      * 保存单元测试记录，学习记录，更新记忆追踪数据(包括单词和例句单元测试)
-     *  @param session
+     * @param session
      * @param wordUnitTestDTO 需要保存的数据的参数
+     * @param testDetail
      */
-    ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO);
+    ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO, String testDetail);
 
     /**
      * 获取单元闯关的测试题

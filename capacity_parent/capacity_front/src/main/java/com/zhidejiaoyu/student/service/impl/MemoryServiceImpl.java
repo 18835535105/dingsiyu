@@ -93,9 +93,12 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
 
         // 查询当前课程的学习遍数
         Integer maxCount = studyCountMapper.selectMaxCountByCourseId(student.getId(), courseId);
+        if (maxCount == null) {
+            maxCount = 1;
+        }
 
         // 查询学生当前单元下已学习单词的个数，即学习进度
-        Long plan = learnMapper.countLearnWord(student.getId(), unitId, "慧记忆", maxCount == null ? 1 : maxCount);
+        Long plan = learnMapper.countLearnWord(student.getId(), unitId, "慧记忆", maxCount);
         // 获取当前单元下的所有单词的总个数
         Long wordCount = unitVocabularyMapper.countByUnitId(unitId);
         if (wordCount == 0) {

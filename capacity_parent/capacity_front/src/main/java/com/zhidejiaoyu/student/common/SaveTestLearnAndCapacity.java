@@ -165,9 +165,9 @@ public class SaveTestLearnAndCapacity {
             int errorWordLength = errorWord.length;
             for (int i = 0; i < errorWordLength; i++) {
                 if (unitId.length == 1) {
-                    this.saveLearnAndCapacity(session, student, unitId[0], Integer.valueOf(correctWordId[i].toString()), type, false);
+                    this.saveLearnAndCapacity(session, student, unitId[0], Integer.valueOf(errorWordId[i].toString()), type, false);
                 } else {
-                    this.saveLearnAndCapacity(session, student, unitId[i], Integer.valueOf(correctWordId[i].toString()), type, false);
+                    this.saveLearnAndCapacity(session, student, unitId[i], Integer.valueOf(errorWordId[i].toString()), type, false);
                 }
             }
         }

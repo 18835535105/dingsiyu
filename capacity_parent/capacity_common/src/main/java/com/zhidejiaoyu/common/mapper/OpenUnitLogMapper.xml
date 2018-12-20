@@ -103,14 +103,6 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.OpenUnitLog">
-        insert into open_unit_log (id, student_id, current_unit_id, next_unit_id, create_time)
-        values (#{id,jdbcType=BIGINT},
-                #{studentId,jdbcType=BIGINT},
-                #{currentUnitId,jdbcType=BIGINT},
-                #{nextUnitId,jdbcType=BIGINT},
-                #{createTime,jdbcType=TIMESTAMP})
-    </insert>
     <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.OpenUnitLog">
         insert into open_unit_log
         <trim prefix="(" suffix=")" suffixOverrides=",">

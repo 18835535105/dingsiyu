@@ -130,12 +130,6 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.StudyFlow">
-        insert into study_flow (id, next_true_flow, next_false_flow,
-                                model_name, flow_name, type)
-        values (#{id,jdbcType=BIGINT}, #{nextTrueFlow,jdbcType=INTEGER}, #{nextFalseFlow,jdbcType=INTEGER},
-                #{modelName,jdbcType=VARCHAR}, #{flowName,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER})
-    </insert>
     <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.StudyFlow">
         insert into study_flow
         <trim prefix="(" suffix=")" suffixOverrides=",">

@@ -384,8 +384,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
      * @param student
      */
     private void clearLearnRecord(Student student) {
-        Long unitId = student.getUnitId();
         Long studentId = student.getId();
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
+        Long unitId = capacityStudentUnit.getUnitId();
 
         learnMapper.deleteByStudentIdAndUnitId(studentId, unitId);
         capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, unitId);

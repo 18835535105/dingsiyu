@@ -66,6 +66,8 @@ public class FtpUtil {
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
             // 设置新建的目录权限为 644
             ftpClient.sendCommand("site umask 022");
+
+            ftpClient.enterLocalPassiveMode();
 			return true;
 		} catch (Exception ex) {
 			this.close();
