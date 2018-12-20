@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.controller;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.common.pojo.Learn;
+import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.SentenceService;
 import com.zhidejiaoyu.student.vo.SentenceWordInfoVo;
@@ -120,4 +121,10 @@ public class SentenceController {
     public ServerResponse<List<CourseUnitVo>> getLearnCourseAndUnit(HttpSession session) {
         return sentenceService.getLearnCourseAndUnit(session);
     }
+
+
+
+
+
+
 }

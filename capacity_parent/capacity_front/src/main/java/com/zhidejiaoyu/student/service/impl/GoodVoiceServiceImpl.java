@@ -128,24 +128,74 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
         Student student = getStudent(session);
         // 上传录音文件
-        String fileName = FileConstant.GOOD_VOICE + ftpUtil.uploadGoodVoice(audio, FileConstant.GOOD_VOICE);
-        log.info("上传数据 wordId :"+wordId+"  word :"+word+"    type :"+type+"   count"+count+"  audio :"+audio);
+        String fileName =null ;
+        /*try{*/
+            String file=  ftpUtil.uploadGoodVoice(audio, FileConstant.GOOD_VOICE);
+            fileName=FileConstant.GOOD_VOICE +file;
+        /*}catch (Exception e){
+            try{
+                fileName= FileConstant.GOOD_VOICE + ftpUtil.uploadGoodVoice(audio, FileConstant.GOOD_VOICE);
+            }catch (Exception s) {
+                System.out.println("读音报错");
+            }
+        }*/
+
+        System.out.println("上传数据 wordId :"+wordId+"  word :"+word+"    type :"+type+"   count"+count+"  audio :"+audio);
         String url = prefix + fileName;
-        int score;
+        int score=0;
         Map<String, Object> map;
         if (type == 1) {
-            map = goodVoiceUtil.getWordEvaluationRecord(word, url);
-            score = (int) map.get("score");
+            if(file!=null){
+                map = goodVoiceUtil.getWordEvaluationRecord(word, url);
+                score = (int) map.get("score");
+                map.put("flow",true);
+            }else{
+                map=new HashMap<>();
+                map.put("score",0);
+                map.put("heart",0);
+                map.put("flow",false);
+            }
         } else {
-            map = goodVoiceUtil.getSentenceEvaluationRecord(word, url);
-            score = (int) map.get("totalScore");
+            if(file!=null){
+                System.out.println("fileName  :"+fileName);
+                System.out.println("url  :"+url);
+                map = goodVoiceUtil.getSentenceEvaluationRecord(word, url);
+                score = (int) map.get("totalScore");
+                map.put("flow",true);
+            }else{
+                map=new HashMap<>();
+                map.put("flow",false);
+                String[] s = word.split(" ");
+                List<Map<String,Object>> resList=new ArrayList<>();
+                for(String wo : s ){
+                    Map<String,Object> resMap=new HashMap<>();
+                    Map<String,Object> ressMap = null;
+                    if (wo.endsWith(",") || wo.endsWith("!") ||wo.endsWith("?") || wo.endsWith(".")) {
+                        resMap.put("word", wo.substring(0, wo.length() - 1));
+                        ressMap=new HashMap<>();
+                        ressMap.put("word", wo.substring(wo.length() - 1));
+                        resMap.put("score",0);
+                        resMap.put("color","red");
+                        resList.add(resMap);
+                    } else {
+                        resMap.put("word", wo);
+                    }
+                    resMap.put("score",0);
+                    resMap.put("color","red");
+                    resList.add(resMap);
+                    if(ressMap!=null){
+                        resList.add(ressMap);
+                    }
+                }
+                map.put("word",resList);
+            }
         }
         map.put("voiceUrl", url);
 
         Long courseId = unitMapper.selectCourseIdByUnitId(unitId);
-
-        saveVoice(unitId, wordId, type, student, fileName, score, courseId,count);
-
+        if(file!=null){
+            saveVoice(unitId, wordId, type, student, fileName, score, courseId,count);
+        }
 
         return ServerResponse.createBySuccess(map);
     }
