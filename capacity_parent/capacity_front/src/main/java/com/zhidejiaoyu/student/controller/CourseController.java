@@ -186,13 +186,13 @@ public class CourseController {
      * 获取课程下的所有单元信息及每单元的单词数量
      *
      * @param courseId 课程id
+     * @param showAll true：含有“全部单元”字样；false:不含有“全部单元字样”
      * @return
      */
     @ResponseBody
     @GetMapping("/getAllUnit")
-    public ServerResponse<List<Map<String, Object>>> getAllUnit(Long courseId) {
-        Assert.notNull(courseId, "courseId 不能为null");
-        return courseService.getAllUnit(courseId);
+    public ServerResponse<List<Map<String, Object>>> getAllUnit(Long courseId, @RequestParam(required = false, defaultValue = "true") Boolean showAll) {
+        return courseService.getAllUnit(courseId, showAll);
     }
 
     /**

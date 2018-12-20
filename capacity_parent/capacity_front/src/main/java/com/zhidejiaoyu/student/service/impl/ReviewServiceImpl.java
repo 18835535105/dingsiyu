@@ -243,18 +243,15 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     }
 
     @Override
-    public Map<String, Object> ReviewCapacity_memory(Long id, String unit_id, int classify, String course_id, boolean pattern) {
+    public Map<String, Object> reviewCapacityMemory(Student student, String unit_id, int classify, String course_id) {
 
-        // 复习上单元
-        if (pattern) {
-            unit_id = learnMapper.getEndUnitIdByStudentId(id);
-        }
+        Long studentId = student.getId();
 
         Map<String, Object> map = new HashMap<>(16);
 
         CapacityReview ca = new CapacityReview();
         // 查询条件1:学生id
-        ca.setStudent_id(id);
+        ca.setStudent_id(studentId);
 
         String model = null;
         if (classify == 1) {
@@ -266,20 +263,17 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         }
 
         // 智能复习, 根据单元查询
-        if (StringUtils.isNotBlank(unit_id) && StringUtils.isBlank(course_id)) {
+        if (StringUtils.isNotBlank(unit_id) && StringUtils.isNotEmpty(course_id)) {
             // 查询条件2.1:单元id
             ca.setUnit_id(Long.valueOf(unit_id));
 
-            // 该单元已学单词  ./
-            Long count_ = learnMapper.learnCountWord(id, Integer.parseInt(unit_id), model);
-            map.put("plan", count_);
-
             // count单元表单词有多少个
-            Integer count = unitMapper.countWordByUnitid(unit_id);
+            Integer count = capacityMapper.countNeedReviewByCourseIdOrUnitId(student, Long.valueOf(course_id),
+                    Long.valueOf(unit_id), commonMethod.getTestType(classify));
             map.put("wordCount", count);
         }
         // 任务课程-复习, 根据课程查询
-        if (StringUtils.isNotBlank(course_id)) {
+        /*if (StringUtils.isNotBlank(course_id)) {
             // 查询条件2.2:课程id
             ca.setCourse_id(Long.valueOf(course_id));
 
@@ -291,12 +285,12 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             map.put("courseName", courseName);
 
             // 该课程已学单词
-            Long count_ = learnMapper.learnCourseCountWord(id, course_id, model);
+            Long count_ = learnMapper.learnCourseCountWord(studentId, course_id, model);
             map.put("plan", count_);
             // 该课程一共多少单词
             Integer count = unitMapper.countWordByCourse(course_id);
             map.put("wordCount", count);
-        }
+        }*/
         // 查询条件3:模块
         ca.setClassify(classify + "");
         // 查询条件4:当前时间
@@ -338,7 +332,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 记忆难度
         if (classify == 1) {
             CapacityMemory cm = new CapacityMemory();
-            cm.setStudentId(id);
+            cm.setStudentId(studentId);
             cm.setUnitId(Long.valueOf(unit_id));
             cm.setVocabularyId(vo.getVocabulary_id());
             cm.setMemoryStrength(vo.getMemory_strength());
@@ -351,56 +345,47 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     }
 
     @Override
-    public Object ReviewSentence_listen(Long stuId, String unit_id, int classify, String course_id, boolean pattern, Integer type) {
+    public Object reviewSentenceListen(Student student, String unit_id, int classify, String course_id, Integer type) {
 
-        // 复习上单元
-        if (pattern) {
-            unit_id = learnMapper.getEndUnitIdByStudentId(stuId);
-        }
-
+        Long studentId = student.getId();
         Map<String, Object> map = new HashMap<>(16);
         // 当前时间
         String dateTime = DateUtil.DateTime();
 
-        Random rand = new Random();
-//        int nextInt = rand.nextInt(2)+1;
         int nextInt = 1;
         // 例句id
         CapacityReview vo = null;
 
         // 1.去记忆追踪中获取需要复习的例句
         // 智能复习 (根据单元查询)
-        if (StringUtils.isNotBlank(unit_id) && StringUtils.isBlank(course_id)) {
+        if (StringUtils.isNotBlank(unit_id) && StringUtils.isNotBlank(course_id)) {
             if (classify == 4) {
                 // 例句听力
-                vo = capacityMapper.ReviewSentence_listen(stuId, unit_id, dateTime);
+                vo = capacityMapper.ReviewSentence_listen(studentId, unit_id, dateTime);
             } else if (classify == 5) {
                 // 例句翻译 sentence_translate
-                vo = capacityMapper.ReviewSentence_translate(stuId, unit_id, dateTime);
+                vo = capacityMapper.ReviewSentence_translate(studentId, unit_id, dateTime);
             } else if (classify == 6) {
                 // 例句默写 sentence_write
-                vo = capacityMapper.ReviewSentence_write(stuId, unit_id, dateTime);
+                vo = capacityMapper.ReviewSentence_write(studentId, unit_id, dateTime);
             }
 
-            // 当前单元下一共有多少例句/.
-            Long countWord = unitSentenceMapper.selectSentenceCountByUnitId(Long.valueOf(unit_id));
-            map.put("sentenceCount", countWord);
-
-            // 当前单元下已学./
-            Integer sum = learnMapper.selectNumberByStudentId(stuId, Integer.parseInt(unit_id), classify);
-            map.put("plan", sum);
+            // 需要复习的例句个数
+            int sentenceCount = capacityMapper.countNeedReviewByCourseIdOrUnitId(student, Long.valueOf(course_id),
+                    Long.valueOf(unit_id), commonMethod.getTestType(classify));
+            map.put("sentenceCount", sentenceCount);
         }
         // 任务课程-复习 (根据课程查询)
-        if (StringUtils.isNotBlank(course_id)) {
+        /*if (StringUtils.isNotBlank(course_id)) {
             if (classify == 4) {
                 // 例句听力
-                vo = capacityMapper.ReviewSentence_listenCourseId(stuId, course_id, dateTime);
+                vo = capacityMapper.ReviewSentence_listenCourseId(studentId, course_id, dateTime);
             } else if (classify == 5) {
                 // 例句翻译 sentence_translate
-                vo = capacityMapper.Reviewsentence_translateCourseId(stuId, course_id, dateTime);
+                vo = capacityMapper.Reviewsentence_translateCourseId(studentId, course_id, dateTime);
             } else if (classify == 6) {
                 // 例句默写 sentence_write
-                vo = capacityMapper.ReviewSentence_writeCourseId(stuId, course_id, dateTime);
+                vo = capacityMapper.ReviewSentence_writeCourseId(studentId, course_id, dateTime);
             }
 
             // 根据课程id获取课程名
@@ -410,11 +395,11 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
             // 该课程一共多少例句
             Long count_ = unitMapper.countSentenceByCourse(course_id);
-            map.put("sentenceCount", count_); // /.
+            map.put("sentenceCount", count_);
             // 该课程已学例句w
-            Integer count = learnMapper.learnCourseCountSentence(stuId, classify, Long.valueOf(course_id));
-            map.put("plan", count); // ./
-        }
+            Integer count = learnMapper.learnCourseCountSentence(studentId, classify, Long.valueOf(course_id));
+            map.put("plan", count);
+        }*/
 
         if (vo == null) {
             logger.info("courseid:{}->unitId:{} 下没有需要复习的句型", course_id, unit_id);
@@ -423,13 +408,16 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 2.通过记忆追踪中的例句id-获取例句信息 (vo.getVocabulary_id()是例句id)
         Sentence sentence = sentenceMapper.selectByPrimaryKey(vo.getVocabulary_id());
 
-        String english = sentence.getCentreExample().replace("#", " "); // 分割例句
-        String chinese = sentence.getCentreTranslate().replace("*", ""); // 分割翻译
+        // 分割例句
+        String english = sentence.getCentreExample().replace("#", " ");
+        // 分割翻译
+        String chinese = sentence.getCentreTranslate().replace("*", "");
 
         // 例句id
         map.put("id", sentence.getId());
         // 例句id
-        if (unit_id == null) { // 任务课程复习
+        // 任务课程复习
+        if (unit_id == null) {
             map.put("unitId", vo.getUnit_id());
         } else {// 智能复习
             map.put("unitId", unit_id);
@@ -960,20 +948,16 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     /**
      * 单词图鉴智能复习模块
      *
-     * @param studentId 学生id
+     * @param student 学生
      * @param unitId    单元id
      * @param model     1=单词图鉴模块
      * @param course_id 课程id
      * @return
      */
     @Override
-    public ServerResponse<Map<String, Object>> Reviewcapacity_picture(Long studentId, String unitId, int model, String course_id, String judge, boolean pattern) {
+    public ServerResponse<Map<String, Object>> reviewCapacityPicture(Student student, String unitId, int model, String course_id, String judge) {
 
-        // 复习上单元
-        if (pattern) {
-            unitId = learnMapper.getEndUnitIdByStudentId(studentId);
-        }
-
+        Long studentId = student.getId();
         // 1. 根据随机数获取题型, 并查出一道正确的题
         // 1.1 去慧记忆中查询单词图鉴是否有需要复习的单词
         Map<String, Object> correct;
@@ -1053,14 +1037,11 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 把四个选项添加到correct正确答案数据中
         correct.put("subject", subject);
 
-        // 3. count单元表单词有多少个查询存在图片的
-        Integer count = unitMapper.countWordByUnitidByPic(Long.valueOf(unitId));
+        // 需要复习的单词总数
+        Integer count = capacityMapper.countNeedReviewByCourseIdOrUnitId(student, Long.valueOf(course_id),
+                Long.valueOf(unitId), commonMethod.getTestType(0));
         correct.put("wordCount", count);
         correct.put("studyNew", false);
-
-        // 4. 该单元已学单词
-        Long learnedCount = learnMapper.learnCountWord(studentId, Integer.parseInt(unitId), "单词图鉴");
-        correct.put("plan", learnedCount);
 
         return ServerResponse.createBySuccess(correct);
 
@@ -1215,30 +1196,25 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     }
 
     @Override
-    public ServerResponse<Map<String, Object>> getWordReview(HttpSession session, Integer classify, Integer totalCount) {
+    public ServerResponse<Map<String, Object>> getWordReview(HttpSession session, Integer classify) {
         Student student = getStudent(session);
         // 上次登录期间学生的单词学习信息
         Duration duration = durationMapper.selectLastLoginDuration(student.getId());
         if (duration != null) {
             List<Learn> learns = learnMapper.selectLastLoginStudy(student.getId(), duration.getLoginTime(), duration.getLoginOutTime());
             if (learns.size() > 0) {
-                return packageWordReviewResult(classify, totalCount, student, learns);
+                return packageWordReviewResult(classify, student, learns);
             }
         }
         return ServerResponse.createBySuccess();
     }
 
-    private ServerResponse<Map<String, Object>> packageWordReviewResult(Integer classify, Integer totalCount, Student student, List<Learn> learns) {
+    private ServerResponse<Map<String, Object>> packageWordReviewResult(Integer classify, Student student, List<Learn> learns) {
         // 存储单词id及单元
         List<Map<String, Object>> maps = packageLastLoginLearnWordIds(learns);
 
         Map<String, Object> map = capacityMapper.selectLastLoginNeedReview(student.getId(), maps, classify);
-        int count;
-        if (totalCount == null) {
-            count = capacityMapper.countLastLoginNeedReview(student.getId(), maps, classify);
-        } else {
-            count = totalCount;
-        }
+        int count = capacityMapper.countLastLoginNeedReview(student.getId(), maps, classify);
 
         // 没有需要复习的单词
         if (map == null || map.size() == 0) {

@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.service;
 
 import com.zhidejiaoyu.common.Vo.student.testCenter.TestCenterVo;
 import com.zhidejiaoyu.common.pojo.CapacityMemory;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.student.vo.TestResultVo;
@@ -38,22 +39,20 @@ public interface ReviewService extends BaseService<CapacityMemory> {
 
     /**
      * 从记忆追踪-...查询一条记录
-     *
-     * @param id      学生id
-     * @param unit_id 单元id
-     */
-    Map<String, Object> ReviewCapacity_memory(Long id, String unit_id, int classify, String course_id, boolean pattern) throws Exception;
+     *  @param student      学生
+     * @param unit_id 单元id*/
+    Map<String, Object> reviewCapacityMemory(Student student, String unit_id, int classify, String course_id);
 
     /**
      * 例句听力
      *
-     * @param stuId    学生id
+     * @param student    学生
      * @param unit_id
      * @param classify 类型  1=慧记忆 2=听写 3=默写 4=例句听写 5=例句翻译 6=例句默写
      * @param type
      * @return
      */
-    Object ReviewSentence_listen(Long stuId, String unit_id, int classify, String course_id, boolean pattern, Integer type);
+    Object reviewSentenceListen(Student student, String unit_id, int classify, String course_id, Integer type);
 
     /**
      * 测试中心页数据展示
@@ -120,7 +119,7 @@ public interface ReviewService extends BaseService<CapacityMemory> {
      */
     ServerResponse<String> saveCapacityReview(HttpSession session, Long[] unitId, Integer classify, String word, Long courseId, Long id, boolean isKnown);
 
-    ServerResponse<Map<String, Object>> Reviewcapacity_picture(Long id, String unitId, int i, String course_id, String judge, boolean pattern);
+    ServerResponse<Map<String, Object>> reviewCapacityPicture(Student student, String unitId, int i, String course_id, String judge);
 
     ServerResponse<Object> testReviewWordPic(String unit_id, int classify, HttpSession session, boolean pattern);
 
@@ -141,8 +140,7 @@ public interface ReviewService extends BaseService<CapacityMemory> {
      * 获取智能复习中单词图鉴需要复习的单词（范围是上次登录期间需要复习的单词）
      *
      * @param session
-     * @param totalCount
      * @return
      */
-    ServerResponse<Map<String, Object>> getWordReview(HttpSession session, Integer classify, Integer totalCount);
+    ServerResponse<Map<String, Object>> getWordReview(HttpSession session, Integer classify);
 }

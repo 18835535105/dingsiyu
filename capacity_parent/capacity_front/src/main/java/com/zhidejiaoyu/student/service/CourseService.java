@@ -65,9 +65,10 @@ public interface CourseService extends BaseService<Course> {
      * 获取课程下的所有单元信息及每单元的单词数量
      *
      * @param courseId 课程id
+     * @param showAll   true：含有“全部单元”字样；false:不含有“全部单元字样”
      * @return
      */
-    ServerResponse<List<Map<String, Object>>> getAllUnit(Long courseId);
+    ServerResponse<List<Map<String, Object>>> getAllUnit(Long courseId, Boolean showAll);
 
     ServerResponse<Object> postUnit(HttpSession session, int unitId, int model);
 

@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.ReviewService;
 import com.zhidejiaoyu.student.vo.TestResultVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +26,7 @@ import java.util.Map;
  * @author qizhentao
  * @version 1.0
  */
+@Slf4j
 @Controller
 @RequestMapping("/review")
 public class ReviewController {
@@ -173,16 +175,6 @@ public class ReviewController {
     }
 
     /**
-     * 1.4 测试记录(测试结果保存测试记录中)
-     *
-     * @Param classifyName 测试类型名
-     * @Param testDateTime 测试日期时间
-     * @Param score 得分
-     * @Param quantity 题数量
-     */
-
-
-    /**
      * url = /capacity
      * 2.1 点击智能复习 - 必要参数单元id (慧记忆,慧听写...)
      *
@@ -207,26 +199,26 @@ public class ReviewController {
      */
     @ResponseBody
     @RequestMapping(value = {"/capacity", "/taskCourse"})
-    public Object CapacityReview(@RequestParam(value = "unit_id",required = false) String unitId, String course_id, int classify, String judge,
-                                                              HttpSession session, boolean pattern,
-                                                              @RequestParam(required = false, defaultValue = "1") Integer type) throws Exception {
+    public Object capacityReview(@RequestParam(value = "unit_id",required = false) String unitId,
+                                 String course_id, int classify, String judge,
+                                                              HttpSession session,
+                                                              @RequestParam(required = false, defaultValue = "1") Integer type){
         // 获取学生id
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        Long id = student.getId();
 
         // 图片图鉴模块
         if(classify == 0){
-            return reviewService.Reviewcapacity_picture(id, unitId, 0, course_id, judge, pattern);
+            return reviewService.reviewCapacityPicture(student, unitId, 0, course_id, judge);
         }
         // 慧记忆模块 / 听写 / 默写
         if (classify == 1 || classify == 2 || classify == 3) {
             // 从记忆追踪-...中查询一条记录
-            Map<String, Object> map = reviewService.ReviewCapacity_memory(id, unitId, classify, course_id, pattern);
+            Map<String, Object> map = reviewService.reviewCapacityMemory(student, unitId, classify, course_id);
             return ServerResponse.createBySuccess(map);
         }
         // 例句听写
         if (classify == 4 || classify == 5 || classify == 6) {
-            Object object = reviewService.ReviewSentence_listen(id, unitId, classify, course_id, pattern, type);
+            Object object = reviewService.reviewSentenceListen(student, unitId, classify, course_id, type);
             return ServerResponse.createBySuccess(object);
         }
 
@@ -237,15 +229,14 @@ public class ReviewController {
      * 获取智能复习题目，上次登录期间需要复习的单词
      *
      * @param classify   0=单词图鉴 1=慧记忆 2=慧听写 3=慧默写
-     * @param totalCount 需要复习的数据总数量，为空时从后台计算总数并返回，不为空时后台使用该数值直接返回
      * @param session
      * @return
      */
     @ResponseBody
     @GetMapping("/getCapacityReview")
-    public ServerResponse<Map<String, Object>> getCapacityReview(Integer classify, Integer totalCount, HttpSession session) {
+    public ServerResponse<Map<String, Object>> getCapacityReview(Integer classify, HttpSession session) {
         if (classify == 0 || classify == 1 || classify == 2 || classify == 3) {
-            return reviewService.getWordReview(session, classify, totalCount);
+            return reviewService.getWordReview(session, classify);
         }
         return ServerResponse.createBySuccess();
     }
