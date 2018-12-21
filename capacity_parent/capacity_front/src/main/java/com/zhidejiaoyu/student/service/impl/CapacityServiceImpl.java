@@ -16,6 +16,7 @@ import com.zhidejiaoyu.student.utils.CapacityFontUtil;
 import com.zhidejiaoyu.student.vo.CapacityContentVo;
 import com.zhidejiaoyu.student.vo.CapacityDigestVo;
 import com.zhidejiaoyu.student.vo.CapacityListVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
@@ -30,10 +31,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
-public class CapacityServiceImpl implements CapacityService {
-
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, CapacityWrite> implements CapacityService {
 
     @Autowired
     private CommonMethod commonMethod;
@@ -180,7 +180,7 @@ public class CapacityServiceImpl implements CapacityService {
         }
 
         if (studyCount == null) {
-            throw new RuntimeException("无当前单词学习记录");
+            return ServerResponse.createByErrorMessage("当前单词无学习记录");
         }
 
         CapacityReview capacityReview = capacityReviewMapper.selectByCourseIdOrUnitId(student, courseId, unitId, id, studyModel);

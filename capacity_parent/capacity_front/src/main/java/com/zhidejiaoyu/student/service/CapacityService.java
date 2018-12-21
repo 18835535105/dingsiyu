@@ -1,7 +1,9 @@
 package com.zhidejiaoyu.student.service;
 
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.common.pojo.CapacityWrite;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.vo.CapacityContentVo;
 import com.zhidejiaoyu.student.vo.CapacityDigestVo;
 
@@ -14,7 +16,7 @@ import javax.servlet.http.HttpSession;
  * @author wuchenxi
  * @date 2018年5月18日 上午9:18:52
  */
-public interface CapacityService {
+public interface CapacityService extends BaseService<CapacityWrite> {
 
     /**
      * 获取记忆追踪中摘要内容 只有单词或例句显示的页面，通过字体大小来确定复习紧迫程度的页面

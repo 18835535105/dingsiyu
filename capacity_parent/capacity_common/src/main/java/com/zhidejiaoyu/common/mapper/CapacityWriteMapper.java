@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.CapacityWrite;
 import com.zhidejiaoyu.common.pojo.CapacityWriteExample;
 import org.apache.ibatis.annotations.Delete;
@@ -9,14 +10,12 @@ import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
-public interface CapacityWriteMapper {
+public interface CapacityWriteMapper extends BaseMapper<CapacityWrite> {
 	int countByExample(CapacityWriteExample example);
 
 	int deleteByExample(CapacityWriteExample example);
 
 	int deleteByPrimaryKey(Long id);
-
-	int insert(CapacityWrite record);
 
 	int insertSelective(CapacityWrite record);
 

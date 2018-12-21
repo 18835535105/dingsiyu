@@ -235,9 +235,17 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
      */
     private boolean canLearn(Student student, Long unitId, int classifyInt, Long sentenceCount, Integer learnCount) {
         long plan = 0;
-        if (classifyInt > 4) {
-            // 判断句型翻译模块是否已经学习完
-            plan = learnMapper.countLearnWord(student.getId(), unitId, commonMethod.getTestType(classifyInt - 1), learnCount == null ? 1 : learnCount);
+        if (Objects.equals(classifyInt, 5)) {
+            // 例句翻译模块直接放行
+            return true;
+        }
+        if (Objects.equals(classifyInt, 4)) {
+            // 判断例句翻译模块是否已学习完
+            plan = learnMapper.countLearnWord(student.getId(), unitId, commonMethod.getTestType(5), learnCount == null ? 1 : learnCount);
+        }
+        if (Objects.equals(classifyInt, 6)) {
+            // 判断例句听力模块是否已学习完
+            plan = learnMapper.countLearnWord(student.getId(), unitId, commonMethod.getTestType(4), learnCount == null ? 1 : learnCount);
         }
         return plan >= sentenceCount;
     }

@@ -60,7 +60,7 @@ public class CapacityController {
     public ServerResponse<CapacityContentVo> getCapacityContent(HttpSession session, String studyModel, Long courseId,
                                                                 Long unitId, Long id) {
         if (StringUtils.isBlank(studyModel) || courseId == null || id == null) {
-            return ServerResponse.createByErrorMessage("非法参数！");
+            return ServerResponse.createByErrorMessage("请求错误！");
         }
         return capacityService.getCapacityContent(session, studyModel, courseId, unitId, id);
     }
