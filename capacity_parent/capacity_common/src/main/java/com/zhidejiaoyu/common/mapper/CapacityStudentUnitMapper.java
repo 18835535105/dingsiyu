@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.CapacityStudentUnit;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Map;
+
 /**
  * <p>
  * 智能版学生当前学习课程和单元记录表 Mapper 接口
@@ -14,6 +16,8 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface CapacityStudentUnitMapper extends BaseMapper<CapacityStudentUnit> {
 
+    CapacityStudentUnit selGetSentenceByStudentIdAndType(Long studentId);
+
     /**
      * 获取学生当前模块正在学习的课程和单元
      *
@@ -22,4 +26,6 @@ public interface CapacityStudentUnitMapper extends BaseMapper<CapacityStudentUni
      * @return
      */
     CapacityStudentUnit selectCurrentUnitIdByStudentIdAndType(@Param("studentId") Long studentId, @Param("type") Integer type);
+
+    void updById(CapacityStudentUnit capacityStudentUnit);
 }

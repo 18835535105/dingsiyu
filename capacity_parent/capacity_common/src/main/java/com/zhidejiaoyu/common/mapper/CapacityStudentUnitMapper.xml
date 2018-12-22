@@ -32,4 +32,14 @@
         from capacity_student_unit where student_id = #{studentId} and type = #{type} limit 1
     </select>
 
+    <select id="selGetSentenceByStudentIdAndType" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select <include refid="base_sql"></include>
+        from  capacity_student_unit where student_id=#{studentId} and type=2
+    </select>
+    <update id="updById" parameterType="java.util.Map">
+        update capacity_student_unit(student_id,course_id,unit_id,type,course_name,unit_name,version) set
+        values(#{studentId},#{coureseId},#{unitId},#{type},#{courseName},#{unitName},#{version}) where id=#{id}
+    </update>
+
+
 </mapper>

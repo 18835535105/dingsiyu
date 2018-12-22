@@ -258,4 +258,6 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
      * @return
      */
     List<Sentence> selectUnlearnInBookPlayer(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+
+    List<Sentence> selectRoundSentence(Long courseId);
 }

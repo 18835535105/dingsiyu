@@ -129,6 +129,21 @@ public class TestController {
         return testService.getSentenceUnitTest(session, unitId, type, pageNum);
     }
 
+
+    /**
+     * 获取例句相关单元闯关的测试题
+     * @param unitId
+     * @return
+     */
+    @GetMapping("/gitUnitSentenceTest")
+    @ResponseBody
+    public ServerResponse<Object> gitUnitSentenceTest( Long unitId) {
+        if (unitId == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), "unitId 不能为 null");
+        }
+        return testService.gitUnitSentenceTest(unitId);
+    }
+
     /**
      * 保存句型单元闯关测试记录
      *
@@ -193,4 +208,13 @@ public class TestController {
     public ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, TestRecord testRecord) {
         return testService.savePreSchoolTest(session, testRecord);
     }
+
+    @PostMapping("/saveCapSentenceTest")
+    public ServerResponse saveCapSentenceTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
+        if (wordUnitTestDTO.getUnitId() == null) {
+            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
+        }
+        return testService.saveCapSentenceTest(session, wordUnitTestDTO);
+    }
+
 }

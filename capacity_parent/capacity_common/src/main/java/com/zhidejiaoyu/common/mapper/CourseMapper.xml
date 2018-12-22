@@ -534,7 +534,7 @@
         order by c.id asc
     </select>
     <select id="selectSentenceCourseIdAndCourseNameByStudentId" resultType="java.util.Map" parameterType="map">
-        select c.id, c.course_name courseName
+        select c.id, c.course_name courseName,su.unit_Id unitId
         from course c,
              student_unit su,
              unit_sentence us

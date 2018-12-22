@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.zhidejiaoyu.common.mapper.SentenceMapper">
+   <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Sentence">
+    <id column="id" property="id" />
+    <result column="centreExample" property="centreExample" />
+    <result column="centreTranslate" property="centreTranslate" />
+    <result column="ExampleDisturb" property="ExampleDisturb" />
+    <result column="TranslateDisturb" property="TranslateDisturb" />
+</resultMap>
+
 
     <!-- 多表关联查询sentence对象 -->
     <sql id="relevance_base_sql">
@@ -268,6 +276,16 @@
         select word_id from player where student_id = #{studentId} and unit_id = us.unit_id and type = 3
         )
         order by s.id asc
+    </select>
+
+    <select id="selectRoundSentence" parameterType="java.lang.Long" resultType="com.zhidejiaoyu.common.pojo.Sentence">
+        select
+        <include refid="relevance_base_sql"></include>
+        from sentence s
+        join unit_sentence us on s.id=us.sentence_id
+        join unit un on us.unit_id=un.id
+        where un.course_id=#{courseId}
+        ORDER BY RAND() LIMIT 30
     </select>
 
 </mapper>

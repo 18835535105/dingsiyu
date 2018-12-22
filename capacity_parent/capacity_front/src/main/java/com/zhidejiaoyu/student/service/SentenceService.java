@@ -67,5 +67,13 @@ public interface SentenceService extends BaseService<Sentence> {
      * @param session
      * @return
      */
-    ServerResponse<List<CourseUnitVo>> getLearnCourseAndUnit(HttpSession session);
+    ServerResponse<Object> getLearnCourseAndUnit(HttpSession session);
+
+    /**
+     * 判断是否可以学习
+     * @param session
+     * @param unitId
+     * @return
+     */
+    ServerResponse<Object> getIsInto(HttpSession session, Long unitId);
 }

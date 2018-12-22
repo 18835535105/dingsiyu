@@ -185,6 +185,14 @@ public interface UnitMapper {
     @Select("select joint_name from unit where id = #{unitId}")
     String getCourseNameByunitId(@Param("unitId") Integer unitId);
 
+
+    /**
+     * 根据单元id查询课程id
+     * @param unitId 单元id
+     * @return
+     */
+    Long getCourseIdByunitId(@Param("unitId") Integer unitId);
+
     /**
      * 单元下单词图鉴的总数
      * @param unitId
@@ -226,4 +234,5 @@ public interface UnitMapper {
      * @return
      */
     List<Map<String, Object>> selectUnitIdAndUnitNameByCourseIdAndStudentId(@Param("courseId") Long courseId, @Param("studentId") Long studentId);
+
 }

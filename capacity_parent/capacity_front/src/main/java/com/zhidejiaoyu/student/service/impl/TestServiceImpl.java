@@ -17,12 +17,14 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
 import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
+import com.zhidejiaoyu.common.utils.testUtil.TestSentenceUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
 import com.zhidejiaoyu.student.constant.PetImageConstant;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
+import com.zhidejiaoyu.student.service.SentenceService;
 import com.zhidejiaoyu.student.service.TestService;
 import com.zhidejiaoyu.student.utils.CcieUtil;
 import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
@@ -115,6 +117,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     @Autowired
     private RedisOpt redisOpt;
+
+    @Autowired
+    private TestSentenceUtil testSentenceUtil;
 
     /**
      * 游戏测试题目获取，获取20个单词供测试
@@ -732,6 +737,74 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         return ServerResponse.createBySuccess();
     }
 
+    /**
+     * 获取例句测试
+     * @param unitId
+     * @return
+     */
+    @Override
+    public ServerResponse<Object> gitUnitSentenceTest(Long unitId) {
+        //获取单元句子
+        List<Sentence> sentences = sentenceMapper.selectByUnitId(unitId);
+        List<Sentence> sentenceList=null;
+        //获取干扰项句子 在当前课程下选择
+        if(sentences.size()<4){
+            //获取测试单元所在的课程
+            Long courseId = unitMapper.getCourseIdByunitId(unitId.intValue());
+            sentenceList = sentenceMapper.selectRoundSentence(courseId);
+        }
+        List<Object> list = testSentenceUtil.resultTestSentence(sentences, sentenceList);
+        return ServerResponse.createBySuccess(list);
+    }
+
+    @Override
+    public ServerResponse<Object> saveCapSentenceTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
+        Student student = getStudent(session);
+        TestRecord testRecord;
+
+        wordUnitTestDTO.setClassify(5);
+
+        // 判断当前单元是不是首次进行测试
+        boolean isFirst = false;
+        TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
+                wordUnitTestDTO.getUnitId()[0], "音译测试", "音译测试");
+        if (testRecordOld == null) {
+            isFirst = true;
+        }
+
+        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld);
+        if (testRecordOld == null) {
+            testRecord = new TestRecord();
+            // 首次测试大于或等于80分，超过历史最高分次数 +1
+            if (wordUnitTestDTO.getPoint() >= PASS) {
+                testRecord.setBetterCount(1);
+            } else {
+                testRecord.setBetterCount(0);
+            }
+        } else {
+            testRecord = new TestRecord();
+            testRecord.setBetterCount(testRecordOld.getBetterCount());
+        }
+
+        testRecord.setCourseId(wordUnitTestDTO.getCourseId());
+        testRecord.setUnitId(wordUnitTestDTO.getUnitId()[0]);
+        testRecord.setPoint(wordUnitTestDTO.getPoint());
+        testRecord.setErrorCount(wordUnitTestDTO.getErrorCount());
+        testRecord.setRightCount(wordUnitTestDTO.getRightCount());
+        testRecord.setGenre("音译测试");
+        testRecord.setStudentId(student.getId());
+        testRecord.setTestEndTime(new Date());
+        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+        testRecord.setQuantity(wordUnitTestDTO.getErrorCount() + wordUnitTestDTO.getRightCount());
+        testRecord.setAwardGold(goldCount);
+        testRecord.setStudyModel("音译测试");
+        testRecordMapper.insert(testRecord);
+        studentMapper.updateByPrimaryKeySelective(student);
+        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
+        return ServerResponse.createBySuccess();
+    }
+
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO, String testDetail) {
@@ -1083,6 +1156,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         List<SentenceTranslateVo> sentenceTestResults = testResultUtil.getSentenceTestResults(sentences, MathUtil.getRandom(4, 6), type);
         return ServerResponse.createBySuccess(sentenceTestResults);
     }
+
+
 
     @Override
     public ServerResponse<Object> showRecord(String course_id, HttpSession session, Integer page, Integer rows) {

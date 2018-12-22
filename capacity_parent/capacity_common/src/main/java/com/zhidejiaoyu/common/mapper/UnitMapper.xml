@@ -340,5 +340,9 @@
           and su.student_id = #{studentId}
         order by u.id asc
     </select>
+    <select id="getCourseIdByunitId" resultType="java.lang.Long" parameterType="java.lang.Integer">
+        select course_id from unit where id=#{unitId};
+    </select>
+
 
 </mapper>

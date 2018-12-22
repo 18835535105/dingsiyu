@@ -41,7 +41,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
      * 三小时
      */
     private final int pushRise = 3;
-    
+
     @Autowired
     private MemoryDifficultyUtil memoryDifficultyUtil;
 
@@ -71,6 +71,9 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
 
     @Autowired
     private TestRecordMapper testRecordMapper;
+
+    @Autowired
+    private CapacityStudentUnitMapper capacityStudentUnitMapper;
 
     /**
      * 例句听力mapper
@@ -102,8 +105,6 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     @Autowired
     private UnitVocabularyMapper unitVocabularyMapper;
 
-    @Autowired
-    private CapacityStudentUnitMapper capacityStudentUnitMapper;
 
     @Override
     public ServerResponse<SentenceTranslateVo> getSentenceTranslate(HttpSession session, Long unitId, int classifyInt, Integer type) {
@@ -119,11 +120,6 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         // 转换类型
         String classify = commonMethod.getTestType(classifyInt);
 
-        // 判断是否可以学习当前句型模块
-        boolean canLearn = this.canLearn(student, unitId, classifyInt, sentenceCount, learnCount);
-        if (!canLearn) {
-            return ServerResponse.createBySuccess(ResponseCode.PREVIOUS_FLOW_UN_OVER.getCode(), classify + "模块还没有完成！");
-        }
 
         boolean firstStudy = isFirstStudy(student, classify);
 
@@ -351,17 +347,17 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             currentLearn.setLearnCount(maxCount);
             currentLearn.setUpdateTime(now);
             int i = learnMapper.updateByPrimaryKeySelective(currentLearn);
-            
+
             // 默写模块错过三次在记忆时间上再加长三小时
-            if("例句默写".equals(classify)) {
-            	// 查询错误次数>=3 
-            	Integer faultTime = sentenceWriteMapper.getFaultTime(studentId, learn.getExampleId());
-            	if(faultTime != null && faultTime >= 3) {
-            		// 如果错误次数>=3, 黄金记忆时间推迟3小时
-            		sentenceWriteMapper.updatePush(studentId, learn.getExampleId(), pushRise);
-            	}
+            if ("例句默写".equals(classify)) {
+                // 查询错误次数>=3
+                Integer faultTime = sentenceWriteMapper.getFaultTime(studentId, learn.getExampleId());
+                if (faultTime != null && faultTime >= 3) {
+                    // 如果错误次数>=3, 黄金记忆时间推迟3小时
+                    sentenceWriteMapper.updatePush(studentId, learn.getExampleId(), pushRise);
+                }
             }
-            
+
             if (i > 0) {
                 return ServerResponse.createBySuccess();
             }
@@ -464,16 +460,16 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     }
 
     @Override
-    public ServerResponse<List<CourseUnitVo>> getLearnCourseAndUnit(HttpSession session) {
+    public ServerResponse<Object> getLearnCourseAndUnit(HttpSession session) {
         Student student = getStudent(session);
         Long studentId = student.getId();
         List<CourseUnitVo> courseUnitVos = new ArrayList<>();
         CourseUnitVo courseUnitVo;
         List<Map<String, Object>> resultMap;
-
+        Map<String,Object> result=new HashMap<>();
         // 学生所有课程id及课程名
         List<Map<String, Object>> courses = courseMapper.selectSentenceCourseIdAndCourseNameByStudentId(studentId);
-
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selGetSentenceByStudentIdAndType(student.getId());
         // 学生课程下所有例句的单元id及单元名
         if (courses.size() > 0) {
             List<Long> courseIds = new ArrayList<>(courses.size());
@@ -493,6 +489,15 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 unLearnMap = learnMapper.selectUnlearnUnit(studentId, unitIds);
             }
 
+            Map<String,Object> present=new HashMap<>();
+            if (capacityStudentUnit != null) {
+               present.put("course",capacityStudentUnit.getCourseId());
+               present.put("unitId",capacityStudentUnit.getUnitId());
+            }else{
+                present.put("course",courses.get(0).get("id"));
+                present.put("unitId",courses.get(0).get("unitId"));
+            }
+            result.put("present",present);
             for (Map<String, Object> courseMap : courses) {
                 courseUnitVo = new CourseUnitVo();
                 resultMap = new ArrayList<>();
@@ -516,14 +521,58 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                             // 正在学习
                             unitInfoMap.put("state", 3);
                         }
+
                         resultMap.add(unitInfoMap);
                     }
                 }
                 courseUnitVo.setUnitVos(resultMap);
                 courseUnitVos.add(courseUnitVo);
             }
+            result.put("list",courseUnitVos);
         }
-        return ServerResponse.createBySuccess(courseUnitVos);
+
+        return ServerResponse.createBySuccess(result);
+    }
+
+    @Override
+    public ServerResponse<Object> getIsInto(HttpSession session, Long unitId) {
+        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+
+        // 获取当前单元下的所有例句的总个数
+        Long sentenceCount = sentenceMapper.countByUnitId(unitId);
+
+        Long courseId = unitMapper.selectCourseIdByUnitId(unitId);
+        // 查询当前课程的学习遍数
+        Integer learnCount = studyCountMapper.selectMaxCountByCourseId(student.getId(), courseId);
+        Map<String, Object> map = new HashMap<>();
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selGetSentenceByStudentIdAndType(student.getId());
+        Unit unit = unitMapper.selectByPrimaryKey(unitId);
+        if (capacityStudentUnit == null) {
+            capacityStudentUnit=new CapacityStudentUnit();
+            capacityStudentUnit.setType(2);
+            capacityStudentUnit.setUnitId(unitId);
+            capacityStudentUnit.setStudentId(student.getId());
+            capacityStudentUnit.setCourseId(unit.getCourseId());
+            capacityStudentUnit.setUnitName(unit.getUnitName());
+            capacityStudentUnit.setCourseName(unit.getJointName());
+            capacityStudentUnitMapper.insert(capacityStudentUnit);
+        } else {
+            capacityStudentUnit.setUnitId(unitId);
+            capacityStudentUnit.setCourseId(unit.getCourseId());
+            capacityStudentUnit.setStudentId(student.getId());
+            capacityStudentUnit.setUnitName(unit.getUnitName());
+            capacityStudentUnit.setCourseName(unit.getJointName());
+            capacityStudentUnitMapper.updateById(capacityStudentUnit);
+        }
+        // 判断是否可以学习当前句型模块
+        boolean canLearn = this.canLearn(student, unitId, 5, sentenceCount, learnCount);
+        map.put("hearing", canLearn);
+
+        // 判断是否可以学习当前句型模块
+        boolean transliteration = this.canLearn(student, unitId, 6, sentenceCount, learnCount);
+        map.put("transliteration", transliteration);
+
+        return ServerResponse.createBySuccess(map);
     }
 
 
@@ -755,7 +804,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         if (nextInt % 2 == 0) {
             if (type == 2) {
                 sentenceTranslateVo.setOrder(commonMethod.getOrderEnglishList(sentence.getCentreExample(), sentence.getExampleDisturb()));
-            }else {
+            } else {
                 sentenceTranslateVo.setOrder(commonMethod.getOrderEnglishList(sentence.getCentreExample(), null));
             }
             sentenceTranslateVo.setRateList(commonMethod.getEnglishList(sentence.getCentreExample()));

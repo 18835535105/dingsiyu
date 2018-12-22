@@ -108,4 +108,19 @@ public interface TestService extends BaseService<TestRecord> {
      * @return
      */
     ServerResponse saveSentenceUnitTest(HttpSession session, WordUnitTestDTO dto);
+
+    /**
+     * 获取例句单元测试
+     * @param unitId
+     * @return
+     */
+    ServerResponse<Object> gitUnitSentenceTest(Long unitId);
+
+    /**
+     * 音译测试
+     * @param session
+     * @param wordUnitTestDTO
+     * @return
+     */
+    ServerResponse<Object> saveCapSentenceTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO);
 }

@@ -47,6 +47,12 @@ public class SentenceController {
         return sentenceService.getSentenceTranslate(session, unitId, classify, type);
     }
 
+    @GetMapping("/getIsInto")
+    public ServerResponse<Object> getIsInto(HttpSession session, Long unitId) {
+
+        return sentenceService.getIsInto(session, unitId);
+    }
+
     /**
      * 保存例句翻译、例句听力、例句默写学习数据，包括相关记忆追踪内容
      *
@@ -118,7 +124,7 @@ public class SentenceController {
      */
     @ResponseBody
     @GetMapping("/getLearnCourseAndUnit")
-    public ServerResponse<List<CourseUnitVo>> getLearnCourseAndUnit(HttpSession session) {
+    public ServerResponse<Object> getLearnCourseAndUnit(HttpSession session) {
         return sentenceService.getLearnCourseAndUnit(session);
     }
 
