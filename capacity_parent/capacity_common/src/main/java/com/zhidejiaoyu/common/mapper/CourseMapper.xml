@@ -578,4 +578,12 @@
         group by c.id
         order by c.id asc
     </select>
+    <select id="getAllUnitInfos" resultType="java.util.Map" parameterType="map">
+        SELECT count(uv.vocabulary_id) wordCount, u.unit_name unitName, u.id unitId
+        FROM unit u
+                 left join unit_vocabulary uv on u.id = uv.unit_id
+        WHERE u.course_id = #{courseId}
+        GROUP BY u.id
+        order by u.id asc
+    </select>
 </mapper>

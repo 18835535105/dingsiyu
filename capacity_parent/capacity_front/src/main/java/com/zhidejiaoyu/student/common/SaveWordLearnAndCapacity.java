@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 学习单词模块，保存单词学习信息和慧追踪信息
@@ -51,31 +52,21 @@ public class SaveWordLearnAndCapacity {
      */
     public CapacityMemory saveCapacityMemory(Learn learn, Student student, boolean isKnown, Integer studyModel) {
         Vocabulary vocabulary = vocabularyMapper.selectByPrimaryKey(learn.getVocabularyId());
-        // 通过学生id，单元id和单词id获取当前单词的记忆追踪信息
-        CapacityMemory capacity;
-        if (studyModel != 1 && studyModel != 2 && studyModel != 3 && studyModel != 0) {
 
+        if (studyModel != 1 && studyModel != 2 && studyModel != 3 && studyModel != 0) {
             throw new RuntimeException("studyModel=" + studyModel + " 非法！");
         }
 
-        if (studyModel == 1) {
-            // 慧记忆
-            capacity = capacityMemoryMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
-                    vocabulary.getId());
-        } else if (studyModel == 2) {
-            // 慧听写
-            capacity = capacityListenMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
-                    vocabulary.getId());
-        } else if (studyModel == 3) {
-            // 慧默写
-            capacity = capacityWriteMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
-                    vocabulary.getId());
-        } else {
-            // 单词图鉴
-            capacity = capacityPictureMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
-                    vocabulary.getId());
-        }
+        // 通过学生id，单元id和单词id获取当前单词的记忆追踪信息
+        CapacityMemory capacity = getCapacityInfo(learn, student, studyModel, vocabulary);
         String wordChinese = unitVocabularyMapper.selectWordChineseByUnitIdAndWordId(learn.getUnitId(), vocabulary.getId());
+        // 封装记忆追踪信息
+        capacity = packageCapacityInfo(learn, student, isKnown, studyModel, vocabulary, capacity, wordChinese);
+        return capacity;
+    }
+
+    private CapacityMemory packageCapacityInfo(Learn learn, Student student, boolean isKnown, Integer studyModel,
+                                               Vocabulary vocabulary, CapacityMemory capacity, String wordChinese) {
         if (capacity == null) {
             if (!isKnown) {
                 if (studyModel == 1) {
@@ -153,6 +144,52 @@ public class SaveWordLearnAndCapacity {
             } else {
                 // 单词图鉴
                 capacityPictureMapper.updateByPrimaryKeySelective((CapacityPicture) capacity);
+            }
+        }
+        return capacity;
+    }
+
+    private CapacityMemory getCapacityInfo(Learn learn, Student student, Integer studyModel, Vocabulary vocabulary) {
+        CapacityMemory capacity = null;
+        if (studyModel == 1) {
+            // 慧记忆
+             List<CapacityMemory> capacityMemoryList = capacityMemoryMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
+                    vocabulary.getId());
+             if (capacityMemoryList.size() > 1) {
+                 capacityMemoryMapper.deleteById(capacityMemoryList.get(1).getId());
+                 capacity = capacityMemoryList.get(0);
+             } else if (capacityMemoryList.size() > 0) {
+                 capacity = capacityMemoryList.get(0);
+             }
+        } else if (studyModel == 2) {
+            // 慧听写
+            List<CapacityListen> capacityListens = capacityListenMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
+                    vocabulary.getId());
+            if (capacityListens.size() > 1) {
+                capacityListenMapper.deleteById(capacityListens.get(1).getId());
+                capacity = capacityListens.get(0);
+            } else if (capacityListens.size() > 0) {
+                capacity = capacityListens.get(0);
+            }
+        } else if (studyModel == 3) {
+            // 慧默写
+            List<CapacityWrite> capacityWrites = capacityWriteMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
+                    vocabulary.getId());
+            if (capacityWrites.size() > 1) {
+                capacityWriteMapper.deleteById(capacityWrites.get(1).getId());
+                capacity = capacityWrites.get(0);
+            } else if (capacityWrites.size() > 0) {
+                capacity = capacityWrites.get(0);
+            }
+        } else {
+            // 单词图鉴
+            List<CapacityPicture> capacityPictures = capacityPictureMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
+                    vocabulary.getId());
+            if (capacityPictures.size() > 1) {
+                capacityPictureMapper.deleteById(capacityPictures.get(1).getId());
+                capacity = capacityPictures.get(0);
+            } else if (capacityPictures.size() > 0) {
+                capacity = capacityPictures.get(0);
             }
         }
         return capacity;

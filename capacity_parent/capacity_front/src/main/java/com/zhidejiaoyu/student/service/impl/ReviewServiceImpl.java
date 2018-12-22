@@ -263,13 +263,12 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         }
 
         // 智能复习, 根据单元查询
-        if (StringUtils.isNotBlank(unit_id) && StringUtils.isNotEmpty(course_id)) {
+        if (StringUtils.isNotBlank(unit_id)) {
             // 查询条件2.1:单元id
             ca.setUnit_id(Long.valueOf(unit_id));
 
             // count单元表单词有多少个
-            Integer count = capacityMapper.countNeedReviewByCourseIdOrUnitId(student, Long.valueOf(course_id),
-                    Long.valueOf(unit_id), commonMethod.getTestType(classify));
+            Integer count = capacityMapper.countNeedReviewByCourseIdOrUnitId(student, null, Long.valueOf(unit_id), commonMethod.getTestType(classify));
             map.put("wordCount", count);
         }
         // 任务课程-复习, 根据课程查询
@@ -464,43 +463,44 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     }
 
     @Override
-    public ServerResponse<List<TestCenterVo>> testCentreIndex(Long courseId, HttpSession session) {
+    public ServerResponse<List<TestCenterVo>> testCentreIndex(Long unitId, Integer type, HttpSession session) {
         // 获取当前学生信息
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         Long studentId = student.getId();
 
-        List<Long> courseIds;
-        if (courseId == 0) {
-            // 学生所有课程id
-            courseIds = studentUnitMapper.selectCourseIdsByStudentId(studentId);
-        } else {
-            courseIds = new ArrayList<>();
-            courseIds.add(courseId);
-        }
-
         List<TestCenterVo> testCenterVos = new ArrayList<>();
-        TestCenterVo testCenterVo;
 
         // 单词模块
-        for (int i = 0; i <= 6; i++) {
-            testCenterVo = new TestCenterVo();
-            String classify = commonMethod.getTestType(i);
-            // 已学
-            Integer learnCount = capacityMapper.countAlreadyStudyWord(studentId, courseIds, classify, i);
-            // 生词
-            Integer unknownCount = capacityMapper.countAccrueWord(studentId, courseIds, classify, i);
-            // 熟词
-            Integer knownCount = capacityMapper.countRipeWord(studentId, courseIds, classify, i);
-
-            testCenterVo.setClassify(i);
-            testCenterVo.setAlreadyStudy(learnCount);
-            testCenterVo.setAccrue(unknownCount);
-            testCenterVo.setRipe(knownCount);
-
-            testCenterVos.add(testCenterVo);
+        if (type == 1) {
+            for (int i = 0; i <= 3; i++) {
+                packageTestCenterInfo(unitId, studentId, testCenterVos, i);
+            }
+        } else {
+            for (int i = 4; i <= 6; i++) {
+                packageTestCenterInfo(unitId, studentId, testCenterVos, i);
+            }
         }
 
+
         return ServerResponse.createBySuccess(testCenterVos);
+    }
+
+    private void packageTestCenterInfo(Long unitId, Long studentId, List<TestCenterVo> testCenterVos, int i) {
+        TestCenterVo testCenterVo = new TestCenterVo();
+        String classify = commonMethod.getTestType(i);
+        // 已学
+        Integer learnCount = capacityMapper.countAlreadyStudyWord(studentId, unitId, classify, i);
+        // 生词
+        Integer unknownCount = capacityMapper.countAccrueWord(studentId, unitId, classify, i);
+        // 熟词
+        Integer knownCount = capacityMapper.countRipeWord(studentId, unitId, classify, i);
+
+        testCenterVo.setClassify(i);
+        testCenterVo.setAlreadyStudy(learnCount);
+        testCenterVo.setAccrue(unknownCount);
+        testCenterVo.setRipe(knownCount);
+
+        testCenterVos.add(testCenterVo);
     }
 
     /**

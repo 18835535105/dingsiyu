@@ -291,7 +291,6 @@ public interface CourseMapper extends BaseMapper<Course> {
      * @param courseId 课程id
      * @return
      */
-    @Select("SELECT count(uv.vocabulary_id) wordCount, u.unit_name unitName, u.id unitId FROM unit u, unit_vocabulary uv, vocabulary v WHERE u.id = uv.unit_id AND v.id =uv.vocabulary_id AND v.delStatus = 1 AND u.course_id = #{courseId} GROUP BY u.id")
     List<Map<String, Object>> getAllUnitInfos(@Param("courseId") Long courseId);
 
     Map<String, Object> getCourseByCreamVersionName(String creamVersion);

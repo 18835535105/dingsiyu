@@ -120,14 +120,6 @@
         course_id= #{courseId} and memory_strength &lt; 1 order by push asc
     </select>
 
-    <select id="selectByUnitIdAndId" resultMap="BaseResultMap"
-            parameterType="map">
-        select
-        <include refid="Base_Column_List"/>
-        from capacity_memory where student_id = #{studentId} and unit_id =
-        #{unitId} and vocabulary_id =#{correctWordId}
-    </select>
-
     <select id="selectByExample" resultMap="BaseResultMap"
             parameterType="com.zhidejiaoyu.common.pojo.CapacityMemoryExample">
         select

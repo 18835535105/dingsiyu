@@ -66,31 +66,31 @@ public interface CapacityReviewMapper {
 	 * @param flag
 	 * @return
 	 */
-	Integer countAlreadyStudyWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds,
+	Integer countAlreadyStudyWord(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
 								  @Param("classify") String classify, @Param("flag") int flag);
 
 	/**
 	 * 学生当前课程下已学生词数
 	 *
 	 * @param studentId
-	 * @param courseIds
+	 * @param unitId
 	 * @param classify
 	 * @param flag
 	 * @return
 	 */
-	Integer countAccrueWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds,
+	Integer countAccrueWord(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
 							@Param("classify") String classify,  @Param("flag") int flag);
 
 	/**
 	 * 学生当前课程下已学熟词数
 	 *
 	 * @param studentId
-	 * @param courseIds
+	 * @param unitId
 	 * @param classify
 	 * @param flag
 	 * @return
 	 */
-	Integer countRipeWord(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds,
+	Integer countRipeWord(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
 						  @Param("classify") String classify,  @Param("flag") int flag);
 
 	// 模块1已学题
@@ -276,27 +276,30 @@ public interface CapacityReviewMapper {
      *
      * @param stuId
      * @param wordIds
+     * @param limit
      * @return
      */
-    List<Map<String, Object>> selectMemoryNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds);
+    List<Map<String, Object>> selectMemoryNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds, @Param("limit") int limit);
 
     /**
      * 获取当前所学课程下慧听力需要复习的单词
      *
      * @param stuId
      * @param wordIds
-     * @return
+     * @param limit
+	 * @return
      */
-    List<Map<String, Object>> selectListenNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds);
+    List<Map<String, Object>> selectListenNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds, @Param("limit") int limit);
 
     /**
      * 获取当前所学课程下慧默写需要复习的单词
      *
      * @param stuId
      * @param wordIds
-     * @return
+     * @param limit
+	 * @return
      */
-    List<Map<String, Object>> selectWriteNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds);
+    List<Map<String, Object>> selectWriteNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds, @Param("limit") int limit);
 
 	/**
 	 * 获取学生指定单元下指定单词需要复习的个数

@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.CapacityPicture;
 import com.zhidejiaoyu.common.pojo.CapacityPictureExample;
 import org.apache.ibatis.annotations.Delete;
@@ -8,14 +9,12 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
-public interface CapacityPictureMapper {
+public interface CapacityPictureMapper extends BaseMapper<CapacityPicture> {
     int countByExample(CapacityPictureExample example);
 
     int deleteByExample(CapacityPictureExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(CapacityPicture record);
 
     int insertSelective(CapacityPicture record);
 
@@ -41,7 +40,7 @@ public interface CapacityPictureMapper {
      * @param correctWordId
      * @return
      */
-    CapacityPicture selectByUnitIdAndId(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+    List<CapacityPicture> selectByUnitIdAndId(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                        @Param("correctWordId") Long correctWordId);
 
     Map<String,Object> selectNeedReviewWordCourse(@Param("course_id") String course_id, @Param("studentId")Long studentId, @Param("s")String s);

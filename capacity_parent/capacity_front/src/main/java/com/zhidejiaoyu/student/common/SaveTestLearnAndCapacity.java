@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 测试结束保存学习记录和慧记忆信息
@@ -469,16 +470,44 @@ public class SaveTestLearnAndCapacity {
      */
     private Object getCapacity(Long studentId, Long correctWordId, Long unitId, Integer classify) {
         if (classify == 0) {
-            return capacityPictureMapper.selectByUnitIdAndId(studentId, unitId, correctWordId);
+            List<CapacityPicture> capacityPictures = capacityPictureMapper.selectByUnitIdAndId(studentId, unitId, correctWordId);
+            if (capacityPictures.size() > 1) {
+                capacityPictureMapper.deleteById(capacityPictures.get(1).getId());
+                return capacityPictures.get(0);
+            } else if (capacityPictures.size() > 0) {
+                return capacityPictures.get(0);
+            }
+            return null;
         } else if (classify == 1) {
             // 慧记忆记忆追踪
-            return capacityMemoryMapper.selectByUnitIdAndId(studentId, unitId, correctWordId);
+            List<CapacityMemory> capacityMemories = capacityMemoryMapper.selectByUnitIdAndId(studentId, unitId, correctWordId);
+            if (capacityMemories.size() > 1) {
+                capacityMemoryMapper.deleteById(capacityMemories.get(1).getId());
+                return capacityMemories.get(0);
+            } else if (capacityMemories.size() > 0) {
+                return capacityMemories.get(0);
+            }
+            return null;
         } else if (classify == 2) {
             // 慧听写记忆追踪
-            return capacityListenMapper.selectByUnitIdAndId(studentId, unitId, correctWordId);
+            List<CapacityListen> capacityListens = capacityListenMapper.selectByUnitIdAndId(studentId, unitId, correctWordId);
+            if (capacityListens.size() > 1) {
+                capacityListenMapper.deleteById(capacityListens.get(1).getId());
+                return capacityListens.get(0);
+            } else if (capacityListens.size() > 0) {
+                return capacityListens.get(0);
+            }
+            return null;
         } else if (classify == 3) {
             // 慧默写记忆追踪
-            return capacityWriteMapper.selectByUnitIdAndId(studentId, unitId, correctWordId);
+            List<CapacityWrite> capacityWrites = capacityWriteMapper.selectByUnitIdAndId(studentId, unitId, correctWordId);
+            if (capacityWrites.size() > 1) {
+                capacityWriteMapper.deleteById(capacityWrites.get(1).getId());
+                return capacityWrites.get(0);
+            } else if (capacityWrites.size() > 0) {
+                return capacityWrites.get(0);
+            }
+            return null;
         } else if (classify == 4) {
             // 例句听力记忆追踪
             return sentenceListenMapper.selectByStuIdAndUnitIdAndWordId(studentId, unitId, correctWordId);

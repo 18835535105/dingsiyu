@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.CapacityListen;
 import com.zhidejiaoyu.common.pojo.CapacityListenExample;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
@@ -9,14 +10,12 @@ import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
-public interface CapacityListenMapper {
+public interface CapacityListenMapper extends BaseMapper<CapacityListen> {
     int countByExample(CapacityListenExample example);
 
     int deleteByExample(CapacityListenExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(CapacityListen record);
 
     int insertSelective(CapacityListen record);
 
@@ -44,7 +43,7 @@ public interface CapacityListenMapper {
      * @param correctWordId
      * @return
      */
-    CapacityListen selectByUnitIdAndId(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+    List<CapacityListen> selectByUnitIdAndId(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                        @Param("correctWordId") Long correctWordId);
 
  /**

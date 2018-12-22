@@ -47,7 +47,7 @@ public interface CapacityWriteMapper extends BaseMapper<CapacityWrite> {
 	 * @param correctWordId
 	 * @return
 	 */
-	CapacityWrite selectByUnitIdAndId(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+	List<CapacityWrite> selectByUnitIdAndId(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
 			@Param("correctWordId") Long correctWordId);
 
 	/**

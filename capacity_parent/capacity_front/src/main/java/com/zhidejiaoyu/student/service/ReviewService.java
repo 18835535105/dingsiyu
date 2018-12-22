@@ -57,11 +57,12 @@ public interface ReviewService extends BaseService<CapacityMemory> {
     /**
      * 测试中心页数据展示
      *
-     * @param courseId
+     * @param unitId
+     * @param type  1：单词；2：句型
      * @param session
      * @return
      */
-    ServerResponse<List<TestCenterVo>> testCentreIndex(Long courseId, HttpSession session);
+    ServerResponse<List<TestCenterVo>> testCentreIndex(Long unitId, Integer type, HttpSession session);
 
     ServerResponse<Object> testcentre(String courseId, String unitId, int select, int classify, Boolean isTrue, HttpSession session);
 

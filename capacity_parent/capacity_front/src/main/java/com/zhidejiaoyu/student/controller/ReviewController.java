@@ -199,7 +199,7 @@ public class ReviewController {
      */
     @ResponseBody
     @RequestMapping(value = {"/capacity", "/taskCourse"})
-    public Object capacityReview(@RequestParam(value = "unit_id",required = false) String unitId,
+    public Object capacityReview(@RequestParam(value = "unitId",required = false) String unitId,
                                  String course_id, int classify, String judge,
                                                               HttpSession session,
                                                               @RequestParam(required = false, defaultValue = "1") Integer type){
@@ -246,14 +246,15 @@ public class ReviewController {
     /**
      * 测试中心首页需要的数据
      *
-     * @param courseId 课程id，默认为全部课程
+     * @param unitId
+     * @param type 1：单词；2：句型
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "/testcentreindex")
-    public ServerResponse<List<TestCenterVo>> testCentreIndex(@RequestParam(required = false, defaultValue = "0") Long courseId,
+    public ServerResponse<List<TestCenterVo>> testCentreIndex(Long unitId, @RequestParam(required = false, defaultValue = "1") Integer type,
                                                               HttpSession session) {
-        return reviewService.testCentreIndex(courseId, session);
+        return reviewService.testCentreIndex(unitId, type, session);
     }
 
     /**

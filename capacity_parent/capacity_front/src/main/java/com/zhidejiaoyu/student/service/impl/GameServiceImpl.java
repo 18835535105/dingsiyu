@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.GameService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ import java.util.*;
  * @author wuchenxi
  * @date 2018/10/29
  */
+@Slf4j
 @Service
 public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore> implements GameService {
 
@@ -199,7 +201,6 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
      * @return
      */
     private List<Map<String, Object>> getNeedReviewWord(Student student) {
-        try {
             // 获取当前所学课程下单词图鉴需要复习的单词
             List<Map<String, Object>> pictureMapList = capacityReviewMapper.selectPictureNeedReviewInCurrentCourse(student.getId());
             if (pictureMapList.size() == 10) {
@@ -213,7 +214,7 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
             }
 
             // 获取当前所学课程下慧记忆需要复习的单词
-            List<Map<String, Object>> memoryMapList = capacityReviewMapper.selectMemoryNeedReviewInCurrentCourse(student.getId(), wordIds);
+            List<Map<String, Object>> memoryMapList = capacityReviewMapper.selectMemoryNeedReviewInCurrentCourse(student.getId(), wordIds, 10 - wordIds.size());
             pictureMapList.addAll(memoryMapList);
 
             if (pictureMapList.size() == 10) {
@@ -225,7 +226,7 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
             }
 
             // 获取当前所学课程下慧听力需要复习的单词
-            List<Map<String, Object>> listenMapList = capacityReviewMapper.selectListenNeedReviewInCurrentCourse(student.getId(), wordIds);
+            List<Map<String, Object>> listenMapList = capacityReviewMapper.selectListenNeedReviewInCurrentCourse(student.getId(), wordIds, 10 - wordIds.size());
             pictureMapList.addAll(listenMapList);
 
             if (pictureMapList.size() == 10) {
@@ -237,20 +238,13 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
             }
 
             // 获取当前所学课程下慧默写需要复习的单词
-            List<Map<String, Object>> writeMapList = capacityReviewMapper.selectWriteNeedReviewInCurrentCourse(student.getId(), wordIds);
+            List<Map<String, Object>> writeMapList = capacityReviewMapper.selectWriteNeedReviewInCurrentCourse(student.getId(), wordIds, 10 - wordIds.size());
             pictureMapList.addAll(writeMapList);
 
             if (pictureMapList.size() == 10) {
                 return pictureMapList;
             }
             return new ArrayList<>();
-        } catch (Exception e) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("500", 500);
-            ArrayList<Map<String, Object>> objects = new ArrayList<>();
-            objects.add(map);
-            return objects;
-        }
     }
 
 }

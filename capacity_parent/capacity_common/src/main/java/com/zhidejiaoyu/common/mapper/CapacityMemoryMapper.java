@@ -60,7 +60,7 @@ public interface CapacityMemoryMapper extends BaseMapper<CapacityMemory> {
 	 * @param id
 	 * @return
 	 */
-	CapacityMemory selectByUnitIdAndId(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+	List<CapacityMemory> selectByUnitIdAndId(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                        @Param("correctWordId") Long id);
 
     /**
@@ -71,7 +71,7 @@ public interface CapacityMemoryMapper extends BaseMapper<CapacityMemory> {
      * @param id
      * @return
      */
-    CapacityMemory selectByCourseIdAndId(@Param("studentId") Long studentId, @Param("courseId") Long courseId,
+    List<CapacityMemory> selectByCourseIdAndId(@Param("studentId") Long studentId, @Param("courseId") Long courseId,
                                          @Param("correctWordId") Long id);
 
 	/**
