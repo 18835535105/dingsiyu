@@ -606,7 +606,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         double gold = 0;
         if (student.getBonusExpires() != null) {
             if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
-                gold += 0.2;
+                gold *= 1.2;
             }
         }
         // 提示语
@@ -619,7 +619,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             studentMapper.updateByPrimaryKeySelective(student);
             session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         }
-        tip.append(Math.round(gold)).append("个");
+        tip.append(Math.round(gold)).append(" 个");
         return tip.toString();
     }
 
