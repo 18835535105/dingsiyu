@@ -212,7 +212,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         this.initStudentFlow(student, testRecord.getPoint());
 
         countMyGoldUtil.countMyGold(student);
-        studentMapper.updateByPrimaryKeySelective(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(map);
     }
@@ -259,7 +258,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             msg = "失败乃成功他母亲，速速利用第二次机会迎回春天！";
             map.put("tip", msg);
             testRecord.setExplain(testRecord.getExplain() + msg);
-            map.put("tip", "游戏还不错吧？下面我们来开始“特色版”的学习吧。");
+            map.put("tip", "游戏还不错吧？下面我们来开始学习吧。");
         }
 
         // 保存历史最高分和历史最低分
