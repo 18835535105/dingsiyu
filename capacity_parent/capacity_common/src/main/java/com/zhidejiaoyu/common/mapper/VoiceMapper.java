@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.Teacher;
 import com.zhidejiaoyu.common.pojo.Voice;
 import com.zhidejiaoyu.common.pojo.VoiceExample;
 import org.apache.ibatis.annotations.Param;
@@ -62,4 +63,24 @@ public interface VoiceMapper extends BaseMapper<Voice> {
      */
     List<Map<String,Object>> selectTeksRank(Map<String,Object> map);
 
-}
+    /**
+     * 获取好声音全校排行
+     *
+     * @param teachers
+     * @param schoolAdminId
+     * @param unitId
+     * @param wordId
+     * @param type
+     * @return
+     */
+    List<Voice> selectSchoolRank(@Param("teachers") List<Teacher> teachers, @Param("schoolAdminId") Integer schoolAdminId, @Param("unitId") Long unitId, @Param("wordId") Long wordId, @Param("type") Integer type);
+
+    /**
+     * 查询所有没有班级的学生的好声音排行
+     *
+     * @param unitId
+     * @param wordId
+     * @param type
+     * @return
+     */
+    List<Voice> selectTeacherIdIsNull(@Param("unitId") Long unitId, @Param("wordId") Long wordId, @Param("type") Integer type);}

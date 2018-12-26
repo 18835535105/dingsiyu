@@ -24,4 +24,14 @@ public class UserConstant {
 	 * 当前登录的教师
 	 */
 	public static final String CURRENT_TEACHER = "CURRENT_TEACHER";
+
+	/**
+	 * 校长角色id
+	 */
+	public static final Integer SCHOOL_ADMIN_ROLE_ID = 9;
+
+	/**
+	 * 教师角色id
+	 */
+	public static final Integer TEACHER_ROLE_ID = 6;
 }

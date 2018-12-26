@@ -324,5 +324,29 @@
   <select id="selMaxCountByUnitIdAndStudentId" parameterType="java.util.Map" resultType="java.lang.Integer">
       select Max(count) from voice  where unit_id=#{unitId} and student_id=#{studentId}
   </select>
+  <select id="selectSchoolRank" resultMap="BaseResultMap" parameterType="map">
+    select <include refid="more_table_list"/> from voice v, student s where v.student_id = s.id and (s.teacher_id in (
+    <foreach collection="teachers" item="teacher" separator=",">
+      #{teacher.teacherId}
+    </foreach>
+    )
+    <if test="schoolAdminId != null">
+      or s.teacher_id = #{schoolAdminId})
+    </if>
+    and v.unit_id = #{unitId} and v.word_id = #{wordId} and v.type = #{type}
+  </select>
+
+  <select id="selectTeacherIdIsNull" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="more_table_list"/>
+    from voice v,
+    student s
+    where v.student_id = s.id
+    and s.teacher_id is null
+    and v.unit_id = #{unitId}
+    and v.word_id = #{wordId}
+    and v.type = #{type}
+    order by v.score desc limit 10
+  </select>
 
 </mapper>

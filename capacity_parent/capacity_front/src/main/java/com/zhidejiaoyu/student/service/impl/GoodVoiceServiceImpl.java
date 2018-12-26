@@ -3,11 +3,9 @@ package com.zhidejiaoyu.student.service.impl;
 import com.zhidejiaoyu.common.Vo.student.voice.VoiceRankVo;
 import com.zhidejiaoyu.common.Vo.student.voice.VoiceVo;
 import com.zhidejiaoyu.common.constant.FileConstant;
+import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.Sentence;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.Vocabulary;
-import com.zhidejiaoyu.common.pojo.Voice;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.http.FtpUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
@@ -41,10 +39,16 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
     private SentenceMapper sentenceMapper;
 
     @Autowired
+    private TeacherMapper teacherMapper;
+
+    @Autowired
     private VoiceMapper voiceMapper;
 
     @Autowired
     private UnitMapper unitMapper;
+
+    @Autowired
+    private SysUserMapper sysUserMapper;
 
     @Autowired
     private CommonMethod commonMethod;
@@ -122,15 +126,44 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
         List<Voice> countryVoiceRank = voiceMapper.selectCountryRank(unitId, wordId, type);
         packageVoiceRankVo(countryRankVos, countryVoiceRank);
 
-        // 全班排行
-        List<Voice> classVoiceRank = voiceMapper.selectClassRank(student, unitId, wordId, type);
-        packageVoiceRankVo(classRankVos, classVoiceRank);
+        // 全校排行
+        List<Voice> schoolVoiceRank = packageSchoolRank(unitId, wordId, type, student);
+
+        packageVoiceRankVo(classRankVos, schoolVoiceRank);
 
         Map<String, List<VoiceRankVo>> map = new HashMap<>(16);
         map.put("classRankVos", classRankVos);
         map.put("countryRankVos", countryRankVos);
 
         return ServerResponse.createBySuccess(map);
+    }
+
+    private List<Voice> packageSchoolRank(Long unitId, Long wordId, Integer type, Student student) {
+        Long teacherId = student.getTeacherId();
+        List<Voice> schoolVoiceRank = null;
+        if (teacherId == null) {
+           schoolVoiceRank = voiceMapper.selectTeacherIdIsNull(unitId, wordId, type);
+        } else {
+            // 判断教师角色，如果是教师，查找其校管，再查找其所管辖的所有教师；如果是校管查找其所管辖的所有教师
+            List<Teacher> teachers;
+            SysUser sysUser = sysUserMapper.selectById(teacherId);
+            if (sysUser != null && sysUser.getRoleid().equals(UserConstant.SCHOOL_ADMIN_ROLE_ID.toString())) {
+                // 校管角色
+                teachers = teacherMapper.selectBySchoolAdminId(sysUser.getId());
+                if (teachers.size() > 0) {
+                    schoolVoiceRank = voiceMapper.selectSchoolRank(teachers, sysUser.getId(), unitId, wordId, type);
+                }
+            } else {
+                // 教师角色
+                Integer schoolAdminId = teacherMapper.selectSchoolAdminIdByTeacherId(teacherId);
+                // 校管角色
+                teachers = teacherMapper.selectBySchoolAdminId(schoolAdminId);
+                if (teachers.size() > 0) {
+                    schoolVoiceRank = voiceMapper.selectSchoolRank(teachers, schoolAdminId, unitId, wordId, type);
+                }
+            }
+        }
+        return schoolVoiceRank;
     }
 
     @Override
@@ -215,7 +248,7 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
     }
 
     private void packageVoiceRankVo(List<VoiceRankVo> rankVos, List<Voice> voiceRank) {
-        if (voiceRank.size() > 0) {
+        if (voiceRank != null && voiceRank.size() > 0) {
             VoiceRankVo vo;
             for (Voice voice : voiceRank) {
                 vo = new VoiceRankVo();

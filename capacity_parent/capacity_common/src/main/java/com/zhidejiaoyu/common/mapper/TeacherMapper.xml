@@ -29,10 +29,19 @@
         qq
     </sql>
 
-    <select id="selectByTeacherId" resultType="com.zhidejiaoyu.common.pojo.Teacher" parameterType="map">
+    <select id="selectByTeacherId" resultMap="BaseResultMap" parameterType="map">
         select <include refid="base_sql"/>
         from teacher
         where teacher_id = #{teacherId}
     </select>
-
+    <select id="selectBySchoolAdminId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from teacher where school_admin_id = #{schoolAdminId}
+    </select>
+    <select id="selectSchoolAdminIdByTeacherId" resultType="java.lang.Integer" parameterType="map">
+        select school_admin_id
+        from teacher
+        where teacher_id = #{teacherId}
+    </select>
 </mapper>

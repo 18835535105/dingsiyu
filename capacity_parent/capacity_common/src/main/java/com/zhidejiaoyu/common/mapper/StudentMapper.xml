@@ -3,6 +3,8 @@
 <mapper namespace="com.zhidejiaoyu.common.mapper.StudentMapper">
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Student">
         <id column="id" property="id" jdbcType="BIGINT"/>
+        <id column="teacher_id" property="teacherId" />
+        <id column="class_id" property="classId" />
         <result column="account" property="account" jdbcType="VARCHAR"/>
         <result column="password" property="password" jdbcType="VARCHAR"/>
         <result column="account_time" property="accountTime" jdbcType="TIMESTAMP"/>
@@ -117,6 +119,8 @@
         id,
         account,
         password,
+        teacher_id,
+        class_id,
         account_time,
         province,
         city,

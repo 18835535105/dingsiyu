@@ -1,10 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.UnitVocabulary;
-import com.zhidejiaoyu.common.pojo.Vocabulary;
-import com.zhidejiaoyu.common.pojo.VocabularyExample;
+import com.zhidejiaoyu.common.pojo.*;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Param;
 
@@ -373,4 +370,6 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     List<Vocabulary> selectUnlearnInBookPlayer(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+
+
 }

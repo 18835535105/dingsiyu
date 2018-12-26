@@ -2,6 +2,9 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.Teacher;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -20,4 +23,20 @@ public interface TeacherMapper extends BaseMapper<Teacher> {
      * @return
      */
     Teacher selectByTeacherId(Long teacherId);
+
+    /**
+     * 查询校管管辖的所有教师信息
+     *
+     * @param schoolAdminId
+     * @return
+     */
+    List<Teacher> selectBySchoolAdminId(@Param("schoolAdminId") Integer schoolAdminId);
+
+    /**
+     * 查询当前教师所属的校管id
+     *
+     * @param teacherId
+     * @return
+     */
+    Integer selectSchoolAdminIdByTeacherId(@Param("teacherId") Long teacherId);
 }
