@@ -1,16 +1,14 @@
 package com.zhidejiaoyu.student.controller;
 
+import com.zhidejiaoyu.common.pojo.Voice;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.GoodVoiceService;
-import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -34,12 +32,14 @@ public class GoodVoiceController {
      * @param session
      * @param unitId
      * @param type  1：单词；2：例句
+     * @param flag  1:获取流程内单词好声音题目；2：获取流程外单词好声音题目
      * @return
      */
     @GetMapping("/getSubjects")
     public ServerResponse getSubjects(HttpSession session, @NotNull(message = "unitId 不能为空！") Long unitId,
-                                      @RequestParam(required = false, defaultValue = "1") Integer type) {
-        return goodVoiceService.getSubjects(session, unitId, type);
+                                      @RequestParam(required = false, defaultValue = "1") Integer type,
+                                      @RequestParam(required = false, defaultValue = "1") Integer flag) {
+        return goodVoiceService.getSubjects(session, unitId, type, flag);
     }
 
     /**
@@ -62,32 +62,28 @@ public class GoodVoiceController {
      * 保存录音
      *
      * @param session
-     * @param unitId
-     * @param wordId
      * @param word 需要评测的文本内容
-     * @param type
      * @param audio 录音文件
      * @return
      */
     @PostMapping("/saveVoice")
-    public ServerResponse saveVoice(HttpSession session, @NotNull(message = "unitId 不能为空！") Long unitId,
-                                    @NotNull(message = "wordId 不能为空！") Long wordId,
+    public ServerResponse saveVoice(HttpSession session, Voice voice,
                                     @NotEmpty(message = "word 不能为空！") String word,
-                                    @NotNull(message = "type 不能为空！") @Min(1) @Max(2) Integer type,
                                     @NotNull(message = "录音不能为空！") MultipartFile audio) {
-
-        return goodVoiceService.saveVoice(session, unitId, wordId, word, type, 0,audio);
+        voice.setCount(0);
+        return goodVoiceService.saveVoice(session, voice, word, audio);
     }
 
     /**
      * 课文好声音
      */
     @PostMapping("/saveTeks")
-    public ServerResponse saveTeks(HttpSession session, @NotNull(message = "unitId 不能为空！") Long unitId,
+    public ServerResponse saveTeks(HttpSession session,  Voice voice,
                                    @NotNull(message = "wordId 不能为空！") Long sentenceId,
                                    @NotEmpty(message = "word 不能为空！") String sentence,
-                                   @NotNull(message = "type 不能为空！") @Min(1) @Max(2) Integer type,
-                                   @NotNull(message = "录音不能为空！") MultipartFile audio, Integer count){
-        return goodVoiceService.saveVoice(session, unitId, sentenceId, sentence, type, count,audio);
+                                   @NotNull(message = "录音不能为空！") MultipartFile audio){
+        voice.setWordId(sentenceId);
+        voice.setCount(0);
+        return goodVoiceService.saveVoice(session, voice, sentence, audio);
     }
 }

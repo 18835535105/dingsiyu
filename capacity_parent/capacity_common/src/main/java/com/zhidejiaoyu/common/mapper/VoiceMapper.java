@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Voice;
 import com.zhidejiaoyu.common.pojo.VoiceExample;
@@ -8,14 +9,12 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
-public interface VoiceMapper {
+public interface VoiceMapper extends BaseMapper<Voice> {
     int countByExample(VoiceExample example);
 
     int deleteByExample(VoiceExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(Voice record);
 
     int insertSelective(Voice record);
 

@@ -13,8 +13,10 @@ import com.zhidejiaoyu.common.utils.http.FtpUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.FileResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.GoodVoiceService;
 import com.zhidejiaoyu.student.utils.GoodVoiceUtil;
+import jxl.read.biff.Record;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,12 +61,20 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Autowired
     private GoodVoiceUtil goodVoiceUtil;
 
+    @Autowired
+    private RedisOpt redisOpt;
+
     @Override
-    public ServerResponse getSubjects(HttpSession session, Long unitId, Integer type) {
+    public ServerResponse getSubjects(HttpSession session, Long unitId, Integer type, Integer flag) {
         Student student = getStudent(session);
         List<VoiceVo> voiceVos;
         if (type == 1) {
-            List<Vocabulary> vocabularies = vocabularyMapper.selectWordVoice(student.getId(), unitId);
+            List<Vocabulary> vocabularies;
+            if (flag == 1) {
+                vocabularies = vocabularyMapper.selectWordVoice(student.getId(), unitId);
+            } else {
+                vocabularies = redisOpt.getWordInfoInUnit(unitId);
+            }
             if (vocabularies.size() == 0) {
                 return ServerResponse.createBySuccess("当前单元没有待学习的单词。");
             }
@@ -124,7 +134,7 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
     }
 
     @Override
-    public ServerResponse saveVoice(HttpSession session, Long unitId, Long wordId, String word, Integer type,Integer count, MultipartFile audio) {
+    public ServerResponse saveVoice(HttpSession session, Voice voice, String word, MultipartFile audio) {
 
         Student student = getStudent(session);
 
@@ -138,11 +148,11 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
         String file=  ftpUtil.uploadGoodVoice(audio, FileConstant.GOOD_VOICE);
         String fileName=FileConstant.GOOD_VOICE +file;
 
-        System.out.println("上传数据 wordId :"+wordId+"  word :"+word+"    type :"+type+"   count"+count+"  audio :"+audio);
+        log.info("上传数据 wordId :" + voice.getWordId() + "  word :" + word + "    type :" + voice.getType() + "   count" + voice.getCount() + "  audio :" + audio);
         String url = prefix + fileName;
         int score=0;
         Map<String, Object> map;
-        if (type == 1) {
+        if (voice.getType() == 1) {
             if(file!=null){
                 map = goodVoiceUtil.getWordEvaluationRecord(word, url);
                 score = (int) map.get("score");
@@ -190,27 +200,18 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
         }
         map.put("voiceUrl", url);
 
-        Long courseId = unitMapper.selectCourseIdByUnitId(unitId);
-        if(file!=null){
-            saveVoice(unitId, wordId, type, student, fileName, score, courseId,count);
+        Long courseId = unitMapper.selectCourseIdByUnitId(voice.getUnitId());
+        if(file != null){
+            voice.setCourseId(courseId);
+            voice.setCreateTime(new Date());
+            voice.setScore(score * 1.0);
+            voice.setStudentId(student.getId());
+            voice.setStudentName(student.getStudentName());
+            voice.setVoiceUrl(fileName);
+            voiceMapper.insert(voice);
         }
 
         return ServerResponse.createBySuccess(map);
-    }
-
-    private void saveVoice(Long unitId, Long wordId, Integer type, Student student, String fileName, int record, Long courseId,Integer count) {
-        Voice voice = new Voice();
-        voice.setCourseId(courseId);
-        voice.setCreateTime(new Date());
-        voice.setScore(record * 1.0);
-        voice.setStudentId(student.getId());
-        voice.setStudentName(student.getStudentName());
-        voice.setType(type);
-        voice.setUnitId(unitId);
-        voice.setVoiceUrl(fileName);
-        voice.setWordId(wordId);
-        voice.setCount(count);
-        voiceMapper.insert(voice);
     }
 
     private void packageVoiceRankVo(List<VoiceRankVo> rankVos, List<Voice> voiceRank) {

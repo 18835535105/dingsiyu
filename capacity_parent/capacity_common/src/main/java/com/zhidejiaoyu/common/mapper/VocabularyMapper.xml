@@ -994,7 +994,7 @@
         AND v.id
         =
         uv.vocabulary_id AND v.delStatus = 1
-        and v.id not in (select word_id from voice where student_id = #{studentId} and unit_id = #{unitId})
+        and v.id not in (select word_id from voice where student_id = #{studentId} and unit_id = #{unitId} and type = 1)
     </select>
     <select id="selectUnlearnInBookPlayer" resultMap="BaseResultMap" parameterType="map">
         select

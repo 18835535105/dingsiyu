@@ -111,30 +111,6 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.Voice" >
-      insert into voice (id,
-                         student_id,
-                         course_id,
-                         unit_id,
-                         word_id,
-                         student_name,
-                         type,
-                         score,
-                         voice_url,
-                         create_time,
-                         count)
-      values (#{id,jdbcType=BIGINT},
-              #{studentId,jdbcType=BIGINT},
-              #{courseId,jdbcType=BIGINT},
-              #{unitId,jdbcType=BIGINT},
-              #{wordId,jdbcType=BIGINT},
-              #{studentName,jdbcType=VARCHAR},
-              #{type,jdbcType=INTEGER},
-              #{score,jdbcType=DOUBLE},
-              #{voiceUrl,jdbcType=VARCHAR},
-              #{createTime,jdbcType=TIMESTAMP},
-              #{count,jdbcType=INTEGER})
-  </insert>
   <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Voice" >
     insert into voice
     <trim prefix="(" suffix=")" suffixOverrides="," >

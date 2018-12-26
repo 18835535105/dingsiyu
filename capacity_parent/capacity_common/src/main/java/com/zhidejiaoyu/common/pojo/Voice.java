@@ -35,6 +35,11 @@ public class Voice extends Model<Voice> {
 
     private Integer count;
 
+    /**
+     * 1:流程内单词好声音；2：流程外单词好声音
+     */
+    private Integer flag;
+
     @Override
     protected Serializable pkVal() {
         return this.id;
