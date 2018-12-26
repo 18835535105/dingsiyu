@@ -43,4 +43,13 @@ public interface StudentFlowMapper {
      */
     @Select("select b.model_name from student_flow a join study_flow b ON a.current_flow_id = b.id AND a.student_id = #{id}")
 	String getStudentFlow(Long id);
+
+    /**
+     *
+     * @param studentId
+     * @param timeMachine   是否是时光机流程。0：普通流程；1：时光机流程
+     * @param presentFlow   是否是当前流程 1：是；2：不是
+     * @return
+     */
+    StudentFlow selectByStudentId(@Param("studentId") Long studentId, @Param("timeMachine") int timeMachine, @Param("presentFlow") int presentFlow);
 }

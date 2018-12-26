@@ -11,10 +11,10 @@ import com.zhidejiaoyu.common.pojo.Voice;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.http.FtpUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
+import com.zhidejiaoyu.common.utils.server.FileResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.GoodVoiceService;
 import com.zhidejiaoyu.student.utils.GoodVoiceUtil;
-import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -127,18 +127,16 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
     public ServerResponse saveVoice(HttpSession session, Long unitId, Long wordId, String word, Integer type,Integer count, MultipartFile audio) {
 
         Student student = getStudent(session);
+
+        // 文件大于2M禁止上传，讯飞语音评测接口最大支持2M音频文件
+        long maxSize = 2097152L;
+        if (audio.getSize() > maxSize) {
+            return ServerResponse.createBySuccess(FileResponseCode.TOO_LARGE.getCode(), FileResponseCode.TOO_LARGE.getMsg());
+        }
+
         // 上传录音文件
-        String fileName =null ;
-        /*try{*/
-            String file=  ftpUtil.uploadGoodVoice(audio, FileConstant.GOOD_VOICE);
-            fileName=FileConstant.GOOD_VOICE +file;
-        /*}catch (Exception e){
-            try{
-                fileName= FileConstant.GOOD_VOICE + ftpUtil.uploadGoodVoice(audio, FileConstant.GOOD_VOICE);
-            }catch (Exception s) {
-                System.out.println("读音报错");
-            }
-        }*/
+        String file=  ftpUtil.uploadGoodVoice(audio, FileConstant.GOOD_VOICE);
+        String fileName=FileConstant.GOOD_VOICE +file;
 
         System.out.println("上传数据 wordId :"+wordId+"  word :"+word+"    type :"+type+"   count"+count+"  audio :"+audio);
         String url = prefix + fileName;

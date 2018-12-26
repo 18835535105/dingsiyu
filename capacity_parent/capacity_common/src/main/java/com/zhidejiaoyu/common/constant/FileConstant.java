@@ -33,4 +33,9 @@ public class FileConstant {
      */
     public static final String GOOD_VOICE = "audio/voice/";
 
+    /**
+     * 单词读音地址
+     */
+    public static final String WORD_AUDIO = "audio/word/";
+
 }

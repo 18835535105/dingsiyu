@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Select;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 记忆追踪mapper
@@ -279,7 +280,7 @@ public interface CapacityReviewMapper {
      * @param limit
      * @return
      */
-    List<Map<String, Object>> selectMemoryNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds, @Param("limit") int limit);
+    List<Map<String, Object>> selectMemoryNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") Set<Long> wordIds, @Param("limit") int limit);
 
     /**
      * 获取当前所学课程下慧听力需要复习的单词
@@ -289,7 +290,7 @@ public interface CapacityReviewMapper {
      * @param limit
 	 * @return
      */
-    List<Map<String, Object>> selectListenNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds, @Param("limit") int limit);
+    List<Map<String, Object>> selectListenNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") Set<Long> wordIds, @Param("limit") int limit);
 
     /**
      * 获取当前所学课程下慧默写需要复习的单词
@@ -299,7 +300,7 @@ public interface CapacityReviewMapper {
      * @param limit
 	 * @return
      */
-    List<Map<String, Object>> selectWriteNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds, @Param("limit") int limit);
+    List<Map<String, Object>> selectWriteNeedReviewInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") Set<Long> wordIds, @Param("limit") int limit);
 
 	/**
 	 * 获取学生指定单元下指定单词需要复习的个数

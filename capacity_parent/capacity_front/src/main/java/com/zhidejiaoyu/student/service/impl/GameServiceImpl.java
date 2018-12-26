@@ -93,6 +93,12 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
 
             // 从学生当前正在学习的课程中随机获取110个单词
             List<String> wordList = learnMapper.selectWordInCurrentCourse(student.getId(), wordIds);
+            if (wordList.size() < 110) {
+                // 如果当前课程下单词总数补足110个，从其他智能版课程随机再取剩余数量的单词
+                List<String> otherWordList = learnMapper.selectWordRandomInCourse(student.getId(), 110 - wordIds.size());
+                wordList.addAll(otherWordList);
+            }
+            Collections.shuffle(wordList);
 
             List<GameTwoVo> gameTwoVos = new ArrayList<>();
             List<String> subjects;
@@ -208,7 +214,7 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
             }
 
             // 存储需要排除的单词id
-            List<Long> wordIds = new ArrayList<>();
+            Set<Long> wordIds = new HashSet<>(16);
             if (pictureMapList.size() > 0) {
                 pictureMapList.forEach(pictureMap -> wordIds.add(Long.valueOf(pictureMap.get("id").toString())));
             }

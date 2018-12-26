@@ -1308,7 +1308,7 @@
             #{wordId}
         </foreach>
         )
-        order by rand() limit 110
+        limit 110
     </select>
 
     <select id="selectLastLoginStudy" resultMap="BaseResultMap" parameterType="map">
@@ -1323,5 +1323,12 @@
             #{unitId}
         </foreach>
         )
+    </select>
+    <select id="selectWordRandomInCourse" resultType="java.lang.String" parameterType="map">
+        select v.word
+        from vocabulary v, unit_vocabulary uv, unit u, student_unit su
+        where v.id = uv.vocabulary_id and v.delStatus = 1
+        and uv.unit_id = u.id and su.unit_id = u.id and su.student_id = #{studentId} and su.type = 1
+        limit #{count}
     </select>
 </mapper>

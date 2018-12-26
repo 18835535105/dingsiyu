@@ -102,9 +102,6 @@ public class SaveTestLearnAndCapacity {
                 } else {
                     count = this.saveLearnAndCapacity(session, student, unitId[i], correctWordId[i], classify, true);
                 }
-                if (count == 0) {
-                    return ServerResponse.createByErrorMessage("无当前模块的学习记录");
-                }
             }
         }
 
@@ -117,9 +114,6 @@ public class SaveTestLearnAndCapacity {
                     count = this.saveLearnAndCapacity(session, student, unitId[0], errorWordId[i], classify, false);
                 } else {
                     count = this.saveLearnAndCapacity(session, student, unitId[i], errorWordId[i], classify, false);
-                }
-                if (count == 0) {
-                    return ServerResponse.createByErrorMessage("无当前模块的学习记录");
                 }
             }
         }

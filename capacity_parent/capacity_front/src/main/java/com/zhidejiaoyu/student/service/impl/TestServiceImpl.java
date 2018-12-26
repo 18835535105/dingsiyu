@@ -107,7 +107,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     private CcieUtil ccieUtil;
     
     @Autowired
-    private DurationMapper durationMapper;
+    private CapacityStudentUnitMapper capacityStudentUnitMapper;
 
     @Autowired
     private TestRecordInfoMapper testRecordInfoMapper;
@@ -150,26 +150,22 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         // 设置游戏测试开始时间
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-        List<Vocabulary> vocabularies = vocabularyMapper.selectByCourseId(2751L);
-        // 根据当前学生所学学段去对应的单词预科库中查找对应的单词和释义
-        String grade = student.getGrade();
-        String phase = commonMethod.getPhase(grade);
-
-        // todo: 以下取题以后改为从预科库中获取
-        /*if ("初中".equals(phase)) {
-            // 前往初中预科库查询简单单词
-            vocabularies = vocabularyMapper.selectByStudentPhase(student, 1);
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+        List<Vocabulary> vocabularies;
+        Long courseId;
+        if (capacityStudentUnit != null) {
+            courseId = capacityStudentUnit.getCourseId();
+            PageHelper.startPage(1, 100);
+            vocabularies = vocabularyMapper.selectByCourseId(courseId);
         } else {
-            // 前往高中预科库查询简单单词
-            vocabularies = vocabularyMapper.selectByStudentPhase(student, 2);
-            if (vocabularies.size() == 0) {
-                vocabularies = vocabularyMapper.selectByStudentPhase(student, 3);
-            }
-        }*/
+            courseId = 2751L;
+            vocabularies = vocabularyMapper.selectByCourseId(2751L);
+        }
+        Collections.shuffle(vocabularies);
 
         String[] type = {"汉译英"};
         // 游戏测试从取当前学段的预科库中的单词25个,其中有5个未预备单词，即可以直接跳过
-        List<TestResult> testResults = testResultUtil.getWordTestes(type, 26, vocabularies, student.getVersion(), phase);
+        List<TestResult> testResults = testResultUtil.getWordTestesForCourse(type, 26, vocabularies, courseId);
         Map<String, Object> map = new HashMap<>(16);
         map.put("testResults", testResults);
         if (point != null) {
@@ -228,18 +224,21 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      * @param point
      */
     private void initStudentFlow(Student student, Integer point) {
-        StudentFlow studentFlow = new StudentFlow();
-        studentFlow.setStudentId(student.getId());
-        studentFlow.setTimeMachine(0);
-        studentFlow.setPresentFlow(1);
-        if (point >= PASS) {
-            // 流程2
-            studentFlow.setCurrentFlowId(24L);
-        } else {
-            // 流程1
-            studentFlow.setCurrentFlowId(11L);
+        StudentFlow studentFlow = studentFlowMapper.selectByStudentId(student.getId(), 0, 1);
+        if (studentFlow == null) {
+            studentFlow = new StudentFlow();
+            studentFlow.setStudentId(student.getId());
+            studentFlow.setTimeMachine(0);
+            studentFlow.setPresentFlow(1);
+            if (point >= PASS) {
+                // 流程2
+                studentFlow.setCurrentFlowId(24L);
+            } else {
+                // 流程1
+                studentFlow.setCurrentFlowId(11L);
+            }
+            studentFlowMapper.insert(studentFlow);
         }
-        studentFlowMapper.insert(studentFlow);
     }
 
     /**

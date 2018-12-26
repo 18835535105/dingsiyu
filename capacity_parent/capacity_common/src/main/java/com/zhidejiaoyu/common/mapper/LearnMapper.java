@@ -735,4 +735,12 @@ public interface LearnMapper {
      */
     @MapKey("unitId")
     Map<Long, Map<Long, Long>> selectUnlearnUnit(@Param("studentId") Long studentId, @Param("unitIds") List<Long> unitIds);
+
+    /**
+     * 从学生智能版课程中随机取出count个单词
+     * @param studentId
+     * @param count
+     * @return
+     */
+    List<String> selectWordRandomInCourse(@Param("studentId") Long studentId, @Param("count") int count);
 }

@@ -478,7 +478,7 @@
     <select id="selectLastLoginDuration" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="Base_Column_List"/>
-        from duration where student_id = #{studentId} and online_time &lt;&gt; 0 and online_time is not null order by id
+        from duration where student_id = #{studentId} and online_time &lt;&gt; 0 order by id
         desc limit 1
     </select>
 
@@ -487,6 +487,6 @@
         from duration
         where student_id = #{student.id}
           and login_time = #{loginTime}
-          and login_out_time is not null
+          and online_time &lt;> 0
     </select>
 </mapper>

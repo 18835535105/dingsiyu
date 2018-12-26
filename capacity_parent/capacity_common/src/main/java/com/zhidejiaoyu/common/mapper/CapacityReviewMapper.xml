@@ -495,7 +495,7 @@
 
     <select id="selectLastLoginNeedReview" resultType="java.util.Map" parameterType="map">
         select
-        memory_strength memoryStrength, fault_time, vocabulary_id id, unit_id, word, word_chinese
+        memory_strength memoryStrength, fault_time, vocabulary_id id, unit_id, word, word_chinese wordChinese, syllable wordyj
         from
         <include refid="classify_sql"/>
         where student_id = #{studentId} and unit_id in (

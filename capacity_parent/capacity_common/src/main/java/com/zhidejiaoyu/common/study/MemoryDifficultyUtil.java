@@ -72,7 +72,7 @@ public class MemoryDifficultyUtil {
 
             if (errCount > studyCount) {
                 logger.error("学生 {} 在单元 {} 模块 {} 下的单词 {} 错误次数大于了学习次数！", studentId, unitId, studyModel, id);
-                throw new RuntimeException("学生当前单词错误次数大于学习次数");
+                errCount = studyCount;
             }
 
             // 错误率

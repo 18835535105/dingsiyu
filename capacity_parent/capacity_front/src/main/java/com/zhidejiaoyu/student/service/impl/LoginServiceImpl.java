@@ -224,7 +224,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 单词图鉴模块, 单元下共有多少带图片的单词
         Long countWord = null;
 
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 4; i++) {
             Map<String, Object> a = new HashMap<>(16);
             //-- 如果 2 = NULL 就跳过4步执行5步   condition = 3(方框为空)
             //-- 如果 2 != NULL 执行4步跳过第5步 , 如果第2步>=80 condition = 1(方框为√), 如果第3步<80 condition = 2(方框为×)
@@ -259,7 +259,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             if (sumValid == null) {
             	sumValid = 0;
             }
-            Integer speed = (int) (BigDecimalUtil.div(sum, sumValid)*3600);
+            int speed = (int) (BigDecimalUtil.div(sum, sumValid)*3600);
 
             // 封装返回结果
             // 已做单元闯关
@@ -288,8 +288,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 a.put("speed", speed + "");
             }
             result.put(i + "", a);
-
-
         }
 
         // 封装返回的数据 - 智能记忆智能复习数量
@@ -317,18 +315,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         result.put("amount2", b);
         result.put("amount3", c);
         result.put("amount0", d);
-        // 听力模块许复习量
-        cr.setClassify("4");
-        Integer e = capacityMapper.countCapacity_memory(cr);
-        // 翻译模块许复习量
-        cr.setClassify("5");
-        Integer f = capacityMapper.countCapacity_memory(cr);
-        // 默写模块许复习量
-        cr.setClassify("6");
-        Integer g = capacityMapper.countCapacity_memory(cr);
-        result.put("amount4", e);
-        result.put("amount5", f);
-        result.put("amount6", g);
         // 是否需要隐藏学习模块
         if (a >= 20 || b >= 10 || c >= 10 || d >=10) {
             result.put("hide", true);
@@ -355,8 +341,10 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             StringBuilder sb = new StringBuilder();
             // 上次登录期间学生的单词学习信息
             Duration duration = durationMapper.selectLastLoginDuration(stu.getId());
+            logger.info("学生上次登录时间：duration:[{}]", duration);
             if (duration != null) {
                 List<Learn> learns = learnMapper.selectLastLoginStudy(stu.getId(), duration.getLoginTime(), duration.getLoginOutTime());
+                logger.info("学生上次登录期间学习信息：learns=[{}]", learns);
                 if (learns.size() > 0) {
                     // 存储单词id及单元
                     List<Map<String, Object>> maps = ReviewServiceImpl.packageLastLoginLearnWordIds(learns);
@@ -663,13 +651,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 封装返回数据
         Map<String, Object> result = new HashMap<>(16);
 
-        // 根据传入的账号密码, 查询个人信息, 加密查询
-        Md5Hash md5 = new Md5Hash(password, SaltConstant.SALT);
-        Student stu = LoginJudge(account, md5.toString());
-        // 没查到不加密查询
-        if(stu == null){
-            stu = LoginJudge(account, password);
-        }
+        Student stu = LoginJudge(account, password);
 
         // 1.账号/密码错误
         if (stu == null) {
@@ -746,7 +728,16 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 return ServerResponse.createBySuccess("2", result);
             }
 
-            // 判断是否需要学前测试
+            TestRecordExample testRecordExample = new TestRecordExample();
+            testRecordExample.createCriteria().andStudentIdEqualTo(stu.getId()).andGenreEqualTo("学前游戏测试");
+            List<TestRecord> testRecords = testRecordMapper.selectByExample(testRecordExample);
+            int size = testRecords.size();
+            if (size == 0) {
+                // 第一次进行游戏测试
+                return ServerResponse.createBySuccess("3", result);
+            }
+
+            /*// 判断是否需要学前测试
             // 判断学生是否已经有推送的课程
             // 有推送课程，不需要学前测试
             int courseCount = studentUnitMapper.countUnitCountByStudentId(stu, commonMethod.getPhase(stu.getGrade()));
@@ -763,12 +754,12 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 
                 // 第二次登陆
                 // 游戏测试次数
-                /*int count = Integer.parseInt(testRecords.get(0).getExplain().split("#")[1]);
+                *//*int count = Integer.parseInt(testRecords.get(0).getExplain().split("#")[1]);
                 if (count == 1) {
                     // 进行游戏测试
                     return ServerResponse.createBySuccess("5", result);
-                }*/
-            }
+                }*//*
+            }*/
 
             // 一个账户只能登陆一台
             judgeMultipleLogin(session, stu);
@@ -808,7 +799,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         Long stuId = stu.getId();
         Integer count = runLogMapper.selectLoginCountByStudentId(stuId);
         if (count == 0) {
-            stu.setAccountTime(new Date(System.currentTimeMillis() + stu.getRank() * 24 * 60 * 60 * 1000));
+            stu.setAccountTime(new Date(System.currentTimeMillis() + stu.getRank() * 24 * 60 * 60 * 1000L));
 
             // 初始化学生勋章信息
             initMedalInfo(stuId, stu);

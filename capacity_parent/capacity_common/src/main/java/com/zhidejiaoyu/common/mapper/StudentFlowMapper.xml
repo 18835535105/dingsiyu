@@ -165,6 +165,12 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </select>
+    <select id="selectByStudentId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from student_flow where student_id = #{studentId} and time_machine = #{timeMachine} and present_flow =
+        #{presentFlow}
+    </select>
 
     <update id="updateByExampleSelective" parameterType="map">
         update student_flow
