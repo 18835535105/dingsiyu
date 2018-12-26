@@ -43,10 +43,10 @@ public class QuartzServiceImpl implements QuartzService {
     private StudentWorkDayMapper studentWorkDayMapper;
 
     /**
-     * 学生升级，每年8月25日 23:59 分学生由低年级升至高年级
+     * 学生升级，每年8月25日 23:59 分学生由低年级升至高年级(已废弃）
      */
     @Transactional(rollbackFor = Exception.class)
-    @Scheduled(cron = "59 59 23 25 8 ?")
+    // @Scheduled(cron = "59 59 23 25 8 ?")
     @Override
     public void studentUpgrade() {
         logger.info("定时任务 -> 学生升级 开始执行...");
