@@ -252,4 +252,12 @@ public interface StudentMapper extends BaseMapper<Student> {
     @Update("update student set account_time = #{format} where id = #{studentId}")
     int updateAccountTimeByStudentId(@Param("studentId") long studentId, @Param("format") String format);
 
+    /**
+     * 查询指定学生的头像
+     *
+     * @param studentIds
+     * @return
+     */
+    @MapKey("id")
+    Map<Long, Map<Long, String>> selectHeadUrlMapByStudentId(@Param("studentIds") List<Long> studentIds);
 }

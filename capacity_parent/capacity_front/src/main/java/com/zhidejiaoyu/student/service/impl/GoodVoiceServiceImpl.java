@@ -51,6 +51,9 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
     private SysUserMapper sysUserMapper;
 
     @Autowired
+    private StudentMapper studentMapper;
+
+    @Autowired
     private CommonMethod commonMethod;
 
     @Autowired
@@ -156,7 +159,6 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
             } else {
                 // 教师角色
                 Integer schoolAdminId = teacherMapper.selectSchoolAdminIdByTeacherId(teacherId);
-                // 校管角色
                 teachers = teacherMapper.selectBySchoolAdminId(schoolAdminId);
                 if (teachers.size() > 0) {
                     schoolVoiceRank = voiceMapper.selectSchoolRank(teachers, schoolAdminId, unitId, wordId, type);
@@ -249,12 +251,20 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
     private void packageVoiceRankVo(List<VoiceRankVo> rankVos, List<Voice> voiceRank) {
         if (voiceRank != null && voiceRank.size() > 0) {
+            List<Long> studentIds = new ArrayList<>(voiceRank.size());
+            voiceRank.forEach(voice -> studentIds.add(voice.getStudentId()));
+            Map<Long, Map<Long, String>> hearUrlMap = studentMapper.selectHeadUrlMapByStudentId(studentIds);
             VoiceRankVo vo;
             for (Voice voice : voiceRank) {
                 vo = new VoiceRankVo();
                 vo.setScore(Integer.valueOf(voice.getScore().toString().split("\\.")[0]));
                 vo.setStudentName(voice.getStudentName());
                 vo.setVoiceUrl(prefix + voice.getVoiceUrl());
+                if (hearUrlMap.get(voice.getStudentId()) != null) {
+                    vo.setHeadUrl(hearUrlMap.get(voice.getStudentId()).get("headUrl"));
+                } else {
+                    vo.setHeadUrl("static/img/portrait/17.png");
+                }
                 rankVos.add(vo);
             }
         }

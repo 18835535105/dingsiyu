@@ -25,4 +25,9 @@ public class VoiceRankVo {
      * 录音地址
      */
     private String voiceUrl;
+
+    /**
+     * 学生头像
+     */
+    private String headUrl;
 }

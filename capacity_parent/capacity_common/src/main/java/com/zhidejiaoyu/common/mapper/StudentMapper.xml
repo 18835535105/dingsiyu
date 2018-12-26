@@ -1207,4 +1207,11 @@
         from student
         where id = #{studentId}
     </select>
+    <select id="selectHeadUrlMapByStudentId" resultType="java.util.Map" parameterType="map">
+        select id, head_url headUrl from student where id in (
+          <foreach collection="studentIds" separator="," item="id">
+              #{id}
+          </foreach>
+            )
+    </select>
 </mapper>
