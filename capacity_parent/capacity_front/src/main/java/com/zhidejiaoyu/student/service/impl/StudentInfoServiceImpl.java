@@ -619,7 +619,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             studentMapper.updateByPrimaryKeySelective(student);
             session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         }
-        tip.append(gold).append("个");
+        tip.append(Math.round(gold)).append("个");
         return tip.toString();
     }
 
