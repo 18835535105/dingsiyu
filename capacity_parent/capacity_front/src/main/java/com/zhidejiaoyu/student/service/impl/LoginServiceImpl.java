@@ -350,7 +350,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
                     String[] str = {"单词图鉴", "慧记忆", "慧听写", "慧默写"};
                     Integer memoryCount;
-                    for (int i = 0; i < 3; i++) {
+                    for (int i = 0; i < 4; i++) {
                         memoryCount = capacityReviewMapper.countCapacityByUnitIdAndWordId(stu.getId(), maps, i);
                         if (memoryCount != null && memoryCount > 0) {
                             sb.append(str[i]).append("-");
