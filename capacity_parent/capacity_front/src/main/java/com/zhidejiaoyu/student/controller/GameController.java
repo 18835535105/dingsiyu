@@ -7,10 +7,7 @@ import com.zhidejiaoyu.common.pojo.GameScore;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
@@ -41,14 +38,15 @@ public class GameController {
     }
 
     /**
-     * 获取游戏《冰火两重界》试题
+     * 获取游戏《冰火两重天》试题
      *
+     * @param pageNum 第几次获取游戏题
      * @param session
      * @return
      */
     @GetMapping("/getGameOne")
-    public ServerResponse<GameOneVo> getGameOne(HttpSession session) {
-        return gameService.getGameOne(session);
+    public ServerResponse<GameOneVo> getGameOne(HttpSession session, @RequestParam(required = false, defaultValue = "1") Integer pageNum) {
+        return gameService.getGameOne(session, pageNum);
     }
 
     /**

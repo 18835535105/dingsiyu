@@ -367,6 +367,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             } else {
                 // 需要进行智能复习
                 studyFlow = studyFlowMapper.selectById(7);
+                session.setAttribute("needReview", needReviewStr);
             }
             result.put("needReview", needReviewStr);
             result.put("nodeId", studyFlow.getId());
@@ -375,13 +376,19 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             session.removeAttribute("needCapacityReview");
         } else {
             // 获取智能化节点数据
-            StudyFlow flow = studyFlowMapper.getFlowInfoByStudentId(stu.getId());
+            StudyFlow flow;
+            if (session.getAttribute("needReview") != null) {
+                // 需要进行智能复习
+                flow = studyFlowMapper.selectById(7);
+                result.put("needReview", session.getAttribute("needReview"));
+            } else {
+                flow = studyFlowMapper.getFlowInfoByStudentId(stu.getId());
+                result.put("needReview", "");
+            }
             if(flow != null){
                 result.put("nodeId", flow.getId());
                 result.put("nodeName", flow.getFlowName());
             }
-
-            result.put("needReview", "");
             // 学生当前节点模块名
             result.put("flowName", studentFlowMapper.getStudentFlow(stu.getId()));
         }

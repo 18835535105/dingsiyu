@@ -751,4 +751,13 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @return
      */
     List<Map<String, Object>> selectLearnedByCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
+
+    /**
+     * 查询学生当前单元已学信息
+     *
+     * @param studentId
+     * @param unitId
+     * @return
+     */
+    List<Map<String, Object>> selectLearnedByUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 }

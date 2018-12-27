@@ -19,9 +19,10 @@ public interface GameService extends BaseService<GameStore> {
      * 获取游戏《冰火两重界》试题
      *
      * @param session
+     * @param pageNum
      * @return
      */
-    ServerResponse<GameOneVo> getGameOne(HttpSession session);
+    ServerResponse<GameOneVo> getGameOne(HttpSession session, Integer pageNum);
 
     /**
      * 获取游戏《桌牌捕音》试题

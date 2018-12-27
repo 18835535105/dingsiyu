@@ -55,11 +55,11 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
     private BaiduSpeak baiduSpeak;
 
     @Override
-    public ServerResponse<GameOneVo> getGameOne(HttpSession session) {
+    public ServerResponse<GameOneVo> getGameOne(HttpSession session, Integer pageNum) {
         Student student = getStudent(session);
 
-        // 从当前正在学习的课程已学习的单词中随机查找15个单词
-        List<Map<String, Object>> wordMap = this.getGameSubject(student, 15);
+        // 从当前正在学习的课程已学习的单词中随机查找10个单词
+        List<Map<String, Object>> wordMap = this.getGameOneSubject(student, pageNum);
 
         List<Map<String, Object>> subjects = new ArrayList<>(30);
 
@@ -84,12 +84,27 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         return ServerResponse.createBySuccess(gameOneVo);
     }
 
+    private List<Map<String, Object>> getGameOneSubject(Student student, Integer pageNum) {
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+        Long courseId = capacityStudentUnit.getCourseId();
+        PageHelper.startPage(pageNum, 10);
+        // 从当前单元单词中随机获取10题
+        List<Map<String, Object>> unitLearns = learnMapper.selectLearnedByUnitId(student.getId(), capacityStudentUnit.getUnitId());
+        if (unitLearns.size() < 10) {
+            PageHelper.startPage(pageNum, 10 - unitLearns.size());
+            packageGameSubjectMap(courseId, unitLearns);
+        }
+        Collections.shuffle(unitLearns);
+
+        return unitLearns;
+    }
+
     @Override
     public ServerResponse<List<GameTwoVo>> getGameTwo(HttpSession session) {
         Student student = getStudent(session);
 
         // 从当前课程随机取10个已学的单词
-        List<Map<String, Object>> needReviewWords = this.getGameSubject(student, 10);
+        List<Map<String, Object>> needReviewWords = this.getGameTwoSubject(student);
 
         List<Long> wordIds = new ArrayList<>(10);
         needReviewWords.forEach(map -> wordIds.add(Long.valueOf(map.get("id").toString())));
@@ -139,27 +154,32 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
      * 获取游戏题目
      *
      * @param student
-     * @param count 需要获取的题目个数
      * @return
      */
-    private List<Map<String, Object>> getGameSubject(Student student, int count) {
+    private List<Map<String, Object>> getGameTwoSubject(Student student) {
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
         Long courseId = capacityStudentUnit.getCourseId();
-        PageHelper.startPage(1, count);
-        List<Map<String, Object>> learns = learnMapper.selectLearnedByCourseId(student.getId(), courseId);
-        if (learns.size() < count) {
-            PageHelper.startPage(1, count - learns.size());
-            List<Vocabulary> vocabularies = vocabularyMapper.selectByCourseIdNotInWord(courseId, learns);
-            vocabularies.forEach(vocabulary -> {
-                Map<String, Object> map = new HashMap<>(16);
-                map.put("word", vocabulary.getWord());
-                map.put("wordChinese", vocabulary.getWordChinese());
-                map.put("id", vocabulary.getId());
-                learns.add(map);
-            });
+        PageHelper.startPage(1, 10);
+        // 从当前单元单词中随机获取10题
+        List<Map<String, Object>> unitLearns = learnMapper.selectLearnedByUnitId(student.getId(), capacityStudentUnit.getUnitId());
+        if (unitLearns.size() < 10) {
+            PageHelper.startPage(1, 10 - unitLearns.size());
+            packageGameSubjectMap(courseId, unitLearns);
         }
-        Collections.shuffle(learns);
-        return learns;
+        Collections.shuffle(unitLearns);
+
+        return unitLearns;
+    }
+
+    private void packageGameSubjectMap(Long courseId, List<Map<String, Object>> unitLearns) {
+        List<Vocabulary> vocabularies = vocabularyMapper.selectByCourseIdNotInWord(courseId, unitLearns);
+        vocabularies.forEach(vocabulary -> {
+            Map<String, Object> map = new HashMap<>(16);
+            map.put("word", vocabulary.getWord());
+            map.put("wordChinese", vocabulary.getWordChinese());
+            map.put("id", vocabulary.getId());
+            unitLearns.add(map);
+        });
     }
 
     @Override
@@ -226,58 +246,4 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         }
         gameScoreMapper.insert(gameScore);
     }
-
-    /**
-     * 从学生当前正在学习的课程中随机获取10个需要复习的生词
-     *
-     * @param student
-     * @return
-     */
-    private List<Map<String, Object>> getNeedReviewWord(Student student) {
-            // 获取当前所学课程下单词图鉴需要复习的单词
-            List<Map<String, Object>> pictureMapList = capacityReviewMapper.selectPictureNeedReviewInCurrentCourse(student.getId());
-            if (pictureMapList.size() == 10) {
-                return pictureMapList;
-            }
-
-            // 存储需要排除的单词id
-            Set<Long> wordIds = new HashSet<>(16);
-            if (pictureMapList.size() > 0) {
-                pictureMapList.forEach(pictureMap -> wordIds.add(Long.valueOf(pictureMap.get("id").toString())));
-            }
-
-            // 获取当前所学课程下慧记忆需要复习的单词
-            List<Map<String, Object>> memoryMapList = capacityReviewMapper.selectMemoryNeedReviewInCurrentCourse(student.getId(), wordIds, 10 - wordIds.size());
-            pictureMapList.addAll(memoryMapList);
-
-            if (pictureMapList.size() == 10) {
-                return pictureMapList;
-            }
-
-            if (pictureMapList.size() > 0) {
-                pictureMapList.forEach(pictureMap -> wordIds.add(Long.valueOf(pictureMap.get("id").toString())));
-            }
-
-            // 获取当前所学课程下慧听力需要复习的单词
-            List<Map<String, Object>> listenMapList = capacityReviewMapper.selectListenNeedReviewInCurrentCourse(student.getId(), wordIds, 10 - wordIds.size());
-            pictureMapList.addAll(listenMapList);
-
-            if (pictureMapList.size() == 10) {
-                return pictureMapList;
-            }
-
-            if (pictureMapList.size() > 0) {
-                pictureMapList.forEach(pictureMap -> wordIds.add(Long.valueOf(pictureMap.get("id").toString())));
-            }
-
-            // 获取当前所学课程下慧默写需要复习的单词
-            List<Map<String, Object>> writeMapList = capacityReviewMapper.selectWriteNeedReviewInCurrentCourse(student.getId(), wordIds, 10 - wordIds.size());
-            pictureMapList.addAll(writeMapList);
-
-            if (pictureMapList.size() == 10) {
-                return pictureMapList;
-            }
-            return new ArrayList<>();
-    }
-
 }

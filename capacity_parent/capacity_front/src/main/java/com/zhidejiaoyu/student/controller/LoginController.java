@@ -55,10 +55,15 @@ public class LoginController {
     /**
      * 首页数据(单词首页)
      *
+     * @param overReview true:智能复习节点完成；false：智能复习节点未完成
      * @return 首页需要展示的数据
      */
     @RequestMapping("/vocabularyIndex")
-    public ServerResponse<Object> indexDate(HttpSession session) {
+    public ServerResponse<Object> indexDate(HttpSession session, @RequestParam(required = false, defaultValue = "false") Boolean overReview) {
+        // 进入单词首页时如果需要智能复习，该标识记录需要智能复习的模块名称，智能复习节点完成后清除该节点
+        if (overReview) {
+            session.removeAttribute("needReview");
+        }
         return loginService.index(session);
     }
 

@@ -1315,7 +1315,16 @@
              vocabulary v
         where student_id = #{studentId}
           and l.vocabulary_id = v.id
-          and course_id = #{courseId}
+          and l.course_id = #{courseId}
         group by v.id
+    </select>
+    <select id="selectLearnedByUnitId" resultType="java.util.Map" parameterType="map">
+        select v.word, v.word_chinese wordChinese, v.id
+        from learn l,
+             vocabulary v
+        where student_id = #{studentId}
+          and l.vocabulary_id = v.id
+          and l.unit_id = #{unitId}
+          group by v.id
     </select>
 </mapper>
