@@ -168,4 +168,16 @@ public interface DurationMapper {
      */
     @Select("select sum(valid_time) from duration where to_days(now()) = to_days(login_time) and student_id = #{stuId} and study_model = #{model} and unit_id = #{unitId}")
     Long sumTodayModelValidTime(@Param("stuId") Long stuId, @Param("model") int model, @Param("unitId") Long unitId);
+
+    /**
+     * 查询当前课程、单元下指定模块的有效时长
+     *
+     * @param studentId
+     * @param courseId
+     * @param unitId
+     * @param loginTime
+     * @param key   模块id
+     * @return
+     */
+    List<Duration> selectByStudentIdAndCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId, @Param("unitId") Long unitId, @Param("loginTime") String loginTime, @Param("key") Integer key);
 }

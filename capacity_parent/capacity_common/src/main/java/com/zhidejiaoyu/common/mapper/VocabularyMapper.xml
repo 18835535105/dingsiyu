@@ -1014,11 +1014,15 @@
         distinct <include refid="unite_Column_List"/>
         FROM vocabulary v, unit_vocabulary uv, unit u
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
-        u.course_id = #{courseId} and v.word not in (
-          <foreach collection="wordMapList" item="map" separator=",">
-              #{map.word}
-          </foreach>
-        )
+        u.course_id = #{courseId}
+        <if test="wordMapList.size > 0">
+            and v.word not in (
+            <foreach collection="wordMapList" item="map" separator=",">
+                #{map.word}
+            </foreach>
+            )
+        </if>
+        group by v.id
     </select>
 
 </mapper>

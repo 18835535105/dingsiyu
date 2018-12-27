@@ -731,13 +731,8 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
      */
     private void saveDuration(HttpSession session, Map<Integer, Duration> map, Date loginTime) {
         map.forEach((key, value) -> {
-            DurationExample example = new DurationExample();
-            DurationExample.Criteria criteria = example.createCriteria().andStudentIdEqualTo(value.getStudentId()).andCourseIdEqualTo(value.getCourseId());
-            if (value.getUnitId() != null) {
-                criteria.andUnitIdEqualTo(value.getUnitId());
-            }
-            criteria.andLoginTimeEqualTo(loginTime).andStudyModelEqualTo(key);
-            List<Duration> durations = durationMapper.selectByExample(example);
+            List<Duration> durations = durationMapper.selectByStudentIdAndCourseId(value.getStudentId(), value.getCourseId(),
+                    value.getUnitId(), DateUtil.formatYYYYMMDDHHMMSS(loginTime), key);
             // 如果时长表有本次登录的当前模块时长信息,更新；否则新增时长记录
             if (durations.size() > 0) {
                 value.setId(durations.get(0).getId());

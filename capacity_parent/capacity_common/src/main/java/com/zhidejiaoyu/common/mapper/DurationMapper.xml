@@ -489,4 +489,13 @@
           and login_time = #{loginTime}
           and online_time &lt;> 0
     </select>
+    <select id="selectByStudentIdAndCourseId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from duration where student_id = #{studentId} and course_id = #{courseId}
+        <if test="unitId != null">
+            and unit_id = #{unitId}
+        </if>
+        and login_time = #{loginTime} and study_model = #{key}
+    </select>
 </mapper>

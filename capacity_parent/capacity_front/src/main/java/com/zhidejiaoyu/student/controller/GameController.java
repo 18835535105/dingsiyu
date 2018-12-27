@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.pojo.GameScore;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.GameService;
+import lombok.EqualsAndHashCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,11 +43,13 @@ public class GameController {
      *
      * @param pageNum 第几次获取游戏题
      * @param session
+     * @param wordList 当前游戏题目中的单词集合，避免下次取的游戏题目与上次题目有重复的
      * @return
      */
     @GetMapping("/getGameOne")
-    public ServerResponse<GameOneVo> getGameOne(HttpSession session, @RequestParam(required = false, defaultValue = "1") Integer pageNum) {
-        return gameService.getGameOne(session, pageNum);
+    public ServerResponse<GameOneVo> getGameOne(HttpSession session, @RequestParam(required = false, defaultValue = "1") Integer pageNum,
+                                                @RequestParam(required = false, name = "wordList[]") List<String> wordList) {
+        return gameService.getGameOne(session, pageNum, wordList);
     }
 
     /**

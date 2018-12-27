@@ -55,11 +55,11 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
     private BaiduSpeak baiduSpeak;
 
     @Override
-    public ServerResponse<GameOneVo> getGameOne(HttpSession session, Integer pageNum) {
+    public ServerResponse<GameOneVo> getGameOne(HttpSession session, Integer pageNum, List<String> wordList) {
         Student student = getStudent(session);
 
         // 从当前正在学习的课程已学习的单词中随机查找10个单词
-        List<Map<String, Object>> wordMap = this.getGameOneSubject(student, pageNum);
+        List<Map<String, Object>> wordMap = this.getGameOneSubject(student, pageNum, wordList);
 
         List<Map<String, Object>> subjects = new ArrayList<>(30);
 
@@ -84,15 +84,24 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         return ServerResponse.createBySuccess(gameOneVo);
     }
 
-    private List<Map<String, Object>> getGameOneSubject(Student student, Integer pageNum) {
+    private List<Map<String, Object>> getGameOneSubject(Student student, Integer pageNum, List<String> wordList) {
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
         Long courseId = capacityStudentUnit.getCourseId();
         PageHelper.startPage(pageNum, 10);
         // 从当前单元单词中随机获取10题
         List<Map<String, Object>> unitLearns = learnMapper.selectLearnedByUnitId(student.getId(), capacityStudentUnit.getUnitId());
         if (unitLearns.size() < 10) {
+            List<Map<String, Object>> ignoreList = new ArrayList<>(unitLearns);
+            if (wordList != null && wordList.size() > 0) {
+                Map<String, Object> map;
+                for (String s : wordList) {
+                    map = new HashMap<>(16);
+                    map.put("word", s);
+                    ignoreList.add(map);
+                }
+            }
             PageHelper.startPage(pageNum, 10 - unitLearns.size());
-            packageGameSubjectMap(courseId, unitLearns);
+            packageGameSubjectMap(courseId, unitLearns, ignoreList);
         }
         Collections.shuffle(unitLearns);
 
@@ -163,16 +172,17 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         // 从当前单元单词中随机获取10题
         List<Map<String, Object>> unitLearns = learnMapper.selectLearnedByUnitId(student.getId(), capacityStudentUnit.getUnitId());
         if (unitLearns.size() < 10) {
+            List<Map<String, Object>> ignoreList = new ArrayList<>(unitLearns);
             PageHelper.startPage(1, 10 - unitLearns.size());
-            packageGameSubjectMap(courseId, unitLearns);
+            packageGameSubjectMap(courseId, unitLearns, ignoreList);
         }
         Collections.shuffle(unitLearns);
 
         return unitLearns;
     }
 
-    private void packageGameSubjectMap(Long courseId, List<Map<String, Object>> unitLearns) {
-        List<Vocabulary> vocabularies = vocabularyMapper.selectByCourseIdNotInWord(courseId, unitLearns);
+    private void packageGameSubjectMap(Long courseId, List<Map<String, Object>> unitLearns, List<Map<String, Object>> ignoreList) {
+        List<Vocabulary> vocabularies = vocabularyMapper.selectByCourseIdNotInWord(courseId, ignoreList);
         vocabularies.forEach(vocabulary -> {
             Map<String, Object> map = new HashMap<>(16);
             map.put("word", vocabulary.getWord());

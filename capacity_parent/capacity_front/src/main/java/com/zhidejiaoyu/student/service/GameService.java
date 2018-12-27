@@ -20,9 +20,10 @@ public interface GameService extends BaseService<GameStore> {
      *
      * @param session
      * @param pageNum
+     * @param wordList
      * @return
      */
-    ServerResponse<GameOneVo> getGameOne(HttpSession session, Integer pageNum);
+    ServerResponse<GameOneVo> getGameOne(HttpSession session, Integer pageNum, List<String> wordList);
 
     /**
      * 获取游戏《桌牌捕音》试题

@@ -161,7 +161,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         Student stu = studentMapper.indexData(student_id);
 
-        //Integer role = studentMapper.judgeUser(Long.valueOf(student_id));
         // 业务员
         if (stu.getRole() !=null && stu.getRole() == 2) {
             result.put("role", "2");
