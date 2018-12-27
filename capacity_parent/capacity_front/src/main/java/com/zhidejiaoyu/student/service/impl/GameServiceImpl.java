@@ -86,10 +86,9 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
 
     private List<Map<String, Object>> getGameOneSubject(Student student, Integer pageNum, List<String> wordList) {
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
-        Long courseId = capacityStudentUnit.getCourseId();
-        PageHelper.startPage(pageNum, 10);
+        int startRow = (pageNum - 1) * 10;
         // 从当前单元单词中随机获取10题
-        List<Map<String, Object>> unitLearns = learnMapper.selectLearnedByUnitId(student.getId(), capacityStudentUnit.getUnitId());
+        List<Map<String, Object>> unitLearns = learnMapper.selectLearnedByUnitId(student.getId(), capacityStudentUnit.getUnitId(), startRow, 10);
         if (unitLearns.size() < 10) {
             List<Map<String, Object>> ignoreList = new ArrayList<>(unitLearns);
             if (wordList != null && wordList.size() > 0) {
@@ -101,7 +100,7 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
                 }
             }
             PageHelper.startPage(pageNum, 10 - unitLearns.size());
-            packageGameSubjectMap(courseId, unitLearns, ignoreList);
+            packageGameSubjectMap(capacityStudentUnit.getCourseId(), unitLearns, ignoreList);
         }
         Collections.shuffle(unitLearns);
 
@@ -168,9 +167,8 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
     private List<Map<String, Object>> getGameTwoSubject(Student student) {
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
         Long courseId = capacityStudentUnit.getCourseId();
-        PageHelper.startPage(1, 10);
         // 从当前单元单词中随机获取10题
-        List<Map<String, Object>> unitLearns = learnMapper.selectLearnedByUnitId(student.getId(), capacityStudentUnit.getUnitId());
+        List<Map<String, Object>> unitLearns = learnMapper.selectLearnedByUnitId(student.getId(), capacityStudentUnit.getUnitId(), 0, 10);
         if (unitLearns.size() < 10) {
             List<Map<String, Object>> ignoreList = new ArrayList<>(unitLearns);
             PageHelper.startPage(1, 10 - unitLearns.size());

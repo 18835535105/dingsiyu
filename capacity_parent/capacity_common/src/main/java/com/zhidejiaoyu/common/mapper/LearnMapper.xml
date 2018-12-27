@@ -1325,6 +1325,7 @@
         where student_id = #{studentId}
           and l.vocabulary_id = v.id
           and l.unit_id = #{unitId}
-          group by v.id
+          group by v.id limit #{beginRow}
+            , #{pageSize}
     </select>
 </mapper>
