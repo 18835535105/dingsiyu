@@ -1009,5 +1009,16 @@
         )
         order by v.id asc
     </select>
+    <select id="selectByCourseIdNotInWord" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        distinct <include refid="unite_Column_List"/>
+        FROM vocabulary v, unit_vocabulary uv, unit u
+        WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
+        u.course_id = #{courseId} and v.word not in (
+          <foreach collection="wordMapList" item="map" separator=",">
+              #{map.word}
+          </foreach>
+        )
+    </select>
 
 </mapper>

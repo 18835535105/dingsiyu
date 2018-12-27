@@ -170,4 +170,12 @@ public interface StudentUnitMapper extends BaseMapper<StudentUnit> {
      * @return
      */
     List<Map<String, Object>> selectCourseInfo(Long studentId);
+
+    /**
+     * 统计学生智能版课程数量
+     *
+     * @param student
+     * @return
+     */
+    int countCapacity(@Param("student") Student student);
 }

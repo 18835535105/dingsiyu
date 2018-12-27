@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.service;
 
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
+import com.zhidejiaoyu.common.Vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
@@ -123,4 +124,13 @@ public interface TestService extends BaseService<TestRecord> {
      * @return
      */
     ServerResponse<Object> saveCapSentenceTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO);
+
+    /**
+     * 获取学生测试详情信息
+     *
+     * @param session
+     * @param testId  测试记录id
+     * @return
+     */
+    ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId);
 }

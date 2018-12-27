@@ -372,4 +372,12 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
     List<Vocabulary> selectUnlearnInBookPlayer(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 
 
+    /**
+     * 获取课程下目标单词外的单词信息
+     *
+     * @param courseId
+     * @param wordMapList
+     * @return
+     */
+    List<Vocabulary> selectByCourseIdNotInWord(@Param("courseId") Long courseId, @Param("wordMapList") List<Map<String, Object>> wordMapList);
 }

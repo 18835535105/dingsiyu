@@ -280,6 +280,12 @@
         group by c.id
         order by c.id asc
     </select>
+    <select id="countCapacity" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from student_unit
+        where student_id = #{student.id}
+          and type = 1
+    </select>
 
     <update id="updateStatus" parameterType="map">
         update student_unit

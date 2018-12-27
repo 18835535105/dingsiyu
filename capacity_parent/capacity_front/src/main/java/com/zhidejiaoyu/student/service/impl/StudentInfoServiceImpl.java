@@ -332,7 +332,8 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         return ServerResponse.createBySuccessMessage(tip);
     }
 
-    private void packageDuration(Integer classify, Long courseId, Long unitId, Long validTime, Map<Integer, Duration> map, Student student, Date loginTime) {
+    private void packageDuration(Integer classify, Long courseId, Long unitId, Long validTime, Map<Integer, Duration> map,
+                                 Student student, Date loginTime) {
         Duration duration = new Duration();
         duration.setCourseId(courseId);
         duration.setStudyModel(classify);
@@ -731,8 +732,11 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     private void saveDuration(HttpSession session, Map<Integer, Duration> map, Date loginTime) {
         map.forEach((key, value) -> {
             DurationExample example = new DurationExample();
-            example.createCriteria().andStudentIdEqualTo(value.getStudentId()).andCourseIdEqualTo(value.getCourseId())
-                    .andUnitIdEqualTo(value.getUnitId()).andLoginTimeEqualTo(loginTime).andStudyModelEqualTo(key);
+            DurationExample.Criteria criteria = example.createCriteria().andStudentIdEqualTo(value.getStudentId()).andCourseIdEqualTo(value.getCourseId());
+            if (value.getUnitId() != null) {
+                criteria.andUnitIdEqualTo(value.getUnitId());
+            }
+            criteria.andLoginTimeEqualTo(loginTime).andStudyModelEqualTo(key);
             List<Duration> durations = durationMapper.selectByExample(example);
             // 如果时长表有本次登录的当前模块时长信息,更新；否则新增时长记录
             if (durations.size() > 0) {

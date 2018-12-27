@@ -48,7 +48,7 @@ public interface LoginService extends BaseService<Student>{
      * @param session
      * @return
      */
-    ServerResponse LoginJudge(String account, String password, HttpSession session, String code);
+    ServerResponse loginJudge(String account, String password, HttpSession session, String code);
 
     /**
      * 退出登录

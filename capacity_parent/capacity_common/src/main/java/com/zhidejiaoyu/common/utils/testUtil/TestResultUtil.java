@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ import java.util.*;
  * @author wuchenxi
  * @date 2018年5月8日
  */
+@Slf4j
 @Component
 public class TestResultUtil implements Serializable {
 
@@ -192,6 +194,12 @@ public class TestResultUtil implements Serializable {
         }
         if (subjectNum > target.size()) {
             throw new RuntimeException("需要封装的测试题数量不能大于当前单词数量!");
+        }
+        if (subjectNum == 0) {
+            log.error("封装测试题时，subjectNum=0");
+        }
+        if (target.size() == 0) {
+            log.error("封装测试题时，target.size=0");
         }
         List<TestResult> results = new ArrayList<>();
         // 随机找出指定数量单词

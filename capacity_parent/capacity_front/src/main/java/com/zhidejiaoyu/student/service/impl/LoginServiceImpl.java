@@ -213,7 +213,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         //-- 1.学生当前单词模块学的那个单元
         Integer unitId = null;
         if (stu.getUnitId() != null) {
-            unitId = stu.getUnitId().intValue();
+            unitId = Integer.valueOf(capacityStudentUnit.getUnitId().toString());
         }
 
         // 查询是否需要阶段测试-隐藏单词学习模块
@@ -259,7 +259,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             if (sumValid == null) {
             	sumValid = 0;
             }
-            int speed = (int) (BigDecimalUtil.div(sum, sumValid)*3600);
+            int speed = (int) (BigDecimalUtil.div(sum, sumValid) * 3600);
 
             // 封装返回结果
             // 已做单元闯关
@@ -645,8 +645,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     @Override
-    public ServerResponse LoginJudge(String account, String password, HttpSession session, String code) {
-//        removeSessionAttribute(session);
+    public ServerResponse loginJudge(String account, String password, HttpSession session, String code) {
 
         // 封装返回数据
         Map<String, Object> result = new HashMap<>(16);
@@ -708,6 +707,13 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 当日首次登陆奖励5金币（日奖励）
             saveDailyAward(stu);
 
+            // 判断学生是否有同步版课程，没有同步版课程不能进入智能版学习
+            if (!this.hasCapacityCourse(stu)) {
+                result.put("capacity", false);
+            } else {
+                result.put("capacity", true);
+            }
+
             // 当前用户信息放到session
             session.setAttribute(UserConstant.CURRENT_STUDENT, stu);
             // 登陆时间放入session
@@ -737,30 +743,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 return ServerResponse.createBySuccess("3", result);
             }
 
-            /*// 判断是否需要学前测试
-            // 判断学生是否已经有推送的课程
-            // 有推送课程，不需要学前测试
-            int courseCount = studentUnitMapper.countUnitCountByStudentId(stu, commonMethod.getPhase(stu.getGrade()));
-            // 没有推送课程，判断是否进行游戏测试
-            if (courseCount == 0) {
-                TestRecordExample testRecordExample = new TestRecordExample();
-                testRecordExample.createCriteria().andStudentIdEqualTo(stu.getId()).andGenreEqualTo("学前游戏测试");
-                List<TestRecord> testRecords = testRecordMapper.selectByExample(testRecordExample);
-                int size = testRecords.size();
-                if (size == 0) {
-                    // 第一次进行游戏测试
-                    return ServerResponse.createBySuccess("3", result);
-                }
-                
-                // 第二次登陆
-                // 游戏测试次数
-                *//*int count = Integer.parseInt(testRecords.get(0).getExplain().split("#")[1]);
-                if (count == 1) {
-                    // 进行游戏测试
-                    return ServerResponse.createBySuccess("5", result);
-                }*//*
-            }*/
-
             // 一个账户只能登陆一台
             judgeMultipleLogin(session, stu);
 
@@ -773,6 +755,17 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 正常登陆
             return ServerResponse.createBySuccess("1", result);
         }
+    }
+
+    /**
+     * 判断学生是否可以学习同步班课程
+     *
+     * @param student
+     * @return
+     */
+    private boolean hasCapacityCourse(Student student) {
+        int count = studentUnitMapper.countCapacity(student);
+        return count > 0;
     }
 
     private void judgeMultipleLogin(HttpSession session, Student stu) {

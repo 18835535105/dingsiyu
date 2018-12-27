@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
+import com.zhidejiaoyu.common.Vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -802,6 +803,38 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         return ServerResponse.createBySuccess();
     }
 
+    @Override
+    public ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId) {
+        Student student = getStudent(session);
+        TestDetailVo testDetailVo = testRecordMapper.selectTestDetailVo(student.getId(), testId);
+        testDetailVo.setUseTime(getUseTime(testDetailVo.getUseTime()));
+        if (StringUtils.isNotEmpty(testDetailVo.getIsWrite())) {
+            if (testDetailVo.getIsWrite().contains("写")) {
+                testDetailVo.setIsWrite("1");
+            } else {
+                testDetailVo.setIsWrite("0");
+            }
+        } else {
+            testDetailVo.setIsWrite(null);
+        }
+        testDetailVo.setInfos(testRecordMapper.selectTestRecordInfo(testId));
+        return ServerResponse.createBySuccess(testDetailVo);
+    }
+
+    /**
+     * 计算测试用时
+     *
+     * @param useTime
+     * @return
+     */
+    private String getUseTime(String useTime) {
+        if (!StringUtils.isEmpty(useTime)) {
+            int intUseTime = Integer.valueOf(useTime);
+            return "用时：" + (intUseTime / 60) + " 分 " + (intUseTime % 60) + "秒";
+        }
+        return "用时：0 分 0 秒";
+    }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -895,7 +928,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     /**
      * @param testDetail
      * @param testRecordId
-     * @param modelType    1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写; 20:能力值测试
+     * @param modelType    1=慧记忆 2=慧听写 3=慧默写 4=例句听力 5=例句翻译 6=例句默写
      */
     private void saveTestDetail(String testDetail, Long testRecordId, int modelType, Student student) {
         if (StringUtils.isEmpty(testDetail)) {
@@ -908,11 +941,10 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             TestRecordInfo testRecordInfo;
             for (Object aJsonArray : jsonArray) {
                 testRecordInfo = new TestRecordInfo();
-
                 object = (JSONObject) aJsonArray;
                 String word = object.getString("title");
                 final String[] selected = {null};
-                if (modelType != 8 && modelType != 9) {
+                if (modelType == 1 || modelType == 0) {
                     // 试卷题目
                     JSONObject subject = object.getJSONObject("subject");
                     final int[] j = {0};
@@ -1171,20 +1203,38 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         List<TestRecord> records = testRecordMapper.showRecord(student_id);
         PageInfo<TestRecord> testRecordPageInfo = new PageInfo<>(records);
 
+        // 每个测试记录下含有测试详情个数，如果没有测试详情，不显示详情按钮
+        Map<Long, Map<Long, Long>> testDetailCountMap = null;
+        if (records.size() > 0) {
+            testDetailCountMap = testRecordInfoMapper.countByRecordIds(records);
+        }
+
         // 封装后返回
         List<Map<String, Object>> result = new ArrayList<>();
 
+        Long recordId;
         for(TestRecord record: records){
-            Map map = new HashMap();
-            map.put("id", record.getId());
+            recordId = record.getId();
+            Map<String, Object> map = new HashMap<>(16);
+            map.put("id", recordId);
             map.put("genre", StringUtils.isEmpty(record.getStudyModel()) ? record.getGenre() : record.getStudyModel() + "-" + record.getGenre());
-            map.put("testStartTime", record.getTestEndTime()); // 测试完成时间
+
+            if (testDetailCountMap != null && testDetailCountMap.get(recordId) != null
+                    && testDetailCountMap.get(recordId).get("count") != null
+                    && testDetailCountMap.get(recordId).get("count") > 0) {
+                map.put("isShow", true);
+            } else {
+                map.put("isShow", false);
+            }
+
+            // 测试完成时间
+            map.put("testStartTime", record.getTestEndTime());
             map.put("point", record.getPoint());
             map.put("awardGold", record.getAwardGold());
             map.put("quantity", record.getQuantity());
             String explain = record.getExplain();
             if (StringUtils.isNotEmpty(explain) && explain.contains("#")) {
-                map.put("explain", explain.substring(explain.lastIndexOf("#")+1, explain.length()));
+                map.put("explain", explain.substring(explain.lastIndexOf("#")+1));
             }else {
                 map.put("explain", explain);
             }

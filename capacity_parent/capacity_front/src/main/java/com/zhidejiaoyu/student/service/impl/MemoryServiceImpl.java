@@ -378,7 +378,14 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         Long courseId = unitMapper.selectCourseIdByUnitId(unitId);
         Integer maxCount = studyCountMapper.selectMaxCountByCourseId(student.getId(), courseId);
-        Learn learn = learnMapper.selectLearnByIdAmdModel(student.getId(), unitId, wordId, null, "慧记忆", maxCount == null ? 1 : maxCount);
+        List<Learn> learns = learnMapper.selectLearnByIdAmdModel(student.getId(), unitId, wordId, null, "慧记忆", maxCount == null ? 1 : maxCount);
+        Learn learn;
+        if (learns.size() > 1) {
+            learnMapper.deleteById(learns.get(0));
+            learn = learns.get(1);
+        } else {
+            learn = learns.get(0);
+        }
         learn.setStudyCount(learn.getStudyCount() + 1);
 
         CapacityMemory capacityMemory = saveWordLearnAndCapacity.saveCapacityMemory(learn, student, isTrue, 1);

@@ -17,5 +17,5 @@ public class GameOneVo implements Serializable {
     /**
      * 试题集合：key 英文；value 中文翻译；
      */
-    private List<Map<String, String>> matchKeyValue;
+    private List<Map<String, Object>> matchKeyValue;
 }

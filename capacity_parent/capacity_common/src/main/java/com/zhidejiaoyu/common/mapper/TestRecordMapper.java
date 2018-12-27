@@ -2,9 +2,11 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
+import com.zhidejiaoyu.common.Vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.pojo.TestRecordExample;
+import com.zhidejiaoyu.common.pojo.TestRecordInfo;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -206,4 +208,20 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     Map<Long, Map<Long, Long>> selectHasUnitTest(@Param("studentId") Long studentId, @Param("unitIds") List<Long> unitIds);
 
     Integer selectMaxPointByUnitStudentModel(Map<String, Object> selMap);
-}
+
+    /**
+     * 获取学生测试记录详情头部信息
+     *
+     * @param stuId
+     * @param testId
+     * @return
+     */
+    TestDetailVo selectTestDetailVo(@Param("stuId") Long stuId, @Param("testId") Long testId);
+
+    /**
+     * 获取学生测试记录详情表格内容
+     *
+     * @param testId
+     * @return
+     */
+    List<TestRecordInfo> selectTestRecordInfo(Long testId);}

@@ -270,28 +270,6 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.Learn">
-        insert into learn (id, student_id, course_id,
-                           unit_id, vocabulary_id, example_id,
-                           status, learn_time, study_model,
-                           study_count,
-                           learn_count,
-                           update_time,
-                           first_study_time,
-                           first_is_known)
-        values (#{id,jdbcType=BIGINT}, #{studentId,jdbcType=BIGINT}, #{courseId,jdbcType=BIGINT},
-                #{unitId,jdbcType=BIGINT},
-                #{vocabularyId,jdbcType=BIGINT},
-                #{exampleId,jdbcType=BIGINT},
-                #{status,jdbcType=INTEGER},
-                #{learnTime,jdbcType=TIMESTAMP},
-                #{studyModel,jdbcType=VARCHAR},
-                #{studyCount,jdbcType=INTEGER},
-                #{learnCount,jdbcType=INTEGER},
-                #{updateTime,jdbcType=TIMESTAMP},
-                #{firstStudyTime,jdbcType=TIMESTAMP},
-                #{firstIsKnown})
-    </insert>
     <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Learn">
         insert into learn
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -1330,5 +1308,14 @@
         where v.id = uv.vocabulary_id and v.delStatus = 1
         and uv.unit_id = u.id and su.unit_id = u.id and su.student_id = #{studentId} and su.type = 1
         limit #{count}
+    </select>
+    <select id="selectLearnedByCourseId" resultType="java.util.Map" parameterType="map">
+        select v.word, v.word_chinese wordChinese, v.id
+        from learn l,
+             vocabulary v
+        where student_id = #{studentId}
+          and l.vocabulary_id = v.id
+          and course_id = #{courseId}
+        group by v.id
     </select>
 </mapper>

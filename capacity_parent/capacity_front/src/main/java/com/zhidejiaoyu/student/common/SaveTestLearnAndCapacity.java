@@ -182,18 +182,24 @@ public class SaveTestLearnAndCapacity {
         Long courseId = unitMapper.selectCourseIdByUnitId(unitId);
         Integer maxCount = studyCountMapper.selectMaxCountByCourseId(student.getId(), courseId);
         // 查询学习记录
-        Learn learn;
+        List<Learn> learns;
         if (classify <= 3) {
             // 查询单词的学习记录
-            learn = learnMapper.selectLearnByIdAmdModel(student.getId(), unitId, Long.valueOf(id.toString()), null,
+            learns = learnMapper.selectLearnByIdAmdModel(student.getId(), unitId, Long.valueOf(id.toString()), null,
                     commonMethod.getTestType(classify), maxCount == null ? 1 : maxCount);
         } else {
             // 查询句子的学习记录
-            learn = learnMapper.selectLearnByIdAmdModel(student.getId(), unitId, null, Long.valueOf(id.toString()),
+            learns = learnMapper.selectLearnByIdAmdModel(student.getId(), unitId, null, Long.valueOf(id.toString()),
                     commonMethod.getTestType(classify), maxCount == null ? 1 : maxCount);
         }
 
-        if (learn == null) {
+        Learn learn;
+        if (learns.size() > 1) {
+            learnMapper.deleteById(learns.get(0));
+            learn = learns.get(1);
+        } else if (learns.size() == 1) {
+            learn = learns.get(0);
+        } else {
             // 无学习记录
             log.error("学生[{}]-[{}]没有当前模块学习记录：单元id[{}],单词id[{}],模块type[{}]", student.getId(), student.getStudentName(), unitId, id, classify);
             return 0;

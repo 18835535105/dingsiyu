@@ -53,6 +53,7 @@ public class GameController {
 
     /**
      * 获取游戏《桌牌捕音》试题
+     * 随机取当前课程已学的10个单词，已学单词不足时可从当前课程取剩余的单词
      *
      * @param session
      * @return

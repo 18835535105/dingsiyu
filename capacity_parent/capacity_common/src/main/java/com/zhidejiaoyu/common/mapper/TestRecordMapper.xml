@@ -19,7 +19,7 @@
         <result column="right_count" property="rightCount" jdbcType="INTEGER"/>
         <result column="study_model" property="studyModel" jdbcType="VARCHAR"/>
         <result column="award_gold" property="awardGold" jdbcType="INTEGER"/>
-        <result column="better_count" property="betterCount" jdbcType="INTEGER" />
+        <result column="better_count" property="betterCount" jdbcType="INTEGER"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -445,17 +445,20 @@
     </update>
 
     <select id="showRecord" parameterType="map" resultMap="BaseResultMap">
-        select
-               a.id,
+        select a.id,
                a.genre,
                a.test_end_time,
                a.point,
                a.quantity,
                a.explain,
                a.study_model,
-               IFNULL(a.award_gold,0) AS award_gold
-        from test_record a
-        where a.student_id = #{student_id} order by a.test_end_time Desc
+               IFNULL(a.award_gold, 0) AS award_gold
+        from test_record a,
+             student_unit su
+        where a.student_id = su.student_id
+          and su.type = 1
+          and a.unit_id = su.unit_id
+          and a.student_id = #{student_id} order by a.test_end_time Desc
     </select>
     <select id="countUnitTest" resultType="java.lang.Integer" parameterType="map">
         select count(id) from test_record where genre = '单元闯关测试'
@@ -734,5 +737,61 @@
 
     <select id="selectMaxPointByUnitStudentModel" parameterType="java.util.Map" resultType="java.lang.Integer">
         select Max(point) from test_record where unit_id=#{unitId} and student_id=#{studentId} and study_model=#{model}
+    </select>
+    <select id="selectTestDetailVo" resultType="com.zhidejiaoyu.common.Vo.testVo.TestDetailVo" parameterType="map">
+        select concat(c.course_name, concat('-', concat(u.unit_name,
+                                                        concat('-', concat(t.study_model, concat('-', t.genre)))))) title,
+               s.student_name                                                                                       name,
+               concat('测试时间：', date_format(if(t.test_start_time is null, now(), t.test_start_time),
+                                           '%Y-%m-%d %H:%i:%s'))                                                    testTime,
+               if(u.unit_name is null or u.unit_name = '', ' ',
+                  concat(concat(concat('测试内容：', u.unit_name), '-'), t.genre))                                       testContent,
+               concat(concat('共 ', t.quantity), ' 题')                                                               subjectCount,
+               concat(concat('对 ', t.right_count), ' 题')                                                            rightCount,
+               concat(concat('错 ', t.error_count), ' 题')                                                            errCount,
+               t.test_end_time - t.test_start_time                                                                  useTime,
+               t.point                                                                                              score,
+               t.study_model                                                                                        isWrite
+        from test_record t
+                 LEFT JOIN course c on t.course_id = c.id
+                 LEFT JOIN unit u on t.unit_id = u.id
+                 LEFT JOIN student s on s.id = t.student_id
+        where t.id = #{testId}
+          and s.id = #{stuId}
+    </select>
+    <select id="selectTestRecordInfo" resultType="com.zhidejiaoyu.common.pojo.TestRecordInfo" parameterType="map">
+        select selected,
+               if(locate('&lt;', if(locate('>', word) > 0, replace(word, '>', ')'),
+                                    word)),
+                  replace(if(locate('>', word) > 0, replace(word, '>', ')'), word),
+                          '&lt;', '('),
+                  word)     word,
+               if(locate('&lt;', if(locate('>', option_a) > 0, replace(option_a, '>', ')'),
+                                    option_a)),
+                  replace(if(locate('>', option_a) > 0, replace(option_a, '>', ')'), option_a),
+                          '&lt;', '('),
+                  option_a) optionA,
+               if(locate('&lt;', if(locate('>', option_b) > 0, replace(option_b, '>', ')'),
+                                    option_b)),
+                  replace(if(locate('>', option_b) > 0, replace(option_b, '>', ')'), option_b),
+                          '&lt;', '('),
+                  option_b) optionB,
+               if(locate('&lt;', if(locate('>', option_c) > 0, replace(option_c, '>', ')'),
+                                    option_c)),
+                  replace(if(locate('>', option_c) > 0, replace(option_c, '>', ')'), option_c),
+                          '&lt;', '('),
+                  option_c) optionC,
+               if(locate('&lt;', if(locate('>', option_d) > 0, replace(option_d, '>', ')'),
+                                    option_d)),
+                  replace(if(locate('>', option_d) > 0, replace(option_d, '>', ')'), option_d),
+                          '&lt;', '('),
+                  option_d) optionD,
+               if(locate('&lt;', if(locate('>', answer) > 0, replace(answer, '>', ')'),
+                                    answer)),
+                  replace(if(locate('>', answer) > 0, replace(answer, '>', ')'), option_d),
+                          '&lt;', '('),
+                  answer)   answer
+        from test_record_info t
+        where t.test_id = #{testId}
     </select>
 </mapper>

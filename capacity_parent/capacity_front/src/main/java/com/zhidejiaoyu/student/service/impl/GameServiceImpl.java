@@ -1,14 +1,12 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.github.pagehelper.PageHelper;
 import com.zhidejiaoyu.common.Vo.game.GameOneVo;
 import com.zhidejiaoyu.common.Vo.game.GameTwoVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.GameScore;
-import com.zhidejiaoyu.common.pojo.GameStore;
-import com.zhidejiaoyu.common.pojo.RunLog;
-import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -48,6 +46,12 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
     private StudentMapper studentMapper;
 
     @Autowired
+    private VocabularyMapper vocabularyMapper;
+
+    @Autowired
+    private CapacityStudentUnitMapper capacityStudentUnitMapper;
+
+    @Autowired
     private BaiduSpeak baiduSpeak;
 
     @Override
@@ -55,16 +59,16 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         Student student = getStudent(session);
 
         // 从当前正在学习的课程已学习的单词中随机查找15个单词
-        List<Map<String, String>> wordMap = gameStoreMapper.selectGameOneSubjects(student.getId());
+        List<Map<String, Object>> wordMap = this.getGameSubject(student, 15);
 
-        List<Map<String, String>> subjects = new ArrayList<>(30);
+        List<Map<String, Object>> subjects = new ArrayList<>(30);
 
         wordMap.forEach(map -> {
-            Map<String, String> subjectMap1 = new HashMap<>(16);
+            Map<String, Object> subjectMap1 = new HashMap<>(16);
             subjectMap1.put("title", map.get("wordChinese"));
             subjectMap1.put("value", map.get("word"));
 
-            Map<String, String> subjectMap2 = new HashMap<>(16);
+            Map<String, Object> subjectMap2 = new HashMap<>(16);
             subjectMap2.put("title", map.get("word"));
             subjectMap2.put("value", map.get("wordChinese"));
 
@@ -84,55 +88,78 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
     public ServerResponse<List<GameTwoVo>> getGameTwo(HttpSession session) {
         Student student = getStudent(session);
 
-        // 从学生当前正在学习的课程中随机获取10个需要复习的生词
-        List<Map<String, Object>> needReviewWords = this.getNeedReviewWord(student);
+        // 从当前课程随机取10个已学的单词
+        List<Map<String, Object>> needReviewWords = this.getGameSubject(student, 10);
 
-        if (needReviewWords.size() == 10) {
-            List<Long> wordIds = new ArrayList<>(10);
-            needReviewWords.forEach(map -> wordIds.add(Long.valueOf(map.get("id").toString())));
+        List<Long> wordIds = new ArrayList<>(10);
+        needReviewWords.forEach(map -> wordIds.add(Long.valueOf(map.get("id").toString())));
 
-            // 从学生当前正在学习的课程中随机获取110个单词
-            List<String> wordList = learnMapper.selectWordInCurrentCourse(student.getId(), wordIds);
-            if (wordList.size() < 110) {
-                // 如果当前课程下单词总数补足110个，从其他智能版课程随机再取剩余数量的单词
-                List<String> otherWordList = learnMapper.selectWordRandomInCourse(student.getId(), 110 - wordIds.size());
-                wordList.addAll(otherWordList);
-            }
-            Collections.shuffle(wordList);
-
-            List<GameTwoVo> gameTwoVos = new ArrayList<>();
-            List<String> subjects;
-            GameTwoVo gameTwoVo;
-            int i = 0;
-            for (Map<String, Object> needReviewWord : needReviewWords) {
-                int bigBossIndex = new Random().nextInt(12);
-                int minBossIndex = new Random().nextInt(12);
-
-                gameTwoVo = new GameTwoVo();
-                gameTwoVo.setBigBossIndex(bigBossIndex);
-                gameTwoVo.setMinBossIndex(minBossIndex);
-                gameTwoVo.setReadUrl(baiduSpeak.getLanguagePath(needReviewWord.get("word").toString()));
-
-                // 封装纸牌的试题集合并打乱顺序；
-                subjects = new ArrayList<>(12);
-                subjects.add(needReviewWord.get("word").toString());
-                subjects.addAll(wordList.subList(i * 11, (i + 1) * 11));
-                Collections.shuffle(subjects);
-
-                gameTwoVo.setSubjects(subjects);
-                // 封装正确答案的索引
-                for (int i1 = 0; i1 < subjects.size(); i1++) {
-                    if (Objects.equals(subjects.get(i1), needReviewWord.get("word").toString())) {
-                        gameTwoVo.setRightIndex(i1);
-                    }
-                }
-                i++;
-                gameTwoVos.add(gameTwoVo);
-            }
-            return ServerResponse.createBySuccess(gameTwoVos);
+        // 从学生当前正在学习的课程中随机获取110个单词
+        List<String> wordList = learnMapper.selectWordInCurrentCourse(student.getId(), wordIds);
+        if (wordList.size() < 110) {
+            // 如果当前课程下单词总数补足110个，从其他智能版课程随机再取剩余数量的单词
+            List<String> otherWordList = learnMapper.selectWordRandomInCourse(student.getId(), 110 - wordList.size());
+            wordList.addAll(otherWordList);
         }
+        Collections.shuffle(wordList);
 
-        return ServerResponse.createBySuccess();
+        List<GameTwoVo> gameTwoVos = new ArrayList<>();
+        List<String> subjects;
+        GameTwoVo gameTwoVo;
+        int i = 0;
+        for (Map<String, Object> needReviewWord : needReviewWords) {
+            int bigBossIndex = new Random().nextInt(12);
+            int minBossIndex = new Random().nextInt(12);
+
+            gameTwoVo = new GameTwoVo();
+            gameTwoVo.setBigBossIndex(bigBossIndex);
+            gameTwoVo.setMinBossIndex(minBossIndex);
+            gameTwoVo.setReadUrl(baiduSpeak.getLanguagePath(needReviewWord.get("word").toString()));
+
+            // 封装纸牌的试题集合并打乱顺序；
+            subjects = new ArrayList<>(12);
+            subjects.add(needReviewWord.get("word").toString());
+            subjects.addAll(wordList.subList(i * 11, (i + 1) * 11));
+            Collections.shuffle(subjects);
+
+            gameTwoVo.setSubjects(subjects);
+            // 封装正确答案的索引
+            for (int i1 = 0; i1 < subjects.size(); i1++) {
+                if (Objects.equals(subjects.get(i1), needReviewWord.get("word").toString())) {
+                    gameTwoVo.setRightIndex(i1);
+                }
+            }
+            i++;
+            gameTwoVos.add(gameTwoVo);
+        }
+        return ServerResponse.createBySuccess(gameTwoVos);
+    }
+
+    /**
+     * 获取游戏题目
+     *
+     * @param student
+     * @param count 需要获取的题目个数
+     * @return
+     */
+    private List<Map<String, Object>> getGameSubject(Student student, int count) {
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+        Long courseId = capacityStudentUnit.getCourseId();
+        PageHelper.startPage(1, count);
+        List<Map<String, Object>> learns = learnMapper.selectLearnedByCourseId(student.getId(), courseId);
+        if (learns.size() < count) {
+            PageHelper.startPage(1, count - learns.size());
+            List<Vocabulary> vocabularies = vocabularyMapper.selectByCourseIdNotInWord(courseId, learns);
+            vocabularies.forEach(vocabulary -> {
+                Map<String, Object> map = new HashMap<>(16);
+                map.put("word", vocabulary.getWord());
+                map.put("wordChinese", vocabulary.getWordChinese());
+                map.put("id", vocabulary.getId());
+                learns.add(map);
+            });
+        }
+        Collections.shuffle(learns);
+        return learns;
     }
 
     @Override

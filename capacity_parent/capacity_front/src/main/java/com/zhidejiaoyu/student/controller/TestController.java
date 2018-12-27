@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.controller;
 
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
+import com.zhidejiaoyu.common.Vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.utils.ValidateUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
@@ -184,6 +185,20 @@ public class TestController {
     @PostMapping("/record")
     public ServerResponse<Object> showRecord(String course_id, HttpSession session, Integer page, Integer rows) {
         return testService.showRecord(course_id, session, page, rows);
+    }
+
+    /**
+     * 获取学生测试详情信息
+     *
+     * @param testId 测试记录id
+     * @return
+     */
+    @GetMapping("/getTestDetail")
+    public ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId) {
+        if (testId == null) {
+            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
+        }
+        return testService.getTestDetail(session, testId);
     }
 
     /**

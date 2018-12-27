@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Course;
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.LearnExample;
@@ -11,14 +12,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public interface LearnMapper {
+public interface LearnMapper extends BaseMapper<Learn> {
     int countByExample(LearnExample example);
 
     int deleteByExample(LearnExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(Learn record);
 
     int insertSelective(Learn record);
 
@@ -99,7 +98,7 @@ public interface LearnMapper {
      * @param count      当前课程的学习遍数
      * @return
      */
-    Learn selectLearnByIdAmdModel(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+    List<Learn> selectLearnByIdAmdModel(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                   @Param("wordId") Long wordId, @Param("sentenceId") Long sentenceId, @Param("studyModel") String studyModel, @Param("count") Integer count);
 
     /**
@@ -743,4 +742,13 @@ public interface LearnMapper {
      * @return
      */
     List<String> selectWordRandomInCourse(@Param("studentId") Long studentId, @Param("count") int count);
+
+    /**
+     * 查询学生当前课程已学信息
+     *
+     * @param studentId
+     * @param courseId
+     * @return
+     */
+    List<Map<String, Object>> selectLearnedByCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
 }

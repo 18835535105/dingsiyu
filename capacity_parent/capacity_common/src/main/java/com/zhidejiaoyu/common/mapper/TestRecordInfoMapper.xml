@@ -23,7 +23,7 @@
         </foreach>
     </insert>
     <select id="countByRecordIds" resultType="java.util.Map" parameterType="map">
-        select test_id testId, count(id) recordCount from test_record_info where test_id in (
+        select test_id testId, count(id) count from test_record_info where test_id in (
         <foreach collection="records" item="record" separator=",">
             #{record.id}
         </foreach>
