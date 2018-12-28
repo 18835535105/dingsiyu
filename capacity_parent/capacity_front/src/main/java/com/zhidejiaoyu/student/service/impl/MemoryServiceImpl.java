@@ -283,29 +283,10 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         }
         learn.setLearnCount(1);
         learn.setUpdateTime(now);
-        int count = learnMapper.insertSelective(learn);
-        ServerResponse<String> serverResponse = toUnitTest(total, plan, count);
-        return serverResponse == null ? ServerResponse.createByErrorMessage("学习记录保存失败！") : serverResponse;
+        learnMapper.insertSelective(learn);
+        return ServerResponse.createBySuccess();
     }
 
-    /**
-     * 判断是否应该进行阶段测试或者单元闯关测试
-     *
-     * @param total 当前单元单词总数
-     * @param plan  当前学习单词的进度
-     * @param count
-     * @return
-     */
-    private ServerResponse<String> toUnitTest(Integer total, Integer plan, int count) {
-        if (count > 0) {
-            if (total.equals(plan + 1)) {
-                // 提醒学生进行单元测试
-                return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
-            }
-            return ServerResponse.createBySuccess();
-        }
-        return null;
-    }
 
     /**
      * 返回达到黄金记忆点的单词信息

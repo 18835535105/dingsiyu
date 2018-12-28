@@ -247,7 +247,6 @@ public class WordWriteServiceImpl implements WordWriteService {
             count = learnMapper.insertSelective(learn);
             if (count > 0 && total == (plan + 1)) {
                 return ServerResponse.createBySuccess();
-//                return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
             }
             if (count > 0) {
                 return ServerResponse.createBySuccess();
