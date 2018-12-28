@@ -34,9 +34,9 @@ public class LoginFilter implements Filter {
         urlMap.put("/login/judge", "/login/judge");
         urlMap.put("/login/loginOut", "/login/loginOut");
         urlMap.put("/login/validateCode", "/login/validateCode");
-        urlMap.put("/api/login/judge", "/api/login/judge");
-        urlMap.put("/api/login/loginOut", "/api/login/loginOut");
-        urlMap.put("/api/login/validateCode", "/api/login/validateCode");
+        urlMap.put("/ec/login/judge", "/ec/login/judge");
+        urlMap.put("/ec/login/loginOut", "/ec/login/loginOut");
+        urlMap.put("/ec/login/validateCode", "/ec/login/validateCode");
     }
 
     @Resource
@@ -81,8 +81,8 @@ public class LoginFilter implements Filter {
      * @throws IOException
      */
     private void doFilter(FilterChain chain, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, String url) throws ServletException, IOException {
-        if (url.contains("/api")) {
-            httpServletRequest.getRequestDispatcher(url.substring(4)).forward(httpServletRequest, httpServletResponse);
+        if (url.contains("/ec")) {
+            httpServletRequest.getRequestDispatcher(url.substring(3)).forward(httpServletRequest, httpServletResponse);
         } else {
             chain.doFilter(httpServletRequest, httpServletResponse);
         }
