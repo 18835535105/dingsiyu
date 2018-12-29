@@ -323,6 +323,13 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 获取学生需要执行的节点信息
         getNode(session, result, stu);
 
+        // 判断学生是否需要进行游戏测试
+        int gameCount = testRecordMapper.countGameCount(stu);
+        if (gameCount == 0) {
+            // 第一次进行游戏测试
+            result.put("game", true);
+        }
+
         return ServerResponse.createBySuccess(result);
     }
 
@@ -714,7 +721,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             saveDailyAward(stu);
 
             // 判断学生是否有同步版课程，没有同步版课程不能进入智能版学习
-            if (this.hasCapacityCourse(stu)) {
+            boolean hasCapacityCourse = this.hasCapacityCourse(stu);
+            if (hasCapacityCourse) {
                 result.put("capacity", true);
             }
 
@@ -738,13 +746,13 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 return ServerResponse.createBySuccess("2", result);
             }
 
-            TestRecordExample testRecordExample = new TestRecordExample();
-            testRecordExample.createCriteria().andStudentIdEqualTo(stu.getId()).andGenreEqualTo("学前游戏测试");
-            List<TestRecord> testRecords = testRecordMapper.selectByExample(testRecordExample);
-            int size = testRecords.size();
-            if (size == 0) {
-                // 第一次进行游戏测试
-                return ServerResponse.createBySuccess("3", result);
+            if (hasCapacityCourse) {
+                // 没有智能版课程不进行游戏测试
+                int gameCount = testRecordMapper.countGameCount(stu);
+                if (gameCount == 0) {
+                    // 第一次进行游戏测试
+                    return ServerResponse.createBySuccess("3", result);
+                }
             }
 
             // 一个账户只能登陆一台

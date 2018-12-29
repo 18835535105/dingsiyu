@@ -224,4 +224,14 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      * @param testId
      * @return
      */
-    List<TestRecordInfo> selectTestRecordInfo(Long testId);}
+    List<TestRecordInfo> selectTestRecordInfo(Long testId);
+
+    /**
+     * 统计当前学生学前游戏测试次数
+     *
+     * @param stu
+     * @return
+     */
+    @Select("select count(id) from test_record where student_id = #{stu.id} and genre = '学前游戏测试'")
+    int countGameCount(@Param("stu") Student stu);
+}
