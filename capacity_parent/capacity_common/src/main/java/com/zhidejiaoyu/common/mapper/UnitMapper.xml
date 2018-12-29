@@ -102,12 +102,6 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.Unit">
-        insert into unit (id, course_id, unit_name,
-                          joint_name, unit_index)
-        values (#{id,jdbcType=BIGINT}, #{courseId,jdbcType=BIGINT}, #{unitName,jdbcType=VARCHAR},
-                #{jointName,jdbcType=VARCHAR}, #{unitIndex,jdbcType=INTEGER})
-    </insert>
 
     <insert id="insertList" parameterType="java.util.List">
         insert into unit (id, course_id, unit_name,

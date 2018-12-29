@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Data;
@@ -20,6 +21,7 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
+@SuppressWarnings("all")
 public class CapacityStudentUnit extends Model<CapacityStudentUnit> {
 
     private static final long serialVersionUID = 1L;
@@ -39,6 +41,18 @@ public class CapacityStudentUnit extends Model<CapacityStudentUnit> {
     private String courseName;
 
     private String version;
+
+    /**
+     * 学生可学习的起始单元id
+     */
+    @TableField("startunit")
+    private Long startunit;
+
+    /**
+     * 学生科学系的结束单元id，当前学习的id等于该id时学生不可再学习下一单元
+     */
+    @TableField("endunit")
+    private Long endunit;
 
     @Override
     protected Serializable pkVal() {

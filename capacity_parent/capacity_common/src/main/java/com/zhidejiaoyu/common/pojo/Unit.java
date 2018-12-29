@@ -1,8 +1,11 @@
 package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
@@ -11,6 +14,8 @@ import java.io.Serializable;
  * 
  * @author Administrator
  */
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class Unit extends Model<Unit> {
 	/** id */
     @TableId(type = IdType.AUTO)
@@ -26,66 +31,11 @@ public class Unit extends Model<Unit> {
     private String jointName;
     
     /** 删除状态 1:未删除（默认），2：删除 */
+    @TableField("delStatus")
     private int delStatus;
     
     /** 单元顺序，用于判断当前单元的下一单元是哪个 */
     private Integer unitIndex;
-    
-    
-    
-    public Integer getUnitIndex() {
-		return unitIndex;
-	}
-
-	public void setUnitIndex(Integer unitIndex) {
-		this.unitIndex = unitIndex;
-	}
-
-	public int getDelStatus() {
-		return delStatus;
-	}
-
-	public void setDelStatus(int delStatus) {
-		this.delStatus = delStatus;
-	}
-
-	@Override
-	public String toString() {
-		return "Unit [id=" + id + ", courseId=" + courseId + ", unitName=" + unitName + ", jointName=" + jointName
-				+ "]";
-	}
-
-	public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getCourseId() {
-        return courseId;
-    }
-
-    public void setCourseId(Long courseId) {
-        this.courseId = courseId;
-    }
-
-    public String getUnitName() {
-        return unitName;
-    }
-
-    public void setUnitName(String unitName) {
-        this.unitName = unitName == null ? null : unitName.trim();
-    }
-
-    public String getJointName() {
-        return jointName;
-    }
-
-    public void setJointName(String jointName) {
-        this.jointName = jointName == null ? null : jointName.trim();
-    }
 
     @Override
     protected Serializable pkVal() {

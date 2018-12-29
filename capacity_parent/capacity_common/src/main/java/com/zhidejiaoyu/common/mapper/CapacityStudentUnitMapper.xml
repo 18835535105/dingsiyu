@@ -12,6 +12,8 @@
         <result column="unit_name" property="unitName"/>
         <result column="course_name" property="courseName"/>
         <result column="version" property="version"/>
+        <result column="startunit" property="startunit"/>
+        <result column="endunit" property="endunit"/>
     </resultMap>
 
     <sql id="base_sql">
@@ -22,7 +24,9 @@
         type,
         unit_name,
         course_name,
-        version
+        version,
+        startunit,
+        endunit
     </sql>
 
     <select id="selectCurrentUnitIdByStudentIdAndType"

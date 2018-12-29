@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Unit;
 import com.zhidejiaoyu.common.pojo.UnitOneExample;
@@ -8,18 +9,15 @@ import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-import javax.annotation.security.PermitAll;
 import java.util.List;
 import java.util.Map;
 
-public interface UnitMapper {
+public interface UnitMapper extends BaseMapper<Unit> {
     int countByExample(UnitOneExample example);
 
     int deleteByExample(UnitOneExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(Unit record);
 
     int insertSelective(Unit record);
 

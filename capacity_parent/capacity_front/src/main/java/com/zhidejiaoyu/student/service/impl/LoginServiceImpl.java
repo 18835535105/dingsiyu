@@ -714,9 +714,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             saveDailyAward(stu);
 
             // 判断学生是否有同步版课程，没有同步版课程不能进入智能版学习
-            if (!this.hasCapacityCourse(stu)) {
-                result.put("capacity", false);
-            } else {
+            if (this.hasCapacityCourse(stu)) {
                 result.put("capacity", true);
             }
 

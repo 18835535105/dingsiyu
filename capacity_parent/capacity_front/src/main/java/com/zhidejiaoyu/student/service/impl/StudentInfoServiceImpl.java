@@ -291,7 +291,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     public ServerResponse<String> calculateValidTime(HttpSession session, Integer classify, Long courseId, Long unitId,
                                                      Long validTime) {
         // key: 学习模块
-        Map<Integer, Duration> map;
+        Map<String, Duration> map;
         Duration duration;
 
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
@@ -303,19 +303,20 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
 
         // session 中还没有学生的学习有效时长
+        String key = classify + ":" + unitId;
         if (session.getAttribute(TimeConstant.TOTAL_VALID_TIME) == null) {
             map = new HashMap<>(16);
             packageDuration(classify, courseId, unitId, validTime, map, student, loginTime);
             session.setAttribute(TimeConstant.TOTAL_VALID_TIME, map);
         } else {
             // session 中已经有学生的学习有效时长，如果没有当前模块增加当前模块的有效时长；如果有当前模块的有效时长，将有效时长相加
-            map = (Map<Integer, Duration>) session.getAttribute(TimeConstant.TOTAL_VALID_TIME);
-            if (map.containsKey(classify)) {
-                duration = map.get(classify);
+            map = (Map<String, Duration>) session.getAttribute(TimeConstant.TOTAL_VALID_TIME);
+            if (map.containsKey(key)) {
+                duration = map.get(key);
                 duration.setValidTime(duration.getValidTime() + validTime);
                 duration.setLoginTime(loginTime);
                 duration.setOnlineTime(0L);
-                map.put(classify, duration);
+                map.put(key, duration);
             } else {
                 packageDuration(classify, courseId, unitId, validTime, map, student, loginTime);
             }
@@ -332,7 +333,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         return ServerResponse.createBySuccessMessage(tip);
     }
 
-    private void packageDuration(Integer classify, Long courseId, Long unitId, Long validTime, Map<Integer, Duration> map,
+    private void packageDuration(Integer classify, Long courseId, Long unitId, Long validTime, Map<String, Duration> map,
                                  Student student, Date loginTime) {
         Duration duration = new Duration();
         duration.setCourseId(courseId);
@@ -342,7 +343,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         duration.setLoginTime(loginTime);
         duration.setStudentId(student.getId());
         duration.setOnlineTime(0L);
-        map.put(classify, duration);
+        map.put(classify + ":" + unitId, duration);
     }
 
     @Override
@@ -729,10 +730,10 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
      * @param map
      * @param loginTime
      */
-    private void saveDuration(HttpSession session, Map<Integer, Duration> map, Date loginTime) {
+    private void saveDuration(HttpSession session, Map<String, Duration> map, Date loginTime) {
         map.forEach((key, value) -> {
             List<Duration> durations = durationMapper.selectByStudentIdAndCourseId(value.getStudentId(), value.getCourseId(),
-                    value.getUnitId(), DateUtil.formatYYYYMMDDHHMMSS(loginTime), key);
+                    value.getUnitId(), DateUtil.formatYYYYMMDDHHMMSS(loginTime), Integer.valueOf(key.split(":")[0]));
             // 如果时长表有本次登录的当前模块时长信息,更新；否则新增时长记录
             if (durations.size() > 0) {
                 value.setId(durations.get(0).getId());
