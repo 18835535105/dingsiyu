@@ -44,11 +44,13 @@ public class LoginController {
      * @return
      */
     @RequestMapping(value = "/judge", method = RequestMethod.POST)
-    public ServerResponse loginJudge(String account, String password, HttpSession session, String code) {
+    public ServerResponse loginJudge(String account, String password, HttpSession session, HttpServletRequest request, String code) {
         if (StringUtils.isEmpty(account) || StringUtils.isEmpty(password)) {
             return ServerResponse.createByErrorMessage("用户名和密码不能为空！");
         }
-        return loginService.loginJudge(account, password, session, code);
+        account = account.trim();
+        password = password.trim();
+        return loginService.loginJudge(account, password, session, request, code);
 
     }
 

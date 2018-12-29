@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.common.MacIpUtil;
-import com.zhidejiaoyu.common.constant.SaltConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -17,7 +16,6 @@ import com.zhidejiaoyu.student.listener.SessionListener;
 import com.zhidejiaoyu.student.service.LoginService;
 import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
 import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.crypto.hash.Md5Hash;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -658,7 +656,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     @Override
-    public ServerResponse loginJudge(String account, String password, HttpSession session, String code) {
+    public ServerResponse loginJudge(String account, String password, HttpSession session, HttpServletRequest request, String code) {
 
         // 封装返回数据
         Map<String, Object> result = new HashMap<>(16);
@@ -715,7 +713,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             result.put("headUrl", stu.getHeadUrl());
 
             // 记录登录信息
-            saveLoginRunLog(stu);
+            saveLoginRunLog(stu, request);
 
             // 当日首次登陆奖励5金币（日奖励）
             saveDailyAward(stu);
@@ -894,8 +892,15 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
     }
 
-    private void saveLoginRunLog(Student stu) {
-        RunLog runLog = new RunLog(stu.getId(), 1, "学生 " + stu.getStudentName() + " 登录", new Date());
+    private void saveLoginRunLog(Student stu, HttpServletRequest request) {
+        String ip = null;
+        try {
+            ip = MacIpUtil.getIpAddr(request);
+        } catch (Exception e) {
+            logger.error("获取学生登录IP地址出错，error=[{}]", e.getMessage());
+        }
+
+        RunLog runLog = new RunLog(stu.getId(), 1, "学生[" + stu.getStudentName() + "]登录,ip=[" + ip +"]", new Date());
         try {
             runLogMapper.insert(runLog);
         } catch (Exception e) {

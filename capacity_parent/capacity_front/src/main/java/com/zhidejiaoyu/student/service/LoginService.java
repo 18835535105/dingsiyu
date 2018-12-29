@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.service;
 
-import com.zhidejiaoyu.common.pojo.Duration;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
@@ -8,8 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
 
 /**
  * 登陆业务接口层
@@ -46,9 +43,10 @@ public interface LoginService extends BaseService<Student>{
      * @param account
      * @param password
      * @param session
+     * @param request
      * @return
      */
-    ServerResponse loginJudge(String account, String password, HttpSession session, String code);
+    ServerResponse loginJudge(String account, String password, HttpSession session, HttpServletRequest request, String code);
 
     /**
      * 退出登录
