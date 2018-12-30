@@ -86,7 +86,7 @@ public class QuartzServiceImpl implements QuartzService {
      * 每日 00:10:00 更新提醒消息中学生账号到期提醒
      */
     @Transactional(rollbackFor = Exception.class)
-    @Scheduled(cron = "0 10 0 * * ?")
+//    @Scheduled(cron = "0 10 0 * * ?")
     @Override
     public void updateNews() {
         logger.info("定时任务 -> 更新提醒消息中学生账号到期提醒 开始执行...");
@@ -161,7 +161,7 @@ public class QuartzServiceImpl implements QuartzService {
      * 每天 00:30:00 更新学生全校日排行记录
      */
     @Transactional(rollbackFor = Exception.class)
-    @Scheduled(cron = "0 30 0 * * ?")
+//    @Scheduled(cron = "0 30 0 * * ?")
     @Override
     public void updateRank() {
         logger.info("定时任务 -> 更新学生全校日排行记录 开始执行...");
@@ -337,7 +337,7 @@ public class QuartzServiceImpl implements QuartzService {
     }
 
     @Override
-    @Scheduled(cron = "0 0 3 * * ?")
+//    @Scheduled(cron = "0 0 3 * * ?")
     public void updateWordDay() {
         // 查询所有工作日结束日期小于当前日期的对象
         List<StudentWorkDay> studentWorkDays = studentWorkDayMapper.selectEndTimeLessThanNow();
