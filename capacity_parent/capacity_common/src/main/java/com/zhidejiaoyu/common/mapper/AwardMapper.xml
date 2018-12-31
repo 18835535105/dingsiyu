@@ -186,12 +186,12 @@
         award_content_type, type, can_get,
         get_flag, create_time, get_time)
         values
-        <foreach collection="awardList" item="award" separator="," close=")" open="(">
-            #{award.id,jdbcType=BIGINT}, #{award.studentId,jdbcType=BIGINT}, #{award.medalType,jdbcType=BIGINT},
+        <foreach collection="awardList" item="award" separator=",">
+            (#{award.id,jdbcType=BIGINT}, #{award.studentId,jdbcType=BIGINT}, #{award.medalType,jdbcType=BIGINT},
             #{award.awardContentType,jdbcType=INTEGER}, #{award.type,jdbcType=VARCHAR},
             #{award.canGet,jdbcType=INTEGER},
-            #{award.getFlag,jdbcType=INTEGER}, #{award.getCreateTime,jdbcType=TIMESTAMP},
-            #{award.getTime,jdbcType=TIMESTAMP}
+            #{award.getFlag,jdbcType=INTEGER}, #{award.createTime,jdbcType=TIMESTAMP},
+            #{award.getTime,jdbcType=TIMESTAMP})
         </foreach>
 
     </insert>
