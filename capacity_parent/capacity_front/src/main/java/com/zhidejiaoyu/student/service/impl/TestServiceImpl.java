@@ -207,12 +207,10 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         } else {
             // 无游戏测试记录，新增记录
             createGameTestRecord(testRecord, student, map);
+            // 根据游戏分数初始化不同流程
+            this.initStudentFlow(student, testRecord.getPoint());
+            countMyGoldUtil.countMyGold(student);
         }
-
-        // 根据游戏分数初始化不同流程
-        this.initStudentFlow(student, testRecord.getPoint());
-
-        countMyGoldUtil.countMyGold(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(map);
     }
@@ -302,7 +300,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             map.put("tip", msg);
             testRecord.setExplain(testRecord.getExplain() + msg);
 
-            map.put("tip", "游戏还不错吧？下面我们来开始“特色版”的学习吧。");
+            map.put("tip", "游戏还不错吧？下面我们来开始学习吧。");
 
         }
 
@@ -388,7 +386,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 this.initReadyCourse(student);
                 // 初始化学生的课程、单元信息
                 commonMethod.initUnit(student);
-                return "根据你的情况，下面我们来开始“特色版”的学习吧。";
+                return "根据你的情况，下面我们来开始学习吧。";
             } else if (point < NINETY_POINT) {
                 // 根据学段推送低年级课程，初中推送七年级课程，高中推送高一课程
                 this.initLowerCourse(student);
@@ -566,7 +564,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (point < PASS) {
             vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "摸底测试"));
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.LEVEL_TEST_LESS_EIGHTY));
-            testRecord.setExplain("根据你的情况，下面我们来开始“特色版”的学习吧。");
+            testRecord.setExplain("根据你的情况，下、面我们来开始学习吧。");
         } else if (point < NINETY_POINT) {
             gold = 10;
             vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "摸底测试"));
