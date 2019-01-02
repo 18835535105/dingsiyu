@@ -42,7 +42,7 @@ public class BaiduSpeak {
 
 		Vocabulary vocabulary = vocabularyMapper.selectByWord(text);
 		if (StringUtils.isNotEmpty(vocabulary.getReadUrl())) {
-			return vocabulary.getReadUrl();
+			return prefix + vocabulary.getReadUrl();
 		} else {
 			log.error("单词=[{}]在单词表中没有读音！", text);
 			try {
