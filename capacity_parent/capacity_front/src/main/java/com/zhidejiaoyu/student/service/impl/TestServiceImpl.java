@@ -1219,7 +1219,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             map.put("id", recordId);
             map.put("genre", StringUtils.isEmpty(record.getStudyModel()) ? record.getGenre() : record.getStudyModel() + "-" + record.getGenre());
 
-            if (testDetailCountMap != null && testDetailCountMap.get(recordId) != null
+            if (!"单词图鉴".equals(record.getStudyModel()) && testDetailCountMap != null && testDetailCountMap.get(recordId) != null
                     && testDetailCountMap.get(recordId).get("count") != null
                     && testDetailCountMap.get(recordId).get("count") > 0) {
                 map.put("isShow", true);
