@@ -1,12 +1,15 @@
 package com.zhidejiaoyu.common.utils.language;
-import com.zhidejiaoyu.common.constant.FileConstant;
+
+import com.zhidejiaoyu.common.mapper.VocabularyMapper;
+import com.zhidejiaoyu.common.pojo.Vocabulary;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Objects;
 
 /**
  * 百度语音合成web api
@@ -25,6 +28,9 @@ public class BaiduSpeak {
 	@Value("${baidu}")
 	private String baidu;
 
+	@Autowired
+	private VocabularyMapper vocabularyMapper;
+
 	/**
 	 * 获取语音合成地址
 	 * 
@@ -33,14 +39,18 @@ public class BaiduSpeak {
 	 * @return
 	 */
 	public String getLanguagePath(String text) {
-		if (Objects.equals(text, "up")) {
-			return prefix + FileConstant.WORD_AUDIO + "up.mp3";
+
+		Vocabulary vocabulary = vocabularyMapper.selectByWord(text);
+		if (StringUtils.isEmpty(vocabulary.getReadUrl())) {
+			return vocabulary.getReadUrl();
+		} else {
+			log.error("单词=[{}]在单词表中没有读音！", text);
+			try {
+				text = URLEncoder.encode(URLEncoder.encode(text, "utf-8"), "utf-8");
+			} catch (UnsupportedEncodingException e) {
+				log.error("单词[{}]进行urlencode时出错！", text, e);
+			}
+			return baidu + text;
 		}
-		try {
-			text = URLEncoder.encode(URLEncoder.encode(text, "utf-8"), "utf-8");
-		} catch (UnsupportedEncodingException e) {
-			log.error("单词[{}]进行urlencode时出错！", text, e);
-		}
-		return baidu + text;
 	}
 }

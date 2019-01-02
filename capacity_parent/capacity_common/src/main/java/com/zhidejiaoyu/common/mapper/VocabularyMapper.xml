@@ -25,6 +25,7 @@
         <result column="delStatus" property="delStatus"
                 jdbcType="VARCHAR"/>
         <result column="sound_mark" property="soundMark"/>
+        <result column="read_url" property="readUrl"/>
     </resultMap>
     <sql id="insertWord_sql">
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -241,7 +242,8 @@
         course_unit,
         syllable,
         delStatus,
-        sound_mark
+        sound_mark,
+        read_url
     </sql>
 
     <!-- 多表查询返回结果 -->
@@ -252,7 +254,16 @@
         v.create_time,
         v.update_time,
         v.course_unit,
-        v.syllable, v.delStatus, v.recordpicurl
+        v
+        .
+        syllable,
+        v
+        .
+        delStatus,
+        v
+        .
+        recordpicurl,
+        read_url
     </sql>
 
     <!-- 根据学生id查询当前单元下指定模块的未学习的所有单词 -->
@@ -1023,6 +1034,11 @@
             )
         </if>
         group by v.id
+    </select>
+    <select id="selectByWord" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from vocabulary where binary word = #{word} limit 1
     </select>
 
 </mapper>

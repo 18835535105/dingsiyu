@@ -380,4 +380,12 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     List<Vocabulary> selectByCourseIdNotInWord(@Param("courseId") Long courseId, @Param("wordMapList") List<Map<String, Object>> wordMapList);
+
+    /**
+     * 根据单词查询单词信息
+     *
+     * @param word
+     * @return
+     */
+    Vocabulary selectByWord(@Param("word") String word);
 }

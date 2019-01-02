@@ -109,6 +109,8 @@ public class Vocabulary extends Model<Vocabulary> {
 	@TableField("sound_mark")
 	private String soundMark;
 
+	private String readUrl;
+
 	@Override
 	protected Serializable pkVal() {
 		return this.id;
