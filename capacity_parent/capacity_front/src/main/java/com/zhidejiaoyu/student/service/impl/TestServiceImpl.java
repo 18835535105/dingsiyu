@@ -759,7 +759,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Student student = getStudent(session);
         TestRecord testRecord;
 
-        wordUnitTestDTO.setClassify(5);
+        wordUnitTestDTO.setClassify(8);
 
         // 判断当前单元是不是首次进行测试
         boolean isFirst = false;
@@ -792,7 +792,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setStudentId(student.getId());
         testRecord.setTestEndTime(new Date());
         testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
-        testRecord.setQuantity(wordUnitTestDTO.getErrorCount() + wordUnitTestDTO.getRightCount());
+        if(wordUnitTestDTO.getErrorCount()!=null&& wordUnitTestDTO.getRightCount()!=null){
+            testRecord.setQuantity(wordUnitTestDTO.getErrorCount() + wordUnitTestDTO.getRightCount());
+        }
         testRecord.setAwardGold(goldCount);
         testRecord.setStudyModel("音译测试");
         testRecordMapper.insert(testRecord);
@@ -800,6 +802,55 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
         return ServerResponse.createBySuccess();
     }
+
+    @Override
+    public ServerResponse<Object> saveCapTeksTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
+        Student student = getStudent(session);
+        TestRecord testRecord;
+
+        wordUnitTestDTO.setClassify(9);
+
+        // 判断当前单元是不是首次进行测试
+        boolean isFirst = false;
+        TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
+                wordUnitTestDTO.getUnitId()[0], "课文测试", "课文测试");
+        if (testRecordOld == null) {
+            isFirst = true;
+        }
+
+        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld);
+        if (testRecordOld == null) {
+            testRecord = new TestRecord();
+            // 首次测试大于或等于80分，超过历史最高分次数 +1
+            if (wordUnitTestDTO.getPoint() >= PASS) {
+                testRecord.setBetterCount(1);
+            } else {
+                testRecord.setBetterCount(0);
+            }
+        } else {
+            testRecord = new TestRecord();
+            testRecord.setBetterCount(testRecordOld.getBetterCount());
+        }
+        testRecord.setCourseId(wordUnitTestDTO.getCourseId());
+        testRecord.setUnitId(wordUnitTestDTO.getUnitId()[0]);
+        testRecord.setPoint(wordUnitTestDTO.getPoint());
+        testRecord.setErrorCount(wordUnitTestDTO.getErrorCount());
+        testRecord.setRightCount(wordUnitTestDTO.getRightCount());
+        testRecord.setGenre("课文测试");
+        testRecord.setStudentId(student.getId());
+        testRecord.setTestEndTime(new Date());
+        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+        if(wordUnitTestDTO.getErrorCount()!=null&& wordUnitTestDTO.getRightCount()!=null){
+            testRecord.setQuantity(wordUnitTestDTO.getErrorCount() + wordUnitTestDTO.getRightCount());
+        }
+        testRecord.setAwardGold(goldCount);
+        testRecord.setStudyModel("课文测试");
+        testRecordMapper.insert(testRecord);
+        studentMapper.updateByPrimaryKeySelective(student);
+        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
+        return ServerResponse.createBySuccess();
+    }
+
 
     @Override
     public ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId) {
@@ -818,6 +869,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testDetailVo.setInfos(testRecordMapper.selectTestRecordInfo(testId));
         return ServerResponse.createBySuccess(testDetailVo);
     }
+
+
+
 
     /**
      * 计算测试用时

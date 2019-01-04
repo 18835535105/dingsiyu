@@ -23,9 +23,10 @@
     </select>
 
     <select id="selectUnitIdAndNameByCourseIds" resultType="java.util.Map" parameterType="map">
-        select u.id id,count(t.id) number , u.unit_name unitName,u.course_id courseId from unit u
+        select u.id id,count(t.id) number , u.unit_name unitName,u.course_id courseId,course.label label,course.grade grade,course.version version from unit u
         left join test_record t on u.id=t.unit_id
         join student_unit su on su.unit_id =u.id
+        join course course on course.id = u.course_id
         where su.student_id = #{studentId}
         and su.type = 1 and
         u.course_id in (
@@ -36,6 +37,22 @@
         group by u.id
         order by u.course_id asc, u.id asc
     </select>
+    <select id="getStudentAllCourse" resultType="java.util.Map" parameterType="map">
+        select distinct course.version version  from unit u
+        left join test_record t on u.id=t.unit_id
+        join student_unit su on su.unit_id =u.id
+        join course course on course.id = u.course_id
+        where su.student_id = #{studentId}
+        and su.type = 1 and
+        u.course_id in (
+        <foreach collection="courseIds" separator="," item="courseId">
+            #{courseId}
+        </foreach>
+        )
+        group by u.id
+        order by u.course_id asc, u.id asc
+    </select>
+
     <select id="selHistoryPronunciation" resultType="java.util.Map" parameterType="java.util.Map">
         select DISTINCT voice.word_id wordId ,teks.id,teks.sentence,teks.paraphrase,voice.score,voice.voice_url url ,voice.create_time time
         from teks teks
@@ -64,6 +81,10 @@
         join voice voice on teks.id= voice.word_id
         where teks.unit_id=#{unitId}
         and voice.student_id= #{studentId}
+    </select>
+
+    <select id="getTwentyTeks" resultType="java.util.Map" parameterType="map">
+        select * from teks order by rand() limit 20
     </select>
 
 </mapper>

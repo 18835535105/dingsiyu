@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="capacity_front:war">
+    <output-path>$PROJECT_DIR$/capacity_front/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>capacity_front</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="capacity_front-1.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="capacity_front:war exploded" />
+    </root>
+  </artifact>
+</component>

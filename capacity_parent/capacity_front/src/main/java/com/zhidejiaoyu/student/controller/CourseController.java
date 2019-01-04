@@ -119,7 +119,7 @@ public class CourseController {
      * @return
      */
     @ResponseBody
-    @GetMapping("/getCoursePlan")
+    @GetMapping("getCoursePlan")
     public ServerResponse<List<CoursePlanVo>> getCoursePlan(HttpSession session, Long courseId, @RequestParam(required = false, defaultValue = "1") Integer type) {
         if (courseId == null) {
             return ServerResponse.createByErrorMessage("参数非法");

@@ -133,4 +133,6 @@ public interface TestService extends BaseService<TestRecord> {
      * @return
      */
     ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId);
+
+    ServerResponse<Object> saveCapTeksTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO);
 }

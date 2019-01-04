@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.mysql.cj.x.protobuf.MysqlxCrud;
 import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
@@ -152,6 +153,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
 
+
     @Override
     public ServerResponse<Object> selChooseTeks(Integer unitId,HttpSession session) {
         Student student = (Student)session.getAttribute(UserConstant.CURRENT_STUDENT);
@@ -210,13 +212,14 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Override
     @SuppressWarnings("all")
-    public ServerResponse<List<CourseUnitVo>> getCourseAndUnit(HttpSession session) {
+    public ServerResponse<Map<String,Object>> getCourseAndUnit(HttpSession session) {
         Student student = getStudent(session);
         Long studentId = student.getId();
         List<CourseUnitVo> courseUnitVos = new ArrayList<>();
         CourseUnitVo courseUnitVo;
+        Map<String,Object> studyMap=null;
         List<Map<String, Object>> resultMap;
-
+        Map<String,Object> returnMap=new HashMap<>();
         // 学生所有课程id及课程名
         List<Map<String, Object>> courses = courseMapper.selectTextCourseIdAndCourseNameByStudentId(studentId);
 
@@ -241,14 +244,24 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 resultMap = new ArrayList<>();
                 courseUnitVo.setCourseId((Long) courseMap.get("id"));
                 courseUnitVo.setCourseName(courseMap.get("courseName").toString());
-
+                courseUnitVo.setVersion(courseMap.get("version").toString());
+                courseUnitVo.setGrad(courseMap.get("grade").toString()+courseMap.get("label").toString());
                 // 存放单元信息
                 Map<String, Object> unitInfoMap;
                 for (Map<String, Object> unitMap : textUnits) {
                     unitInfoMap = new HashMap<>(16);
                     if (Objects.equals(courseMap.get("id"), unitMap.get("courseId"))) {
+                        if(studyMap==null){
+                            studyMap=new HashMap<>();
+                            studyMap.put("unitId", unitMap.get("id"));
+                            studyMap.put("unitName", unitMap.get("unitName"));
+                            studyMap.put("version",unitMap.get("version"));
+                            studyMap.put("grade",unitMap.get("grade").toString()+unitMap.get("label").toString());
+                        }
                         unitInfoMap.put("unitId", unitMap.get("id"));
                         unitInfoMap.put("unitName", unitMap.get("unitName"));
+                        unitInfoMap.put("version",unitMap.get("version"));
+                        unitInfoMap.put("grade",unitMap.get("grade").toString()+unitMap.get("label").toString());
                         if(unitMap.get("number")==null){
                             unitInfoMap.put("number",0);
                         }else{
@@ -268,8 +281,14 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 courseUnitVo.setUnitVos(resultMap);
                 courseUnitVos.add(courseUnitVo);
             }
+            List<Map<String,Object>> testList=teksMapper.getStudentAllCourse(studentId, courseIds);
+            returnMap.put("present",studyMap);
+           returnMap.put("versionList",testList);
+           returnMap.put("list",courseUnitVos);
         }
-        return ServerResponse.createBySuccess(courseUnitVos);
+
+
+        return ServerResponse.createBySuccess(returnMap);
     }
 
     @Override
@@ -522,15 +541,80 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
 
+    /**
+     * 获取课文测试
+     */
+    @Override
+    public ServerResponse<Object> getTeksTest(Integer unitId) {
+        List<Teks> teks = teksMapper.selTeksByUnitId(unitId);
+        List<Teks> addTeks=null;
+        if(teks.size()<4){
+            addTeks=teksMapper.getTwentyTeks();
+        }
+        return getReturnTestTeks(teks,addTeks);
+    }
 
+    private ServerResponse<Object> getReturnTestTeks(List<Teks> teks,List<Teks> addTeks){
+        List<Map<String,Object>> returnList = new ArrayList<>();
+        List<Teks> optionList=new ArrayList<>();
+        optionList.addAll(teks);
+        if(addTeks!=null){
+            optionList.addAll(addTeks);
+        }
+        for(int i=0;i<teks.size();i++){
+            Collections.shuffle(optionList);
+            List<Teks> list=new ArrayList<>();
+            list.addAll(optionList);
+            list.remove(teks.get(i));
+            Integer ss=(int)Math.ceil((Math.random()*2));
+            Map<String,Object> returnMap=new HashMap<>();
+            returnMap.put("chinese",teks.get(i).getParaphrase());
+            returnMap.put("pronunciation",baiduSpeak.getLanguagePath(teks.get(i).getSentence()));
+            returnMap.put("english",teks.get(i).getSentence());
+            //英选汉
+            if(ss==1){
+                returnMap.put("type","BritishElectHan");
+                BritishElectHan(teks.get(i),list.subList(0,3),returnMap);
+            //汉选英
+            }else{
+                returnMap.put("type","HanElectBritish");
+                HanElectBritish(teks.get(i),list.subList(0,3),returnMap);
+            }
+            returnList.add(returnMap);
+        }
+        return ServerResponse.createBySuccess(returnList);
+    }
 
+    private void HanElectBritish(Teks teks, List<Teks> optionList, Map<String, Object> returnMap) {
+        List<String> option=new ArrayList<>();
+        option.add(teks.getSentence());
+        for(int i=0;i<3;i++){
+            option.add(optionList.get(i).getSentence());
+        }
+        Collections.shuffle(option);
+        for(int i=0;i<option.size();i++){
+            if(option.get(i).equals(teks.getSentence())){
+                returnMap.put("answer",i);
+            }
+        }
+        returnMap.put("option",option);
 
+    }
 
-
-
-
-
-
+    private void BritishElectHan(Teks teks, List<Teks> optionList, Map<String, Object> returnMap) {
+       optionList.add(teks);
+       Collections.shuffle(optionList);
+       List<String> english=new ArrayList<>();
+       List<String> option=new ArrayList<>();
+       for(int i=0;i<optionList.size();i++){
+           if(optionList.get(i).getSentence().equals(teks.getSentence())){
+               returnMap.put("answer",i);
+           }
+            english.add(optionList.get(i).getSentence());
+            option.add(baiduSpeak.getLanguagePath(optionList.get(i).getSentence()));
+       }
+        returnMap.put("option",option);
+    }
 
 
 }

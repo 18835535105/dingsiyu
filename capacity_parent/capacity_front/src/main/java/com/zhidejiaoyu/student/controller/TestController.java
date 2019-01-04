@@ -224,12 +224,27 @@ public class TestController {
         return testService.savePreSchoolTest(session, testRecord);
     }
 
+    /**
+     * 保存句子测试
+     * @param session
+     * @param wordUnitTestDTO
+     * @return
+     */
     @PostMapping("/saveCapSentenceTest")
     public ServerResponse saveCapSentenceTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
         if (wordUnitTestDTO.getUnitId() == null) {
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
         }
         return testService.saveCapSentenceTest(session, wordUnitTestDTO);
+    }
+
+    @PostMapping("/saveCapTeksTest")
+    public ServerResponse<Object> saveCapTeksTest(HttpSession session,WordUnitTestDTO wordUnitTestDTO){
+        if (wordUnitTestDTO.getUnitId() == null) {
+            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
+        }
+        return testService.saveCapTeksTest(session, wordUnitTestDTO);
+
     }
 
 }

@@ -534,7 +534,7 @@
         order by c.id asc
     </select>
     <select id="selectSentenceCourseIdAndCourseNameByStudentId" resultType="java.util.Map" parameterType="map">
-        select c.id, c.course_name courseName,su.unit_Id unitId
+        select c.id, c.course_name courseName,su.unit_Id unitId,c.grade,c.label,c.version
         from course c,
              student_unit su,
              unit_sentence us
@@ -547,7 +547,7 @@
     </select>
 
     <select id="selectTextCourseIdAndCourseNameByStudentId" resultType="java.util.Map" parameterType="map">
-        select c.id, c.course_name courseName
+        select c.id, c.course_name courseName,c.grade grade,c.label label,c.version version
         from course c,
              student_unit su,
              teks t
@@ -586,4 +586,24 @@
         GROUP BY u.id
         order by u.id asc
     </select>
+    <select id="getAllVersion" resultType="java.util.Map" parameterType="java.lang.Long">
+      select distinct c.version
+        from course c,
+             student_unit su,
+             unit_sentence us
+        where c.id = su.course_id
+          and su.student_id = #{studentId}
+          and su.type = 1
+          and us.unit_id = su.unit_id
+    </select>
+    <select id="selectByCourseAndStudent" resultType="java.util.Map" parameterType="java.lang.Long">
+        select course.id courseId , unit.id unitId , cou.version,cou.label,cou.grade  from student_course course
+          join student student on course.student_id=student.id
+          join unit unit on unit.course_id=course.course_id
+          join course cou on course.course_id=cou.id
+        where
+        (course.course_name not like '小学%' and course.course_name not like '初中%'
+        and course.course_name not like '高中%') and student.id=#{studentId} and type=2 limit 1
+    </select>
+
 </mapper>

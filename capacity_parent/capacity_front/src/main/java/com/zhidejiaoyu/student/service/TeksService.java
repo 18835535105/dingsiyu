@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Map;
 
 public interface TeksService extends BaseService<Teks> {
 
@@ -22,7 +23,7 @@ public interface TeksService extends BaseService<Teks> {
      * @param session
      * @return
      */
-    ServerResponse<List<CourseUnitVo>> getCourseAndUnit(HttpSession session);
+    ServerResponse<Map<String,Object>> getCourseAndUnit(HttpSession session);
 
     //获取默写课文
     ServerResponse<Object> selWriteTeks(Integer unitId);
@@ -44,4 +45,6 @@ public interface TeksService extends BaseService<Teks> {
     ServerResponse<Object> selHistoryByCountAndUnitId(Integer count, Integer unitId, HttpSession session);
 
     ServerResponse<Object> selRankingList(Integer unitId, HttpSession session);
+
+    ServerResponse<Object> getTeksTest(Integer unitId);
 }

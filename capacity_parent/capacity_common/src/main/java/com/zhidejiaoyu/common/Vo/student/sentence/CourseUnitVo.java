@@ -14,9 +14,10 @@ import java.util.Map;
  */
 @Data
 public class CourseUnitVo implements Serializable {
-
     private String courseName;
+    private String version;
     private Long courseId;
+    private String grad;
 
     /**
      * key:unitName 单元名

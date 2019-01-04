@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/teks")
@@ -31,7 +32,7 @@ public class TeksController  {
      */
     @ResponseBody
     @RequestMapping("/getTextCourseAndUnit")
-    public ServerResponse<List<CourseUnitVo>> getCourseAndUnit(HttpSession session) {
+    public ServerResponse<Map<String,Object>> getCourseAndUnit(HttpSession session) {
         return teksService.getCourseAndUnit(session);
     }
 
@@ -124,6 +125,12 @@ public class TeksController  {
     @ResponseBody
     public ServerResponse<Object> selRankingList(Integer unitId,HttpSession session){
         return teksService.selRankingList(unitId,session);
+    }
+
+    @RequestMapping("getTeksTest")
+    @ResponseBody
+    public ServerResponse<Object> getTeksTest(Integer unitId){
+        return teksService.getTeksTest(unitId);
     }
 
 
