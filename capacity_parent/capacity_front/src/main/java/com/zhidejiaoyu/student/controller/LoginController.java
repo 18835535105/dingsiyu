@@ -119,7 +119,7 @@ public class LoginController {
      */
     @RequestMapping("/toLogin/{boolean}")
     public Map<String, Boolean> isLogin(@PathVariable("boolean") Boolean flag) {
-        Map<String, Boolean> isLogin = new HashMap<>();
+        Map<String, Boolean> isLogin = new HashMap<>(16);
         isLogin.put("isLogin", flag);
         return isLogin;
     }
