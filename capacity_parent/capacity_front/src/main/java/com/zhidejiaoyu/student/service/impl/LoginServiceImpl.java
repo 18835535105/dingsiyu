@@ -5,7 +5,6 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.ValidateCode;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -14,7 +13,6 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.personal.InitRedPointThread;
 import com.zhidejiaoyu.student.listener.SessionListener;
 import com.zhidejiaoyu.student.service.LoginService;
-import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -796,6 +794,12 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         if (count == 0) {
             stu.setAccountTime(new Date(System.currentTimeMillis() + stu.getRank() * 24 * 60 * 60 * 1000L));
 
+            // 更新单个字段，减少死锁情况发生
+            Student student = new Student();
+            student.setAccountTime(stu.getAccountTime());
+            student.setId(stu.getId());
+            studentMapper.updateByPrimaryKeySelective(student);
+
             // 初始化学生勋章信息
             initMedalInfo(stuId, stu);
         }
@@ -874,7 +878,13 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             award.setGetTime(new Date());
             try {
                 awardMapper.insert(award);
-                studentMapper.updateByPrimaryKeySelective(stu);
+
+                // 更新单个字段，减少死锁情况发生
+                Student student = new Student();
+                student.setSystemGold(stu.getSystemGold());
+                student.setId(stu.getId());
+                studentMapper.updateByPrimaryKeySelective(student);
+
                 sb = new StringBuilder("学生").append(stu.getStudentName()).append("今日首次登陆系统，奖励#5#金币");
                 RunLog runLog = new RunLog(stu.getId(), 4, sb.toString(), new Date());
                 runLogMapper.insert(runLog);
