@@ -388,4 +388,14 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     Vocabulary selectByWord(@Param("word") String word);
+
+    /**
+     * 查询课程中指定数量的单词
+     *
+     * @param courseId
+     * @param limitStart
+     * @param limitEnd
+     * @return
+     */
+    List<String> selectWordByCourseId(@Param("courseId") long courseId, @Param("limitStart") int limitStart, @Param("limitEnd") int limitEnd);
 }

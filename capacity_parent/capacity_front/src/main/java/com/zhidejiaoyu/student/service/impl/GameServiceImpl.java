@@ -124,6 +124,11 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
             List<String> otherWordList = learnMapper.selectWordRandomInCourse(student.getId(), 110 - wordList.size());
             wordList.addAll(otherWordList);
         }
+        if (wordList.size() < 110) {
+            // 如果学生所有课程中单词总数补足110个，从《外研社版（一年级起）(一年级-上册)》取剩余单词
+            List<String> otherWordList = vocabularyMapper.selectWordByCourseId(2863L, 0, 110 - wordIds.size());
+            wordList.addAll(otherWordList);
+        }
         Collections.shuffle(wordList);
 
         List<GameTwoVo> gameTwoVos = new ArrayList<>();

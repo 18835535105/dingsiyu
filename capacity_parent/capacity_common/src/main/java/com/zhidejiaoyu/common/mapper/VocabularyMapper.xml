@@ -1040,5 +1040,13 @@
         <include refid="Base_Column_List"/>
         from vocabulary where binary word = #{word} limit 1
     </select>
+    <select id="selectWordByCourseId" resultType="java.lang.String" parameterType="map">
+        SELECT
+        distinct
+        v.word
+        FROM vocabulary v, unit_vocabulary uv, unit u
+        WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
+        u.course_id = #{courseId} limit #{limitStart}, #{limitEnd}
+    </select>
 
 </mapper>
