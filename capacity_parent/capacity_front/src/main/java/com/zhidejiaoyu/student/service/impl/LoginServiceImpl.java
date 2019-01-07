@@ -163,6 +163,10 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         // 获取学生当前正在学习的单元信息
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student_id, 1);
+        if (capacityStudentUnit == null) {
+            logger.error("学生[{}]-[{}]没有智能版课程！", stu.getId(), stu.getStudentName());
+            return ServerResponse.createBySuccess();
+        }
         // 学生id
         result.put("student_id", stu.getId());
         // 当前单词所学课程id
@@ -951,15 +955,15 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveDurationInfo(Student student, HttpSession session) {
-        // 学生 session 失效时将该学生从在线人数中移除
-        redisTemplate.opsForSet().remove(RedisKeysConst.ONLINE_USER, student.getId());
-
         Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
         Date loginOutTime = DateUtil.parseYYYYMMDDHHMMSS(new Date());
         if (loginTime != null && loginOutTime != null) {
             // 判断当前登录时间是否已经记录有在线时长信息，如果没有插入记录，如果有无操作
             int count = durationMapper.countOnlineTimeWithLoginTime(student, loginTime);
             if (count <= 0) {
+                // 学生 session 失效时将该学生从在线人数中移除
+                redisTemplate.opsForSet().remove(RedisKeysConst.ONLINE_USER, student.getId());
+
                 Long onlineTime = (loginOutTime.getTime() - loginTime.getTime()) / 1000;
                 Duration duration = new Duration();
                 duration.setStudentId(student.getId());
