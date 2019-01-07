@@ -748,15 +748,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 return ServerResponse.createBySuccess("2", result);
             }
 
-            if (hasCapacityCourse) {
-                // 没有智能版课程不进行游戏测试
-                int gameCount = testRecordMapper.countGameCount(stu);
-                if (gameCount == 0) {
-                    // 第一次进行游戏测试
-                    return ServerResponse.createBySuccess("3", result);
-                }
-            }
-
             // 一个账户只能登陆一台
             judgeMultipleLogin(session, stu);
 
