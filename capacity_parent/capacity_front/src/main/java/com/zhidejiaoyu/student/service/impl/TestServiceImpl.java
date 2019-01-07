@@ -25,7 +25,6 @@ import com.zhidejiaoyu.student.constant.PetImageConstant;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
-import com.zhidejiaoyu.student.service.SentenceService;
 import com.zhidejiaoyu.student.service.TestService;
 import com.zhidejiaoyu.student.utils.CcieUtil;
 import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
@@ -913,6 +912,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         Integer point = wordUnitTestDTO.getPoint();
 
+        // 获取需要奖励的能量值
+        int addEnergy = getEnergy(student, point);
+
         // 保存测试记录
         // 查看是否已经有该单元当前模块的单元闯关测试记录
         TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
@@ -946,11 +948,41 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setMsg(msg);
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
         vo.setGold(goldCount);
+        vo.setEnergy(addEnergy);
         countMyGoldUtil.countMyGold(student);
         ccieUtil.saveCcieTest(student, 1, classify);
         studentMapper.updateByPrimaryKeySelective(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(vo);
+    }
+
+    /**
+     * 获取需要奖励的能量值
+     *
+     * @param student
+     * @param point
+     * @return
+     */
+    private int getEnergy(Student student, Integer point) {
+        int addEnergy = 0;
+        if (student.getEnergy() == null) {
+            if (point >= 80) {
+                student.setEnergy(2);
+                addEnergy = 2;
+            } else if (point > 20) {
+                student.setEnergy(1);
+                addEnergy = 1;
+            }
+        } else {
+            if (point >= 80) {
+                student.setEnergy(student.getEnergy() + 2);
+                addEnergy = 2;
+            } else if (point > 20) {
+                student.setEnergy(student.getEnergy() + 1);
+                addEnergy = 1;
+            }
+        }
+        return addEnergy;
     }
 
     /**

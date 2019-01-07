@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.ValidateCode;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
+import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.personal.InitRedPointThread;
 import com.zhidejiaoyu.student.listener.SessionListener;
@@ -161,6 +162,10 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         // 获取学生当前正在学习的单元信息
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student_id, 1);
+        if (capacityStudentUnit == null) {
+            logger.error("学生：[{}]-[{}] 没有初始化智能版课程！", student_id, stu.getStudentName());
+            return ServerResponse.createBySuccess(ResponseCode.FORBIDDEN.getCode(), ResponseCode.FORBIDDEN.getMsg());
+        }
         // 学生id
         result.put("student_id", stu.getId());
         // 当前单词所学课程id

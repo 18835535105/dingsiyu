@@ -19,6 +19,11 @@ public enum ResponseCode {
      * 参数非法
      */
     ILLEGAL_ARGUMENT(400,"ILLEGAL_ARGUMENT"),
+
+    /**
+     * 无权限访问
+     */
+    FORBIDDEN(403, "FORBIDDEN"),
     /**
      * 原密码输入错误
      */
