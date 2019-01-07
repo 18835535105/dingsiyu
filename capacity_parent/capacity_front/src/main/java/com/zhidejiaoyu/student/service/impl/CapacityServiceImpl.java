@@ -509,7 +509,7 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
         capacityListVo = new CapacityListVo();
         capacityListVo.setChinese(flag ?
                 capacityMemory.getWordChinese().replace("*", "") : capacityMemory.getWordChinese());
-        capacityListVo.setContent(flag ? capacityMemory.getWord() : capacityMemory.getSyllable());
+        capacityListVo.setContent(flag ? capacityMemory.getWord() : StringUtils.isEmpty(capacityMemory.getSyllable()) ? capacityMemory.getWord() : capacityMemory.getSyllable());
         capacityListVo.setMemeoryStrength(capacityMemory.getMemoryStrength());
         capacityListVo.setPush(this.getPushTime(capacityMemory.getPush()));
         capacityListVo.setReadUrl(baiduSpeak.getLanguagePath(capacityMemory.getWord()));
