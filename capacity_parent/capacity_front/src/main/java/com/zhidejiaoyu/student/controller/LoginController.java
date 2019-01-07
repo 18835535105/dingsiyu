@@ -1,14 +1,17 @@
 package com.zhidejiaoyu.student.controller;
 
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.LoginService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -34,6 +37,9 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
+    @Resource
+    private RedisTemplate<String, Objects> redisTemplate;
+
     /**
      * 登陆
      *
@@ -52,6 +58,12 @@ public class LoginController {
         password = password.trim();
         return loginService.loginJudge(account, password, session, request, code);
 
+    }
+
+    @GetMapping("/getOnlineUserCount")
+    public ServerResponse getOnlineUserCount() {
+        Long size = redisTemplate.opsForSet().size(RedisKeysConst.ONLINE_USER);
+        return ServerResponse.createBySuccess(size);
     }
 
     /**

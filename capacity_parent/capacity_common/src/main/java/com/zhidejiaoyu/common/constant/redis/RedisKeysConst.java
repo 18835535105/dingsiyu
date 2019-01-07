@@ -54,4 +54,9 @@ public class RedisKeysConst {
      * 所有等级信息
      */
     public static final String ALL_LEVEL= "ALL_LEVEL";
+
+    /**
+     * 统计在线人数
+     */
+    public static final String ONLINE_USER = "ONLINE_USER";
 }

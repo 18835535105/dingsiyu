@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.service.impl;
 import com.zhidejiaoyu.common.MacIpUtil;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
@@ -672,6 +673,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             return ServerResponse.createByErrorMessage("此账号已被删除");
             // 3.正确
         } else {
+            // 将登录的学生放入指定 key 用于统计在线人数
+            redisTemplate.opsForSet().add(RedisKeysConst.ONLINE_USER, stu.getId());
 
             // 学生首次登陆系统，初始化其账号有效期，勋章信息
             initAccountTime(stu);
@@ -953,6 +956,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveDurationInfo(Student student, HttpSession session) {
+        // 学生 session 失效时将该学生从在线人数中移除
+        redisTemplate.opsForSet().remove(RedisKeysConst.ONLINE_USER, student.getId());
+
         Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
         Date loginOutTime = DateUtil.parseYYYYMMDDHHMMSS(new Date());
         if (loginTime != null && loginOutTime != null) {
