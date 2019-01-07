@@ -163,10 +163,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         // 获取学生当前正在学习的单元信息
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student_id, 1);
-        if (capacityStudentUnit == null) {
-            logger.error("学生：[{}]-[{}] 没有初始化智能版课程！", student_id, stu.getStudentName());
-            return ServerResponse.createBySuccess(ResponseCode.FORBIDDEN.getCode(), ResponseCode.FORBIDDEN.getMsg());
-        }
         // 学生id
         result.put("student_id", stu.getId());
         // 当前单词所学课程id
@@ -579,8 +575,16 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Override
     public ServerResponse<Object> clickPortrait(HttpSession session) {
 
-        Map<String, Object> map = new HashMap<String, Object>();
-        long studentId = StudentIdBySession(session);
+        Student student = getStudent(session);
+        Long studentId = student.getId();
+
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
+        if (capacityStudentUnit == null) {
+            logger.error("学生：[{}]-[{}] 没有初始化智能版课程！", studentId, student.getStudentName());
+            return ServerResponse.createBySuccess(ResponseCode.FORBIDDEN.getCode(), ResponseCode.FORBIDDEN.getMsg());
+        }
+
+        Map<String, Object> map = new HashMap<>(16);
 
         // 获取今日已学单词
         int learnWord = learnMapper.getTodayWord(DateUtil.formatYYYYMMDD(new Date()), studentId);
