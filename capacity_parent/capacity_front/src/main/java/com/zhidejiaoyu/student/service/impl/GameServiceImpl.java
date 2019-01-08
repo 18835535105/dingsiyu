@@ -186,10 +186,13 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
 
     private void packageGameSubjectMap(Long courseId, List<Map<String, Object>> unitLearns, List<Map<String, Object>> ignoreList) {
         List<Vocabulary> vocabularies = vocabularyMapper.selectByCourseIdNotInWord(courseId, ignoreList);
-        /*if (vocabularies.size() < 10) {
-            PageHelper.startPage(1, 10 - vocabularies.size());
+        log.error("vocabularies.size=[{}],unitLearns.size=[{}]", vocabularies.size(), unitLearns.size());
+        int size = unitLearns.size() + vocabularies.size();
+        if (size < 10) {
+            PageHelper.startPage(1, 10 - size);
             vocabularies.addAll(vocabularyMapper.selectByCourseIdNotInWord(courseId + 1, ignoreList));
-        }*/
+            log.error("vocabularies.size=[{}], unitLearns.size=[{}]", vocabularies.size(), unitLearns.size());
+        }
         vocabularies.forEach(vocabulary -> {
             Map<String, Object> map = new HashMap<>(16);
             map.put("word", vocabulary.getWord());
