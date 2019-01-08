@@ -371,6 +371,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 studyFlow = studyFlowMapper.selectById(7);
                 session.setAttribute("needReview", needReviewStr);
             }
+            if (studyFlow == null) {
+                logger.error("学生[{}]-[{}]还没有初始化智能版流程节点！", stu.getId(), stu.getStudentName());
+            }
             result.put("needReview", needReviewStr);
             result.put("nodeId", studyFlow.getId());
             result.put("nodeName", studyFlow.getFlowName());
