@@ -407,6 +407,13 @@ public class CommonMethod implements Serializable {
         return list;
     }
 
+    public static void main(String[] args) {
+        CommonMethod commonMethod = new CommonMethod();
+        String str = "刚才*在街上*，我*碰巧*看见了我的叔叔。";
+        System.out.println(commonMethod.getOrderChineseList(str, "昨天"));
+        System.out.println(commonMethod.getChineseList(str));
+    }
+
     /**
      * 获取乱序的中文选项
      *
@@ -423,12 +430,16 @@ public class CommonMethod implements Serializable {
         }
 
         // 拆分并去除*
-        List<String> list = new ArrayList<>();
         String[] arr = sentence.split("\\*");
+        List<String> list = new ArrayList<>(arr.length);
         for (int i = 0; i < arr.length; i++) {
             arr[i] = arr[i].trim();
         }
-        Collections.addAll(list, arr);
+        for (String s : arr) {
+            if (StringUtils.isNotEmpty(s)) {
+                list.add(s);
+            }
+        }
         if (StringUtils.isNotEmpty(translateDisturb)) {
             list.add(translateDisturb);
         }
@@ -454,7 +465,7 @@ public class CommonMethod implements Serializable {
         for (String s : arr) {
             if (s.contains("*")) {
                 list.add(s.replace("*", ""));
-            } else {
+            } else if (StringUtils.isNotEmpty(s.trim())){
                 list.add(s.trim());
             }
         }
@@ -489,14 +500,4 @@ public class CommonMethod implements Serializable {
         }
         return null;
     }
-
-    public static void main(String[] args) {
-        CommonMethod commonMethod = new CommonMethod();
-        String str = "在奥林匹克运动会*早期,只有男性运动员*才能参加*比赛。";
-        System.out.println(commonMethod.getChineseList(str));
-        System.out.println(commonMethod.getOrderChineseList(str, null));
-
-    }
-
-
 }
