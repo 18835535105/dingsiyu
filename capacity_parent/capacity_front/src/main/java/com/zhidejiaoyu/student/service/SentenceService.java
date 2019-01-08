@@ -37,7 +37,7 @@ public interface SentenceService extends BaseService<Sentence> {
      * @return
      */
     ServerResponse<String> saveSentenceTranslate(HttpSession session, Learn learn, Boolean isKnown, Integer plan,
-                                                 Integer total, String classify);
+                                                 Integer total, String classify,Integer unitId);
 
     /**
      * 例句听力和例句翻译时获取制定单词的信息
@@ -76,4 +76,6 @@ public interface SentenceService extends BaseService<Sentence> {
      * @return
      */
     ServerResponse<Object> getIsInto(HttpSession session, Long unitId);
+
+    ServerResponse<Object> getSentenceLaterLearnTime(HttpSession session);
 }

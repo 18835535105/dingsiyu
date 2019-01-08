@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
+import com.zhidejiaoyu.common.utils.dateUtlis.CalculateTimeUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,7 +36,8 @@ import java.util.stream.Collectors;
  * @date 2018/5/21 15:15
  */
 @Service
-public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentence> implements SentenceService {
+public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentence> implements SentenceService
+{
 
     private Logger log = LoggerFactory.getLogger(SentenceService.class);
 
@@ -274,7 +278,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<String> saveSentenceTranslate(HttpSession session, Learn learn, Boolean known, Integer plan,
-                                                        Integer total, String classify) {
+                                                        Integer total, String classify,Integer unitId) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         Date now = DateUtil.parseYYYYMMDDHHMMSS(new Date());
         Long studentId = student.getId();
@@ -355,10 +359,10 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             // 默写模块错过三次在记忆时间上再加长三小时
             if ("例句默写".equals(classify)) {
                 // 查询错误次数>=3
-                Integer faultTime = sentenceWriteMapper.getFaultTime(studentId, learn.getExampleId());
+                Integer faultTime = sentenceWriteMapper.getFaultTime(studentId, learn.getExampleId(),unitId);
                 if (faultTime != null && faultTime >= 3) {
                     // 如果错误次数>=3, 黄金记忆时间推迟3小时
-                    sentenceWriteMapper.updatePush(studentId, learn.getExampleId(), pushRise);
+                    sentenceWriteMapper.updatePush(studentId, learn.getExampleId(), pushRise,unitId);
                 }
             }
 
@@ -531,29 +535,37 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                         }
                         Integer learnCount = studyCountMapper.selectMaxCountByCourseId(student.getId(), Long.parseLong(unitMap.get("courseId").toString()));
                         Long id = learnMapper.countLearnWord(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(5), learnCount == null ? 1 : learnCount);
-                        if(id>0){
-                            unitInfoMap.put("sentenceTranslation",true);
+                        //获取当前单元有多少例句
+                        Long senCount = unitSentenceMapper.selectSentenceCountByUnitId((Long) unitMap.get("id"));
+                        if(id<senCount&&id>0){
+                            unitInfoMap.put("sentenceTranslation","正在学习");
+                        }else if(id>=senCount){
+                            unitInfoMap.put("sentenceTranslation","已学习");
                         }else{
-                            unitInfoMap.put("sentenceTranslation",false);
+                            unitInfoMap.put("sentenceTranslation","未学习");
                         }
                         Long id1 = learnMapper.countLearnWord(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(4), learnCount == null ? 1 : learnCount);
-                        if(id1>0){
-                            unitInfoMap.put("sentenceListening",true);
+                        if(id1<senCount&&id>0){
+                            unitInfoMap.put("sentenceListening","正在学习");
+                        }else if(id1>=senCount){
+                            unitInfoMap.put("sentenceListening","已学习");
                         }else{
-                            unitInfoMap.put("sentenceListening",false);
+                            unitInfoMap.put("sentenceListening","未学习");
                         }
                         Long id2 = learnMapper.countLearnWord(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(6), learnCount == null ? 1 : learnCount);
-                        if(id2>0){
-                            unitInfoMap.put("sentenceWriting",true);
+                        if(id2<senCount&&id>0){
+                            unitInfoMap.put("sentenceWriting","正在学习");
+                        }else if(id2>=senCount){
+                            unitInfoMap.put("sentenceWriting","已学习");
                         }else{
-                            unitInfoMap.put("sentenceWriting",false);
+                            unitInfoMap.put("sentenceWriting","未学习");
                         }
                         TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
                                 Long.parseLong(unitMap.get("id").toString()), "音译测试", "音译测试");
                         if(testRecordOld!=null){
-                            unitInfoMap.put("transliterationExercise",true);
+                            unitInfoMap.put("transliterationExercise","已学习");
                         }else{
-                            unitInfoMap.put("transliterationExercise",false);
+                            unitInfoMap.put("transliterationExercise","未学习");
                         }
                         resultMap.add(unitInfoMap);
                     }
@@ -609,7 +621,34 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         return ServerResponse.createBySuccess(map);
     }
 
+    @Override
+    public ServerResponse<Object> getSentenceLaterLearnTime(HttpSession session) {
+        //获取学生id
+        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        //获取学习时间
+        List<Map<String,Object>> list=sentenceMapper.selectSentenceLaterLearnTimeByStudentId(student.getId());
+        List<Map<String,Object>> resultList=new ArrayList<>();
+        //获取学生学习单元时间
+        for(Map<String,Object> map:list){
+            Date learnTime=(Date)map.get("learn_time");
+            String time=learnTime.toString();
+            if (StringUtils.isNotEmpty(time)) {
+                map.put("learn_time", CalculateTimeUtil.CalculateTime(time));
+            } else {
+                map.put("learn_time", "");
+            }
+            // sort用于时间排序
+            time = time.replaceAll("[\\pP\\pS\\pZ]", "");
+            map.put("sort", time+"");
+            resultList.add(map);
+        }
+        return ServerResponse.createBySuccess(resultList);
+    }
 
+    public static void main(String[] args){
+        SimpleDateFormat dfs = new SimpleDateFormat("yyyy-MM-dd");
+        System.out.println(dfs.format(new Date()));
+    }
     /**
      * 封装单词信息
      *

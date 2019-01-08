@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SentenceMapper extends BaseMapper<Sentence> {
 
@@ -260,4 +261,6 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
     List<Sentence> selectUnlearnInBookPlayer(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 
     List<Sentence> selectRoundSentence(Long courseId);
+
+    List<Map<String, Object>> selectSentenceLaterLearnTimeByStudentId(Long id);
 }

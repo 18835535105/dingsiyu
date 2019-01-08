@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.zhidejiaoyu.common.mapper.SentenceMapper">
-   <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Sentence">
-    <id column="id" property="id" />
-    <result column="centreExample" property="centreExample" />
-    <result column="centreTranslate" property="centreTranslate" />
-    <result column="ExampleDisturb" property="ExampleDisturb" />
-    <result column="TranslateDisturb" property="TranslateDisturb" />
-</resultMap>
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Sentence">
+        <id column="id" property="id"/>
+        <result column="centreExample" property="centreExample"/>
+        <result column="centreTranslate" property="centreTranslate"/>
+        <result column="ExampleDisturb" property="ExampleDisturb"/>
+        <result column="TranslateDisturb" property="TranslateDisturb"/>
+    </resultMap>
 
 
     <!-- 多表关联查询sentence对象 -->
@@ -79,7 +79,7 @@
         from sentence s,
         unit_sentence us
         where
-         s.id = us.sentence_id
+        s.id = us.sentence_id
         and us.unit_id = #{unitId}
     </select>
 
@@ -215,7 +215,8 @@
             and l.`status` = 1
         </if>
     </select>
-    <select id="selectUnLearnedSentenceByCourseId" resultType="com.zhidejiaoyu.common.pojo.Sentence" parameterType="map">
+    <select id="selectUnLearnedSentenceByCourseId" resultType="com.zhidejiaoyu.common.pojo.Sentence"
+            parameterType="map">
         select
         <include refid="relevance_base_sql"/>
         from sentence s where s.id not in (select l.example_id from learn l where l.example_id is not null and
@@ -287,5 +288,19 @@
         where un.course_id=#{courseId}
         ORDER BY RAND() LIMIT 30
     </select>
+
+    <select id="selectSentenceLaterLearnTimeByStudentId" parameterType="java.lang.Long" resultType="java.util.Map">
+        select  DISTINCT unit.joint_name,
+        learn.learn_time ,course.course_name
+        from  learn learn
+        join sentence sen on learn.example_id = sen.id
+        join unit_sentence unsen on unsen.sentence_id=sen.id
+        join unit unit on unit.id=unsen.unit_id
+        join course course on course.id=unit.course_id
+        where learn.example_id is not null and learn.student_id = #{id}
+        group by unit.joint_name
+        order by learn.id desc
+    </select>
+
 
 </mapper>

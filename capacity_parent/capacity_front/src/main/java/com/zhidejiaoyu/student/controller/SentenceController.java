@@ -66,11 +66,11 @@ public class SentenceController {
      */
     @PostMapping("/saveSentenceTranslate")
     public ServerResponse<String> saveSentenceTranslate(HttpSession session, Learn learn, Boolean isKnown, Integer plan,
-                                                        Integer total, String classify) {
+                                                        Integer total, String classify,Integer unitId) {
         if (plan == null || total == null) {
             return ServerResponse.createByErrorMessage("参数非法");
         }
-        return sentenceService.saveSentenceTranslate(session, learn, isKnown, plan, total, classify);
+        return sentenceService.saveSentenceTranslate(session, learn, isKnown, plan, total, classify,unitId);
     }
 
     /**
@@ -128,6 +128,11 @@ public class SentenceController {
         return sentenceService.getLearnCourseAndUnit(session);
     }
 
+    @ResponseBody
+    @GetMapping("/getSentenceLaterLearnTime")
+    public ServerResponse<Object> getSentenceLaterLearnTime(HttpSession session){
+        return sentenceService.getSentenceLaterLearnTime(session);
+    }
 
 
 

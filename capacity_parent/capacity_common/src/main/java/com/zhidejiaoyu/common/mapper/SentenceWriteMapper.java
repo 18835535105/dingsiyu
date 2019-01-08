@@ -108,19 +108,17 @@ public interface SentenceWriteMapper {
      * 获取单词错误次数
      *
      * @param id
-     * @param vocabularyId
      * @return
      */
-    @Select("select fault_time from sentence_write where student_id = #{studentId} AND vocabulary_id = #{exampleId}")
-	Integer getFaultTime(@Param("studentId")Long id, @Param("exampleId")Long exampleId);
+    @Select("select fault_time from sentence_write where student_id = #{studentId} AND vocabulary_id = #{exampleId} AND unit_id=#{unitId}")
+	Integer getFaultTime(@Param("studentId")Long id, @Param("exampleId")Long exampleId,@Param("unitId")int unitId);
 
     /**
      * 黄金记忆时间加指定的3小时
      *
      * @param id
-     * @param vocabularyId
      * @param pushRise
      */
-    @Update("update sentence_write set push = date_add(push, interval ${pushRise} hour) where student_id = #{studentId} AND vocabulary_id = #{exampleId}")
-	void updatePush(@Param("studentId")Long id, @Param("exampleId")Long exampleId, @Param("pushRise")int pushRise);
+    @Update("update sentence_write set push = date_add(push, interval ${pushRise} hour) where student_id = #{studentId} AND vocabulary_id = #{exampleId} AND unit_id=#{unitId}")
+	void updatePush(@Param("studentId")Long id, @Param("exampleId")Long exampleId, @Param("pushRise")int pushRise,@Param("unitId")int unitId );
 }

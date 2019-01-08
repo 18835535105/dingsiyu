@@ -188,7 +188,9 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
         capacityContentVo.setFaultCount(capacityReview.getFault_time());
         capacityContentVo.setMemoryStrength(capacityReview.getMemory_strength());
         capacityContentVo.setPush(this.getPushTime(DateUtil.parseYYYYMMDDHHMMSS(capacityReview.getPush())));
-
+        if(studyModel.equals("例句听力")||studyModel.equals("例句翻译")||studyModel.equals("例句默写")){
+            capacityContentVo.setReadUrl(baiduSpeak.getLanguagePath(sentenceMapper.selectByPrimaryKey(capacityReview.getVocabulary_id()).getCentreExample()));
+        }
         capacityContentVo.setChinese(chinese);
         capacityContentVo.setStudyCount(studyCount);
         return ServerResponse.createBySuccess(capacityContentVo);

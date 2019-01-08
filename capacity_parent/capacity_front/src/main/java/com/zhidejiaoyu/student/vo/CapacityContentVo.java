@@ -26,4 +26,7 @@ public class CapacityContentVo {
 	/** 距离黄金记忆点时间 */
 	private String push;
 
+	/** 读音地址 */
+	private String readUrl;
+
 }
