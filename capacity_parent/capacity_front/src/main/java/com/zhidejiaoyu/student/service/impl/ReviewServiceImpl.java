@@ -357,7 +357,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
         // 1.去记忆追踪中获取需要复习的例句
         // 智能复习 (根据单元查询)
-        if (StringUtils.isNotBlank(unit_id) && StringUtils.isNotBlank(course_id)) {
+        if (StringUtils.isNotBlank(unit_id)) {
             if (classify == 4) {
                 // 例句听力
                 vo = capacityMapper.ReviewSentence_listen(studentId, unit_id, dateTime);
@@ -370,35 +370,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             }
 
             // 需要复习的例句个数
-            int sentenceCount = capacityMapper.countNeedReviewByCourseIdOrUnitId(student, Long.valueOf(course_id),
+            int sentenceCount = capacityMapper.countNeedReviewByCourseIdOrUnitId(student, null,
                     Long.valueOf(unit_id), commonMethod.getTestType(classify));
             map.put("sentenceCount", sentenceCount);
         }
-        // 任务课程-复习 (根据课程查询)
-        /*if (StringUtils.isNotBlank(course_id)) {
-            if (classify == 4) {
-                // 例句听力
-                vo = capacityMapper.ReviewSentence_listenCourseId(studentId, course_id, dateTime);
-            } else if (classify == 5) {
-                // 例句翻译 sentence_translate
-                vo = capacityMapper.Reviewsentence_translateCourseId(studentId, course_id, dateTime);
-            } else if (classify == 6) {
-                // 例句默写 sentence_write
-                vo = capacityMapper.ReviewSentence_writeCourseId(studentId, course_id, dateTime);
-            }
-
-            // 根据课程id获取课程名
-            String courseName = courseMapper.selectByCourseName(course_id);
-            map.put("id", course_id);
-            map.put("courseName", courseName);
-
-            // 该课程一共多少例句
-            Long count_ = unitMapper.countSentenceByCourse(course_id);
-            map.put("sentenceCount", count_);
-            // 该课程已学例句w
-            Integer count = learnMapper.learnCourseCountSentence(studentId, classify, Long.valueOf(course_id));
-            map.put("plan", count);
-        }*/
 
         if (vo == null) {
             logger.info("courseid:{}->unitId:{} 下没有需要复习的句型", course_id, unit_id);
