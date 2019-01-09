@@ -1274,9 +1274,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
 
     @Override
-    public ServerResponse<Object> showRecord(String course_id, HttpSession session, Integer page, Integer rows) {
+    public ServerResponse<Object> showRecord(String course_id, Integer type, HttpSession session, Integer page, Integer rows) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        Long student_id = student.getId();
+        Long studentId = student.getId();
 
         if(page == null){
             page = 1;
@@ -1284,7 +1284,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if(rows != null){
             PageHelper.startPage(page, rows);
         }
-        List<TestRecord> records = testRecordMapper.showRecord(student_id);
+        List<TestRecord> records = testRecordMapper.showRecord(studentId, type);
         PageInfo<TestRecord> testRecordPageInfo = new PageInfo<>(records);
 
         // 每个测试记录下含有测试详情个数，如果没有测试详情，不显示详情按钮

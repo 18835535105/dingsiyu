@@ -85,7 +85,15 @@ public interface TestService extends BaseService<TestRecord> {
      */
     ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId, Integer type, Integer pageNum);
 
-    ServerResponse<Object> showRecord(String course_id, HttpSession session, Integer page, Integer rows);
+    /**
+     * @param course_id
+     * @param type      1:单词测试记录；2：句型测试记录
+     * @param session
+     * @param page
+     * @param rows
+     * @return
+     */
+    ServerResponse<Object> showRecord(String course_id, Integer type, HttpSession session, Integer page, Integer rows);
 
 
     /**
