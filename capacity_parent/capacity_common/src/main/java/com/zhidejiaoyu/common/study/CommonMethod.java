@@ -126,7 +126,7 @@ public class CommonMethod implements Serializable {
      */
     public boolean isFirst(Long stuId, String studyModel) {
         LearnExample learnExample = new LearnExample();
-        learnExample.createCriteria().andStudentIdEqualTo(stuId).andStudyModelEqualTo(studyModel);
+        learnExample.createCriteria().andStudentIdEqualTo(stuId).andStudyModelEqualTo(studyModel).andTypeEqualTo(1);
         List<Learn> learns = learnMapper.selectByExample(learnExample);
         return learns.size() == 0;
     }

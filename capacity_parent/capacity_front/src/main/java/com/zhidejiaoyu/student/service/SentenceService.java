@@ -78,4 +78,6 @@ public interface SentenceService extends BaseService<Sentence> {
     ServerResponse<Object> getIsInto(HttpSession session, Long unitId);
 
     ServerResponse<Object> getSentenceLaterLearnTime(HttpSession session);
+
+    ServerResponse<Object> getModuleRelearning(HttpSession session, String studyModel, Integer unitId);
 }

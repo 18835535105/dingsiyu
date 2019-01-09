@@ -600,6 +600,8 @@ public class LearnExample {
             return (Criteria) this;
         }
 
+
+
         public Criteria andStudyModelNotEqualTo(String value) {
             addCriterion("study_model <>", value, "studyModel");
             return (Criteria) this;
@@ -677,6 +679,11 @@ public class LearnExample {
 
         public Criteria andStudyCountGreaterThan(Integer value) {
             addCriterion("study_count >", value, "studyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andTypeEqualTo(Integer type){
+            addCriterion("type =",type ,"type");
             return (Criteria) this;
         }
 

@@ -215,6 +215,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             Learn learn = new Learn();
             learn.setStudentId(student.getId());
             learn.setStudyModel(classify);
+            learn.setType(1);
             learnMapper.insert(learn);
         }
         return firstStudy;
@@ -290,7 +291,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
 
         // 该课程是否是第一次学习，是第一次学习要保存课程首次学习时间
         LearnExample learnExample = new LearnExample();
-        learnExample.createCriteria().andStudentIdEqualTo(studentId).andCourseIdEqualTo(learn.getCourseId());
+        learnExample.createCriteria().andStudentIdEqualTo(studentId).andCourseIdEqualTo(learn.getCourseId()).andTypeEqualTo(1);
         int courseLearnCount = learnMapper.countByExample(learnExample);
 
         Integer maxCount = commonMethod.saveStudyCount(session, learn.getCourseId());
@@ -298,7 +299,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         Date learnTime = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
 
         // 查询当前例句的学习记录数据
-        Learn currentLearn = learnMapper.selectLearn(studentId, learn, classify, maxCount == null ? 1 : maxCount);
+        Learn currentLearn = learnMapper.selectLearn(studentId, learn, classify, maxCount == null ? 1 : maxCount, 1);
         // 保存学习记录
         // 当前课程学习的第一遍，当前例句是第一次学习，如果答对记为熟句，答错记为生句
         if (currentLearn == null) {
@@ -322,6 +323,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 // 不认识将该例句记入记忆追踪中
                 this.saveCapacityMemory(learn, student, false, classify);
             }
+            learn.setType(1);
             count = learnMapper.insertSelective(learn);
             if (count > 0 && total == (plan + 1)) {
                 return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
@@ -537,7 +539,12 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                         if (id < senCount && id > 0) {
                             unitInfoMap.put("sentenceTranslation", "正在学习");
                         } else if (id >= senCount) {
-                            unitInfoMap.put("sentenceTranslation", "已学习");
+                            Long id1 = learnMapper.countLearnWordAndType(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(5), learnCount == null ? 1 : learnCount);
+                            if(id1 < senCount && id1 > 0){
+                                unitInfoMap.put("sentenceTranslation", "正在学习");
+                            }else if(id1 >= senCount){
+                                unitInfoMap.put("sentenceTranslation", "已学习");
+                            }
                         } else {
                             unitInfoMap.put("sentenceTranslation", "未学习");
                         }
@@ -545,7 +552,12 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                         if (id1 < senCount && id1 > 0) {
                             unitInfoMap.put("sentenceListening", "正在学习");
                         } else if (id1 >= senCount) {
-                            unitInfoMap.put("sentenceListening", "已学习");
+                            Long id2 = learnMapper.countLearnWordAndType(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(5), learnCount == null ? 1 : learnCount);
+                            if(id2 < senCount && id2 > 0){
+                                unitInfoMap.put("sentenceListening", "正在学习");
+                            }else if(id2 >= senCount){
+                                unitInfoMap.put("sentenceListening", "已学习");
+                            }
                         } else {
                             unitInfoMap.put("sentenceListening", "未学习");
                         }
@@ -553,7 +565,12 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                         if (id2 < senCount && id2 > 0) {
                             unitInfoMap.put("sentenceWriting", "正在学习");
                         } else if (id2 >= senCount) {
-                            unitInfoMap.put("sentenceWriting", "已学习");
+                            Long id3 = learnMapper.countLearnWordAndType(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(5), learnCount == null ? 1 : learnCount);
+                            if(id2 < senCount && id3 > 0){
+                                unitInfoMap.put("sentenceWriting", "正在学习");
+                            }else if(id3 >= senCount){
+                                unitInfoMap.put("sentenceWriting", "已学习");
+                            }
                         } else {
                             unitInfoMap.put("sentenceWriting", "未学习");
                         }
@@ -642,10 +659,38 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         return ServerResponse.createBySuccess(resultList);
     }
 
-    public static void main(String[] args) {
-        SimpleDateFormat dfs = new SimpleDateFormat("yyyy-MM-dd");
-        System.out.println(dfs.format(new Date()));
+    @Override
+    public ServerResponse<Object> getModuleRelearning(HttpSession session, String studyModel, Integer unitId) {
+        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Integer update = learnMapper.updLearnByUnitIdAndStudyModelAndStudentId(student.getId(), studyModel, unitId);
+        Integer isDelete = 0;
+        if (update > 0) {
+            if (studyModel.equals("例句翻译")) {
+                Integer integer = sentenceTranslateMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
+                if (integer > 0) {
+                    isDelete = 1;
+                }
+            }
+            if (studyModel.equals("例句听力")) {
+                Integer integer = sentenceListenMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
+                if (integer > 0) {
+                    isDelete = 1;
+                }
+            }
+            if (studyModel.equals("例句默写")) {
+                Integer integer = sentenceWriteMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
+                if (integer > 0) {
+                    isDelete = 1;
+                }
+            }
+        }
+        if (isDelete > 0) {
+            return ServerResponse.createBySuccess();
+        } else {
+            return ServerResponse.createByError();
+        }
     }
+
 
     /**
      * 封装单词信息

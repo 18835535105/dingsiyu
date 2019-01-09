@@ -46,6 +46,18 @@ public interface LearnMapper extends BaseMapper<Learn> {
                         @Param("studyModel") String studyModel, @Param("count") Integer count);
 
     /**
+     * 查询学生当前单元当前模块下已学习单词/例句的个数，即学习进度 By Type
+     *
+     * @param studentId  学生id
+     * @param unitId     单元id
+     * @param studyModel
+     * @param count      当前课程的学习遍数
+     * @return
+     */
+    Long countLearnWordAndType(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+                        @Param("studyModel") String studyModel, @Param("count") Integer count);
+
+    /**
      * 查询学生当前课程当前模块下已学习单词/例句的个数，即学习进度
      *
      * @param studentId  学生id
@@ -66,7 +78,7 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @return
      */
     Learn selectLearn(@Param("studentId") Long studentId, @Param("learn") Learn learn,
-                      @Param("studyModel") String studyModel, @Param("count") Integer count);
+                      @Param("studyModel") String studyModel, @Param("count") Integer count ,@Param("type") Integer type);
 
     /**
      * 根据学生id删除
@@ -505,7 +517,7 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @param wordId
      * @return
      */
-    @Update("update learn set `status` = 0 where student_id = #{student.id} and unit_id = #{unitId} and course_id = #{courseId} and vocabulary_id = #{wordId} ")
+    @Update("update learn set `status` = 0 where student_id = #{student.id} and unit_id = #{unitId} and course_id = #{courseId} and vocabulary_id = #{wordId} and type=1 ")
     int updateUnknownWord(@Param("student") Student student, @Param("unitId") Long unitId, @Param("courseId") Long courseId, @Param("wordId") Long wordId);
 
     /**
@@ -760,4 +772,6 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @return
      */
     List<Map<String, Object>> selectLearnedByUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("beginRow") Integer beginRow, @Param("pageSize") Integer pageSize);
+
+    Integer updLearnByUnitIdAndStudyModelAndStudentId(@Param("studentId")Long id,@Param("studyModel")String studyModel,@Param("unitId") Integer unitId);
 }

@@ -213,7 +213,7 @@ public class WordWriteServiceImpl implements WordWriteService {
             studyModel = "单词图鉴";
         }
         Integer maxCount = commonMethod.saveStudyCount(session, learn.getCourseId());
-        Learn currentLearn = learnMapper.selectLearn(studentId, learn, studyModel, maxCount == null ? 1 : maxCount);
+        Learn currentLearn = learnMapper.selectLearn(studentId, learn, studyModel, maxCount == null ? 1 : maxCount,1);
         // 保存学习记录
         // 第一次学习，如果答对记为熟词，答错记为生词
         if (currentLearn == null) {

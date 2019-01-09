@@ -56,6 +56,12 @@ public class Learn extends Model<Learn> {
      */
 	private Integer firstIsKnown;
 
+	/**
+	 *1，当前学习  2，以前学习
+	 */
+	private Integer type;
+
+
     @Override
     protected Serializable pkVal() {
         return this.id;

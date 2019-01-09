@@ -15,7 +15,8 @@
         <result column="learn_count" property="learnCount" jdbcType="INTEGER"/>
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
         <result column="first_study_time" property="firstStudyTime" jdbcType="TIMESTAMP"/>
-        <result column="first_is_known" property="firstIsKnown"/>
+        <result column="first_is_known" property="firstIsKnown" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
     </resultMap>
 
     <!-- 查询learn中的单词还是例句 -->
@@ -90,7 +91,7 @@
     </sql>
     <sql id="Base_Column_List">
         id, student_id, course_id, unit_id, vocabulary_id, example_id, status, learn_time,
-        study_model, study_count, learn_count, update_time, first_study_time, first_is_known
+        study_model, study_count, learn_count, update_time, first_study_time, first_is_known ,type
     </sql>
 
     <!--区分单词例句-->
@@ -134,7 +135,7 @@
         select count(id) from learn l where
         l.student_id=#{studentId}
         and l.unit_id=#{unitId} and l.study_model =
-        #{studyModel}
+        #{studyModel} and type=1
         <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写' or studyModel == '单词图鉴'">
             and l.vocabulary_id is not null and (select v.delStatus from
             vocabulary v where v.id = l.vocabulary_id) = 1
@@ -146,6 +147,27 @@
         and learn_count = #{count}
 
     </select>
+
+    <!-- 查询学生当前单元当前模块下已学习单词/例句的个数，即学习进度 -->
+    <select id="countLearnWordAndType" resultType="java.lang.Long"
+            parameterType="map">
+        select count(id) from learn l where
+        l.student_id=#{studentId}
+        and l.unit_id=#{unitId} and l.study_model =
+        #{studyModel} and type=1
+        <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写' or studyModel == '单词图鉴'">
+            and l.vocabulary_id is not null and (select v.delStatus from
+            vocabulary v where v.id = l.vocabulary_id) = 1
+        </if>
+        <if
+                test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
+            and example_id is not null
+        </if>
+        and learn_count = #{count}
+        and type=1
+
+    </select>
+
 
     <!-- 查询当前单元下生词/生句的个数 -->
     <select id="countNotKnownWord" resultType="java.lang.Long"
@@ -233,8 +255,8 @@
             and example_id=#{learn.exampleId}
         </if>
         and learn_count = #{count}
-        and
-        study_model=#{studyModel}
+        and study_model=#{studyModel}
+        and type=#{type}
     </select>
 
     <select id="selectByExample" resultMap="BaseResultMap"
@@ -632,7 +654,7 @@
                 first_study_time = #{firstStudyTime,jdbcType=TIMESTAMP},
             </if>
         </set>
-        where id = #{id,jdbcType=BIGINT}
+        where id = #{id,jdbcType=BIGINT} and type=1
     </update>
     <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.Learn">
         update learn
@@ -932,7 +954,7 @@
         from learn l where
         l.student_id=#{student.id}
         and l.unit_id=#{unitId} and l.study_model =
-        #{studyModel}
+        #{studyModel} and type=1
         <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写'">
             and l.vocabulary_id is not null and (select v.delStatus from
             vocabulary v where v.id = l.vocabulary_id) = 1
@@ -951,7 +973,7 @@
     <select id="selectThirtyVocabularyIdByStudentIdAndCourseId" resultType="java.lang.Long" parameterType="map">
         select distinct vocabulary_id
         from learn
-        where study_model = '慧记忆' and student_id = #{stuId} and course_id = #{courseId}
+        where study_model = '慧记忆' and student_id = #{stuId} and course_id = #{courseId} and type=1
         order by id desc
         limit 30
     </select>
@@ -1328,4 +1350,9 @@
           group by v.id limit #{beginRow}
             , #{pageSize}
     </select>
+    <update id="updLearnByUnitIdAndStudyModelAndStudentId" parameterType="map">
+         update learn set type=2 where student_id=#{studentId} and study_model=#{studyModel} and type=1 and unit_id=#{unitId};
+    </update>
+
+
 </mapper>

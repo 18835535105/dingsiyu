@@ -134,6 +134,16 @@ public class SentenceController {
         return sentenceService.getSentenceLaterLearnTime(session);
     }
 
+    /**
+     * 模块重新学习
+     * @param session
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/getModuleRelearning")
+    public ServerResponse<Object> getModuleRelearning(HttpSession session,String studyModel,Integer unitId){
+        return sentenceService.getModuleRelearning(session,studyModel,unitId);
+    }
 
 
 

@@ -1263,10 +1263,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (session.getAttribute(TimeConstant.BEGIN_START_TIME) == null) {
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         }
-
         // 获取当前单元下其中一个例句
-        PageHelper.startPage(pageNum, 1);
-        List<Sentence> sentences = sentenceMapper.selectOneByUnitId(student.getId(), unitId);
+        List<Sentence> sentences = sentenceMapper.selectByUnitId(unitId);
         List<SentenceTranslateVo> sentenceTestResults = testResultUtil.getSentenceTestResults(sentences, MathUtil.getRandom(4, 6), type);
         return ServerResponse.createBySuccess(sentenceTestResults);
     }

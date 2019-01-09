@@ -121,4 +121,7 @@ public interface SentenceWriteMapper {
      */
     @Update("update sentence_write set push = date_add(push, interval ${pushRise} hour) where student_id = #{studentId} AND vocabulary_id = #{exampleId} AND unit_id=#{unitId}")
 	void updatePush(@Param("studentId")Long id, @Param("exampleId")Long exampleId, @Param("pushRise")int pushRise,@Param("unitId")int unitId );
+
+    @Delete("delete from sentence_write where student_id=#{studentId} and unit_id=#{unitId}")
+    Integer deleteByUnitIdAndStudentId(@Param("studentId") Long id, @Param("unitId") Integer unitId);
 }

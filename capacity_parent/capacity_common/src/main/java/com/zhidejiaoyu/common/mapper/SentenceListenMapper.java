@@ -59,7 +59,7 @@ public interface SentenceListenMapper {
      * @return
      */
     List<SentenceListen> selectByUnitIdAndStudentId(@Param("unitId") Long unitId,
-                                                      @Param("studentId") Long studentId);
+                                                    @Param("studentId") Long studentId);
 
     /**
      * 根据课程id和学生id获取需要需要达到黄金记忆点的例句数
@@ -112,4 +112,7 @@ public interface SentenceListenMapper {
      * @return
      */
     Integer countNeedReviewByStudentIdAndUnitId(@Param("unitId") Long unitId, @Param("studentId") Long stuId);
+
+    @Delete("delete from sentence_listen where student_id=#{studentId} and unit_id=#{unitId}")
+    Integer deleteByUnitIdAndStudentId(@Param("studentId") Long id, @Param("unitId") Integer unitId);
 }

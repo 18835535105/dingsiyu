@@ -185,7 +185,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         // 保存课程的学习次数
         Integer maxCount = commonMethod.saveStudyCount(session, courseId);
         // 查询当前单词的学习记录数据
-        Learn currentLearn = learnMapper.selectLearn(studentId, learn, "慧记忆", maxCount);
+        Learn currentLearn = learnMapper.selectLearn(studentId, learn, "慧记忆", maxCount,1);
 
         // 保存学习记录
         // 第一次学习，如果答对记为熟词，答错记为生词
