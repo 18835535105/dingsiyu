@@ -153,6 +153,13 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         Student stu = studentMapper.indexData(student_id);
 
+        // 判断学生是否需要进行游戏测试
+        int gameCount = testRecordMapper.countGameCount(stu);
+        if (gameCount == 0) {
+            // 第一次进行游戏测试
+            result.put("game", true);
+        }
+
         // 业务员
         if (stu.getRole() !=null && stu.getRole() == 2) {
             result.put("role", "2");
@@ -319,12 +326,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 获取学生需要执行的节点信息
         getNode(session, result, stu);
 
-        // 判断学生是否需要进行游戏测试
-        int gameCount = testRecordMapper.countGameCount(stu);
-        if (gameCount == 0) {
-            // 第一次进行游戏测试
-            result.put("game", true);
-        }
 
         return ServerResponse.createBySuccess(result);
     }
@@ -373,6 +374,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             }
             if (studyFlow == null) {
                 logger.error("学生[{}]-[{}]还没有初始化智能版流程节点！", stu.getId(), stu.getStudentName());
+                return;
             }
             result.put("needReview", needReviewStr);
             result.put("nodeId", studyFlow.getId());
