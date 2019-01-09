@@ -446,19 +446,27 @@
 
     <select id="showRecord" parameterType="map" resultMap="BaseResultMap">
         select a.id,
-               a.genre,
-               a.test_end_time,
-               a.point,
-               a.quantity,
-               a.explain,
-               a.study_model,
-               IFNULL(a.award_gold, 0) AS award_gold
+        a.genre,
+        a.test_end_time,
+        a.point,
+        a.quantity,
+        a.explain,
+        a.study_model,
+        IFNULL(a.award_gold, 0) AS award_gold
         from test_record a,
-             student_unit su
+        student_unit su
         where a.student_id = su.student_id
-          and su.type = 1
-          and a.unit_id = su.unit_id
-          and a.student_id = #{student_id} order by a.test_end_time Desc
+        and su.type = 1
+        and a.unit_id = su.unit_id
+        <if test="type == 1">
+            <!-- 单词类型的测试记录 -->
+          and a.study_model in ('单词图鉴','慧记忆','慧听写','慧默写')
+        </if>
+        <if test="type == 2">
+            <!-- 句型类型的测试记录 -->
+          and a.study_model in ('例句翻译','例句听力','例句默写')
+        </if>
+        and a.student_id = #{student_id} order by a.test_end_time Desc
     </select>
     <select id="countUnitTest" resultType="java.lang.Integer" parameterType="map">
         select count(id) from test_record where genre = '单元闯关测试'

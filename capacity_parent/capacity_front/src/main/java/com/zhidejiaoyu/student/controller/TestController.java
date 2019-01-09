@@ -181,10 +181,12 @@ public class TestController {
      * 测试记录首页展示
      *
      * @param course_id 课程id
+     * @param type      1:单词测试记录；2：句型测试记录
      */
     @PostMapping("/record")
-    public ServerResponse<Object> showRecord(String course_id, HttpSession session, Integer page, Integer rows) {
-        return testService.showRecord(course_id, session, page, rows);
+    public ServerResponse<Object> showRecord(String course_id, @RequestParam(required = false, defaultValue = "1") Integer type,
+                                             HttpSession session, Integer page, Integer rows) {
+        return testService.showRecord(course_id, type, session, page, rows);
     }
 
     /**

@@ -61,7 +61,14 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     TestRecord selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                           @Param("genre") String genre, @Param("studyModel") String studyModel);
 
-    List<TestRecord> showRecord(@Param("student_id") Long student_id);
+    /**
+     * 查询指定类型的测试记录
+     *
+     * @param studentId
+     * @param type      1:单词测试记录；2：句型测试记录
+     * @return
+     */
+    List<TestRecord> showRecord(@Param("student_id") Long studentId, @Param("type") Integer type);
 
     /**
      * 查看学生今日单元闯关个数
