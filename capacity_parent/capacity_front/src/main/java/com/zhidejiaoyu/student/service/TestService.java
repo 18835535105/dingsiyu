@@ -75,6 +75,14 @@ public interface TestService extends BaseService<TestRecord> {
     ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO, String testDetail);
 
     /**
+     * 保存句子测试记录，学习记录，更新记忆追踪数据(包括单词和例句单元测试)
+     * @param session
+     * @param wordUnitTestDTO 需要保存的数据的参数
+     * @param testDetail
+     */
+    ServerResponse<TestResultVo> saveSentenceUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO, String testDetail);
+
+    /**
      * 获取单元闯关的测试题
      *
      * @param session
@@ -108,15 +116,6 @@ public interface TestService extends BaseService<TestRecord> {
     ServerResponse<Object> getPreSchoolTest(HttpSession session);
 
     ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, TestRecord testRecord);
-
-    /**
-     * 保存句型单元闯关测试
-     *
-     * @param session
-     * @param dto
-     * @return
-     */
-    ServerResponse saveSentenceUnitTest(HttpSession session, WordUnitTestDTO dto);
 
     /**
      * 获取例句单元测试

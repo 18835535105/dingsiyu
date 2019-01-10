@@ -135,7 +135,7 @@
         select count(id) from learn l where
         l.student_id=#{studentId}
         and l.unit_id=#{unitId} and l.study_model =
-        #{studyModel} and type=1
+        #{studyModel}
         <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写' or studyModel == '单词图鉴'">
             and l.vocabulary_id is not null and (select v.delStatus from
             vocabulary v where v.id = l.vocabulary_id) = 1
@@ -145,6 +145,24 @@
             and example_id is not null
         </if>
         and learn_count = #{count}
+
+    </select>
+
+    <select id="isCountLearnWord" resultType="java.lang.Long"
+            parameterType="map">
+        select count(id) from learn l where
+        l.student_id=#{studentId}
+        and l.unit_id=#{unitId} and l.study_model =
+        #{studyModel}
+        <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写' or studyModel == '单词图鉴'">
+            and l.vocabulary_id is not null and (select v.delStatus from
+            vocabulary v where v.id = l.vocabulary_id) = 1
+        </if>
+        <if
+                test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
+            and example_id is not null
+        </if>
+        and learn_count = #{count} and type=1
 
     </select>
 

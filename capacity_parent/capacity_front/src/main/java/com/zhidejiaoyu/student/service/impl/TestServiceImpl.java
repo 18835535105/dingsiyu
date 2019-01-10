@@ -686,52 +686,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
 
-    @Override
-    public ServerResponse saveSentenceUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
-        Student student = getStudent(session);
-        TestRecord testRecord;
-
-        wordUnitTestDTO.setClassify(5);
-
-        // 判断当前单元是不是首次进行测试
-        boolean isFirst = false;
-        TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
-                wordUnitTestDTO.getUnitId()[0], "单元闯关测试", "例句翻译");
-        if (testRecordOld == null) {
-            isFirst = true;
-        }
-
-        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld);
-        if (testRecordOld == null) {
-            testRecord = new TestRecord();
-            // 首次测试大于或等于80分，超过历史最高分次数 +1
-            if (wordUnitTestDTO.getPoint() >= PASS) {
-                testRecord.setBetterCount(1);
-            } else {
-                testRecord.setBetterCount(0);
-            }
-        } else {
-            testRecord = new TestRecord();
-            testRecord.setBetterCount(testRecordOld.getBetterCount());
-        }
-
-        testRecord.setCourseId(wordUnitTestDTO.getCourseId());
-        testRecord.setUnitId(wordUnitTestDTO.getUnitId()[0]);
-        testRecord.setPoint(wordUnitTestDTO.getPoint());
-        testRecord.setErrorCount(wordUnitTestDTO.getErrorCount());
-        testRecord.setRightCount(wordUnitTestDTO.getRightCount());
-        testRecord.setGenre("单元闯关测试");
-        testRecord.setStudentId(student.getId());
-        testRecord.setTestEndTime(new Date());
-        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
-        testRecord.setQuantity(wordUnitTestDTO.getErrorCount() + wordUnitTestDTO.getRightCount());
-        testRecord.setAwardGold(goldCount);
-        testRecord.setStudyModel("例句翻译");
-        testRecordMapper.insert(testRecord);
-        studentMapper.updateByPrimaryKeySelective(student);
-        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
-        return ServerResponse.createBySuccess();
-    }
 
     /**
      * 获取例句测试
@@ -855,13 +809,10 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     public ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId) {
         Student student = getStudent(session);
         TestDetailVo testDetailVo = testRecordMapper.selectTestDetailVo(student.getId(), testId);
+        testDetailVo.setTitle(testDetailVo.getTitle().replaceAll("例句","句型"));
         testDetailVo.setUseTime(getUseTime(testDetailVo.getUseTime()));
         if (StringUtils.isNotEmpty(testDetailVo.getIsWrite())) {
-            if (testDetailVo.getIsWrite().contains("写")) {
-                testDetailVo.setIsWrite("1");
-            } else {
-                testDetailVo.setIsWrite("0");
-            }
+             testDetailVo.setIsWrite("1");
         } else {
             testDetailVo.setIsWrite(null);
         }
@@ -887,6 +838,13 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
 
+    /**
+     * 保存单元闯关测试
+     * @param session
+     * @param wordUnitTestDTO 需要保存的数据的参数
+     * @param testDetail
+     * @return
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO, String testDetail) {
@@ -947,6 +905,82 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
        
         vo.setMsg(msg);
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
+        vo.setGold(goldCount);
+        vo.setEnergy(addEnergy);
+        countMyGoldUtil.countMyGold(student);
+        ccieUtil.saveCcieTest(student, 1, classify);
+        studentMapper.updateByPrimaryKeySelective(student);
+        session.setAttribute(UserConstant.CURRENT_STUDENT, student);
+        return ServerResponse.createBySuccess(vo);
+    }
+
+    /**
+     * 保存句子测试
+     * @param session
+     * @param wordUnitTestDTO 需要保存的数据的参数
+     * @param testDetail
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ServerResponse<TestResultVo> saveSentenceUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO, String testDetail) {
+
+        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        if (StringUtils.isEmpty(student.getPetName())) {
+            student.setPetName("大明白");
+            student.setPartUrl(PetImageConstant.DEFAULT_IMAGE);
+        }
+
+        TestResultVo vo = new TestResultVo();
+        // 是否是第一次进行当前模块下的单元闯关测试标识
+        boolean isFirst = false;
+
+        String[] correctWord = wordUnitTestDTO.getCorrectWord();
+        Integer[] correctWordId = wordUnitTestDTO.getCorrectWordId();
+        String[] errorWord = wordUnitTestDTO.getErrorWord();
+        Integer[] errorWordId = wordUnitTestDTO.getErrorWordId();
+        Long[] unitId = wordUnitTestDTO.getUnitId();
+        Long courseId = unitMapper.selectCourseIdByUnitId(unitId[0]);
+        Integer classify = wordUnitTestDTO.getClassify();
+        String type = commonMethod.getTestType(wordUnitTestDTO.getClassify());
+
+        Integer point = wordUnitTestDTO.getPoint();
+
+        // 获取需要奖励的能量值
+        int addEnergy = getEnergy(student, point);
+
+        // 保存测试记录
+        // 查看是否已经有该单元当前模块的单元闯关测试记录
+        TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
+                wordUnitTestDTO.getUnitId()[0], "句子测试", type);
+        if (testRecord == null) {
+            isFirst = true;
+        }
+        saveTestLearnAndCapacity.saveTestAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, unitId, classify);
+
+        // 根据不同分数奖励学生金币
+        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord);
+
+        Long testId = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, testRecord, goldCount);
+
+        String msg;
+        // 默写
+        if(classify == 3 || classify == 6) {
+            msg = getMessage(student, vo, point, FIVE);
+        }else if(classify == 4 || classify == 2) {
+            // 听力
+            msg = getMessage(student, vo, point, SIX);
+        }else {
+            msg = getMessage(student, vo, point, PASS);
+        }
+
+        // 保存测试记录详情
+        if (testDetail != null) {
+            this.saveTestDetail(testDetail, testId, classify, student);
+        }
+
+        vo.setMsg(msg);
+        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "句子测试"));
         vo.setGold(goldCount);
         vo.setEnergy(addEnergy);
         countMyGoldUtil.countMyGold(student);
@@ -1299,7 +1333,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             recordId = record.getId();
             Map<String, Object> map = new HashMap<>(16);
             map.put("id", recordId);
-            map.put("genre", StringUtils.isEmpty(record.getStudyModel()) ? record.getGenre() : record.getStudyModel() + "-" + record.getGenre());
+            map.put("genre", StringUtils.isEmpty(record.getStudyModel()) ? record.getGenre() : record.getStudyModel().replace("例句","句型") + "-" + record.getGenre());
 
             if (!"单词图鉴".equals(record.getStudyModel()) && testDetailCountMap != null && testDetailCountMap.get(recordId) != null
                     && testDetailCountMap.get(recordId).get("count") != null

@@ -540,15 +540,15 @@
         </if>
     </sql>
     <select id="countAlreadyStudyWord" resultType="java.lang.Integer" parameterType="map">
-        <include refid="testCenterSql"/>
+        <include refid="testCenterSql"/> and type=1
     </select>
     <select id="countAccrueWord" resultType="java.lang.Integer" parameterType="map">
-        <include refid="testCenterSql"/>
+        <include refid="testCenterSql"/> and type=1
         and status = 0
     </select>
     <select id="countRipeWord" resultType="java.lang.Integer" parameterType="map">
         <include refid="testCenterSql"/>
-        and status = 1
+        and status = 1 and type=1
     </select>
     <select id="countByPushByCourseId" resultType="java.lang.Integer" parameterType="map">
         select count(id) from

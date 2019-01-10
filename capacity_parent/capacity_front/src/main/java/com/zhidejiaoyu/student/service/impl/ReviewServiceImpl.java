@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.Vo.student.testCenter.TestCenterVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
@@ -19,6 +21,7 @@ import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
 import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.constant.TestAwardGoldConstant;
+import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.ReviewService;
 import com.zhidejiaoyu.student.utils.CcieUtil;
 import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
@@ -49,7 +52,26 @@ import java.util.*;
 public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, CapacityMemory> implements ReviewService {
 
     private Logger logger = LoggerFactory.getLogger(ReviewServiceImpl.class);
-
+    /**
+     * 50分
+     */
+    private static final int FIVE = 50;
+    /**
+     * 60分
+     */
+    private static final int SIX = 60;
+    /**
+     * 80分
+     */
+    private static final int PASS = 80;
+    /**
+     * 90分
+     */
+    private static final int NINETY_POINT = 90;
+    /**
+     * 100分
+     */
+    private static final int FULL_MARK = 100;
     @Value("${ftp.prefix}")
     private String ftpPrefix;
 
@@ -85,6 +107,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
     @Autowired
     private RunLogMapper runLogMapper;
+    @Autowired
+    private TestRecordInfoMapper testRecordInfoMapper;
 
     /**
      * 记忆难度
@@ -793,7 +817,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     @Override
     public ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Integer[] correctWordId,
                                                        Integer[] errorWordId, Long[] unitId, Integer classify, Long courseId,
-                                                       HttpSession session, Integer point, String genre) {
+                                                       HttpSession session, Integer point, String genre,String testDetail) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         TestResultVo vo = new TestResultVo();
 
@@ -818,12 +842,111 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 throw new RuntimeException("无当前模块的学习记录");
             }
         }
-
-        int gold = this.saveTestRecord(quantity, errorCount, rightCount, classify, session, student, point, genre, courseId);
+        int[] gold = this.saveTestRecord(quantity, errorCount, rightCount, classify, session, student, point, genre, courseId,unitId);
+        if(testDetail!=null){
+            // 根据不同分数奖励学生金币
+            this.saveTestDetail(testDetail, Long.valueOf(gold[1]+""), classify, student);
+        }
         // 封装提示语
-        packagePetSay(gold, point, student, vo, genre);
+        packagePetSay(gold[0], point, student, vo, genre);
         countMyGoldUtil.countMyGold(student);
         return ServerResponse.createBySuccess(vo);
+    }
+
+    /**
+     * @param testDetail
+     * @param testRecordId
+     * @param modelType    1=慧记忆 2=慧听写 3=慧默写 4=例句听力 5=例句翻译 6=例句默写
+     */
+    private void saveTestDetail(String testDetail, Long testRecordId, int modelType, Student student) {
+        if (StringUtils.isEmpty(testDetail)) {
+            return;
+        }
+        JSONArray jsonArray = JSONObject.parseArray(testDetail);
+        if (jsonArray != null && jsonArray.size() > 0) {
+            JSONObject object;
+            List<TestRecordInfo> testRecordInfos = new ArrayList<>(20);
+            TestRecordInfo testRecordInfo;
+            for (Object aJsonArray : jsonArray) {
+                testRecordInfo = new TestRecordInfo();
+                object = (JSONObject) aJsonArray;
+                String word = object.getString("title");
+                final String[] selected = {null};
+                if (modelType == 1 || modelType == 0) {
+                    // 试卷题目
+                    JSONObject subject = object.getJSONObject("subject");
+                    final int[] j = {0};
+                    TestRecordInfo finalTestRecordInfo = testRecordInfo;
+                    JSONObject finalObject = object;
+                    subject.forEach((key, val) -> {
+                        if (Objects.equals(subject.get(key), true)) {
+                            finalTestRecordInfo.setAnswer(matchSelected(j[0]));
+                        }
+                        this.setOptions(finalTestRecordInfo, j[0], key);
+                        if (finalObject.getJSONObject("userInput") != null) {
+                            selected[0] = this.matchSelected(finalObject.getJSONObject("userInput").getInteger("optionIndex"));
+                        }
+                        finalTestRecordInfo.setWord(word);
+                        j[0]++;
+                    });
+                } else {
+                    selected[0] = object.getString("userInput");
+                    String chinese = object.getString("chinese");
+                    testRecordInfo.setWord(chinese);
+                    testRecordInfo.setAnswer(word);
+                }
+
+                testRecordInfo.setTestId(testRecordId);
+                testRecordInfo.setSelected(selected[0]);
+                testRecordInfos.add(testRecordInfo);
+            }
+            if (testRecordInfos.size() > 0) {
+                try {
+                    testRecordInfoMapper.insertList(testRecordInfos);
+                } catch (Exception e) {
+                    logger.error("学生测试记录详情保存失败：studentId=[{}], testId=[{}], modelType=[{}], error=[{}]",
+                            student.getId(), testRecordId, modelType, e.getMessage());
+                }
+            }
+        }
+    }
+
+    private void setOptions(TestRecordInfo testRecordInfo, int j, String option) {
+        switch (j) {
+            case 0:
+                testRecordInfo.setOptionA(option);
+                break;
+            case 1:
+                testRecordInfo.setOptionB(option);
+                break;
+            case 2:
+                testRecordInfo.setOptionC(option);
+                break;
+            case 3:
+                testRecordInfo.setOptionD(option);
+                break;
+            default:
+        }
+    }
+    /**
+     * 匹配选项
+     *
+     * @param integer
+     * @return
+     */
+    private String matchSelected(Integer integer) {
+        switch (integer) {
+            case 0:
+                return "A";
+            case 1:
+                return "B";
+            case 2:
+                return "C";
+            case 3:
+                return "D";
+            default:
+                return null;
+        }
     }
 
     /**
@@ -882,11 +1005,11 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     @Override
     public ServerResponse<TestResultVo> saveTestReview(String[] correctWord, String[] errorWord, Integer[] correctWordId,
                                                        Integer[] errorWordId, Long[] unitId, Integer classify, Long courseId,
-                                                       HttpSession session, Integer point, String genre) {
+                                                       HttpSession session, Integer point, String genre,String testDetail) {
         if (correctWord == null && errorWord == null) {
             return ServerResponse.createByErrorMessage("参数错误！");
         }
-        return saveTestCenter(correctWord, errorWord, correctWordId, errorWordId, unitId, classify, courseId, session, point, genre);
+        return saveTestCenter(correctWord, errorWord, correctWordId, errorWordId, unitId, classify, courseId, session, point, genre,testDetail);
     }
 
     @Override
@@ -1272,9 +1395,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
      * @param courseId
      * @return 学生获得的金币数
      */
-    private int saveTestRecord(int quantity, int errorCount, int rightCount, Integer classify, HttpSession
-            session,
-                               Student student, Integer point, String genre, Long courseId) {
+    private int[] saveTestRecord(int quantity, int errorCount, int rightCount, Integer classify, HttpSession
+            session, Student student, Integer point, String genre, Long courseId,Long[] unitId) {
         String studyModel = commonMethod.getTestType(classify);
         StringBuilder msg = new StringBuilder();
         long stuId = student.getId();
@@ -1289,7 +1411,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         testRecord.setGenre(genre);
         testRecord.setErrorCount(errorCount);
         testRecord.setCourseId(courseId);
-
+        testRecord.setUnitId(unitId[0]);
         int gold = 0;
 
         if ("已学测试".equals(genre) || "生词测试".equals(genre) || "熟词测试".equals(genre) || genre.contains("五维测试")) {
@@ -1374,7 +1496,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             runLog.setCourseId(student.getCourseId());
             runLogMapper.insert(runLog);
         }
-        return gold;
+        int[] i = new int[2];
+        i[0]=gold;
+        i[1]=testRecord.getId().intValue();
+        return i;
     }
 
     /**

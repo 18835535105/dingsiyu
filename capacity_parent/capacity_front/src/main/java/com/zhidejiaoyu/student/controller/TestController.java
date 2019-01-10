@@ -152,12 +152,14 @@ public class TestController {
      * @param wordUnitTestDTO
      * @return
      */
-    @PostMapping("/saveSentenceUnitTest")
-    public ServerResponse saveSentenceUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
-        if (wordUnitTestDTO.getUnitId() == null) {
-            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
+    @PostMapping("/saveTestCenter")
+    public ServerResponse saveSentenceUnitTest(HttpSession session, @Valid WordUnitTestDTO wordUnitTestDTO,
+                                               BindingResult bindingResult, String testDetail) {
+        String msg = ValidateUtil.validate(bindingResult);
+        if ("ok".equals(msg)) {
+            return testService.saveSentenceUnitTest(session, wordUnitTestDTO, testDetail);
         }
-        return testService.saveSentenceUnitTest(session, wordUnitTestDTO);
+        return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), msg);
     }
 
     /**
@@ -176,6 +178,9 @@ public class TestController {
         }
         return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), msg);
     }
+
+
+
 
     /**
      * 测试记录首页展示

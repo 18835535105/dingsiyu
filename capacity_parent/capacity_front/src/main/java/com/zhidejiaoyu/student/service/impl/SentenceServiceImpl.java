@@ -128,7 +128,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
         // 查询学生当前单元下已学习例句的个数，即学习进度
-        Long plan = learnMapper.countLearnWord(student.getId(), unitId, classify, learnCount == null ? 1 : learnCount);
+        Long plan = learnMapper.isCountLearnWord(student.getId(), unitId, classify, learnCount == null ? 1 : learnCount);
 
         if (sentenceCount == 0) {
             log.error("单元 {} 下没有例句信息！", unitId);
@@ -544,6 +544,8 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                                 unitInfoMap.put("sentenceTranslation", "正在学习");
                             }else if(id1 >= senCount){
                                 unitInfoMap.put("sentenceTranslation", "已学习");
+                            }else{
+                                unitInfoMap.put("sentenceTranslation", "未学习");
                             }
                         } else {
                             unitInfoMap.put("sentenceTranslation", "未学习");
@@ -557,6 +559,8 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                                 unitInfoMap.put("sentenceListening", "正在学习");
                             }else if(id2 >= senCount){
                                 unitInfoMap.put("sentenceListening", "已学习");
+                            }else{
+                                unitInfoMap.put("sentenceListening", "未学习");
                             }
                         } else {
                             unitInfoMap.put("sentenceListening", "未学习");
@@ -566,10 +570,12 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                             unitInfoMap.put("sentenceWriting", "正在学习");
                         } else if (id2 >= senCount) {
                             Long id3 = learnMapper.countLearnWordAndType(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(5), learnCount == null ? 1 : learnCount);
-                            if(id2 < senCount && id3 > 0){
+                            if(id3 < senCount && id3 > 0){
                                 unitInfoMap.put("sentenceWriting", "正在学习");
                             }else if(id3 >= senCount){
                                 unitInfoMap.put("sentenceWriting", "已学习");
+                            }else{
+                                unitInfoMap.put("sentenceWriting", "未学习");
                             }
                         } else {
                             unitInfoMap.put("sentenceWriting", "未学习");
@@ -663,32 +669,12 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     public ServerResponse<Object> getModuleRelearning(HttpSession session, String studyModel, Integer unitId) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         Integer update = learnMapper.updLearnByUnitIdAndStudyModelAndStudentId(student.getId(), studyModel, unitId);
-        Integer isDelete = 0;
         if (update > 0) {
-            if (studyModel.equals("例句翻译")) {
-                Integer integer = sentenceTranslateMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
-                if (integer > 0) {
-                    isDelete = 1;
-                }
-            }
-            if (studyModel.equals("例句听力")) {
-                Integer integer = sentenceListenMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
-                if (integer > 0) {
-                    isDelete = 1;
-                }
-            }
-            if (studyModel.equals("例句默写")) {
-                Integer integer = sentenceWriteMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
-                if (integer > 0) {
-                    isDelete = 1;
-                }
-            }
+                sentenceTranslateMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
+                sentenceListenMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
+                sentenceWriteMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
         }
-        if (isDelete > 0) {
-            return ServerResponse.createBySuccess();
-        } else {
-            return ServerResponse.createByError();
-        }
+        return ServerResponse.createBySuccess();
     }
 
 

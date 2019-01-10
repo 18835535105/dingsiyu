@@ -104,7 +104,7 @@ public class ReviewController {
     @ResponseBody
     @PostMapping("/saveTestCenter")
     public ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Integer[] correctWordId, Integer[] errorWordId, Long[] unitId,
-                                                 Integer classify, Long courseId,HttpSession session, Integer point, String genre) {
+                                                 Integer classify, Long courseId,HttpSession session, Integer point, String genre,String testDetail) {
         if (!"单词五维测试".equals(genre) && !"单词五维测试".equals(genre)) {
             Assert.notEmpty(unitId, "unitId cant't be null!");
         }
@@ -122,7 +122,7 @@ public class ReviewController {
         if (correctWord == null && errorWord == null) {
             return ServerResponse.createByErrorMessage("参数错误！");
         }
-        return reviewService.saveTestCenter(correctWord, errorWord, correctWordId, errorWordId, unitId, classify, courseId, session, point, genre);
+        return reviewService.saveTestCenter(correctWord, errorWord, correctWordId, errorWordId, unitId, classify, courseId, session, point, genre,testDetail);
     }
 
     /**
@@ -149,7 +149,7 @@ public class ReviewController {
         Assert.notNull(courseId, "courseId cant't be null!");
         Assert.notNull(point, "point cant't be null!");
         return reviewService.saveTestReview(correctWord, errorWord, correctWordId, errorWordId, unitId, classify, courseId,
-                session, point, "复习测试");
+                session, point, "复习测试",null);
     }
 
     /**
