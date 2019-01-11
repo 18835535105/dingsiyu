@@ -345,5 +345,5 @@ public interface CourseMapper extends BaseMapper<Course> {
 
     List<Map<String,Object>> getAllVersion(Long studnetId);
 
-    Map<String,Object> selectByCourseAndStudent(Long studentId);
+    Map<String,Object> selectCourseByUnitId(Long unitId);
 }

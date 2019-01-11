@@ -596,14 +596,13 @@
           and su.type = 1
           and us.unit_id = su.unit_id
     </select>
-    <select id="selectByCourseAndStudent" resultType="java.util.Map" parameterType="java.lang.Long">
+    <select id="selectCourseByUnitId" resultType="java.util.Map" parameterType="java.lang.Long">
         select course.id courseId , unit.id unitId , cou.version,cou.label,cou.grade  from student_course course
           join student student on course.student_id=student.id
           join unit unit on unit.course_id=course.course_id
           join course cou on course.course_id=cou.id
-        where
-        (course.course_name not like '小学%' and course.course_name not like '初中%'
-        and course.course_name not like '高中%') and student.id=#{studentId} and type=2 limit 1
+          where unit.id = #{unitId}
+		  limit 1
     </select>
 
 </mapper>
