@@ -18,7 +18,7 @@ public class CourseUnitVo implements Serializable {
     private String version;
     private Long courseId;
     private String grad;
-    private List<Long> learnUnitVos;
+    private String learnUnit;
     /**
      * key:unitName 单元名
      * key:unitId   单元id

@@ -522,7 +522,10 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 courseUnitVo.setGrad(courseMap.get("grade").toString() + courseMap.get("label").toString());
                 // 存放单元信息
                 Map<String, Object> unitInfoMap;
-                courseUnitVo.setLearnUnitVos(learnMapper.selByStudentIdAndCourseIdDisVersion(studentId,(Long) courseMap.get("id")));
+                courseUnitVo.setLearnUnit(learnMapper.selByStudentIdAndCourseIdDisVersion(studentId,(Long) courseMap.get("id")).toString());
+                if(courseUnitVo.getLearnUnit()==null){
+                    courseUnitVo.setLearnUnit(sentenceUnits.get(0).get("id").toString());
+                }
                 for (Map<String, Object> unitMap : sentenceUnits) {
                     unitInfoMap = new HashMap<>(16);
                     if (Objects.equals(courseMap.get("id"), unitMap.get("courseId"))) {

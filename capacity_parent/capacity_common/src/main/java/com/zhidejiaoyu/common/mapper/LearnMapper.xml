@@ -1376,6 +1376,8 @@
         where learn.student_id= #{studentId}
         and learn.course_id= #{courseId}
         and learn.type=1
+        order by id desc
+        limit 1
     </select>
 
 </mapper>
