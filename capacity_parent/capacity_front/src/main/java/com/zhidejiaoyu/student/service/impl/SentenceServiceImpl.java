@@ -505,10 +505,12 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 present.put("grade", course.getGrade() + course.getLabel());
                 present.put("unitId", capacityStudentUnit.getUnitId());
             } else {
-                Map<String, Object> map = courseMapper.selectCourseByUnitId(Long.parseLong(sentenceUnits.get(0).get("unitId").toString()));
-                present.put("version", map.get("version"));
-                present.put("grade", map.get("grade").toString() + map.get("label").toString());
-                present.put("unitId", map.get("unitId"));
+                if(sentenceUnits.size()>0){
+                    Map<String, Object> map = courseMapper.selectCourseByUnitId(Long.parseLong(sentenceUnits.get(0).get("id").toString()));
+                    present.put("version", map.get("version"));
+                    present.put("grade", map.get("grade").toString() + map.get("label").toString());
+                    present.put("unitId", map.get("unitId"));
+                }
             }
             result.put("present", present);
             for (Map<String, Object> courseMap : courses) {
@@ -520,6 +522,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 courseUnitVo.setGrad(courseMap.get("grade").toString() + courseMap.get("label").toString());
                 // 存放单元信息
                 Map<String, Object> unitInfoMap;
+                courseUnitVo.setLearnUnitVos(learnMapper.selByStudentIdAndCourseIdDisVersion(studentId,(Long) courseMap.get("id")));
                 for (Map<String, Object> unitMap : sentenceUnits) {
                     unitInfoMap = new HashMap<>(16);
                     if (Objects.equals(courseMap.get("id"), unitMap.get("courseId"))) {
@@ -576,7 +579,12 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                             if(id3 < senCount && id3 > 0){
                                 unitInfoMap.put("sentenceWriting", "正在学习");
                             }else if(id3 >= senCount){
-                                unitInfoMap.put("sentenceWriting", "已学习");
+                                Integer count =testRecordMapper.selectByStudentIdAndGenre(student.getId());
+                                if(id2/senCount==count){
+                                    unitInfoMap.put("sentenceWriting", "已学习");
+                                }else{
+                                    unitInfoMap.put("sentenceWriting", "正在学习");
+                                }
                             }else{
                                 unitInfoMap.put("sentenceWriting", "未学习");
                             }

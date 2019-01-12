@@ -241,4 +241,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      */
     @Select("select count(id) from test_record where student_id = #{stu.id} and genre = '学前游戏测试'")
     int countGameCount(@Param("stu") Student stu);
+
+    @Select("select count(id) from test_record where student_id=#{id} and genre='已学测试'")
+    Integer selectByStudentIdAndGenre(Long id);
 }

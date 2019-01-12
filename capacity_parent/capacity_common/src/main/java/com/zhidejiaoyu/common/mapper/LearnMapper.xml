@@ -1371,6 +1371,11 @@
     <update id="updLearnByUnitIdAndStudyModelAndStudentId" parameterType="map">
          update learn set type=2 where student_id=#{studentId} and study_model=#{studyModel} and type=1 and unit_id=#{unitId};
     </update>
-
+    <select  id="selByStudentIdAndCourseIdDisVersion" parameterType="java.util.Map" resultType="java.util.Map">
+        select DISTINCT learn.unit_id from learn learn
+        where learn.student_id= #{studentId}
+        and learn.course_id= #{courseId}
+        and learn.type=1
+    </select>
 
 </mapper>

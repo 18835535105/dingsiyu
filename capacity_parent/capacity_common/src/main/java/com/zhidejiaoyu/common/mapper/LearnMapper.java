@@ -776,4 +776,6 @@ public interface LearnMapper extends BaseMapper<Learn> {
     List<Map<String, Object>> selectLearnedByUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("beginRow") Integer beginRow, @Param("pageSize") Integer pageSize);
 
     Integer updLearnByUnitIdAndStudyModelAndStudentId(@Param("studentId")Long id,@Param("studyModel")String studyModel,@Param("unitId") Integer unitId);
+
+    List<Map<String, Object>> selByStudentIdAndCourseIdDisVersion(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
 }
