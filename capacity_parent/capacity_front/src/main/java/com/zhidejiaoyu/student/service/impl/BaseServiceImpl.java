@@ -48,4 +48,33 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         return onlineTime;
     }
 
+    /**
+     * 获取需要奖励的能量值
+     *
+     * @param student
+     * @param point
+     * @return
+     */
+    int getEnergy(Student student, Integer point) {
+        int addEnergy = 0;
+        if (student.getEnergy() == null) {
+            if (point >= 80) {
+                student.setEnergy(2);
+                addEnergy = 2;
+            } else if (point > 20) {
+                student.setEnergy(1);
+                addEnergy = 1;
+            }
+        } else {
+            if (point >= 80) {
+                student.setEnergy(student.getEnergy() + 2);
+                addEnergy = 2;
+            } else if (point > 20) {
+                student.setEnergy(student.getEnergy() + 1);
+                addEnergy = 1;
+            }
+        }
+        return addEnergy;
+    }
+
 }

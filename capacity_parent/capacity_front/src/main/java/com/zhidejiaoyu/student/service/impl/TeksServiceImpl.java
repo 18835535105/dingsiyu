@@ -79,7 +79,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             List<Teks> resultTeks=new ArrayList<>();
             int i=0;
             for(Teks teks1:teks){
-                teks1.setPronunciation(baiduSpeak.getLanguagePath(teks1.getSentence()));
+                teks1.setPronunciation(baiduSpeak.getSentencePaht(teks1.getSentence()));
                 i++;
                 resultTeks.add(teks1);
             }
@@ -101,7 +101,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             List<Teks> resultTeks=new ArrayList<>();
             int i=0;
             for(Teks teks1:teks){
-                teks1.setPronunciation(baiduSpeak.getLanguagePath(teks1.getSentence()));
+                teks1.setPronunciation(baiduSpeak.getSentencePaht(teks1.getSentence()));
                 i++;
                 resultTeks.add(teks1);
             }
@@ -302,7 +302,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 //保存返回的数据
                 Map<String,Object> map=new HashMap<>();
                 map.put("chinese",teks.getParaphrase());
-                map.put("pronunciation",baiduSpeak.getLanguagePath(teks.getSentence()));
+                map.put("pronunciation",baiduSpeak.getSentencePaht(teks.getSentence()));
                 map.put("sentence",teks.getSentence());
                 map.put("id",teks.getId());
                 String[] sentenceList = teks.getSentence().split(" ");
@@ -569,7 +569,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             Integer ss=(int)Math.ceil((Math.random()*2));
             Map<String,Object> returnMap=new HashMap<>();
             returnMap.put("chinese",teks.get(i).getParaphrase());
-            returnMap.put("pronunciation",baiduSpeak.getLanguagePath(teks.get(i).getSentence()));
+            returnMap.put("pronunciation",baiduSpeak.getSentencePaht(teks.get(i).getSentence()));
             returnMap.put("english",teks.get(i).getSentence());
             //英选汉
             if(ss==1){
@@ -611,7 +611,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                returnMap.put("answer",i);
            }
             english.add(optionList.get(i).getSentence());
-            option.add(baiduSpeak.getLanguagePath(optionList.get(i).getSentence()));
+            option.add(baiduSpeak.getSentencePaht(optionList.get(i).getSentence()));
        }
         returnMap.put("option",option);
     }

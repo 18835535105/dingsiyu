@@ -87,20 +87,18 @@ public class SaveTestLearnAndCapacity {
      * @param classify      学习类型 0=单词图鉴 1=慧记忆 2=慧听写 3=慧默写 4=例句听写 5=例句翻译 6=例句默写
      * @return 响应信息
      */
-    public ServerResponse<String> saveLearnAndCapacity(String[] correctWord, String[] errorWord, Integer[] correctWordId,
+    public void saveLearnAndCapacity(String[] correctWord, String[] errorWord, Integer[] correctWordId,
                                                        Integer[] errorWordId, HttpSession session, Student student,
                                                        Long[] unitId, Integer classify) {
-        int count;
-
         // 保存正确单词/例句的学习记录和记忆追踪信息
         if (correctWord != null && correctWordId != null && correctWord.length > 0
                 && correctWord.length == correctWordId.length) {
             int correctWordLength = correctWord.length;
             for (int i = 0; i < correctWordLength; i++) {
                 if (unitId.length == 1) {
-                    count = this.saveLearnAndCapacity(session, student, unitId[0], correctWordId[i], classify, true);
+                    this.saveLearnAndCapacity(session, student, unitId[0], correctWordId[i], classify, true);
                 } else {
-                    count = this.saveLearnAndCapacity(session, student, unitId[i], correctWordId[i], classify, true);
+                    this.saveLearnAndCapacity(session, student, unitId[i], correctWordId[i], classify, true);
                 }
             }
         }
@@ -111,13 +109,12 @@ public class SaveTestLearnAndCapacity {
             int errorWordLength = errorWord.length;
             for (int i = 0; i < errorWordLength; i++) {
                 if (unitId.length == 1) {
-                    count = this.saveLearnAndCapacity(session, student, unitId[0], errorWordId[i], classify, false);
+                    this.saveLearnAndCapacity(session, student, unitId[0], errorWordId[i], classify, false);
                 } else {
-                    count = this.saveLearnAndCapacity(session, student, unitId[i], errorWordId[i], classify, false);
+                    this.saveLearnAndCapacity(session, student, unitId[i], errorWordId[i], classify, false);
                 }
             }
         }
-        return null;
     }
 
     /**

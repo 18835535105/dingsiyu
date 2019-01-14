@@ -28,6 +28,9 @@ public class BaiduSpeak {
 	@Value("${baidu}")
 	private String baidu;
 
+	@Value("${youdao}")
+	private String youdao;
+
 	@Autowired
 	private VocabularyMapper vocabularyMapper;
 
@@ -52,5 +55,9 @@ public class BaiduSpeak {
 			}
 			return baidu + text;
 		}
+	}
+
+	public String getSentencePaht(String text) {
+		return youdao + text;
 	}
 }
