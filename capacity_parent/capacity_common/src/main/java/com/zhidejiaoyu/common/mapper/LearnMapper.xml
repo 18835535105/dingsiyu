@@ -431,7 +431,7 @@
     <select id="countByCourseId" resultType="java.lang.Integer" parameterType="map">
         select count(id)
         from learn
-        where student_id = #{studentId} and course_id = #{courseId} and study_model = #{studyModel}
+        where student_id = #{studentId} and type = 1 and course_id = #{courseId} and study_model = #{studyModel}
     </select>
     <select id="selectLearnUnitsByStuId" resultType="java.lang.Long" parameterType="map">
         select distinct (unit_id)

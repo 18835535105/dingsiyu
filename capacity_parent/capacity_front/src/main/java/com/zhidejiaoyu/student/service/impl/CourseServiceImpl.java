@@ -172,16 +172,17 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
         } else {
             // 当前课程下例句总量
             int sentenceCount = sentenceMapper.countByCourseId(courseId);
-            // 获取例句听力模块本课程已学例句量和达到黄金记忆点的待复习例句量
-            studyModel = "例句听力";
-            learnedCount = learnMapper.countByCourseId(studentId, courseId, studyModel);
-            pushCount = sentenceListenMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
-            this.packageMemoryVo(learnedCount, pushCount, sentenceCount, studyModel, vos);
 
             // 获取例句翻译模块本课程已学例句量和达到黄金记忆点的待复习例句量
             studyModel = "例句翻译";
             learnedCount = learnMapper.countByCourseId(studentId, courseId, studyModel);
             pushCount = sentenceTranslateMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
+            this.packageMemoryVo(learnedCount, pushCount, sentenceCount, studyModel, vos);
+
+            // 获取例句听力模块本课程已学例句量和达到黄金记忆点的待复习例句量
+            studyModel = "例句听力";
+            learnedCount = learnMapper.countByCourseId(studentId, courseId, studyModel);
+            pushCount = sentenceListenMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
             this.packageMemoryVo(learnedCount, pushCount, sentenceCount, studyModel, vos);
 
             // 获取例句翻译模块本课程已学例句量和达到黄金记忆点的待复习例句量
