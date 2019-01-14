@@ -281,9 +281,11 @@
         order by c.id asc
     </select>
     <select id="countCapacity" resultType="java.lang.Integer" parameterType="map">
-        select count(id)
-        from student_unit
-        where student_id = #{student.id}
+        select count(uv.vocabulary_id)
+        from student_unit su,
+             unit_vocabulary uv
+        where su.student_id = #{student.id}
+          and su.unit_id = uv.unit_id
           and type = 1
     </select>
 
