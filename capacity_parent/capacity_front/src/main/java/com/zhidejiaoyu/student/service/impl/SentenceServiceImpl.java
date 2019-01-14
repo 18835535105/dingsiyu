@@ -522,13 +522,16 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 courseUnitVo.setGrad(courseMap.get("grade").toString() + courseMap.get("label").toString());
                 // 存放单元信息
                 Map<String, Object> unitInfoMap;
-                courseUnitVo.setLearnUnit(learnMapper.selByStudentIdAndCourseIdDisVersion(studentId,(Long) courseMap.get("id")).toString());
-                if(courseUnitVo.getLearnUnit()==null){
-                    courseUnitVo.setLearnUnit(sentenceUnits.get(0).get("id").toString());
+                Long learnUnitId = learnMapper.selByStudentIdAndCourseIdDisVersion(studentId, (Long) courseMap.get("id"));
+                if(learnUnitId!=null) {
+                    courseUnitVo.setLearnUnit(learnUnitId.toString());
                 }
                 for (Map<String, Object> unitMap : sentenceUnits) {
                     unitInfoMap = new HashMap<>(16);
                     if (Objects.equals(courseMap.get("id"), unitMap.get("courseId"))) {
+                        if(learnUnitId==null){
+                            courseUnitVo.setLearnUnit(unitMap.get("id").toString());
+                        }
                         unitInfoMap.put("unitId", unitMap.get("id"));
                         unitInfoMap.put("unitName", unitMap.get("unitName"));
                         if (testMap != null && testMap.containsKey(unitMap.get("id"))) {
@@ -582,7 +585,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                             if(id3 < senCount && id3 > 0){
                                 unitInfoMap.put("sentenceWriting", "正在学习");
                             }else if(id3 >= senCount){
-                                Integer count =testRecordMapper.selectByStudentIdAndGenre(student.getId());
+                                Integer count =testRecordMapper.selectByStudentIdAndGenre(student.getId(),Long.parseLong(unitMap.get("id").toString()));
                                 if(id2/senCount==count){
                                     unitInfoMap.put("sentenceWriting", "已学习");
                                 }else{

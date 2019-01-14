@@ -248,6 +248,7 @@
         and learn_count = #{count}
         and
         study_model=#{studyModel}
+        and type = 1
     </select>
 
     <select id="selectByCount" resultType="java.lang.Long"
