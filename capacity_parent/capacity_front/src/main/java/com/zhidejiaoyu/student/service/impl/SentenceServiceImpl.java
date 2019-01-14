@@ -478,6 +478,9 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         Map<String, Object> result = new HashMap<>();
         // 学生所有课程id及课程名
         List<Map<String, Object>> courses = courseMapper.selectSentenceCourseIdAndCourseNameByStudentId(studentId);
+        if(courses.size()<0){
+            return ServerResponse.createByError(500,"当前学生没有课程，请让老师添加");
+        }
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selGetSentenceByStudentIdAndType(student.getId());
         // 学生课程下所有例句的单元id及单元名
         if (courses.size() > 0) {

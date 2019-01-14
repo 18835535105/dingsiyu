@@ -178,4 +178,13 @@ public interface StudentUnitMapper extends BaseMapper<StudentUnit> {
      * @return
      */
     int countCapacity(@Param("student") Student student);
+
+    @Select("select count(stunit.id) from student_unit stunit join unit_sentence unsen on stunit.unit_id = unsen.unit_id " +
+            "where  stunit.student_id = #{student_id}")
+    int countCapacitySentence(Long studentId);
+
+    @Select("select count(stunit.id) from student_unit stunit join teks teks on stunit.unit_id = teks.unit_id \n" +
+            "where  stunit.student_id = #{student_id};")
+    int countCapacityTeks(Long id);
+
 }

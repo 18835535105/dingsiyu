@@ -737,6 +737,17 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 result.put("capacity", true);
             }
 
+            // 判断学生是否有同步版课程，没有同步版句子课程不能进入智能版学习
+            boolean hasCapacityCourseSentence=this.hasCapacitySentence(stu);
+            if(hasCapacityCourseSentence){
+                result.put("capacitySentence", true);
+            }
+
+            // 判断学生是否有同步版课程，没有同步版课文课程不能进入智能版学习
+            boolean hasCapacityTeks=this.hasCapacityTeks(stu);
+            if(hasCapacityTeks){
+                result.put("capacityTeks", true);
+            }
             // 当前用户信息放到session
             session.setAttribute(UserConstant.CURRENT_STUDENT, stu);
             // 登陆时间放入session
@@ -777,6 +788,28 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      */
     private boolean hasCapacityCourse(Student student) {
         int count = studentUnitMapper.countCapacity(student);
+        return count > 0;
+    }
+
+    /**
+     * 判断学生是否可以学习同步班句型课程
+     *
+     * @param student
+     * @return
+     */
+    private boolean hasCapacitySentence(Student student) {
+        int count = studentUnitMapper.countCapacitySentence(student.getId());
+        return count > 0;
+    }
+
+    /**
+     * 判断学生是否可以学习同步班课文课程
+     *
+     * @param student
+     * @return
+     */
+    private boolean hasCapacityTeks(Student student) {
+        int count = studentUnitMapper.countCapacityTeks(student.getId());
         return count > 0;
     }
 
