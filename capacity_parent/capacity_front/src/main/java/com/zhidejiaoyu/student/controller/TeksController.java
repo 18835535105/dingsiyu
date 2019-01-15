@@ -36,6 +36,30 @@ public class TeksController  {
         return teksService.getCourseAndUnit(session);
     }
 
+    /**
+     * 查看课文最后学习时间
+     * @param session
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/getTeksLaterLearnTime")
+    public ServerResponse<List<Map<String, Object>>> getTeksLaterLearnTime(HttpSession session){
+        return teksService.getTeksLaterLearnTime(session);
+    }
+
+    /**
+     * 保存课文试听
+     * @param unitId
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("saveTeksAudition")
+    public ServerResponse<Map<String,Object>> saveTeksAudition(HttpSession session,Integer unitId,Integer courseId){
+        return teksService.saveTeksAudition(session,unitId,courseId);
+    }
+
+
+
     //查看课文以及翻译
     @RequestMapping("/selTeksByUnitId")
     @ResponseBody

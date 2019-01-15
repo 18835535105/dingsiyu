@@ -83,4 +83,7 @@ public interface VoiceMapper extends BaseMapper<Voice> {
      * @param type
      * @return
      */
-    List<Voice> selectTeacherIdIsNull(@Param("unitId") Long unitId, @Param("wordId") Long wordId, @Param("type") Integer type);}
+    List<Voice> selectTeacherIdIsNull(@Param("unitId") Long unitId, @Param("wordId") Long wordId, @Param("type") Integer type);
+
+    List<Map<String,Object>> selVoiceTeksByStudentAndUnit(@Param("unitId") Long unitId,@Param("studentId") Long studentId);
+}

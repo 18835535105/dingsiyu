@@ -119,11 +119,11 @@ public interface CapacityReviewMapper {
 	List<Vocabulary> ripeWordStr(@Param("student_id") Long student_id, @Param("unit_id") String unit_id, @Param("classifyStr") String classifyStr);
 
 	// 4,5,6模块初中已学题
-	@Select("select a.id, a.centreExample, a.centreTranslate from learn b INNER JOIN sentence a on a.id = b.example_id and b.unit_id = #{unit_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} limit 0,20")
+	@Select("select a.id, a.centreExample, a.centreTranslate from learn b INNER JOIN sentence a on a.id = b.example_id and b.unit_id = #{unit_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} and type=1 limit 0,20")
 	List<Sentence> centreReviewSentence_listen(@Param("student_id") Long student_id,@Param("unit_id") String unit_id,@Param("classifyStr") String classifyStr);
-	@Select("select a.id, a.centreExample, a.centreTranslate from learn b INNER JOIN sentence a on a.id = b.example_id and b.unit_id = #{unit_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} and b.status = 0  limit  0,20")
+	@Select("select a.id, a.centreExample, a.centreTranslate from learn b INNER JOIN sentence a on a.id = b.example_id and b.unit_id = #{unit_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} and type=1 and b.status = 0  limit  0,20")
 	List<Sentence> accrueCentreReviewSentence_listen(@Param("student_id") Long student_id, @Param("unit_id") String unit_id, @Param("classifyStr") String classifyStr);
-	@Select("select a.id, a.centreExample, a.centreTranslate from learn b INNER JOIN sentence a on a.id = b.example_id and b.unit_id = #{unit_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} and b.status = 1  limit 0,20")
+	@Select("select a.id, a.centreExample, a.centreTranslate from learn b INNER JOIN sentence a on a.id = b.example_id and b.unit_id = #{unit_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} and type=1 and b.status = 1  limit 0,20")
 	List<Sentence> ripeCentreReviewSentence_listen(@Param("student_id") Long student_id, @Param("unit_id") String unit_id, @Param("classifyStr") String classifyStr);
 	
 	// 4,5,6模块高中已学题

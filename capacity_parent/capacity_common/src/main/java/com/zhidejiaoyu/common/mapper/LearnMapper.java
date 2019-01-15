@@ -778,4 +778,18 @@ public interface LearnMapper extends BaseMapper<Learn> {
     Integer updLearnByUnitIdAndStudyModelAndStudentId(@Param("studentId")Long id,@Param("studyModel")String studyModel,@Param("unitId") Integer unitId);
 
     Long selByStudentIdAndCourseIdDisVersion(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
+
+    @Select("select id from learn where student_id=#{studentId} and unit_id =#{unitId} and course_id=#{courseId} and study_model=#{studyModel} and vocabulary_id is null and example_id is null")
+    Long selTeksLearn(Learn learn);
+
+    @Update("update learn set update_time=#{updateTime} where id=#{id} ")
+    Integer updTeksLearn(Learn learn);
+
+    List<Map<String, Object>> selectTeksLaterLearnTimeByStudentId(Long id);
+
+    Long selLaterLearnTeks(@Param("studentId") Long studentId,@Param("courseId") Long courseId);
+
+    Map<String,Object> selTeksLaterCourse(Long id);
+
+    Integer selLearnTeks(@Param("studentId") Long studentId,@Param("studyModel")String studyModel);
 }

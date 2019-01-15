@@ -65,7 +65,7 @@ public interface UnitMapper extends BaseMapper<Unit> {
      * @param nextUnitIndex
      * @return
      */
-    @Select("select id from unit where course_id=#{courseId} and unit_index=#{nextUnitIndex}")
+    @Select("select DISTINCT unit.id from unit unit join unit_vocabulary uv on unit.id=uv.unit_id  where unit.course_id=#{courseId} and unit.unit_index=#{nextUnitIndex}")
     Long selectNextUnitIndexByCourseId(@Param("courseId") Long courseId, @Param("nextUnitIndex") Integer nextUnitIndex);
 
     /**

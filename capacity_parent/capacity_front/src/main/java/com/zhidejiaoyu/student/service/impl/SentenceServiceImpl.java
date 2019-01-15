@@ -281,8 +281,8 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         Date now = DateUtil.parseYYYYMMDDHHMMSS(new Date());
         Long studentId = student.getId();
         int count;
-        if(unitId == null){
-            return ServerResponse.createByError(300,"未传入unitId");
+        if (unitId == null) {
+            return ServerResponse.createByError(300, "未传入unitId");
         }
         if (student.getFirstStudyTime() == null) {
             // 说明学生是第一次在本系统学习，记录首次学习时间
@@ -478,8 +478,8 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         Map<String, Object> result = new HashMap<>();
         // 学生所有课程id及课程名
         List<Map<String, Object>> courses = courseMapper.selectSentenceCourseIdAndCourseNameByStudentId(studentId);
-        if(courses.size()<0){
-            return ServerResponse.createByError(500,"当前学生没有课程，请让老师添加");
+        if (courses.size() < 0) {
+            return ServerResponse.createByError(500, "当前学生没有课程，请让老师添加");
         }
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selGetSentenceByStudentIdAndType(student.getId());
         // 学生课程下所有例句的单元id及单元名
@@ -500,7 +500,6 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 testMap = testRecordMapper.selectHasUnitTest(studentId, unitIds);
                 unLearnMap = learnMapper.selectUnlearnUnit(studentId, unitIds);
             }
-
             Map<String, Object> present = new HashMap<>();
             if (capacityStudentUnit != null) {
                 Course course = courseMapper.selectById(capacityStudentUnit.getCourseId());
@@ -508,7 +507,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 present.put("grade", course.getGrade() + course.getLabel());
                 present.put("unitId", capacityStudentUnit.getUnitId());
             } else {
-                if(sentenceUnits.size()>0){
+                if (sentenceUnits.size() > 0) {
                     Map<String, Object> map = courseMapper.selectCourseByUnitId(Long.parseLong(sentenceUnits.get(0).get("id").toString()));
                     present.put("version", map.get("version"));
                     present.put("grade", map.get("grade").toString() + map.get("label").toString());
@@ -526,13 +525,13 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 // 存放单元信息
                 Map<String, Object> unitInfoMap;
                 Long learnUnitId = learnMapper.selByStudentIdAndCourseIdDisVersion(studentId, (Long) courseMap.get("id"));
-                if(learnUnitId!=null) {
+                if (learnUnitId != null) {
                     courseUnitVo.setLearnUnit(learnUnitId.toString());
                 }
                 for (Map<String, Object> unitMap : sentenceUnits) {
                     unitInfoMap = new HashMap<>(16);
                     if (Objects.equals(courseMap.get("id"), unitMap.get("courseId"))) {
-                        if(learnUnitId==null){
+                        if (learnUnitId == null && courseUnitVo.getLearnUnit() == null) {
                             courseUnitVo.setLearnUnit(unitMap.get("id").toString());
                         }
                         unitInfoMap.put("unitId", unitMap.get("id"));
@@ -555,11 +554,11 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                             unitInfoMap.put("sentenceTranslation", "正在学习");
                         } else if (id >= senCount) {
                             Long id1 = learnMapper.countLearnWordAndType(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(5), learnCount == null ? 1 : learnCount);
-                            if(id1 < senCount && id1 > 0){
+                            if (id1 < senCount && id1 > 0) {
                                 unitInfoMap.put("sentenceTranslation", "正在学习");
-                            }else if(id1 >= senCount){
+                            } else if (id1 >= senCount) {
                                 unitInfoMap.put("sentenceTranslation", "已学习");
-                            }else{
+                            } else {
                                 unitInfoMap.put("sentenceTranslation", "未学习");
                             }
                         } else {
@@ -570,11 +569,11 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                             unitInfoMap.put("sentenceListening", "正在学习");
                         } else if (id1 >= senCount) {
                             Long id2 = learnMapper.countLearnWordAndType(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(4), learnCount == null ? 1 : learnCount);
-                            if(id2 < senCount && id2 > 0){
+                            if (id2 < senCount && id2 > 0) {
                                 unitInfoMap.put("sentenceListening", "正在学习");
-                            }else if(id2 >= senCount){
+                            } else if (id2 >= senCount) {
                                 unitInfoMap.put("sentenceListening", "已学习");
-                            }else{
+                            } else {
                                 unitInfoMap.put("sentenceListening", "未学习");
                             }
                         } else {
@@ -585,16 +584,16 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                             unitInfoMap.put("sentenceWriting", "正在学习");
                         } else if (id2 >= senCount) {
                             Long id3 = learnMapper.countLearnWordAndType(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(6), learnCount == null ? 1 : learnCount);
-                            if(id3 < senCount && id3 > 0){
+                            if (id3 < senCount && id3 > 0) {
                                 unitInfoMap.put("sentenceWriting", "正在学习");
-                            }else if(id3 >= senCount){
-                                Integer count =testRecordMapper.selectByStudentIdAndGenre(student.getId(),Long.parseLong(unitMap.get("id").toString()));
-                                if(id2/senCount==count){
+                            } else if (id3 >= senCount) {
+                                Integer count = testRecordMapper.selectByStudentIdAndGenre(student.getId(), Long.parseLong(unitMap.get("id").toString()));
+                                if (id2 / senCount == count) {
                                     unitInfoMap.put("sentenceWriting", "已学习");
-                                }else{
+                                } else {
                                     unitInfoMap.put("sentenceWriting", "正在学习");
                                 }
-                            }else{
+                            } else {
                                 unitInfoMap.put("sentenceWriting", "未学习");
                             }
                         } else {
@@ -689,14 +688,14 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     public ServerResponse<Object> getModuleRelearning(HttpSession session, String studyModel, Integer unitId) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         Integer update = learnMapper.updLearnByUnitIdAndStudyModelAndStudentId(student.getId(), studyModel, unitId);
-        if(update>0){
-            if(studyModel.equals("例句翻译")){
+        if (update > 0) {
+            if (studyModel.equals("例句翻译")) {
                 sentenceTranslateMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
             }
-            if(studyModel.equals("例句听力")){
+            if (studyModel.equals("例句听力")) {
                 sentenceListenMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
             }
-            if(studyModel.equals("例句默写")){
+            if (studyModel.equals("例句默写")) {
                 sentenceWriteMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
             }
         }

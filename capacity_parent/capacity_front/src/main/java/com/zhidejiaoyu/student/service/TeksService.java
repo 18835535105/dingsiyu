@@ -47,4 +47,8 @@ public interface TeksService extends BaseService<Teks> {
     ServerResponse<Object> selRankingList(Integer unitId, HttpSession session);
 
     ServerResponse<Object> getTeksTest(Integer unitId);
+
+    ServerResponse<Map<String, Object>> saveTeksAudition(HttpSession session, Integer unitId, Integer courseId);
+
+    ServerResponse<List<Map<String, Object>>> getTeksLaterLearnTime(HttpSession session);
 }

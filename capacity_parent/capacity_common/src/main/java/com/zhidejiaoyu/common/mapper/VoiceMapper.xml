@@ -350,4 +350,11 @@
     order by v.score desc limit 10
   </select>
 
+  <select id="selVoiceTeksByStudentAndUnit" resultType="map" parameterType="map" >
+    select DISTINCT voice.word_id , voice.id
+    from voice voice
+    where voice.unit_id =#{unitId}
+    and voice.student_id=#{student_id}
+  </select>
+
 </mapper>

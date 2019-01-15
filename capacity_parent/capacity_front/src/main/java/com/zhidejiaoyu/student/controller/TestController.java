@@ -138,7 +138,7 @@ public class TestController {
      */
     @GetMapping("/gitUnitSentenceTest")
     @ResponseBody
-    public ServerResponse<Object> gitUnitSentenceTest( Long unitId) {
+    public ServerResponse<Object> gitUnitSentenceTest(Long unitId) {
         if (unitId == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), "unitId 不能为 null");
         }
@@ -251,7 +251,6 @@ public class TestController {
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
         }
         return testService.saveCapTeksTest(session, wordUnitTestDTO);
-
     }
 
 }

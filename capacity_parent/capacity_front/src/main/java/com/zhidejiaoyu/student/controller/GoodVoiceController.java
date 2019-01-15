@@ -71,7 +71,7 @@ public class GoodVoiceController {
                                     @NotEmpty(message = "word 不能为空！") String word,
                                     @NotNull(message = "录音不能为空！") MultipartFile audio) {
         voice.setCount(0);
-        return goodVoiceService.saveVoice(session, voice, word, audio);
+        return goodVoiceService.saveVoice(session, voice, word, audio,1);
     }
 
     /**
@@ -84,6 +84,6 @@ public class GoodVoiceController {
                                    @NotNull(message = "录音不能为空！") MultipartFile audio){
         voice.setWordId(sentenceId);
         voice.setCount(0);
-        return goodVoiceService.saveVoice(session, voice, sentence, audio);
+        return goodVoiceService.saveVoice(session, voice, sentence, audio,2);
     }
 }

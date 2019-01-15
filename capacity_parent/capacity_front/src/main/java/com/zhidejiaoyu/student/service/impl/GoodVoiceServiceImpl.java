@@ -71,6 +71,10 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Autowired
     private RedisOpt redisOpt;
 
+    @Autowired
+    private LearnMapper learnMapper;
+
+
     @Override
     public ServerResponse getSubjects(HttpSession session, Long unitId, Integer type, Integer flag) {
         Student student = getStudent(session);
@@ -169,7 +173,7 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
     }
 
     @Override
-    public ServerResponse saveVoice(HttpSession session, Voice voice, String word, MultipartFile audio) {
+    public ServerResponse saveVoice(HttpSession session, Voice voice, String word, MultipartFile audio,Integer type) {
 
         Student student = getStudent(session);
 
@@ -245,7 +249,21 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
             voice.setVoiceUrl(fileName);
             voiceMapper.insert(voice);
         }
-
+        if(type==2){
+            Learn learn =new Learn ();
+            learn.setLearnTime(new Date());
+            learn.setUpdateTime(new Date());
+            learn.setCourseId(voice.getCourseId());
+            learn.setStudentId(voice.getStudentId());
+            learn.setStudyModel("课文好声音");
+            learn.setType(1);
+            Long aLong = learnMapper.selTeksLearn(learn);
+            if(aLong!=null){
+                learnMapper.updTeksLearn(learn);
+            }else{
+                learnMapper.insert(learn);
+            }
+        }
         return ServerResponse.createBySuccess(map);
     }
 
