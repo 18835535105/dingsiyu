@@ -599,8 +599,11 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         int learnWord = learnMapper.getTodayWord(DateUtil.formatYYYYMMDD(new Date()), studentId);
         // 获取今日已学例句
         int learnSentence = learnMapper.getTodaySentence(DateUtil.formatYYYYMMDD(new Date()), studentId);
+        //获取今日已学课文数
+        int learnTeks=learnMapper.getTodyTeks(DateUtil.formatYYYYMMDD(new Date()),studentId);
         map.put("learnWord", learnWord);
         map.put("learnSentence", learnSentence);
+        map.put("learnTeks", learnTeks);
 
         // 获取我的总金币
         Double myGoldD = studentMapper.myGold(studentId);

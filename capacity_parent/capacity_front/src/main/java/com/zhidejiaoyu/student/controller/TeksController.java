@@ -36,6 +36,13 @@ public class TeksController  {
         return teksService.getCourseAndUnit(session);
     }
 
+    @ResponseBody
+    @RequestMapping("getIsInto")
+    public ServerResponse<Map<String,Object>> getIsInto(HttpSession session,Long unitId) {
+        return teksService.getIsInto(session,unitId);
+    }
+
+
     /**
      * 查看课文最后学习时间
      * @param session
@@ -68,7 +75,7 @@ public class TeksController  {
     }
 
     //选择课文单词
-    @RequestMapping("selChooseTeks")
+    @RequestMapping("/selChooseTeks")
     @ResponseBody
     public Object selChooseTeks(Integer unitId,HttpSession session){
         return teksService.selChooseTeks(unitId,session);
@@ -92,7 +99,7 @@ public class TeksController  {
 
 
     /**
-     * 添加课文测试结果
+     * 添加课文默写测试结果
      * @param testRecord
      * @param session
      * @return
@@ -155,6 +162,12 @@ public class TeksController  {
     @ResponseBody
     public ServerResponse<Object> getTeksTest(Integer unitId){
         return teksService.getTeksTest(unitId);
+    }
+
+    @RequestMapping("getTeksLearnSchedule")
+    @ResponseBody
+    public ServerResponse<Object> getLearnSchedule(Long courseId,HttpSession session){
+        return teksService.getLearnSchedule(courseId,session);
     }
 
 

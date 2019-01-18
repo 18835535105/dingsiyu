@@ -354,7 +354,7 @@
     select DISTINCT voice.word_id , voice.id
     from voice voice
     where voice.unit_id =#{unitId}
-    and voice.student_id=#{student_id}
+    and voice.student_id=#{studentId}
   </select>
 
 </mapper>

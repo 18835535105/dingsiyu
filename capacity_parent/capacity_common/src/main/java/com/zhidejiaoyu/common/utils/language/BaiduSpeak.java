@@ -13,44 +13,49 @@ import java.net.URLEncoder;
 
 /**
  * 百度语音合成web api
- * 
+ *
  * @author wuchenxi
  * @date 2018年4月23日 下午6:39:36
- *
  */
 @Slf4j
 @Component
 public class BaiduSpeak {
 
-	@Value("${ftp.prefix}")
-	private String prefix;
+    @Value("${ftp.prefix}")
+    private String prefix;
 
-	@Value("${baidu}")
-	private String baidu;
+    @Value("${baidu}")
+    private String baidu;
 
-	@Autowired
-	private VocabularyMapper vocabularyMapper;
+    @Value("${youdao}")
+    private String youdao;
 
-	/**
-	 * 获取语音合成地址
-	 * 
-	 * @param text
-	 *            需要合成的文字内容
-	 * @return
-	 */
-	public String getLanguagePath(String text) {
+    @Autowired
+    private VocabularyMapper vocabularyMapper;
 
-		Vocabulary vocabulary = vocabularyMapper.selectByWord(text);
-		if (vocabulary!=null && StringUtils.isNotEmpty(vocabulary.getReadUrl())) {
-			return prefix + vocabulary.getReadUrl();
-		} else {
-			log.error("单词=[{}]在单词表中没有读音！", text);
-			try {
-				text = URLEncoder.encode(URLEncoder.encode(text, "utf-8"), "utf-8");
-			} catch (UnsupportedEncodingException e) {
-				log.error("单词[{}]进行urlencode时出错！", text, e);
-			}
-			return baidu + text;
-		}
-	}
+    /**
+     * 获取语音合成地址
+     *
+     * @param text 需要合成的文字内容
+     * @return
+     */
+    public String getLanguagePath(String text) {
+
+        Vocabulary vocabulary = vocabularyMapper.selectByWord(text);
+        if (vocabulary != null && StringUtils.isNotEmpty(vocabulary.getReadUrl())) {
+            return prefix + vocabulary.getReadUrl();
+        } else {
+            log.error("单词=[{}]在单词表中没有读音！", text);
+            try {
+                text = URLEncoder.encode(URLEncoder.encode(text, "utf-8"), "utf-8");
+            } catch (UnsupportedEncodingException e) {
+                log.error("单词[{}]进行urlencode时出错！", text, e);
+            }
+            return baidu + text;
+        }
+    }
+
+    public String getSentencePaht(String text) {
+        return youdao + text + "@&@" + baidu + text;
+    }
 }

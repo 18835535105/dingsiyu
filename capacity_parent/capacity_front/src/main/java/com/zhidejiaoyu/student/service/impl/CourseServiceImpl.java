@@ -87,6 +87,8 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
 
     @Autowired
     private CapacityReviewMapper capacityReviewMapper;
+    @Autowired
+    private TeksMapper teksMapper;
 
     @Override
     public List chooseGrade(HttpSession session) {
@@ -169,7 +171,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
             pushCount = capacityWriteMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
             this.packageMemoryVo(learnedCount, pushCount, wordCount, studyModel, vos);
 
-        } else {
+        } else if(type==2){
             // 当前课程下例句总量
             int sentenceCount = sentenceMapper.countByCourseId(courseId);
 
@@ -190,6 +192,19 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
             learnedCount = learnMapper.countByCourseId(studentId, courseId, studyModel);
             pushCount = sentenceWriteMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
             this.packageMemoryVo(learnedCount, pushCount, sentenceCount, studyModel, vos);
+        }else{
+            //当前课程下单元数量
+            List<Map<String, Object>> maps = teksMapper.selTeksByCorseId(courseId);
+            int size = maps.size();
+            studyModel="课文试听";
+            Integer countAudition = learnMapper.selAllTeksLearn(student.getId(), courseId, studyModel);
+            this.packageMemoryVo(countAudition, 0, size, studyModel, vos);
+            studyModel="课文好声音";
+            Integer teksGoodVoice=learnMapper.selAllTeksLearn(student.getId(), courseId,studyModel);
+            this.packageMemoryVo(teksGoodVoice, 0, size, "课文跟读", vos);
+            studyModel="课文训练";
+            Integer teksTest=learnMapper.selAllTeksLearn(student.getId(), courseId,"课文默写测试");
+            this.packageMemoryVo(teksTest, 0, size, studyModel, vos);
         }
         return ServerResponse.createBySuccess(vos);
     }

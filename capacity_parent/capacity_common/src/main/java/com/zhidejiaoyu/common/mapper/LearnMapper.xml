@@ -1393,17 +1393,27 @@
         order by id desc limit 1
     </select>
     <select id="selTeksLaterCourse" parameterType="java.lang.Long" resultType="java.util.Map">
-        select learn.unit_id , course.grade , course.version , course.lable
+        select learn.unit_id , course.grade , course.version , course.label
         from learn learn
         join course course on course.id=learn.course_id
         where learn.student_id=#{studentId}
-        order by id desc limit 1
+        and vocabulary_id is null
+        and example_id is null
+        order by learn.update_time desc limit 1
     </select>
-    <select id="selLearnTeks" parameterType="java.util.Map" resultType="java.util.Map">
-        select distinct study_model study_model from learn
+    <select id="selLearnTeks" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(id) from learn
         where student_id=#{studentId}
         and study_model=#{studyModel}
+        and unit_id=#{unitId}
         and vocabulary_id is null
         and example_id is null
     </select>
+    <select id="selAllTeksLearn" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(id) from learn
+        where student_id=#{studentId}
+        and course_id=#{courseId}
+        and study_model=#{studyModel}
+    </select>
+
 </mapper>

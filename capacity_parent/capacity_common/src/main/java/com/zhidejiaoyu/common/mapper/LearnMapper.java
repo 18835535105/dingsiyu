@@ -422,6 +422,10 @@ public interface LearnMapper extends BaseMapper<Learn> {
     @Select("select count(DISTINCT example_id) from learn where date_format(learn_time, '%Y-%m-%d') = #{formatYYYYMMDD} AND student_id = #{studentId} AND vocabulary_id IS NULL")
     int getTodaySentence(@Param("formatYYYYMMDD") String formatYYYYMMDD, @Param("studentId") long studentId);
 
+    @Select("select count(DISTINCT unit_id) from learn where date_format(learn_time, '%Y-%m-%d') = #{formatYYYYMMDD} AND student_id = #{studentId} AND vocabulary_id IS NULL AND example_id IS NULL")
+    int getTodyTeks(@Param("formatYYYYMMDD") String formatYYYYMMDD,@Param("studentId") long studentId);
+
+
     /**
      * 根据学习时间倒叙查询学生所学的单词或者例句
      *
@@ -791,5 +795,7 @@ public interface LearnMapper extends BaseMapper<Learn> {
 
     Map<String,Object> selTeksLaterCourse(Long id);
 
-    Integer selLearnTeks(@Param("studentId") Long studentId,@Param("studyModel")String studyModel);
+    Integer selLearnTeks(@Param("studentId") Long studentId,@Param("studyModel")String studyModel,@Param("unitId") Long unitId);
+
+    Integer selAllTeksLearn(@Param("studentId") Long studentId,@Param("courseId")  Long courseId,@Param("studyModel") String studyModel);
 }

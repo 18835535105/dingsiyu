@@ -421,7 +421,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             map.put("unitId", unit_id);
         }
         // 例句读音
-        map.put("readUrl", baiduSpeak.getLanguagePath(english));
+        map.put("readUrl", baiduSpeak.getSentencePaht(english));
         // 例句翻译
         map.put("word_Chinese", chinese);
         // 例句英文原文
@@ -836,11 +836,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 把已学测试,生词测试,熟词测试保存慧追踪中
         if (!"单词五维测试".equals(genre) && !"例句五维测试".equals(genre)) {
             // 保存学习记录和慧追踪信息
-            ServerResponse<String> serverResponse = saveTestLearnAndCapacity.saveLearnAndCapacity(correctWord, errorWord,
+            saveTestLearnAndCapacity.saveLearnAndCapacity(correctWord, errorWord,
                     correctWordId, errorWordId, session, student, unitId, classify);
-            if (serverResponse != null) {
-                throw new RuntimeException("无当前模块的学习记录");
-            }
         }
         int[] gold = this.saveTestRecord(quantity, errorCount, rightCount, classify, session, student, point, genre, courseId,unitId);
         if(testDetail!=null){
@@ -849,6 +846,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         }
         // 封装提示语
         packagePetSay(gold[0], point, student, vo, genre);
+        vo.setEnergy(getEnergy(student, point));
         countMyGoldUtil.countMyGold(student);
         return ServerResponse.createBySuccess(vo);
     }
@@ -1035,11 +1033,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         }
 
         // 保存学习记录和慧追踪信息
-        ServerResponse<String> serverResponse = saveTestLearnAndCapacity.saveLearnAndCapacity(correctWord, errorWord,
-                correctWordId, errorWordId, session, student, unitId, classify);
-        if (serverResponse != null) {
-            return serverResponse;
-        }
+        saveTestLearnAndCapacity.saveLearnAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, student, unitId, classify);
         return ServerResponse.createBySuccessMessage("学习记录保存成功！");
     }
 
@@ -1411,7 +1405,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         testRecord.setGenre(genre);
         testRecord.setErrorCount(errorCount);
         testRecord.setCourseId(courseId);
-        testRecord.setUnitId(unitId[0]);
+        testRecord.setUnitId((unitId == null || unitId.length == 0) ? null : unitId[0]);
         int gold = 0;
 
         if ("已学测试".equals(genre) || "生词测试".equals(genre) || "熟词测试".equals(genre) || genre.contains("五维测试")) {

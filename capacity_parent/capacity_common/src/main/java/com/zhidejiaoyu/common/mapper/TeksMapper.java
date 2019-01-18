@@ -38,4 +38,8 @@ public interface TeksMapper extends BaseMapper<Teks> {
     List<Map<String,Object>> getStudentAllCourse(@Param("studentId") Long studentId, @Param("courseIds")  List<Long> courseIds);
 
     List<Teks> getTwentyTeks();
+
+    List<Map<String,Object>> selTeksByCorseId(@Param("courseId") Long courseId);
+
+    Long selTeksBySentence(String word);
 }

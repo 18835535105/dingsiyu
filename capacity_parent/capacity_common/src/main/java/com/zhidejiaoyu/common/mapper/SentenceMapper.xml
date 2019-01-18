@@ -158,7 +158,8 @@
     <select id="selectUnLearnedSentenceByUnitId" parameterType="map" resultType="com.zhidejiaoyu.common.pojo.Sentence">
         select
         <include refid="relevance_base_sql"/>
-        from sentence s where s.id not in (select l.example_id from learn l where l.example_id is not null and
+        from sentence s, unit_sentence us where us.unit_id = #{unitId} and us.sentence_id = s.id and s.id not in (select
+        l.example_id from learn l where l.example_id is not null and
         l.unit_id = #{unitId} and l.student_id = #{studentId} and l.study_model = #{studyModel})
     </select>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultType="com.zhidejiaoyu.common.pojo.Sentence">

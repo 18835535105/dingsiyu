@@ -74,6 +74,8 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Autowired
     private LearnMapper learnMapper;
 
+    @Autowired
+    private TeksMapper teksMapper;
 
     @Override
     public ServerResponse getSubjects(HttpSession session, Long unitId, Integer type, Integer flag) {
@@ -255,10 +257,12 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
             learn.setUpdateTime(new Date());
             learn.setCourseId(voice.getCourseId());
             learn.setStudentId(voice.getStudentId());
+            learn.setUnitId(voice.getUnitId());
             learn.setStudyModel("课文好声音");
             learn.setType(1);
             Long aLong = learnMapper.selTeksLearn(learn);
             if(aLong!=null){
+                learn.setId(aLong);
                 learnMapper.updTeksLearn(learn);
             }else{
                 learnMapper.insert(learn);

@@ -27,6 +27,7 @@
         left join test_record t on u.id=t.unit_id
         join student_unit su on su.unit_id =u.id
         join course course on course.id = u.course_id
+        join teks teks on teks.unit_id=u.id
         where su.student_id = #{studentId}
         and su.type = 1 and
         u.course_id in (
@@ -83,8 +84,18 @@
         and voice.student_id= #{studentId}
     </select>
 
-    <select id="getTwentyTeks" resultType="java.util.Map" parameterType="map">
-        select * from teks order by rand() limit 20
+    <select id="getTwentyTeks" resultMap="BaseResultMap" parameterType="map">
+        select <include refid="Base_Column_List"></include> from teks t order by rand() limit 20
+    </select>
+
+    <select id="selTeksByCorseId" parameterType="java.util.Map" resultType="java.util.Map">
+       select DISTINCT unit.id from course course
+       join unit unit on unit.course_id=course.id
+       join teks teks on teks.unit_id=unit.id where course.id=#{courseId}
+    </select>
+
+    <select id="selTeksBySentence" parameterType="java.lang.String" resultType="java.lang.Long">
+        select unit_id from Teks where
     </select>
 
 </mapper>
