@@ -1013,9 +1013,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 duration.setLoginOutTime(loginOutTime);
                 duration.setValidTime(0L);
                 durationMapper.insert(duration);
-                removeSessionAttributes(session);
             }
         }
+        removeSessionAttributes(session);
     }
 
     /**

@@ -739,6 +739,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
                 value.setId(durations.get(0).getId());
                 durationMapper.updateByPrimaryKeySelective(value);
             } else {
+                value.setId(null);
                 value.setLoginOutTime(DateUtil.parseYYYYMMDDHHMMSS(new Date()));
                 try {
                     value.setId(null);
