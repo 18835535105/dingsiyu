@@ -77,7 +77,7 @@
     </select>
 
     <select id="isHistoryPronunciation" resultType="java.lang.Integer" parameterType="java.util.Map">
-        select max(count) count
+        select count(voice.id) count
         from teks teks
         join voice voice on teks.id= voice.word_id
         where teks.unit_id=#{unitId}
