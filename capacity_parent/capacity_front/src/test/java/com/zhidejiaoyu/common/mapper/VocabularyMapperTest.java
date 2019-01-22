@@ -22,4 +22,9 @@ public class VocabularyMapperTest extends BaseTest {
         List<String> strings = vocabularyMapper.selectWordByCourseId(2863L, 0, 100);
         log.info("words=[{}]", strings);
     }
+
+    @Test
+    public void testSelectPictureWordFromLearned() {
+        vocabularyMapper.selectPictureWordFromLearned(8956L, 3);
+    }
 }
