@@ -40,8 +40,9 @@ public class BaiduSpeak {
      * @return
      */
     public String getLanguagePath(String text) {
+        return youdao + text;
 
-        Vocabulary vocabulary = vocabularyMapper.selectByWord(text);
+        /*Vocabulary vocabulary = vocabularyMapper.selectByWord(text);
         if (vocabulary != null && StringUtils.isNotEmpty(vocabulary.getReadUrl())) {
             return prefix + vocabulary.getReadUrl();
         } else {
@@ -52,7 +53,7 @@ public class BaiduSpeak {
                 log.error("单词[{}]进行urlencode时出错！", text, e);
             }
             return baidu + text;
-        }
+        }*/
     }
 
     public String getSentencePaht(String text) {
