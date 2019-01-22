@@ -1190,7 +1190,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     private Integer saveGold(boolean isFirst, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord) {
     	int point = wordUnitTestDTO.getPoint();
     	int goldCount = 0;
-    	
+
     	// 总有效时间是否小于俩小时 = 17流程金币奖励规则
     	/*int timeByStudentId = durationMapper.labelValidTimeByStudentId(student.getId());
     	if(timeByStudentId < 2) {
@@ -1204,7 +1204,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     		this.saveLog(student, goldCount, wordUnitTestDTO, null);
     		return goldCount;
     	}*/
-        
+
         if (isFirst) {
             if (point >= PASS) {
                 if (point < FULL_MARK) {

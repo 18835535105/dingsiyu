@@ -32,6 +32,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private static final int PASS = 80;
 
     /**
+     * 90分
+     */
+    private static final int SENCONDARY = 90;
+
+    /**
      * 100分
      */
     private static final int FULL_MARK = 100;
@@ -508,13 +513,20 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         Integer point = testRecord.getPoint();
         Integer goldCount = 0;
         if (point >= PASS) {
-            if (point < FULL_MARK) {
-                goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_FULL;
-                this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试");
-            } else if (point == FULL_MARK) {
+            if (point>SENCONDARY && point < FULL_MARK) {
                 goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
                 this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试");
+            } else if (point == FULL_MARK) {
+                goldCount = TestAwardGoldConstant.FIVE_TEST_EIGHTY_TO_NINETY;
+                goldCount+=goldCount;
+                this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试");
+                this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试双倍奖励");
+            }else if(point == PASS){
+                goldCount=TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_FULL;
+                this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试");
             }
+        }else{
+
         }
         testRecord.setGenre("课文默写测试");
         testRecord.setAwardGold(goldCount);
@@ -540,7 +552,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 learnMapper.insert(learn);
             }
         }
-        return ServerResponse.createBySuccess();
+        Map<String,Object> map=new HashMap<>();
+        map.put("gold",goldCount);
+        return ServerResponse.createBySuccess(map);
     }
 
     @Override
