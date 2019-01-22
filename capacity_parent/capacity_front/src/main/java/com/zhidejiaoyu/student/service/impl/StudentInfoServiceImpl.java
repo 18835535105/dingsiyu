@@ -742,6 +742,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
                 value.setId(null);
                 value.setLoginOutTime(DateUtil.parseYYYYMMDDHHMMSS(new Date()));
                 try {
+                    value.setId(null);
                     durationMapper.insertSelective(value);
                 } catch (Exception e) {
                     log.error("保存时长信息出错，当前 key->value => {} -> {}", key, value, e);

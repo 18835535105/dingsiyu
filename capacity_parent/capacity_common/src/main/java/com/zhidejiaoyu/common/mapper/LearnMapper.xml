@@ -145,7 +145,6 @@
             and example_id is not null
         </if>
         and learn_count = #{count}
-
     </select>
 
     <select id="isCountLearnWord" resultType="java.lang.Long"
@@ -202,7 +201,7 @@
             </if>
         </if>
         and learn_count = #{count}
-        and study_model = #{studyModel} and status = 0
+        and study_model = #{studyModel} and status = 0 and type = 1
     </select>
 
     <!-- 查询当前课程下的单词/例句的学习次数 -->
@@ -433,6 +432,9 @@
         select count(id)
         from learn
         where student_id = #{studentId} and type = 1 and course_id = #{courseId} and study_model = #{studyModel}
+        <if test="studyModel=='例句翻译' or studyModel=='例句听力' or studyModel=='例句默写'">
+            and type = 1
+        </if>
     </select>
     <select id="selectLearnUnitsByStuId" resultType="java.lang.Long" parameterType="map">
         select distinct (unit_id)
@@ -1009,7 +1011,7 @@
                 test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
             and example_id is not null
         </if>
-        and learn_count = #{count}
+        and learn_count = #{count} and type =1
     </select>
     <select id="countNotKnownWordByCourse" resultType="java.lang.Long" parameterType="map">
         select count(id) from learn l where l.student_id = #{studentId} and
@@ -1024,7 +1026,7 @@
             </if>
         </if>
         and learn_count = #{count}
-        and study_model = #{studyModel} and status = 0
+        and study_model = #{studyModel} and status = 0 and type = 1
     </select>
 
     <select id="countByStudentId" resultType="java.lang.Integer" parameterType="map">

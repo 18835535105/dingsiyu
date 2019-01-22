@@ -32,6 +32,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private static final int PASS = 80;
 
     /**
+     * 90分
+     */
+    private static final int SENCONDARY = 90;
+
+    /**
      * 100分
      */
     private static final int FULL_MARK = 100;
@@ -73,10 +78,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @Override
     public ServerResponse<List<Teks>> selTeksByUnitId(Integer unitId) {
         List<Teks> teks = teksMapper.selTeksByUnitId(unitId);
-        if(teks.size()>0){
-            List<Teks> resultTeks=new ArrayList<>();
-            int i=0;
-            for(Teks teks1:teks){
+        if (teks.size() > 0) {
+            List<Teks> resultTeks = new ArrayList<>();
+            int i = 0;
+            for (Teks teks1 : teks) {
                 teks1.setPronunciation(baiduSpeak.getSentencePaht(teks1.getSentence()));
                 i++;
                 resultTeks.add(teks1);
@@ -95,10 +100,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         getMap.put("studentId", student.getId());
         getMap.put("unitId", unitId);
         Integer integer = voiceMapper.selMaxCountByUnitIdAndStudentId(getMap);
-        if(teks.size()>0){
-            List<Teks> resultTeks=new ArrayList<>();
-            int i=0;
-            for(Teks teks1:teks){
+        if (teks.size() > 0) {
+            List<Teks> resultTeks = new ArrayList<>();
+            int i = 0;
+            for (Teks teks1 : teks) {
                 teks1.setPronunciation(baiduSpeak.getSentencePaht(teks1.getSentence()));
                 i++;
                 resultTeks.add(teks1);
@@ -228,7 +233,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             // 获取课程下所有课文的单元信息
             List<Map<String, Object>> textUnits = teksMapper.selectUnitIdAndNameByCourseIds(studentId, courseIds);
             Map<String, Object> learnUnit = learnMapper.selTeksLaterCourse(student.getId());
-            if(learnUnit!=null){
+            if (learnUnit != null) {
                 studyMap = new HashMap<>();
                 studyMap.put("unitId", learnUnit.get("unit_id"));
                 studyMap.put("version", learnUnit.get("version"));
@@ -245,7 +250,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 courseUnitVo = new CourseUnitVo();
                 resultMap = new ArrayList<>();
                 Long id = learnMapper.selLaterLearnTeks(student.getId(), (Long) courseMap.get("id"));
-                if(id != null){
+                if (id != null) {
                     courseUnitVo.setLearnUnit(id.toString());
                 }
                 courseUnitVo.setCourseId((Long) courseMap.get("id"));
@@ -263,7 +268,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                             studyMap.put("version", unitMap.get("version"));
                             studyMap.put("grade", unitMap.get("grade").toString() + unitMap.get("label").toString());
                         }
-                        if(id==null && courseUnitVo.getLearnUnit() == null){
+                        if (id == null && courseUnitVo.getLearnUnit() == null) {
                             courseUnitVo.setLearnUnit(unitMap.get("id").toString());
                         }
                         unitInfoMap.put("unitId", unitMap.get("id"));
@@ -282,34 +287,34 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                             unitInfoMap.put("state", 1);
                         }
                         List<Teks> id1 = teksMapper.selTeksByUnitId(((Long) unitMap.get("id")).intValue());
-                        Integer teksAudition = learnMapper.selLearnTeks(studentId,"课文试听",(Long)unitMap.get("id"));
-                        if(teksAudition!=null && teksAudition>0){
-                            unitInfoMap.put("teksAudition",true);
-                        }else{
-                            unitInfoMap.put("teksAudition",false);
+                        Integer teksAudition = learnMapper.selLearnTeks(studentId, "课文试听", (Long) unitMap.get("id"));
+                        if (teksAudition != null && teksAudition > 0) {
+                            unitInfoMap.put("teksAudition", true);
+                        } else {
+                            unitInfoMap.put("teksAudition", false);
                         }
                         List<Map<String, Object>> id2 = voiceMapper.selVoiceTeksByStudentAndUnit((Long) unitMap.get("id"), studentId);
-                        if(id2!=null){
-                            if(id1.size()<=id2.size()){
-                                unitInfoMap.put("teksGoodVoice",true);
-                            }else{
-                                unitInfoMap.put("teksGoodVoice",false);
+                        if (id2 != null) {
+                            if (id1.size() <= id2.size()) {
+                                unitInfoMap.put("teksGoodVoice", true);
+                            } else {
+                                unitInfoMap.put("teksGoodVoice", false);
                             }
-                        }else{
-                            unitInfoMap.put("teksGoodVoice",false);
+                        } else {
+                            unitInfoMap.put("teksGoodVoice", false);
                         }
-                        Integer teksTest = learnMapper.selLearnTeks(studentId,"课文默写测试",(Long)unitMap.get("id"));
-                        if(teksTest!=null && teksTest>0){
-                            unitInfoMap.put("teksTest",true);
-                        }else{
-                            unitInfoMap.put("teksTest",false);
+                        Integer teksTest = learnMapper.selLearnTeks(studentId, "课文默写测试", (Long) unitMap.get("id"));
+                        if (teksTest != null && teksTest > 0) {
+                            unitInfoMap.put("teksTest", true);
+                        } else {
+                            unitInfoMap.put("teksTest", false);
                         }
 
-                        Integer testRecord = learnMapper.selLearnTeks(studentId,"课文测试",(Long)unitMap.get("id"));
-                        if(testRecord!=null && testRecord>0){
-                            unitInfoMap.put("teksEntryTest",true);
-                        }else{
-                            unitInfoMap.put("teksEntryTest",false);
+                        Integer testRecord = learnMapper.selLearnTeks(studentId, "课文测试", (Long) unitMap.get("id"));
+                        if (testRecord != null && testRecord > 0) {
+                            unitInfoMap.put("teksEntryTest", true);
+                        } else {
+                            unitInfoMap.put("teksEntryTest", false);
                         }
                         resultMap.add(unitInfoMap);
 
@@ -329,26 +334,25 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
     @Override
-    public ServerResponse<Map<String, Object>> getIsInto(HttpSession session,Long unitId) {
-        Student student = (Student)session.getAttribute(UserConstant.CURRENT_STUDENT);
+    public ServerResponse<Map<String, Object>> getIsInto(HttpSession session, Long unitId) {
+        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         List<Teks> id1 = teksMapper.selTeksByUnitId(unitId.intValue());
-        Long studentId=student.getId();
-        Map<String,Object> unitInfoMap=new HashMap<>();
-        unitInfoMap.put("teksAudition",true);
-        unitInfoMap.put("teksGoodVoice",true);
-        List<Map<String, Object>> id2 = voiceMapper.selVoiceTeksByStudentAndUnit(unitId, studentId);
-        Integer teksAudition = learnMapper.selLearnTeks(studentId,"课文试听",unitId);
-        Integer teksTest = learnMapper.selLearnTeks(studentId,"课文默写测试",unitId);
-        if(teksAudition!=null && id2!=null && id2.size()>=id1.size()){
-            unitInfoMap.put("teksTest",true);
-            if(teksTest!=null){
-                unitInfoMap.put("testRecord",true);
-            }else{
-                unitInfoMap.put("testRecord",false);
+        Long studentId = student.getId();
+        Map<String, Object> unitInfoMap = new HashMap<>();
+        unitInfoMap.put("teksAudition", true);
+        unitInfoMap.put("teksGoodVoice", true);
+        Integer teksAudition = learnMapper.selLearnTeks(studentId, "课文试听", unitId);
+        Integer teksTest = learnMapper.selLearnTeks(studentId, "课文默写测试", unitId);
+        if (teksAudition != null && teksAudition != 0) {
+            unitInfoMap.put("teksTest", true);
+            if (teksTest != null && teksTest != 0) {
+                unitInfoMap.put("testRecord", true);
+            } else {
+                unitInfoMap.put("testRecord", false);
             }
-        }else{
-            unitInfoMap.put("teksTest",false);
-            unitInfoMap.put("testRecord",false);
+        } else {
+            unitInfoMap.put("teksTest", false);
+            unitInfoMap.put("testRecord", false);
         }
 
         return ServerResponse.createBySuccess(unitInfoMap);
@@ -356,42 +360,42 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     //查看当前课程学习进度
     @Override
-    public ServerResponse<Object> getLearnSchedule(Long courseId,HttpSession session) {
-        Student student =(Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+    public ServerResponse<Object> getLearnSchedule(Long courseId, HttpSession session) {
+        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         //获取当前课程下课文的总单元数
         List<Map<String, Object>> maps = teksMapper.selTeksByCorseId(courseId);
-        Integer count=maps.size();
-        Map<String,Object> resultMap = new HashMap<>();
+        Integer count = maps.size();
+        Map<String, Object> resultMap = new HashMap<>();
         //获取课文试听学习进度
         Integer countAudition = learnMapper.selAllTeksLearn(student.getId(), courseId, "课文试听");
-        Map<String,Object> map=new HashMap<>();
-        if(countAudition==null){
-            map.put("schedule",0);
-            map.put("proportion","0/"+count);
-        }else{
-            map.put("schedule",countAudition/count);
-            map.put("proportion",countAudition+"/"+count);
+        Map<String, Object> map = new HashMap<>();
+        if (countAudition == null) {
+            map.put("schedule", 0);
+            map.put("proportion", "0/" + count);
+        } else {
+            map.put("schedule", countAudition / count);
+            map.put("proportion", countAudition + "/" + count);
         }
-        resultMap.put("teksAudition",map);
+        resultMap.put("teksAudition", map);
         //获取课文好声音学习进度
-        Integer teksGoodVoice=learnMapper.selAllTeksLearn(student.getId(), courseId,"课文好声音");
-        if(teksGoodVoice==null){
-            map.put("schedule",0);
-            map.put("proportion","0/"+count);
-        }else{
-            map.put("schedule",teksGoodVoice/count);
-            map.put("proportion",teksGoodVoice+"/"+count);
+        Integer teksGoodVoice = learnMapper.selAllTeksLearn(student.getId(), courseId, "课文好声音");
+        if (teksGoodVoice == null) {
+            map.put("schedule", 0);
+            map.put("proportion", "0/" + count);
+        } else {
+            map.put("schedule", teksGoodVoice / count);
+            map.put("proportion", teksGoodVoice + "/" + count);
         }
-        resultMap.put("teksGoodVoice",map);
-        Integer teksTest=learnMapper.selAllTeksLearn(student.getId(), courseId,"课文默写测试");
-        if(teksTest==null){
-            map.put("schedule",0);
-            map.put("proportion","0/"+count);
-        }else{
-            map.put("schedule",teksTest/count);
-            map.put("proportion",teksTest+"/"+count);
+        resultMap.put("teksGoodVoice", map);
+        Integer teksTest = learnMapper.selAllTeksLearn(student.getId(), courseId, "课文默写测试");
+        if (teksTest == null) {
+            map.put("schedule", 0);
+            map.put("proportion", "0/" + count);
+        } else {
+            map.put("schedule", teksTest / count);
+            map.put("proportion", teksTest + "/" + count);
         }
-        resultMap.put("teksTest",map);
+        resultMap.put("teksTest", map);
         return ServerResponse.createBySuccess(resultMap);
     }
 
@@ -404,11 +408,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         if (listTeks.size() > 0) {
             for (Teks teks : listTeks) {
                 //保存返回的数据
-                Map<String,Object> map=new HashMap<>();
-                map.put("chinese",teks.getParaphrase());
-                map.put("pronunciation",baiduSpeak.getSentencePaht(teks.getSentence()));
-                map.put("sentence",teks.getSentence());
-                map.put("id",teks.getId());
+                Map<String, Object> map = new HashMap<>();
+                map.put("chinese", teks.getParaphrase());
+                map.put("pronunciation", baiduSpeak.getSentencePaht(teks.getSentence()));
+                map.put("sentence", teks.getSentence());
+                map.put("id", teks.getId());
                 String[] sentenceList = teks.getSentence().split(" ");
                 int[] integers;
                 //获取空格出现的位置
@@ -509,13 +513,20 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         Integer point = testRecord.getPoint();
         Integer goldCount = 0;
         if (point >= PASS) {
-            if (point < FULL_MARK) {
-                goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_FULL;
-                this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试");
-            } else if (point == FULL_MARK) {
+            if (point>SENCONDARY && point < FULL_MARK) {
                 goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
                 this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试");
+            } else if (point == FULL_MARK) {
+                goldCount = TestAwardGoldConstant.FIVE_TEST_EIGHTY_TO_NINETY;
+                goldCount+=goldCount;
+                this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试");
+                this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试双倍奖励");
+            }else if(point == PASS){
+                goldCount=TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_FULL;
+                this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试");
             }
+        }else{
+
         }
         testRecord.setGenre("课文默写测试");
         testRecord.setAwardGold(goldCount);
@@ -541,7 +552,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 learnMapper.insert(learn);
             }
         }
-        return ServerResponse.createBySuccess();
+        Map<String,Object> map=new HashMap<>();
+        map.put("gold",goldCount);
+        return ServerResponse.createBySuccess(map);
     }
 
     @Override
@@ -726,19 +739,20 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
 
-
     private ServerResponse<Object> getReturnTestTeks(List<Teks> teks, List<Teks> addTeks) {
         List<Map<String, Object>> returnList = new ArrayList<>();
         List<Teks> optionList = new ArrayList<>(teks);
-        for(Teks teks1:addTeks){
-            boolean isAdd=true;
-            for(Teks teks2:optionList){
-                if(teks2.getSentence().equals(teks1.getSentence())){
-                    isAdd=false;
+        if (addTeks != null && addTeks.size() > 0) {
+            for (Teks teks1 : addTeks) {
+                boolean isAdd = true;
+                for (Teks teks2 : optionList) {
+                    if (teks2.getSentence().equals(teks1.getSentence())) {
+                        isAdd = false;
+                    }
                 }
-            }
-            if(isAdd){
-                optionList.add(teks1);
+                if (isAdd) {
+                    optionList.add(teks1);
+                }
             }
         }
         for (int i = 0; i < teks.size(); i++) {
@@ -746,12 +760,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             List<Teks> list = new ArrayList<>();
             list.addAll(optionList);
             list.remove(teks.get(i));
-            Integer ss=(int)Math.ceil((Math.random()*2));
-            Map<String,Object> returnMap=new HashMap<>();
-            returnMap.put("id",teks.get(i).getId());
-            returnMap.put("chinese",teks.get(i).getParaphrase());
-            returnMap.put("pronunciation",baiduSpeak.getSentencePaht(teks.get(i).getSentence()));
-            returnMap.put("english",teks.get(i).getSentence());
+            Integer ss = (int) Math.ceil((Math.random() * 2));
+            Map<String, Object> returnMap = new HashMap<>();
+            returnMap.put("id", teks.get(i).getId());
+            returnMap.put("chinese", teks.get(i).getParaphrase());
+            returnMap.put("pronunciation", baiduSpeak.getSentencePaht(teks.get(i).getSentence()));
+            returnMap.put("english", teks.get(i).getSentence());
             //英选汉
             if (ss == 1) {
                 returnMap.put("type", "BritishElectHan");
@@ -793,8 +807,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             }
             english.add(optionList.get(i).getSentence());
             option.add(baiduSpeak.getSentencePaht(optionList.get(i).getSentence()));
-       }
-        returnMap.put("option",option);
+        }
+        returnMap.put("option", option);
     }
 
 
