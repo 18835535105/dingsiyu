@@ -39,9 +39,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @Service
@@ -56,6 +53,10 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      * 60分
      */
     private static final int SIX = 60;
+    /**
+     * 70分
+     */
+    private static final int SEVENTY = 70;
     /**
      * 80分
      */
@@ -1188,51 +1189,39 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      * @return 学生应奖励金币数
      */
     private Integer saveGold(boolean isFirst, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord) {
-    	int point = wordUnitTestDTO.getPoint();
-    	int goldCount = 0;
-    	
-    	// 总有效时间是否小于俩小时 = 17流程金币奖励规则
-    	/*int timeByStudentId = durationMapper.labelValidTimeByStudentId(student.getId());
-    	if(timeByStudentId < 2) {
-    		if(point < PASS) {
-    			goldCount = TestAwardGoldConstant.FLOW_TEST_EIGHT_ZERO;
-    		}else if(point >= PASS && point < NINETY_POINT) {
-    			goldCount = TestAwardGoldConstant.FLOW_TEST_EIGHTY_TO_FULL;
-    		}else {
-    			goldCount = TestAwardGoldConstant.FLOW_TEST_NINETY_TO_FULL;
-    		}
-    		this.saveLog(student, goldCount, wordUnitTestDTO, null);
-    		return goldCount;
-    	}*/
-        
+        int point = wordUnitTestDTO.getPoint();
+        int goldCount = 0;
         if (isFirst) {
-            if (point >= PASS) {
-                if (point < FULL_MARK) {
-                    goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_FULL;
-                    this.saveLog(student, goldCount, wordUnitTestDTO, null);
-                } else if (point == FULL_MARK) {
-                    goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
-                    this.saveLog(student, goldCount, wordUnitTestDTO, null);
-                }
-            }
+            goldCount = getGoldCount(wordUnitTestDTO, student, point);
         } else {
             // 查询当前单元测试历史最高分数
             int betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), wordUnitTestDTO.getUnitId()[0],
                     wordUnitTestDTO.getClassify());
 
-            // 非首次测试成绩大于或等于80分并且本次测试成绩大于历史最高分，超过历史最高分次数 +1并且金币奖励翻倍
-            if (point >= PASS && betterPoint < wordUnitTestDTO.getPoint()) {
+            // 非首次测试成绩本次测试成绩大于历史最高分，超过历史最高分次数 +1并且金币奖励翻倍
+            if (betterPoint < wordUnitTestDTO.getPoint()) {
                 int betterCount = testRecord.getBetterCount() + 1;
                 testRecord.setBetterCount(betterCount);
-                if (point < FULL_MARK) {
-                    goldCount = betterCount * TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_FULL;
-                    this.saveLog(student, goldCount, wordUnitTestDTO, null);
-                } else if (point == FULL_MARK) {
-                    goldCount = betterCount * TestAwardGoldConstant.UNIT_TEST_FULL;
-                    this.saveLog(student, goldCount, wordUnitTestDTO, null);
-                }
+                goldCount = getGoldCount(wordUnitTestDTO, student, point);
             }
         }
+        return goldCount;
+    }
+
+    private int getGoldCount(WordUnitTestDTO wordUnitTestDTO, Student student, int point) {
+        int goldCount;
+        if (point >= SIX && point < SEVENTY) {
+            goldCount = TestAwardGoldConstant.UNIT_TEST_SIXTY_TO_SEVENTY;
+        } else if (point < PASS) {
+            goldCount = TestAwardGoldConstant.UNIT_TEST_SEVENTY_TO_EIGHTY;
+        } else if (point < NINETY_POINT) {
+            goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_NINETY;
+        } else if (point < FULL_MARK) {
+            goldCount = TestAwardGoldConstant.UNIT_TEST_NINETY_TO_FULL;
+        } else {
+            goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
+        }
+        this.saveLog(student, goldCount, wordUnitTestDTO, null);
         return goldCount;
     }
 
