@@ -1,15 +1,10 @@
 package com.zhidejiaoyu.common.utils.language;
 
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
-import com.zhidejiaoyu.common.pojo.Vocabulary;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
  * 百度语音合成web api
