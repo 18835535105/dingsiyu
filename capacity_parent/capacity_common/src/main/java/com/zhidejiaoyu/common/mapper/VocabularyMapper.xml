@@ -1048,5 +1048,17 @@
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = #{courseId} limit #{limitStart}, #{limitEnd}
     </select>
+    <select id="selectPictureWordFromLearned" resultType="java.util.Map" parameterType="map">
+        SELECT a.id,
+               a.word,
+               a.word_chinese,
+               a.recordpicurl
+        FROM vocabulary a,
+             learn l
+        where a.id = l.vocabulary_id
+          and a.recordpicurl is not null
+          and student_id = #{studentId}
+        limit #{limit}
+    </select>
 
 </mapper>
