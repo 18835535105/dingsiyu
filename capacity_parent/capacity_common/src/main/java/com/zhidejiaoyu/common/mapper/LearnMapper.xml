@@ -145,7 +145,6 @@
             and example_id is not null
         </if>
         and learn_count = #{count}
-        and type=1
     </select>
 
     <select id="isCountLearnWord" resultType="java.lang.Long"
