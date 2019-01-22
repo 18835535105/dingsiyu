@@ -975,7 +975,7 @@
         from learn l where
         l.student_id=#{student.id}
         and l.unit_id=#{unitId} and l.study_model =
-        #{studyModel} and type=1
+        #{studyModel} and l.type = 1
         <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写'">
             and l.vocabulary_id is not null and (select v.delStatus from
             vocabulary v where v.id = l.vocabulary_id) = 1

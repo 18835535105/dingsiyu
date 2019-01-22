@@ -220,6 +220,7 @@ public class WordWriteServiceImpl implements WordWriteService {
             learn.setStudentId(studentId);
             learn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
             learn.setStudyModel(studyModel);
+            learn.setType(1);
             learn.setStudyCount(1);
             learn.setLearnCount(1);
             learn.setUpdateTime(now);
@@ -244,7 +245,7 @@ public class WordWriteServiceImpl implements WordWriteService {
                 }
 
             }
-            count = learnMapper.insertSelective(learn);
+            count = learnMapper.insert(learn);
             if (count > 0 && total == (plan + 1)) {
                 return ServerResponse.createBySuccess();
             }

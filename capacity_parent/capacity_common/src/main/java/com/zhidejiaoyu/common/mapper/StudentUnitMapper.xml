@@ -286,7 +286,7 @@
              unit_vocabulary uv
         where su.student_id = #{student.id}
           and su.unit_id = uv.unit_id
-          and type = 1
+          and su.type = 1
     </select>
 
     <update id="updateStatus" parameterType="map">
