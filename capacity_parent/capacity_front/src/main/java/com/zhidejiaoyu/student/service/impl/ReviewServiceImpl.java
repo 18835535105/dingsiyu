@@ -1320,7 +1320,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             map.put("recordpicurl", ftpPrefix + vocabulary.getRecordpicurl());
             List<Map<String, Object>> mapErrorVocabulary = vocabularyMapper.getWordIdByUnit(new Long(map.get("id").toString()), map.get("unit_id").toString());
             if (mapErrorVocabulary.size() < 3) {
-                List<Map<String, Object>> otherErrorVocabulary = vocabularyMapper.selectPictureWordFromLearned(student.getId(), 4 - mapErrorVocabulary.size());
+                List<Map<String, Object>> otherErrorVocabulary = vocabularyMapper.selectPictureWordFromLearned(student.getId(), 3 - mapErrorVocabulary.size());
                 mapErrorVocabulary.addAll(otherErrorVocabulary);
             }
             // 四道题
