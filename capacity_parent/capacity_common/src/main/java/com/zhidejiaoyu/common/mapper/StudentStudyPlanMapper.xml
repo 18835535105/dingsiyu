@@ -34,5 +34,11 @@
         #{endUnit} and type = and
         complete = 1 order by id asc limit 1
     </select>
+    <select id="selectNextPlan" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from student_study_plan where student_id = #{studentId} and type = #{type} and id > #{planId} order by id asc
+        limit 1
+    </select>
 
 </mapper>

@@ -25,4 +25,15 @@ public interface StudentStudyPlanMapper extends BaseMapper<StudentStudyPlan> {
      * @return
      */
     StudentStudyPlan selectCurrentPlan(@Param("studentId") Long studentId, @Param("startUnit") Long startUnit, @Param("endUnit") Long endUnit, @Param("type") int type);
+
+    /**
+     * 查找下一个学习计划
+     *
+     *
+     * @param studentId
+     * @param planId
+     * @param type
+     * @return
+     */
+    StudentStudyPlan selectNextPlan(@Param("studentId") Long studentId, @Param("planId") Integer planId, @Param("type") int type);
 }

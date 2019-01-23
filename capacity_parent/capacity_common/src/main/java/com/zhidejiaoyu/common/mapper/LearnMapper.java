@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.LearnExample;
 import com.zhidejiaoyu.common.pojo.Student;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -806,4 +807,14 @@ public interface LearnMapper extends BaseMapper<Learn> {
      */
     @Update("update learn set type = 2 where student_id = #{studentId} and unit_id = #{unitId} where type = 1")
     void updateTypeToLearned(@Param("studentId") Long studentId, @Param("unitId") long unitId);
+
+    /**
+     * 学生当前课程下已学习的单元个数
+     *
+     * @param courseId
+     * @param studentId
+     * @return
+     */
+    @Select("select count(distinct unit_id) from learn where student_id = #{studentId} and course_id = #{courseId} ")
+    int countLearnedUnitByCourseId(@Param("courseId") Long courseId, @Param("studentId") Long studentId);
 }
