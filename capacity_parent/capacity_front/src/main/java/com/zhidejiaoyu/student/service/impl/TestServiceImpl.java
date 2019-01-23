@@ -1209,7 +1209,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     private int getGoldCount(WordUnitTestDTO wordUnitTestDTO, Student student, int point) {
-        int goldCount;
+        int goldCount = 0;
         if (point >= SIX && point < SEVENTY) {
             goldCount = TestAwardGoldConstant.UNIT_TEST_SIXTY_TO_SEVENTY;
         } else if (point < PASS) {
@@ -1218,7 +1218,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_NINETY;
         } else if (point < FULL_MARK) {
             goldCount = TestAwardGoldConstant.UNIT_TEST_NINETY_TO_FULL;
-        } else {
+        } else if (point == FULL_MARK){
             goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
         }
         this.saveLog(student, goldCount, wordUnitTestDTO, null);
