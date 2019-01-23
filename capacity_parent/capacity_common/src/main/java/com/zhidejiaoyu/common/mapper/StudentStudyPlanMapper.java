@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.StudentStudyPlan;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -14,4 +15,14 @@ import com.zhidejiaoyu.common.pojo.StudentStudyPlan;
 public interface StudentStudyPlanMapper extends BaseMapper<StudentStudyPlan> {
 
 
+    /**
+     * 查询学生当前的学习计划
+     *
+     * @param studentId
+     * @param startUnit
+     * @param endUnit
+     * @param type
+     * @return
+     */
+    StudentStudyPlan selectCurrentPlan(@Param("studentId") Long studentId, @Param("startUnit") Long startUnit, @Param("endUnit") Long endUnit, @Param("type") int type);
 }

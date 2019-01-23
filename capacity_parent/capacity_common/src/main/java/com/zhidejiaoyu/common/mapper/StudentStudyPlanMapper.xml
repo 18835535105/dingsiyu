@@ -27,5 +27,12 @@
         total_study_count,
         update_time
     </sql>
+    <select id="selectCurrentPlan" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from student_study_plan where student_id = #{studentId} and start_unit_id = #{startUnit} and end_unit_id =
+        #{endUnit} and type = and
+        complete = 1 order by id asc limit 1
+    </select>
 
 </mapper>

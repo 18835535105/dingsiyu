@@ -68,6 +68,12 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
 
     @Autowired
+    private StudentStudyPlanMapper studentStudyPlanMapper;
+
+    @Autowired
+    private CcieMapper ccieMapper;
+
+    @Autowired
     private CcieUtil ccieUtil;
     /**
      * 节点学完, 把下一节初始化到student_flow表, 并把下一节点返回
@@ -623,12 +629,13 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     private String unlockNextUnit(Student student, Long courseId, Long unitId, HttpSession session, StudyFlow studyFlow) {
         Long studentId = student.getId();
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+        // 学完当前学习计划最后一个单元
         if (Objects.equals(capacityStudentUnit.getUnitId(), capacityStudentUnit.getEndunit())) {
             // 清除学生当前已分配的单元学习记录
-            Long startunit = capacityStudentUnit.getStartunit();
-            Long endunit = capacityStudentUnit.getEndunit();
-            for (long i = startunit; i <= endunit; i++) {
-                learnMapper.deleteByStudentIdAndUnitId(studentId, i);
+            Long startUnit = capacityStudentUnit.getStartunit();
+            Long endUnit = capacityStudentUnit.getEndunit();
+            for (long i = startUnit; i <= endUnit; i++) {
+                learnMapper.updateTypeToLearned(studentId, i);
                 capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, i);
                 capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, i);
                 capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, i);
@@ -642,17 +649,38 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             } else {
                 this.toAnotherFlow(student, 24);
             }
-            Unit unit = unitMapper.selectById(startunit);
-            Course course = courseMapper.selectById(unit.getCourseId());
-            capacityStudentUnit.setCourseName(course.getCourseName());
-            capacityStudentUnit.setCourseId(unit.getCourseId());
-            capacityStudentUnit.setUnitName(unit.getUnitName());
-            capacityStudentUnit.setUnitId(unit.getId());
-            capacityStudentUnit.setVersion(course.getVersion());
-            capacityStudentUnitMapper.updateById(capacityStudentUnit);
 
-            // 学生学习到老师分配的最后一个单元，提示学生
-            return "教师分配的课程已完成，是否重新学习?";
+            // 查询学生当前学习计划
+            StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selectCurrentPlan(studentId, startUnit, endUnit, 1);
+
+            // 判断学生是否能获取课程证书,每个课程智能获取一个课程证书
+            int count = ccieMapper.countCourseCcieByCourseId(studentId, capacityStudentUnit.getCourseId());
+            if (count == 0) {
+                //
+            }
+
+            if (Objects.equals(studentStudyPlan.getCurrentStudyCount(), studentStudyPlan.getTotalStudyCount())) {
+                // 当前学习计划完成需要学习的遍数
+                studentStudyPlan.setComplete(2);
+                studentStudyPlan.setUpdateTime(new Date());
+                studentStudyPlanMapper.updateById(studentStudyPlan);
+                return "恭喜你，完成了本次学习任务，快去向教师申请开始新的征程吧！";
+            } else {
+                Unit unit = unitMapper.selectById(startUnit);
+                Course course = courseMapper.selectById(unit.getCourseId());
+                capacityStudentUnit.setCourseName(course.getCourseName());
+                capacityStudentUnit.setCourseId(unit.getCourseId());
+                capacityStudentUnit.setUnitName(unit.getUnitName());
+                capacityStudentUnit.setUnitId(unit.getId());
+                capacityStudentUnit.setVersion(course.getVersion());
+                capacityStudentUnitMapper.updateById(capacityStudentUnit);
+
+                studentStudyPlan.setUpdateTime(new Date());
+                studentStudyPlan.setCurrentStudyCount(studentStudyPlan.getCurrentStudyCount() + 1);
+
+                // 学生学习到老师分配的最后一个单元，提示学生
+                return "傲人的成绩离不开反复的磨练，再学一次吧！";
+            }
         } else {
             // 学生可继续学习，开启下一单元、课程
             // 查看当前课程的最大单元和当前单元的index

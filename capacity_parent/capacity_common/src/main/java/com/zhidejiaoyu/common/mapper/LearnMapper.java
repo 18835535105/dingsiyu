@@ -6,7 +6,6 @@ import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.LearnExample;
 import com.zhidejiaoyu.common.pojo.Student;
 import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -798,4 +797,13 @@ public interface LearnMapper extends BaseMapper<Learn> {
     Integer selLearnTeks(@Param("studentId") Long studentId,@Param("studyModel")String studyModel,@Param("unitId") Long unitId);
 
     Integer selAllTeksLearn(@Param("studentId") Long studentId,@Param("courseId")  Long courseId,@Param("studyModel") String studyModel);
+
+    /**
+     * 将学生当前单元学习记录置为以往学习
+     *
+     * @param studentId
+     * @param unitId
+     */
+    @Update("update learn set type = 2 where student_id = #{studentId} and unit_id = #{unitId} where type = 1")
+    void updateTypeToLearned(@Param("studentId") Long studentId, @Param("unitId") long unitId);
 }
