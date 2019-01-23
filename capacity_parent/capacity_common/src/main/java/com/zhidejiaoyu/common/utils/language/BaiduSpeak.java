@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 /**
  * 百度语音合成web api
  *
@@ -35,6 +37,9 @@ public class BaiduSpeak {
      * @return
      */
     public String getLanguagePath(String text) {
+        if (Objects.equals("Mr.", text)) {
+            return youdao + text + "&type=1";
+        }
         return youdao + text;
 
         /*Vocabulary vocabulary = vocabularyMapper.selectByWord(text);
