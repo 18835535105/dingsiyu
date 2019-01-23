@@ -280,15 +280,6 @@
         group by c.id
         order by c.id asc
     </select>
-    <select id="countCapacity" resultType="java.lang.Integer" parameterType="map">
-        select count(uv.vocabulary_id)
-        from student_unit su,
-             unit_vocabulary uv
-        where su.student_id = #{student.id}
-          and su.unit_id = uv.unit_id
-          and su.type = 1
-    </select>
-
     <update id="updateStatus" parameterType="map">
         update student_unit
         set word_status     = 1,

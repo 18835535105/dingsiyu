@@ -805,7 +805,7 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @param studentId
      * @param unitId
      */
-    @Update("update learn set type = 2 where student_id = #{studentId} and unit_id = #{unitId} where type = 1")
+    @Update("update learn set type = 2 where student_id = #{studentId} and unit_id = #{unitId} and type = 1")
     void updateTypeToLearned(@Param("studentId") Long studentId, @Param("unitId") long unitId);
 
     /**

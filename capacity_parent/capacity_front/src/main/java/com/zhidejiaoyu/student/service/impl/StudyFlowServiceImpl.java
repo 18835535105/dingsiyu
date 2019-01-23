@@ -281,17 +281,17 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             // 学习下一单元, 前端需要一个弹框提示
             if (studyFlow.getNextTrueFlow() == 0) {
                 // 开启下一单元并且返回需要学习的流程信息
-                return openNextUnitAndReturn(courseId, unitId, session, student, studyFlow);
+                return openNextUnitAndReturn(unitId, session, student, studyFlow);
             } else if (Objects.equals(-1, studyFlow.getNextTrueFlow())) {
                 // 进入流程2
-                String s = this.unlockNextUnit(student, courseId, unitId, session, studyFlow);
+               /* String s = this.unlockNextUnit(student, courseId, unitId, session, studyFlow);
                 if (s != null) {
                     return ServerResponse.createBySuccess(300, s);
-                }
+                }*/
                 return toAnotherFlow(student, 24);
             } else if (Objects.equals(-3, studyFlow.getNextTrueFlow())) {
                 // 进入流程1
-                String s = this.unlockNextUnit(student, courseId, unitId, session, studyFlow);
+                String s = this.unlockNextUnit(student, unitId, session, studyFlow);
                 if (s != null) {
                     return ServerResponse.createBySuccess(300, s);
                 }
@@ -428,17 +428,16 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     /**
      * 开启下一单元并且返回需要学习的流程信息
      *
-     * @param courseId
      * @param unitId
      * @param session
      * @param student
      * @param studyFlow
      * @return
      */
-    private ServerResponse<Object> openNextUnitAndReturn(Long courseId, Long unitId, HttpSession session, Student student,
+    private ServerResponse<Object> openNextUnitAndReturn(Long unitId, HttpSession session, Student student,
                                                          StudyFlow studyFlow) {
         // 开启下一单元
-        String s = unlockNextUnit(student, courseId, unitId, session, studyFlow);
+        String s = unlockNextUnit(student, unitId, session, studyFlow);
         if (s != null) {
             // 分配单元已学习完
             return ServerResponse.createBySuccess(300, s);
@@ -455,26 +454,28 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     /**
      * 当前流程学习完毕后开启下一单元
      *
-     * @param courseId 课程id
      * @param unitId   单元id（当前单元闯关测试的单元id）
      * @param studyFlow
      * @return
      */
-    private String unlockNextUnit(Student student, Long courseId, Long unitId, HttpSession session, StudyFlow studyFlow) {
+    private String unlockNextUnit(Student student, Long unitId, HttpSession session, StudyFlow studyFlow) {
         Long studentId = student.getId();
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
         // 清除学生当前已分配的单元学习记录
         Long startUnit = capacityStudentUnit.getStartunit();
         Long endUnit = capacityStudentUnit.getEndunit();
+
+        learnMapper.updateTypeToLearned(studentId, unitId);
+        capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, unitId);
+        capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, unitId);
+        capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, unitId);
+        capacityListenMapper.deleteByStudentIdAndUnitId(studentId, unitId);
+
+        // 查询学生当前学习计划
+        StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selectCurrentPlan(studentId, startUnit, endUnit, 1);
+
         // 学完当前学习计划最后一个单元
         if (Objects.equals(capacityStudentUnit.getUnitId(), capacityStudentUnit.getEndunit())) {
-            for (long i = startUnit; i <= endUnit; i++) {
-                learnMapper.updateTypeToLearned(studentId, i);
-                capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, i);
-                capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, i);
-                capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, i);
-                capacityListenMapper.deleteByStudentIdAndUnitId(studentId, i);
-            }
 
             // 初始化当前流程的初始单元
             // 获取流程信息
@@ -483,9 +484,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             } else {
                 this.toAnotherFlow(student, 24);
             }
-
-            // 查询学生当前学习计划
-            StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selectCurrentPlan(studentId, startUnit, endUnit, 1);
 
             // 判断学生是否能获取课程证书,每个课程智能获取一个课程证书
             int count = ccieMapper.countCourseCcieByCourseId(studentId, capacityStudentUnit.getCourseId());
@@ -506,6 +504,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
                 StudentStudyPlan nextPlan = studentStudyPlanMapper.selectNextPlan(studentId, studentStudyPlan.getId(), 1);
                 if (nextPlan == null) {
+                    // todo:页面需要跳转到那里？学生是否还能继续学习？
                     // 教师分配的所有计划已完成
                     return "恭喜你，完成了本次学习任务，快去向教师申请开始新的征程吧！";
                 }
@@ -517,6 +516,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
                 studentStudyPlan.setUpdateTime(new Date());
                 studentStudyPlan.setCurrentStudyCount(studentStudyPlan.getCurrentStudyCount() + 1);
+                studentStudyPlanMapper.updateById(studentStudyPlan);
 
                 // 学生学习到老师分配的最后一个单元，提示学生
                 return "傲人的成绩离不开反复的磨练，再学一次吧！";
@@ -525,6 +525,11 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
             Long currentUnitId = capacityStudentUnit.getUnitId();
             long nextUnitId = currentUnitId + 1;
+
+            studentStudyPlan.setUpdateTime(new Date());
+            studentStudyPlan.setCurrentStudyCount(studentStudyPlan.getCurrentStudyCount() + 1);
+            studentStudyPlanMapper.updateById(studentStudyPlan);
+
             updateCapacityStudentUnit(capacityStudentUnit, nextUnitId);
             saveOpenUnitLog(student, unitId, nextUnitId);
 

@@ -790,7 +790,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      * @return
      */
     private boolean hasCapacityCourse(Student student) {
-        int count = studentUnitMapper.countCapacity(student);
+        int count = capacityStudentUnitMapper.countByType(student, 1);
         return count > 0;
     }
 
