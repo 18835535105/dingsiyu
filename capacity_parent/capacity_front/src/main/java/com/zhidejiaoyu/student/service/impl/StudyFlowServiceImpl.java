@@ -471,11 +471,11 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         // 学完当前学习计划最后一个单元
         if (Objects.equals(capacityStudentUnit.getUnitId(), capacityStudentUnit.getEndunit())) {
 
-                learnMapper.updateTypeToLearned(studentId,1, startUnit, endUnit);
-                capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
-                capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
-                capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
-                capacityListenMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+            learnMapper.updateTypeToLearned(studentId, 1, startUnit, endUnit);
+            capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+            capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+            capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+            capacityListenMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
 
             // 初始化当前流程的初始单元
             // 获取流程信息
@@ -505,7 +505,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 StudentStudyPlan nextPlan = studentStudyPlanMapper.selectNextPlan(studentId, studentStudyPlan.getId(), 1);
                 if (nextPlan == null) {
                     // 教师分配的所有计划已完成
-                    capacityStudentUnitMapper.deleteByStudentIdAndType(studentId, 1);
+//                    capacityStudentUnitMapper.deleteByStudentIdAndType(studentId, 1);
                     return "恭喜你，完成了本次学习任务，快去向教师申请开始新的征程吧！";
                 }
                 updateCapacityStudentUnit(capacityStudentUnit, nextPlan.getStartUnitId());

@@ -110,6 +110,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Autowired
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
 
+    @Autowired
+    private StudentStudyPlanMapper studentStudyPlanMapper;
+
     @Override
     public Student LoginJudge(String account, String password) {
         Student st = new Student();
@@ -174,6 +177,12 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             logger.error("学生[{}]-[{}]没有智能版课程！", stu.getId(), stu.getStudentName());
             return ServerResponse.createBySuccess();
         }
+
+        // 判断学生是否已经学完教师分配的所有计划，如果已学完所有计划，开始之旅按钮将被替换并且不能被点击
+        if (isLearnedAllPlan(student_id)) {
+            result.put("learnedAllPlan", true);
+        }
+
         // 学生id
         result.put("student_id", stu.getId());
         // 当前单词所学课程id
@@ -328,6 +337,17 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
 
         return ServerResponse.createBySuccess(result);
+    }
+
+    /**
+     * 判断学生是否已经学完教师分配的所有计划
+     *
+     * @param studentId
+     * @return
+     */
+    private boolean isLearnedAllPlan(Long studentId) {
+        int count = studentStudyPlanMapper.countUnlearnedPlan(studentId, 1);
+        return count == 0;
     }
 
     /**
