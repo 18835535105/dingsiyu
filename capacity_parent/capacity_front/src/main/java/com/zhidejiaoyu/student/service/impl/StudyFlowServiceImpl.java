@@ -399,7 +399,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
         Long unitId = capacityStudentUnit.getUnitId();
 
-//        learnMapper.updateTypeToLearned(studentId, );
+        learnMapper.updateTypeToLearned(studentId, 1, unitId, unitId);
         learnMapper.deleteByStudentIdAndUnitId(studentId, unitId);
         capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, unitId, unitId);
         capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, unitId, unitId);

@@ -818,4 +818,17 @@ public interface LearnMapper extends BaseMapper<Learn> {
      */
     @Select("select count(distinct unit_id) from learn where student_id = #{studentId} and course_id = #{courseId} ")
     int countLearnedUnitByCourseId(@Param("courseId") Long courseId, @Param("studentId") Long studentId);
+
+    /**
+     * 查询正在学习的学习记录 id
+     *
+     * @param studentId
+     * @param learn
+     * @param studyModel
+     * @param count
+     * @param type
+     * @return
+     */
+    List<Long> selectLearnIds(@Param("studentId") Long studentId, @Param("learn") Learn learn,
+                              @Param("studyModel") String studyModel, @Param("count") int count, @Param("type") int type);
 }
