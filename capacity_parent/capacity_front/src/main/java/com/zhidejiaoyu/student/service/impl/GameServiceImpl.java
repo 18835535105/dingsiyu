@@ -143,6 +143,7 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
             gameTwoVo.setBigBossIndex(bigBossIndex);
             gameTwoVo.setMinBossIndex(minBossIndex);
             gameTwoVo.setReadUrl(baiduSpeak.getLanguagePath(needReviewWord.get("word").toString()));
+            gameTwoVo.setChinese(needReviewWord.get("wordChinese").toString());
 
             // 封装纸牌的试题集合并打乱顺序；
             subjects = new ArrayList<>(12);
