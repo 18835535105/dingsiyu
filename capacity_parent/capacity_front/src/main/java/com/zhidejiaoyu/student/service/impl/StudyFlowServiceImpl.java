@@ -472,10 +472,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         if (Objects.equals(capacityStudentUnit.getUnitId(), capacityStudentUnit.getEndunit())) {
 
             learnMapper.updateTypeToLearned(studentId, 1, startUnit, endUnit);
-            capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+           /* capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
             capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
             capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
-            capacityListenMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+            capacityListenMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);*/
 
             // 初始化当前流程的初始单元
             // 获取流程信息
