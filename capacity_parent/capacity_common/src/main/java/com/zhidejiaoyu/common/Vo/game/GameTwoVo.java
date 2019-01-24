@@ -20,6 +20,11 @@ public class GameTwoVo implements Serializable {
     private String readUrl;
 
     /**
+     * 单词释义
+     */
+    private String chinese;
+
+    /**
      * 大王牌索引
      */
     private Integer bigBossIndex;
