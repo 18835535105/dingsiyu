@@ -467,11 +467,14 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
         // 查询学生当前学习计划
         StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selectCurrentPlan(studentId, startUnit, endUnit, 1);
+        if (studentStudyPlan == null) {
+            return "恭喜你，完成了本次学习任务，快去向教师申请开始新的征程吧！";
+        }
 
         // 学完当前学习计划最后一个单元
         if (Objects.equals(capacityStudentUnit.getUnitId(), capacityStudentUnit.getEndunit())) {
 
-            learnMapper.updateTypeToLearned(studentId, 1, startUnit, endUnit);
+//            learnMapper.updateTypeToLearned(studentId, 1, startUnit, endUnit);
            /* capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
             capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
             capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
@@ -505,14 +508,13 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 StudentStudyPlan nextPlan = studentStudyPlanMapper.selectNextPlan(studentId, studentStudyPlan.getId(), 1);
                 if (nextPlan == null) {
                     // 教师分配的所有计划已完成
-//                    capacityStudentUnitMapper.deleteByStudentIdAndType(studentId, 1);
                     return "恭喜你，完成了本次学习任务，快去向教师申请开始新的征程吧！";
                 }
-                updateCapacityStudentUnit(capacityStudentUnit, nextPlan.getStartUnitId());
+                updateCapacityStudentUnit(capacityStudentUnit, nextPlan.getStartUnitId(), nextPlan);
 
                 return "干的漂亮，当前计划已经完成，新的计划已经开启！";
             } else {
-                updateCapacityStudentUnit(capacityStudentUnit, startUnit);
+                updateCapacityStudentUnit(capacityStudentUnit, startUnit, null);
 
                 studentStudyPlan.setUpdateTime(new Date());
                 studentStudyPlan.setCurrentStudyCount(studentStudyPlan.getCurrentStudyCount() + 1);
@@ -530,7 +532,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             studentStudyPlan.setCurrentStudyCount(studentStudyPlan.getCurrentStudyCount() + 1);
             studentStudyPlanMapper.updateById(studentStudyPlan);
 
-            updateCapacityStudentUnit(capacityStudentUnit, nextUnitId);
+            updateCapacityStudentUnit(capacityStudentUnit, nextUnitId, null);
             saveOpenUnitLog(student, unitId, nextUnitId);
 
             // 更新学生session
@@ -540,7 +542,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         return null;
     }
 
-    private void updateCapacityStudentUnit(CapacityStudentUnit capacityStudentUnit, long nextUnitId) {
+    private void updateCapacityStudentUnit(CapacityStudentUnit capacityStudentUnit, long nextUnitId, StudentStudyPlan nextPlan) {
         Unit unit = unitMapper.selectById(nextUnitId);
         Course course = courseMapper.selectById(unit.getCourseId());
         capacityStudentUnit.setCourseName(course.getCourseName());
@@ -548,6 +550,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         capacityStudentUnit.setUnitName(unit.getUnitName());
         capacityStudentUnit.setUnitId(unit.getId());
         capacityStudentUnit.setVersion(course.getVersion());
+        if (nextPlan != null) {
+            capacityStudentUnit.setStartunit(nextPlan.getStartUnitId());
+            capacityStudentUnit.setEndunit(nextPlan.getEndUnitId());
+        }
         capacityStudentUnitMapper.updateById(capacityStudentUnit);
     }
 

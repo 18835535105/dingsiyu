@@ -619,8 +619,9 @@
                     learn l1
                 WHERE
                     l1.student_id = #{id}
-                    AND l1.unit_id = #{unit_id}
-                    AND l1.study_model = '慧听写')
+                  and l1.type = 1
+                  AND l1.unit_id = #{unit_id}
+                  AND l1.study_model = '慧听写')
         LIMIT 0, 1
     </select>
     <select id="countByCourseId" resultType="java.lang.Integer" parameterType="map">
@@ -888,8 +889,9 @@
                     learn l1
                 WHERE
                     l1.student_id = #{studentId}
-                    AND l1.unit_id = #{unitId}
-                    AND l1.study_model = '单词图鉴')
+                  and l1.type = 1
+                  AND l1.unit_id = #{unitId}
+                  AND l1.study_model = '单词图鉴')
         LIMIT 0, 1
     </select>
 

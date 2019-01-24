@@ -136,6 +136,7 @@
         l.student_id=#{studentId}
         and l.unit_id=#{unitId} and l.study_model =
         #{studyModel}
+        and l.type = 1
         <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写' or studyModel == '单词图鉴'">
             and l.vocabulary_id is not null and (select v.delStatus from
             vocabulary v where v.id = l.vocabulary_id) = 1
@@ -954,7 +955,7 @@
         select count(id) from learn l where
         l.student_id=#{studentId}
         and l.unit_id=#{unitId} and l.study_model =
-        #{studyModel}
+        #{studyModel} and l.type = 1
         <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写' or studyModel == '单词图鉴'">
             and l.vocabulary_id is not null and (select v.delStatus from
             vocabulary v where v.id = l.vocabulary_id) = 1
