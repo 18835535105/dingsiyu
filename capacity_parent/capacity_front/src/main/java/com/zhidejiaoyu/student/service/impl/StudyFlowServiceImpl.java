@@ -465,17 +465,19 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         Long startUnit = capacityStudentUnit.getStartunit();
         Long endUnit = capacityStudentUnit.getEndunit();
 
-        learnMapper.updateTypeToLearned(studentId, unitId);
-        capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, unitId);
-        capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, unitId);
-        capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, unitId);
-        capacityListenMapper.deleteByStudentIdAndUnitId(studentId, unitId);
-
         // 查询学生当前学习计划
         StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selectCurrentPlan(studentId, startUnit, endUnit, 1);
 
         // 学完当前学习计划最后一个单元
         if (Objects.equals(capacityStudentUnit.getUnitId(), capacityStudentUnit.getEndunit())) {
+
+            for (long i = startUnit; i < endUnit; i++) {
+                learnMapper.updateTypeToLearned(studentId, i);
+                capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, i);
+                capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, i);
+                capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, i);
+                capacityListenMapper.deleteByStudentIdAndUnitId(studentId, i);
+            }
 
             // 初始化当前流程的初始单元
             // 获取流程信息
