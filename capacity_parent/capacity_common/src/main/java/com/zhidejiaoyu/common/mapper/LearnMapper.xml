@@ -1374,6 +1374,23 @@
     <update id="updLearnByUnitIdAndStudyModelAndStudentId" parameterType="map">
          update learn set type=2 where student_id=#{studentId} and study_model=#{studyModel} and type=1 and unit_id=#{unitId};
     </update>
+    <update id="updateTypeToLearned" parameterType="map">
+        update learn
+        set type = 2
+        where student_id = #{studentId}
+        and unit_id >= #{startUnit}
+        and unit_id &lt;= #{endUnit}
+        and type = 1
+        <if test="studyType == 1">
+            and study_model in ('单词图鉴', '慧听写', '慧记忆', '慧默写')
+        </if>
+        <if test="studyType == 2">
+            and study_model in ('例句听力', '例句翻译', '例句默写')
+        </if>
+        <if test="studyType = 3">
+            and study_model in ('课文好声音', '课文试听', '课文默写测试')
+        </if>
+    </update>
     <select  id="selByStudentIdAndCourseIdDisVersion" parameterType="java.util.Map" resultType="java.lang.Long">
         select DISTINCT learn.unit_id from learn learn
         where learn.student_id= #{studentId}

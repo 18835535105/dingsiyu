@@ -800,13 +800,14 @@ public interface LearnMapper extends BaseMapper<Learn> {
     Integer selAllTeksLearn(@Param("studentId") Long studentId,@Param("courseId")  Long courseId,@Param("studyModel") String studyModel);
 
     /**
-     * 将学生当前单元学习记录置为以往学习
+     * 将学生当前指定范围的单元学习记录置为以往学习
      *
      * @param studentId
-     * @param unitId
+     * @param studyType 1:单词；2：例句；3：课文
+     * @param startUnit
+     * @param endUnit
      */
-    @Update("update learn set type = 2 where student_id = #{studentId} and unit_id = #{unitId} and type = 1")
-    void updateTypeToLearned(@Param("studentId") Long studentId, @Param("unitId") long unitId);
+    void updateTypeToLearned(@Param("studentId") Long studentId, @Param("studyType") int studyType, @Param("startUnit") Long startUnit, @Param("endUnit") Long endUnit);
 
     /**
      * 学生当前课程下已学习的单元个数

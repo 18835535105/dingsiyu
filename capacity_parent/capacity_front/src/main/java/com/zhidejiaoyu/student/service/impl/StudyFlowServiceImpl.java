@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -400,11 +399,12 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
         Long unitId = capacityStudentUnit.getUnitId();
 
+//        learnMapper.updateTypeToLearned(studentId, );
         learnMapper.deleteByStudentIdAndUnitId(studentId, unitId);
-        capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, unitId);
-        capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, unitId);
-        capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, unitId);
-        capacityListenMapper.deleteByStudentIdAndUnitId(studentId, unitId);
+        capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, unitId, unitId);
+        capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, unitId, unitId);
+        capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, unitId, unitId);
+        capacityListenMapper.deleteByStudentIdAndUnitId(studentId, unitId, unitId);
     }
 
     /**
@@ -471,13 +471,11 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         // 学完当前学习计划最后一个单元
         if (Objects.equals(capacityStudentUnit.getUnitId(), capacityStudentUnit.getEndunit())) {
 
-            for (long i = startUnit; i < endUnit; i++) {
-                learnMapper.updateTypeToLearned(studentId, i);
-                capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, i);
-                capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, i);
-                capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, i);
-                capacityListenMapper.deleteByStudentIdAndUnitId(studentId, i);
-            }
+                learnMapper.updateTypeToLearned(studentId,1, startUnit, endUnit);
+                capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+                capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+                capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+                capacityListenMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
 
             // 初始化当前流程的初始单元
             // 获取流程信息

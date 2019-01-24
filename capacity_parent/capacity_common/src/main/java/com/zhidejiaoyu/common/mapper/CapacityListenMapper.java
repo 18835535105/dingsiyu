@@ -114,10 +114,10 @@ public interface CapacityListenMapper extends BaseMapper<CapacityListen> {
 
     /**
      * 删除学生当前单元的记忆追踪信息
-     *
-     * @param studentId
-     * @param unitId
+     *  @param studentId
+     * @param startUnit
+     * @param endUnit
      */
-    @Delete("delete from capacity_listen where student_id = #{studentId} and unit_id = #{unitId}")
-    void deleteByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+    @Delete("delete from capacity_listen where student_id = #{studentId} and unit_id >= #{startUnit} and unit_id <= #{endUnit}")
+    void deleteByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("startUnit") Long startUnit, @Param("endUnit") Long endUnit);
 }
