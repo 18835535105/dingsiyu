@@ -1387,7 +1387,7 @@
         <if test="studyType == 2">
             and study_model in ('例句听力', '例句翻译', '例句默写')
         </if>
-        <if test="studyType = 3">
+        <if test="studyType == 3">
             and study_model in ('课文好声音', '课文试听', '课文默写测试')
         </if>
     </update>
