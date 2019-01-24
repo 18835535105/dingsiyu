@@ -504,8 +504,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
                 StudentStudyPlan nextPlan = studentStudyPlanMapper.selectNextPlan(studentId, studentStudyPlan.getId(), 1);
                 if (nextPlan == null) {
-                    // todo:页面需要跳转到那里？学生是否还能继续学习？
                     // 教师分配的所有计划已完成
+                    capacityStudentUnitMapper.deleteByStudentIdAndType(studentId, 1);
                     return "恭喜你，完成了本次学习任务，快去向教师申请开始新的征程吧！";
                 }
                 updateCapacityStudentUnit(capacityStudentUnit, nextPlan.getStartUnitId());

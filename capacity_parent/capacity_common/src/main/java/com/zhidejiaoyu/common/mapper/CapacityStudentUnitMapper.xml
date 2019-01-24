@@ -28,6 +28,12 @@
         startunit,
         endunit
     </sql>
+    <delete id="deleteByStudentIdAndType" parameterType="map">
+        delete
+        from capacity_student_unit
+        where student_id = #{studentId}
+          and type = #{type}
+    </delete>
 
     <select id="selectCurrentUnitIdByStudentIdAndType"
             resultMap="BaseResultMap" parameterType="map">
