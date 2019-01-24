@@ -757,9 +757,10 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * 从学生智能版课程中随机取出count个单词
      * @param studentId
      * @param count
+     * @param wordIds
      * @return
      */
-    List<String> selectWordRandomInCourse(@Param("studentId") Long studentId, @Param("count") int count);
+    List<String> selectWordRandomInCourse(@Param("studentId") Long studentId, @Param("count") int count, @Param("wordIds") List<Long> wordIds);
 
     /**
      * 查询学生当前课程已学信息
