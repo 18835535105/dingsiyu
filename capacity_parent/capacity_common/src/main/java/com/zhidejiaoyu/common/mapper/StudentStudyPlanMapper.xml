@@ -28,4 +28,17 @@
         update_time
     </sql>
 
+    <select id="selByStudentId" parameterType="java.util.Map" resultType="java.util.Map">
+     select
+        course.id id,course.course_name courseName, ssp.start_unit_id unitId,ssp.end_unit_id endUnitId
+        course.grade grade , course.label label,course.version version
+        from student_study_plan ssp join course course on ssp.course_id=course.id
+        where student_id=#{studentId} and type =#{type} group by course.id;
+    </select>
+    <select id="selByStudentIdAndCourseId" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include> from student_study_plan
+        where student_id=#{studentId}
+        and course_id=#{courseId}
+    </select>
+
 </mapper>

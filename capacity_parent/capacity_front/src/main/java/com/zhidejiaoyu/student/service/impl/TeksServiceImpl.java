@@ -66,6 +66,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @Autowired
     private LearnMapper learnMapper;
 
+    @Autowired
+    private StudentStudyPlanMapper studentStudyPlanMapper;
+
     @Value("${ftp.prefix}")
     private String prefix;
 
@@ -109,7 +112,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             } else {
                 map.put("count", integer);
             }
-
             return ServerResponse.createBySuccess(map);
         }
         return ServerResponse.createByError();
@@ -218,15 +220,15 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         List<Map<String, Object>> resultMap;
         Map<String, Object> returnMap = new HashMap<>();
         // 学生所有课程id及课程名
-        List<Map<String, Object>> courses = courseMapper.selectTextCourseIdAndCourseNameByStudentId(studentId);
-
+       /* List<Map<String, Object>> courses = courseMapper.selectTextCourseIdAndCourseNameByStudentId(studentId);*/
+        List<Map<String, Object>> courses =studentStudyPlanMapper.selByStudentId(studentId,3);
         // 学生课程下所有例句的单元id及单元名
         if (courses.size() > 0) {
             List<Long> courseIds = new ArrayList<>(courses.size());
             courses.forEach(map -> courseIds.add((Long) map.get("id")));
-
             // 获取课程下所有课文的单元信息
-            List<Map<String, Object>> textUnits = teksMapper.selectUnitIdAndNameByCourseIds(studentId, courseIds);
+            List<Map<String, Object>> textUnits = new ArrayList<>();
+            this.getStudyUnit(courseIds,textUnits,studentId);
             Map<String, Object> learnUnit = learnMapper.selTeksLaterCourse(student.getId());
             if (learnUnit != null) {
                 studyMap = new HashMap<>();
@@ -797,5 +799,26 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         returnMap.put("option", option);
     }
 
-
+    private void getStudyUnit(List<Long> courseIds,List<Map<String,Object>> returnCourse,Long studentId){
+        for (int i = 0; i < courseIds.size(); i++) {
+            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, courseIds.get(i));
+            if(studentStudyPlans.size()>1){
+                for(StudentStudyPlan studentStudyPlan:studentStudyPlans){
+                    List<Map<String, Object>> maps = unitMapper.selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(courseIds.get(i),
+                            studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId(),studentId);
+                    for(int j=0;j<maps.size();i++){
+                        boolean contains = returnCourse.contains(maps.get(j));
+                        if(contains){
+                            maps.remove(maps.get(i));
+                        }
+                    }
+                    returnCourse.addAll(maps);
+                }
+            }else if(studentStudyPlans.size()==1){
+                List<Map<String, Object>> maps = unitMapper.selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(courseIds.get(i),
+                        studentStudyPlans.get(0).getStartUnitId(), studentStudyPlans.get(0).getEndUnitId(),studentId);
+                returnCourse.addAll(maps);
+            }
+        }
+    }
 }
