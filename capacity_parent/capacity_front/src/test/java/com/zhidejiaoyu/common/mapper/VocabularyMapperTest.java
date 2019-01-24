@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,7 +20,7 @@ public class VocabularyMapperTest extends BaseTest {
 
     @Test
     public void testSelectWordByCourseId() {
-        List<String> strings = vocabularyMapper.selectWordByCourseId(2863L, 0, 100);
+        List<String> strings = vocabularyMapper.selectWordByCourseId(2863L, 0, 100, new ArrayList<>());
         log.info("words=[{}]", strings);
     }
 

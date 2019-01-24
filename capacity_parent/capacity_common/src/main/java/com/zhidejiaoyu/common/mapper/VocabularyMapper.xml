@@ -1046,7 +1046,15 @@
         v.word
         FROM vocabulary v, unit_vocabulary uv, unit u
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
-        u.course_id = #{courseId} limit #{limitStart}, #{limitEnd}
+        u.course_id = #{courseId}
+        <if test="wordIds.size > 0">
+            and v.id not in (
+            <foreach collection="wordIds" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        limit #{limitStart}, #{limitEnd}
     </select>
     <select id="selectPictureWordFromLearned" resultType="java.util.Map" parameterType="map">
         SELECT a.id,

@@ -395,9 +395,11 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @param courseId
      * @param limitStart
      * @param limitEnd
+     * @param wordIds
      * @return
      */
-    List<String> selectWordByCourseId(@Param("courseId") long courseId, @Param("limitStart") int limitStart, @Param("limitEnd") int limitEnd);
+    List<String> selectWordByCourseId(@Param("courseId") long courseId, @Param("limitStart") int limitStart,
+                                      @Param("limitEnd") int limitEnd, @Param("wordIds") List<Long> wordIds);
 
     /**
      * 获取指定数量的学生已学含有图片的单词信息

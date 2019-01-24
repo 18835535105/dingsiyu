@@ -1350,6 +1350,13 @@
         from vocabulary v, unit_vocabulary uv, unit u, student_unit su
         where v.id = uv.vocabulary_id and v.delStatus = 1
         and uv.unit_id = u.id and su.unit_id = u.id and su.student_id = #{studentId} and su.type = 1
+        <if test="wordIds.size > 0">
+            and v.id not in (
+            <foreach collection="wordIds" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
         limit #{count}
     </select>
     <select id="selectLearnedByCourseId" resultType="java.util.Map" parameterType="map">
