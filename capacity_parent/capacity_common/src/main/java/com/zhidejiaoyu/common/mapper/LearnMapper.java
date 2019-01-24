@@ -798,4 +798,17 @@ public interface LearnMapper extends BaseMapper<Learn> {
     Integer selLearnTeks(@Param("studentId") Long studentId,@Param("studyModel")String studyModel,@Param("unitId") Long unitId);
 
     Integer selAllTeksLearn(@Param("studentId") Long studentId,@Param("courseId")  Long courseId,@Param("studyModel") String studyModel);
+
+    /**
+     * 查询正在学习的学习记录 id
+     *
+     * @param studentId
+     * @param learn
+     * @param studyModel
+     * @param count
+     * @param type
+     * @return
+     */
+    List<Long> selectLearnIds(@Param("studentId") Long studentId, @Param("learn") Learn learn,
+                              @Param("studyModel") String studyModel, @Param("count") int count, @Param("type") int type);
 }

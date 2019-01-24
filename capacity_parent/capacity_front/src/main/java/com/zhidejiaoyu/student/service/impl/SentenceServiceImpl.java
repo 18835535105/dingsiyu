@@ -300,6 +300,12 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
 
         Date learnTime = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
 
+        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, classify, maxCount == null ? 1 : maxCount,1);
+        if (learnIds.size() > 1) {
+            List<Long> longs = learnIds.subList(1, learnIds.size());
+            learnMapper.deleteBatchIds(longs);
+        }
+
         // 查询当前例句的学习记录数据
         Learn currentLearn = learnMapper.selectLearn(studentId, learn, classify, maxCount == null ? 1 : maxCount, 1);
         // 保存学习记录

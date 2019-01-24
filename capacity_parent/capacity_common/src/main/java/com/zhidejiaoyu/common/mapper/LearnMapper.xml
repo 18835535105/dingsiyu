@@ -1417,5 +1417,20 @@
         and course_id=#{courseId}
         and study_model=#{studyModel}
     </select>
+    <select id="selectLearnIds" resultType="java.lang.Long" parameterType="map">
+        select
+        id
+        from learn where student_id=#{studentId} and
+        unit_id=#{learn.unitId}
+        <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel =='慧默写' or studyModel =='单词图鉴'">
+            and vocabulary_id=#{learn.vocabularyId}
+        </if>
+        <if test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel =='例句默写'">
+            and example_id=#{learn.exampleId}
+        </if>
+        and learn_count = #{count}
+        and study_model=#{studyModel}
+        and type=#{type}
+    </select>
 
 </mapper>
