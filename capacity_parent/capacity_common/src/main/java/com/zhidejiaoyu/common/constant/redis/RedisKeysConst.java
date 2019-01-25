@@ -59,4 +59,10 @@ public class RedisKeysConst {
      * 统计在线人数
      */
     public static final String ONLINE_USER = "ONLINE_USER";
+
+    /**
+     * 学生保存测试记录时记录学生 id 及开始测试时间；学生再次保存测试记录时验证是不是重复
+     * key: TEST_SUBMIT:studentId  value:学生测试开始时间
+     */
+    public static final String TEST_SUBMIT = "TEST_SUBMIT";
 }

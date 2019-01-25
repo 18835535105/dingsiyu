@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -244,4 +245,17 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
 
     @Select("select count(id) from test_record where student_id=#{id} and genre='单元闯关测试' and unit_id=#{unitId} and study_model='例句默写'")
     Integer selectByStudentIdAndGenre(@Param("id") Long id,@Param("unitId") Long unitId);
+
+    /**
+     * 查询当前测试是否已存在
+     *
+     * @param studentId
+     * @param unitId
+     * @param genre
+     * @param studyModel
+     * @param testStartTime
+     * @return
+     */
+    int countCurrentTestByStudentId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("genre") String genre,
+                                    @Param("studyModel") String studyModel, @Param("testStartTime") Date testStartTime);
 }

@@ -10,8 +10,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 业务逻辑中操作 redis 的常用操作逻辑
@@ -134,6 +137,30 @@ public class RedisOpt {
             }
         }
         return allLevel;
+    }
+
+    /**
+     * 判断学生测试是不是重复提交
+     *
+     * @param studentId
+     * @param testStartTime
+     * @return true:是重复提交；false：是正常提交
+     */
+    public boolean isRepeatSubmit(Long studentId, Date testStartTime) {
+        String key = RedisKeysConst.TEST_SUBMIT + ":" + studentId;
+        Object object = redisTemplate.opsForValue().get(key);
+        redisTemplate.opsForValue().set(key, testStartTime);
+        redisTemplate.expire(key, 1, TimeUnit.HOURS);
+        if (object != null) {
+            try {
+                Date startTime = (Date) object;
+                // 相同说明是重复提交的
+                return Objects.equals(startTime, testStartTime);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
     }
 
     private Object getRedisObject(String key) {
