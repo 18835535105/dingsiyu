@@ -722,7 +722,7 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @param wordIds   需要过滤掉的单词id
      * @return
      */
-    List<String> selectWordInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds);
+    List<Map<String, String>> selectWordInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds);
 
     /**
      * 获取学生上次登录期间单词的学习信息
@@ -760,7 +760,7 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @param wordIds
      * @return
      */
-    List<String> selectWordRandomInCourse(@Param("studentId") Long studentId, @Param("count") int count, @Param("wordIds") List<Long> wordIds);
+    List<Map<String, String>> selectWordRandomInCourse(@Param("studentId") Long studentId, @Param("count") int count, @Param("wordIds") List<Long> wordIds);
 
     /**
      * 查询学生当前课程已学信息
