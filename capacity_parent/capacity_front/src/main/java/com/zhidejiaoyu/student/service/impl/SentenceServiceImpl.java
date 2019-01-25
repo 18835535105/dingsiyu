@@ -489,9 +489,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         /*   List<Map<String, Object>> courses = courseMapper.selectSentenceCourseIdAndCourseNameByStudentId(studentId);*/
 
         List<Map<String, Object>> courses = studentStudyPlanMapper.selByStudentId(studentId, 2);
-        if (courses.size() > 0) {
 
-        }
         if (courses.size() < 0) {
             return ServerResponse.createByError(500, "当前学生没有课程，请让老师添加");
         }
@@ -500,11 +498,6 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         if (courses.size() > 0) {
             List<Long> courseIds = new ArrayList<>(courses.size());
             courses.forEach(map -> courseIds.add((Long) map.get("id")));
-
-            // 获取课程下所有例句的单元信息
-            for (int i = 0; i < courses.size(); i++) {
-
-            }
             List<Map<String, Object>> sentenceUnits = new ArrayList<>();
             //查看学生所能学习的单元
             this.getStudyUnit(courseIds,sentenceUnits,studentId);
@@ -992,15 +985,15 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
 
     private void getStudyUnit(List<Long> courseIds,List<Map<String,Object>> returnCourse,Long studentId){
         for (int i = 0; i < courseIds.size(); i++) {
-            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, courseIds.get(i));
+            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, courseIds.get(i),2);
             if(studentStudyPlans.size()>1){
                 for(StudentStudyPlan studentStudyPlan:studentStudyPlans){
                     List<Map<String, Object>> maps = unitSentenceMapper.selUnitIdAndNameByCourseIdsAndStartUnitIdAndEndUnitId(courseIds.get(i),
                             studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());
-                    for(int j=0;j<maps.size();i++){
+                    for(int j=0;j<maps.size();j++){
                         boolean contains = returnCourse.contains(maps.get(j));
                         if(contains){
-                            maps.remove(maps.get(i));
+                            maps.remove(maps.get(j));
                         }
                     }
                     returnCourse.addAll(maps);

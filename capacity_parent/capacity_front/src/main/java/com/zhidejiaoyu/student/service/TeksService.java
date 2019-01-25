@@ -54,5 +54,4 @@ public interface TeksService extends BaseService<Teks> {
 
     ServerResponse<Map<String, Object>> getIsInto(HttpSession session,Long unitId);
 
-    ServerResponse<Object> getLearnSchedule(Long courseId,HttpSession session);
 }

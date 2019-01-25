@@ -432,7 +432,14 @@
     <select id="countByCourseId" resultType="java.lang.Integer" parameterType="map">
         select count(id)
         from learn
-        where student_id = #{studentId} and type = 1 and course_id = #{courseId} and study_model = #{studyModel}
+        where student_id = #{studentId}
+        and type = 1
+        and unit_id in (
+        <foreach collection="unitIds" item="unitId" separator=",">
+            #{unitId}
+        </foreach>
+        )
+        and study_model = #{studyModel}
         <if test="studyModel=='例句翻译' or studyModel=='例句听力' or studyModel=='例句默写'">
             and type = 1
         </if>
@@ -1439,7 +1446,11 @@
     <select id="selAllTeksLearn" parameterType="java.util.Map" resultType="java.lang.Integer">
         select count(id) from learn
         where student_id=#{studentId}
-        and course_id=#{courseId}
+        and unit_id in (
+        <foreach collection="unitIds" item="unitId" separator=",">
+          #{unitId}
+        </foreach>
+        )
         and study_model=#{studyModel}
     </select>
     <select id="selectLearnIds" resultType="java.lang.Long" parameterType="map">

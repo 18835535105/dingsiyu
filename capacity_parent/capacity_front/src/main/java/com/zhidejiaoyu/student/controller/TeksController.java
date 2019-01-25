@@ -164,11 +164,5 @@ public class TeksController  {
         return teksService.getTeksTest(unitId);
     }
 
-    @RequestMapping("getTeksLearnSchedule")
-    @ResponseBody
-    public ServerResponse<Object> getLearnSchedule(Long courseId,HttpSession session){
-        return teksService.getLearnSchedule(courseId,session);
-    }
-
 
 }

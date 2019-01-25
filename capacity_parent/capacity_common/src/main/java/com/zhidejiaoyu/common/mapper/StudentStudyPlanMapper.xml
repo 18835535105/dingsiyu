@@ -59,6 +59,7 @@
         select <include refid="base_sql"></include> from student_study_plan
         where student_id=#{studentId}
         and course_id=#{courseId}
+        and type=#{type}
     </select>
 
 </mapper>

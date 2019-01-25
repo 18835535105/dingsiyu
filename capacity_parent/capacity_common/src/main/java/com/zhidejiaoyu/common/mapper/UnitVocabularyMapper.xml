@@ -297,4 +297,11 @@
         (unit_id, vocabulary_id, classify, word_chinese)
         VALUES (#{unitId}, #{wordId}, #{classify}, #{word_chinese})
     </insert>
+    <select id="selUnitIdAndNameByCourseIdsAndStartUnitIdAndEndUnitId" parameterType="java.util.Map" resultType="java.util.Map">
+        select course.id courseId , unit.id id,unit.unit_name unitName
+        from course course join unit unit on course.id=unit.course_id
+        where course.id=#{courseId}
+        and unit.id >= #{startUnitId}
+        and unit.id &lt;=#{endUnitId}
+    </select>
 </mapper>

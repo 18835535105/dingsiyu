@@ -214,4 +214,7 @@ public interface UnitVocabularyMapper {
 
     @Select("SELECT count(DISTINCT(c.id)) FROM	unit a JOIN unit_vocabulary b ON a.id = b.unit_id JOIN vocabulary c ON b.vocabulary_id = c.id AND a.course_id = #{courseId} AND c.delStatus = 1 ")
     int getAllCountWordByCourse(Long courseId);
+
+    List<Map<String, Object>> selUnitIdAndNameByCourseIdsAndStartUnitIdAndEndUnitId(@Param("courseId") Long courseId
+            ,@Param("startUnitId") Long startUnitId,@Param("endUnitId") Long endUnitId);
 }
