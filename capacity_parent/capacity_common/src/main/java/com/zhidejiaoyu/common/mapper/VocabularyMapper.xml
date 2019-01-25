@@ -1042,10 +1042,10 @@
         <include refid="Base_Column_List"/>
         from vocabulary where binary word = #{word} limit 1
     </select>
-    <select id="selectWordByCourseId" resultType="java.lang.String" parameterType="map">
+    <select id="selectWordByCourseId" resultType="java.util.Map" parameterType="map">
         SELECT
         distinct
-        v.word
+        v.word, uv.word_chinese wordChinese
         FROM vocabulary v, unit_vocabulary uv, unit u
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = #{courseId}

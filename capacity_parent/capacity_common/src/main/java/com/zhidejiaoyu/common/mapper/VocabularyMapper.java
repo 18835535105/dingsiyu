@@ -398,7 +398,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @param wordIds
      * @return
      */
-    List<String> selectWordByCourseId(@Param("courseId") long courseId, @Param("limitStart") int limitStart,
+    List<Map<String, String>> selectWordByCourseId(@Param("courseId") long courseId, @Param("limitStart") int limitStart,
                                       @Param("limitEnd") int limitEnd, @Param("wordIds") List<Long> wordIds);
 
     /**

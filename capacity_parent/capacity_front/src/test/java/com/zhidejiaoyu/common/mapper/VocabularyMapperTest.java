@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author wuchenxi
@@ -20,7 +21,7 @@ public class VocabularyMapperTest extends BaseTest {
 
     @Test
     public void testSelectWordByCourseId() {
-        List<String> strings = vocabularyMapper.selectWordByCourseId(2863L, 0, 100, new ArrayList<>());
+        List<Map<String, String>> strings = vocabularyMapper.selectWordByCourseId(2863L, 0, 100, new ArrayList<>());
         log.info("words=[{}]", strings);
     }
 

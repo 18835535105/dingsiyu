@@ -119,39 +119,61 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         needReviewWords.forEach(map -> wordIds.add(Long.valueOf(map.get("id").toString())));
 
         // 从学生当前正在学习的课程中随机获取110个单词
-        List<String> wordList = learnMapper.selectWordInCurrentCourse(student.getId(), wordIds);
+        List<Map<String, String>> wordList = learnMapper.selectWordInCurrentCourse(student.getId(), wordIds);
         if (wordList.size() < 110) {
             // 如果当前课程下单词总数补足110个，从其他智能版课程随机再取剩余数量的单词
-            List<String> otherWordList = learnMapper.selectWordRandomInCourse(student.getId(), 110 - wordList.size(), wordIds);
+            List<Map<String, String>> otherWordList = learnMapper.selectWordRandomInCourse(student.getId(), 110 - wordList.size(), wordIds);
             wordList.addAll(otherWordList);
         }
         if (wordList.size() < 110) {
             // 如果学生所有课程中单词总数补足110个，从《外研社版（一年级起）(一年级-上册)》取剩余单词
-            List<String> otherWordList = vocabularyMapper.selectWordByCourseId(2863L, 0, 110 - wordIds.size(), wordIds);
+            List<Map<String, String>> otherWordList = vocabularyMapper.selectWordByCourseId(2863L, 0, 110 - wordIds.size(), wordIds);
             wordList.addAll(otherWordList);
         }
         Collections.shuffle(wordList);
 
         List<GameTwoVo> gameTwoVos = new ArrayList<>();
+        List<Object> list;
+        // 中文集合
+        List<String> chinese;
+        // 试题英文集合
         List<String> subjects;
         GameTwoVo gameTwoVo;
         int i = 0;
         for (Map<String, Object> needReviewWord : needReviewWords) {
-            int bigBossIndex = new Random().nextInt(12);
-            int minBossIndex = new Random().nextInt(12);
+            int bigBossIndex = -1;
+            int minBossIndex = -1;
+            if (i < 2) {
+                int index = new Random().nextInt(2);
+                if (index % 2 == 0) {
+                    bigBossIndex = new Random().nextInt(12);
+                } else {
+                    minBossIndex = new Random().nextInt(12);
+                }
+                i++;
+            }
 
             gameTwoVo = new GameTwoVo();
             gameTwoVo.setBigBossIndex(bigBossIndex);
             gameTwoVo.setMinBossIndex(minBossIndex);
             gameTwoVo.setReadUrl(baiduSpeak.getLanguagePath(needReviewWord.get("word").toString()));
-            gameTwoVo.setChinese(needReviewWord.get("wordChinese").toString());
 
             // 封装纸牌的试题集合并打乱顺序；
-            subjects = new ArrayList<>(12);
-            subjects.add(needReviewWord.get("word").toString());
-            subjects.addAll(wordList.subList(i * 11, (i + 1) * 11));
-            Collections.shuffle(subjects);
+            list = new ArrayList<>(12);
+            list.add(needReviewWord);
+            list.addAll(wordList.subList(i * 11, (i + 1) * 11));
+            Collections.shuffle(list);
 
+            subjects = new ArrayList<>(list.size());
+            chinese = new ArrayList<>(list.size());
+            for (Object object : list) {
+                Map<String, Object> objectMap = (Map<String, Object>) object;
+
+                subjects.add(objectMap.get("word").toString());
+                chinese.add(objectMap.get("wordChinese").toString());
+            }
+
+            gameTwoVo.setChinese(chinese);
             gameTwoVo.setSubjects(subjects);
             // 封装正确答案的索引
             for (int i1 = 0; i1 < subjects.size(); i1++) {
@@ -159,7 +181,6 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
                     gameTwoVo.setRightIndex(i1);
                 }
             }
-            i++;
             gameTwoVos.add(gameTwoVo);
         }
         return ServerResponse.createBySuccess(gameTwoVos);

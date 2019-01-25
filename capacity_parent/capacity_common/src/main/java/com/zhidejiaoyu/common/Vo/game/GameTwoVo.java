@@ -22,7 +22,7 @@ public class GameTwoVo implements Serializable {
     /**
      * 单词翻译
      */
-    private String chinese;
+    private List<String> chinese;
 
     /**
      * 大王牌索引

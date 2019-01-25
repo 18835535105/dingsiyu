@@ -480,8 +480,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         // 学完当前学习计划最后一个单元
         if (Objects.equals(capacityStudentUnit.getUnitId(), capacityStudentUnit.getEndunit())) {
 
-
-
             // 初始化当前流程的初始单元
             // 获取流程信息
             if ("流程1".equals(studyFlow.getFlowName())) {
