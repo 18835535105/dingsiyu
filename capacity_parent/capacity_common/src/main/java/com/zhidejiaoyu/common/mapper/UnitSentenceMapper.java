@@ -73,4 +73,6 @@ public interface UnitSentenceMapper {
      * @return
      */
     List<Map<String, Object>> selectUnitIdAndNameByCourseIds(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds);
+
+    List<Map<String,Object>> selUnitIdAndNameByCourseIdsAndStartUnitIdAndEndUnitId(@Param("courseId") Long courseId,@Param("startUnitId") Long unitId,@Param("endUnitId") Long endUnitId);
 }

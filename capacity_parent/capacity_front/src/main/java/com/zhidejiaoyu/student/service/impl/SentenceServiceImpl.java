@@ -106,6 +106,9 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     @Autowired
     private UnitVocabularyMapper unitVocabularyMapper;
 
+    @Autowired
+    private StudentStudyPlanMapper studentStudyPlanMapper;
+
 
     @Override
     public ServerResponse<SentenceTranslateVo> getSentenceTranslate(HttpSession session, Long unitId, int classifyInt, Integer type) {
@@ -483,7 +486,12 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         List<Map<String, Object>> resultMap;
         Map<String, Object> result = new HashMap<>();
         // 学生所有课程id及课程名
-        List<Map<String, Object>> courses = courseMapper.selectSentenceCourseIdAndCourseNameByStudentId(studentId);
+        /*   List<Map<String, Object>> courses = courseMapper.selectSentenceCourseIdAndCourseNameByStudentId(studentId);*/
+
+        List<Map<String, Object>> courses = studentStudyPlanMapper.selByStudentId(studentId, 2);
+        if (courses.size() > 0) {
+
+        }
         if (courses.size() < 0) {
             return ServerResponse.createByError(500, "当前学生没有课程，请让老师添加");
         }
@@ -494,8 +502,12 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             courses.forEach(map -> courseIds.add((Long) map.get("id")));
 
             // 获取课程下所有例句的单元信息
-            List<Map<String, Object>> sentenceUnits = unitSentenceMapper.selectUnitIdAndNameByCourseIds(studentId, courseIds);
+            for (int i = 0; i < courses.size(); i++) {
 
+            }
+            List<Map<String, Object>> sentenceUnits = new ArrayList<>();
+            //查看学生所能学习的单元
+            this.getStudyUnit(courseIds,sentenceUnits,studentId);
             // 已经进行过单元闯关的单元
             Map<Long, Map<Long, Long>> testMap = null;
             // 还没有学习的单元
@@ -973,4 +985,26 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         return sentenceTranslateVo;
     }
 
+    private void getStudyUnit(List<Long> courseIds,List<Map<String,Object>> returnCourse,Long studentId){
+        for (int i = 0; i < courseIds.size(); i++) {
+            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, courseIds.get(i));
+            if(studentStudyPlans.size()>1){
+                for(StudentStudyPlan studentStudyPlan:studentStudyPlans){
+                    List<Map<String, Object>> maps = unitSentenceMapper.selUnitIdAndNameByCourseIdsAndStartUnitIdAndEndUnitId(courseIds.get(i),
+                            studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());
+                    for(int j=0;j<maps.size();i++){
+                        boolean contains = returnCourse.contains(maps.get(j));
+                        if(contains){
+                            maps.remove(maps.get(i));
+                        }
+                    }
+                    returnCourse.addAll(maps);
+                }
+            }else{
+                List<Map<String, Object>> maps = unitSentenceMapper.selUnitIdAndNameByCourseIdsAndStartUnitIdAndEndUnitId(courseIds.get(i),
+                        studentStudyPlans.get(0).getStartUnitId(), studentStudyPlans.get(0).getEndUnitId());
+                returnCourse.addAll(maps);
+            }
+        }
+    }
 }

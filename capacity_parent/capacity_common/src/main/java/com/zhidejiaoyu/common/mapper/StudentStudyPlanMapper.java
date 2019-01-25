@@ -3,6 +3,12 @@ package com.zhidejiaoyu.common.mapper;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.StudentStudyPlan;
 import org.apache.ibatis.annotations.Param;
+<<<<<<< HEAD
+
+import java.util.List;
+import java.util.Map;
+=======
+>>>>>>> 054b96e90f91806ee83bf446da26f752f981f1bd
 
 /**
  * <p>
@@ -15,6 +21,11 @@ import org.apache.ibatis.annotations.Param;
 public interface StudentStudyPlanMapper extends BaseMapper<StudentStudyPlan> {
 
 
+<<<<<<< HEAD
+    List<Map<String,Object>> selByStudentId(@Param("studentId") Long studentId,@Param("type") int type);
+
+    List<StudentStudyPlan> selByStudentIdAndCourseId(@Param("studentId") Long studentId,@Param("courseId") Long courseId);
+=======
     /**
      * 查询学生当前的学习计划
      *
@@ -45,4 +56,5 @@ public interface StudentStudyPlanMapper extends BaseMapper<StudentStudyPlan> {
      * @return
      */
     int countUnlearnedPlan(@Param("studentId") Long studentId, @Param("type") int type);
+>>>>>>> 054b96e90f91806ee83bf446da26f752f981f1bd
 }

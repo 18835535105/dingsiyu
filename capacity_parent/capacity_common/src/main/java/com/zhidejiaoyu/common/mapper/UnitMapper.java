@@ -233,6 +233,9 @@ public interface UnitMapper extends BaseMapper<Unit> {
      */
     List<Map<String, Object>> selectUnitIdAndUnitNameByCourseIdAndStudentId(@Param("courseId") Long courseId, @Param("studentId") Long studentId);
 
+<<<<<<< HEAD
+    List<Map<String, Object>> selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(@Param("courseId") Long courseId, @Param("startUnitId") Long startUnitId, @Param("endUnitId") Long endUnitId, @Param("studentId") Long studentId);
+=======
     /**
      * 当前课程下单元总个数
      *
@@ -241,4 +244,5 @@ public interface UnitMapper extends BaseMapper<Unit> {
      */
     @Select("select count(id) from unit where course_id = #{courseId} ")
     int countByCourseId(@Param("courseId") Long courseId);
+>>>>>>> 054b96e90f91806ee83bf446da26f752f981f1bd
 }
