@@ -499,7 +499,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 }
             }
 
-            if (Objects.equals(studentStudyPlan.getCurrentStudyCount(), studentStudyPlan.getTotalStudyCount())) {
+            if (studentStudyPlan.getCurrentStudyCount() >= studentStudyPlan.getTotalStudyCount()) {
                 // 当前学习计划完成需要学习的遍数
                 studentStudyPlan.setComplete(2);
                 studentStudyPlan.setUpdateTime(new Date());
