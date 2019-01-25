@@ -360,46 +360,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         return ServerResponse.createBySuccess(unitInfoMap);
     }
 
-    //查看当前课程学习进度
-    @Override
-    public ServerResponse<Object> getLearnSchedule(Long courseId, HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        //获取当前课程下课文的总单元数
-        List<Map<String, Object>> maps = teksMapper.selTeksByCorseId(courseId);
-        Integer count = maps.size();
-        Map<String, Object> resultMap = new HashMap<>();
-        //获取课文试听学习进度
-        Integer countAudition = learnMapper.selAllTeksLearn(student.getId(), courseId, "课文试听");
-        Map<String, Object> map = new HashMap<>();
-        if (countAudition == null) {
-            map.put("schedule", 0);
-            map.put("proportion", "0/" + count);
-        } else {
-            map.put("schedule", countAudition / count);
-            map.put("proportion", countAudition + "/" + count);
-        }
-        resultMap.put("teksAudition", map);
-        //获取课文好声音学习进度
-        Integer teksGoodVoice = learnMapper.selAllTeksLearn(student.getId(), courseId, "课文好声音");
-        if (teksGoodVoice == null) {
-            map.put("schedule", 0);
-            map.put("proportion", "0/" + count);
-        } else {
-            map.put("schedule", teksGoodVoice / count);
-            map.put("proportion", teksGoodVoice + "/" + count);
-        }
-        resultMap.put("teksGoodVoice", map);
-        Integer teksTest = learnMapper.selAllTeksLearn(student.getId(), courseId, "课文默写测试");
-        if (teksTest == null) {
-            map.put("schedule", 0);
-            map.put("proportion", "0/" + count);
-        } else {
-            map.put("schedule", teksTest / count);
-            map.put("proportion", teksTest + "/" + count);
-        }
-        resultMap.put("teksTest", map);
-        return ServerResponse.createBySuccess(resultMap);
-    }
+
 
     @Override
     public ServerResponse<Object> selWriteTeks(Integer unitId) {
@@ -815,12 +776,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     private void getStudyUnit(List<Long> courseIds,List<Map<String,Object>> returnCourse,Long studentId){
         for (int i = 0; i < courseIds.size(); i++) {
-            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, courseIds.get(i));
+            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, courseIds.get(i),3);
             if(studentStudyPlans.size()>1){
                 for(StudentStudyPlan studentStudyPlan:studentStudyPlans){
                     List<Map<String, Object>> maps = unitMapper.selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(courseIds.get(i),
                             studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId(),studentId);
-                    for(int j=0;j<maps.size();i++){
+                    for(int j=0;j<maps.size();j++){
                         boolean contains = returnCourse.contains(maps.get(j));
                         if(contains){
                             maps.remove(maps.get(i));

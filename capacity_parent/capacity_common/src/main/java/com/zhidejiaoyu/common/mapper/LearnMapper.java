@@ -178,11 +178,11 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * 查询当前课程下指定模块的已学习单词/例句个数
      *
      * @param studentId
-     * @param courseId
+     * @param unitIds
      * @param studyModel 学习模块 （单词图鉴，慧记忆，慧听写，慧默写，单词图鉴，例句听力，例句翻译，例句默写）
      * @return
      */
-    int countByCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId, @Param("studyModel") String studyModel);
+    int countByCourseId(@Param("studentId") Long studentId, @Param("unitIds") List<Long> unitIds, @Param("studyModel") String studyModel);
 
     /**
      * 查看学生当天学习的单元数
@@ -798,7 +798,7 @@ public interface LearnMapper extends BaseMapper<Learn> {
 
     Integer selLearnTeks(@Param("studentId") Long studentId,@Param("studyModel")String studyModel,@Param("unitId") Long unitId);
 
-    Integer selAllTeksLearn(@Param("studentId") Long studentId,@Param("courseId")  Long courseId,@Param("studyModel") String studyModel);
+    Integer selAllTeksLearn(@Param("studentId") Long studentId,@Param("unitIds")  List<Long> unitId,@Param("studyModel") String studyModel);
 
     /**
      * 将学生当前指定范围的单元学习记录置为以往学习

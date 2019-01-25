@@ -203,11 +203,11 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
 
     /**
      * 查看当前课程下例句总数
-     * @param courseId  课程id
+     * @param unitIds  单元id集合
      * @return
      */
-    @Select("select count(s.id) from sentence s, unit_sentence us, unit u where s.id = us.sentence_id and u.id = us.unit_id and u.course_id = #{courseId}")
-    int countByCourseId(@Param("courseId") Long courseId);
+
+    int countByCourseId(@Param("unitIds") List<Long> unitIds);
 
     /**
      * 查询当前单元未学习的首个例句

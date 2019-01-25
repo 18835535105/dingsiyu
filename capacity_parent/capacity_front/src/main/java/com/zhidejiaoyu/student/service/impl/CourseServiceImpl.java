@@ -4,10 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.Course;
-import com.zhidejiaoyu.common.pojo.Learn;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.StudentCourse;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.CalculateTimeUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -87,8 +84,9 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
 
     @Autowired
     private CapacityReviewMapper capacityReviewMapper;
+
     @Autowired
-    private TeksMapper teksMapper;
+    private StudentStudyPlanMapper studentStudyPlanMapper;
 
     @Override
     public List chooseGrade(HttpSession session) {
@@ -142,68 +140,126 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
         String studyModel;
         int learnedCount;
         int pushCount;
-
         if (type == 1) {
+            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, courseId,1);
+            List<Map<String,Object>> returnCourse=new ArrayList<>();
+            if(studentStudyPlans.size()>0) {
+                for (StudentStudyPlan studentStudyPlan : studentStudyPlans) {
+                    List<Map<String, Object>> maps = unitVocabularyMapper.selUnitIdAndNameByCourseIdsAndStartUnitIdAndEndUnitId(courseId,
+                            studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());
+                    for (int j = 0; j < maps.size(); j++) {
+                        boolean contains = returnCourse.contains(maps.get(j));
+                        if (contains) {
+                            maps.remove(maps.get(j));
+                        }
+                    }
+                    returnCourse.addAll(maps);
+                }
+            }
+            List<Long> unitIds = new ArrayList<>(returnCourse.size());
+            returnCourse.parallelStream().forEach(map -> unitIds.add((Long)map.get("id")));
             // 获取当前课程的单词总量
             int wordCount = vocabularyMapper.countByCourseId(courseId, 2);
 
             // 获取慧记忆模块本课程已学单词量和达到黄金记忆点的待复习单词量
             studyModel = "慧记忆";
-            learnedCount = learnMapper.countByCourseId(studentId, courseId, studyModel);
+            learnedCount = learnMapper.countByCourseId(studentId, unitIds, studyModel);
             pushCount = capacityMemoryMapper.countNeedReviewByStudentIdAndCourseId(studentId, courseId);
             this.packageMemoryVo(learnedCount, pushCount, wordCount, studyModel, vos);
 
             studyModel = "单词图鉴";
-            learnedCount = learnMapper.countByCourseId(studentId, courseId, studyModel);
+            learnedCount = learnMapper.countByCourseId(studentId, unitIds, studyModel);
             pushCount = capacityListenMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
             int pictureWordCount = vocabularyMapper.countByCourseId(courseId, 1);
             this.packageMemoryVo(learnedCount, pushCount, pictureWordCount, studyModel, vos);
 
             // 获取慧听写模块本课程已学单词量和达到黄金记忆点的待复习单词量
             studyModel = "慧听写";
-            learnedCount = learnMapper.countByCourseId(studentId, courseId, studyModel);
+            learnedCount = learnMapper.countByCourseId(studentId, unitIds, studyModel);
             pushCount = capacityListenMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
             this.packageMemoryVo(learnedCount, pushCount, wordCount, studyModel, vos);
 
             // 获取慧默写模块本课程已学单词量和达到黄金记忆点的待复习单词量
             studyModel = "慧默写";
-            learnedCount = learnMapper.countByCourseId(studentId, courseId, studyModel);
+            learnedCount = learnMapper.countByCourseId(studentId, unitIds, studyModel);
             pushCount = capacityWriteMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
             this.packageMemoryVo(learnedCount, pushCount, wordCount, studyModel, vos);
 
         } else if(type==2){
+            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, courseId,2);
+            List<Map<String,Object>> returnCourse=new ArrayList<>();
+            if(studentStudyPlans.size()>0) {
+                for (StudentStudyPlan studentStudyPlan : studentStudyPlans) {
+                    List<Map<String, Object>> maps = unitSentenceMapper.selUnitIdAndNameByCourseIdsAndStartUnitIdAndEndUnitId(courseId,
+                            studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());
+                    for (int j = 0; j < maps.size(); j++) {
+                        boolean contains = returnCourse.contains(maps.get(j));
+                        if (contains) {
+                            maps.remove(maps.get(j));
+                        }
+                    }
+                    returnCourse.addAll(maps);
+                }
+            }
+            List<Long> unitIds = new ArrayList<>(returnCourse.size());
+            returnCourse.parallelStream().forEach(map -> unitIds.add((Long)map.get("id")));
             // 当前课程下例句总量
-            int sentenceCount = sentenceMapper.countByCourseId(courseId);
-
+            int sentenceCount = sentenceMapper.countByCourseId(unitIds);
             // 获取例句翻译模块本课程已学例句量和达到黄金记忆点的待复习例句量
             studyModel = "例句翻译";
-            learnedCount = learnMapper.countByCourseId(studentId, courseId, studyModel);
+            learnedCount = learnMapper.countByCourseId(studentId, unitIds, studyModel);
             pushCount = sentenceTranslateMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
             this.packageMemoryVo(learnedCount, pushCount, sentenceCount, studyModel, vos);
 
             // 获取例句听力模块本课程已学例句量和达到黄金记忆点的待复习例句量
             studyModel = "例句听力";
-            learnedCount = learnMapper.countByCourseId(studentId, courseId, studyModel);
+            learnedCount = learnMapper.countByCourseId(studentId, unitIds, studyModel);
             pushCount = sentenceListenMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
             this.packageMemoryVo(learnedCount, pushCount, sentenceCount, studyModel, vos);
 
             // 获取例句翻译模块本课程已学例句量和达到黄金记忆点的待复习例句量
             studyModel = "例句默写";
-            learnedCount = learnMapper.countByCourseId(studentId, courseId, studyModel);
+            learnedCount = learnMapper.countByCourseId(studentId, unitIds, studyModel);
             pushCount = sentenceWriteMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
             this.packageMemoryVo(learnedCount, pushCount, sentenceCount, studyModel, vos);
         }else{
+            //获取但前单元课程包含单元数量
+            List<Map<String, Object>> maps =new ArrayList<>();
+            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, courseId,3);
+            if (studentStudyPlans.size() > 0) {
+                for (StudentStudyPlan studentStudyPlan : studentStudyPlans) {
+                    List<Map<String, Object>> returnMap = unitMapper.selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(courseId,
+                            studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId(), studentId);
+                    for (int j = 0; j < returnMap.size(); j++) {
+                        boolean contains = maps.contains(returnMap.get(j));
+                        if (contains) {
+                            returnMap.remove(returnMap.get(j));
+                        }
+                    }
+                    maps.addAll(returnMap);
+                }
+            }
+            List<Long> unitIds = new ArrayList<>(maps.size());
+            maps.parallelStream().forEach(map -> unitIds.add((Long)map.get("id")));
             //当前课程下单元数量
-            List<Map<String, Object>> maps = teksMapper.selTeksByCorseId(courseId);
             int size = maps.size();
             studyModel="课文试听";
-            Integer countAudition = learnMapper.selAllTeksLearn(student.getId(), courseId, studyModel);
+            Integer countAudition = 0;
+            Integer teksGoodVoice=0;
+            Integer teksTest=0;
+            if(unitIds.size()>0){
+                countAudition=learnMapper.selAllTeksLearn(student.getId(), unitIds, studyModel);
+            }
             this.packageMemoryVo(countAudition, 0, size, studyModel, vos);
             studyModel="课文好声音";
-            Integer teksGoodVoice=learnMapper.selAllTeksLearn(student.getId(), courseId,studyModel);
+            if(unitIds.size()>0){
+                teksGoodVoice=learnMapper.selAllTeksLearn(student.getId(), unitIds,studyModel);
+            }
             this.packageMemoryVo(teksGoodVoice, 0, size, "课文跟读", vos);
             studyModel="课文训练";
-            Integer teksTest=learnMapper.selAllTeksLearn(student.getId(), courseId,"课文默写测试");
+            if(unitIds.size()>0){
+                teksTest=learnMapper.selAllTeksLearn(student.getId(), unitIds,"课文默写测试");
+            }
             this.packageMemoryVo(teksTest, 0, size, studyModel, vos);
         }
         return ServerResponse.createBySuccess(vos);

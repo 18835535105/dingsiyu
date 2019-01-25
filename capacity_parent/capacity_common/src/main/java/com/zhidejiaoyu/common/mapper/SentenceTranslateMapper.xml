@@ -243,8 +243,9 @@
         select count(st.id)
         from
             sentence_translate st, sentence s
-        where st.vocabulary_id = s.id and st.student_id = #{studentId} and st.course_id = #{courseId} and
-              st.memory_strength &lt; 1 and push &lt; now()
+        where st.vocabulary_id = s.id and st.student_id = #{studentId}
+        and st.course_id = #{courseId}
+        and   st.memory_strength &lt; 1 and push &lt; now()
     </select>
     <select id="countNeedReviewByStudentIdAndUnitId" resultType="java.lang.Integer" parameterType="map">
         select count(st.id)
