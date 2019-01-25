@@ -222,8 +222,6 @@ public interface UnitMapper extends BaseMapper<Unit> {
     @Select("select id from unit WHERE course_id = #{courseId} AND delStatus = 1 ORDER BY unit_index desc LIMIT 1")
     long getMaxUnitIdByCourseId(@Param("courseId") long courseId);
 
-    Map getMinUnitData(@Param("courseId") long courseId);
-
     /**
      * 获取当前学生当前课程下的所有单元信息
      *
@@ -232,7 +230,6 @@ public interface UnitMapper extends BaseMapper<Unit> {
      * @return
      */
     List<Map<String, Object>> selectUnitIdAndUnitNameByCourseIdAndStudentId(@Param("courseId") Long courseId, @Param("studentId") Long studentId);
-
 
     List<Map<String, Object>> selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(@Param("courseId") Long courseId, @Param("startUnitId") Long startUnitId, @Param("endUnitId") Long endUnitId, @Param("studentId") Long studentId);
 

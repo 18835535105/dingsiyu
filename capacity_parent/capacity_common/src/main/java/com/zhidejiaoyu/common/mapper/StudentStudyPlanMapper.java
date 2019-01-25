@@ -18,8 +18,6 @@ import java.util.Map;
  */
 public interface StudentStudyPlanMapper extends BaseMapper<StudentStudyPlan> {
 
-
-
     List<Map<String,Object>> selByStudentId(@Param("studentId") Long studentId,@Param("type") int type);
 
     List<StudentStudyPlan> selByStudentIdAndCourseId(@Param("studentId") Long studentId,@Param("courseId") Long courseId);
