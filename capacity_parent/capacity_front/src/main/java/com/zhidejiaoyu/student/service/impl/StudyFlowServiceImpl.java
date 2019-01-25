@@ -438,12 +438,18 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                                                          StudyFlow studyFlow) {
         // 开启下一单元
         String s = unlockNextUnit(student, unitId, session, studyFlow);
+        // 获取流程信息
+
         if (s != null) {
+            if ("流程1".equals(studyFlow.getFlowName())) {
+                this.toAnotherFlow(student, 11);
+            } else {
+                this.toAnotherFlow(student, 24);
+            }
             // 分配单元已学习完
             return ServerResponse.createBySuccess(300, s);
         }
 
-        // 获取流程信息
         if ("流程1".equals(studyFlow.getFlowName())) {
             return this.toAnotherFlow(student, 11);
         } else {
@@ -474,11 +480,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         // 学完当前学习计划最后一个单元
         if (Objects.equals(capacityStudentUnit.getUnitId(), capacityStudentUnit.getEndunit())) {
 
-//            learnMapper.updateTypeToLearned(studentId, 1, startUnit, endUnit);
-           /* capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
-            capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
-            capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
-            capacityListenMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);*/
+
 
             // 初始化当前流程的初始单元
             // 获取流程信息
@@ -519,6 +521,12 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 studentStudyPlan.setUpdateTime(new Date());
                 studentStudyPlan.setCurrentStudyCount(studentStudyPlan.getCurrentStudyCount() + 1);
                 studentStudyPlanMapper.updateById(studentStudyPlan);
+
+                learnMapper.updateTypeToLearned(studentId, 1, startUnit, endUnit);
+                capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+                capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+                capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+                capacityListenMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
 
                 // 学生学习到老师分配的最后一个单元，提示学生
                 return "傲人的成绩离不开反复的磨练，再学一次吧！";
