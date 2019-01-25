@@ -587,14 +587,10 @@
         order by u.id asc
     </select>
     <select id="getAllVersion" resultType="java.util.Map" parameterType="java.lang.Long">
-      select distinct c.version
-        from course c,
-             student_unit su,
-             unit_sentence us
-        where c.id = su.course_id
-          and su.student_id = #{studentId}
-          and su.type = 1
-          and us.unit_id = su.unit_id
+      select DISTINCT course.version from student_study_plan ssp
+			join course course on course.id=ssp.course_id
+			where ssp.student_id =#{studentId}
+      and ssp.type=2 group by ssp.course_id
     </select>
     <select id="selectCourseByUnitId" resultType="java.util.Map" parameterType="java.lang.Long">
         select course.id courseId , unit.id unitId , cou.version,cou.label,cou.grade  from student_course course

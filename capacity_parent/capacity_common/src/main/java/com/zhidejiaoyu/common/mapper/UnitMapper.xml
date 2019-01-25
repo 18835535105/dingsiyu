@@ -339,14 +339,13 @@
     </select>
     <select id="selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId" parameterType="java.util.Map"
             resultType="java.util.Map">
-        select u.id id,count(t.id) number , u.unit_name unitName,u.course_id courseId,course.label label,course.grade grade,course.version version from unit u
+        select u.id id,count(t.id) number , u.unit_name unitName,u.course_id courseId,course.label label,course.grade grade,course.version version
+        from unit u
         left join test_record t on u.id=t.unit_id
         join course course on course.id = u.course_id
         join teks teks on teks.unit_id=u.id
-        where su.student_id=#{studentId}
-        and (u.id>=#{startUnitId} and u.id &lt; = #{endUnitId})
+        where  (u.id>=#{startUnitId} and u.id &lt;= #{endUnitId})
         and u.course_id =#{courseId}
-        and su.type=1
         group by u.id
         order by u.id asc;
     </select>

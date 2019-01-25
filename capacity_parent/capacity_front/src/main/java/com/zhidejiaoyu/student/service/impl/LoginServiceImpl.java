@@ -821,7 +821,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      * @return
      */
     private boolean hasCapacitySentence(Student student) {
-        int count = studentUnitMapper.countCapacitySentence(student.getId());
+        int count = capacityStudentUnitMapper.countByType(student, 2);
         return count > 0;
     }
 
@@ -832,7 +832,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      * @return
      */
     private boolean hasCapacityTeks(Student student) {
-        int count = studentUnitMapper.countCapacityTeks(student.getId());
+        int count = capacityStudentUnitMapper.countByType(student, 3);
         return count > 0;
     }
 

@@ -606,11 +606,16 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                                 unitInfoMap.put("sentenceWriting", "正在学习");
                             } else if (id3 >= senCount) {
                                 Integer count = testRecordMapper.selectByStudentIdAndGenre(student.getId(), Long.parseLong(unitMap.get("id").toString()));
-                                if (id2 / senCount == count) {
-                                    unitInfoMap.put("sentenceWriting", "已学习");
-                                } else {
+                                if(id2!=null && id2!=0){
+                                    if (id2/senCount == count) {
+                                        unitInfoMap.put("sentenceWriting", "已学习");
+                                    } else {
+                                        unitInfoMap.put("sentenceWriting", "正在学习");
+                                    }
+                                }else{
                                     unitInfoMap.put("sentenceWriting", "正在学习");
                                 }
+
                             } else {
                                 unitInfoMap.put("sentenceWriting", "未学习");
                             }

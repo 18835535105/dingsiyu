@@ -39,19 +39,10 @@
         order by u.course_id asc, u.id asc
     </select>
     <select id="getStudentAllCourse" resultType="java.util.Map" parameterType="map">
-        select distinct course.version version  from unit u
-        left join test_record t on u.id=t.unit_id
-        join student_unit su on su.unit_id =u.id
-        join course course on course.id = u.course_id
-        where su.student_id = #{studentId}
-        and su.type = 1 and
-        u.course_id in (
-        <foreach collection="courseIds" separator="," item="courseId">
-            #{courseId}
-        </foreach>
-        )
-        group by u.id
-        order by u.course_id asc, u.id asc
+     select DISTINCT course.version from student_study_plan ssp
+			join course course on course.id=ssp.course_id
+			where ssp.student_id =#{studentId}
+      and ssp.type=3 group by ssp.course_id
     </select>
 
     <select id="selHistoryPronunciation" resultType="java.util.Map" parameterType="java.util.Map">
