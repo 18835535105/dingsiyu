@@ -184,6 +184,12 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
 
         // 保存课程的学习次数
         Integer maxCount = commonMethod.saveStudyCount(session, courseId);
+
+        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, "慧记忆", maxCount == null ? 1 : maxCount,1);
+        if (learnIds.size() > 1) {
+            List<Long> longs = learnIds.subList(1, learnIds.size());
+            learnMapper.deleteBatchIds(longs);
+        }
         // 查询当前单词的学习记录数据
         Learn currentLearn = learnMapper.selectLearn(studentId, learn, "慧记忆", maxCount,1);
 
@@ -283,6 +289,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         }
         learn.setLearnCount(1);
         learn.setUpdateTime(now);
+        learn.setType(1);
         learnMapper.insertSelective(learn);
         return ServerResponse.createBySuccess();
     }

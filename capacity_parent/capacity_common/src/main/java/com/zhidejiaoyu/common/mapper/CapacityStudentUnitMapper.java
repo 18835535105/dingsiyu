@@ -2,9 +2,9 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.CapacityStudentUnit;
+import com.zhidejiaoyu.common.pojo.Student;
 import org.apache.ibatis.annotations.Param;
-
-import java.util.Map;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * <p>
@@ -28,4 +28,22 @@ public interface CapacityStudentUnitMapper extends BaseMapper<CapacityStudentUni
     CapacityStudentUnit selectCurrentUnitIdByStudentIdAndType(@Param("studentId") Long studentId, @Param("type") Integer type);
 
     void updById(CapacityStudentUnit capacityStudentUnit);
+
+    /**
+     * 查看指定类型是否有同步版课程
+     *
+     * @param student
+     * @param type
+     * @return
+     */
+    @Select("select count(id) from capacity_student_unit where student_id = #{student.id} and type = #{type}")
+    int countByType(@Param("student") Student student, @Param("type") int type);
+
+    /**
+     * 清除学生指定类型的正在学习课程信息
+     *
+     * @param studentId
+     * @param type
+     */
+    void deleteByStudentIdAndType(@Param("studentId") Long studentId, @Param("type") int type);
 }

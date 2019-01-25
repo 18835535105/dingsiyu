@@ -136,6 +136,7 @@
         l.student_id=#{studentId}
         and l.unit_id=#{unitId} and l.study_model =
         #{studyModel}
+        and l.type = 1
         <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写' or studyModel == '单词图鉴'">
             and l.vocabulary_id is not null and (select v.delStatus from
             vocabulary v where v.id = l.vocabulary_id) = 1
@@ -145,7 +146,6 @@
             and example_id is not null
         </if>
         and learn_count = #{count}
-        and type=1
     </select>
 
     <select id="isCountLearnWord" resultType="java.lang.Long"
@@ -955,7 +955,7 @@
         select count(id) from learn l where
         l.student_id=#{studentId}
         and l.unit_id=#{unitId} and l.study_model =
-        #{studyModel}
+        #{studyModel} and l.type = 1
         <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写' or studyModel == '单词图鉴'">
             and l.vocabulary_id is not null and (select v.delStatus from
             vocabulary v where v.id = l.vocabulary_id) = 1
@@ -976,7 +976,7 @@
         from learn l where
         l.student_id=#{student.id}
         and l.unit_id=#{unitId} and l.study_model =
-        #{studyModel} and type=1
+        #{studyModel} and l.type = 1
         <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写'">
             and l.vocabulary_id is not null and (select v.delStatus from
             vocabulary v where v.id = l.vocabulary_id) = 1
@@ -1351,6 +1351,13 @@
         from vocabulary v, unit_vocabulary uv, unit u, student_unit su
         where v.id = uv.vocabulary_id and v.delStatus = 1
         and uv.unit_id = u.id and su.unit_id = u.id and su.student_id = #{studentId} and su.type = 1
+        <if test="wordIds.size > 0">
+            and v.id not in (
+            <foreach collection="wordIds" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
         limit #{count}
     </select>
     <select id="selectLearnedByCourseId" resultType="java.util.Map" parameterType="map">
@@ -1374,6 +1381,23 @@
     </select>
     <update id="updLearnByUnitIdAndStudyModelAndStudentId" parameterType="map">
          update learn set type=2 where student_id=#{studentId} and study_model=#{studyModel} and type=1 and unit_id=#{unitId};
+    </update>
+    <update id="updateTypeToLearned" parameterType="map">
+        update learn
+        set type = 2
+        where student_id = #{studentId}
+        and unit_id >= #{startUnit}
+        and unit_id &lt;= #{endUnit}
+        and type = 1
+        <if test="studyType == 1">
+            and study_model in ('单词图鉴', '慧听写', '慧记忆', '慧默写')
+        </if>
+        <if test="studyType == 2">
+            and study_model in ('例句听力', '例句翻译', '例句默写')
+        </if>
+        <if test="studyType == 3">
+            and study_model in ('课文好声音', '课文试听', '课文默写测试')
+        </if>
     </update>
     <select  id="selByStudentIdAndCourseIdDisVersion" parameterType="java.util.Map" resultType="java.lang.Long">
         select DISTINCT learn.unit_id from learn learn
@@ -1417,6 +1441,21 @@
         where student_id=#{studentId}
         and course_id=#{courseId}
         and study_model=#{studyModel}
+    </select>
+    <select id="selectLearnIds" resultType="java.lang.Long" parameterType="map">
+        select
+        id
+        from learn where student_id=#{studentId} and
+        unit_id=#{learn.unitId}
+        <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel =='慧默写' or studyModel =='单词图鉴'">
+            and vocabulary_id=#{learn.vocabularyId}
+        </if>
+        <if test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel =='例句默写'">
+            and example_id=#{learn.exampleId}
+        </if>
+        and learn_count = #{count}
+        and study_model=#{studyModel}
+        and type=#{type}
     </select>
 
 </mapper>

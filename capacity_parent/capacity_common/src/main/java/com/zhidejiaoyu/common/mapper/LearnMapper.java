@@ -757,9 +757,10 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * 从学生智能版课程中随机取出count个单词
      * @param studentId
      * @param count
+     * @param wordIds
      * @return
      */
-    List<String> selectWordRandomInCourse(@Param("studentId") Long studentId, @Param("count") int count);
+    List<String> selectWordRandomInCourse(@Param("studentId") Long studentId, @Param("count") int count, @Param("wordIds") List<Long> wordIds);
 
     /**
      * 查询学生当前课程已学信息
@@ -798,4 +799,37 @@ public interface LearnMapper extends BaseMapper<Learn> {
     Integer selLearnTeks(@Param("studentId") Long studentId,@Param("studyModel")String studyModel,@Param("unitId") Long unitId);
 
     Integer selAllTeksLearn(@Param("studentId") Long studentId,@Param("courseId")  Long courseId,@Param("studyModel") String studyModel);
+
+    /**
+     * 将学生当前指定范围的单元学习记录置为以往学习
+     *
+     * @param studentId
+     * @param studyType 1:单词；2：例句；3：课文
+     * @param startUnit
+     * @param endUnit
+     */
+    void updateTypeToLearned(@Param("studentId") Long studentId, @Param("studyType") int studyType, @Param("startUnit") Long startUnit, @Param("endUnit") Long endUnit);
+
+    /**
+     * 学生当前课程下已学习的单元个数
+     *
+     * @param courseId
+     * @param studentId
+     * @return
+     */
+    @Select("select count(distinct unit_id) from learn where student_id = #{studentId} and course_id = #{courseId} ")
+    int countLearnedUnitByCourseId(@Param("courseId") Long courseId, @Param("studentId") Long studentId);
+
+    /**
+     * 查询正在学习的学习记录 id
+     *
+     * @param studentId
+     * @param learn
+     * @param studyModel
+     * @param count
+     * @param type
+     * @return
+     */
+    List<Long> selectLearnIds(@Param("studentId") Long studentId, @Param("learn") Learn learn,
+                              @Param("studyModel") String studyModel, @Param("count") int count, @Param("type") int type);
 }

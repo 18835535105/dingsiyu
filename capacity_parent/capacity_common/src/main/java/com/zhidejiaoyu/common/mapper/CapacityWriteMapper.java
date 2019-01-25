@@ -126,8 +126,9 @@ public interface CapacityWriteMapper extends BaseMapper<CapacityWrite> {
 	 * 删除学生当前单元记忆追踪信息
 	 *
 	 * @param studentId
-	 * @param unitId
+	 * @param startUnit
+	 * @param endUnit
 	 */
-	@Delete("delete from capacity_write where student_id = #{studentId} and unit_id = #{unitId}")
-	void deleteByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+	@Delete("delete from capacity_write where student_id = #{studentId} and unit_id >= #{startUnit} and unit_id <= #{endUnit}")
+	void deleteByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("startUnit") Long startUnit, @Param("endUnit") Long endUnit);
 }

@@ -213,6 +213,12 @@ public class WordWriteServiceImpl implements WordWriteService {
             studyModel = "单词图鉴";
         }
         Integer maxCount = commonMethod.saveStudyCount(session, learn.getCourseId());
+
+        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, studyModel, maxCount == null ? 1 : maxCount,1);
+        if (learnIds.size() > 1) {
+            List<Long> longs = learnIds.subList(1, learnIds.size());
+            learnMapper.deleteBatchIds(longs);
+        }
         Learn currentLearn = learnMapper.selectLearn(studentId, learn, studyModel, maxCount == null ? 1 : maxCount,1);
         // 保存学习记录
         // 第一次学习，如果答对记为熟词，答错记为生词
@@ -220,6 +226,7 @@ public class WordWriteServiceImpl implements WordWriteService {
             learn.setStudentId(studentId);
             learn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
             learn.setStudyModel(studyModel);
+            learn.setType(1);
             learn.setStudyCount(1);
             learn.setLearnCount(1);
             learn.setUpdateTime(now);
@@ -244,7 +251,7 @@ public class WordWriteServiceImpl implements WordWriteService {
                 }
 
             }
-            count = learnMapper.insertSelective(learn);
+            count = learnMapper.insert(learn);
             if (count > 0 && total == (plan + 1)) {
                 return ServerResponse.createBySuccess();
             }

@@ -80,4 +80,13 @@ public interface CcieMapper extends BaseMapper<Ccie> {
      */
     @Update("update ccie set read_flag = #{readFlag} where student_id = #{studentId}")
     int updateReadFlag(@Param("studentId") Long studentId, @Param("readFlag") int readFlag);
+
+    /**
+     * 查询当前课程获取的课程证书个数
+     *
+     * @param studentId
+     * @param courseId
+     * @return
+     */
+    int countCourseCcieByCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
 }

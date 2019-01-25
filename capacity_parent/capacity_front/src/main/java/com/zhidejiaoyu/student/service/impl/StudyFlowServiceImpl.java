@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -66,6 +65,12 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
     @Autowired
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
+
+    @Autowired
+    private StudentStudyPlanMapper studentStudyPlanMapper;
+
+    @Autowired
+    private CcieMapper ccieMapper;
 
     @Autowired
     private CcieUtil ccieUtil;
@@ -275,17 +280,17 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             // 学习下一单元, 前端需要一个弹框提示
             if (studyFlow.getNextTrueFlow() == 0) {
                 // 开启下一单元并且返回需要学习的流程信息
-                return openNextUnitAndReturn(courseId, unitId, session, student, studyFlow);
+                return openNextUnitAndReturn(unitId, session, student, studyFlow);
             } else if (Objects.equals(-1, studyFlow.getNextTrueFlow())) {
                 // 进入流程2
-                String s = this.unlockNextUnit(student, courseId, unitId, session, studyFlow);
+               /* String s = this.unlockNextUnit(student, courseId, unitId, session, studyFlow);
                 if (s != null) {
                     return ServerResponse.createBySuccess(300, s);
-                }
+                }*/
                 return toAnotherFlow(student, 24);
             } else if (Objects.equals(-3, studyFlow.getNextTrueFlow())) {
                 // 进入流程1
-                String s = this.unlockNextUnit(student, courseId, unitId, session, studyFlow);
+                String s = this.unlockNextUnit(student, unitId, session, studyFlow);
                 if (s != null) {
                     return ServerResponse.createBySuccess(300, s);
                 }
@@ -394,11 +399,12 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
         Long unitId = capacityStudentUnit.getUnitId();
 
+        learnMapper.updateTypeToLearned(studentId, 1, unitId, unitId);
         learnMapper.deleteByStudentIdAndUnitId(studentId, unitId);
-        capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, unitId);
-        capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, unitId);
-        capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, unitId);
-        capacityListenMapper.deleteByStudentIdAndUnitId(studentId, unitId);
+        capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, unitId, unitId);
+        capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, unitId, unitId);
+        capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, unitId, unitId);
+        capacityListenMapper.deleteByStudentIdAndUnitId(studentId, unitId, unitId);
     }
 
     /**
@@ -422,17 +428,16 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     /**
      * 开启下一单元并且返回需要学习的流程信息
      *
-     * @param courseId
      * @param unitId
      * @param session
      * @param student
      * @param studyFlow
      * @return
      */
-    private ServerResponse<Object> openNextUnitAndReturn(Long courseId, Long unitId, HttpSession session, Student student,
+    private ServerResponse<Object> openNextUnitAndReturn(Long unitId, HttpSession session, Student student,
                                                          StudyFlow studyFlow) {
         // 开启下一单元
-        String s = unlockNextUnit(student, courseId, unitId, session, studyFlow);
+        String s = unlockNextUnit(student, unitId, session, studyFlow);
         if (s != null) {
             // 分配单元已学习完
             return ServerResponse.createBySuccess(300, s);
@@ -447,193 +452,33 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     }
 
     /**
-     * 删除精华版学习产生的数据, 重新学习精华版
-     * @param studentId
-     * @param courseId
-     *//*
-    private void deleteEssenceVersionLearn(long studentId, long courseId) {
-        // 删除learn, test_record, 7个记忆追踪数据
-        LearnExample learnExampler = new LearnExample();
-        learnExampler.createCriteria().andCourseIdEqualTo(courseId).andStudentIdEqualTo(studentId);
-        learnMapper.deleteByExample(learnExampler);
-
-        TestRecordExample testRecordExampler = new TestRecordExample();
-        testRecordExampler.createCriteria().andCourseIdEqualTo(courseId).andStudentIdEqualTo(studentId);
-        testRecordMapper.deleteByExample(testRecordExampler);
-
-        for (int model = 0; model < 7; model++) {
-            capacityPictureMapper.deleteAllMemory(studentId, courseId, model);
-        }
-
-    }
-
-    *//**
-     * 升级规则, 精华版课程学完才进行升级规则
-     * @param studentId
-     * @param courseId
-     * @param unitId
-     * @param st
-     * @return 1 = 升级, 0不升级
-     *//*
-    private int upgradeRules(long studentId, long courseId, long unitId, Student st, HttpSession session) {
-        if(st.getVersion().contains("小学精华版") || st.getVersion().contains("初一精华版") ||
-                st.getVersion().contains("中考精华版") || st.getVersion().contains("高一精华版") ||
-                st.getVersion().contains("高考精华版")){
-            // 1.判断是否该课程下的最后一单元
-            long maxUnitId = unitMapper.getMaxUnitIdByCourseId(courseId);
-            if(maxUnitId != unitId){
-                return 0;
-            }
-
-            // 2.判断进度
-            // 课程下已学单词数量
-            int countWord = learnMapper.labelWordsQuantityByStudentIdAndCourseId(studentId, courseId);
-            // 课程下已掌握单词
-            int graspWord = learnMapper.labelGraspWordsByStudentIdAndCourseId(studentId, courseId);
-            int word = countWord == 0 ? 0 : graspWord / countWord * 100;
-            // 升级
-            if(word >= 80){
-                // 1.查询普通版最后一次学习的单元id,
-                long finallyUnitId = studentUnitMapper.getFinallyLearnUnitByStudentIdAndCourseId(studentId, courseId);
-
-                // 2.普通版执行解锁下一单元方法, 普通版的转精华版的时候普通版没有开启下一单元,所以需要在这里开启学习一下单元
-                unlockNextUnit(st, courseId, finallyUnitId, session);
-
-                // 3.删掉当前精华版学习数据
-                deleteEssenceVersionLearn(studentId, courseId);
-                return 1;
-            }else{
-                return 0;
-            }
-        }
-
-        return 0;
-    }
-
-    *//**
-     * 降级规则, 并把对应的精华版本更新到学生表, 根据课程判断掌握度进行降级
-     *//*
-    private int flowDropRules(long studentId, long courseId, Student student, HttpSession session){
-        // 1.查询是否到达降级条件
-        // 已学单元
-        int learnUnit = learnMapper.countDISTINCTUnit(studentId);
-        // 单元总数
-        int countUnit = unitMapper.selectMaxUnitIndexByCourseId(courseId);
-        int duty =  learnUnit / countUnit * 100;
-        // 已学本课程下30%的单元
-        if(duty >= 30){
-            // 课程下已学单词数量
-            int countWord = learnMapper.labelWordsQuantityByStudentIdAndCourseId(studentId, courseId);
-            // 课程下已掌握单词
-            int graspWord = learnMapper.labelGraspWordsByStudentIdAndCourseId(studentId, courseId);
-            int word = countWord == 0 ? 0 : graspWord / countWord * 100;
-            // 单词掌握率低于40%
-            if(word < 40){
-                // 降级!
-                //Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-                String grade = student.getGrade(); // 年级
-                String version = student.getVersion(); // 版本
-
-                // 学生普通版本名
-                String commonVersion = null;
-                if(version.contains("-")){
-                    commonVersion = version.substring(0, version.indexOf("-"));
-                }else{
-                    commonVersion = version;
-                }
-
-                // 记录需要修改的精华版本的版本名
-                String creamVersion = commonVersion;
-
-                if(grade.equals("八年级") || grade.equals("初二")){
-                    if(version.contains("小学精华版")){
-                        return 0;
-                    }else if(!version.contains("初一精华版")){
-                        // 把普通版本改为初一精华版
-                        creamVersion += "-初一精华版";
-                    }else{
-                        // 把普通版本改为小学精华版
-                        creamVersion += "-小学精华版";
-                    }
-                }else if(grade.equals("九年级") || grade.equals("初三")){
-                    if(version.contains("中考精华版")){
-                        return 0;
-                    }else{
-                        // 把普通版本改为中考精华版
-                        creamVersion += "-中考精华版";
-                    }
-                }else if(grade.equals("高二")){
-                    if(version.contains("中考精华版")){
-                        return 0;
-                    }else if(!version.contains("高一精华版")){
-                        // 把普通版本改为高一精华版
-                        creamVersion += "-高一精华版";
-                    }else{
-                        // 把普通版本改为中考精华版
-                        creamVersion += "-中考精华版";
-                    }
-                }else if(grade.equals("高三")){
-                    if (version.contains("高考精华版")){
-                        return 0;
-                    }else{
-                        // 把普通版本改为高考精华版
-                        creamVersion += "-高考精华版";
-                    }
-                }
-
-                // 根据精华版本名查询课程信息  id, version, course_name
-                Map course = courseMapper.getCourseByCreamVersionName(creamVersion);
-                // 查询精华版第一个单元id和单元名  id, unit_name
-                Map unit = unitMapper.getLimitOneByCourseId((long)course.get("id"));
-
-                // 更新学生信息
-                Student stu = new Student();
-                stu.setId(studentId);
-                stu.setVersion(course.get("version").toString());
-
-                stu.setCourseId((long)course.get("id"));
-                stu.setUnitId((long)unit.get("id"));
-                stu.setUnitName(unit.get("unit_name").toString());
-                stu.setCourseName(course.get("course_name").toString());
-
-                stu.setSentenceCourseId((long)course.get("id"));
-                stu.setSentenceCourseName(course.get("course_name").toString());
-                stu.setSentenceUnitId(Integer.parseInt(unit.get("id")+""));
-                stu.setSentenceUnitName(unit.get("unit_name").toString());
-
-                studentMapper.updateByPrimaryKeySelective(stu);
-
-                // 更新学生session
-                Student student1 = studentMapper.selectByPrimaryKey(studentId);
-                session.setAttribute(UserConstant.CURRENT_STUDENT, student1);
-                return 1;
-            }
-        }
-        return 0;
-    }
-
-    *//**
      * 当前流程学习完毕后开启下一单元
      *
-     * @param courseId 课程id
      * @param unitId   单元id（当前单元闯关测试的单元id）
      * @param studyFlow
      * @return
      */
-    private String unlockNextUnit(Student student, Long courseId, Long unitId, HttpSession session, StudyFlow studyFlow) {
+    private String unlockNextUnit(Student student, Long unitId, HttpSession session, StudyFlow studyFlow) {
         Long studentId = student.getId();
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+        // 清除学生当前已分配的单元学习记录
+        Long startUnit = capacityStudentUnit.getStartunit();
+        Long endUnit = capacityStudentUnit.getEndunit();
+
+        // 查询学生当前学习计划
+        StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selectCurrentPlan(studentId, startUnit, endUnit, 1);
+        if (studentStudyPlan == null) {
+            return "恭喜你，完成了本次学习任务，快去向教师申请开始新的征程吧！";
+        }
+
+        // 学完当前学习计划最后一个单元
         if (Objects.equals(capacityStudentUnit.getUnitId(), capacityStudentUnit.getEndunit())) {
-            // 清除学生当前已分配的单元学习记录
-            Long startunit = capacityStudentUnit.getStartunit();
-            Long endunit = capacityStudentUnit.getEndunit();
-            for (long i = startunit; i <= endunit; i++) {
-                learnMapper.deleteByStudentIdAndUnitId(studentId, i);
-                capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, i);
-                capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, i);
-                capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, i);
-                capacityListenMapper.deleteByStudentIdAndUnitId(studentId, i);
-            }
+
+//            learnMapper.updateTypeToLearned(studentId, 1, startUnit, endUnit);
+           /* capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+            capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+            capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+            capacityListenMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);*/
 
             // 初始化当前流程的初始单元
             // 获取流程信息
@@ -642,52 +487,52 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             } else {
                 this.toAnotherFlow(student, 24);
             }
-            Unit unit = unitMapper.selectById(startunit);
-            Course course = courseMapper.selectById(unit.getCourseId());
-            capacityStudentUnit.setCourseName(course.getCourseName());
-            capacityStudentUnit.setCourseId(unit.getCourseId());
-            capacityStudentUnit.setUnitName(unit.getUnitName());
-            capacityStudentUnit.setUnitId(unit.getId());
-            capacityStudentUnit.setVersion(course.getVersion());
-            capacityStudentUnitMapper.updateById(capacityStudentUnit);
 
-            // 学生学习到老师分配的最后一个单元，提示学生
-            return "教师分配的课程已完成，是否重新学习?";
-        } else {
-            // 学生可继续学习，开启下一单元、课程
-            // 查看当前课程的最大单元和当前单元的index
-            Integer maxUnitIndex = unitMapper.selectMaxUnitIndexByCourseId(courseId);
-            Integer currentUnitIndex = unitMapper.selectCurrentUnitIndexByUnitId(unitId);
-            Long nextUnitId = null;
-            if (currentUnitIndex < maxUnitIndex) {
-                // 查询 当前单元index+1 的单元id
-                Integer nextUnitIndex = currentUnitIndex + 1;
-                nextUnitId = unitMapper.selectNextUnitIndexByCourseId(courseId, nextUnitIndex);
-                Unit unit = unitMapper.selectByPrimaryKey(nextUnitId);
-                // 根据学生id，课程id和下一个单元id开启下个单元
-                studentUnitMapper.updateStatus(student.getId(), courseId, nextUnitId);
-
-                // 记录学生开启的单元信息
-                saveCurrentCourseAndUnitInfo(student, courseId, nextUnitId, unit);
-            } else {
-                // 本课程已学习完
-                // 奖励学生课程证书
-                ccieUtil.saveCourseCcie(student);
-                // 查找学生可学习的下一课程
-                List<StudentUnit> studentUnits = studentUnitMapper.selectNextCourse(student, courseId);
-                if (studentUnits.size() != 0) {
-                    StudentUnit studentUnit = studentUnits.get(0);
-                    List<Unit> units = unitMapper.selectUnitsByCourseId(studentUnit.getCourseId());
-                    Unit unit;
-                    if (units.size() > 0) {
-                        unit = units.get(0);
-                        nextUnitId = unit.getId();
-
-                        // 记录学生开启的单元信息
-                        saveCurrentCourseAndUnitInfo(student, courseId, nextUnitId, unit);
-                    }
+            // 判断学生是否能获取课程证书,每个课程智能获取一个课程证书
+            int count = ccieMapper.countCourseCcieByCourseId(studentId, capacityStudentUnit.getCourseId());
+            if (count == 0) {
+                int unitCount = unitMapper.countByCourseId(studentStudyPlan.getCourseId());
+                int learnedUnitCount = learnMapper.countLearnedUnitByCourseId(studentStudyPlan.getCourseId(), studentId);
+                if (learnedUnitCount >= unitCount) {
+                    // 课程学习完毕，奖励学生课程证书
+                    ccieUtil.saveCourseCcie(student);
                 }
             }
+
+            if (Objects.equals(studentStudyPlan.getCurrentStudyCount(), studentStudyPlan.getTotalStudyCount())) {
+                // 当前学习计划完成需要学习的遍数
+                studentStudyPlan.setComplete(2);
+                studentStudyPlan.setUpdateTime(new Date());
+                studentStudyPlanMapper.updateById(studentStudyPlan);
+
+                StudentStudyPlan nextPlan = studentStudyPlanMapper.selectNextPlan(studentId, studentStudyPlan.getId(), 1);
+                if (nextPlan == null) {
+                    // 教师分配的所有计划已完成
+                    return "恭喜你，完成了本次学习任务，快去向教师申请开始新的征程吧！";
+                }
+                updateCapacityStudentUnit(capacityStudentUnit, nextPlan.getStartUnitId(), nextPlan);
+
+                return "干的漂亮，当前计划已经完成，新的计划已经开启！";
+            } else {
+                updateCapacityStudentUnit(capacityStudentUnit, startUnit, null);
+
+                studentStudyPlan.setUpdateTime(new Date());
+                studentStudyPlan.setCurrentStudyCount(studentStudyPlan.getCurrentStudyCount() + 1);
+                studentStudyPlanMapper.updateById(studentStudyPlan);
+
+                // 学生学习到老师分配的最后一个单元，提示学生
+                return "傲人的成绩离不开反复的磨练，再学一次吧！";
+            }
+        } else {
+
+            Long currentUnitId = capacityStudentUnit.getUnitId();
+            long nextUnitId = currentUnitId + 1;
+
+            studentStudyPlan.setUpdateTime(new Date());
+            studentStudyPlan.setCurrentStudyCount(studentStudyPlan.getCurrentStudyCount() + 1);
+            studentStudyPlanMapper.updateById(studentStudyPlan);
+
+            updateCapacityStudentUnit(capacityStudentUnit, nextUnitId, null);
             saveOpenUnitLog(student, unitId, nextUnitId);
 
             // 更新学生session
@@ -697,18 +542,19 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         return null;
     }
 
-    private void saveCurrentCourseAndUnitInfo(Student student, Long courseId, Long nextUnitId, Unit unit) {
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
-        if (capacityStudentUnit == null) {
-            // 没有学生当前学习的单元信息，保存
-            capacityStudentUnit = packageCapacityStudentUnit(student, courseId, nextUnitId, unit);
-            capacityStudentUnitMapper.insert(capacityStudentUnit);
-        } else {
-            // 已有当前学习的单元信息，更新
-            CapacityStudentUnit capacityStudentUnit1 = packageCapacityStudentUnit(student, unit.getCourseId(), nextUnitId, unit);
-            capacityStudentUnit1.setId(capacityStudentUnit.getId());
-            capacityStudentUnitMapper.updateById(capacityStudentUnit1);
+    private void updateCapacityStudentUnit(CapacityStudentUnit capacityStudentUnit, long nextUnitId, StudentStudyPlan nextPlan) {
+        Unit unit = unitMapper.selectById(nextUnitId);
+        Course course = courseMapper.selectById(unit.getCourseId());
+        capacityStudentUnit.setCourseName(course.getCourseName());
+        capacityStudentUnit.setCourseId(unit.getCourseId());
+        capacityStudentUnit.setUnitName(unit.getUnitName());
+        capacityStudentUnit.setUnitId(unit.getId());
+        capacityStudentUnit.setVersion(course.getVersion());
+        if (nextPlan != null) {
+            capacityStudentUnit.setStartunit(nextPlan.getStartUnitId());
+            capacityStudentUnit.setEndunit(nextPlan.getEndUnitId());
         }
+        capacityStudentUnitMapper.updateById(capacityStudentUnit);
     }
 
     private CapacityStudentUnit packageCapacityStudentUnit(Student student, Long courseId, Long nextUnitId, Unit unit) {

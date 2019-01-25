@@ -1,15 +1,12 @@
 package com.zhidejiaoyu.common.utils.language;
 
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
-import com.zhidejiaoyu.common.pojo.Vocabulary;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.util.Objects;
 
 /**
  * 百度语音合成web api
@@ -40,8 +37,12 @@ public class BaiduSpeak {
      * @return
      */
     public String getLanguagePath(String text) {
+        if (Objects.equals("Mr.", text)) {
+            return youdao + text + "&type=1";
+        }
+        return youdao + text;
 
-        Vocabulary vocabulary = vocabularyMapper.selectByWord(text);
+        /*Vocabulary vocabulary = vocabularyMapper.selectByWord(text);
         if (vocabulary != null && StringUtils.isNotEmpty(vocabulary.getReadUrl())) {
             return prefix + vocabulary.getReadUrl();
         } else {
@@ -52,7 +53,7 @@ public class BaiduSpeak {
                 log.error("单词[{}]进行urlencode时出错！", text, e);
             }
             return baidu + text;
-        }
+        }*/
     }
 
     public String getSentencePaht(String text) {

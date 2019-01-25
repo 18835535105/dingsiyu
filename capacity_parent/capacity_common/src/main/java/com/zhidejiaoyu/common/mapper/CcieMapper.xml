@@ -318,4 +318,13 @@
   <select id="getMapKeyStudentCCie" resultType="java.util.Map">
     select student_id as id, count(*) as count from ccie GROUP BY student_id
   </select>
+  <select id="countCourseCcieByCourseId" resultType="java.lang.Integer" parameterType="map">
+    select count(c.id)
+    from ccie c,
+         unit u
+    where c.unit_id = u.id
+      and u.course_id = #{courseId}
+      and c.student_id = #{studentId}
+      and c.ccie_no like 'K%'
+  </select>
 </mapper>

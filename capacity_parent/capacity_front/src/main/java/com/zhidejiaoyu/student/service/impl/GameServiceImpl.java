@@ -57,6 +57,7 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
     @Override
     public ServerResponse<GameOneVo> getGameOne(HttpSession session, Integer pageNum, List<String> wordList) {
         Student student = getStudent(session);
+        session.setAttribute(TimeConstant.GAME_BEGIN_START_TIME, new Date());
 
         // 从当前正在学习的课程已学习的单词中随机查找10个单词
         List<Map<String, Object>> wordMap = this.getGameOneSubject(student, pageNum, wordList);
@@ -121,12 +122,12 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         List<String> wordList = learnMapper.selectWordInCurrentCourse(student.getId(), wordIds);
         if (wordList.size() < 110) {
             // 如果当前课程下单词总数补足110个，从其他智能版课程随机再取剩余数量的单词
-            List<String> otherWordList = learnMapper.selectWordRandomInCourse(student.getId(), 110 - wordList.size());
+            List<String> otherWordList = learnMapper.selectWordRandomInCourse(student.getId(), 110 - wordList.size(), wordIds);
             wordList.addAll(otherWordList);
         }
         if (wordList.size() < 110) {
             // 如果学生所有课程中单词总数补足110个，从《外研社版（一年级起）(一年级-上册)》取剩余单词
-            List<String> otherWordList = vocabularyMapper.selectWordByCourseId(2863L, 0, 110 - wordIds.size());
+            List<String> otherWordList = vocabularyMapper.selectWordByCourseId(2863L, 0, 110 - wordIds.size(), wordIds);
             wordList.addAll(otherWordList);
         }
         Collections.shuffle(wordList);
@@ -143,6 +144,7 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
             gameTwoVo.setBigBossIndex(bigBossIndex);
             gameTwoVo.setMinBossIndex(minBossIndex);
             gameTwoVo.setReadUrl(baiduSpeak.getLanguagePath(needReviewWord.get("word").toString()));
+            gameTwoVo.setChinese(needReviewWord.get("wordChinese").toString());
 
             // 封装纸牌的试题集合并打乱顺序；
             subjects = new ArrayList<>(12);
