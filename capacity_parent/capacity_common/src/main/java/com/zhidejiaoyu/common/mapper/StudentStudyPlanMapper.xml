@@ -45,7 +45,7 @@
         from student_study_plan
         where student_id = #{studentId}
           and type = #{type}
-          and course_id = 1
+          and complete = 1
     </select>
 
     <select id="selByStudentId" parameterType="java.util.Map" resultType="java.util.Map">

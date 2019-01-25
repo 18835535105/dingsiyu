@@ -233,9 +233,13 @@ public interface UnitMapper extends BaseMapper<Unit> {
      */
     List<Map<String, Object>> selectUnitIdAndUnitNameByCourseIdAndStudentId(@Param("courseId") Long courseId, @Param("studentId") Long studentId);
 
+<<<<<<< HEAD
 
     List<Map<String, Object>> selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(@Param("courseId") Long courseId, @Param("startUnitId") Long startUnitId, @Param("endUnitId") Long endUnitId, @Param("studentId") Long studentId);
 
+=======
+    List<Map<String, Object>> selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(@Param("courseId") Long courseId, @Param("startUnitId") Long startUnitId, @Param("endUnitId") Long endUnitId, @Param("studentId") Long studentId);
+>>>>>>> 996e43bd8e0455497f4cc04ca879358d5582abf3
     /**
      * 当前课程下单元总个数
      *

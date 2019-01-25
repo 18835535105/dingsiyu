@@ -912,9 +912,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         Integer point = wordUnitTestDTO.getPoint();
 
-        // 获取需要奖励的能量值
-        int addEnergy = getEnergy(student, point);
-
         // 保存测试记录
         // 查看是否已经有该单元当前模块的单元闯关测试记录
         TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
@@ -922,12 +919,27 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (testRecord == null) {
             isFirst = true;
         }
-        saveTestLearnAndCapacity.saveTestAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, unitId, classify);
 
         // 根据不同分数奖励学生金币
-        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord);
+        int goldCount = 0;
+        int addEnergy = 0;
+        if (!redisOpt.isRepeatSubmit(student.getId(), (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME))) {
+            saveTestLearnAndCapacity.saveTestAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, unitId, classify);
 
-        Long testId = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, testRecord, goldCount);
+            goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord);
+
+            Long testId = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, testRecord, goldCount);
+
+            // 保存测试记录详情
+            if (testDetail != null) {
+                this.saveTestDetail(testDetail, testId, classify, student);
+            }
+
+            // 获取需要奖励的能量值
+            addEnergy = getEnergy(student, point);
+
+            ccieUtil.saveCcieTest(student, 1, classify);
+        }
 
         String msg;
         // 默写
@@ -940,17 +952,11 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             msg = getMessage(student, vo, point, PASS);
         }
 
-        // 保存测试记录详情
-        if (testDetail != null) {
-            this.saveTestDetail(testDetail, testId, classify, student);
-        }
-       
         vo.setMsg(msg);
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
         vo.setGold(goldCount);
         vo.setEnergy(addEnergy);
         countMyGoldUtil.countMyGold(student);
-        ccieUtil.saveCcieTest(student, 1, classify);
         studentMapper.updateByPrimaryKeySelective(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(vo);

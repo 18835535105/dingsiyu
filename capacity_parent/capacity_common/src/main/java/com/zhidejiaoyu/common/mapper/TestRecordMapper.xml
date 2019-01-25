@@ -802,4 +802,14 @@
         from test_record_info t
         where t.test_id = #{testId}
     </select>
+    <select id="countCurrentTestByStudentId" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from test_record
+        where student_id = #{studentId}
+          and unit_id =
+              #{unitId}
+          and genre = #{genre}
+          and study_model = #{studyModel}
+          and test_start_time = #{testStartTime}
+    </select>
 </mapper>
