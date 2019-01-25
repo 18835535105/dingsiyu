@@ -453,11 +453,8 @@
         a.explain,
         a.study_model,
         IFNULL(a.award_gold, 0) AS award_gold
-        from test_record a,
-        student_unit su
-        where a.student_id = su.student_id
-        and su.type = 1
-        and a.unit_id = su.unit_id
+        from test_record a
+        where a.student_id = #{student_id}
         <if test="type == 1">
             <!-- 单词类型的测试记录 -->
           and a.study_model in ('单词图鉴','慧记忆','慧听写','慧默写')
