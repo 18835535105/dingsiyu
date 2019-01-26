@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -31,13 +33,24 @@ public class BaiduSpeak {
     private VocabularyMapper vocabularyMapper;
 
     /**
+     * 需要特殊处理的单词/例句集合
+     */
+    private static Map<String, String> wordMap;
+
+    static {
+        wordMap = new HashMap<>(16);
+        wordMap.put("Mr.", "Mr.");
+        wordMap.put("car", "car");
+    }
+
+    /**
      * 获取语音合成地址
      *
      * @param text 需要合成的文字内容
      * @return
      */
     public String getLanguagePath(String text) {
-        if (Objects.equals("Mr.", text)) {
+        if (wordMap.containsKey(text)) {
             return youdao + text + "&type=1";
         }
         return youdao + text;

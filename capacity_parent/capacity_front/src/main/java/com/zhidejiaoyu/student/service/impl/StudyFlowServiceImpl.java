@@ -283,15 +283,12 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 return openNextUnitAndReturn(unitId, session, student, studyFlow);
             } else if (Objects.equals(-1, studyFlow.getNextTrueFlow())) {
                 // 进入流程2
-               /* String s = this.unlockNextUnit(student, courseId, unitId, session, studyFlow);
-                if (s != null) {
-                    return ServerResponse.createBySuccess(300, s);
-                }*/
                 return toAnotherFlow(student, 24);
             } else if (Objects.equals(-3, studyFlow.getNextTrueFlow())) {
                 // 进入流程1
                 String s = this.unlockNextUnit(student, unitId, session, studyFlow);
                 if (s != null) {
+                    toAnotherFlow(student, 11);
                     return ServerResponse.createBySuccess(300, s);
                 }
                 return toAnotherFlow(student, 11);
