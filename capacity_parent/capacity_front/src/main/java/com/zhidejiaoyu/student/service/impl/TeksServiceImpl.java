@@ -263,13 +263,13 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 Map<String, Object> unitInfoMap;
                 for (Map<String, Object> unitMap : textUnits) {
                     unitInfoMap = new HashMap<>(16);
+                    if (studyMap == null) {
+                        studyMap = new HashMap<>();
+                        studyMap.put("unitId", unitMap.get("id"));
+                        studyMap.put("version", unitMap.get("version"));
+                        studyMap.put("grade", unitMap.get("grade").toString() + unitMap.get("label").toString());
+                    }
                     if (Objects.equals(courseMap.get("id"), unitMap.get("courseId"))) {
-                        if (studyMap == null) {
-                            studyMap = new HashMap<>();
-                            studyMap.put("unitId", unitMap.get("id"));
-                            studyMap.put("version", unitMap.get("version"));
-                            studyMap.put("grade", unitMap.get("grade").toString() + unitMap.get("label").toString());
-                        }
                         if (id == null && courseUnitVo.getLearnUnit() == null) {
                             courseUnitVo.setLearnUnit(unitMap.get("id").toString());
                         }

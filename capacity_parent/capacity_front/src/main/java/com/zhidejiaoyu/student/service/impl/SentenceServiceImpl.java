@@ -511,21 +511,15 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 testMap = testRecordMapper.selectHasUnitTest(studentId, unitIds);
                 unLearnMap = learnMapper.selectUnlearnUnit(studentId, unitIds);
             }
-            Map<String, Object> present = new HashMap<>();
+            Map<String, Object> present =null;
             if (capacityStudentUnit != null) {
                 Course course = courseMapper.selectById(capacityStudentUnit.getCourseId());
+                present= new HashMap<>();
                 present.put("version", course.getVersion());
                 present.put("grade", course.getGrade() + course.getLabel());
                 present.put("unitId", capacityStudentUnit.getUnitId());
-            } else {
-                if (sentenceUnits.size() > 0) {
-                    Map<String, Object> map = courseMapper.selectCourseByUnitId(Long.parseLong(sentenceUnits.get(0).get("id").toString()));
-                    present.put("version", map.get("version"));
-                    present.put("grade", map.get("grade").toString() + map.get("label").toString());
-                    present.put("unitId", map.get("unitId"));
-                }
             }
-            result.put("present", present);
+
             for (Map<String, Object> courseMap : courses) {
 
                 courseUnitVo = new CourseUnitVo();
@@ -540,6 +534,12 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                     courseUnitVo.setLearnUnit(learnUnitId.toString());
                 }
                 for (Map<String, Object> unitMap : sentenceUnits) {
+                    if(present==null){
+                        Map<String, Object> map = courseMapper.selectCourseByUnitId(Long.parseLong(unitMap.get("id").toString()));
+                        present.put("version", map.get("version"));
+                        present.put("grade", map.get("grade").toString() + map.get("label").toString());
+                        present.put("unitId", map.get("unitId"));
+                    }
                     unitInfoMap = new HashMap<>(16);
                     if (Objects.equals(courseMap.get("id"), unitMap.get("courseId"))) {
                         if (learnUnitId == null && courseUnitVo.getLearnUnit() == null) {
@@ -629,6 +629,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 courseUnitVos.add(courseUnitVo);
             }
             List<Map<String, Object>> courseList = courseMapper.getAllVersion(student.getId());
+            result.put("present", present);
             result.put("list", courseUnitVos);
             result.put("versionList", courseList);
         }
