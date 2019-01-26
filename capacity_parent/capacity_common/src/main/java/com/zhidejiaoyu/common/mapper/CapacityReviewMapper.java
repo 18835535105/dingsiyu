@@ -94,28 +94,70 @@ public interface CapacityReviewMapper {
 	Integer countRipeWord(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
 						  @Param("classify") String classify,  @Param("flag") int flag);
 
-	// 模块1已学题
-	@Select("select a.id, a.word, a.word_chinese as wordChinese, a.recordpicurl from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id	and b.unit_id = #{unit_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id  AND a.delStatus = 1")
+	/**
+	 * 模块1已学题
+	 *
+	 * @param student_id
+	 * @param unit_id
+	 * @param classifyStr
+	 * @return
+	 */
+	@Select("select a.id, a.word, a.word_chinese as wordChinese, a.recordpicurl from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id and b.type = 1 and b.unit_id = #{unit_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id  AND a.delStatus = 1")
 	List<Vocabulary> alreadyWordStrOne(@Param("student_id") Long student_id,@Param("unit_id") String unit_id,@Param("classifyStr") String classifyStr);
 
-	// 模块1生词题
-	@Select("select a.id, a.word, a.word_chinese as wordChinese, a.recordpicurl from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id and b.unit_id = #{unit_id} and b.student_id = #{student_id}	and b.study_model = #{classifyStr} and b.status = 0 INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id  AND a.delStatus = 1")
+	/**
+	 * 模块1生词题
+	 *
+	 * @param student_id
+	 * @param unit_id
+	 * @param classifyStr
+	 * @return
+	 */
+	@Select("select a.id, a.word, a.word_chinese as wordChinese, a.recordpicurl from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id and b.type = 1 and b.unit_id = #{unit_id} and b.student_id = #{student_id}	and b.study_model = #{classifyStr} and b.status = 0 INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id  AND a.delStatus = 1")
 	List<Vocabulary> accrueWordStrOne(@Param("student_id") Long student_id,@Param("unit_id") String unit_id,@Param("classifyStr")  String classifyStr);
 
-	// 模块1熟词题
-	@Select("select a.id, a.word, a.word_chinese as wordChinese, a.recordpicurl from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id and b.unit_id = #{unit_id} and b.student_id = #{student_id}	and b.study_model = #{classifyStr} and b.status = 1 INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id  AND a.delStatus = 1")
+	/**
+	 * 模块1熟词题
+	 *
+	 * @param student_id
+	 * @param unit_id
+	 * @param classifyStr
+	 * @return
+	 */
+	@Select("select a.id, a.word, a.word_chinese as wordChinese, a.recordpicurl from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id and b.type = 1 and b.unit_id = #{unit_id} and b.student_id = #{student_id}	and b.study_model = #{classifyStr} and b.status = 1 INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id  AND a.delStatus = 1")
 	List<Vocabulary> ripeWordStrOne(@Param("student_id") Long student_id, @Param("unit_id") String unit_id, @Param("classifyStr") String classifyStr);
-	
-	// 模块2,3已学题
-	@Select("select a.id, a.word, a.word_chinese as wordChinese, b.unit_id as status from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id	and b.unit_id = #{unit_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id")
+
+	/**
+	 * 模块2,3已学题
+	 *
+	 * @param student_id
+	 * @param unit_id
+	 * @param classifyStr
+	 * @return
+	 */
+	@Select("select a.id, a.word, a.word_chinese as wordChinese, b.unit_id as status from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id and b.type = 1 and b.unit_id = #{unit_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id")
 	List<Vocabulary> alreadyWordStr(@Param("student_id") Long student_id, @Param("unit_id") String unit_id, @Param("classifyStr") String classifyStr);
 
-	// 模块2,3生词题
-	@Select("select a.id, a.word, a.word_chinese as wordChinese, b.unit_id as status from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id and b.unit_id = #{unit_id} and b.student_id = #{student_id}	and b.study_model = #{classifyStr} and b.status = 0 INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id")
+	/**
+	 * 模块2,3生词题
+	 *
+	 * @param student_id
+	 * @param unit_id
+	 * @param classifyStr
+	 * @return
+	 */
+	@Select("select a.id, a.word, a.word_chinese as wordChinese, b.unit_id as status from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id and b.type = 1 and b.unit_id = #{unit_id} and b.student_id = #{student_id}	and b.study_model = #{classifyStr} and b.status = 0 INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id")
 	List<Vocabulary> accrueWordStr(@Param("student_id") Long student_id, @Param("unit_id") String unit_id, @Param("classifyStr") String classifyStr);
 
-	// 模块2,3熟词题
-	@Select("select a.id, a.word, a.word_chinese as wordChinese, b.unit_id as status from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id and b.unit_id = #{unit_id} and b.student_id = #{student_id}	and b.study_model = #{classifyStr} and b.status = 1 INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id")
+	/**
+	 * 模块2,3熟词题
+	 *
+	 * @param student_id
+	 * @param unit_id
+	 * @param classifyStr
+	 * @return
+	 */
+	@Select("select a.id, a.word, a.word_chinese as wordChinese, b.unit_id as status from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id and b.type = 1 and b.unit_id = #{unit_id} and b.student_id = #{student_id}	and b.study_model = #{classifyStr} and b.status = 1 INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id")
 	List<Vocabulary> ripeWordStr(@Param("student_id") Long student_id, @Param("unit_id") String unit_id, @Param("classifyStr") String classifyStr);
 
 	// 4,5,6模块初中已学题
