@@ -266,12 +266,12 @@ public class WordPictureServiceImpl implements WordPictureService {
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
         // 判断学生当前单元有无进行单元闯关测试记录，如果已参加过单元闯关测试，提示其需要花费金币购买测试机会，如果还没有测试记录可以免费进行测试
-        int flag = this.isFirstTest(student, unitId, "单词图鉴", isTrue);
+        /*int flag = this.isFirstTest(student, unitId, "单词图鉴", isTrue);
         if (flag == 1) {
             return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该单元闯关测试，再次参加需扣除1金币。");
         } else if (flag == 2) {
             return ServerResponse.createByError(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
-        }
+        }*/
 
         // 获取单元下所有有图片的单词
         List<Vocabulary> list = vocabularyMapper.getWordPicAll(unitId);
