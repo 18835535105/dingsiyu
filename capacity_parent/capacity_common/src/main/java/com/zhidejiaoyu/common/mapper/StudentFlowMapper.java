@@ -1,22 +1,20 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.StudentFlow;
 import com.zhidejiaoyu.common.pojo.StudentFlowExample;
-import java.util.List;
-
-import com.zhidejiaoyu.common.pojo.StudyFlow;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-public interface StudentFlowMapper {
+import java.util.List;
+
+public interface StudentFlowMapper extends BaseMapper<StudentFlow> {
     int countByExample(StudentFlowExample example);
 
     int deleteByExample(StudentFlowExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(StudentFlow record);
 
     int insertSelective(StudentFlow record);
 

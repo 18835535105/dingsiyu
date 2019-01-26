@@ -160,9 +160,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
         List<Vocabulary> vocabularies;
         Long courseId;
+        PageHelper.startPage(1, 100);
         if (capacityStudentUnit != null) {
             courseId = capacityStudentUnit.getCourseId();
-            PageHelper.startPage(1, 100);
             vocabularies = vocabularyMapper.selectByCourseId(courseId);
         } else {
             courseId = 2751L;
@@ -214,8 +214,11 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             // 无游戏测试记录，新增记录
             createGameTestRecord(testRecord, student, map);
             // 根据游戏分数初始化不同流程
-            this.initStudentFlow(student, testRecord.getPoint());
-            countMyGoldUtil.countMyGold(student);
+            StudentFlow studentFlow = studentFlowMapper.selectByStudentId(student.getId(), 0, 1);
+            this.initStudentFlow(student, testRecord.getPoint(), studentFlow);
+            if (studentFlow == null) {
+                countMyGoldUtil.countMyGold(student);
+            }
         }
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(map);
@@ -223,12 +226,11 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     /**
      * 游戏结束初始化学习流程
-     *
-     * @param student
+     *  @param student
      * @param point
+     * @param studentFlow
      */
-    private void initStudentFlow(Student student, Integer point) {
-        StudentFlow studentFlow = studentFlowMapper.selectByStudentId(student.getId(), 0, 1);
+    private void initStudentFlow(Student student, Integer point, StudentFlow studentFlow) {
         if (studentFlow == null) {
             studentFlow = new StudentFlow();
             studentFlow.setStudentId(student.getId());
@@ -242,6 +244,15 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 studentFlow.setCurrentFlowId(11L);
             }
             studentFlowMapper.insert(studentFlow);
+        } else {
+            if (point >= PASS) {
+                // 流程2
+                studentFlow.setCurrentFlowId(24L);
+            } else {
+                // 流程1
+                studentFlow.setCurrentFlowId(11L);
+            }
+            studentFlowMapper.updateById(studentFlow);
         }
     }
 

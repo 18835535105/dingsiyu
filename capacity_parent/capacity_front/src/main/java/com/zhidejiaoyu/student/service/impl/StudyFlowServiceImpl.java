@@ -37,9 +37,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     private StudentMapper studentMapper;
 
     @Resource
-    private StudentUnitMapper studentUnitMapper;
-
-    @Resource
     private CourseMapper courseMapper;
 
     @Resource
@@ -59,9 +56,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
     @Resource
     private OpenUnitLogMapper openUnitLogMapper;
-    
-    @Resource
-    private DurationMapper durationMapper;
 
     @Autowired
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
@@ -508,6 +502,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                     return "恭喜你，完成了本次学习任务，快去向教师申请开始新的征程吧！";
                 }
                 updateCapacityStudentUnit(capacityStudentUnit, nextPlan.getStartUnitId(), nextPlan);
+
+                // 进入下一学习计划前删除学前游戏测试记录，让学生再次进行学前游戏测试，重新初始化流程
+                testRecordMapper.deleteGameRecord(studentId);
 
                 return "干的漂亮，当前计划已经完成，新的计划已经开启！";
             } else {
