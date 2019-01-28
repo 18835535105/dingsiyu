@@ -323,9 +323,12 @@
   </update>
 
   <select id="selectNeedReviewWord" resultType="java.util.Map" parameterType="map">
-    select a.id, a.word, b.word_chinese, b.memory_strength, a.recordpicurl, b.fault_time, b.unit_id
-    from vocabulary a INNER JOIN capacity_picture b on a.id = b.vocabulary_id and b.unit_id = #{unidId}
-      and b.student_id = #{studentId} and b.push &lt; #{s} and b.memory_strength &lt; 1 and a.delStatus = 1 ORDER BY b.push asc LIMIT 0,1
+    select a.id, a.word, b.word_chinese, b.memory_strength, a.recordpicurl, b.fault_time, b.unit_id, a.sound_mark
+    from vocabulary a
+           INNER JOIN capacity_picture b on a.id = b.vocabulary_id and b.unit_id = #{unidId}
+      and b.student_id = #{studentId} and b.push &lt; #{s} and b.memory_strength &lt; 1 and a.delStatus = 1
+    ORDER BY b.push asc
+    LIMIT 0,1
   </select>
 
   <select id="selectByUnitIdAndId" resultMap="BaseResultMap" parameterType="map" >

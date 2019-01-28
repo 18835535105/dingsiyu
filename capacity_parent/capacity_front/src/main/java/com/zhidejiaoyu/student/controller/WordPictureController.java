@@ -36,11 +36,12 @@ public class WordPictureController {
      * 三种类型 看词选图,看图选词,听音选图
      *
      * @param session 用于获取当前学生id
+     * @param plan 学习进度
      * @return 封装的一道学习题
      */
     @RequestMapping("/getWordPicture")
-    public ServerResponse<Object> getWordPicture(HttpSession session, Long courseId, Long unitId){
-       return wordPictureService.getWordPicture(session, courseId, unitId);
+    public ServerResponse<Object> getWordPicture(HttpSession session, Long courseId, Long unitId, @RequestParam(defaultValue = "0") Integer plan) {
+       return wordPictureService.getWordPicture(session, courseId, unitId, plan);
     }
 
     /**
