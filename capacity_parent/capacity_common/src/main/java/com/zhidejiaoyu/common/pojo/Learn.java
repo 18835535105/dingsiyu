@@ -61,6 +61,11 @@ public class Learn extends Model<Learn> {
 	 */
 	private Integer type;
 
+	/**
+	 * 流程名称
+	 */
+	private String flowName;
+
 
     @Override
     protected Serializable pkVal() {

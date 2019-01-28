@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.service;
 
 import com.baomidou.mybatisplus.service.IService;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.StudyFlow;
 
 import javax.servlet.http.HttpSession;
 
@@ -48,4 +49,19 @@ public interface BaseService<T> extends IService<T> {
      * @return 有效时长 （秒）
      */
     Integer getOnLineTime(HttpSession session, String beginTime, String endTime);
+
+    /**
+     * 获取数据请求参数字符串
+     *
+     * @return
+     */
+    String getParameters();
+
+    /**
+     * 获取学生当前正在学习的流程信息
+     *
+     * @param studentId
+     * @return
+     */
+    StudyFlow getCurrentStudyFlow(Long studentId);
 }

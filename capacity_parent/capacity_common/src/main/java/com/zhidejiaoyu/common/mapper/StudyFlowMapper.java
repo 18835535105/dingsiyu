@@ -47,4 +47,12 @@ public interface StudyFlowMapper extends BaseMapper<StudyFlow> {
      * @return
      */
     StudyFlow selectStudentCurrentFlow(@Param("studentId") Long studentId, @Param("presentFlow") int presentFlow);
+
+    /**
+     * 获取学生当前正在学习的流程信息
+     *
+     * @param studentId
+     * @return
+     */
+    StudyFlow selectCurrentFlowByStudentId(@Param("studentId") Long studentId);
 }

@@ -277,24 +277,22 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 return openNextUnitAndReturn(unitId, session, student, studyFlow);
             } else if (Objects.equals(-1, studyFlow.getNextTrueFlow())) {
                 // 进入流程2
-                if ("流程2".equals(studyFlow.getFlowName())) {
-                    String s = this.unlockNextUnit(student, unitId, session, studyFlow);
-                    if (s != null) {
-                        toAnotherFlow(student, 24);
-                        return ServerResponse.createBySuccess(300, s);
-                    }
-                }
                 return toAnotherFlow(student, 24);
             } else if (Objects.equals(-3, studyFlow.getNextTrueFlow())) {
                 // 进入流程1
-                if ("流程1".equals(studyFlow.getFlowName())) {
+                // 判断当前单元流程1学习次数，如果没有学习，初始化同一单元的流程1；如果已学习初始化下一单元的流程1
+                int count = learnMapper.countByStudentIdAndFlow(student.getId(), unitId, "流程1");
+                if (count == 0) {
+                    return toAnotherFlow(student, 11);
+                } else {
                     String s = this.unlockNextUnit(student, unitId, session, studyFlow);
                     if (s != null) {
                         toAnotherFlow(student, 11);
                         return ServerResponse.createBySuccess(300, s);
+                    } else {
+                        return toAnotherFlow(student, 11);
                     }
                 }
-                return toAnotherFlow(student, 11);
             } else if (Objects.equals(-2, studyFlow.getNextTrueFlow())) {
                 // 继续上次流程
                 StudyFlow lastStudyFlow = studyFlowMapper.selectStudentCurrentFlow(student.getId(), 1);

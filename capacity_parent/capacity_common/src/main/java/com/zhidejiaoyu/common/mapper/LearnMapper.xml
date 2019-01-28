@@ -17,6 +17,7 @@
         <result column="first_study_time" property="firstStudyTime" jdbcType="TIMESTAMP"/>
         <result column="first_is_known" property="firstIsKnown" jdbcType="INTEGER"/>
         <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="flow_name" property="flowName"/>
     </resultMap>
 
     <!-- 查询learn中的单词还是例句 -->
@@ -91,7 +92,14 @@
     </sql>
     <sql id="Base_Column_List">
         id, student_id, course_id, unit_id, vocabulary_id, example_id, status, learn_time,
-        study_model, study_count, learn_count, update_time, first_study_time, first_is_known ,type
+        study_model,
+        study_count,
+        learn_count,
+        update_time,
+        first_study_time,
+        first_is_known ,
+        type,
+        flow_name
     </sql>
 
     <!--区分单词例句-->
@@ -1467,6 +1475,14 @@
         and learn_count = #{count}
         and study_model=#{studyModel}
         and type=#{type}
+    </select>
+    <select id="countByStudentIdAndFlow" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from learn
+        where student_id = #{studentId}
+          and unit_id = #{unitId}
+          and type = 1
+          and flow_name = #{flowName}
     </select>
 
 </mapper>

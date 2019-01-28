@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.service;
 
 import com.zhidejiaoyu.common.pojo.Learn;
+import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.vo.WordWriteStudyVo;
 
@@ -13,7 +14,7 @@ import javax.servlet.http.HttpSession;
  * @date 2018年5月17日 下午4:51:30
  *
  */
-public interface WordWriteService {
+public interface WordWriteService extends BaseService<Vocabulary> {
 
 	/**
 	 * 获取慧默写需要学习的单词

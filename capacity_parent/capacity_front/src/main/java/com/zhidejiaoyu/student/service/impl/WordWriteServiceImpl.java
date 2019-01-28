@@ -25,7 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class WordWriteServiceImpl implements WordWriteService {
+public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabulary> implements WordWriteService {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -230,6 +230,9 @@ public class WordWriteServiceImpl implements WordWriteService {
             learn.setStudyCount(1);
             learn.setLearnCount(1);
             learn.setUpdateTime(now);
+            if (super.getCurrentStudyFlow(studentId) != null) {
+                learn.setFlowName(super.getCurrentStudyFlow(studentId).getFlowName());
+            }
             if (courseLearnCount == 0) {
                 // 首次学习当前课程，记录课程首次学习时间
                 learn.setFirstStudyTime(now);

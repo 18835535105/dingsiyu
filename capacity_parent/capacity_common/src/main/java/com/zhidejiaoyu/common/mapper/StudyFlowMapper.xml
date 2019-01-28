@@ -275,5 +275,10 @@
         and stf.present_flow = #{presentFlow}
         limit 1
     </select>
+    <select id="selectCurrentFlowByStudentId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_column_list"/>
+        from study_flow sf, student_flow st where sf.id = st.current_flow_id and st.student_id = #{studentId}
+    </select>
 
 </mapper>

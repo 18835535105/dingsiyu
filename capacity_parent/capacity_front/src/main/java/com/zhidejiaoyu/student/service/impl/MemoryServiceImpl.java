@@ -290,7 +290,10 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         learn.setLearnCount(1);
         learn.setUpdateTime(now);
         learn.setType(1);
-        learnMapper.insertSelective(learn);
+        if (super.getCurrentStudyFlow(studentId) != null) {
+            learn.setFlowName(super.getCurrentStudyFlow(studentId).getFlowName());
+        }
+        learnMapper.insert(learn);
         return ServerResponse.createBySuccess();
     }
 
