@@ -182,9 +182,16 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 for (int i = 0; i < sentenceList.length; i++) {
                     if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
                         blankSentenceArray.add(null);
-                        blankSentenceArray.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                        sentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
-                        sentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
+                        if(sentenceList[i].endsWith("...")){
+                            blankSentenceArray.add(sentenceList[i].substring(sentenceList[i].length() - 3));
+                            sentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
+                            sentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
+                        }else{
+                            blankSentenceArray.add(sentenceList[i].substring(sentenceList[i].length() - 1));
+                            sentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
+                            sentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
+                        }
+
                     } else {
                         blankSentenceArray.add(null);
                         sentence.add(sentenceList[i]);
