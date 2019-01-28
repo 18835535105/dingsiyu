@@ -37,7 +37,7 @@ public class TeksController  {
     }
 
     @ResponseBody
-    @RequestMapping("getIsInto")
+    @RequestMapping("/getIsInto")
     public ServerResponse<Map<String,Object>> getIsInto(HttpSession session,Long unitId) {
         return teksService.getIsInto(session,unitId);
     }
