@@ -120,7 +120,14 @@
             sentence_write cr
         </if>
     </sql>
-
+    <sql id="table_studyModel_sql_vocAndSen">
+        <if test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel =='例句默写'">
+            sentence v
+        </if>
+        <if test="studyModel == '慧记忆' or studyModel == '慧听写' or  studyModel == '慧默写' or studyModel == '单词图鉴'">
+            vocabulary v
+        </if>
+    </sql>
 
     <insert id="insertByBatch" parameterType="map">
 		INSERT INTO <include refid="classify_sql"/>
@@ -371,10 +378,12 @@
         select
         <include refid="more_table_sql"/>
         from
-        <include refid="more_table_studyModel_sql"/>, vocabulary v
+        <include refid="more_table_studyModel_sql"/>, <include refid="table_studyModel_sql_vocAndSen"/>
         where
         cr.vocabulary_id = v.id
-        and v.delStatus = 1
+        <if test="studyModel == '慧记忆' or studyModel == '慧听写' or  studyModel == '慧默写' or studyModel == '单词图鉴'">
+            and v.delStatus = 1
+        </if>
         and cr.memory_strength &lt; 1
         and cr.student_id = #{student.id}
         and cr.course_id = #{courseId}
@@ -387,10 +396,12 @@
         select
         count(distinct cr.vocabulary_id)
         from
-        <include refid="more_table_studyModel_sql"/>, vocabulary v
+        <include refid="more_table_studyModel_sql"/>, <include refid="table_studyModel_sql_vocAndSen"/>
         where
         cr.vocabulary_id = v.id
-        and v.delStatus = 1
+        <if test="studyModel == '慧记忆' or studyModel == '慧听写' or  studyModel == '慧默写' or studyModel == '单词图鉴'">
+            and v.delStatus = 1
+        </if>
         and cr.memory_strength &lt; 1
         and cr.student_id = #{student.id}
         <if test="courseId != null">
