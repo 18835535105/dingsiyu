@@ -771,6 +771,10 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             if(hasCapacityTeks){
                 result.put("capacityTeks", true);
             }
+            //判断学生是否有同步版阅读课程，没有同步版课文课程不能进入智能版学习
+            result.put("capacityRead",false);
+            //判断学生是否有同步版阅读课程，没有同步版课文课程不能进入智能版学习
+            result.put("capacityAxisMotif",false);
             // 当前用户信息放到session
             session.setAttribute(UserConstant.CURRENT_STUDENT, stu);
             // 登陆时间放入session
