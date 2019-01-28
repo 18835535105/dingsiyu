@@ -65,4 +65,10 @@ public class RedisKeysConst {
      * key: TEST_SUBMIT:studentId  value:学生测试开始时间
      */
     public static final String TEST_SUBMIT = "TEST_SUBMIT";
+
+    /**
+     * 用于存储已经保存过时长信息的登录时间，防止在线时长重复保存导致在线时长比实际大问题
+     * key: SAVE_LOGIN_TIME:studentId value:保存的在线时长中的登录时间
+     */
+    public static final String SAVE_LOGIN_TIME = "SAVE_LOGIN_TIME";
 }

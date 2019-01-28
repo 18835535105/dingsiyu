@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1020,12 +1021,21 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveDurationInfo(Student student, HttpSession session) {
-        Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
+        Date date = (Date) session.getAttribute(TimeConstant.LOGIN_TIME);
+        Date loginTime = DateUtil.parseYYYYMMDDHHMMSS(date);
         Date loginOutTime = DateUtil.parseYYYYMMDDHHMMSS(new Date());
-        if (loginTime != null && loginOutTime != null) {
+
+        String key = RedisKeysConst.SAVE_LOGIN_TIME + ":" + student.getId() + ":" + date;
+        Object object = redisTemplate.opsForValue().get(key);
+
+        if (loginTime != null && loginOutTime != null && object == null) {
             // 判断当前登录时间是否已经记录有在线时长信息，如果没有插入记录，如果有无操作
             int count = durationMapper.countOnlineTimeWithLoginTime(student, loginTime);
             if (count <= 0) {
+
+                redisTemplate.opsForValue().set(key, date);
+                redisTemplate.expire(key, 30, TimeUnit.SECONDS);
+
                 // 学生 session 失效时将该学生从在线人数中移除
                 redisTemplate.opsForSet().remove(RedisKeysConst.ONLINE_USER, student.getId());
 
