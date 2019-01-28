@@ -600,7 +600,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                             } else if (id3 >= senCount) {
                                 Integer count = testRecordMapper.selectByStudentIdAndGenre(student.getId(), Long.parseLong(unitMap.get("id").toString()));
                                 if(id2!=null && id2!=0){
-                                    if (id2/senCount == count) {
+                                    if (id2/senCount <= count) {
                                         unitInfoMap.put("sentenceWriting", "已学习");
                                     } else {
                                         unitInfoMap.put("sentenceWriting", "正在学习");
