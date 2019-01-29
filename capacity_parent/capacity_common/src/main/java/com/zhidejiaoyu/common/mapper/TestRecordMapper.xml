@@ -816,6 +816,6 @@
         and genre='单元闯关测试'
         and unit_id=#{unitId}
         and study_model='例句默写'
-        order by id limit 1
+        order by id desc limit 1
     </select>
 </mapper>
