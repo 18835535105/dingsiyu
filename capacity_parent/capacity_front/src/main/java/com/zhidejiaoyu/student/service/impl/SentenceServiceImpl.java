@@ -590,6 +590,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                         } else {
                             unitInfoMap.put("sentenceListening", "未学习");
                         }
+
                         Long id2 = learnMapper.countLearnWord(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(6), learnCount == null ? 1 : learnCount);
                         if (id2 < senCount && id2 > 0) {
                             unitInfoMap.put("sentenceWriting", "正在学习");
@@ -598,11 +599,17 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                             if (id3 < senCount && id3 > 0) {
                                 unitInfoMap.put("sentenceWriting", "正在学习");
                             } else if (id3 >= senCount) {
-                                Integer count = testRecordMapper.selectByStudentIdAndGenre(student.getId(), Long.parseLong(unitMap.get("id").toString()));
+                                TestRecord testRecord = testRecordMapper.selectByStudentIdAndGenre(student.getId(), Long.parseLong(unitMap.get("id").toString()));
                                 if(id2!=null && id2!=0){
-                                    if (id2/senCount <= count) {
-                                        unitInfoMap.put("sentenceWriting", "已学习");
-                                    } else {
+                                    //获取最后一个句子的学习时间
+                                    Learn learnSentence = learnMapper.selLaterSentence(student.getId(), Long.parseLong(unitMap.get("id").toString()));
+                                    if(testRecord!=null){
+                                        if(testRecord.getTestStartTime().getTime()>learnSentence.getLearnTime().getTime()){
+                                            unitInfoMap.put("sentenceWriting", "已学习");
+                                        }else{
+                                            unitInfoMap.put("sentenceWriting", "正在学习");
+                                        }
+                                    }else{
                                         unitInfoMap.put("sentenceWriting", "正在学习");
                                     }
                                 }else{

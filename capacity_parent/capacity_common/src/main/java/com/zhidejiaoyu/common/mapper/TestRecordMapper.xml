@@ -809,4 +809,13 @@
           and study_model = #{studyModel}
           and test_start_time = #{testStartTime}
     </select>
+
+    <select id="selectByStudentIdAndGenre" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select * from test_record
+        where student_id=#{id}
+        and genre='单元闯关测试'
+        and unit_id=#{unitId}
+        and study_model='例句默写'
+        order by id limit 1
+    </select>
 </mapper>

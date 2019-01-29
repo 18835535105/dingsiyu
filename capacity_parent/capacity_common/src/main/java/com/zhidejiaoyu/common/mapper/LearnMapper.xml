@@ -1468,5 +1468,9 @@
         and study_model=#{studyModel}
         and type=#{type}
     </select>
+    <select id="selLaterSentence" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select * from learn where student_id=#{studentId} and type=1 and unit_id=#{unitId} order by id limit 1;
+    </select>
+
 
 </mapper>

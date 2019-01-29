@@ -1,10 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.zhidejiaoyu.common.pojo.Course;
-import com.zhidejiaoyu.common.pojo.Learn;
-import com.zhidejiaoyu.common.pojo.LearnExample;
-import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.*;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Param;
 
@@ -832,4 +829,6 @@ public interface LearnMapper extends BaseMapper<Learn> {
      */
     List<Long> selectLearnIds(@Param("studentId") Long studentId, @Param("learn") Learn learn,
                               @Param("studyModel") String studyModel, @Param("count") int count, @Param("type") int type);
+
+    Learn selLaterSentence(@Param("studentId") Long studentId,@Param("unitId") long unitId);
 }
