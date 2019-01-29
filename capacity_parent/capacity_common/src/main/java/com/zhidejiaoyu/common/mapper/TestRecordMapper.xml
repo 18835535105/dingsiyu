@@ -811,7 +811,7 @@
     </select>
 
     <select id="selectByStudentIdAndGenre" resultMap="BaseResultMap" parameterType="java.util.Map">
-        select * from test_record
+        select <include refid="Base_Column_List"/> from test_record
         where student_id=#{id}
         and genre='单元闯关测试'
         and unit_id=#{unitId}
