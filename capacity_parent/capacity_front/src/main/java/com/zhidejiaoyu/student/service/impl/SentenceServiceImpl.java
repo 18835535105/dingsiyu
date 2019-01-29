@@ -604,7 +604,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                                     //获取最后一个句子的学习时间
                                     Learn learnSentence = learnMapper.selLaterSentence(student.getId(), Long.parseLong(unitMap.get("id").toString()));
                                     if(testRecord!=null){
-                                        if(testRecord.getTestStartTime().getTime()>learnSentence.getLearnTime().getTime()){
+                                        if(testRecord.getTestEndTime().getTime() > learnSentence.getLearnTime().getTime()){
                                             unitInfoMap.put("sentenceWriting", "已学习");
                                         }else{
                                             unitInfoMap.put("sentenceWriting", "正在学习");
