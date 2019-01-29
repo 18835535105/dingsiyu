@@ -1025,8 +1025,12 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         Date loginTime = DateUtil.parseYYYYMMDDHHMMSS(date);
         Date loginOutTime = DateUtil.parseYYYYMMDDHHMMSS(new Date());
 
-        String key = RedisKeysConst.SAVE_LOGIN_TIME + ":" + student.getId() + ":" + date;
-        Object object = redisTemplate.opsForValue().get(key);
+        Object object = null;
+        String key = "";
+        if (student != null) {
+            key = RedisKeysConst.SAVE_LOGIN_TIME + ":" + student.getId() + ":" + date;
+            object = redisTemplate.opsForValue().get(key);
+        }
 
         if (loginTime != null && loginOutTime != null && object == null) {
             // 判断当前登录时间是否已经记录有在线时长信息，如果没有插入记录，如果有无操作
