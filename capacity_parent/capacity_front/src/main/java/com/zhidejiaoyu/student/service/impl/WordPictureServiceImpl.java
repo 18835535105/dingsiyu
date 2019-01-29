@@ -10,10 +10,8 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
-import com.zhidejiaoyu.common.utils.server.GoldResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.WordPictureService;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,20 +77,21 @@ public class WordPictureServiceImpl implements WordPictureService {
      * @param session
      * @param courseId
      * @param unitId
+     * @param plan
      * @return
      */
     @Override
-    public ServerResponse<Object> getWordPicture(HttpSession session, Long courseId, Long unitId) {
+    public ServerResponse<Object> getWordPicture(HttpSession session, Long courseId, Long unitId, Integer plan) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         Long studentId = student.getId();
 
         // 判断学生是否在本系统首次学习，如果是记录首次学习时间
         judgeIsFirstStudy(session, student);
 
-        // 判断学生是否需要进行单元闯关测试
-        ServerResponse<Object> x = judgeToUnitTest(unitId, student, courseId);
-        if (x != null) {
-            return x;
+        int wordCount = unitVocabularyMapper.countWordPictureByUnitId(unitId);
+        if (wordCount == 0) {
+            log.error("单元 {} 下没有单词图鉴信息！", unitId);
+            return ServerResponse.createByErrorMessage("The unit no pictures");
         }
 
         // 1. 根据随机数获取题型, 并查出一道正确的题
@@ -102,7 +101,10 @@ public class WordPictureServiceImpl implements WordPictureService {
         // 没有需要复习的
         if (correct == null) {
             // 获取新词
-            correct = vocabularyMapper.getNotNeedReviewWord(unitId, studentId);
+            correct = vocabularyMapper.selectPictureWord(studentId, unitId, plan);
+            if (correct == null) {
+                return ServerResponse.createBySuccess(600, "TO_UNIT_TEST");
+            }
             // 是新单词
             correct.put("studyNew", true);
             // 记忆强度
@@ -139,21 +141,8 @@ public class WordPictureServiceImpl implements WordPictureService {
         Integer hard = memoryDifficultyUtil.getMemoryDifficulty(cp, 1);
         correct.put("memoryDifficulty", hard);
 
-        try {/**/
-            Map<String, String> resultMap = youDaoTranslate.getResultMap(correct.get("word").toString());
-            // 音标
-            String phonetic = resultMap.get("phonetic");
-            if(StringUtils.isNotBlank(phonetic) && !"null".equals(phonetic)) {
-                correct.put("soundmark", "[" + phonetic + "]");
-            }else {
-                correct.put("soundmark", null);
-            }
-//            vocabularyMapper.
-            // 读音url
-            correct.put("readUrl", baiduSpeak.getLanguagePath(correct.get("word").toString()));
-        } catch (Exception e) {
-            log.error("WordPictureServiceImpl.ServerResponse(有道翻译)");
-        }
+        // 读音url
+        correct.put("readUrl", baiduSpeak.getLanguagePath(correct.get("word").toString()));
 
         // 2. 从本课程非本单元下随机获取三个题, 三个作为错题, 并且id不等于正确题id
         List<Map<String, Object>> mapErrorVocabulary = vocabularyMapper.getWordIdByCourse(new Long(correct.get("id").toString()), courseId, unitId);
@@ -161,24 +150,15 @@ public class WordPictureServiceImpl implements WordPictureService {
         Collections.shuffle(mapErrorVocabulary); // 随机打乱顺序
 
         // 封装选项正确答案
-        Map subject = new HashMap();
-        for(Map m : mapErrorVocabulary){
+        Map subject = new HashMap(16);
+        for (Map m : mapErrorVocabulary) {
 
             boolean b = false;
-            if(m.get("word").equals(correct.get("word"))){
+            if (m.get("word").equals(correct.get("word"))) {
                 b = true;
             }
-
-//            if(i == 1){
-//                correct.put("type", 1);
-//                subject.put(m.get("recordpicurl"), b);
-//            }else if(i == 2){
-                correct.put("type", 2);
-                subject.put(m.get("word"), b);
-//            }else {
-//                correct.put("type", 3);
-//                subject.put(m.get("recordpicurl"), b);
-//            }
+            correct.put("type", 2);
+            subject.put(m.get("word"), b);
         }
         // 把四个选项添加到correct正确答案数据中
         correct.put("subject", subject);
@@ -186,11 +166,6 @@ public class WordPictureServiceImpl implements WordPictureService {
         // 3. count单元表单词有多少个查询存在图片的    /.
         Integer count = unitMapper.countWordByUnitidByPic(unitId);
         correct.put("wordCount", count);
-
-        // 4. 该单元已学单词  ./
-        //Integer count_ = capacityListenMapper.alreadyStudyWord(unit_id, id);
-        Long count_ = learnMapper.learnCountWord(studentId, Integer.parseInt(unitId.toString()), "单词图鉴");
-        correct.put("plan", count_);
 
         // 5. 是否是第一次学习单词图鉴，true:第一次学习，进入学习引导页；false：不是第一次学习
         Integer the = learnMapper.theFirstTimeToWordPic(studentId);
@@ -224,29 +199,6 @@ public class WordPictureServiceImpl implements WordPictureService {
             studentMapper.updateByPrimaryKeySelective(student);
             session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         }
-    }
-
-    /**
-     * 判断学生是否需要进行单元闯关测试
-     *
-     * @param unitId
-     * @param student
-     * @param courseId
-     * @return
-     */
-    private ServerResponse<Object> judgeToUnitTest(Long unitId, Student student, Long courseId) {
-        // 查询当前课程的学习遍数
-        Integer maxCount = studyCountMapper.selectMaxCountByCourseId(student.getId(), courseId);
-        Long plan = learnMapper.countLearnWord(student.getId(), unitId, "单词图鉴", maxCount == null ? 1 : maxCount);
-        // 获取当前单元下的所有单词的总个数
-        int wordCount = unitVocabularyMapper.countWordPictureByUnitId(unitId);
-        if (wordCount == 0) {
-            log.error("单元 {} 下没有单词图鉴信息！", unitId);
-            return ServerResponse.createByErrorMessage("The unit no pictures");
-        } else if (wordCount == plan) {
-            return ServerResponse.createBySuccess(600, "TO_UNIT_TEST");
-        }
-        return null;
     }
 
     /**

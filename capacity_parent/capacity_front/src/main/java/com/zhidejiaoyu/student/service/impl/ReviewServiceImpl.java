@@ -1601,7 +1601,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             msg.append(" 中获得#").append(gold).append("#金币。");
         } else {
             testRecord.setAwardGold(0);
-            msg.append(" 中未获得金币。");
+            msg.append(" 中获得#0#金币。");
         }
         return gold;
 

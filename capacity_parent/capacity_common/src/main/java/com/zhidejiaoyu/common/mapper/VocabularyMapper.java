@@ -305,8 +305,6 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
 
     List<Map<String, Object>> getWordIdByCourse(@Param("correctWordId") Long correctWordId, @Param("courseId") Long courseId, @Param("unidId") Long unidId);
 
-    Map<String, Object> getNotNeedReviewWord(@Param("unitId") Long unidId, @Param("studentId") Long studentId);
-
     List<Vocabulary> getWordPicAll(@Param("unitId") Long unitId);
 
     List<Vocabulary> getWordIdByCourseAll(@Param("courseId") Long courseId);
@@ -409,4 +407,14 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     List<Map<String, Object>> selectPictureWordFromLearned(@Param("studentId") Long studentId, @Param("limit") int limit);
+
+    /**
+     * 获取指定进度的单词图鉴信息
+     *
+     * @param studentId
+     * @param unitId
+     * @param plan
+     * @return
+     */
+    Map<String, Object> selectPictureWord(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("plan") Integer plan);
 }

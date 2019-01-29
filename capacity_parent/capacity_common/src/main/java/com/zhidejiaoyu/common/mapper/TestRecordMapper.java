@@ -258,4 +258,12 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      */
     int countCurrentTestByStudentId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("genre") String genre,
                                     @Param("studyModel") String studyModel, @Param("testStartTime") Date testStartTime);
+
+    /**
+     * 删除学生的学前游戏测试记录
+     *
+     * @param studentId
+     */
+    @Delete("delete from test_record where student_id = #{studentId} and genre = '学前游戏测试'")
+    void deleteGameRecord(@Param("studentId") Long studentId);
 }

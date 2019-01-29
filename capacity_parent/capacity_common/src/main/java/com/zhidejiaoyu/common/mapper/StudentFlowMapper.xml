@@ -109,12 +109,6 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.StudentFlow">
-        insert into student_flow (id, student_id, current_flow_id,
-                                  current_flow_max_id, time_machine, present_flow)
-        values (#{id,jdbcType=BIGINT}, #{studentId,jdbcType=BIGINT}, #{currentFlowId,jdbcType=BIGINT},
-                #{currentFlowMaxId,jdbcType=BIGINT}, #{timeMachine,jdbcType=INTEGER}, #{presentFlow,jdbcType=INTEGER})
-    </insert>
     <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.StudentFlow">
         insert into student_flow
         <trim prefix="(" suffix=")" suffixOverrides=",">
