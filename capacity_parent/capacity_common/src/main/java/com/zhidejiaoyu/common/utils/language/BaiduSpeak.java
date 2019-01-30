@@ -51,12 +51,12 @@ public class BaiduSpeak {
      */
     public String getLanguagePath(String text) {
         if (wordMap.containsKey(text)) {
-            return  baidu + text ;
-            /*return youdao + text + "&type=1";*/
+            //return  baidu + text ;
+            return youdao + text + "&type=1";
         }
 
-        return baidu + text;
-        /*return youdao + text;*/
+        //return baidu + text;
+        return youdao + text;
 
         /*Vocabulary vocabulary = vocabularyMapper.selectByWord(text);
         if (vocabulary != null && StringUtils.isNotEmpty(vocabulary.getReadUrl())) {
@@ -73,7 +73,6 @@ public class BaiduSpeak {
     }
 
     public String getSentencePaht(String text) {
-        return baidu + text;
-        /*return youdao + text + "@&@" + baidu + text;*/
+        return youdao + text + "@&@" + baidu + text;
     }
 }
