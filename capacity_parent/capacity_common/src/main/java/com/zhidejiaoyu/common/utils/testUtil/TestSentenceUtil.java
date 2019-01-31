@@ -37,13 +37,13 @@ public class TestSentenceUtil {
             if(i!=0){
                 int ran = MathUtil.getRandom(1, 10);
                 if(ran>=5){
-                    resultList.add(englishToChinese(sentences.get(i), sentenceList));
+                    resultList.add(hearing(sentences.get(i), sentenceList));
                 }
                 if(ran<5 && ran>=3){
                     resultList.add(chineseToEnglish(sentences.get(i), sentenceList));
                 }
                 if(ran>=1&&ran<3){
-                    resultList.add(hearing(sentences.get(i), sentenceList));
+                    resultList.add(englishToChinese(sentences.get(i), sentenceList));
                 }
             }
 
