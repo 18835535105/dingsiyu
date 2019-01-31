@@ -358,7 +358,7 @@ public class CommonMethod implements Serializable {
             if (sentence.contains(s)) {
                 if (".".equals(s)) {
                     if(sentence.contains(".")){
-                        sentence=sentence.replace(". "," "+".");
+                        sentence=sentence.replace(". "," . ");
                         if(sentence.substring(sentence.length()-1).equals(".")){
                             sentence=sentence.substring(0,sentence.length()-1);
                             sentence=sentence+" .";
@@ -448,7 +448,7 @@ public class CommonMethod implements Serializable {
                         sentence=sentence.substring(0,sentence.length()-1);
                     }
                 }else{
-                    sentence = sentence.replace(s, "");
+                    sentence = sentence.replace(s, "*");
                 }
             }
         }
@@ -480,18 +480,15 @@ public class CommonMethod implements Serializable {
     public List<String> getChineseList(String sentence) {
         for (String s : POINT) {
             if (sentence.contains(s)) {
-                if (sentence.contains(s)) {
-                    if(".".equals(s)){
-                        sentence=sentence.replace(". ","*"+"."+"*");
-                        if(sentence.substring(sentence.length()-1).equals(".")){
-                            sentence=sentence.substring(0,sentence.length()-1);
-                            sentence=sentence+"*.*";
-                        }
-                    }else{
-                        sentence = sentence.replace(s, "*" + s + "*");
-                    }
+                if (".".equals(s)) {
+                    sentence=sentence.replace(". ","*"+"."+"*");
+                    if(sentence.substring(sentence.length()-1).equals("."));
+                }else{{
+                    sentence=sentence.substring(0,sentence.length()-1);
+                    sentence=sentence+"*.*";
                 }
-
+                    sentence = sentence.replace(s, "*" + s + "*");
+                }
             }
         }
 
