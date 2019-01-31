@@ -65,14 +65,14 @@ public class SessionListener implements HttpSessionListener {
         // 当 session 失效时只有 9082 端口的服务负责保存学生时长信息
         if (currentPort == Integer.valueOf(port)) {
             HttpSession session = se.getSession();
-            if (session != null) {
-                session = getSessionById(session.getId());
-                removeSessionById(session.getId());
-                clearRedisSessionId(session);
-                saveLogoutInfo(session);
-                Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-                loginService.saveDurationInfo(student, session);
+            Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+            if (student == null) {
+                student = (Student) getSessionById(session.getId()).getAttribute(UserConstant.CURRENT_STUDENT);
             }
+            removeSessionById(session.getId());
+            clearRedisSessionId(session);
+            saveLogoutInfo(session);
+            loginService.saveDurationInfo(student, session);
         }
     }
 
