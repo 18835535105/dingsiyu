@@ -1412,7 +1412,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         testRecord.setUnitId((unitId == null || unitId.length == 0) ? null : unitId[0]);
         int gold = 0;
 
-        if ("已学测试".equals(genre) || "生词测试".equals(genre) || "熟词测试".equals(genre) || genre.contains("五维测试")) {
+        if ("已学测试".equals(genre) || "生词测试".equals(genre) || "熟词测试".equals(genre) || genre.contains("五维测试")
+                || genre.contains("生句测试") || genre.contains("熟句测试")) {
             if (point < 80) {
                 testRecord.setExplain("你的测试未通过，请再接再厉！");
             } else {
@@ -1440,7 +1441,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 }
             }
             ccieUtil.saveCcieTest(student, 6, classify);
-        } else if ("已学测试".equals(genre) || "生词测试".equals(genre) || "熟词测试".equals(genre)) {
+        } else if ("已学测试".equals(genre) || "生词测试".equals(genre) || "熟词测试".equals(genre) || "熟句测试".equals(genre) || "生句测试".equals(genre)) {
             // 判断学生之前是否已经在当前课程有过“已学测试”或者“生词测试”或者“熟词测试”
             List<TestRecord> testRecords = testRecordMapper.selectMaxPointByStudyModel(stuId, courseId, genre, studyModel);
             if (testRecords.size() == 0) {
@@ -1464,6 +1465,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 testType = 4;
             } else if ("熟词测试".equals(genre)) {
                 testType = 5;
+            } else if("熟句测试".equals(genre)){
+                testType=12;
+            }else if("生句测试".equals(genre)){
+                testType=13;
             }
             ccieUtil.saveCcieTest(student, testType, classify);
         } else if ("复习测试".equals(genre)) {
