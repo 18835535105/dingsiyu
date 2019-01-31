@@ -86,6 +86,8 @@ public class PetUrlUtil {
             case "已学测试":
             case "生词测试":
             case "熟词测试":
+            case "生句测试":
+            case "熟句测试":
                 return robotCenterTestImgUrl(point);
             case "五维测试":
                 return robotFiveTestImgUrl(point);

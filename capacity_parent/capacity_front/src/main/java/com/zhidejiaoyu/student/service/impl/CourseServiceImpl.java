@@ -846,8 +846,8 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
     }
 
     @Override
-    public ServerResponse<List<Map<String, Object>>> getAllUnit(Long courseId, Boolean showAll) {
-        List<Map<String, Object>> unitsInfo = courseMapper.getAllUnitInfos(courseId);
+    public ServerResponse<List<Map<String, Object>>> getAllUnit(Long courseId, Boolean showAll, Integer type) {
+        List<Map<String, Object>> unitsInfo = courseMapper.getAllUnitInfos(courseId, type);
         if (unitsInfo.size() > 0 && showAll) {
             int totalWordCount = 0;
             Map<String, Object> map = new HashMap<>(16);
