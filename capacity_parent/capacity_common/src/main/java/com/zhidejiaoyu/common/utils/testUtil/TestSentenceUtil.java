@@ -35,14 +35,14 @@ public class TestSentenceUtil {
                 resultList.add(englishToChinese(sentences.get(i), sentenceList));
             }
             if(i!=0){
-                int ran = MathUtil.getRandom(1, 3);
-                if (ran == 1) {
-                    resultList.add(chineseToEnglish(sentences.get(i), sentenceList));
-                }
-                if (ran == 2) {
+                int ran = MathUtil.getRandom(1, 10);
+                if(ran>=5){
                     resultList.add(englishToChinese(sentences.get(i), sentenceList));
                 }
-                if (ran == 3) {
+                if(ran<5 && ran>=3){
+                    resultList.add(chineseToEnglish(sentences.get(i), sentenceList));
+                }
+                if(ran>=1&&ran<3){
                     resultList.add(hearing(sentences.get(i), sentenceList));
                 }
             }
