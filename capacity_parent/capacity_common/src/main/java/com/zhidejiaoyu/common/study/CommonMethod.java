@@ -480,12 +480,11 @@ public class CommonMethod implements Serializable {
             if (sentence.contains(s)) {
                 if (".".equals(s)) {
                     sentence = sentence.replace(". ", "*" + "." + "*");
-                    if (sentence.substring(sentence.length() - 1).equals(".")) ;
-                } else {
-                    {
+                    if (sentence.substring(sentence.length() - 1).equals(".")){
                         sentence = sentence.substring(0, sentence.length() - 1);
                         sentence = sentence + "*.*";
                     }
+                } else {
                     sentence = sentence.replace(s, "*" + s + "*");
                 }
             }
