@@ -198,11 +198,11 @@
             vocabulary v where v.id = l.vocabulary_id) = 1
             <if
                     test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
-                and example_id is not null
+                and l.example_id is not null
             </if>
         </if>
-        and learn_count = #{count}
-        and study_model = #{studyModel} and status = 0 and type = 1
+        and l.learn_count = #{count}
+        and l.study_model = #{studyModel} and l.status = 0 and l.type = 1
     </select>
 
     <!-- 查询当前课程下的单词/例句的学习次数 -->
