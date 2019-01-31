@@ -262,6 +262,7 @@ public class CommonMethod implements Serializable {
 
     /**
      * 获取当前学生可学习的所有课程
+     *
      * @param student
      * @return
      */
@@ -357,17 +358,14 @@ public class CommonMethod implements Serializable {
         for (String s : POINT) {
             if (sentence.contains(s)) {
                 if (".".equals(s)) {
-                    if(sentence.contains(".")){
-                        sentence=sentence.replace(". "," . ");
-                        if(sentence.substring(sentence.length()-1).equals(".")){
-                            sentence=sentence.substring(0,sentence.length()-1);
-                            sentence=sentence+" .";
-                        }
-                    }else{
-                        sentence = sentence.replace(s, " " + s);
+                    sentence = sentence.replace(". ", " . ");
+                    if (sentence.substring(sentence.length() - 1).equals(".")) {
+                        sentence = sentence.substring(0, sentence.length() - 1);
+                        sentence = sentence + " .";
                     }
+                } else {
+                    sentence = sentence.replace(s, " " + s);
                 }
-
             }
         }
 
@@ -394,12 +392,12 @@ public class CommonMethod implements Serializable {
         // 去除标点
         for (String s : POINT) {
             if (sentence.contains(s)) {
-                if(".".equals(s)){
-                    sentence=sentence.replace(". "," ");
-                    if(sentence.substring(sentence.length()-1).equals(".")){
-                        sentence=sentence.substring(0,sentence.length()-1);
+                if (".".equals(s)) {
+                    sentence = sentence.replace(". ", " ");
+                    if (sentence.substring(sentence.length() - 1).equals(".")) {
+                        sentence = sentence.substring(0, sentence.length() - 1);
                     }
-                }else{
+                } else {
                     sentence = sentence.replace(s, "");
                 }
             }
@@ -442,12 +440,12 @@ public class CommonMethod implements Serializable {
         // 去除标点
         for (String s : POINT) {
             if (sentence.contains(s)) {
-                if(".".equals(s)){
-                    sentence=sentence.replace(". "," ");
-                    if(sentence.substring(sentence.length()-1).equals(".")){
-                        sentence=sentence.substring(0,sentence.length()-1);
+                if (".".equals(s)) {
+                    sentence = sentence.replace(". ", " ");
+                    if (sentence.substring(sentence.length() - 1).equals(".")) {
+                        sentence = sentence.substring(0, sentence.length() - 1);
                     }
-                }else{
+                } else {
                     sentence = sentence.replace(s, "*");
                 }
             }
@@ -481,12 +479,13 @@ public class CommonMethod implements Serializable {
         for (String s : POINT) {
             if (sentence.contains(s)) {
                 if (".".equals(s)) {
-                    sentence=sentence.replace(". ","*"+"."+"*");
-                    if(sentence.substring(sentence.length()-1).equals("."));
-                }else{{
-                    sentence=sentence.substring(0,sentence.length()-1);
-                    sentence=sentence+"*.*";
-                }
+                    sentence = sentence.replace(". ", "*" + "." + "*");
+                    if (sentence.substring(sentence.length() - 1).equals(".")) ;
+                } else {
+                    {
+                        sentence = sentence.substring(0, sentence.length() - 1);
+                        sentence = sentence + "*.*";
+                    }
                     sentence = sentence.replace(s, "*" + s + "*");
                 }
             }
@@ -497,7 +496,7 @@ public class CommonMethod implements Serializable {
         for (String s : arr) {
             if (s.contains("*")) {
                 list.add(s.replace("*", ""));
-            } else if (StringUtils.isNotEmpty(s.trim())){
+            } else if (StringUtils.isNotEmpty(s.trim())) {
                 list.add(s.trim());
             }
         }
@@ -512,9 +511,9 @@ public class CommonMethod implements Serializable {
      */
     public String getTestType(Integer classify) {
         if (classify != null) {
-            if(classify == 0){
+            if (classify == 0) {
                 return "单词图鉴";
-            }else if (1 == classify) {
+            } else if (1 == classify) {
                 return "慧记忆";
             } else if (2 == classify) {
                 return "慧听写";
@@ -526,7 +525,7 @@ public class CommonMethod implements Serializable {
                 return "例句翻译";
             } else if (6 == classify) {
                 return "例句默写";
-            } else if (7 == classify){
+            } else if (7 == classify) {
                 return "课文测试";
             }
         }
