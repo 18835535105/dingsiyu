@@ -430,7 +430,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
     /**
      * 查询课程下除去指定单词的单词信息
      *
-     * @param currentCourseId
+     * @param courseId
      * @param vocabularies
      * @return
      */
