@@ -356,7 +356,7 @@ public class CommonMethod implements Serializable {
     public List<String> getEnglishList(String sentence) {
         for (String s : POINT) {
             if (sentence.contains(s)) {
-                if (sentence.contains(s)) {
+                if (".".equals(s)) {
                     if(sentence.contains(".")){
                         sentence=sentence.replace(". "," "+".");
                         if(sentence.substring(sentence.length()-1).equals(".")){
@@ -394,7 +394,7 @@ public class CommonMethod implements Serializable {
         // 去除标点
         for (String s : POINT) {
             if (sentence.contains(s)) {
-                if(sentence.contains(".")){
+                if(".".equals(s)){
                     sentence=sentence.replace(". "," ");
                     if(sentence.substring(sentence.length()-1).equals(".")){
                         sentence=sentence.substring(0,sentence.length()-1);
@@ -442,7 +442,7 @@ public class CommonMethod implements Serializable {
         // 去除标点
         for (String s : POINT) {
             if (sentence.contains(s)) {
-                if(sentence.contains(".")){
+                if(".".equals(s)){
                     sentence=sentence.replace(". "," ");
                     if(sentence.substring(sentence.length()-1).equals(".")){
                         sentence=sentence.substring(0,sentence.length()-1);
@@ -481,7 +481,7 @@ public class CommonMethod implements Serializable {
         for (String s : POINT) {
             if (sentence.contains(s)) {
                 if (sentence.contains(s)) {
-                    if(sentence.contains(".")){
+                    if(".".equals(s)){
                         sentence=sentence.replace(". ","*"+"."+"*");
                         if(sentence.substring(sentence.length()-1).equals(".")){
                             sentence=sentence.substring(0,sentence.length()-1);
