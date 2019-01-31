@@ -356,7 +356,18 @@ public class CommonMethod implements Serializable {
     public List<String> getEnglishList(String sentence) {
         for (String s : POINT) {
             if (sentence.contains(s)) {
-                sentence = sentence.replace(s, " " + s);
+                if (sentence.contains(s)) {
+                    if(sentence.contains(".")){
+                        sentence=sentence.replace(". "," "+".");
+                        if(sentence.substring(sentence.length()-1).equals(".")){
+                            sentence=sentence.substring(0,sentence.length()-1);
+                            sentence=sentence+" .";
+                        }
+                    }else{
+                        sentence = sentence.replace(s, " " + s);
+                    }
+                }
+
             }
         }
 
@@ -383,10 +394,16 @@ public class CommonMethod implements Serializable {
         // 去除标点
         for (String s : POINT) {
             if (sentence.contains(s)) {
-                sentence = sentence.replace(s, "");
+                if(sentence.contains(".")){
+                    sentence=sentence.replace(". "," ");
+                    if(sentence.substring(sentence.length()-1).equals(".")){
+                        sentence=sentence.substring(0,sentence.length()-1);
+                    }
+                }else{
+                    sentence = sentence.replace(s, "");
+                }
             }
         }
-
         // 将例句按照空格拆分
         String[] words = sentence.split(" ");
 
@@ -425,7 +442,14 @@ public class CommonMethod implements Serializable {
         // 去除标点
         for (String s : POINT) {
             if (sentence.contains(s)) {
-                sentence = sentence.replace(s, "*");
+                if(sentence.contains(".")){
+                    sentence=sentence.replace(". "," ");
+                    if(sentence.substring(sentence.length()-1).equals(".")){
+                        sentence=sentence.substring(0,sentence.length()-1);
+                    }
+                }else{
+                    sentence = sentence.replace(s, "");
+                }
             }
         }
 
@@ -456,7 +480,18 @@ public class CommonMethod implements Serializable {
     public List<String> getChineseList(String sentence) {
         for (String s : POINT) {
             if (sentence.contains(s)) {
-                sentence = sentence.replace(s, "*" + s + "*");
+                if (sentence.contains(s)) {
+                    if(sentence.contains(".")){
+                        sentence=sentence.replace(". ","*"+"."+"*");
+                        if(sentence.substring(sentence.length()-1).equals(".")){
+                            sentence=sentence.substring(0,sentence.length()-1);
+                            sentence=sentence+"*.*";
+                        }
+                    }else{
+                        sentence = sentence.replace(s, "*" + s + "*");
+                    }
+                }
+
             }
         }
 
