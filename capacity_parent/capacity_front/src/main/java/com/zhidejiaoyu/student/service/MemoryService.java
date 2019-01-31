@@ -24,7 +24,7 @@ public interface MemoryService extends BaseService<Vocabulary> {
 	 *            当前学习的单元id
 	 * @return
 	 */
-	ServerResponse<MemoryStudyVo> getMemoryWord(HttpSession session, Long unitId);
+	Object getMemoryWord(HttpSession session, Long unitId);
 
 	/**
 	 * 保存慧记忆学习记录 流程： 1.前端先发送保存学生学习信息的请求 2.然后根据后台响应数据再发送获取慧记忆学习的单词信息

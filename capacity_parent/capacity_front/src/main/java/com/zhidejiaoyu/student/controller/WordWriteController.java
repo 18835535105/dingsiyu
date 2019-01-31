@@ -34,7 +34,7 @@ public class WordWriteController {
      * @return
      */
     @GetMapping("/getWriteWord")
-    public ServerResponse<WordWriteStudyVo> getWriteWord(HttpSession session, Long unitId) {
+    public Object getWriteWord(HttpSession session, Long unitId) {
         return wordWriteService.getWriteWord(session, unitId);
     }
 

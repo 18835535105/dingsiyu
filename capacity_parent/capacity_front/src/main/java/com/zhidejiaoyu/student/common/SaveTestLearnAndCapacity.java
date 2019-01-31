@@ -129,7 +129,7 @@ public class SaveTestLearnAndCapacity {
      * @param type   1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写;
      * @return 响应信息
      */
-    public void saveTestAndCapacity(String[] correctWord, String[] errorWord, Integer[] correctWordId,
+    public int saveTestAndCapacity(String[] correctWord, String[] errorWord, Integer[] correctWordId,
                                     Integer[] errorWordId, HttpSession session,
                                     Long[] unitId, Integer type) {
 
@@ -139,14 +139,15 @@ public class SaveTestLearnAndCapacity {
         log.info("correctWordId:{}; errorWordId:{}; studentId:{}; unitId:{}; type:{};", correctWordId, errorWordId, student.getId(), unitId, type);
 
         // 保存正确单词/例句的学习记录和记忆追踪信息
+        int count = 0;
         if (correctWord != null && correctWordId != null && correctWord.length > 0
                 && correctWord.length == correctWordId.length) {
             int correctWordLength = correctWord.length;
             for (int i = 0; i < correctWordLength; i++) {
                 if (unitId.length == 1) {
-                    this.saveLearnAndCapacity(session, student, unitId[0], correctWordId[i], type, true);
+                    count = this.saveLearnAndCapacity(session, student, unitId[0], correctWordId[i], type, true);
                 } else {
-                    this.saveLearnAndCapacity(session, student, unitId[i], correctWordId[i], type, true);
+                    count = this.saveLearnAndCapacity(session, student, unitId[i], correctWordId[i], type, true);
                 }
             }
         }
@@ -157,12 +158,13 @@ public class SaveTestLearnAndCapacity {
             int errorWordLength = errorWord.length;
             for (int i = 0; i < errorWordLength; i++) {
                 if (unitId.length == 1) {
-                    this.saveLearnAndCapacity(session, student, unitId[0], Integer.valueOf(errorWordId[i].toString()), type, false);
+                    count = this.saveLearnAndCapacity(session, student, unitId[0], Integer.valueOf(errorWordId[i].toString()), type, false);
                 } else {
-                    this.saveLearnAndCapacity(session, student, unitId[i], Integer.valueOf(errorWordId[i].toString()), type, false);
+                    count = this.saveLearnAndCapacity(session, student, unitId[i], Integer.valueOf(errorWordId[i].toString()), type, false);
                 }
             }
         }
+        return count;
     }
 
     /**

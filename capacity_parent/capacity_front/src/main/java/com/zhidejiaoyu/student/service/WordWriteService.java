@@ -23,7 +23,7 @@ public interface WordWriteService extends BaseService<Vocabulary> {
 	 * @param unitId
 	 * @return
 	 */
-	ServerResponse<WordWriteStudyVo> getWriteWord(HttpSession session, Long unitId);
+	Object getWriteWord(HttpSession session, Long unitId);
 
 	/**
 	 * 保存慧默写学习记录 流程： 1.前端先发送保存学生学习信息的请求 2.然后根据后台响应数据再发送获取慧记忆学习的单词信息

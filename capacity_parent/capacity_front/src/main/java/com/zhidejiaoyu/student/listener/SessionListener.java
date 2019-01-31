@@ -3,10 +3,12 @@ package com.zhidejiaoyu.student.listener;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.RunLogMapper;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.student.config.ServiceInfoUtil;
 import com.zhidejiaoyu.student.service.LoginService;
 import com.zhidejiaoyu.student.service.impl.LoginServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +27,9 @@ import java.util.HashMap;
 @Component
 @WebListener
 public class SessionListener implements HttpSessionListener {
+
+    @Value("${quartz.port}")
+    private String port;
 
     /**
      * 存放登陆过系统的sessionId 和 session的对应关系,当学生有多地登录行为时清除 sessionMap 中的学生信息
@@ -56,12 +61,19 @@ public class SessionListener implements HttpSessionListener {
      */
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {
-        HttpSession session = se.getSession();
-        removeSessionById(session.getId());
-        clearRedisSessionId(session);
-        saveLogoutInfo(session);
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        loginService.saveDurationInfo(student, session);
+        int currentPort = ServiceInfoUtil.getPort();
+        // 当 session 失效时只有 9082 端口的服务负责保存学生时长信息
+        if (currentPort == Integer.valueOf(port)) {
+            HttpSession session = se.getSession();
+            if (session != null) {
+                session = getSessionById(session.getId());
+                removeSessionById(session.getId());
+                clearRedisSessionId(session);
+                saveLogoutInfo(session);
+                Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+                loginService.saveDurationInfo(student, session);
+            }
+        }
     }
 
     /**

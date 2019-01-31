@@ -35,7 +35,7 @@ public class DictationController {
 	 * @return 一道题, 学习进度, 生词, 熟词, 复习
 	 */
 	@RequestMapping(value = "/dictation")
-	public ServerResponse<Object> dictationShow(String unit_id, HttpSession session) {
+	public Object dictationShow(String unit_id, HttpSession session) {
 		return dictationService.dictationShow(unit_id, session);
 	}
 	

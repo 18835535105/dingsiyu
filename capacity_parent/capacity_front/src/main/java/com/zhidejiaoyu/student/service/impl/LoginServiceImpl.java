@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.TokenUtil;
 import com.zhidejiaoyu.common.utils.ValidateCode;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
@@ -397,6 +398,11 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 logger.error("学生[{}]-[{}]还没有初始化智能版流程节点！", stu.getId(), stu.getStudentName());
                 return;
             }
+            if (studyFlow.getModelName().contains("单元闯关")) {
+                String token = TokenUtil.getToken();
+                result.put("token", token);
+                session.setAttribute("token", token);
+            }
             result.put("needReview", needReviewStr);
             result.put("nodeId", studyFlow.getId());
             result.put("nodeName", studyFlow.getFlowName());
@@ -412,6 +418,11 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             } else {
                 flow = studyFlowMapper.getFlowInfoByStudentId(stu.getId());
                 result.put("needReview", "");
+            }
+            if (flow.getModelName().contains("单元闯关")) {
+                String token = TokenUtil.getToken();
+                result.put("token", token);
+                session.setAttribute("token", token);
             }
             if(flow != null){
                 result.put("nodeId", flow.getId());

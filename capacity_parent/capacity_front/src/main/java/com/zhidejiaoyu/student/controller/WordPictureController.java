@@ -1,9 +1,5 @@
 package com.zhidejiaoyu.student.controller;
 
-import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.constant.UserConstant;
-import com.zhidejiaoyu.common.pojo.Learn;
-import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.WordPictureService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,14 +7,10 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import sun.util.resources.ga.LocaleNames_ga;
 
 import javax.servlet.http.HttpSession;
-import javax.websocket.Session;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.Objects;
 
 /**
  * 单词模块的看图学习
@@ -40,7 +32,7 @@ public class WordPictureController {
      * @return 封装的一道学习题
      */
     @RequestMapping("/getWordPicture")
-    public ServerResponse<Object> getWordPicture(HttpSession session, Long courseId, Long unitId, @RequestParam(defaultValue = "0") Integer plan) {
+    public Object getWordPicture(HttpSession session, Long courseId, Long unitId, @RequestParam(defaultValue = "0") Integer plan) {
        return wordPictureService.getWordPicture(session, courseId, unitId, plan);
     }
 
@@ -50,11 +42,19 @@ public class WordPictureController {
      * @param session
      * @param unitId 测试的单元
      * @param isTrue 是否确认消费1金币进行测试 true:是；false：否（默认）
+     * @param token token 不正确不给学生试题
      * @return
      */
     @RequestMapping("/getWordPicUnitTest")
-    public ServerResponse<Object> getWordPicUnitTest(HttpSession session, Long unitId, Long courseId, Boolean isTrue){
+    public ServerResponse<Object> getWordPicUnitTest(HttpSession session, Long unitId, Long courseId, Boolean isTrue,
+                                                     @RequestParam(required = false) String token){
         Assert.notNull(unitId, "parameter: \"unitId\" can not be blank");
+
+        Object object = session.getAttribute("token");
+        if (object == null || !Objects.equals(object.toString(), token)) {
+            return ServerResponse.createBySuccess(new ArrayList<>());
+        }
+
         return wordPictureService.getWordPicUnitTest(session, unitId, courseId, isTrue);
     }
 

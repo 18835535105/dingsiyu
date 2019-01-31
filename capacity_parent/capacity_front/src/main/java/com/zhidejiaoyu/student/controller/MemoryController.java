@@ -32,7 +32,7 @@ public class MemoryController {
      * @return
      */
     @GetMapping("/getMemoryWord")
-    public ServerResponse<MemoryStudyVo> getMemoryWord(HttpSession session, Long unitId) {
+    public Object getMemoryWord(HttpSession session, Long unitId) {
         Assert.notNull(unitId, "unitId cant't be null!");
         return memoryService.getMemoryWord(session, unitId);
     }

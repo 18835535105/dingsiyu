@@ -11,6 +11,7 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.service.BaseService;
 import com.zhidejiaoyu.student.service.WordPictureService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @Service
-public class WordPictureServiceImpl implements WordPictureService {
+public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabulary> implements WordPictureService {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -81,7 +82,7 @@ public class WordPictureServiceImpl implements WordPictureService {
      * @return
      */
     @Override
-    public ServerResponse<Object> getWordPicture(HttpSession session, Long courseId, Long unitId, Integer plan) {
+    public Object getWordPicture(HttpSession session, Long courseId, Long unitId, Integer plan) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         Long studentId = student.getId();
 
@@ -103,7 +104,7 @@ public class WordPictureServiceImpl implements WordPictureService {
             // 获取新词
             correct = vocabularyMapper.selectPictureWord(studentId, unitId, plan);
             if (correct == null) {
-                return ServerResponse.createBySuccess(600, "TO_UNIT_TEST");
+                return super.toUnitTest();
             }
             // 是新单词
             correct.put("studyNew", true);
@@ -211,7 +212,7 @@ public class WordPictureServiceImpl implements WordPictureService {
      */
     @Override
     public ServerResponse<Object> getWordPicUnitTest(HttpSession session, Long unitId, Long courseId, Boolean isTrue) {
-        Long studentId = getStudentId(session);
+        Long studentId = super.getStudentId(session);
         // 根据学生id实时查询学生信息
         Student student = studentMapper.selectByPrimaryKey(studentId);
 
@@ -270,18 +271,5 @@ public class WordPictureServiceImpl implements WordPictureService {
             }
         }
         return 0;
-    }
-
-    /**
-     * 获取当前学生id
-     *
-     * @param session
-     * @return id
-     */
-    private Long getStudentId(HttpSession session){
-        // 获取当前学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        // 学生id
-        return student.getId();
     }
 }

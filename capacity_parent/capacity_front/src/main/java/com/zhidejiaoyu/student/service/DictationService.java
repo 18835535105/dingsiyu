@@ -1,11 +1,11 @@
 package com.zhidejiaoyu.student.service;
 
+import com.zhidejiaoyu.common.pojo.Vocabulary;
+
 import javax.servlet.http.HttpSession;
 
-import com.zhidejiaoyu.common.utils.server.ServerResponse;
+public interface DictationService extends BaseService<Vocabulary> {
 
-public interface DictationService {
-
-	ServerResponse<Object> dictationShow(String unit_id, HttpSession session);
+	Object dictationShow(String unit_id, HttpSession session);
 
 }

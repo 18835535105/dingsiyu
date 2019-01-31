@@ -32,7 +32,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/student")
 @Validated
-public class StudentInfoController {
+public class StudentInfoController extends BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StudentInfoController.class);
 
@@ -251,7 +251,7 @@ public class StudentInfoController {
             try {
                 valid = Long.valueOf(validTime);
             } catch (Exception e) {
-                log.error("有效时长入参类型错误：学习模块[{}]，validTime[{}]，error=[{}]", classify, validTime, e.getMessage());
+                log.error("有效时长入参类型错误：param=[{}], error=[{}]", super.getParams(), e.getMessage());
             }
         }
         return studentInfoService.calculateValidTime(session, classify, courseId, unitId, valid);

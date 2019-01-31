@@ -66,7 +66,7 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<WordWriteStudyVo> getWriteWord(HttpSession session, Long unitId) {
+    public Object getWriteWord(HttpSession session, Long unitId) {
 
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         boolean firstStudy = this.isFirst(student.getId());
@@ -94,7 +94,7 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 
         if (wordCount.equals(plan)) {
             // 提醒学生进行单元闯关测试
-            return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
+            return super.toUnitTest();
         }
 
         // 查看当前单元下记忆追踪中有无达到黄金记忆点的单词

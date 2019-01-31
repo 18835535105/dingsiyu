@@ -76,7 +76,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
     private SaveWordLearnAndCapacity saveWordLearnAndCapacity;
 
     @Override
-    public ServerResponse<MemoryStudyVo> getMemoryWord(HttpSession session, Long unitId) {
+    public Object getMemoryWord(HttpSession session, Long unitId) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         boolean firstStudy = commonMethod.isFirst(student.getId(), "慧记忆");
 
@@ -107,8 +107,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         }
 
         if (wordCount.equals(plan)) {
-            // 提醒学生进行单元测试
-            return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
+            return super.toUnitTest();
         }
 
         // 查看当前单元下记忆追踪中有无达到黄金记忆点的单词

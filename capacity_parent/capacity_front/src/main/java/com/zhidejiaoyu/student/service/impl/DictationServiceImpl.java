@@ -24,7 +24,7 @@ import java.util.Map;
 
 @Service
 @Transactional
-public class DictationServiceImpl implements DictationService {
+public class DictationServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabulary> implements DictationService {
 
 	/** 单词 */
 	@Autowired
@@ -52,8 +52,8 @@ public class DictationServiceImpl implements DictationService {
 	private BaiduSpeak baiduSpeak;
 
 	@Override
-	public ServerResponse<Object> dictationShow(String unit_id, HttpSession session) {
-		Map<String,Object> map = new HashMap<String, Object>();
+	public Object dictationShow(String unit_id, HttpSession session) {
+		Map<String,Object> map = new HashMap<>();
 		
 		// 获取当前学生信息
 		Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
@@ -92,7 +92,7 @@ public class DictationServiceImpl implements DictationService {
 		
 		// 单元单词已学完,去单元测试
         if (vocabulary == null) {
-			return ServerResponse.createBySuccess(600, "TO_UNIT_TEST");
+			return super.toUnitTest();
 		}
 
         // id

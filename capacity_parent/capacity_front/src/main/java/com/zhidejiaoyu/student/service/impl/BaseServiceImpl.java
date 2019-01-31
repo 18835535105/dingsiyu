@@ -8,14 +8,18 @@ import com.zhidejiaoyu.common.mapper.DurationMapper;
 import com.zhidejiaoyu.common.mapper.StudyFlowMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudyFlow;
+import com.zhidejiaoyu.common.utils.TokenUtil;
+import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.student.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
+
+import static com.zhidejiaoyu.student.controller.BaseController.getParams;
 
 /**
  * @author wuchenxi
@@ -62,17 +66,27 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
 
     @Override
     public String getParameters() {
-        Map<String, String[]> parameterMap = request.getParameterMap();
-        StringBuilder sb = new StringBuilder();
-        if (parameterMap != null && parameterMap.size() > 0) {
-            parameterMap.forEach((key, value) -> sb.append(key).append(":").append(Arrays.toString(value)).append(";"));
-        }
-        return sb.toString();
+        return getParams(request);
     }
 
     @Override
     public StudyFlow getCurrentStudyFlow(Long studentId) {
         return studyFlowMapper.selectCurrentFlowByStudentId(studentId);
+    }
+
+    /**
+     * 学生需要单元测试提示信息
+     *
+     * @return
+     */
+    Map<String, Object> toUnitTest() {
+        String token = TokenUtil.getToken();
+        Map<String, Object> map = new HashMap<>(16);
+        map.put("status", TestResponseCode.TO_UNIT_TEST.getCode());
+        map.put("msg", TestResponseCode.TO_UNIT_TEST.getMsg());
+        map.put("token", token);
+        request.getSession().setAttribute("token", token);
+        return map;
     }
 
     /**
