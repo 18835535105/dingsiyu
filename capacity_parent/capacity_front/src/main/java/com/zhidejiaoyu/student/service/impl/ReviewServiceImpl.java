@@ -973,6 +973,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             case "已学测试":
             case "生词测试":
             case "熟词测试":
+            case "生句测试":
+            case "熟句测试":
                 if (point < 80) {
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_LESS_EIGHTY));
                 } else if (point < 90) {
