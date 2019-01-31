@@ -187,12 +187,15 @@ public class CourseController {
      *
      * @param courseId 课程id
      * @param showAll true：含有“全部单元”字样；false:不含有“全部单元字样”
+     * @param type  1:单词；2：句型；3：课文
      * @return
      */
     @ResponseBody
     @GetMapping("/getAllUnit")
-    public ServerResponse<List<Map<String, Object>>> getAllUnit(Long courseId, @RequestParam(required = false, defaultValue = "true") Boolean showAll) {
-        return courseService.getAllUnit(courseId, showAll);
+    public ServerResponse<List<Map<String, Object>>> getAllUnit(Long courseId,
+                                                                @RequestParam(required = false, defaultValue = "true") Boolean showAll,
+                                                                @RequestParam(required = false, defaultValue = "1") Integer type) {
+        return courseService.getAllUnit(courseId, showAll, type);
     }
 
     /**

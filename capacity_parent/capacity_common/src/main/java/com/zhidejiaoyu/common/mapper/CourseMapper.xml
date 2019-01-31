@@ -581,7 +581,15 @@
     <select id="getAllUnitInfos" resultType="java.util.Map" parameterType="map">
         SELECT count(uv.vocabulary_id) wordCount, u.unit_name unitName, u.id unitId
         FROM unit u
-                 left join unit_vocabulary uv on u.id = uv.unit_id
+        <if test="type == 1">
+            join unit_vocabulary uv on u.id = uv.unit_id
+        </if>
+        <if test="type == 2">
+            join unit_sentence us on u.id = us.unit_id
+        </if>
+        <if test="type == 3">
+            join teks t on t.unit_id = u.id
+        </if>
         WHERE u.course_id = #{courseId}
         GROUP BY u.id
         order by u.id asc

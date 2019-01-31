@@ -289,9 +289,10 @@ public interface CourseMapper extends BaseMapper<Course> {
      * 查询课程下所有单元信息及单元内单词数量
      *
      * @param courseId 课程id
+     * @param type
      * @return
      */
-    List<Map<String, Object>> getAllUnitInfos(@Param("courseId") Long courseId);
+    List<Map<String, Object>> getAllUnitInfos(@Param("courseId") Long courseId, @Param("type") Integer type);
 
     Map<String, Object> getCourseByCreamVersionName(String creamVersion);
 
