@@ -41,6 +41,7 @@ public class BaiduSpeak {
         wordMap = new HashMap<>(16);
         wordMap.put("Mr.", "Mr.");
         wordMap.put("car", "car");
+        wordMap.put("before", "before");
     }
 
     /**
@@ -51,7 +52,6 @@ public class BaiduSpeak {
      */
     public String getLanguagePath(String text) {
         if (wordMap.containsKey(text)) {
-            //return  baidu + text ;
             return youdao + text + "&type=1";
         }
 
