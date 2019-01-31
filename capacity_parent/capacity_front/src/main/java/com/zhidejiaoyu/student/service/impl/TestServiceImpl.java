@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.common.Vo.game.StrengthGameVo;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.Vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
@@ -222,6 +223,134 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(map);
+    }
+
+    @Override
+    public ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session) {
+
+        Student student = getStudent(session);
+        Long studentId = student.getId();
+
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
+        // 随机选出20个正确单词信息
+        PageHelper.startPage(1, 20);
+        List<Vocabulary> rightVocabularies = vocabularyMapper.selectByStartUnitIdAndEndUnitId(capacityStudentUnit.getStartunit(), capacityStudentUnit.getEndunit());
+        Map<String, String> map = this.getWordMap(rightVocabularies);
+
+        int size = rightVocabularies.size();
+        int errorSize = size * 3;
+        long currentCourseId = capacityStudentUnit.getCourseId();
+        PageHelper.startPage(1, errorSize);
+        List<Vocabulary> errorVocabularies = vocabularyMapper.selectByCourseIdWithoutWordIds(currentCourseId, rightVocabularies);
+        map.putAll(this.getWordMap(errorVocabularies));
+
+        List<Vocabulary> ignore = new ArrayList<>(errorVocabularies);
+        ignore.addAll(rightVocabularies);
+
+        // 如果错误单词取值不够用，从当前课程的上一个磕碜和下一个课程取值
+        if (errorVocabularies.size() < errorSize) {
+            PageHelper.startPage(1, errorSize - errorVocabularies.size());
+            List<Vocabulary> otherErrorVocabularies = vocabularyMapper.selectByCourseIdWithoutWordIds(currentCourseId + 1, ignore);
+            if (otherErrorVocabularies.size() > 0) {
+                errorVocabularies.addAll(otherErrorVocabularies);
+                ignore.addAll(otherErrorVocabularies);
+                map.putAll(this.getWordMap(otherErrorVocabularies));
+            }
+            if (otherErrorVocabularies.size() < errorSize) {
+                PageHelper.startPage(1, errorSize - errorVocabularies.size());
+                otherErrorVocabularies = vocabularyMapper.selectByCourseIdWithoutWordIds(currentCourseId - 1, ignore);
+                if (otherErrorVocabularies.size() > 0) {
+                    errorVocabularies.addAll(otherErrorVocabularies);
+                    map.putAll(this.getWordMap(otherErrorVocabularies));
+                }
+            }
+        }
+
+        // 封装各组信息
+        ServerResponse<Map<String, Object>> resultMap = packageStrengthVo(student, rightVocabularies, map, size,
+                errorSize, errorVocabularies);
+        if (resultMap != null) {
+            return resultMap;
+        }
+        return null;
+    }
+
+    /**
+     * 将单词集合封装成 map key 为单词，value 为单词翻译
+     *
+     * @param rightVocabularies
+     * @return
+     */
+    private Map<String, String> getWordMap(List<Vocabulary> rightVocabularies) {
+        Map<String, String> map = new HashMap<>(16);
+        if (rightVocabularies.size() > 0) {
+            rightVocabularies.forEach(vocabulary -> map.put(vocabulary.getWord(), vocabulary.getWordChinese()));
+        }
+        return map;
+    }
+
+    private ServerResponse<Map<String, Object>> packageStrengthVo(Student student, List<Vocabulary> rightVocabularies, Map<String, String> map, int size, int errorSize, List<Vocabulary> errorVocabularies) {
+        List<StrengthGameVo> strengthGameVos = new ArrayList<>();
+        if (size > 0) {
+            List<String> wordList;
+            List<String> chineseList;
+            StrengthGameVo strengthGameVo;
+            int k = 0;
+            for (Vocabulary rightVocabulary : rightVocabularies) {
+                wordList = new ArrayList<>(8);
+                chineseList = new ArrayList<>(8);
+                strengthGameVo = new StrengthGameVo();
+
+                // 小人图片顺序
+                int pictureIndex = 0;
+                wordList.add(String.valueOf(pictureIndex++));
+                wordList.add(rightVocabulary.getWord());
+                for (int j = 0; j < 3; j++) {
+                    wordList.add(String.valueOf(pictureIndex++));
+                    if (k < errorSize) {
+                        wordList.add(errorVocabularies.get(k).getWord());
+                    }
+                    k++;
+                }
+
+                Collections.shuffle(wordList);
+
+                int num = new Random().nextInt(2);
+                for (int n = 0; n < 8; n++) {
+                    if (Objects.equals(wordList.get(n), rightVocabulary.getWord())) {
+                        if (num % 2 == 0) {
+                            strengthGameVo.setType("英译汉");
+                            strengthGameVo.setTitle(rightVocabulary.getWord());
+                        } else {
+                            strengthGameVo.setType("汉译英");
+                            strengthGameVo.setTitle(rightVocabulary.getWordChinese());
+                        }
+                        strengthGameVo.setRightIndex(n);
+                        break;
+                    }
+                }
+                pictureIndex = 0;
+                for (String word : wordList) {
+                    if (map.get(word) == null) {
+                        chineseList.add(String.valueOf(pictureIndex++));
+                    } else {
+                        chineseList.add(map.get(word));
+                    }
+
+                }
+
+                strengthGameVo.setChineseList(chineseList);
+                strengthGameVo.setWordList(wordList);
+
+                strengthGameVos.add(strengthGameVo);
+            }
+
+            Map<String, Object> resultMap = new HashMap<>(16);
+            resultMap.put("result", strengthGameVos);
+            resultMap.put("sex", student.getSex());
+            return ServerResponse.createBySuccess(resultMap);
+        }
+        return null;
     }
 
     /**

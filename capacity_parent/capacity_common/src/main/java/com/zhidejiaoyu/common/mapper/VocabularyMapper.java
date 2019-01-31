@@ -417,4 +417,23 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     Map<String, Object> selectPictureWord(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("plan") Integer plan);
+
+    /**
+     * 获取指定单元范围的单词信息
+     *
+     * @param startUnitId
+     * @param endUnitId
+     * @return
+     */
+    List<Vocabulary> selectByStartUnitIdAndEndUnitId(@Param("startUnitId") Long startUnitId, @Param("endUnitId") Long endUnitId);
+
+    /**
+     * 查询课程下除去指定单词的单词信息
+     *
+     * @param currentCourseId
+     * @param vocabularies
+     * @return
+     */
+    List<Vocabulary> selectByCourseIdWithoutWordIds(@Param("courseId") long courseId, @Param("vocabularies") List<Vocabulary> vocabularies);
+
 }

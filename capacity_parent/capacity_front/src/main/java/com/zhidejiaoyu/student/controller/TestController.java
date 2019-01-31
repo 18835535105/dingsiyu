@@ -262,4 +262,9 @@ public class TestController {
         return testService.saveCapTeksTest(session, wordUnitTestDTO);
     }
 
+    @GetMapping("/getStrengthGame")
+    public ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session) {
+        return testService.getStrengthGame(session);
+    }
+
 }
