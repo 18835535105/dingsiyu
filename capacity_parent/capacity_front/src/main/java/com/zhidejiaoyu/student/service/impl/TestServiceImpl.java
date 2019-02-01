@@ -995,7 +995,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         TestDetailVo testDetailVo = testRecordMapper.selectTestDetailVo(student.getId(), testId);
         testDetailVo.setTitle(testDetailVo.getTitle().replaceAll("例句","句型"));
         testDetailVo.setUseTime(getUseTime(testDetailVo.getUseTime()));
-        if (testDetailVo.getIsWrite().contains("默写")) {
+        if (testDetailVo.getIsWrite().contains("写")) {
              testDetailVo.setIsWrite("1");
         } else {
             testDetailVo.setIsWrite("0");
