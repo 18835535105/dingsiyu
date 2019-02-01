@@ -1,6 +1,8 @@
 package com.zhidejiaoyu.common.utils.language;
 
+import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
+import com.zhidejiaoyu.common.pojo.Vocabulary;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * 百度语音合成web api
@@ -32,6 +33,8 @@ public class BaiduSpeak {
     @Autowired
     private VocabularyMapper vocabularyMapper;
 
+    @Autowired
+
     /**
      * 需要特殊处理的单词/例句集合
      */
@@ -51,25 +54,16 @@ public class BaiduSpeak {
      * @return
      */
     public String getLanguagePath(String text) {
-//        if (wordMap.containsKey(text)) {
-//            return youdao + text + "&type=1";
-//        }
-//
-        return baidu + text;
-//        return youdao + text;
-
-        /*Vocabulary vocabulary = vocabularyMapper.selectByWord(text);
+        Vocabulary vocabulary = vocabularyMapper.selectByWord(text);
         if (vocabulary != null && StringUtils.isNotEmpty(vocabulary.getReadUrl())) {
             return prefix + vocabulary.getReadUrl();
         } else {
-            log.error("单词=[{}]在单词表中没有读音！", text);
-            try {
-                text = URLEncoder.encode(URLEncoder.encode(text, "utf-8"), "utf-8");
-            } catch (UnsupportedEncodingException e) {
-                log.error("单词[{}]进行urlencode时出错！", text, e);
+            if (wordMap.containsKey(text)) {
+                return youdao + text + "&type=1";
+            } else {
+                return youdao + text;
             }
-            return baidu + text;
-        }*/
+        }
     }
 
     public String getSentencePaht(String text) {
