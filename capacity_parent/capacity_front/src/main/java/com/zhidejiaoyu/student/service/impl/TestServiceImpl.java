@@ -991,15 +991,21 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Override
     public ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId) {
         Student student = getStudent(session);
+        TestRecord testRecord = testRecordMapper.selectById(testId);
         TestDetailVo testDetailVo = testRecordMapper.selectTestDetailVo(student.getId(), testId);
         testDetailVo.setTitle(testDetailVo.getTitle().replaceAll("例句","句型"));
         testDetailVo.setUseTime(getUseTime(testDetailVo.getUseTime()));
-        if (StringUtils.isNotEmpty(testDetailVo.getIsWrite())) {
+        if (testDetailVo.getIsWrite().contains("默写")) {
              testDetailVo.setIsWrite("1");
         } else {
-            testDetailVo.setIsWrite(null);
+            testDetailVo.setIsWrite("0");
         }
-        testDetailVo.setInfos(testRecordMapper.selectTestRecordInfo(testId));
+        List<TestRecordInfo> testRecordInfos = testRecordMapper.selectTestRecordInfo(testId);
+        if (testRecord != null && Objects.equals("慧听写", testRecord.getStudyModel())) {
+            // 慧听写题目就是正确答案
+            testRecordInfos.forEach(testRecordInfo -> testRecordInfo.setWord(testRecordInfo.getAnswer()));
+        }
+        testDetailVo.setInfos(testRecordInfos);
         return ServerResponse.createBySuccess(testDetailVo);
     }
 

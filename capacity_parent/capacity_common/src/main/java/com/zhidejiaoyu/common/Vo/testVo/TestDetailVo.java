@@ -60,7 +60,7 @@ public class TestDetailVo implements Serializable {
     private String score;
 
     /**
-     * 是否是默写模块
+     * 是否是默写模块  1:是默写模块；0：不是默写模块
      */
     private String isWrite;
 
