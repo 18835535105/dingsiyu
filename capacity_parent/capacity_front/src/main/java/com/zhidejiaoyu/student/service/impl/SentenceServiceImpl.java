@@ -953,7 +953,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         sentenceTranslateVo.setMemoryStrength(0.0);
 
         int nextInt = new Random().nextInt(10);
-        if (nextInt > 3) {
+        if (nextInt > 2) {
             if (type == 2) {
                 sentenceTranslateVo.setOrder(commonMethod.getOrderEnglishList(sentence.getCentreExample(), sentence.getExampleDisturb()));
             } else {
