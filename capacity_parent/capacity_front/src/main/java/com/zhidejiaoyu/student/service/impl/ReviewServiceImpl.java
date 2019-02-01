@@ -423,7 +423,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 例句读音
         map.put("readUrl", baiduSpeak.getSentencePaht(english));
         // 例句翻译
-        map.put("word_Chinese", chinese);
+        map.put("chinese", chinese);
         // 例句英文原文
         map.put("sentence", english);
         // 记忆强度
