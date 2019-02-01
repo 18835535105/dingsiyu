@@ -372,8 +372,8 @@ public class CommonMethod implements Serializable {
         List<String> list = new ArrayList<>();
         String[] arr = sentence.split(" ");
         for (String s : arr) {
-            if (s.contains("#")) {
-                list.add(s.replace("#", " "));
+            if (s.contains("#")||s.contains("*")) {
+                list.add(s.replace("#", " ").replace("*"," "));
             } else {
                 list.add(s.trim());
             }
@@ -410,6 +410,9 @@ public class CommonMethod implements Serializable {
         for (int i = 0; i < words.length; i++) {
             if (words[i].contains("#")) {
                 words[i] = words[i].replace("#", " ");
+            }
+            if (words[i].contains("*")) {
+                words[i] = words[i].replace("*", " ");
             }
             list.add(words[i].trim());
         }
