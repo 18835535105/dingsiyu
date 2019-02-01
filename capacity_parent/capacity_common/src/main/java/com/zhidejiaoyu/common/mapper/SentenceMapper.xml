@@ -146,7 +146,7 @@
         <include refid="relevance_base_sql"/>
         from sentence s,learn l where s.id = l.example_id and
         l.example_id is not null and
-        l.unit_id = #{unitId} and l.student_id = #{studentId} and l.study_model = #{studyModel}
+        l.unit_id = #{unitId} and l.student_id = #{studentId} and l.study_model = #{studyModel} and l.type=1
         <if test="condition == 2">
             -- 生句
             and l.`status` = 0
