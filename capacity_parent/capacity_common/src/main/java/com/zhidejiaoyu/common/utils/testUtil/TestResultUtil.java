@@ -376,7 +376,7 @@ public class TestResultUtil implements Serializable {
             if (classify == 6) {
                 getSentenceWriteVo(sentences, vos, type);
             } else {
-                getSentenceTranslateVo(sentences, vos, type);
+                getSentenceTranslateVo(sentences, vos, type,classify);
             }
             return vos;
         }
@@ -402,7 +402,7 @@ public class TestResultUtil implements Serializable {
         }
     }
 
-    private void getSentenceTranslateVo(List<Sentence> sentences, List<SentenceTranslateVo> vos, int type) {
+    private void getSentenceTranslateVo(List<Sentence> sentences, List<SentenceTranslateVo> vos, int type,int classify) {
         SentenceTranslateVo sentenceTranslateVo;
         for (Sentence sentence : sentences) {
             sentenceTranslateVo = new SentenceTranslateVo();
@@ -412,6 +412,9 @@ public class TestResultUtil implements Serializable {
             sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePaht(sentence.getCentreExample().replace("#", " ")));
 
             int nextInt = new Random().nextInt();
+            if(classify==4){
+                nextInt=2;
+            }
             if (nextInt % 2 == 0) {
                 if (type == 2) {
                     sentenceTranslateVo.setOrder(commonMethod.getOrderEnglishList(sentence.getCentreExample(), sentence.getExampleDisturb()));
