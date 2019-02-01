@@ -7,12 +7,13 @@
         <result column="centreTranslate" property="centreTranslate"/>
         <result column="ExampleDisturb" property="ExampleDisturb"/>
         <result column="TranslateDisturb" property="TranslateDisturb"/>
+        <result column="read_url" property="readUrl"/>
     </resultMap>
 
 
     <!-- 多表关联查询sentence对象 -->
     <sql id="relevance_base_sql">
-        s.id, s.centreExample, s.centreTranslate, s.ExampleDisturb, s.TranslateDisturb
+        s.id, s.centreExample, s.centreTranslate, s.ExampleDisturb, s.TranslateDisturb, s.read_url
     </sql>
 
     <!-- 新增sql片段 -->

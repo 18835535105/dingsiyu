@@ -33,6 +33,8 @@ public class Sentence extends Model<Sentence> {
 	@TableField("TranslateDisturb")
     private String TranslateDisturb;
 
+	private String readUrl;
+
     @Override
     protected Serializable pkVal() {
         return this.id;
