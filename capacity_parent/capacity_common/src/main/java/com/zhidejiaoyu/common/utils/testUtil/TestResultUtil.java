@@ -407,7 +407,7 @@ public class TestResultUtil implements Serializable {
         for (Sentence sentence : sentences) {
             sentenceTranslateVo = new SentenceTranslateVo();
             sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
-            sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " "));
+            sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*"," "));
             sentenceTranslateVo.setId(sentence.getId());
             sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePaht(sentence.getCentreExample().replace("#", " ")));
 
