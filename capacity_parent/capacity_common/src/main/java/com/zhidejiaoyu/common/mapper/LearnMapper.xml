@@ -141,8 +141,24 @@
             and l.vocabulary_id is not null and (select v.delStatus from
             vocabulary v where v.id = l.vocabulary_id) = 1
         </if>
-        <if
-                test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
+        <if test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
+            and example_id is not null
+        </if>
+        and learn_count = #{count}
+    </select>
+
+    <!-- 查询学生当前单元当前模块下已学习单词/例句的个数，即学习进度 -->
+    <select id="learnWordBySentence" resultType="java.lang.Long"
+            parameterType="map">
+        select count(id) from learn l where
+        l.student_id=#{studentId}
+        and l.unit_id=#{unitId} and l.study_model =
+        #{studyModel}
+        <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写' or studyModel == '单词图鉴'">
+            and l.vocabulary_id is not null and (select v.delStatus from
+            vocabulary v where v.id = l.vocabulary_id) = 1
+        </if>
+        <if test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
             and example_id is not null
         </if>
         and learn_count = #{count}

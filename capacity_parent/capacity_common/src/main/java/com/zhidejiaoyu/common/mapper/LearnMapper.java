@@ -45,6 +45,18 @@ public interface LearnMapper extends BaseMapper<Learn> {
     Long countLearnWord(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                         @Param("studyModel") String studyModel, @Param("count") Integer count);
 
+    /**
+     * 查询学生当前单元当前模块下已学习单词/例句的个数，即学习进度
+     *
+     * @param studentId  学生id
+     * @param unitId     单元id
+     * @param studyModel
+     * @param count      当前课程的学习遍数
+     * @return
+     */
+    Long learnWordBySentence(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+                        @Param("studyModel") String studyModel, @Param("count") Integer count);
+
     Long isCountLearnWord(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                           @Param("studyModel") String studyModel, @Param("count") Integer count);
     /**

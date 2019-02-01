@@ -242,15 +242,15 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         }
         if (Objects.equals(classifyInt, 4)) {
             // 判断例句翻译模块是否已学习完
-            plan = learnMapper.countLearnWord(student.getId(), unitId, commonMethod.getTestType(5), learnCount == null ? 1 : learnCount);
+            plan = learnMapper.learnWordBySentence(student.getId(), unitId, commonMethod.getTestType(5), learnCount == null ? 1 : learnCount);
         }
         if (Objects.equals(classifyInt, 6)) {
             // 判断例句听力模块是否已学习完
-            plan = learnMapper.countLearnWord(student.getId(), unitId, commonMethod.getTestType(4), learnCount == null ? 1 : learnCount);
+            plan = learnMapper.learnWordBySentence(student.getId(), unitId, commonMethod.getTestType(4), learnCount == null ? 1 : learnCount);
         }
         if (Objects.equals(classifyInt, 7)) {
             // 判断例句听力默写是否已学习完
-            plan = learnMapper.countLearnWord(student.getId(), unitId, commonMethod.getTestType(6), learnCount == null ? 1 : learnCount);
+            plan = learnMapper.learnWordBySentence(student.getId(), unitId, commonMethod.getTestType(6), learnCount == null ? 1 : learnCount);
         }
         return plan >= sentenceCount;
     }
