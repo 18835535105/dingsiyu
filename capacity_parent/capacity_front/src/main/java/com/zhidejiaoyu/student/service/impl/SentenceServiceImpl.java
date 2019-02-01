@@ -944,7 +944,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     private SentenceTranslateVo getSentenceTranslateVo(Long plan, boolean firstStudy, Long sentenceCount, Integer type, Sentence sentence) {
         SentenceTranslateVo sentenceTranslateVo = new SentenceTranslateVo();
         sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
-        sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " "));
+        sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*"," "));
         sentenceTranslateVo.setFirstStudy(firstStudy);
         sentenceTranslateVo.setId(sentence.getId());
         sentenceTranslateVo.setPlan(plan);
@@ -974,7 +974,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     private SentenceTranslateVo getSentenceVo(Sentence sentence, boolean firstStudy, Long plan, double memoryStrength, Long sentenceCount, Integer type) {
         SentenceTranslateVo sentenceTranslateVo = new SentenceTranslateVo();
         sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
-        sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " "));
+        sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*"," "));
         sentenceTranslateVo.setFirstStudy(firstStudy);
         sentenceTranslateVo.setId(sentence.getId());
         sentenceTranslateVo.setPlan(plan);
