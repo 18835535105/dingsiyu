@@ -347,4 +347,13 @@ public interface CourseMapper extends BaseMapper<Course> {
     List<Map<String,Object>> getAllVersion(Long studnetId);
 
     Map<String,Object> selectCourseByUnitId(Long unitId);
+
+    /**
+     * 查询学生当前可学习课程及课程下单词、句型、课文个数
+     *
+     * @param student
+     * @param type  1:单词；2：句子；3：课文
+     * @return
+     */
+    List<Map<String, Object>> getAllCourse(@Param("student") Student student, @Param("type") Integer type);
 }

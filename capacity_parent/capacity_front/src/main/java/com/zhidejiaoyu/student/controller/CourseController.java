@@ -199,10 +199,10 @@ public class CourseController {
     }
 
     /**
-     * 获取学生可学习的所有课程及课程下单词/例句数量
+     * 获取学生可学习的所有课程及课程下单词、例句、课文数量
      *
      * @param session
-     * @param type    1:单词；2：句子
+     * @param type    1:单词；2：句子；3：课文
      * @return courseName:课程名称 <br>
      * count:当前课程下单词或例句的个数 <br>
      * courseId:课程id
