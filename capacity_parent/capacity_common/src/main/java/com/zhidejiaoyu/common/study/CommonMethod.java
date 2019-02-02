@@ -73,7 +73,11 @@ public class CommonMethod implements Serializable {
     public Integer saveStudyCount(HttpSession session, Long courseId) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         Long studentId = student.getId();
-        Long cId = (Long) session.getAttribute("课程" + courseId);
+        Object courseObject = session.getAttribute("课程" + courseId);
+        Long cId = null;
+        if (courseObject != null) {
+            cId = Long.valueOf(courseObject.toString());
+        }
         Integer maxCount = studyCountMapper.selectMaxCountByCourseId(studentId, courseId);
         if (cId == null) {
             // 本次登录第一次学习当前课程
