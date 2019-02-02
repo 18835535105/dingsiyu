@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
+import com.zhidejiaoyu.common.Vo.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.Vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.TestRecord;
@@ -69,7 +70,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      * @param type      1:单词测试记录；2：句型测试记录
      * @return
      */
-    List<TestRecord> showRecord(@Param("student_id") Long studentId, @Param("type") Integer type);
+    List<TestRecordVo> showRecord(@Param("student_id") Long studentId, @Param("type") Integer type);
 
     /**
      * 查看学生今日单元闯关个数

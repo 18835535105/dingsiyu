@@ -444,16 +444,18 @@
         update test_record set `explain` = '游戏测试次数#2#恭喜你旗开得胜，祝未来勇闯天涯！' where student_id = #{student.id} and  genre = '学前游戏测试'
     </update>
 
-    <select id="showRecord" parameterType="map" resultMap="BaseResultMap">
+    <select id="showRecord" parameterType="map" resultType="com.zhidejiaoyu.common.Vo.testVo.TestRecordVo">
         select a.id,
         a.genre,
-        a.test_end_time,
+        a.test_end_time testEndTime,
         a.point,
         a.quantity,
         a.explain,
-        a.study_model,
-        IFNULL(a.award_gold, 0) AS award_gold
-        from test_record a
+        a.study_model studyModel,
+        c.course_name courseName,
+        u.unit_name unitName,
+        IFNULL(a.award_gold, 0) awardGold
+        from test_record a left join course c on a.course_id = c.id left join unit u on u.id = a.unit_id
         where a.student_id = #{student_id}
         <if test="type == 1">
             <!-- 单词类型的测试记录 -->

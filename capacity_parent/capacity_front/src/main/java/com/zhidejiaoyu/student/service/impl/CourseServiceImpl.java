@@ -880,12 +880,8 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
     @Override
     public ServerResponse<List<Map<String, Object>>> getAllCourses(HttpSession session, Integer type) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        List<Map<String, Object>> courseInfo;
-        if (type == 1) {
-            courseInfo = courseMapper.getAllCourseInfoWithWord(student);
-        } else {
-            courseInfo = courseMapper.getAllCourseInfoWithSentence(student);
-        }
+        List<Map<String, Object>> courseInfo = courseMapper.getAllCourse(student, type);
+
         if (courseInfo.size() > 0) {
             int count = 0;
             Map<String, Object> map = new HashMap<>(16);

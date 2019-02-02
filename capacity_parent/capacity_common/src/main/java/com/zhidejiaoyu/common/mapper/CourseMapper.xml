@@ -608,6 +608,39 @@
           where unit.id = #{unitId}
 		  limit 1
     </select>
+    <select id="getAllCourse" resultType="java.util.Map" parameterType="map">
+        select c.id courseId, c.course_name courseName, c.version
+        <if test="type == 3">
+            , count(distinct t.unit_id) `count`
+        </if>
+        <if test="type != 3">
+            , count(t.id) `count`
+        </if>
+        from student_study_plan ssp, course c, unit u
+        <if test="type == 1">
+            , unit_vocabulary uv
+            , vocabulary t
+        </if>
+        <if test="type == 2">
+            , unit_sentence us
+            , sentence t
+        </if>
+        <if test="type == 3">
+            , teks t
+        </if>
+        where ssp.course_id = c.id and u.course_id = c.id and ssp.type = #{type}
+        <if test="type == 1">
+            and uv.unit_id = u.id and uv.vocabulary_id = t.id
+        </if>
+        <if test="type == 2">
+            and us.unit_id = u.id and us.sentence_id = t.id
+        </if>
+        <if test="type == 3">
+            and t.unit_id = u.id
+        </if>
+        group by c.id
+        order by c.id asc
+    </select>
     <select id="getVersionByUnitId" parameterType="java.lang.Long" resultType="java.lang.String">
         select cou.version from course cou join unit unit on cou.id=unit.course_id where unit.id=#{unitId}
     </select>

@@ -6,6 +6,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.game.StrengthGameVo;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
+import com.zhidejiaoyu.common.Vo.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.Vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
@@ -14,7 +15,6 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
-import com.zhidejiaoyu.common.utils.server.GoldResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
@@ -1472,8 +1472,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if(rows != null){
             PageHelper.startPage(page, rows);
         }
-        List<TestRecord> records = testRecordMapper.showRecord(studentId, type);
-        PageInfo<TestRecord> testRecordPageInfo = new PageInfo<>(records);
+        List<TestRecordVo> records = testRecordMapper.showRecord(studentId, type);
+        PageInfo<TestRecordVo> testRecordPageInfo = new PageInfo<>(records);
 
         // 每个测试记录下含有测试详情个数，如果没有测试详情，不显示详情按钮
         Map<Long, Map<Long, Long>> testDetailCountMap = null;
@@ -1485,11 +1485,20 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         List<Map<String, Object>> result = new ArrayList<>();
 
         Long recordId;
-        for(TestRecord record: records){
+        String studyModel;
+        for(TestRecordVo record: records){
             recordId = record.getId();
             Map<String, Object> map = new HashMap<>(16);
+            studyModel = record.getStudyModel().replace("例句","句型");
             map.put("id", recordId);
-            map.put("genre", StringUtils.isEmpty(record.getStudyModel()) ? record.getGenre() : record.getStudyModel().replace("例句","句型") + "-" + record.getGenre());
+
+            if (Objects.equals("单元闯关测试", record.getGenre())) {
+                map.put("genre", studyModel);
+            } else if (record.getGenre()!= null && record.getGenre().contains("五维测试")) {
+                map.put("genre", record.getGenre());
+            } else {
+                map.put("genre", studyModel + "-" + record.getGenre());
+            }
 
             if (!"单词图鉴".equals(record.getStudyModel()) && testDetailCountMap != null && testDetailCountMap.get(recordId) != null
                     && testDetailCountMap.get(recordId).get("count") != null
@@ -1504,6 +1513,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             map.put("point", record.getPoint());
             map.put("awardGold", record.getAwardGold());
             map.put("quantity", record.getQuantity());
+            map.put("courseName", record.getCourseName());
+            map.put("unitName", record.getUnitName());
             String explain = record.getExplain();
             if (StringUtils.isNotEmpty(explain) && explain.contains("#")) {
                 map.put("explain", explain.substring(explain.lastIndexOf("#")+1));

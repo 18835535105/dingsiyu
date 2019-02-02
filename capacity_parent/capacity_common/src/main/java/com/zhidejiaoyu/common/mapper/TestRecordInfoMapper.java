@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.zhidejiaoyu.common.pojo.TestRecord;
+import com.zhidejiaoyu.common.Vo.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.pojo.TestRecordInfo;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.MapKey;
@@ -43,5 +43,5 @@ public interface TestRecordInfoMapper extends BaseMapper<TestRecordInfo> {
      * @return  key:测试id  value: recordCount 测试详情数
      */
     @MapKey("testId")
-    Map<Long, Map<Long, Long>> countByRecordIds(@Param("records") List<TestRecord> records);
+    Map<Long, Map<Long, Long>> countByRecordIds(@Param("records") List<TestRecordVo> records);
 }
