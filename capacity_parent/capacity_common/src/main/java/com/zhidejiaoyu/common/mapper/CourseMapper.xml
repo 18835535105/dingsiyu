@@ -608,5 +608,8 @@
           where unit.id = #{unitId}
 		  limit 1
     </select>
+    <select id="getVersionByUnitId" parameterType="java.lang.Long" resultType="java.lang.String">
+        select cou.version from course cou join unit unit on cou.id=unit.course_id where unit.id=#{unitId}
+    </select>
 
 </mapper>

@@ -22,6 +22,8 @@ public interface StudentStudyPlanMapper extends BaseMapper<StudentStudyPlan> {
 
     List<StudentStudyPlan> selByStudentIdAndCourseId(@Param("studentId") Long studentId,@Param("courseId") Long courseId,@Param("type") Integer type);
 
+    List<StudentStudyPlan> selByStudentIdAndCourseIdAndUnitId(@Param("studentId") Long studentId,@Param("courseId") Long courseId,@Param("type") Integer type,@Param("unitId") Long unitId);
+
     /**
      * 查询学生当前的学习计划
      *

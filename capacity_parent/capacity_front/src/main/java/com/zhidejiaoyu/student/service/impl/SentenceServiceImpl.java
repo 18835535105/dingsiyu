@@ -664,6 +664,10 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             capacityStudentUnit.setCourseId(unit.getCourseId());
             capacityStudentUnit.setUnitName(unit.getUnitName());
             capacityStudentUnit.setCourseName(unit.getJointName());
+            capacityStudentUnit.setVersion(courseMapper.getVersionByUnitId(unit.getId()));
+            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseIdAndUnitId(student.getId(), unit.getCourseId(), 2,unit.getId());
+            capacityStudentUnit.setStartunit(studentStudyPlans.get(0).getStartUnitId());
+            capacityStudentUnit.setEndunit(studentStudyPlans.get(0).getEndUnitId());
             capacityStudentUnitMapper.insert(capacityStudentUnit);
         } else {
             capacityStudentUnit.setUnitId(unitId);
@@ -671,6 +675,10 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             capacityStudentUnit.setStudentId(student.getId());
             capacityStudentUnit.setUnitName(unit.getUnitName());
             capacityStudentUnit.setCourseName(unit.getJointName());
+            capacityStudentUnit.setVersion(courseMapper.getVersionByUnitId(unit.getId()));
+            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseIdAndUnitId(student.getId(), unit.getCourseId(), 2,unit.getId());
+            capacityStudentUnit.setStartunit(studentStudyPlans.get(0).getStartUnitId());
+            capacityStudentUnit.setEndunit(studentStudyPlans.get(0).getEndUnitId());
             capacityStudentUnitMapper.updateById(capacityStudentUnit);
         }
         // 判断是否可以学习当前句型模块
