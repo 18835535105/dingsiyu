@@ -197,7 +197,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                         sentence.add(sentenceList[i]);
                     }
                     //返回的填空单词 以及句子填空位置
-                    map.put("vocabularyArray", commonMethod.getOrderEnglishList(teks1.getSentence(), null));
+                    if(teks1.getSentence().indexOf("...") != -1){
+                        String substring = teks1.getSentence().replace("..." ,"");
+                        map.put("vocabularyArray",commonMethod.getOrderEnglishList(substring ,null));
+                    }else{
+                        map.put("vocabularyArray", commonMethod.getOrderEnglishList(teks1.getSentence(), null));
+                    }
                     map.put("blankSentenceArray", blankSentenceArray);
                     map.put("sentence", sentence);
                 }
@@ -390,6 +395,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                     integers=wirterBlank(sentenceList.length,3);
                 }else*/
                 if (sentenceList.length > 3) {
+
                     integers = wirterBlank(sentenceList.length, 2);
                 } else {
                     integers = wirterBlank(sentenceList.length, 1);
@@ -600,8 +606,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
             }
         }*/
-
-
         return integers;
     }
 
