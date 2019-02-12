@@ -91,7 +91,7 @@ public class TeksController  {
 
 
     //选择课文单词
-    @RequestMapping("selWriteTeks")
+    @RequestMapping("/selWriteTeks")
     @ResponseBody
     public Object selWriteTeks(Integer unitId){
         return teksService.selWriteTeks(unitId);
@@ -104,7 +104,7 @@ public class TeksController  {
      * @param session
      * @return
      */
-    @PostMapping("addData")
+    @PostMapping("/addData")
     @ResponseBody
     public ServerResponse<Object> addData(TestRecord testRecord, HttpSession session){
         return teksService.addData(testRecord,session);
@@ -117,7 +117,7 @@ public class TeksController  {
      * @param session
      * @return
      */
-    @RequestMapping("selHistoryPronunciation")
+    @RequestMapping("/selHistoryPronunciation")
     @ResponseBody
     public ServerResponse<Object> selHistoryPronunciation(Integer unitId,HttpSession session){
         return teksService.selHistoryPronunciation(unitId,session);
@@ -129,7 +129,7 @@ public class TeksController  {
      * @param session
      * @return
      */
-    @RequestMapping("isHistoryPronunciation")
+    @RequestMapping("/isHistoryPronunciation")
     @ResponseBody
     public ServerResponse<Object> isHistoryPronunciation(Integer unitId,HttpSession session){
         return teksService.isHistoryPronunciation(unitId,session);
@@ -143,7 +143,7 @@ public class TeksController  {
      * @param session
      * @return
      */
-    @RequestMapping("selHistoryByCountAndUnitId")
+    @RequestMapping("/selHistoryByCountAndUnitId")
     @ResponseBody
     public ServerResponse<Object> selHistoryByCountAndUnitId(Integer count,Integer unitId,HttpSession session){
         return  teksService.selHistoryByCountAndUnitId(count,unitId,session);
@@ -152,13 +152,13 @@ public class TeksController  {
     /**
      * 查看排行榜信息
      */
-    @RequestMapping("getRanking")
+    @RequestMapping("/getRanking")
     @ResponseBody
     public ServerResponse<Object> selRankingList(Integer unitId,HttpSession session){
         return teksService.selRankingList(unitId,session);
     }
 
-    @RequestMapping("getTeksTest")
+    @RequestMapping("/getTeksTest")
     @ResponseBody
     public ServerResponse<Object> getTeksTest(Integer unitId){
         return teksService.getTeksTest(unitId);
