@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.common.personal.InitRedPointThread;
 import com.zhidejiaoyu.student.listener.SessionListener;
 import com.zhidejiaoyu.student.service.LoginService;
@@ -790,7 +791,13 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 当前用户信息放到session
             session.setAttribute(UserConstant.CURRENT_STUDENT, stu);
             // 登陆时间放入session
-            session.setAttribute(TimeConstant.LOGIN_TIME, DateUtil.parseYYYYMMDDHHMMSS(new Date()));
+            Date loginTime = DateUtil.parseYYYYMMDDHHMMSS(new Date());
+            session.setAttribute(TimeConstant.LOGIN_TIME, loginTime);
+
+            Map<String, Object> sessionMap = new HashMap<>(16);
+            sessionMap.put(UserConstant.CURRENT_STUDENT, stu);
+            sessionMap.put(TimeConstant.LOGIN_TIME, loginTime);
+            sessionMap.put("sessionId", session.getId());
 
             // 2.判断是否需要完善个人信息
             if (!StringUtils.isNotBlank(stu.getHeadUrl())) {
@@ -808,7 +815,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             }
 
             // 一个账户只能登陆一台
-            judgeMultipleLogin(session, stu);
+            judgeMultipleLogin(session, stu, sessionMap);
 
             // 判断学生是否需要进行智能复习,学生登录时在session中增加该字段，在接口 /login/vocabularyIndex 如果获取到该字段不为空，
             // 判断学生是否需要进行智能复习，如果该字段为空不再判断是否需要进行智能复习
@@ -852,18 +859,17 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         return count > 0;
     }
 
-    private void judgeMultipleLogin(HttpSession session, Student stu) {
+    private void judgeMultipleLogin(HttpSession session, Student stu, Map<String, Object> sessionMap) {
         Object object = redisTemplate.opsForHash().get("loginSession", stu.getId());
-        HttpSession oldSession;
         if (object != null) {
-            oldSession = SessionListener.getSessionById(object.toString());
+            Map<String, Object> oldSessionMap = RedisOpt.getSessionMap(object.toString());
             // 如果账号登录的session不同，保存前一个session的信息
-            if (oldSession != null && !Objects.equals(object, session.getId())) {
-                saveDurationInfo(stu, oldSession);
+            if (oldSessionMap != null && !Objects.equals(object, session.getId())) {
+                saveDurationInfo(oldSessionMap);
                 saveLogoutLog(stu, runLogMapper, logger);
             }
         }
-        SessionListener.putSession(session);
+        redisTemplate.opsForHash().put(RedisKeysConst.SESSION_MAP, session.getId(), sessionMap);
         redisTemplate.opsForHash().put("loginSession", stu.getId(), session.getId());
     }
 
@@ -995,12 +1001,12 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
 
-    public static void saveLogoutLog(Student stu, RunLogMapper runLogMapper, Logger logger) {
-        RunLog runLog = new RunLog(stu.getId(), 1, "学生[" + stu.getStudentName() + "]退出登录", new Date());
+    public static void saveLogoutLog(Student student, RunLogMapper runLogMapper, Logger logger) {
+        RunLog runLog = new RunLog(student.getId(), 1, "学生[" + student.getStudentName() + "]退出登录", new Date());
         try {
             runLogMapper.insert(runLog);
         } catch (Exception e) {
-            logger.error("记录学生 [{}]->[{}] 退出登录信息失败！", stu.getId(), stu.getStudentName(), e);
+            logger.error("记录学生 [{}]->[{}] 退出登录信息失败！", student.getId(), student.getStudentName(), e);
         }
     }
 
@@ -1008,86 +1014,34 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     public void loginOut(HttpSession session, HttpServletRequest request) {
         Student student = getStudent(session);
         if (student != null) {
-            String ip = null;
-            try {
-                ip = MacIpUtil.getIpAddr(request);
-            } catch (Exception e) {
-                logger.error("获取学生[{}]-[{}]登录IP失败！error=[{}]", student.getId(), student.getStudentName(), e.getMessage());
-            }
-            RunLog runLog = new RunLog(student.getId(), 1, "学生[" + student.getStudentName() + "]通过退出按钮退出登录, ip=[" + ip + "]", new Date());
-            try {
-                runLogMapper.insert(runLog);
-            } catch (Exception e) {
-                logger.error("记录学生 [{}]->[{}] 退出登录信息失败！", student.getId(), student.getStudentName(), e);
-            }
-
-            // 保存学生时长信息
-            saveDurationInfo(student, session);
             // 删除学生登录信息
-            SessionListener.removeSessionById(session.getId());
             redisTemplate.opsForHash().delete("loginSession", student.getId());
+            session.invalidate();
         }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveDurationInfo(Student student, HttpSession session) {
-        Date date = (Date) session.getAttribute(TimeConstant.LOGIN_TIME);
-        Date loginTime = DateUtil.parseYYYYMMDDHHMMSS(date);
-        Date loginOutTime = DateUtil.parseYYYYMMDDHHMMSS(new Date());
+    public void saveDurationInfo(Map<String, Object> sessionMap) {
+        if (sessionMap != null) {
+            Student student = (Student) sessionMap.get(UserConstant.CURRENT_STUDENT);
+            Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) sessionMap.get(TimeConstant.LOGIN_TIME));
+            Date loginOutTime = DateUtil.parseYYYYMMDDHHMMSS(new Date());
+            if (loginTime != null && loginOutTime != null) {
+                // 判断当前登录时间是否已经记录有在线时长信息，如果没有插入记录，如果有无操作
+                int count = durationMapper.countOnlineTimeWithLoginTime(student, loginTime);
+                if (count == 0) {
+                    // 学生 session 失效时将该学生从在线人数中移除
+                    redisTemplate.opsForSet().remove(RedisKeysConst.ONLINE_USER, student.getId());
 
-        Object object = null;
-        String key = "";
-        if (student != null) {
-            key = RedisKeysConst.SAVE_LOGIN_TIME + ":" + student.getId() + ":" + date;
-            object = redisTemplate.opsForValue().get(key);
-        }
-
-        if (loginTime != null && loginOutTime != null && object == null) {
-            // 判断当前登录时间是否已经记录有在线时长信息，如果没有插入记录，如果有无操作
-            int count = durationMapper.countOnlineTimeWithLoginTime(student, loginTime);
-            if (count <= 0) {
-
-                redisTemplate.opsForValue().set(key, date);
-                redisTemplate.expire(key,30, TimeUnit.SECONDS);
-
-                // 学生 session 失效时将该学生从在线人数中移除
-                redisTemplate.opsForSet().remove(RedisKeysConst.ONLINE_USER, student.getId());
-
-                Long onlineTime = (loginOutTime.getTime() - loginTime.getTime()) / 1000;
-                Duration duration = new Duration();
-                duration.setStudentId(student.getId());
-                duration.setOnlineTime(onlineTime);
-                duration.setLoginTime(loginTime);
-                duration.setLoginOutTime(loginOutTime);
-                duration.setValidTime(0L);
-                durationMapper.insert(duration);
-            }
-        }
-        removeSessionAttributes(session);
-    }
-
-    /**
-     * 判断当前用户是否已登录，防止用户正常登录期间通过url再次登录导致更新时长表信息出错问题
-     * <ul>
-     * <li>如果已登录，又重新登录，清除上次登录信息，并更新时长信息</li>
-     * <li>如果是新登录，不做操作</li>
-     * </ul>
-     *
-     * @param session
-     */
-    private void removeSessionAttributes(HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        if (student != null) {
-            Enumeration<String> attributeNames = session.getAttributeNames();
-            StringBuilder sb = new StringBuilder();
-            while (attributeNames.hasMoreElements()) {
-                sb.append(attributeNames.nextElement()).append("@@");
-            }
-            if (sb.length() > 0) {
-                String[] attrs = sb.toString().split("@@");
-                for (String attr : attrs) {
-                    session.removeAttribute(attr);
+                    Long onlineTime = (loginOutTime.getTime() - loginTime.getTime()) / 1000;
+                    Duration duration = new Duration();
+                    duration.setStudentId(student.getId());
+                    duration.setOnlineTime(onlineTime);
+                    duration.setLoginTime(loginTime);
+                    duration.setLoginOutTime(loginOutTime);
+                    duration.setValidTime(0L);
+                    durationMapper.insert(duration);
                 }
             }
         }

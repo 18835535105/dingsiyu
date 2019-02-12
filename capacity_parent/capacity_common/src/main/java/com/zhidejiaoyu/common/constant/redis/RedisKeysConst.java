@@ -48,7 +48,7 @@ public class RedisKeysConst {
      * 当前学生当前模块下所有课程信息
      * key - All_COURSE_WITH_STUDENT_IN_TYPE:学生id:模块名称
      */
-    public static final String All_COURSE_WITH_STUDENT_IN_TYPE = "All_COURSE_WITH_STUDENT_IN_TYPE:";
+    public static final String ALL_COURSE_WITH_STUDENT_IN_TYPE = "All_COURSE_WITH_STUDENT_IN_TYPE:";
 
     /**
      * 所有等级信息
@@ -71,4 +71,9 @@ public class RedisKeysConst {
      * key: SAVE_LOGIN_TIME:studentId value:保存的在线时长中的登录时间
      */
     public static final String SAVE_LOGIN_TIME = "SAVE_LOGIN_TIME";
+
+    /**
+     * 用于存储学生时长信息及学生信息
+     */
+    public static final String SESSION_MAP = "SESSION_MAP";
 }

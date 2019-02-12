@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
@@ -33,12 +34,6 @@ public class RedisOpt {
     private VocabularyMapper vocabularyMapper;
 
     @Autowired
-    private CourseMapper courseMapper;
-
-    @Autowired
-    private StudentUnitMapper studentUnitMapper;
-
-    @Autowired
     private LevelMapper levelMapper;
 
     @Autowired
@@ -46,6 +41,13 @@ public class RedisOpt {
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+
+    private static RedisTemplate<String, Object> staticRedisTemplate;
+
+    @PostConstruct
+    public void init() {
+        staticRedisTemplate = redisTemplate;
+    }
 
     /**
      * 当前课程下所有单词数
@@ -161,6 +163,14 @@ public class RedisOpt {
             }
         }
         return false;
+    }
+
+    public static Map<String, Object> getSessionMap(String sessionId) {
+        Object object = staticRedisTemplate.opsForHash().get(RedisKeysConst.SESSION_MAP, sessionId);
+        if (object == null) {
+            return null;
+        }
+        return (Map<String, Object>) object;
     }
 
     private Object getRedisObject(String key) {
