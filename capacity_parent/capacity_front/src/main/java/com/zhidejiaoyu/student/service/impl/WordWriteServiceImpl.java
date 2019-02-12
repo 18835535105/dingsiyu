@@ -297,8 +297,8 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
             currentLearn.setUpdateTime(now);
             int i = learnMapper.updateByPrimaryKeySelective(currentLearn);
             
-            // 默写模块错过三次在记忆时间上再加长三小时
-            if(classify == 3) {
+            // 慧默写、慧听写模块错过三次在记忆时间上再加长三小时
+            if(classify == 3 || classify == 2) {
             	// 查询错误次数>=3 
             	Integer faultTime = capacityWriteMapper.getFaultTime(studentId, learn.getVocabularyId());
             	if(faultTime != null && faultTime >= 3) {
