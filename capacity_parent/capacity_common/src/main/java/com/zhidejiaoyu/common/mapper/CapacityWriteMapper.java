@@ -119,7 +119,7 @@ public interface CapacityWriteMapper extends BaseMapper<CapacityWrite> {
      * @param vocabularyId
      * @param pushRise
      */
-    @Update("update simple_capacity set push = date_add(push, interval ${pushRise} hour) where student_id = #{studentId} AND vocabulary_id = #{vocabularyId}")
+    @Update("update capacity_write set push = date_add(push, interval ${pushRise} hour) where student_id = #{studentId} AND vocabulary_id = #{vocabularyId}")
 	void updatePush(@Param("studentId")Long id, @Param("vocabularyId")Long vocabularyId, @Param("pushRise")int pushRise);
 
 	/**
