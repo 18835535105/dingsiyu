@@ -212,7 +212,7 @@ public class StudyLocusServiceImpl implements StudyLocusService {
     }
 
     private List<Map<String, Object>> getCourseInfo(HttpSession session, StudyLocusVo studyLocusVo) {
-        ServerResponse<List<Map<String, Object>>> allCourses = courseService.getAllCourses(session, 1);
+        ServerResponse<List<Map<String, Object>>> allCourses = courseService.getAllCourses(session, 1, true);
         List<Map<String, Object>> courseList = allCourses.getData();
         courseList.remove(0);
         for (Map<String, Object> stringObjectMap : courseList) {

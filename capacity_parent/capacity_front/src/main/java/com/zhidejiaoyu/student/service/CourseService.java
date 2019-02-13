@@ -78,9 +78,10 @@ public interface CourseService extends BaseService<Course> {
      *
      * @param session
      * @param type    1:单词；2：句子
+     * @param flag
      * @return
      */
-    ServerResponse<List<Map<String, Object>>> getAllCourses(HttpSession session, Integer type);
+    ServerResponse<List<Map<String, Object>>> getAllCourses(HttpSession session, Integer type, Boolean flag);
 
     /**
      * 分页获取当前课程下所有单元信息

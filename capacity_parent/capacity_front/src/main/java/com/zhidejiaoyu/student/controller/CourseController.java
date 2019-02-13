@@ -203,14 +203,16 @@ public class CourseController {
      *
      * @param session
      * @param type    1:单词；2：句子；3：课文
+     * @param flag  true:显示“全部课程”；false：不显示
      * @return courseName:课程名称 <br>
      * count:当前课程下单词或例句的个数 <br>
      * courseId:课程id
      */
     @ResponseBody
     @GetMapping("/getAllCourses")
-    public ServerResponse<List<Map<String, Object>>> getAllCourses(HttpSession session, @RequestParam(required = false, defaultValue = "1") Integer type) {
-        return courseService.getAllCourses(session, type);
+    public ServerResponse<List<Map<String, Object>>> getAllCourses(HttpSession session, @RequestParam(required = false, defaultValue = "1") Integer type,
+                                                                   @RequestParam(required = false, defaultValue = "true") Boolean flag) {
+        return courseService.getAllCourses(session, type, flag);
     }
 
     /**

@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.pojo.Vocabulary;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -121,4 +122,11 @@ public interface CapacityListenMapper extends BaseMapper<CapacityListen> {
      */
     @Delete("delete from capacity_listen where student_id = #{studentId} and unit_id >= #{startUnit} and unit_id <= #{endUnit}")
     void deleteByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("startUnit") Long startUnit, @Param("endUnit") Long endUnit);
+
+    @Select("select fault_time from capacity_listen where student_id = #{studentId} AND vocabulary_id = #{vocabularyId} limit 1")
+    Integer getFaultTime(Long studentId, Long vocabularyId);
+
+    @Update("update capacity_listen set push = date_add(push, interval ${pushRise} hour) where student_id = #{studentId} AND vocabulary_id = #{vocabularyId}")
+    void updatePush(Long studentId, Long vocabularyId, int pushRise);
+
 }
