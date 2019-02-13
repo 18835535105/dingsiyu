@@ -799,8 +799,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             sessionMap.put(TimeConstant.LOGIN_TIME, loginTime);
             sessionMap.put("sessionId", session.getId());
 
-            redisTemplate.opsForHash().put(RedisKeysConst.SESSION_MAP, session.getId(), sessionMap);
-            redisTemplate.opsForHash().put("loginSession", stu.getId(), session.getId());
+            // 一个账户只能登陆一台
+            judgeMultipleLogin(session, stu, sessionMap);
 
             // 2.判断是否需要完善个人信息
             if (!StringUtils.isNotBlank(stu.getHeadUrl())) {
@@ -816,9 +816,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 // 2.1 跳到完善个人信息页面
                 return ServerResponse.createBySuccess("2", result);
             }
-
-            // 一个账户只能登陆一台
-            judgeMultipleLogin(session, stu);
 
             // 判断学生是否需要进行智能复习,学生登录时在session中增加该字段，在接口 /login/vocabularyIndex 如果获取到该字段不为空，
             // 判断学生是否需要进行智能复习，如果该字段为空不再判断是否需要进行智能复习
@@ -862,7 +859,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         return count > 0;
     }
 
-    private void judgeMultipleLogin(HttpSession session, Student stu) {
+    private void judgeMultipleLogin(HttpSession session, Student stu, Map<String, Object> sessionMap) {
         Object object = redisTemplate.opsForHash().get("loginSession", stu.getId());
         if (object != null) {
             Map<String, Object> oldSessionMap = RedisOpt.getSessionMap(object.toString());
@@ -872,6 +869,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 saveLogoutLog(stu, runLogMapper, logger);
             }
         }
+        redisTemplate.opsForHash().put(RedisKeysConst.SESSION_MAP, session.getId(), sessionMap);
+        redisTemplate.opsForHash().put("loginSession", stu.getId(), session.getId());
     }
 
     /**
