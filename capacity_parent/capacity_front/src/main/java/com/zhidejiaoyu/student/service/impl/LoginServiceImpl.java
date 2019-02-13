@@ -338,7 +338,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 获取学生需要执行的节点信息
         getNode(session, result, stu);
 
-
         return ServerResponse.createBySuccess(result);
     }
 
@@ -420,14 +419,15 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 flow = studyFlowMapper.getFlowInfoByStudentId(stu.getId());
                 result.put("needReview", "");
             }
-            if (flow.getModelName().contains("单元闯关")) {
-                String token = TokenUtil.getToken();
-                result.put("token", token);
-                session.setAttribute("token", token);
-            }
             if(flow != null){
                 result.put("nodeId", flow.getId());
                 result.put("nodeName", flow.getFlowName());
+
+                if (flow.getModelName().contains("单元闯关")) {
+                    String token = TokenUtil.getToken();
+                    result.put("token", token);
+                    session.setAttribute("token", token);
+                }
             }
             // 学生当前节点模块名
             result.put("flowName", studentFlowMapper.getStudentFlow(stu.getId()));
