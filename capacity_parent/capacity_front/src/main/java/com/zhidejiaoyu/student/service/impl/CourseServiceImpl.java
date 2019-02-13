@@ -11,6 +11,7 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.CourseService;
 import com.zhidejiaoyu.student.vo.CoursePlanVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ import java.util.*;
  * @author qizhentao
  * @version 1.0
  */
+@Slf4j
 @Service
 @Transactional
 public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> implements CourseService {
@@ -142,8 +144,9 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
         int pushCount;
         if (type == 1) {
             List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, courseId,1);
-            List<Map<String,Object>> returnCourse=new ArrayList<>();
-            if(studentStudyPlans.size()>0) {
+            List<Map<String,Object>> returnCourse = null;
+            if(studentStudyPlans.size() > 0) {
+                returnCourse = new ArrayList<>();
                 for (StudentStudyPlan studentStudyPlan : studentStudyPlans) {
                     List<Map<String, Object>> maps = unitVocabularyMapper.selUnitIdAndNameByCourseIdsAndStartUnitIdAndEndUnitId(courseId,
                             studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());
@@ -155,6 +158,10 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                     }
                     returnCourse.addAll(maps);
                 }
+            }
+            if (returnCourse == null) {
+                log.error("学生[{}]->[{}]没有课程[{}]的学习计划！", studentId, student.getStudentName(), courseId);
+                return null;
             }
             List<Long> unitIds = new ArrayList<>(returnCourse.size());
             returnCourse.parallelStream().forEach(map -> unitIds.add((Long)map.get("id")));
