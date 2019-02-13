@@ -9,7 +9,6 @@ import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.student.common.SaveWordLearnAndCapacity;
 import com.zhidejiaoyu.student.service.WordWriteService;
 import com.zhidejiaoyu.student.vo.WordWriteStudyVo;
