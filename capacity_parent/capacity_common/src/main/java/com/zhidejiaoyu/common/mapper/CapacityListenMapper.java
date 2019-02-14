@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.mapper;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.CapacityListen;
 import com.zhidejiaoyu.common.pojo.CapacityListenExample;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
@@ -128,4 +129,14 @@ public interface CapacityListenMapper extends BaseMapper<CapacityListen> {
 
     @Update("update capacity_listen set push = date_add(push, interval ${pushRise} hour) where student_id = #{studentId} AND vocabulary_id = #{vocabularyId}")
     void updatePush(Long studentId, Long vocabularyId, int pushRise);
+
+    /**
+     * 获取一个生词
+     *
+     * @param student
+     * @param unitId
+     * @param ignoreWordId 忽略的单词 id
+     * @return
+     */
+    Long selectUnknownWordByUnitId(@Param("student") Student student, @Param("unitId") String unitId, @Param("ignoreWordId") Long[] ignoreWordId);
 }

@@ -1,14 +1,11 @@
 package com.zhidejiaoyu.student.controller;
 
-import java.util.*;
-
-import javax.servlet.http.HttpSession;
-
+import com.zhidejiaoyu.student.service.DictationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.service.DictationService;
+
+import javax.servlet.http.HttpSession;
 
 /**
  * 智能听写	
@@ -32,11 +29,12 @@ public class DictationController {
 	 * 出一道题
 	 *
 	 * @param unit_id 单元id
+	 * @param ignoreWordId 获取单词时需要忽略的单词 id
 	 * @return 一道题, 学习进度, 生词, 熟词, 复习
 	 */
 	@RequestMapping(value = "/dictation")
-	public Object dictationShow(String unit_id, HttpSession session) {
-		return dictationService.dictationShow(unit_id, session);
+	public Object dictationShow(String unit_id, HttpSession session, Long[] ignoreWordId) {
+		return dictationService.dictationShow(unit_id, session, ignoreWordId);
 	}
 	
 }

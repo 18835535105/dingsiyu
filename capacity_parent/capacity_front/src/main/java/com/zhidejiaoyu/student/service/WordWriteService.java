@@ -3,7 +3,6 @@ package com.zhidejiaoyu.student.service;
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.vo.WordWriteStudyVo;
 
 import javax.servlet.http.HttpSession;
 
@@ -21,9 +20,10 @@ public interface WordWriteService extends BaseService<Vocabulary> {
 	 * 
 	 * @param session
 	 * @param unitId
-	 * @return
+	 * @param ignoreWordId
+     * @return
 	 */
-	Object getWriteWord(HttpSession session, Long unitId);
+	Object getWriteWord(HttpSession session, Long unitId, Long[] ignoreWordId);
 
 	/**
 	 * 保存慧默写学习记录 流程： 1.前端先发送保存学生学习信息的请求 2.然后根据后台响应数据再发送获取慧记忆学习的单词信息

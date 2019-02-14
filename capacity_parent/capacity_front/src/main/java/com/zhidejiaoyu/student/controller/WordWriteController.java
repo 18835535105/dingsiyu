@@ -31,11 +31,12 @@ public class WordWriteController {
      *
      * @param session
      * @param unitId
+     * @param ignoreWordId 获取单词时需要忽略的单词 id
      * @return
      */
-    @GetMapping("/getWriteWord")
-    public Object getWriteWord(HttpSession session, Long unitId) {
-        return wordWriteService.getWriteWord(session, unitId);
+    @RequestMapping("/getWriteWord")
+    public Object getWriteWord(HttpSession session, Long unitId, Long[] ignoreWordId) {
+        return wordWriteService.getWriteWord(session, unitId, ignoreWordId);
     }
 
     /**
