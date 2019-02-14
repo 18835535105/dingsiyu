@@ -58,7 +58,7 @@ public class SessionListener implements HttpSessionListener {
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {
         int currentPort = ServiceInfoUtil.getPort();
-        // 当 session 失效时只有 9082 端口的服务负责保存学生时长信息
+        // 当 session 失效时只有 8082 端口的服务负责保存学生时长信息
         if (currentPort == Integer.valueOf(port)) {
             HttpSession session = se.getSession();
             clearRedisSessionId(session);
