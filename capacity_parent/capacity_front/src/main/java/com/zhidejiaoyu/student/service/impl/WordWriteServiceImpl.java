@@ -9,7 +9,6 @@ import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.student.common.SaveWordLearnAndCapacity;
 import com.zhidejiaoyu.student.service.WordWriteService;
 import com.zhidejiaoyu.student.vo.WordWriteStudyVo;
@@ -299,18 +298,18 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
             currentLearn.setLearnCount(maxCount);
             currentLearn.setUpdateTime(now);
             int i = learnMapper.updateByPrimaryKeySelective(currentLearn);
-
+            
             // 慧默写、慧听写模块错过三次在记忆时间上再加长三小时
             if (classify == 2) {
                 Integer faultTime = capacityListenMapper.getFaultTime(studentId, learn.getVocabularyId());
-                if (faultTime != null && faultTime >= 3) {
+                if (faultTime != null && faultTime >= 5) {
                     capacityListenMapper.updatePush(studentId, learn.getVocabularyId(), pushRise);
                 }
             }
             if(classify == 3) {
             	// 查询错误次数>=3 
             	Integer faultTime = capacityWriteMapper.getFaultTime(studentId, learn.getVocabularyId());
-            	if(faultTime != null && faultTime >= 3) {
+            	if(faultTime != null && faultTime >= 5) {
             		// 如果错误次数>=3, 黄金记忆时间推迟3小时
             		capacityWriteMapper.updatePush(studentId, learn.getVocabularyId(), pushRise);
             	}

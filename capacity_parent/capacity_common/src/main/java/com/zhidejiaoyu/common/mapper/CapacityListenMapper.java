@@ -128,5 +128,4 @@ public interface CapacityListenMapper extends BaseMapper<CapacityListen> {
 
     @Update("update capacity_listen set push = date_add(push, interval ${pushRise} hour) where student_id = #{studentId} AND vocabulary_id = #{vocabularyId}")
     void updatePush(Long studentId, Long vocabularyId, int pushRise);
-
 }

@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.listener;
 
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.RunLogMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.student.config.ServiceInfoUtil;
@@ -17,7 +18,7 @@ import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author wuchenxi
@@ -30,11 +31,6 @@ public class SessionListener implements HttpSessionListener {
 
     @Value("${quartz.port}")
     private String port;
-
-    /**
-     * 存放登陆过系统的sessionId 和 session的对应关系,当学生有多地登录行为时清除 sessionMap 中的学生信息
-     */
-    private static HashMap<String, HttpSession> sessionMap = new HashMap<>(16);
 
     @Autowired
     private LoginService loginService;
@@ -62,17 +58,18 @@ public class SessionListener implements HttpSessionListener {
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {
         int currentPort = ServiceInfoUtil.getPort();
-        // 当 session 失效时只有 9082 端口的服务负责保存学生时长信息
+        // 当 session 失效时只有 8082 端口的服务负责保存学生时长信息
         if (currentPort == Integer.valueOf(port)) {
             HttpSession session = se.getSession();
-            Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-            if (student == null) {
-                student = (Student) getSessionById(session.getId()).getAttribute(UserConstant.CURRENT_STUDENT);
-            }
-            removeSessionById(session.getId());
             clearRedisSessionId(session);
             saveLogoutInfo(session);
-            loginService.saveDurationInfo(student, session);
+            Map<String, Object> sessionMap = null;
+            Object object = redisTemplate.opsForHash().get(RedisKeysConst.SESSION_MAP, session.getId());
+            if (object != null) {
+                sessionMap = (Map<String, Object>) redisTemplate.opsForHash().get(RedisKeysConst.SESSION_MAP, session.getId());
+                redisTemplate.opsForHash().delete(RedisKeysConst.SESSION_MAP, session.getId());
+            }
+            loginService.saveDurationInfo(sessionMap);
         }
     }
 
@@ -99,33 +96,5 @@ public class SessionListener implements HttpSessionListener {
             Student student = (Student) studentSession;
             redisTemplate.opsForHash().delete("loginSession", student.getId());
         }
-    }
-
-    /**
-     * 通过sessionid获取session信息
-     *
-     * @param sessionId
-     * @return
-     */
-    public static HttpSession getSessionById(String sessionId) {
-        return sessionMap.get(sessionId);
-    }
-
-    /**
-     * 根据sessionId 删除指定的session信息
-     *
-     * @param sessionId
-     */
-    public static void removeSessionById(String sessionId) {
-        sessionMap.remove(sessionId);
-    }
-
-    /**
-     * 增加session
-     *
-     * @param session
-     */
-    public static void putSession(HttpSession session) {
-        sessionMap.put(session.getId(), session);
     }
 }

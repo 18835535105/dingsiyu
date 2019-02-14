@@ -339,29 +339,15 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                     return x;
                 }
             }
-        }
 
-        if (Objects.equals(2, studyFlow.getType())) {
-            // 分数>=80分走 nextTrue 流程，否则走 nextFalse 流程
-            if (grade != null) {
-                if (grade >= 80) {
-                    return toAnotherFlow(student, studyFlow.getNextTrueFlow());
-                } else {
-                    return toAnotherFlow(student, studyFlow.getNextFalseFlow());
-                }
+            if (grade >= studyFlow.getType()) {
+                return toAnotherFlow(student, studyFlow.getNextTrueFlow());
+            } else if (grade < studyFlow.getType()) {
+                return toAnotherFlow(student, studyFlow.getNextFalseFlow());
+            } else {
+                // 判断是否进行单词好声音
+                return ServerResponse.createBySuccess("true", studyFlow);
             }
-        } else if (Objects.equals(1, studyFlow.getType())) {
-            // 分数>=60分走 nextTrue 流程，否则走 nextFalse 流程
-            if (grade != null) {
-                if (grade >= 60) {
-                    return toAnotherFlow(student, studyFlow.getNextTrueFlow());
-                } else {
-                    return toAnotherFlow(student, studyFlow.getNextFalseFlow());
-                }
-            }
-        } else {
-            // 判断是否进行单词好声音
-            return ServerResponse.createBySuccess("true", studyFlow);
         }
         return null;
     }

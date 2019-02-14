@@ -1,7 +1,11 @@
 package com.zhidejiaoyu.app;
 
+import com.zhidejiaoyu.common.MacIpUtil;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.student.common.RedisOpt;
+import com.zhidejiaoyu.student.listener.SessionListener;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +24,7 @@ import java.util.Objects;
  * @author wuchenxi
  * @date 2018/6/21 20:03
  */
+@Slf4j
 @Component
 @WebFilter(urlPatterns = "/*")
 public class LoginFilter implements Filter {
@@ -53,7 +58,13 @@ public class LoginFilter implements Filter {
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         HttpSession session = httpServletRequest.getSession();
 
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Map<String, Object> sessionMap = RedisOpt.getSessionMap(session.getId());
+
+        Student student = null;
+        if (sessionMap != null && sessionMap.get(UserConstant.CURRENT_STUDENT) != null) {
+            student = (Student) sessionMap.get(UserConstant.CURRENT_STUDENT);
+        }
+
         String url = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
 
         if (urlMap.containsKey(url)) {
@@ -133,6 +144,12 @@ public class LoginFilter implements Filter {
             currentSession.removeAttribute("multipleLoginMsg");
             String currentSessionId = currentSession.getId();
             if (!Objects.equals(sessionId, currentSessionId)) {
+                try {
+                    String ip = MacIpUtil.getIpAddr(request);
+                    log.error("学生[{}]->[{}] 在ip=[{}]地方异地登录；", student.getId(), student.getStudentName(), ip);
+                } catch (Exception e) {
+                    log.error("获取学生IP地址失败, error=[{}]", e.getMessage());
+                }
                 currentSession.setAttribute("multipleLoginMsg", "您的帐号在另一地点登录，您已被迫下线！请重新登录。");
             }
         }

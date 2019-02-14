@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * 登陆业务接口层
@@ -59,10 +60,9 @@ public interface LoginService extends BaseService<Student>{
     /**
      * session过期和系统重启时保存学生时长相关信息
      *
-     * @param student
-     * @param session
+     * @param sessionMap
      */
-    void saveDurationInfo(Student student, HttpSession session);
+    void saveDurationInfo(Map<String, Object> sessionMap);
 
     void getValidateCode(HttpSession session, HttpServletResponse response) throws IOException;
 }
