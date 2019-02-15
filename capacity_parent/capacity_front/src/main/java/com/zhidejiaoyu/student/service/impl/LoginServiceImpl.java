@@ -207,6 +207,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         result.put("partUrl", stu.getPartUrl());
         // 宠物名
         result.put("petName", stu.getPetName());
+        result.put("schoolName", stu.getSchoolName());
 
         String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
         // 有效时长  !
