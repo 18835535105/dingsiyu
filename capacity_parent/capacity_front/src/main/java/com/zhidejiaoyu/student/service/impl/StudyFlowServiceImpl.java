@@ -479,7 +479,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 int learnedUnitCount = learnMapper.countLearnedUnitByCourseId(studentStudyPlan.getCourseId(), studentId);
                 if (learnedUnitCount >= unitCount) {
                     // 课程学习完毕，奖励学生课程证书
-                    ccieUtil.saveCourseCcie(student);
+                    ccieUtil.saveCourseCcie(student, capacityStudentUnit.getCourseId(), capacityStudentUnit.getUnitId());
                 }
             }
 

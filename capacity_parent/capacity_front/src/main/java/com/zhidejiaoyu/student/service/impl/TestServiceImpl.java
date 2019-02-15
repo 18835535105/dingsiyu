@@ -1108,7 +1108,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             // 获取需要奖励的能量值
             addEnergy = getEnergy(student, point);
 
-            ccieUtil.saveCcieTest(student, 1, classify);
+            ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0]);
         }
 
         String msg;
@@ -1202,7 +1202,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setGold(goldCount);
         vo.setEnergy(addEnergy);
         countMyGoldUtil.countMyGold(student);
-        ccieUtil.saveCcieTest(student, 1, classify);
+        ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0]);
         studentMapper.updateByPrimaryKeySelective(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(vo);

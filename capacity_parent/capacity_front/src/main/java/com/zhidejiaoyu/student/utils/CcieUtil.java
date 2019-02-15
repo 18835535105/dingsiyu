@@ -1,7 +1,10 @@
 package com.zhidejiaoyu.student.utils;
 
 import com.zhidejiaoyu.common.mapper.CcieMapper;
+import com.zhidejiaoyu.common.mapper.CourseMapper;
+import com.zhidejiaoyu.common.mapper.UnitMapper;
 import com.zhidejiaoyu.common.pojo.Ccie;
+import com.zhidejiaoyu.common.pojo.Course;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import org.apache.commons.lang.StringUtils;
@@ -22,6 +25,9 @@ public class CcieUtil {
     @Autowired
     private CcieMapper ccieMapper;
 
+    @Autowired
+    private CourseMapper courseMapper;
+
     /**
      * 测试证书
      * @param student
@@ -30,22 +36,26 @@ public class CcieUtil {
      * 			10:单元后测,11:能力值测试,12:生句测试,13:熟句测试
      *
      * @param classify
-     * 			0 : 单词图鉴 ; 1：慧记忆；2：慧听写；3：慧默写；4：例句听力；5：例句翻译；6：例句默写；7: 五维测试(词汇量测试);
+     * @param courseId
+     * @param unitId
      */
-    public void saveCcieTest(Student student, Integer testType, Integer classify) {
-        saveCcie(student, 1, testType, classify);
+    public void saveCcieTest(Student student, Integer testType, Integer classify, Long courseId, Long unitId) {
+        saveCcie(student, 1, testType, classify, courseId, unitId);
     }
 
     /**
      * 保存课程证书
      *
      * @param student
+     * @param courseId
+     * @param unitId
      */
-    public void saveCourseCcie(Student student) {
-        saveCcie(student, 2, 1, 0);
+    public void saveCourseCcie(Student student, Long courseId, Long unitId) {
+        saveCcie(student, 2, 1, 0, courseId, unitId);
     }
 
-    private void saveCcie(Student student, Integer type, Integer testType, Integer classify) {
+    private void saveCcie(Student student, Integer type, Integer testType, Integer classify, Long courseId, Long unitId) {
+        Course course = courseMapper.selectById(courseId);
         Ccie ccie = new Ccie();
         ccie.setEncourageWord("名列前茅");
         ccie.setTestType(testType);
@@ -53,9 +63,10 @@ public class CcieUtil {
         ccie.setGetTime(new Date());
         ccie.setStudentId(student.getId());
         ccie.setStudentName(student.getStudentName());
-        ccie.setUnitId(student.getUnitId());
-        ccie.setUnitId(student.getCourseId());
-        ccie.setCourseName(student.getCourseName());
+        ccie.setUnitId(unitId);
+        if (course != null) {
+            ccie.setCourseName(course.getCourseName());
+        }
         ccie.setReadFlag(0);
         ccie.setCcieNo(getNo(type));
         ccieMapper.insert(ccie);
