@@ -480,6 +480,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         result.put("studentName", stu.getStudentName());
         // 头像
         result.put("headUrl", stu.getHeadUrl());
+        result.put("schoolName", stu.getSchoolName());
 
         String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
         // 有效时长  !
