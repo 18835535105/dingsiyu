@@ -63,6 +63,8 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     TestRecord selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                           @Param("genre") String genre, @Param("studyModel") String studyModel);
 
+    TestRecord selectByStudentIdAndUnitIdAndGenre(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+                                                  @Param("genre") String genre);
     /**
      * 查询指定类型的测试记录
      *

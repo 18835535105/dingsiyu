@@ -883,12 +883,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             testRecord = new TestRecord();
             testRecord.setBetterCount(testRecordOld.getBetterCount());
         }
-
         testRecord.setCourseId(wordUnitTestDTO.getCourseId());
         testRecord.setUnitId(wordUnitTestDTO.getUnitId()[0]);
         testRecord.setPoint(wordUnitTestDTO.getPoint());
         testRecord.setErrorCount(wordUnitTestDTO.getErrorCount());
         testRecord.setRightCount(wordUnitTestDTO.getRightCount());
+        testRecord.setAwardGold(goldCount);
         testRecord.setGenre("音译测试");
         testRecord.setStudentId(student.getId());
         testRecord.setTestEndTime(new Date());
@@ -901,7 +901,31 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecordMapper.insert(testRecord);
         studentMapper.updateByPrimaryKeySelective(student);
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
-        return ServerResponse.createBySuccess();
+        Map<String,Object> resultMap=new HashMap<>();
+        if(goldCount>0){
+            int energy = getEnergy(student, wordUnitTestDTO.getPoint());
+            studentMapper.updateByPrimaryKeySelective(student);
+            resultMap.put("energy",energy);
+        }else{
+            resultMap.put("energy",0);
+        }
+        resultMap.put("gold",goldCount);
+        Integer point = wordUnitTestDTO.getPoint();
+        if (point < PASS) {
+            resultMap.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
+            resultMap.put("text","很遗憾，闯关失败，再接再厉。");
+        } else if (point < NINETY_POINT) {
+            resultMap.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
+            resultMap.put("text","闯关成功，独孤求败！");
+        } else {
+            resultMap.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+            resultMap.put("text","恭喜你刷新了纪录！");
+        }
+
+        resultMap.put("point",point);
+        resultMap.put("imgUrl",student.getPartUrl());
+
+        return ServerResponse.createBySuccess(resultMap);
     }
 
     @Override
@@ -967,7 +991,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Map<String,Object> resultMap=new HashMap<>();
         resultMap.put("gold",goldCount);
         int energy = getEnergy(student, wordUnitTestDTO.getPoint());
-        student.setEnergy(student.getEnergy()+energy);
         studentMapper.updateByPrimaryKeySelective(student);
         resultMap.put("energy",energy);
         Integer point = wordUnitTestDTO.getPoint();

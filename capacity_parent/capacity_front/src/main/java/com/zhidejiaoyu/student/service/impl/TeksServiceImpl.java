@@ -10,12 +10,15 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.CalculateTimeUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.TeksService;
+import com.zhidejiaoyu.student.utils.PetSayUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
@@ -25,21 +28,37 @@ import java.util.*;
 @Service
 public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implements TeksService {
 
-
+    /**
+     * 50分
+     */
+    private static final int FIVE = 50;
+    /**
+     * 60分
+     */
+    private static final int SIX = 60;
+    /**
+     * 70分
+     */
+    private static final int SEVENTY = 70;
     /**
      * 80分
      */
     private static final int PASS = 80;
+    /**
+     * 90分
+     */
+    private static final int NINETY_POINT = 90;
+    /**
+     * 100分
+     */
+    private static final int FULL_MARK = 100;
 
     /**
      * 90分
      */
     private static final int SENCONDARY = 90;
 
-    /**
-     * 100分
-     */
-    private static final int FULL_MARK = 100;
+
 
 
     @Autowired
@@ -73,6 +92,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Autowired
     private StudentStudyPlanMapper studentStudyPlanMapper;
+
+    @Autowired
+    private PetSayUtil petSayUtil;
 
     @Value("${ftp.prefix}")
     private String prefix;
@@ -182,11 +204,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 for (int i = 0; i < sentenceList.length; i++) {
                     if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
                         blankSentenceArray.add(null);
-                        if(sentenceList[i].endsWith("...")){
+                        if (sentenceList[i].endsWith("...")) {
                             blankSentenceArray.add(sentenceList[i].substring(sentenceList[i].length() - 3));
                             sentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
                             sentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
-                        }else{
+                        } else {
                             blankSentenceArray.add(sentenceList[i].substring(sentenceList[i].length() - 1));
                             sentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
                             sentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
@@ -197,10 +219,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                         sentence.add(sentenceList[i]);
                     }
                     //返回的填空单词 以及句子填空位置
-                    if(teks1.getSentence().indexOf("...") != -1){
-                        String substring = teks1.getSentence().replace("..." ,"");
-                        map.put("vocabularyArray",commonMethod.getOrderEnglishList(substring ,null));
-                    }else{
+                    if (teks1.getSentence().indexOf("...") != -1) {
+                        String substring = teks1.getSentence().replace("...", "");
+                        map.put("vocabularyArray", commonMethod.getOrderEnglishList(substring, null));
+                    } else {
                         map.put("vocabularyArray", commonMethod.getOrderEnglishList(teks1.getSentence(), null));
                     }
                     map.put("blankSentenceArray", blankSentenceArray);
@@ -237,15 +259,15 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         List<Map<String, Object>> resultMap;
         Map<String, Object> returnMap = new HashMap<>();
         // 学生所有课程id及课程名
-       /* List<Map<String, Object>> courses = courseMapper.selectTextCourseIdAndCourseNameByStudentId(studentId);*/
-        List<Map<String, Object>> courses =studentStudyPlanMapper.selByStudentId(studentId,3);
+        /* List<Map<String, Object>> courses = courseMapper.selectTextCourseIdAndCourseNameByStudentId(studentId);*/
+        List<Map<String, Object>> courses = studentStudyPlanMapper.selByStudentId(studentId, 3);
         // 学生课程下所有例句的单元id及单元名
         if (courses.size() > 0) {
             List<Long> courseIds = new ArrayList<>(courses.size());
             courses.forEach(map -> courseIds.add((Long) map.get("id")));
             // 获取课程下所有课文的单元信息
             List<Map<String, Object>> textUnits = new ArrayList<>();
-            this.getStudyUnit(courseIds,textUnits,studentId);
+            this.getStudyUnit(courseIds, textUnits, studentId);
             Map<String, Object> learnUnit = learnMapper.selTeksLaterCourse(student.getId());
             if (learnUnit != null) {
                 studyMap = new HashMap<>();
@@ -360,7 +382,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         if (teksAudition != null && teksAudition != 0) {
             unitInfoMap.put("teksTest", true);
             if (teksTest != null && teksTest != 0) {
-                unitInfoMap.put("testRecord", true);
+                TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitIdAndGenre(studentId, unitId, "课文默写测试");
+                if (testRecord.getPoint() >= 70) {
+                    unitInfoMap.put("testRecord", true);
+                } else {
+                    unitInfoMap.put("testRecord", false);
+                }
             } else {
                 unitInfoMap.put("testRecord", false);
             }
@@ -371,7 +398,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
         return ServerResponse.createBySuccess(unitInfoMap);
     }
-
 
 
     @Override
@@ -441,7 +467,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                     map.put("blanceSentence", blanceSentence);
                     map.put("vocabulary", vocabulary);
                 } else if (integers.length == 3) {
-                    //当空格数为二时调用
+                    //当空格数为三时调用
                     for (int i = 0; i < sentenceList.length; i++) {
                         if (i == (integers[0] - 1) || i == (integers[1] - 1) || i == (integers[2] - 1)) {
                             addList(sentenceList[i], blanceSentence, vocabulary);
@@ -488,24 +514,32 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         wordUnitTestDTO.setClassify(7);
         Integer point = testRecord.getPoint();
         Integer goldCount = 0;
+        Map<String, Object> map = new HashMap<>();
         if (point >= PASS) {
-            if (point>SENCONDARY && point < FULL_MARK) {
+            if (point > SENCONDARY && point < FULL_MARK) {
                 goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
                 this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试");
             } else if (point == FULL_MARK) {
                 goldCount = TestAwardGoldConstant.FIVE_TEST_EIGHTY_TO_NINETY;
-                goldCount+=goldCount;
+                goldCount += goldCount;
                 this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试");
                 this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试双倍奖励");
-            }else if(point == PASS){
-                goldCount=TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_FULL;
+            } else if (point == PASS) {
+                goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_FULL;
                 this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试");
             }
-        }else{
-
         }
         testRecord.setGenre("课文默写测试");
         testRecord.setAwardGold(goldCount);
+        if(goldCount>0){
+            int energy = getEnergy(student, wordUnitTestDTO.getPoint());
+            studentMapper.updateByPrimaryKeySelective(student);
+            map.put("energy",energy);
+        }else{
+            map.put("energy",0);
+        }
+        student.setSystemGold(student.getSystemGold()+goldCount);
+        studentMapper.updateByPrimaryKeySelective(student);
         //添加对象
         testRecord.setStudentId(student.getId());
         testRecord.setCourseId(aLong);
@@ -523,13 +557,26 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             learn.setLearnTime(new Date());
             Long aLong1 = learnMapper.selTeksLearn(learn);
             if (aLong1 != null) {
+                learn.setId(aLong1);
                 learnMapper.updTeksLearn(learn);
             } else {
                 learnMapper.insert(learn);
             }
         }
-        Map<String,Object> map=new HashMap<>();
-        map.put("gold",goldCount);
+        map.put("gold", goldCount);
+        if (point < PASS) {
+            map.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
+            map.put("text","很遗憾，闯关失败，再接再厉。");
+        } else if (point < NINETY_POINT) {
+            map.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
+            map.put("text","闯关成功，独孤求败！");
+        } else {
+            map.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+            map.put("text","恭喜你刷新了纪录！");
+        }
+
+        map.put("point",point);
+        map.put("imgUrl",student.getPartUrl());
         return ServerResponse.createBySuccess(map);
     }
 
@@ -653,12 +700,24 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
      */
     @Override
     public ServerResponse<Object> getTeksTest(Integer unitId) {
+        //获取单元中的课文语句
         List<Teks> teks = teksMapper.selTeksByUnitId(unitId);
+        //第一步去除课文中只有一句话的句子
+        List<Teks> useTeks = new ArrayList<>();
+        for (Teks teks1 : teks) {
+            String sentence = teks1.getSentence();
+            String[] s = sentence.split(" ");
+            if (s.length > 1) {
+                useTeks.add(teks1);
+            }
+        }
+        //附加项选择
         List<Teks> addTeks = null;
-        if (teks.size() < 4) {
+        //根据清楚后的语句小于4句时添加
+        if (useTeks.size() < 4) {
             addTeks = teksMapper.getTwentyTeks();
         }
-        return getReturnTestTeks(teks, addTeks);
+        return getReturnTestTeks(useTeks, addTeks);
     }
 
     @Override
@@ -715,7 +774,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     private ServerResponse<Object> getReturnTestTeks(List<Teks> teks, List<Teks> addTeks) {
         List<Map<String, Object>> returnList = new ArrayList<>();
+        List<Map<String, Object>> choseFour = new ArrayList<>();
+        List<Map<String, Object>> hearingList = new ArrayList<>();
         List<Teks> optionList = new ArrayList<>(teks);
+        //去除附加选项中与原课文语句相同的语句
         if (addTeks != null && addTeks.size() > 0) {
             for (Teks teks1 : addTeks) {
                 boolean isAdd = true;
@@ -729,29 +791,154 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 }
             }
         }
-        for (int i = 0; i < teks.size(); i++) {
+        //判断课文语句数量
+        if (teks.size() < 4) {
+            //语句小于4全部为听力
+            hearing(teks, returnList, optionList);
+        } else {
+            //打乱顺序
+            Collections.shuffle(teks);
+            //当语句等于4个 为四选四题目
+            if (teks.size() == 4) {
+                //取前4个句子为四选四句子
+                fourChooseFour(teks, choseFour);
+            } else {
+                int fourLength = teks.size() / 5;
+                int i = teks.size() % 5;
+                if (i != 4) {
+                    //获取四选四习题
+                    List<Teks> fourOption = teks.subList(0, fourLength * 4);
+                    fourChooseFour(fourOption, choseFour);
+                    //获取听力习题
+                    List<Teks> hearOption = teks.subList(fourLength * 4, teks.size());
+                    hearing(hearOption, hearingList, optionList);
+                } else {
+                    //获取四选四习题
+                    List<Teks> fourOption = teks.subList(0, (fourLength + 1) * 4);
+                    fourChooseFour(fourOption, choseFour);
+                    //获取听力习题
+                    List<Teks> hearOption = teks.subList((fourLength + 1) * 4, teks.size());
+                    hearing(hearOption, hearingList, optionList);
+                }
+                //排列习题的顺序
+                arrayList(choseFour, hearingList, returnList);
+            }
+        }
+        return ServerResponse.createBySuccess(returnList);
+    }
+
+    //排列习题循序
+    private void arrayList(List<Map<String, Object>> choseFour, List<Map<String, Object>> hearingList, List<Map<String, Object>> returnList) {
+        if (choseFour.size() >= hearingList.size()) {
+            for (int i = 0; i < choseFour.size(); i++) {
+                returnList.add(choseFour.get(i));
+                if (hearingList.size() - 1 >= i) {
+                    returnList.add(hearingList.get(i));
+                }
+            }
+        } else {
+            for (int i = 0; i < hearingList.size(); i++) {
+
+                if (choseFour.size() - 1 >= i) {
+                    returnList.add(choseFour.get(i));
+                }
+                returnList.add(hearingList.get(i));
+            }
+        }
+    }
+
+    //四选四题目获取
+    private void fourChooseFour(List<Teks> optionList, List<Map<String, Object>> choseFour) {
+        for (int i = 0; i < optionList.size(); i += 4) {
+            Map<String, Object> returnMap = new HashMap<>();
+            returnMap.put("type", "fourChoseFour");
+            List<Teks> teks = optionList.subList(i, i + 4);
+            List<Object> objects = new ArrayList<>();
+            List<Map<String, Object>> answers = new ArrayList<>();
+            List<String> returnAnswers = new ArrayList<>();
+            for (int s = 0; s < teks.size(); s++) {
+                answersFour(teks.get(s), objects, answers, s, returnAnswers);
+            }
+            Collections.shuffle(answers);
+            returnMap.put("option", objects);
+            returnMap.put("subject", answers);
+            returnMap.put("answer", returnAnswers);
+            choseFour.add(returnMap);
+        }
+    }
+
+    //四选四题目挖空并储存选项和答案
+    private void answersFour(Teks teks, List<Object> senOption, List<Map<String, Object>> answers, Integer index, List<String> returnAnswers) {
+        String sentence = teks.getSentence();
+        String[] s = sentence.split(" ");
+        List<String> arrList = new ArrayList<>();
+        Integer location = (int) Math.ceil(Math.random() * (s.length - 1));
+        for (int i = 0; i < s.length; i++) {
+            Map<String, Object> returnMap = new HashMap<>();
+            if (i == location) {
+                String option = s[i];
+                arrList.add(null);
+                if (option.endsWith(",") || option.endsWith(".") || option.endsWith("!") || option.endsWith("?")) {
+                    if (option.endsWith("...")) {
+                        returnMap.put("name", 5);
+                        returnMap.put("value", option.replace("...", ""));
+                        arrList.add("...");
+                        returnAnswers.add(option.replace("...", ""));
+                    } else {
+                        returnMap.put("name", 5);
+                        returnMap.put("value", option.substring(0, option.length() - 1));
+                        arrList.add(option.substring(option.length() - 1));
+                        returnAnswers.add(option.substring(0, option.length() - 1));
+                    }
+
+                } else {
+                    returnMap.put("name", 5);
+                    returnMap.put("value", option);
+                    returnAnswers.add(option);
+                }
+                answers.add(returnMap);
+            } else {
+                String option = s[i];
+                if (option.endsWith(",") || option.endsWith(".") || option.endsWith("!") || option.endsWith("?")) {
+                    if (option.endsWith("...")) {
+                        arrList.add(option.replace("...", ""));
+                        arrList.add("...");
+                    } else {
+                        arrList.add(option.substring(0, option.length() - 1));
+                        arrList.add(option.substring(option.length() - 1));
+                    }
+                } else {
+                    arrList.add(option);
+                }
+            }
+        }
+        senOption.add(arrList);
+    }
+
+    //获取听力题
+    private void hearing(List<Teks> hearingList, List<Map<String, Object>> returnList, List<Teks> optionList) {
+        for (int i = 0; i < hearingList.size(); i++) {
             Collections.shuffle(optionList);
             List<Teks> list = new ArrayList<>();
             list.addAll(optionList);
-            list.remove(teks.get(i));
-            Integer ss = (int) Math.ceil((Math.random() * 2));
+            list.remove(hearingList.get(i));
+            /*Integer ss =1; //(int) Math.ceil((Math.random() * 2));*/
             Map<String, Object> returnMap = new HashMap<>();
-            returnMap.put("id", teks.get(i).getId());
-            returnMap.put("chinese", teks.get(i).getParaphrase());
-            returnMap.put("pronunciation", baiduSpeak.getSentencePaht(teks.get(i).getSentence()));
-            returnMap.put("english", teks.get(i).getSentence());
-            //英选汉
-            if (ss == 1) {
-                returnMap.put("type", "BritishElectHan");
-                BritishElectHan(teks.get(i), new ArrayList<Teks>(list.subList(0, 3)), returnMap);
-                //汉选英
-            } else {
-                returnMap.put("type", "HanElectBritish");
-                HanElectBritish(teks.get(i), new ArrayList<Teks>(list.subList(0, 3)), returnMap);
-            }
+            returnMap.put("id", hearingList.get(i).getId());
+            returnMap.put("chinese", hearingList.get(i).getParaphrase());
+            returnMap.put("pronunciation", baiduSpeak.getSentencePaht(hearingList.get(i).getSentence()));
+            returnMap.put("english", hearingList.get(i).getSentence());
+            //英选汉 原有两个选项现改为一个
+              /*  if (ss == 1) {
+                    returnMap.put("type", "BritishElectHan");
+                    BritishElectHan(teks.get(i), new ArrayList<Teks>(list.subList(0, 3)), returnMap);
+                    //汉选英
+                } else {*/
+            returnMap.put("type", "HanElectBritish");
+            HanElectBritish(hearingList.get(i), new ArrayList<Teks>(list.subList(0, 3)), returnMap);
+            /*}*/
             returnList.add(returnMap);
         }
-        return ServerResponse.createBySuccess(returnList);
     }
 
     private void HanElectBritish(Teks teks, List<Teks> optionList, Map<String, Object> returnMap) {
@@ -785,24 +972,24 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         returnMap.put("option", option);
     }
 
-    private void getStudyUnit(List<Long> courseIds,List<Map<String,Object>> returnCourse,Long studentId){
+    private void getStudyUnit(List<Long> courseIds, List<Map<String, Object>> returnCourse, Long studentId) {
         for (int i = 0; i < courseIds.size(); i++) {
-            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, courseIds.get(i),3);
-            if(studentStudyPlans.size()>1){
-                for(StudentStudyPlan studentStudyPlan:studentStudyPlans){
+            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, courseIds.get(i), 3);
+            if (studentStudyPlans.size() > 1) {
+                for (StudentStudyPlan studentStudyPlan : studentStudyPlans) {
                     List<Map<String, Object>> maps = unitMapper.selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(courseIds.get(i),
-                            studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId(),studentId);
-                    for(int j=0;j<maps.size();j++){
+                            studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId(), studentId);
+                    for (int j = 0; j < maps.size(); j++) {
                         boolean contains = returnCourse.contains(maps.get(j));
-                        if(contains){
+                        if (contains) {
                             maps.remove(maps.get(i));
                         }
                     }
                     returnCourse.addAll(maps);
                 }
-            }else if(studentStudyPlans.size()==1){
+            } else if (studentStudyPlans.size() == 1) {
                 List<Map<String, Object>> maps = unitMapper.selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(courseIds.get(i),
-                        studentStudyPlans.get(0).getStartUnitId(), studentStudyPlans.get(0).getEndUnitId(),studentId);
+                        studentStudyPlans.get(0).getStartUnitId(), studentStudyPlans.get(0).getEndUnitId(), studentId);
                 returnCourse.addAll(maps);
             }
         }
