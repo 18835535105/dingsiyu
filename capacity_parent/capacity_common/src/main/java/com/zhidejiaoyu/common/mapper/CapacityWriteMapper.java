@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.mapper;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.CapacityWrite;
 import com.zhidejiaoyu.common.pojo.CapacityWriteExample;
+import com.zhidejiaoyu.common.pojo.Student;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -131,4 +132,14 @@ public interface CapacityWriteMapper extends BaseMapper<CapacityWrite> {
 	 */
 	@Delete("delete from capacity_write where student_id = #{studentId} and unit_id >= #{startUnit} and unit_id <= #{endUnit}")
 	void deleteByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("startUnit") Long startUnit, @Param("endUnit") Long endUnit);
+
+	/**
+	 * 获取生词信息
+	 *
+	 * @param student
+	 * @param unitId
+	 * @param ignoreWordId
+	 * @return
+	 */
+	CapacityWrite selectUnknownWordByUnitId(@Param("student") Student student, @Param("unitId") Long unitId, @Param("ignoreWordId") Long[] ignoreWordId);
 }

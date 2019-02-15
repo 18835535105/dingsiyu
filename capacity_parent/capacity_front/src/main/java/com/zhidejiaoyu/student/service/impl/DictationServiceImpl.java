@@ -12,7 +12,6 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.DictationService;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,8 +51,8 @@ public class DictationServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 	private BaiduSpeak baiduSpeak;
 
 	@Override
-	public Object dictationShow(String unit_id, HttpSession session) {
-		Map<String,Object> map = new HashMap<>();
+	public Object dictationShow(String unitId, HttpSession session, Long[] ignoreWordId) {
+		Map<String,Object> map = new HashMap<>(16);
 		
 		// 获取当前学生信息
 		Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
@@ -74,20 +73,28 @@ public class DictationServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 		String dateTime = DateUtil.DateTime();
 
 		// 1. 查询智能听写记忆追踪中是否有需要复习的单词
-        Vocabulary vocabulary = capacityListenMapper.showCapacity_listen(unit_id, id, dateTime);
+        Vocabulary vocabulary = capacityListenMapper.showCapacity_listen(unitId, id, dateTime);
 
 		// 2. 如果记忆追踪中没有需要复习的, 去单词表中取出一个单词,条件是(learn表中单词id不存在的)
         if (vocabulary == null) {
-			vocabulary = vocabularyMapper.showWord(unit_id, id);
+			vocabulary = vocabularyMapper.showWord(unitId, id);
             // 是新单词
             map.put("studyNew", true);
             // 记忆强度
             map.put("memoryStrength", 0.00);
-		}else {
+		} else {
 			// 不是新词
 			map.put("studyNew", false);
 			// 记忆强度
 			map.put("memoryStrength", vocabulary.getMemory_strength());
+		}
+
+		// 如果该单元单词都已经学习完毕并且没有达到黄金记忆点的单词，获取生词
+        if (vocabulary == null) {
+			Long wordId = capacityListenMapper.selectUnknownWordByUnitId(student, unitId, ignoreWordId);
+			if (wordId != null) {
+				vocabulary = vocabularyMapper.selectById(wordId);
+			}
 		}
 		
 		// 单元单词已学完,去单元测试
@@ -110,21 +117,17 @@ public class DictationServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
             map.put("wordyj", vocabulary.getSyllable());
 		}
 		// 音标,读音url,词性
-		try {
-			map.put("soundmark", vocabulary.getSoundMark());
-			// 读音url
-			map.put("readUrl", baiduSpeak.getLanguagePath(vocabulary.getWord()));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
+		map.put("soundmark", vocabulary.getSoundMark());
+		// 读音url
+		map.put("readUrl", baiduSpeak.getLanguagePath(vocabulary.getWord()));
+
 		// 3. count单元表单词有多少个    /.
-		Integer count = unitMapper.countWordByUnitid(unit_id);
+		Integer count = unitMapper.countWordByUnitid(unitId);
 		map.put("wordCount", count);
 		
 		// 4. 该单元已学单词  ./
 		//Integer count_ = capacityListenMapper.alreadyStudyWord(unit_id, id);
-		Long count_ = learnMapper.learnCountWord(id, Integer.parseInt(unit_id), "慧听写");
+		Long count_ = learnMapper.learnCountWord(id, Integer.parseInt(unitId), "慧听写");
 		map.put("plan", count_);
 		
 		// 5. 是否是第一次学习慧听写，true:第一次学习，进入学习引导页；false：不是第一次学习

@@ -244,6 +244,21 @@
         from capacity_write where student_id = #{studentId} and course_id = #{courseId}
         and vocabulary_id =#{correctWordId} group by vocabulary_id
     </select>
+    <select id="selectUnknownWordByUnitId" resultMap="BaseResultMap" parameterType="map">
+        select <include refid="Base_Column_List"/>
+        from capacity_write
+        where student_id = #{student.id}
+        and unit_id = #{unitId}
+        and push &lt; 1
+        <if test="ignoreWordId != null and ignoreWordId.length > 0">
+            and vocabulary_id not in (
+            <foreach collection="ignoreWordId" separator="," item="id">
+                #{id}
+            </foreach>
+            )
+        </if>
+        limit 1
+    </select>
     <update id="updateByExampleSelective" parameterType="map">
         update capacity_write
         <set>

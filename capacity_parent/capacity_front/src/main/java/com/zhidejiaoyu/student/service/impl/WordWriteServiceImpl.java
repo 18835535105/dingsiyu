@@ -68,7 +68,7 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object getWriteWord(HttpSession session, Long unitId) {
+    public Object getWriteWord(HttpSession session, Long unitId, Long[] ignoreWordId) {
 
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         boolean firstStudy = this.isFirst(student.getId());
@@ -92,11 +92,6 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
         Long wordCount = unitVocabularyMapper.countByUnitId(unitId);
         if (wordCount == 0) {
             return ServerResponse.createByErrorMessage("当前单元下没有单词！");
-        }
-
-        if (wordCount.equals(plan)) {
-            // 提醒学生进行单元闯关测试
-            return super.toUnitTest();
         }
 
         // 查看当前单元下记忆追踪中有无达到黄金记忆点的单词
@@ -136,6 +131,17 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
             wordWriteStudyVo.setWordCount(wordCount);
             wordWriteStudyVo.setReadUrl(baiduSpeak.getLanguagePath(currentStudyWord.getWord()));
             return ServerResponse.createBySuccess(wordWriteStudyVo);
+        }
+
+        // 如果该单元单词都已经学习完毕并且没有达到黄金记忆点的单词，获取生词
+        CapacityWrite capacityWrite = capacityWriteMapper.selectUnknownWordByUnitId(student, unitId, ignoreWordId);
+        if (capacityWrite != null) {
+            return this.returnGoldWord(capacityWrite, plan, firstStudy, wordCount);
+        }
+
+        if (wordCount.equals(plan)) {
+            // 提醒学生进行单元闯关测试
+            return super.toUnitTest();
         }
         return null;
     }
