@@ -130,6 +130,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Autowired
     private LearnMapper learnMapper;
 
+    @Autowired
+    private StudyFlowMapper studyFlowMapper;
+
     /**
      * 游戏测试题目获取，获取20个单词供测试
      *
@@ -222,6 +225,20 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 countMyGoldUtil.countMyGold(student);
             }
         }
+
+        // 流程名称
+        StudyFlow studyFlow = studyFlowMapper.selectById(3);
+        if (studyFlow != null) {
+            int grade = studyFlow.getType();
+            if (testRecord.getPoint() >= grade) {
+                map.put("flow", "流程二");
+            } else {
+                map.put("flow", "流程一");
+            }
+        } else {
+            map.put("flow", "流程一");
+        }
+
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(map);
     }
