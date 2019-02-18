@@ -15,6 +15,7 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
+import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
@@ -231,6 +232,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Student student = getStudent(session);
         Long studentId = student.getId();
 
+        // 判断学生是否已经进行过游戏测试，如果进行过不允许再次进行；否则返回游戏题目
+        int count = testRecordMapper.countGameCount(student);
+        if (count > 0) {
+            return ServerResponse.createBySuccess(ResponseCode.FORBIDDEN.getCode(), ResponseCode.FORBIDDEN.getMsg());
+        }
+
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
         // 随机选出20个正确单词信息
         PageHelper.startPage(1, 20);
@@ -247,7 +254,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         List<Vocabulary> ignore = new ArrayList<>(errorVocabularies);
         ignore.addAll(rightVocabularies);
 
-        // 如果错误单词取值不够用，从当前课程的上一个磕碜和下一个课程取值
+        // 如果错误单词取值不够用，从当前课程的上一个课程和下一个课程取值
         if (errorVocabularies.size() < errorSize) {
             PageHelper.startPage(1, errorSize - errorVocabularies.size());
             List<Vocabulary> otherErrorVocabularies = vocabularyMapper.selectByCourseIdWithoutWordIds(currentCourseId + 1, ignore);

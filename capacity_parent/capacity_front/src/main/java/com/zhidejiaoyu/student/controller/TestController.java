@@ -262,6 +262,12 @@ public class TestController {
         return testService.saveCapTeksTest(session, wordUnitTestDTO);
     }
 
+    /**
+     * 获取学前游戏测试题目
+     *
+     * @param session
+     * @return
+     */
     @GetMapping("/getStrengthGame")
     public ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session) {
         return testService.getStrengthGame(session);
