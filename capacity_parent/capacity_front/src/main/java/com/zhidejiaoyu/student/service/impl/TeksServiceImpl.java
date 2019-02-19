@@ -513,6 +513,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         WordUnitTestDTO wordUnitTestDTO = new WordUnitTestDTO();
         wordUnitTestDTO.setClassify(7);
         Integer point = testRecord.getPoint();
+        wordUnitTestDTO.setPoint(point);
         Integer goldCount = 0;
         Map<String, Object> map = new HashMap<>();
         if (point >= PASS) {
