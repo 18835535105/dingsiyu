@@ -21,7 +21,6 @@ import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
 import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.constant.TestAwardGoldConstant;
-import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.ReviewService;
 import com.zhidejiaoyu.student.utils.CcieUtil;
 import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
@@ -1397,7 +1396,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
      * @return 学生获得的金币数
      */
     private int[] saveTestRecord(int quantity, int errorCount, int rightCount, Integer classify, HttpSession
-            session, Student student, Integer point, String genre, Long courseId,Long[] unitId) {
+            session, Student student, Integer point, String genre, Long courseId,Long[] unitIds) {
+        Long unitId = (unitIds == null || unitIds.length ==0) ? null : unitIds[0];
         String studyModel = commonMethod.getTestType(classify);
         StringBuilder msg = new StringBuilder();
         long stuId = student.getId();
@@ -1412,7 +1412,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         testRecord.setGenre(genre);
         testRecord.setErrorCount(errorCount);
         testRecord.setCourseId(courseId);
-        testRecord.setUnitId((unitId == null || unitId.length == 0) ? null : unitId[0]);
+        testRecord.setUnitId(unitId);
         int gold = 0;
 
         if ("已学测试".equals(genre) || "生词测试".equals(genre) || "熟词测试".equals(genre) || genre.contains("五维测试")
@@ -1443,7 +1443,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     gold = decideFiveD(point, genre, student, msg, studyModel, testRecord);
                 }
             }
-            ccieUtil.saveCcieTest(student, 6, classify);
+            ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId);
         } else if ("已学测试".equals(genre) || "生词测试".equals(genre) || "熟词测试".equals(genre) || "熟句测试".equals(genre) || "生句测试".equals(genre)) {
             // 判断学生之前是否已经在当前课程有过“已学测试”或者“生词测试”或者“熟词测试”
             List<TestRecord> testRecords = testRecordMapper.selectMaxPointByStudyModel(stuId, courseId, genre, studyModel);
@@ -1473,7 +1473,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             }else if("生句测试".equals(genre)){
                 testType=13;
             }
-            ccieUtil.saveCcieTest(student, testType, classify);
+            ccieUtil.saveCcieTest(student, testType, classify, courseId, unitId);
         } else if ("复习测试".equals(genre)) {
             // 判断学生之前是否已经在当前课程有过“已学测试”或者“生词测试”或者“熟词测试”
             List<TestRecord> testRecords = testRecordMapper.selectMaxPointByStudyModel(stuId, courseId, genre, studyModel);
@@ -1489,7 +1489,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             }
             // 奖励金币信息
             gold = reviewGold(point, genre, student, msg, studyModel, testRecord);
-            ccieUtil.saveCcieTest(student, 2, classify);
+            ccieUtil.saveCcieTest(student, 2, classify, courseId, unitId);
         }
 
         studentMapper.updateByPrimaryKeySelective(student);

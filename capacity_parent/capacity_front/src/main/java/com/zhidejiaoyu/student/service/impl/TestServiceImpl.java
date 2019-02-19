@@ -15,6 +15,7 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
+import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
@@ -129,6 +130,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Autowired
     private LearnMapper learnMapper;
 
+    @Autowired
+    private StudyFlowMapper studyFlowMapper;
+
     /**
      * 游戏测试题目获取，获取20个单词供测试
      *
@@ -221,6 +225,20 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 countMyGoldUtil.countMyGold(student);
             }
         }
+
+        // 流程名称
+        StudyFlow studyFlow = studyFlowMapper.selectById(3);
+        if (studyFlow != null) {
+            int grade = studyFlow.getType();
+            if (testRecord.getPoint() >= grade) {
+                map.put("flow", "流程二");
+            } else {
+                map.put("flow", "流程一");
+            }
+        } else {
+            map.put("flow", "流程一");
+        }
+
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(map);
     }
@@ -230,6 +248,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         Student student = getStudent(session);
         Long studentId = student.getId();
+
+        // 判断学生是否已经进行过游戏测试，如果进行过不允许再次进行；否则返回游戏题目
+        int count = testRecordMapper.countGameCount(student);
+        if (count > 0) {
+            return ServerResponse.createBySuccess(ResponseCode.FORBIDDEN.getCode(), ResponseCode.FORBIDDEN.getMsg());
+        }
 
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
         // 随机选出20个正确单词信息
@@ -247,7 +271,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         List<Vocabulary> ignore = new ArrayList<>(errorVocabularies);
         ignore.addAll(rightVocabularies);
 
-        // 如果错误单词取值不够用，从当前课程的上一个磕碜和下一个课程取值
+        // 如果错误单词取值不够用，从当前课程的上一个课程和下一个课程取值
         if (errorVocabularies.size() < errorSize) {
             PageHelper.startPage(1, errorSize - errorVocabularies.size());
             List<Vocabulary> otherErrorVocabularies = vocabularyMapper.selectByCourseIdWithoutWordIds(currentCourseId + 1, ignore);
@@ -1108,7 +1132,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             // 获取需要奖励的能量值
             addEnergy = getEnergy(student, point);
 
-            ccieUtil.saveCcieTest(student, 1, classify);
+            ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0]);
         }
 
         String msg;
@@ -1202,7 +1226,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setGold(goldCount);
         vo.setEnergy(addEnergy);
         countMyGoldUtil.countMyGold(student);
-        ccieUtil.saveCcieTest(student, 1, classify);
+        ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0]);
         studentMapper.updateByPrimaryKeySelective(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(vo);
