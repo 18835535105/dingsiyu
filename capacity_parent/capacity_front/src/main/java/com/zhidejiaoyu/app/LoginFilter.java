@@ -58,11 +58,9 @@ public class LoginFilter implements Filter {
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         HttpSession session = httpServletRequest.getSession();
 
-        Map<String, Object> sessionMap = RedisOpt.getSessionMap(session.getId());
-
         Student student = null;
-        if (sessionMap != null && sessionMap.get(UserConstant.CURRENT_STUDENT) != null) {
-            student = (Student) sessionMap.get(UserConstant.CURRENT_STUDENT);
+        if (session.getAttribute(UserConstant.CURRENT_STUDENT) != null) {
+            student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         }
 
         String url = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
