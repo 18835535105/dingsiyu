@@ -15,7 +15,6 @@ import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.common.personal.InitRedPointThread;
-import com.zhidejiaoyu.student.listener.SessionListener;
 import com.zhidejiaoyu.student.service.LoginService;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
@@ -34,7 +33,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
