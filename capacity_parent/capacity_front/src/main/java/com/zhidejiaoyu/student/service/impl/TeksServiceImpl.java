@@ -64,6 +64,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         add("Yifan");
         add("Wang");
         add("Han");
+        add("Amy");
     }};
 
 
@@ -665,17 +666,17 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 if(strList[i].endsWith(",")||strList[i].endsWith("?")||strList[i].endsWith(".")||strList[i].endsWith("!")){
                     if(strList[i].endsWith("...")){
                         String str=strList[i].replace("...","");
-                        if(str==NAMELIST.get(j)){
+                        if(str.equals(NAMELIST.get(j))){
                             falg=false;
                         }
                     }else{
                         String str=strList[i].substring(0,strList[i].length()-1);
-                        if(str==NAMELIST.get(j)){
+                        if(str.equals(NAMELIST.get(j))){
                             falg=false;
                         }
                     }
                 }else{
-                    if(strList[i]==NAMELIST.get(j)){
+                    if(strList[i].equals(NAMELIST.get(j))){
                         falg=false;
                     }
                 }
