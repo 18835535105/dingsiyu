@@ -58,6 +58,13 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
      */
     private static final int SENCONDARY = 90;
 
+    private static final List<String> NAMELIST=new ArrayList<String>(){{
+        add("Zhang");
+        add("Wu");
+        add("Yifan");
+        add("Wang");
+        add("Han");
+    }};
 
 
 
@@ -415,84 +422,121 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 map.put("sentence", teks.getSentence());
                 map.put("id", teks.getId());
                 String[] sentenceList = teks.getSentence().split(" ");
-                int[] integers;
+
                 //获取空格出现的位置
                /* if(sentenceList.length>6){
                     integers=wirterBlank(sentenceList.length,3);
                 }else*/
-                if (sentenceList.length > 3) {
-
-                    integers = wirterBlank(sentenceList.length, 2);
-                } else {
-                    integers = wirterBlank(sentenceList.length, 1);
-                }
+                int[] integers;
                 List<String> blanceSentence = new ArrayList<>();
                 List<String> vocabulary = new ArrayList<>();
-                if (integers.length == 1) {
-                    //当空格数为一时调用
-                    for (int i = 0; i < sentenceList.length; i++) {
-                        if (i == (integers[0] - 1)) {
-                            addList(sentenceList[i], blanceSentence, vocabulary);
-                        } else {
-                            if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
-                                vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
-                                vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                                blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
-                                blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
+                if (sentenceList.length != 1) {
+                    integers = wirterBlank(sentenceList);
+                    if (integers.length == 1) {
+                        //当空格数为一时调用
+                        for (int i = 0; i < sentenceList.length; i++) {
+                            if (i == (integers[0])) {
+                                addList(sentenceList[i], blanceSentence, vocabulary);
                             } else {
-                                vocabulary.add(sentenceList[i]);
-                                blanceSentence.add(sentenceList[i]);
+                                if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
+                                    if(sentenceList[i].endsWith("...")){
+                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
+                                        vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 3));
+                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
+                                        blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
+                                    }else{
+                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
+                                        vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 1));
+                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
+                                        blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
+                                    }
+                                } else {
+                                    vocabulary.add(sentenceList[i]);
+                                    blanceSentence.add(sentenceList[i]);
+                                }
                             }
                         }
+                        map.put("blanceSentence", blanceSentence);
+                        map.put("vocabulary", vocabulary);
+                    } else if (integers.length == 2) {
+                        //当空格数为二时调用
+                        for (int i = 0; i < sentenceList.length; i++) {
+                            if (i == (integers[0]) || i == (integers[1])) {
+                                addList(sentenceList[i], blanceSentence, vocabulary);
+                            } else {
+                                if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
+                                    if(sentenceList[i].endsWith("...")){
+                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
+                                        vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 3));
+                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
+                                        blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
+                                    }else{
+                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
+                                        vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 1));
+                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
+                                        blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
+                                    }
+                                } else {
+                                    vocabulary.add(sentenceList[i]);
+                                    blanceSentence.add(sentenceList[i]);
+                                }
+                            }
+                        }
+                        map.put("blanceSentence", blanceSentence);
+                        map.put("vocabulary", vocabulary);
+                    } else if (integers.length == 3) {
+                        //当空格数为三时调用
+                        for (int i = 0; i < sentenceList.length; i++) {
+                            if (i == (integers[0] - 1) || i == (integers[1] - 1) || i == (integers[2] - 1)) {
+                                addList(sentenceList[i], blanceSentence, vocabulary);
+                            } else {
+                                if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
+                                    if(sentenceList[i].endsWith("...")){
+                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
+                                        vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 3));
+                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
+                                        blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
+                                    }else{
+                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
+                                        vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 1));
+                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
+                                        blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
+                                    }
+                                } else {
+                                    vocabulary.add(sentenceList[i]);
+                                    blanceSentence.add(sentenceList[i]);
+                                }
+                            }
+                        }
+                        map.put("blanceSentence", blanceSentence);
+                        map.put("vocabulary", vocabulary);
                     }
-                    map.put("blanceSentence", blanceSentence);
-                    map.put("vocabulary", vocabulary);
-                } else if (integers.length == 2) {
-                    //当空格数为二时调用
-                    for (int i = 0; i < sentenceList.length; i++) {
-                        if (i == (integers[0] - 1) || i == (integers[1] - 1)) {
-                            addList(sentenceList[i], blanceSentence, vocabulary);
-                        } else {
-                            if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
-                                vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
-                                vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                                blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
-                                blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                            } else {
-                                vocabulary.add(sentenceList[i]);
-                                blanceSentence.add(sentenceList[i]);
-                            }
+
+                    resultTeks.add(map);
+
+                }else{
+                    if (sentenceList[0].endsWith(",") || sentenceList[0].endsWith(".") || sentenceList[0].endsWith("?") || sentenceList[0].endsWith("!")) {
+                        if(sentenceList[0].endsWith("...")){
+                            vocabulary.add(sentenceList[0].substring(0, sentenceList[0].length() - 3));
+                            vocabulary.add(sentenceList[0].substring(sentenceList[0].length() - 3));
+                            blanceSentence.add(sentenceList[0].substring(0, sentenceList[0].length() - 3));
+                            blanceSentence.add(sentenceList[0].substring(sentenceList[0].length() - 3));
+                        }else{
+                            vocabulary.add(sentenceList[0].substring(0, sentenceList[0].length() - 1));
+                            vocabulary.add(sentenceList[0].substring(sentenceList[0].length() - 1));
+                            blanceSentence.add(sentenceList[0].substring(0, sentenceList[0].length() - 1));
+                            blanceSentence.add(sentenceList[0].substring(sentenceList[0].length() - 1));
                         }
-                    }
-                    map.put("blanceSentence", blanceSentence);
-                    map.put("vocabulary", vocabulary);
-                } else if (integers.length == 3) {
-                    //当空格数为三时调用
-                    for (int i = 0; i < sentenceList.length; i++) {
-                        if (i == (integers[0] - 1) || i == (integers[1] - 1) || i == (integers[2] - 1)) {
-                            addList(sentenceList[i], blanceSentence, vocabulary);
-                        } else {
-                            if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
-                                vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
-                                vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                                blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
-                                blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                            } else {
-                                vocabulary.add(sentenceList[i]);
-                                blanceSentence.add(sentenceList[i]);
-                            }
-                        }
+                    } else {
+                        vocabulary.add(sentenceList[0]);
+                        blanceSentence.add(sentenceList[0]);
                     }
                     map.put("blanceSentence", blanceSentence);
                     map.put("vocabulary", vocabulary);
                 }
-
-                resultTeks.add(map);
             }
             return ServerResponse.createBySuccess(resultTeks);
         }
-
-
         return ServerResponse.createByError();
     }
 
@@ -612,21 +656,62 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
 
     //判断空格出现位置
-    public int[] wirterBlank(Integer number, Integer choose) {
+    public int[] wirterBlank(String[] strList) {
+        Random random=new Random();
+        List<Integer> shuZhuString =new ArrayList<>();
+        for(int i=0;i<strList.length;i++){
+            boolean falg=true;
+            for(int j=0;j<NAMELIST.size();j++) {
+                if(strList[i].endsWith(",")||strList[i].endsWith("?")||strList[i].endsWith(".")||strList[i].endsWith("!")){
+                    if(strList[i].endsWith("...")){
+                        String str=strList[i].replace("...","");
+                        if(str==NAMELIST.get(j)){
+                            falg=false;
+                        }
+                    }else{
+                        String str=strList[i].substring(0,strList[i].length()-1);
+                        if(str==NAMELIST.get(j)){
+                            falg=false;
+                        }
+                    }
+                }else{
+                    if(strList[i]==NAMELIST.get(j)){
+                        falg=false;
+                    }
+                }
+            }
+            if(falg){
+                shuZhuString.add(i);
+            }
+        }
+
+
+        int choose=0;
+        if(shuZhuString.size()>3){
+            choose=2;
+        }else{
+            choose=1;
+        }
         int[] integers = new int[choose];
+        if(shuZhuString.size()==0){
+            return integers;
+        }
         int s = 0;
         if (choose == 1) {
-            integers[0] = ((int) (Math.random() * number)) + 1;
+            int i= random.nextInt(shuZhuString.size());
+            integers[0]=shuZhuString.get(i);
         }
         if (choose == 2) {
+            int index=0;
             while (integers[choose - 1] == 0) {
-                int i = ((int) (Math.random() * number)) + 1;
+                int i = random.nextInt(shuZhuString.size());
                 if (choose == 2 && s == 1) {
-                    if (i != integers[0]) {
-                        integers[s] = i;
+                    if (i != index) {
+                        integers[s] = shuZhuString.get(i);
                     }
                 } else {
-                    integers[s] = i;
+                    integers[s] = shuZhuString.get(i);
+                    index=i;
                 }
                 if (s != 1) {
                     s++;
