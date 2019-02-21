@@ -58,7 +58,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
      */
     private static final int SENCONDARY = 90;
 
-    private static final List<String> NAMELIST=new ArrayList<String>(){{
+    private static final List<String> NAMELIST = new ArrayList<String>() {{
         add("Zhang");
         add("Wu");
         add("Yifan");
@@ -66,7 +66,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         add("Han");
         add("Amy");
     }};
-
 
 
     @Autowired
@@ -210,6 +209,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 List sentence = new ArrayList();
                 //获取填空位置
                 for (int i = 0; i < sentenceList.length; i++) {
+                    sentenceList[i] = sentenceList[i].trim();
                     if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
                         blankSentenceArray.add(null);
                         if (sentenceList[i].endsWith("...")) {
@@ -423,7 +423,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 map.put("sentence", teks.getSentence());
                 map.put("id", teks.getId());
                 String[] sentenceList = teks.getSentence().split(" ");
-
+                for (int i = 0; i < sentenceList.length; i++) {
+                    sentenceList[i] = sentenceList[i].trim();
+                }
                 //获取空格出现的位置
                /* if(sentenceList.length>6){
                     integers=wirterBlank(sentenceList.length,3);
@@ -440,12 +442,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                                 addList(sentenceList[i], blanceSentence, vocabulary);
                             } else {
                                 if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
-                                    if(sentenceList[i].endsWith("...")){
+                                    if (sentenceList[i].endsWith("...")) {
                                         vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
                                         vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 3));
                                         blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
                                         blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
-                                    }else{
+                                    } else {
                                         vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
                                         vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 1));
                                         blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
@@ -466,12 +468,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                                 addList(sentenceList[i], blanceSentence, vocabulary);
                             } else {
                                 if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
-                                    if(sentenceList[i].endsWith("...")){
+                                    if (sentenceList[i].endsWith("...")) {
                                         vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
                                         vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 3));
                                         blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
                                         blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
-                                    }else{
+                                    } else {
                                         vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
                                         vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 1));
                                         blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
@@ -492,12 +494,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                                 addList(sentenceList[i], blanceSentence, vocabulary);
                             } else {
                                 if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
-                                    if(sentenceList[i].endsWith("...")){
+                                    if (sentenceList[i].endsWith("...")) {
                                         vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
                                         vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 3));
                                         blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
                                         blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
-                                    }else{
+                                    } else {
                                         vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
                                         vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 1));
                                         blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
@@ -515,14 +517,14 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
                     resultTeks.add(map);
 
-                }else{
+                } else {
                     if (sentenceList[0].endsWith(",") || sentenceList[0].endsWith(".") || sentenceList[0].endsWith("?") || sentenceList[0].endsWith("!")) {
-                        if(sentenceList[0].endsWith("...")){
+                        if (sentenceList[0].endsWith("...")) {
                             vocabulary.add(sentenceList[0].substring(0, sentenceList[0].length() - 3));
                             vocabulary.add(sentenceList[0].substring(sentenceList[0].length() - 3));
                             blanceSentence.add(sentenceList[0].substring(0, sentenceList[0].length() - 3));
                             blanceSentence.add(sentenceList[0].substring(sentenceList[0].length() - 3));
-                        }else{
+                        } else {
                             vocabulary.add(sentenceList[0].substring(0, sentenceList[0].length() - 1));
                             vocabulary.add(sentenceList[0].substring(sentenceList[0].length() - 1));
                             blanceSentence.add(sentenceList[0].substring(0, sentenceList[0].length() - 1));
@@ -577,14 +579,21 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         }
         testRecord.setGenre("课文默写测试");
         testRecord.setAwardGold(goldCount);
-        if(goldCount>0){
+        TestRecord testRecord1 = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), wordUnitTestDTO.getUnitId()[0], "课文默写测试", "课文默写测试");
+        if(testRecord1==null){
             int energy = getEnergy(student, wordUnitTestDTO.getPoint());
             studentMapper.updateByPrimaryKeySelective(student);
             map.put("energy",energy);
         }else{
-            map.put("energy",0);
+            if(goldCount>0){
+                int energy = getEnergy(student, wordUnitTestDTO.getPoint());
+                studentMapper.updateByPrimaryKeySelective(student);
+                map.put("energy",energy);
+            }else{
+                map.put("energy",0);
+            }
         }
-        student.setSystemGold(student.getSystemGold()+goldCount);
+        student.setSystemGold(student.getSystemGold() + goldCount);
         studentMapper.updateByPrimaryKeySelective(student);
         //添加对象
         testRecord.setStudentId(student.getId());
@@ -611,18 +620,18 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         }
         map.put("gold", goldCount);
         if (point < PASS) {
-            map.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
-            map.put("text","很遗憾，闯关失败，再接再厉。");
+            map.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
+            map.put("text", "很遗憾，闯关失败，再接再厉。");
         } else if (point < NINETY_POINT) {
-            map.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
-            map.put("text","闯关成功，独孤求败！");
+            map.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
+            map.put("text", "闯关成功，独孤求败！");
         } else {
-            map.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
-            map.put("text","恭喜你刷新了纪录！");
+            map.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+            map.put("text", "恭喜你刷新了纪录！");
         }
 
-        map.put("point",point);
-        map.put("imgUrl",student.getPartUrl());
+        map.put("point", point);
+        map.put("imgUrl", student.getPartUrl());
         return ServerResponse.createBySuccess(map);
     }
 
@@ -658,52 +667,52 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     //判断空格出现位置
     public int[] wirterBlank(String[] strList) {
-        Random random=new Random();
-        List<Integer> shuZhuString =new ArrayList<>();
-        for(int i=0;i<strList.length;i++){
-            boolean falg=true;
-            for(int j=0;j<NAMELIST.size();j++) {
-                if(strList[i].endsWith(",")||strList[i].endsWith("?")||strList[i].endsWith(".")||strList[i].endsWith("!")){
-                    if(strList[i].endsWith("...")){
-                        String str=strList[i].replace("...","");
-                        if(str.equals(NAMELIST.get(j))){
-                            falg=false;
+        Random random = new Random();
+        List<Integer> shuZhuString = new ArrayList<>();
+        for (int i = 0; i < strList.length; i++) {
+            boolean falg = true;
+            for (int j = 0; j < NAMELIST.size(); j++) {
+                if (strList[i].endsWith(",") || strList[i].endsWith("?") || strList[i].endsWith(".") || strList[i].endsWith("!")) {
+                    if (strList[i].endsWith("...")) {
+                        String str = strList[i].replace("...", "");
+                        if (str.equals(NAMELIST.get(j))) {
+                            falg = false;
                         }
-                    }else{
-                        String str=strList[i].substring(0,strList[i].length()-1);
-                        if(str.equals(NAMELIST.get(j))){
-                            falg=false;
+                    } else {
+                        String str = strList[i].substring(0, strList[i].length() - 1);
+                        if (str.equals(NAMELIST.get(j))) {
+                            falg = false;
                         }
                     }
-                }else{
-                    if(strList[i].equals(NAMELIST.get(j))){
-                        falg=false;
+                } else {
+                    if (strList[i].equals(NAMELIST.get(j))) {
+                        falg = false;
                     }
                 }
             }
-            if(falg){
+            if (falg) {
                 shuZhuString.add(i);
             }
         }
 
 
-        int choose=0;
-        if(shuZhuString.size()>3){
-            choose=2;
-        }else{
-            choose=1;
+        int choose = 0;
+        if (shuZhuString.size() > 3) {
+            choose = 2;
+        } else {
+            choose = 1;
         }
         int[] integers = new int[choose];
-        if(shuZhuString.size()==0){
+        if (shuZhuString.size() == 0) {
             return integers;
         }
         int s = 0;
         if (choose == 1) {
-            int i= random.nextInt(shuZhuString.size());
-            integers[0]=shuZhuString.get(i);
+            int i = random.nextInt(shuZhuString.size());
+            integers[0] = shuZhuString.get(i);
         }
         if (choose == 2) {
-            int index=0;
+            int index = 0;
             while (integers[choose - 1] == 0) {
                 int i = random.nextInt(shuZhuString.size());
                 if (choose == 2 && s == 1) {
@@ -712,7 +721,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                     }
                 } else {
                     integers[s] = shuZhuString.get(i);
-                    index=i;
+                    index = i;
                 }
                 if (s != 1) {
                     s++;
