@@ -111,7 +111,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     @Autowired
     private CcieUtil ccieUtil;
-    
+
     @Autowired
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
 
@@ -926,12 +926,19 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         studentMapper.updateByPrimaryKeySelective(student);
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
         Map<String,Object> resultMap=new HashMap<>();
-        if(goldCount>0){
+        TestRecord testRecord1 = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), wordUnitTestDTO.getUnitId()[0], "音译测试", "音译测试");
+        if(testRecord1==null){
             int energy = getEnergy(student, wordUnitTestDTO.getPoint());
             studentMapper.updateByPrimaryKeySelective(student);
             resultMap.put("energy",energy);
         }else{
-            resultMap.put("energy",0);
+            if(goldCount>0){
+                int energy = getEnergy(student, wordUnitTestDTO.getPoint());
+                studentMapper.updateByPrimaryKeySelective(student);
+                resultMap.put("energy",energy);
+            }else{
+                resultMap.put("energy",0);
+            }
         }
         resultMap.put("gold",goldCount);
         Integer point = wordUnitTestDTO.getPoint();
@@ -1014,9 +1021,20 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
         Map<String,Object> resultMap=new HashMap<>();
         resultMap.put("gold",goldCount);
-        int energy = getEnergy(student, wordUnitTestDTO.getPoint());
-        studentMapper.updateByPrimaryKeySelective(student);
-        resultMap.put("energy",energy);
+        TestRecord testRecord1 = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), wordUnitTestDTO.getUnitId()[0], "课文测试", "课文测试");
+        if(testRecord1==null){
+            int energy = getEnergy(student, wordUnitTestDTO.getPoint());
+            studentMapper.updateByPrimaryKeySelective(student);
+            resultMap.put("energy",energy);
+        }else{
+            if(goldCount>0){
+                int energy = getEnergy(student, wordUnitTestDTO.getPoint());
+                studentMapper.updateByPrimaryKeySelective(student);
+                resultMap.put("energy",energy);
+            }else{
+                resultMap.put("energy",0);
+            }
+        }
         Integer point = wordUnitTestDTO.getPoint();
         if (point < PASS) {
             resultMap.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
@@ -1626,7 +1644,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         // 游戏测试开始时间
         Date gameStartTime = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
-        
+
         testRecord.setStudentId(student.getId());
         testRecord.setCourseId(student.getCourseId());
         testRecord.setTestStartTime(gameStartTime);
