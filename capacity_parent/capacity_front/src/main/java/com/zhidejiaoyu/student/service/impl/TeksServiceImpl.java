@@ -579,7 +579,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         }
         testRecord.setGenre("课文默写测试");
         testRecord.setAwardGold(goldCount);
-        TestRecord testRecord1 = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), wordUnitTestDTO.getUnitId()[0], "课文默写测试", "课文默写测试");
+        TestRecord testRecord1 = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), testRecord.getUnitId(), "课文默写测试", "课文默写测试");
         if(testRecord1==null){
             int energy = getEnergy(student, wordUnitTestDTO.getPoint());
             studentMapper.updateByPrimaryKeySelective(student);
@@ -877,6 +877,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         if (addTeks != null && addTeks.size() > 0) {
             for (Teks teks1 : addTeks) {
                 boolean isAdd = true;
+
                 for (Teks teks2 : optionList) {
                     if (teks2.getSentence().equals(teks1.getSentence())) {
                         isAdd = false;
@@ -928,13 +929,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         if (choseFour.size() >= hearingList.size()) {
             for (int i = 0; i < choseFour.size(); i++) {
                 returnList.add(choseFour.get(i));
-                if (hearingList.size() - 1 >= i) {
+                if(hearingList.size() - 1 >= i) {
                     returnList.add(hearingList.get(i));
                 }
             }
         } else {
             for (int i = 0; i < hearingList.size(); i++) {
-
                 if (choseFour.size() - 1 >= i) {
                     returnList.add(choseFour.get(i));
                 }
