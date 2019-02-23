@@ -362,10 +362,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
      */
     private ServerResponse<Object> toNextNode(Student student, Long grade, StudyFlow flow) {
         if (grade != null) {
-            // 50 <= 分数 < 80分走 nextTrue 流程，分数 < 50 走 nextFalse 流程
+            // 50 <= 分数 < 90分走 nextTrue 流程，分数 < 50 走 nextFalse 流程
             if (grade >= 50 && grade < 90) {
                 return toAnotherFlow(student, flow.getNextTrueFlow());
-            } else if (grade < 50) {
+            } else if (grade < 90) {
                 clearLearnRecord(student);
                 return toAnotherFlow(student, flow.getNextFalseFlow());
             }

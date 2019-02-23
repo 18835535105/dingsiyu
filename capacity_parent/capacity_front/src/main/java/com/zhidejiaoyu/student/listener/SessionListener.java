@@ -67,7 +67,7 @@ public class SessionListener implements HttpSessionListener {
             Object object = redisTemplate.opsForHash().get(RedisKeysConst.SESSION_MAP, session.getId());
             if (object != null) {
                 sessionMap = (Map<String, Object>) redisTemplate.opsForHash().get(RedisKeysConst.SESSION_MAP, session.getId());
-                redisTemplate.opsForHash().delete(RedisKeysConst.SESSION_MAP, session.getId());
+//                redisTemplate.opsForHash().delete(RedisKeysConst.SESSION_MAP, session.getId());
             }
             loginService.saveDurationInfo(sessionMap);
         }
