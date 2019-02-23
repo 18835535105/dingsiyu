@@ -21,6 +21,7 @@ import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
 import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.constant.TestAwardGoldConstant;
+import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.ReviewService;
 import com.zhidejiaoyu.student.utils.CcieUtil;
 import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
@@ -842,10 +843,15 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         int[] gold = this.saveTestRecord(quantity, errorCount, rightCount, classify, session, student, point, genre, courseId,unitId);
         if(testDetail!=null){
             // 根据不同分数奖励学生金币
-            this.saveTestDetail(testDetail, Long.valueOf(gold[1]+""), classify, student);
+            this.saveTestDetail(testDetail, (long) gold[1], classify, student);
         }
+        WordUnitTestDTO wordUnitTestDTO = new WordUnitTestDTO();
+        wordUnitTestDTO.setPoint(point);
+        wordUnitTestDTO.setUnitId(unitId);
+        wordUnitTestDTO.setCourseId(courseId);
+        wordUnitTestDTO.setClassify(classify);
         // 封装提示语
-        packagePetSay(gold[0], point, student, vo, genre);
+        packagePetSay(gold[0], wordUnitTestDTO, student, vo, genre);
         vo.setEnergy(getEnergy(student, point));
         countMyGoldUtil.countMyGold(student);
         return ServerResponse.createBySuccess(vo);
@@ -949,16 +955,19 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
     /**
      * 已学测试, 生词测试, 熟词测试, 五维测试
-     *
-     * @param gold
-     * @param point
+     *  @param gold
+     * @param dto
      * @param student
      * @param vo
      * @param genre
      */
-    private void packagePetSay(Integer gold, Integer point, Student student, TestResultVo vo, String genre) {
+    private void packagePetSay(Integer gold, WordUnitTestDTO dto, Student student, TestResultVo vo, String genre) {
         String msg = "";
         String petName = student.getPetName();
+        int point = dto.getPoint();
+        long unitId = dto.getUnitId()[0];
+        long courseId = dto.getCourseId();
+        int classify = dto.getClassify();
         switch (genre) {
             case "测试复习":
                 if (point < 80) {
@@ -967,6 +976,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 } else {
                     msg = "真让人刮目相看！继续学习吧！";
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.CAPACITY_REVIEW_EIGHTY_TO_HUNDRED));
+                    ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId);
                 }
                 vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "智能复习测试"));
                 break;
@@ -981,6 +991,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_EIGHTY_TO_NINETY));
                 } else {
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_NINETY_TO_HUNDRED));
+                    ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId);
                 }
                 msg = point < 90 ? "你的测试未通过，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
                 vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, genre));
@@ -991,6 +1002,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.FIVE_TEST_LESS_EIGHTY));
                 } else {
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.FIVE_TEST_EIGHTY_TO_HUNDRED));
+                    ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId);
                 }
                 msg = point < 90 ? "你的测试未成功，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
                 vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "五维测试"));
@@ -1443,7 +1455,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     gold = decideFiveD(point, genre, student, msg, studyModel, testRecord);
                 }
             }
-            ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId);
         } else if ("已学测试".equals(genre) || "生词测试".equals(genre) || "熟词测试".equals(genre) || "熟句测试".equals(genre) || "生句测试".equals(genre)) {
             // 判断学生之前是否已经在当前课程有过“已学测试”或者“生词测试”或者“熟词测试”
             List<TestRecord> testRecords = testRecordMapper.selectMaxPointByStudyModel(stuId, courseId, genre, studyModel);
@@ -1473,7 +1484,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             }else if("生句测试".equals(genre)){
                 testType=13;
             }
-            ccieUtil.saveCcieTest(student, testType, classify, courseId, unitId);
         } else if ("复习测试".equals(genre)) {
             // 判断学生之前是否已经在当前课程有过“已学测试”或者“生词测试”或者“熟词测试”
             List<TestRecord> testRecords = testRecordMapper.selectMaxPointByStudyModel(stuId, courseId, genre, studyModel);
@@ -1489,7 +1499,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             }
             // 奖励金币信息
             gold = reviewGold(point, genre, student, msg, studyModel, testRecord);
-            ccieUtil.saveCcieTest(student, 2, classify, courseId, unitId);
         }
 
         studentMapper.updateByPrimaryKeySelective(student);
