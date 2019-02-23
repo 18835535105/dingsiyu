@@ -207,7 +207,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         result.put("petName", stu.getPetName());
         result.put("schoolName", stu.getSchoolName());
 
-        this.getIndexTime(session, student_id, result);
+        this.getIndexTime(session, stu, result);
 
         // i参数 1=慧记忆，2=慧听写，3=慧默写，4=例句听力，5=例句翻译，6=例句默写
         //-- 1.学生当前单词模块学的那个单元
@@ -467,7 +467,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         result.put("headUrl", stu.getHeadUrl());
         result.put("schoolName", stu.getSchoolName());
 
-        this.getIndexTime(session, student_id, result);
+        this.getIndexTime(session, stu, result);
 
         // i参数 1=慧记忆，2=慧听写，3=慧默写，4=例句听力，5=例句翻译，6=例句默写
         //-- 1.查询学生当前单词模块学的那个单元
@@ -561,15 +561,17 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         return ServerResponse.createBySuccess(result);
     }
 
-    private void getIndexTime(HttpSession session, Long studentId, Map<String, Object> result) {
+    private void getIndexTime(HttpSession session, Student student, Map<String, Object> result) {
         String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
-        // 有效时长  !
-        Integer valid = getValidTime(studentId, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
-        // 在线时长 !
+        // 有效时长
+        Integer valid = getValidTime(student.getId(), formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
+        // 在线时长
         Integer online = getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
-        // 今日学习效率 !
+        // 今日学习效率
         if (valid != null && online != null) {
-//            online = valid >= online ? (valid / 2 + valid) : online;
+            if (valid >= online) {
+                logger.error("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, student);
+            }
             String efficiency = LearnTimeUtil.efficiency(valid, online);
             result.put("efficiency", efficiency);
         } else {
