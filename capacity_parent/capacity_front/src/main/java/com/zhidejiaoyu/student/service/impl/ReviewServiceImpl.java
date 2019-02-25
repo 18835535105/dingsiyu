@@ -965,7 +965,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         String msg = "";
         String petName = student.getPetName();
         int point = dto.getPoint();
-        long unitId = dto.getUnitId()[0];
+        Long unitId = dto.getUnitId() == null ? null : dto.getUnitId()[0];
         long courseId = dto.getCourseId();
         int classify = dto.getClassify();
         switch (genre) {
