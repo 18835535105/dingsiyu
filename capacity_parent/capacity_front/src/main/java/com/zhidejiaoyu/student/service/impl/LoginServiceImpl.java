@@ -852,7 +852,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     private void judgeMultipleLogin(HttpSession session, Student stu, Map<String, Object> sessionMap) {
-        Object object = redisTemplate.opsForHash().get("loginSession", stu.getId());
+        Object object = redisTemplate.opsForHash().get(RedisKeysConst.LOGIN_SESSION, stu.getId());
         if (object != null) {
             Map<String, Object> oldSessionMap = RedisOpt.getSessionMap(object.toString());
             // 如果账号登录的session不同，保存前一个session的信息
@@ -862,7 +862,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             }
         }
         redisTemplate.opsForHash().put(RedisKeysConst.SESSION_MAP, session.getId(), sessionMap);
-        redisTemplate.opsForHash().put("loginSession", stu.getId(), session.getId());
+        redisTemplate.opsForHash().put(RedisKeysConst.LOGIN_SESSION, stu.getId(), session.getId());
     }
 
     /**
@@ -1004,12 +1004,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Override
     public void loginOut(HttpSession session, HttpServletRequest request) {
-        Student student = getStudent(session);
-        if (student != null) {
-            // 删除学生登录信息
-            redisTemplate.opsForHash().delete("loginSession", student.getId());
-            session.invalidate();
-        }
+        session.invalidate();
     }
 
     @Override
