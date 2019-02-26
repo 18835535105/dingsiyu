@@ -489,19 +489,22 @@
     </select>
     <select id="countCapacityByUnitIdAndWordId" resultType="java.lang.Integer" parameterType="map">
         select
-        count(id)
+        count(c.id)
         from
         <include refid="classify_sql"/>
-        where student_id = #{studentId} and unit_id in (
+        c, learn l
+        where c.student_id = l.student_id and c.unit_id = l.unit_id and c.vocabulary_id = l.vocabulary_id and l.type = 1
+        and c.student_id = #{studentId} and
+        c.unit_id in (
         <foreach collection="maps" separator="," item="map">
             #{map.unitId}
         </foreach>
         )
-        and vocabulary_id in (
+        and c.vocabulary_id in (
         <foreach collection="maps" item="map" separator=",">
             #{map.wordId}
         </foreach>
-        ) and push &lt;= now() and memory_strength &lt; 1
+        ) and c.push &lt;= now() and c.memory_strength &lt; 1
     </select>
 
     <select id="selectLastLoginNeedReview" resultType="java.util.Map" parameterType="map">

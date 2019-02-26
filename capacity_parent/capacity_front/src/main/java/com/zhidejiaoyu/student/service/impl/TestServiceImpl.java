@@ -6,8 +6,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.game.StrengthGameVo;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
-import com.zhidejiaoyu.common.Vo.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.Vo.testVo.TestDetailVo;
+import com.zhidejiaoyu.common.Vo.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -1052,7 +1052,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         return ServerResponse.createBySuccess(resultMap);
     }
 
-
     @Override
     public ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId) {
         Student student = getStudent(session);
@@ -1073,9 +1072,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testDetailVo.setInfos(testRecordInfos);
         return ServerResponse.createBySuccess(testDetailVo);
     }
-
-
-
 
     /**
      * 计算测试用时
@@ -1150,18 +1146,27 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             // 获取需要奖励的能量值
             addEnergy = getEnergy(student, point);
 
-            ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0]);
+
         }
 
         String msg;
         // 默写
         if(classify == 3 || classify == 6) {
             msg = getMessage(student, vo, point, FIVE);
+            if (point >= FIVE) {
+                ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0]);
+            }
         }else if(classify == 4 || classify == 2) {
             // 听力
             msg = getMessage(student, vo, point, SIX);
+            if (point >= SIX) {
+                ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0]);
+            }
         }else {
             msg = getMessage(student, vo, point, PASS);
+            if (point >= PASS) {
+                ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0]);
+            }
         }
 
         vo.setMsg(msg);
