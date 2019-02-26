@@ -278,10 +278,22 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             this.getStudyUnit(courseIds, textUnits, studentId);
             Map<String, Object> learnUnit = learnMapper.selTeksLaterCourse(student.getId());
             if (learnUnit != null) {
-                studyMap = new HashMap<>();
-                studyMap.put("unitId", learnUnit.get("unit_id"));
-                studyMap.put("version", learnUnit.get("version"));
-                studyMap.put("grade", learnUnit.get("grade").toString() + learnUnit.get("label").toString());
+                List<StudentStudyPlan> plans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, (Long) learnUnit.get("course_id"), 3);
+                boolean flag=false;
+                Long unitId =(Long) learnUnit.get("unit_id");
+                if(plans.size()!=0){
+                    for (StudentStudyPlan plan:plans) {
+                        if(unitId>=plan.getStartUnitId()&&unitId<=plan.getEndUnitId()){
+                            flag=true;
+                        }
+                    }
+                }
+                if(flag){
+                    studyMap = new HashMap<>();
+                    studyMap.put("unitId", learnUnit.get("unit_id"));
+                    studyMap.put("version", learnUnit.get("version"));
+                    studyMap.put("grade", learnUnit.get("grade").toString() + learnUnit.get("label").toString());
+                }
             }
             // 已经进行过单元闯关的单元
             Map<Long, Map<Long, Long>> testMap = null;
