@@ -1029,6 +1029,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 if (count == 0) {
                     // 学生 session 失效时将该学生从在线人数中移除
                     redisTemplate.opsForSet().remove(RedisKeysConst.ONLINE_USER, student.getId());
+                    redisTemplate.opsForHash().delete(RedisKeysConst.LOGIN_SESSION, student.getId());
 
                     Long onlineTime = (loginOutTime.getTime() - loginTime.getTime()) / 1000;
                     Duration duration = new Duration();
