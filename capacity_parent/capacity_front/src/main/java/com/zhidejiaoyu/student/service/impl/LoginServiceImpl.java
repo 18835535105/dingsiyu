@@ -782,19 +782,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             result.put("capacityRead",false);
             //判断学生是否有同步版阅读课程，没有同步版课文课程不能进入智能版学习
             result.put("capacityAxisMotif",false);
-            // 当前用户信息放到session
-            session.setAttribute(UserConstant.CURRENT_STUDENT, stu);
-            // 登陆时间放入session
-            Date loginTime = DateUtil.parseYYYYMMDDHHMMSS(new Date());
-            session.setAttribute(TimeConstant.LOGIN_TIME, loginTime);
-
-            Map<String, Object> sessionMap = new HashMap<>(16);
-            sessionMap.put(UserConstant.CURRENT_STUDENT, stu);
-            sessionMap.put(TimeConstant.LOGIN_TIME, loginTime);
-            sessionMap.put("sessionId", session.getId());
 
             // 一个账户只能登陆一台
-            judgeMultipleLogin(session, stu, sessionMap);
+            judgeMultipleLogin(session, stu);
 
             // 2.判断是否需要完善个人信息
             if (!StringUtils.isNotBlank(stu.getHeadUrl())) {
@@ -853,16 +843,33 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         return count > 0;
     }
 
-    private void judgeMultipleLogin(HttpSession session, Student stu, Map<String, Object> sessionMap) {
+    private void judgeMultipleLogin(HttpSession session, Student stu) {
         Object object = redisTemplate.opsForHash().get(RedisKeysConst.LOGIN_SESSION, stu.getId());
         if (object != null) {
+
+            // 同一浏览器重复登录不更新其上次登录信息
+            if (Objects.equals(object, session.getId())) {
+                return;
+            }
+
             Map<String, Object> oldSessionMap = RedisOpt.getSessionMap(object.toString());
             // 如果账号登录的session不同，保存前一个session的信息
-            if (oldSessionMap != null && !Objects.equals(object, session.getId())) {
+            if (oldSessionMap != null) {
                 saveDurationInfo(oldSessionMap);
                 saveLogoutLog(stu, runLogMapper, logger);
             }
         }
+
+        // 学生首次在当前浏览器登录时记录其登录信息
+        Date loginTime = DateUtil.parseYYYYMMDDHHMMSS(new Date());
+        session.setAttribute(UserConstant.CURRENT_STUDENT, stu);
+        session.setAttribute(TimeConstant.LOGIN_TIME, loginTime);
+
+        Map<String, Object> sessionMap = new HashMap<>(16);
+        sessionMap.put(UserConstant.CURRENT_STUDENT, stu);
+        sessionMap.put(TimeConstant.LOGIN_TIME, loginTime);
+        sessionMap.put("sessionId", session.getId());
+
         redisTemplate.opsForHash().put(RedisKeysConst.SESSION_MAP, session.getId(), sessionMap);
         redisTemplate.opsForHash().put(RedisKeysConst.LOGIN_SESSION, stu.getId(), session.getId());
     }
