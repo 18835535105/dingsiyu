@@ -68,7 +68,14 @@ public class BaiduSpeak {
         }
     }
 
-    public String getSentencePath(String text) {
-        return youdao + text + "@&@" + baidu + text;
+    public String getSentencePath(String centreExample) {
+        if (StringUtils.isEmpty(centreExample)) {
+            return "";
+        }
+        String readUrl = sentenceMapper.selectReadUrlByCentreExample(centreExample);
+        if (StringUtils.isEmpty(readUrl)) {
+            return youdao + centreExample.replace("#", " ") + "@&@" + baidu + centreExample.replace("#", " ");
+        }
+        return prefix + readUrl + "@&@" + baidu + centreExample.replace("#", " ");
     }
 }

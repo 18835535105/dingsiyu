@@ -421,7 +421,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             map.put("unitId", unit_id);
         }
         // 例句读音
-        map.put("readUrl", baiduSpeak.getSentencePath(english));
+        map.put("readUrl", baiduSpeak.getSentencePath(sentence.getCentreExample()));
         // 例句翻译
         map.put("chinese", chinese);
         // 例句英文原文
