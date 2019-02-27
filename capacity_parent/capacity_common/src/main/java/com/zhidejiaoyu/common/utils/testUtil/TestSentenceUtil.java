@@ -65,7 +65,7 @@ public class TestSentenceUtil {
         String chinese = sentences.getCentreTranslate().replace("*", "");
         selMap.put("english", english);
         selMap.put("chinese", chinese);
-        selMap.put("hearing", baiduSpeak.getSentencePaht(english));
+        selMap.put("hearing", baiduSpeak.getSentencePath(english));
         selMap.put("type", "hearing");
         arrange(anawerList, english, selMap);
         return selMap;
@@ -84,7 +84,7 @@ public class TestSentenceUtil {
         String chinese = sentences.getCentreTranslate().replace("*", "");
         selMap.put("english", english);
         selMap.put("chinese", chinese);
-        selMap.put("hearing", baiduSpeak.getSentencePaht(english));
+        selMap.put("hearing", baiduSpeak.getSentencePath(english));
         selMap.put("type", "english");
         arrange(anawerList, chinese, selMap);
         return selMap;
@@ -103,7 +103,7 @@ public class TestSentenceUtil {
         String chinese = sentences.getCentreTranslate().replace("*", "");
         selMap.put("english", english);
         selMap.put("chinese", chinese);
-        selMap.put("hearing", baiduSpeak.getSentencePaht(english));
+        selMap.put("hearing", baiduSpeak.getSentencePath(english));
         selMap.put("type", "chinese");
         arrange(anawerList, english, selMap);
         return selMap;

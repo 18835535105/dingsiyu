@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -262,7 +261,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         sentenceTranslateVo.setMemoryStrength(0.00);
         sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " "));
         sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
-        sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePaht(sentence.getCentreExample().replace("#", " ")));
+        sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePath(sentence.getCentreExample().replace("#", " ")));
         if (type == 2) {
             sentenceTranslateVo.setOrderEnglish(commonMethod.getOrderEnglishList(sentence.getCentreExample(), sentence.getExampleDisturb()));
         } else {
@@ -960,7 +959,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         sentenceTranslateVo.setFirstStudy(firstStudy);
         sentenceTranslateVo.setId(sentence.getId());
         sentenceTranslateVo.setPlan(plan);
-        sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePaht(sentence.getCentreExample().replace("#", " ")));
+        sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePath(sentence.getCentreExample().replace("#", " ")));
         sentenceTranslateVo.setSentenceCount(sentenceCount);
         sentenceTranslateVo.setMemoryStrength(0.0);
 
@@ -991,7 +990,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         sentenceTranslateVo.setId(sentence.getId());
         sentenceTranslateVo.setPlan(plan);
         sentenceTranslateVo.setMemoryStrength(memoryStrength);
-        sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePaht(sentence.getCentreExample().replace("#", " ")));
+        sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePath(sentence.getCentreExample().replace("#", " ")));
         sentenceTranslateVo.setSentenceCount(sentenceCount);
         sentenceTranslateVo.setStudyNew(false);
         sentenceTranslateVo.setEnglishList(commonMethod.getEnglishList(sentence.getCentreExample()));

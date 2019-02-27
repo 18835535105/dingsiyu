@@ -168,7 +168,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
             vo.setChinese(sentence.getCentreTranslate().replace("*", ""));
             vo.setContent(sentence.getCentreExample().replace("#", " "));
             vo.setReadUrl(baiduSpeak
-                    .getSentencePaht(sentence.getCentreExample().replace("#", " ")));
+                    .getSentencePath(sentence.getCentreExample().replace("#", " ")));
             list.add(vo);
         }
         return list;
