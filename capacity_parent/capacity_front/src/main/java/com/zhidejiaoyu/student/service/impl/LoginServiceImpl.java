@@ -736,15 +736,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             if (l <= 1) {
                 result.put("accountDate", "账号即将过期，请及时续期");
             }
-            // 判断用户是学生还是业务员
+            // 学生权限
             Integer role = stu.getRole();
-            if (role == null || role == 1) {
-                // 学生
-                result.put("role", "1");
-            } else {
-                // 业务员
-                result.put("role", "2");
-            }
+            result.put("role", role == null ? 2 : role);
 
             // 学生id
             result.put("student_id", stu.getId());
