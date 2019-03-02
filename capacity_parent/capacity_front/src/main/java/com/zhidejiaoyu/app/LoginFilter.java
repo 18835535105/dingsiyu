@@ -2,9 +2,8 @@ package com.zhidejiaoyu.app;
 
 import com.zhidejiaoyu.common.MacIpUtil;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.student.common.RedisOpt;
-import com.zhidejiaoyu.student.listener.SessionListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -135,7 +134,7 @@ public class LoginFilter implements Filter {
      */
     private void replaceSession(HttpServletRequest request, Student student) {
         Long id = student.getId();
-        Object sessionObject = redisTemplate.opsForHash().get("loginSession", id);
+        Object sessionObject = redisTemplate.opsForHash().get(RedisKeysConst.LOGIN_SESSION, id);
         if (sessionObject != null) {
             String sessionId = (String) sessionObject;
             HttpSession currentSession = request.getSession();

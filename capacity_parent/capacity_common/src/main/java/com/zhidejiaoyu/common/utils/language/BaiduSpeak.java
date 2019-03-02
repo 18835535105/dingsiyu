@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.utils.language;
 
 import com.baomidou.mybatisplus.toolkit.StringUtils;
+import com.zhidejiaoyu.common.mapper.SentenceMapper;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ public class BaiduSpeak {
     private VocabularyMapper vocabularyMapper;
 
     @Autowired
+    private SentenceMapper sentenceMapper;
 
     /**
      * 需要特殊处理的单词/例句集合
@@ -66,7 +68,14 @@ public class BaiduSpeak {
         }
     }
 
-    public String getSentencePaht(String text) {
-        return youdao + text + "@&@" + baidu + text;
+    public String getSentencePath(String centreExample) {
+        if (StringUtils.isEmpty(centreExample)) {
+            return "";
+        }
+        String readUrl = sentenceMapper.selectReadUrlByCentreExample(centreExample);
+        if (StringUtils.isEmpty(readUrl)) {
+            return youdao + centreExample.replace("#", " ") + "@&@" + baidu + centreExample.replace("#", " ");
+        }
+        return prefix + readUrl + "@&@" + baidu + centreExample.replace("#", " ");
     }
 }

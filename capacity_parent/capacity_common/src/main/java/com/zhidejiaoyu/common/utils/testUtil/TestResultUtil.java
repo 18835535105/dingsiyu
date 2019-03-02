@@ -391,7 +391,7 @@ public class TestResultUtil implements Serializable {
             sentenceTranslateVo.setMemoryStrength(0.00);
             sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " "));
             sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
-            sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePaht(sentence.getCentreExample().replace("#", " ")));
+            sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePath(sentence.getCentreExample()));
             if (type == 2) {
                 sentenceTranslateVo.setOrder(commonMethod.getOrderEnglishList(sentence.getCentreExample(), sentence.getExampleDisturb()));
             } else {
@@ -409,7 +409,7 @@ public class TestResultUtil implements Serializable {
             sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
             sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*"," "));
             sentenceTranslateVo.setId(sentence.getId());
-            sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePaht(sentence.getCentreExample().replace("#", " ")));
+            sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePath(sentence.getCentreExample()));
 
             int nextInt = new Random().nextInt();
             if(classify==4){

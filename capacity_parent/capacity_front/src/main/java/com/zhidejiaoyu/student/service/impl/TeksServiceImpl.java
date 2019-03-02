@@ -18,7 +18,6 @@ import com.zhidejiaoyu.student.utils.PetSayUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
@@ -114,7 +113,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             List<Teks> resultTeks = new ArrayList<>();
             int i = 0;
             for (Teks teks1 : teks) {
-                teks1.setPronunciation(baiduSpeak.getSentencePaht(teks1.getSentence()));
+                teks1.setPronunciation(baiduSpeak.getSentencePath(teks1.getSentence()));
                 i++;
                 resultTeks.add(teks1);
             }
@@ -136,7 +135,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             List<Teks> resultTeks = new ArrayList<>();
             int i = 0;
             for (Teks teks1 : teks) {
-                teks1.setPronunciation(baiduSpeak.getSentencePaht(teks1.getSentence()));
+                teks1.setPronunciation(baiduSpeak.getSentencePath(teks1.getSentence()));
                 i++;
                 resultTeks.add(teks1);
             }
@@ -202,7 +201,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 //将遍历的数据放入到
                 Map<String, Object> map = new HashMap<>();
                 map.put("chinese", teks1.getParaphrase());
-                map.put("pronunciation", baiduSpeak.getSentencePaht(teks1.getSentence()));
+                map.put("pronunciation", baiduSpeak.getSentencePath(teks1.getSentence()));
                 map.put("id", teks1.getId());
                 String[] sentenceList = teks1.getSentence().split(" ");
                 List blankSentenceArray = new ArrayList();
@@ -431,7 +430,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 //保存返回的数据
                 Map<String, Object> map = new HashMap<>();
                 map.put("chinese", teks.getParaphrase());
-                map.put("pronunciation", baiduSpeak.getSentencePaht(teks.getSentence()));
+                map.put("pronunciation", baiduSpeak.getSentencePath(teks.getSentence()));
                 map.put("sentence", teks.getSentence());
                 map.put("id", teks.getId());
                 String[] sentenceList = teks.getSentence().split(" ");
@@ -1034,7 +1033,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("id", hearingList.get(i).getId());
             returnMap.put("chinese", hearingList.get(i).getParaphrase());
-            returnMap.put("pronunciation", baiduSpeak.getSentencePaht(hearingList.get(i).getSentence()));
+            returnMap.put("pronunciation", baiduSpeak.getSentencePath(hearingList.get(i).getSentence()));
             returnMap.put("english", hearingList.get(i).getSentence());
             //英选汉 原有两个选项现改为一个
               /*  if (ss == 1) {
@@ -1075,7 +1074,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 returnMap.put("answer", i);
             }
             english.add(optionList.get(i).getSentence());
-            option.add(baiduSpeak.getSentencePaht(optionList.get(i).getSentence()));
+            option.add(baiduSpeak.getSentencePath(optionList.get(i).getSentence()));
         }
         returnMap.put("option", option);
     }
