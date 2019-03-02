@@ -590,20 +590,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         }
         testRecord.setGenre("课文默写测试");
         testRecord.setAwardGold(goldCount);
-        TestRecord testRecord1 = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), testRecord.getUnitId(), "课文默写测试", "课文默写测试");
-        if(testRecord1==null){
-            int energy = getEnergy(student, wordUnitTestDTO.getPoint());
-            studentMapper.updateByPrimaryKeySelective(student);
-            map.put("energy",energy);
-        }else{
-            if(goldCount>0){
-                int energy = getEnergy(student, wordUnitTestDTO.getPoint());
-                studentMapper.updateByPrimaryKeySelective(student);
-                map.put("energy",energy);
-            }else{
-                map.put("energy",0);
-            }
-        }
+        int energy = getEnergy(student, wordUnitTestDTO.getPoint());
+        studentMapper.updateByPrimaryKeySelective(student);
+        map.put("energy",energy);
         student.setSystemGold(student.getSystemGold() + goldCount);
         studentMapper.updateByPrimaryKeySelective(student);
         //添加对象
