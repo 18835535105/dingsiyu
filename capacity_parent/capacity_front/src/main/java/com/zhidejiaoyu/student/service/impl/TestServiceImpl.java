@@ -926,20 +926,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         studentMapper.updateByPrimaryKeySelective(student);
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
         Map<String,Object> resultMap=new HashMap<>();
-        TestRecord testRecord1 = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), wordUnitTestDTO.getUnitId()[0], "音译测试", "音译测试");
-        if(testRecord1==null){
-            int energy = getEnergy(student, wordUnitTestDTO.getPoint());
-            studentMapper.updateByPrimaryKeySelective(student);
-            resultMap.put("energy",energy);
-        }else{
-            if(goldCount>0){
-                int energy = getEnergy(student, wordUnitTestDTO.getPoint());
-                studentMapper.updateByPrimaryKeySelective(student);
-                resultMap.put("energy",energy);
-            }else{
-                resultMap.put("energy",0);
-            }
-        }
+        int energy = getEnergy(student, wordUnitTestDTO.getPoint());
+        studentMapper.updateByPrimaryKeySelective(student);
+        resultMap.put("energy",energy);
         resultMap.put("gold",goldCount);
         Integer point = wordUnitTestDTO.getPoint();
         if (point < PASS) {
@@ -1021,20 +1010,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
         Map<String,Object> resultMap=new HashMap<>();
         resultMap.put("gold",goldCount);
-        TestRecord testRecord1 = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), wordUnitTestDTO.getUnitId()[0], "课文测试", "课文测试");
-        if(testRecord1==null){
-            int energy = getEnergy(student, wordUnitTestDTO.getPoint());
-            studentMapper.updateByPrimaryKeySelective(student);
-            resultMap.put("energy",energy);
-        }else{
-            if(goldCount>0){
-                int energy = getEnergy(student, wordUnitTestDTO.getPoint());
-                studentMapper.updateByPrimaryKeySelective(student);
-                resultMap.put("energy",energy);
-            }else{
-                resultMap.put("energy",0);
-            }
-        }
+        int energy = getEnergy(student, wordUnitTestDTO.getPoint());
+        studentMapper.updateByPrimaryKeySelective(student);
+        resultMap.put("energy",energy);
         Integer point = wordUnitTestDTO.getPoint();
         if (point < PASS) {
             resultMap.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
