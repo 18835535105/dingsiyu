@@ -13,6 +13,7 @@
     <result column="encourage_word" property="encourageWord" jdbcType="VARCHAR" />
     <result column="read_flag" property="readFlag" jdbcType="INTEGER" />
     <result column="course_name" property="courseName" jdbcType="VARCHAR"/>
+    <result column="point" property="point"/>
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -76,7 +77,8 @@
     id, student_id, unit_id, student_name, get_time, test_type, study_model, ccie_no,
     encourage_word,
     read_flag,
-    course_name
+    course_name,
+    `point`
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.CcieExample" >
     select

@@ -1154,18 +1154,18 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if(classify == 3 || classify == 6) {
             msg = getMessage(student, vo, point, FIVE);
             if (point >= FIVE) {
-                ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0]);
+                ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0], point);
             }
         }else if(classify == 4 || classify == 2) {
             // 听力
             msg = getMessage(student, vo, point, SIX);
             if (point >= SIX) {
-                ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0]);
+                ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0], point);
             }
         }else {
             msg = getMessage(student, vo, point, PASS);
             if (point >= PASS) {
-                ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0]);
+                ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0], point);
             }
         }
 
@@ -1249,7 +1249,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setGold(goldCount);
         vo.setEnergy(addEnergy);
         countMyGoldUtil.countMyGold(student);
-        ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0]);
+        ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0], point);
         studentMapper.updateByPrimaryKeySelective(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(vo);
