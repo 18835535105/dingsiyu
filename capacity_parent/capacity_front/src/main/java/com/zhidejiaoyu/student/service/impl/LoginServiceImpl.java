@@ -840,13 +840,17 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private void judgeMultipleLogin(HttpSession session, Student stu) {
         Object object = redisTemplate.opsForHash().get(RedisKeysConst.LOGIN_SESSION, stu.getId());
         if (object != null) {
+            Long oldStudentId = null;
+            Map<String, Object> oldSessionMap = RedisOpt.getSessionMap(object.toString());
+            if (oldSessionMap != null && oldSessionMap.get(UserConstant.CURRENT_STUDENT) != null) {
+                oldStudentId = ((Student) oldSessionMap.get(UserConstant.CURRENT_STUDENT)).getId();
+            }
 
-            // 同一浏览器重复登录不更新其上次登录信息
-            if (Objects.equals(object, session.getId())) {
+            // 如果账号 session 相同说明是同一个浏览器中，并且不是同一个账号，不再更改其 session 中登录信息
+            if (Objects.equals(oldStudentId, stu.getId()) && Objects.equals(object, session.getId())) {
                 return;
             }
 
-            Map<String, Object> oldSessionMap = RedisOpt.getSessionMap(object.toString());
             // 如果账号登录的session不同，保存前一个session的信息
             if (oldSessionMap != null) {
                 saveDurationInfo(oldSessionMap);
