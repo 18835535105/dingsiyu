@@ -35,7 +35,6 @@ import static org.springframework.boot.SpringApplication.run;
 public class ZdjyFrontApplication {
 
 
-    @SuppressWarnings("unused")
     public static void main(String[] args) {
 
         run(ZdjyFrontApplication.class, args);

@@ -421,7 +421,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             map.put("unitId", unit_id);
         }
         // 例句读音
-        map.put("readUrl", baiduSpeak.getSentencePaht(english));
+        map.put("readUrl", baiduSpeak.getSentencePath(sentence.getCentreExample()));
         // 例句翻译
         map.put("chinese", chinese);
         // 例句英文原文
@@ -965,7 +965,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         String msg = "";
         String petName = student.getPetName();
         int point = dto.getPoint();
-        long unitId = dto.getUnitId()[0];
+        Long unitId = dto.getUnitId() == null ? null : dto.getUnitId()[0];
         long courseId = dto.getCourseId();
         int classify = dto.getClassify();
         switch (genre) {

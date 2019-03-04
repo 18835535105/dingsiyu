@@ -76,4 +76,9 @@ public class RedisKeysConst {
      * 用于存储学生时长信息及学生信息
      */
     public static final String SESSION_MAP = "SESSION_MAP";
+
+    /**
+     * 存储学生 id 与其 sessionId 对应关系
+     */
+    public static final String LOGIN_SESSION = "LOGIN_SESSION";
 }

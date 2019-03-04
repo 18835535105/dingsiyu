@@ -61,13 +61,11 @@ public class SessionListener implements HttpSessionListener {
         // 当 session 失效时只有 8082 端口的服务负责保存学生时长信息
         if (currentPort == Integer.valueOf(port)) {
             HttpSession session = se.getSession();
-            clearRedisSessionId(session);
             saveLogoutInfo(session);
             Map<String, Object> sessionMap = null;
             Object object = redisTemplate.opsForHash().get(RedisKeysConst.SESSION_MAP, session.getId());
             if (object != null) {
-                sessionMap = (Map<String, Object>) redisTemplate.opsForHash().get(RedisKeysConst.SESSION_MAP, session.getId());
-//                redisTemplate.opsForHash().delete(RedisKeysConst.SESSION_MAP, session.getId());
+                sessionMap = (Map<String, Object>) object;
             }
             loginService.saveDurationInfo(sessionMap);
         }
@@ -82,19 +80,6 @@ public class SessionListener implements HttpSessionListener {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         if (student != null) {
             LoginServiceImpl.saveLogoutLog(student, runLogMapper, log);
-        }
-    }
-
-    /**
-     * 清除redis中用于判断用户是否多地点同时登录的sessionId标识
-     *
-     * @param session
-     */
-    private void clearRedisSessionId(HttpSession session) {
-        Object studentSession = session.getAttribute(UserConstant.CURRENT_STUDENT);
-        if (studentSession != null) {
-            Student student = (Student) studentSession;
-            redisTemplate.opsForHash().delete("loginSession", student.getId());
         }
     }
 }
