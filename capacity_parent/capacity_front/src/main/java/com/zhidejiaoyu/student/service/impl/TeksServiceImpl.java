@@ -583,7 +583,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 goldCount += goldCount;
                 this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试");
                 this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试双倍奖励");
-            } else if (point == PASS) {
+            } else if (point >= PASS) {
                 goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_FULL;
                 this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试");
             }

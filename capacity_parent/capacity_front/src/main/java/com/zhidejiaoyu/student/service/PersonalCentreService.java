@@ -112,4 +112,6 @@ public interface PersonalCentreService extends BaseService<Student> {
 	 * @return
 	 */
 	ServerResponse<List<Map<String,Object>>> getMedalInClass(HttpSession session);
+
+    Object getLucky(Integer studentId,HttpSession session);
 }

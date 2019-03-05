@@ -257,4 +257,9 @@ public class PersonalCentreController {
 	public ServerResponse<List<Map<String,Object>>> getMedalInClass(HttpSession session) {
 		return personalCentreService.getMedalInClass(session);
 	}
+
+	@GetMapping("/getLucky")
+	public Object getLucky(Integer studentId,HttpSession session){
+		return personalCentreService.getLucky(studentId,session);
+	}
 }
