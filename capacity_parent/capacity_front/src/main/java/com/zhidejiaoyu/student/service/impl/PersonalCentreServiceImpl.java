@@ -15,6 +15,12 @@ import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.PersonalCentreService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -102,6 +108,12 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
 
     @Autowired
     private MessageBoardMapper messageBoardMapper;
+
+    @Autowired
+    private SyntheticRewardsListMapper syntheticRewardsListMapper;
+
+    @Autowired
+    private StudentSkinMapper studentSkinMapper;
 
     @Autowired
     private RedisOpt redisOpt;
@@ -1673,6 +1685,33 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
             }
         }
         return ServerResponse.createBySuccess(resultList);
+    }
+
+    @Override
+    public Object getLucky(Integer studentId,HttpSession session) {
+        if(studentId==null){
+            Student student = (Student)session.getAttribute(UserConstant.CURRENT_STUDENT);
+            studentId=student.getId().intValue();
+        }
+        //查询手套印记
+        List<SyntheticRewardsList> gloveOrFlower = syntheticRewardsListMapper.getGloveOrFlower(studentId);
+        List<Map<String,Object>> list=new ArrayList<>();
+
+        for(SyntheticRewardsList synthetic:gloveOrFlower){
+            Map<String,Object> map=new HashMap<>();
+            map.put("url",synthetic.getImgUrl());
+            map.put("type","gloveOrFlower");
+            list.add(map);
+        }
+        List<StudentSkin> studentSkins = studentSkinMapper.selSkinByStudentIdIsHave(studentId.longValue());
+        for(StudentSkin studentSkin:studentSkins){
+            Map<String,Object> map=new HashMap<>();
+            map.put("url",studentSkin.getImgUrl());
+            map.put("type","skin");
+            list.add(map);
+        }
+        return ServerResponse.createBySuccess(list);
+
     }
 
 }
