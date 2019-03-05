@@ -95,4 +95,12 @@ public interface AwardMapper {
 
     @MapKey("id")
     Map<Long, Map<String, Long>> getMapKeyStudentXZ();
+
+    /**
+     * 获取当前班级的学生最新领取勋章的信息
+     *
+     * @param classId
+     * @return  niceName:学生姓名；medalNam:领取的勋章名
+     */
+    List<Map<String, String>> selectLatestMedalInClass(@Param("classId") Long classId);
 }

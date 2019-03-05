@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.text.ParseException;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -246,4 +248,14 @@ public class PersonalCentreController {
 		return personalCentreService.updateCcie(session);
 	}
 
+	/**
+	 * 获取当前学生所在班级最新获取勋章的学生信息
+	 *
+	 * @param session
+	 * @return
+	 */
+	@GetMapping("/getLatestMedalInClass")
+	public ServerResponse<List<Map<String,Object>>> getMedalInClass(HttpSession session) {
+		return personalCentreService.getMedalInClass(session);
+	}
 }
