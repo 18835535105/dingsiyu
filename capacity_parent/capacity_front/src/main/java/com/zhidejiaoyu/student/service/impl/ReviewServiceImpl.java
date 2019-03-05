@@ -969,6 +969,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         long courseId = dto.getCourseId();
         int classify = dto.getClassify();
         switch (genre) {
+            // 没有该模块
             case "测试复习":
                 if (point < 80) {
                     msg = "闯关失败，请再接再厉！";

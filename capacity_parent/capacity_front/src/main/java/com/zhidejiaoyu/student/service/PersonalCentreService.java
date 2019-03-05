@@ -6,6 +6,8 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
 import java.text.ParseException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 消息中心
@@ -102,4 +104,12 @@ public interface PersonalCentreService extends BaseService<Student> {
 	 * @return
 	 */
 	ServerResponse updateCcie(HttpSession session);
+
+	/**
+	 * 获取当前学生所在班级最新获取勋章的学生信息
+	 *
+	 * @param session
+	 * @return
+	 */
+	ServerResponse<List<Map<String,Object>>> getMedalInClass(HttpSession session);
 }
