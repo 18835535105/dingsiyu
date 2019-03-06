@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.controller;
 
+import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,8 +75,9 @@ public class AwardController {
         paramMap.put("model", model);
         paramMap.put("session", session);
         paramMap.put("studentId", ((Student)session.getAttribute(UserConstant.CURRENT_STUDENT)).getId());
+        paramMap.put("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)));
 
-        String url = domain + "/api/award/getAeardSize?type={type}&model={model}&session={session}&studentId={studentId}";
+        String url = domain + "/api/award/getAeardSize?type={type}&model={model}&session={session}&studentId={studentId}&loginTime={loginTime}";
         ResponseEntity<Map> responseEntity = restTemplate.getForEntity(url, Map.class, paramMap);
         return ServerResponse.createBySuccess(responseEntity.getBody() == null ? null : responseEntity.getBody().get("data"));
     }

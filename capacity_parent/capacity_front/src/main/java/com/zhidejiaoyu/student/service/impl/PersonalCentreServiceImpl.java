@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
+import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -11,7 +12,6 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.TimeUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.PersonalCentreService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -1662,8 +1662,9 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         Map<String, Object> paramMap = new HashMap<>(16);
         paramMap.put("studentId", student.getId());
         paramMap.put("session", session);
+        paramMap.put("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)));
 
-        String url = domain + "/api/personal/getLatestMedalInClass?session={session}&studentId={studentId}";
+        String url = domain + "/api/personal/getLatestMedalInClass?session={session}&studentId={studentId}&loginTime={loginTime}";
         ResponseEntity<Map> entity = restTemplate.getForEntity(url, Map.class, paramMap);
         return ServerResponse.createBySuccess(entity.getBody() == null ? null : entity.getBody().get("data"));
     }
