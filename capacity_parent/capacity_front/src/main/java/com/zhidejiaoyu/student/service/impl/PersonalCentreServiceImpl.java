@@ -1660,7 +1660,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         Student student = getStudent(session);
         List<Map<String, Object>> resultList = new ArrayList<>();
         if (student.getClassId() != null) {
-            List<Map<String, String>> medalMap = awardMapper.selectLatestMedalInClass(student.getClassId());
+            List<Map<String, String>> medalMap = awardMapper.selectLatestMedalInClass(student);
             if (medalMap.size() > 0) {
                 medalMap.forEach(map -> {
                             if (map != null && map.containsKey("nickName") && map.containsKey("medalName")) {

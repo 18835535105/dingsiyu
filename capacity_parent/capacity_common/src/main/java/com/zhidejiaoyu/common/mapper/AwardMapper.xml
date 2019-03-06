@@ -266,7 +266,12 @@
              medal m
         where s.id = a.student_id
           and a.medal_type = m.id
-          and s.class_id = #{classId}
+          <if test="classId == null">
+             and s.teacher_id = #{student.teacherId} and s.class_id is null
+          </if>
+          <if test="classId != null">
+              and s.class_id = #{classId}
+          </if>
           and to_days(get_time) = to_days(now())
         order by a.get_time desc
     </select>
