@@ -157,6 +157,14 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         Student stu = studentMapper.indexData(student_id);
 
+        // 判断学生是否有智能版课程
+        int count = studentStudyPlanMapper.countByStudentIdAndType(student_id, 1);
+        if (count == 0) {
+            result.put("hasCapacity", false);
+        } else {
+            result.put("hasCapacity", true);
+        }
+
         // 判断学生是否需要进行游戏测试
         int gameCount = testRecordMapper.countGameCount(stu);
         if (gameCount == 0) {
