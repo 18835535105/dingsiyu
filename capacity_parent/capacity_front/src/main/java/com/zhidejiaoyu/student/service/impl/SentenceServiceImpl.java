@@ -681,8 +681,8 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             if(studentStudyPlans!=null && studentStudyPlans.size()>0){
                 capacityStudentUnit.setStartunit(studentStudyPlans.get(0).getStartUnitId());
                 capacityStudentUnit.setEndunit(studentStudyPlans.get(0).getEndUnitId());
+                capacityStudentUnitMapper.updateById(capacityStudentUnit);
             }
-            capacityStudentUnitMapper.updateById(capacityStudentUnit);
         }
         // 判断是否可以学习当前句型模块
         boolean canLearn = this.canLearn(student, unitId, 4, sentenceCount, learnCount);
