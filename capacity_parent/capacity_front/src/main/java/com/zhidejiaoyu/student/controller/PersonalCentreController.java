@@ -254,7 +254,7 @@ public class PersonalCentreController {
 	 * @return
 	 */
 	@GetMapping("/getLatestMedalInClass")
-	public ServerResponse<List<Map<String,Object>>> getMedalInClass(HttpSession session) {
+	public ServerResponse<Object> getMedalInClass(HttpSession session) {
 		return personalCentreService.getMedalInClass(session);
 	}
 
