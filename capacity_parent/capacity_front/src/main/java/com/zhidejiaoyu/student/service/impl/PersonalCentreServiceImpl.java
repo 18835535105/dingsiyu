@@ -15,12 +15,6 @@ import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.PersonalCentreService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -1659,30 +1653,28 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     public ServerResponse<List<Map<String, Object>>> getMedalInClass(HttpSession session) {
         Student student = getStudent(session);
         List<Map<String, Object>> resultList = new ArrayList<>();
-        if (student.getClassId() != null) {
-            List<Map<String, String>> medalMap = awardMapper.selectLatestMedalInClass(student);
-            if (medalMap.size() > 0) {
-                medalMap.forEach(map -> {
-                            if (map != null && map.containsKey("nickName") && map.containsKey("medalName")) {
-                                Map<String, Object> resMap = new HashMap<>();
-                                resMap.put("nickName", map.get("nickName"));
-                                resMap.put("textTheme", "同学获取了");
-                                if (map.get("medalName") != null && map.get("medalName").contains("#")) {
-                                    String[] medalNames = map.get("medalName").split("#");
-                                    if (medalNames.length > 1) {
-                                        resMap.put("medalName", Objects.equals(student.getSex(), 1) ? medalNames[1] : medalNames[0]);
-                                    } else {
-                                        resMap.put("medalName", map.get("medalName"));
-                                    }
+        List<Map<String, String>> medalMap = awardMapper.selectLatestMedalInClass(student);
+        if (medalMap.size() > 0) {
+            medalMap.forEach(map -> {
+                        if (map != null && map.containsKey("nickName") && map.containsKey("medalName")) {
+                            Map<String, Object> resMap = new HashMap<>(16);
+                            resMap.put("nickName", map.get("nickName"));
+                            resMap.put("textTheme", "同学获取了");
+                            if (map.get("medalName") != null && map.get("medalName").contains("#")) {
+                                String[] medalNames = map.get("medalName").split("#");
+                                if (medalNames.length > 1) {
+                                    resMap.put("medalName", Objects.equals(student.getSex(), 1) ? medalNames[1] : medalNames[0]);
                                 } else {
                                     resMap.put("medalName", map.get("medalName"));
                                 }
-                                resMap.put("textEnding", "勋章");
-                                resultList.add(resMap);
+                            } else {
+                                resMap.put("medalName", map.get("medalName"));
                             }
+                            resMap.put("textEnding", "勋章");
+                            resultList.add(resMap);
                         }
-                );
-            }
+                    }
+            );
         }
         return ServerResponse.createBySuccess(resultList);
     }
