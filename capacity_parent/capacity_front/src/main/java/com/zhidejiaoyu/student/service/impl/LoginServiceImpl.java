@@ -184,7 +184,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student_id, 1);
         if (capacityStudentUnit == null) {
             logger.error("学生[{}]-[{}]没有智能版课程！", stu.getId(), stu.getStudentName());
-            return ServerResponse.createBySuccess();
+            return ServerResponse.createBySuccess(result);
         }
 
         // 判断学生是否已经学完教师分配的所有计划，如果已学完所有计划，开始之旅按钮将被替换并且不能被点击
