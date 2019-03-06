@@ -270,7 +270,7 @@
              and s.teacher_id = #{student.teacherId} and s.class_id is null
           </if>
           <if test="student.classId != null">
-              and s.class_id = #{classId}
+              and s.class_id = #{student.classId}
           </if>
           and to_days(get_time) = to_days(now())
         order by a.get_time desc
