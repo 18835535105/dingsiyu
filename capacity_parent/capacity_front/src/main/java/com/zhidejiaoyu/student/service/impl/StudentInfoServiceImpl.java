@@ -205,10 +205,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         List<Worship> worships = worshipMapper.selectSevenDaysInfoByStudent(student);
         if (worships.size() > 0) {
             // 上次膜拜时间
-            long lastWorshipTime = worships.get(0).getWorshipTime().getTime();
-            long now = System.currentTimeMillis();
-            if (now - lastWorshipTime < 86400000) {
-                // 上次膜拜时间距现在不足24小时
+            Date lastWorshipTime = worships.get(0).getWorshipTime();
+            if (Objects.equals(DateUtil.formatYYYYMMDD(lastWorshipTime), DateUtil.formatYYYYMMDD(new Date()))) {
+                // 今天已经膜拜过其他人
                 return ServerResponse.createByErrorCodeMessage(ResponseCode.TIME_LESS_ONE_DAY.getCode(), ResponseCode.TIME_LESS_ONE_DAY.getMsg());
             }
             long count = worships.stream().filter(worship -> worship.getStudentIdByWorship().equals(userId)).count();
@@ -382,10 +381,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             List<Worship> worships = worshipMapper.selectSevenDaysInfoByStudent(currentStudent);
             if (worships.size() > 0) {
                 // 上次膜拜时间
-                long lastWorshipTime = worships.get(0).getWorshipTime().getTime();
-                long now = System.currentTimeMillis();
-                if (now - lastWorshipTime < 86400000) {
-                    // 上次膜拜时间距现在不足24小时
+                Date lastWorshipTime = worships.get(0).getWorshipTime();
+                if (Objects.equals(DateUtil.formatYYYYMMDD(lastWorshipTime), DateUtil.formatYYYYMMDD(new Date()))) {
+                    // 今天已经膜拜过其他人
                     showFist = false;
                 }
                 long count = worships.stream().filter(worship -> worship.getStudentIdByWorship().equals(student.getId())).count();
