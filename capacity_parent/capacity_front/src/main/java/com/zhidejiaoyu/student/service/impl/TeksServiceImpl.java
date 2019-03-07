@@ -898,7 +898,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             //当语句等于4个 为四选四题目
             if (teks.size() == 4) {
                 //取前4个句子为四选四句子
-                fourChooseFour(teks, choseFour);
+                fourChooseFour(teks, returnList);
             } else {
                 int fourLength = teks.size() / 5;
                 int i = teks.size() % 5;
