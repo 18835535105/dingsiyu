@@ -362,7 +362,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             Duration duration = durationMapper.selectLastLoginDuration(stu.getId());
             logger.info("学生上次登录时间：duration:[{}]", duration);
             if (duration != null) {
-                List<Learn> learns = learnMapper.selectLastLoginStudy(stu.getId(), duration.getLoginTime(), duration.getLoginOutTime());
+                List<Learn> learns = learnMapper.selectLastLoginStudy(stu.getId(), duration.getLoginTime(), duration.getLoginOutTime(), null);
                 logger.info("学生上次登录期间学习信息：learns=[{}]", learns);
                 if (learns.size() > 0) {
                     // 存储单词id及单元
@@ -371,7 +371,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                     String[] str = {"单词图鉴", "慧记忆", "慧听写", "慧默写"};
                     Integer memoryCount;
                     for (int i = 0; i < 4; i++) {
-                        memoryCount = capacityReviewMapper.countCapacityByUnitIdAndWordId(stu.getId(), maps, i);
+                        memoryCount = capacityReviewMapper.countCapacityByUnitIdAndWordId(stu.getId(), maps, i, str[i]);
                         if (memoryCount != null && memoryCount > 0) {
                             sb.append(str[i]).append("-");
                         }

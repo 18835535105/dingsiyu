@@ -1308,7 +1308,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 上次登录期间学生的单词学习信息
         Duration duration = durationMapper.selectLastLoginDuration(student.getId());
         if (duration != null) {
-            List<Learn> learns = learnMapper.selectLastLoginStudy(student.getId(), duration.getLoginTime(), duration.getLoginOutTime());
+            List<Learn> learns = learnMapper.selectLastLoginStudy(student.getId(), duration.getLoginTime(), duration.getLoginOutTime(), classify);
             if (learns.size() > 0) {
                 return packageWordReviewResult(classify, student, learns);
             }

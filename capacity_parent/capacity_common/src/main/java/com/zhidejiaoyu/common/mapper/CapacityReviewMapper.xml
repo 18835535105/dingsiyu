@@ -504,7 +504,7 @@
         <foreach collection="maps" item="map" separator=",">
             #{map.wordId}
         </foreach>
-        ) and c.push &lt;= now() and c.memory_strength &lt; 1
+        ) and l.study_model = #{typeStr} and c.push &lt;= now() and c.memory_strength &lt; 1
     </select>
 
     <select id="selectLastLoginNeedReview" resultType="java.util.Map" parameterType="map">
