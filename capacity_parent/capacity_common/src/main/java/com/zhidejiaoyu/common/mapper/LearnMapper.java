@@ -742,9 +742,10 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @param studentId
      * @param loginTime
      * @param loginOutTime
+     * @param classify
      * @return
      */
-    List<Learn> selectLastLoginStudy(@Param("studentId") Long studentId, @Param("loginTime") Date loginTime, @Param("loginOutTime") Date loginOutTime);
+    List<Learn> selectLastLoginStudy(@Param("studentId") Long studentId, @Param("loginTime") Date loginTime, @Param("loginOutTime") Date loginOutTime, @Param("classify") Integer classify);
 
     /**
      * 删除学生当前单元的学习记录

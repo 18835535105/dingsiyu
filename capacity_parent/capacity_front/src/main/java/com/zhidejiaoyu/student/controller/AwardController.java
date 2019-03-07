@@ -1,17 +1,26 @@
 package com.zhidejiaoyu.student.controller;
 
+import com.zhidejiaoyu.common.constant.TimeConstant;
+import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.AwardService;
 import com.zhidejiaoyu.student.vo.AwardVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 任务奖励controller
@@ -24,8 +33,14 @@ import java.util.List;
 @Validated
 public class AwardController {
 
+    @Value("${domain}")
+    private String domain;
+
     @Autowired
     private AwardService awardService;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     /**
      * 获取任务奖励信息
@@ -47,8 +62,23 @@ public class AwardController {
      * @param type 领取类型：1：领取金币将励；2：领取勋章奖励
      * @return
      */
-    @PostMapping("getAware")
+    @PostMapping("/getAware")
     public ServerResponse<String> getAware(HttpSession session, @NotNull Long awareId, @Min(value = 0)@Max(value = 2) Integer type) {
         return awardService.getAware(session, awareId, type);
+    }
+
+    @GetMapping("/getAeardSize")
+    public ServerResponse<Object> getAwardSize(HttpSession session, int type, @RequestParam(defaultValue = "0") Integer model) {
+
+        Map<String, Object> paramMap = new HashMap<>(16);
+        paramMap.put("type", type);
+        paramMap.put("model", model);
+        paramMap.put("session", session);
+        paramMap.put("studentId", ((Student)session.getAttribute(UserConstant.CURRENT_STUDENT)).getId());
+        paramMap.put("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)));
+
+        String url = domain + "/api/award/getAeardSize?type={type}&model={model}&session={session}&studentId={studentId}&loginTime={loginTime}";
+        ResponseEntity<Map> responseEntity = restTemplate.getForEntity(url, Map.class, paramMap);
+        return ServerResponse.createBySuccess(responseEntity.getBody() == null ? null : responseEntity.getBody().get("data"));
     }
 }

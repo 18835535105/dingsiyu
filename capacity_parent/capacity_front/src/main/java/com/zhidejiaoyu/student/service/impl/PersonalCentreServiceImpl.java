@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
+import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -11,20 +12,16 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.TimeUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.PersonalCentreService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -45,6 +42,9 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Transactional
 public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements PersonalCentreService {
+
+    @Value("${domain}")
+    private String domain;
 
     /**
      * 消息中心mapper接口
@@ -116,7 +116,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     private StudentSkinMapper studentSkinMapper;
 
     @Autowired
-    private RedisOpt redisOpt;
+    private RestTemplate restTemplate;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -1656,35 +1656,17 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     }
 
     @Override
-    public ServerResponse<List<Map<String, Object>>> getMedalInClass(HttpSession session) {
+    public ServerResponse<Object> getMedalInClass(HttpSession session) {
         Student student = getStudent(session);
-        List<Map<String, Object>> resultList = new ArrayList<>();
-        if (student.getClassId() != null) {
-            List<Map<String, String>> medalMap = awardMapper.selectLatestMedalInClass(student.getClassId());
-            if (medalMap.size() > 0) {
-                medalMap.forEach(map -> {
-                            if (map != null && map.containsKey("nickName") && map.containsKey("medalName")) {
-                                Map<String, Object> resMap = new HashMap<>();
-                                resMap.put("nickName", map.get("nickName"));
-                                resMap.put("textTheme", "同学获取了");
-                                if (map.get("medalName") != null && map.get("medalName").contains("#")) {
-                                    String[] medalNames = map.get("medalName").split("#");
-                                    if (medalNames.length > 1) {
-                                        resMap.put("medalName", Objects.equals(student.getSex(), 1) ? medalNames[1] : medalNames[0]);
-                                    } else {
-                                        resMap.put("medalName", map.get("medalName"));
-                                    }
-                                } else {
-                                    resMap.put("medalName", map.get("medalName"));
-                                }
-                                resMap.put("textEnding", "勋章");
-                                resultList.add(resMap);
-                            }
-                        }
-                );
-            }
-        }
-        return ServerResponse.createBySuccess(resultList);
+
+        Map<String, Object> paramMap = new HashMap<>(16);
+        paramMap.put("studentId", student.getId());
+        paramMap.put("session", session);
+        paramMap.put("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)));
+
+        String url = domain + "/api/personal/getLatestMedalInClass?session={session}&studentId={studentId}&loginTime={loginTime}";
+        ResponseEntity<Map> entity = restTemplate.getForEntity(url, Map.class, paramMap);
+        return ServerResponse.createBySuccess(entity.getBody() == null ? null : entity.getBody().get("data"));
     }
 
     @Override

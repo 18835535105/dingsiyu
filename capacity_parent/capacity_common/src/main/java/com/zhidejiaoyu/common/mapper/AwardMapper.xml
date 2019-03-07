@@ -259,17 +259,6 @@
           AND b.role = 1
         GROUP BY a.student_id
     </select>
-    <select id="selectLatestMedalInClass" resultType="java.util.Map" parameterType="map">
-        select s.nickname nickName, concat(m.parent_name, m.child_name) medalName
-        from student s,
-             award a,
-             medal m
-        where s.id = a.student_id
-          and a.medal_type = m.id
-          and s.class_id = #{classId}
-          and to_days(get_time) = to_days(now())
-        order by a.get_time desc
-    </select>
 
     <update id="updateByExampleSelective" parameterType="map">
         update award

@@ -23,7 +23,6 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping("/personal")
-@SuppressWarnings("all")
 public class PersonalCentreController {
 
 	@Autowired
@@ -109,7 +108,7 @@ public class PersonalCentreController {
 	/**
 	 * 我的报告 - 分页
 	 *  2.每周学习量
-	 * @param 0=全部, 2018=指定年份
+	 * @param year 0=全部, 2018=指定年份
 	 */
 	@RequestMapping("/weekQuantityPage")
 	public ServerResponse<Object> weekQuantityPage(HttpSession session, int page, int rows, Integer year){
@@ -255,7 +254,7 @@ public class PersonalCentreController {
 	 * @return
 	 */
 	@GetMapping("/getLatestMedalInClass")
-	public ServerResponse<List<Map<String,Object>>> getMedalInClass(HttpSession session) {
+	public ServerResponse<Object> getMedalInClass(HttpSession session) {
 		return personalCentreService.getMedalInClass(session);
 	}
 

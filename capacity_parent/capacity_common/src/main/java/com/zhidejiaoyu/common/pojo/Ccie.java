@@ -62,6 +62,11 @@ public class Ccie extends Model<Ccie> {
      */
     private String courseName;
 
+    /**
+     * 测试得分
+     */
+    private Integer point;
+
     @Override
     protected Serializable pkVal() {
         return this.id;

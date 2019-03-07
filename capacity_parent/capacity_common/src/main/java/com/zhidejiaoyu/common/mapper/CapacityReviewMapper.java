@@ -350,9 +350,10 @@ public interface CapacityReviewMapper {
 	 * @param studentId
 	 * @param maps
 	 * @param classify
+	 * @param typeStr
 	 * @return
 	 */
-	Integer countCapacityByUnitIdAndWordId(@Param("studentId") Long studentId, @Param("maps") List<Map<String, Object>> maps, @Param("classify") int classify);
+	Integer countCapacityByUnitIdAndWordId(@Param("studentId") Long studentId, @Param("maps") List<Map<String, Object>> maps, @Param("classify") int classify, @Param("typeStr") String typeStr);
 
 	/**
 	 * 查询上次登录期间需要复习的生词(取黄金记忆点最大的一个)

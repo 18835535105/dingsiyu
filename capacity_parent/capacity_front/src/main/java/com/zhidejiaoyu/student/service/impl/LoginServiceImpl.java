@@ -157,6 +157,14 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         Student stu = studentMapper.indexData(student_id);
 
+        // 判断学生是否有智能版课程
+        int count = studentStudyPlanMapper.countByStudentIdAndType(student_id, 1);
+        if (count == 0) {
+            result.put("hasCapacity", false);
+        } else {
+            result.put("hasCapacity", true);
+        }
+
         // 判断学生是否需要进行游戏测试
         int gameCount = testRecordMapper.countGameCount(stu);
         if (gameCount == 0) {
@@ -176,7 +184,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student_id, 1);
         if (capacityStudentUnit == null) {
             logger.error("学生[{}]-[{}]没有智能版课程！", stu.getId(), stu.getStudentName());
-            return ServerResponse.createBySuccess();
+            return ServerResponse.createBySuccess(result);
         }
 
         // 判断学生是否已经学完教师分配的所有计划，如果已学完所有计划，开始之旅按钮将被替换并且不能被点击
@@ -354,7 +362,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             Duration duration = durationMapper.selectLastLoginDuration(stu.getId());
             logger.info("学生上次登录时间：duration:[{}]", duration);
             if (duration != null) {
-                List<Learn> learns = learnMapper.selectLastLoginStudy(stu.getId(), duration.getLoginTime(), duration.getLoginOutTime());
+                List<Learn> learns = learnMapper.selectLastLoginStudy(stu.getId(), duration.getLoginTime(), duration.getLoginOutTime(), null);
                 logger.info("学生上次登录期间学习信息：learns=[{}]", learns);
                 if (learns.size() > 0) {
                     // 存储单词id及单元
@@ -363,7 +371,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                     String[] str = {"单词图鉴", "慧记忆", "慧听写", "慧默写"};
                     Integer memoryCount;
                     for (int i = 0; i < 4; i++) {
-                        memoryCount = capacityReviewMapper.countCapacityByUnitIdAndWordId(stu.getId(), maps, i);
+                        memoryCount = capacityReviewMapper.countCapacityByUnitIdAndWordId(stu.getId(), maps, i, str[i]);
                         if (memoryCount != null && memoryCount > 0) {
                             sb.append(str[i]).append("-");
                         }

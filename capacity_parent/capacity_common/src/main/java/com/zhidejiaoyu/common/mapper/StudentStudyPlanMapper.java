@@ -54,4 +54,13 @@ public interface StudentStudyPlanMapper extends BaseMapper<StudentStudyPlan> {
      * @return
      */
     int countUnlearnedPlan(@Param("studentId") Long studentId, @Param("type") int type);
+
+    /**
+     * 查询学生指定类型的学习计划个数
+     *
+     * @param studentId
+     * @param type
+     * @return
+     */
+    int countByStudentIdAndType(@Param("studentId") Long studentId, @Param("type") int type);
 }
