@@ -12,6 +12,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.CourseService;
 import com.zhidejiaoyu.student.vo.CoursePlanVo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.protocol.ResponseServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -211,6 +212,9 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
             List<Long> unitIds = new ArrayList<>(returnCourse.size());
             returnCourse.parallelStream().forEach(map -> unitIds.add((Long)map.get("id")));
             // 当前课程下例句总量
+            if(unitIds.size()==0){
+                return ServerResponse.createByErrorMessage("无数据");
+            }
             int sentenceCount = sentenceMapper.countByCourseId(unitIds);
             // 获取例句翻译模块本课程已学例句量和达到黄金记忆点的待复习例句量
             studyModel = "例句翻译";
@@ -248,6 +252,9 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
             }
             List<Long> unitIds = new ArrayList<>(maps.size());
             maps.parallelStream().forEach(map -> unitIds.add((Long)map.get("id")));
+            if(unitIds.size()==0){
+                return ServerResponse.createByErrorMessage("无数据");
+            }
             //当前课程下单元数量
             int size = maps.size();
             studyModel="课文试听";
