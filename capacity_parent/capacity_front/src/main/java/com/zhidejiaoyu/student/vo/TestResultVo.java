@@ -25,7 +25,7 @@ public class TestResultVo {
     /**
      * 测试结果页背景上的提示语
      */
-    private String backMsg;
+    private String[] backMsg;
 
     /**
      * 宠物图片url

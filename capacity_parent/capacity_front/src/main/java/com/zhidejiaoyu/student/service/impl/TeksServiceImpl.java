@@ -623,15 +623,15 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         if (point < PASS) {
             map.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
             map.put("text", "很遗憾，闯关失败，再接再厉。");
-            map.put("backMsg", "别气馁，已经超越了" + TestPointUtil.getPercentage(point) + "的同学，继续努力吧！");
+            map.put("backMsg", new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
         } else if (point < NINETY_POINT) {
             map.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
             map.put("text", "闯关成功，独孤求败！");
-            map.put("backMsg", "恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！");
+            map.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
         } else {
             map.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
             map.put("text", "恭喜你刷新了纪录！");
-            map.put("backMsg", "恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！");
+            map.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
         }
 
         map.put("point", point);

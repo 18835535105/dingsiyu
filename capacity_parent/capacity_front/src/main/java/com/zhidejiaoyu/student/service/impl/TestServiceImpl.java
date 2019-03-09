@@ -1001,15 +1001,15 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (point < PASS) {
             resultMap.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
             resultMap.put("text","很遗憾，闯关失败，再接再厉。");
-            resultMap.put("backMsg", "别气馁，已经超越了" + TestPointUtil.getPercentage(point) + "的同学，继续努力吧！");
+            resultMap.put("backMsg", new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
         } else if (point < NINETY_POINT) {
             resultMap.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
             resultMap.put("text","闯关成功，独孤求败！");
-            resultMap.put("backMsg", "恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！");
+            resultMap.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
         } else {
             resultMap.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
             resultMap.put("text","恭喜你刷新了纪录！");
-            resultMap.put("backMsg", "恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！");
+            resultMap.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
         }
 
         resultMap.put("point",point);
@@ -1234,15 +1234,15 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (point < pass) {
             msg = "很遗憾，闯关失败，再接再厉。";
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
-            vo.setBackMsg("别气馁，已经超越了" + TestPointUtil.getPercentage(point) + "的同学，继续努力吧！");
+            vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
         } else if (point < FULL_MARK) {
             msg = "闯关成功，独孤求败！";
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
-            vo.setBackMsg("恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！");
+            vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
         } else {
             msg = "恭喜你刷新了纪录！";
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
-            vo.setBackMsg("恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！");
+            vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
         }
         return msg;
     }

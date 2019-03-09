@@ -975,12 +975,12 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 if (point < 80) {
                     msg = "闯关失败，请再接再厉！";
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.CAPACITY_REVIEW_LESS_EIGHTY));
-                    vo.setBackMsg("别气馁，已经超越了" + TestPointUtil.getPercentage(point) + "的同学，继续努力吧！");
+                    vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
                 } else {
                     msg = "真让人刮目相看！继续学习吧！";
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.CAPACITY_REVIEW_EIGHTY_TO_HUNDRED));
                     ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId, point);
-                    vo.setBackMsg("恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！");
+                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
                 }
                 vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "智能复习测试"));
                 break;
@@ -998,9 +998,9 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId, point);
                 }
                 if (point < 90) {
-                    vo.setBackMsg("别气馁，已经超越了" + TestPointUtil.getPercentage(point) + "的同学，继续努力吧！");
+                    vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
                 } else {
-                    vo.setBackMsg("恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！");
+                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
                 }
 
                 msg = point < 90 ? "你的测试未通过，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
@@ -1015,9 +1015,9 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId, point);
                 }
                 if (point < 90) {
-                    vo.setBackMsg("别气馁，已经超越了" + TestPointUtil.getPercentage(point) + "的同学，继续努力吧！");
+                    vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
                 } else {
-                    vo.setBackMsg("恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！");
+                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
                 }
                 msg = point < 90 ? "你的测试未成功，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
                 vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "五维测试"));
