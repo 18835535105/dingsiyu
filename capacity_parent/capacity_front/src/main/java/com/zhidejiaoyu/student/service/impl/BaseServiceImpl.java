@@ -49,7 +49,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
 
     @Override
     public Integer getValidTime(Long studentId, String beginTime, String endTime) {
-        return durationMapper.selectValidTime(studentId, beginTime, endTime);
+        Integer time = durationMapper.selectValidTime(studentId, beginTime, endTime);
+        return time == null ? 0 : time;
     }
 
     @Override

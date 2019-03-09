@@ -21,6 +21,12 @@
         select <include refid="Base_Column_List" /> from student_skin where student_id=#{studentId}
     </select>
 
+
+    <select id="selSkinByStudentIdIsHave" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select <include refid="Base_Column_List" /> from student_skin where student_id=#{studentId} and end_time is null
+    </select>
+
+
     <select id="selSkinByStudentIdAndEndTime" resultMap="BaseResultMap" parameterType="java.lang.Long">
         select <include refid="Base_Column_List" /> from student_skin where student_id=#{studentId} and (end_time > now() or end_time is null)
     </select>

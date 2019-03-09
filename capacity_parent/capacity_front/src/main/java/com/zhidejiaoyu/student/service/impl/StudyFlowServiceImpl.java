@@ -274,7 +274,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             // 学习下一单元, 前端需要一个弹框提示
             if (studyFlow.getNextTrueFlow() == 0) {
                 // 开启下一单元并且返回需要学习的流程信息
-                return openNextUnitAndReturn(unitId, session, student, studyFlow);
+                return openNextUnitAndReturn(unitId, session, student, studyFlow, grade);
             } else if (Objects.equals(-1, studyFlow.getNextTrueFlow())) {
                 // 进入流程2
                 return toAnotherFlow(student, 24);
@@ -285,7 +285,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 if (count == 0) {
                     return toAnotherFlow(student, 11);
                 } else {
-                    String s = this.unlockNextUnit(student, unitId, session, studyFlow);
+                    String s = this.unlockNextUnit(student, unitId, session, studyFlow, grade);
                     if (s != null) {
                         toAnotherFlow(student, 11);
                         return ServerResponse.createBySuccess(300, s);
@@ -416,12 +416,13 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
      * @param session
      * @param student
      * @param studyFlow
+     * @param grade
      * @return
      */
     private ServerResponse<Object> openNextUnitAndReturn(Long unitId, HttpSession session, Student student,
-                                                         StudyFlow studyFlow) {
+                                                         StudyFlow studyFlow, Long grade) {
         // 开启下一单元
-        String s = unlockNextUnit(student, unitId, session, studyFlow);
+        String s = unlockNextUnit(student, unitId, session, studyFlow, grade);
         // 获取流程信息
 
         if (s != null) {
@@ -446,9 +447,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
      *
      * @param unitId   单元id（当前单元闯关测试的单元id）
      * @param studyFlow
+     * @param grade
      * @return
      */
-    private String unlockNextUnit(Student student, Long unitId, HttpSession session, StudyFlow studyFlow) {
+    private String unlockNextUnit(Student student, Long unitId, HttpSession session, StudyFlow studyFlow, Long grade) {
         Long studentId = student.getId();
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
         // 清除学生当前已分配的单元学习记录
@@ -479,7 +481,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 int learnedUnitCount = learnMapper.countLearnedUnitByCourseId(studentStudyPlan.getCourseId(), studentId);
                 if (learnedUnitCount >= unitCount) {
                     // 课程学习完毕，奖励学生课程证书
-                    ccieUtil.saveCourseCcie(student, capacityStudentUnit.getCourseId(), capacityStudentUnit.getUnitId());
+                    ccieUtil.saveCourseCcie(student, capacityStudentUnit.getCourseId(), capacityStudentUnit.getUnitId(), grade == null ? 0 : Integer.valueOf(grade.toString()));
                 }
             }
 

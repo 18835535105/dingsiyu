@@ -430,6 +430,10 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         } else {
             result.put("efficiency", "0%");
         }
+        // todo:跟踪日志
+        if (valid == null) {
+            log.error("今日有效时长 valid = null;");
+        }
         return ServerResponse.createBySuccess(result);
     }
 

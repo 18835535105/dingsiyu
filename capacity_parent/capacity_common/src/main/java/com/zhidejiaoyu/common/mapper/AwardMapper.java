@@ -95,4 +95,5 @@ public interface AwardMapper {
 
     @MapKey("id")
     Map<Long, Map<String, Long>> getMapKeyStudentXZ();
+
 }

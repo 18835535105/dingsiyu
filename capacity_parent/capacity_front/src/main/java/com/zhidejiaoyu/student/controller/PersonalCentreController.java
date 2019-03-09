@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.text.ParseException;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -21,7 +23,6 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping("/personal")
-@SuppressWarnings("all")
 public class PersonalCentreController {
 
 	@Autowired
@@ -107,7 +108,7 @@ public class PersonalCentreController {
 	/**
 	 * 我的报告 - 分页
 	 *  2.每周学习量
-	 * @param 0=全部, 2018=指定年份
+	 * @param year 0=全部, 2018=指定年份
 	 */
 	@RequestMapping("/weekQuantityPage")
 	public ServerResponse<Object> weekQuantityPage(HttpSession session, int page, int rows, Integer year){
@@ -246,4 +247,19 @@ public class PersonalCentreController {
 		return personalCentreService.updateCcie(session);
 	}
 
+	/**
+	 * 获取当前学生所在班级最新获取勋章的学生信息
+	 *
+	 * @param session
+	 * @return
+	 */
+	@GetMapping("/getLatestMedalInClass")
+	public ServerResponse<Object> getMedalInClass(HttpSession session) {
+		return personalCentreService.getMedalInClass(session);
+	}
+
+	@GetMapping("/getLucky")
+	public Object getLucky(Integer studentId,HttpSession session){
+		return personalCentreService.getLucky(studentId,session);
+	}
 }

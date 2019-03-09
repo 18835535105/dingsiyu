@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
+import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -11,14 +12,16 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.TimeUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.PersonalCentreService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -39,6 +42,9 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Transactional
 public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements PersonalCentreService {
+
+    @Value("${domain}")
+    private String domain;
 
     /**
      * 消息中心mapper接口
@@ -104,7 +110,13 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     private MessageBoardMapper messageBoardMapper;
 
     @Autowired
-    private RedisOpt redisOpt;
+    private SyntheticRewardsListMapper syntheticRewardsListMapper;
+
+    @Autowired
+    private StudentSkinMapper studentSkinMapper;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -1641,6 +1653,47 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         Long studentId = getStudentId(session);
         ccieMapper.updateReadFlag(studentId, 1);
         return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    public ServerResponse<Object> getMedalInClass(HttpSession session) {
+        Student student = getStudent(session);
+
+        Map<String, Object> paramMap = new HashMap<>(16);
+        paramMap.put("studentId", student.getId());
+        paramMap.put("session", session);
+        paramMap.put("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)));
+
+        String url = domain + "/api/personal/getLatestMedalInClass?session={session}&studentId={studentId}&loginTime={loginTime}";
+        ResponseEntity<Map> entity = restTemplate.getForEntity(url, Map.class, paramMap);
+        return ServerResponse.createBySuccess(entity.getBody() == null ? null : entity.getBody().get("data"));
+    }
+
+    @Override
+    public Object getLucky(Integer studentId,HttpSession session) {
+        if(studentId==null){
+            Student student = (Student)session.getAttribute(UserConstant.CURRENT_STUDENT);
+            studentId=student.getId().intValue();
+        }
+        //查询手套印记
+        List<SyntheticRewardsList> gloveOrFlower = syntheticRewardsListMapper.getGloveOrFlower(studentId);
+        List<Map<String,Object>> list=new ArrayList<>();
+
+        for(SyntheticRewardsList synthetic:gloveOrFlower){
+            Map<String,Object> map=new HashMap<>();
+            map.put("url",synthetic.getImgUrl());
+            map.put("type","gloveOrFlower");
+            list.add(map);
+        }
+        List<StudentSkin> studentSkins = studentSkinMapper.selSkinByStudentIdIsHave(studentId.longValue());
+        for(StudentSkin studentSkin:studentSkins){
+            Map<String,Object> map=new HashMap<>();
+            map.put("url",studentSkin.getImgUrl());
+            map.put("type","skin");
+            list.add(map);
+        }
+        return ServerResponse.createBySuccess(list);
+
     }
 
 }

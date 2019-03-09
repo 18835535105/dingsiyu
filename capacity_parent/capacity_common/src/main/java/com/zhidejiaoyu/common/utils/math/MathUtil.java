@@ -1,7 +1,5 @@
 package com.zhidejiaoyu.common.utils.math;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 /**

@@ -68,5 +68,11 @@
         and type=#{type}
         and (start_unit_id &lt;=#{unitId} and end_unit_id>=#{unitId})
     </select>
+    <select id="countByStudentIdAndType" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from student_study_plan
+        where student_id = #{studentId}
+          and type = #{type}
+    </select>
 
 </mapper>

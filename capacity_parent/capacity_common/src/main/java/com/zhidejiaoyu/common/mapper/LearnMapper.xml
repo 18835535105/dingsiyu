@@ -1359,7 +1359,20 @@
     <select id="selectLastLoginStudy" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="Base_Column_List"/>
-        from learn where student_id = #{studentId} and vocabulary_id is not null and learn_time between #{loginTime} and
+        from learn where student_id = #{studentId}
+        <if test="classify == 0">
+            and study_model = '单词图鉴'
+        </if>
+        <if test="classify == 1">
+            and study_model = '慧记忆'
+        </if>
+        <if test="classify == 2">
+            and study_model = '慧听写'
+        </if>
+        <if test="classify == 3">
+            and study_model = '慧默写'
+        </if>
+        and vocabulary_id is not null and learn_time between #{loginTime} and
         #{loginOutTime} and type = 1
     </select>
     <select id="selectUnlearnUnit" resultType="java.util.Map" parameterType="map">
@@ -1443,7 +1456,7 @@
         order by id desc limit 1
     </select>
     <select id="selTeksLaterCourse" parameterType="java.lang.Long" resultType="java.util.Map">
-        select learn.unit_id , course.grade , course.version , course.label
+        select learn.unit_id , course.grade , course.version , course.label , learn.course_id
         from learn learn
         join course course on course.id=learn.course_id
         where learn.student_id=#{studentId}

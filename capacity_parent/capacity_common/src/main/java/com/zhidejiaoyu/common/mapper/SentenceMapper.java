@@ -263,4 +263,13 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
     List<Sentence> selectRoundSentence(Long courseId);
 
     List<Map<String, Object>> selectSentenceLaterLearnTimeByStudentId(Long id);
+
+    /**
+     * 查询句型的读音地址
+     *
+     * @param centreExample
+     * @return
+     */
+    @Select("select read_url from sentence where centreExample = #{centreExample} limit 1")
+    String selectReadUrlByCentreExample(String centreExample);
 }

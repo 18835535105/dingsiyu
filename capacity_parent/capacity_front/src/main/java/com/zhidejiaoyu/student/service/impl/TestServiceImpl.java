@@ -926,20 +926,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         studentMapper.updateByPrimaryKeySelective(student);
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
         Map<String,Object> resultMap=new HashMap<>();
-        TestRecord testRecord1 = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), wordUnitTestDTO.getUnitId()[0], "音译测试", "音译测试");
-        if(testRecord1==null){
-            int energy = getEnergy(student, wordUnitTestDTO.getPoint());
-            studentMapper.updateByPrimaryKeySelective(student);
-            resultMap.put("energy",energy);
-        }else{
-            if(goldCount>0){
-                int energy = getEnergy(student, wordUnitTestDTO.getPoint());
-                studentMapper.updateByPrimaryKeySelective(student);
-                resultMap.put("energy",energy);
-            }else{
-                resultMap.put("energy",0);
-            }
-        }
+        int energy = getEnergy(student, wordUnitTestDTO.getPoint());
+        studentMapper.updateByPrimaryKeySelective(student);
+        resultMap.put("energy",energy);
         resultMap.put("gold",goldCount);
         Integer point = wordUnitTestDTO.getPoint();
         if (point < PASS) {
@@ -1021,20 +1010,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
         Map<String,Object> resultMap=new HashMap<>();
         resultMap.put("gold",goldCount);
-        TestRecord testRecord1 = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), wordUnitTestDTO.getUnitId()[0], "课文测试", "课文测试");
-        if(testRecord1==null){
-            int energy = getEnergy(student, wordUnitTestDTO.getPoint());
-            studentMapper.updateByPrimaryKeySelective(student);
-            resultMap.put("energy",energy);
-        }else{
-            if(goldCount>0){
-                int energy = getEnergy(student, wordUnitTestDTO.getPoint());
-                studentMapper.updateByPrimaryKeySelective(student);
-                resultMap.put("energy",energy);
-            }else{
-                resultMap.put("energy",0);
-            }
-        }
+        int energy = getEnergy(student, wordUnitTestDTO.getPoint());
+        studentMapper.updateByPrimaryKeySelective(student);
+        resultMap.put("energy",energy);
         Integer point = wordUnitTestDTO.getPoint();
         if (point < PASS) {
             resultMap.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
@@ -1154,18 +1132,18 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if(classify == 3 || classify == 6) {
             msg = getMessage(student, vo, point, FIVE);
             if (point >= FIVE) {
-                ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0]);
+                ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0], point);
             }
         }else if(classify == 4 || classify == 2) {
             // 听力
             msg = getMessage(student, vo, point, SIX);
             if (point >= SIX) {
-                ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0]);
+                ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0], point);
             }
         }else {
             msg = getMessage(student, vo, point, PASS);
             if (point >= PASS) {
-                ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0]);
+                ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0], point);
             }
         }
 
@@ -1249,7 +1227,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setGold(goldCount);
         vo.setEnergy(addEnergy);
         countMyGoldUtil.countMyGold(student);
-        ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0]);
+        ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0], point);
         studentMapper.updateByPrimaryKeySelective(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(vo);

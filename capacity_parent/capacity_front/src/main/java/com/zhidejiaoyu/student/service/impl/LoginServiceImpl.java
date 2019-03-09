@@ -157,6 +157,14 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         Student stu = studentMapper.indexData(student_id);
 
+        // 判断学生是否有智能版课程
+        int count = studentStudyPlanMapper.countByStudentIdAndType(student_id, 1);
+        if (count == 0) {
+            result.put("hasCapacity", false);
+        } else {
+            result.put("hasCapacity", true);
+        }
+
         // 判断学生是否需要进行游戏测试
         int gameCount = testRecordMapper.countGameCount(stu);
         if (gameCount == 0) {
@@ -176,7 +184,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student_id, 1);
         if (capacityStudentUnit == null) {
             logger.error("学生[{}]-[{}]没有智能版课程！", stu.getId(), stu.getStudentName());
-            return ServerResponse.createBySuccess();
+            return ServerResponse.createBySuccess(result);
         }
 
         // 判断学生是否已经学完教师分配的所有计划，如果已学完所有计划，开始之旅按钮将被替换并且不能被点击
@@ -354,7 +362,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             Duration duration = durationMapper.selectLastLoginDuration(stu.getId());
             logger.info("学生上次登录时间：duration:[{}]", duration);
             if (duration != null) {
-                List<Learn> learns = learnMapper.selectLastLoginStudy(stu.getId(), duration.getLoginTime(), duration.getLoginOutTime());
+                List<Learn> learns = learnMapper.selectLastLoginStudy(stu.getId(), duration.getLoginTime(), duration.getLoginOutTime(), null);
                 logger.info("学生上次登录期间学习信息：learns=[{}]", learns);
                 if (learns.size() > 0) {
                     // 存储单词id及单元
@@ -363,7 +371,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                     String[] str = {"单词图鉴", "慧记忆", "慧听写", "慧默写"};
                     Integer memoryCount;
                     for (int i = 0; i < 4; i++) {
-                        memoryCount = capacityReviewMapper.countCapacityByUnitIdAndWordId(stu.getId(), maps, i);
+                        memoryCount = capacityReviewMapper.countCapacityByUnitIdAndWordId(stu.getId(), maps, i, str[i]);
                         if (memoryCount != null && memoryCount > 0) {
                             sb.append(str[i]).append("-");
                         }
@@ -736,15 +744,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             if (l <= 1) {
                 result.put("accountDate", "账号即将过期，请及时续期");
             }
-            // 判断用户是学生还是业务员
+            // 学生权限
             Integer role = stu.getRole();
-            if (role == null || role == 1) {
-                // 学生
-                result.put("role", "1");
-            } else {
-                // 业务员
-                result.put("role", "2");
-            }
+            result.put("role", role == null ? 2 : role);
 
             // 学生id
             result.put("student_id", stu.getId());
@@ -846,13 +848,17 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private void judgeMultipleLogin(HttpSession session, Student stu) {
         Object object = redisTemplate.opsForHash().get(RedisKeysConst.LOGIN_SESSION, stu.getId());
         if (object != null) {
+            Long oldStudentId = null;
+            Map<String, Object> oldSessionMap = RedisOpt.getSessionMap(object.toString());
+            if (oldSessionMap != null && oldSessionMap.get(UserConstant.CURRENT_STUDENT) != null) {
+                oldStudentId = ((Student) oldSessionMap.get(UserConstant.CURRENT_STUDENT)).getId();
+            }
 
-            // 同一浏览器重复登录不更新其上次登录信息
-            if (Objects.equals(object, session.getId())) {
+            // 如果账号 session 相同说明是同一个浏览器中，并且不是同一个账号，不再更改其 session 中登录信息
+            if (Objects.equals(oldStudentId, stu.getId()) && Objects.equals(object, session.getId())) {
                 return;
             }
 
-            Map<String, Object> oldSessionMap = RedisOpt.getSessionMap(object.toString());
             // 如果账号登录的session不同，保存前一个session的信息
             if (oldSessionMap != null) {
                 saveDurationInfo(oldSessionMap);
@@ -956,31 +962,18 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      */
     private void saveDailyAward(Student stu) {
         int count = runLogMapper.countStudentTodayLogin(stu);
-        StringBuilder sb;
         if (count == 1) {
-            stu.setSystemGold(BigDecimalUtil.add(stu.getSystemGold(), 5));
             Award award = new Award();
             award.setCanGet(1);
-            award.setGetFlag(1);
+            award.setGetFlag(2);
             award.setStudentId(stu.getId());
             award.setType(1);
             award.setAwardContentType(1);
             award.setCreateTime(new Date());
-            award.setGetTime(new Date());
             try {
                 awardMapper.insert(award);
-
-                // 更新单个字段，减少死锁情况发生
-                Student student = new Student();
-                student.setSystemGold(stu.getSystemGold());
-                student.setId(stu.getId());
-                studentMapper.updateByPrimaryKeySelective(student);
-
-                sb = new StringBuilder("学生").append(stu.getStudentName()).append("今日首次登陆系统，奖励#5#金币");
-                RunLog runLog = new RunLog(stu.getId(), 4, sb.toString(), new Date());
-                runLogMapper.insert(runLog);
             } catch (Exception e) {
-                logger.error("保存学生 {} -> {} 5个金币奖励信息失败！", stu.getId(), stu.getStudentName(), e);
+                logger.error("保存学生 {} -> {} 首次登陆奖励信息失败！", stu.getId(), stu.getStudentName(), e);
             }
         }
     }

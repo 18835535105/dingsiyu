@@ -39,8 +39,8 @@ public class CcieUtil {
      * @param courseId
      * @param unitId
      */
-    public void saveCcieTest(Student student, Integer testType, Integer classify, Long courseId, Long unitId) {
-        saveCcie(student, 1, testType, classify, courseId, unitId);
+    public void saveCcieTest(Student student, Integer testType, Integer classify, Long courseId, Long unitId, Integer point) {
+        saveCcie(student, 1, testType, classify, courseId, unitId, point);
     }
 
     /**
@@ -50,11 +50,11 @@ public class CcieUtil {
      * @param courseId
      * @param unitId
      */
-    public void saveCourseCcie(Student student, Long courseId, Long unitId) {
-        saveCcie(student, 2, 1, 0, courseId, unitId);
+    public void saveCourseCcie(Student student, Long courseId, Long unitId, Integer point) {
+        saveCcie(student, 2, 1, 0, courseId, unitId, point);
     }
 
-    private void saveCcie(Student student, Integer type, Integer testType, Integer classify, Long courseId, Long unitId) {
+    private void saveCcie(Student student, Integer type, Integer testType, Integer classify, Long courseId, Long unitId, Integer point) {
         Course course = courseMapper.selectById(courseId);
         Ccie ccie = new Ccie();
         ccie.setEncourageWord("名列前茅");
@@ -64,6 +64,7 @@ public class CcieUtil {
         ccie.setStudentId(student.getId());
         ccie.setStudentName(student.getStudentName());
         ccie.setUnitId(unitId);
+        ccie.setPoint(point);
         if (course != null) {
             ccie.setCourseName(course.getCourseName());
         }

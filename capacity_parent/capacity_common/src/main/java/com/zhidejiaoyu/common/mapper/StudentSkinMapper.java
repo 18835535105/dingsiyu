@@ -23,6 +23,13 @@ public interface StudentSkinMapper extends BaseMapper<StudentSkin> {
      */
     List<StudentSkin> selSkinByStudentId(Long studentId);
 
+    /**
+     * 获取学生已拥有皮肤
+     * @param studentId
+     * @return
+     */
+    List<StudentSkin> selSkinByStudentIdIsHave(Long studentId);
+
     List<StudentSkin> selSkinByStudentIdAndEndTime(Long studentId);
 
     /**

@@ -421,7 +421,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             map.put("unitId", unit_id);
         }
         // 例句读音
-        map.put("readUrl", baiduSpeak.getSentencePaht(english));
+        map.put("readUrl", baiduSpeak.getSentencePath(sentence.getCentreExample()));
         // 例句翻译
         map.put("chinese", chinese);
         // 例句英文原文
@@ -969,6 +969,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         long courseId = dto.getCourseId();
         int classify = dto.getClassify();
         switch (genre) {
+            // 没有该模块
             case "测试复习":
                 if (point < 80) {
                     msg = "闯关失败，请再接再厉！";
@@ -976,7 +977,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 } else {
                     msg = "真让人刮目相看！继续学习吧！";
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.CAPACITY_REVIEW_EIGHTY_TO_HUNDRED));
-                    ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId);
+                    ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId, point);
                 }
                 vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "智能复习测试"));
                 break;
@@ -991,7 +992,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_EIGHTY_TO_NINETY));
                 } else {
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_NINETY_TO_HUNDRED));
-                    ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId);
+                    ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId, point);
                 }
                 msg = point < 90 ? "你的测试未通过，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
                 vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, genre));
@@ -1002,7 +1003,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.FIVE_TEST_LESS_EIGHTY));
                 } else {
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.FIVE_TEST_EIGHTY_TO_HUNDRED));
-                    ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId);
+                    ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId, point);
                 }
                 msg = point < 90 ? "你的测试未成功，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
                 vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "五维测试"));
@@ -1307,7 +1308,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 上次登录期间学生的单词学习信息
         Duration duration = durationMapper.selectLastLoginDuration(student.getId());
         if (duration != null) {
-            List<Learn> learns = learnMapper.selectLastLoginStudy(student.getId(), duration.getLoginTime(), duration.getLoginOutTime());
+            List<Learn> learns = learnMapper.selectLastLoginStudy(student.getId(), duration.getLoginTime(), duration.getLoginOutTime(), classify);
             if (learns.size() > 0) {
                 return packageWordReviewResult(classify, student, learns);
             }
