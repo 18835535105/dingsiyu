@@ -290,9 +290,6 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     @SuppressWarnings("unchecked")
     public ServerResponse<String> calculateValidTime(HttpSession session, Integer classify, Long courseId, Long unitId,
                                                      Long validTime) {
-        // key: 学习模块
-        Map<String, Duration> map;
-        Duration duration;
 
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
 
@@ -302,25 +299,12 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         }
         Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
 
-        // session 中还没有学生的学习有效时长
-        String key = classify + ":" + unitId;
-        if (session.getAttribute(TimeConstant.TOTAL_VALID_TIME) == null) {
-            map = new HashMap<>(16);
-            packageDuration(classify, courseId, unitId, validTime, map, student, loginTime);
-            session.setAttribute(TimeConstant.TOTAL_VALID_TIME, map);
-        } else {
-            // session 中已经有学生的学习有效时长，如果没有当前模块增加当前模块的有效时长；如果有当前模块的有效时长，将有效时长相加
-            map = (Map<String, Duration>) session.getAttribute(TimeConstant.TOTAL_VALID_TIME);
-            if (map.containsKey(key)) {
-                duration = map.get(key);
-                duration.setValidTime(duration.getValidTime() + validTime);
-                duration.setLoginTime(loginTime);
-                duration.setOnlineTime(0L);
-                map.put(key, duration);
-            } else {
-                packageDuration(classify, courseId, unitId, validTime, map, student, loginTime);
-            }
-            session.setAttribute(TimeConstant.TOTAL_VALID_TIME, map);
+        Duration duration = packageDuration(classify, courseId, unitId, validTime, student, loginTime);
+
+        try {
+            durationMapper.insert(duration);
+        } catch (Exception e) {
+            log.error("保存时长信息出错", e);
         }
 
         String tip = null;
@@ -328,13 +312,11 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             tip = saveGoldAward(session, classify, validTime, loginTime);
             countMyGoldUtil.countMyGold(student);
         }
-        saveDuration(session, map, loginTime);
         session.removeAttribute(TimeConstant.BEGIN_VALID_TIME);
         return ServerResponse.createBySuccessMessage(tip);
     }
 
-    private void packageDuration(Integer classify, Long courseId, Long unitId, Long validTime, Map<String, Duration> map,
-                                 Student student, Date loginTime) {
+    private Duration packageDuration(Integer classify, Long courseId, Long unitId, Long validTime, Student student, Date loginTime) {
         Duration duration = new Duration();
         duration.setCourseId(courseId);
         duration.setStudyModel(classify);
@@ -343,7 +325,8 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         duration.setLoginTime(loginTime);
         duration.setStudentId(student.getId());
         duration.setOnlineTime(0L);
-        map.put(classify + ":" + unitId, duration);
+        duration.setLoginOutTime(new Date());
+        return duration;
     }
 
     @Override
