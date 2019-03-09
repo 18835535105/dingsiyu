@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
+import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
@@ -924,28 +925,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setStudyModel("音译测试");
         testRecordMapper.insert(testRecord);
         studentMapper.updateByPrimaryKeySelective(student);
-        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
-        Map<String,Object> resultMap=new HashMap<>();
-        int energy = getEnergy(student, wordUnitTestDTO.getPoint());
-        studentMapper.updateByPrimaryKeySelective(student);
-        resultMap.put("energy",energy);
-        resultMap.put("gold",goldCount);
-        Integer point = wordUnitTestDTO.getPoint();
-        if (point < PASS) {
-            resultMap.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
-            resultMap.put("text","很遗憾，闯关失败，再接再厉。");
-        } else if (point < NINETY_POINT) {
-            resultMap.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
-            resultMap.put("text","闯关成功，独孤求败！");
-        } else {
-            resultMap.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
-            resultMap.put("text","恭喜你刷新了纪录！");
-        }
-
-        resultMap.put("point",point);
-        resultMap.put("imgUrl",student.getPartUrl());
-
-        return ServerResponse.createBySuccess(resultMap);
+        return getObjectServerResponse(session, wordUnitTestDTO, student, goldCount);
     }
 
     @Override
@@ -1007,22 +987,29 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }else{
             learnMapper.insert(learn);
         }
+        return getObjectServerResponse(session, wordUnitTestDTO, student, goldCount);
+    }
+
+    private ServerResponse<Object> getObjectServerResponse(HttpSession session, WordUnitTestDTO wordUnitTestDTO, Student student, int goldCount) {
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
-        Map<String,Object> resultMap=new HashMap<>();
-        resultMap.put("gold",goldCount);
+        Map<String,Object> resultMap=new HashMap<>(16);
         int energy = getEnergy(student, wordUnitTestDTO.getPoint());
         studentMapper.updateByPrimaryKeySelective(student);
         resultMap.put("energy",energy);
+        resultMap.put("gold",goldCount);
         Integer point = wordUnitTestDTO.getPoint();
         if (point < PASS) {
             resultMap.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
             resultMap.put("text","很遗憾，闯关失败，再接再厉。");
+            resultMap.put("backMsg", "别气馁，已经超越了" + TestPointUtil.getPercentage(point) + "的同学，继续努力吧！");
         } else if (point < NINETY_POINT) {
             resultMap.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
             resultMap.put("text","闯关成功，独孤求败！");
+            resultMap.put("backMsg", "恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！");
         } else {
             resultMap.put("petName",petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
             resultMap.put("text","恭喜你刷新了纪录！");
+            resultMap.put("backMsg", "恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！");
         }
 
         resultMap.put("point",point);
@@ -1247,12 +1234,15 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (point < pass) {
             msg = "很遗憾，闯关失败，再接再厉。";
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
+            vo.setBackMsg("别气馁，已经超越了" + TestPointUtil.getPercentage(point) + "的同学，继续努力吧！");
         } else if (point < FULL_MARK) {
             msg = "闯关成功，独孤求败！";
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
+            vo.setBackMsg("恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！");
         } else {
             msg = "恭喜你刷新了纪录！";
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+            vo.setBackMsg("恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！");
         }
         return msg;
     }
