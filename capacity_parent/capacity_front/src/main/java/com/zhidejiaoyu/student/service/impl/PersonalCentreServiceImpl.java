@@ -1671,28 +1671,50 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
 
     @Override
     public Object getLucky(Integer studentId,HttpSession session) {
-        if(studentId==null){
-            Student student = (Student)session.getAttribute(UserConstant.CURRENT_STUDENT);
-            studentId=student.getId().intValue();
+        Map<String, Object> useMap = new HashMap<>();
+        if (studentId == null) {
+            Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+            studentId = student.getId().intValue();
+            useMap.put("sex",student.getSex()==1?"男":"女");
+        }else{
+            Student student = studentMapper.selectById(studentId);
+            useMap.put("sex",student.getSex()==1?"男":"女");
         }
+        Map<String, Object> resultMap = new HashMap<>();
         //查询手套印记
         List<SyntheticRewardsList> gloveOrFlower = syntheticRewardsListMapper.getGloveOrFlower(studentId);
-        List<Map<String,Object>> list=new ArrayList<>();
+        SyntheticRewardsList useGloveOrFlower = syntheticRewardsListMapper.getUseGloveOrFlower(studentId);
+        List<Map<String, Object>> gloveOrFlowerList = new ArrayList<>();
 
-        for(SyntheticRewardsList synthetic:gloveOrFlower){
-            Map<String,Object> map=new HashMap<>();
-            map.put("url",synthetic.getImgUrl());
-            map.put("type","gloveOrFlower");
-            list.add(map);
+        for (SyntheticRewardsList synthetic : gloveOrFlower) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("url", synthetic.getImgUrl());
+            map.put("state", false);
+            map.put("type", "gloveOrFlower");
+            gloveOrFlowerList.add(map);
         }
+        if (useGloveOrFlower!=null) {
+            Map<String, Object> useNowMap = new HashMap<>();
+            useNowMap.put("url", useGloveOrFlower.getImgUrl());
+            useNowMap.put("endTime",useGloveOrFlower.getUseEndTime());
+            useMap.put("gloveOrFlower", useNowMap);
+        }
+        resultMap.put("gloveOrFlower", gloveOrFlowerList);
+        List<Map<String, Object>> skinList = new ArrayList<>();
         List<StudentSkin> studentSkins = studentSkinMapper.selSkinByStudentIdIsHave(studentId.longValue());
-        for(StudentSkin studentSkin:studentSkins){
-            Map<String,Object> map=new HashMap<>();
-            map.put("url",studentSkin.getImgUrl());
-            map.put("type","skin");
-            list.add(map);
+        for (StudentSkin studentSkin : studentSkins) {
+            if (studentSkin.getState() == 1) {
+                useMap.put("skin", studentSkin.getImgUrl());
+            }
+            Map<String, Object> map = new HashMap<>();
+            map.put("url", studentSkin.getImgUrl());
+            map.put("state", false);
+            map.put("type", "skin");
+            skinList.add(map);
         }
-        return ServerResponse.createBySuccess(list);
+        resultMap.put("skin", skinList);
+        resultMap.put("use",useMap);
+        return ServerResponse.createBySuccess(resultMap);
 
     }
 

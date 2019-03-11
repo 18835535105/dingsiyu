@@ -64,7 +64,5 @@ public interface SyntheticRewardsListMapper extends BaseMapper<SyntheticRewardsL
     Map<String,Object> selGloveOrFlowerByStudentIdAndNameByState(Map map);
 
 
-
-
-
+    SyntheticRewardsList getUseGloveOrFlower(Integer studentId);
 }
