@@ -962,31 +962,18 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      */
     private void saveDailyAward(Student stu) {
         int count = runLogMapper.countStudentTodayLogin(stu);
-        StringBuilder sb;
         if (count == 1) {
-            stu.setSystemGold(BigDecimalUtil.add(stu.getSystemGold(), 5));
             Award award = new Award();
             award.setCanGet(1);
-            award.setGetFlag(1);
+            award.setGetFlag(2);
             award.setStudentId(stu.getId());
             award.setType(1);
             award.setAwardContentType(1);
             award.setCreateTime(new Date());
-            award.setGetTime(new Date());
             try {
                 awardMapper.insert(award);
-
-                // 更新单个字段，减少死锁情况发生
-                Student student = new Student();
-                student.setSystemGold(stu.getSystemGold());
-                student.setId(stu.getId());
-                studentMapper.updateByPrimaryKeySelective(student);
-
-                sb = new StringBuilder("学生").append(stu.getStudentName()).append("今日首次登陆系统，奖励#5#金币");
-                RunLog runLog = new RunLog(stu.getId(), 4, sb.toString(), new Date());
-                runLogMapper.insert(runLog);
             } catch (Exception e) {
-                logger.error("保存学生 {} -> {} 5个金币奖励信息失败！", stu.getId(), stu.getStudentName(), e);
+                logger.error("保存学生 {} -> {} 首次登陆奖励信息失败！", stu.getId(), stu.getStudentName(), e);
             }
         }
     }

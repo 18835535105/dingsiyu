@@ -18,9 +18,14 @@ public class TestResultVo {
     private Integer gold;
 
     /**
-     * 推送课程信息
+     * 测试结果页弹框显示的提示语
      */
     private String msg;
+
+    /**
+     * 测试结果页背景上的提示语
+     */
+    private String[] backMsg;
 
     /**
      * 宠物图片url
