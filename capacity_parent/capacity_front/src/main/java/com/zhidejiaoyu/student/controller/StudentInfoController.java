@@ -21,6 +21,7 @@ import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 获取学生信息相关controller
@@ -242,17 +243,20 @@ public class StudentInfoController extends BaseController {
     public ServerResponse<String> endValidTime(HttpSession session, Integer classify,
                                                Long courseId, Long unitId, String validTime) {
         if (classify == null || courseId == null) {
+            log.error("保存有效时长，参数有误：classify=[{}], courseId=[{}]", classify, courseId);
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
         }
-        // TODO：validTime 修改为string，查找NAN问题
-        // 有效时长数字
+
+        if (Objects.equals("NaN", validTime) || StringUtils.isEmpty(validTime)) {
+            log.error("validTime=[{}]", validTime);
+            return ServerResponse.createBySuccess();
+        }
+
         long valid = 0L;
-        if (!StringUtils.isEmpty(validTime)) {
-            try {
-                valid = Long.valueOf(validTime);
-            } catch (Exception e) {
-                log.error("有效时长入参类型错误：param=[{}], error=[{}]", super.getParams(), e.getMessage());
-            }
+        try {
+            valid = Long.valueOf(validTime);
+        } catch (Exception e) {
+            log.error("有效时长入参类型错误：学习模块[{}]，validTime[{}]，error=[{}]", classify, validTime, e.getMessage());
         }
         return studentInfoService.calculateValidTime(session, classify, courseId, unitId, valid);
     }
