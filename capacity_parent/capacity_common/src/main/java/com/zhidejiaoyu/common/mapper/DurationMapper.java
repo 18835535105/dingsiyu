@@ -180,4 +180,14 @@ public interface DurationMapper {
      * @return
      */
     List<Duration> selectByStudentIdAndCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId, @Param("unitId") Long unitId, @Param("loginTime") String loginTime, @Param("key") Integer key);
+
+    /**
+     * 查询当前 loginOutTime 为当前时间的记录条数
+     *
+     *
+     * @param studentId
+     * @param loginOutTime
+     * @return
+     */
+    int countByLoginOutTime(@Param("studentId") Long studentId, @Param("loginOutTime") String loginOutTime);
 }

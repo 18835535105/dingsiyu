@@ -498,4 +498,8 @@
         </if>
         and login_time = #{loginTime} and study_model = #{key}
     </select>
+    <select id="countByLoginOutTime" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from duration where student_id = #{studentId} and login_out_time like concat(#{loginOutTime}, '%')
+    </select>
 </mapper>
