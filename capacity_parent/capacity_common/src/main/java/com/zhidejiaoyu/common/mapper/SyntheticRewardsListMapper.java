@@ -65,4 +65,6 @@ public interface SyntheticRewardsListMapper extends BaseMapper<SyntheticRewardsL
 
 
     SyntheticRewardsList getUseGloveOrFlower(Integer studentId);
+
+    SyntheticRewardsList getIsUse(Integer studentId, String name);
 }
