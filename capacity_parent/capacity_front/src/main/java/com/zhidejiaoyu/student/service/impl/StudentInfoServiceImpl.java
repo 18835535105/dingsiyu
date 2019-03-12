@@ -286,7 +286,6 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public ServerResponse<String> calculateValidTime(HttpSession session, Integer classify, Long courseId, Long unitId,
                                                      Long validTime) {
 
@@ -296,6 +295,13 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         if (student == null) {
             return ServerResponse.createBySuccess();
         }
+
+        // 当前学习的有效时长是否已经保存
+        int count = durationMapper.countByLoginOutTime(student.getId(), DateUtil.formatYYYYMMDDHHMMSS(new Date()));
+        if (count > 0) {
+            return ServerResponse.createBySuccessMessage("本次学习获得金币：0 个");
+        }
+
         Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
 
         Duration duration = packageDuration(classify, courseId, unitId, validTime, student, loginTime);
