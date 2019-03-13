@@ -241,7 +241,7 @@ public class StudentInfoController extends BaseController {
      */
     @PostMapping("/endValidTime")
     public ServerResponse<String> endValidTime(HttpSession session, Integer classify,
-                                               Long courseId, Long unitId, String validTime) {
+                                               Long courseId, Long unitId, String validTime, @RequestParam(required = false) Integer num) {
         if (classify == null || courseId == null) {
             log.error("保存有效时长，参数有误：classify=[{}], courseId=[{}]", classify, courseId);
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
@@ -257,6 +257,10 @@ public class StudentInfoController extends BaseController {
             valid = Long.valueOf(validTime);
         } catch (Exception e) {
             log.error("有效时长入参类型错误：学习模块[{}]，validTime[{}]，error=[{}]", classify, validTime, e.getMessage());
+        }
+        // todo：调试用
+        if (num != null) {
+            log.error("debug : num={}", num);
         }
         return studentInfoService.calculateValidTime(session, classify, courseId, unitId, valid);
     }
