@@ -72,10 +72,6 @@ public class BaiduSpeak {
         if (StringUtils.isEmpty(centreExample)) {
             return "";
         }
-        String readUrl = sentenceMapper.selectReadUrlByCentreExample(centreExample);
-        if (StringUtils.isEmpty(readUrl)) {
-            return youdao + centreExample.replace("#", " ") + "@&@" + baidu + centreExample.replace("#", " ");
-        }
-        return prefix + readUrl + "@&@" + baidu + centreExample.replace("#", " ");
+        return youdao +  centreExample.replace("#", " ") + "@&@" + baidu + centreExample.replace("#", " ");
     }
 }
