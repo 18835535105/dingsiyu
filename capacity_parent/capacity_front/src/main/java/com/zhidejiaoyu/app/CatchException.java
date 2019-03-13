@@ -37,11 +37,12 @@ public class CatchException extends BaseServiceImpl<StudentMapper, Student> {
         HttpSession session = request.getSession();
         String param = super.getParameters();
         Object studentObject = session.getAttribute(UserConstant.CURRENT_STUDENT);
+        String url = request.getRequestURI().substring(request.getContextPath().length());
         if (studentObject != null) {
             Student student = (Student) studentObject;
-            log.error("学生[{}]->[{}]操作出现系统异常,param=[{}]", student.getId(), student.getStudentName(), param, e);
+            log.error("学生[{}]->[{}],请求 URL=[{}],操作出现系统异常,param=[{}]", student.getId(), student.getStudentName(), url, param, e);
         } else {
-            log.error("学生操作出现系统异常,param=[{}]", param, e);
+            log.error("学生操作出现系统异常,param=[{}], URL=[{}]", param, url, e);
         }
         return ServerResponse.createByError();
     }
