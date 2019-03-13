@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.AwardUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.TimeUtil;
@@ -1689,8 +1690,26 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         for (SyntheticRewardsList synthetic : gloveOrFlower) {
             Map<String, Object> map = new HashMap<>();
             map.put("url", synthetic.getImgUrl());
-            map.put("state", false);
+            if(useGloveOrFlower!=null){
+                map.put("state", true);
+                map.put("time",48);
+            }else{
+                SyntheticRewardsList isUse = syntheticRewardsListMapper.getIsUse(studentId, synthetic.getName());
+                if(isUse!=null){
+                    Integer count = syntheticRewardsListMapper.selCountByStudentIdAndName(synthetic);
+                    map.put("state", false);
+                    map.put("time",48*count);
+                }else{
+                    map.put("state", true);
+                    map.put("time",48);
+                }
+            }
+            map.put("syntheticInteger", AwardUtil.getMaps(synthetic.getName()));
+            map.put("time",48);
             map.put("type", "gloveOrFlower");
+            map.put("name",synthetic.getName());
+            map.put("message", "得到的金币加成"+ AwardUtil.getNumber(Integer.parseInt(AwardUtil.getMaps(synthetic.getName()).toString())) + "%");
+            map.put("createTime", synthetic.getCreateTime());
             gloveOrFlowerList.add(map);
         }
         if (useGloveOrFlower!=null) {
@@ -1708,14 +1727,22 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
             }
             Map<String, Object> map = new HashMap<>();
             map.put("url", studentSkin.getImgUrl());
-            map.put("state", false);
+            if(studentSkin.getState() == 1){
+                map.put("state", true);
+            }else{
+                map.put("state", false);
+            }
             map.put("type", "skin");
+            map.put("skinIngter",AwardUtil.getMaps(studentSkin.getSkinName()));
+            map.put("id",studentSkin.getId());
+            map.put("name",studentSkin.getSkinName());
+            map.put("message", "个性装扮");
+            map.put("createTime", studentSkin.getCreateTime());
             skinList.add(map);
         }
         resultMap.put("skin", skinList);
         resultMap.put("use",useMap);
         return ServerResponse.createBySuccess(resultMap);
-
     }
 
 }

@@ -50,4 +50,8 @@
     <select id="getUseGloveOrFlower" parameterType="map" resultMap="BaseResultMap">
         select <include refid="Result_Base"></include> from synthetic_rewards_list where student_id=#{studentId} and use_end_time>now() and use_state=1 limit 1
     </select>
+
+    <select id="getIsUse" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="Result_Base"></include> from synthetic_rewards_list where student_id=#{studentId} and use_end_time is null and name=#{name} limit 1
+    </select>
 </mapper>
