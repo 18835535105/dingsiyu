@@ -574,7 +574,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         Integer point = testRecord.getPoint();
         wordUnitTestDTO.setPoint(point);
         Integer goldCount = 0;
-        Map<String, Object> map = new HashMap<>();
+
         if (point >= PASS) {
             if (point > SENCONDARY && point < FULL_MARK) {
                 goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
@@ -591,9 +591,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         }
         testRecord.setGenre("课文默写测试");
         testRecord.setAwardGold(goldCount);
-        int energy = getEnergy(student, wordUnitTestDTO.getPoint());
         studentMapper.updateByPrimaryKeySelective(student);
-        map.put("energy",energy);
+
         student.setSystemGold(student.getSystemGold() + goldCount);
         studentMapper.updateByPrimaryKeySelective(student);
         //添加对象
@@ -601,7 +600,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         testRecord.setCourseId(aLong);
         testRecord.setTestStartTime(startTime);
         testRecord.setTestEndTime(endTime);
+
+        // 封装响应数据
+        Map<String, Object> map = packageResultMap(student, wordUnitTestDTO, point, goldCount, testRecord);
+
         Integer insert = testRecordMapper.insert(testRecord);
+
         if (insert > 0) {
             Learn learn = new Learn();
             learn.setType(1);
@@ -619,24 +623,33 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 learnMapper.insert(learn);
             }
         }
+
+        return ServerResponse.createBySuccess(map);
+    }
+
+    private Map<String, Object> packageResultMap(Student student, WordUnitTestDTO wordUnitTestDTO, Integer point, Integer goldCount, TestRecord testRecord) {
+        Map<String, Object> map = new HashMap<>(16);
+        map.put("energy", getEnergy(student, wordUnitTestDTO.getPoint()));
         map.put("gold", goldCount);
         if (point < PASS) {
             map.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
             map.put("text", "很遗憾，闯关失败，再接再厉。");
             map.put("backMsg", new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+            testRecord.setPass(2);
         } else if (point < NINETY_POINT) {
             map.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
             map.put("text", "闯关成功，独孤求败！");
             map.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+            testRecord.setPass(1);
         } else {
             map.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
             map.put("text", "恭喜你刷新了纪录！");
             map.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+            testRecord.setPass(1);
         }
-
         map.put("point", point);
         map.put("imgUrl", student.getPartUrl());
-        return ServerResponse.createBySuccess(map);
+        return map;
     }
 
     @Override

@@ -20,6 +20,7 @@
         <result column="study_model" property="studyModel" jdbcType="VARCHAR"/>
         <result column="award_gold" property="awardGold" jdbcType="INTEGER"/>
         <result column="better_count" property="betterCount" jdbcType="INTEGER"/>
+        <result column="pass" property="pass" jdbcType="INTEGER"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -84,7 +85,7 @@
     <sql id="Base_Column_List" >
         id, student_id, course_id, unit_id, genre, test_start_time, test_end_time, point,
         history_best_point, history_bad_point, quantity, `explain`, error_count, right_count,
-        study_model, award_gold, better_count
+        study_model, award_gold, better_count, pass
     </sql>
     <sql id="study_model_sql">
         <if test="model == 0">
@@ -478,7 +479,7 @@
     <select id="countUnitTest" resultType="java.lang.Integer" parameterType="map">
         select count(id) from test_record where genre = '单元闯关测试'
         <if test="flag == 1">
-            and point &gt;= 80
+            and pass = 1
         </if>
         and to_days(test_end_time) = to_days(now()) and student_id = #{studentId}
     </select>
@@ -525,7 +526,7 @@
                 '五维测试'
             )
             AND TO_DAYS(test_end_time) = TO_DAYS(now())
-            AND point &gt;= 80
+            AND pass = 1
     </select>
     <select id="countCompleteByStudentId" resultType="java.util.Map" parameterType="map">
         SELECT

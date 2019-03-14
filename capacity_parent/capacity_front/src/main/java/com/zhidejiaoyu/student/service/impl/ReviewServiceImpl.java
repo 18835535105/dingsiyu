@@ -821,7 +821,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                                                        Integer[] errorWordId, Long[] unitId, Integer classify, Long courseId,
                                                        HttpSession session, Integer point, String genre,String testDetail) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        TestResultVo vo = new TestResultVo();
 
         // 保存测试记录
         int quantity;
@@ -841,19 +840,25 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             saveTestLearnAndCapacity.saveLearnAndCapacity(correctWord, errorWord,
                     correctWordId, errorWordId, session, student, unitId, classify);
         }
-        int[] gold = this.saveTestRecord(quantity, errorCount, rightCount, classify, session, student, point, genre, courseId,unitId);
-        if(testDetail!=null){
-            // 根据不同分数奖励学生金币
-            this.saveTestDetail(testDetail, (long) gold[1], classify, student);
-        }
         WordUnitTestDTO wordUnitTestDTO = new WordUnitTestDTO();
         wordUnitTestDTO.setPoint(point);
         wordUnitTestDTO.setUnitId(unitId);
         wordUnitTestDTO.setCourseId(courseId);
         wordUnitTestDTO.setClassify(classify);
+
+        TestRecord testRecord = this.saveTestRecord(quantity, errorCount, rightCount, classify, session, student, point, genre, courseId,unitId);
+
+        TestResultVo vo = new TestResultVo();
         // 封装提示语
-        packagePetSay(gold[0], wordUnitTestDTO, student, vo, genre);
+        packagePetSay(testRecord, wordUnitTestDTO, student, vo, genre);
         vo.setEnergy(getEnergy(student, point));
+
+        testRecordMapper.insert(testRecord);
+        if(testDetail!=null){
+            // 根据不同分数奖励学生金币
+            this.saveTestDetail(testDetail, testRecord.getId(), classify, student);
+        }
+
         countMyGoldUtil.countMyGold(student);
         return ServerResponse.createBySuccess(vo);
     }
@@ -956,13 +961,14 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
     /**
      * 已学测试, 生词测试, 熟词测试, 五维测试
-     *  @param gold
+     *
+     * @param testRecord
      * @param dto
      * @param student
      * @param vo
      * @param genre
      */
-    private void packagePetSay(Integer gold, WordUnitTestDTO dto, Student student, TestResultVo vo, String genre) {
+    private void packagePetSay(TestRecord testRecord, WordUnitTestDTO dto, Student student, TestResultVo vo, String genre) {
         String msg = "";
         String petName = student.getPetName();
         int point = dto.getPoint();
@@ -976,11 +982,13 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     msg = "闯关失败，请再接再厉！";
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.CAPACITY_REVIEW_LESS_EIGHTY));
                     vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
+                    testRecord.setPass(2);
                 } else {
                     msg = "真让人刮目相看！继续学习吧！";
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.CAPACITY_REVIEW_EIGHTY_TO_HUNDRED));
                     ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId, point);
                     vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    testRecord.setPass(1);
                 }
                 vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "智能复习测试"));
                 break;
@@ -999,8 +1007,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 }
                 if (point < 90) {
                     vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
+                    testRecord.setPass(2);
                 } else {
                     vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    testRecord.setPass(1);
                 }
 
                 msg = point < 90 ? "你的测试未通过，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
@@ -1016,8 +1026,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 }
                 if (point < 90) {
                     vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
+                    testRecord.setPass(2);
                 } else {
                     vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    testRecord.setPass(1);
                 }
                 msg = point < 90 ? "你的测试未成功，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
                 vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "五维测试"));
@@ -1025,7 +1037,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             default:
         }
 
-        vo.setGold(gold);
+        vo.setGold(testRecord.getAwardGold());
         vo.setMsg(msg);
     }
 
@@ -1422,7 +1434,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
      * @param courseId
      * @return 学生获得的金币数
      */
-    private int[] saveTestRecord(int quantity, int errorCount, int rightCount, Integer classify, HttpSession
+    private TestRecord saveTestRecord(int quantity, int errorCount, int rightCount, Integer classify, HttpSession
             session, Student student, Integer point, String genre, Long courseId,Long[] unitIds) {
         Long unitId = (unitIds == null || unitIds.length ==0) ? null : unitIds[0];
         String studyModel = commonMethod.getTestType(classify);
@@ -1440,7 +1452,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         testRecord.setErrorCount(errorCount);
         testRecord.setCourseId(courseId);
         testRecord.setUnitId(unitId);
-        int gold = 0;
 
         if ("已学测试".equals(genre) || "生词测试".equals(genre) || "熟词测试".equals(genre) || genre.contains("五维测试")
                 || genre.contains("生句测试") || genre.contains("熟句测试")) {
@@ -1457,7 +1468,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             if (testRecords.size() == 0) {
                 initTestCenterBetterCount(point, testRecord);
                 msg.append("id 为 ").append(stuId).append(" 的学生在 测试中心 -> ");
-                gold = decideFiveD(point, genre, student, msg, studyModel, testRecord);
+                decideFiveD(point, genre, student, msg, studyModel, testRecord);
             } else {
                 TestRecord preTestRecord = testRecords.get(0);
                 if (preTestRecord.getPoint() < point) {
@@ -1467,7 +1478,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                         testRecord.setBetterCount(preTestRecord.getBetterCount());
                     }
                     msg.append("id 为 ").append(stuId).append(" 的学生在 测试中心 -> ");
-                    gold = decideFiveD(point, genre, student, msg, studyModel, testRecord);
+                    decideFiveD(point, genre, student, msg, studyModel, testRecord);
                 }
             }
         } else if ("已学测试".equals(genre) || "生词测试".equals(genre) || "熟词测试".equals(genre) || "熟句测试".equals(genre) || "生句测试".equals(genre)) {
@@ -1476,7 +1487,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             if (testRecords.size() == 0) {
                 initTestCenterBetterCount(point, testRecord);
                 msg.append("id 为 ").append(stuId).append(" 的学生在 测试中心 -> ");
-                gold = decideLearnedUnKnown(point, genre, student, msg, studyModel, testRecord);
+                decideLearnedUnKnown(point, genre, student, msg, studyModel, testRecord);
             } else {
                 TestRecord preTestRecord = testRecords.get(0);
                 if (preTestRecord.getPoint() < point) {
@@ -1486,18 +1497,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                         testRecord.setBetterCount(preTestRecord.getBetterCount());
                     }
                     msg.append("id 为 ").append(stuId).append(" 的学生在 测试中心 -> ");
-                    gold = decideLearnedUnKnown(point, genre, student, msg, studyModel, testRecord);
+                    decideLearnedUnKnown(point, genre, student, msg, studyModel, testRecord);
                 }
-            }
-            int testType = 3;
-            if ("生词测试".equals(genre)) {
-                testType = 4;
-            } else if ("熟词测试".equals(genre)) {
-                testType = 5;
-            } else if("熟句测试".equals(genre)){
-                testType=12;
-            }else if("生句测试".equals(genre)){
-                testType=13;
             }
         } else if ("复习测试".equals(genre)) {
             // 判断学生之前是否已经在当前课程有过“已学测试”或者“生词测试”或者“熟词测试”
@@ -1513,12 +1514,11 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 }
             }
             // 奖励金币信息
-            gold = reviewGold(point, genre, student, msg, studyModel, testRecord);
+            reviewGold(point, genre, student, msg, studyModel, testRecord);
         }
 
         studentMapper.updateByPrimaryKeySelective(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
-        testRecordMapper.insert(testRecord);
         if (msg.length() > 0) {
             logger.info(msg.toString());
             RunLog runLog = new RunLog(stuId, 4, msg.toString(), new Date());
@@ -1526,10 +1526,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             runLog.setCourseId(student.getCourseId());
             runLogMapper.insert(runLog);
         }
-        int[] i = new int[2];
-        i[0]=gold;
-        i[1]=testRecord.getId().intValue();
-        return i;
+        return testRecord;
     }
 
     /**
@@ -1556,12 +1553,11 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
      * @param studyModel
      * @param testRecord
      */
-    private int reviewGold(Integer point, String genre, Student student, StringBuilder msg, String
+    private void reviewGold(Integer point, String genre, Student student, StringBuilder msg, String
             studyModel, TestRecord testRecord) {
-        int gold = 0;
         if (point >= 80) {
             // 奖励1金币
-            gold = testRecord.getBetterCount() * TestAwardGoldConstant.REVIEW_TEST_NINETY_TO_FULL;
+            int gold = testRecord.getBetterCount() * TestAwardGoldConstant.REVIEW_TEST_NINETY_TO_FULL;
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
             testRecord.setAwardGold(gold);
             msg.append("id 为 ").append(student.getId()).append(" 的学生在 ").append(genre).append(studyModel)
@@ -1569,7 +1565,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         } else {
             testRecord.setAwardGold(0);
         }
-        return gold;
     }
 
     /**
@@ -1582,19 +1577,18 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
      * @param studyModel
      * @param testRecord
      */
-    private int decideLearnedUnKnown(Integer point, String genre, Student student, StringBuilder msg, String
+    private void decideLearnedUnKnown(Integer point, String genre, Student student, StringBuilder msg, String
             studyModel, TestRecord testRecord) {
-        int gold = 0;
         msg.append(genre).append(studyModel);
         if (point < 90 && point >= 80) {
             // 奖励2金币
-            gold = testRecord.getBetterCount() * TestAwardGoldConstant.TEST_CENTER_ENGHTY_TO_NINETY;
+            int gold = testRecord.getBetterCount() * TestAwardGoldConstant.TEST_CENTER_ENGHTY_TO_NINETY;
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
             testRecord.setAwardGold(gold);
             msg.append(" 中获得#").append(gold).append("#金币。");
         } else if (point >= 90 && point <= 100) {
             // 奖励5枚金币
-            gold = testRecord.getBetterCount() * TestAwardGoldConstant.TEST_CENTER_NINETY_TO_FULL;
+            int gold = testRecord.getBetterCount() * TestAwardGoldConstant.TEST_CENTER_NINETY_TO_FULL;
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
             testRecord.setAwardGold(gold);
             msg.append(" 中获得#").append(gold).append("#金币。");
@@ -1602,7 +1596,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             testRecord.setAwardGold(0);
             msg.append(" 中未获得金币");
         }
-        return gold;
     }
 
     /**
@@ -1615,19 +1608,18 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
      * @param studyModel
      * @param testRecord
      */
-    private int decideFiveD(Integer point, String genre, Student student, StringBuilder msg, String
+    private void decideFiveD(Integer point, String genre, Student student, StringBuilder msg, String
             studyModel, TestRecord testRecord) {
-        int gold = 0;
         msg.append(genre).append(studyModel);
         if (point < 90 && point >= 80) {
             // 奖励10金币
-            gold = testRecord.getBetterCount() * TestAwardGoldConstant.FIVE_TEST_EIGHTY_TO_NINETY;
+            int  gold = testRecord.getBetterCount() * TestAwardGoldConstant.FIVE_TEST_EIGHTY_TO_NINETY;
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
             testRecord.setAwardGold(gold);
             msg.append(" 中获得#").append(gold).append("#金币。");
         } else if (point >= 90 && point <= 100) {
             // 奖励20枚金币
-            gold = testRecord.getBetterCount() * TestAwardGoldConstant.FIVE_TEST_NINETY_TO_FULL;
+            int gold = testRecord.getBetterCount() * TestAwardGoldConstant.FIVE_TEST_NINETY_TO_FULL;
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
             testRecord.setAwardGold(gold);
             msg.append(" 中获得#").append(gold).append("#金币。");
@@ -1635,8 +1627,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             testRecord.setAwardGold(0);
             msg.append(" 中获得#0#金币。");
         }
-        return gold;
-
     }
 
 }
