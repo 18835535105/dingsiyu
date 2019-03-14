@@ -296,25 +296,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             Integer count = capacityMapper.countNeedReviewByCourseIdOrUnitId(student, null, Long.valueOf(unit_id), commonMethod.getTestType(classify));
             map.put("wordCount", count);
         }
-        // 任务课程-复习, 根据课程查询
-        /*if (StringUtils.isNotBlank(course_id)) {
-            // 查询条件2.2:课程id
-            ca.setCourse_id(Long.valueOf(course_id));
-
-            // 根据课程id获取课程名
-            String courseName = courseMapper.selectByCourseName(course_id);
-            // 课程id
-
-            // 课程名
-            map.put("courseName", courseName);
-
-            // 该课程已学单词
-            Long count_ = learnMapper.learnCourseCountWord(studentId, course_id, model);
-            map.put("plan", count_);
-            // 该课程一共多少单词
-            Integer count = unitMapper.countWordByCourse(course_id);
-            map.put("wordCount", count);
-        }*/
         // 查询条件3:模块
         ca.setClassify(classify + "");
         // 查询条件4:当前时间
@@ -364,6 +345,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             Integer hard = memoryDifficultyUtil.getMemoryDifficulty(cm, 1);
             map.put("memoryDifficulty", hard);
         }
+        map.put("studyNew", false);
 
         return map;
     }
