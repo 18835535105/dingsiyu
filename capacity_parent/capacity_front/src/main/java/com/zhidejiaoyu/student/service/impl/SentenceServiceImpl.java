@@ -668,8 +668,15 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             if(studentStudyPlans!=null && studentStudyPlans.size()>0){
                 capacityStudentUnit.setStartunit(studentStudyPlans.get(0).getStartUnitId());
                 capacityStudentUnit.setEndunit(studentStudyPlans.get(0).getEndUnitId());
+                capacityStudentUnitMapper.insert(capacityStudentUnit);
+                // 判断是否可以学习当前句型模块
+                boolean canLearn = this.canLearn(student, unitId, 4, sentenceCount, learnCount);
+                map.put("hearing", canLearn);
+
+                // 判断是否可以学习当前句型模块
+                boolean transliteration = this.canLearn(student, unitId, 6, sentenceCount, learnCount);
+                map.put("transliteration", transliteration);
             }
-            capacityStudentUnitMapper.insert(capacityStudentUnit);
         } else {
             capacityStudentUnit.setUnitId(unitId);
             capacityStudentUnit.setCourseId(unit.getCourseId());
@@ -682,16 +689,14 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 capacityStudentUnit.setStartunit(studentStudyPlans.get(0).getStartUnitId());
                 capacityStudentUnit.setEndunit(studentStudyPlans.get(0).getEndUnitId());
                 capacityStudentUnitMapper.updateById(capacityStudentUnit);
+                // 判断是否可以学习当前句型模块
+                boolean canLearn = this.canLearn(student, unitId, 4, sentenceCount, learnCount);
+                map.put("hearing", canLearn);
+                // 判断是否可以学习当前句型模块
+                boolean transliteration = this.canLearn(student, unitId, 6, sentenceCount, learnCount);
+                map.put("transliteration", transliteration);
             }
         }
-        // 判断是否可以学习当前句型模块
-        boolean canLearn = this.canLearn(student, unitId, 4, sentenceCount, learnCount);
-        map.put("hearing", canLearn);
-
-        // 判断是否可以学习当前句型模块
-        boolean transliteration = this.canLearn(student, unitId, 6, sentenceCount, learnCount);
-        map.put("transliteration", transliteration);
-
         return ServerResponse.createBySuccess(map);
     }
 
