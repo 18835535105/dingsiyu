@@ -260,7 +260,8 @@ public class StudentInfoController extends BaseController {
         }
         // todo：调试用
         if (num != null) {
-            log.error("debug : num={}", num);
+            Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+            log.error("debug : studentId={}, studentName={}, num={}", student.getId(), student.getStudentName(), num);
         }
         return studentInfoService.calculateValidTime(session, classify, courseId, unitId, valid);
     }
