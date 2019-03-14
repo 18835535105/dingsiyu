@@ -799,9 +799,6 @@
             <if test="updateTime != null">
                 update_time = #{updateTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="role != null">
-                role = #{role,jdbcType=INTEGER},
-            </if>
             <if test="version != null">
                 version = #{version,jdbcType=VARCHAR},
             </if>
@@ -883,7 +880,6 @@
             worship_first_time      = #{worshipFirstTime,jdbcType=TIMESTAMP},
             `rank`                  = #{rank,jdbcType=INTEGER},
             update_time             = #{updateTime,jdbcType=TIMESTAMP},
-            role                    = #{role,jdbcType=INTEGER},
             version                 = #{version,jdbcType=VARCHAR},
             first_study_time        = #{firstStudyTime,jdbcType=TIMESTAMP},
             course_id               = #{courseId,jdbcType=BIGINT},

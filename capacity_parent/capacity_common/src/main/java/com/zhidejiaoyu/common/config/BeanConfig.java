@@ -1,12 +1,17 @@
 package com.zhidejiaoyu.common.config;
 
+import com.alibaba.druid.support.http.StatViewServlet;
 import com.zhidejiaoyu.common.utils.http.FtpUtil;
 import com.zhidejiaoyu.common.utils.http.HttpClientUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * bean管理工具类
@@ -59,5 +64,21 @@ public class BeanConfig {
 	@Bean
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
+	}
+
+	@Bean
+	public ServletRegistrationBean druidServlet() {
+		ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean();
+		servletRegistrationBean.setServlet(new StatViewServlet());
+		servletRegistrationBean.addUrlMappings("/druid/*");
+		Map<String, String> initParameters = new HashMap<>(16);
+		initParameters.put("resetEnable", "false");
+		initParameters.put("allow", "");
+		initParameters.put("loginUsername", "admin");
+		initParameters.put("loginPassword", "zhide2018");
+		initParameters.put("deny", "");
+		//如果某个ip同时存在，deny优先于allow
+		servletRegistrationBean.setInitParameters(initParameters);
+		return servletRegistrationBean;
 	}
 }
