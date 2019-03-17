@@ -242,7 +242,7 @@ public class StudentInfoController extends BaseController {
     @PostMapping("/endValidTime")
     public ServerResponse<String> endValidTime(HttpSession session, Integer classify,
                                                Long courseId, Long unitId, String validTime, @RequestParam(required = false) Integer num) {
-        if (classify == null || courseId == null) {
+        if (classify == null) {
             log.error("保存有效时长，参数有误：classify=[{}], courseId=[{}]", classify, courseId);
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
         }

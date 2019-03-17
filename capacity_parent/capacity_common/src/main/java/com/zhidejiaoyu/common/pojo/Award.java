@@ -49,6 +49,17 @@ public class Award extends Model<Award> {
 
     private Date getTime;
 
+
+    /**
+     * 当前完成进度
+     */
+    private Integer currentPlan;
+
+    /**
+     * 需要完成的总进度
+     */
+    private Integer totalPlan;
+
     @Override
     protected Serializable pkVal() {
         return this.id;

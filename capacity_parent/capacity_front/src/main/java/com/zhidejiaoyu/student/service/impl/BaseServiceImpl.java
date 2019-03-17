@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.mapper.StudyFlowMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudyFlow;
 import com.zhidejiaoyu.common.utils.TokenUtil;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.student.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,28 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
             onlineTime += loginTime;
         }
         return onlineTime;
+    }
+
+    /**
+     * 计算今天的在线时长
+     *
+     * @param session
+     * @return
+     */
+    Integer getTodayOnlineTime(HttpSession session) {
+        String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
+        return this.getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
+    }
+
+    /**
+     * 计算今天的有效时长
+     *
+     * @param studentId
+     * @return
+     */
+    Integer getTodayValidTime(Long studentId) {
+        String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
+        return this.getValidTime(studentId, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
     }
 
     @Override

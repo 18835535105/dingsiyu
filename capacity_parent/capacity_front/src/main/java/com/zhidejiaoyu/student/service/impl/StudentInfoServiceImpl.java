@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.student.level.ChildMedalVo;
 import com.zhidejiaoyu.common.Vo.student.level.LevelVo;
+import com.zhidejiaoyu.common.constant.MedalConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 
 @Service
 public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements StudentInfoService {
@@ -63,6 +65,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
     @Autowired
     private CountMyGoldUtil countMyGoldUtil;
+
+    @Autowired
+    private ExecutorService executorService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -318,7 +323,59 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             countMyGoldUtil.countMyGold(student);
         }
         session.removeAttribute(TimeConstant.BEGIN_VALID_TIME);
+
+        // 辉煌荣耀勋章：今天学习效率>目标学习效率 currentPlan ++；否则不操作，每天第一次登录的时候查看昨天是否有更新辉煌荣耀勋章，如果没更新，将其 currentPlan 置为0
+        executorService.execute(() -> this.honour(session));
         return ServerResponse.createBySuccessMessage(tip);
+    }
+
+    /**
+     * 更新辉煌荣耀勋章
+     *
+     * @param session
+     */
+    private void honour(HttpSession session) {
+        Student student = super.getStudent(session);
+        // 今日学习效率
+        double validTime = super.getTodayValidTime(student.getId());
+        double onlineTime = super.getTodayOnlineTime(session);
+        double efficiency = BigDecimalUtil.div(validTime, onlineTime, 2);
+
+        // 辉煌荣耀子勋章id
+        List<Medal> children = medalMapper.selectChildrenIdByParentId(6);
+
+        // 获取勋章奖励信息
+        List<Award> awards = awardMapper.selectMedalByStudentIdAndMedalType(student, children);
+
+        if (awards.size() > 0) {
+            Date date = new Date();
+            int size = awards.size();
+            Award award;
+            try {
+                for (int i = 0; i < size; i++) {
+                    award = awards.get(i);
+                    // 总进度为空或者总进度不等于需要完成的总进度，重新设置奖励总进度
+                    if (award.getTotalPlan() == null || award.getTotalPlan() != MedalConstant.HONOUR_TOTAL_PLAN[i]) {
+                        award.setTotalPlan(MedalConstant.HONOUR_TOTAL_PLAN[i]);
+                    }
+                    // 如果总进度!=当前完成进度，更新当前完成进度
+                    if (!Objects.equals(award.getTotalPlan(), award.getCurrentPlan())) {
+                        // 学习效率 >= 需要完成的学习效率，并且当前记录不是今天更新的，进度++
+                        if (efficiency >= MedalConstant.HONOUR_TARGET_PLAN[i] && !Objects.equals(DateUtil.formatYYYYMMDD(award.getCreateTime()), DateUtil.formatYYYYMMDD(date))) {
+                            if (award.getCurrentPlan() == null) {
+                                award.setCurrentPlan(1);
+                            } else {
+                                award.setCurrentPlan(award.getCurrentPlan() + 1);
+                            }
+                            award.setCreateTime(date);
+                        }
+                        awardMapper.updateById(award);
+                    }
+                }
+            } catch (Exception e) {
+                log.error("实时计算辉煌荣耀勋章出错，studentId=[{}], studentName=[{}], error=[{}]", student.getId(), student.getStudentName(), e);
+            }
+        }
     }
 
     private Duration packageDuration(Integer classify, Long courseId, Long unitId, Long validTime, Student student, Date loginTime) {

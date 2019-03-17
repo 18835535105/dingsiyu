@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Award;
 import com.zhidejiaoyu.common.pojo.AwardExample;
 import com.zhidejiaoyu.common.pojo.Medal;
@@ -10,14 +11,12 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
-public interface AwardMapper {
+public interface AwardMapper extends BaseMapper<Award> {
     int countByExample(AwardExample example);
 
     int deleteByExample(AwardExample example);
 
     int deleteByPrimaryKey(Long id);
-
-    int insert(Award record);
 
     int insertSelective(Award record);
 
