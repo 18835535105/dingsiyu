@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.config;
 
 import com.alibaba.druid.support.http.StatViewServlet;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.zhidejiaoyu.common.utils.http.FtpUtil;
 import com.zhidejiaoyu.common.utils.http.HttpClientUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
@@ -12,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.*;
 
 /**
  * bean管理工具类
@@ -64,6 +66,15 @@ public class BeanConfig {
 	@Bean
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
+	}
+
+	@Bean
+	public ExecutorService singleThreadPool() {
+		ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
+				.setNameFormat("zdjy-pool-%d").build();
+		return new ThreadPoolExecutor(10, 20,
+				0L, TimeUnit.MILLISECONDS,
+				new LinkedBlockingQueue<>(1024), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
 	}
 
 	@Bean

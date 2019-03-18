@@ -88,6 +88,11 @@ public class CcieUtil {
         }
         String today = DateUtil.formatDate(new Date(), "yyyyMMdd");
         sb.append(today);
+        if (type == 1) {
+            today = "N" + today;
+        } else {
+            today = "K" + today;
+        }
         String maxCcieNo = ccieMapper.selectMaxCcieNo(type, today);
         if (StringUtils.isEmpty(maxCcieNo)) {
             sb.append("1000");

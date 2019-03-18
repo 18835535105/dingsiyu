@@ -88,6 +88,11 @@ public class TestRecord extends Model<TestRecord> {
      */
     private Integer betterCount;
 
+    /**
+     * 1：测试通过；2：测试未通过
+     */
+    private Integer pass;
+
     @Override
     protected Serializable pkVal() {
         return this.id;

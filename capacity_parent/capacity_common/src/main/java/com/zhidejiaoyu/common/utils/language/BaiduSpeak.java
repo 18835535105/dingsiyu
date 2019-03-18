@@ -47,6 +47,7 @@ public class BaiduSpeak {
         wordMap.put("Mr.", "Mr.");
         wordMap.put("car", "car");
         wordMap.put("before", "before");
+        wordMap.put("fast", "fast");
     }
 
     /**

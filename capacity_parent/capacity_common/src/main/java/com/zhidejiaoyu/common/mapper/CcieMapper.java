@@ -50,7 +50,7 @@ public interface CcieMapper extends BaseMapper<Ccie> {
      * @param today 当天时间的 yyyyMMdd
      * @return
      */
-    @Select("select ccie_no from ccie where ccie_no like concat(concat('%', #{today}), '%') and test_type = #{type} order by id desc limit 1")
+    @Select("select ccie_no from ccie where ccie_no like concat(#{today}, '%') and test_type = #{type} order by id desc limit 1")
     String selectMaxCcieNo(@Param("type") Integer type, @Param("today") String today);
 
     /**

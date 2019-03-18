@@ -11,6 +11,8 @@
         <result column="get_flag" property="getFlag" jdbcType="INTEGER"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="get_time" property="getTime" jdbcType="TIMESTAMP"/>
+        <result column="current_plan" property="currentPlan" jdbcType="INTEGER"/>
+        <result column="total_plan" property="totalPlan" jdbcType="INTEGER"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -73,7 +75,7 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-        id, student_id, medal_type, award_content_type, type, can_get, get_flag, get_time, create_time
+        id, student_id, medal_type, award_content_type, type, can_get, get_flag, get_time, create_time, current_plan, total_plan
     </sql>
     <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.AwardExample">
         select
@@ -105,21 +107,7 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.Award" useGeneratedKeys="true" keyColumn="id"
-            keyProperty="id">
-        insert into award (id, student_id, medal_type,
-                           award_content_type,
-                           type,
-                           can_get,
-                           get_flag,
-                           create_time,
-                           get_time)
-        values (#{id,jdbcType=BIGINT}, #{studentId,jdbcType=BIGINT}, #{medalType,jdbcType=BIGINT},
-                #{awardContentType,jdbcType=INTEGER}, #{type,jdbcType=VARCHAR}, #{canGet,jdbcType=INTEGER},
-                #{getFlag,jdbcType=INTEGER},
-                #{createTime,jdbcType=TIMESTAMP},
-                #{getTime,jdbcType=TIMESTAMP})
-    </insert>
+
     <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Award">
         insert into award
         <trim prefix="(" suffix=")" suffixOverrides=",">

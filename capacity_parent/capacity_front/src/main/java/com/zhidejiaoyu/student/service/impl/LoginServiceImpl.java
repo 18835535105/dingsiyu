@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.common.MacIpUtil;
+import com.zhidejiaoyu.common.constant.MedalConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
@@ -17,6 +18,7 @@ import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.common.personal.InitRedPointThread;
 import com.zhidejiaoyu.student.service.LoginService;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -110,6 +113,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Autowired
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
+
+    @Autowired
+    private ExecutorService executorService;
 
     @Autowired
     private StudentStudyPlanMapper studentStudyPlanMapper;
@@ -974,6 +980,43 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 awardMapper.insert(award);
             } catch (Exception e) {
                 logger.error("保存学生 {} -> {} 首次登陆奖励信息失败！", stu.getId(), stu.getStudentName(), e);
+            }
+
+            // 如果昨天辉煌荣耀奖励没有更新，将指定的奖励当前进度置为0
+            executorService.execute(() -> this.updateHonour(stu));
+        }
+    }
+
+    /**
+     * 如果学生辉煌荣耀等级没有更新，将该奖励金都置为0
+     *
+     * @param student
+     */
+    private void updateHonour(Student student) {
+        // 辉煌荣耀子勋章id
+        List<Medal> children = medalMapper.selectChildrenIdByParentId(6);
+
+        // 获取勋章奖励信息
+        List<Award> awards = awardMapper.selectMedalByStudentIdAndMedalType(student, children);
+
+        if (awards.size() > 0) {
+            try {
+                Award award;
+                int size = awards.size();
+                for (int i = 0; i < size; i++) {
+                    award = awards.get(i);
+                    if (award.getTotalPlan() == null) {
+                        award.setTotalPlan(MedalConstant.HONOUR_TOTAL_PLAN[i]);
+                    }
+                    // 如果总进度!=当前完成进度并且昨天没有更新（昨天不更新说明没有达到条件）,将当前进度置为0
+                    if (!Objects.equals(award.getTotalPlan(), award.getCurrentPlan())
+                            && !Objects.equals(DateUtil.formatYYYYMMDD(award.getCreateTime()), DateUtil.formatYYYYMMDD(new DateTime().minusDays(1).toDate()))) {
+                        award.setCurrentPlan(0);
+                    }
+                    awardMapper.updateById(award);
+                }
+            } catch (Exception e) {
+                logger.error("首次登陆更新辉煌荣耀勋章奖励信息失败！studentId={}, studentName={}", student.getId(), student.getStudentName(), e);
             }
         }
     }
