@@ -1692,20 +1692,19 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
             map.put("url", synthetic.getImgUrl());
             if(useGloveOrFlower!=null){
                 map.put("state", true);
-                map.put("time",48);
+                map.put("time",48+"小时00分00秒");
             }else{
                 SyntheticRewardsList isUse = syntheticRewardsListMapper.getIsUse(studentId, synthetic.getName());
                 if(isUse!=null){
                     Integer count = syntheticRewardsListMapper.selCountByStudentIdAndName(synthetic);
                     map.put("state", false);
-                    map.put("time",48*count);
+                    map.put("time",48*count+"小时00分00秒");
                 }else{
                     map.put("state", true);
-                    map.put("time",48);
+                    map.put("time",48+"小时00分00秒");
                 }
             }
             map.put("syntheticInteger", AwardUtil.getMaps(synthetic.getName()));
-            map.put("time",48);
             map.put("type", "gloveOrFlower");
             map.put("name",synthetic.getName());
             map.put("message", "得到的金币加成"+ AwardUtil.getNumber(Integer.parseInt(AwardUtil.getMaps(synthetic.getName()).toString())) + "%");
