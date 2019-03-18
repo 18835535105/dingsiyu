@@ -629,7 +629,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
 
         Map<String, Object> map = new HashMap<>(16);
-
+        map.put("sex",student.getSex());
         // 获取今日已学单词
         int learnWord = learnMapper.getTodayWord(DateUtil.formatYYYYMMDD(new Date()), studentId);
         // 获取今日已学例句

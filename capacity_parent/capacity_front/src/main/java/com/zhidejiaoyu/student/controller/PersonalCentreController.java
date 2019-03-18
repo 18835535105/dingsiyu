@@ -1,16 +1,24 @@
 package com.zhidejiaoyu.student.controller;
 
+import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.service.AwardService;
 import com.zhidejiaoyu.student.service.PersonalCentreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpSession;
 import java.text.ParseException;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,7 +35,14 @@ public class PersonalCentreController {
 
 	@Autowired
 	private PersonalCentreService personalCentreService;
-	
+
+	@Value("${domain}")
+	private String domain;
+
+	@Autowired
+	private RestTemplate restTemplate;
+
+
 	/**
 	 * 点击个人中心
 	 * 	1.消息中心红点是否显示
@@ -239,7 +254,6 @@ public class PersonalCentreController {
 	 * 将证书的是否已读状态更新为“已读”状态
 	 *
 	 * @param session
-	 * @param ccieId  证书id
 	 * @return
 	 */
 	@PostMapping("/updateCcie")
@@ -262,4 +276,39 @@ public class PersonalCentreController {
 	public Object getLucky(Integer studentId,HttpSession session){
 		return personalCentreService.getLucky(studentId,session);
 	}
+
+	//查看今天是否为第一次抽奖
+	@PostMapping("getRecord")
+	public ServerResponse<Object> getRecord(HttpSession session){
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("session", session.toString());
+		headers.add("studentId",  ((Student)session.getAttribute(UserConstant.CURRENT_STUDENT)).getId().toString());
+		headers.add("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)).toString());
+		MediaType sType = MediaType.parseMediaType("application/json; charset=UTF-8");
+		headers.setContentType(sType);
+		String url = domain + "/api/drawRecord/getRecord";
+		ResponseEntity<Map> responseEntity =restTemplate.postForEntity(url,headers,Map.class);
+		return ServerResponse.createBySuccess(responseEntity.getBody() == null ? null : responseEntity.getBody().get("data"));
+	}
+
+	//添加抽奖
+	@PostMapping("addAward")
+	public ServerResponse<Object> addAward(HttpSession session,Integer type,String explain, String imgUrl){
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("explain", explain);
+		headers.add("session", session.toString());
+		headers.add("type", type.toString());
+		if(imgUrl!=null){
+			headers.add("imgUrl", imgUrl.toString());
+		}
+		headers.add("studentId",  ((Student)session.getAttribute(UserConstant.CURRENT_STUDENT)).getId().toString());
+		headers.add("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)).toString());
+		MediaType sType = MediaType.parseMediaType("application/json; charset=UTF-8");
+		headers.setContentType(sType);
+		String url = domain + "/api/drawRecord/AddAward";
+		ResponseEntity<Map> responseEntity =restTemplate.postForEntity(url,headers,Map.class);
+		return ServerResponse.createBySuccess(responseEntity.getBody() == null ? null : responseEntity.getBody().get("data"));
+	}
+
+
 }

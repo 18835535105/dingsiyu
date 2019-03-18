@@ -36,16 +36,7 @@ public class TestController {
     @Autowired
     private TestService testService;
 
-    /**
-     * 获取游戏测试题目
-     *
-     * @param session
-     * @return
-     */
-    @GetMapping("/getGameTest")
-    public ServerResponse<Map<String, Object>> getGameSubject(HttpSession session) {
-        return testService.getGameSubject(session);
-    }
+
 
     /**
      * 保存学生游戏测试记录
@@ -263,7 +254,7 @@ public class TestController {
     }
 
     /**
-     * 获取学前游戏测试题目
+     * 获取游戏实力初显
      *
      * @param session
      * @return
@@ -271,6 +262,16 @@ public class TestController {
     @GetMapping("/getStrengthGame")
     public ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session) {
         return testService.getStrengthGame(session);
+    }
+    /**
+     * 获取游戏 找同学
+     *
+     * @param session
+     * @return
+     */
+    @GetMapping("/getGameTest")
+    public ServerResponse<Map<String, Object>> getGameSubject(HttpSession session) {
+        return testService.getGameSubject(session);
     }
 
 }
