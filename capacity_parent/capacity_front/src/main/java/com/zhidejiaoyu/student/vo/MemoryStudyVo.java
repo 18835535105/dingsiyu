@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
 
 /**
  * 慧记忆学习页面数据
@@ -8,7 +9,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author wuchenxi
  * @date 2018年5月10日
  */
-@JsonInclude(JsonInclude.Include.NON_EMPTY)public class MemoryStudyVo{
+@Data
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public class MemoryStudyVo {
 
 	/** 单词id */
 	private Long wordId;
@@ -47,100 +50,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 	private String readUrl;
 
-	public String getSyllable() {
-		return syllable;
-	}
-
-	public void setSyllable(String syllable) {
-		this.syllable = syllable;
-	}
-
-	public String getReadUrl() {
-		return readUrl;
-	}
-
-	public void setReadUrl(String readUrl) {
-		this.readUrl = readUrl;
-	}
-
-	public Long getWordId() {
-		return wordId;
-	}
-
-	public void setWordId(Long wordId) {
-		this.wordId = wordId;
-	}
-
-	public Long getWordCount() {
-		return wordCount;
-	}
-
-	public void setWordCount(Long wordCount) {
-		this.wordCount = wordCount;
-	}
-
-	public Long getPlan() {
-		return plan;
-	}
-
-	public void setPlan(Long plan) {
-		this.plan = plan;
-	}
-
-	public Boolean getStudyNew() {
-		return studyNew;
-	}
-
-	public void setStudyNew(Boolean studyNew) {
-		this.studyNew = studyNew;
-	}
-
-	public String getWord() {
-		return word;
-	}
-
-	public void setWord(String word) {
-		this.word = word;
-	}
-
-	public String getWordChinese() {
-		return wordChinese;
-	}
-
-	public void setWordChinese(String wordChinese) {
-		this.wordChinese = wordChinese;
-	}
-
-    public String getSoundMark() {
-        return soundMark;
-    }
-
-    public void setSoundMark(String soundMark) {
-        this.soundMark = soundMark;
-    }
-
-    public Boolean getFirstStudy() {
-        return firstStudy;
-    }
-
-    public void setFirstStudy(Boolean firstStudy) {
-        this.firstStudy = firstStudy;
-    }
-
-    public Integer getMemoryDifficulty() {
-		return memoryDifficulty;
-	}
-
-	public void setMemoryDifficulty(Integer memoryDifficulty) {
-		this.memoryDifficulty = memoryDifficulty;
-	}
-
-	public Double getMemoryStrength() {
-		return memoryStrength;
-	}
-
-	public void setMemoryStrength(Double memoryStrength) {
-		this.memoryStrength = memoryStrength;
-	}
-
+	/**
+	 * 认知引擎
+	 */
+	private Integer engine;
 }

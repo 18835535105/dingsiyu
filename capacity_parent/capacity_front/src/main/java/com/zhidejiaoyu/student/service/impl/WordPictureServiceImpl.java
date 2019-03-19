@@ -11,7 +11,7 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.service.BaseService;
+import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.service.WordPictureService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,6 +142,9 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
         Integer hard = memoryDifficultyUtil.getMemoryDifficulty(cp, 1);
         correct.put("memoryDifficulty", hard);
 
+        // 认知引擎
+        correct.put("engine", PerceiveEngine.getPerceiveEngine(hard, cp.getMemoryStrength()));
+
         // 读音url
         correct.put("readUrl", baiduSpeak.getLanguagePath(correct.get("word").toString()));
 
@@ -212,30 +215,14 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
      */
     @Override
     public ServerResponse<Object> getWordPicUnitTest(HttpSession session, Long unitId, Long courseId, Boolean isTrue) {
-        Long studentId = super.getStudentId(session);
-        // 根据学生id实时查询学生信息
-        Student student = studentMapper.selectByPrimaryKey(studentId);
-
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-
-        // 判断学生当前单元有无进行单元闯关测试记录，如果已参加过单元闯关测试，提示其需要花费金币购买测试机会，如果还没有测试记录可以免费进行测试
-        /*int flag = this.isFirstTest(student, unitId, "单词图鉴", isTrue);
-        if (flag == 1) {
-            return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该单元闯关测试，再次参加需扣除1金币。");
-        } else if (flag == 2) {
-            return ServerResponse.createByError(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
-        }*/
 
         // 获取单元下所有有图片的单词
         List<Vocabulary> list = vocabularyMapper.getWordPicAll(unitId);
 
-        // 获取课程下带图片的单词用于四个选择题
-        // List<Vocabulary> listSelect = vocabularyMapper.getWordIdByCourseAll(courseId);
         // 随机获取带图片的单词, 正确答案的三倍
         List<Vocabulary> listSelect = vocabularyMapper.getWordIdByAll(list.size() * 4);
 
-        // 分配题型‘看词选图’、‘听音选图’、‘看图选词’ 3:3:4
-        //return ServerResponse.createBySuccess(allocationWord(list, listSelect));
         // 分题工具类
         Map<String, Object> map = wordPictureUtil.allocationWord(list, listSelect, null);
         return ServerResponse.createBySuccess(map);

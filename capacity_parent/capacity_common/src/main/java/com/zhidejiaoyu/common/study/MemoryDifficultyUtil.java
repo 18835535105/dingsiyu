@@ -31,7 +31,7 @@ public class MemoryDifficultyUtil {
      * @param flag   1:计算单词的记忆难度；2：计算例句的记忆难度
      * @return 当前单词的记忆难度 0:熟词；其余情况为生词
      */
-    public Integer getMemoryDifficulty(Object object, Integer flag) throws RuntimeException {
+    public int getMemoryDifficulty(Object object, Integer flag) throws RuntimeException {
         if (object == null) {
             return 0;
         }
@@ -94,7 +94,7 @@ public class MemoryDifficultyUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return 0;
     }
 
     /**
