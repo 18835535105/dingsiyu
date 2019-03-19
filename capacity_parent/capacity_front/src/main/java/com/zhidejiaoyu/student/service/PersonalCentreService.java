@@ -21,7 +21,7 @@ public interface PersonalCentreService extends BaseService<Student> {
 
 	ServerResponse<String> newsupdate(HttpSession session, Integer state, Integer[] id);
 
-	ServerResponse<Object> PersonalIndex(HttpSession session);
+	ServerResponse<Object> personalIndex(HttpSession session);
 
 	/**
 	 * 消息中心-每周时长页面信息 

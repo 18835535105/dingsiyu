@@ -123,7 +123,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     private RedisTemplate<String, Object> redisTemplate;
 
     @Override
-    public ServerResponse<Object> PersonalIndex(HttpSession session) {
+    public ServerResponse<Object> personalIndex(HttpSession session) {
         Map<String, Object> map = new HashMap<>(16);
         // 获取当前学生信息
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);

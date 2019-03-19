@@ -29,7 +29,7 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping("/personal")
-public class PersonalCentreController {
+public class PersonalCentreController extends BaseController {
 
     @Autowired
     private PersonalCentreService personalCentreService;
@@ -49,8 +49,25 @@ public class PersonalCentreController {
      * @return read 消息中心是否有未读消息, true有未读消息  false无未读消息
      */
     @RequestMapping("/personal")
-    public ServerResponse<Object> PersonalIndex(HttpSession session) {
-        return personalCentreService.PersonalIndex(session);
+    public ServerResponse<Object> personalIndex(HttpSession session) {
+        return personalCentreService.personalIndex(session);
+    }
+
+    /**
+     * 统计个人中心中需要查看的消息个数
+     * <ul>
+     * <li>未查看的留言反馈个数</li>
+     * <li>可抽奖次数</li>
+     * </ul>
+     *
+     * @param session
+     * @return
+     */
+    @GetMapping("/needViewCount")
+    public ServerResponse<Object> needViewCount(HttpSession session) {
+        String url = domain + "/api/personal/needViewCount?session={session}&studentId={studentId}&loginTime={loginTime}";
+        ResponseEntity<Map> responseEntity = restTemplate.getForEntity(url, Map.class, super.packageParams(session));
+        return ServerResponse.createBySuccess(responseEntity.getBody() == null ? null : responseEntity.getBody().get("data"));
     }
 
 
