@@ -82,7 +82,7 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
 
     @Override
     public ServerResponse<CapacityDigestVo> getCapacityDigestVo(HttpSession session, Long courseId, Long unitId, String studyModel) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         CapacityDigestVo vo = new CapacityDigestVo();
         if (student.getShowCapacity() == null || student.getShowCapacity() == 1) {
             vo.setShowCapacity(true);

@@ -121,7 +121,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Override
     public ServerResponse<Object> selSpeakTeksByUnitId(Integer unitId, HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Map<String, Object> map = new HashMap<>();
         List<Teks> teks = teksMapper.selTeksByUnitId(unitId);
         Map<String, Object> getMap = new HashMap<>();
@@ -149,7 +149,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Override
     public ServerResponse<Object> selHistoryByCountAndUnitId(Integer count, Integer unitId, HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Map<String, Object> maps = new HashMap<>();
         maps.put("unitId", unitId);
         maps.put("studentId", student.getId());
@@ -168,7 +168,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Override
     public ServerResponse<Object> selRankingList(Integer unitId, HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Map<String, Object> getMap = new HashMap<>();
         getMap.put("schoolName", student.getSchoolName());
         getMap.put("unitId", unitId);
@@ -185,7 +185,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Override
     public ServerResponse<Object> selChooseTeks(Integer unitId, HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         List<Teks> teks = teksMapper.selTeksByUnitId(unitId);
         //判断是否取出数据
@@ -387,7 +387,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Override
     public ServerResponse<Map<String, Object>> getIsInto(HttpSession session, Long unitId) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         List<Teks> id1 = teksMapper.selTeksByUnitId(unitId.intValue());
         Long studentId = student.getId();
         Map<String, Object> unitInfoMap = new HashMap<>();
@@ -580,7 +580,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         testRecord.setCourseId(aLong);
         testRecord.setTestStartTime(startTime);
         testRecord.setTestEndTime(endTime);
-
+        getLevel(session);
         // 封装响应数据
         Map<String, Object> map = packageResultMap(student, wordUnitTestDTO, point, goldCount, testRecord);
 
@@ -700,7 +700,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Override
     public ServerResponse<Object> selHistoryPronunciation(Integer unitId, HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Map<String, Object> maps = new HashMap<>();
         maps.put("unitId", unitId);
         maps.put("studentId", student.getId());
@@ -715,7 +715,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Override
     public ServerResponse<Object> isHistoryPronunciation(Integer unitId, HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Map<String, Object> maps = new HashMap<>();
         maps.put("unitId", unitId);
         maps.put("studentId", student.getId());
@@ -856,7 +856,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Override
     public ServerResponse<Map<String, Object>> saveTeksAudition(HttpSession session, Integer unitId, Integer courseId) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Learn learn = new Learn();
         learn.setType(1);
         learn.setStudentId(student.getId());
@@ -884,7 +884,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @Override
     public ServerResponse<List<Map<String, Object>>> getTeksLaterLearnTime(HttpSession session) {
         //获取学生id
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         //获取学习时间
         List<Map<String, Object>> list = learnMapper.selectTeksLaterLearnTimeByStudentId(student.getId());
         List<Map<String, Object>> resultList = new ArrayList<>();

@@ -87,7 +87,7 @@ public class AwardServiceImpl extends BaseServiceImpl<AwardMapper,Award> impleme
      */
     @Override
     public ServerResponse<List<AwardVo>> getAwareInfo(HttpSession session, Integer type) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student =getStudent(session);
         List<AwardVo> awardVos = new ArrayList<>();
         switch (type) {
             case 1:
@@ -1407,7 +1407,7 @@ public class AwardServiceImpl extends BaseServiceImpl<AwardMapper,Award> impleme
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<String> getAware(HttpSession session, Long awareId, Integer getType) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Award award = awardMapper.selectByIdAndStuId(awareId, student.getId());
         Medal medal = null;
         String msg = null;
@@ -1438,6 +1438,7 @@ public class AwardServiceImpl extends BaseServiceImpl<AwardMapper,Award> impleme
                     runLog.setCourseId(student.getCourseId());
                     try {
                         runLogMapper.insert(runLog);
+                        getLevel(session);
                         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
                     } catch (Exception e) {
                         log.error("id为 {} 的学生在领取 {} 中 {} 奖励时保存日志出错！", student.getId(), awardType, awardContent, e);

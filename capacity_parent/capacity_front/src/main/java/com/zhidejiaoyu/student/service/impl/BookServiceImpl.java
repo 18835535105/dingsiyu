@@ -82,7 +82,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
     @Override
     public ServerResponse<PageInfo<BookVo>> getWordBookList(HttpSession session, Long courseId, Long unitId, String studyModel,
                                                             Integer condition, Integer pageNum, Integer pageSize) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long studentId = student.getId();
 
         int totalWord = 1;
@@ -340,7 +340,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<String> studyAgain(HttpSession session, Long courseId) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long studentId = student.getId();
 
         // 查询当前学生当前课程的学习记录
@@ -379,7 +379,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<String> restudy(HttpSession session, Long courseId, Long unitId, Long[] wordIds, Integer studyModel) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         // 查询当前学生当前课程的学习遍数
         Integer maxStudyCount = studyCountMapper.selectMaxCountByCourseId(student.getId(), courseId);
         // 更新学习记录

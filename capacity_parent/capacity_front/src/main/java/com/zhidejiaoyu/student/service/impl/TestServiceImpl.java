@@ -143,7 +143,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Override
     public ServerResponse<Map<String, Object>> getGameSubject(HttpSession session) {
         // 获取当前学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student =getStudent(session);
         // 查询当前学生游戏测试的次数，如果已经测试两次不再允许游戏测试
         TestRecordExample example = new TestRecordExample();
         example.createCriteria().andStudentIdEqualTo(student.getId()).andGenreEqualTo("学前游戏测试");
@@ -193,7 +193,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Map<String, Object>> saveGameTestRecord(HttpSession session, TestRecord testRecord) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
 
         // 存放响应的 提示语，推送课程名称，奖励金币数
         Map<String, Object> map = new HashMap<>(16);
@@ -226,7 +226,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 countMyGoldUtil.countMyGold(student);
             }
         }
-
+        getLevel(session);
         // 流程名称
         StudyFlow studyFlow = studyFlowMapper.selectById(3);
         if (studyFlow != null) {
@@ -631,7 +631,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     @Override
     public ServerResponse<Map<String, Object>> getLevelTest(HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
 
         // 判断学生是否已经进行过摸底测试
         Integer levelTestCount = testRecordMapper.countLevelTestCountByStudentId(student);
@@ -718,7 +718,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<TestResultVo> saveLevelTest(HttpSession session, TestRecord testRecord) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         TestResultVo vo = new TestResultVo();
         // 游戏测试开始时间
         Date gameStartTime = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
@@ -758,6 +758,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         // 保存摸底测试记录
         int count = testRecordMapper.insertSelective(testRecord);
+        getLevel(session);
         if (count > 0) {
             // 根据学生成绩判断学生下一步操作
             String courseName = this.pushCourse(point, student, "学前摸底测试");
@@ -778,7 +779,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Override
     public ServerResponse<List<TestResult>> getWordUnitTest(HttpSession session, Long unitId, String studyModel,
                                                             Boolean isTrue) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         student = studentMapper.selectByPrimaryKey(student.getId());
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
@@ -1067,7 +1068,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO, String testDetail) {
 
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         if (StringUtils.isEmpty(student.getPetName())) {
             student.setPetName("大明白");
             student.setPartUrl(PetImageConstant.DEFAULT_IMAGE);
@@ -1144,6 +1145,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setEnergy(addEnergy);
         countMyGoldUtil.countMyGold(student);
         studentMapper.updateByPrimaryKeySelective(student);
+        getLevel(session);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(vo);
     }
@@ -1159,7 +1161,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<TestResultVo> saveSentenceUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO, String testDetail) {
 
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         if (StringUtils.isEmpty(student.getPetName())) {
             student.setPetName("大明白");
             student.setPartUrl(PetImageConstant.DEFAULT_IMAGE);
@@ -1222,6 +1224,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0], point);
         studentMapper.updateByPrimaryKeySelective(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
+        getLevel(session);
         return ServerResponse.createBySuccess(vo);
     }
 
@@ -1500,7 +1503,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     @Override
     public ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId, Integer type, Integer pageNum) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         student = studentMapper.selectByPrimaryKey(student.getId());
         if (session.getAttribute(TimeConstant.BEGIN_START_TIME) == null) {
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
@@ -1515,7 +1518,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     @Override
     public ServerResponse<Object> showRecord(String course_id, Integer type, HttpSession session, Integer page, Integer rows) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long studentId = student.getId();
 
         if(page == null){
@@ -1586,7 +1589,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<String> pushGameCourse(HttpSession session, Integer point) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student =getStudent(session);
         String courseName = this.pushCourse(point, student, "学前游戏测试");
         return ServerResponse.createBySuccess(courseName);
     }
@@ -1600,7 +1603,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      */
     @Override
     public ServerResponse<Object> getPreSchoolTest(HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long courseId = student.getCourseId();
 
         // 1.题类型
@@ -1625,7 +1628,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      */
     @Override
     public ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, TestRecord testRecord) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         TestResultVo vo = new TestResultVo();
         vo.setPetUrl(student.getPartUrl());
         // 游戏测试开始时间
@@ -1663,7 +1666,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             session.setAttribute(UserConstant.CURRENT_STUDENT, student);
             studentMapper.updateByPrimaryKeySelective(student);
         }
-
+        getLevel(session);
         // 保存摸底测试记录
         int count = testRecordMapper.insertSelective(testRecord);
         studentMapper.updateByPrimaryKeySelective(student);
