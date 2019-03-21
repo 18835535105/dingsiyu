@@ -991,9 +991,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     private ServerResponse<Object> getObjectServerResponse(HttpSession session, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord) {
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
-
-        studentMapper.updateByPrimaryKeySelective(student);
-
         Integer point = wordUnitTestDTO.getPoint();
 
         Map<String,Object> resultMap=new HashMap<>(16);
@@ -1019,7 +1016,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         resultMap.put("imgUrl",student.getPartUrl());
 
         testRecordMapper.insert(testRecord);
-
+        studentMapper.updateByPrimaryKeySelective(student);
         return ServerResponse.createBySuccess(resultMap);
     }
 
