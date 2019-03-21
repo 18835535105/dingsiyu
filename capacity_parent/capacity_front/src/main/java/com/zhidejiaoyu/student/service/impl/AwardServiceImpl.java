@@ -25,7 +25,7 @@ import static java.lang.Integer.parseInt;
  * @date 2018/6/9 18:22
  */
 @Service
-public class AwardServiceImpl implements AwardService {
+public class AwardServiceImpl extends BaseServiceImpl<AwardMapper,Award> implements AwardService {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**

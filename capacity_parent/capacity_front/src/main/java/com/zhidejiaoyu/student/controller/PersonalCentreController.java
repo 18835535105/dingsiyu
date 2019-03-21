@@ -4,7 +4,6 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.service.AwardService;
 import com.zhidejiaoyu.student.service.PersonalCentreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpSession;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -309,6 +307,4 @@ public class PersonalCentreController {
 		ResponseEntity<Map> responseEntity =restTemplate.postForEntity(url,headers,Map.class);
 		return ServerResponse.createBySuccess(responseEntity.getBody() == null ? null : responseEntity.getBody().get("data"));
 	}
-
-
 }

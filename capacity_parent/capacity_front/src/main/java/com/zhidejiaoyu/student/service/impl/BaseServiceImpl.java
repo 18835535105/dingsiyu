@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.DurationMapper;
+import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.StudyFlowMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudyFlow;
@@ -31,6 +32,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
     @Autowired
     private DurationMapper durationMapper;
 
+    @Autowired
+    private StudentMapper studentMapper;
 
     @Autowired
     private StudyFlowMapper studyFlowMapper;
@@ -40,7 +43,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
 
     @Override
     public Student getStudent(HttpSession session) {
-        return (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student =(Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        return studentMapper.selectByPrimaryKey(student.getId());
     }
 
     @Override
