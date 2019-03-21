@@ -95,4 +95,5 @@ public interface AwardMapper extends BaseMapper<Award> {
     @MapKey("id")
     Map<Long, Map<String, Long>> getMapKeyStudentXZ();
 
+    List<Map<String, Object>> selAwardCountByStudentId(Long studentId);
 }

@@ -11,6 +11,7 @@ import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
+import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.common.SaveWordLearnAndCapacity;
 import com.zhidejiaoyu.student.service.MemoryService;
 import com.zhidejiaoyu.student.vo.MemoryStudyVo;
@@ -65,9 +66,6 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
 
     @Autowired
     private CourseMapper courseMapper;
-
-    @Autowired
-    private DurationMapper durationMapper;
 
     @Autowired
     private BaiduSpeak baiduSpeak;
@@ -167,6 +165,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
             memoryStudyVo.setStudyNew(true);
             memoryStudyVo.setFirstStudy(firstStudy);
             memoryStudyVo.setWordCount(wordCount);
+            memoryStudyVo.setEngine(1);
             return ServerResponse.createBySuccess(memoryStudyVo);
         }
         return null;
@@ -310,7 +309,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         MemoryStudyVo memoryStudyVo = new MemoryStudyVo();
         String soundMark = commonMethod.getSoundMark(capacityMemory.getWord());
         // 计算当前单词的记忆难度
-        Integer memoryDifficulty = memoryDifficultyUtil.getMemoryDifficulty(capacityMemory, 1);
+        int memoryDifficulty = memoryDifficultyUtil.getMemoryDifficulty(capacityMemory, 1);
         // 计算当前单词的记忆强度
         double memoryStrength = capacityMemory.getMemoryStrength();
 
@@ -326,6 +325,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         memoryStudyVo.setFirstStudy(firstStudy);
         memoryStudyVo.setWordCount(wordCount);
         memoryStudyVo.setReadUrl(baiduSpeak.getLanguagePath(capacityMemory.getWord()));
+        memoryStudyVo.setEngine(PerceiveEngine.getPerceiveEngine(memoryDifficulty, memoryStrength));
         return ServerResponse.createBySuccess(memoryStudyVo);
 
     }

@@ -19,6 +19,7 @@ import com.zhidejiaoyu.common.utils.server.GoldResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
 import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
+import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.constant.TestAwardGoldConstant;
@@ -1388,7 +1389,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         cm.setStudentId(studentId);
         cm.setUnitId(map.get("unit_id") == null ? null : (Long) map.get("unit_id"));
         cm.setVocabularyId(map.get("id") == null ? null : (Long) map.get("id"));
-        Integer hard = memoryDifficultyUtil.getMemoryDifficulty(cm, 1);
+        int hard = memoryDifficultyUtil.getMemoryDifficulty(cm, 1);
         map.put("memoryDifficulty", hard);
 
         map.put("soundmark", vocabulary.getSoundMark());
@@ -1397,7 +1398,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
         map.put("wordCount", count);
         map.put("studyNew", false);
-
+        map.put("engine", PerceiveEngine.getPerceiveEngine(hard, map.get("memoryStrength") == null ? 0 : Double.parseDouble(map.get("memoryStrength").toString())));
         map.put("plan", 0);
         return vocabulary;
     }

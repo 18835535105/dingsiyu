@@ -341,7 +341,7 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
 
     @Override
     public ServerResponse<String> cancelTip(HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = super.getStudent(session);
         student.setShowCapacity(2);
         studentMapper.updateByPrimaryKeySelective(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);

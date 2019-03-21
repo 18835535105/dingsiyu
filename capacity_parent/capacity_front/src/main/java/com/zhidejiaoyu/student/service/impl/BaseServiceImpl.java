@@ -5,13 +5,17 @@ import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.DurationMapper;
+import com.zhidejiaoyu.common.mapper.StudentExpansionMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.StudyFlowMapper;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.pojo.StudyFlow;
+import com.zhidejiaoyu.common.utils.LevelUtils;
 import com.zhidejiaoyu.common.utils.TokenUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
+import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.zhidejiaoyu.student.controller.BaseController.getParams;
@@ -32,14 +37,21 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
     @Autowired
     private DurationMapper durationMapper;
 
-    @Autowired
-    private StudentMapper studentMapper;
 
     @Autowired
     private StudyFlowMapper studyFlowMapper;
 
     @Autowired
     private HttpServletRequest request;
+
+    @Autowired
+    private StudentMapper studentMapper;
+
+    @Autowired
+    private RedisOpt redisOpt;
+
+    @Autowired
+    private StudentExpansionMapper studentExpansionMapper;
 
     @Override
     public Student getStudent(HttpSession session) {
@@ -49,7 +61,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
 
     @Override
     public Long getStudentId(HttpSession session) {
-        return getStudent(session).getId();
+        Student student =  (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        return student.getId();
     }
 
     @Override
@@ -79,6 +92,22 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
     Integer getTodayOnlineTime(HttpSession session) {
         String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
         return this.getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
+    }
+
+    @Override
+    public void getLevel(HttpSession session) {
+        Student student = getStudent(session);
+        Double gold=student.getSystemGold()+student.getOfflineGold();
+        List<Map<String, Object>> levels = redisOpt.getAllLevel();
+        int level = getLevel(gold.intValue(), levels);
+        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
+        if(studentExpansion.getLevel()<level){
+            Integer oldStudy = LevelUtils.getStudy(studentExpansion.getLevel());
+            Integer newStudy = LevelUtils.getStudy(level);
+            Integer addStudy=newStudy-oldStudy;
+            studentExpansion.setStudyPower(studentExpansion.getStudyPower()+addStudy);
+            studentExpansionMapper.updateById(studentExpansion);
+        }
     }
 
     /**
@@ -145,5 +174,36 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         }
         return addEnergy;
     }
+
+
+    private int getLevel(Integer myGold, List<Map<String, Object>> levels) {
+        int level = 0;
+        if (myGold >= 50) {
+            int myrecord = 0;
+            int myauto = 1;
+            for (int i = 0; i < levels.size(); i++) {
+                // 循环的当前等级分数
+                int levelGold = (int) levels.get(i).get("gold");
+                // 下一等级分数
+                int xlevelGold = (int) levels.get((i + 1) < levels.size() ? (i + 1) : i).get("gold");
+
+                if (myGold >= myrecord && myGold < xlevelGold) {
+                    level = i + 1;
+                    break;
+                    // 等级循环完还没有确定等级 = 最高等级
+                } else if (myauto == levels.size()) {
+                    level = i + 1;
+                    break;
+                }
+                myrecord = levelGold;
+                myauto++;
+            }
+            myrecord = 0;
+            myauto = 0;
+        }
+        return level;
+    }
+
+
 
 }

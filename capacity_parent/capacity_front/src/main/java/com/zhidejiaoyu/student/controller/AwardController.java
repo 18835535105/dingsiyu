@@ -31,7 +31,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/award")
 @Validated
-public class AwardController {
+public class AwardController extends BaseController {
 
     @Value("${domain}")
     private String domain;
@@ -69,13 +69,9 @@ public class AwardController {
 
     @GetMapping("/getAeardSize")
     public ServerResponse<Object> getAwardSize(HttpSession session, int type, @RequestParam(defaultValue = "0") Integer model) {
-
-        Map<String, Object> paramMap = new HashMap<>(16);
+        Map<String, Object> paramMap = super.packageParams(session);
         paramMap.put("type", type);
         paramMap.put("model", model);
-        paramMap.put("session", session);
-        paramMap.put("studentId", ((Student)session.getAttribute(UserConstant.CURRENT_STUDENT)).getId());
-        paramMap.put("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)));
 
         String url = domain + "/api/award/getAeardSize?type={type}&model={model}&session={session}&studentId={studentId}&loginTime={loginTime}";
         ResponseEntity<Map> responseEntity = restTemplate.getForEntity(url, Map.class, paramMap);

@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.student.vo;
 
+import lombok.Data;
+
 /**
  * 慧默写学习数据vo
  * 
@@ -7,6 +9,7 @@ package com.zhidejiaoyu.student.vo;
  * @date 2018年5月17日 下午4:46:43
  *
  */
+@Data
 public class WordWriteStudyVo {
 
 	/** 单词id */
@@ -45,93 +48,5 @@ public class WordWriteStudyVo {
 	 * 单词读音地址
 	 */
 	private String readUrl;
-
-	public String getReadUrl() {
-		return readUrl;
-	}
-
-	public void setReadUrl(String readUrl) {
-		this.readUrl = readUrl;
-	}
-
-	public String getSyllable() {
-		return syllable;
-	}
-
-	public void setSyllable(String syllable) {
-		this.syllable = syllable;
-	}
-
-	public Long getWordId() {
-		return wordId;
-	}
-
-	public void setWordId(Long wordId) {
-		this.wordId = wordId;
-	}
-
-	public String getWord() {
-		return word;
-	}
-
-	public void setWord(String word) {
-		this.word = word;
-	}
-
-	public String getWordChinese() {
-		return wordChinese;
-	}
-
-	public void setWordChinese(String wordChinese) {
-		this.wordChinese = wordChinese;
-	}
-
-	public String getSoundmark() {
-		return soundmark;
-	}
-
-	public void setSoundmark(String soundmark) {
-		this.soundmark = soundmark;
-	}
-
-	public Boolean getStudyNew() {
-		return studyNew;
-	}
-
-	public void setStudyNew(Boolean studyNew) {
-		this.studyNew = studyNew;
-	}
-
-	public Double getMemoryStrength() {
-		return memoryStrength;
-	}
-
-	public void setMemoryStrength(Double memoryStrength) {
-		this.memoryStrength = memoryStrength;
-	}
-
-	public Long getPlan() {
-		return plan;
-	}
-
-	public void setPlan(Long plan) {
-		this.plan = plan;
-	}
-
-	public Boolean getFirstStudy() {
-		return firstStudy;
-	}
-
-	public void setFirstStudy(Boolean firstStudy) {
-		this.firstStudy = firstStudy;
-	}
-
-	public Long getWordCount() {
-		return wordCount;
-	}
-
-	public void setWordCount(Long wordCount) {
-		this.wordCount = wordCount;
-	}
 
 }

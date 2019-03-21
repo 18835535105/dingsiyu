@@ -485,6 +485,12 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 }
             }
 
+            learnMapper.updateTypeToLearned(studentId, 1, startUnit, endUnit);
+            capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+            capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+            capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+            capacityListenMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+
             if (studentStudyPlan.getCurrentStudyCount() >= studentStudyPlan.getTotalStudyCount()) {
                 // 当前学习计划完成需要学习的遍数
                 studentStudyPlan.setComplete(2);
@@ -508,12 +514,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 studentStudyPlan.setUpdateTime(new Date());
                 studentStudyPlan.setCurrentStudyCount(studentStudyPlan.getCurrentStudyCount() + 1);
                 studentStudyPlanMapper.updateById(studentStudyPlan);
-
-                learnMapper.updateTypeToLearned(studentId, 1, startUnit, endUnit);
-                capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
-                capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
-                capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
-                capacityListenMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
 
                 // 学生学习到老师分配的最后一个单元，提示学生
                 return "傲人的成绩离不开反复的磨练，再学一次吧！";

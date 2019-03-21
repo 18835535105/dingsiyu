@@ -50,6 +50,8 @@ public interface BaseService<T> extends IService<T> {
      */
     Integer getOnLineTime(HttpSession session, String beginTime, String endTime);
 
+    void getLevel(HttpSession session);
+
     /**
      * 获取数据请求参数字符串
      *

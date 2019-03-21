@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.StudentExpansionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentExpansion">
+        <id column="id" property="id" />
+        <result column="student_id" property="studentId" />
+        <result column="study_power" property="studyPower" />
+        <result column="level" property="level"/>
+        <result column="is_look" property="isLook"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, student_id, study_power , level ,is_look
+    </sql>
+
+    <select id="isHave" parameterType="long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from student_expansion where student_id=#{studentId}
+    </select>
+
+    <insert id="addStudy" parameterType="map">
+        insert into student_expansion(student_id,study_power,level,is_look)
+        values(#{studentId},#{study},#{level},#{isLook})
+    </insert>
+
+    <select id="selectByStudentId" parameterType="long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from student_expansion where student_id=#{studentId}
+    </select>
+
+</mapper>

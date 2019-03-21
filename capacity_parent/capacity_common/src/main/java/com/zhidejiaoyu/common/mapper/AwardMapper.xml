@@ -345,4 +345,12 @@
         update award
         set can_get = 2, get_flag = 2, get_time = null
     </update>
+
+    <select id="selAwardCountByStudentId" parameterType="long" resultType="map">
+        select medal.child_name name,count(award.id) number
+        from award award
+        join medal medal
+        where award.medal_type=medal.id and get_flag = 1 and award.student_id=#{studentId}
+        group by medal.child_name
+    </select>
 </mapper>
