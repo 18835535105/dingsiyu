@@ -136,7 +136,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
 
     @Override
     public ServerResponse<List<CoursePlanVo>> getCoursePlan(HttpSession session, Long courseId, Integer type) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = super.getStudent(session);
         Long studentId = student.getId();
 
         List<CoursePlanVo> vos = new ArrayList<>();

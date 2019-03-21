@@ -2,8 +2,8 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
-import com.zhidejiaoyu.common.Vo.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.Vo.testVo.TestDetailVo;
+import com.zhidejiaoyu.common.Vo.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.pojo.TestRecordExample;
@@ -52,7 +52,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     int selectByUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("type") Integer type);
 
     /**
-     * 查询当前学生有无进行当前单元的测试记录
+     * 查询当前学生有无进行当前单元的测试记录,如果有取better_count最大的一条记录
      *
      * @param studentId
      * @param unitId

@@ -77,9 +77,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private CommonMethod commonMethod;
 
     @Autowired
-    private CourseMapper courseMapper;
-
-    @Autowired
     private TestRecordMapper testRecordMapper;
 
     @Autowired
@@ -105,7 +102,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Value("${ftp.prefix}")
     private String prefix;
-
 
     @Override
     public ServerResponse<List<Teks>> selTeksByUnitId(Integer unitId) {
@@ -558,14 +554,15 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @Override
     public ServerResponse<Object> addData(TestRecord testRecord, HttpSession session) {
         //学生对象
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = super.getStudent(session);
+        final String model = "课文默写测试";
         //测试开始时间
         Date startTime = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
         //测试结束时间
         Date endTime = new Date();
         //添加学习模块
-        testRecord.setStudyModel("课文默写测试");
+        testRecord.setStudyModel(model);
         //获取课程id
         Long aLong = unitMapper.selectCourseIdByUnitId(testRecord.getUnitId());
         //添加金币
@@ -573,29 +570,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         wordUnitTestDTO.setClassify(7);
         Integer point = testRecord.getPoint();
         wordUnitTestDTO.setPoint(point);
-        Integer goldCount = 0;
 
-        if (point >= PASS) {
-            if (point > SENCONDARY && point < FULL_MARK) {
-                goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
-                this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试");
-            } else if (point == FULL_MARK) {
-                goldCount = TestAwardGoldConstant.FIVE_TEST_EIGHTY_TO_NINETY;
-                goldCount += goldCount;
-                this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试");
-                this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试双倍奖励");
-            } else if (point >= PASS) {
-                goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_FULL;
-                this.saveLog(student, goldCount, wordUnitTestDTO, "课文默写测试");
-            }
-        }
-        testRecord.setGenre("课文默写测试");
+        TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), testRecord.getUnitId(), model, model);
+
+        int goldCount = this.getGold(testRecord, student, testRecordOld, 7);
+        testRecord.setGenre(model);
         testRecord.setAwardGold(goldCount);
-        studentMapper.updateByPrimaryKeySelective(student);
-
-        student.setSystemGold(student.getSystemGold() + goldCount);
-        studentMapper.updateByPrimaryKeySelective(student);
-        //添加对象
         testRecord.setStudentId(student.getId());
         testRecord.setCourseId(aLong);
         testRecord.setTestStartTime(startTime);
@@ -603,6 +583,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
         // 封装响应数据
         Map<String, Object> map = packageResultMap(student, wordUnitTestDTO, point, goldCount, testRecord);
+
+        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldCount));
+        studentMapper.updateByPrimaryKeySelective(student);
 
         Integer insert = testRecordMapper.insert(testRecord);
 
@@ -627,9 +610,72 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         return ServerResponse.createBySuccess(map);
     }
 
+    private int getGold(TestRecord testRecord, Student student, TestRecord testRecordOld, Integer classify) {
+
+        int goldCount = 0;
+        if (testRecordOld == null) {
+            goldCount = getGoldCount(classify, student, testRecord.getPoint(), testRecord.getStudyModel());
+        } else {
+            // 查询当前单元测试历史最高分数
+            int betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 7);
+
+            // 非首次测试成绩本次测试成绩大于历史最高分，超过历史最高分次数 +1并且金币奖励翻倍
+            if (betterPoint < testRecord.getPoint()) {
+                int betterCount = testRecordOld.getBetterCount() + 1;
+                testRecord.setBetterCount(betterCount);
+                goldCount = getGoldCount(classify, student, testRecord.getPoint(), testRecord.getStudyModel());
+            }
+        }
+        return goldCount;
+    }
+
+    private int getGoldCount(Integer classify, Student student, int point, String model) {
+        int goldCount;
+        if (point < SIX) {
+            goldCount = 0;
+        } else if (point < SEVENTY) {
+            goldCount = TestAwardGoldConstant.UNIT_TEST_SIXTY_TO_SEVENTY;
+        } else if (point < PASS) {
+            goldCount = TestAwardGoldConstant.UNIT_TEST_SEVENTY_TO_EIGHTY;
+        } else if (point < NINETY_POINT) {
+            goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_NINETY;
+        } else if (point < FULL_MARK) {
+            goldCount = TestAwardGoldConstant.UNIT_TEST_NINETY_TO_FULL;
+        } else {
+            goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
+        }
+        this.saveLog(student, goldCount, classify, model);
+        return goldCount;
+    }
+
+    /**
+     * 保存金币变化日志信息
+     *
+     * @param student
+     * @param goldCount       奖励金币数
+     * @param classify
+     * @param model           测试模块
+     */
+    private void saveLog(Student student, int goldCount, Integer classify, String model) {
+        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldCount));
+        studentMapper.updateByPrimaryKeySelective(student);
+        String msg;
+        if (classify != null) {
+            msg = "id为：" + student.getId() + "的学生在" + commonMethod.getTestType(classify)
+                    + " 模块下的单元闯关测试中首次闯关成功，获得#" + goldCount + "#枚金币";
+        } else {
+            msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + goldCount + "#枚金币";
+        }
+        RunLog runLog = new RunLog(student.getId(), 4, msg, new Date());
+        runLog.setCourseId(student.getCourseId());
+        runLog.setUnitId(student.getUnitId());
+        runLogMapper.insert(runLog);
+    }
+
     private Map<String, Object> packageResultMap(Student student, WordUnitTestDTO wordUnitTestDTO, Integer point, Integer goldCount, TestRecord testRecord) {
         Map<String, Object> map = new HashMap<>(16);
-        map.put("energy", getEnergy(student, wordUnitTestDTO.getPoint()));
+        int energy = super.getEnergy(student, wordUnitTestDTO.getPoint());
+        map.put("energy", energy);
         map.put("gold", goldCount);
         if (point < PASS) {
             map.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
@@ -782,31 +828,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             blanceSentence.add(null);
         }
     }
-
-    /**
-     * 保存金币变化日志信息
-     *
-     * @param student
-     * @param goldCount       奖励金币数
-     * @param wordUnitTestDTO
-     * @param model           测试模块
-     */
-    private void saveLog(Student student, int goldCount, WordUnitTestDTO wordUnitTestDTO, String model) {
-        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldCount));
-        studentMapper.updateByPrimaryKeySelective(student);
-        String msg;
-        if (wordUnitTestDTO != null) {
-            msg = "id为：" + student.getId() + "的学生在" + commonMethod.getTestType(wordUnitTestDTO.getClassify())
-                    + " 模块下的单元闯关测试中首次闯关成功，获得#" + goldCount + "#枚金币";
-        } else {
-            msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + goldCount + "#枚金币";
-        }
-        RunLog runLog = new RunLog(student.getId(), 4, msg, new Date());
-        runLog.setCourseId(student.getCourseId());
-        runLog.setUnitId(student.getUnitId());
-        runLogMapper.insert(runLog);
-    }
-
 
     /**
      * 获取课文测试
