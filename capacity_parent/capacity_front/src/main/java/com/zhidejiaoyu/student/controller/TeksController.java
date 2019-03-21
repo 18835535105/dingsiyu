@@ -160,8 +160,8 @@ public class TeksController  {
 
     @RequestMapping("/getTeksTest")
     @ResponseBody
-    public ServerResponse<Object> getTeksTest(Integer unitId){
-        return teksService.getTeksTest(unitId);
+    public ServerResponse<Object> getTeksTest(HttpSession session, Integer unitId){
+        return teksService.getTeksTest(session, unitId);
     }
 
 

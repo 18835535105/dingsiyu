@@ -833,7 +833,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
      * 获取课文测试
      */
     @Override
-    public ServerResponse<Object> getTeksTest(Integer unitId) {
+    public ServerResponse<Object> getTeksTest(HttpSession session, Integer unitId) {
+        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         //获取单元中的课文语句
         List<Teks> teks = teksMapper.selTeksByUnitId(unitId);
         //第一步去除课文中只有一句话的句子
