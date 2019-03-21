@@ -109,6 +109,9 @@
         <if test="model == 6">
             and study_model = '例句默写'
         </if>
+        <if test="model == 7">
+            and study_model = '课文默写测试'
+        </if>
     </sql>
 
     <select id="selectByStudentIdAndUnitId"
@@ -116,7 +119,7 @@
         select
         <include refid="Base_Column_List"/>
         from test_record where student_id = #{studentId} and unit_id =
-        #{unitId} and genre = #{genre} and study_model = #{studyModel} order by id desc limit 1
+        #{unitId} and genre = #{genre} and study_model = #{studyModel} order by better_count desc limit 1
     </select>
 
     <select id="selectByStudentIdAndUnitIdAndGenre"
