@@ -343,8 +343,9 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             cm.setVocabularyId(vo.getVocabulary_id());
             cm.setMemoryStrength(vo.getMemory_strength());
             cm.setFaultTime(vo.getFault_time());
-            Integer hard = memoryDifficultyUtil.getMemoryDifficulty(cm, 1);
+            int hard = memoryDifficultyUtil.getMemoryDifficulty(cm, 1);
             map.put("memoryDifficulty", hard);
+            map.put("engine", PerceiveEngine.getPerceiveEngine(hard, vo.getMemory_strength()));
         }
         map.put("studyNew", false);
 
@@ -1115,6 +1116,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         }
         Integer hard = memoryDifficultyUtil.getMemoryDifficulty(cp, 1);
         correct.put("memoryDifficulty", hard);
+        correct.put("engine", PerceiveEngine.getPerceiveEngine(hard, cp.getMemoryStrength()));
 
         try {
             Vocabulary vocabulary = vocabularyMapper.selectByPrimaryKey(cp.getVocabularyId());
