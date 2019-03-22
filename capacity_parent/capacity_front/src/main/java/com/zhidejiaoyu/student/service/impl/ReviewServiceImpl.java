@@ -199,7 +199,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         List<Vocabulary> vocabularies;
 
         // 获取当前学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         // 学生id
         Long id = student.getId();
 
@@ -448,7 +448,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     @Override
     public ServerResponse<List<TestCenterVo>> testCentreIndex(Long unitId, Integer type, HttpSession session) {
         // 获取当前学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long studentId = student.getId();
 
         List<TestCenterVo> testCenterVos = new ArrayList<>();
@@ -492,7 +492,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     @Override
     public ServerResponse<Object> testcentre(String course_id, String unitId, int select, int classify, Boolean isTrue, HttpSession session) {
         // 获取当前学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         // 学生id
         Long studentId = student.getId();
 
@@ -619,7 +619,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 返回结果集
         Map<String, Object> map = new HashMap<String, Object>();
         // 获取当前学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         // 学生id
         Long studentId = student.getId();
         // 学生年级
@@ -659,7 +659,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     @Override
     public ServerResponse<Object> testeffect(String course_id, HttpSession session) {
         // 获取当前学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         // 学生id
         Long studentId = student.getId();
 
@@ -679,7 +679,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
      */
     @Override
     public ServerResponse<Object> fiveDimensionTest(String course_id, boolean isTrue, HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long studentId = student.getId();
 
         // true 扣除一金币
@@ -803,7 +803,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     public ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Integer[] correctWordId,
                                                        Integer[] errorWordId, Long[] unitId, Integer classify, Long courseId,
                                                        HttpSession session, Integer point, String genre,String testDetail) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
 
         // 保存测试记录
         int quantity;
@@ -1037,7 +1037,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     @Override
     public ServerResponse<String> saveCapacityReview(HttpSession session, Long[] unitId, Integer classify, String word,
                                                      Long courseId, Long id, boolean isKnown) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
 
         String[] correctWord = new String[0];
         String[] errorWord = new String[0];
@@ -1173,7 +1173,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
      */
     @Override
     public ServerResponse<Object> testReviewWordPic(String unit_id, int classify, HttpSession session, boolean pattern) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long studentId = student.getId();
 
         // 复习测试上一单元
@@ -1204,7 +1204,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
      */
     @Override
     public ServerResponse<Object> testWordPic(String courseId, String unitId, int select, int classify, Boolean isTrue, HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long studentId = student.getId();
 
         // true 扣除一金币
@@ -1258,7 +1258,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
     @Override
     public ServerResponse<List<SentenceTranslateVo>> getSentenceReviewTest(HttpSession session, Long unitId, Integer classify, Integer type, boolean pattern) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
 
         // 复习测试上一单元
         if (pattern) {

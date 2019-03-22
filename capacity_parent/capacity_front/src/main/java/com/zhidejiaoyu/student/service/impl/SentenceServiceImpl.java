@@ -111,7 +111,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
 
     @Override
     public ServerResponse<SentenceTranslateVo> getSentenceTranslate(HttpSession session, Long unitId, int classifyInt, Integer type) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
 
         // 获取当前单元下的所有例句的总个数
         Long sentenceCount = sentenceMapper.countByUnitId(unitId);
@@ -279,7 +279,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<String> saveSentenceTranslate(HttpSession session, Learn learn, Boolean known, Integer plan,
                                                         Integer total, String classify, Integer unitId) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Date now = DateUtil.parseYYYYMMDDHHMMSS(new Date());
         Long studentId = student.getId();
         int count;
@@ -384,7 +384,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
 
     @Override
     public ServerResponse<SentenceWordInfoVo> getSentenceWordInfo(HttpSession session, Long unitId, Long courseId, String word) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         SentenceWordInfoVo sentenceWordInfoVo;
         int status = 1;
 
@@ -441,7 +441,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
 
     @Override
     public ServerResponse<String> saveUnknownWord(HttpSession session, Long unitId, Long courseId, Long wordId) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         // 在学习记录中将指定单词置为生词
         learnMapper.updateUnknownWord(student, unitId, courseId, wordId);
         // 查看 记忆追踪-慧听写 中是否含有该单词的信息
@@ -644,7 +644,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
 
     @Override
     public ServerResponse<Object> getIsInto(HttpSession session, Long unitId) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
 
         // 获取当前单元下的所有例句的总个数
         Long sentenceCount = sentenceMapper.countByUnitId(unitId);
@@ -703,7 +703,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     @Override
     public ServerResponse<Object> getSentenceLaterLearnTime(HttpSession session) {
         //获取学生id
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         //获取学习时间
         List<Map<String, Object>> list = sentenceMapper.selectSentenceLaterLearnTimeByStudentId(student.getId());
         List<Map<String, Object>> resultList = new ArrayList<>();
@@ -726,7 +726,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
 
     @Override
     public ServerResponse<Object> getModuleRelearning(HttpSession session, String studyModel, Integer unitId) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Integer update = learnMapper.updLearnByUnitIdAndStudyModelAndStudentId(student.getId(), studyModel, unitId);
         if (update > 0) {
             if (studyModel.equals("例句翻译")) {

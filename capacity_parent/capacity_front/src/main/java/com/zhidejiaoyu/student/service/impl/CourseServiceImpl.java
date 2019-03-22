@@ -291,7 +291,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
 
     @Override
     public ServerResponse<Object> taskCourse(HttpSession session, Integer model) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long studentId = student.getId();
 
         Map result = new HashMap();
@@ -459,7 +459,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
      */
     @Override
     public ServerResponse<Object> buildReview(HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long studentId = student.getId();
 
         Map<String, Object> result = new HashMap<>(16);
@@ -488,7 +488,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
 
     @Override
     public ServerResponse<Object> myCourse(HttpSession session, Integer model, Integer ifSort) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long student_id = student.getId();
 
         List<Map<String, String>> result = new ArrayList<>();
@@ -583,8 +583,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
      */
     private long StudentIdBySession(HttpSession session) {
         // 获取当前学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        return student.getId();
+        return getStudentId(session);
     }
 
     /**
@@ -893,7 +892,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
 
     @Override
     public ServerResponse<List<Map<String, Object>>> getAllCourses(HttpSession session, Integer type, Boolean flag) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         List<Map<String, Object>> courseInfo = courseMapper.getAllCourse(student, type);
 
         if (courseInfo.size() > 0) {
@@ -914,7 +913,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
 
     @Override
     public ServerResponse<PageInfo<Map<String, Object>>> getUnitPage(HttpSession session, Long courseId, Integer pageNum, Integer pageSize) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         PageHelper.startPage(pageNum, pageSize);
         List<Map<String, Object>> map = unitMapper.selectUnitIdAndUnitNameByCourseIdAndStudentId(courseId, student.getId());
         PageInfo<Map<String, Object>> mapPageInfo = new PageInfo<>(map);

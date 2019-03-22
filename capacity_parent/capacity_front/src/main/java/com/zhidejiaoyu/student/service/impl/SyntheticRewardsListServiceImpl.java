@@ -28,7 +28,7 @@ import java.util.*;
  * @since 2018-11-19
  */
 @Service
-public class SyntheticRewardsListServiceImpl extends ServiceImpl<SyntheticRewardsListMapper, SyntheticRewardsList> implements SyntheticRewardsListService {
+public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRewardsListMapper, SyntheticRewardsList> implements SyntheticRewardsListService {
 
     @Autowired
     private SyntheticRewardsListMapper syntheticRewardsListMapper;
@@ -70,7 +70,7 @@ public class SyntheticRewardsListServiceImpl extends ServiceImpl<SyntheticReward
     @Override
     public ServerResponse<Object> selSyntheticList(HttpSession session) {
         //获取学生session
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         //获取全部的手套印记`
         HashMap<String, Object> mapss = new HashMap<>();
         mapss.put("studentId", student.getId());
@@ -141,7 +141,7 @@ public class SyntheticRewardsListServiceImpl extends ServiceImpl<SyntheticReward
     @Override
     public ServerResponse<Object> updSyntheticList(HttpSession session, Integer nameInteger) {
         //获取学生session
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         if (student.getBonusExpires() != null) {
             if (student.getBonusExpires().getTime() > new Date().getTime()) {
                 return ServerResponse.createByError();
@@ -187,7 +187,7 @@ public class SyntheticRewardsListServiceImpl extends ServiceImpl<SyntheticReward
     @Override
     public ServerResponse<Object> getMessage(HttpSession session, Integer nameInteger, Integer type) {
         //获取学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         //获取查找名
         String name = AwardUtil.getAward(nameInteger);
         //返回值格式
@@ -242,7 +242,7 @@ public class SyntheticRewardsListServiceImpl extends ServiceImpl<SyntheticReward
     public ServerResponse<Object> getLucky(Integer studentId, HttpSession session) {
         Map<String, Object> useMap = new HashMap<>();
         if (studentId == null) {
-            Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+            Student student = getStudent(session);
             studentId = student.getId().intValue();
             useMap.put("sex",student.getSex()==1?"男":"女");
         }else{

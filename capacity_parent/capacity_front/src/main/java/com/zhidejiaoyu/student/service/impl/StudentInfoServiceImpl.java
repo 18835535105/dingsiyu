@@ -204,7 +204,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     @Transactional(rollbackFor = Exception.class)
     @Override
     public ServerResponse<String> worship(HttpSession session, Long userId) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
 
         // 查询用户上次的膜拜信息
         List<Worship> worships = worshipMapper.selectSevenDaysInfoByStudent(student);
@@ -294,7 +294,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     public ServerResponse<String> calculateValidTime(HttpSession session, Integer classify, Long courseId, Long unitId,
                                                      Long validTime) {
 
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
 
         // 学生超过30分钟无操作后，session过期会导致student为空，点击退出按钮会出现NPE，在此进行处理
         if (student == null) {
@@ -402,7 +402,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
     @Override
     public ServerResponse<String> updateStudentInfo(HttpSession session, Student student) {
-        Student currentStudent = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student currentStudent = getStudent(session);
         if (!Objects.equals(currentStudent.getId(), student.getId())) {
             log.error("学生 {}->{} 试图修改 学生 {}->{} 的个人信息！", currentStudent.getId(), currentStudent.getStudentName(),
                     student.getId(), student.getStudentName());
@@ -645,7 +645,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
      * @return
      */
     private String saveGoldAward(HttpSession session, Integer classify, Long second, Date loginTime) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         student = studentMapper.selectByPrimaryKey(student.getId());
         String learnType = commonMethod.getTestType(classify);
         // 金币数

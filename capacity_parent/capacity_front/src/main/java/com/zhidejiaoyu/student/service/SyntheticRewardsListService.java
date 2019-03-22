@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
  * @author zdjy
  * @since 2018-11-19
  */
-public interface SyntheticRewardsListService extends IService<SyntheticRewardsList> {
+public interface SyntheticRewardsListService extends BaseService<SyntheticRewardsList> {
 
 
     /**

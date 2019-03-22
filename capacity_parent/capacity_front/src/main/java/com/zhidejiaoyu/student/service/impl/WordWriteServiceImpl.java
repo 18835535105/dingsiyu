@@ -70,7 +70,7 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
     @Transactional(rollbackFor = Exception.class)
     public Object getWriteWord(HttpSession session, Long unitId, Long[] ignoreWordId) {
 
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         boolean firstStudy = this.isFirst(student.getId());
 
         if (firstStudy) {
@@ -194,7 +194,7 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<String> saveWriteWord(HttpSession session, Learn learn, Boolean isKnown, Integer plan,
                                                 Integer total, Integer classify) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Date now = DateUtil.parseYYYYMMDDHHMMSS(new Date());
         Long studentId = student.getId();
         int count;

@@ -27,7 +27,7 @@ import java.util.*;
  * @since 2018-11-19
  */
 @Service
-public class StudentSkinServiceImpl extends ServiceImpl<StudentSkinMapper, StudentSkin> implements StudentSkinService {
+public class StudentSkinServiceImpl extends BaseServiceImpl<StudentSkinMapper, StudentSkin> implements StudentSkinService {
 
     @Autowired
     private StudentSkinMapper studentSkinMapper;
@@ -81,7 +81,7 @@ public class StudentSkinServiceImpl extends ServiceImpl<StudentSkinMapper, Stude
     @Override
     public ServerResponse<Object> addStudentSkinByDiamond(HttpSession session, int number, int skinInteger, String imgUrl) {
         //获取学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         //获取学生钻石数量
         Integer diamond = student.getDiamond();
         //根据皮肤编号获取皮肤名称
@@ -122,7 +122,7 @@ public class StudentSkinServiceImpl extends ServiceImpl<StudentSkinMapper, Stude
         //返回值格式确定
         Map<String, Object> map = new HashMap<>();
         //获取学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         //获取未使用的皮肤碎片信息
         List<Exhumation> exhumations = exhumationMapper.selExhumationByStudentIdTOSkin(student.getId());
         //储存皮肤碎片数量
@@ -225,7 +225,7 @@ public class StudentSkinServiceImpl extends ServiceImpl<StudentSkinMapper, Stude
     @Override
     public ServerResponse<Object> selSkin(HttpSession session) {
         //获取学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         //查询学生下皮肤信息
         List<StudentSkin> studentSkins = studentSkinMapper.selSkinByStudentIdAndEndTime(student.getId());
         //返回值格式确定
@@ -277,7 +277,7 @@ public class StudentSkinServiceImpl extends ServiceImpl<StudentSkinMapper, Stude
     @Override
     public ServerResponse<Object> useSkin(HttpSession session, Integer skinInteger, Integer dateInteger, Integer type, String imgUrl) {
         //获取学生对象
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         String name = AwardUtil.getAward(skinInteger);
         if (type == 1) {
             //使用功能
@@ -360,7 +360,7 @@ public class StudentSkinServiceImpl extends ServiceImpl<StudentSkinMapper, Stude
     @Override
     public ServerResponse<Object> selUseSkinById(HttpSession session) {
         //获取学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         //根据学生id获取使用的皮肤信息
         StudentSkin studentSkin = studentSkinMapper.selUseSkinByStudentId(student.getId());
         //返回数据放入map集合中

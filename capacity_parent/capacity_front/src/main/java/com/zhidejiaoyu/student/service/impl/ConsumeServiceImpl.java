@@ -21,7 +21,7 @@ import javax.servlet.http.HttpSession;
  * @since 2018-11-21
  */
 @Service
-public class ConsumeServiceImpl extends ServiceImpl<ConsumeMapper, Consume> implements ConsumeService {
+public class ConsumeServiceImpl extends BaseServiceImpl<ConsumeMapper, Consume> implements ConsumeService {
 
     @Autowired
     private ConsumeMapper consumeMapper;
@@ -31,7 +31,7 @@ public class ConsumeServiceImpl extends ServiceImpl<ConsumeMapper, Consume> impl
 
     @Override
     public int reduceConsume(int type, int number, HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         if(type==1){
             Consume consume = getConsume("金币消耗", type, number, student.getId().intValue(),2);
             Integer result = consumeMapper.insert(consume);
@@ -62,7 +62,7 @@ public class ConsumeServiceImpl extends ServiceImpl<ConsumeMapper, Consume> impl
 
     @Override
     public int addConsume(int type, int number, HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         if(type==1){
             Consume consume = getConsume("金币增加", type, number, student.getId().intValue(),1);
             Integer result = consumeMapper.insert(consume);

@@ -788,6 +788,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 一个账户只能登陆一台
             judgeMultipleLogin(session, stu);
 
+            isStudentEx(stu);
             // 2.判断是否需要完善个人信息
             if (!StringUtils.isNotBlank(stu.getHeadUrl())) {
 

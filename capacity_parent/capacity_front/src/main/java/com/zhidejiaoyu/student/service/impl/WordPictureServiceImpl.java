@@ -83,7 +83,7 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
      */
     @Override
     public Object getWordPicture(HttpSession session, Long courseId, Long unitId, Integer plan) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long studentId = student.getId();
 
         // 判断学生是否在本系统首次学习，如果是记录首次学习时间

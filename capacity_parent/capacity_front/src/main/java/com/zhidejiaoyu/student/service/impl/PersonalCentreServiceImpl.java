@@ -126,7 +126,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     public ServerResponse<Object> personalIndex(HttpSession session) {
         Map<String, Object> map = new HashMap<>(16);
         // 获取当前学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long id = student.getId();
         map.put("name", student.getStudentName());
         map.put("headUrl", student.getHeadUrl());
@@ -335,8 +335,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
      */
     private long StudentIdBySession(HttpSession session) {
         // 获取当前学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        return student.getId();
+        return getStudentId(session);
     }
 
     /**
@@ -662,7 +661,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         Map<String, Object> result = new HashMap<>(16);
 
         // 获取当前学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
 
         final String KEY = "capacity_student_rank";
         final String FIELD = "condition:" + student.getId() + ":" + page + ":" + rows + ":" + golds + ":" + badges + ":" + certificates + ":" + worships + ":" + model + ":" + queryType;
@@ -1065,7 +1064,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     @Override
     public ServerResponse<Object> showCcie(HttpSession session, Integer model, Integer type) {
         // 获取当前学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long studentId = student.getId();
 
         List<Map<String, Object>> listCcie = ccieMapper.selectAllCcieByStudentIdAndDate(studentId, model, type);
@@ -1368,7 +1367,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     @Override
     public ServerResponse<Object> durationSeniority(HttpSession session, Integer model, Integer haveUnit, Integer haveTest, Integer haveTime, Integer page, Integer rows) {
         // 获取当前学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long studentId = student.getId();
         // 姓名
         String studentName = student.getStudentName();
@@ -1504,7 +1503,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
 
     @Override
     public ServerResponse<Object> courseStatisticsCountTrue(HttpSession session, Integer unitId, Integer model) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long studentId = student.getId();
 
         Map map = new HashMap();
@@ -1674,7 +1673,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     public Object getLucky(Integer studentId,HttpSession session) {
         Map<String, Object> useMap = new HashMap<>();
         if (studentId == null) {
-            Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+            Student student = getStudent(session);
             studentId = student.getId().intValue();
             useMap.put("sex",student.getSex()==1?"男":"女");
         }else{

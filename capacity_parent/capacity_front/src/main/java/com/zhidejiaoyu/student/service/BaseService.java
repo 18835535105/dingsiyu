@@ -66,4 +66,6 @@ public interface BaseService<T> extends IService<T> {
      * @return
      */
     StudyFlow getCurrentStudyFlow(Long studentId);
+
+    void isStudentEx(Student student);
 }

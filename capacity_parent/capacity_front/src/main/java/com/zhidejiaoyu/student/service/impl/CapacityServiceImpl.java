@@ -153,7 +153,7 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
     @Override
     public ServerResponse<CapacityContentVo> getCapacityContent(HttpSession session, String studyModel, Long courseId,
                                                                 Long unitId, Long id) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         Long studentId = student.getId();
         String chinese;
         Integer studyCount;
@@ -200,7 +200,7 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
     @Override
     public ServerResponse<PageInfo> getCapacityList(HttpSession session, String studyModel, Long courseId, Long unitId,
                                                     Integer page, Integer size) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         return packageCapacityList(student, courseId, unitId, studyModel, page, size);
     }
 
@@ -226,7 +226,7 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
     @Override
     public void downloadCapacity(HttpSession session, HttpServletResponse response, String studyModel, Long courseId,
                                  Long unitId, Integer pageNum, Integer pageSize) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = getStudent(session);
         final String[] modelArr = {"慧记忆", "慧听写", "慧默写", "单词图鉴", "例句听力", "例句翻译", "例句默写"};
         Long studentId = student.getId();
 

@@ -297,7 +297,7 @@
         join unit unit on unit.id=learn.unit_id
         join course course on course.id=learn.course_id
         where student_id = #{studentId} and example_id is not null
-        group by unit.joint_name
+        group by unit.course_id
         order by learn.id desc;
     </select>
     <select id="countByCourseId" parameterType="java.util.Map" resultType="java.lang.Integer">

@@ -15,7 +15,7 @@ import java.util.Date;
  * @author zdjy
  * @since 2018-11-19
  */
-public interface StudentSkinService extends IService<StudentSkin> {
+public interface StudentSkinService extends BaseService<StudentSkin> {
 
     /**
      * 添加皮肤

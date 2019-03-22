@@ -13,7 +13,7 @@ import javax.servlet.http.HttpSession;
  * @author zdjy
  * @since 2018-11-21
  */
-public interface ConsumeService extends IService<Consume> {
+public interface ConsumeService extends BaseService<Consume> {
 
 
     /**

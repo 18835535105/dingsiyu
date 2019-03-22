@@ -55,7 +55,7 @@ public class DictationServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 		Map<String,Object> map = new HashMap<>(16);
 		
 		// 获取当前学生信息
-		Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+		Student student = getStudent(session);
 		Long id = student.getId();
 
 		if (student.getFirstStudyTime() == null) {
