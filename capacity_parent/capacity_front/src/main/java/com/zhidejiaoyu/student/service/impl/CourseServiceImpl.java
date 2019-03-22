@@ -265,16 +265,17 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                 countAudition=learnMapper.selAllTeksLearn(student.getId(), unitIds, studyModel);
             }
             this.packageMemoryVo(countAudition, 0, size, studyModel, vos);
-            studyModel="课文好声音";
-            if(unitIds.size()>0){
-                teksGoodVoice=learnMapper.selAllTeksLearn(student.getId(), unitIds,studyModel);
-            }
-            this.packageMemoryVo(teksGoodVoice, 0, size, "课文跟读", vos);
             studyModel="课文训练";
             if(unitIds.size()>0){
                 teksTest=learnMapper.selAllTeksLearn(student.getId(), unitIds,"课文默写测试");
             }
             this.packageMemoryVo(teksTest, 0, size, studyModel, vos);
+            studyModel="课文好声音";
+            if(unitIds.size()>0){
+                teksGoodVoice=learnMapper.selAllTeksLearn(student.getId(), unitIds,studyModel);
+            }
+            this.packageMemoryVo(teksGoodVoice, 0, size, "课文跟读", vos);
+
         }
         return ServerResponse.createBySuccess(vos);
     }
