@@ -923,7 +923,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             testRecord.setQuantity(wordUnitTestDTO.getErrorCount() + wordUnitTestDTO.getRightCount());
         }
         testRecord.setStudyModel("音译测试");
-
+        if(student.getBonusExpires()!=null){
+            if(student.getBonusExpires().getTime() > new Date().getTime()){
+                double doubleGoldCount=goldCount*0.2;
+                student.setSystemGold(student.getSystemGold()+doubleGoldCount);
+            }
+        }
         studentMapper.updateByPrimaryKeySelective(student);
         return getObjectServerResponse(session, wordUnitTestDTO, student, testRecord);
     }
@@ -970,7 +975,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
         testRecord.setAwardGold(goldCount);
         testRecord.setStudyModel("课文测试");
-
+        if(student.getBonusExpires()!=null){
+            if(student.getBonusExpires().getTime() > new Date().getTime()){
+                double doubleGoldCount=goldCount*0.2;
+                student.setSystemGold(student.getSystemGold()+doubleGoldCount);
+            }
+        }
         studentMapper.updateByPrimaryKeySelective(student);
         Learn learn = new Learn();
         learn.setLearnTime(new Date());
