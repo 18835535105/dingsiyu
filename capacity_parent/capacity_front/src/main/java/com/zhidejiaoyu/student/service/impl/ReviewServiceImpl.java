@@ -1006,7 +1006,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.FIVE_TEST_LESS_EIGHTY));
                 } else {
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.FIVE_TEST_EIGHTY_TO_HUNDRED));
-                    ccieUtil.saveCcieTest(student, 6, null, courseId, unitId, point);
+                    ccieUtil.saveCcieTest(student, 6, -1, courseId, unitId, point);
                 }
                 if (point < 90) {
                     vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
