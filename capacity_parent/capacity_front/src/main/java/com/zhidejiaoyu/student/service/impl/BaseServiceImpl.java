@@ -101,7 +101,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         List<Map<String, Object>> levels = redisOpt.getAllLevel();
         int level = getLevel(gold.intValue(), levels);
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
-        if(studentExpansion.getLevel()<level){
+        if(studentExpansion != null && studentExpansion.getLevel()<level){
             Integer oldStudy = LevelUtils.getStudy(studentExpansion.getLevel());
             Integer newStudy = LevelUtils.getStudy(level);
             Integer addStudy=newStudy-oldStudy;
