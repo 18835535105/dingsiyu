@@ -1485,21 +1485,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     decideLearnedUnKnown(point, genre, student, msg, studyModel, testRecord);
                 }
             }
-        } else if ("复习测试".equals(genre)) {
-            // 判断学生之前是否已经在当前课程有过“已学测试”或者“生词测试”或者“熟词测试”
-            List<TestRecord> testRecords = testRecordMapper.selectMaxPointByStudyModel(stuId, courseId, genre, studyModel);
-            if (testRecords.size() == 0) {
-                initTestCenterBetterCount(point, testRecord);
-            } else {
-                TestRecord preTestRecord = testRecords.get(0);
-                if (preTestRecord.getPoint() < point && point >= 90) {
-                    testRecord.setBetterCount(preTestRecord.getBetterCount() + 1);
-                } else {
-                    testRecord.setBetterCount(preTestRecord.getBetterCount());
-                }
-            }
-            // 奖励金币信息
-            reviewGold(point, genre, student, msg, studyModel, testRecord);
         }
 
         studentMapper.updateByPrimaryKeySelective(student);
@@ -1525,30 +1510,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             testRecord.setBetterCount(1);
         } else {
             testRecord.setBetterCount(0);
-        }
-    }
-
-    /**
-     * 判断 复习测试 奖励金
-     *
-     * @param point
-     * @param genre
-     * @param student
-     * @param msg
-     * @param studyModel
-     * @param testRecord
-     */
-    private void reviewGold(Integer point, String genre, Student student, StringBuilder msg, String
-            studyModel, TestRecord testRecord) {
-        if (point >= 80) {
-            // 奖励1金币
-            int gold = testRecord.getBetterCount() * TestAwardGoldConstant.REVIEW_TEST_NINETY_TO_FULL;
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
-            testRecord.setAwardGold(gold);
-            msg.append("id 为 ").append(student.getId()).append(" 的学生在 ").append(genre).append(studyModel)
-                    .append(" 中获得#").append(gold).append("#金币。");
-        } else {
-            testRecord.setAwardGold(0);
         }
     }
 
