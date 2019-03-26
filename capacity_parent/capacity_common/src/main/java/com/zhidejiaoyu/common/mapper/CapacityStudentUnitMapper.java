@@ -27,8 +27,6 @@ public interface CapacityStudentUnitMapper extends BaseMapper<CapacityStudentUni
      */
     CapacityStudentUnit selectCurrentUnitIdByStudentIdAndType(@Param("studentId") Long studentId, @Param("type") Integer type);
 
-    void updById(CapacityStudentUnit capacityStudentUnit);
-
     /**
      * 查看指定类型是否有同步版课程
      *

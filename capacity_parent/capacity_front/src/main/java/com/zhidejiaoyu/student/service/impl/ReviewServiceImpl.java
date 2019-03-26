@@ -343,8 +343,9 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             cm.setVocabularyId(vo.getVocabulary_id());
             cm.setMemoryStrength(vo.getMemory_strength());
             cm.setFaultTime(vo.getFault_time());
-            Integer hard = memoryDifficultyUtil.getMemoryDifficulty(cm, 1);
+            int hard = memoryDifficultyUtil.getMemoryDifficulty(cm, 1);
             map.put("memoryDifficulty", hard);
+            map.put("engine", PerceiveEngine.getPerceiveEngine(hard, vo.getMemory_strength()));
         }
         map.put("studyNew", false);
 
@@ -1005,7 +1006,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.FIVE_TEST_LESS_EIGHTY));
                 } else {
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.FIVE_TEST_EIGHTY_TO_HUNDRED));
-                    ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId, point);
+                    ccieUtil.saveCcieTest(student, 6, -1, courseId, unitId, point);
                 }
                 if (point < 90) {
                     vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
@@ -1115,6 +1116,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         }
         Integer hard = memoryDifficultyUtil.getMemoryDifficulty(cp, 1);
         correct.put("memoryDifficulty", hard);
+        correct.put("engine", PerceiveEngine.getPerceiveEngine(hard, cp.getMemoryStrength()));
 
         try {
             Vocabulary vocabulary = vocabularyMapper.selectByPrimaryKey(cp.getVocabularyId());
@@ -1483,21 +1485,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     decideLearnedUnKnown(point, genre, student, msg, studyModel, testRecord);
                 }
             }
-        } else if ("复习测试".equals(genre)) {
-            // 判断学生之前是否已经在当前课程有过“已学测试”或者“生词测试”或者“熟词测试”
-            List<TestRecord> testRecords = testRecordMapper.selectMaxPointByStudyModel(stuId, courseId, genre, studyModel);
-            if (testRecords.size() == 0) {
-                initTestCenterBetterCount(point, testRecord);
-            } else {
-                TestRecord preTestRecord = testRecords.get(0);
-                if (preTestRecord.getPoint() < point && point >= 90) {
-                    testRecord.setBetterCount(preTestRecord.getBetterCount() + 1);
-                } else {
-                    testRecord.setBetterCount(preTestRecord.getBetterCount());
-                }
-            }
-            // 奖励金币信息
-            reviewGold(point, genre, student, msg, studyModel, testRecord);
         }
 
         studentMapper.updateByPrimaryKeySelective(student);
@@ -1523,30 +1510,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             testRecord.setBetterCount(1);
         } else {
             testRecord.setBetterCount(0);
-        }
-    }
-
-    /**
-     * 判断 复习测试 奖励金
-     *
-     * @param point
-     * @param genre
-     * @param student
-     * @param msg
-     * @param studyModel
-     * @param testRecord
-     */
-    private void reviewGold(Integer point, String genre, Student student, StringBuilder msg, String
-            studyModel, TestRecord testRecord) {
-        if (point >= 80) {
-            // 奖励1金币
-            int gold = testRecord.getBetterCount() * TestAwardGoldConstant.REVIEW_TEST_NINETY_TO_FULL;
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
-            testRecord.setAwardGold(gold);
-            msg.append("id 为 ").append(student.getId()).append(" 的学生在 ").append(genre).append(studyModel)
-                    .append(" 中获得#").append(gold).append("#金币。");
-        } else {
-            testRecord.setAwardGold(0);
         }
     }
 

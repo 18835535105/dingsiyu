@@ -511,13 +511,13 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         int point = testRecord.getPoint();
         int goldCount = 0;
         if (point >= PASS && point < NINETY_POINT) {
-            goldCount = 10;
+            goldCount = 3;
             this.saveLog(student, goldCount, null, "游戏测试");
         } else if (point >= NINETY_POINT && point < FULL_MARK) {
-            goldCount = 20;
+            goldCount = 5;
             this.saveLog(student, goldCount, null, "游戏测试");
         } else if (point == FULL_MARK) {
-            goldCount = 30;
+            goldCount = 10;
             this.saveLog(student, goldCount, null, "游戏测试");
         }
         studentMapper.updateByPrimaryKeySelective(student);

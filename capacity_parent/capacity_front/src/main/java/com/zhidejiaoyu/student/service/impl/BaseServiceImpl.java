@@ -55,7 +55,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
 
     @Override
     public Student getStudent(HttpSession session) {
-        Student student =(Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         return studentMapper.selectByPrimaryKey(student.getId());
     }
 
@@ -101,7 +101,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         List<Map<String, Object>> levels = redisOpt.getAllLevel();
         int level = getLevel(gold.intValue(), levels);
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
-        if(studentExpansion.getLevel()<level){
+        if(studentExpansion != null && studentExpansion.getLevel()<level){
             Integer oldStudy = LevelUtils.getStudy(studentExpansion.getLevel());
             Integer newStudy = LevelUtils.getStudy(level);
             Integer addStudy=newStudy-oldStudy;
@@ -133,7 +133,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
 
     @Override
     public void isStudentEx(Student student) {
-        StudentExpansion have = studentExpansionMapper.isHave(student.getId());
+        StudentExpansion have = studentExpansionMapper.selectByStudentId(student.getId());
         if (have == null) {
             List<Map<String, Object>> levels = redisOpt.getAllLevel();
             Double gold = student.getSystemGold() + student.getOfflineGold();

@@ -112,6 +112,13 @@
         <if test="model == 7">
             and study_model = '课文默写测试'
         </if>
+        <if test="model == 8">
+            and study_model = '音译测试'
+        </if>
+
+        <if test="model == 9">
+            and study_model = '课文测试'
+        </if>
     </sql>
 
     <select id="selectByStudentIdAndUnitId"

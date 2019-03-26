@@ -16,17 +16,13 @@
         id, student_id, study_power , level ,is_look
     </sql>
 
-    <select id="isHave" parameterType="long" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"></include> from student_expansion where student_id=#{studentId}
-    </select>
-
     <insert id="addStudy" parameterType="map">
         insert into student_expansion(student_id,study_power,level,is_look)
         values(#{studentId},#{study},#{level},#{isLook})
     </insert>
 
     <select id="selectByStudentId" parameterType="long" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"></include> from student_expansion where student_id=#{studentId}
+        select <include refid="Base_Column_List"/> from student_expansion where student_id=#{studentId} limit 1
     </select>
 
 </mapper>

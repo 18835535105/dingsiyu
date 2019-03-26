@@ -16,8 +16,6 @@ import org.apache.ibatis.annotations.Update;
  */
 public interface StudentExpansionMapper extends BaseMapper<StudentExpansion> {
 
-    StudentExpansion isHave(@Param("studentId") Long studentId);
-
     void addStudy(@Param("studentId") Long studentId, @Param("study") Integer study,
                   @Param("level") int level, @Param("isLook") int isLook);
 

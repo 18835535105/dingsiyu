@@ -300,34 +300,31 @@ public class PersonalCentreController extends BaseController {
         return personalCentreService.getLucky(studentId, session);
     }
 
-    //查看今天是否为第一次抽奖
-    @PostMapping("getRecord")
+    /**
+     * 查看今天是否为第一次抽奖
+     *
+     * @param session
+     * @return
+     */
+    @PostMapping("/getRecord")
     public ServerResponse<Object> getRecord(HttpSession session) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("session", session.toString());
-        headers.add("studentId", ((Student) session.getAttribute(UserConstant.CURRENT_STUDENT)).getId().toString());
-        headers.add("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)).toString());
-        MediaType sType = MediaType.parseMediaType("application/json; charset=UTF-8");
-        headers.setContentType(sType);
+        HttpHeaders headers = super.packageHeader(session);
         String url = domain + "/api/drawRecord/getRecord";
         ResponseEntity<Map> responseEntity = restTemplate.postForEntity(url, headers, Map.class);
         return ServerResponse.createBySuccess(responseEntity.getBody() == null ? null : responseEntity.getBody().get("data"));
     }
 
-    //添加抽奖
-    @PostMapping("addAward")
+    /**
+     * 添加抽奖
+     */
+    @PostMapping("/addAward")
     public ServerResponse<Object> addAward(HttpSession session, Integer type, String explain, String imgUrl) {
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = super.packageHeader(session);
         headers.add("explain", explain);
-        headers.add("session", session.toString());
         headers.add("type", type.toString());
         if (imgUrl != null) {
-            headers.add("imgUrl", imgUrl.toString());
+            headers.add("imgUrl", imgUrl);
         }
-        headers.add("studentId", ((Student) session.getAttribute(UserConstant.CURRENT_STUDENT)).getId().toString());
-        headers.add("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)).toString());
-        MediaType sType = MediaType.parseMediaType("application/json; charset=UTF-8");
-        headers.setContentType(sType);
         String url = domain + "/api/drawRecord/AddAward";
         ResponseEntity<Map> responseEntity = restTemplate.postForEntity(url, headers, Map.class);
         return ServerResponse.createBySuccess(responseEntity.getBody() == null ? null : responseEntity.getBody().get("data"));

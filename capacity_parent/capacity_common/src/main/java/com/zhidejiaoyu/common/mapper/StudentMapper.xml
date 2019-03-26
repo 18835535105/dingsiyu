@@ -166,7 +166,8 @@
         sentence_unit_name,
         energy,
         diamond,
-        bonus_expires
+        bonus_expires,
+        show_capacity
     </sql>
     <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.StudentExample">
         select

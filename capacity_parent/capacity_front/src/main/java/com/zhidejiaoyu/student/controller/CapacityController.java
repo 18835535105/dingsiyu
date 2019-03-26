@@ -1,18 +1,24 @@
 package com.zhidejiaoyu.student.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.CapacityService;
 import com.zhidejiaoyu.student.vo.CapacityContentVo;
 import com.zhidejiaoyu.student.vo.CapacityDigestVo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 记忆追踪（慧追踪）模块
@@ -22,10 +28,16 @@ import javax.servlet.http.HttpSession;
  */
 @Controller
 @RequestMapping("/capacity")
-public class CapacityController {
+public class CapacityController extends BaseController{
+
+    @Value("${domain}")
+    private String domain;
 
     @Autowired
     private CapacityService capacityService;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     /**
      * 获取记忆追踪中摘要内容 只有单词或例句显示的页面，通过字体大小来确定复习紧迫程度的页面
@@ -123,7 +135,13 @@ public class CapacityController {
      */
     @ResponseBody
     @PostMapping("/cancelTip")
-    public ServerResponse<String> cancelTip(HttpSession session) {
-        return capacityService.cancelTip(session);
+    public ServerResponse<Object> cancelTip(HttpSession session) {
+        Student student = super.getStudent(session);
+        if (!Objects.equals(student.getShowCapacity(), 2)) {
+            HttpHeaders headers = super.packageHeader(session);
+            String url = domain + "/api/capacity/cancelTip";
+            restTemplate.postForEntity(url, headers, Map.class);
+        }
+        return ServerResponse.createBySuccess();
     }
 }

@@ -67,12 +67,4 @@ public interface CapacityService extends BaseService<CapacityWrite> {
      * @param pageSize
      */
     void downloadCapacity(HttpSession session, HttpServletResponse response, String studyModel, Long courseId, Long unitId, Integer pageNum, Integer pageSize);
-
-    /**
-     * 取消进入慧追踪的提示框
-     *
-     * @param session
-     * @return
-     */
-    ServerResponse<String> cancelTip(HttpSession session);
 }
