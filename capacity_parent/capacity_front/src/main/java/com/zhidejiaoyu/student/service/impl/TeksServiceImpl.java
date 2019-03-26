@@ -110,7 +110,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             List<Teks> resultTeks = new ArrayList<>();
             int i = 0;
             for (Teks teks1 : teks) {
-                teks1.setPronunciation(baiduSpeak.getSentencePath(teks1.getSentence()));
+                teks1.setPronunciation(baiduSpeak.getSentencePath(teks1.getSentence().replace("#"," ").replace("$","")));
                 i++;
                 resultTeks.add(teks1);
             }
@@ -132,7 +132,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             List<Teks> resultTeks = new ArrayList<>();
             int i = 0;
             for (Teks teks1 : teks) {
-                teks1.setPronunciation(baiduSpeak.getSentencePath(teks1.getSentence()));
+                teks1.setPronunciation(baiduSpeak.getSentencePath(teks1.getSentence()).replace("#"," ").replace("$",""));
                 i++;
                 resultTeks.add(teks1);
             }
@@ -427,8 +427,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 //保存返回的数据
                 Map<String, Object> map = new HashMap<>();
                 map.put("chinese", teks.getParaphrase());
-                map.put("pronunciation", baiduSpeak.getSentencePath(teks.getSentence()));
-                map.put("sentence", teks.getSentence());
+                map.put("pronunciation", baiduSpeak.getSentencePath(teks.getSentence()).replace("#"," ").replace("$",""));
+                map.put("sentence", teks.getSentence().replace("#"," ").replace("$",""));
                 map.put("id", teks.getId());
                 String[] sentenceList = teks.getSentence().split(" ");
                 for (int i = 0; i < sentenceList.length; i++) {
@@ -451,14 +451,14 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                             } else {
                                 if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
                                     if (sentenceList[i].endsWith("...")) {
-                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
+                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#"," ").replace("$",""));
                                         vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 3));
-                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
+                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#"," ").replace("$",""));
                                         blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
                                     } else {
-                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
+                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#"," ").replace("$",""));
                                         vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
+                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#"," ").replace("$",""));
                                         blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
                                     }
                                 } else {
@@ -477,14 +477,19 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                             } else {
                                 if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
                                     if (sentenceList[i].endsWith("...")) {
-                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
-                                        vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 3));
-                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
-                                        blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
+                                        if(sentenceList[i].length()==3){
+                                            vocabulary.add(sentenceList[i]);
+                                            blanceSentence.add(sentenceList[i]);
+                                        }else{
+                                            vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#"," ").replace("$",""));
+                                            vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 3));
+                                            blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#"," ").replace("$",""));
+                                            blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
+                                        }
                                     } else {
-                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
+                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#"," ").replace("$",""));
                                         vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
+                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#"," ").replace("$",""));
                                         blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
                                     }
                                 } else {
