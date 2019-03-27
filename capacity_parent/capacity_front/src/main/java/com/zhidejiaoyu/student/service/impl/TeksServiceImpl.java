@@ -53,6 +53,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
      */
     private static final int FULL_MARK = 100;
 
+
+    /**
+     * 标点数组
+     */
+    private final String[] POINT = {".", ",", "?", "!", "，", "。", "？", "！", "、", "：", "“", "”", "《", "》"};
+
     private static final List<String> NAMELIST = new ArrayList<String>() {{
         add("Zhang");
         add("Wu");
@@ -194,7 +200,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 //将遍历的数据放入到
                 Map<String, Object> map = new HashMap<>();
                 map.put("chinese", teks1.getParaphrase());
-                map.put("pronunciation", baiduSpeak.getSentencePath(teks1.getSentence()));
+                map.put("pronunciation", baiduSpeak.getSentencePath(teks1.getSentence().replace("#", " ").replace("$", "")));
                 map.put("id", teks1.getId());
                 String[] sentenceList = teks1.getSentence().split(" ");
                 List blankSentenceArray = new ArrayList();
@@ -205,25 +211,25 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                     if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
                         blankSentenceArray.add(null);
                         if (sentenceList[i].endsWith("...")) {
-                            blankSentenceArray.add(sentenceList[i].substring(sentenceList[i].length() - 3));
-                            sentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
+                            blankSentenceArray.add(sentenceList[i].substring(sentenceList[i].length() - 3).replace("#", " ").replace("$", ""));
+                            sentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#", " ").replace("$", ""));
                             sentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
                         } else {
-                            blankSentenceArray.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                            sentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
+                            blankSentenceArray.add(sentenceList[i].substring(sentenceList[i].length() - 1).replace("#", " ").replace("$", ""));
+                            sentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#", " ").replace("$", ""));
                             sentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
                         }
 
                     } else {
                         blankSentenceArray.add(null);
-                        sentence.add(sentenceList[i]);
+                        sentence.add(sentenceList[i].replace("#", " ").replace("$", ""));
                     }
                     //返回的填空单词 以及句子填空位置
                     if (teks1.getSentence().indexOf("...") != -1) {
                         String substring = teks1.getSentence().replace("...", "");
-                        map.put("vocabularyArray", commonMethod.getOrderEnglishList(substring, null));
+                        map.put("vocabularyArray", getOrderEnglishList(substring, null));
                     } else {
-                        map.put("vocabularyArray", commonMethod.getOrderEnglishList(teks1.getSentence(), null));
+                        map.put("vocabularyArray", getOrderEnglishList(teks1.getSentence(), null));
                     }
                     map.put("blankSentenceArray", blankSentenceArray);
                     map.put("sentence", sentence);
@@ -1049,14 +1055,14 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 String option = s[i];
                 if (option.endsWith(",") || option.endsWith(".") || option.endsWith("!") || option.endsWith("?")) {
                     if (option.endsWith("...")) {
-                        arrList.add(option.replace("...", ""));
+                        arrList.add(option.replace("...", "").replace("#", " ").replace("$", ""));
                         arrList.add("...");
                     } else {
-                        arrList.add(option.substring(0, option.length() - 1));
+                        arrList.add(option.substring(0, option.length() - 1).replace("#", " ").replace("$", ""));
                         arrList.add(option.substring(option.length() - 1));
                     }
                 } else {
-                    arrList.add(option);
+                    arrList.add(option.replace("#", " ").replace("$", ""));
                 }
             }
         }
@@ -1153,5 +1159,52 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 returnCourse.addAll(maps);
             }
         }
+    }
+
+    /**
+     * 将例句单词顺序打乱
+     *
+     * @param sentence
+     * @param exampleDisturb 例句英文干扰项  为空时无干扰项
+     * @return
+     */
+    public List<String> getOrderEnglishList(String sentence, String exampleDisturb) {
+        // 去除标点
+        for (String s : POINT) {
+            if (sentence.contains(s)) {
+                if (".".equals(s)) {
+                    sentence = sentence.replace(". ", " ");
+                    if (sentence.substring(sentence.length() - 1).equals(".")) {
+                        sentence = sentence.substring(0, sentence.length() - 1);
+                    }
+                } else {
+                    sentence = sentence.replace(s, "");
+                }
+            }
+        }
+        // 将例句按照空格拆分
+        String[] words = sentence.split(" ");
+
+        List<String> list = new ArrayList<>();
+        // 去除固定搭配中的#
+        for (int i = 0; i < words.length; i++) {
+            if (words[i].contains("#")) {
+                words[i] = words[i].replace("#", " ");
+            }
+            if (words[i].contains("*")) {
+                words[i] = words[i].replace("*", " ");
+            }
+            if(words[i].contains("$")){
+                words[i] = words[i].replace("$", " ");
+            }
+            list.add(words[i].trim());
+        }
+
+        if (StringUtils.isNotEmpty(exampleDisturb)) {
+            list.add(exampleDisturb.replace("#", " "));
+        }
+
+        Collections.shuffle(list);
+        return list;
     }
 }
