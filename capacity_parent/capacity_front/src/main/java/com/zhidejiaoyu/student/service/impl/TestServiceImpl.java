@@ -15,6 +15,7 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -133,6 +134,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     @Autowired
     private StudyFlowMapper studyFlowMapper;
+
+    @Autowired
+    private TestGoldUtil testGoldUtil;
 
     /**
      * 游戏测试题目获取，获取20个单词供测试
@@ -1425,7 +1429,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 goldCount = getGoldCount(wordUnitTestDTO, student, point);
             }
         }
-        return goldCount;
+        return testGoldUtil.addGold(student, goldCount);
     }
 
     private int getGoldCount(WordUnitTestDTO wordUnitTestDTO, Student student, int point) {
