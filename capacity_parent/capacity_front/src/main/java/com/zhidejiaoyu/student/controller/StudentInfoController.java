@@ -14,8 +14,12 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
@@ -37,8 +41,14 @@ public class StudentInfoController extends BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StudentInfoController.class);
 
+    @Value("${domain}")
+    private String domain;
+
     @Autowired
     private StudentInfoService studentInfoService;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     /**
      * 完善学生信息、修改学生信息时获取学生信息
@@ -343,4 +353,35 @@ public class StudentInfoController extends BaseController {
                                                           @RequestParam(required = false, defaultValue = "18") Integer pageSize) {
         return studentInfoService.getWorship(session, type, pageNum, pageSize);
     }
+
+    /**
+     * 打开/关闭背景音乐
+     *
+     * @param session
+     * @param status  1:打开音乐；2：关闭音乐
+     * @return
+     */
+    @PostMapping("/optBackMusic")
+    public ServerResponse optBackMusic(HttpSession session, Integer status) {
+        if (status == null || status < 1 || status > 2) {
+            status = 1;
+        }
+        HttpHeaders httpHeaders = super.packageHeader(session);
+        httpHeaders.add("status", status.toString());
+        restTemplate.postForEntity(domain + "/api/student/optBackMusic", httpHeaders, Map.class);
+        return ServerResponse.createBySuccess();
+    }
+
+    /**
+     * 获取学生背景音乐开关状态
+     *
+     * @param session
+     * @return
+     */
+    @GetMapping("/getBackMusicStatus")
+    public ServerResponse<Object> getBackMusicStatus(HttpSession session) {
+        ResponseEntity<Map> forEntity = restTemplate.getForEntity(domain + "/api/student/getBackMusicStatus", Map.class, super.packageParams(session));
+        return ServerResponse.createBySuccess(forEntity.getBody() == null ? null : forEntity.getBody().get("data"));
+    }
+
 }

@@ -70,9 +70,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private AwardMapper awardMapper;
 
     @Autowired
-    private StudentUnitMapper studentUnitMapper;
-
-    @Autowired
     private LevelMapper levelMapper;
 
     @Autowired
@@ -113,6 +110,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Autowired
     private StudentStudyPlanMapper studentStudyPlanMapper;
+
+    @Autowired
+    private StudentExpansionMapper studentExpansionMapper;
 
     @Override
     public Student LoginJudge(String account, String password) {
@@ -789,6 +789,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             judgeMultipleLogin(session, stu);
 
             isStudentEx(stu);
+
+            // 每次登陆默认打开背景音
+            openBackAudio(stu);
             // 2.判断是否需要完善个人信息
             if (!StringUtils.isNotBlank(stu.getHeadUrl())) {
 
@@ -810,6 +813,24 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
             // 正常登陆
             return ServerResponse.createBySuccess("1", result);
+        }
+    }
+
+    /**
+     * 每次登陆默认打开背景音乐
+     *
+     * @param student
+     */
+    private void openBackAudio(Student student) {
+        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
+        if (studentExpansion != null) {
+            studentExpansion.setAudioStatus(1);
+            studentExpansionMapper.updateById(studentExpansion);
+        } else {
+            studentExpansion = new StudentExpansion();
+            studentExpansion.setStudentId(student.getId());
+            studentExpansion.setAudioStatus(1);
+            studentExpansionMapper.insert(studentExpansion);
         }
     }
 

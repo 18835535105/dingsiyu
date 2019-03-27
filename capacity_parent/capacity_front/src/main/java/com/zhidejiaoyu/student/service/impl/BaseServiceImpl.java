@@ -133,13 +133,20 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
 
     @Override
     public void isStudentEx(Student student) {
-        StudentExpansion have = studentExpansionMapper.selectByStudentId(student.getId());
-        if (have == null) {
+        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
+        if (studentExpansion == null) {
             List<Map<String, Object>> levels = redisOpt.getAllLevel();
             Double gold = student.getSystemGold() + student.getOfflineGold();
             int level = getLevel(gold.intValue(), levels);
             Integer study = LevelUtils.getStudy(level);
-            studentExpansionMapper.addStudy(student.getId(), study, level, 2);
+
+            studentExpansion = new StudentExpansion();
+            studentExpansion.setStudentId(student.getId());
+            studentExpansion.setAudioStatus(1);
+            studentExpansion.setStudyPower(study);
+            studentExpansion.setLevel(level);
+            studentExpansion.setIsLook(2);
+            studentExpansionMapper.insert(studentExpansion);
         }
     }
 
