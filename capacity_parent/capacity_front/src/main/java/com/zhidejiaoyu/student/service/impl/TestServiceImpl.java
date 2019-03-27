@@ -924,7 +924,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
         testRecord.setStudyModel("音译测试");
         if(student.getBonusExpires()!=null){
-            if(student.getBonusExpires().getTime() > new Date().getTime()){
+            if(student.getBonusExpires().getTime() > System.currentTimeMillis()){
                 Double doubleGoldCount=goldCount*0.2;
                 student.setSystemGold(student.getSystemGold()+doubleGoldCount);
                 testRecord.setAwardGold(goldCount+doubleGoldCount.intValue());
@@ -977,7 +977,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setAwardGold(goldCount);
         testRecord.setStudyModel("课文测试");
         if(student.getBonusExpires()!=null){
-            if(student.getBonusExpires().getTime() > new Date().getTime()){
+            if(student.getBonusExpires().getTime() > System.currentTimeMillis()){
                 Double doubleGoldCount=goldCount*0.2;
                 student.setSystemGold(student.getSystemGold()+doubleGoldCount);
                 testRecord.setAwardGold(goldCount+doubleGoldCount.intValue());
@@ -1152,10 +1152,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         vo.setMsg(msg);
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
-        if(student.getBonusExpires().getTime()>new Date().getTime()){
-            Double v = goldCount * 0.2;
-            student.setSystemGold(student.getSystemGold()+v);
-            goldCount=goldCount+v.intValue();
+        if(student.getBonusExpires()!=null){
+            if(student.getBonusExpires().getTime()>System.currentTimeMillis()){
+                Double v = goldCount * 0.2;
+                student.setSystemGold(student.getSystemGold()+v);
+                goldCount=goldCount+v.intValue();
+            }
         }
         vo.setGold(goldCount);
         vo.setEnergy(addEnergy);

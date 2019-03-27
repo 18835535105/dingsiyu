@@ -107,6 +107,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             for (Teks teks1 : teks) {
                 teks1.setPronunciation(baiduSpeak.getSentencePath(teks1.getSentence().replace("#", " ").replace("$", "")));
                 i++;
+                teks1.setSentence(teks1.getSentence().replace("#", " ").replace("$", ""));
                 resultTeks.add(teks1);
             }
             return ServerResponse.createBySuccess(resultTeks);
@@ -581,10 +582,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         testRecord.setTestStartTime(startTime);
         testRecord.setTestEndTime(endTime);
         getLevel(session);
-        if(student.getBonusExpires().getTime()>new Date().getTime()){
-            Double doubleGOld=goldCount*0.2;
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), doubleGOld));
-            goldCount=goldCount+doubleGOld.intValue();
+        if(student.getBonusExpires()!=null){
+            if(student.getBonusExpires().getTime()>System.currentTimeMillis()){
+                Double doubleGOld=goldCount*0.2;
+                student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), doubleGOld));
+                goldCount=goldCount+doubleGOld.intValue();
+            }
         }
         // 封装响应数据
         Map<String, Object> map = packageResultMap(student, wordUnitTestDTO, point, goldCount, testRecord);
