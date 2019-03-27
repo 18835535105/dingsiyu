@@ -39,6 +39,11 @@ public class StudentExpansion extends Model<StudentExpansion> {
     @TableField("is_look")
     private Integer isLook;
 
+    /**
+     * 背景音乐开关；1：开启；2：关闭
+     */
+    private Integer audioStatus;
+
     @Override
     protected Serializable pkVal() {
         return this.id;

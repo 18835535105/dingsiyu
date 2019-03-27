@@ -105,7 +105,7 @@ public class ReviewController {
     @PostMapping("/saveTestCenter")
     public ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Integer[] correctWordId, Integer[] errorWordId, Long[] unitId,
                                                  Integer classify, Long courseId,HttpSession session, Integer point, String genre,String testDetail) {
-        if (!"单词五维测试".equals(genre) && !"单词五维测试".equals(genre)) {
+        if (!"单词五维测试".equals(genre) && !"例句五维测试".equals(genre)) {
             Assert.notEmpty(unitId, "unitId cant't be null!");
         }
         Assert.notNull(courseId, "courseId can't be null!");
