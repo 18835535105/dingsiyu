@@ -46,6 +46,10 @@ public class TestGoldUtil {
             addGold = gold;
             this.insertStudentExpansion(studentExpansion, student);
             return addGold;
+        } else if (studentExpansion.getTestGoldAdd() == null) {
+            studentExpansion.setTestGoldAdd(gold);
+            this.updateStudentExpansion(studentExpansion, student);
+            return gold;
         } else if (studentExpansion.getTestGoldAdd() < MAX_GOLD) {
             // 当日闯关获得金币加上当前测试获得金币大于最大值，取差值
             if (studentExpansion.getTestGoldAdd() + gold > MAX_GOLD) {
