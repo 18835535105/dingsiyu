@@ -581,12 +581,15 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         testRecord.setTestStartTime(startTime);
         testRecord.setTestEndTime(endTime);
         getLevel(session);
+        if(student.getBonusExpires().getTime()>new Date().getTime()){
+            Double doubleGOld=goldCount*0.2;
+            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), doubleGOld));
+            goldCount=goldCount+doubleGOld.intValue();
+        }
         // 封装响应数据
         Map<String, Object> map = packageResultMap(student, wordUnitTestDTO, point, goldCount, testRecord);
-
         student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldCount));
         studentMapper.updateByPrimaryKeySelective(student);
-
         Integer insert = testRecordMapper.insert(testRecord);
 
         if (insert > 0) {
