@@ -1460,6 +1460,7 @@
         from learn learn
         join course course on course.id=learn.course_id
         where learn.student_id=#{studentId}
+
         and vocabulary_id is null
         and example_id is null
         order by learn.update_time desc limit 1

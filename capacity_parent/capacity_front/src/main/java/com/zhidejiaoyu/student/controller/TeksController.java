@@ -99,7 +99,7 @@ public class TeksController  {
 
 
     /**
-     * 添加课文默写测试结果
+     * 添加课文默写测试结果   课文训练
      * @param testRecord
      * @param session
      * @return

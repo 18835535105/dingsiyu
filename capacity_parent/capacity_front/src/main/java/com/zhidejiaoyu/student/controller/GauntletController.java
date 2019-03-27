@@ -249,5 +249,34 @@ public class GauntletController {
         return ServerResponse.createBySuccess(responseEntity.getBody() == null ? null : responseEntity.getBody().get("data"));
     }
 
+    /**
+     * 关闭pk说明
+     */
+    @RequestMapping("/closePkExplain")
+    public ServerResponse<Object> closePkExplain(HttpSession session){
+        Map<String, Object> paramMap = new HashMap<>(16);
+        paramMap.put("session", session);
+        paramMap.put("studentId", ((Student)session.getAttribute(UserConstant.CURRENT_STUDENT)).getId());
+        paramMap.put("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)));
+        String url = domain + "/api/gauntlet/closePkExplain?session={session}&studentId={studentId}&loginTime={loginTime}";
+        ResponseEntity<Map> responseEntity = restTemplate.getForEntity(url, Map.class, paramMap);
+        return ServerResponse.createBySuccess(responseEntity.getBody() == null ? null : responseEntity.getBody().get("data"));
+    }
+
+    /**
+     * 查看英雄榜
+     */
+    @RequestMapping("/getHeroList")
+    public ServerResponse<Object> getHeroList(HttpSession session,Integer type){
+        Map<String, Object> paramMap = new HashMap<>(16);
+        paramMap.put("type",type);
+        paramMap.put("session", session);
+        paramMap.put("studentId", ((Student)session.getAttribute(UserConstant.CURRENT_STUDENT)).getId());
+        paramMap.put("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)));
+        String url = domain + "/api/gauntlet/getHeroList?type={type}&session={session}&studentId={studentId}&loginTime={loginTime}";
+        ResponseEntity<Map> responseEntity = restTemplate.getForEntity(url, Map.class, paramMap);
+        return ServerResponse.createBySuccess(responseEntity.getBody() == null ? null : responseEntity.getBody().get("data"));
+    }
+
 
 }

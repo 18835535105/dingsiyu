@@ -245,6 +245,12 @@ public class TestController {
         return testService.saveCapSentenceTest(session, wordUnitTestDTO);
     }
 
+    /**
+     * genre 课文测试  闯关测试
+     * @param session
+     * @param wordUnitTestDTO
+     * @return
+     */
     @PostMapping("/saveCapTeksTest")
     public ServerResponse<Object> saveCapTeksTest(HttpSession session,WordUnitTestDTO wordUnitTestDTO){
         if (wordUnitTestDTO.getUnitId() == null) {
