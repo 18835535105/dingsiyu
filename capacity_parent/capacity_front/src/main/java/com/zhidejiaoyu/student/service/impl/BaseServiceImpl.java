@@ -146,6 +146,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
             studentExpansion.setStudyPower(study);
             studentExpansion.setLevel(level);
             studentExpansion.setIsLook(2);
+            studentExpansion.setPkExplain(1);
             studentExpansionMapper.insert(studentExpansion);
         }
     }
