@@ -220,6 +220,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
             }
             myrecord = 0;
             myauto = 0;
+        }else{
+            level=1;
         }
         return level;
     }
