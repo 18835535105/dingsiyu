@@ -694,13 +694,13 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         if (queryType == null) {
             if ("3".equals(model)) {
                 // 全国排名
-                classLevel = studentMapper.selectLevelByStuId(student, 3);
+                classLevel = studentMapper.selectLevelByStuId(student, 3, null);
             } else if ("2".equals(model)) {
                 // 学校排名
-                classLevel = studentMapper.selectLevelByStuId(student, 2);
+                classLevel = studentMapper.selectLevelByStuId(student, 2, null);
             } else {
                 // 班级排名
-                classLevel = studentMapper.selectLevelByStuId(student, 1);
+                classLevel = studentMapper.selectLevelByStuId(student, 1, null);
             }
             if(classLevel == null || classLevel.get(student.getId()) == null) {
                 return ServerResponse.createBySuccess("无排行数据");

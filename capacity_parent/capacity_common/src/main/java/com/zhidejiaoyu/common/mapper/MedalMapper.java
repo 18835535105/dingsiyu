@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Medal;
 import com.zhidejiaoyu.common.pojo.MedalExample;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -10,28 +11,8 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 import java.util.Map;
 
-public interface MedalMapper {
+public interface MedalMapper extends BaseMapper<Medal> {
     int countByExample(MedalExample example);
-
-    int deleteByExample(MedalExample example);
-
-    int deleteByPrimaryKey(Long id);
-
-    int insert(Medal record);
-
-    int insertSelective(Medal record);
-
-    List<Medal> selectByExample(MedalExample example);
-
-    Medal selectByPrimaryKey(Long id);
-
-    int updateByExampleSelective(@Param("record") Medal record, @Param("example") MedalExample example);
-
-    int updateByExample(@Param("record") Medal record, @Param("example") MedalExample example);
-
-    int updateByPrimaryKeySelective(Medal record);
-
-    int updateByPrimaryKey(Medal record);
 
     /**
      * 查询每个勋章大类含有的子勋章个数
@@ -109,4 +90,5 @@ public interface MedalMapper {
      * @return key： imgUrl，id(勋章id)
      */
     List<Map<String, Object>> selectMedalImgUrl(@Param("student") Student student);
-}
+
+    List<Medal> selectByParentIds(@Param("parentIds") List<Long> parentIds);}

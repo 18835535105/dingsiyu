@@ -96,4 +96,37 @@ public interface AwardMapper extends BaseMapper<Award> {
     Map<Long, Map<String, Long>> getMapKeyStudentXZ();
 
     List<Map<String, Object>> selAwardCountByStudentId(Long studentId);
+
+    /**
+     * 查询学生指定勋章奖励
+     *
+     * @param studentId
+     * @param medalId
+     * @return
+     */
+    Award selectByStudentIdAndMedalType(@Param("studentId") Long studentId, @Param("medalId") Long medalId);
+
+    /**
+     * 计算学生能够获取的所有勋章总个数
+     *
+     * @param studentId
+     * @return
+     */
+    int countTotalMedal(@Param("studentId") Long studentId);
+
+    /**
+     * 计算学生已经领取的勋章个数
+     *
+     * @param studentId
+     * @return
+     */
+    int countGetModel(@Param("studentId") Long studentId);
+
+    /**
+     * 获取今天学生完成的日奖励个数
+     *
+     * @param student
+     * @return
+     */
+    int countCompleteAllDailyAward(@Param("student") Student student);
 }

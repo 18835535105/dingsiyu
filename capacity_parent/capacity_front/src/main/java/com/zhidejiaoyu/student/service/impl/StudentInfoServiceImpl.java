@@ -5,6 +5,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.student.level.ChildMedalVo;
 import com.zhidejiaoyu.common.Vo.student.level.LevelVo;
+import com.zhidejiaoyu.common.award.GoldAwardAsync;
+import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.MedalConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
@@ -67,7 +69,10 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     private CountMyGoldUtil countMyGoldUtil;
 
     @Autowired
-    private ExecutorService executorService;
+    private MedalAwardAsync medalAwardAsync;
+
+    @Autowired
+    private GoldAwardAsync goldAwardAsync;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -175,7 +180,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             runLog = new RunLog(student.getId(), 4, "id为 " + student.getId() + " 的学生首次完善资料达 " + scale * 100 + "%，奖励金币#30#枚！", new Date());
             runLogMapper.insert(runLog);
             int awardContentType = 11;
-            packageSaveInfoAward(student, awardContentType);
+            goldAwardAsync.dailyAward(student, awardContentType);
         } else {
             // 完善完必填信息，奖励金币20个
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), 20));
@@ -184,21 +189,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             runLog = new RunLog(student.getId(), 4, "id为 " + student.getId() + " 的学生首次完善资料达 " + scale * 100 + "%，奖励金币#20#枚！", new Date());
             runLogMapper.insert(runLog);
             int awardContentType = 10;
-            packageSaveInfoAward(student, awardContentType);
+            goldAwardAsync.dailyAward(student, awardContentType);
         }
         return tip;
-    }
-
-    private void packageSaveInfoAward(Student student, int awardContentType) {
-        Award award = new Award();
-        award.setType(2);
-        award.setStudentId(student.getId());
-        award.setAwardContentType(awardContentType);
-        award.setGetFlag(1);
-        award.setCreateTime(new Date());
-        award.setGetTime(new Date());
-        award.setCanGet(1);
-        awardMapper.insert(award);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -287,6 +280,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         worship.setWorshipTime(new Date());
         worshipMapper.insert(worship);
 
+        // 众望所归勋章
+        medalAwardAsync.enjoyPopularConfidence(student);
+
         return ServerResponse.createBySuccessMessage("膜拜成功");
     }
 
@@ -325,8 +321,24 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         session.removeAttribute(TimeConstant.BEGIN_VALID_TIME);
 
         // 辉煌荣耀勋章：今天学习效率>目标学习效率 currentPlan ++；否则不操作，每天第一次登录的时候查看昨天是否有更新辉煌荣耀勋章，如果没更新，将其 currentPlan 置为0
-        executorService.execute(() -> this.honour(session));
+        medalAwardAsync.honour(student, super.getTodayValidTime(student.getId()), super.getTodayOnlineTime(session));
+
+        // 学习总有效时长金币奖励
+        goldAwardAsync.totalValidTime(student);
+
+        // 熟词句相关勋章
+        medalAwardAsync.tryHand(student, this.getModel(classify));
         return ServerResponse.createBySuccessMessage(tip);
+    }
+
+    private int getModel(Integer classify) {
+        if (classify == null) {
+            return 0;
+        }
+        if (classify < 7) {
+            return classify;
+        }
+        return 0;
     }
 
     /**

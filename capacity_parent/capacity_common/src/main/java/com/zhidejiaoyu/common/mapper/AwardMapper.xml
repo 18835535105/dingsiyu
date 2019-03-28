@@ -353,4 +353,32 @@
         where award.medal_type=medal.id and get_flag = 1 and award.student_id=#{studentId}
         group by medal.child_name
     </select>
-</mapper>
+    <select id="selectByStudentIdAndMedalType" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from award
+        where student_id = #{studentId}
+        and medal_type = #{medalId}
+        limit 1
+    </select>
+    <select id="countTotalMedal" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from award
+        where student_id = #{studentId}
+          and type = 3
+    </select>
+    <select id="countGetModel" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from award
+        where student_id = #{studentId}
+          and type = 3
+          and get_flag = 1
+    </select>
+    <select id="countCompleteAllDailyAward" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from award
+        where student_id = #{student.id}
+          and type = 1
+          and can_get = 1
+          and to_days(create_time) = to_days(now())
+    </select></mapper>

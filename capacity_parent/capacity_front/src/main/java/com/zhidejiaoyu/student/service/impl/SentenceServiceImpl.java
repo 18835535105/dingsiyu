@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
+import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -107,6 +108,9 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
 
     @Autowired
     private StudentStudyPlanMapper studentStudyPlanMapper;
+
+    @Autowired
+    private MedalAwardAsync medalAwardAsync;
 
 
     @Override
@@ -334,7 +338,11 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 this.saveCapacityMemory(learn, student, false, classify);
             }
             learn.setType(1);
-            count = learnMapper.insertSelective(learn);
+            count = learnMapper.insert(learn);
+
+            // 统计初出茅庐勋章
+            medalAwardAsync.inexperienced(student);
+
             if (count > 0 && total == (plan + 1)) {
                 return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
             }
