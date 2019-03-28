@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 /**
@@ -19,4 +20,5 @@ public interface StudentExpansionMapper extends BaseMapper<StudentExpansion> {
     Integer updateByIsLook(Long studentId);
 
     StudentExpansion selectByStudentId(Long challengerStudentId);
+
 }
