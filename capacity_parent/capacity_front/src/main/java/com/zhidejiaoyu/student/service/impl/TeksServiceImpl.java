@@ -1115,7 +1115,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         }
         Collections.shuffle(option);
         for (int i = 0; i < option.size(); i++) {
-            if (option.get(i).equals(teks.getSentence())) {
+            if (option.get(i).equals(teks.getSentence().replace("#", " ").replace("$", ""))) {
                 returnMap.put("answer", i);
             }
         }
