@@ -14,6 +14,7 @@ import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.study.WordPictureUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.GoldResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -102,9 +103,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     private BaiduSpeak baiduSpeak;
 
     @Autowired
-    private CourseMapper courseMapper;
-
-    @Autowired
     private SaveTestLearnAndCapacity saveTestLearnAndCapacity;
 
     @Autowired
@@ -140,16 +138,13 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     private CountMyGoldUtil countMyGoldUtil;
 
     @Autowired
-    private UnitSentenceMapper unitSentenceMapper;
-
-    @Autowired
     private DurationMapper durationMapper;
 
     @Autowired
-    private StudentUnitMapper studentUnitMapper;
+    private CcieUtil ccieUtil;
 
     @Autowired
-    private CcieUtil ccieUtil;
+    private TestGoldUtil testGoldUtil;
 
     @Override
     public Map<String, Integer> testReview(String unit_id, String studentId) {
@@ -1526,22 +1521,20 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     private void decideLearnedUnKnown(Integer point, String genre, Student student, StringBuilder msg, String
             studyModel, TestRecord testRecord) {
         msg.append(genre).append(studyModel);
+        int gold = 0;
         if (point < 90 && point >= 80) {
             // 奖励2金币
-            int gold = testRecord.getBetterCount() * TestAwardGoldConstant.TEST_CENTER_ENGHTY_TO_NINETY;
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
-            testRecord.setAwardGold(gold);
-            msg.append(" 中获得#").append(gold).append("#金币。");
+            gold = testRecord.getBetterCount() * TestAwardGoldConstant.TEST_CENTER_ENGHTY_TO_NINETY;
         } else if (point >= 90 && point <= 100) {
             // 奖励5枚金币
-            int gold = testRecord.getBetterCount() * TestAwardGoldConstant.TEST_CENTER_NINETY_TO_FULL;
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
-            testRecord.setAwardGold(gold);
-            msg.append(" 中获得#").append(gold).append("#金币。");
+            gold = testRecord.getBetterCount() * TestAwardGoldConstant.TEST_CENTER_NINETY_TO_FULL;
         } else {
             testRecord.setAwardGold(0);
-            msg.append(" 中未获得金币");
         }
+        int addGold = testGoldUtil.addGold(student, gold);
+        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), addGold));
+        testRecord.setAwardGold(addGold);
+        msg.append(" 中获得#").append(addGold).append("#金币。");
     }
 
     /**
@@ -1557,22 +1550,19 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     private void decideFiveD(Integer point, String genre, Student student, StringBuilder msg, String
             studyModel, TestRecord testRecord) {
         msg.append(genre).append(studyModel);
+        int gold = 0;
         if (point < 90 && point >= 80) {
             // 奖励10金币
-            int  gold = testRecord.getBetterCount() * TestAwardGoldConstant.FIVE_TEST_EIGHTY_TO_NINETY;
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
-            testRecord.setAwardGold(gold);
-            msg.append(" 中获得#").append(gold).append("#金币。");
+            gold = testRecord.getBetterCount() * TestAwardGoldConstant.FIVE_TEST_EIGHTY_TO_NINETY;
+
         } else if (point >= 90 && point <= 100) {
             // 奖励20枚金币
-            int gold = testRecord.getBetterCount() * TestAwardGoldConstant.FIVE_TEST_NINETY_TO_FULL;
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
-            testRecord.setAwardGold(gold);
-            msg.append(" 中获得#").append(gold).append("#金币。");
-        } else {
-            testRecord.setAwardGold(0);
-            msg.append(" 中获得#0#金币。");
+            gold = testRecord.getBetterCount() * TestAwardGoldConstant.FIVE_TEST_NINETY_TO_FULL;
         }
+        testRecord.setAwardGold(gold);
+        int addGold = testGoldUtil.addGold(student, gold);
+        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), addGold));
+        msg.append(" 中获得#").append(addGold).append("#金币。");
     }
 
 }

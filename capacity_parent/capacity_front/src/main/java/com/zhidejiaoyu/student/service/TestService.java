@@ -125,7 +125,8 @@ public interface TestService extends BaseService<TestRecord> {
     ServerResponse<Object> gitUnitSentenceTest(Long unitId);
 
     /**
-     * 音译测试
+     * 音译测试（音译测试）
+     *
      * @param session
      * @param wordUnitTestDTO
      * @return

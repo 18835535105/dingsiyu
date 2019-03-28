@@ -2,13 +2,13 @@ package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.CalculateTimeUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
@@ -100,6 +100,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Autowired
     private PetSayUtil petSayUtil;
+
+    @Autowired
+    private TestGoldUtil testGoldUtil;
 
     @Value("${ftp.prefix}")
     private String prefix;
@@ -638,7 +641,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 goldCount = getGoldCount(classify, student, testRecord.getPoint(), testRecord.getStudyModel());
             }
         }
-        return goldCount;
+        return testGoldUtil.addGold(student, goldCount);
     }
 
     private int getGoldCount(Integer classify, Student student, int point, String model) {

@@ -10,12 +10,13 @@
         <result column="level" property="level"/>
         <result column="is_look" property="isLook"/>
         <result column="audio_status" property="audioStatus"/>
+        <result column="test_gold_add" property="testGoldAdd"/>
         <result column="pk_explain" property="pkExplain"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, student_id, study_power , level ,is_look, audio_status ,pk_explain
+        id, student_id, study_power , level ,is_look, audio_status, test_gold_add, pk_explain
     </sql>
 
     <select id="selectByStudentId" parameterType="long" resultMap="BaseResultMap">

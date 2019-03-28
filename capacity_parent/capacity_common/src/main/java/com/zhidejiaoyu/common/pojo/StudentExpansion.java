@@ -47,6 +47,11 @@ public class StudentExpansion extends Model<StudentExpansion> {
      */
     private Integer audioStatus;
 
+    /**
+     * 闯关类当日金币增加量，每天首次登陆时清零
+     */
+    private Integer testGoldAdd;
+
     @Override
     protected Serializable pkVal() {
         return this.id;

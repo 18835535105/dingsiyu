@@ -985,17 +985,46 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private void saveDailyAward(Student stu) {
         int count = runLogMapper.countStudentTodayLogin(stu);
         if (count == 1) {
-            Award award = new Award();
-            award.setCanGet(1);
-            award.setGetFlag(2);
-            award.setStudentId(stu.getId());
-            award.setType(1);
-            award.setAwardContentType(1);
-            award.setCreateTime(new Date());
+            // 每日首次登陆日奖励
+            this.packageFirstLoginAward(stu);
+
+            // 当天首次登陆将学生每日闯关获取金币数清空
+            this.resetTestGold(stu);
+        }
+    }
+
+    private void packageFirstLoginAward(Student stu) {
+        Award award = new Award();
+        award.setCanGet(1);
+        award.setGetFlag(2);
+        award.setStudentId(stu.getId());
+        award.setType(1);
+        award.setAwardContentType(1);
+        award.setCreateTime(new Date());
+        try {
+            awardMapper.insert(award);
+        } catch (Exception e) {
+            logger.error("保存学生 {} -> {} 首次登陆奖励信息失败！", stu.getId(), stu.getStudentName(), e);
+        }
+    }
+
+    private void resetTestGold(Student stu) {
+        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(stu.getId());
+        if (studentExpansion == null) {
+            studentExpansion = new StudentExpansion();
+            studentExpansion.setStudentId(stu.getId());
+            studentExpansion.setTestGoldAdd(0);
             try {
-                awardMapper.insert(award);
+                studentExpansionMapper.insert(studentExpansion);
             } catch (Exception e) {
-                logger.error("保存学生 {} -> {} 首次登陆奖励信息失败！", stu.getId(), stu.getStudentName(), e);
+                logger.error("当日首次登陆重置学生闯关类获取金币数量失败[{}]->[{}]", stu.getId(), stu.getStudentName(), e);
+            }
+        } else {
+            studentExpansion.setTestGoldAdd(0);
+            try {
+                studentExpansionMapper.updateById(studentExpansion);
+            } catch (Exception e) {
+                logger.error("当日首次登陆重置学生闯关类获取金币数量失败[{}]->[{}]", stu.getId(), stu.getStudentName(), e);
             }
         }
     }
