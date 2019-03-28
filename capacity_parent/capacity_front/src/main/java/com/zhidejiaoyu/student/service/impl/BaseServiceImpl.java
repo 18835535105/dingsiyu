@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
-import com.zhidejiaoyu.common.mapper.DurationMapper;
-import com.zhidejiaoyu.common.mapper.StudentExpansionMapper;
-import com.zhidejiaoyu.common.mapper.StudentMapper;
-import com.zhidejiaoyu.common.mapper.StudyFlowMapper;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.pojo.StudyFlow;
@@ -52,6 +49,9 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
 
     @Autowired
     private StudentExpansionMapper studentExpansionMapper;
+
+    @Autowired
+    private LevelMapper levelMapper;
 
     @Override
     public Student getStudent(HttpSession session) {
@@ -102,9 +102,10 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         int level = getLevel(gold.intValue(), levels);
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
         if(studentExpansion != null && studentExpansion.getLevel()<level){
-            Integer oldStudy = LevelUtils.getStudy(studentExpansion.getLevel());
-            Integer newStudy = LevelUtils.getStudy(level);
+            Integer oldStudy = levelMapper.getStudyById(studentExpansion.getLevel());
+            Integer newStudy = levelMapper.getStudyById(level);
             Integer addStudy=newStudy-oldStudy;
+            studentExpansion.setLevel(level);
             studentExpansion.setStudyPower(studentExpansion.getStudyPower()+addStudy);
             studentExpansionMapper.updateById(studentExpansion);
         }
@@ -138,8 +139,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
             List<Map<String, Object>> levels = redisOpt.getAllLevel();
             Double gold = student.getSystemGold() + student.getOfflineGold();
             int level = getLevel(gold.intValue(), levels);
-            Integer study = LevelUtils.getStudy(level);
-
+            Integer study = levelMapper.getStudyById(level);
             studentExpansion = new StudentExpansion();
             studentExpansion.setStudentId(student.getId());
             studentExpansion.setAudioStatus(1);

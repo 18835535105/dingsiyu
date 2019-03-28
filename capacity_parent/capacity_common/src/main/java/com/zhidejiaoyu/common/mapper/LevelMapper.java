@@ -32,4 +32,7 @@ public interface LevelMapper extends BaseMapper<Level> {
     int updateByPrimaryKey(Level record);
 
 	List<Map<String, Object>> selectAll();
+
+	@Select("select study_power from level where id=#{levelId}")
+    Integer getStudyById(@Param("levelId") int level);
 }
