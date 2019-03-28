@@ -39,6 +39,9 @@ public class StudentExpansion extends Model<StudentExpansion> {
     @TableField("is_look")
     private Integer isLook;
 
+    @TableField("pk_explain")
+    private Integer pkExplain;
+
     /**
      * 背景音乐开关；1：开启；2：关闭
      */
