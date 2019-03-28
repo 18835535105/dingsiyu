@@ -1092,7 +1092,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("id", hearingList.get(i).getId());
             returnMap.put("chinese", hearingList.get(i).getParaphrase());
-            returnMap.put("pronunciation", baiduSpeak.getSentencePath(hearingList.get(i).getSentence()));
+            returnMap.put("pronunciation", baiduSpeak.getSentencePath(hearingList.get(i).getSentence().replace("#", " ").replace("$", "")));
             returnMap.put("english", hearingList.get(i).getSentence().replace("#", " ").replace("$", ""));
             //英选汉 原有两个选项现改为一个
               /*  if (ss == 1) {
