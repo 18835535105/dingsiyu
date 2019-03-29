@@ -43,7 +43,7 @@ public class UnitTestChangeAop {
     @Autowired
     private MedalAwardAsync medalAwardAsync;
 
-    @Pointcut("execution(public * com.zhidejiaoyu.student.service.impl.TestServiceImpl(..))")
+    @Pointcut("execution(public * com.zhidejiaoyu.student.service.TestService.*(..))")
     public void testPoint() {}
 
     @After("testPoint()")
