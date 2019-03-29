@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.SentenceCourseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.SentenceCourse">
+        <id column="id" property="id" />
+        <result column="study_paragraph" property="studyParagraph" />
+        <result column="grade" property="grade" />
+        <result column="version" property="version" />
+        <result column="label" property="label" />
+        <result column="picture_name" property="pictureName" />
+        <result column="picture_url" property="pictureUrl" />
+        <result column="course_name" property="courseName" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="delStatus" property="delStatus" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, study_paragraph, grade, version, label, picture_name, picture_url, course_name, status, create_time, update_time, delStatus
+    </sql>
+
+    <select id="getVersionByUnitId" parameterType="java.lang.Long" resultType="java.lang.String">
+        select cou.version from course cou join unit unit on cou.id=unit.course_id where unit.id=#{unitId}
+    </select>
+
+</mapper>

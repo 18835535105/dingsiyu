@@ -75,6 +75,9 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     @Autowired
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
 
+    @Autowired
+    private SentenceUnitMapper sentenceUnitMapper;
+
     /**
      * 例句听力mapper
      */
@@ -107,6 +110,9 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
 
     @Autowired
     private StudentStudyPlanMapper studentStudyPlanMapper;
+
+    @Autowired
+    private SentenceCourseMapper sentenceCourseMapper;
 
 
     @Override
@@ -649,12 +655,12 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         // 获取当前单元下的所有例句的总个数
         Long sentenceCount = sentenceMapper.countByUnitId(unitId);
 
-        Long courseId = unitMapper.selectCourseIdByUnitId(unitId);
+        Long courseId = sentenceUnitMapper.selectCourseIdByUnitId(unitId);
         // 查询当前课程的学习遍数
         Integer learnCount = studyCountMapper.selectMaxCountByCourseId(student.getId(), courseId);
         Map<String, Object> map = new HashMap<>();
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selGetSentenceByStudentIdAndType(student.getId());
-        Unit unit = unitMapper.selectByPrimaryKey(unitId);
+        SentenceUnit unit = sentenceUnitMapper.selectByPrimaryKey(unitId);
         if (capacityStudentUnit == null) {
             capacityStudentUnit = new CapacityStudentUnit();
             capacityStudentUnit.setType(2);
@@ -663,7 +669,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             capacityStudentUnit.setCourseId(unit.getCourseId());
             capacityStudentUnit.setUnitName(unit.getUnitName());
             capacityStudentUnit.setCourseName(unit.getJointName());
-            capacityStudentUnit.setVersion(courseMapper.getVersionByUnitId(unit.getId()));
+            capacityStudentUnit.setVersion(sentenceCourseMapper.getVersionByUnitId(unit.getId()));
             List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseIdAndUnitId(student.getId(), unit.getCourseId(), 2,unit.getId());
             if(studentStudyPlans!=null && studentStudyPlans.size()>0){
                 capacityStudentUnit.setStartunit(studentStudyPlans.get(0).getStartUnitId());
@@ -683,7 +689,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             capacityStudentUnit.setStudentId(student.getId());
             capacityStudentUnit.setUnitName(unit.getUnitName());
             capacityStudentUnit.setCourseName(unit.getJointName());
-            capacityStudentUnit.setVersion(courseMapper.getVersionByUnitId(unit.getId()));
+            capacityStudentUnit.setVersion(sentenceCourseMapper.getVersionByUnitId(unit.getId()));
             List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseIdAndUnitId(student.getId(), unit.getCourseId(), 2,unit.getId());
             if(studentStudyPlans!=null && studentStudyPlans.size()>0){
                 capacityStudentUnit.setStartunit(studentStudyPlans.get(0).getStartUnitId());
