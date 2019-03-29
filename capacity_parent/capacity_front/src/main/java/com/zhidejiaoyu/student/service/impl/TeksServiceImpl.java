@@ -404,11 +404,16 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             unitInfoMap.put("teksTest", true);
             if (teksTest != null && teksTest != 0) {
                 TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitIdAndGenre(studentId, unitId, "课文默写测试");
-                if (testRecord.getPoint() >= 70) {
-                    unitInfoMap.put("testRecord", true);
-                } else {
+                if(testRecord!=null){
+                    if (testRecord.getPoint() >= 70) {
+                        unitInfoMap.put("testRecord", true);
+                    } else {
+                        unitInfoMap.put("testRecord", false);
+                    }
+                }else{
                     unitInfoMap.put("testRecord", false);
                 }
+
             } else {
                 unitInfoMap.put("testRecord", false);
             }
