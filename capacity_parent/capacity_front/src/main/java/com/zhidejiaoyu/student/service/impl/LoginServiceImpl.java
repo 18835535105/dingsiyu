@@ -760,6 +760,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 记录登录信息
             saveLoginRunLog(stu, request);
 
+            isStudentEx(stu);
+
             // 当日首次登陆奖励5金币（日奖励）
             saveDailyAward(stu);
 
@@ -788,7 +790,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 一个账户只能登陆一台
             judgeMultipleLogin(session, stu);
 
-            isStudentEx(stu);
+
 
             // 每次登陆默认打开背景音
             openBackAudio(stu);
