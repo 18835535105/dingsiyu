@@ -107,6 +107,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @Value("${ftp.prefix}")
     private String prefix;
 
+    @Autowired
+    private TeksCourseMapper teksCourseMapper;
+
+    @Autowired
+    private TeksUnitMapper teksUnitMapper;
+
     @Override
     public ServerResponse<List<Teks>> selTeksByUnitId(Integer unitId) {
         List<Teks> teks = teksMapper.selTeksByUnitId(unitId);
@@ -574,7 +580,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         //添加学习模块
         testRecord.setStudyModel(model);
         //获取课程id
-        Long aLong = unitMapper.selectCourseIdByUnitId(testRecord.getUnitId());
+        Long aLong = teksUnitMapper.selectCourseIdByUnitId(testRecord.getUnitId());
         //添加金币
         WordUnitTestDTO wordUnitTestDTO = new WordUnitTestDTO();
         wordUnitTestDTO.setClassify(7);

@@ -138,6 +138,18 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Autowired
     private TestGoldUtil testGoldUtil;
 
+    @Autowired
+    private SentenceUnitMapper sentenceUnitMapper;
+
+    @Autowired
+    private SentenceCourseMapper sentenceCourseMapper;
+
+    @Autowired
+    private TeksCourseMapper teksCourseMapper;
+
+    @Autowired
+    private TeksUnitMapper teksUnitMapper;
+
     /**
      * 游戏测试题目获取，获取20个单词供测试
      *
@@ -878,7 +890,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         //获取干扰项句子 在当前课程下选择
         if(sentences.size()<4){
             //获取测试单元所在的课程
-            Long courseId = unitMapper.getCourseIdByunitId(unitId.intValue());
+            Long courseId = sentenceUnitMapper.getCourseIdByunitId(unitId.intValue());
             sentenceList = sentenceMapper.selectRoundSentence(courseId);
         }
         List<Object> list = testSentenceUtil.resultTestSentence(sentences, sentenceList);

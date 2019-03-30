@@ -122,7 +122,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         // 获取当前单元下的所有例句的总个数
         Long sentenceCount = sentenceMapper.countByUnitId(unitId);
 
-        Long courseId = unitMapper.selectCourseIdByUnitId(unitId);
+        Long courseId = sentenceUnitMapper.selectCourseIdByUnitId(unitId);
         // 查询当前课程的学习遍数
         Integer learnCount = studyCountMapper.selectMaxCountByCourseId(student.getId(), courseId);
 
@@ -493,7 +493,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         // 学生所有课程id及课程名
         /*   List<Map<String, Object>> courses = courseMapper.selectSentenceCourseIdAndCourseNameByStudentId(studentId);*/
 
-        List<Map<String, Object>> courses = studentStudyPlanMapper.selByStudentId(studentId, 2);
+        List<Map<String, Object>> courses = studentStudyPlanMapper.selBySentenceStudentId(studentId, 2);
 
         if (courses.size() < 0) {
             return ServerResponse.createByError(500, "当前学生没有课程，请让老师添加");
@@ -640,7 +640,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 courseUnitVo.setUnitVos(resultMap);
                 courseUnitVos.add(courseUnitVo);
             }
-            List<Map<String, Object>> courseList = courseMapper.getAllVersion(student.getId());
+            List<Map<String, Object>> courseList = sentenceCourseMapper.getAllVersion(student.getId());
             result.put("present", present);
             result.put("list", courseUnitVos);
             result.put("versionList", courseList);

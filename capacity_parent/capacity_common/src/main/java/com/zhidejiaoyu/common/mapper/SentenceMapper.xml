@@ -286,7 +286,7 @@
         <include refid="relevance_base_sql"></include>
         from sentence s
         join unit_sentence us on s.id=us.sentence_id
-        join unit un on us.unit_id=un.id
+        join sentence_unit un on us.unit_id=un.id
         where un.course_id=#{courseId}
         ORDER BY RAND() LIMIT 30
     </select>
@@ -301,7 +301,7 @@
         order by learn.id desc;
     </select>
     <select id="countByCourseId" parameterType="java.util.Map" resultType="java.lang.Integer">
-        select count(s.id) from sentence s, unit_sentence us, unit u
+        select count(s.id) from sentence s, unit_sentence us, sentence_unit u
         where s.id = us.sentence_id
         and u.id = us.unit_id
         and u.id in (

@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.mapper;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.SentenceUnit;
 import com.zhidejiaoyu.common.pojo.Unit;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 /**
@@ -22,8 +23,17 @@ public interface SentenceUnitMapper extends BaseMapper<SentenceUnit> {
      * @return
      */
     @Select("select course_id from sentence_unit where id = #{unitId}")
-    Long selectCourseIdByUnitId(Long unitId);
+    Long selectCourseIdByUnitId(Long unitId); 
 
     SentenceUnit selectByPrimaryKey(Long id);
 
+    @Select("select unit_name from unit where id = #{unitId}")
+    String getUnitNameByUnitId(@Param("unitId") Long unitId);
+
+    /**
+     * 根据单元id查询课程id
+     * @param unitId 单元id
+     * @return
+     */
+    Long getCourseIdByunitId(@Param("unitId") Integer unitId);
 }

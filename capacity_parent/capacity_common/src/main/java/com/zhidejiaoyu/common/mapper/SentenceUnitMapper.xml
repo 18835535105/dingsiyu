@@ -24,4 +24,8 @@
         where id = #{id,jdbcType=BIGINT}
     </select>
 
+    <select id="getCourseIdByunitId" resultType="java.lang.Long" parameterType="java.lang.Integer">
+        select course_id from sentence_unit where id=#{unitId};
+    </select>
+
 </mapper>

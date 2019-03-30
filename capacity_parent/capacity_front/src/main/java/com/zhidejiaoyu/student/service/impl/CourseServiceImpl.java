@@ -71,6 +71,12 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
     private UnitMapper unitMapper;
 
     @Autowired
+    private SentenceCourseMapper sentenceCourseMapper;
+
+    @Autowired
+    private TeksCourseMapper teksCourseMapper;
+
+    @Autowired
     private TestRecordMapper testRecordMapper;
 
     @Autowired
@@ -861,7 +867,14 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
 
     @Override
     public ServerResponse<List<Map<String, Object>>> getAllUnit(Long courseId, Boolean showAll, Integer type) {
-        List<Map<String, Object>> unitsInfo = courseMapper.getAllUnitInfos(courseId, type);
+        List<Map<String, Object>> unitsInfo =new ArrayList<>();
+        if(type==1){
+            unitsInfo = courseMapper.getAllUnitInfos(courseId, type);
+        }else if(type==2){
+            unitsInfo = sentenceCourseMapper.getAllUnitInfos(courseId, type);
+        }else if(type==3){
+            unitsInfo = teksCourseMapper.getAllUnitInfos(courseId, type);
+        }
         if (unitsInfo.size() > 0 && showAll) {
             int totalWordCount = 0;
             Map<String, Object> map = new HashMap<>(16);
@@ -894,8 +907,14 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
     @Override
     public ServerResponse<List<Map<String, Object>>> getAllCourses(HttpSession session, Integer type, Boolean flag) {
         Student student = getStudent(session);
-        List<Map<String, Object>> courseInfo = courseMapper.getAllCourse(student, type);
-
+        List<Map<String, Object>> courseInfo = new ArrayList<>();
+        if(type==1){
+            courseInfo = courseMapper.getAllCourse(student, type);
+        }else if(type==2){
+            courseInfo = sentenceCourseMapper.getAllCourse(student, type);
+        }else if(type==3){
+            courseInfo = teksCourseMapper.getAllCourse(student, type);
+        }
         if (courseInfo.size() > 0) {
             int count = 0;
             Map<String, Object> map = new HashMap<>(16);
