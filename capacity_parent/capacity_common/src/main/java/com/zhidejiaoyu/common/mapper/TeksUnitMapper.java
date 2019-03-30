@@ -2,7 +2,11 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.TeksUnit;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -23,5 +27,6 @@ public interface TeksUnitMapper extends BaseMapper<TeksUnit> {
     @Select("select course_id from teks_unit where id = #{unitId}")
     Long selectCourseIdByUnitId(Long unitId);
 
+    List<Map<String, Object>> selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(@Param("courseId") Long courseId, @Param("startUnitId") Long startUnitId, @Param("endUnitId") Long endUnitId, @Param("studentId") Long studentId);
 
 }

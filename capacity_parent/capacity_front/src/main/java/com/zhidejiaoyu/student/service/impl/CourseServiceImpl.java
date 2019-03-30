@@ -97,6 +97,9 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
     @Autowired
     private StudentStudyPlanMapper studentStudyPlanMapper;
 
+    @Autowired
+    private TeksUnitMapper teksUnitMapper;
+
     @Override
     public List chooseGrade(HttpSession session) {
 
@@ -245,7 +248,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
             List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, courseId,3);
             if (studentStudyPlans.size() > 0) {
                 for (StudentStudyPlan studentStudyPlan : studentStudyPlans) {
-                    List<Map<String, Object>> returnMap = unitMapper.selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(courseId,
+                    List<Map<String, Object>> returnMap = teksUnitMapper.selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(courseId,
                             studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId(), studentId);
                     for (int j = 0; j < returnMap.size(); j++) {
                         boolean contains = maps.contains(returnMap.get(j));

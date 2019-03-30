@@ -40,7 +40,7 @@
     </select>
     <select id="getStudentAllCourse" resultType="java.util.Map" parameterType="map">
      select DISTINCT course.version from student_study_plan ssp
-			join course course on course.id=ssp.course_id
+			join teks_course course on course.id=ssp.course_id
 			where ssp.student_id =#{studentId}
       and ssp.type=3 group by ssp.course_id
     </select>

@@ -518,7 +518,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             }
             Map<String, Object> present = null;
             if (capacityStudentUnit != null) {
-                Course course = courseMapper.selectById(capacityStudentUnit.getCourseId());
+                SentenceCourse course = sentenceCourseMapper.selectById(capacityStudentUnit.getCourseId());
                 present = new HashMap<>();
                 present.put("version", course.getVersion());
                 present.put("grade", course.getGrade() + course.getLabel());
@@ -540,7 +540,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 }
                 for (Map<String, Object> unitMap : sentenceUnits) {
                     if (present == null) {
-                        Map<String, Object> map = courseMapper.selectCourseByUnitId(Long.parseLong(unitMap.get("id").toString()));
+                        Map<String, Object> map = sentenceCourseMapper.selectCourseByUnitId(Long.parseLong(unitMap.get("id").toString()));
                         present.put("version", map.get("version"));
                         present.put("grade", map.get("grade").toString() + map.get("label").toString());
                         present.put("unitId", map.get("unitId"));

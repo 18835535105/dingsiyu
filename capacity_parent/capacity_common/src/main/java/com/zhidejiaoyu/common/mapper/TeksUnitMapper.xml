@@ -17,5 +17,17 @@
         id, course_id, unit_name, joint_name, delStatus, unit_index
     </sql>
 
+    <select id="selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId" parameterType="java.util.Map"
+            resultType="java.util.Map">
+        select u.id id,count(t.id) number , u.unit_name unitName,u.course_id courseId,course.label label,course.grade grade,course.version version
+        from teks_unit u
+        left join test_record t on u.id=t.unit_id
+        join teks_course course on course.id = u.course_id
+        join teks teks on teks.unit_id=u.id
+        where  (u.id>=#{startUnitId} and u.id &lt;= #{endUnitId})
+        and u.course_id =#{courseId}
+        group by u.id
+        order by u.id asc;
+    </select>
 
 </mapper>

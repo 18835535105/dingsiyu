@@ -20,7 +20,7 @@
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
         select
         <include refid="Base_Column_List"/>
-        from unit
+        from sentence_unit
         where id = #{id,jdbcType=BIGINT}
     </select>
 

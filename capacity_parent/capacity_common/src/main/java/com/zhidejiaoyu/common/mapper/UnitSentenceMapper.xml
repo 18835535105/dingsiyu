@@ -168,8 +168,8 @@
     </update>
     <select id="selUnitIdAndNameByCourseIdsAndStartUnitIdAndEndUnitId" resultType="java.util.Map" parameterType="map">
         select course.id courseId , unit.id id,unit.unit_name unitName
-        from course course
-        join unit unit on course.id=unit.course_id
+        from sentence_course course
+        join sentence_unit unit on course.id=unit.course_id
         join unit_sentence unsen on unsen.unit_id=unit.id
         join sentence sen on sen.id=unsen.sentence_id
         where course.id=#{courseId}

@@ -211,7 +211,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 map.put("chinese", teks1.getParaphrase());
                 map.put("pronunciation", baiduSpeak.getSentencePath(teks1.getSentence().replace("#", " ").replace("$", "")));
                 map.put("id", teks1.getId());
-                String[] sentenceList = teks1.getSentence().split(" ");
+                String[] sentenceList = teks1.getSentence().trim().split(" ");
                 List blankSentenceArray = new ArrayList();
                 List sentence = new ArrayList();
                 //获取填空位置
@@ -473,8 +473,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                                         blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
                                     }
                                 } else {
-                                    vocabulary.add(sentenceList[i]);
-                                    blanceSentence.add(sentenceList[i]);
+                                    vocabulary.add(sentenceList[i].replace("#", " ").replace("$", ""));
+                                    blanceSentence.add(sentenceList[i].replace("#", " ").replace("$", ""));
                                 }
                             }
                         }
@@ -504,8 +504,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                                         blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
                                     }
                                 } else {
-                                    vocabulary.add(sentenceList[i]);
-                                    blanceSentence.add(sentenceList[i]);
+                                    vocabulary.add(sentenceList[i].replace("#", " ").replace("$", ""));
+                                    blanceSentence.add(sentenceList[i].replace("#", " ").replace("$", ""));
                                 }
                             }
                         }
@@ -519,19 +519,19 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                             } else {
                                 if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
                                     if (sentenceList[i].endsWith("...")) {
-                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
+                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#", " ").replace("$", ""));
                                         vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 3));
-                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3));
+                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#", " ").replace("$", ""));
                                         blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
                                     } else {
-                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
+                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#", " ").replace("$", ""));
                                         vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1));
+                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#", " ").replace("$", ""));
                                         blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
                                     }
                                 } else {
-                                    vocabulary.add(sentenceList[i]);
-                                    blanceSentence.add(sentenceList[i]);
+                                    vocabulary.add(sentenceList[i].replace("#", " ").replace("$", ""));
+                                    blanceSentence.add(sentenceList[i].replace("#", " ").replace("$", ""));
                                 }
                             }
                         }
@@ -1152,7 +1152,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, courseIds.get(i), 3);
             if (studentStudyPlans.size() > 1) {
                 for (StudentStudyPlan studentStudyPlan : studentStudyPlans) {
-                    List<Map<String, Object>> maps = unitMapper.selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(courseIds.get(i),
+                    List<Map<String, Object>> maps = teksUnitMapper.selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(courseIds.get(i),
                             studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId(), studentId);
                     for (int j = 0; j < maps.size(); j++) {
                         boolean contains = returnCourse.contains(maps.get(j));
@@ -1163,7 +1163,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                     returnCourse.addAll(maps);
                 }
             } else if (studentStudyPlans.size() == 1) {
-                List<Map<String, Object>> maps = unitMapper.selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(courseIds.get(i),
+                List<Map<String, Object>> maps = teksUnitMapper.selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId(courseIds.get(i),
                         studentStudyPlans.get(0).getStartUnitId(), studentStudyPlans.get(0).getEndUnitId(), studentId);
                 returnCourse.addAll(maps);
             }
