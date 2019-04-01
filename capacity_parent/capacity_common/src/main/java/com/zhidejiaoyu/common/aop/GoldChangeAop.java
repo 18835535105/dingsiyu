@@ -49,7 +49,7 @@ public class GoldChangeAop {
 
     private Double systemGold = null;
 
-    @Pointcut("execution(public * com.zhidejiaoyu.student.service.*.*(..)))")
+    @Pointcut("@annotation(com.zhidejiaoyu.common.annotation.GoldChangeAnnotation)")
     public void goldPoint() {
     }
 
