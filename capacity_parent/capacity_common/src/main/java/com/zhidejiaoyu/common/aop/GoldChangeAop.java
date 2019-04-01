@@ -54,7 +54,7 @@ public class GoldChangeAop {
     }
 
     @Around("goldPoint()")
-    public Object opt(ProceedingJoinPoint pjp) {
+    public Object opt(ProceedingJoinPoint pjp) throws Throwable {
         Method method = ((MethodSignature) pjp.getSignature()).getMethod();
         Student student = this.getStudent();
         GoldChangeAnnotation annotation = null;
@@ -64,16 +64,11 @@ public class GoldChangeAop {
                 this.beforeChange(student);
             }
         }
-        try {
             Object proceed = pjp.proceed();
             if (annotation != null && student != null) {
                 this.afterChange(student);
             }
             return proceed;
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
-        return null;
     }
 
     private Student getStudent() {

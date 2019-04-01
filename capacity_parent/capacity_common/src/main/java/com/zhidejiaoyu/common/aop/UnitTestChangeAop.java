@@ -46,9 +46,8 @@ public class UnitTestChangeAop {
 
     @Autowired
     private MedalAwardAsync medalAwardAsync;
-    private Method method;
 
-    @Pointcut("execution(public * com.zhidejiaoyu.student.service.TestService.*(..))")
+    @Pointcut("execution(public * com.zhidejiaoyu.student.service.*.*(..))")
     public void testPoint() {}
 
     @Around("testPoint()")
