@@ -195,6 +195,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     @Override
+    @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Map<String, Object>> saveGameTestRecord(HttpSession session, TestRecord testRecord) {
         Student student = getStudent(session);
@@ -771,40 +772,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     /**
-     * 判断学生当前单元有无进行单元闯关测试记录，如果已参加过单元闯关测试，提示其需要花费金币购买测试机会，如果还没有测试记录可以免费进行测试
-     *
-     * @param student
-     * @param unitId
-     * @param studyModel
-     * @param isTrue
-     * @return 1:提示用户需要支付金币购买测试机会；2：金币不足
-     */
-    private int isFirstTest(Student student, Long unitId, String studyModel, Boolean isTrue) {
-        TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), unitId, "单元闯关测试",
-                studyModel);
-        if (testRecord != null) {
-            if (!isTrue) {
-                return 1;
-            } else {
-                // 金币不足
-                if (student.getSystemGold() == 0) {
-                    return 2;
-                }
-                student.setSystemGold(BigDecimalUtil.sub(student.getSystemGold(), 1));
-                student.setOfflineGold(BigDecimalUtil.add(student.getOfflineGold(), 1));
-                studentMapper.updateByPrimaryKeySelective(student);
-                String msg = "id为：" + student.getId() + " 的学生花费 1 金币进行" + studyModel + " 模块下的单元闯关测试。";
-                RunLog runLog = new RunLog(student.getId(), 5, msg, new Date());
-                runLogMapper.insert(runLog);
-                LOGGER.info(msg);
-            }
-        }
-        return 0;
-    }
-
-
-
-    /**
      * 获取例句测试
      * @param unitId
      * @return
@@ -1119,6 +1086,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      * @return
      */
     @Override
+    @GoldChangeAnnotation
+    @TestChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<TestResultVo> saveSentenceUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO, String testDetail) {
 

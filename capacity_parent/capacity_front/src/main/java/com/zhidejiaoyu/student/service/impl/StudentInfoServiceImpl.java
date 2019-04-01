@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.student.level.ChildMedalVo;
 import com.zhidejiaoyu.common.Vo.student.level.LevelVo;
+import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.MedalConstant;
@@ -75,6 +76,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     private GoldAwardAsync goldAwardAsync;
 
     @Override
+    @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<String> saveStudentInfo(HttpSession session, Student student, String oldPassword,
                                                   String newPassword) {
@@ -287,6 +289,8 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     }
 
     @Override
+    @GoldChangeAnnotation
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse<String> calculateValidTime(HttpSession session, Integer classify, Long courseId, Long unitId,
                                                      Long validTime) {
 

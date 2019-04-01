@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.pojo.Consume;
@@ -8,7 +9,9 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.student.service.ConsumeService;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 
@@ -30,6 +33,8 @@ public class ConsumeServiceImpl extends BaseServiceImpl<ConsumeMapper, Consume> 
     private StudentMapper studentMapper;
 
     @Override
+    @GoldChangeAnnotation
+    @Transactional(rollbackFor = Exception.class)
     public int reduceConsume(int type, int number, HttpSession session) {
         Student student = getStudent(session);
         if(type==1){
@@ -61,6 +66,8 @@ public class ConsumeServiceImpl extends BaseServiceImpl<ConsumeMapper, Consume> 
     }
 
     @Override
+    @GoldChangeAnnotation
+    @Transactional(rollbackFor = Exception.class)
     public int addConsume(int type, int number, HttpSession session) {
         Student student = getStudent(session);
         if(type==1){
