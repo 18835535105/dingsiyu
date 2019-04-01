@@ -52,8 +52,17 @@ public class UnitTestChangeAop {
 
     @Around("testPoint()")
     public Object optTest(ProceedingJoinPoint pjp) throws Throwable {
-        Method method = ((MethodSignature) pjp.getSignature()).getMethod();
         Object proceed = pjp.proceed();
+        try {
+            this.opt(pjp);
+        } catch (Exception e) {
+            log.error("[{}] @Arount 操作出错", this.getClass().getName(), e);
+        }
+        return proceed;
+    }
+
+    private void opt(ProceedingJoinPoint pjp) {
+        Method method = ((MethodSignature) pjp.getSignature()).getMethod();
         if (method != null) {
             TestChangeAnnotation annotation = method.getAnnotation(TestChangeAnnotation.class);
             if (annotation != null) {
@@ -65,7 +74,6 @@ public class UnitTestChangeAop {
                 }
             }
         }
-        return proceed;
     }
 
     private Student getStudent() {
