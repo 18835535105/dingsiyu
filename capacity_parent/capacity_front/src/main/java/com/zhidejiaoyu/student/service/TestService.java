@@ -115,8 +115,6 @@ public interface TestService extends BaseService<TestRecord> {
 
     ServerResponse<Object> getPreSchoolTest(HttpSession session);
 
-    ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, TestRecord testRecord);
-
     /**
      * 获取例句单元测试
      * @param unitId

@@ -220,18 +220,6 @@ public class TestController {
     }
 
     /**
-     * 保存学前测试
-     *
-     * @param session    当前学生session
-     * @param testRecord 测试记录
-     * @return
-     */
-    @PostMapping("/savePreSchoolTest")
-    public ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, TestRecord testRecord) {
-        return testService.savePreSchoolTest(session, testRecord);
-    }
-
-    /**
      * 保存句子测试
      * @param session
      * @param wordUnitTestDTO
