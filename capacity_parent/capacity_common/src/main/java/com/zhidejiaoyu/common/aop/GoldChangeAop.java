@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.common.aop;
 
-import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.UserConstant;
@@ -8,17 +7,15 @@ import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.TeacherMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
@@ -53,48 +50,33 @@ public class GoldChangeAop {
     public void goldPoint() {
     }
 
-    @Around("goldPoint()")
-    public Object opt(ProceedingJoinPoint pjp) throws Throwable {
-        Method method = ((MethodSignature) pjp.getSignature()).getMethod();
-        Student student = this.getStudent();
-        GoldChangeAnnotation annotation = null;
-        if (method != null) {
-            annotation = method.getAnnotation(GoldChangeAnnotation.class);
-            if (annotation != null && student != null) {
-                this.beforeChange(student);
+    @Before("goldPoint()")
+    public void beforeChange() {
+        try {
+            Student student = this.getStudent();
+            if (student != null) {
+                this.systemGold = student.getSystemGold();
             }
+        } catch (Exception e) {
+            log.error("[{}] @before操作错误！", this.getClass().getSimpleName(), e);
         }
-            Object proceed = pjp.proceed();
-            if (annotation != null && student != null) {
-                this.afterChange(student);
+    }
+
+    @After("goldPoint()")
+    public void afterChange() {
+        try {
+            Student student = this.getStudent();
+            if (student != null && systemGold != null && !Objects.equals(this.systemGold, student.getSystemGold())) {
+                // 金币有变化
+                //今日全校排行榜上升10名以上
+                dailyAwardAsync.todayUpRank(student);
+                // 天道酬勤勋章计算
+                medalAwardAsync.upLevel(student, this.getSchoolAdminId(student));
+                // 女神勋章（男神勋章）
+                medalAwardAsync.godMan(student);
             }
-            return proceed;
-    }
-
-    private Student getStudent() {
-        HttpSession session = request.getSession();
-        Object object = session.getAttribute(UserConstant.CURRENT_STUDENT);
-        if (object != null) {
-            Student student = (Student) object;
-            return studentMapper.selectById(student.getId());
-        }
-        return null;
-    }
-
-
-    private void beforeChange(Student student) {
-        this.systemGold = student.getSystemGold();
-    }
-
-    private void afterChange(Student student) {
-        if (systemGold != null && !Objects.equals(this.systemGold, student.getSystemGold())) {
-            // 金币有变化
-            //今日全校排行榜上升10名以上
-            dailyAwardAsync.todayUpRank(student);
-            // 天道酬勤勋章计算
-            medalAwardAsync.upLevel(student, this.getSchoolAdminId(student));
-            // 女神勋章（男神勋章）
-            medalAwardAsync.godMan(student);
+        } catch (Exception e) {
+            log.error("[{}] @after操作错误！", this.getClass().getSimpleName(), e);
         }
     }
 
@@ -107,5 +89,15 @@ public class GoldChangeAop {
             return Integer.valueOf(student.getTeacherId().toString());
         }
         return schoolAdminId;
+    }
+
+    private Student getStudent() {
+        HttpSession session = request.getSession();
+        Object object = session.getAttribute(UserConstant.CURRENT_STUDENT);
+        if (object != null) {
+            Student student = (Student) object;
+            return studentMapper.selectById(student.getId());
+        }
+        return null;
     }
 }
