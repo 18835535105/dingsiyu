@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.Vo.student.testCenter.TestCenterVo;
+import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
+import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -796,6 +798,9 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     }
 
     @Override
+    @GoldChangeAnnotation
+    @TestChangeAnnotation(isUnitTest = false)
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Integer[] correctWordId,
                                                        Integer[] errorWordId, Long[] unitId, Integer classify, Long courseId,
                                                        HttpSession session, Integer point, String genre,String testDetail) {

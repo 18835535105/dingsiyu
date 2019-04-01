@@ -8,6 +8,8 @@ import com.zhidejiaoyu.common.Vo.game.StrengthGameVo;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.Vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.Vo.testVo.TestRecordVo;
+import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
+import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -36,6 +38,7 @@ import com.zhidejiaoyu.student.utils.PetSayUtil;
 import com.zhidejiaoyu.student.utils.PetUrlUtil;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.io.ResolverUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -792,6 +795,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     @Override
+    @GoldChangeAnnotation
+    @TestChangeAnnotation(isUnitTest = false)
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> saveCapSentenceTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
         Student student = getStudent(session);
         TestRecord testRecord;
@@ -845,6 +851,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
 
     @Override
+    @GoldChangeAnnotation
+    @TestChangeAnnotation(isUnitTest = false)
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> saveCapTeksTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
         Student student = getStudent(session);
         TestRecord testRecord;
@@ -986,6 +995,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      * @return
      */
     @Override
+    @GoldChangeAnnotation
+    @TestChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO, String testDetail) {
 

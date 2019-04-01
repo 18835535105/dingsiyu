@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.aop;
 
+import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
 import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
@@ -7,14 +8,17 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
@@ -42,26 +46,64 @@ public class UnitTestChangeAop {
 
     @Autowired
     private MedalAwardAsync medalAwardAsync;
+    private Method method;
 
     @Pointcut("execution(public * com.zhidejiaoyu.student.service.TestService.*(..))")
     public void testPoint() {}
 
-    @After("testPoint()")
-    public void afterTest() {
+    @Around("testPoint()")
+    public Object optTest(ProceedingJoinPoint pjp) throws Throwable {
+        Method method = ((MethodSignature) pjp.getSignature()).getMethod();
+        Object proceed = pjp.proceed();
+        if (method != null) {
+            TestChangeAnnotation annotation = method.getAnnotation(TestChangeAnnotation.class);
+            if (annotation != null) {
+                Student student = this.getStudent();
+                if (annotation.isUnitTest()) {
+                    this.afterUnitTest(student);
+                } else {
+                    this.afterTest(student);
+                }
+            }
+        }
+        return proceed;
+    }
+
+    private Student getStudent() {
         HttpSession session = request.getSession();
         Object object = session.getAttribute(UserConstant.CURRENT_STUDENT);
         if (object != null) {
             Student student = (Student) object;
-            student = studentMapper.selectById(student.getId());
-            String point = request.getParameter("point");
+            return studentMapper.selectById(student.getId());
+        }
+        return null;
+    }
 
+    /**
+     * 完成单元闯关测试之后操作
+     *
+     * @param student
+     */
+    private void afterUnitTest(Student student) {
+        if (student != null) {
             // 验证学生今日是否完成一个单元
             dailyAwardAsync.todayLearnOneUnit(student);
             // 验证学生今日是否完成10个单元闯关测试
             dailyAwardAsync.todayCompleteTenUnitTest(student);
             // 验证学生单元闯关成功个数
             goldAwardAsync.completeUnitTest(student);
+        }
+    }
 
+    /**
+     * 所有测试保存后操作
+     *
+     * @param student
+     */
+    private void afterTest(Student student) {
+        if (student != null) {
+            String point = request.getParameter("point");
+           this.afterUnitTest(student);
             // 最有潜力勋章
             medalAwardAsync.potentialMan(student);
             if (Objects.equals(point, "100")) {
