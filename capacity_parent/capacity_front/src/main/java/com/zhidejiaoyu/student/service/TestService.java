@@ -46,15 +46,6 @@ public interface TestService extends BaseService<TestRecord> {
     ServerResponse<Map<String, Object>> getLevelTest(HttpSession session);
 
     /**
-     * 保存学生等级测试记录
-     *
-     * @param session    当前学生session
-     * @param testRecord 测试记录
-     * @return
-     */
-    ServerResponse<TestResultVo> saveLevelTest(HttpSession session, TestRecord testRecord);
-
-    /**
      * 获取单元闯关的测试题
      *
      * @param session

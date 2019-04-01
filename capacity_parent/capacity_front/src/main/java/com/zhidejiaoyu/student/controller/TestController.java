@@ -77,18 +77,6 @@ public class TestController {
     }
 
     /**
-     * 保存学生等级测试记录
-     *
-     * @param session    当前学生session
-     * @param testRecord 测试记录
-     * @return
-     */
-    @PostMapping("/saveLevelTest")
-    public ServerResponse<TestResultVo> saveLevelTest(HttpSession session, TestRecord testRecord) {
-        return testService.saveLevelTest(session, testRecord);
-    }
-
-    /**
      * 获取单词相关单元闯关的测试题
      *
      * @param session

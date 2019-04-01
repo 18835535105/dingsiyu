@@ -720,67 +720,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<TestResultVo> saveLevelTest(HttpSession session, TestRecord testRecord) {
-        Student student = getStudent(session);
-        TestResultVo vo = new TestResultVo();
-        // 游戏测试开始时间
-        Date gameStartTime = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
-        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
-
-        testRecord.setStudentId(student.getId());
-        testRecord.setTestStartTime(gameStartTime);
-        testRecord.setTestEndTime(new Date());
-        testRecord.setGenre("学前摸底测试");
-        testRecord.setQuantity(testRecord.getErrorCount() + testRecord.getRightCount());
-
-        int gold = 0;
-        int point = testRecord.getPoint();
-        if (point < PASS) {
-            vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "摸底测试"));
-            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.LEVEL_TEST_LESS_EIGHTY));
-            testRecord.setExplain("根据你的情况，下、面我们来开始学习吧。");
-        } else if (point < NINETY_POINT) {
-            gold = 10;
-            vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "摸底测试"));
-            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.LEVEL_TEST_EIGHTY_TO_NINETY));
-            testRecord.setExplain("本课程就是为你量身而做，快去学习吧！");
-        } else {
-            gold = 30;
-            vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "摸底测试"));
-            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.LEVEL_TEST_GREATER_NINETY));
-            testRecord.setExplain("不要让小事遮住视线，我们还有更大的世界！");
-        }
-        testRecord.setAwardGold(gold);
-
-        // 奖励
-        if (gold > 0) {
-            this.saveLog(student, gold, null, "摸底测试");
-            session.setAttribute(UserConstant.CURRENT_STUDENT, student);
-            studentMapper.updateByPrimaryKeySelective(student);
-        }
-
-        // 保存摸底测试记录
-        int count = testRecordMapper.insertSelective(testRecord);
-        getLevel(session);
-        if (count > 0) {
-            // 根据学生成绩判断学生下一步操作
-            String courseName = this.pushCourse(point, student, "学前摸底测试");
-            vo.setGold(gold);
-            vo.setMsg(courseName);
-            studentMapper.updateByPrimaryKeySelective(student);
-            return ServerResponse.createBySuccess(vo);
-        } else {
-            String errMsg = "id为 " + student.getId() + " 的学生 " + student.getStudentName() + " 摸底测试记录保存失败！";
-            LOGGER.error(errMsg);
-            RunLog runLog = new RunLog(2, errMsg, new Date());
-            runLogMapper.insert(runLog);
-            return ServerResponse.createByErrorMessage("摸底测试记录保存失败！");
-        }
-
-    }
-
-    @Override
     public ServerResponse<List<TestResult>> getWordUnitTest(HttpSession session, Long unitId, String studyModel,
                                                             Boolean isTrue) {
         Student student = getStudent(session);
