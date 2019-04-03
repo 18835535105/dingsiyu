@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.SentenceCourseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.SentenceCourse">
+        <id column="id" property="id"/>
+        <result column="study_paragraph" property="studyParagraph"/>
+        <result column="grade" property="grade"/>
+        <result column="version" property="version"/>
+        <result column="label" property="label"/>
+        <result column="picture_name" property="pictureName"/>
+        <result column="picture_url" property="pictureUrl"/>
+        <result column="course_name" property="courseName"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="delStatus" property="delStatus"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, study_paragraph, grade, version, label, picture_name, picture_url, course_name, status, create_time, update_time, delStatus
+    </sql>
+
+    <select id="getVersionByUnitId" parameterType="java.lang.Long" resultType="java.lang.String">
+        select cou.version from course cou join unit unit on cou.id=unit.course_id where unit.id=#{unitId}
+    </select>
+
+    <select id="selectCourseByUnitId" resultType="java.util.Map" parameterType="java.lang.Long">
+        select course.id courseId , unit.id unitId , cou.version,cou.label,cou.grade  from student_course course
+          join student student on course.student_id=student.id
+          join sentence_unit unit on unit.course_id=course.course_id
+          join course cou on course.course_id=cou.id
+          where unit.id = #{unitId}
+		  limit 1
+    </select>
+
+    <select id="getAllVersion" resultType="java.util.Map" parameterType="java.lang.Long">
+      select DISTINCT course.version from student_study_plan ssp
+			join sentence_course course on course.id=ssp.course_id
+			where ssp.student_id =#{studentId}
+      and ssp.type=2 group by ssp.course_id
+    </select>
+
+    <select id="getAllUnitInfos" resultType="java.util.Map" parameterType="map">
+        SELECT count(uv.vocabulary_id) wordCount, u.unit_name unitName, u.id unitId
+        FROM sentence_unit u
+        join unit_sentence us on u.id = us.unit_id
+        WHERE u.course_id = #{courseId}
+        GROUP BY u.id
+        order by u.id asc
+    </select>
+
+    <select id="getAllCourse" resultType="java.util.Map" parameterType="map">
+        select c.id courseId, c.course_name courseName, c.version
+            , count(t.id) `count`
+        from student_study_plan ssp, sentence_course c, sentence_unit u
+            , unit_sentence us
+            , sentence t
+        where ssp.course_id = c.id and u.course_id = c.id and ssp.type = #{type}
+            and us.unit_id = u.id and us.sentence_id = t.id
+        group by c.id
+        order by c.id asc
+    </select>
+
+</mapper>

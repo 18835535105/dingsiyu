@@ -114,6 +114,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Autowired
     private StudentExpansionMapper studentExpansionMapper;
 
+    @Autowired
+    private SentenceUnitMapper sentenceUnitMapper;
+
     @Override
     public Student LoginJudge(String account, String password) {
         Student st = new Student();
@@ -466,7 +469,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 当前例句所学单元名
         // result.put("unit_name", stu.getSentenceUnitName());
         // 根据单元id查询单元名
-        result.put("unit_name", unitMapper.getUnitNameByUnitId(stu.getSentenceUnitId().longValue()));
+        result.put("unit_name", sentenceUnitMapper.getUnitNameByUnitId(stu.getSentenceUnitId().longValue()));
         // 账号
         result.put("account", stu.getAccount());
         // 姓名
