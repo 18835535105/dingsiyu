@@ -1458,7 +1458,7 @@
     <select id="selTeksLaterCourse" parameterType="java.lang.Long" resultType="java.util.Map">
         select learn.unit_id , course.grade , course.version , course.label , learn.course_id
         from learn learn
-        join course course on course.id=learn.course_id
+        join teks_course course on course.id=learn.course_id
         where learn.student_id=#{studentId}
 
         and vocabulary_id is null
