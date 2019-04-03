@@ -376,7 +376,7 @@ public class CommonMethod implements Serializable {
         List<String> list = new ArrayList<>();
         String[] arr = sentence.split(" ");
         for (String s : arr) {
-            if (s.contains("#")||s.contains("*")) {
+            if (s.contains("#")||s.contains("*")||s.contains("$")) {
                 list.add(s.replace("#", " ").replace("*"," ").replace("$",""));
             } else {
                 list.add(s.trim());
