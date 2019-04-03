@@ -981,7 +981,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             } else {
                 sentenceTranslateVo.setOrder(commonMethod.getOrderEnglishList(sentence.getCentreExample(), null));
             }
-            sentenceTranslateVo.setRateList(commonMethod.getEnglishList(sentence.getCentreExample().replace("#", " ").replace("*"," ").replace("$", "")));
+            sentenceTranslateVo.setRateList(commonMethod.getEnglishList(sentence.getCentreExample()));
         } else {
             if (type == 2) {
                 sentenceTranslateVo.setOrder(commonMethod.getOrderChineseList(sentence.getCentreTranslate(), sentence.getTranslateDisturb()));
