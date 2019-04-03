@@ -413,10 +413,13 @@ public class CommonMethod implements Serializable {
         // 去除固定搭配中的#
         for (int i = 0; i < words.length; i++) {
             if (words[i].contains("#")) {
-                words[i] = words[i].replace("#", " ").replace("$", "");
+                words[i] = words[i].replace("#", " ");
             }
             if (words[i].contains("*")) {
                 words[i] = words[i].replace("*", " ");
+            }
+            if(words[i].contains("$")){
+                words[i] = words[i].replace("$", "");
             }
             list.add(words[i].trim());
         }
