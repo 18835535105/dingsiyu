@@ -387,7 +387,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         Sentence sentence = sentenceMapper.selectByPrimaryKey(vo.getVocabulary_id());
 
         // 分割例句
-        String english = sentence.getCentreExample().replace("#", " ");
+        String english = sentence.getCentreExample().replace("#", " ").replace("$", "");
         // 分割翻译
         String chinese = sentence.getCentreTranslate().replace("*", "");
 

@@ -73,6 +73,6 @@ public class BaiduSpeak {
         if (StringUtils.isEmpty(centreExample)) {
             return "";
         }
-        return youdao +  centreExample.replace("#", " ") + "@&@" + baidu + centreExample.replace("#", " ");
+        return youdao +  centreExample.replace("#", " ").replace("$", "") + "@&@" + baidu + centreExample.replace("#", " ").replace("$", "");
     }
 }

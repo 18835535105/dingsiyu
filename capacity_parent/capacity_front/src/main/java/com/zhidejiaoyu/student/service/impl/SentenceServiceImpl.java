@@ -259,8 +259,8 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
 
         sentenceTranslateVo.setId(sentence.getId());
         sentenceTranslateVo.setMemoryStrength(0.00);
-        sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " "));
-        sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
+        sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("$", ""));
+        sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", "").replace("$", ""));
         sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePath(sentence.getCentreExample()));
         if (type == 2) {
             sentenceTranslateVo.setOrderEnglish(commonMethod.getOrderEnglishList(sentence.getCentreExample(), sentence.getExampleDisturb()));
@@ -960,7 +960,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     private SentenceTranslateVo getSentenceTranslateVo(Long plan, boolean firstStudy, Long sentenceCount, Integer type, Sentence sentence) {
         SentenceTranslateVo sentenceTranslateVo = new SentenceTranslateVo();
         sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
-        sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*"," "));
+        sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*"," ").replace("$", ""));
         sentenceTranslateVo.setFirstStudy(firstStudy);
         sentenceTranslateVo.setId(sentence.getId());
         sentenceTranslateVo.setPlan(plan);
@@ -990,7 +990,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     private SentenceTranslateVo getSentenceVo(Sentence sentence, boolean firstStudy, Long plan, double memoryStrength, Long sentenceCount, Integer type) {
         SentenceTranslateVo sentenceTranslateVo = new SentenceTranslateVo();
         sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
-        sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*"," "));
+        sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*"," ").replace("$", ""));
         sentenceTranslateVo.setFirstStudy(firstStudy);
         sentenceTranslateVo.setId(sentence.getId());
         sentenceTranslateVo.setPlan(plan);

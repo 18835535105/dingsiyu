@@ -57,11 +57,11 @@ public class TestSentenceUtil {
         List<String> anawerList = new ArrayList<>();
         if (disturb != null) {
             for (int i = 0; i < disturb.size(); i++) {
-                anawerList.add(disturb.get(i).getCentreExample().replace("#", " "));
+                anawerList.add(disturb.get(i).getCentreExample().replace("#", " ").replace("$",""));
             }
         }
         Map<String, Object> selMap = new HashMap<>();
-        String english = sentences.getCentreExample().replace("#", " ");
+        String english = sentences.getCentreExample().replace("#", " ").replace("$","");
         String chinese = sentences.getCentreTranslate().replace("*", "");
         selMap.put("english", english);
         selMap.put("chinese", chinese);
@@ -80,7 +80,7 @@ public class TestSentenceUtil {
             }
         }
         Map<String, Object> selMap = new HashMap<>();
-        String english = sentences.getCentreExample().replace("#", " ");
+        String english = sentences.getCentreExample().replace("#", " ").replace("$","");
         String chinese = sentences.getCentreTranslate().replace("*", "");
         selMap.put("english", english);
         selMap.put("chinese", chinese);
@@ -95,15 +95,15 @@ public class TestSentenceUtil {
         List<String> anawerList = new ArrayList<>();
         if (disturb != null) {
             for (int i = 0; i < disturb.size(); i++) {
-                anawerList.add(disturb.get(i).getCentreExample().replace("#", " "));
+                anawerList.add(disturb.get(i).getCentreExample().replace("#", " ").replace("$",""));
             }
         }
         Map<String, Object> selMap = new HashMap<>();
-        String english = sentences.getCentreExample().replace("#", " ");
+        String english = sentences.getCentreExample().replace("#", " ").replace("$","");
         String chinese = sentences.getCentreTranslate().replace("*", "");
         selMap.put("english", english);
         selMap.put("chinese", chinese);
-        selMap.put("hearing", baiduSpeak.getSentencePath(sentences.getCentreExample()));
+        selMap.put("hearing", baiduSpeak.getSentencePath(sentences.getCentreExample().replace("$","")));
         selMap.put("type", "chinese");
         arrange(anawerList, english, selMap);
         return selMap;

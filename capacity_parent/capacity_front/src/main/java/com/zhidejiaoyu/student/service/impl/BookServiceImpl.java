@@ -166,7 +166,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
             vo = new BookVo();
             vo.setId(sentence.getId());
             vo.setChinese(sentence.getCentreTranslate().replace("*", ""));
-            vo.setContent(sentence.getCentreExample().replace("#", " "));
+            vo.setContent(sentence.getCentreExample().replace("#", " ").replace("$", ""));
             vo.setReadUrl(baiduSpeak
                     .getSentencePath(sentence.getCentreExample()));
             list.add(vo);
@@ -443,7 +443,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
                     capacityReview.setFault_time(0);
                     capacityReview.setMemory_strength(memoryStrength);
                     capacityReview.setVocabulary_id(sentence.getId());
-                    capacityReview.setWord(sentence.getCentreExample().replace("#", " "));
+                    capacityReview.setWord(sentence.getCentreExample().replace("#", " ").replace("$", ""));
                     capacityReview.setWord_chinese(sentence.getCentreTranslate().replace("*", ""));
                     capacityReviews.add(capacityReview);
                 }
