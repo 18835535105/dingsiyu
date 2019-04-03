@@ -389,7 +389,7 @@ public class TestResultUtil implements Serializable {
             sentenceTranslateVo = new SentenceTranslateVo();
             sentenceTranslateVo.setId(sentence.getId());
             sentenceTranslateVo.setMemoryStrength(0.00);
-            sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " "));
+            sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("$",""));
             sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
             sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePath(sentence.getCentreExample()));
             if (type == 2) {
@@ -407,7 +407,7 @@ public class TestResultUtil implements Serializable {
         for (Sentence sentence : sentences) {
             sentenceTranslateVo = new SentenceTranslateVo();
             sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
-            sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*"," "));
+            sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*"," ").replace("$",""));
             sentenceTranslateVo.setId(sentence.getId());
             sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePath(sentence.getCentreExample()));
 

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.TeksCourseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.TeksCourse">
+        <id column="id" property="id" />
+        <result column="study_paragraph" property="studyParagraph" />
+        <result column="grade" property="grade" />
+        <result column="version" property="version" />
+        <result column="label" property="label" />
+        <result column="picture_name" property="pictureName" />
+        <result column="picture_url" property="pictureUrl" />
+        <result column="course_name" property="courseName" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="delStatus" property="delStatus" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, study_paragraph, grade, version, label, picture_name, picture_url, course_name, status, create_time, update_time, delStatus
+    </sql>
+
+    <select id="getAllUnitInfos" resultType="java.util.Map" parameterType="map">
+        SELECT count(uv.vocabulary_id) wordCount, u.unit_name unitName, u.id unitId
+        FROM teks_unit u
+        join teks t on t.unit_id = u.id
+        WHERE u.course_id = #{courseId}
+        GROUP BY u.id
+        order by u.id asc
+    </select>
+
+    <select id="getAllCourse" resultType="java.util.Map" parameterType="map">
+        select c.id courseId, c.course_name courseName, c.version
+            , count(distinct t.unit_id) `count`
+        from student_study_plan ssp, teks_course c, teks_unit u
+            , teks t
+        where ssp.course_id = c.id and u.course_id = c.id and ssp.type = #{type}
+        and t.unit_id = u.id
+        group by c.id
+        order by c.id asc
+    </select>
+
+</mapper>

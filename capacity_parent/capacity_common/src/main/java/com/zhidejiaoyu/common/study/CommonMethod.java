@@ -376,8 +376,8 @@ public class CommonMethod implements Serializable {
         List<String> list = new ArrayList<>();
         String[] arr = sentence.split(" ");
         for (String s : arr) {
-            if (s.contains("#")||s.contains("*")) {
-                list.add(s.replace("#", " ").replace("*"," "));
+            if (s.contains("#")||s.contains("*")||s.contains("$")) {
+                list.add(s.replace("#", " ").replace("*"," ").replace("$",""));
             } else {
                 list.add(s.trim());
             }
@@ -418,11 +418,14 @@ public class CommonMethod implements Serializable {
             if (words[i].contains("*")) {
                 words[i] = words[i].replace("*", " ");
             }
+            if(words[i].contains("$")){
+                words[i] = words[i].replace("$", "");
+            }
             list.add(words[i].trim());
         }
 
         if (StringUtils.isNotEmpty(exampleDisturb)) {
-            list.add(exampleDisturb.replace("#", " "));
+            list.add(exampleDisturb.replace("#", " ").replace("$", ""));
         }
 
         Collections.shuffle(list);
@@ -501,7 +504,7 @@ public class CommonMethod implements Serializable {
         String[] arr = sentence.split("\\*");
         for (String s : arr) {
             if (s.contains("*")) {
-                list.add(s.replace("*", ""));
+                list.add(s.replace("*", "").replace("$", ""));
             } else if (StringUtils.isNotEmpty(s.trim())) {
                 list.add(s.trim());
             }

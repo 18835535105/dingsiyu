@@ -75,7 +75,7 @@ public class SaveTestLearnAndCapacity {
 
     @Autowired
     private CommonMethod commonMethod;
-    
+
     @Autowired
     private DailyAwardAsync dailyAwardAsync;
 
@@ -434,7 +434,7 @@ public class SaveTestLearnAndCapacity {
             wordChinese = vocabulary.getWordChinese();
         } else {
             wordChinese = sentence.getCentreTranslate().replace("*", "");
-            setWord.invoke(object, sentence.getCentreExample().replace("#", " "));
+            setWord.invoke(object, sentence.getCentreExample().replace("#", " ").replace("$", ""));
         }
 
         Method setCourseId = clazz.getMethod("setCourseId", Long.class);

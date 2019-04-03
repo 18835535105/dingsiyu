@@ -72,6 +72,9 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
     private PlayerMapper playerMapper;
 
     @Autowired
+    private SentenceUnitMapper sentenceUnitMapper;
+
+    @Autowired
     private RedisOpt redisOpt;
 
     private final String WORD_MEMORY = "慧记忆";
@@ -166,7 +169,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
             vo = new BookVo();
             vo.setId(sentence.getId());
             vo.setChinese(sentence.getCentreTranslate().replace("*", ""));
-            vo.setContent(sentence.getCentreExample().replace("#", " "));
+            vo.setContent(sentence.getCentreExample().replace("#", " ").replace("$", ""));
             vo.setReadUrl(baiduSpeak
                     .getSentencePath(sentence.getCentreExample()));
             list.add(vo);
@@ -217,7 +220,11 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
         boolean flag = WORD_MEMORY.equals(studyModel) || WORD_LISTEN.equals(studyModel) || WORD_WRITE.equals(studyModel);
         if (unitId != 0) {
             // 查看指定单元的单词/例句信息
-            courseId = unitMapper.selectCourseIdByUnitId(unitId);
+            if (flag) {
+                courseId = unitMapper.selectCourseIdByUnitId(unitId);
+            }else{
+                courseId = sentenceUnitMapper.selectCourseIdByUnitId(unitId);
+            }
             Integer learnCount = studyCountMapper.selectMaxCountByCourseId(studentId, courseId);
             learnedCount = learnMapper.countLearnWord(studentId, unitId, studyModel, learnCount == null ? 1 : learnCount);
             notKnow = learnMapper.countNotKnownWord(studentId, unitId, studyModel, learnCount == null ? 1 : learnCount);
@@ -443,7 +450,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
                     capacityReview.setFault_time(0);
                     capacityReview.setMemory_strength(memoryStrength);
                     capacityReview.setVocabulary_id(sentence.getId());
-                    capacityReview.setWord(sentence.getCentreExample().replace("#", " "));
+                    capacityReview.setWord(sentence.getCentreExample().replace("#", " ").replace("$", ""));
                     capacityReview.setWord_chinese(sentence.getCentreTranslate().replace("*", ""));
                     capacityReviews.add(capacityReview);
                 }
