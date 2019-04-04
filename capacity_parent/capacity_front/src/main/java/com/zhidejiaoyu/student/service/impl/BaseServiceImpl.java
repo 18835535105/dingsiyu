@@ -102,7 +102,10 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         int level = getLevel(gold.intValue(), levels);
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
         if(studentExpansion != null && studentExpansion.getLevel()<level){
-            Integer oldStudy = levelMapper.getStudyById(studentExpansion.getLevel());
+            Integer oldStudy =0;
+            if(studentExpansion.getLevel()!=0){
+                oldStudy=levelMapper.getStudyById(studentExpansion.getLevel());
+            }
             Integer newStudy = levelMapper.getStudyById(level);
             Integer addStudy=newStudy-oldStudy;
             studentExpansion.setLevel(level);
