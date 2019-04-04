@@ -641,7 +641,7 @@
             , vocabulary t
         </if>
         <if test="type == 2">
-            sententce_course c,
+            sentence_course c,
             sentence_unit u
             , unit_sentence us
             , sentence t

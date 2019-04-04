@@ -42,17 +42,4 @@
 			where ssp.student_id =#{studentId}
       and ssp.type=2 group by ssp.course_id
     </select>
-
-    <select id="getAllCourse" resultType="java.util.Map" parameterType="map">
-        select c.id courseId, c.course_name courseName, c.version
-            , count(t.id) `count`
-        from student_study_plan ssp, sentence_course c, sentence_unit u
-            , unit_sentence us
-            , sentence t
-        where ssp.course_id = c.id and u.course_id = c.id and ssp.type = #{type}
-            and us.unit_id = u.id and us.sentence_id = t.id
-        group by c.id
-        order by c.id asc
-    </select>
-
 </mapper>

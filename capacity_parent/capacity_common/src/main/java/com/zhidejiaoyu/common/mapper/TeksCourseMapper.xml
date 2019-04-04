@@ -22,16 +22,4 @@
     <sql id="Base_Column_List">
         id, study_paragraph, grade, version, label, picture_name, picture_url, course_name, status, create_time, update_time, delStatus
     </sql>
-
-    <select id="getAllCourse" resultType="java.util.Map" parameterType="map">
-        select c.id courseId, c.course_name courseName, c.version
-            , count(distinct t.unit_id) `count`
-        from student_study_plan ssp, teks_course c, teks_unit u
-            , teks t
-        where ssp.course_id = c.id and u.course_id = c.id and ssp.type = #{type}
-        and t.unit_id = u.id
-        group by c.id
-        order by c.id asc
-    </select>
-
 </mapper>

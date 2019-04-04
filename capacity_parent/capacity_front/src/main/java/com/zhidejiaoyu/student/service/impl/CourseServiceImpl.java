@@ -903,14 +903,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
     @Override
     public ServerResponse<List<Map<String, Object>>> getAllCourses(HttpSession session, Integer type, Boolean flag) {
         Student student = getStudent(session);
-        List<Map<String, Object>> courseInfo = new ArrayList<>();
-        if (type == 1) {
-            courseInfo = courseMapper.getAllCourse(student, type);
-        } else if (type == 2) {
-            courseInfo = sentenceCourseMapper.getAllCourse(student, type);
-        } else if (type == 3) {
-            courseInfo = teksCourseMapper.getAllCourse(student, type);
-        }
+        List<Map<String, Object>> courseInfo = courseMapper.getAllCourse(student, type);
         if (courseInfo.size() > 0) {
             int count = 0;
             Map<String, Object> map = new HashMap<>(16);
