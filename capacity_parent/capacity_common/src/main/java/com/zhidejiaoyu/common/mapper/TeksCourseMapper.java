@@ -18,8 +18,6 @@ import java.util.Map;
  */
 public interface TeksCourseMapper extends BaseMapper<TeksCourse> {
 
-    List<Map<String, Object>> getAllUnitInfos(@Param("courseId") Long courseId, @Param("type") Integer type);
-
     List<Map<String, Object>> getAllCourse(@Param("student") Student student, @Param("type") Integer type);
 
 }

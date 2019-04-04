@@ -43,15 +43,6 @@
       and ssp.type=2 group by ssp.course_id
     </select>
 
-    <select id="getAllUnitInfos" resultType="java.util.Map" parameterType="map">
-        SELECT count(uv.vocabulary_id) wordCount, u.unit_name unitName, u.id unitId
-        FROM sentence_unit u
-        join unit_sentence us on u.id = us.unit_id
-        WHERE u.course_id = #{courseId}
-        GROUP BY u.id
-        order by u.id asc
-    </select>
-
     <select id="getAllCourse" resultType="java.util.Map" parameterType="map">
         select c.id courseId, c.course_name courseName, c.version
             , count(t.id) `count`
