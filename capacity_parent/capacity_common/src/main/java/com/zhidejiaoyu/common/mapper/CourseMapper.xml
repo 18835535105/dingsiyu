@@ -589,16 +589,18 @@
         <if test="type == 3">
             count(distinct t.unit_id) wordCount,
         </if>
-
         u.unit_name unitName, u.id unitId
-        FROM unit u
+        FROM
         <if test="type == 1">
+            unit u
             join unit_vocabulary uv on u.id = uv.unit_id
         </if>
         <if test="type == 2">
+            sentence_unit u
             join unit_sentence us on u.id = us.unit_id
         </if>
         <if test="type == 3">
+            teks_unit u
             join teks t on t.unit_id = u.id
         </if>
         join student_study_plan ssp
