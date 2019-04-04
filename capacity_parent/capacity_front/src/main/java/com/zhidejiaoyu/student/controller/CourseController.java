@@ -192,10 +192,10 @@ public class CourseController {
      */
     @ResponseBody
     @GetMapping("/getAllUnit")
-    public ServerResponse<List<Map<String, Object>>> getAllUnit(Long courseId,
+    public ServerResponse<List<Map<String, Object>>> getAllUnit(HttpSession session, Long courseId,
                                                                 @RequestParam(required = false, defaultValue = "true") Boolean showAll,
                                                                 @RequestParam(required = false, defaultValue = "1") Integer type) {
-        return courseService.getAllUnit(courseId, showAll, type);
+        return courseService.getAllUnit(session, courseId, showAll, type);
     }
 
     /**

@@ -25,8 +25,6 @@ public interface SentenceCourseMapper extends BaseMapper<SentenceCourse> {
 
     List<Map<String,Object>> getAllVersion(Long studnetId);
 
-    List<Map<String, Object>> getAllUnitInfos(@Param("courseId") Long courseId, @Param("type") Integer type);
-
     List<Map<String, Object>> getAllCourse(@Param("student") Student student, @Param("type") Integer type);
 
 }

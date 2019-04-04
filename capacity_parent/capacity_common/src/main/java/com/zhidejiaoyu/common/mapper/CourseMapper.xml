@@ -579,7 +579,18 @@
         order by c.id asc
     </select>
     <select id="getAllUnitInfos" resultType="java.util.Map" parameterType="map">
-        SELECT count(uv.vocabulary_id) wordCount, u.unit_name unitName, u.id unitId
+        SELECT
+        <if test="type == 1">
+            count(uv.vocabulary_id) wordCount,
+        </if>
+        <if test="type == 2">
+            count(us.sentence_id) wordCount,
+        </if>
+        <if test="type == 3">
+            count(distinct t.unit_id) wordCount,
+        </if>
+
+        u.unit_name unitName, u.id unitId
         FROM unit u
         <if test="type == 1">
             join unit_vocabulary uv on u.id = uv.unit_id
@@ -590,7 +601,12 @@
         <if test="type == 3">
             join teks t on t.unit_id = u.id
         </if>
+        join student_study_plan ssp
         WHERE u.course_id = #{courseId}
+        and ssp.course_id = u.course_id
+        and u.id &lt;= ssp.end_unit_id
+        and u.id >= ssp.start_unit_id
+        and ssp.student_id = #{student.id}
         GROUP BY u.id
         order by u.id asc
     </select>
@@ -616,19 +632,25 @@
         <if test="type != 3">
             , count(t.id) `count`
         </if>
-        from student_study_plan ssp, course c, unit u
+        from student_study_plan ssp,
         <if test="type == 1">
+            course c, unit u
             , unit_vocabulary uv
             , vocabulary t
         </if>
         <if test="type == 2">
+            sententce_course c,
+            sentence_unit u
             , unit_sentence us
             , sentence t
         </if>
         <if test="type == 3">
+            teks_course c,
+            teks_unit u
             , teks t
         </if>
         where ssp.course_id = c.id and u.course_id = c.id and ssp.type = #{type}
+        and ssp.student_id = #{student.id}
         <if test="type == 1">
             and uv.unit_id = u.id and uv.vocabulary_id = t.id
         </if>
