@@ -23,7 +23,7 @@ public class TestRecordMapperTest {
 
     @Test
     public void testSelectTestDetailVo() {
-        TestDetailVo testDetailVo = testRecordMapper.selectTestDetailVo(9985L, 9225L);
+        TestDetailVo testDetailVo = testRecordMapper.selectTestDetailVo(9985L, 9225L, 1);
         log.info("vo=[{}]", testDetailVo);
     }
 }

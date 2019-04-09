@@ -138,9 +138,10 @@ public interface TestService extends BaseService<TestRecord> {
      *
      * @param session
      * @param testId  测试记录id
+     * @param type
      * @return
      */
-    ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId);
+    ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId, Integer type);
 
     ServerResponse<Object> saveCapTeksTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO);
 

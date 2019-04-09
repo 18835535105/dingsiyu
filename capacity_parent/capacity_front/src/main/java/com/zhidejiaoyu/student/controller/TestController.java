@@ -198,14 +198,15 @@ public class TestController {
      * 获取学生测试详情信息
      *
      * @param testId 测试记录id
+     * @param type 1:单词；2：句型；3：课文
      * @return
      */
     @GetMapping("/getTestDetail")
-    public ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId) {
+    public ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId, @RequestParam(required = false, defaultValue = "1") Integer type) {
         if (testId == null) {
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
         }
-        return testService.getTestDetail(session, testId);
+        return testService.getTestDetail(session, testId, type);
     }
 
     /**

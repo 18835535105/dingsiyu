@@ -225,9 +225,10 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      *
      * @param stuId
      * @param testId
+     * @param type  1:单词；2：句型；3：课文
      * @return
      */
-    TestDetailVo selectTestDetailVo(@Param("stuId") Long stuId, @Param("testId") Long testId);
+    TestDetailVo selectTestDetailVo(@Param("stuId") Long stuId, @Param("testId") Long testId, @Param("type") Integer type);
 
     /**
      * 获取学生测试记录详情表格内容
