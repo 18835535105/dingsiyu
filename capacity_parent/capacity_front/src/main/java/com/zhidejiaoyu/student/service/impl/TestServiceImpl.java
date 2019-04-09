@@ -1112,7 +1112,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         String[] errorWord = wordUnitTestDTO.getErrorWord();
         Integer[] errorWordId = wordUnitTestDTO.getErrorWordId();
         Long[] unitId = wordUnitTestDTO.getUnitId();
-        Long courseId = unitMapper.selectCourseIdByUnitId(unitId[0]);
+        Long courseId = wordUnitTestDTO.getCourseId();
         Integer classify = wordUnitTestDTO.getClassify();
         String type = commonMethod.getTestType(wordUnitTestDTO.getClassify());
 
