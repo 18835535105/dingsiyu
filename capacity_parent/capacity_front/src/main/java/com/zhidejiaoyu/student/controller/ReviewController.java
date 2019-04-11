@@ -105,7 +105,14 @@ public class ReviewController {
     @PostMapping("/saveTestCenter")
     public ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Integer[] correctWordId, Integer[] errorWordId, Long[] unitId,
                                                  Integer classify, Long courseId,HttpSession session, Integer point, String genre,String testDetail) {
-        if (!"单词五维测试".equals(genre) && !"例句五维测试".equals(genre)) {
+        final String wordFiveTest = "单词五维测试";
+        final String sentenceFiveTest = "例句五维测试";
+
+        // 当 genre 为空时为其赋值，防止因 genre 为空而导致报错问题
+        if (StringUtils.isEmpty(genre) && correctWord != null && errorWord != null && (correctWord.length + errorWord.length > 40)) {
+            genre = wordFiveTest;
+        }
+        if (!wordFiveTest.equals(genre) && !sentenceFiveTest.equals(genre)) {
             Assert.notEmpty(unitId, "unitId cant't be null!");
         }
         Assert.notNull(courseId, "courseId can't be null!");
@@ -113,10 +120,10 @@ public class ReviewController {
         if (StringUtils.isEmpty(genre)) {
             throw new RuntimeException("genre can't be null!");
         }
-        if ("单词五维测试".equals(genre)) {
+        if (wordFiveTest.equals(genre)) {
             classify = 1;
         }
-        if ("例句五维测试".equals(genre)) {
+        if (sentenceFiveTest.equals(genre)) {
             classify = 4;
         }
         if (correctWord == null && errorWord == null) {
