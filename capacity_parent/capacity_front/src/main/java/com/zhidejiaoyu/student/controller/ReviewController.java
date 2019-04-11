@@ -109,7 +109,11 @@ public class ReviewController {
         final String sentenceFiveTest = "例句五维测试";
 
         // 当 genre 为空时为其赋值，防止因 genre 为空而导致报错问题
-        if (StringUtils.isEmpty(genre) && correctWord != null && errorWord != null && (correctWord.length + errorWord.length > 40)) {
+        boolean isWordFiveTest = StringUtils.isEmpty(genre)
+                && ((correctWord != null && errorWord != null && (correctWord.length + errorWord.length > 40))
+                || (correctWord == null && errorWord.length > 40))
+                || (errorWord == null && correctWord.length > 40);
+        if (isWordFiveTest) {
             genre = wordFiveTest;
         }
         if (!wordFiveTest.equals(genre) && !sentenceFiveTest.equals(genre)) {
