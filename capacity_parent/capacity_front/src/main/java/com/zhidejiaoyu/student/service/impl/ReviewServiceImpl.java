@@ -674,7 +674,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
      * 五维测试
      */
     @Override
-    public ServerResponse<Object> fiveDimensionTest(String course_id, boolean isTrue, HttpSession session) {
+    public ServerResponse<Object> fiveDimensionTest(String courseId, boolean isTrue, HttpSession session) {
         Student student = getStudent(session);
         Long studentId = student.getId();
 
@@ -684,24 +684,24 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             Integer gold = studentMapper.getSystem_gold(studentId);
             if (gold != null && gold > 0) {
                 // 扣除1金币
-                int state = studentMapper.updateBySystem_gold((gold - 1), studentId);
+                studentMapper.updateBySystem_gold((gold - 1), studentId);
             } else {
                 // 金币不足
                 return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
             }
             // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
         } else {
-            Integer judgeTest = testRecordMapper.selectJudgeTest(course_id, studentId, "单词五维测试");
+            Integer judgeTest = testRecordMapper.selectJudgeTest(courseId, studentId, "单词五维测试");
             if (judgeTest != null) {
                 // 已经测试过, 提示扣除金币是否测试
                 return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
             }
         }
 
-        Map<String, Object> result = new LinkedHashMap<String, Object>();
+        Map<String, Object> result = new LinkedHashMap<>();
 
         // 查询课程下边一共有多少单词
-        Integer countWord = unitMapper.countWordByCourse(course_id);
+        Integer countWord = unitMapper.countWordByCourse(courseId);
         if (countWord == 0) {
             return ServerResponse.createByError(500, "该课程下没有单词!");
         }
@@ -711,10 +711,14 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         }
 
         // 平均分配题量 - b:英译汉,汉译英,听力理解需要的题数量, c:听力,默写需要的题数量
-        int count = countWord;// 总题量
-        int aa = count / 5; // 分五份
-        int b = aa * 3; // 1,2,3
-        int c = aa * 2; // 4听力,5默写
+        // 总题量
+        int count = countWord;
+        // 分五份
+        int aa = count / 5;
+        // 1,2,3
+        int b = aa * 3;
+        // 4听力,5默写
+        int c = aa * 2;
         // 获取count/5剩余的数量, 加到b,c中
         int countBC = 0;
         if (count > (b + c)) {
@@ -727,14 +731,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             b += countBC;
         }
 
-        // 从课程中查出*个单词 - 英译汉,汉译英,听力理解 limit 0,b
-        //List<Vocabulary> vocabularies = capacityMapper.fiveDimensionTest(course_id, b);
-
-        // 从课程中查出*个单词 - 听写,默写 limit b,c
-        //List<Vocabulary> vocabulariesTwo = capacityMapper.fiveDimensionTestTwo(course_id, b, c);
-
         // 1. 获取课程下的所有打乱顺序的单词
-        List<Vocabulary> list = capacityMapper.fiveDimensionTestAll(course_id);
+        List<Vocabulary> list = capacityMapper.fiveDimensionTestAll(courseId);
 
         // 2.1 从课程中查出*个单词 - 英译汉,汉译英,听力理解 limit 0,b
         List<Vocabulary> vocabularies = list.subList(0, b);
@@ -742,19 +740,19 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 2.2 从课程中查出*个单词 - 听写,默写 limit b,c
         List<Vocabulary> vocabulariesTwo = list.subList(b, b + c);
         // 1.英译汉 2.汉译英 3.听力理解
-        String[] type_a = {"英译汉"};
-        String[] type_b = {"汉译英"};
-        String[] type_c = {"听力理解"};
-        List<TestResult> testResults_a = testResultUtil.getWordTestesForCourse(type_a, vocabularies.subList(0, vocabularies.size() / 3).size(),
-                vocabularies.subList(0, vocabularies.size() / 3), Long.valueOf(course_id));
-        List<TestResult> testResults_b = testResultUtil.getWordTestesForCourse(type_b, vocabularies.subList(vocabularies.size() / 3, (int) BigDecimalUtil.div((double) vocabularies.size(), 1.5, 0)).size(),
-                vocabularies.subList(vocabularies.size() / 3, (int) BigDecimalUtil.div((double) vocabularies.size(), 1.5, 0)), Long.valueOf(course_id));
-        List<TestResult> testResults_c = testResultUtil.getWordTestesForCourse(type_c, vocabularies.subList((int) BigDecimalUtil.div((double) vocabularies.size(), 1.5, 0), vocabularies.size()).size(),
-                vocabularies.subList((int) BigDecimalUtil.div((double) vocabularies.size(), 1.5, 0), vocabularies.size()), Long.valueOf(course_id));
+        String[] typeA = {"英译汉"};
+        String[] typeB = {"汉译英"};
+        String[] typeC = {"听力理解"};
+        List<TestResult> testResultsA = testResultUtil.getWordTestesForCourse(typeA, vocabularies.subList(0, vocabularies.size() / 3).size(),
+                vocabularies.subList(0, vocabularies.size() / 3), Long.valueOf(courseId));
+        List<TestResult> testResultsB = testResultUtil.getWordTestesForCourse(typeB, vocabularies.subList(vocabularies.size() / 3, (int) BigDecimalUtil.div((double) vocabularies.size(), 1.5, 0)).size(),
+                vocabularies.subList(vocabularies.size() / 3, (int) BigDecimalUtil.div((double) vocabularies.size(), 1.5, 0)), Long.valueOf(courseId));
+        List<TestResult> testResultsC = testResultUtil.getWordTestesForCourse(typeC, vocabularies.subList((int) BigDecimalUtil.div((double) vocabularies.size(), 1.5, 0), vocabularies.size()).size(),
+                vocabularies.subList((int) BigDecimalUtil.div((double) vocabularies.size(), 1.5, 0), vocabularies.size()), Long.valueOf(courseId));
 
-        result.put("testResults_a", testResults_a);
-        result.put("testResults_b", testResults_b);
-        result.put("testResults_c", testResults_c);
+        result.put("testResults_a", testResultsA);
+        result.put("testResults_b", testResultsB);
+        result.put("testResults_c", testResultsC);
 
         // 4.听写
         List<Map<String, Object>> hearList = new ArrayList<>();
@@ -764,7 +762,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         int a = 0;
         for (Vocabulary vo : vocabulariesTwo) {
             // 用于封装一道题
-            Map m = new LinkedHashMap();
+            Map<String, Object> m = new LinkedHashMap<>(16);
 
             // 听写
             if (a < (vocabulariesTwo.size() / 2)) {
