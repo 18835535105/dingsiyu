@@ -80,7 +80,7 @@ public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRe
         Map<String, Object> map1 = syntheticRewardsListMapper.selGloveOrFlowerByStudentIdAndNameByState(mapss);
         if (map1 != null) {
             String finalNames = (String) map1.get("name");
-            if (((Date) map1.get("useEndTime")).getTime() < new Date().getTime()) {
+            if (((Date) map1.get("useEndTime")).getTime() < System.currentTimeMillis()) {
                 HashMap mapsss = new HashMap();
                 mapsss.put("studentId", student.getId());
                 mapsss.put("name", finalNames);
@@ -90,11 +90,11 @@ public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRe
         for (HashMap<String, Object> map : hashMaps) {
             Date endTime = (Date) map.get("endTime");
             if (endTime != null) {
-                if (endTime.getTime() > new Date().getTime()) {
+                if (endTime.getTime() > System.currentTimeMillis()) {
                     map.put("status", 2);
                     map.put("beUseing", true);
                     map.put("nameId", AwardUtil.getMaps((String) map.get("name")));
-                    map.put("time", (endTime.getTime() - new Date().getTime()) / 1000);
+                    map.put("time", (endTime.getTime() - System.currentTimeMillis()) / 1000);
                     map.put("type", 1);
                     list.add(map);
                 } else {
@@ -143,7 +143,7 @@ public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRe
         //获取学生session
         Student student = getStudent(session);
         if (student.getBonusExpires() != null) {
-            if (student.getBonusExpires().getTime() > new Date().getTime()) {
+            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
                 return ServerResponse.createByError();
             }
         }
@@ -213,7 +213,7 @@ public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRe
                 map.put("createName", syntheticRewardsList.getCreateTime());
                 Date date = student.getBonusExpires();
                 if (date != null) {
-                    if (date.getTime() > new Date().getTime()) {
+                    if (date.getTime() > System.currentTimeMillis()) {
                         map.put("state", 0);
                     } else {
                         map.put("state", 1);

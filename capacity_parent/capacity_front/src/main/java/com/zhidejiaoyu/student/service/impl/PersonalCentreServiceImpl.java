@@ -1598,7 +1598,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Calendar c = Calendar.getInstance();
         // 到期时间小于当前日期
-        if (parse.getTime() < new Date().getTime()) {
+        if (parse.getTime() < System.currentTimeMillis()) {
             // 从当前日期添加90天
             c.add(Calendar.DAY_OF_MONTH, cardNo);
             format = sf.format(c.getTime());

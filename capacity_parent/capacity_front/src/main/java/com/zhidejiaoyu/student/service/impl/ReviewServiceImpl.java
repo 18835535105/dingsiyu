@@ -32,6 +32,7 @@ import com.zhidejiaoyu.student.utils.PetSayUtil;
 import com.zhidejiaoyu.student.utils.PetUrlUtil;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -796,7 +797,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     @Override
     public ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Integer[] correctWordId,
                                                        Integer[] errorWordId, Long[] unitId, Integer classify, Long courseId,
-                                                       HttpSession session, Integer point, String genre,String testDetail) {
+                                                       HttpSession session, Integer point, String genre, String testDetail) {
         Student student = getStudent(session);
 
         // 保存测试记录
@@ -823,7 +824,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         wordUnitTestDTO.setCourseId(courseId);
         wordUnitTestDTO.setClassify(classify);
 
-        TestRecord testRecord = this.saveTestRecord(quantity, errorCount, rightCount, classify, session, student, point, genre, courseId,unitId);
+        TestRecord testRecord = this.saveTestRecord(quantity, errorCount, rightCount, classify, session, student, point, genre, courseId, unitId);
 
         TestResultVo vo = new TestResultVo();
         // 封装提示语
@@ -831,7 +832,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         vo.setEnergy(getEnergy(student, point));
 
         testRecordMapper.insert(testRecord);
-        if(testDetail!=null){
+        if (testDetail != null) {
             // 根据不同分数奖励学生金币
             this.saveTestDetail(testDetail, testRecord.getId(), classify, student);
         }
@@ -915,6 +916,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             default:
         }
     }
+
     /**
      * 匹配选项
      *
@@ -958,7 +960,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 if (point < 80) {
                     msg = "闯关失败，请再接再厉！";
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.CAPACITY_REVIEW_LESS_EIGHTY));
-                    vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
+                    vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
                     testRecord.setPass(2);
                 } else {
                     msg = "真让人刮目相看！继续学习吧！";
@@ -983,7 +985,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId, point);
                 }
                 if (point < 90) {
-                    vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
+                    vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
                     testRecord.setPass(2);
                 } else {
                     vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
@@ -1002,7 +1004,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     ccieUtil.saveCcieTest(student, 6, -1, courseId, unitId, point);
                 }
                 if (point < 90) {
-                    vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
+                    vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
                     testRecord.setPass(2);
                 } else {
                     vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
@@ -1021,11 +1023,11 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     @Override
     public ServerResponse<TestResultVo> saveTestReview(String[] correctWord, String[] errorWord, Integer[] correctWordId,
                                                        Integer[] errorWordId, Long[] unitId, Integer classify, Long courseId,
-                                                       HttpSession session, Integer point, String genre,String testDetail) {
+                                                       HttpSession session, Integer point, String genre, String testDetail) {
         if (correctWord == null && errorWord == null) {
             return ServerResponse.createByErrorMessage("参数错误！");
         }
-        return saveTestCenter(correctWord, errorWord, correctWordId, errorWordId, unitId, classify, courseId, session, point, genre,testDetail);
+        return saveTestCenter(correctWord, errorWord, correctWordId, errorWordId, unitId, classify, courseId, session, point, genre, testDetail);
     }
 
     @Override
@@ -1058,7 +1060,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     /**
      * 单词图鉴智能复习模块
      *
-     * @param student 学生
+     * @param student   学生
      * @param unitId    单元id
      * @param model     1=单词图鉴模块
      * @param course_id 课程id
@@ -1413,8 +1415,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
      * @return 学生获得的金币数
      */
     private TestRecord saveTestRecord(int quantity, int errorCount, int rightCount, Integer classify, HttpSession
-            session, Student student, Integer point, String genre, Long courseId,Long[] unitIds) {
-        Long unitId = (unitIds == null || unitIds.length ==0) ? null : unitIds[0];
+            session, Student student, Integer point, String genre, Long courseId, Long[] unitIds) {
+        Long unitId = (unitIds == null || unitIds.length == 0) ? null : unitIds[0];
         String studyModel = commonMethod.getTestType(classify);
         StringBuilder msg = new StringBuilder();
         long stuId = student.getId();
@@ -1530,6 +1532,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             testRecord.setAwardGold(0);
         }
         int addGold = testGoldUtil.addGold(student, gold);
+        if (student.getBonusExpires() != null && System.currentTimeMillis() > student.getBonusExpires().getTime()) {
+                Double doubleGold=gold*0.2;
+                addGold=doubleGold.intValue()+addGold;
+        }
         student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), addGold));
         testRecord.setAwardGold(addGold);
         msg.append(" 中获得#").append(addGold).append("#金币。");

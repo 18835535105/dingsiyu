@@ -150,7 +150,7 @@ public class StudentSkinServiceImpl extends BaseServiceImpl<StudentSkinMapper, S
             Date endTime = (Date) map2.get("endTime");
             //判断皮肤是使用的皮肤还是试用的皮肤
             if (endTime != null) {
-                if (new Date().getTime() >= endTime.getTime()) {
+                if (System.currentTimeMillis() >= endTime.getTime()) {
                     //当使用时间小于现在的时间时调用
                     map2.put("use", false);
                 } else {
@@ -371,7 +371,7 @@ public class StudentSkinServiceImpl extends BaseServiceImpl<StudentSkinMapper, S
                 //已获得皮肤储存皮肤对应编号
                 map.put("skinId", AwardUtil.getMaps(studentSkin.getSkinName()));
                 //未获得皮肤判断使用时间
-            } else if (studentSkin.getEndTime().getTime() > new Date().getTime()) {
+            } else if (studentSkin.getEndTime().getTime() > System.currentTimeMillis()) {
                 //使用时间大于当前时间储存皮肤编号
                 map.put("skinId", AwardUtil.getMaps(studentSkin.getSkinName()));
             } else {
