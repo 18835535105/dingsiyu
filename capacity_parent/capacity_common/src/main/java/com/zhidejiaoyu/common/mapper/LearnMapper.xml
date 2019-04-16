@@ -1445,9 +1445,12 @@
     </select>
     <select id="selectTeksLaterLearnTimeByStudentId" resultType="java.util.Map" parameterType="java.lang.Long">
         select DISTINCT learn.update_time , unit.joint_name ,course.course_name
-        from learn learn join teks_unit unit on unit.id=learn.unit_id join teks_course course on course.id=learn.course_id
+        from learn learn
+        join teks_unit unit on unit.id=learn.unit_id
+        join teks_course course on course.id=learn.course_id
         where student_id = #{id} and learn.vocabulary_id is null and learn.example_id is null
-        group by course.course_name order by learn.update_time
+        group by course.course_name
+        order by learn.update_time desc
     </select>
     <select id="selLaterLearnTeks" parameterType="java.util.Map" resultType="java.lang.Long">
         select learn.unit_id from learn learn
