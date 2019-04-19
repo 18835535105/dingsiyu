@@ -60,7 +60,7 @@ public class TeksController  {
      * @return
      */
     @ResponseBody
-    @RequestMapping("saveTeksAudition")
+    @RequestMapping("/saveTeksAudition")
     public ServerResponse<Map<String,Object>> saveTeksAudition(HttpSession session,Integer unitId,Integer courseId){
         return teksService.saveTeksAudition(session,unitId,courseId);
     }
