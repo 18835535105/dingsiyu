@@ -256,9 +256,9 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 			ca.setUnit_id(Long.valueOf(unit_id));
 			ca.setClassify(classify+"");
 			vocabularies = capacityMapper.selectCapacity(ca);
-			
+
 			// 处理结果
-			List<TestResult> testResults = testResultUtil.getWordTestes(type, vocabularies.size(), vocabularies);	
+			List<TestResult> testResults = testResultUtil.getWordTestes(type, vocabularies.size(), vocabularies);
 			return ServerResponse.createBySuccess(testResults);
 		}*/
         return ServerResponse.createByErrorMessage("选择模块后进行测试!");
@@ -972,9 +972,85 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "智能复习测试"));
                 break;
             case "已学测试":
+                if (point < 80) {
+                    vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_LESS_EIGHTY));
+                } else if (point < 90) {
+                    vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_EIGHTY_TO_NINETY));
+                } else {
+                    vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_NINETY_TO_HUNDRED));
+                    ccieUtil.saveCcieTest(student, 3, classify, courseId, unitId, point);
+                }
+                if (point < 90) {
+                    vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+                    testRecord.setPass(2);
+                } else {
+                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    testRecord.setPass(1);
+                }
+
+                msg = point < 90 ? "你的测试未通过，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
+                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, genre));
+                break;
             case "生词测试":
+                if (point < 80) {
+                    vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_LESS_EIGHTY));
+                } else if (point < 90) {
+                    vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_EIGHTY_TO_NINETY));
+                } else {
+                    vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_NINETY_TO_HUNDRED));
+                    ccieUtil.saveCcieTest(student, 4, classify, courseId, unitId, point);
+                }
+                if (point < 90) {
+                    vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+                    testRecord.setPass(2);
+                } else {
+                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    testRecord.setPass(1);
+                }
+
+                msg = point < 90 ? "你的测试未通过，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
+                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, genre));
+                break;
             case "熟词测试":
+                if (point < 80) {
+                    vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_LESS_EIGHTY));
+                } else if (point < 90) {
+                    vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_EIGHTY_TO_NINETY));
+                } else {
+                    vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_NINETY_TO_HUNDRED));
+                    ccieUtil.saveCcieTest(student, 5, classify, courseId, unitId, point);
+                }
+                if (point < 90) {
+                    vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+                    testRecord.setPass(2);
+                } else {
+                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    testRecord.setPass(1);
+                }
+
+                msg = point < 90 ? "你的测试未通过，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
+                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, genre));
+                break;
             case "生句测试":
+                if (point < 80) {
+                    vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_LESS_EIGHTY));
+                } else if (point < 90) {
+                    vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_EIGHTY_TO_NINETY));
+                } else {
+                    vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_NINETY_TO_HUNDRED));
+                    ccieUtil.saveCcieTest(student, 4, classify, courseId, unitId, point);
+                }
+                if (point < 90) {
+                    vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+                    testRecord.setPass(2);
+                } else {
+                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    testRecord.setPass(1);
+                }
+
+                msg = point < 90 ? "你的测试未通过，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";
+                vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, genre));
+                break;
             case "熟句测试":
                 if (point < 80) {
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_LESS_EIGHTY));
@@ -982,7 +1058,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_EIGHTY_TO_NINETY));
                 } else {
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.TEST_CENTER_NINETY_TO_HUNDRED));
-                    ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId, point);
+                    ccieUtil.saveCcieTest(student, 5, classify, courseId, unitId, point);
                 }
                 if (point < 90) {
                     vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
