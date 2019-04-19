@@ -1532,7 +1532,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             testRecord.setAwardGold(0);
         }
         int addGold = testGoldUtil.addGold(student, gold);
-        if (student.getBonusExpires() != null && System.currentTimeMillis() > student.getBonusExpires().getTime()) {
+        if (student.getBonusExpires() != null && System.currentTimeMillis() < student.getBonusExpires().getTime()) {
                 Double doubleGold=gold*0.2;
                 addGold=doubleGold.intValue()+addGold;
         }
