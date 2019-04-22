@@ -42,4 +42,9 @@ public class VoiceVo {
      * 单词、例句读音地址
      */
     private String readUrl;
+
+    /**
+     * 声音
+     */
+    private String voice;
 }

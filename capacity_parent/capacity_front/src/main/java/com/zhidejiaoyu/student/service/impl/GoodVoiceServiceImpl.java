@@ -101,6 +101,7 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 voiceVo.setSyllable(vocabulary.getSyllable());
                 voiceVo.setWord(vocabulary.getWord());
                 voiceVo.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
+                voiceVo.setVoice(1+"");
                 voiceVos.add(voiceVo);
             }
             Collections.shuffle(voiceVos);
@@ -118,6 +119,7 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 voiceVo.setId(sentence.getId());
                 voiceVo.setWord(sentence.getCentreExample());
                 voiceVo.setReadUrl(baiduSpeak.getLanguagePath(sentence.getCentreExample()));
+                voiceVo.setVoice(1+"");
                 voiceVos.add(voiceVo);
             }
             Collections.shuffle(voiceVos);

@@ -144,6 +144,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             int i = 0;
             for (Teks teks1 : teks) {
                 teks1.setPronunciation(baiduSpeak.getSentencePath(teks1.getSentence()).replace("#", " ").replace("$", ""));
+                teks1.setSentence(teks1.getSentence().replace("#"," ").replace("$",""));
                 i++;
                 resultTeks.add(teks1);
             }

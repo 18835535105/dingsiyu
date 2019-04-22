@@ -115,8 +115,6 @@ public class GoodVoiceUtil {
                         mapList.add(wordMap);
                     }
                     j++;
-
-
                 }
             } else {
                 wordMap = new HashMap<>(16);
