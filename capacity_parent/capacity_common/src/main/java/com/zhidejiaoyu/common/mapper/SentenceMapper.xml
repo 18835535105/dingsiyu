@@ -292,7 +292,7 @@
     </select>
 
     <select id="selectSentenceLaterLearnTimeByStudentId" parameterType="java.lang.Long" resultType="java.util.Map">
-        select DISTINCT unit.joint_name , learn.student_id , MAX(learn.update_time) update_time ,course.course_name
+        select DISTINCT unit.joint_name , learn.student_id , MAX(learn.update_time) learn_time ,course.course_name
         from learn learn
         join sentence_unit unit on unit.id=learn.unit_id
         join sentence_course course on course.id=learn.course_id
