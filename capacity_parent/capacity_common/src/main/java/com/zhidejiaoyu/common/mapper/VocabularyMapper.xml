@@ -1055,22 +1055,53 @@
     </select>
 
     <select id="selectByStartUnitIdAndEndUnitId" resultMap="BaseResultMap" parameterType="map">
-        select
-            v.id, v.word, uv.word_chinese, v.example_english,
-            v.example_chinese,
-            v.explain_,
-            v.create_time,
-            v.update_time,
-            v.course_unit,
-            v.syllable,
-            v.delStatus,
-            v.recordpicurl,
-            v.read_url
-        from unit_vocabulary uv, vocabulary v where v.id = uv.vocabulary_id and uv.unit_id >= #{startUnitId} and
-        uv.unit_id &lt;= #{endUnitId} and uv.word_chinese not like '%……%' and LENGTH(SUBSTRING_INDEX(uv.word_chinese,'.',1)) &lt; 6
+        select t.id,
+               t.word,
+               t.word_chinese,
+               t.example_english,
+               t.example_chinese,
+               t.explain_,
+               t.create_time,
+               t.update_time,
+               t.course_unit,
+               t.syllable,
+               t.delStatus,
+               t.recordpicurl,
+               t.read_url
+        from (select v.id,
+                     v.word,
+                     uv.word_chinese,
+                     if(uv.word_chinese like '%.%' and (LENGTH(SUBSTRING_INDEX(uv.word_chinese, '.', 1)) > 6), 1, 0) i,
+                     v.example_english,
+                     v.example_chinese,
+                     v.explain_,
+                     v.create_time,
+                     v.update_time,
+                     v.course_unit,
+                     v.syllable,
+                     v.delStatus,
+                     v.recordpicurl,
+                     v.read_url
+              from unit_vocabulary uv,
+                   vocabulary v
+              where v.id = uv.vocabulary_id
+                and uv.unit_id >= #{startUnitId}
+                and uv.unit_id &lt;= #{endUnitId}
+                and uv.word_chinese not like '%……%') t
+        where t.i = 0
 
     </select>
     <select id="selectByCourseIdWithoutWordIds" resultMap="BaseResultMap" parameterType="map">
+        select t.id, t.word, t.word_chinese, t.example_english,
+        t.example_chinese,
+        t.explain_,
+        t.create_time,
+        t.update_time,
+        t.course_unit,
+        t.syllable,
+        t.delStatus,
+        t.recordpicurl,
+        t.read_url from (
         SELECT
         v.id, v.word, uv.word_chinese, v.example_english,
         v.example_chinese,
@@ -1081,7 +1112,8 @@
         v.syllable,
         v.delStatus,
         v.recordpicurl,
-        v.read_url
+        v.read_url,
+        if(uv.word_chinese like '%.%' and (LENGTH(SUBSTRING_INDEX(uv.word_chinese, '.', 1)) > 6), 1, 0) i
         FROM vocabulary v, unit_vocabulary uv, unit u
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = #{courseId}
@@ -1093,8 +1125,8 @@
             )
         </if>
         and
-        uv.word_chinese not like '%……%' and LENGTH(SUBSTRING_INDEX(uv.word_chinese,'.',1)) &lt; 6
-        group by v.id
+        uv.word_chinese not like '%……%'
+        group by v.id) t where t.i = 0
     </select>
 
 </mapper>
