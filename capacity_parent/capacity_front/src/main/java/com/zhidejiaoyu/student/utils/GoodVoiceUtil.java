@@ -68,9 +68,6 @@ public class GoodVoiceUtil {
             map.put("totalScore", (int) Math.round(Double.valueOf(readChapter.getString("total_score")) * 20));
             map.put("heart", getHeart((int) map.get("totalScore")));
 
-            log.info("readChapter:[{}]", readChapter);
-
-
             int score;
 //            for (Object object : sentenceArray) {
             String[] s = text.split(" ");
@@ -82,8 +79,6 @@ public class GoodVoiceUtil {
                 int j = 0;
                 for (int i = 0; i < wordArray.size(); i++) {
                     JSONObject wordJsonObject = (JSONObject) wordArray.get(i);
-                    log.error("wordJsonObject:[{}]", wordJsonObject);
-                    log.info("index[{}]", wordJsonObject.getInteger("index"));
                     Integer index = wordJsonObject.getInteger("index");
                     if (index == null) {
                         continue;
@@ -104,8 +99,6 @@ public class GoodVoiceUtil {
                         wordMap.put("color", getColor(score));
                         mapList.add(wordMap);
                     }
-                    log.info("数组长度:[{}]", j);
-                    log.info("句子长度[{}]", s.length);
                     // todo:数组下标越界异常
 
                     if (s[j].endsWith(",") || s[j].endsWith("!") || s[j].endsWith("?") || s[j].endsWith(".")) {
