@@ -735,6 +735,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         List<Map<String, Object>> resultMap = new ArrayList<>();
         for (Map<String, Object> getMap : map) {
             getMap.put("url", prefix + getMap.get("url"));
+            String sentence = getMap.get("sentence").toString();
+            getMap.put("sentence",sentence.replace("$","").replace("#"," "));
             resultMap.add(getMap);
         }
         return ServerResponse.createBySuccess(resultMap);
