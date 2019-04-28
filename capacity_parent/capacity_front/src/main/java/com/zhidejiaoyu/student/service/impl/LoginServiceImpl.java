@@ -715,6 +715,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         // 1.账号/密码错误
         if (stu == null) {
+            logger.warn("学生账号[{}]账号或密码输入错误，登录失败。", account);
             return ServerResponse.createByErrorMessage("账号或密码输入错误");
             // 2.账号已关闭
         }else if(stu.getStatus() != null && stu.getStatus()==2) {
@@ -807,6 +808,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                // initStudentWorkDay(stu);
 
                 // 2.1 跳到完善个人信息页面
+                logger.info("学生[{} -> {} -> {}]登录成功前往完善信息页面。", stu.getId(), stu.getAccount(), stu.getStudentName());
                 return ServerResponse.createBySuccess("2", result);
             }
 
@@ -815,6 +817,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             session.setAttribute("needCapacityReview", true);
 
             // 正常登陆
+            logger.info("学生[{} -> {} -> {}]登录成功。", stu.getId(), stu.getAccount(), stu.getStudentName());
             return ServerResponse.createBySuccess("1", result);
         }
     }
