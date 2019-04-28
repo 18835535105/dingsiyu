@@ -363,10 +363,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             StringBuilder sb = new StringBuilder();
             // 上次登录期间学生的单词学习信息
             Duration duration = durationMapper.selectLastLoginDuration(stu.getId());
-            logger.info("学生上次登录时间：duration:[{}]", duration);
             if (duration != null) {
                 List<Learn> learns = learnMapper.selectLastLoginStudy(stu.getId(), duration.getLoginTime(), duration.getLoginOutTime(), null);
-                logger.info("学生上次登录期间学习信息：learns=[{}]", learns);
                 if (learns.size() > 0) {
                     // 存储单词id及单元
                     List<Map<String, Object>> maps = ReviewServiceImpl.packageLastLoginLearnWordIds(learns);
