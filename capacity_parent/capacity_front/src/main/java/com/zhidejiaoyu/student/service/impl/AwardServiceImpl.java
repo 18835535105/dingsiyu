@@ -1422,8 +1422,7 @@ public class AwardServiceImpl extends BaseServiceImpl<AwardMapper,Award> impleme
                     Integer awardGold = awardContentType.getAwardGold();
                     // 金币奖励
                     awardType = award.getType() == 1 ? "日奖励" : "任务奖励";
-                    msg = "id 为" + student.getId() + " 的学生 " + student.getStudentName() + " 在 "
-                            + DateUtil.DateTime(new Date()) + " 领取了 " + awardType + " 下 " + awardContent + " 的 #" + awardGold + "# 个金币";
+                    msg = "id 为" + student.getId() + " 的学生 " + student.getStudentName() + " 领取了 " + awardType + " 下 " + awardContent + " 的 #" + awardGold + "# 个金币";
                     // 更新学生金币信息
                     student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
                     try {
@@ -1449,8 +1448,7 @@ public class AwardServiceImpl extends BaseServiceImpl<AwardMapper,Award> impleme
                 medal = medalMapper.selectByPrimaryKey(award.getMedalType());
                 awardType = "勋章";
                 awardContent = medal.getMarkedWords();
-                msg = "id 为" + student.getId() + " 的学生 " + student.getStudentName() + " 在 "
-                        + DateUtil.DateTime(new Date()) + " 领取了勋章 \""+medal.getParentName() +"-" + medal.getChildName()+"\" #" + medal.getChildImgUrl() + "# ";
+                msg = "id 为" + student.getId() + " 的学生 " + student.getStudentName() + " 领取了勋章 "+medal.getParentName() +"-" + medal.getChildName()+" #" + medal.getChildImgUrl() + "# ";
                 RunLog runLog = new RunLog(student.getId(), 7, msg, new Date());
                 runLog.setCourseId(student.getCourseId());
                 runLog.setUnitId(student.getUnitId());

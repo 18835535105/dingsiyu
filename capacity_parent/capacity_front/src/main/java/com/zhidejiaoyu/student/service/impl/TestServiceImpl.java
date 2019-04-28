@@ -159,7 +159,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Override
     public ServerResponse<Map<String, Object>> getGameSubject(HttpSession session) {
         // 获取当前学生信息
-        Student student =getStudent(session);
+        Student student = getStudent(session);
         // 查询当前学生游戏测试的次数，如果已经测试两次不再允许游戏测试
         TestRecordExample example = new TestRecordExample();
         example.createCriteria().andStudentIdEqualTo(student.getId()).andGenreEqualTo("学前游戏测试");

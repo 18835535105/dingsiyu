@@ -14,7 +14,6 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.GoodVoiceService;
 import com.zhidejiaoyu.student.utils.GoodVoiceUtil;
-import jxl.read.biff.Record;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -180,6 +179,7 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
     public ServerResponse saveVoice(HttpSession session, Voice voice, String word, MultipartFile audio,Integer type) {
 
         Student student = getStudent(session);
+        log.info("学生[" + student.getId() + " -> " + student.getAccount() + "] 上传" + (Objects.equals(voice.getType(), 1) ? "单词" : "句型") + "[" + voice.getWordId() + " -> " + word + "] 录音");
 
         // 文件大于2M禁止上传，讯飞语音评测接口最大支持2M音频文件
         long maxSize = 2097152L;
@@ -191,7 +191,8 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
         String file=  ftpUtil.uploadGoodVoice(audio, FileConstant.GOOD_VOICE);
         String fileName=FileConstant.GOOD_VOICE +file;
 
-        log.info("上传数据 wordId :" + voice.getWordId() + "  word :" + word + "    type :" + voice.getType() + "   count" + voice.getCount() + "  audio :" + audio);
+
+
         String url = prefix + fileName;
         int score=0;
         Map<String, Object> map;

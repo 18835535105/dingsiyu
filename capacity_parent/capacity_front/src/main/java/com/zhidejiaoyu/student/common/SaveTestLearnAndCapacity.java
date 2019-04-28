@@ -135,9 +135,6 @@ public class SaveTestLearnAndCapacity {
 
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
 
-        log.info("======== 测试模块 保存学习记录和记忆追踪信息 ========");
-        log.info("correctWordId:{}; errorWordId:{}; studentId:{}; unitId:{}; type:{};", correctWordId, errorWordId, student.getId(), unitId, type);
-
         // 保存正确单词/例句的学习记录和记忆追踪信息
         int count = 0;
         if (correctWord != null && correctWordId != null && correctWord.length > 0
@@ -200,7 +197,7 @@ public class SaveTestLearnAndCapacity {
             learn = learns.get(0);
         } else {
             // 无学习记录
-            log.error("学生[{}]-[{}]没有当前模块学习记录：单元id[{}],单词id[{}],模块type[{}]", student.getId(), student.getStudentName(), unitId, id, classify);
+            log.warn("学生[{}]-[{}]没有当前模块学习记录：单元id[{}],单词id[{}],模块type[{}]", student.getId(), student.getStudentName(), unitId, id, classify);
             return 0;
         }
         // 保存记忆追踪信息
