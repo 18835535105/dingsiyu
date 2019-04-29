@@ -200,17 +200,20 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 map = goodVoiceUtil.getWordEvaluationRecord(word, url);
                 score = (int) map.get("score");
                 map.put("flow", true);
+                map.put("voiceUrl", url);
             } else {
                 map = new HashMap<>();
                 map.put("score", 0);
                 map.put("heart", 0);
                 map.put("flow", false);
+                map.put("voiceUrl", "");
             }
         } else {
             if (file != null) {
                 map = goodVoiceUtil.getSentenceEvaluationRecord(word, url);
                 score = (int) map.get("totalScore");
                 map.put("flow", true);
+                map.put("voiceUrl", url);
             } else {
                 map = new HashMap<>();
                 map.put("flow", false);
@@ -237,9 +240,10 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
                     }
                 }
                 map.put("word", resList);
+                map.put("voiceUrl", "");
             }
         }
-        map.put("voiceUrl", url);
+
 
         Long courseId = unitMapper.selectCourseIdByUnitId(voice.getUnitId());
         if (file != null) {

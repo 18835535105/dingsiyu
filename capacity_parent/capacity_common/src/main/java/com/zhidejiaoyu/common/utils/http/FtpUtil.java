@@ -18,7 +18,7 @@ import java.util.UUID;
 
 /**
  * FTP工具类
- * 
+ *
  * @author dq
  */
 @Slf4j
@@ -42,7 +42,7 @@ public class FtpUtil {
 
 	/**
 	 * 连接服务器
-	 * 
+	 *
 	 * @return 连接成功与否 true:成功， false:失败
 	 */
 	public boolean open() {
@@ -77,7 +77,7 @@ public class FtpUtil {
 
 	/**
 	 * 层层切换工作目录
-	 * 
+	 *
 	 * @param ftpPath
 	 *            目的目录
 	 * @return 切换结果
@@ -117,7 +117,7 @@ public class FtpUtil {
 
 	/**
 	 * 循环创建目录，并且创建完目录后，设置工作目录为当前创建的目录下
-	 * 
+	 *
 	 * @param ftpPath
 	 *            需要创建的目录
 	 * @return
@@ -160,12 +160,12 @@ public class FtpUtil {
 
 	/**
 	 * 上传文件到FTP服务器
-	 * 
+	 *
 	 * @param file
 	 *            上传到服务器的文件
 	 * @param ftpDirectory
 	 *            FTP目录如:/path1/pathb2/,如果目录不存在会自动创建目录
-	 * @param fileName 
+	 * @param fileName
 	 * 			      指定上传图片名, 该字段如果为null默认uuid生成的图片名
 	 * @return 上传到服务器上的文件名
 	 */
