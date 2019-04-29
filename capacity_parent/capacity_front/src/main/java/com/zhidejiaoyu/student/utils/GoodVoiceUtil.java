@@ -34,12 +34,31 @@ public class GoodVoiceUtil {
         String result = speechEvaluation.getEvaluationResult(text, fileUrl);
         if (result != null) {
             Map<String, Object> map = new HashMap<>(16);
-            int score = (int) Math.round(Double.valueOf(getReadChapterJsonObject(result).getString("total_score")) * 20);
+            boolean flag = this.getIsRejected(result);
+            int score;
+            if (flag) {
+                score = 0;
+            } else {
+                score = (int) Math.round(Double.valueOf(getReadChapterJsonObject(result).getString("total_score")) * 20);
+            }
             map.put("score", score);
             map.put("heart", getHeart(score));
             return map;
         }
         return new HashMap<>(16);
+
+    }
+
+    /**
+     * 判断用户是否是乱读
+     *
+     * @param result    true：用户属于乱读；false：用户不是乱读
+     * @return
+     */
+    private boolean getIsRejected(String result) {
+        String string = JSONObject.parseObject(result).getJSONObject("data").getJSONObject("read_sentence").
+                getJSONObject("rec_paper").getJSONObject("read_chapter").getString("is_rejected");
+        return Objects.equals("true", string);
     }
 
     /**
