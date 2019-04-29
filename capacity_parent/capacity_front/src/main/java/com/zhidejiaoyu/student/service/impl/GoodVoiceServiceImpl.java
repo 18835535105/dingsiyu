@@ -100,7 +100,7 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 voiceVo.setSyllable(vocabulary.getSyllable());
                 voiceVo.setWord(vocabulary.getWord());
                 voiceVo.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
-                voiceVo.setVoice(1+"");
+                voiceVo.setVoice(1 + "");
                 voiceVos.add(voiceVo);
             }
             Collections.shuffle(voiceVos);
@@ -118,7 +118,7 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 voiceVo.setId(sentence.getId());
                 voiceVo.setWord(sentence.getCentreExample());
                 voiceVo.setReadUrl(baiduSpeak.getLanguagePath(sentence.getCentreExample()));
-                voiceVo.setVoice(1+"");
+                voiceVo.setVoice(1 + "");
                 voiceVos.add(voiceVo);
             }
             Collections.shuffle(voiceVos);
@@ -152,7 +152,7 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
         Long teacherId = student.getTeacherId();
         List<Voice> schoolVoiceRank = null;
         if (teacherId == null) {
-           schoolVoiceRank = voiceMapper.selectTeacherIdIsNull(unitId, wordId, type);
+            schoolVoiceRank = voiceMapper.selectTeacherIdIsNull(unitId, wordId, type);
         } else {
             // 判断教师角色，如果是教师，查找其校管，再查找其所管辖的所有教师；如果是校管查找其所管辖的所有教师
             List<Teacher> teachers;
@@ -176,7 +176,7 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
     }
 
     @Override
-    public ServerResponse saveVoice(HttpSession session, Voice voice, String word, MultipartFile audio,Integer type) {
+    public ServerResponse saveVoice(HttpSession session, Voice voice, String word, MultipartFile audio, Integer type) {
 
         Student student = getStudent(session);
         log.info("学生[" + student.getId() + " -> " + student.getAccount() + "] 上传" + (Objects.equals(voice.getType(), 1) ? "单词" : "句型") + "[" + voice.getWordId() + " -> " + word + "] 录音");
@@ -188,64 +188,61 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
         }
 
         // 上传录音文件
-        String file=  ftpUtil.uploadGoodVoice(audio, FileConstant.GOOD_VOICE);
-        String fileName=FileConstant.GOOD_VOICE +file;
-
+        String file = ftpUtil.uploadGoodVoice(audio, FileConstant.GOOD_VOICE);
+        String fileName = FileConstant.GOOD_VOICE + file;
 
 
         String url = prefix + fileName;
-        int score=0;
+        int score = 0;
         Map<String, Object> map;
         if (voice.getType() == 1) {
-            if(file!=null){
+            if (file != null) {
                 map = goodVoiceUtil.getWordEvaluationRecord(word, url);
                 score = (int) map.get("score");
-                map.put("flow",true);
-            }else{
-                map=new HashMap<>();
-                map.put("score",0);
-                map.put("heart",0);
-                map.put("flow",false);
+                map.put("flow", true);
+            } else {
+                map = new HashMap<>();
+                map.put("score", 0);
+                map.put("heart", 0);
+                map.put("flow", false);
             }
         } else {
-            if(file!=null){
-                System.out.println("fileName  :"+fileName);
-                System.out.println("url  :"+url);
+            if (file != null) {
                 map = goodVoiceUtil.getSentenceEvaluationRecord(word, url);
                 score = (int) map.get("totalScore");
-                map.put("flow",true);
-            }else{
-                map=new HashMap<>();
-                map.put("flow",false);
+                map.put("flow", true);
+            } else {
+                map = new HashMap<>();
+                map.put("flow", false);
                 String[] s = word.split(" ");
-                List<Map<String,Object>> resList=new ArrayList<>();
-                for(String wo : s ){
-                    Map<String,Object> resMap=new HashMap<>();
-                    Map<String,Object> ressMap = null;
-                    if (wo.endsWith(",") || wo.endsWith("!") ||wo.endsWith("?") || wo.endsWith(".")) {
+                List<Map<String, Object>> resList = new ArrayList<>();
+                for (String wo : s) {
+                    Map<String, Object> resMap = new HashMap<>();
+                    Map<String, Object> ressMap = null;
+                    if (wo.endsWith(",") || wo.endsWith("!") || wo.endsWith("?") || wo.endsWith(".")) {
                         resMap.put("word", wo.substring(0, wo.length() - 1));
-                        ressMap=new HashMap<>();
+                        ressMap = new HashMap<>();
                         ressMap.put("word", wo.substring(wo.length() - 1));
-                        resMap.put("score",0);
-                        resMap.put("color","red");
+                        resMap.put("score", 0);
+                        resMap.put("color", "red");
                         resList.add(resMap);
                     } else {
                         resMap.put("word", wo);
                     }
-                    resMap.put("score",0);
-                    resMap.put("color","red");
+                    resMap.put("score", 0);
+                    resMap.put("color", "red");
                     resList.add(resMap);
-                    if(ressMap!=null){
+                    if (ressMap != null) {
                         resList.add(ressMap);
                     }
                 }
-                map.put("word",resList);
+                map.put("word", resList);
             }
         }
         map.put("voiceUrl", url);
 
         Long courseId = unitMapper.selectCourseIdByUnitId(voice.getUnitId());
-        if(file != null){
+        if (file != null) {
             voice.setCourseId(courseId);
             voice.setCreateTime(new Date());
             voice.setScore(score * 1.0);
@@ -254,8 +251,8 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
             voice.setVoiceUrl(fileName);
             voiceMapper.insert(voice);
         }
-        if(type==2){
-            Learn learn =new Learn ();
+        if (type == 2) {
+            Learn learn = new Learn();
             learn.setLearnTime(new Date());
             learn.setUpdateTime(new Date());
             learn.setCourseId(voice.getCourseId());
@@ -264,10 +261,10 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
             learn.setStudyModel("课文好声音");
             learn.setType(1);
             Long aLong = learnMapper.selTeksLearn(learn);
-            if(aLong!=null){
+            if (aLong != null) {
                 learn.setId(aLong);
                 learnMapper.updTeksLearn(learn);
-            }else{
+            } else {
                 learnMapper.insert(learn);
             }
         }

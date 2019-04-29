@@ -69,7 +69,6 @@ public class GoodVoiceUtil {
             map.put("heart", getHeart((int) map.get("totalScore")));
 
             int score;
-//            for (Object object : sentenceArray) {
             String[] s = text.split(" ");
 
             if (s.length > 1) {
