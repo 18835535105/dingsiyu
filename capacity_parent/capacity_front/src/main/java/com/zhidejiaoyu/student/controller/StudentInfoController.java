@@ -268,10 +268,9 @@ public class StudentInfoController extends BaseController {
         } catch (Exception e) {
             log.error("有效时长入参类型错误：学习模块[{}]，validTime[{}]，error=[{}]", classify, validTime, e.getMessage());
         }
-        // todo：调试用
         if (num != null) {
             Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-            log.error("debug : studentId={}, studentName={}, num={}", student.getId(), student.getStudentName(), num);
+            log.info("studentId={}, studentName={}, num={}", student.getId(), student.getStudentName(), num);
         }
         return studentInfoService.calculateValidTime(session, classify, courseId, unitId, valid);
     }
