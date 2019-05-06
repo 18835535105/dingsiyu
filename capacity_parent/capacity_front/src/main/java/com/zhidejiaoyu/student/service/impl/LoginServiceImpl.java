@@ -76,9 +76,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private CapacityReviewMapper capacityMapper;
 
     @Autowired
-    private UnitMapper unitMapper;
-
-    @Autowired
     private StudentWorkDayMapper studentWorkDayMapper;
 
     @Autowired
@@ -116,6 +113,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Autowired
     private SentenceUnitMapper sentenceUnitMapper;
+
+    @Autowired
+    private PayLogMapper payLogMapper;
 
     @Override
     public Student LoginJudge(String account, String password) {
@@ -768,22 +768,17 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             saveDailyAward(stu);
 
             // 判断学生是否有同步版课程，没有同步版课程不能进入智能版学习
-            boolean hasCapacityCourse = this.hasCapacityCourse(stu);
-            if (hasCapacityCourse) {
-                result.put("capacity", true);
-            }
+            this.hasCapacityCourse(stu, result);
 
             // 判断学生是否有同步版课程，没有同步版句子课程不能进入智能版学习
-            boolean hasCapacityCourseSentence=this.hasCapacitySentence(stu);
-            if(hasCapacityCourseSentence){
-                result.put("capacitySentence", true);
-            }
+            this.hasCapacitySentence(stu, result);
 
             // 判断学生是否有同步版课程，没有同步版课文课程不能进入智能版学习
-            boolean hasCapacityTeks=this.hasCapacityTeks(stu);
-            if(hasCapacityTeks){
-                result.put("capacityTeks", true);
-            }
+            this.hasCapacityTeks(stu, result);
+
+            // 判断学生是否有充值记录，如果没有充值记录不显示“绝招好课”星球
+            this.hasPayLog(stu, result);
+
             //判断学生是否有同步版阅读课程，没有同步版课文课程不能进入智能版学习
             result.put("capacityRead",false);
             //判断学生是否有同步版阅读课程，没有同步版课文课程不能进入智能版学习
@@ -791,8 +786,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
             // 一个账户只能登陆一台
             judgeMultipleLogin(session, stu);
-
-
 
             // 每次登陆默认打开背景音
             openBackAudio(stu);
@@ -822,6 +815,13 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
     }
 
+    private void hasPayLog(Student stu, Map<String, Object> result) {
+        int count = payLogMapper.countByStudent(stu.getId());
+        if (count > 0) {
+            result.put("hasPayLog", true);
+        }
+    }
+
     /**
      * 每次登陆默认打开背景音乐
      *
@@ -844,33 +844,42 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      * 判断学生是否可以学习同步班课程
      *
      * @param student
+     * @param result
      * @return
      */
-    private boolean hasCapacityCourse(Student student) {
+    private void hasCapacityCourse(Student student, Map<String, Object> result) {
         int count = capacityStudentUnitMapper.countByType(student, 1);
-        return count > 0;
+        if (count > 0) {
+            result.put("capacity", true);
+        }
     }
 
     /**
      * 判断学生是否可以学习同步班句型课程
      *
      * @param student
+     * @param result
      * @return
      */
-    private boolean hasCapacitySentence(Student student) {
+    private void hasCapacitySentence(Student student, Map<String, Object> result) {
         int count = capacityStudentUnitMapper.countByType(student, 2);
-        return count > 0;
+        if (count > 0) {
+            result.put("capacitySentence", true);
+        }
     }
 
     /**
      * 判断学生是否可以学习同步班课文课程
      *
      * @param student
+     * @param result
      * @return
      */
-    private boolean hasCapacityTeks(Student student) {
+    private void hasCapacityTeks(Student student, Map<String, Object> result) {
         int count = capacityStudentUnitMapper.countByType(student, 3);
-        return count > 0;
+        if (count > 0) {
+            result.put("capacityTeks", true);
+        }
     }
 
     private void judgeMultipleLogin(HttpSession session, Student stu) {

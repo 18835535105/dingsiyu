@@ -59,7 +59,7 @@ public class FtpUtil {
 			int reply = ftpClient.getReplyCode();
 			if (!FTPReply.isPositiveCompletion(reply)) {
 				this.close();
-				System.err.println("FTP server refused connection.");
+				log.error("FTP server refused connection.");
 				System.exit(1);
 			}
             // 设置上传模式.binally or ascii
@@ -69,9 +69,10 @@ public class FtpUtil {
             ftpClient.enterLocalPassiveMode();
 			return true;
 		} catch (Exception ex) {
-			this.close();
 			ex.printStackTrace();
 			return false;
+		} finally {
+			this.close();
 		}
 	}
 
@@ -407,11 +408,11 @@ public class FtpUtil {
                 // 上传
                 flag = ftpClient.storeFile(new String(ftpFileName.getBytes(), "iso-8859-1"), fis);
             } catch (Exception e) {
-                this.close();
                 e.printStackTrace();
                 return null;
             } finally {
                 try {
+					this.close();
                     if (fis != null) {
                         fis.close();
                     }
