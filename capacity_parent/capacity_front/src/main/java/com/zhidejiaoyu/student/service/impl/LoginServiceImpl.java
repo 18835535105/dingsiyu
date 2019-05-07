@@ -571,11 +571,10 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     private void getIndexTime(HttpSession session, Student student, Map<String, Object> result) {
-        String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
         // 有效时长
-        Integer valid = getValidTime(student.getId(), formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
+        Integer valid = getTodayValidTime(student.getId());
         // 在线时长
-        Integer online = getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
+        Integer online = getTodayOnlineTime(session);
         // 今日学习效率
         if (valid != null && online != null) {
             if (valid >= online) {
@@ -746,9 +745,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             if (l <= 1) {
                 result.put("accountDate", "账号即将过期，请及时续期");
             }
-            // 学生权限
-            Integer role = stu.getRole();
-            result.put("role", role == null ? 2 : role);
 
             // 学生id
             result.put("student_id", stu.getId());

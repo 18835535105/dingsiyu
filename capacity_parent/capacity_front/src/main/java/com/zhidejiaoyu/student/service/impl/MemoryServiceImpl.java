@@ -412,11 +412,10 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         // 封装返回数据
         Map<String, Object> result = new HashMap<>(16);
 
-        String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
         // 有效时长  !
-        Integer valid = getValidTime(id, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
+        Integer valid = getTodayValidTime(id);
         // 在线时长 !
-        Integer online = getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
+        Integer online = getTodayOnlineTime(session);
         result.put("online", online);
         result.put("valid", valid);
         // 今日学习效率 !
