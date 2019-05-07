@@ -223,17 +223,18 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
                     Map<String, Object> resMap = new HashMap<>();
                     Map<String, Object> ressMap = null;
                     if (wo.endsWith(",") || wo.endsWith("!") || wo.endsWith("?") || wo.endsWith(".")) {
-                        resMap.put("word", wo.substring(0, wo.length() - 1));
+                        resMap.put("word", wo.substring(0,wo.length() - 1));
                         ressMap = new HashMap<>();
                         ressMap.put("word", wo.substring(wo.length() - 1));
+                        ressMap.put("score", 0);
+                        ressMap.put("color", "red");
                         resMap.put("score", 0);
                         resMap.put("color", "red");
-                        resList.add(resMap);
                     } else {
                         resMap.put("word", wo);
+                        resMap.put("score", 0);
+                        resMap.put("color", "red");
                     }
-                    resMap.put("score", 0);
-                    resMap.put("color", "red");
                     resList.add(resMap);
                     if (ressMap != null) {
                         resList.add(ressMap);
