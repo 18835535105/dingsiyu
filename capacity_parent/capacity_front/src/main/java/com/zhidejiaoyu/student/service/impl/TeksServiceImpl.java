@@ -277,6 +277,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         // 学生所有课程id及课程名
         /* List<Map<String, Object>> courses = courseMapper.selectTextCourseIdAndCourseNameByStudentId(studentId);*/
         List<Map<String, Object>> courses = studentStudyPlanMapper.selByStudentId(studentId, 3);
+        if (courses == null || courses.size() == 0) {
+            return ServerResponse.createByError(400,"当前学生没有课程，请让老师添加");
+        }
         // 学生课程下所有例句的单元id及单元名
         if (courses.size() > 0) {
             List<Long> courseIds = new ArrayList<>(courses.size());
