@@ -114,9 +114,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Autowired
     private SentenceUnitMapper sentenceUnitMapper;
 
-    @Autowired
-    private PayLogMapper payLogMapper;
-
     @Override
     public Student LoginJudge(String account, String password) {
         Student st = new Student();
@@ -772,9 +769,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 判断学生是否有同步版课程，没有同步版课文课程不能进入智能版学习
             this.hasCapacityTeks(stu, result);
 
-            // 判断学生是否有充值记录，如果没有充值记录不显示“绝招好课”星球
-            this.hasPayLog(stu, result);
-
             //判断学生是否有同步版阅读课程，没有同步版课文课程不能进入智能版学习
             result.put("capacityRead",false);
             //判断学生是否有同步版阅读课程，没有同步版课文课程不能进入智能版学习
@@ -808,13 +802,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 正常登陆
             logger.info("学生[{} -> {} -> {}]登录成功。", stu.getId(), stu.getAccount(), stu.getStudentName());
             return ServerResponse.createBySuccess("1", result);
-        }
-    }
-
-    private void hasPayLog(Student stu, Map<String, Object> result) {
-        int count = payLogMapper.countByStudent(stu.getId());
-        if (count > 0) {
-            result.put("hasPayLog", true);
         }
     }
 
