@@ -660,6 +660,10 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         Map<String, Object> map = new HashMap<>();
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selGetSentenceByStudentIdAndType(student.getId());
         SentenceUnit unit = sentenceUnitMapper.selectByPrimaryKey(unitId);
+        List<StudentStudyPlan> listSize = studentStudyPlanMapper.selByStudentIdAndCourseIdAndUnitId(student.getId(), courseId, 2, unitId);
+        if(listSize==null||listSize.size()==0){
+            return ServerResponse.createBySuccess();
+        }
         if (capacityStudentUnit == null) {
             capacityStudentUnit = new CapacityStudentUnit();
             capacityStudentUnit.setType(2);
