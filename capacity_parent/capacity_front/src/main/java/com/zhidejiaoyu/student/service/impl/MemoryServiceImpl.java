@@ -331,38 +331,6 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
     }
 
     @Override
-    public ServerResponse<WordIntensifyVo> getWordIntensify(HttpSession session, Integer plan, Long unitId,
-                                                            Integer wordCount) {
-        Student student = getStudent(session);
-        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-        List<Long> wordIds = learnMapper.selectByCount(student.getId(), unitId, wordCount);
-        if (plan <= wordIds.size() && plan > 0) {
-            Long wordId = wordIds.get(plan - 1);
-            Vocabulary vocabulary = vocabularyMapper.selectByPrimaryKey(wordId);
-            CapacityMemory capacityMemory = capacityMemoryMapper.selectByStuIdAndUnitIdAndWordId(student.getId(),
-                    unitId, wordId);
-            String wordChinese = unitVocabularyMapper.selectWordChineseByUnitIdAndWordId(unitId, vocabulary.getId());
-
-            WordIntensifyVo wordIntensifyVo = new WordIntensifyVo();
-            if (capacityMemory == null) {
-                wordIntensifyVo.setMemoryStrength(0.0);
-            } else {
-                wordIntensifyVo.setMemoryStrength(capacityMemory.getMemoryStrength());
-            }
-
-            String soundMark = commonMethod.getSoundMark(vocabulary.getWord());
-
-            wordIntensifyVo.setWordId(wordId);
-            wordIntensifyVo.setSoundMark(soundMark);
-            wordIntensifyVo.setWord(StringUtils.isEmpty(vocabulary.getSyllable()) ? vocabulary.getWord() : vocabulary.getSyllable());
-            wordIntensifyVo.setWordChinese(wordChinese);
-            wordIntensifyVo.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
-            return ServerResponse.createBySuccess(wordIntensifyVo);
-        }
-        return null;
-    }
-
-    @Override
     public ServerResponse<String> clearFirst(HttpSession session, String studyModel) {
         Student student = getStudent(session);
         commonMethod.clearFirst(student.getId(), studyModel);

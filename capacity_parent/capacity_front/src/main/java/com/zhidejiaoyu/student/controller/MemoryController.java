@@ -66,22 +66,6 @@ public class MemoryController {
     }
 
     /**
-     * 获取词义强化相关单词
-     *
-     * @param session
-     * @param plan      当前学习进度
-     * @param unitId
-     * @param wordCount 需要强化的单词个数，默认是10个，如果不足10个达到单元最大单词量，则数量为最新学习的不足10个的单词
-     * @return
-     */
-    @GetMapping("/getWordIntensify")
-    public ServerResponse<WordIntensifyVo> getWordIntensify(HttpSession session,
-                                                            @RequestParam(defaultValue = "1") Integer plan, Long unitId,
-                                                            @RequestParam(defaultValue = "10") Integer wordCount) {
-        return memoryService.getWordIntensify(session, plan, unitId, wordCount);
-    }
-
-    /**
      * 获取今日学习效率, 在线时长, 有效时长
      */
     @GetMapping("/todayTime")
