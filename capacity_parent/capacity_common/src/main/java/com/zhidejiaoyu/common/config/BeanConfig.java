@@ -76,9 +76,9 @@ public class BeanConfig {
 	public ExecutorService singleThreadPool() {
 		ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
 				.setNameFormat("zdjy-pool-%d").build();
-		return new ThreadPoolExecutor(10, 20,
+		return new ThreadPoolExecutor(3, 10,
 				0L, TimeUnit.MILLISECONDS,
-				new LinkedBlockingQueue<>(1024), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
+				new LinkedBlockingQueue<>(50), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
 	}
 
 	@Bean
