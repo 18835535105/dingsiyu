@@ -180,6 +180,7 @@ public class ReviewController {
      */
     @ResponseBody
     @PostMapping("/saveCapacityReview")
+    @ControllerLogAnnotation(name = "保存智能复习")
     public ServerResponse<String> saveCapacityReview(HttpSession session, Long[] unitId, Integer classify, String word,
                                                      Long courseId, Long id, boolean isKnown) {
         if (unitId == null || unitId.length == 0 || courseId == null || classify == null || id == null) {
