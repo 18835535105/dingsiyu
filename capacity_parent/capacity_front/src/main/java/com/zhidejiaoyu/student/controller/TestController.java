@@ -256,6 +256,7 @@ public class TestController {
      * @param wordUnitTestDTO
      * @return
      */
+    @ControllerLogAnnotation(name = "保存音译练习记录")
     @PostMapping("/saveCapTeksTest")
     public ServerResponse<Object> saveCapTeksTest(HttpSession session,WordUnitTestDTO wordUnitTestDTO){
         if (wordUnitTestDTO.getUnitId() == null) {

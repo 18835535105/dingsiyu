@@ -33,6 +33,7 @@ public class TeksController  {
      */
     @ResponseBody
     @RequestMapping("/getTextCourseAndUnit")
+    @ControllerLogAnnotation(name = "获取课文的课程及单元信息")
     public ServerResponse<Map<String,Object>> getCourseAndUnit(HttpSession session) {
         return teksService.getCourseAndUnit(session);
     }
@@ -76,7 +77,13 @@ public class TeksController  {
         return  teksService.selTeksByUnitId(unitId);
     }
 
-    //选择课文单词
+    /**
+     * 选择课文单词
+     *
+     * @param unitId
+     * @param session
+     * @return
+     */
     @RequestMapping("/selChooseTeks")
     @ResponseBody
     public Object selChooseTeks(Integer unitId,HttpSession session){
