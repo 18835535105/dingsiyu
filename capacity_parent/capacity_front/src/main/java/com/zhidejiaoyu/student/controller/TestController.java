@@ -236,11 +236,13 @@ public class TestController {
 
     /**
      * 保存句子测试
+     *
      * @param session
      * @param wordUnitTestDTO
      * @return
      */
     @PostMapping("/saveCapSentenceTest")
+    @ControllerLogAnnotation(name = "保存音译练习记录")
     public ServerResponse saveCapSentenceTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
         if (wordUnitTestDTO.getUnitId() == null) {
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
