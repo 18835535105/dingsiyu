@@ -58,7 +58,7 @@ public class StudentInfoController extends BaseController {
     @GetMapping("/getStudentInfo")
     public ServerResponse<Student> getStudentInfo(HttpSession session, @RequestParam(value = "studentId", required = false) Long studentId) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        if (StringUtils.isNotEmpty(student.getPetName()) && studentId == null) {
+        if (StringUtils.isNotEmpty(student.getHeadUrl()) && studentId == null) {
             session.invalidate();
             // 学生已经完善过信息，不可重复完善信息
             return ServerResponse.createByErrorMessage("您已经完善过个人信息，不可再次执行该操作！");
@@ -268,10 +268,9 @@ public class StudentInfoController extends BaseController {
         } catch (Exception e) {
             log.error("有效时长入参类型错误：学习模块[{}]，validTime[{}]，error=[{}]", classify, validTime, e.getMessage());
         }
-        // todo：调试用
         if (num != null) {
             Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-            log.error("debug : studentId={}, studentName={}, num={}", student.getId(), student.getStudentName(), num);
+            log.info("studentId={}, studentName={}, num={}", student.getId(), student.getStudentName(), num);
         }
         return studentInfoService.calculateValidTime(session, classify, courseId, unitId, valid);
     }

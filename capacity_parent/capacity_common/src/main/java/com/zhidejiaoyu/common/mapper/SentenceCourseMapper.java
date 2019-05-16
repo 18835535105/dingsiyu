@@ -2,8 +2,6 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.SentenceCourse;
-import com.zhidejiaoyu.common.pojo.Student;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -24,9 +22,4 @@ public interface SentenceCourseMapper extends BaseMapper<SentenceCourse> {
     Map<String,Object> selectCourseByUnitId(Long unitId);
 
     List<Map<String,Object>> getAllVersion(Long studnetId);
-
-    List<Map<String, Object>> getAllUnitInfos(@Param("courseId") Long courseId, @Param("type") Integer type);
-
-    List<Map<String, Object>> getAllCourse(@Param("student") Student student, @Param("type") Integer type);
-
 }

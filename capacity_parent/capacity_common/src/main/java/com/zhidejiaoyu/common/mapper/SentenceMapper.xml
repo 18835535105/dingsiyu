@@ -292,13 +292,13 @@
     </select>
 
     <select id="selectSentenceLaterLearnTimeByStudentId" parameterType="java.lang.Long" resultType="java.util.Map">
-        select DISTINCT unit.joint_name , learn.student_id , learn.learn_time ,course.course_name
+        select DISTINCT unit.joint_name , learn.student_id , MAX(learn.update_time) learn_time ,course.course_name
         from learn learn
         join sentence_unit unit on unit.id=learn.unit_id
         join sentence_course course on course.id=learn.course_id
         where student_id = #{studentId} and example_id is not null
         group by unit.course_id
-        order by learn.id desc;
+        order by learn.update_time desc;
     </select>
     <select id="countByCourseId" parameterType="java.util.Map" resultType="java.lang.Integer">
         select count(s.id) from sentence s, unit_sentence us, sentence_unit u

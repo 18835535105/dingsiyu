@@ -78,9 +78,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private CapacityReviewMapper capacityMapper;
 
     @Autowired
-    private UnitMapper unitMapper;
-
-    @Autowired
     private StudentWorkDayMapper studentWorkDayMapper;
 
     @Autowired
@@ -235,11 +232,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             unitId = Integer.valueOf(capacityStudentUnit.getUnitId().toString());
         }
 
-        // 查询是否需要阶段测试-隐藏单词学习模块
-        TestRecordExample testRecordExample = new TestRecordExample();
-        testRecordExample.createCriteria().andStudentIdEqualTo(student_id).andGenreEqualTo("阶段测试")
-                .andCourseIdEqualTo(stu.getCourseId());
-
         // 单词图鉴模块, 单元下共有多少带图片的单词
         Long countWord = null;
 
@@ -311,8 +303,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         // 封装返回的数据 - 智能记忆智能复习数量
         // 当前时间
-        SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String datetime = s.format(new Date());
+
+        String datetime = DateUtil.formatYYYYMMDDHHMMSS(new Date());
 
         CapacityReview cr = new CapacityReview();
         cr.setUnit_id(Long.valueOf(unitId));
@@ -371,10 +363,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             StringBuilder sb = new StringBuilder();
             // 上次登录期间学生的单词学习信息
             Duration duration = durationMapper.selectLastLoginDuration(stu.getId());
-            logger.info("学生上次登录时间：duration:[{}]", duration);
             if (duration != null) {
                 List<Learn> learns = learnMapper.selectLastLoginStudy(stu.getId(), duration.getLoginTime(), duration.getLoginOutTime(), null);
-                logger.info("学生上次登录期间学习信息：learns=[{}]", learns);
                 if (learns.size() > 0) {
                     // 存储单词id及单元
                     List<Map<String, Object>> maps = ReviewServiceImpl.packageLastLoginLearnWordIds(learns);
@@ -581,11 +571,10 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     private void getIndexTime(HttpSession session, Student student, Map<String, Object> result) {
-        String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
         // 有效时长
-        Integer valid = getValidTime(student.getId(), formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
+        Integer valid = getTodayValidTime(student.getId());
         // 在线时长
-        Integer online = getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
+        Integer online = getTodayOnlineTime(session);
         // 今日学习效率
         if (valid != null && online != null) {
             if (valid >= online) {
@@ -725,6 +714,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         // 1.账号/密码错误
         if (stu == null) {
+            logger.warn("学生账号[{}]账号或密码输入错误，登录失败。", account);
             return ServerResponse.createByErrorMessage("账号或密码输入错误");
             // 2.账号已关闭
         }else if(stu.getStatus() != null && stu.getStatus()==2) {
@@ -755,9 +745,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             if (l <= 1) {
                 result.put("accountDate", "账号即将过期，请及时续期");
             }
-            // 学生权限
-            Integer role = stu.getRole();
-            result.put("role", role == null ? 2 : role);
 
             // 学生id
             result.put("student_id", stu.getId());
@@ -777,22 +764,14 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             saveDailyAward(stu);
 
             // 判断学生是否有同步版课程，没有同步版课程不能进入智能版学习
-            boolean hasCapacityCourse = this.hasCapacityCourse(stu);
-            if (hasCapacityCourse) {
-                result.put("capacity", true);
-            }
+            this.hasCapacityCourse(stu, result);
 
             // 判断学生是否有同步版课程，没有同步版句子课程不能进入智能版学习
-            boolean hasCapacityCourseSentence=this.hasCapacitySentence(stu);
-            if(hasCapacityCourseSentence){
-                result.put("capacitySentence", true);
-            }
+            this.hasCapacitySentence(stu, result);
 
             // 判断学生是否有同步版课程，没有同步版课文课程不能进入智能版学习
-            boolean hasCapacityTeks=this.hasCapacityTeks(stu);
-            if(hasCapacityTeks){
-                result.put("capacityTeks", true);
-            }
+            this.hasCapacityTeks(stu, result);
+
             //判断学生是否有同步版阅读课程，没有同步版课文课程不能进入智能版学习
             result.put("capacityRead",false);
             //判断学生是否有同步版阅读课程，没有同步版课文课程不能进入智能版学习
@@ -800,8 +779,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
             // 一个账户只能登陆一台
             judgeMultipleLogin(session, stu);
-
-
 
             // 每次登陆默认打开背景音
             openBackAudio(stu);
@@ -817,6 +794,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                // initStudentWorkDay(stu);
 
                 // 2.1 跳到完善个人信息页面
+                logger.info("学生[{} -> {} -> {}]登录成功前往完善信息页面。", stu.getId(), stu.getAccount(), stu.getStudentName());
                 return ServerResponse.createBySuccess("2", result);
             }
 
@@ -828,6 +806,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             medalAwardAsync.oldMan(stu);
 
             // 正常登陆
+            logger.info("学生[{} -> {} -> {}]登录成功。", stu.getId(), stu.getAccount(), stu.getStudentName());
             return ServerResponse.createBySuccess("1", result);
         }
     }
@@ -854,33 +833,42 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      * 判断学生是否可以学习同步班课程
      *
      * @param student
+     * @param result
      * @return
      */
-    private boolean hasCapacityCourse(Student student) {
+    private void hasCapacityCourse(Student student, Map<String, Object> result) {
         int count = capacityStudentUnitMapper.countByType(student, 1);
-        return count > 0;
+        if (count > 0) {
+            result.put("capacity", true);
+        }
     }
 
     /**
      * 判断学生是否可以学习同步班句型课程
      *
      * @param student
+     * @param result
      * @return
      */
-    private boolean hasCapacitySentence(Student student) {
+    private void hasCapacitySentence(Student student, Map<String, Object> result) {
         int count = capacityStudentUnitMapper.countByType(student, 2);
-        return count > 0;
+        if (count > 0) {
+            result.put("capacitySentence", true);
+        }
     }
 
     /**
      * 判断学生是否可以学习同步班课文课程
      *
      * @param student
+     * @param result
      * @return
      */
-    private boolean hasCapacityTeks(Student student) {
+    private void hasCapacityTeks(Student student, Map<String, Object> result) {
         int count = capacityStudentUnitMapper.countByType(student, 3);
-        return count > 0;
+        if (count > 0) {
+            result.put("capacityTeks", true);
+        }
     }
 
     private void judgeMultipleLogin(HttpSession session, Student stu) {

@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.utils.ValidateUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
+import com.zhidejiaoyu.student.aop.log.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.TestService;
 import com.zhidejiaoyu.student.vo.TestResultVo;
@@ -158,6 +159,7 @@ public class TestController {
      * @return
      */
     @PostMapping("/saveWordUnitTest")
+    @ControllerLogAnnotation(name = "保存单元闯关测试记录")
     public ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, @Valid WordUnitTestDTO wordUnitTestDTO,
                                                          BindingResult bindingResult, String testDetail) {
         String msg = ValidateUtil.validate(bindingResult);
@@ -186,14 +188,15 @@ public class TestController {
      * 获取学生测试详情信息
      *
      * @param testId 测试记录id
+     * @param type 1:单词；2：句型；3：课文
      * @return
      */
     @GetMapping("/getTestDetail")
-    public ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId) {
+    public ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId, @RequestParam(required = false, defaultValue = "1") Integer type) {
         if (testId == null) {
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
         }
-        return testService.getTestDetail(session, testId);
+        return testService.getTestDetail(session, testId, type);
     }
 
     /**
@@ -209,11 +212,13 @@ public class TestController {
 
     /**
      * 保存句子测试
+     *
      * @param session
      * @param wordUnitTestDTO
      * @return
      */
     @PostMapping("/saveCapSentenceTest")
+    @ControllerLogAnnotation(name = "保存音译练习记录")
     public ServerResponse saveCapSentenceTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
         if (wordUnitTestDTO.getUnitId() == null) {
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
@@ -227,6 +232,7 @@ public class TestController {
      * @param wordUnitTestDTO
      * @return
      */
+    @ControllerLogAnnotation(name = "保存音译练习记录")
     @PostMapping("/saveCapTeksTest")
     public ServerResponse<Object> saveCapTeksTest(HttpSession session,WordUnitTestDTO wordUnitTestDTO){
         if (wordUnitTestDTO.getUnitId() == null) {

@@ -1,11 +1,10 @@
 package com.zhidejiaoyu.student.controller;
 
-import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.constant.UserConstant;
-import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.aop.log.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.service.AwardService;
 import com.zhidejiaoyu.student.vo.AwardVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +16,6 @@ import javax.servlet.http.HttpSession;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +25,7 @@ import java.util.Map;
  * @author wuchenxi
  * @date 2018/6/9 18:19
  */
+@Slf4j
 @RestController
 @RequestMapping("/award")
 @Validated
@@ -68,6 +66,7 @@ public class AwardController extends BaseController {
     }
 
     @GetMapping("/getAeardSize")
+    @ControllerLogAnnotation(name = "获取奖励排行可领取数量")
     public ServerResponse<Object> getAwardSize(HttpSession session, int type, @RequestParam(defaultValue = "0") Integer model) {
         Map<String, Object> paramMap = super.packageParams(session);
         paramMap.put("type", type);

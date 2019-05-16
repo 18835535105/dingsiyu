@@ -1,11 +1,15 @@
 package com.zhidejiaoyu.common.config;
 
 import com.alibaba.druid.support.http.StatViewServlet;
+import com.alibaba.druid.support.spring.stat.DruidStatInterceptor;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.zhidejiaoyu.common.utils.http.FtpUtil;
 import com.zhidejiaoyu.common.utils.http.HttpClientUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
+import org.springframework.aop.Advisor;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
+import org.springframework.aop.support.JdkRegexpMethodPointcut;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +21,7 @@ import java.util.concurrent.*;
 
 /**
  * bean管理工具类
- * 
+ *
  * @author wuchenxi
  * @date 2018年4月24日 上午10:35:09
  *
@@ -27,7 +31,7 @@ public class BeanConfig {
 
 	/**
 	 * 获取百度语音合成api链接地址
-	 * 
+	 *
 	 * @return
 	 */
 	@Bean
@@ -37,7 +41,7 @@ public class BeanConfig {
 
 	/**
 	 * 获取有道翻译工具类
-	 * 
+	 *
 	 * @return
 	 */
 	@Bean
@@ -47,7 +51,7 @@ public class BeanConfig {
 
 	/**
 	 * 获取httpClient工具类
-	 * 
+	 *
 	 * @return
 	 */
 	@Bean
@@ -72,9 +76,9 @@ public class BeanConfig {
 	public ExecutorService singleThreadPool() {
 		ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
 				.setNameFormat("zdjy-pool-%d").build();
-		return new ThreadPoolExecutor(10, 20,
+		return new ThreadPoolExecutor(3, 10,
 				0L, TimeUnit.MILLISECONDS,
-				new LinkedBlockingQueue<>(1024), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
+				new LinkedBlockingQueue<>(50), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
 	}
 
 	@Bean
@@ -92,4 +96,32 @@ public class BeanConfig {
 		servletRegistrationBean.setInitParameters(initParameters);
 		return servletRegistrationBean;
 	}
+
+	/**
+	 * druid 为druidStatPointcut添加拦截
+	 *
+	 * @return
+	 */
+	@Bean
+	public Advisor druidStatAdvisor() {
+		return new DefaultPointcutAdvisor(druidStatPointcut(), druidStatInterceptor());
+	}
+
+	/**
+	 * druid数据库连接池监控
+	 */
+	@Bean
+	public DruidStatInterceptor druidStatInterceptor() {
+		return new DruidStatInterceptor();
+	}
+
+	@Bean
+	public JdkRegexpMethodPointcut druidStatPointcut() {
+		JdkRegexpMethodPointcut druidStatPointcut = new JdkRegexpMethodPointcut();
+		String patterns = "com.zhidejiaoyu.student.*.service.*";
+		//可以set多个
+		druidStatPointcut.setPatterns(patterns);
+		return druidStatPointcut;
+	}
+
 }

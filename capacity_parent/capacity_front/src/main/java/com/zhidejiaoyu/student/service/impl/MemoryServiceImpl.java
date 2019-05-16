@@ -338,73 +338,6 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
     }
 
     @Override
-    public ServerResponse<WordIntensifyVo> getWordIntensify(HttpSession session, Integer plan, Long unitId,
-                                                            Integer wordCount) {
-        Student student = getStudent(session);
-        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-        List<Long> wordIds = learnMapper.selectByCount(student.getId(), unitId, wordCount);
-        if (plan <= wordIds.size() && plan > 0) {
-            Long wordId = wordIds.get(plan - 1);
-            Vocabulary vocabulary = vocabularyMapper.selectByPrimaryKey(wordId);
-            CapacityMemory capacityMemory = capacityMemoryMapper.selectByStuIdAndUnitIdAndWordId(student.getId(),
-                    unitId, wordId);
-            String wordChinese = unitVocabularyMapper.selectWordChineseByUnitIdAndWordId(unitId, vocabulary.getId());
-
-            WordIntensifyVo wordIntensifyVo = new WordIntensifyVo();
-            if (capacityMemory == null) {
-                wordIntensifyVo.setMemoryStrength(0.0);
-            } else {
-                wordIntensifyVo.setMemoryStrength(capacityMemory.getMemoryStrength());
-            }
-
-            String soundMark = commonMethod.getSoundMark(vocabulary.getWord());
-
-            wordIntensifyVo.setWordId(wordId);
-            wordIntensifyVo.setSoundMark(soundMark);
-            wordIntensifyVo.setWord(StringUtils.isEmpty(vocabulary.getSyllable()) ? vocabulary.getWord() : vocabulary.getSyllable());
-            wordIntensifyVo.setWordChinese(wordChinese);
-            wordIntensifyVo.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
-            return ServerResponse.createBySuccess(wordIntensifyVo);
-        }
-        return null;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<String> saveWordIntensify(HttpSession session, Long unitId, Long wordId, Boolean isTrue, Boolean isLast) {
-        Student student = getStudent(session);
-        Long courseId = unitMapper.selectCourseIdByUnitId(unitId);
-        Integer maxCount = studyCountMapper.selectMaxCountByCourseId(student.getId(), courseId);
-        List<Learn> learns = learnMapper.selectLearnByIdAmdModel(student.getId(), unitId, wordId, null, "慧记忆", maxCount == null ? 1 : maxCount);
-        Learn learn;
-        if (learns.size() > 1) {
-            learnMapper.deleteById(learns.get(0));
-            learn = learns.get(1);
-        } else {
-            learn = learns.get(0);
-        }
-        learn.setStudyCount(learn.getStudyCount() + 1);
-
-        CapacityMemory capacityMemory = saveWordLearnAndCapacity.saveCapacityMemory(learn, student, isTrue, 1);
-
-        Integer memoryDifficulty = memoryDifficultyUtil.getMemoryDifficulty(capacityMemory, 1);
-        if (capacityMemory == null || memoryDifficulty == 0) {
-            learn.setStatus(1);
-        } else {
-            learn.setStatus(0);
-        }
-        int count = learnMapper.updateByPrimaryKeySelective(learn);
-
-        if (isLast) {
-            // 可以参加单元测试
-            return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
-        }
-
-        return count > 0 ? ServerResponse.createBySuccessMessage("保存成功！")
-                : ServerResponse.createByErrorMessage("保存失败！");
-    }
-
-    @Override
     public ServerResponse<String> clearFirst(HttpSession session, String studyModel) {
         Student student = getStudent(session);
         commonMethod.clearFirst(student.getId(), studyModel);
@@ -419,11 +352,10 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         // 封装返回数据
         Map<String, Object> result = new HashMap<>(16);
 
-        String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
         // 有效时长  !
-        Integer valid = getValidTime(id, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
+        Integer valid = getTodayValidTime(id);
         // 在线时长 !
-        Integer online = getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 24:00:00");
+        Integer online = getTodayOnlineTime(session);
         result.put("online", online);
         result.put("valid", valid);
         // 今日学习效率 !

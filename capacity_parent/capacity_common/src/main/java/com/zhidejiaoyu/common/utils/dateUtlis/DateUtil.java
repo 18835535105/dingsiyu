@@ -27,7 +27,7 @@ public class DateUtil implements Serializable {
     private static final String YYYYMMDDHHMMSS = "yyyy-MM-dd HH:mm:ss";
 
     private static final String YYYY = "yyyy";
-    
+
     /**
      * 当前时间 yyyy-MM-dd HH:mm:ss
      * 字符串
@@ -49,9 +49,9 @@ public class DateUtil implements Serializable {
         }
         return null;
     }
-    
+
     /**
-     * 
+     *
      * @param date
      *
      * @return yyyy
@@ -60,7 +60,7 @@ public class DateUtil implements Serializable {
         SimpleDateFormat s = new SimpleDateFormat(YYYY);
         return s.format(date);
     }
-    
+
     /**
      * 当前年份yyyy (int类型)
      */
@@ -156,13 +156,13 @@ public class DateUtil implements Serializable {
         // int year = calendar2.get(Calendar.YEAR);
         // int month = calendar2.get(Calendar.MONTH);
         // int day = calendar2.get(Calendar.DAY_OF_MONTH);
-        int hour = calendar2.get(Calendar.HOUR_OF_DAY);//24小时制  
-//      int hour = calendar2.get(Calendar.HOUR);//12小时制  
+        int hour = calendar2.get(Calendar.HOUR_OF_DAY);//24小时制
+//      int hour = calendar2.get(Calendar.HOUR);//12小时制
         int minute = calendar2.get(Calendar.MINUTE);
         int second = calendar2.get(Calendar.SECOND);
 
-        //System.out.println(year + "年" + (month + 1) + "月" + day + "日"  
-        //		+ hour + "时" + minute + "分" + second + "秒");  
+        //System.out.println(year + "年" + (month + 1) + "月" + day + "日"
+        //		+ hour + "时" + minute + "分" + second + "秒");
 
         return hour + ":" + minute + ":" + second;
     }
@@ -377,11 +377,11 @@ public class DateUtil implements Serializable {
      * @return
      */
     public static List<List<String>> parseMsg(String msg, int len) {
-        List<List<String>> lists = new ArrayList<List<String>>();
+        List<List<String>> lists = new ArrayList<>();
         if (msg.startsWith("Y,")) {
             String[] strings = msg.split(",");
             for (int i = 0; i < (strings.length - 1) / len; i++) {
-                List<String> list = new ArrayList<String>();
+                List<String> list = new ArrayList<>();
                 for (int j = 0; j < len; j++) {
 //						strings2[i][j]=strings[i*len+j+1];
                     list.add(strings[i * len + j + 1]);

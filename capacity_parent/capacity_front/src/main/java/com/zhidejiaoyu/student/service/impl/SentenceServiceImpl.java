@@ -502,9 +502,8 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         /*   List<Map<String, Object>> courses = courseMapper.selectSentenceCourseIdAndCourseNameByStudentId(studentId);*/
 
         List<Map<String, Object>> courses = studentStudyPlanMapper.selBySentenceStudentId(studentId, 2);
-
-        if (courses.size() < 0) {
-            return ServerResponse.createByError(500, "当前学生没有课程，请让老师添加");
+        if (courses == null || courses.size() == 0) {
+            return ServerResponse.createByError(400,"当前学生没有课程，请让老师添加");
         }
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selGetSentenceByStudentIdAndType(student.getId());
         // 学生课程下所有例句的单元id及单元名
@@ -669,6 +668,10 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         Map<String, Object> map = new HashMap<>();
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selGetSentenceByStudentIdAndType(student.getId());
         SentenceUnit unit = sentenceUnitMapper.selectByPrimaryKey(unitId);
+        List<StudentStudyPlan> listSize = studentStudyPlanMapper.selByStudentIdAndCourseIdAndUnitId(student.getId(), courseId, 2, unitId);
+        if(listSize==null||listSize.size()==0){
+            return ServerResponse.createBySuccess();
+        }
         if (capacityStudentUnit == null) {
             capacityStudentUnit = new CapacityStudentUnit();
             capacityStudentUnit.setType(2);
@@ -678,8 +681,8 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             capacityStudentUnit.setUnitName(unit.getUnitName());
             capacityStudentUnit.setCourseName(unit.getJointName());
             capacityStudentUnit.setVersion(sentenceCourseMapper.getVersionByUnitId(unit.getId()));
-            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseIdAndUnitId(student.getId(), unit.getCourseId(), 2,unit.getId());
-            if(studentStudyPlans!=null && studentStudyPlans.size()>0){
+            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseIdAndUnitId(student.getId(), unit.getCourseId(), 2, unit.getId());
+            if (studentStudyPlans != null && studentStudyPlans.size() > 0) {
                 capacityStudentUnit.setStartunit(studentStudyPlans.get(0).getStartUnitId());
                 capacityStudentUnit.setEndunit(studentStudyPlans.get(0).getEndUnitId());
                 capacityStudentUnitMapper.insert(capacityStudentUnit);
@@ -698,8 +701,8 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             capacityStudentUnit.setUnitName(unit.getUnitName());
             capacityStudentUnit.setCourseName(unit.getJointName());
             capacityStudentUnit.setVersion(sentenceCourseMapper.getVersionByUnitId(unit.getId()));
-            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseIdAndUnitId(student.getId(), unit.getCourseId(), 2,unit.getId());
-            if(studentStudyPlans!=null && studentStudyPlans.size()>0){
+            List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseIdAndUnitId(student.getId(), unit.getCourseId(), 2, unit.getId());
+            if (studentStudyPlans != null && studentStudyPlans.size() > 0) {
                 capacityStudentUnit.setStartunit(studentStudyPlans.get(0).getStartUnitId());
                 capacityStudentUnit.setEndunit(studentStudyPlans.get(0).getEndUnitId());
                 capacityStudentUnitMapper.updateById(capacityStudentUnit);
@@ -974,7 +977,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     private SentenceTranslateVo getSentenceTranslateVo(Long plan, boolean firstStudy, Long sentenceCount, Integer type, Sentence sentence) {
         SentenceTranslateVo sentenceTranslateVo = new SentenceTranslateVo();
         sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
-        sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*"," ").replace("$", ""));
+        sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*", " ").replace("$", ""));
         sentenceTranslateVo.setFirstStudy(firstStudy);
         sentenceTranslateVo.setId(sentence.getId());
         sentenceTranslateVo.setPlan(plan);
@@ -1004,7 +1007,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     private SentenceTranslateVo getSentenceVo(Sentence sentence, boolean firstStudy, Long plan, double memoryStrength, Long sentenceCount, Integer type) {
         SentenceTranslateVo sentenceTranslateVo = new SentenceTranslateVo();
         sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
-        sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*"," ").replace("$", ""));
+        sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*", " ").replace("$", ""));
         sentenceTranslateVo.setFirstStudy(firstStudy);
         sentenceTranslateVo.setId(sentence.getId());
         sentenceTranslateVo.setPlan(plan);

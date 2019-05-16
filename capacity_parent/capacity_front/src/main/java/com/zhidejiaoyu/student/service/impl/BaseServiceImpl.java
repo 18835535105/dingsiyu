@@ -8,7 +8,6 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.pojo.StudyFlow;
-import com.zhidejiaoyu.common.utils.LevelUtils;
 import com.zhidejiaoyu.common.utils.TokenUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
@@ -102,7 +101,10 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         int level = getLevel(gold.intValue(), levels);
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
         if(studentExpansion != null && studentExpansion.getLevel()<level){
-            Integer oldStudy = levelMapper.getStudyById(studentExpansion.getLevel());
+            Integer oldStudy =0;
+            if(studentExpansion.getLevel()!=0){
+                oldStudy=levelMapper.getStudyById(studentExpansion.getLevel());
+            }
             Integer newStudy = levelMapper.getStudyById(level);
             Integer addStudy=newStudy-oldStudy;
             studentExpansion.setLevel(level);

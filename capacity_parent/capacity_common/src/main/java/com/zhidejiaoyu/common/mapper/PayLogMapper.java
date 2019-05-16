@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.PayLog;
 import com.zhidejiaoyu.common.pojo.PayLogExample;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
-import javax.validation.Payload;
 import java.util.List;
 import java.util.Map;
 
@@ -31,4 +31,13 @@ public interface PayLogMapper extends BaseMapper<PayLog> {
     int updateByPrimaryKey(PayLog record);
 
     List<Map> selectPayLogDataByStudentId(@Param("studentId") long studentId);
+
+    /**
+     * 统计学生充值次数
+     *
+     * @param studentId
+     * @return
+     */
+    @Select("select count(id) from pay_log where student_id = #{studentId}")
+    int countByStudent(Long studentId);
 }

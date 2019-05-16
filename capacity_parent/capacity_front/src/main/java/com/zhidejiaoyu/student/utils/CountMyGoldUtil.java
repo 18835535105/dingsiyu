@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.pojo.Award;
 import com.zhidejiaoyu.common.pojo.Medal;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.student.vo.AwardVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
  * @author wuchenxi
  * @date 2018/8/25
  */
+@Slf4j
 @Component
 public class CountMyGoldUtil {
 
@@ -64,7 +66,7 @@ public class CountMyGoldUtil {
             student.setSchoolGoldFirstTime(new Date());
 
         }
-        studentMapper.updateByPrimaryKeySelective(student);
+        studentMapper.updateById(student);
     }
 
     /**

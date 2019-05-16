@@ -474,7 +474,19 @@
         c.course_name courseName,
         u.unit_name unitName,
         IFNULL(a.award_gold, 0) awardGold
-        from test_record a left join course c on a.course_id = c.id left join unit u on u.id = a.unit_id
+        from test_record a
+        <if test="type == 1">
+            LEFT JOIN course c on a.course_id = c.id
+            LEFT JOIN unit u on a.unit_id = u.id
+        </if>
+        <if test="type == 2">
+            LEFT JOIN sentence_course c on a.course_id = c.id
+            LEFT JOIN sentence_unit u on a.unit_id = u.id
+        </if>
+        <if test="type == 3">
+            LEFT JOIN teks_course c on a.course_id = c.id
+            LEFT JOIN teks_unit u on a.unit_id = u.id
+        </if>
         where a.student_id = #{student_id}
         <if test="type == 1">
             <!-- 单词类型的测试记录 -->
@@ -766,24 +778,34 @@
     </select>
     <select id="selectTestDetailVo" resultType="com.zhidejiaoyu.common.Vo.testVo.TestDetailVo" parameterType="map">
         select concat(c.course_name, concat('-', concat(u.unit_name,
-                                                        concat('-', concat(t.study_model, concat('-', t.genre)))))) title,
-               s.student_name                                                                                       name,
-               concat('测试时间：', date_format(if(t.test_start_time is null, now(), t.test_start_time),
-                                           '%Y-%m-%d %H:%i:%s'))                                                    testTime,
-               if(u.unit_name is null or u.unit_name = '', ' ',
-                  concat(concat(concat('测试内容：', u.unit_name), '-'), t.genre))                                       testContent,
-               concat(concat('共 ', t.quantity), ' 题')                                                               subjectCount,
-               concat(concat('对 ', t.right_count), ' 题')                                                            rightCount,
-               concat(concat('错 ', t.error_count), ' 题')                                                            errCount,
-               t.test_end_time - t.test_start_time                                                                  useTime,
-               t.point                                                                                              score,
-               t.study_model                                                                                        isWrite
+        concat('-', concat(t.study_model, concat('-', t.genre)))))) title,
+        s.student_name name,
+        concat('测试时间：', date_format(if(t.test_start_time is null, now(), t.test_start_time),
+        '%Y-%m-%d %H:%i:%s')) testTime,
+        if(u.unit_name is null or u.unit_name = '', ' ',
+        concat(concat(concat('测试内容：', u.unit_name), '-'), t.genre)) testContent,
+        concat(concat('共 ', t.quantity), ' 题') subjectCount,
+        concat(concat('对 ', t.right_count), ' 题') rightCount,
+        concat(concat('错 ', t.error_count), ' 题') errCount,
+        t.test_end_time - t.test_start_time useTime,
+        t.point score,
+        t.study_model isWrite
         from test_record t
-                 LEFT JOIN course c on t.course_id = c.id
-                 LEFT JOIN unit u on t.unit_id = u.id
-                 LEFT JOIN student s on s.id = t.student_id
+        <if test="type == 1">
+            LEFT JOIN course c on t.course_id = c.id
+            LEFT JOIN unit u on t.unit_id = u.id
+        </if>
+        <if test="type == 2">
+            LEFT JOIN sentence_course c on t.course_id = c.id
+            LEFT JOIN sentence_unit u on t.unit_id = u.id
+        </if>
+        <if test="type == 3">
+            LEFT JOIN teks_course c on t.course_id = c.id
+            LEFT JOIN teks_unit u on t.unit_id = u.id
+        </if>
+        LEFT JOIN student s on s.id = t.student_id
         where t.id = #{testId}
-          and s.id = #{stuId}
+        and s.id = #{stuId}
     </select>
     <select id="selectTestRecordInfo" resultType="com.zhidejiaoyu.common.pojo.TestRecordInfo" parameterType="map">
         select selected,

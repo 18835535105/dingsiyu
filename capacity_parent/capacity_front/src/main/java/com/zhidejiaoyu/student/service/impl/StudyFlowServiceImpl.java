@@ -400,6 +400,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
      */
     private ServerResponse<Object> toAnotherFlow(Student student, int flowId) {
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+        if (capacityStudentUnit == null) {
+            log.error("教师已经删除[{} -> {} -> {}]正在学习的学习计划。不影响程序继续执行！", student.getId(), student.getAccount(), student.getStudentName());
+            throw new RuntimeException("学生学习计划已被教师删除！不影响程序继续执行！");
+        }
         studentFlowMapper.updateFlowByStudentId(student.getId(), flowId);
         StudyFlow byPrimaryKey = studyFlowMapper.selectById(flowId);
         byPrimaryKey.setCourseId(capacityStudentUnit.getCourseId());

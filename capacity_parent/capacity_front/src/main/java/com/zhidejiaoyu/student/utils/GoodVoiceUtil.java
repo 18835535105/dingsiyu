@@ -34,12 +34,31 @@ public class GoodVoiceUtil {
         String result = speechEvaluation.getEvaluationResult(text, fileUrl);
         if (result != null) {
             Map<String, Object> map = new HashMap<>(16);
-            int score = (int) Math.round(Double.valueOf(getReadChapterJsonObject(result).getString("total_score")) * 20);
+            boolean flag = this.getIsRejected(result);
+            int score;
+            if (flag) {
+                score = 0;
+            } else {
+                score = (int) Math.round(Double.valueOf(getReadChapterJsonObject(result).getString("total_score")) * 20);
+            }
             map.put("score", score);
             map.put("heart", getHeart(score));
             return map;
         }
         return new HashMap<>(16);
+
+    }
+
+    /**
+     * 判断用户是否是乱读
+     *
+     * @param result    true：用户属于乱读；false：用户不是乱读
+     * @return
+     */
+    private boolean getIsRejected(String result) {
+        String string = JSONObject.parseObject(result).getJSONObject("data").getJSONObject("read_sentence").
+                getJSONObject("rec_paper").getJSONObject("read_chapter").getString("is_rejected");
+        return Objects.equals("true", string);
     }
 
     /**
@@ -68,11 +87,7 @@ public class GoodVoiceUtil {
             map.put("totalScore", (int) Math.round(Double.valueOf(readChapter.getString("total_score")) * 20));
             map.put("heart", getHeart((int) map.get("totalScore")));
 
-            log.info("readChapter:[{}]", readChapter);
-
-
             int score;
-//            for (Object object : sentenceArray) {
             String[] s = text.split(" ");
 
             if (s.length > 1) {
@@ -80,18 +95,16 @@ public class GoodVoiceUtil {
                 JSONObject sentenceObject = readChapter.getJSONObject("sentence");
                 JSONArray wordArray = sentenceObject.getJSONArray("word");
                 int j = 0;
-                for (int i = 0; i < wordArray.size(); i++) {
-                    JSONObject wordJsonObject = (JSONObject) wordArray.get(i);
-                    log.error("wordJsonObject:[{}]", wordJsonObject);
-                    log.info("index[{}]", wordJsonObject.getInteger("index"));
+                for (Object o : wordArray) {
+                    JSONObject wordJsonObject = (JSONObject) o;
                     Integer index = wordJsonObject.getInteger("index");
                     if (index == null) {
                         continue;
                     }
-                    if(ifMap.get(index)!=null){
+                    if (ifMap.get(index) != null) {
                         continue;
                     }
-                    ifMap.put(index,index);
+                    ifMap.put(index, index);
                     if (StringUtils.isNotEmpty(wordJsonObject.getString("total_score"))) {
                         score = (int) Math.round(Double.valueOf(wordJsonObject.getString("total_score")) * 20);
                         wordMap = new HashMap<>(16);
@@ -104,8 +117,6 @@ public class GoodVoiceUtil {
                         wordMap.put("color", getColor(score));
                         mapList.add(wordMap);
                     }
-                    log.info("数组长度:[{}]", j);
-                    log.info("句子长度[{}]", s.length);
                     // todo:数组下标越界异常
 
                     if (s[j].endsWith(",") || s[j].endsWith("!") || s[j].endsWith("?") || s[j].endsWith(".")) {
@@ -115,8 +126,6 @@ public class GoodVoiceUtil {
                         mapList.add(wordMap);
                     }
                     j++;
-
-
                 }
             } else {
                 wordMap = new HashMap<>(16);

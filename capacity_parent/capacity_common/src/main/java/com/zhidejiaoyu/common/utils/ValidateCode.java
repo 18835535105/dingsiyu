@@ -15,7 +15,7 @@ import java.util.Random;
  * @author
  */
 public class ValidateCode {
-    public static final String PATH = "D:/" + new Date().getTime() + ".png";
+    public static final String PATH = "D:/" + System.currentTimeMillis() + ".png";
     // 图片的宽度。
     private int width = 160;
     // 图片的高度。
@@ -137,13 +137,14 @@ public class ValidateCode {
 
     /**
      * 测试函数,默认生成到d盘
+     *
      * @param args
      */
     public static void main(String[] args) {
-        ValidateCode vCode = new ValidateCode(160,40,5,150);
+        ValidateCode vCode = new ValidateCode(160, 40, 5, 150);
         try {
-            String PATH="D:/"+new Date().getTime()+".png";
-            System.out.println(vCode.getCode()+" >"+PATH);
+            String PATH = "D:/" + System.currentTimeMillis() + ".png";
+            System.out.println(vCode.getCode() + " >" + PATH);
             vCode.write(PATH);
         } catch (IOException e) {
             e.printStackTrace();
