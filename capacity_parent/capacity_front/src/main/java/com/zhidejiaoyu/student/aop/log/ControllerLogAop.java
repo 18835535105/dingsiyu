@@ -32,18 +32,29 @@ public class ControllerLogAop {
 
     @Around("cut()")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
-        Signature signature = pjp.getSignature();
-        MethodSignature methodSignature = (MethodSignature) signature;
-        Method method = methodSignature.getMethod();
-        ControllerLogAnnotation annotation = method.getAnnotation(ControllerLogAnnotation.class);
-        if (annotation != null) {
-            Object object = HttpUtil.getHttpSession().getAttribute(UserConstant.CURRENT_STUDENT);
-            if (object != null) {
-                String url = HttpUtil.getHttpServletRequest().getRequestURI().substring(HttpUtil.getHttpServletRequest().getContextPath().length());
-                Student student = (Student) object;
-                log.info("学生[{} -> {} -> {}] 访问接口：[{} -> {}], param=[{}]", student.getId(), student.getAccount(), student.getStudentName(), annotation.name(), url, BaseController.getParams(HttpUtil.getHttpServletRequest()));
+        long startTime = System.currentTimeMillis();
+        Object proceed = pjp.proceed();
+        printLog(pjp, startTime);
+        return proceed;
+    }
+
+    private void printLog(ProceedingJoinPoint pjp, long startTime) {
+        try {
+            Signature signature = pjp.getSignature();
+            MethodSignature methodSignature = (MethodSignature) signature;
+            Method method = methodSignature.getMethod();
+            ControllerLogAnnotation annotation = method.getAnnotation(ControllerLogAnnotation.class);
+            if (annotation != null) {
+                Object object = HttpUtil.getHttpSession().getAttribute(UserConstant.CURRENT_STUDENT);
+                if (object != null) {
+                    String url = HttpUtil.getHttpServletRequest().getRequestURI().substring(HttpUtil.getHttpServletRequest().getContextPath().length());
+                    Student student = (Student) object;
+                    long time = System.currentTimeMillis() - startTime;
+                    log.info("学生[{} -> {} -> {}] 访问接口：[{} -> {}], 用时：[{}] ms, param=[{}]", student.getId(), student.getAccount(), student.getStudentName(), annotation.name(), url, time < 1000 ? time : time / 1000, BaseController.getParams(HttpUtil.getHttpServletRequest()));
+                }
             }
+        } catch (Exception e) {
+            log.error("记录 log 出错！ errMsg=[{}]", e.getMessage());
         }
-        return pjp.proceed();
     }
 }
