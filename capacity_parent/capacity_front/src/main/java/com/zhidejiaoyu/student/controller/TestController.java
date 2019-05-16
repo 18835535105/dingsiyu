@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.utils.ValidateUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
+import com.zhidejiaoyu.student.aop.log.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.TestService;
 import com.zhidejiaoyu.student.vo.TestResultVo;
@@ -170,6 +171,7 @@ public class TestController {
      * @return
      */
     @PostMapping("/saveWordUnitTest")
+    @ControllerLogAnnotation(name = "保存单元闯关测试记录")
     public ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, @Valid WordUnitTestDTO wordUnitTestDTO,
                                                          BindingResult bindingResult, String testDetail) {
         String msg = ValidateUtil.validate(bindingResult);

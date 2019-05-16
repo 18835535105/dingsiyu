@@ -2,12 +2,14 @@ package com.zhidejiaoyu.student.controller;
 
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.aop.log.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.service.MemoryService;
-import com.zhidejiaoyu.student.vo.MemoryStudyVo;
-import com.zhidejiaoyu.student.vo.WordIntensifyVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 
@@ -60,6 +62,7 @@ public class MemoryController {
      * @return
      */
     @PostMapping("/saveMemoryWord")
+    @ControllerLogAnnotation(name = "保存慧记忆学习记录")
     public ServerResponse<String> saveMemoryWord(HttpSession session, Learn learn, Boolean isKnown, Integer plan,
                                                  Integer total) {
         return memoryService.saveMemoryWord(session, learn, isKnown, plan, total);

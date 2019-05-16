@@ -4,6 +4,7 @@ package com.zhidejiaoyu.student.controller;
 import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.aop.log.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.service.TeksService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -61,6 +62,7 @@ public class TeksController  {
      */
     @ResponseBody
     @RequestMapping("/saveTeksAudition")
+    @ControllerLogAnnotation(name = "保存课文试听记录")
     public ServerResponse<Map<String,Object>> saveTeksAudition(HttpSession session,Integer unitId,Integer courseId){
         return teksService.saveTeksAudition(session,unitId,courseId);
     }
