@@ -82,21 +82,6 @@ public class MemoryController {
     }
 
     /**
-     * 保存词义强化学习记录
-     *
-     * @param session
-     * @param unitId  单元id
-     * @param wordId  单词id
-     * @param isTrue  当前单词是否答对
-     * @param isLast  本单元单词是否已经学完。true：已经学完，待词义强化完成后进入单元测试；false（默认）：单元内单词还没有学完
-     * @return
-     */
-    @PostMapping("/saveWordIntensify")
-    public ServerResponse<String> saveWordIntensify(HttpSession session, Long unitId, Long wordId, Boolean isTrue, Boolean isLast) {
-        return memoryService.saveWordIntensify(session, unitId, wordId, isTrue, isLast);
-    }
-
-    /**
      * 获取今日学习效率, 在线时长, 有效时长
      */
     @GetMapping("/todayTime")
