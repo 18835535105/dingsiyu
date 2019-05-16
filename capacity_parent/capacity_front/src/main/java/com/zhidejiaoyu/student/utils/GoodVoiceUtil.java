@@ -95,16 +95,16 @@ public class GoodVoiceUtil {
                 JSONObject sentenceObject = readChapter.getJSONObject("sentence");
                 JSONArray wordArray = sentenceObject.getJSONArray("word");
                 int j = 0;
-                for (int i = 0; i < wordArray.size(); i++) {
-                    JSONObject wordJsonObject = (JSONObject) wordArray.get(i);
+                for (Object o : wordArray) {
+                    JSONObject wordJsonObject = (JSONObject) o;
                     Integer index = wordJsonObject.getInteger("index");
                     if (index == null) {
                         continue;
                     }
-                    if(ifMap.get(index)!=null){
+                    if (ifMap.get(index) != null) {
                         continue;
                     }
-                    ifMap.put(index,index);
+                    ifMap.put(index, index);
                     if (StringUtils.isNotEmpty(wordJsonObject.getString("total_score"))) {
                         score = (int) Math.round(Double.valueOf(wordJsonObject.getString("total_score")) * 20);
                         wordMap = new HashMap<>(16);

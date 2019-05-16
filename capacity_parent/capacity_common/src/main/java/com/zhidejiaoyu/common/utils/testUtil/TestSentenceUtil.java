@@ -21,14 +21,9 @@ public class TestSentenceUtil {
 
     public List<Object> resultTestSentence(List<Sentence> sentences, List<Sentence> disturb) {
         List<Object> resultList = new ArrayList<>();
-        List<Sentence> sentenceList = new ArrayList<>();
-        for (int i = 0; i < sentences.size(); i++) {
-            sentenceList.add(sentences.get(i));
-        }
+        List<Sentence> sentenceList = new ArrayList<>(sentences);
         if (disturb != null) {
-            for (int i = 0; i < disturb.size(); i++) {
-                sentenceList.add(disturb.get(i));
-            }
+            sentenceList.addAll(disturb);
         }
         for (int i = 0; i < sentences.size(); i++) {
             if(i==0){

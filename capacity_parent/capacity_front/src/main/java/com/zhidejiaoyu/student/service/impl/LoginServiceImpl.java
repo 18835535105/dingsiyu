@@ -224,11 +224,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             unitId = Integer.valueOf(capacityStudentUnit.getUnitId().toString());
         }
 
-        // 查询是否需要阶段测试-隐藏单词学习模块
-        TestRecordExample testRecordExample = new TestRecordExample();
-        testRecordExample.createCriteria().andStudentIdEqualTo(student_id).andGenreEqualTo("阶段测试")
-                .andCourseIdEqualTo(stu.getCourseId());
-
         // 单词图鉴模块, 单元下共有多少带图片的单词
         Long countWord = null;
 
@@ -300,8 +295,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         // 封装返回的数据 - 智能记忆智能复习数量
         // 当前时间
-        SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String datetime = s.format(new Date());
+
+        String datetime = DateUtil.formatYYYYMMDDHHMMSS(new Date());
 
         CapacityReview cr = new CapacityReview();
         cr.setUnit_id(Long.valueOf(unitId));

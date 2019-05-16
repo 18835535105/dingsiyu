@@ -4,7 +4,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.AwardUtil;
@@ -574,9 +573,9 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
 
                         a = 3;
                     }
-                    
-                    if(!mm.containsKey("colour")) {
-                    	mm.put("colour", 3); // 还未做单元测试3
+
+                    if (!mm.containsKey("colour")) {
+                        mm.put("colour", 3); // 还未做单元测试3
                     }
                     li.add(mm);
                 }
@@ -642,21 +641,21 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     }
 
     /**
-	 * 我的排名
-	 *
-	 * @param model        本班排行模块  model = 1
-	 *                     本校模块 model = 2
-	 *                     全国模块 model = 3
-	 * @param queryType    空代表全部查询，1=今日排行 2=本周排行 3=本月排行
-	 * @param golds        金币 1=正序 2=倒叙  - 默认金币倒叙排行
-	 * @param badges       勋章 1=正序 2=倒叙
-	 * @param certificates 证书 1=正序 2=倒叙
-	 * @param worships     膜拜 1=正序 2=倒叙
-	 */
-	@SuppressWarnings("unlikely-arg-type")
-	@Override
-	public ServerResponse<Object> classSeniority(HttpSession session, Integer page, Integer rows,
-												 String golds, String badges, String certificates, String worships, String model, Integer queryType) {
+     * 我的排名
+     *
+     * @param model        本班排行模块  model = 1
+     *                     本校模块 model = 2
+     *                     全国模块 model = 3
+     * @param queryType    空代表全部查询，1=今日排行 2=本周排行 3=本月排行
+     * @param golds        金币 1=正序 2=倒叙  - 默认金币倒叙排行
+     * @param badges       勋章 1=正序 2=倒叙
+     * @param certificates 证书 1=正序 2=倒叙
+     * @param worships     膜拜 1=正序 2=倒叙
+     */
+    @SuppressWarnings("unlikely-arg-type")
+    @Override
+    public ServerResponse<Object> classSeniority(HttpSession session, Integer page, Integer rows,
+                                                 String golds, String badges, String certificates, String worships, String model, Integer queryType) {
 
         Map<String, Object> result = new HashMap<>(16);
 
@@ -702,7 +701,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
                 // 班级排名
                 classLevel = studentMapper.selectLevelByStuId(student, 1);
             }
-            if(classLevel == null || classLevel.get(student.getId()) == null) {
+            if (classLevel == null || classLevel.get(student.getId()) == null) {
                 return ServerResponse.createBySuccess("无排行数据");
             }
             String myRankingDouble = (classLevel.get(student.getId())).get("rank") + "";
@@ -947,7 +946,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         redisTemplate.opsForHash().put(KEY, FIELD, result);
         redisTemplate.expire(KEY, 30, TimeUnit.MINUTES);
         return ServerResponse.createBySuccess(result);
-	}
+    }
 
     // 金币降序
     static class MapGoldDesc implements Comparator<Map<String, Object>> {
@@ -1369,23 +1368,15 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         // 获取当前学生信息
         Student student = getStudent(session);
         Long studentId = student.getId();
-        // 姓名
-        String studentName = student.getStudentName();
-        // 区
-       // String area = student.getArea();
-        // 学校
-       // String school_name = student.getSchoolName();
-        // 班级
-       // String squad = student.getSquad();
         // 年级
         String grade = student.getGrade();
         // 版本
         String version = student.getVersion();
-     
-    	// 教师id - 学校
- 		Long teacherId = student.getTeacherId();
- 		// 班级id - 班级
- 		Long classId = student.getClassId();
+
+        // 教师id - 学校
+        Long teacherId = student.getTeacherId();
+        // 班级id - 班级
+        Long classId = student.getClassId();
 
         // 学段
         String study_paragraph;
@@ -1414,8 +1405,8 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
                 list = durationMapper.planSeniority(grade, study_paragraph, haveTime, version, classId);
             }
 
-			// 班级总参与人数
-			result.put("atNumber", list == null ? 0 : list.size());
+            // 班级总参与人数
+            result.put("atNumber", list == null ? 0 : list.size());
 
             // 本校排行
         } else if (model == 2) {
@@ -1430,8 +1421,8 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
                 list = durationMapper.planSenioritySchool(study_paragraph, haveTime, version, teacherId);
             }
 
-			// 学校总参与人数
-			result.put("atNumber", studentMapper.schoolHeadcount(teacherId, version));
+            // 学校总参与人数
+            result.put("atNumber", studentMapper.schoolHeadcount(teacherId, version));
 
             // 全国排行
         } else {
@@ -1446,21 +1437,20 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
                 list = durationMapper.planSeniorityNationwide(study_paragraph, haveTime, version);
             }
 
-			// 初中/高中总参与人数
-			result.put("atNumber", studentMapper.schoolHeadcountNationwide(study_paragraph, version));
+            // 初中/高中总参与人数
+            result.put("atNumber", studentMapper.schoolHeadcountNationwide(study_paragraph, version));
 
         }
 
-        int onset = (page - 1 * rows);
         int auto = 0;
 
         // 用于判断当前学生是否在排行里边有排名
         result.put("atRanking", "0");
 
-		// 封装页面需要的数据, 所有学生数据
-		for(SeniorityVo vo : list){
+        // 封装页面需要的数据, 所有学生数据
+        for (SeniorityVo vo : list) {
 
-			Long stuId = vo.getStudent_id();
+            Long stuId = vo.getStudent_id();
 
             // 学生排行
             // 查询单元排行
@@ -1481,8 +1471,8 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
 
         }
 
-		result.put("page", page);
-		result.put("total", list.size() % rows == 0 ? list.size() / rows : list.size() / rows + 1);
+        result.put("page", page);
+        result.put("total", list.size() % rows == 0 ? list.size() / rows : list.size() / rows + 1);
 
         // 对list分页
         page = (page - 1) * rows;
@@ -1490,13 +1480,13 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         List<SeniorityVo> resultList = new ArrayList<>(list.subList(page > list.size() ? list.size() : page, list.size() < rows ? list.size() : rows));
         result.put("pageDate", resultList);
 
-		// 当前学生排行等数据,
-		if (result.get("atRanking").equals("0")){
-			result.put("atRanking", "未上榜");
-			result.put("atCountUnit", studentUnitMapper.onePlanSeniority(studentId));
-			result.put("atCountTest", testRecordMapper.onePlanSeniority(studentId));
-			result.put("atLearnDate", durationMapper.onePlanSeniority(studentId));
-		}
+        // 当前学生排行等数据,
+        if (result.get("atRanking").equals("0")) {
+            result.put("atRanking", "未上榜");
+            result.put("atCountUnit", studentUnitMapper.onePlanSeniority(studentId));
+            result.put("atCountTest", testRecordMapper.onePlanSeniority(studentId));
+            result.put("atLearnDate", durationMapper.onePlanSeniority(studentId));
+        }
 
         return ServerResponse.createBySuccess(result);
     }
@@ -1670,15 +1660,15 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     }
 
     @Override
-    public Object getLucky(Integer studentId,HttpSession session) {
+    public Object getLucky(Integer studentId, HttpSession session) {
         Map<String, Object> useMap = new HashMap<>();
         if (studentId == null) {
             Student student = getStudent(session);
             studentId = student.getId().intValue();
-            useMap.put("sex",student.getSex()==1?"男":"女");
-        }else{
+            useMap.put("sex", student.getSex() == 1 ? "男" : "女");
+        } else {
             Student student = studentMapper.selectById(studentId);
-            useMap.put("sex",student.getSex()==1?"男":"女");
+            useMap.put("sex", student.getSex() == 1 ? "男" : "女");
         }
         Map<String, Object> resultMap = new HashMap<>();
         //查询手套印记
@@ -1689,31 +1679,31 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         for (SyntheticRewardsList synthetic : gloveOrFlower) {
             Map<String, Object> map = new HashMap<>();
             map.put("url", synthetic.getImgUrl());
-            if(useGloveOrFlower!=null){
+            if (useGloveOrFlower != null) {
                 map.put("state", true);
-                map.put("time",48+"小时00分00秒");
-            }else{
+                map.put("time", 48 + "小时00分00秒");
+            } else {
                 SyntheticRewardsList isUse = syntheticRewardsListMapper.getIsUse(studentId, synthetic.getName());
-                if(isUse!=null){
+                if (isUse != null) {
                     Integer count = syntheticRewardsListMapper.selCountByStudentIdAndName(synthetic);
                     map.put("state", false);
-                    map.put("time",48*count+"小时00分00秒");
-                }else{
+                    map.put("time", 48 * count + "小时00分00秒");
+                } else {
                     map.put("state", true);
-                    map.put("time",48+"小时00分00秒");
+                    map.put("time", 48 + "小时00分00秒");
                 }
             }
             map.put("syntheticInteger", AwardUtil.getMaps(synthetic.getName()));
             map.put("type", "gloveOrFlower");
-            map.put("name",synthetic.getName());
-            map.put("message", "得到的金币加成"+ AwardUtil.getNumber(Integer.parseInt(AwardUtil.getMaps(synthetic.getName()).toString())) + "%");
+            map.put("name", synthetic.getName());
+            map.put("message", "得到的金币加成" + AwardUtil.getNumber(Integer.parseInt(AwardUtil.getMaps(synthetic.getName()).toString())) + "%");
             map.put("createTime", synthetic.getCreateTime());
             gloveOrFlowerList.add(map);
         }
-        if (useGloveOrFlower!=null) {
+        if (useGloveOrFlower != null) {
             Map<String, Object> useNowMap = new HashMap<>();
             useNowMap.put("url", useGloveOrFlower.getImgUrl());
-            useNowMap.put("endTime",useGloveOrFlower.getUseEndTime());
+            useNowMap.put("endTime", useGloveOrFlower.getUseEndTime());
             useMap.put("gloveOrFlower", useNowMap);
         }
         resultMap.put("gloveOrFlower", gloveOrFlowerList);
@@ -1725,21 +1715,21 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
             }
             Map<String, Object> map = new HashMap<>();
             map.put("url", studentSkin.getImgUrl());
-            if(studentSkin.getState() == 1){
+            if (studentSkin.getState() == 1) {
                 map.put("state", true);
-            }else{
+            } else {
                 map.put("state", false);
             }
             map.put("type", "skin");
-            map.put("skinIngter",AwardUtil.getMaps(studentSkin.getSkinName()));
-            map.put("id",studentSkin.getId());
-            map.put("name",studentSkin.getSkinName());
+            map.put("skinIngter", AwardUtil.getMaps(studentSkin.getSkinName()));
+            map.put("id", studentSkin.getId());
+            map.put("name", studentSkin.getSkinName());
             map.put("message", "个性装扮");
             map.put("createTime", studentSkin.getCreateTime());
             skinList.add(map);
         }
         resultMap.put("skin", skinList);
-        resultMap.put("use",useMap);
+        resultMap.put("use", useMap);
         return ServerResponse.createBySuccess(resultMap);
     }
 
