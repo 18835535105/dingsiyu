@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.PhoneticSymbolMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.PhoneticSymbol">
+        <id column="id" property="id" />
+        <result column="phonetic_symbol" property="phoneticSymbol" />
+        <result column="type" property="type" />
+        <result column="letter" property="letter" />
+        <result column="pronunciation_method" property="pronunciationMethod" />
+        <result column="url" property="url" />
+    </resultMap>
+
+</mapper>

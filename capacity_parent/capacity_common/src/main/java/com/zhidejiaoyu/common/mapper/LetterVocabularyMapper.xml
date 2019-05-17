@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.LetterVocabularyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.LetterVocabulary">
+        <id column="id" property="id" />
+        <result column="unit" property="unit" />
+        <result column="letter" property="letter" />
+        <result column="major_categories" property="majorCategories" />
+        <result column="subordinate_category" property="subordinateCategory" />
+        <result column="vocabulary" property="vocabulary" />
+        <result column="phonetic_symbol" property="phoneticSymbol" />
+        <result column="syllable" property="syllable" />
+    </resultMap>
+
+</mapper>
