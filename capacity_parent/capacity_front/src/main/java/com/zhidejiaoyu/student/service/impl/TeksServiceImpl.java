@@ -403,7 +403,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @Override
     public ServerResponse<Map<String, Object>> getIsInto(HttpSession session, Long unitId) {
         Student student = getStudent(session);
-        List<Teks> id1 = teksMapper.selTeksByUnitId(unitId.intValue());
         Long studentId = student.getId();
         Map<String, Object> unitInfoMap = new HashMap<>();
         unitInfoMap.put("teksAudition", true);

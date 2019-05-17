@@ -1,12 +1,7 @@
 package com.zhidejiaoyu.common.study;
 
 import com.zhidejiaoyu.common.pojo.Vocabulary;
-import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -32,122 +27,14 @@ public class WordPictureUtil {
     public Map<String, Object> allocationWord(List<Vocabulary> list, List<Vocabulary> listSelect, Map<Long, Map<Long, Long>> longMapMap){
         // 打乱
         Collections.shuffle(list);
-
-        // 题的比例
-//        int size = list.size();
-//        int a = (int) Math.round(size*0.3);
-//        int b = (int) Math.round(size*0.3);
-//        int c = size - (int) Math.round(size*0.3) * 2;
-//
         int c = list.size();
-        /*if(size <= 5){
-            if(size == 5){
-                a = 1;
-                b = 2;
-                c = 2;
-            }else if(size == 4){
-                a = 1;
-                b = 1;
-                c = 2;
-            }else if(size == 3){
-                a = 1;
-                b = 1;
-                c = 1;
-            }else if(size == 2){
-                a = 1;
-                b = 1;
-                c = 0;
-            }else if(size == 1){
-                a = 1;
-                b = 0;
-                c = 0;
-            }
-        }*/
 
         Map result = new HashMap();
 
         int max = listSelect.size();
 
-        /*if(a != 0){
-            List<Map<String, Object>> listMapa = new ArrayList<>();
-            List<Vocabulary> lista = list.subList(0, a);
-            // 遍历每一道题
-            Map m = null;
-            Map t = null;
-            for (Vocabulary vo : lista){
-                m = new HashMap();
-                t = new HashMap();
-
-                // 封装单元id
-                if(longMapMap != null && longMapMap.containsKey(vo.getId())){
-                    m.put("unitId", (longMapMap.get(vo.getId()).get("unitId")));
-                }
-                m.put("type", "看词选图");
-                m.put("id", vo.getId());
-                m.put("chinese", vo.getWordChinese());
-                m.put("title", vo.getWord());
-                m.put("recordpicurl", prefix + vo.getRecordpicurl());
-                m.put("word", vo.getWord());
-                for (int i = 0; i < 4; i++) {
-                    if(i==0){
-                        t.put(prefix + vo.getRecordpicurl(), true);
-                    }else{
-                        max -- ;
-                        if(!(prefix + listSelect.get(max).getRecordpicurl()).equals(prefix + vo.getRecordpicurl())){
-                            t.put(prefix + listSelect.get(max).getRecordpicurl(), false);
-                        }else{
-                            i--;
-                        }
-                    }
-                }
-                m.put("subject",t);
-                listMapa.add(m);
-            }
-            result.put("one", listMapa);
-        }
-
-        if(b > 0){
-            List<Map<String, Object>> listMapb = new ArrayList<>();
-            List<Vocabulary> listb = list.subList(a, a+b);
-
-            Map m = null;
-            Map t = null;
-            for (Vocabulary vo : listb){
-                m = new HashMap();
-                t = new HashMap();
-
-                // 封装单元id
-                if(longMapMap != null && longMapMap.containsKey(vo.getId())){
-                    m.put("unitId", (longMapMap.get(vo.getId()).get("unitId")));
-                }
-                m.put("type", "听音选图");
-                m.put("id", vo.getId());
-                m.put("chinese", vo.getWordChinese());
-                m.put("recordpicurl", prefix + vo.getRecordpicurl());
-                m.put("word", vo.getWord());
-                // 读音url
-                m.put("title", baiduSpeak.getLanguagePath(vo.getWord()));
-                for (int i = 0; i < 4; i++) {
-                    if(i==0){
-                        t.put(prefix + vo.getRecordpicurl(), true);
-                    }else{
-                        max -- ;
-                        if(!(prefix + listSelect.get(max).getRecordpicurl()).equals(prefix + vo.getRecordpicurl())){
-                            t.put(prefix + listSelect.get(max).getRecordpicurl(), false);
-                        }else{
-                            i--;
-                        }
-                    }
-                }
-                m.put("subject",t);
-                listMapb.add(m);
-            }
-            result.put("two", listMapb);
-        }
-*/
         if(c > 0){
             List<Map<String, Object>> listMapc = new ArrayList<>();
-//            List<Vocabulary> listc = list.subList(a+b, a+b+c);
             Map m;
             Map t;
             for (Vocabulary vo : list){

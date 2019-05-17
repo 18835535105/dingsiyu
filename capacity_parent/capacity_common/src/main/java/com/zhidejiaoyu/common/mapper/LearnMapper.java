@@ -797,7 +797,7 @@ public interface LearnMapper extends BaseMapper<Learn> {
 
     Long selByStudentIdAndCourseIdDisVersion(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
 
-    @Select("select id from learn where student_id=#{studentId} and unit_id =#{unitId} and course_id=#{courseId} and study_model=#{studyModel} and vocabulary_id is null and example_id is null")
+    @Select("select id from learn where unit_id =#{unitId} and student_id=#{studentId} and course_id=#{courseId} and study_model=#{studyModel} and vocabulary_id is null and example_id is null")
     Long selTeksLearn(Learn learn);
 
     @Update("update learn set update_time=#{updateTime} where id=#{id} ")

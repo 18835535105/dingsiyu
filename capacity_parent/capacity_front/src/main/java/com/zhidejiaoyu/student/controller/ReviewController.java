@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.aop.log.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.service.ReviewService;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 import lombok.extern.slf4j.Slf4j;
@@ -103,6 +104,7 @@ public class ReviewController {
      */
     @ResponseBody
     @PostMapping("/saveTestCenter")
+    @ControllerLogAnnotation(name = "保存测试中心测试结果")
     public ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Integer[] correctWordId, Integer[] errorWordId, Long[] unitId,
                                                  Integer classify, Long courseId,HttpSession session, Integer point, String genre,String testDetail) {
         final String wordFiveTest = "单词五维测试";
@@ -152,6 +154,7 @@ public class ReviewController {
      */
     @ResponseBody
     @PostMapping("/saveTestReview")
+    @ControllerLogAnnotation(name = "保存测试复习测试记录")
     public ServerResponse<TestResultVo> saveTestReview(String[] correctWord, String[] errorWord, Integer[] correctWordId,
                                                        Integer[] errorWordId, Long[] unitId,
                                                        Integer classify, Long courseId,
@@ -177,6 +180,7 @@ public class ReviewController {
      */
     @ResponseBody
     @PostMapping("/saveCapacityReview")
+    @ControllerLogAnnotation(name = "保存智能复习")
     public ServerResponse<String> saveCapacityReview(HttpSession session, Long[] unitId, Integer classify, String word,
                                                      Long courseId, Long id, boolean isKnown) {
         if (unitId == null || unitId.length == 0 || courseId == null || classify == null || id == null) {
@@ -194,9 +198,9 @@ public class ReviewController {
      *                  <p>
      *                  <p>
      *                  url = /taskCourse
-     *                  
+     *
      * 2.2 任务课程-点击复习 - 必要参数单元id,课程id
-     * 
+     *
      * @param course_id 课程id
      * @param classify  类型 0=单词图鉴 1=慧记忆 2=慧听写 3=慧默写 4=例句听写 5=例句翻译 6=例句默写
      * @return 4, 5, 6模块所需复习的例句

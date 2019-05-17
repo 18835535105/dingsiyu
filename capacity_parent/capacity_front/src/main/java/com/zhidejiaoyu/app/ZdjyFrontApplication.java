@@ -38,6 +38,6 @@ public class ZdjyFrontApplication {
     public static void main(String[] args) {
 
         run(ZdjyFrontApplication.class, args);
-        log.error("application is started");
+        log.info("application is started");
     }
 }
