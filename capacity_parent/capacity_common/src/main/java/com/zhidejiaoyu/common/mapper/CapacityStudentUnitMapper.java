@@ -34,7 +34,7 @@ public interface CapacityStudentUnitMapper extends BaseMapper<CapacityStudentUni
      * @param type
      * @return
      */
-    @Select("select count(id) from capacity_student_unit where student_id = #{student.id} and type = #{type}")
+    @Select("select count(id) from student_study_plan where student_id = #{student.id} and type = #{type}")
     int countByType(@Param("student") Student student, @Param("type") int type);
 
     /**
