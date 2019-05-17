@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,9 +70,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private UnitVocabularyMapper unitVocabularyMapper;
 
     @Autowired
-    private AwardMapper awardMapper;
-
-    @Autowired
     private LevelMapper levelMapper;
 
     @Autowired
@@ -91,9 +89,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Resource
     private UnitSentenceMapper unitSentenceMapper;
-
-    @Autowired
-    private MedalMapper medalMapper;
 
     @Autowired
     private InitRedPointThread initRedPointThread;
@@ -121,6 +116,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Autowired
     private SentenceUnitMapper sentenceUnitMapper;
+
+    @Autowired
+    private ExecutorService executorService;
 
     @Override
     public Student LoginJudge(String account, String password) {
@@ -919,7 +917,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             studentMapper.updateById(stu);
 
             // 初始化学生勋章信息
-            dailyAwardAsync.initAward(stu);
+            executorService.execute(() -> dailyAwardAsync.initAward(stu));
         }
     }
 
