@@ -23,7 +23,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"player"};
+        String[] tableName = {"phonetic_symbol","letter","letter_vocabulary"};
 
         /**
          * 配置：
@@ -38,7 +38,7 @@ public class MpGeneratorUtil {
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig
                 //设置代码生成路径
-                .setOutputDir("/Users/wuchenxi/Desktop/zdjy")
+                .setOutputDir("D:\\表")
                 //设置作者
                 .setAuthor("zdjy")
                 //设置二级缓存的开闭
@@ -57,9 +57,9 @@ public class MpGeneratorUtil {
         dataSourceConfig
                 //设置数据库类型
                 .setDbType(DbType.MYSQL)
-                .setUrl("jdbc:mysql://192.168.31.183:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false")
-                .setUsername("root")
-                .setPassword("root")
+                .setUrl("jdbc:mysql://192.168.0.2:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false")
+                .setUsername("zdjy")
+                .setPassword("zdjy")
                 .setDriverName("com.mysql.jdbc.Driver");
 
         //3.策略配置
