@@ -60,16 +60,11 @@ class BaseAwardAsync{
         // 如果从数据库中直接修改了需要完成奖励的总个数，也需要修改 award 表中相应的总个数
         if (type == 1 || type == 2) {
             AwardContentType awardContentType = awardContentTypeMapper.selectById(award.getAwardContentType());
-            if (awardContentType != null && !Objects.equals(awardContentType.getTotalPlan(), award.getTotalPlan()))  {
-                return true;
-            }
+            return awardContentType != null && !Objects.equals(awardContentType.getTotalPlan(), award.getTotalPlan());
         } else {
             Medal medal = medalMapper.selectById(award.getMedalType());
-            if (medal != null && !Objects.equals(medal.getTotalPlan(), award.getTotalPlan())) {
-                return true;
-            }
+            return medal != null && !Objects.equals(medal.getTotalPlan(), award.getTotalPlan());
         }
-        return false;
     }
 
     /**
@@ -93,7 +88,6 @@ class BaseAwardAsync{
             AwardContentType contentType = awardContentTypeMapper.selectById(id);
             totalPlan = contentType.getTotalPlan();
         }
-
 
         if (award == null) {
             if (currentPlan >= totalPlan) {
