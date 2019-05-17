@@ -15,7 +15,8 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- *
+ * 字母，音节，字母宝典关联的单元表
+
  * </p>
  *
  * @author zdjy
@@ -24,32 +25,19 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class Letter extends Model<Letter> {
+public class LetterUnit extends Model<LetterUnit> {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 单元 id
+     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     /**
-     * 大写字母
+     * 单元名称
      */
-    private String bigLetter;
-    /**
-     * 小写字母
-     */
-    private String lowercaseLetters;
-    /**
-     * 单元id
-     */
-    private Integer unitId;
-    /**
-     * 类型
-     */
-    private String type;
-    /**
-     * gif图片
-     */
-    private String gifUrl;
+    private String unitName;
 
 
     @Override

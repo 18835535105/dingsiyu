@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author zdjy
@@ -50,6 +50,10 @@ public class PhoneticSymbol extends Model<PhoneticSymbol> {
      * 音标读音地址
      */
     private String url;
+
+    private Integer unitId;
+
+    private String content;
 
 
     @Override

@@ -10,6 +10,8 @@
         <result column="letter" property="letter" />
         <result column="pronunciation_method" property="pronunciationMethod" />
         <result column="url" property="url" />
+        <result column="unit_id" property="unitId" />
+        <result column="content" property="content" />
     </resultMap>
 
 </mapper>
