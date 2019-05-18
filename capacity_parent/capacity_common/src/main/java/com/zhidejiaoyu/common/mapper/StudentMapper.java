@@ -123,10 +123,6 @@ public interface StudentMapper extends BaseMapper<Student> {
      * 学生的信息, 证书, 膜拜
      *
      * @param model
-     * @param squad
-     * @param grade
-     * @param school_name
-     * @param area
      * @return
      */
     //List<StudentSeniority> selectSeniority();
