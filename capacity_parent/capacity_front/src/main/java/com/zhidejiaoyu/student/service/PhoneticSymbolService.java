@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.service;
 
 import com.zhidejiaoyu.common.pojo.PhoneticSymbol;
 import com.baomidou.mybatisplus.service.IService;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
 import javax.servlet.http.HttpSession;
 
@@ -23,4 +24,12 @@ public interface PhoneticSymbolService extends IService<PhoneticSymbol> {
     Object getSymbolUnit(HttpSession session);
 
     Object getSymbol(Integer unitId,HttpSession session);
+
+    /**
+     * 获取音标辨音题目
+     *
+     * @param unitId 单元 id
+     * @return
+     */
+    ServerResponse<Object> getSymbolListen(Long unitId, HttpSession session);
 }

@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.common;
 
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.pojo.PhoneticSymbol;
 import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,9 @@ public class RedisOpt {
     @Autowired
     private SentenceMapper sentenceMapper;
 
+    @Autowired
+    private PhoneticSymbolMapper phoneticSymbolMapper;
+
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
@@ -54,7 +58,7 @@ public class RedisOpt {
      */
     public int wordCountInCourse(Long courseId) {
         String hKey = RedisKeysConst.WORD_COUNT_WITH_COURSE + courseId;
-        Object object = getRedisObject(hKey);
+        Object object = getRedisHashObject(hKey);
         int count;
         if (object == null) {
             count = unitVocabularyMapper.getAllCountWordByCourse(courseId);
@@ -80,7 +84,7 @@ public class RedisOpt {
     public List<Vocabulary> getWordInfoInUnit(Long unitId) {
         String hKey = RedisKeysConst.WORD_INFO_IN_UNIT + unitId;
         List<Vocabulary> vocabularies;
-        Object object = getRedisObject(hKey);
+        Object object = getRedisHashObject(hKey);
         if (object == null) {
             vocabularies = vocabularyMapper.selectByUnitId(unitId);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, hKey, vocabularies);
@@ -104,7 +108,7 @@ public class RedisOpt {
     public List<Sentence> getSentenceInfoInUnit(Long unitId) {
         String hKey = RedisKeysConst.SENTENCE_INFO_IN_UNIT + unitId;
         List<Sentence> sentences;
-        Object redisObject = getRedisObject(hKey);
+        Object redisObject = getRedisHashObject(hKey);
         if (redisObject == null) {
             sentences = sentenceMapper.selectByUnitId(unitId);
         } else {
@@ -124,7 +128,7 @@ public class RedisOpt {
      * @return
      */
     public List<Map<String, Object>> getAllLevel() {
-        Object object = getRedisObject(RedisKeysConst.ALL_LEVEL);
+        Object object = getRedisHashObject(RedisKeysConst.ALL_LEVEL);
         List<Map<String, Object>> allLevel;
         if (object == null) {
             allLevel = levelMapper.selectAll();
@@ -165,6 +169,37 @@ public class RedisOpt {
         return false;
     }
 
+    /**
+     * 获取音节信息
+     *
+     * @return
+     */
+    @SuppressWarnings("all")
+    public List<PhoneticSymbol> getPhoneticSymbol() {
+        String key = RedisKeysConst.PHONETIC_SYMBOL;
+        Object redisObject = this.getRedisStringObject(key);
+        if (redisObject == null) {
+            return getPhoneticSymbols(key);
+        } else {
+            try {
+                return (List<PhoneticSymbol>) redisObject;
+            } catch (Exception e) {
+                return getPhoneticSymbols(key);
+            }
+        }
+    }
+
+    private List<PhoneticSymbol> getPhoneticSymbols(String key) {
+        List<PhoneticSymbol> phoneticSymbols = phoneticSymbolMapper.selectList(null);
+        redisTemplate.opsForValue().set(key, phoneticSymbols);
+        redisTemplate.expire(key, 7, TimeUnit.DAYS);
+        return phoneticSymbols;
+    }
+
+    private Object getRedisStringObject(String key) {
+        return redisTemplate.opsForValue().get(key);
+    }
+
     public static Map<String, Object> getSessionMap(String sessionId) {
         Object object = staticRedisTemplate.opsForHash().get(RedisKeysConst.SESSION_MAP, sessionId);
         if (object == null) {
@@ -173,7 +208,7 @@ public class RedisOpt {
         return (Map<String, Object>) object;
     }
 
-    private Object getRedisObject(String key) {
+    private Object getRedisHashObject(String key) {
         Object object = null;
         try {
             object = redisTemplate.opsForHash().get(RedisKeysConst.PREFIX, key);

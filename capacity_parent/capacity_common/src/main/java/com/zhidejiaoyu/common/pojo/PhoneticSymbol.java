@@ -55,6 +55,11 @@ public class PhoneticSymbol extends Model<PhoneticSymbol> {
 
     private String content;
 
+    /**
+     * 图片路径
+     */
+    private String partUrl;
+
 
     @Override
     protected Serializable pkVal() {

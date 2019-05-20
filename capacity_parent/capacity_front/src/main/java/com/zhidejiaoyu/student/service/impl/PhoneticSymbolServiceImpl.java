@@ -1,22 +1,19 @@
 package com.zhidejiaoyu.student.service.impl;
 
-import com.zhidejiaoyu.common.mapper.CapacityStudentUnitMapper;
-import com.zhidejiaoyu.common.mapper.LetterUnitMapper;
-import com.zhidejiaoyu.common.mapper.StudentStudyPlanMapper;
+import com.zhidejiaoyu.common.Vo.study.phonetic.PhoneticSymbolListenVo;
+import com.zhidejiaoyu.common.Vo.study.phonetic.Topic;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.mapper.PhoneticSymbolMapper;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.PhoneticSymbolService;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -37,6 +34,13 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     private PhoneticSymbolMapper phoneticSymbolMapper;
     @Autowired
     private StudentStudyPlanMapper studentStudyPlanMapper;
+
+    @Autowired
+    private LearnMapper learnMapper;
+
+    @Autowired
+    private RedisOpt redisOpt;
+
     @Value("${ftp.url}")
     private String url;
 
@@ -154,8 +158,64 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         return ServerResponse.createBySuccess(returnList);
     }
 
+    @Override
+    public ServerResponse<Object> getSymbolListen(Long unitId, HttpSession session) {
+        Student student = super.getStudent(session);
+        Long studentId = student.getId();
+        final String studyModel = "音标辨音";
 
+        PhoneticSymbolListenVo vo = new PhoneticSymbolListenVo();
 
+        List<Learn> learns = learnMapper.selectByStudentIdAndStudyModel(studentId, studyModel, unitId);
+
+        int total = phoneticSymbolMapper.countByUnitId(unitId);
+
+        PhoneticSymbol phoneticSymbol = phoneticSymbolMapper.selectNotLearnByStudentIdAndUnitId(studentId, studyModel, unitId, learns);
+        if (phoneticSymbol == null) {
+            return ServerResponse.createBySuccess(600, "当前单元已学习完！");
+        }
+
+        vo.setPhonetic(phoneticSymbol.getPhoneticSymbol());
+        vo.setPlan(learns.size());
+        vo.setTotal(total);
+        vo.setTopics(this.getTopics(phoneticSymbol));
+
+        return ServerResponse.createBySuccess(vo);
+    }
+
+    /**
+     * 封装试题及答案
+     *
+     * @param phoneticSymbol
+     * @return
+     */
+    private List<Topic> getTopics(PhoneticSymbol phoneticSymbol) {
+        List<PhoneticSymbol> phoneticSymbols = redisOpt.getPhoneticSymbol();
+        if (phoneticSymbols.size() > 0) {
+            Collections.shuffle(phoneticSymbols);
+            // 添加正确答案
+            List<Topic> topics = phoneticSymbols.stream().filter(phoneticSymbol1 -> Objects.equals(phoneticSymbol1.getPhoneticSymbol(), phoneticSymbol.getPhoneticSymbol())).map(result -> {
+                Topic topic = new Topic();
+                topic.setAnswer(true);
+                topic.setWord(result.getLetter());
+                return topic;
+            }).collect(Collectors.toList());
+
+            // 添加两个错误答案
+            topics.addAll(phoneticSymbols.stream().filter(phoneticSymbol1 -> !Objects.equals(phoneticSymbol1.getPhoneticSymbol(), phoneticSymbol.getPhoneticSymbol()))
+                    .limit(2)
+                    .map(result -> {
+                        Topic topic = new Topic();
+                        topic.setAnswer(false);
+                        topic.setWord(result.getLetter());
+                        return topic;
+                    }).collect(Collectors.toList()));
+
+            Collections.shuffle(topics);
+            return topics;
+        }
+        return new ArrayList<>();
+    }
 
 
 }

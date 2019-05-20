@@ -857,4 +857,14 @@ public interface LearnMapper extends BaseMapper<Learn> {
     int countByStudentIdAndFlow(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("flowName") String flowName);
 
     Learn selLaterSentence(@Param("studentId") Long studentId,@Param("unitId") long unitId);
+
+    /**
+     * 查询学生当前模块的当前正在学习的学习记录
+     *
+     * @param studentId
+     * @param studyModel
+     * @param unitId
+     * @return
+     */
+    List<Learn> selectByStudentIdAndStudyModel(@Param("studentId") Long studentId, @Param("studyModel") String studyModel, @Param("unitId") Long unitId);
 }

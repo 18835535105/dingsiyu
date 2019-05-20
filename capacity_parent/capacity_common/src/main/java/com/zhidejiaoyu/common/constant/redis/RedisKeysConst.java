@@ -81,4 +81,9 @@ public class RedisKeysConst {
      * 存储学生 id 与其 sessionId 对应关系
      */
     public static final String LOGIN_SESSION = "LOGIN_SESSION";
+
+    /**
+     * 存储音节信息
+     */
+    public static final String PHONETIC_SYMBOL = "PHONETIC_SYMBOL";
 }

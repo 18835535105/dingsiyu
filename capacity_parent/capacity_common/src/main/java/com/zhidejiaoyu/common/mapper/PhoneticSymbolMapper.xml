@@ -4,26 +4,50 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.PhoneticSymbol">
-        <id column="id" property="id" />
-        <result column="phonetic_symbol" property="phoneticSymbol" />
-        <result column="type" property="type" />
-        <result column="letter" property="letter" />
-        <result column="pronunciation_method" property="pronunciationMethod" />
-        <result column="url" property="url" />
-        <result column="unit_id" property="unitId" />
-        <result column="content" property="content" />
+        <id column="id" property="id"/>
+        <result column="phonetic_symbol" property="phoneticSymbol"/>
+        <result column="type" property="type"/>
+        <result column="letter" property="letter"/>
+        <result column="pronunciation_method" property="pronunciationMethod"/>
+        <result column="url" property="url"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="content" property="content"/>
+        <result column="part_url" property="partUrl"/>
     </resultMap>
 
     <sql id="base_sql">
-        id,phonetic_symbol,type,letter,pronunciation_method,url,unit_id,content
+        id,phonetic_symbol,type,letter,pronunciation_method,url,unit_id,content,part_url
     </sql>
-    
+    <!--多表查询-->
+    <sql id="more_sql">
+        ps.id, ps.phonetic_symbol, ps.type, ps.letter, ps.pronunciation_method, ps.url, ps.unit_id, ps.content, ps.part_url
+    </sql>
+
     <select id="selByUnitId" parameterType="integer" resultType="map">
-        select id,phonetic_symbol,type from phonetic_symbol where unit_id=#{unitId} group by phonetic_symbol
+        select id, phonetic_symbol, type
+        from phonetic_symbol
+        where unit_id = #{unitId}
+        group by phonetic_symbol
     </select>
-    
+
     <select id="selAllByUnitIdAndSymbol" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include> from phonetic_symbol where unit_id=#{unitId} and phonetic_symbol=#{symbol}
+        select
+        <include refid="base_sql"/>
+        from phonetic_symbol where unit_id=#{unitId} and phonetic_symbol=#{symbol}
     </select>
+    <select id="countByUnitId" resultType="java.lang.Integer">
+        select count(id)
+        from phonetic_symbol
+        where unit_id = #{unitId}
+    </select>
+    <select id="selectNotLearnByStudentIdAndUnitId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from phonetic_symbol where unit_id = #{unitId} and id not in (
+        select vocabulary_id from learn where unit_id = #{unitId} and student_id = #{studentId} and study_model =
+        #{studyModel}
+        ) group by phonetic_symbol limit 1
+    </select>
+
 
 </mapper>
