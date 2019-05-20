@@ -1,14 +1,14 @@
 package com.zhidejiaoyu.student.controller;
 
 
+import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.PhoneticSymbolService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
@@ -21,6 +21,7 @@ import javax.servlet.http.HttpSession;
  * @author zdjy
  * @since 2019-05-17
  */
+@Validated
 @RestController
 @RequestMapping("/phoneticSymbol")
 public class PhoneticSymbolController {
@@ -56,6 +57,22 @@ public class PhoneticSymbolController {
             return ServerResponse.createByError(400, "单元 id 不能为空！");
         }
         return phoneticSymbolService.getSymbolListen(unitId, session);
+    }
+
+    /**
+     * 保存音节辨音记录
+     *
+     * @param session
+     * @param unitId
+     * @param symbolId  音节 id
+     * @return
+     */
+    @PostMapping("/saveSymbolListen")
+    public ServerResponse saveSymbolListen(HttpSession session, Long unitId,  Integer symbolId) {
+        if (unitId == null || symbolId == null) {
+            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT);
+        }
+        return phoneticSymbolService.saveSymbolListen(session, unitId, symbolId);
     }
 
 

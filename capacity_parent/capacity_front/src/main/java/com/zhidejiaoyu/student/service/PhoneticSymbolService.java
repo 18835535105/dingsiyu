@@ -29,7 +29,18 @@ public interface PhoneticSymbolService extends IService<PhoneticSymbol> {
      * 获取音标辨音题目
      *
      * @param unitId 单元 id
+     * @param session
      * @return
      */
     ServerResponse<Object> getSymbolListen(Long unitId, HttpSession session);
+
+    /**
+     * 保存音节辨音记录
+     *
+     * @param session
+     * @param unitId
+     * @param symbolId  音节 id
+     * @return
+     */
+    ServerResponse saveSymbolListen(HttpSession session, Long unitId, Integer symbolId);
 }

@@ -1,8 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.zhidejiaoyu.common.pojo.Learn;
-import com.zhidejiaoyu.common.pojo.PhoneticSymbol;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.PhoneticSymbol;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -35,13 +34,20 @@ public interface PhoneticSymbolMapper extends BaseMapper<PhoneticSymbol> {
     int countByUnitId(@Param("unitId") Long unitId);
 
     /**
-     * 查询当前单元还没有学习的音标信息
+     * 获取当前单元已经学习的音节数据
      *
      * @param studentId
      * @param studyModel
      * @param unitId
-     * @param learns
      * @return
      */
-    PhoneticSymbol selectNotLearnByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("studyModel") String studyModel, @Param("unitId") Long unitId, @Param("learns") List<Learn> learns);
+    List<String> selectLearnedPhoneticSymbolByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("studyModel") String studyModel, @Param("unitId") Long unitId);
+
+    /**
+     * 获取未学习的音节数据（取第一个）
+     *
+     * @param phoneticSymbols 已经学习过的音节数据
+     * @return
+     */
+    PhoneticSymbol selectUnLearnPhoneticSymbolByPhoneticSymbols(@Param("phoneticSymbols") List<String> phoneticSymbols);
 }

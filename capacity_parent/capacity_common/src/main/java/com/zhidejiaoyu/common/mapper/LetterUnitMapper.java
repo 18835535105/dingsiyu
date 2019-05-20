@@ -19,4 +19,12 @@ import java.util.Map;
 public interface LetterUnitMapper extends BaseMapper<LetterUnit> {
 
     List<LetterUnit> selSymbolUnit(@Param("startUnit") Long startunit,@Param("endUnit") Long endunit);
+
+    /**
+     * 查找下一单元信息
+     *
+     * @param unitId
+     * @return
+     */
+    LetterUnit selectNextUnitId(@Param("unitId") Long unitId);
 }

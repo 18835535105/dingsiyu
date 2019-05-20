@@ -1510,11 +1510,14 @@
           and flow_name = #{flowName}
     </select>
     <select id="selLaterSentence" parameterType="java.util.Map" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"/> from learn where student_id=#{studentId} and type=1 and unit_id=#{unitId} and study_model="例句默写" order by id desc limit 1;
-    </select>
-    <select id="selectByStudentIdAndStudyModel" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="Base_Column_List"/>
+        from learn where student_id=#{studentId} and type=1 and unit_id=#{unitId} and study_model='例句默写' order by id
+        desc limit 1;
+    </select>
+    <select id="countByStudentIdAndStudyModel" resultMap="BaseResultMap" parameterType="map">
+        select
+        count(id)
         from learn
         where unit_id = #{unitId}
         and student_id = #{studentId}

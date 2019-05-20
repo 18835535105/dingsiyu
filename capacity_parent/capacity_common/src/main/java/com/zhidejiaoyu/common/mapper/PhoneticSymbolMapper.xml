@@ -40,13 +40,31 @@
         from phonetic_symbol
         where unit_id = #{unitId}
     </select>
-    <select id="selectNotLearnByStudentIdAndUnitId" resultMap="BaseResultMap" parameterType="map">
+    <select id="selectLearnedPhoneticSymbolByStudentIdAndUnitId" resultType="java.lang.String" parameterType="map">
+        select distinct (ps.phonetic_symbol)
+        from phonetic_symbol ps,
+             learn l
+        where ps.unit_id = l.unit_id
+          and l.unit_id = #{unitId}
+          and l.student_id = #{studentId}
+          and l.study_model = #{studyModel}
+          and l.type = 1
+    </select>
+    <select id="selectUnLearnPhoneticSymbolByPhoneticSymbols"
+            resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="base_sql"/>
-        from phonetic_symbol where unit_id = #{unitId} and id not in (
-        select vocabulary_id from learn where unit_id = #{unitId} and student_id = #{studentId} and study_model =
-        #{studyModel}
-        ) group by phonetic_symbol limit 1
+        from phonetic_symbol
+        <where>
+            <if test="phoneticSymbols.size > 0">
+                phonetic_symbol not in (
+                <foreach collection="phoneticSymbols" separator="," item="item">
+                    #{item}
+                </foreach>
+                )
+            </if>
+        </where>
+        limit 1
     </select>
 
 

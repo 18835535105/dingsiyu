@@ -25,5 +25,13 @@
         and unit.id >=#{startUnit}
         group by unit.id
     </select>
+    <select id="selectNextUnitId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="sql"/>
+        from letter_unit
+        where id > #{unitId}
+        order by id asc
+        limit 1
+    </select>
 
 </mapper>

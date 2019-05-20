@@ -15,6 +15,11 @@ import java.util.List;
 public class PhoneticSymbolListenVo implements Serializable {
 
     /**
+     * 音节 id
+     */
+    private Integer id;
+
+    /**
      * 音节信息
      */
     private String phonetic;
