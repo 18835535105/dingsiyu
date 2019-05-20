@@ -14,4 +14,16 @@
         <result column="content" property="content" />
     </resultMap>
 
+    <sql id="base_sql">
+        id,phonetic_symbol,type,letter,pronunciation_method,url,unit_id,content
+    </sql>
+    
+    <select id="selByUnitId" parameterType="integer" resultType="map">
+        select id,phonetic_symbol,type from phonetic_symbol where unit_id=#{unitId} group by phonetic_symbol
+    </select>
+    
+    <select id="selAllByUnitIdAndSymbol" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include> from phonetic_symbol where unit_id=#{unitId} and phonetic_symbol=#{symbol}
+    </select>
+
 </mapper>

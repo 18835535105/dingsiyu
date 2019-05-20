@@ -83,4 +83,8 @@
           and type = #{type}
     </select>
 
+    <select id="selSymbolByStudentId" resultMap="BaseResultMap" parameterType="long">
+        select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type = 5 limit 1
+    </select>
+
 </mapper>

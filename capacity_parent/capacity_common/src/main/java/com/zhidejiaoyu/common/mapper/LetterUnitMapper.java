@@ -2,6 +2,10 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.LetterUnit;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -14,4 +18,5 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
  */
 public interface LetterUnitMapper extends BaseMapper<LetterUnit> {
 
+    List<LetterUnit> selSymbolUnit(@Param("startUnit") Long startunit,@Param("endUnit") Long endunit);
 }

@@ -8,4 +8,22 @@
         <result column="unit_name" property="unitName" />
     </resultMap>
 
+    <sql id="sql">
+        id,unit_name
+    </sql>
+
+    <sql id="base_sql">
+        unit.id,unit.unit_name
+    </sql>
+
+    <select id="selSymbolUnit" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include>
+        from letter_unit unit
+        join phonetic_symbol symbol
+        on unit.id=symbol.unit_id
+        where unit.id &lt;= #{endUnit}
+        and unit.id >=#{startUnit}
+        group by unit.id
+    </select>
+
 </mapper>
