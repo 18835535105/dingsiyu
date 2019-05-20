@@ -25,8 +25,6 @@ public interface UnitVocabularyMapper {
     int updateByExampleSelective(@Param("record") UnitVocabulary record,
                                  @Param("example") UnitVocabularyExample example);
 
-    int updateByExample(@Param("record") UnitVocabulary record, @Param("example") UnitVocabularyExample example);
-
     /**
      * 根据单词id获取所有对应的单元id
      *
@@ -217,4 +215,23 @@ public interface UnitVocabularyMapper {
 
     List<Map<String, Object>> selUnitIdAndNameByCourseIdsAndStartUnitIdAndEndUnitId(@Param("courseId") Long courseId
             ,@Param("startUnitId") Long startUnitId,@Param("endUnitId") Long endUnitId);
+
+    /**
+     * 查询出三个本单元非当前单词的单词释义
+     *
+     * @param unitId       单元 id
+     * @param vocabularyId 单词 id
+     * @return
+     */
+    List<String> selectWordChineseByUnitIdAndCurrentWordId(@Param("unitId") Long unitId, @Param("vocabularyId") Long vocabularyId);
+
+    /**
+     * 查询当前课程下不在当前单元的单词释义
+     *
+     * @param courseId
+     * @param unitId
+     * @param limitSize 查询数据量
+     * @return
+     */
+    List<String> selectWordChineseByCourseIdAndNotInUnitId(@Param("courseId") Long courseId, @Param("unitId") Long unitId, @Param("limitSize") int limitSize);
 }
