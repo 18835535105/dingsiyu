@@ -18,13 +18,53 @@
     <sql id="base_sql">
         id,phonetic_symbol,type,letter,pronunciation_method,url,unit_id,content,part_url
     </sql>
-    
+    <!--多表查询-->
+    <sql id="more_sql">
+        ps.id, ps.phonetic_symbol, ps.type, ps.letter, ps.pronunciation_method, ps.url, ps.unit_id, ps.content, ps.part_url
+    </sql>
+
     <select id="selByUnitId" parameterType="integer" resultType="map">
-        select id,phonetic_symbol,type from phonetic_symbol where unit_id=#{unitId} group by phonetic_symbol
+        select id, phonetic_symbol, type
+        from phonetic_symbol
+        where unit_id = #{unitId}
+        group by phonetic_symbol
     </select>
-    
+
     <select id="selAllByUnitIdAndSymbol" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include> from phonetic_symbol where unit_id=#{unitId} and phonetic_symbol=#{symbol}
+        select
+        <include refid="base_sql"/>
+        from phonetic_symbol where unit_id=#{unitId} and phonetic_symbol=#{symbol}
+    </select>
+    <select id="countByUnitId" resultType="java.lang.Integer">
+        select count(id)
+        from phonetic_symbol
+        where unit_id = #{unitId}
+    </select>
+    <select id="selectLearnedPhoneticSymbolByStudentIdAndUnitId" resultType="java.lang.String" parameterType="map">
+        select distinct (ps.phonetic_symbol)
+        from phonetic_symbol ps,
+             learn l
+        where ps.unit_id = l.unit_id
+          and l.unit_id = #{unitId}
+          and l.student_id = #{studentId}
+          and l.study_model = #{studyModel}
+          and l.type = 1
+    </select>
+    <select id="selectUnLearnPhoneticSymbolByPhoneticSymbols"
+            resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from phonetic_symbol
+        <where>
+            <if test="phoneticSymbols.size > 0">
+                phonetic_symbol not in (
+                <foreach collection="phoneticSymbols" separator="," item="item">
+                    #{item}
+                </foreach>
+                )
+            </if>
+        </where>
+        limit 1
     </select>
 
 </mapper>

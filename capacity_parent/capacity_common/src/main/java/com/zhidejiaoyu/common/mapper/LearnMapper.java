@@ -858,6 +858,16 @@ public interface LearnMapper extends BaseMapper<Learn> {
 
     Learn selLaterSentence(@Param("studentId") Long studentId,@Param("unitId") long unitId);
 
+    /**
+     * 统计学生当前模块的当前已经学习
+     *
+     * @param studentId
+     * @param studyModel
+     * @param unitId
+     * @return
+     */
+    List<Learn> countByStudentIdAndStudyModel(@Param("studentId") Long studentId, @Param("studyModel") String studyModel, @Param("unitId") Long unitId);
+
 
     Integer selLetterLearn(@Param("studentId") Long studentId,@Param("unitId") Long unitId,@Param("studyModel") String studyModel);
 

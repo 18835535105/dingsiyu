@@ -281,16 +281,6 @@
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
     </update>
-    <update id="updateByExample" parameterType="map">
-        update unit_vocabulary
-        set unit_id = #{record.unitId,jdbcType=BIGINT},
-        vocabulary_id = #{record.vocabularyId,jdbcType=BIGINT},
-        classify = #{record.classify,jdbcType=INTEGER},
-        word_chinese = #{record.wordChinese,jdbcType=VARCHAR}
-        <if test="_parameter != null">
-            <include refid="Update_By_Example_Where_Clause"/>
-        </if>
-    </update>
 
     <insert id="insertWordToUnit" parameterType="map">
         insert into unit_vocabulary
@@ -303,5 +293,20 @@
         where course.id=#{courseId}
         and unit.id >= #{startUnitId}
         and unit.id &lt;=#{endUnitId}
+    </select>
+    <select id="selectWordChineseByUnitIdAndCurrentWordId" resultType="java.lang.String" parameterType="map">
+        select word_chinese
+        from unit_vocabulary
+        where unit_id = #{unitId}
+          and vocabulary_id &lt;> #{vocabularyId}
+    </select>
+    <select id="selectWordChineseByCourseIdAndNotInUnitId" resultType="java.lang.String" parameterType="map">
+        select uv.word_chinese
+        from unit_vocabulary uv,
+             unit u
+        where uv.unit_id = u.id
+          and u.course_id = #{courseId}
+          and u.id &lt;> #{unitId}
+        limit #{limitSize}
     </select>
 </mapper>

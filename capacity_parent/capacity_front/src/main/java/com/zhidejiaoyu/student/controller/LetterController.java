@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpSession;
 
 /**
- * <p>
- *  前端控制器
- * </p>
+ * 字母相关 controller
  *
  * @author zdjy
  * @since 2019-05-17
