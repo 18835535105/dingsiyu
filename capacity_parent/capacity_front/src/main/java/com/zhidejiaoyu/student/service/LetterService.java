@@ -2,6 +2,8 @@ package com.zhidejiaoyu.student.service;
 
 import com.zhidejiaoyu.common.pojo.Letter;
 import com.baomidou.mybatisplus.service.IService;
+import com.zhidejiaoyu.common.pojo.LetterPair;
+import com.zhidejiaoyu.common.pojo.Player;
 
 import javax.servlet.http.HttpSession;
 
@@ -16,4 +18,16 @@ import javax.servlet.http.HttpSession;
 public interface LetterService extends IService<Letter> {
 
     Object getLetterUnit(HttpSession session);
+
+    Object getLetterUnitStatus(HttpSession session, Long unitId);
+
+    Object getLetterListen(Long unitId, HttpSession session);
+
+    Object saveLetterListen(Player player, HttpSession session);
+
+    Object getLetterPair(Long unitId, HttpSession session);
+
+    Object saveLetterPair(LetterPair letterPair, HttpSession session);
+
+    Object getLetterTreasure(String major, String subordinate);
 }

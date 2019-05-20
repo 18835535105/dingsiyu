@@ -1512,6 +1512,11 @@
     <select id="selLaterSentence" parameterType="java.util.Map" resultMap="BaseResultMap">
         select <include refid="Base_Column_List"/> from learn where student_id=#{studentId} and type=1 and unit_id=#{unitId} and study_model="例句默写" order by id desc limit 1;
     </select>
-
+    <select id="selLetterLearn" parameterType="map" resultType="integer">
+        select count(id) from learn where  student_id=#{studentId} and type=4 and unit_id=#{unitId} and study_model=#{studyModel};
+    </select>
+    <select id="selLetter" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from learn where   student_id=#{studentId} and type=4 and unit_id=#{unitId} and study_model=#{studyModel} and vocabulary_id=#{wordId};
+    </select>
 
 </mapper>

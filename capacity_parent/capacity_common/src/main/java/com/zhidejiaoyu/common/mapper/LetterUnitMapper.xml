@@ -26,4 +26,30 @@
         group by unit.id
     </select>
 
+    <select id="selLetterUnit" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include>
+        from letter_unit unit
+        join letter letter
+        on unit.id=letter.unit_id
+        where unit.id &lt;= #{endUnit}
+        and unit.id >=#{startUnit}
+        group by unit.id
+    </select>
+    <select id="selLetterAllUnit" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include>
+        from letter_unit unit
+        join letter letter
+        on unit.id=letter.unit_id
+        group by unit.id
+    </select>
+    <select id="selLetterTreasure" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include>
+        from letter_unit unit
+        join letter_vocabulary voc
+        on unit.id=voc.unit_id
+        where voc.major_categories=#{major}
+        and voc.subordinate_category=#{subordinate}
+        group by unit.id
+    </select>
+
 </mapper>

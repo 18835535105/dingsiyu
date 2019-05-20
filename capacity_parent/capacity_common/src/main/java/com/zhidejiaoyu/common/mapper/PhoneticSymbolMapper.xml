@@ -12,10 +12,11 @@
         <result column="url" property="url" />
         <result column="unit_id" property="unitId" />
         <result column="content" property="content" />
+        <result column="part_url" property="partUrl" />
     </resultMap>
 
     <sql id="base_sql">
-        id,phonetic_symbol,type,letter,pronunciation_method,url,unit_id,content
+        id,phonetic_symbol,type,letter,pronunciation_method,url,unit_id,content,part_url
     </sql>
     
     <select id="selByUnitId" parameterType="integer" resultType="map">

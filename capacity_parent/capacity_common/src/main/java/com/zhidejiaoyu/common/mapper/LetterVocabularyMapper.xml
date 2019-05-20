@@ -14,4 +14,11 @@
         <result column="syllable" property="syllable" />
     </resultMap>
 
+    <sql id="base_sql">
+        id,unit_id,letter,major_categories,subordinate_category,vocabulary,phonetic_symbol,syllable
+    </sql>
+    <select id="selByUnitIds" resultMap="BaseResultMap" parameterType="map">
+        select <include refid="base_sql"></include> from letter_vocabulary
+        where major_categories=#{major} and subordinate_category=#{subordinate} and unit_id=#{unit}
+    </select>
 </mapper>
