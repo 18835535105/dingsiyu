@@ -318,7 +318,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             int hard = memoryDifficultyUtil.getMemoryDifficulty(cm, 1);
             map.put("memoryDifficulty", hard);
             map.put("engine", PerceiveEngine.getPerceiveEngine(hard, vo.getMemory_strength()));
-            map.put("wordChineseList", this.getChinese(Long.parseLong(unitId), vo.getVocabulary_id(), vo.getWord_chinese()));
         }
         map.put("studyNew", false);
 
@@ -1455,6 +1454,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             map.put("type", 2);
             // 把四个选项添加到correct正确答案数据中
             map.put("subject", subject);
+        } else if (classify == 1) {
+            map.put("wordChineseList", this.getChinese(Long.parseLong(map.get("unit_id").toString()), vocabulary.getId(), map.get("wordChinese").toString()));
         }
         return ServerResponse.createBySuccess(map);
     }
