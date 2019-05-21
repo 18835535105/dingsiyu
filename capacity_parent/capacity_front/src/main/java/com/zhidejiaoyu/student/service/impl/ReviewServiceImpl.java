@@ -44,6 +44,7 @@ import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 智能复习业务逻辑层
@@ -56,31 +57,15 @@ import java.util.*;
 public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, CapacityMemory> implements ReviewService {
 
     private Logger logger = LoggerFactory.getLogger(ReviewServiceImpl.class);
-    /**
-     * 50分
-     */
-    private static final int FIVE = 50;
-    /**
-     * 60分
-     */
-    private static final int SIX = 60;
-    /**
-     * 80分
-     */
-    private static final int PASS = 80;
-    /**
-     * 90分
-     */
-    private static final int NINETY_POINT = 90;
-    /**
-     * 100分
-     */
-    private static final int FULL_MARK = 100;
+
     @Value("${ftp.prefix}")
     private String ftpPrefix;
 
     @Autowired
     private TestResultUtil testResultUtil;
+
+    @Autowired
+    private UnitVocabularyMapper unitVocabularyMapper;
 
     /**
      * 记忆追踪mapper
@@ -265,7 +250,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     }
 
     @Override
-    public Map<String, Object> reviewCapacityMemory(Student student, String unit_id, int classify, String course_id) {
+    public Map<String, Object> reviewCapacityMemory(Student student, String unitId, int classify, String course_id) {
 
         Long studentId = student.getId();
 
@@ -275,22 +260,13 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 查询条件1:学生id
         ca.setStudent_id(studentId);
 
-        String model = null;
-        if (classify == 1) {
-            model = "慧记忆";
-        } else if (classify == 2) {
-            model = "慧听写";
-        } else if (classify == 3) {
-            model = "慧默写";
-        }
-
         // 智能复习, 根据单元查询
-        if (StringUtils.isNotBlank(unit_id)) {
+        if (StringUtils.isNotBlank(unitId)) {
             // 查询条件2.1:单元id
-            ca.setUnit_id(Long.valueOf(unit_id));
+            ca.setUnit_id(Long.valueOf(unitId));
 
             // count单元表单词有多少个
-            Integer count = capacityMapper.countNeedReviewByCourseIdOrUnitId(student, null, Long.valueOf(unit_id), commonMethod.getTestType(classify));
+            Integer count = capacityMapper.countNeedReviewByCourseIdOrUnitId(student, null, Long.valueOf(unitId), commonMethod.getTestType(classify));
             map.put("wordCount", count);
         }
         // 查询条件3:模块
@@ -313,9 +289,9 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         map.put("wordChinese", vo.getWord_chinese());
         // 音节
         map.put("wordyj", vo.getSyllable());
-        if (StringUtils.isBlank(unit_id)) {
+        if (StringUtils.isBlank(unitId)) {
             map.put("unitId", vo.getUnit_id());
-            unit_id = vo.getUnit_id().toString();
+            unitId = vo.getUnit_id().toString();
         }
         // 如果音节为空
         if (vo.getSyllable() == null) {
@@ -335,17 +311,59 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         if (classify == 1) {
             CapacityMemory cm = new CapacityMemory();
             cm.setStudentId(studentId);
-            cm.setUnitId(Long.valueOf(unit_id));
+            cm.setUnitId(Long.valueOf(unitId));
             cm.setVocabularyId(vo.getVocabulary_id());
             cm.setMemoryStrength(vo.getMemory_strength());
             cm.setFaultTime(vo.getFault_time());
             int hard = memoryDifficultyUtil.getMemoryDifficulty(cm, 1);
             map.put("memoryDifficulty", hard);
             map.put("engine", PerceiveEngine.getPerceiveEngine(hard, vo.getMemory_strength()));
+            map.put("wordChineseList", this.getChinese(Long.parseLong(unitId), vo.getVocabulary_id(), vo.getWord_chinese()));
         }
         map.put("studyNew", false);
 
         return map;
+    }
+
+    /**
+     * 封装中文干扰项
+     *
+     * @param unitId
+     * @param vocabularyId
+     * @param wordChinese
+     * @return
+     */
+    private List<Map<String, Boolean>> getChinese(Long unitId, Long vocabularyId, String wordChinese) {
+        return getInterferenceChinese(unitId, vocabularyId, wordChinese, unitVocabularyMapper, unitMapper);
+    }
+
+    /**
+     * 获取中文选项
+     *
+     * @param unitId
+     * @param vocabularyId
+     * @param wordChinese
+     * @param unitVocabularyMapper
+     * @param unitMapper
+     * @return
+     */
+    static List<Map<String, Boolean>> getInterferenceChinese(Long unitId, Long vocabularyId, String wordChinese, UnitVocabularyMapper unitVocabularyMapper, UnitMapper unitMapper) {
+        List<String> chinese = unitVocabularyMapper.selectWordChineseByUnitIdAndCurrentWordId(unitId, vocabularyId);
+        if (chinese.size() < 3) {
+            Unit unit = unitMapper.selectById(unitId);
+            chinese.addAll(unitVocabularyMapper.selectWordChineseByCourseIdAndNotInUnitId(unit.getCourseId(), unitId, 3 - chinese.size()));
+        }
+        Collections.shuffle(chinese);
+        List<Map<String, Boolean>> wordChineseList = chinese.stream().limit(3).map(result -> {
+            Map<String, Boolean> map = new HashMap<>(16);
+            map.put(result, false);
+            return map;
+        }).collect(Collectors.toList());
+        Map<String, Boolean> map = new HashMap<>(16);
+        map.put(wordChinese, true);
+        wordChineseList.add(map);
+        Collections.shuffle(wordChineseList);
+        return wordChineseList;
     }
 
     @Override
