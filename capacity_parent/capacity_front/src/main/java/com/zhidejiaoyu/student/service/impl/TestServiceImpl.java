@@ -448,7 +448,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setStudyModel("字母学后测试");
         testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
         getUnitTestMsg(testRecord, testRecord.getPoint());
-        Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 11);
+        Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 12);
         Integer goldCount = 0;
         if (integer <= point) {
             if (point < SIX) {
