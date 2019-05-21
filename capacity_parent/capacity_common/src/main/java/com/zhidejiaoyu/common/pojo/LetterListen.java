@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.common.pojo;
 
-import com.baomidou.mybatisplus.enums.IdType;
-import com.baomidou.mybatisplus.annotations.TableId;
+import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
 import com.baomidou.mybatisplus.activerecord.Model;
@@ -15,47 +14,45 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- *
+ * 
  * </p>
  *
  * @author zdjy
- * @since 2019-05-17
+ * @since 2019-05-20
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class PhoneticSymbol extends Model<PhoneticSymbol> {
+public class LetterListen extends Model<LetterListen> {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     /**
-     * 音标
+     * 单元id
      */
-    private String phoneticSymbol;
-    /**
-     * 类型
-     */
-    private String type;
-    /**
-     * 对应字母
-     */
-    private String letter;
-    /**
-     * 发音方法
-     */
-    private String pronunciationMethod;
-    /**
-     * 音标读音地址
-     */
-    private String url;
-
     private Integer unitId;
-
-    private String content;
-
-    private String partUrl;
+    /**
+     * 字母id
+     */
+    private Integer letterId;
+    /**
+     * 状态1，正在学习 2，已经学习
+     */
+    private Integer state;
+    /**
+     * 黄金记忆点时间
+     */
+    private Date push;
+    /**
+     * 记忆强度
+     */
+    private Integer memoryStrength;
+    /**
+     * 学生id
+     */
+    private Integer studentId;
 
 
     @Override

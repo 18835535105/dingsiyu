@@ -866,7 +866,16 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @param unitId
      * @return
      */
-    int countByStudentIdAndStudyModel(@Param("studentId") Long studentId, @Param("studyModel") String studyModel, @Param("unitId") Long unitId);
+    List<Learn> countByStudentIdAndStudyModel(@Param("studentId") Long studentId, @Param("studyModel") String studyModel, @Param("unitId") Long unitId);
+
+
+    Integer selLetterLearn(@Param("studentId") Long studentId,@Param("unitId") Long unitId,@Param("studyModel") String studyModel);
+
+
+    Learn selLetter(@Param("studentId") Long studentId,@Param("wordId") Long wordId,@Param("unitId") Long unitId);
+
+    @Update("update learn set type=2 where student_id=#{studentId} and unit_id =#{unitId} and study_model=#{studyModel}")
+    void updLetterPair(@Param("studentId") Long studentId,@Param("unitId") Long unitId,@Param("studyModel") String studyModel);
 
     /**
      * 修改学习记录中的状态

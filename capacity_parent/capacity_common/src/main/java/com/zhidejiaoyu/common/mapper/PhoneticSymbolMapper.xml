@@ -4,15 +4,15 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.PhoneticSymbol">
-        <id column="id" property="id"/>
-        <result column="phonetic_symbol" property="phoneticSymbol"/>
-        <result column="type" property="type"/>
-        <result column="letter" property="letter"/>
-        <result column="pronunciation_method" property="pronunciationMethod"/>
-        <result column="url" property="url"/>
-        <result column="unit_id" property="unitId"/>
-        <result column="content" property="content"/>
-        <result column="part_url" property="partUrl"/>
+        <id column="id" property="id" />
+        <result column="phonetic_symbol" property="phoneticSymbol" />
+        <result column="type" property="type" />
+        <result column="letter" property="letter" />
+        <result column="pronunciation_method" property="pronunciationMethod" />
+        <result column="url" property="url" />
+        <result column="unit_id" property="unitId" />
+        <result column="content" property="content" />
+        <result column="part_url" property="partUrl" />
     </resultMap>
 
     <sql id="base_sql">
@@ -68,6 +68,5 @@
         </where>
         limit 1
     </select>
-
 
 </mapper>

@@ -23,7 +23,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"letter_unit"};
+        String[] tableName = {"letter_write"};
 
         /**
          * 配置：
@@ -38,7 +38,7 @@ public class MpGeneratorUtil {
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig
                 //设置代码生成路径
-                .setOutputDir("/Users/wuchenxi/Desktop/zdjy")
+                .setOutputDir("D:\\表")
                 //设置作者
                 .setAuthor("zdjy")
                 //设置二级缓存的开闭

@@ -46,7 +46,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     @Autowired
     private RedisOpt redisOpt;
 
-    @Value("${ftp.url}")
+    @Value("${ftp.prefix}")
     private String url;
 
     @Value("${ftp.prefix}")
@@ -111,31 +111,46 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                         map.put("method",split);
                     }
                     if(map.get("listen")==null || map.get("listen")==""){
-                        map.put("listen",url+"/"+phonetic.getUrl());
+                        map.put("listen",url+phonetic.getUrl());
+                    }
+                    if(map.get("partUrl")==null||map.get("partUrl")==""){
+                        map.put("partUrl",url+phonetic.getPartUrl());
                     }
                 }
                 symbolMap.put("letter",phonetic.getLetter());
                 String[] split = phonetic.getContent().split("；");
+                List<String> vocabularies=new ArrayList<>();
                 if(split.length>4){
                     List<String> lets=new ArrayList<>();
                     int i=0;
                     for(String let:split){
+                        String[] s = let.split(" ");
+                        vocabularies.add(s[1].replace("#",""));
                         lets.add(let);
                         if(lets.size()==4 && i==0){
                             i++;
                             symbolMap2.put("letter",phonetic.getLetter());
                             symbolMap2.put("merge",true);
                             symbolMap2.put("example",lets);
+                            symbolMap2.put("vocabularies",vocabularies);
                             list.add(symbolMap2);
+                            vocabularies=new ArrayList<>();
                             lets=new ArrayList<>();
                         }
                     }
                     symbolMap.put("display",true);
                     symbolMap.put("example",lets);
+                    symbolMap.put("vocabularies",vocabularies);
                     list.add(symbolMap);
                 }else{
                     symbolMap.put("example",split);
+                    for(String let:split){
+                        String[] s = let.split(" ");
+                        vocabularies.add(s[1].replace("#",""));
+                    }
+                    symbolMap.put("vocabularies",vocabularies);
                     list.add(symbolMap);
+
                 }
 
             }

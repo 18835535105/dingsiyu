@@ -115,9 +115,11 @@
         <if test="model == 8">
             and study_model = '音译测试'
         </if>
-
         <if test="model == 9">
             and study_model = '课文测试'
+        </if>
+        <if test="model == 10">
+            and study_model = '字母单元闯关'
         </if>
     </sql>
 
