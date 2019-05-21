@@ -249,12 +249,16 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                 .collect(Collectors.toList());
         Collections.shuffle(otherPhoneticSymbol);
 
+        // 根据读音去重
+        List<String> urlList = getUrlList(otherPhoneticSymbol);
+
+
         List<Map<String, Object>> resultList = new ArrayList<>(phoneticSymbols.size() * 3);
 
         Map<String, List<PhoneticSymbol>> collectMap = phoneticSymbols.parallelStream().collect(Collectors.groupingBy(PhoneticSymbol::getPhoneticSymbol));
         collectMap.forEach((key, val) -> {
             // 看音标选声音（听力理解）
-            this.getTypeOne(otherPhoneticSymbol, resultList, val);
+            this.getTypeOne(urlList, resultList, val);
 
             // 听音标选单词（音标辨音）
             this.getTypeTwo(otherPhoneticSymbol, resultList, val);
@@ -265,6 +269,11 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
 
         Collections.shuffle(resultList);
         return ServerResponse.createBySuccess(resultList);
+    }
+
+    private List<String> getUrlList(List<PhoneticSymbol> otherPhoneticSymbol) {
+        Map<String, List<PhoneticSymbol>> collect = otherPhoneticSymbol.stream().collect(Collectors.groupingBy(PhoneticSymbol::getUrl));
+        return new ArrayList<>(collect.keySet());
     }
 
     /**
@@ -330,26 +339,28 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     /**
      * 看音标选声音（听力理解）
      *
-     * @param otherPhoneticSymbol
+     *  @param phoneticSymbolList
      * @param resultList
      * @param val
      */
-    private void getTypeOne(List<PhoneticSymbol> otherPhoneticSymbol, List<Map<String, Object>> resultList, List<PhoneticSymbol> val) {
+    private void getTypeOne(List<String> phoneticSymbolList, List<Map<String, Object>> resultList, List<PhoneticSymbol> val) {
+        Collections.shuffle(phoneticSymbolList);
         Map<String, Object> map = new HashMap<>(16);
         map.put("type", 1);
         map.put("title", val.get(0).getPhoneticSymbol());
 
         List<Map<String, Object>> list = new ArrayList<>(4);
-        Map<String, Object> answerMap = new HashMap<>(16);
-        answerMap.put("url", prefix + val.get(0).getUrl());
-        answerMap.put("answer", true);
-        list.add(answerMap);
-
+        Map<String, Object> answerMap;
         for (int i = 0; i < 3; i++) {
-            answerMap.put("url", prefix + otherPhoneticSymbol.get(i).getUrl());
+            answerMap = new HashMap<>(16);
+            answerMap.put("url", prefix + phoneticSymbolList.get(i));
             answerMap.put("answer", false);
             list.add(answerMap);
         }
+        answerMap = new HashMap<>(16);
+        answerMap.put("url", prefix + val.get(0).getUrl());
+        answerMap.put("answer", true);
+        list.add(answerMap);
 
         map.put("answer", list);
         resultList.add(map);
