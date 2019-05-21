@@ -13,4 +13,22 @@
         <result column="state" property="state" />
     </resultMap>
 
+    <sql id="base_sql" >
+        id,student_id,unit_id,letter_id,push,memory_strength,state
+    </sql>
+
+    <select id="selStudyLetterIdByUnitIdAndStudent" parameterType="map" resultType="long">
+        select letter_id from letter_write where unit_id=#{unitId} and student_id=#{studentId}
+    </select>
+
+    <select id="selStudyLetterCountByUnitIdAndStudent" parameterType="map" resultType="integer">
+        select count(id) from letter_write where unit_id=#{unitId} and student_id=#{studentId}
+    </select>
+
+    <select id="selByLetterIdAndStudent" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include> from letter_write where letter_id=#{letterId} and student_id=#{studentId}
+    </select>
+
+
+
 </mapper>

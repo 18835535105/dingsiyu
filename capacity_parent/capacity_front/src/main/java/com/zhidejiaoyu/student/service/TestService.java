@@ -146,4 +146,12 @@ public interface TestService extends BaseService<TestRecord> {
     ServerResponse<Object> saveCapTeksTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO);
 
     ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session);
+
+    Object getLetterUnitEntry(HttpSession session,Long unitId);
+
+    Object saveLetterUnitEntry(HttpSession session, TestRecord testRecord);
+
+    Object getLetterAfterLearning(HttpSession session, Long unitId);
+
+    Object saveLetterAfterLearning(HttpSession session, TestRecord testRecord);
 }

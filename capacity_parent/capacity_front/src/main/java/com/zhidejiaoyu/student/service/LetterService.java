@@ -23,11 +23,15 @@ public interface LetterService extends IService<Letter> {
 
     Object getLetterListen(Long unitId, HttpSession session);
 
-    Object saveLetterListen(Player player, HttpSession session);
+    Object saveLetterListen(Player player, HttpSession session,Long valid);
 
     Object getLetterPair(Long unitId, HttpSession session);
 
-    Object saveLetterPair(LetterPair letterPair, HttpSession session);
+    Object saveLetterPair(LetterPair letterPair, HttpSession session,Long vaild);
 
     Object getLetterTreasure(String major, String subordinate);
+
+    Object getLetterWrite(Long unitId, HttpSession session);
+
+    Object saveLetterWrite(Letter letter, HttpSession session,Boolean falg,Long vaild);
 }

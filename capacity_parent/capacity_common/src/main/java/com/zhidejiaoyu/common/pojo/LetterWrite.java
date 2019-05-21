@@ -48,7 +48,7 @@ public class LetterWrite extends Model<LetterWrite> {
     /**
      * 记忆强度
      */
-    private Integer memoryStrength;
+    private Double memoryStrength;
     /**
      * 1,正在学习 2，已经学习
      */

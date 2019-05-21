@@ -15,6 +15,9 @@
     <sql id="base_sql">
         id,big_letter,lowercase_letters,unit_id,type,gif_url
     </sql>
+    <sql id="res_sql">
+        letter.id,letter.big_letter,letter.lowercase_letters,letter.unit_id,letter.type,letter.gif_url
+    </sql>
 
     <select id="selLetterCountById" resultType="integer" parameterType="long">
         select count(id) from letter where unit_id =#{unitId}
@@ -44,6 +47,18 @@
 
     <select id="getThreeLetter" parameterType="map" resultMap="BaseResultMap">
         select <include refid="base_sql"></include> from letter where id &lt;> #{letterId} order by rand() limit 3
+    </select>
+
+    <select id="selPushLetterByUnitIdAndStudent" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="res_sql"></include>
+        from letter letter
+        join letter_write letwrite
+        on letwrite.letter_id=letter.id
+        where letwrite.unit_id=#{unitId}
+        and letwrite.student_id=#{studentId}
+        and letwrite.push is not null
+        and letwrite.push &lt;= now()
+        limit 1
     </select>
 
 </mapper>

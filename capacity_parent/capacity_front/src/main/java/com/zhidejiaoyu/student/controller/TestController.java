@@ -286,4 +286,27 @@ public class TestController {
         return testService.getGameSubject(session);
     }
 
+    /**
+     * 获取字母单元闯关内容
+     */
+    @RequestMapping("/getLetterUnitEntry")
+    public Object getLetterUnitEntry(HttpSession session,Long unitId){
+        return testService.getLetterUnitEntry(session,unitId);
+    }
+
+    @RequestMapping("/saveLetterUnitEntry")
+    public Object saveLetterUnitEntry(HttpSession session,TestRecord testRecord){
+        return testService.saveLetterUnitEntry(session,testRecord);
+    }
+
+    @RequestMapping("/getLetterAfterLearning")
+    public Object getLetterAfterLearning(HttpSession session,Long unitId){
+        return testService.getLetterAfterLearning(session,unitId);
+    }
+
+    @RequestMapping("/saveLetterAfterLearning")
+    public Object saveLetterAfterLearning(HttpSession session,TestRecord testRecord){
+        return testService.saveLetterAfterLearning(session,testRecord);
+    }
+
 }
