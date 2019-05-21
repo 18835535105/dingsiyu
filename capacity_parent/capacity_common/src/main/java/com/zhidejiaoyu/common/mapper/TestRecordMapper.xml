@@ -122,6 +122,9 @@
             and study_model = '字母单元闯关'
         </if>
         <if test="model == 11">
+            and study_model = '音标测试'
+        </if>
+        <if test="model == 12">
             and study_model = '字母学后测试'
         </if>
     </sql>

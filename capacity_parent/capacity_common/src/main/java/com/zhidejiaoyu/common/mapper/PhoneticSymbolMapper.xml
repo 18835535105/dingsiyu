@@ -48,6 +48,7 @@
           and l.unit_id = #{unitId}
           and l.student_id = #{studentId}
           and l.study_model = #{studyModel}
+          and ps.id = l.vocabulary_id
           and l.type = 1
     </select>
     <select id="selectUnLearnPhoneticSymbolByPhoneticSymbols"
@@ -56,8 +57,9 @@
         <include refid="base_sql"/>
         from phonetic_symbol
         <where>
+            unit_id = #{unitId}
             <if test="phoneticSymbols.size > 0">
-                phonetic_symbol not in (
+                and phonetic_symbol not in (
                 <foreach collection="phoneticSymbols" separator="," item="item">
                     #{item}
                 </foreach>

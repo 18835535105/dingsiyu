@@ -1435,6 +1435,13 @@
             and study_model in ('课文好声音', '课文试听', '课文默写测试')
         </if>
     </update>
+    <update id="updateTypeByStudentIdAndUnitId" parameterType="map">
+        update learn
+        set type = #{type}
+        where unit_id = #{unitId}
+          and student_id = #{studentId}
+          and study_model = #{studyModel}
+    </update>
     <select  id="selByStudentIdAndCourseIdDisVersion" parameterType="java.util.Map" resultType="java.lang.Long">
         select DISTINCT learn.unit_id from learn learn
         where learn.student_id= #{studentId}
@@ -1515,7 +1522,7 @@
         from learn where student_id=#{studentId} and type=1 and unit_id=#{unitId} and study_model='例句默写' order by id
         desc limit 1;
     </select>
-    <select id="countByStudentIdAndStudyModel" resultMap="BaseResultMap" parameterType="map">
+    <select id="countByStudentIdAndStudyModel" resultType="integer" parameterType="map">
         select
         count(id)
         from learn

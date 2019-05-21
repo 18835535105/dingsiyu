@@ -342,22 +342,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
      * @return
      */
     private List<Map<String, Boolean>> getChinese(Long unitId, Long vocabularyId, String wordChinese) {
-        List<String> chinese = unitVocabularyMapper.selectWordChineseByUnitIdAndCurrentWordId(unitId, vocabularyId);
-        if (chinese.size() < 3) {
-            Unit unit = unitMapper.selectById(unitId);
-            chinese.addAll(unitVocabularyMapper.selectWordChineseByCourseIdAndNotInUnitId(unit.getCourseId(), unitId, 3 - chinese.size()));
-        }
-        Collections.shuffle(chinese);
-        List<Map<String, Boolean>> wordChineseList = chinese.stream().limit(3).map(result -> {
-            Map<String, Boolean> map = new HashMap<>(16);
-            map.put(result, false);
-            return map;
-        }).collect(Collectors.toList());
-        Map<String, Boolean> map = new HashMap<>(16);
-        map.put(wordChinese, true);
-        wordChineseList.add(map);
-        Collections.shuffle(wordChineseList);
-        return wordChineseList;
+        return ReviewServiceImpl.getInterferenceChinese(unitId, vocabularyId, wordChinese, unitVocabularyMapper, unitMapper);
     }
 
     @Override

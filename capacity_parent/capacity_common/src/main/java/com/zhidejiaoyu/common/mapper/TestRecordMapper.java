@@ -183,7 +183,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     Integer selectUnitTestMaxPointByStudyModel(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("model") Integer classify);
 
     List<SeniorityVo> planSeniority(@Param("grade") String grade, @Param("study_paragraph") String study_paragraph, @Param("haveTest") Integer haveTest, @Param("version") String version, @Param("classId")Long classId);
-    
+
     @Select("SELECT COUNT(id) AS testCount FROM test_record WHERE student_id = #{stuId}  GROUP BY student_id")
     Integer onePlanSeniority(@Param("stuId") Long stuId);
 

@@ -35,6 +35,11 @@ public class PhoneticSymbolListenVo implements Serializable {
     private Integer total;
 
     /**
+     * 音标读音
+     */
+    private String audioUrl;
+
+    /**
      * 答案集合
      */
     private List<Topic> topics;
