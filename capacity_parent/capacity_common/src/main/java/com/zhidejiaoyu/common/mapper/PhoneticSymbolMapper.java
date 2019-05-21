@@ -46,8 +46,10 @@ public interface PhoneticSymbolMapper extends BaseMapper<PhoneticSymbol> {
     /**
      * 获取未学习的音节数据（取第一个）
      *
+     *
+     * @param unitId    单元 id
      * @param phoneticSymbols 已经学习过的音节数据
      * @return
      */
-    PhoneticSymbol selectUnLearnPhoneticSymbolByPhoneticSymbols(@Param("phoneticSymbols") List<String> phoneticSymbols);
+    PhoneticSymbol selectUnLearnPhoneticSymbolByPhoneticSymbols(@Param("unitId") Long unitId, @Param("phoneticSymbols") List<String> phoneticSymbols);
 }

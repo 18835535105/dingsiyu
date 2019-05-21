@@ -1,8 +1,10 @@
 package com.zhidejiaoyu.student.controller;
 
 
+import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.dto.phonetic.UnitTestDto;
 import com.zhidejiaoyu.student.service.PhoneticSymbolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+import java.util.Date;
 
 /**
  * <p>
@@ -75,6 +79,30 @@ public class PhoneticSymbolController {
         return phoneticSymbolService.saveSymbolListen(session, unitId, symbolId);
     }
 
+    /**
+     * 获取单元闯关测试题目
+     *
+     * @param session
+     * @param unitId
+     * @return
+     */
+    @GetMapping("/getUnitTest")
+    public ServerResponse getUnitTest(HttpSession session, Long unitId) {
+        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
+        return phoneticSymbolService.getUnitTest(session, unitId);
+    }
+
+    /**
+     * 保存单元闯关测试记录
+     *
+     * @param session
+     * @param dto
+     * @return
+     */
+    @PostMapping("/saveUnitTest")
+    public ServerResponse saveUnitTest(HttpSession session, @Valid UnitTestDto dto) {
+        return phoneticSymbolService.saveUnitTest(session, dto);
+    }
 
 }
 

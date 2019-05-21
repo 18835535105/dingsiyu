@@ -7,10 +7,12 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
+import com.zhidejiaoyu.student.dto.phonetic.UnitTestDto;
 import com.zhidejiaoyu.student.service.PhoneticSymbolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
@@ -46,6 +48,9 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
 
     @Value("${ftp.url}")
     private String url;
+
+    @Value("${ftp.prefix}")
+    private String prefix;
 
     @Override
     public Object getSymbolUnit(HttpSession session) {
@@ -168,11 +173,11 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
 
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
-        List<Learn> learns = learnMapper.countByStudentIdAndStudyModel(studentId, STUDY_MODEL, unitId);
+        int learnCount = learnMapper.countByStudentIdAndStudyModel(studentId, STUDY_MODEL, unitId);
 
         int total = phoneticSymbolMapper.countByUnitId(unitId);
 
-        PhoneticSymbol phoneticSymbol = getUnLearnedPhoneticSymbol(unitId, studentId);
+        PhoneticSymbol phoneticSymbol = this.getUnLearnedPhoneticSymbol(unitId, studentId);
         if (phoneticSymbol == null) {
             return ServerResponse.createBySuccess(600, "当前单元已学习完！");
         }
@@ -180,9 +185,10 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         PhoneticSymbolListenVo vo = new PhoneticSymbolListenVo();
         vo.setId(phoneticSymbol.getId());
         vo.setPhonetic(phoneticSymbol.getPhoneticSymbol());
-        vo.setPlan(learns.size());
+        vo.setPlan(learnCount);
         vo.setTotal(total);
         vo.setTopics(this.getTopics(phoneticSymbol));
+        vo.setAudioUrl(prefix + phoneticSymbol.getUrl());
 
         return ServerResponse.createBySuccess(vo);
     }
@@ -196,10 +202,11 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
      */
     private PhoneticSymbol getUnLearnedPhoneticSymbol(Long unitId, Long studentId) {
         List<String> phoneticSymbols = phoneticSymbolMapper.selectLearnedPhoneticSymbolByStudentIdAndUnitId(studentId, STUDY_MODEL, unitId);
-        return phoneticSymbolMapper.selectUnLearnPhoneticSymbolByPhoneticSymbols(phoneticSymbols);
+        return phoneticSymbolMapper.selectUnLearnPhoneticSymbolByPhoneticSymbols(unitId, phoneticSymbols);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse saveSymbolListen(HttpSession session, Long unitId, Integer symbolId) {
         Student student = super.getStudent(session);
         this.saveSymbolListenLearn(session, unitId, symbolId, student);
@@ -210,6 +217,159 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
             return ServerResponse.createBySuccess(super.toUnitTest());
         }
         return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    public ServerResponse getUnitTest(HttpSession session, Long unitId) {
+        List<PhoneticSymbol> allPhoneticSymbol = redisOpt.getPhoneticSymbol();
+        // 当前单元的所有音标信息
+        List<PhoneticSymbol> phoneticSymbols = allPhoneticSymbol.parallelStream()
+                .filter(phoneticSymbol -> Objects.equals(Long.valueOf(phoneticSymbol.getUnitId().toString()), unitId))
+                .collect(Collectors.toList());
+        Collections.shuffle(phoneticSymbols);
+
+        // 非当前单元的所有音标信息
+        List<PhoneticSymbol> otherPhoneticSymbol = allPhoneticSymbol.parallelStream()
+                .filter(phoneticSymbol -> !Objects.equals(Long.valueOf(phoneticSymbol.getUnitId().toString()), unitId))
+                .collect(Collectors.toList());
+        Collections.shuffle(otherPhoneticSymbol);
+
+        List<Map<String, Object>> resultList = new ArrayList<>(phoneticSymbols.size() * 3);
+
+        Map<String, List<PhoneticSymbol>> collectMap = phoneticSymbols.parallelStream().collect(Collectors.groupingBy(PhoneticSymbol::getPhoneticSymbol));
+        collectMap.forEach((key, val) -> {
+            // 看音标选声音（听力理解）
+            this.getTypeOne(otherPhoneticSymbol, resultList, val);
+
+            // 听音标选单词（音标辨音）
+            this.getTypeTwo(otherPhoneticSymbol, resultList, val);
+
+            // 看单词选音标（音标配对）
+            this.getTypeThree(otherPhoneticSymbol, val, resultList);
+        });
+
+        Collections.shuffle(resultList);
+        return ServerResponse.createBySuccess(resultList);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ServerResponse saveUnitTest(HttpSession session, UnitTestDto dto) {
+        Student student = super.getStudent(session);
+        Object beginTime = session.getAttribute(TimeConstant.BEGIN_START_TIME);
+
+        Long unitId = dto.getUnitId();
+
+        TestRecord testRecord = new TestRecord();
+        testRecord.setStudentId(student.getId());
+        testRecord.setUnitId(unitId);
+        testRecord.setGenre(STUDY_MODEL);
+        testRecord.setTestEndTime(new Date());
+        testRecord.setTestStartTime(beginTime == null ? new Date() : (Date) beginTime);
+        testRecord.setPoint(dto.getPoint());
+        testRecord.setHistoryBadPoint(dto.getPoint());
+        testRecord.setHistoryBestPoint(dto.getPoint());
+        testRecord.setQuantity(dto.getRightCount() + dto.getErrorCount());
+        testRecord.setErrorCount(dto.getErrorCount());
+        testRecord.setRightCount(dto.getRightCount());
+        testRecord.setStudyModel(STUDY_MODEL);
+
+        // 获取的的能量
+        int energy = super.getEnergy(student, dto.getPoint());
+
+
+
+        // 将学生学习记录置为已学习状态
+        learnMapper.updateTypeByStudentIdAndUnitId(student.getId(), unitId, STUDY_MODEL, 2);
+        return null;
+    }
+
+    /**
+     * 看音标选单词（音标配对）
+     *
+     * @param symbols         其他单元的音标信息
+     * @param phoneticSymbols 当前单元的音标信息
+     * @param resultList
+     */
+    private void getTypeThree(List<PhoneticSymbol> symbols, List<PhoneticSymbol> phoneticSymbols, List<Map<String, Object>> resultList) {
+
+            Collections.shuffle(symbols);
+            List<PhoneticSymbol> collect = symbols.stream().limit(3).collect(Collectors.toList());
+            List<Map<String, Object>> answerList = new ArrayList<>(collect.size());
+            Map<String, Object> answerMap;
+            for (PhoneticSymbol symbol : collect) {
+                answerMap = new HashMap<>(16);
+                answerMap.put("word", symbol.getPhoneticSymbol());
+                answerMap.put("answer", false);
+                answerList.add(answerMap);
+            }
+            answerMap = new HashMap<>(16);
+            answerMap.put("word", phoneticSymbols.get(0).getPhoneticSymbol());
+            answerMap.put("answer", true);
+            answerList.add(answerMap);
+
+            Map<String, Object> map = new HashMap<>(16);
+            map.put("type", 3);
+            map.put("title", phoneticSymbols.get(0).getLetter());
+            map.put("answer", answerList);
+            resultList.add(map);
+    }
+
+    /**
+     * 听音标选单词（音标辨音）
+     *
+     * @param otherPhoneticSymbol
+     * @param resultList
+     * @param val
+     */
+    private void getTypeTwo(List<PhoneticSymbol> otherPhoneticSymbol, List<Map<String, Object>> resultList, List<PhoneticSymbol> val) {
+        Map<String, Object> map = new HashMap<>(16);
+        map.put("type", 2);
+        map.put("title", prefix + val.get(0).getUrl());
+
+        List<Map<String, Object>> list = new ArrayList<>(4);
+        Map<String, Object> answerMap = new HashMap<>(16);
+        answerMap.put("word", val.get(0).getLetter());
+        answerMap.put("answer", true);
+        list.add(answerMap);
+
+        for (int i = 0; i < 3; i++) {
+            answerMap = new HashMap<>(16);
+            answerMap.put("word", otherPhoneticSymbol.get(i).getLetter());
+            answerMap.put("answer", false);
+            list.add(answerMap);
+        }
+
+        map.put("answer", list);
+        resultList.add(map);
+    }
+
+    /**
+     * 看音标选声音（听力理解）
+     *
+     * @param otherPhoneticSymbol
+     * @param resultList
+     * @param val
+     */
+    private void getTypeOne(List<PhoneticSymbol> otherPhoneticSymbol, List<Map<String, Object>> resultList, List<PhoneticSymbol> val) {
+        Map<String, Object> map = new HashMap<>(16);
+        map.put("type", 1);
+        map.put("title", val.get(0).getPhoneticSymbol());
+
+        List<Map<String, Object>> list = new ArrayList<>(4);
+        Map<String, Object> answerMap = new HashMap<>(16);
+        answerMap.put("url", prefix + val.get(0).getUrl());
+        answerMap.put("answer", true);
+        list.add(answerMap);
+
+        for (int i = 0; i < 3; i++) {
+            answerMap.put("url", prefix + prefix + otherPhoneticSymbol.get(i).getUrl());
+            answerMap.put("answer", false);
+            list.add(answerMap);
+        }
+
+        map.put("answer", list);
+        resultList.add(map);
     }
 
     private void saveSymbolListenLearn(HttpSession session, Long unitId, Integer symbolId, Student student) {
