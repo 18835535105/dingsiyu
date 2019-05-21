@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
+import com.zhidejiaoyu.student.dto.phonetic.UnitTestDto;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 
 import javax.servlet.http.HttpSession;
@@ -146,4 +147,13 @@ public interface TestService extends BaseService<TestRecord> {
     ServerResponse<Object> saveCapTeksTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO);
 
     ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session);
+
+    /**
+     * 保存单元闯关测试记录
+     *
+     * @param session
+     * @param unitId
+     * @return
+     */
+    ServerResponse savePhoneticSymbolUnitTest(HttpSession session, UnitTestDto unitId);
 }

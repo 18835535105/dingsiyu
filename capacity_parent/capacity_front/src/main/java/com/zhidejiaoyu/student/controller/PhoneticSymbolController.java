@@ -92,17 +92,5 @@ public class PhoneticSymbolController {
         return phoneticSymbolService.getUnitTest(session, unitId);
     }
 
-    /**
-     * 保存单元闯关测试记录
-     *
-     * @param session
-     * @param dto
-     * @return
-     */
-    @PostMapping("/saveUnitTest")
-    public ServerResponse saveUnitTest(HttpSession session, @Valid UnitTestDto dto) {
-        return phoneticSymbolService.saveUnitTest(session, dto);
-    }
-
 }
 

@@ -8,8 +8,11 @@ import com.zhidejiaoyu.common.Vo.game.StrengthGameVo;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.Vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.Vo.testVo.TestRecordVo;
+import com.zhidejiaoyu.common.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.study.StudyModelContant;
+import com.zhidejiaoyu.common.constant.study.TestGenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
@@ -27,8 +30,8 @@ import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
 import com.zhidejiaoyu.student.constant.PetImageConstant;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
-import com.zhidejiaoyu.student.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
+import com.zhidejiaoyu.student.dto.phonetic.UnitTestDto;
 import com.zhidejiaoyu.student.service.TestService;
 import com.zhidejiaoyu.student.utils.CcieUtil;
 import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
@@ -43,6 +46,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @Service
@@ -1172,13 +1178,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         vo.setMsg(msg);
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
-        if (student.getBonusExpires() != null) {
-            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
-                Double v = goldCount * 0.2;
-                student.setSystemGold(student.getSystemGold() + v);
-                goldCount = goldCount + v.intValue();
-            }
-        }
+        goldCount = getBonusGold(student, goldCount);
         vo.setGold(goldCount);
         vo.setEnergy(addEnergy);
         countMyGoldUtil.countMyGold(student);
@@ -1381,12 +1381,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
     }
 
-    /**
-     * 匹配选项
-     *
-     * @param integer
-     * @return
-     */
     private String matchSelected(Integer integer) {
         switch (integer) {
             case 0:
@@ -1416,7 +1410,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         String msg;
         if (wordUnitTestDTO != null) {
             msg = "id为：" + student.getId() + "的学生在" + commonMethod.getTestType(wordUnitTestDTO.getClassify())
-                    + " 模块下的单元闯关测试中首次闯关成功，获得#" + goldCount + "#枚金币";
+                    + " 模块下的单元闯关测试中闯关成功，获得#" + goldCount + "#枚金币";
         } else {
             msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + goldCount + "#枚金币";
         }
@@ -1425,6 +1419,80 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         runLog.setUnitId(student.getUnitId());
         runLogMapper.insert(runLog);
         LOGGER.info(msg);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ServerResponse savePhoneticSymbolUnitTest(HttpSession session, UnitTestDto dto) {
+        Student student = super.getStudent(session);
+        Object beginTime = session.getAttribute(TimeConstant.BEGIN_START_TIME);
+
+        // 判断是否是首次测试
+        boolean isFirst = false;
+        TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
+                dto.getUnitId(), TestGenreConstant.UNIT_TEST.getGenre(), PhoneticSymbolServiceImpl.STUDY_MODEL);
+        if (testRecord != null) {
+            isFirst = true;
+        }
+
+        Integer point = dto.getPoint();
+
+        testRecord = new TestRecord();
+        testRecord.setStudentId(student.getId());
+        testRecord.setUnitId(dto.getUnitId());
+        testRecord.setGenre(TestGenreConstant.UNIT_TEST.getGenre());
+        testRecord.setTestEndTime(new Date());
+        testRecord.setTestStartTime(beginTime == null ? new Date() : (Date) beginTime);
+        testRecord.setPoint(point);
+        testRecord.setHistoryBadPoint(point);
+        testRecord.setHistoryBestPoint(point);
+        testRecord.setQuantity(dto.getRightCount() + dto.getErrorCount());
+        testRecord.setErrorCount(dto.getErrorCount());
+        testRecord.setRightCount(dto.getRightCount());
+        testRecord.setStudyModel(StudyModelContant.PHONETIC_SYMBOL_TEST.getModel());
+
+        WordUnitTestDTO wordUnitTestDTO = new WordUnitTestDTO();
+        wordUnitTestDTO.setClassify(10);
+        wordUnitTestDTO.setUnitId(new Long[]{dto.getUnitId()});
+        wordUnitTestDTO.setPoint(point);
+        Integer goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord);
+
+        TestResultVo vo = new TestResultVo();
+        vo.setMsg(getMessage(student, vo, testRecord, point, PASS));
+        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, TestGenreConstant.UNIT_TEST.getGenre()));
+        vo.setGold(getBonusGold(student, goldCount));
+        vo.setEnergy(super.getEnergy(student, point));
+
+        testRecordMapper.insert(testRecord);
+        countMyGoldUtil.countMyGold(student);
+        studentMapper.updateById(student);
+        getLevel(session);
+
+        // 将学生学习记录置为已学习状态
+        learnMapper.updateTypeByStudentIdAndUnitId(student.getId(), dto.getUnitId(), PhoneticSymbolServiceImpl.STUDY_MODEL, 2);
+
+        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
+        session.setAttribute(UserConstant.CURRENT_STUDENT, student);
+
+        return ServerResponse.createBySuccess(vo);
+    }
+
+    /**
+     * 获取加成后的金币
+     *
+     * @param student
+     * @param goldCount
+     * @return
+     */
+    private Integer getBonusGold(Student student, Integer goldCount) {
+        if (student.getBonusExpires() != null) {
+            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
+                Double v = goldCount * 0.2;
+                student.setSystemGold(student.getSystemGold() + v);
+                goldCount = goldCount + v.intValue();
+            }
+        }
+        return goldCount;
     }
 
     /**

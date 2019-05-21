@@ -29,12 +29,12 @@ public class UnitTestDto {
     private Integer point;
 
     /**
-     * 错题数量(用于例句单元闯关测试)
+     * 错题数量
      */
     private Integer errorCount;
 
     /**
-     * 正确题数量(用于例句单元闯关测试)
+     * 正确题数量
      */
     private Integer rightCount;
 }

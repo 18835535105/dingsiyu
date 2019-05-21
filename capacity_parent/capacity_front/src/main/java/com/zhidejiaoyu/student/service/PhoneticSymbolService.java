@@ -54,12 +54,4 @@ public interface PhoneticSymbolService extends IService<PhoneticSymbol> {
      */
     ServerResponse getUnitTest(HttpSession session, Long unitId);
 
-    /**
-     * 保存单元闯关测试记录
-     *
-     * @param session
-     * @param unitId
-     * @return
-     */
-    ServerResponse saveUnitTest(HttpSession session, UnitTestDto unitId);
 }

@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Service
 public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMapper, PhoneticSymbol> implements PhoneticSymbolService {
 
-    private final String STUDY_MODEL = "音标辨音";
+    public static final String STUDY_MODEL = "音标辨音";
 
     @Autowired
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
@@ -267,38 +267,6 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         return ServerResponse.createBySuccess(resultList);
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ServerResponse saveUnitTest(HttpSession session, UnitTestDto dto) {
-        Student student = super.getStudent(session);
-        Object beginTime = session.getAttribute(TimeConstant.BEGIN_START_TIME);
-
-        Long unitId = dto.getUnitId();
-
-        TestRecord testRecord = new TestRecord();
-        testRecord.setStudentId(student.getId());
-        testRecord.setUnitId(unitId);
-        testRecord.setGenre(STUDY_MODEL);
-        testRecord.setTestEndTime(new Date());
-        testRecord.setTestStartTime(beginTime == null ? new Date() : (Date) beginTime);
-        testRecord.setPoint(dto.getPoint());
-        testRecord.setHistoryBadPoint(dto.getPoint());
-        testRecord.setHistoryBestPoint(dto.getPoint());
-        testRecord.setQuantity(dto.getRightCount() + dto.getErrorCount());
-        testRecord.setErrorCount(dto.getErrorCount());
-        testRecord.setRightCount(dto.getRightCount());
-        testRecord.setStudyModel(STUDY_MODEL);
-
-        // 获取的的能量
-        int energy = super.getEnergy(student, dto.getPoint());
-
-
-
-        // 将学生学习记录置为已学习状态
-        learnMapper.updateTypeByStudentIdAndUnitId(student.getId(), unitId, STUDY_MODEL, 2);
-        return null;
-    }
-
     /**
      * 看音标选单词（音标配对）
      *
@@ -378,7 +346,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         list.add(answerMap);
 
         for (int i = 0; i < 3; i++) {
-            answerMap.put("url", prefix + prefix + otherPhoneticSymbol.get(i).getUrl());
+            answerMap.put("url", prefix + otherPhoneticSymbol.get(i).getUrl());
             answerMap.put("answer", false);
             list.add(answerMap);
         }

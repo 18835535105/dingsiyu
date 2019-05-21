@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
 import com.zhidejiaoyu.student.aop.log.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
+import com.zhidejiaoyu.student.dto.phonetic.UnitTestDto;
 import com.zhidejiaoyu.student.service.TestService;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -286,4 +287,15 @@ public class TestController {
         return testService.getGameSubject(session);
     }
 
+    /**
+     * 保存单元闯关测试记录
+     *
+     * @param session
+     * @param dto
+     * @return
+     */
+    @PostMapping("/saveUnitTest")
+    public ServerResponse saveUnitTest(HttpSession session, @Valid UnitTestDto dto) {
+        return testService.savePhoneticSymbolUnitTest(session, dto);
+    }
 }
