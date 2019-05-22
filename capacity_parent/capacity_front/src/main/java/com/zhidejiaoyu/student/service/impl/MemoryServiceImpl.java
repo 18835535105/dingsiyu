@@ -11,12 +11,10 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.common.SaveWordLearnAndCapacity;
 import com.zhidejiaoyu.student.service.MemoryService;
 import com.zhidejiaoyu.student.vo.MemoryStudyVo;
-import com.zhidejiaoyu.student.vo.WordIntensifyVo;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabulary> implements MemoryService {
@@ -151,12 +147,13 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
             // 查询学习记录本模块学习过的所有单词id
             List<Long> wordIds = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "慧记忆", maxCount);
 
-            MemoryStudyVo memoryStudyVo = new MemoryStudyVo();
             Vocabulary currentStudyWord = vocabularyMapper.selectOneWordNotInIds(wordIds, unitId);
 
             // 查询单词释义
             String wordChinese = unitVocabularyMapper.selectWordChineseByUnitIdAndWordId(unitId, currentStudyWord.getId());
             String soundMark = commonMethod.getSoundMark(currentStudyWord.getWord());
+
+            MemoryStudyVo memoryStudyVo = new MemoryStudyVo();
             memoryStudyVo.setWordId(currentStudyWord.getId());
             memoryStudyVo.setMemoryDifficulty(0);
             memoryStudyVo.setMemoryStrength(0.00);
@@ -170,6 +167,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
             memoryStudyVo.setFirstStudy(firstStudy);
             memoryStudyVo.setWordCount(wordCount);
             memoryStudyVo.setEngine(1);
+            memoryStudyVo.setWordChineseList(this.getChinese(unitId, currentStudyWord.getId(), wordChinese));
             return ServerResponse.createBySuccess(memoryStudyVo);
         }
         return null;
@@ -313,28 +311,45 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
      */
     private ServerResponse<MemoryStudyVo> returnGoldWord(CapacityMemory capacityMemory, Long plan, boolean firstStudy,
                                                          Long wordCount) {
-        MemoryStudyVo memoryStudyVo = new MemoryStudyVo();
         String soundMark = commonMethod.getSoundMark(capacityMemory.getWord());
         // 计算当前单词的记忆难度
         int memoryDifficulty = memoryDifficultyUtil.getMemoryDifficulty(capacityMemory, 1);
         // 计算当前单词的记忆强度
         double memoryStrength = capacityMemory.getMemoryStrength();
 
-        memoryStudyVo.setWordId(capacityMemory.getVocabularyId());
+        Long unitId = capacityMemory.getUnitId();
+        Long vocabularyId = capacityMemory.getVocabularyId();
+        String wordChinese = capacityMemory.getWordChinese();
+
+        MemoryStudyVo memoryStudyVo = new MemoryStudyVo();
+        memoryStudyVo.setWordId(vocabularyId);
         memoryStudyVo.setMemoryDifficulty(memoryDifficulty);
         memoryStudyVo.setMemoryStrength(memoryStrength);
         memoryStudyVo.setSoundMark(soundMark);
         memoryStudyVo.setWord(capacityMemory.getWord());
         memoryStudyVo.setSyllable(capacityMemory.getSyllable());
-        memoryStudyVo.setWordChinese(capacityMemory.getWordChinese());
+        memoryStudyVo.setWordChinese(wordChinese);
         memoryStudyVo.setPlan(plan);
         memoryStudyVo.setStudyNew(false);
         memoryStudyVo.setFirstStudy(firstStudy);
         memoryStudyVo.setWordCount(wordCount);
         memoryStudyVo.setReadUrl(baiduSpeak.getLanguagePath(capacityMemory.getWord()));
         memoryStudyVo.setEngine(PerceiveEngine.getPerceiveEngine(memoryDifficulty, memoryStrength));
+        memoryStudyVo.setWordChineseList(this.getChinese(unitId, vocabularyId, wordChinese));
         return ServerResponse.createBySuccess(memoryStudyVo);
 
+    }
+
+    /**
+     * 封装中文干扰项
+     *
+     * @param unitId
+     * @param vocabularyId
+     * @param wordChinese
+     * @return
+     */
+    private List<Map<String, Boolean>> getChinese(Long unitId, Long vocabularyId, String wordChinese) {
+        return ReviewServiceImpl.getInterferenceChinese(unitId, vocabularyId, wordChinese, unitVocabularyMapper, unitMapper);
     }
 
     @Override

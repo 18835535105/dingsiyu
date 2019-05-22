@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author zdjy
@@ -33,7 +33,7 @@ public class LetterVocabulary extends Model<LetterVocabulary> {
     /**
      * 单元
      */
-    private String unit;
+    private Integer unitId;
     /**
      * 字母
      */

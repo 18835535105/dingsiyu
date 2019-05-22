@@ -7,7 +7,7 @@
         <id column="id" property="id" />
         <result column="big_letter" property="bigLetter" />
         <result column="lowercase_letters" property="lowercaseLetters" />
-        <result column="unit" property="unit" />
+        <result column="unit_id" property="unitId" />
         <result column="type" property="type" />
         <result column="gif_url" property="gifUrl" />
     </resultMap>
