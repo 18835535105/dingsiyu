@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface MedalMapper extends BaseMapper<Medal> {
-    int countByExample(MedalExample example);
 
     /**
      * 查询每个勋章大类含有的子勋章个数

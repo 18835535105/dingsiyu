@@ -11,6 +11,9 @@
         <result column="marked_words" property="markedWords" jdbcType="VARCHAR"/>
         <result column="child_img_url" property="childImgUrl" jdbcType="VARCHAR"/>
         <result column="parent_img_url" property="parentImgUrl" jdbcType="VARCHAR"/>
+        <result column="gold_img_url" property="goldImgUrl" jdbcType="VARCHAR"/>
+        <result column="gray_img_url" property="grayImgUrl" jdbcType="VARCHAR"/>
+        <result column="total_plan" property="totalPlan"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -74,14 +77,12 @@
     </sql>
     <sql id="Base_Column_List">
         id, parent_name, next_parent, child_name, next_child,`explain`, marked_words, child_img_url,
-        parent_img_url
+        parent_img_url, gold_img_url, gray_img_url, total_plan
     </sql>
-    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.MedalExample" resultType="java.lang.Integer">
-        select count(*) from medal
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-    </select>
+    <sql id="more_Column_List">
+        m.id, m.parent_name, m.next_parent, m.child_name, m.next_child,m.`explain`, m.marked_words, m.child_img_url,
+        m.parent_img_url, m.gold_img_url, m.gray_img_url, m.total_plan
+    </sql>
 
 
     <select id="countChildByIds" resultType="java.util.Map" parameterType="java.util.List">
