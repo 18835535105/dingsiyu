@@ -341,11 +341,6 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <update id="resetDayAward">
-        update award
-        set can_get = 2, get_flag = 2, get_time = null
-    </update>
-
     <select id="selAwardCountByStudentId" parameterType="long" resultType="map">
         select medal.child_name name,count(award.id) number
         from award award

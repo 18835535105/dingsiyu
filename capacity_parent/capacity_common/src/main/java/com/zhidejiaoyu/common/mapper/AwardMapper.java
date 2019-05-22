@@ -52,13 +52,6 @@ public interface AwardMapper extends BaseMapper<Award> {
     Award selectByIdAndStuId(@Param("awareId") Long awareId, @Param("stuId") Long stuId);
 
     /**
-     * 重置学生日奖励信息
-     *
-     * @return
-     */
-    int resetDayAward();
-
-    /**
      * 根据学生信息和当前勋章子勋章查询当前勋章的领取情况
      *
      * @param student
