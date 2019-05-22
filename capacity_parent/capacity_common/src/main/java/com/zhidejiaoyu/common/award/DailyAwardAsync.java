@@ -114,12 +114,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
      * @param student
      */
     public void firstLogin(Student student) {
-
-        final int awardContentType = 1;
-        Award award = awardMapper.selectByAwardContentTypeAndType(student.getId(), DAILY_TYPE, awardContentType);
-        if (this.checkAward(award, DAILY_TYPE)) {
-            super.optAward(student.getId(), awardContentType, 1, award, DAILY_TYPE);
-        }
+        this.initDailyAward(student);
     }
 
     /**
