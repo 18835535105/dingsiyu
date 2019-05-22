@@ -168,7 +168,6 @@ public class DailyAwardAsync extends BaseAwardAsync {
 
     @Transactional(rollbackFor = Exception.class)
     public void initAward(Student student) {
-        this.initDailyAward(student);
 
         this.initGoldAward(student);
 
