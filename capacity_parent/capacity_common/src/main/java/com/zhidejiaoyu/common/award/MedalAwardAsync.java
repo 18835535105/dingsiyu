@@ -205,11 +205,11 @@ public class MedalAwardAsync extends BaseAwardAsync {
                     award = awardMapper.selectByStudentIdAndMedalType(studentId, medalId);
                     if (i < 3) {
                         if (super.checkAward(award, MEDAL_TYPE)) {
-                            super.optAward(studentId, medalId, (int) (schoolDayRank - schoolRank), award, MEDAL_TYPE);
+                            super.optAward(studentId, medalId, schoolDayRank == null ? 0 : ((int) (schoolDayRank - schoolRank)), award, MEDAL_TYPE);
                         }
                     } else {
                         if (super.checkAward(award, MEDAL_TYPE)) {
-                            super.optAward(studentId, medalId, (int) (countryDayRank - countryRank), award, MEDAL_TYPE);
+                            super.optAward(studentId, medalId, countryDayRank == null ? 0 : ((int) (countryDayRank - countryRank)), award, MEDAL_TYPE);
                         }
                     }
                 }
