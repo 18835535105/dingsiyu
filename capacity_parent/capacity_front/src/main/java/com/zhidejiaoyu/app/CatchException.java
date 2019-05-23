@@ -3,6 +3,7 @@ package com.zhidejiaoyu.app;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.validation.ConstraintViolationException;
+import java.util.ArrayList;
 
 /**
  * 异常处理
@@ -46,4 +49,18 @@ public class CatchException extends BaseServiceImpl<StudentMapper, Student> {
         }
         return ServerResponse.createByError();
     }
+
+
+    /**
+     * 拦截参数校验异常
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ServerResponse constraintViolationException(ConstraintViolationException e) {
+        log.error("参数校验异常:{}", e.getMessage());
+        return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), new ArrayList<>(e.getConstraintViolations()).get(0).getMessageTemplate());
+    }
+
+
 }

@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
 import com.zhidejiaoyu.student.aop.log.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
+import com.zhidejiaoyu.student.dto.phonetic.UnitTestDto;
 import com.zhidejiaoyu.student.service.TestService;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -260,6 +261,40 @@ public class TestController {
     @GetMapping("/getGameTest")
     public ServerResponse<Map<String, Object>> getGameSubject(HttpSession session) {
         return testService.getGameSubject(session);
+    }
+
+    /**
+     * 保存单元闯关测试记录
+     *
+     * @param session
+     * @param dto
+     * @return
+     */
+    @PostMapping("/saveUnitTest")
+    public ServerResponse saveUnitTest(HttpSession session, @Valid UnitTestDto dto) {
+        return testService.savePhoneticSymbolUnitTest(session, dto);
+    }
+    /**
+     * 获取字母单元闯关内容
+     */
+    @RequestMapping("/getLetterUnitEntry")
+    public Object getLetterUnitEntry(HttpSession session,Long unitId){
+        return testService.getLetterUnitEntry(session,unitId);
+    }
+
+    @RequestMapping("/saveLetterUnitEntry")
+    public Object saveLetterUnitEntry(HttpSession session,TestRecord testRecord){
+        return testService.saveLetterUnitEntry(session,testRecord);
+    }
+
+    @RequestMapping("/getLetterAfterLearning")
+    public Object getLetterAfterLearning(HttpSession session,Long unitId){
+        return testService.getLetterAfterLearning(session,unitId);
+    }
+
+    @RequestMapping("/saveLetterAfterLearning")
+    public Object saveLetterAfterLearning(HttpSession session,TestRecord testRecord){
+        return testService.saveLetterAfterLearning(session,testRecord);
     }
 
 }

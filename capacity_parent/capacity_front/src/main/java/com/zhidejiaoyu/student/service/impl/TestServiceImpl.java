@@ -10,14 +10,18 @@ import com.zhidejiaoyu.common.Vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.Vo.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
+import com.zhidejiaoyu.common.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.study.StudyModelContant;
+import com.zhidejiaoyu.common.constant.study.TestGenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -29,8 +33,9 @@ import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
 import com.zhidejiaoyu.student.constant.PetImageConstant;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
-import com.zhidejiaoyu.student.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
+import com.zhidejiaoyu.student.dto.phonetic.UnitTestDto;
+import com.zhidejiaoyu.student.service.StudentInfoService;
 import com.zhidejiaoyu.student.service.TestService;
 import com.zhidejiaoyu.student.utils.CcieUtil;
 import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
@@ -46,6 +51,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @Service
@@ -145,13 +153,13 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     private SentenceUnitMapper sentenceUnitMapper;
 
     @Autowired
-    private SentenceCourseMapper sentenceCourseMapper;
+    private LetterMapper letterMapper;
 
     @Autowired
-    private TeksCourseMapper teksCourseMapper;
+    private BaiduSpeak baiduSpeak;
 
     @Autowired
-    private TeksUnitMapper teksUnitMapper;
+    private StudentInfoService studentInfoService;
 
     /**
      * 游戏测试题目获取，获取20个单词供测试
@@ -318,6 +326,254 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             return resultMap;
         }
         return null;
+    }
+
+    @Override
+    public Object getLetterUnitEntry(HttpSession session, Long unitId) {
+        // 设置游戏测试开始时间
+        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
+        List<Letter> letters = letterMapper.getByUnitId(unitId);
+        Collections.shuffle(letters);
+        List<Map<String, Object>> returnList = new ArrayList<>();
+        int i = 0;
+        for (Letter letter : letters) {
+            Map<String, Object> map = new HashMap<>();
+            if (i < 2) {
+                //字母匹配
+                getLetterPair(map, letter);
+            } else if (i < 4) {
+                //字母辨音
+                getLetterDiscrimination(map, letter);
+            } else {
+                //字母听写
+                getLetterWrite(map, letter);
+            }
+            returnList.add(map);
+            i++;
+        }
+        return ServerResponse.createBySuccess(returnList);
+    }
+
+    @Override
+    public Object saveLetterUnitEntry(HttpSession session, TestRecord testRecord) {
+        Student student = getStudent(session);
+        Integer point = testRecord.getPoint();
+        testRecord.setStudentId(student.getId());
+        testRecord.setGenre("单元闯关测试");
+        testRecord.setStudyModel("字母单元闯关");
+        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+        getUnitTestMsg(testRecord, testRecord.getPoint());
+        Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 10);
+        Integer goldCount = 0;
+        if (integer <= point) {
+            if (point < SIX) {
+                goldCount = 0;
+            } else if (point < SEVENTY) {
+                goldCount = TestAwardGoldConstant.UNIT_TEST_SIXTY_TO_SEVENTY;
+            } else if (point < PASS) {
+                goldCount = TestAwardGoldConstant.UNIT_TEST_SEVENTY_TO_EIGHTY;
+            } else if (point < NINETY_POINT) {
+                goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_NINETY;
+            } else if (point < FULL_MARK) {
+                goldCount = TestAwardGoldConstant.UNIT_TEST_NINETY_TO_FULL;
+            } else {
+                goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
+            }
+        }
+        this.saveLog(student, goldCount, null, "字母单元闯关测试");
+        if (student.getBonusExpires() != null) {
+            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
+                Double doubleGoldCount = goldCount * 0.2;
+                student.setSystemGold(student.getSystemGold() + doubleGoldCount);
+                testRecord.setAwardGold(goldCount + doubleGoldCount.intValue());
+            }
+        }
+        testRecord.setTestEndTime(new Date());
+        testRecordMapper.insert(testRecord);
+        TestResultVo vo = new TestResultVo();
+        vo.setGold(goldCount);
+        int energy = getEnergy(student, testRecord.getPoint());
+        vo.setEnergy(energy);
+        getMessage(student, vo, testRecord, point, 100);
+        studentMapper.updateById(student);
+        studentInfoService.calculateValidTime(session, 7, null,
+                testRecord.getUnitId().longValue(),
+                (testRecord.getTestStartTime().getTime()-testRecord.getTestEndTime().getTime()));
+        return ServerResponse.createBySuccess(vo);
+    }
+
+    @Override
+    public Object getLetterAfterLearning(HttpSession session, Long unitId) {
+        // 设置游戏测试开始时间
+        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
+        //获取单元字母
+        List<Letter> letters = letterMapper.getByUnitId(unitId);
+        //打乱顺序
+        Collections.shuffle(letters);
+        Map<String, Object> map = new HashMap<>();
+        //获取字母配对试题
+        List<Letter> letterPairList = letters.subList(0, 5);
+        List<Map<String,Object>> pairList=new ArrayList<>();
+        for (Letter letter : letterPairList) {
+            Map<String,Object> letterPairMap=new HashMap<>();
+            getLetterPair(letterPairMap, letter);
+            pairList.add(letterPairMap);
+        }
+        map.put("letterPair",pairList);
+        Collections.shuffle(letters);
+        //获取字母辨音试题
+        List<Letter> letterDiscriminationList = letters.subList(0, 5);
+        List<Map<String,Object>> discriminationList=new ArrayList<>();
+        for(Letter letter:letterDiscriminationList){
+            Map<String,Object> discriminationMap=new HashMap<>();
+            getLetterDiscrimination(discriminationMap, letter);
+            discriminationList.add(discriminationMap);
+        }
+        map.put("letterDiscrimination",discriminationList);
+        Collections.shuffle(letters);
+        //获取字母听写试题
+        List<Letter> letterWriteList = letters.subList(0, 3);
+        List<Map<String,Object>> writeList=new ArrayList<>();
+        for(Letter letter:letterWriteList){
+            Map<String,Object> letterWriteMap=new HashMap<>();
+            getLetterWrite(letterWriteMap, letter);
+            writeList.add(letterWriteMap);
+        }
+        map.put("letterWrite",writeList);
+        return ServerResponse.createBySuccess(map);
+    }
+
+    @Override
+    public Object saveLetterAfterLearning(HttpSession session, TestRecord testRecord) {
+        Student student = getStudent(session);
+        Integer point = testRecord.getPoint();
+        testRecord.setStudentId(student.getId());
+        testRecord.setGenre("学后测试");
+        testRecord.setStudyModel("字母学后测试");
+        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+        getUnitTestMsg(testRecord, testRecord.getPoint());
+        Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 12);
+        Integer goldCount = 0;
+        if (integer <= point) {
+            if (point < SIX) {
+                goldCount = 0;
+            } else if (point < SEVENTY) {
+                goldCount = TestAwardGoldConstant.UNIT_TEST_SIXTY_TO_SEVENTY;
+            } else if (point < PASS) {
+                goldCount = TestAwardGoldConstant.UNIT_TEST_SEVENTY_TO_EIGHTY;
+            } else if (point < NINETY_POINT) {
+                goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_NINETY;
+            } else if (point < FULL_MARK) {
+                goldCount = TestAwardGoldConstant.UNIT_TEST_NINETY_TO_FULL;
+            } else {
+                goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
+            }
+        }
+        this.saveLog(student, goldCount, null, "字母学后测试");
+        if (student.getBonusExpires() != null) {
+            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
+                Double doubleGoldCount = goldCount * 0.2;
+                student.setSystemGold(student.getSystemGold() + doubleGoldCount);
+                testRecord.setAwardGold(goldCount + doubleGoldCount.intValue());
+            }
+        }
+        TestResultVo vo = new TestResultVo();
+        vo.setGold(goldCount);
+        int energy = getEnergy(student, testRecord.getPoint());
+        vo.setEnergy(energy);
+        getMessage(student, vo, testRecord, point, 100);
+        testRecord.setTestEndTime(new Date());
+        testRecordMapper.insert(testRecord);
+        studentMapper.updateById(student);
+        studentInfoService.calculateValidTime(session, 9, null,
+                testRecord.getUnitId().longValue(),
+                (testRecord.getTestStartTime().getTime()-testRecord.getTestEndTime().getTime()));
+        return ServerResponse.createBySuccess(vo);
+    }
+
+    private void getLetterWrite(Map<String, Object> map, Letter studyLetter) {
+        map.put("type", 3);
+        map.put("mp3url", baiduSpeak.getSentencePath(studyLetter.getBigLetter()));
+        map.put("bigLetter", studyLetter.getBigLetter());
+        map.put("lowercaseLetter", studyLetter.getLowercaseLetters());
+    }
+
+    private void getLetterDiscrimination(Map<String, Object> map, Letter studyLetter) {
+        map.put("type", 2);
+        List<Letter> threeLetter = letterMapper.getThreeLetter(studyLetter.getId());
+        //获取题目
+        Random random = new Random();
+        int ranId = random.nextInt(10);
+        map.put("mp3url", baiduSpeak.getSentencePath(studyLetter.getBigLetter()));
+        List<String> options = new ArrayList<>();
+        if (ranId > 5) {
+            //小写字母题目
+            options.add(studyLetter.getLowercaseLetters());
+            for (Letter letter : threeLetter) {
+                options.add(letter.getLowercaseLetters());
+            }
+        } else {
+            options.add(studyLetter.getBigLetter());
+            //大写字母题目
+            for (Letter letter : threeLetter) {
+                options.add(letter.getBigLetter());
+            }
+        }
+        Collections.shuffle(options);
+        map.put("options", options);
+        if (ranId > 0) {
+            for (int i = 0; i < options.size(); i++) {
+                if (studyLetter.getLowercaseLetters().equals(options.get(i))) {
+                    map.put("answer", i);
+                }
+            }
+        } else {
+            for (int i = 0; i < options.size(); i++) {
+                if (studyLetter.getBigLetter().equals(options.get(i))) {
+                    map.put("answer", i);
+                }
+            }
+        }
+    }
+
+    private void getLetterPair(Map<String, Object> map, Letter studyLetter) {
+        map.put("type", 1);
+        List<Letter> threeLetter = letterMapper.getThreeLetter(studyLetter.getId());
+        //获取题目
+        Random random = new Random();
+        int ranId = random.nextInt(10);
+        List<String> options = new ArrayList<>();
+        if (ranId > 5) {
+            //大写字母题目
+            map.put("title", studyLetter.getBigLetter());
+            options.add(studyLetter.getLowercaseLetters());
+            for (Letter letter : threeLetter) {
+                options.add(letter.getLowercaseLetters());
+            }
+        } else {
+            //小写字母题目
+            map.put("title", studyLetter.getLowercaseLetters());
+            options.add(studyLetter.getBigLetter());
+            for (Letter letter : threeLetter) {
+                options.add(letter.getBigLetter());
+            }
+        }
+        Collections.shuffle(options);
+        map.put("options", options);
+        if (ranId > 0) {
+            for (int i = 0; i < options.size(); i++) {
+                if (studyLetter.getLowercaseLetters().equals(options.get(i))) {
+                    map.put("answer", i);
+                }
+            }
+        } else {
+            for (int i = 0; i < options.size(); i++) {
+                if (studyLetter.getBigLetter().equals(options.get(i))) {
+                    map.put("answer", i);
+                }
+            }
+        }
+
     }
 
     /**
@@ -1336,7 +1592,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         String msg;
         if (wordUnitTestDTO != null) {
             msg = "id为：" + student.getId() + "的学生在" + commonMethod.getTestType(wordUnitTestDTO.getClassify())
-                    + " 模块下的单元闯关测试中首次闯关成功，获得#" + goldCount + "#枚金币";
+                    + " 模块下的单元闯关测试中闯关成功，获得#" + goldCount + "#枚金币";
         } else {
             msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + goldCount + "#枚金币";
         }
@@ -1345,6 +1601,84 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         runLog.setUnitId(student.getUnitId());
         runLogMapper.insert(runLog);
         LOGGER.info(msg);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ServerResponse savePhoneticSymbolUnitTest(HttpSession session, UnitTestDto dto) {
+        Student student = super.getStudent(session);
+        Object beginTime = session.getAttribute(TimeConstant.BEGIN_START_TIME);
+
+        // 判断是否是首次测试
+        boolean isFirst = false;
+        TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
+                dto.getUnitId(), TestGenreConstant.UNIT_TEST.getGenre(), PhoneticSymbolServiceImpl.STUDY_MODEL);
+        if (testRecord != null) {
+            isFirst = true;
+        }
+
+        Integer point = dto.getPoint();
+
+        testRecord = new TestRecord();
+        testRecord.setStudentId(student.getId());
+        testRecord.setUnitId(dto.getUnitId());
+        testRecord.setGenre(TestGenreConstant.UNIT_TEST.getGenre());
+        testRecord.setTestEndTime(new Date());
+        testRecord.setTestStartTime(beginTime == null ? new Date() : (Date) beginTime);
+        testRecord.setPoint(point);
+        testRecord.setHistoryBadPoint(point);
+        testRecord.setHistoryBestPoint(point);
+        testRecord.setQuantity(dto.getRightCount() + dto.getErrorCount());
+        testRecord.setErrorCount(dto.getErrorCount());
+        testRecord.setRightCount(dto.getRightCount());
+        testRecord.setStudyModel(StudyModelContant.PHONETIC_SYMBOL_TEST.getModel());
+
+        WordUnitTestDTO wordUnitTestDTO = new WordUnitTestDTO();
+        wordUnitTestDTO.setClassify(10);
+        wordUnitTestDTO.setUnitId(new Long[]{dto.getUnitId()});
+        wordUnitTestDTO.setPoint(point);
+        Integer goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord);
+
+        testRecord.setAwardGold(goldCount);
+        TestResultVo vo = new TestResultVo();
+        String message = getMessage(student, vo, testRecord, point, PASS);
+        testRecord.setExplain(message);
+
+        vo.setMsg(message);
+        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, TestGenreConstant.UNIT_TEST.getGenre()));
+        vo.setGold(getBonusGold(student, goldCount));
+        vo.setEnergy(super.getEnergy(student, point));
+
+        testRecordMapper.insert(testRecord);
+        countMyGoldUtil.countMyGold(student);
+        studentMapper.updateById(student);
+        getLevel(session);
+
+        // 将学生学习记录置为已学习状态
+        learnMapper.updateTypeByStudentIdAndUnitId(student.getId(), dto.getUnitId(), PhoneticSymbolServiceImpl.STUDY_MODEL, 2);
+
+        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
+        session.setAttribute(UserConstant.CURRENT_STUDENT, student);
+
+        return ServerResponse.createBySuccess(vo);
+    }
+
+    /**
+     * 获取加成后的金币
+     *
+     * @param student
+     * @param goldCount
+     * @return
+     */
+    private Integer getBonusGold(Student student, Integer goldCount) {
+        if (student.getBonusExpires() != null) {
+            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
+                Double v = goldCount * 0.2;
+                student.setSystemGold(student.getSystemGold() + v);
+                goldCount = goldCount + v.intValue();
+            }
+        }
+        return goldCount;
     }
 
     /**
@@ -1363,12 +1697,15 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             goldCount = getGoldCount(wordUnitTestDTO, student, point);
         } else {
             // 查询当前单元测试历史最高分数
-            int betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), wordUnitTestDTO.getUnitId()[0],
+            Integer betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), wordUnitTestDTO.getUnitId()[0],
                     wordUnitTestDTO.getClassify());
+            if (betterPoint == null) {
+                betterPoint = 0;
+            }
 
             // 非首次测试成绩本次测试成绩大于历史最高分，超过历史最高分次数 +1并且金币奖励翻倍
             if (betterPoint < wordUnitTestDTO.getPoint()) {
-                int betterCount = testRecord.getBetterCount() + 1;
+                int betterCount = (testRecord.getBetterCount() == null ? 0 : testRecord.getBetterCount()) + 1;
                 testRecord.setBetterCount(betterCount);
                 goldCount = getGoldCount(wordUnitTestDTO, student, point);
             }

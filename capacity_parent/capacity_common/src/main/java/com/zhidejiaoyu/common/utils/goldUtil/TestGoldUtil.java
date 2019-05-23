@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.utils.goldUtil;
 import com.zhidejiaoyu.common.mapper.StudentExpansionMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
+import com.zhidejiaoyu.common.pojo.TestRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -63,7 +64,7 @@ public class TestGoldUtil {
             this.updateStudentExpansion(studentExpansion, student);
             return addGold;
         } else {
-            log.error("学生[{}]->[{}] 今日闯关类测试获取金币数=300", student.getId(), student.getStudentName());
+            log.info("学生[{}]->[{}] 今日闯关类测试获取金币数=300", student.getId(), student.getStudentName());
             return addGold;
         }
     }

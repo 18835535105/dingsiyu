@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.enums.IdType;
+import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
@@ -15,47 +16,43 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- *
+ * 字母配对记忆表
  * </p>
  *
  * @author zdjy
- * @since 2019-05-17
+ * @since 2019-05-20
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class PhoneticSymbol extends Model<PhoneticSymbol> {
+public class LetterPair extends Model<LetterPair> {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     /**
-     * 音标
+     * 字母id
      */
-    private String phoneticSymbol;
+    private Integer letterId;
     /**
-     * 类型
+     * 学生id
      */
-    private String type;
+    private Integer studentId;
     /**
-     * 对应字母
+     * 黄金记忆时间
      */
-    private String letter;
+    private Date push;
     /**
-     * 发音方法
+     * 状态
      */
-    private String pronunciationMethod;
+    private Integer state;
     /**
-     * 音标读音地址
+     * 记忆强度
      */
-    private String url;
+    private Integer memoryStrength;
 
     private Integer unitId;
-
-    private String content;
-
-    private String partUrl;
 
 
     @Override

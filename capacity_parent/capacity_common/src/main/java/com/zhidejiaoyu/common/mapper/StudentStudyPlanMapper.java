@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.CapacityStudentUnit;
 import com.zhidejiaoyu.common.pojo.StudentStudyPlan;
 import org.apache.ibatis.annotations.Param;
 
@@ -65,4 +66,10 @@ public interface StudentStudyPlanMapper extends BaseMapper<StudentStudyPlan> {
      * @return
      */
     int countByStudentIdAndType(@Param("studentId") Long studentId, @Param("type") int type);
+
+    StudentStudyPlan selSymbolByStudentId(Long id);
+
+    StudentStudyPlan selLetterByStudentId(Long studentId);
+
+    StudentStudyPlan selLetterSudyByStudentAndUnitId(@Param("studentId") Long studentId,@Param("unitId") Long unitId);
 }

@@ -47,4 +47,16 @@
         from  capacity_student_unit where student_id=#{studentId} and type=2
     </select>
 
+    <select id="selSymbolByStudentId" parameterType="long" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include>
+        from capacity_student_unit
+        where student_id=#{studentId} and type=5
+    </select>
+
+    <select id="selLetterByStudentId" parameterType="long" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include>
+        from capacity_student_unit
+        where student_id=#{studentId} and type=4
+    </select>
+
 </mapper>

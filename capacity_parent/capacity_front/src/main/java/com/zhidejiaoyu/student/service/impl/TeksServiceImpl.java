@@ -13,7 +13,7 @@ import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
-import com.zhidejiaoyu.student.constant.TestAwardGoldConstant;
+import com.zhidejiaoyu.common.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.TeksService;
 import com.zhidejiaoyu.student.utils.PetSayUtil;
