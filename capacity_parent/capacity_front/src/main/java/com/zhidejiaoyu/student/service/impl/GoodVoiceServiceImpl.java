@@ -179,7 +179,6 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
     public ServerResponse saveVoice(HttpSession session, Voice voice, String word, MultipartFile audio, Integer type) {
 
         Student student = getStudent(session);
-        log.info("学生[" + student.getId() + " -> " + student.getAccount() + "] 上传" + (Objects.equals(voice.getType(), 1) ? "单词" : "句型") + "[" + voice.getWordId() + " -> " + word + "] 录音");
 
         // 文件大于2M禁止上传，讯飞语音评测接口最大支持2M音频文件
         long maxSize = 2097152L;
