@@ -319,6 +319,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             int hard = memoryDifficultyUtil.getMemoryDifficulty(cm, 1);
             map.put("memoryDifficulty", hard);
             map.put("engine", PerceiveEngine.getPerceiveEngine(hard, vo.getMemory_strength()));
+            map.put("wordChineseList", getInterferenceChinese(Long.parseLong(unitId), vo.getVocabulary_id(), vo.getWord_chinese(), unitVocabularyMapper, unitMapper));
         }
         map.put("studyNew", false);
 
