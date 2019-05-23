@@ -68,10 +68,20 @@
         <commons-lang.version>2.4</commons-lang.version>
         <shiro-core.version>1.4.0</shiro-core.version>
 
+        <!--语音评测-->
+        <tencentcloud-sdk-java.version>3.0.63</tencentcloud-sdk-java.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+
+            <!-- 腾讯语音评测 -->
+            <dependency>
+                <groupId>com.tencentcloudapi</groupId>
+                <artifactId>tencentcloud-sdk-java</artifactId>
+                <version>${tencentcloud-sdk-java.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>

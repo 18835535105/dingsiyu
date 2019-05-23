@@ -4,11 +4,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.utils.language.SpeechEvaluation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 好声音工具类
@@ -34,12 +36,13 @@ public class GoodVoiceUtil {
         String result = speechEvaluation.getEvaluationResult(text, fileUrl);
         if (result != null) {
             Map<String, Object> map = new HashMap<>(16);
-            boolean flag = this.getIsRejected(result);
+
             int score;
-            if (flag) {
+            Float pronAccuracy = JSONObject.parseObject(result).getFloat("PronAccuracy");
+            if (pronAccuracy == -1) {
                 score = 0;
             } else {
-                score = (int) Math.round(Double.valueOf(getReadChapterJsonObject(result).getString("total_score")) * 20);
+                score = Math.round(pronAccuracy);
             }
             map.put("score", score);
             map.put("heart", getHeart(score));
@@ -47,18 +50,6 @@ public class GoodVoiceUtil {
         }
         return new HashMap<>(16);
 
-    }
-
-    /**
-     * 判断用户是否是乱读
-     *
-     * @param result    true：用户属于乱读；false：用户不是乱读
-     * @return
-     */
-    private boolean getIsRejected(String result) {
-        String string = JSONObject.parseObject(result).getJSONObject("data").getJSONObject("read_sentence").
-                getJSONObject("rec_paper").getJSONObject("read_chapter").getString("is_rejected");
-        return Objects.equals("true", string);
     }
 
     /**
@@ -74,50 +65,52 @@ public class GoodVoiceUtil {
      * <p>
      */
     public Map<String, Object> getSentenceEvaluationRecord(String text, String fileUrl) {
+        // 得分
+        final String pronAccuracy = "PronAccuracy";
+        // 句子中各个单词得分信息
+        final String words = "Words";
+
         String findText = text.replace("!", ",").replace("?", ",").replace(".", ",");
         String result = speechEvaluation.getEvaluationResult(findText, fileUrl);
         if (result != null) {
-
-            JSONObject readChapter = getReadChapterJsonObject(result);
-
             Map<String, Object> map = new HashMap<>(16);
             List<Map<String, Object>> mapList = new ArrayList<>();
             Map<String, Object> wordMap;
 
-            map.put("totalScore", (int) Math.round(Double.valueOf(readChapter.getString("total_score")) * 20));
-            map.put("heart", getHeart((int) map.get("totalScore")));
+            JSONObject jsonObject = JSONObject.parseObject(result);
+
+            int totalScore = Math.round(jsonObject.getFloat(pronAccuracy));
+            if (totalScore == -1) {
+                totalScore = 0;
+            }
+
+            map.put("totalScore", totalScore);
+            map.put("heart", getHeart(totalScore));
 
             int score;
             String[] s = text.split(" ");
 
+            JSONArray wordArray = jsonObject.getJSONArray(words);
             if (s.length > 1) {
-                Map<Integer,Integer> ifMap=new HashMap<>();
-                JSONObject sentenceObject = readChapter.getJSONObject("sentence");
-                JSONArray wordArray = sentenceObject.getJSONArray("word");
                 int j = 0;
                 for (Object o : wordArray) {
                     JSONObject wordJsonObject = (JSONObject) o;
-                    Integer index = wordJsonObject.getInteger("index");
-                    if (index == null) {
+                    if ("*".equals(wordJsonObject.getString("Word")) || ",".equals(wordJsonObject.getString("Word"))) {
                         continue;
                     }
-                    if (ifMap.get(index) != null) {
-                        continue;
+                    score = Math.round(wordJsonObject.getFloat(pronAccuracy));
+                    if (score == -1) {
+                        score = 0;
                     }
-                    ifMap.put(index, index);
-                    if (StringUtils.isNotEmpty(wordJsonObject.getString("total_score"))) {
-                        score = (int) Math.round(Double.valueOf(wordJsonObject.getString("total_score")) * 20);
-                        wordMap = new HashMap<>(16);
-                        if (s[j].endsWith(",") || s[j].endsWith("!") || s[j].endsWith("?") || s[j].endsWith(".")) {
-                            wordMap.put("word", s[j].substring(0, s[j].length() - 1));
-                        } else {
-                            wordMap.put("word", s[j]);
-                        }
-                        wordMap.put("score", score);
-                        wordMap.put("color", getColor(score));
-                        mapList.add(wordMap);
+                    wordMap = new HashMap<>(16);
+                    if (s[j].endsWith(",") || s[j].endsWith("!") || s[j].endsWith("?") || s[j].endsWith(".")) {
+                        wordMap.put("word", s[j].substring(0, s[j].length() - 1));
+                    } else {
+                        wordMap.put("word", s[j]);
                     }
-                    // todo:数组下标越界异常
+                    wordMap.put("pronAccuracy", score);
+                    wordMap.put("color", getColor(score));
+                    mapList.add(wordMap);
 
                     if (s[j].endsWith(",") || s[j].endsWith("!") || s[j].endsWith("?") || s[j].endsWith(".")) {
                         wordMap = new HashMap<>(16);
@@ -129,7 +122,10 @@ public class GoodVoiceUtil {
                 }
             } else {
                 wordMap = new HashMap<>(16);
-                score = (int) Math.round(Double.valueOf(getReadChapterJsonObject(result).getString("total_score")) * 20);
+                score = Math.round(wordArray.getJSONObject(0).getFloat(pronAccuracy));
+                if (score == -1) {
+                    score = 0;
+                }
                 wordMap.put("word", s[0].substring(0, s[0].length() - 1));
                 wordMap.put("score", score);
                 wordMap.put("color", getColor(score));
@@ -171,18 +167,5 @@ public class GoodVoiceUtil {
         } else {
             return "#b90202";
         }
-    }
-
-    /**
-     * @param result
-     * @return
-     */
-    private JSONObject getReadChapterJsonObject(String result) {
-        JSONObject resultObject = JSONObject.parseObject(result);
-        if (!Objects.equals("0", resultObject.getString("code"))) {
-            log.error("获取学生语音评测信息出错: {}", resultObject.toString());
-        }
-        return JSONObject.parseObject(result).getJSONObject("data").getJSONObject("read_sentence")
-                .getJSONObject("rec_paper").getJSONObject("read_chapter");
     }
 }

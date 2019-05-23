@@ -1,116 +1,168 @@
 package com.zhidejiaoyu.common.utils.language;
 
-import com.alibaba.fastjson.JSONObject;
-import com.zhidejiaoyu.common.utils.http.HttpClientUtil;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-import org.apache.shiro.crypto.hash.Md5Hash;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import com.tencentcloudapi.common.Credential;
+import com.tencentcloudapi.common.exception.TencentCloudSDKException;
+import com.tencentcloudapi.common.profile.ClientProfile;
+import com.tencentcloudapi.common.profile.HttpProfile;
+import com.tencentcloudapi.soe.v20180724.SoeClient;
+import com.tencentcloudapi.soe.v20180724.models.InitOralProcessRequest;
+import com.tencentcloudapi.soe.v20180724.models.InitOralProcessResponse;
+import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessRequest;
+import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.*;
+import java.util.UUID;
 
 /**
- * 讯飞语音评测工具
- * <p><a href="http://doc.xfyun.cn/ise_protocol/%E8%AF%84%E6%B5%8B%E7%BB%93%E6%9E%9C%E6%A0%BC%E5%BC%8F.html">返回结果说明地址</a></p>
+ * 腾讯语音评测
+ * <p><a href="https://cloud.tencent.com/document/product/884/32821">文档中心</a></p>
  *
  * @author wuchenxi
  * @date 2018/6/20 17:01
  */
+@Slf4j
 @Component
 public class SpeechEvaluation {
 
-    private Logger logger = LoggerFactory.getLogger(SpeechEvaluation.class);
+    private static final String REGION = "ap-beijing";
+    private static final String END_POINT = "soe.ap-beijing.tencentcloudapi.com";
+    private static final String SECRET_ID = "AKIDZrWvYvmtwlPYAbjGm6E5lyvxmJtrO6Q5";
+    private static final String SECRET_KEY = "b0CrHSRAesq0x87uNegSQ9cqCG73paHq";
 
-    @Autowired
-    private HttpClientUtil httpClientUtil;
+    public static final int EVAL_MODE_WORD = 0;
+    public static final int EVAL_MODE_SENTENCE = 1;
+    public static final int EVAL_MODE_PARA = 2;
+    public static final int EVAL_MODE_FREETALK = 3;
 
-    @Value("${xfyun.ise.URL}")
-    private String URL;
+    public static final int WORK_MODE_STREAM = 0;
+    public static final int WORK_MODE_ONCE = 1;
 
-    @Value("${xfyun.ise.APP_ID}")
-    private String APP_ID;
+    public static final int MP3 = 3;
+    public static final int WAV = 2;
+    public static final int RAW = 1;
 
-    @Value("${xfyun.ise.API_KEY}")
-    private String API_KEY;
+    public static final int CN = 1;
+    public static final int EN = 0;
 
+
+    public static final int PKG_SIZE = 16 * 1024;
+
+
+    public static final String FINISHED = "Finished";
+    public static final String FAILED = "Failed";
+    public static final String EVALUATING = "Evaluating";
+
+    public String getEvaluationResult(String text, String fileUrl) {
+
+        Credential cred = new Credential(SECRET_ID, SECRET_KEY);
+        HttpProfile httpProfile = new HttpProfile();
+
+        /**
+         *  设置访问域名，如果需要就近部署，可以使用 soe-tencentcloudapi.com, 腾讯云将根据访问的地域解析到合适的服务器上，如果调用服务已确定地域，如华南地区
+         *  可以直接使用地域域名，加快访问速度
+         */
+        httpProfile.setEndpoint(END_POINT);
+        ClientProfile clientProfile = new ClientProfile();
+        clientProfile.setHttpProfile(httpProfile);
+        SoeClient client = new SoeClient(cred, REGION, clientProfile);
+
+
+        InitOralProcessRequest req = new InitOralProcessRequest();
+        //设置初始化，参数详情可见官方文档
+        String sessionId = getSessionId();
+        req.setSessionId(sessionId);
+        req.setEvalMode(EVAL_MODE_WORD);
+        req.setRefText(text);
+        req.setStorageMode(1);
+        // 设置为流式评估
+        req.setWorkMode(WORK_MODE_ONCE);
+        req.setScoreCoeff(1.0f);
+        try {
+            InitOralProcessResponse resp = initWithRetry(client,req);
+            log.info("初始化返回结果:{}", InitOralProcessRequest.toJsonString(resp));
+        } catch (Exception e) {
+            log.error("初始化语音评测失败！", e);
+            return null;
+        }
+
+        TransmitOralProcessRequest transReq = new TransmitOralProcessRequest();
+        transReq.setSessionId(sessionId);
+        transReq.setVoiceEncodeType(1);
+        transReq.setVoiceFileType(WAV);
+        try {
+            byte[] buf = getFileOutputStream(fileUrl);
+            String base64Str = new sun.misc.BASE64Encoder().encode(buf);
+            transReq.setUserVoiceData(base64Str);
+            transReq.setSeqId(1);
+            transReq.setIsEnd(1);
+            TransmitOralProcessResponse transmitOralProcessResponse = transmitWithRetry(client, transReq);
+            return TransmitOralProcessResponse.toJsonString(transmitOralProcessResponse);
+        } catch (Exception e) {
+            log.error("获取语音评测信息失败！", e);
+        }
+        return null;
+    }
 
     /**
-     * 获取评测结果
-     *
-     * @param text    评测的内容
-     * @param fileUrl 语音文件地址
-     * @return 测试结果，结果详细说明地址：
-     * <a href="http://doc.xfyun.cn/ise_protocol/%E8%AF%84%E6%B5%8B%E7%BB%93%E6%9E%9C%E6%A0%BC%E5%BC%8F.html">
-     * http://doc.xfyun.cn/ise_protocol/%E8%AF%84%E6%B5%8B%E7%BB%93%E6%9E%9C%E6%A0%BC%E5%BC%8F.html
-     * </a>
+     * 当网络错误导致参数缺失重试数据传输请求
+     * @param client
+     * @param req
+     * @return
+     * @throws TencentCloudSDKException
      */
-    public String getEvaluationResult(String text, String fileUrl) {
-        // 读取音频文件
-        byte[] bytes = getFileOutputStream(fileUrl);
-
-        String mp3Bytes = Base64.getEncoder().encodeToString(bytes);
-
-        // 请求参数
-        Map<String, String> map = new HashMap<>(16);
-        map.put("aue", "raw");
-        map.put("language", "en");
-        map.put("category", "read_sentence");
-
-        String param = JSONObject.toJSON(map).toString();
-        String X_param = Base64.getMimeEncoder().encodeToString(param.getBytes()).replace(" ", "");
-        String currentTime = String.valueOf(System.currentTimeMillis() / 1000);
-
-
-        CloseableHttpClient httpClient = httpClientUtil.getHttpClient();
-        HttpPost post = new HttpPost(URL);
-        post.addHeader("X-Appid", APP_ID);
-        post.addHeader("X-CurTime", currentTime);
-        post.addHeader("X-Param", X_param);
-        post.addHeader("X-CheckSum", new Md5Hash(API_KEY + currentTime + X_param).toString());
-
-        map.put("audio", mp3Bytes);
-        map.put("text", text);
-
-        List<BasicNameValuePair> param1 = new ArrayList<>();
-        map.forEach((key, value) -> {
-            if (value != null) {
-                param1.add(new BasicNameValuePair(key, value));
-            }
-        });
-
-        String result = null;
-        CloseableHttpResponse response = null;
-        try {
-            post.setEntity(new UrlEncodedFormEntity(param1, "UTF-8"));
-            response = httpClient.execute(post);
-            HttpEntity entity = response.getEntity();
-            result = EntityUtils.toString(entity, "utf-8");
-            EntityUtils.consume(entity);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (response != null) {
-                    response.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    private TransmitOralProcessResponse transmitWithRetry(SoeClient client, TransmitOralProcessRequest req) throws TencentCloudSDKException {
+        if (req == null) {
+            return null;
         }
-        return result;
+        if (client == null) {
+            return null;
+        }
+        try {
+            TransmitOralProcessResponse resp = client.TransmitOralProcess(req);
+            return resp;
+        } catch (TencentCloudSDKException e) {
+            // 避免网络丢包数据，可以根据业务情景修改重试策略
+            if (e.getMessage().indexOf("MissingParameter") >= 0){
+                TransmitOralProcessResponse resp = client.TransmitOralProcess(req);
+                return resp;
+            }
+            throw e;
+        }
+    }
+
+    /**
+     * 过长文本转段落模式重试的初始化请求
+     * @param client
+     * @param req
+     * @return
+     * @throws TencentCloudSDKException
+     */
+    private InitOralProcessResponse initWithRetry(SoeClient client, InitOralProcessRequest req) throws TencentCloudSDKException {
+        if (req == null) {
+            return null;
+        }
+        if (client == null) {
+            return null;
+        }
+
+        try {
+            InitOralProcessResponse resp = client.InitOralProcess(req);
+            return resp;
+        } catch (TencentCloudSDKException e) {
+            // 长字符串采用段落模式，可以根据业务情景修改重试策略
+            if (e.getMessage().indexOf("InvalidParameterValue.RefTxtTooLang") >= 0) {
+                if (req.getEvalMode() == EVAL_MODE_WORD || req.getEvalMode() == EVAL_MODE_SENTENCE) {
+                    req.setEvalMode(EVAL_MODE_PARA);
+                    return client.InitOralProcess(req);
+                }
+            }
+            throw e;
+        }
     }
 
     private byte[] getFileOutputStream(String fileUrl) {
@@ -128,7 +180,7 @@ public class SpeechEvaluation {
             return out.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
-            logger.error("语音评测获取语音文件失败！路径： {}", fileUrl, e.getMessage());
+            log.error("语音评测获取语音文件失败！路径： {}", fileUrl, e.getMessage());
         } finally {
             try {
                 if (inputStream != null) {
@@ -139,5 +191,10 @@ public class SpeechEvaluation {
             }
         }
         return new byte[0];
+    }
+
+    public static String getSessionId() {
+        // sessionID 保证唯一性,建议使用时间戳加随机数或者直接使用 uuid
+        return UUID.randomUUID().toString().replaceAll("-", "");
     }
 }

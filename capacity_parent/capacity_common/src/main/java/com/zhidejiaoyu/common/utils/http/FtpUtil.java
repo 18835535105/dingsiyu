@@ -69,10 +69,9 @@ public class FtpUtil {
             ftpClient.enterLocalPassiveMode();
 			return true;
 		} catch (Exception ex) {
+			this.close();
 			ex.printStackTrace();
 			return false;
-		} finally {
-			this.close();
 		}
 	}
 
@@ -393,7 +392,7 @@ public class FtpUtil {
             return null;
         }
         // 文件后缀名
-        String ftpFileName  = UUID.randomUUID().toString().replace("-","") + ".mp3";
+        String ftpFileName  = UUID.randomUUID().toString().replace("-","") + ".wav";
         boolean flag = false;
         if (ftpClient != null) {
             FileInputStream fis = null;
@@ -408,11 +407,11 @@ public class FtpUtil {
                 // 上传
                 flag = ftpClient.storeFile(new String(ftpFileName.getBytes(), "iso-8859-1"), fis);
             } catch (Exception e) {
+				this.close();
                 e.printStackTrace();
                 return null;
             } finally {
                 try {
-					this.close();
                     if (fis != null) {
                         fis.close();
                     }

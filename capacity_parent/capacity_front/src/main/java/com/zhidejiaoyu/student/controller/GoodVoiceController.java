@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.controller;
 
 import com.zhidejiaoyu.common.pojo.Voice;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.aop.log.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.service.GoodVoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -67,6 +68,7 @@ public class GoodVoiceController {
      * @return
      */
     @PostMapping("/saveVoice")
+    @ControllerLogAnnotation(name = "保存单词好声音")
     public ServerResponse saveVoice(HttpSession session, Voice voice,
                                     @NotEmpty(message = "word 不能为空！") String word,
                                     @NotNull(message = "录音不能为空！") MultipartFile audio) {
@@ -78,6 +80,7 @@ public class GoodVoiceController {
      * 课文好声音
      */
     @PostMapping("/saveTeks")
+    @ControllerLogAnnotation(name = "保存课文跟读")
     public ServerResponse saveTeks(HttpSession session,  Voice voice,
                                    @NotNull(message = "wordId 不能为空！") Long sentenceId,
                                    @NotEmpty(message = "word 不能为空！") String sentence,
