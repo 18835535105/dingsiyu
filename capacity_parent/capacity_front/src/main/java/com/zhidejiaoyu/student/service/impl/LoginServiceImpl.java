@@ -1,6 +1,8 @@
 package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.common.MacIpUtil;
+import com.zhidejiaoyu.common.award.DailyAwardAsync;
+import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
@@ -33,6 +35,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,9 +70,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private UnitVocabularyMapper unitVocabularyMapper;
 
     @Autowired
-    private AwardMapper awardMapper;
-
-    @Autowired
     private LevelMapper levelMapper;
 
     @Autowired
@@ -91,9 +91,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private UnitSentenceMapper unitSentenceMapper;
 
     @Autowired
-    private MedalMapper medalMapper;
-
-    @Autowired
     private InitRedPointThread initRedPointThread;
 
     @Autowired
@@ -112,7 +109,16 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private StudentExpansionMapper studentExpansionMapper;
 
     @Autowired
+    private MedalAwardAsync medalAwardAsync;
+
+    @Autowired
+    private DailyAwardAsync dailyAwardAsync;
+
+    @Autowired
     private SentenceUnitMapper sentenceUnitMapper;
+
+    @Autowired
+    private ExecutorService executorService;
 
     @Override
     public Student LoginJudge(String account, String password) {
@@ -794,6 +800,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 判断学生是否需要进行智能复习，如果该字段为空不再判断是否需要进行智能复习
             session.setAttribute("needCapacityReview", true);
 
+            // 值得元老勋章
+            medalAwardAsync.oldMan(stu);
+
             // 正常登陆
             logger.info("学生[{} -> {} -> {}]登录成功。", stu.getId(), stu.getAccount(), stu.getStudentName());
             return ServerResponse.createBySuccess("1", result);
@@ -905,47 +914,10 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         Integer count = runLogMapper.selectLoginCountByStudentId(stuId);
         if (count == 0) {
             stu.setAccountTime(new Date(System.currentTimeMillis() + stu.getRank() * 24 * 60 * 60 * 1000L));
-
-            // 更新单个字段，减少死锁情况发生
-            Student student = new Student();
-            student.setAccountTime(stu.getAccountTime());
-            student.setId(stu.getId());
-            studentMapper.updateByPrimaryKeySelective(student);
+            studentMapper.updateById(stu);
 
             // 初始化学生勋章信息
-            initMedalInfo(stuId, stu);
-        }
-    }
-
-    private void initMedalInfo(Long stuId, Student stu) {
-        List<Long> parentIds = new ArrayList<>();
-        parentIds.add(1L);
-        parentIds.add(6L);
-        parentIds.add(11L);
-        parentIds.add(17L);
-        parentIds.add(23L);
-        parentIds.add(37L);
-        parentIds.add(47L);
-        parentIds.add(67L);
-        parentIds.add(72L);
-        parentIds.add(87L);
-        parentIds.add(97L);
-        List<Long> ids = medalMapper.selectAllIdsByParentIds(parentIds);
-        List<Award> awards = new ArrayList<>(ids.size());
-        ids.forEach(id -> {
-            Award award = new Award();
-            award.setCanGet(2);
-            award.setGetFlag(2);
-            award.setType(3);
-            award.setMedalType(id);
-            award.setStudentId(stuId);
-            awards.add(award);
-        });
-
-        try {
-            awardMapper.insertList(awards);
-        } catch (Exception e) {
-            logger.error("初始化学生 [{}]->[{}] 勋章信息失败", stuId, stu.getStudentName(), e);
+            executorService.execute(() -> dailyAwardAsync.initAward(stu));
         }
     }
 
@@ -979,25 +951,13 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         int count = runLogMapper.countStudentTodayLogin(stu);
         if (count == 1) {
             // 每日首次登陆日奖励
-            this.packageFirstLoginAward(stu);
+            dailyAwardAsync.firstLogin(stu);
 
             // 当天首次登陆将学生每日闯关获取金币数清空
             this.resetTestGold(stu);
-        }
-    }
 
-    private void packageFirstLoginAward(Student stu) {
-        Award award = new Award();
-        award.setCanGet(1);
-        award.setGetFlag(2);
-        award.setStudentId(stu.getId());
-        award.setType(1);
-        award.setAwardContentType(1);
-        award.setCreateTime(new Date());
-        try {
-            awardMapper.insert(award);
-        } catch (Exception e) {
-            logger.error("保存学生 {} -> {} 首次登陆奖励信息失败！", stu.getId(), stu.getStudentName(), e);
+            // 如果昨天辉煌荣耀奖励没有更新，将指定的奖励当前进度置为0
+            medalAwardAsync.updateHonour(stu);
         }
     }
 

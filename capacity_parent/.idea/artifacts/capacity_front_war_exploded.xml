@@ -17,6 +17,11 @@
           <element id="archive" name="capacity_common-1.0-SNAPSHOT.jar">
             <element id="module-output" name="capacity_common" />
           </element>
+          <element id="library" level="project" name="Maven: com.tencentcloudapi:tencentcloud-sdk-java:3.0.63" />
+          <element id="library" level="project" name="Maven: com.squareup.okhttp:okhttp:2.5.0" />
+          <element id="library" level="project" name="Maven: com.squareup.okio:okio:1.6.0" />
+          <element id="library" level="project" name="Maven: com.google.code.gson:gson:2.8.2" />
+          <element id="library" level="project" name="Maven: javax.xml.bind:jaxb-api:2.3.0" />
           <element id="library" level="project" name="Maven: mysql:mysql-connector-java:8.0.13" />
           <element id="library" level="project" name="Maven: com.google.protobuf:protobuf-java:3.6.1" />
           <element id="library" level="project" name="Maven: com.alibaba:druid-spring-boot-starter:1.1.9" />

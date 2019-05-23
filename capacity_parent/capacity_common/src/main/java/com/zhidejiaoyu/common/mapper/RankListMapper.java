@@ -55,4 +55,12 @@ public interface RankListMapper {
      * @return
      */
     int updateList(@Param("updateList") List<RankList> updateList);
+
+    /**
+     * 查询学生排行数据
+     *
+     * @param studentId
+     * @return
+     */
+    RankList selectByStudentId(@Param("studentId") Long studentId);
 }

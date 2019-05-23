@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
+import com.zhidejiaoyu.student.dto.phonetic.UnitTestDto;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 
 import javax.servlet.http.HttpSession;
@@ -44,15 +45,6 @@ public interface TestService extends BaseService<TestRecord> {
      * @return
      */
     ServerResponse<Map<String, Object>> getLevelTest(HttpSession session);
-
-    /**
-     * 保存学生等级测试记录
-     *
-     * @param session    当前学生session
-     * @param testRecord 测试记录
-     * @return
-     */
-    ServerResponse<TestResultVo> saveLevelTest(HttpSession session, TestRecord testRecord);
 
     /**
      * 获取单元闯关的测试题
@@ -115,8 +107,6 @@ public interface TestService extends BaseService<TestRecord> {
 
     ServerResponse<Object> getPreSchoolTest(HttpSession session);
 
-    ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, TestRecord testRecord);
-
     /**
      * 获取例句单元测试
      * @param unitId
@@ -146,4 +136,21 @@ public interface TestService extends BaseService<TestRecord> {
     ServerResponse<Object> saveCapTeksTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO);
 
     ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session);
+
+    /**
+     * 保存单元闯关测试记录
+     *
+     * @param session
+     * @param unitId
+     * @return
+     */
+    ServerResponse savePhoneticSymbolUnitTest(HttpSession session, UnitTestDto unitId);
+
+    Object getLetterUnitEntry(HttpSession session,Long unitId);
+
+    Object saveLetterUnitEntry(HttpSession session, TestRecord testRecord);
+
+    Object getLetterAfterLearning(HttpSession session, Long unitId);
+
+    Object saveLetterAfterLearning(HttpSession session, TestRecord testRecord);
 }

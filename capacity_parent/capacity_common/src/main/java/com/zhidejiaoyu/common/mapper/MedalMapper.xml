@@ -11,6 +11,9 @@
         <result column="marked_words" property="markedWords" jdbcType="VARCHAR"/>
         <result column="child_img_url" property="childImgUrl" jdbcType="VARCHAR"/>
         <result column="parent_img_url" property="parentImgUrl" jdbcType="VARCHAR"/>
+        <result column="gold_img_url" property="goldImgUrl" jdbcType="VARCHAR"/>
+        <result column="gray_img_url" property="grayImgUrl" jdbcType="VARCHAR"/>
+        <result column="total_plan" property="totalPlan"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -74,207 +77,13 @@
     </sql>
     <sql id="Base_Column_List">
         id, parent_name, next_parent, child_name, next_child,`explain`, marked_words, child_img_url,
-        parent_img_url
+        parent_img_url, gold_img_url, gray_img_url, total_plan
     </sql>
-    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.MedalExample">
-        select
-        <if test="distinct">
-            distinct
-        </if>
-        <include refid="Base_Column_List"/>
-        from medal
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-        <if test="orderByClause != null">
-            order by ${orderByClause}
-        </if>
-    </select>
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
-        select
-        <include refid="Base_Column_List"/>
-        from medal
-        where id = #{id,jdbcType=BIGINT}
-    </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from medal
-        where id = #{id,jdbcType=BIGINT}
-    </delete>
-    <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.MedalExample">
-        delete from medal
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-    </delete>
-    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.Medal">
-        insert into medal (id, parent_name, next_parent,
-                           child_name, next_child, explain,
-                           marked_words, child_img_url, parent_img_url
-        )
-        values (#{id,jdbcType=BIGINT}, #{parentName,jdbcType=VARCHAR}, #{nextParent,jdbcType=BIGINT},
-                #{childName,jdbcType=VARCHAR}, #{nextChild,jdbcType=BIGINT}, #{explain,jdbcType=VARCHAR},
-                #{markedWords,jdbcType=VARCHAR}, #{childImgUrl,jdbcType=VARCHAR}, #{parentImgUrl,jdbcType=VARCHAR}
-        )
-    </insert>
-    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Medal">
-        insert into medal
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                id,
-            </if>
-            <if test="parentName != null">
-                parent_name,
-            </if>
-            <if test="nextParent != null">
-                next_parent,
-            </if>
-            <if test="childName != null">
-                child_name,
-            </if>
-            <if test="nextChild != null">
-                next_child,
-            </if>
-            <if test="explain != null">
-                explain,
-            </if>
-            <if test="markedWords != null">
-                marked_words,
-            </if>
-            <if test="childImgUrl != null">
-                child_img_url,
-            </if>
-            <if test="parentImgUrl != null">
-                parent_img_url,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id,jdbcType=BIGINT},
-            </if>
-            <if test="parentName != null">
-                #{parentName,jdbcType=VARCHAR},
-            </if>
-            <if test="nextParent != null">
-                #{nextParent,jdbcType=BIGINT},
-            </if>
-            <if test="childName != null">
-                #{childName,jdbcType=VARCHAR},
-            </if>
-            <if test="nextChild != null">
-                #{nextChild,jdbcType=BIGINT},
-            </if>
-            <if test="explain != null">
-                #{explain,jdbcType=VARCHAR},
-            </if>
-            <if test="markedWords != null">
-                #{markedWords,jdbcType=VARCHAR},
-            </if>
-            <if test="childImgUrl != null">
-                #{childImgUrl,jdbcType=VARCHAR},
-            </if>
-            <if test="parentImgUrl != null">
-                #{parentImgUrl,jdbcType=VARCHAR},
-            </if>
-        </trim>
-    </insert>
-    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.MedalExample" resultType="java.lang.Integer">
-        select count(*) from medal
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-    </select>
-    <update id="updateByExampleSelective" parameterType="map">
-        update medal
-        <set>
-            <if test="record.id != null">
-                id = #{record.id,jdbcType=BIGINT},
-            </if>
-            <if test="record.parentName != null">
-                parent_name = #{record.parentName,jdbcType=VARCHAR},
-            </if>
-            <if test="record.nextParent != null">
-                next_parent = #{record.nextParent,jdbcType=BIGINT},
-            </if>
-            <if test="record.childName != null">
-                child_name = #{record.childName,jdbcType=VARCHAR},
-            </if>
-            <if test="record.nextChild != null">
-                next_child = #{record.nextChild,jdbcType=BIGINT},
-            </if>
-            <if test="record.explain != null">
-                explain = #{record.explain,jdbcType=VARCHAR},
-            </if>
-            <if test="record.markedWords != null">
-                marked_words = #{record.markedWords,jdbcType=VARCHAR},
-            </if>
-            <if test="record.childImgUrl != null">
-                child_img_url = #{record.childImgUrl,jdbcType=VARCHAR},
-            </if>
-            <if test="record.parentImgUrl != null">
-                parent_img_url = #{record.parentImgUrl,jdbcType=VARCHAR},
-            </if>
-        </set>
-        <if test="_parameter != null">
-            <include refid="Update_By_Example_Where_Clause"/>
-        </if>
-    </update>
-    <update id="updateByExample" parameterType="map">
-        update medal
-        set id = #{record.id,jdbcType=BIGINT},
-        parent_name = #{record.parentName,jdbcType=VARCHAR},
-        next_parent = #{record.nextParent,jdbcType=BIGINT},
-        child_name = #{record.childName,jdbcType=VARCHAR},
-        next_child = #{record.nextChild,jdbcType=BIGINT},
-        explain = #{record.explain,jdbcType=VARCHAR},
-        marked_words = #{record.markedWords,jdbcType=VARCHAR},
-        child_img_url = #{record.childImgUrl,jdbcType=VARCHAR},
-        parent_img_url = #{record.parentImgUrl,jdbcType=VARCHAR}
-        <if test="_parameter != null">
-            <include refid="Update_By_Example_Where_Clause"/>
-        </if>
-    </update>
-    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.Medal">
-        update medal
-        <set>
-            <if test="parentName != null">
-                parent_name = #{parentName,jdbcType=VARCHAR},
-            </if>
-            <if test="nextParent != null">
-                next_parent = #{nextParent,jdbcType=BIGINT},
-            </if>
-            <if test="childName != null">
-                child_name = #{childName,jdbcType=VARCHAR},
-            </if>
-            <if test="nextChild != null">
-                next_child = #{nextChild,jdbcType=BIGINT},
-            </if>
-            <if test="explain != null">
-                explain = #{explain,jdbcType=VARCHAR},
-            </if>
-            <if test="markedWords != null">
-                marked_words = #{markedWords,jdbcType=VARCHAR},
-            </if>
-            <if test="childImgUrl != null">
-                child_img_url = #{childImgUrl,jdbcType=VARCHAR},
-            </if>
-            <if test="parentImgUrl != null">
-                parent_img_url = #{parentImgUrl,jdbcType=VARCHAR},
-            </if>
-        </set>
-        where id = #{id,jdbcType=BIGINT}
-    </update>
-    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.Medal">
-        update medal
-        set parent_name    = #{parentName,jdbcType=VARCHAR},
-            next_parent    = #{nextParent,jdbcType=BIGINT},
-            child_name     = #{childName,jdbcType=VARCHAR},
-            next_child     = #{nextChild,jdbcType=BIGINT},
-            explain        = #{explain,jdbcType=VARCHAR},
-            marked_words   = #{markedWords,jdbcType=VARCHAR},
-            child_img_url  = #{childImgUrl,jdbcType=VARCHAR},
-            parent_img_url = #{parentImgUrl,jdbcType=VARCHAR}
-        where id = #{id,jdbcType=BIGINT}
-    </update>
+    <sql id="more_Column_List">
+        m.id, m.parent_name, m.next_parent, m.child_name, m.next_child,m.`explain`, m.marked_words, m.child_img_url,
+        m.parent_img_url, m.gold_img_url, m.gray_img_url, m.total_plan
+    </sql>
+
 
     <select id="countChildByIds" resultType="java.util.Map" parameterType="java.util.List">
         SELECT
@@ -372,4 +181,15 @@
         group by m.parent_name
         order by m.id asc
     </select>
-</mapper>
+    <select id="selectByParentIds" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from medal
+        where parent_name in (select parent_name from medal where id in(
+        <foreach collection="parentIds" item="parentId" separator=",">
+            #{parentId}
+        </foreach>
+        )
+        )
+        order by id asc
+    </select></mapper>

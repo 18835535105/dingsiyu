@@ -73,4 +73,12 @@ public interface WorshipMapper {
      * @return
      */
     List<Map<String, String>> selectStudentNameAndTime(@Param("student") Student student, @Param("type") Integer type);
+
+    /**
+     * 统计指定学生被膜拜的次数
+     *
+     * @param studentId
+     * @return
+     */
+    int countByWorship(@Param("studentId") Long studentId);
 }

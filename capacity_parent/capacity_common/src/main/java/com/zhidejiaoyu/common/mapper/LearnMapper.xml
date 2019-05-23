@@ -309,115 +309,7 @@
             order by ${orderByClause}
         </if>
     </select>
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap"
-            parameterType="java.lang.Long">
-        select
-        <include refid="Base_Column_List"/>
-        from learn
-        where id = #{id,jdbcType=BIGINT}
-    </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from learn
-        where id = #{id,jdbcType=BIGINT}
-    </delete>
-    <delete id="deleteByExample"
-            parameterType="com.zhidejiaoyu.common.pojo.LearnExample">
-        delete from learn
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-    </delete>
-    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Learn">
-        insert into learn
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                id,
-            </if>
-            <if test="studentId != null">
-                student_id,
-            </if>
-            <if test="courseId != null">
-                course_id,
-            </if>
-            <if test="unitId != null">
-                unit_id,
-            </if>
-            <if test="vocabularyId != null">
-                vocabulary_id,
-            </if>
-            <if test="exampleId != null">
-                example_id,
-            </if>
-            <if test="status != null">
-                status,
-            </if>
-            <if test="learnTime != null">
-                learn_time,
-            </if>
-            <if test="studyModel != null">
-                study_model,
-            </if>
-            <if test="studyCount != null">
-                study_count,
-            </if>
-            <if test="learnCount != null">
-                learn_count,
-            </if>
-            <if test="updateTime != null">
-                update_time,
-            </if>
-            <if test="firstStudyTime != null">
-                first_study_time,
-            </if>
-            <if test="firstIsKnown != null">
-                first_is_known
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id,jdbcType=BIGINT},
-            </if>
-            <if test="studentId != null">
-                #{studentId,jdbcType=BIGINT},
-            </if>
-            <if test="courseId != null">
-                #{courseId,jdbcType=BIGINT},
-            </if>
-            <if test="unitId != null">
-                #{unitId,jdbcType=BIGINT},
-            </if>
-            <if test="vocabularyId != null">
-                #{vocabularyId,jdbcType=BIGINT},
-            </if>
-            <if test="exampleId != null">
-                #{exampleId,jdbcType=BIGINT},
-            </if>
-            <if test="status != null">
-                #{status,jdbcType=INTEGER},
-            </if>
-            <if test="learnTime != null">
-                #{learnTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="studyModel != null">
-                #{studyModel,jdbcType=VARCHAR},
-            </if>
-            <if test="studyCount != null">
-                #{studyCount,jdbcType=INTEGER},
-            </if>
-            <if test="learnCount != null">
-                #{learnCount,jdbcType=INTEGER},
-            </if>
-            <if test="updateTime != null">
-                #{updateTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="firstStudyTime != null">
-                #{firstStudyTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="firstIsKnown != null">
-                #{firstIsKnown}
-            </if>
-        </trim>
-    </insert>
+
     <insert id="insertList" parameterType="java.util.List">
         insert into learn (id, student_id, course_id,
         unit_id, vocabulary_id, example_id,
@@ -593,72 +485,6 @@
         </foreach>
         )
     </select>
-    <update id="updateByExampleSelective" parameterType="map">
-        update learn
-        <set>
-            <if test="record.id != null">
-                id = #{record.id,jdbcType=BIGINT},
-            </if>
-            <if test="record.studentId != null">
-                student_id = #{record.studentId,jdbcType=BIGINT},
-            </if>
-            <if test="record.courseId != null">
-                course_id = #{record.courseId,jdbcType=BIGINT},
-            </if>
-            <if test="record.unitId != null">
-                unit_id = #{record.unitId,jdbcType=BIGINT},
-            </if>
-            <if test="record.vocabularyId != null">
-                vocabulary_id = #{record.vocabularyId,jdbcType=BIGINT},
-            </if>
-            <if test="record.exampleId != null">
-                example_id = #{record.exampleId,jdbcType=BIGINT},
-            </if>
-            <if test="record.status != null">
-                status = #{record.status,jdbcType=INTEGER},
-            </if>
-            <if test="record.learnTime != null">
-                learn_time = #{record.learnTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="record.studyModel != null">
-                study_model = #{record.studyModel,jdbcType=VARCHAR},
-            </if>
-            <if test="record.studyCount != null">
-                study_count = #{record.studyCount,jdbcType=INTEGER},
-            </if>
-            <if test="record.learnCount != null">
-                learn_count = #{record.learnCount,jdbcType=INTEGER},
-            </if>
-            <if test="record.updateTime != null">
-                update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="record.firstStudyTime != null">
-                first_study_time = #{record.firstStudyTime,jdbcType=TIMESTAMP},
-            </if>
-        </set>
-        <if test="_parameter != null">
-            <include refid="Update_By_Example_Where_Clause"/>
-        </if>
-    </update>
-    <update id="updateByExample" parameterType="map">
-        update learn
-        set id = #{record.id,jdbcType=BIGINT},
-        student_id = #{record.studentId,jdbcType=BIGINT},
-        course_id = #{record.courseId,jdbcType=BIGINT},
-        unit_id = #{record.unitId,jdbcType=BIGINT},
-        vocabulary_id = #{record.vocabularyId,jdbcType=BIGINT},
-        example_id = #{record.exampleId,jdbcType=BIGINT},
-        status = #{record.status,jdbcType=INTEGER},
-        learn_time = #{record.learnTime,jdbcType=TIMESTAMP},
-        study_model = #{record.studyModel,jdbcType=VARCHAR},
-        study_count = #{record.studyCount,jdbcType=INTEGER},
-        learn_count = #{record.learnCount,jdbcType=INTEGER},
-        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-        first_study_time = #{record.firstStudyTime,jdbcType=TIMESTAMP}
-        <if test="_parameter != null">
-            <include refid="Update_By_Example_Where_Clause"/>
-        </if>
-    </update>
     <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.Learn">
         update learn
         <set>
@@ -701,23 +527,6 @@
         </set>
         where id = #{id,jdbcType=BIGINT} and type=1
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.Learn">
-        update learn
-        set student_id       = #{studentId,jdbcType=BIGINT},
-            course_id        = #{courseId,jdbcType=BIGINT},
-            unit_id          = #{unitId,jdbcType=BIGINT},
-            vocabulary_id    = #{vocabularyId,jdbcType=BIGINT},
-            example_id       = #{exampleId,jdbcType=BIGINT},
-            status           = #{status,jdbcType=INTEGER},
-            learn_time       = #{learnTime,jdbcType=TIMESTAMP},
-            study_model      = #{studyModel,jdbcType=VARCHAR},
-            study_count      = #{studyCount,jdbcType=INTEGER},
-            learn_count      = #{learnCount,jdbcType=INTEGER},
-            update_time      = #{updateTime,jdbcType=TIMESTAMP},
-            first_study_time = #{firstStudyTime,jdbcType=TIMESTAMP}
-        where id = #{id,jdbcType=BIGINT}
-    </update>
-
 
     <update id="updateByCourseId" parameterType="map">
         update learn
@@ -1435,6 +1244,13 @@
             and study_model in ('课文好声音', '课文试听', '课文默写测试')
         </if>
     </update>
+    <update id="updateTypeByStudentIdAndUnitId" parameterType="map">
+        update learn
+        set type = #{type}
+        where unit_id = #{unitId}
+          and student_id = #{studentId}
+          and study_model = #{studyModel}
+    </update>
     <select  id="selByStudentIdAndCourseIdDisVersion" parameterType="java.util.Map" resultType="java.lang.Long">
         select DISTINCT learn.unit_id from learn learn
         where learn.student_id= #{studentId}
@@ -1510,7 +1326,35 @@
           and flow_name = #{flowName}
     </select>
     <select id="selLaterSentence" parameterType="java.util.Map" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"/> from learn where student_id=#{studentId} and type=1 and unit_id=#{unitId} and study_model="例句默写" order by id desc limit 1;
+        select
+        <include refid="Base_Column_List"/>
+        from learn where student_id=#{studentId} and type=1 and unit_id=#{unitId} and study_model='例句默写' order by id
+        desc limit 1;
+    </select>
+    <select id="countByStudentIdAndStudyModel" resultType="integer" parameterType="map">
+        select
+        count(id)
+        from learn
+        where unit_id = #{unitId}
+        and student_id = #{studentId}
+        and study_model = #{studyModel}
+        and type = 1
+    </select>
+    <select id="selLetterLearn" parameterType="map" resultType="integer">
+        select count(id) from learn where  student_id=#{studentId} and type=4 and unit_id=#{unitId} and study_model=#{studyModel};
+    </select>
+    <select id="selLetter" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from learn where   student_id=#{studentId} and type=4 and unit_id=#{unitId} and study_model=#{studyModel} and vocabulary_id=#{wordId};
+    </select>
+    <select id="countTodayRestudyAndMemoryStrengthGePercentFifty" resultType="java.lang.Integer" parameterType="map">
+        select count(distinct sr.vocabulary_id)
+        from simple_capacity sc,
+             student_restudy sr
+        where sc.student_id = sr.student_id
+          and sc.unit_id = sr.unit_id
+          and sr.type = 1
+          and to_days(sr.update_time) = to_days(now())
+          and sc.student_id = #{student.id} and sc.memory_strength >= 0.5
     </select>
 
 

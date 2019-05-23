@@ -1,8 +1,17 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 
-public class Medal implements Serializable {
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class Medal extends Model<Medal> {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private String parentName;
@@ -27,75 +36,23 @@ public class Medal implements Serializable {
 
     private String parentImgUrl;
 
-    public String getMarkedWords() {
-        return markedWords;
-    }
+    /**
+     * 勋章中金色图片，学生查看等级和勋章页面显示
+     */
+    private String goldImgUrl;
 
-    public void setMarkedWords(String markedWords) {
-        this.markedWords = markedWords;
-    }
+    /**
+     * 勋章中灰色图片，学生查看等级和勋章页面显示
+     */
+    private String grayImgUrl;
 
-    public Long getId() {
-        return id;
-    }
+    /**
+     * 总进度
+     */
+    private Integer totalPlan;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getParentName() {
-        return parentName;
-    }
-
-    public void setParentName(String parentName) {
-        this.parentName = parentName == null ? null : parentName.trim();
-    }
-
-    public Long getNextParent() {
-        return nextParent;
-    }
-
-    public void setNextParent(Long nextParent) {
-        this.nextParent = nextParent;
-    }
-
-    public String getChildName() {
-        return childName;
-    }
-
-    public void setChildName(String childName) {
-        this.childName = childName == null ? null : childName.trim();
-    }
-
-    public Long getNextChild() {
-        return nextChild;
-    }
-
-    public void setNextChild(Long nextChild) {
-        this.nextChild = nextChild;
-    }
-
-    public String getExplain() {
-        return explain;
-    }
-
-    public void setExplain(String explain) {
-        this.explain = explain == null ? null : explain.trim();
-    }
-
-    public String getChildImgUrl() {
-        return childImgUrl;
-    }
-
-    public void setChildImgUrl(String childImgUrl) {
-        this.childImgUrl = childImgUrl == null ? null : childImgUrl.trim();
-    }
-
-    public String getParentImgUrl() {
-        return parentImgUrl;
-    }
-
-    public void setParentImgUrl(String parentImgUrl) {
-        this.parentImgUrl = parentImgUrl == null ? null : parentImgUrl.trim();
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
     }
 }

@@ -23,7 +23,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"phonetic_symbol","letter","letter_vocabulary"};
+        String[] tableName = {"letter_write"};
 
         /**
          * 配置：

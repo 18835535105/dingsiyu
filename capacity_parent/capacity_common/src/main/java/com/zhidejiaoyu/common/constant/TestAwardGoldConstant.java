@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.constant;
+package com.zhidejiaoyu.common.constant;
 
 /**
  * 测试相关奖励金币数常量类
@@ -7,7 +7,7 @@ package com.zhidejiaoyu.student.constant;
  * @date 2018/8/7
  */
 public class TestAwardGoldConstant {
-	
+
 	/**
 	 * 新生 流程17 point < 80
 	 */
@@ -17,7 +17,7 @@ public class TestAwardGoldConstant {
 	 */
 	public static final int FLOW_TEST_EIGHTY_TO_FULL = 5;
 	/**
-	 * 新生 流程17 point >= 90 
+	 * 新生 流程17 point >= 90
 	 */
 	public static final int FLOW_TEST_NINETY_TO_FULL = 10;
 

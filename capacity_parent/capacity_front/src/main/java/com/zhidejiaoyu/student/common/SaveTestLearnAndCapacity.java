@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.student.common;
 
+import com.zhidejiaoyu.common.award.DailyAwardAsync;
+import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -73,6 +75,9 @@ public class SaveTestLearnAndCapacity {
 
     @Autowired
     private CommonMethod commonMethod;
+
+    @Autowired
+    private DailyAwardAsync dailyAwardAsync;
 
     /**
      * 分别保存例句或单词学习信息和记忆追踪信息
@@ -204,11 +209,14 @@ public class SaveTestLearnAndCapacity {
         Object capacity = null;
         try {
             capacity = this.saveCapacityMemory(learn, student, isTrue, classify);
+
+            // 判断学生今日复习30个生词且记忆强度达到50%
+            dailyAwardAsync.todayReview(student);
         } catch (Exception e) {
             e.printStackTrace();
         }
         // 计算记忆难度
-        Integer memoryDifficult = 0;
+        int memoryDifficult = 0;
         if (capacity != null) {
             if (classify <= 3) {
                 memoryDifficult = memoryDifficultyUtil.getMemoryDifficulty(capacity, 1);

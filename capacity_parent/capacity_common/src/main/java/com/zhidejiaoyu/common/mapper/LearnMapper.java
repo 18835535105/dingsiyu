@@ -15,23 +15,9 @@ import java.util.Map;
 public interface LearnMapper extends BaseMapper<Learn> {
     int countByExample(LearnExample example);
 
-    int deleteByExample(LearnExample example);
-
-    int deleteByPrimaryKey(Long id);
-
-    int insertSelective(Learn record);
-
     List<Learn> selectByExample(LearnExample example);
 
-    Learn selectByPrimaryKey(Long id);
-
-    int updateByExampleSelective(@Param("record") Learn record, @Param("example") LearnExample example);
-
-    int updateByExample(@Param("record") Learn record, @Param("example") LearnExample example);
-
     int updateByPrimaryKeySelective(Learn record);
-
-    int updateByPrimaryKey(Learn record);
 
     /**
      * 查询学生当前单元当前模块下已学习单词/例句的个数，即学习进度
@@ -857,4 +843,41 @@ public interface LearnMapper extends BaseMapper<Learn> {
     int countByStudentIdAndFlow(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("flowName") String flowName);
 
     Learn selLaterSentence(@Param("studentId") Long studentId,@Param("unitId") long unitId);
+
+    /**
+     * 统计学生当前模块的当前已经学习
+     *
+     * @param studentId
+     * @param studyModel
+     * @param unitId
+     * @return
+     */
+    int countByStudentIdAndStudyModel(@Param("studentId") Long studentId, @Param("studyModel") String studyModel, @Param("unitId") Long unitId);
+
+
+    Integer selLetterLearn(@Param("studentId") Long studentId,@Param("unitId") Long unitId,@Param("studyModel") String studyModel);
+
+
+    Learn selLetter(@Param("studentId") Long studentId,@Param("wordId") Long wordId,@Param("unitId") Long unitId);
+
+    @Update("update learn set type=2 where student_id=#{studentId} and unit_id =#{unitId} and study_model=#{studyModel}")
+    void updLetterPair(@Param("studentId") Long studentId,@Param("unitId") Long unitId,@Param("studyModel") String studyModel);
+
+    /**
+     * 修改学习记录中的状态
+     *
+     * @param studentId
+     * @param unitId
+     * @param studyModel
+     * @param type  状态
+     */
+    void updateTypeByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("studyModel") String studyModel, @Param("type") int type);
+
+    /**
+     * 统计今天学生复习的记忆强度大于等于50%的生词数个数
+     *
+     * @param student
+     * @return
+     */
+    int countTodayRestudyAndMemoryStrengthGePercentFifty(@Param("student") Student student);
 }
