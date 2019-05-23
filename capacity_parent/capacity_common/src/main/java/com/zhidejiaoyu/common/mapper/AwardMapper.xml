@@ -172,14 +172,14 @@
     <insert id="insertList" parameterType="map" useGeneratedKeys="true" keyProperty="id">
         insert into award (id, student_id, medal_type,
         award_content_type, type, can_get,
-        get_flag, create_time, get_time)
+        get_flag, create_time, get_time, create_time, current_plan, total_plan)
         values
         <foreach collection="awardList" item="award" separator=",">
             (#{award.id,jdbcType=BIGINT}, #{award.studentId,jdbcType=BIGINT}, #{award.medalType,jdbcType=BIGINT},
             #{award.awardContentType,jdbcType=INTEGER}, #{award.type,jdbcType=VARCHAR},
             #{award.canGet,jdbcType=INTEGER},
             #{award.getFlag,jdbcType=INTEGER}, #{award.createTime,jdbcType=TIMESTAMP},
-            #{award.getTime,jdbcType=TIMESTAMP})
+            #{award.getTime,jdbcType=TIMESTAMP}, #{award.createTime}, #{award.currentPlan}, #{award.totalPlan})
         </foreach>
 
     </insert>
