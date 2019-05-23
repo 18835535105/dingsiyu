@@ -227,6 +227,7 @@
         from run_log
         where to_days(create_time) = to_days(now())
           and operate_user_id = #{stu.id}
+          and log_content not like '%退出登录%'
     </select>
     <select id="selectGoldByUnitId" parameterType="map" resultMap="BaseResultMap">
         select
