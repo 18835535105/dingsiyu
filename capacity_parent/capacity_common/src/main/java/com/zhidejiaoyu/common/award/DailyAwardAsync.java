@@ -135,21 +135,16 @@ public class DailyAwardAsync extends BaseAwardAsync {
         if (this.checkAward(award, DAILY_TYPE)) {
             // 查询学生昨天的学校排名
             RankList rankList = rankListMapper.selectByStudentId(studentId);
-            int rank = 0;
+
+            int up = 0;
             if (rankList != null) {
-                rank = rankList.getSchoolDayRank() == null ? 0 : rankList.getSchoolDayRank();
-            }
-
-            // 学生当前全校排名
-            int currentRank = this.getCurrentSchoolRank(student);
-
-            int up;
-            if (currentRank == 0) {
-                up = 0;
-            } else {
-                up = rank - currentRank;
-                if (rank == 0) {
-                    up = Math.abs(up);
+                int rank = rankList.getSchoolDayRank() == null ? 0 : rankList.getSchoolDayRank();
+                // 学生当前全校排名
+                int currentRank = this.getCurrentSchoolRank(student);
+                if (currentRank == 0) {
+                    up = 0;
+                } else {
+                    up = Math.abs(rank - currentRank);
                 }
             }
             int upRank = up >= 0 ? up : 0;
