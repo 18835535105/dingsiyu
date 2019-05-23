@@ -18,4 +18,6 @@ import java.util.List;
 public interface LetterVocabularyMapper extends BaseMapper<LetterVocabulary> {
 
     List<LetterVocabulary> selByUnitIds(@Param("major") String major, @Param("subordinate") String subordinate, @Param("unit") Integer unit);
+
+    List<String> selLetterByUnitId(@Param("major") String major, @Param("subordinate") String subordinate, @Param("unit") Integer unit);
 }

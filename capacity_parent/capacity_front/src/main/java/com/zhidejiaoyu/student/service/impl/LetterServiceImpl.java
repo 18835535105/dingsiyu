@@ -9,10 +9,12 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.LetterService;
 import com.zhidejiaoyu.student.service.StudentInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -51,7 +53,8 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     private MemoryStrengthUtil memoryStrengthUtil;
     @Autowired
     private StudentInfoService studentInfoService;
-
+    @Value("${ftp.prefix}")
+    private String partUrl;
     /**
      * 获取字母单元
      *
@@ -286,19 +289,41 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterAllUnit();
             for (LetterUnit letterUnit : letterUnits) {
                 List<Letter> allLetter = letterMapper.getAllLetterByUnitId(letterUnit.getId());
+                List<Letter> returnLetter=new ArrayList<>();
+                allLetter.forEach(letter->{
+                    letter.setGifUrl(partUrl+letter.getGifUrl());
+                    returnLetter.add(letter);
+                });
                 Map<String, Object> returnMap = new HashMap<>();
                 returnMap.put("title", letterUnit.getUnitName());
-                returnMap.put("list", allLetter);
+                returnMap.put("list", returnLetter);
                 returnList.add(returnMap);
             }
         } else {
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterTreasure(major, subordinate);
             for (LetterUnit unit : letterUnits) {
                 List<LetterVocabulary> letterVocabulary = letterVocabularyMapper.selByUnitIds(major, subordinate, unit.getId());
-                Map<String, Object> returnMap = new HashMap<>();
-                returnMap.put("title", unit.getUnitName());
-                returnMap.put("list", letterVocabulary);
-                returnList.add(returnMap);
+                if(major.equals("字母拼读")){
+                    //获取当前单元显示的字母
+                    List<String> letters=letterVocabularyMapper.selLetterByUnitId(major, subordinate, unit.getId());
+                    Map<String, List<LetterVocabulary>> collect = letterVocabulary.stream().collect(Collectors.groupingBy(vo -> vo.getLetter()));
+                    List<Map<String,Object>> letterList=new ArrayList<>();
+                    letters.forEach(letter -> {
+                        Map<String, Object> letterMap = new HashMap<>();
+                        letterMap.put("letter",letter);
+                        letterMap.put("list",collect.get(letter));
+                        letterList.add(letterMap);
+                    });
+                    Map<String,Object> returnMap=new HashMap<>();
+                    returnMap.put("unit",unit.getUnitName());
+                    returnMap.put("list",letterList);
+                    returnList.add(returnMap);
+                }else{
+                    Map<String, Object> returnMap = new HashMap<>();
+                    returnMap.put("title", unit.getUnitName());
+                    returnMap.put("list", letterVocabulary);
+                    returnList.add(returnMap);
+                }
             }
         }
 

@@ -21,4 +21,9 @@
         select <include refid="base_sql"></include> from letter_vocabulary
         where major_categories=#{major} and subordinate_category=#{subordinate} and unit_id=#{unit}
     </select>
+    <select id="selLetterByUnitId" resultType="string" parameterType="map">
+        select letter from letter_vocabulary
+        where major_categories=#{major} and subordinate_category=#{subordinate} and unit_id=#{unit}
+        group by letter
+    </select>
 </mapper>
