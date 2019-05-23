@@ -34,7 +34,6 @@ public class GoodVoiceUtil {
      */
     public Map<String, Object> getWordEvaluationRecord(String text, String fileUrl) {
         String result = speechEvaluation.getEvaluationResult(text, fileUrl);
-        log.info(result);
         if (result != null) {
             Map<String, Object> map = new HashMap<>(16);
 
@@ -73,7 +72,6 @@ public class GoodVoiceUtil {
 
         String findText = text.replace("!", ",").replace("?", ",").replace(".", ",");
         String result = speechEvaluation.getEvaluationResult(findText, fileUrl);
-        log.info("评测结果：{}", result);
         if (result != null) {
             Map<String, Object> map = new HashMap<>(16);
             List<Map<String, Object>> mapList = new ArrayList<>();
