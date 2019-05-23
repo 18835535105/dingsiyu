@@ -7,7 +7,6 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
-import com.zhidejiaoyu.student.dto.phonetic.UnitTestDto;
 import com.zhidejiaoyu.student.service.PhoneticSymbolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author zdjy
@@ -56,23 +55,23 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     public Object getSymbolUnit(HttpSession session) {
         Student student = getStudent(session);
         StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selSymbolByStudentId(student.getId());
-        List<Object> list=new ArrayList<>();
-        if(studentStudyPlan!=null){
+        List<Object> list = new ArrayList<>();
+        if (studentStudyPlan != null) {
             //获取单元
             List<LetterUnit> letterUnits = letterUnitMapper.selSymbolUnit(studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());
-            for(LetterUnit letterUnit:letterUnits){
-                Map<String,Object> returnMap=new HashMap<>();
-                returnMap.put("title",letterUnit.getUnitName());
-                returnMap.put("id",letterUnit.getId());
+            for (LetterUnit letterUnit : letterUnits) {
+                Map<String, Object> returnMap = new HashMap<>();
+                returnMap.put("title", letterUnit.getUnitName());
+                returnMap.put("id", letterUnit.getId());
                 List<Map<String, Object>> maps = phoneticSymbolMapper.selByUnitId(letterUnit.getId());
-                List<Map<String,Object>> symbolList=new ArrayList<>();
-                for(Map<String,Object> map:maps){
-                    Map<String,Object> unitMap=new HashMap<>();
-                    unitMap.put("title",map.get("type").toString()+map.get("phonetic_symbol")+"的发音方法");
-                    unitMap.put("type",map.get("type").toString()+map.get("phonetic_symbol"));
+                List<Map<String, Object>> symbolList = new ArrayList<>();
+                for (Map<String, Object> map : maps) {
+                    Map<String, Object> unitMap = new HashMap<>();
+                    unitMap.put("title", map.get("type").toString() + map.get("phonetic_symbol") + "的发音方法");
+                    unitMap.put("type", map.get("type").toString() + map.get("phonetic_symbol"));
                     symbolList.add(unitMap);
                 }
-                returnMap.put("child",symbolList);
+                returnMap.put("child", symbolList);
                 list.add(returnMap);
             }
         }
@@ -81,97 +80,98 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
 
     /**
      * 获取单元音标信息
+     *
      * @param unitId
      * @return
      */
     @Override
-    public Object getSymbol(Integer unitId,HttpSession session) {
-        if(unitId==null){
+    public Object getSymbol(Integer unitId, HttpSession session) {
+        if (unitId == null) {
             Student student = getStudent(session);
             CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selSymbolByStudentId(student.getId());
-            if(capacityStudentUnit!=null){
-                unitId=capacityStudentUnit.getUnitId().intValue();
-            }else{
+            if (capacityStudentUnit != null) {
+                unitId = capacityStudentUnit.getUnitId().intValue();
+            } else {
                 StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selSymbolByStudentId(student.getId());
-                unitId=studentStudyPlan.getStartUnitId().intValue();
+                unitId = studentStudyPlan.getStartUnitId().intValue();
             }
         }
-        List<String> symbolsList=phoneticSymbolMapper.selSymbolByUnitId(unitId);
-        List<Map<String,Object>> returnList=new ArrayList<>();
-        for(String symbol:symbolsList){
-            Map<String,Object> map=new HashMap<>();
-            List<Map<String,Object>> list=new ArrayList<>();
-            List<PhoneticSymbol> phoneticSymbols = phoneticSymbolMapper.selAllByUnitIdAndSymbol(unitId,symbol);
-            for(PhoneticSymbol phonetic:phoneticSymbols){
-                Map<String,Object> symbolMap=new HashMap<>();
-                Map<String,Object> symbolMap2=new HashMap<>();
-                if(phonetic.getPhoneticSymbol().equals(symbol)){
-                    if(map.get("method")==null || map.get("method")==""){
+        List<String> symbolsList = phoneticSymbolMapper.selSymbolByUnitId(unitId);
+        List<Map<String, Object>> returnList = new ArrayList<>();
+        for (String symbol : symbolsList) {
+            Map<String, Object> map = new HashMap<>();
+            List<Map<String, Object>> list = new ArrayList<>();
+            List<PhoneticSymbol> phoneticSymbols = phoneticSymbolMapper.selAllByUnitIdAndSymbol(unitId, symbol);
+            for (PhoneticSymbol phonetic : phoneticSymbols) {
+                Map<String, Object> symbolMap = new HashMap<>();
+                Map<String, Object> symbolMap2 = new HashMap<>();
+                if (phonetic.getPhoneticSymbol().equals(symbol)) {
+                    if (map.get("method") == null || map.get("method") == "") {
                         String[] split = phonetic.getPronunciationMethod().split("；");
-                        map.put("method",split);
+                        map.put("method", split);
                     }
-                    if(map.get("listen")==null || map.get("listen")==""){
-                        map.put("listen",url+phonetic.getUrl());
+                    if (map.get("listen") == null || map.get("listen") == "") {
+                        map.put("listen", url + phonetic.getUrl());
                     }
-                    if(map.get("partUrl")==null||map.get("partUrl")==""){
-                        map.put("partUrl",url+phonetic.getPartUrl());
+                    if (map.get("partUrl") == null || map.get("partUrl") == "") {
+                        map.put("partUrl", url + phonetic.getPartUrl());
                     }
                 }
-                symbolMap.put("letter",phonetic.getLetter());
+                symbolMap.put("letter", phonetic.getLetter());
                 String[] split = phonetic.getContent().split("；");
-                List<String> vocabularies=new ArrayList<>();
-                if(split.length>4){
-                    List<String> lets=new ArrayList<>();
-                    int i=0;
-                    for(String let:split){
+                List<String> vocabularies = new ArrayList<>();
+                if (split.length > 4) {
+                    List<String> lets = new ArrayList<>();
+                    int i = 0;
+                    for (String let : split) {
                         String[] s = let.split(" ");
-                        vocabularies.add(s[1].replace("#",""));
+                        vocabularies.add(s[1].replace("#", ""));
                         lets.add(let);
-                        if(lets.size()==4 && i==0){
+                        if (lets.size() == 4 && i == 0) {
                             i++;
-                            symbolMap2.put("letter",phonetic.getLetter());
-                            symbolMap2.put("merge",true);
-                            symbolMap2.put("example",lets);
-                            symbolMap2.put("vocabularies",vocabularies);
+                            symbolMap2.put("letter", phonetic.getLetter());
+                            symbolMap2.put("merge", true);
+                            symbolMap2.put("example", lets);
+                            symbolMap2.put("vocabularies", vocabularies);
                             list.add(symbolMap2);
-                            vocabularies=new ArrayList<>();
-                            lets=new ArrayList<>();
+                            vocabularies = new ArrayList<>();
+                            lets = new ArrayList<>();
                         }
                     }
-                    symbolMap.put("display",true);
-                    symbolMap.put("example",lets);
-                    symbolMap.put("vocabularies",vocabularies);
+                    symbolMap.put("display", true);
+                    symbolMap.put("example", lets);
+                    symbolMap.put("vocabularies", vocabularies);
                     list.add(symbolMap);
-                }else{
-                    symbolMap.put("example",split);
-                    for(String let:split){
+                } else {
+                    symbolMap.put("example", split);
+                    for (String let : split) {
                         String[] s = let.split(" ");
-                        vocabularies.add(s[1].replace("#",""));
+                        vocabularies.add(s[1].replace("#", ""));
                     }
-                    symbolMap.put("vocabularies",vocabularies);
+                    symbolMap.put("vocabularies", vocabularies);
                     list.add(symbolMap);
 
                 }
 
             }
-            map.put("title",symbol);
-            map.put("content",list);
+            map.put("title", symbol);
+            map.put("content", list);
             returnList.add(map);
-            if(returnList.size()==2){
-                Map<String,Object> sMap=new HashMap<>();
-                sMap.put("title",".");
+            if (returnList.size() == 2) {
+                Map<String, Object> sMap = new HashMap<>();
+                sMap.put("title", ".");
                 returnList.add(sMap);
             }
         }
         Long studentId = getStudentId(session);
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selSymbolByStudentId(studentId);
-        if(capacityStudentUnit!=null){
-           if(!capacityStudentUnit.getUnitId().equals(unitId)){
-               capacityStudentUnit.setUnitId(unitId.longValue());
-               capacityStudentUnitMapper.updateById(capacityStudentUnit);
-           }
-        }else{
-            capacityStudentUnit=new CapacityStudentUnit();
+        if (capacityStudentUnit != null) {
+            if (!capacityStudentUnit.getUnitId().equals(unitId)) {
+                capacityStudentUnit.setUnitId(unitId.longValue());
+                capacityStudentUnitMapper.updateById(capacityStudentUnit);
+            }
+        } else {
+            capacityStudentUnit = new CapacityStudentUnit();
             capacityStudentUnit.setUnitId(unitId.longValue());
             StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selSymbolByStudentId(studentId);
             capacityStudentUnit.setStartunit(studentStudyPlan.getStartUnitId());
@@ -252,7 +252,6 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         // 根据读音去重
         List<String> urlList = getUrlList(otherPhoneticSymbol);
 
-
         List<Map<String, Object>> resultList = new ArrayList<>(phoneticSymbols.size() * 3);
 
         Map<String, List<PhoneticSymbol>> collectMap = phoneticSymbols.parallelStream().collect(Collectors.groupingBy(PhoneticSymbol::getPhoneticSymbol));
@@ -285,26 +284,27 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
      */
     private void getTypeThree(List<PhoneticSymbol> symbols, List<PhoneticSymbol> phoneticSymbols, List<Map<String, Object>> resultList) {
 
-            Collections.shuffle(symbols);
-            List<PhoneticSymbol> collect = symbols.stream().limit(3).collect(Collectors.toList());
-            List<Map<String, Object>> answerList = new ArrayList<>(collect.size());
-            Map<String, Object> answerMap;
-            for (PhoneticSymbol symbol : collect) {
-                answerMap = new HashMap<>(16);
-                answerMap.put("word", symbol.getPhoneticSymbol());
-                answerMap.put("answer", false);
-                answerList.add(answerMap);
-            }
+        Collections.shuffle(symbols);
+        List<PhoneticSymbol> collect = symbols.stream().limit(3).collect(Collectors.toList());
+        List<Map<String, Object>> answerList = new ArrayList<>(collect.size());
+        Map<String, Object> answerMap;
+        for (PhoneticSymbol symbol : collect) {
             answerMap = new HashMap<>(16);
-            answerMap.put("word", phoneticSymbols.get(0).getPhoneticSymbol());
-            answerMap.put("answer", true);
+            answerMap.put("word", symbol.getPhoneticSymbol());
+            answerMap.put("answer", false);
             answerList.add(answerMap);
+        }
+        answerMap = new HashMap<>(16);
+        answerMap.put("word", phoneticSymbols.get(0).getPhoneticSymbol());
+        answerMap.put("answer", true);
+        answerList.add(answerMap);
+        Collections.shuffle(answerList);
 
-            Map<String, Object> map = new HashMap<>(16);
-            map.put("type", 3);
-            map.put("title", phoneticSymbols.get(0).getLetter());
-            map.put("answer", answerList);
-            resultList.add(map);
+        Map<String, Object> map = new HashMap<>(16);
+        map.put("type", 3);
+        map.put("title", phoneticSymbols.get(0).getLetter());
+        map.put("answer", answerList);
+        resultList.add(map);
     }
 
     /**
@@ -331,6 +331,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
             answerMap.put("answer", false);
             list.add(answerMap);
         }
+        Collections.shuffle(list);
 
         map.put("answer", list);
         resultList.add(map);
@@ -339,7 +340,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     /**
      * 看音标选声音（听力理解）
      *
-     *  @param phoneticSymbolList
+     * @param phoneticSymbolList
      * @param resultList
      * @param val
      */
@@ -361,6 +362,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         answerMap.put("url", prefix + val.get(0).getUrl());
         answerMap.put("answer", true);
         list.add(answerMap);
+        Collections.shuffle(list);
 
         map.put("answer", list);
         resultList.add(map);
