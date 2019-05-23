@@ -16,15 +16,9 @@ public interface AwardMapper extends BaseMapper<Award> {
 
     int deleteByExample(AwardExample example);
 
-    int deleteByPrimaryKey(Long id);
-
-    int insertSelective(Award record);
-
     List<Award> selectByExample(AwardExample example);
 
     Award selectByPrimaryKey(Long id);
-
-    int updateByExampleSelective(@Param("record") Award record, @Param("example") AwardExample example);
 
     int updateByExample(@Param("record") Award record, @Param("example") AwardExample example);
 
