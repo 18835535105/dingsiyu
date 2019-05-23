@@ -73,9 +73,8 @@ public class GoodVoiceUtil {
 
         String findText = text.replace("!", ",").replace("?", ",").replace(".", ",");
         String result = speechEvaluation.getEvaluationResult(findText, fileUrl);
-        log.info(result);
+        log.info("评测结果：{}", result);
         if (result != null) {
-
             Map<String, Object> map = new HashMap<>(16);
             List<Map<String, Object>> mapList = new ArrayList<>();
             Map<String, Object> wordMap;
@@ -98,6 +97,9 @@ public class GoodVoiceUtil {
                 int j = 0;
                 for (Object o : wordArray) {
                     JSONObject wordJsonObject = (JSONObject) o;
+                    if ("*".equals(wordJsonObject.getString("Word")) || ",".equals(wordJsonObject.getString("Word"))) {
+                        continue;
+                    }
                     score = Math.round(wordJsonObject.getFloat(pronAccuracy));
                     if (score == -1) {
                         score = 0;
@@ -123,6 +125,9 @@ public class GoodVoiceUtil {
             } else {
                 wordMap = new HashMap<>(16);
                 score = Math.round(wordArray.getJSONObject(0).getFloat(pronAccuracy));
+                if (score == -1) {
+                    score = 0;
+                }
                 wordMap.put("word", s[0].substring(0, s[0].length() - 1));
                 wordMap.put("score", score);
                 wordMap.put("color", getColor(score));

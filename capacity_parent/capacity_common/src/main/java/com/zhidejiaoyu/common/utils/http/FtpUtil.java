@@ -392,7 +392,7 @@ public class FtpUtil {
             return null;
         }
         // 文件后缀名
-        String ftpFileName  = UUID.randomUUID().toString().replace("-","") + ".mp3";
+        String ftpFileName  = UUID.randomUUID().toString().replace("-","") + ".wav";
         boolean flag = false;
         if (ftpClient != null) {
             FileInputStream fis = null;
