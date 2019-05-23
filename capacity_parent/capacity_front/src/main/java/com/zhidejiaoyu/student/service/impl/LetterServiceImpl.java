@@ -284,7 +284,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
 
     @Override
     public Object getLetterTreasure(String major, String subordinate) {
-        List<Map<String, Object>> returnList = new ArrayList<>();
+        List<Object> returnList = new ArrayList<>();
         if (major.equals("认字母")) {
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterAllUnit();
             for (LetterUnit letterUnit : letterUnits) {
@@ -319,10 +319,29 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                     returnMap.put("list",letterList);
                     returnList.add(returnMap);
                 }else{
-                    Map<String, Object> returnMap = new HashMap<>();
-                    returnMap.put("title", unit.getUnitName());
-                    returnMap.put("list", letterVocabulary);
-                    returnList.add(returnMap);
+
+                    int i=0;
+                    int total=0;
+                    List<LetterVocabulary> list=new ArrayList<>();
+                    List<Object> letterVoList=new ArrayList<>();
+                    for(LetterVocabulary vo:letterVocabulary ){
+                        list.add(vo);
+                        total++;
+                        if(list.size()%6==0||letterVocabulary.size()==total){
+                            Map<String,Object> map=new HashMap<>();
+                            if(i==0){
+                                map.put("merge",true);
+                            }else{
+                                map.put("display",true);
+                            }
+                            map.put("title",unit.getUnitName());
+                            map.put("list",list);
+                            letterVoList.add(map);
+                            list=new ArrayList<>();
+                            i++;
+                        }
+                    }
+                    returnList.add(letterVoList);
                 }
             }
         }
