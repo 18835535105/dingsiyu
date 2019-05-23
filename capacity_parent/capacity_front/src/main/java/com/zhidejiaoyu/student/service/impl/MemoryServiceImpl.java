@@ -18,17 +18,23 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabulary> implements MemoryService {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
+
+    @Value("${ftp.prefix}")
+    private String prefix;
 
     @Autowired
     private CommonMethod commonMethod;
@@ -164,6 +170,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
             memoryStudyVo.setWordCount(wordCount);
             memoryStudyVo.setEngine(1);
             memoryStudyVo.setWordChineseList(this.getChinese(unitId, currentStudyWord.getId(), wordChinese));
+            memoryStudyVo.setImgUrl(prefix + currentStudyWord.getRecordpicurl());
             return ServerResponse.createBySuccess(memoryStudyVo);
         }
         return null;
@@ -309,6 +316,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         int memoryDifficulty = memoryDifficultyUtil.getMemoryDifficulty(capacityMemory, 1);
         // 计算当前单词的记忆强度
         double memoryStrength = capacityMemory.getMemoryStrength();
+        Vocabulary vocabulary = vocabularyMapper.selectById(capacityMemory.getVocabularyId());
 
         Long unitId = capacityMemory.getUnitId();
         Long vocabularyId = capacityMemory.getVocabularyId();
@@ -329,6 +337,8 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         memoryStudyVo.setReadUrl(baiduSpeak.getLanguagePath(capacityMemory.getWord()));
         memoryStudyVo.setEngine(PerceiveEngine.getPerceiveEngine(memoryDifficulty, memoryStrength));
         memoryStudyVo.setWordChineseList(this.getChinese(unitId, vocabularyId, wordChinese));
+        memoryStudyVo.setImgUrl(vocabulary == null ? "" : prefix + vocabulary.getRecordpicurl());
+
         return ServerResponse.createBySuccess(memoryStudyVo);
 
     }

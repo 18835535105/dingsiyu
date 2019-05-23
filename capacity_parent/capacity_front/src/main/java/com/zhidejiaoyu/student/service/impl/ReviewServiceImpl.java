@@ -1456,6 +1456,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             map.put("subject", subject);
         } else if (classify == 1) {
             map.put("wordChineseList", this.getChinese(Long.parseLong(map.get("unit_id").toString()), vocabulary.getId(), map.get("wordChinese").toString()));
+            map.put("imgUrl", ftpPrefix + vocabulary.getRecordpicurl());
         }
         return ServerResponse.createBySuccess(map);
     }
