@@ -55,6 +55,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     private StudentInfoService studentInfoService;
     @Value("${ftp.prefix}")
     private String partUrl;
+
     /**
      * 获取字母单元
      *
@@ -165,7 +166,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     }
 
     @Override
-    public Object saveLetterListen(Player player, HttpSession session,Long valid) {
+    public Object saveLetterListen(Player player, HttpSession session, Long valid) {
         Long studentId = getStudentId(session);
         int i = playerMapper.selectByType(studentId, player.getUnitId(), 4, player.getWordId());
         if (i == 0) {
@@ -264,7 +265,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     }
 
     @Override
-    public Object saveLetterPair(LetterPair letterPair, HttpSession session,Long valid) {
+    public Object saveLetterPair(LetterPair letterPair, HttpSession session, Long valid) {
         Long studentId = getStudentId(session);
         Learn learn = new Learn();
         learn.setStudentId(studentId);
@@ -289,9 +290,9 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterAllUnit();
             for (LetterUnit letterUnit : letterUnits) {
                 List<Letter> allLetter = letterMapper.getAllLetterByUnitId(letterUnit.getId());
-                List<Letter> returnLetter=new ArrayList<>();
-                allLetter.forEach(letter->{
-                    letter.setGifUrl(partUrl+letter.getGifUrl());
+                List<Letter> returnLetter = new ArrayList<>();
+                allLetter.forEach(letter -> {
+                    letter.setGifUrl(partUrl + letter.getGifUrl());
                     returnLetter.add(letter);
                 });
                 Map<String, Object> returnMap = new HashMap<>();
@@ -303,45 +304,53 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterTreasure(major, subordinate);
             for (LetterUnit unit : letterUnits) {
                 List<LetterVocabulary> letterVocabulary = letterVocabularyMapper.selByUnitIds(major, subordinate, unit.getId());
-                if(major.equals("字母拼读")){
+                if (major.equals("字母拼读")) {
                     //获取当前单元显示的字母
-                    List<String> letters=letterVocabularyMapper.selLetterByUnitId(major, subordinate, unit.getId());
+                    List<String> letters = letterVocabularyMapper.selLetterByUnitId(major, subordinate, unit.getId());
                     Map<String, List<LetterVocabulary>> collect = letterVocabulary.stream().collect(Collectors.groupingBy(vo -> vo.getLetter()));
-                    List<Map<String,Object>> letterList=new ArrayList<>();
                     letters.forEach(letter -> {
-                        Map<String, Object> letterMap = new HashMap<>();
-                        letterMap.put("letter",letter);
-                        letterMap.put("list",collect.get(letter));
-                        letterList.add(letterMap);
+                        List<LetterVocabulary> letterVocabularies = collect.get(letter);
+                        int i=0;
+                        for(LetterVocabulary vo:letterVocabularies){
+                            Map<String, Object> letterMap = new HashMap<>();
+                            if(i==0){
+                                letterMap.put("marge",true);
+                            }else{
+                                letterMap.put("display",true);
+                            }
+                            letterMap.put("letter", letter);
+                            letterMap.put("unit", unit.getUnitName());
+                            letterMap.put("line",collect.get(letter).size());
+                            returnList.add(letterMap);
+                            i++;
+                        }
                     });
-                    Map<String,Object> returnMap=new HashMap<>();
-                    returnMap.put("unit",unit.getUnitName());
-                    returnMap.put("list",letterList);
-                    returnList.add(returnMap);
-                }else{
+                } else {
 
-                    int i=0;
-                    int total=0;
-                    List<LetterVocabulary> list=new ArrayList<>();
-                    List<Object> letterVoList=new ArrayList<>();
-                    for(LetterVocabulary vo:letterVocabulary ){
+                    int i = 0;
+                    int total = 0;
+                    List<LetterVocabulary> list = new ArrayList<>();
+                    int lineSize = letterVocabulary.size()%6>0?letterVocabulary.size()/6+1:letterVocabulary.size()/6;
+
+                    for (LetterVocabulary vo : letterVocabulary) {
                         list.add(vo);
                         total++;
-                        if(list.size()%6==0||letterVocabulary.size()==total){
-                            Map<String,Object> map=new HashMap<>();
-                            if(i==0){
-                                map.put("merge",true);
-                            }else{
-                                map.put("display",true);
+                        if (list.size() % 6 == 0 || letterVocabulary.size() == total) {
+                            Map<String, Object> map = new HashMap<>();
+                            if (i == 0) {
+                                map.put("merge", true);
+                            } else {
+                                map.put("display", true);
                             }
-                            map.put("title",unit.getUnitName());
-                            map.put("list",list);
-                            letterVoList.add(map);
-                            list=new ArrayList<>();
+                            map.put("title", unit.getUnitName());
+                            map.put("list", list);
+                            map.put("line",lineSize);
+                            returnList.add(map);
+                            list = new ArrayList<>();
                             i++;
                         }
                     }
-                    returnList.add(letterVoList);
+
                 }
             }
         }
@@ -354,48 +363,48 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         Long studentId = getStudentId(session);
         Integer countByUnitId = letterMapper.selLetterCountById(unitId);
         Integer letterWriteCount = letterWriteMapper.selStudyLetterCountByUnitIdAndStudent(unitId, studentId);
-        if(countByUnitId.equals(letterWriteCount)){
-            letterWriteMapper.delByUnitIdAndStudentId(unitId,studentId);
+        if (countByUnitId.equals(letterWriteCount)) {
+            letterWriteMapper.delByUnitIdAndStudentId(unitId, studentId);
             learnMapper.updLetterPair(studentId, unitId, "字母听写");
         }
         //查看是否有到黄金记忆点的字母
         Letter letter = letterMapper.selPushLetterByUnitIdAndStudent(unitId, studentId);
-        if(letter==null){
+        if (letter == null) {
             List<Long> studyWirteIds = letterWriteMapper.selStudyLetterIdByUnitIdAndStudent(unitId, studentId);
             letter = letterMapper.getStudyLetter(unitId, studyWirteIds);
         }
-        Map<String,Object> map=new HashMap<>();
-        map.put("id",letter.getId());
-        map.put("unitId",unitId);
-        map.put("letter",letter.getLowercaseLetters());
-        map.put("bigLetter",letter.getBigLetter());
-        map.put("listen",baiduSpeak.getSentencePath(letter.getBigLetter()));
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", letter.getId());
+        map.put("unitId", unitId);
+        map.put("letter", letter.getLowercaseLetters());
+        map.put("bigLetter", letter.getBigLetter());
+        map.put("listen", baiduSpeak.getSentencePath(letter.getBigLetter()));
         return ServerResponse.createBySuccess(map);
     }
 
     @Override
-    public Object saveLetterWrite(Letter letter, HttpSession session,Boolean falg,Long valid) {
+    public Object saveLetterWrite(Letter letter, HttpSession session, Boolean falg, Long valid) {
         Long studentId = getStudentId(session);
         LetterWrite letterWrite = letterWriteMapper.selByLetterIdAndStudent(letter.getId(), studentId);
-        if(letterWrite != null){
+        if (letterWrite != null) {
             // 重新计算记忆强度
             Date push = GoldMemoryTime.getGoldMemoryTime(letterWrite.getMemoryStrength(), new Date());
             letterWrite.setPush(push);
             letterWrite.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(letterWrite.getMemoryStrength(), falg));
             letterWriteMapper.updateById(letterWrite);
-        }else{
-            letterWrite=new LetterWrite();
+        } else {
+            letterWrite = new LetterWrite();
             letterWrite.setLetterId(letter.getId());
             letterWrite.setUnitId(letter.getUnitId());
             letterWrite.setStudentId(studentId.intValue());
             letterWrite.setState(1);
-            if(!falg){
+            if (!falg) {
                 letterWrite.setMemoryStrength(0.12);
                 Date push = GoldMemoryTime.getGoldMemoryTime(letterWrite.getMemoryStrength(), new Date());
                 letterWrite.setPush(push);
             }
             letterWriteMapper.insert(letterWrite);
-            Date date=new Date();
+            Date date = new Date();
             Learn learn = new Learn();
             learn.setStudentId(studentId);
             learn.setStudyModel("字母听写");
