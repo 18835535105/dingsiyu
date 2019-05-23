@@ -1009,6 +1009,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }*/
         // 获取当前单元下的所有单词
         List<Vocabulary> vocabularies = redisOpt.getWordInfoInUnit(unitId);
+        learnMapper.updLetterPair(student.getId(),unitId,studyModel);
         String[] type;
         if ("慧记忆".equals(studyModel)) {
             type = new String[]{"英译汉", "汉译英"};
