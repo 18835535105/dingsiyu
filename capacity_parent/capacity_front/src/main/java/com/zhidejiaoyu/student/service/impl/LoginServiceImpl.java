@@ -950,14 +950,16 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private void saveDailyAward(Student stu) {
         int count = runLogMapper.countStudentTodayLogin(stu);
         if (count == 1) {
-            // 每日首次登陆日奖励
-            dailyAwardAsync.firstLogin(stu);
+            executorService.execute(() -> {
+                // 每日首次登陆日奖励
+                dailyAwardAsync.firstLogin(stu);
 
-            // 当天首次登陆将学生每日闯关获取金币数清空
-            this.resetTestGold(stu);
+                // 当天首次登陆将学生每日闯关获取金币数清空
+                this.resetTestGold(stu);
 
-            // 如果昨天辉煌荣耀奖励没有更新，将指定的奖励当前进度置为0
-            medalAwardAsync.updateHonour(stu);
+                // 如果昨天辉煌荣耀奖励没有更新，将指定的奖励当前进度置为0
+                medalAwardAsync.updateHonour(stu);
+            });
         }
     }
 
