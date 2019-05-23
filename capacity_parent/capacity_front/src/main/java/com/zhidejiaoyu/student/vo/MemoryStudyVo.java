@@ -59,6 +59,11 @@ public class MemoryStudyVo {
 	private Integer engine;
 
 	/**
+	 * 单词图片地址
+	 */
+	private String imgUrl;
+
+	/**
 	 * 中文选项
 	 */
 	private List<Map<String, Boolean>> wordChineseList;
