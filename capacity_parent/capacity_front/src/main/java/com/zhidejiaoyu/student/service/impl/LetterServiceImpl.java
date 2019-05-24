@@ -341,7 +341,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                         }
                         letterMap.put("letter", letter);
                         letterMap.put("unit", unit.getUnitName());
-                        letterMap.put("line", collect.get(letter).size());
+                        letterMap.put("line", letters.size());
                         letterMap.put("list", collect.get(letter).subList(0, 5));
                         returnList.add(letterMap);
                         i++;
