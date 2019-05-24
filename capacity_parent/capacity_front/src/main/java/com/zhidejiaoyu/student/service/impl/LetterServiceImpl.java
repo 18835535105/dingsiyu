@@ -229,9 +229,9 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         map.put("plan", integer);
         //获取题目
         Random random = new Random();
-        int ranId = random.nextInt(1);
+        int ranId = random.nextInt(10);
         List<String> options = new ArrayList<>();
-        if (ranId > 0) {
+        if (ranId > 5) {
             //大写字母题目
             map.put("title", studyLetter.getBigLetter());
             options.add(studyLetter.getLowercaseLetters());
@@ -247,20 +247,34 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             }
         }
         Collections.shuffle(options);
-        map.put("options", options);
+        List<Map<String,Object>> returnList=new ArrayList<>();
         if (ranId > 0) {
             for (int i = 0; i < options.size(); i++) {
+                Map<String,Object> returnMap=new HashMap<>();
                 if (studyLetter.getLowercaseLetters().equals(options.get(i))) {
-                    map.put("answer", i);
+                    returnMap.put("letter", options.get(i));
+                    returnMap.put("isTurn",true);
+                }else{
+                    returnMap.put("letter", options.get(i));
+                    returnMap.put("isTurn",false);
                 }
+                returnList.add(returnMap);
             }
         } else {
             for (int i = 0; i < options.size(); i++) {
+                Map<String,Object> returnMap=new HashMap<>();
                 if (studyLetter.getBigLetter().equals(options.get(i))) {
-                    map.put("answer", i);
+                    returnMap.put("letter", options.get(i));
+                    returnMap.put("isTurn",true);
+                }else{
+                    returnMap.put("letter", options.get(i));
+                    returnMap.put("isTurn",false);
                 }
+                returnList.add(returnMap);
             }
         }
+        map.put("options", returnList);
+        map.put("id",studyLetter.getId());
         return ServerResponse.createBySuccess(map);
     }
 
@@ -288,6 +302,8 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         List<Object> returnList = new ArrayList<>();
         if (major.equals("认字母")) {
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterAllUnit();
+            Map<String, Object> map = new HashMap<>();
+            List<Object> list=new ArrayList<>();
             for (LetterUnit letterUnit : letterUnits) {
                 List<Letter> allLetter = letterMapper.getAllLetterByUnitId(letterUnit.getId());
                 List<Letter> returnLetter = new ArrayList<>();
@@ -298,8 +314,29 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 Map<String, Object> returnMap = new HashMap<>();
                 returnMap.put("title", letterUnit.getUnitName());
                 returnMap.put("list", returnLetter);
-                returnList.add(returnMap);
+                list.add(returnMap);
             }
+            for(LetterUnit letterUnit:letterUnits){
+                int i = 0;
+                List<Letter> allLetter = letterMapper.getAllLetterByUnitId(letterUnit.getId());
+                for (Letter letter : allLetter) {
+                    Map<String, Object> letterMap = new HashMap<>();
+                    letterMap.put("title", letterUnit.getUnitName());
+                    letter.setGifUrl(partUrl + letter.getGifUrl());
+                    letterMap.put("letter", letter);
+                    if (i == 0) {
+                        letterMap.put("marge", true);
+                    } else {
+                        letterMap.put("display", true);
+                    }
+                    i++;
+                    letterMap.put("line",allLetter.size());
+                    returnList.add(letterMap);
+                }
+            }
+            map.put("letterMap", list);
+            map.put("listen",returnList);
+            return ServerResponse.createBySuccess(map);
         } else {
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterTreasure(major, subordinate);
             for (LetterUnit unit : letterUnits) {
@@ -308,29 +345,27 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                     //获取当前单元显示的字母
                     List<String> letters = letterVocabularyMapper.selLetterByUnitId(major, subordinate, unit.getId());
                     Map<String, List<LetterVocabulary>> collect = letterVocabulary.stream().collect(Collectors.groupingBy(vo -> vo.getLetter()));
-                    letters.forEach(letter -> {
-                        List<LetterVocabulary> letterVocabularies = collect.get(letter);
-                        int i=0;
-                        for(LetterVocabulary vo:letterVocabularies){
-                            Map<String, Object> letterMap = new HashMap<>();
-                            if(i==0){
-                                letterMap.put("marge",true);
-                            }else{
-                                letterMap.put("display",true);
-                            }
-                            letterMap.put("letter", letter);
-                            letterMap.put("unit", unit.getUnitName());
-                            letterMap.put("line",collect.get(letter).size());
-                            returnList.add(letterMap);
-                            i++;
+                    Integer i = 0;
+                    for (String letter : letters) {
+                        Map<String, Object> letterMap = new HashMap<>();
+                        if (i == 0) {
+                            letterMap.put("marge", true);
+                        } else {
+                            letterMap.put("display", true);
                         }
-                    });
+                        letterMap.put("letter", letter);
+                        letterMap.put("unit", unit.getUnitName());
+                        letterMap.put("line", letters.size());
+                        letterMap.put("list", collect.get(letter).subList(0, 5));
+                        returnList.add(letterMap);
+                        i++;
+                    }
                 } else {
 
                     int i = 0;
                     int total = 0;
                     List<LetterVocabulary> list = new ArrayList<>();
-                    int lineSize = letterVocabulary.size()%6>0?letterVocabulary.size()/6+1:letterVocabulary.size()/6;
+                    int lineSize = letterVocabulary.size() % 6 > 0 ? letterVocabulary.size() / 6 + 1 : letterVocabulary.size() / 6;
 
                     for (LetterVocabulary vo : letterVocabulary) {
                         list.add(vo);
@@ -344,7 +379,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                             }
                             map.put("title", unit.getUnitName());
                             map.put("list", list);
-                            map.put("line",lineSize);
+                            map.put("line", lineSize);
                             returnList.add(map);
                             list = new ArrayList<>();
                             i++;
