@@ -229,9 +229,9 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         map.put("plan", integer);
         //获取题目
         Random random = new Random();
-        int ranId = random.nextInt(1);
+        int ranId = random.nextInt(10);
         List<String> options = new ArrayList<>();
-        if (ranId > 0) {
+        if (ranId > 5) {
             //大写字母题目
             map.put("title", studyLetter.getBigLetter());
             options.add(studyLetter.getLowercaseLetters());
@@ -247,20 +247,34 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             }
         }
         Collections.shuffle(options);
-        map.put("options", options);
+        List<Map<String,Object>> returnList=new ArrayList<>();
         if (ranId > 0) {
             for (int i = 0; i < options.size(); i++) {
+                Map<String,Object> returnMap=new HashMap<>();
                 if (studyLetter.getLowercaseLetters().equals(options.get(i))) {
-                    map.put("answer", i);
+                    returnMap.put("letter", options.get(i));
+                    returnMap.put("isTurn",true);
+                }else{
+                    returnMap.put("letter", options.get(i));
+                    returnMap.put("isTurn",false);
                 }
+                returnList.add(returnMap);
             }
         } else {
             for (int i = 0; i < options.size(); i++) {
+                Map<String,Object> returnMap=new HashMap<>();
                 if (studyLetter.getBigLetter().equals(options.get(i))) {
-                    map.put("answer", i);
+                    returnMap.put("letter", options.get(i));
+                    returnMap.put("isTurn",true);
+                }else{
+                    returnMap.put("letter", options.get(i));
+                    returnMap.put("isTurn",false);
                 }
+                returnList.add(returnMap);
             }
         }
+        map.put("options", returnList);
+        map.put("id",studyLetter.getId());
         return ServerResponse.createBySuccess(map);
     }
 
