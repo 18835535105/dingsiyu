@@ -120,9 +120,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private SentenceUnitMapper sentenceUnitMapper;
 
     @Autowired
-    private ExecutorService executorService;
-
-    @Autowired
     private TeacherMapper teacherMapper;
 
     @Autowired
@@ -130,6 +127,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Autowired
     private LocationMapper locationMapper;
+
+    @Autowired
+    private ExecutorService executorService;
 
     @Autowired
     private LocationUtil locationUtil;
