@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.JoinSchoolMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.JoinSchool">
+        <id column="id" property="id"/>
+        <result column="school_name" property="schoolName"/>
+        <result column="date_of_joining" property="dateOfJoining"/>
+        <result column="pessident_name" property="pessidentName"/>
+        <result column="phone" property="phone"/>
+        <result column="longitude" property="longitude"/>
+        <result column="latitude" property="latitude"/>
+        <result column="joining_number" property="joiningNumber"/>
+        <result column="address" property="address"/>
+        <result column="audit_status" property="auditStatus"/>
+        <result column="reservation_number" property="reservationNumber"/>
+        <result column="date_of_audit" property="dateOfAudit"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="area" property="area"/>
+        <result column="user_id" property="userId"/>
+        <result column="reporting" property="reporting"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, school_name, date_of_joining, pessident_name, phone, longitude, latitude, joining_number, address, audit_status, reservation_number, date_of_audit, province, city, area,user_id,reporting
+    </sql>
+    <select id="selectByUserId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from join_school
+        where user_id = #{schoolAdminId} limit 1
+    </select>
+
+</mapper>
