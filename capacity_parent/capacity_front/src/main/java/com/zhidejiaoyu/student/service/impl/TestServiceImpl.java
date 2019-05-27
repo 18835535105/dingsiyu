@@ -413,7 +413,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         List<Letter> letters = letterMapper.getByUnitId(unitId);
         //打乱顺序
         Collections.shuffle(letters);
-        Map<String, Object> map = new HashMap<>();
+        List<Map<String,Object>> returnList=new ArrayList<>();
         //获取字母配对试题
         List<Letter> letterPairList = letters.subList(0, 5);
         List<Map<String,Object>> pairList=new ArrayList<>();
@@ -422,7 +422,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             getLetterPair(letterPairMap, letter);
             pairList.add(letterPairMap);
         }
-        map.put("letterPair",pairList);
+        returnList.addAll(pairList);
         Collections.shuffle(letters);
         //获取字母辨音试题
         List<Letter> letterDiscriminationList = letters.subList(0, 5);
@@ -432,7 +432,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             getLetterDiscrimination(discriminationMap, letter);
             discriminationList.add(discriminationMap);
         }
-        map.put("letterDiscrimination",discriminationList);
+        returnList.addAll(discriminationList);
         Collections.shuffle(letters);
         //获取字母听写试题
         List<Letter> letterWriteList = letters.subList(0, 3);
@@ -442,8 +442,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             getLetterWrite(letterWriteMap, letter);
             writeList.add(letterWriteMap);
         }
-        map.put("letterWrite",writeList);
-        return ServerResponse.createBySuccess(map);
+        returnList.addAll(writeList);
+        return ServerResponse.createBySuccess(returnList);
     }
 
     @Override

@@ -34,4 +34,6 @@ public interface LetterService extends IService<Letter> {
     Object getLetterWrite(Long unitId, HttpSession session);
 
     Object saveLetterWrite(Letter letter, HttpSession session,Boolean falg);
+
+    Object updLetter(HttpSession session, Long unitId);
 }

@@ -129,6 +129,14 @@ public class LetterController {
     }
 
     /**
+     * 去除字母听写数据
+     */
+    @RequestMapping("/updLetter")
+    public Object updLetter(HttpSession session ,Long unitId){
+        return letterService.updLetter(session,unitId);
+    }
+
+    /**
      * 保存字母听写内容
      */
     @RequestMapping("/saveLetterWrite")

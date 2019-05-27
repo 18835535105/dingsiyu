@@ -53,6 +53,8 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     private MemoryStrengthUtil memoryStrengthUtil;
     @Autowired
     private StudentInfoService studentInfoService;
+
+
     @Value("${ftp.prefix}")
     private String partUrl;
 
@@ -70,14 +72,35 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         if (capacityStudentUnit != null) {
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterUnit(capacityStudentUnit.getStartunit(), capacityStudentUnit.getEndunit());
             map.put("study", capacityStudentUnit.getUnitId());
-            map.put("list", letterUnits);
+            map.put("list", getLetterUnites(letterUnits,studentId));
         } else {
             StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selLetterByStudentId(studentId);
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterUnit(studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());
             map.put("study", studentStudyPlan.getStartUnitId());
-            map.put("list", letterUnits);
+            map.put("list", getLetterUnites(letterUnits,studentId));
         }
         return ServerResponse.createBySuccess(map);
+    }
+
+    private List<Map<String,Object>> getLetterUnites(List<LetterUnit> list,Long studentId){
+        List<Map<String,Object>> returnList=new ArrayList<>();
+        Boolean isTrue =true;
+        for(LetterUnit unit:list){
+            Map<String,Object> map=new HashMap<>();
+            if(isTrue){
+                Integer point = testRecordMapper.selectUnitTestMaxPointByStudyModel(studentId, unit.getId().longValue(), 12);
+                map.put("isOpen",isTrue);
+                if(point < 100){
+                    isTrue=false;
+                }
+            }else{
+                map.put("isOpen",isTrue);
+            }
+            map.put("id",unit.getId());
+            map.put("unitName",unit.getUnitName());
+            returnList.add(map);
+        }
+        return returnList;
     }
 
     @Override
@@ -110,7 +133,9 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                     Integer letterWriteCount = learnMapper.selLetterLearn(unitId, studentId, "字母听写");
                     if (letterWriteCount != null && letterCount <= letterWriteCount) {
                         map.put("LettersBreakThrough", true);
+                        //查看单元闯关是否完成
                         Integer testPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(studentId, unitId, 10);
+                        //查看学后测试是否开启
                         if (testPoint == 100) {
                             map.put("LetterPosttest", true);
                         } else {
@@ -398,8 +423,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         Integer countByUnitId = letterMapper.selLetterCountById(unitId);
         Integer letterWriteCount = letterWriteMapper.selStudyLetterCountByUnitIdAndStudent(unitId, studentId);
         if (countByUnitId.equals(letterWriteCount)) {
-            letterWriteMapper.delByUnitIdAndStudentId(unitId, studentId);
-            learnMapper.updLetterPair(studentId, unitId, "字母听写");
+            return ServerResponse.createBySuccess(600,"无学习");
         }
         Integer letterWriteCounts = letterWriteMapper.selStudyLetterCountByUnitIdAndStudent(unitId, studentId);
         //查看是否有到黄金记忆点的字母
@@ -415,15 +439,6 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             map.put("memoryStrength",stringObjectMap.get("memoryStrength"));
             map.put("studyNew",false);
         }
-        //查看生词数量
-        Integer integer = letterWriteMapper.selByNewWords(unitId, studentId);
-        map.put("newWord",integer);
-        //查看待复习数量
-        Integer toReview = letterWriteMapper.selByToReview(unitId, studentId);
-        map.put("toReview",toReview);
-        //查看熟词数量
-        Integer ripeWordsCount=letterWriteMapper.selByRipeWords(unitId, studentId);
-        map.put("ripeWords",ripeWordsCount);
         map.put("id", letter.getId());
         map.put("unitId", unitId);
         map.put("letter", letter.getLowercaseLetters());
@@ -432,6 +447,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         map.put("total",countByUnitId);
         map.put("plan",letterWriteCounts+1);
         return ServerResponse.createBySuccess(map);
+
     }
 
     @Override
@@ -467,6 +483,14 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             learn.setType(4);
             learnMapper.insert(learn);
         }
+        return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    public Object updLetter(HttpSession session, Long unitId) {
+        Long studentId = getStudentId(session);
+        letterWriteMapper.delByUnitIdAndStudentId(unitId, studentId);
+        learnMapper.updLetterPair(studentId, unitId, "字母听写");
         return ServerResponse.createBySuccess();
     }
 
