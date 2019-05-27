@@ -516,7 +516,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 Map<String,Object> option=new HashMap<>();
                 option.put("letter",letter.getLowercaseLetters());
                 option.put("isTure",true);
-                options.add(map);
+                options.add(option);
             }
         } else {
             anwars.put("letter",studyLetter.getBigLetter());
@@ -549,22 +549,22 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             anwars.put("isTrue",true);
             options.add(anwars);
             for (Letter letter : threeLetter) {
-                Map<String,Object> option=new HashMap<>();
-                option.put("letter",letter.getLowercaseLetters());
-                option.put("isTrue",false);
-                options.add(option);
+                Map<String,Object> users=new HashMap<>();
+                users.put("letter",letter.getLowercaseLetters());
+                users.put("isTrue",false);
+                options.add(users);
             }
         } else {
             //小写字母题目
             map.put("title", studyLetter.getLowercaseLetters());
-            anwars.put("letter",studyLetter.getLowercaseLetters());
+            anwars.put("letter",studyLetter.getBigLetter());
             anwars.put("isTrue",true);
             options.add(anwars);
             for (Letter letter : threeLetter) {
-                Map<String,Object> option=new HashMap<>();
-                option.put("letter",letter.getLowercaseLetters());
-                option.put("isTrue",false);
-                options.add(option);
+                Map<String,Object> users=new HashMap<>();
+                users.put("letter",letter.getBigLetter());
+                users.put("isTrue",false);
+                options.add(users);
             }
         }
         Collections.shuffle(options);

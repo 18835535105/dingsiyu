@@ -409,10 +409,10 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         if (letter == null) {
             List<Long> studyWirteIds = letterWriteMapper.selStudyLetterIdByUnitIdAndStudent(unitId, studentId);
             letter = letterMapper.getStudyLetter(unitId, studyWirteIds);
+            map.put("memoryStrength",0);
+        }else{
             Map<String, Object> stringObjectMap = letterWriteMapper.selByLetterMemoryStrengthAndStudent(letter.getId(), unitId, studentId);
             map.put("memoryStrength",stringObjectMap.get("memoryStrength"));
-        }else{
-            map.put("memoryStrength",0);
         }
         map.put("id", letter.getId());
         map.put("unitId", unitId);
