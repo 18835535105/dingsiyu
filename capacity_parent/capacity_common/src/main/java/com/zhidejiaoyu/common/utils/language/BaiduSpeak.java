@@ -34,9 +34,6 @@ public class BaiduSpeak {
     @Autowired
     private VocabularyMapper vocabularyMapper;
 
-    @Autowired
-    private SentenceMapper sentenceMapper;
-
     /**
      * 需要特殊处理的单词/例句集合
      */
@@ -48,6 +45,7 @@ public class BaiduSpeak {
         wordMap.put("car", "car");
         wordMap.put("before", "before");
         wordMap.put("fast", "fast");
+        wordMap.put("hang", "hang");
     }
 
     /**
