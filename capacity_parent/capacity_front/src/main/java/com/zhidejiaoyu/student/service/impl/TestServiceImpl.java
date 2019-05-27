@@ -540,38 +540,35 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         //获取题目
         Random random = new Random();
         int ranId = random.nextInt(10);
-        List<String> options = new ArrayList<>();
+        List<Map<String,Object>> options = new ArrayList<>();
+        Map<String,Object> anwars=new HashMap<>();
         if (ranId > 5) {
             //大写字母题目
             map.put("title", studyLetter.getBigLetter());
-            options.add(studyLetter.getLowercaseLetters());
+            anwars.put("letter",studyLetter.getLowercaseLetters());
+            anwars.put("isTrue",true);
+            options.add(anwars);
             for (Letter letter : threeLetter) {
-                options.add(letter.getLowercaseLetters());
+                Map<String,Object> option=new HashMap<>();
+                option.put("letter",letter.getLowercaseLetters());
+                option.put("isTrue",false);
+                options.add(option);
             }
         } else {
             //小写字母题目
             map.put("title", studyLetter.getLowercaseLetters());
-            options.add(studyLetter.getBigLetter());
+            anwars.put("letter",studyLetter.getLowercaseLetters());
+            anwars.put("isTrue",true);
+            options.add(anwars);
             for (Letter letter : threeLetter) {
-                options.add(letter.getBigLetter());
+                Map<String,Object> option=new HashMap<>();
+                option.put("letter",letter.getLowercaseLetters());
+                option.put("isTrue",false);
+                options.add(option);
             }
         }
         Collections.shuffle(options);
         map.put("options", options);
-        if (ranId > 5) {
-            for (int i = 0; i < options.size(); i++) {
-                if (studyLetter.getLowercaseLetters().equals(options.get(i))) {
-                    map.put("answer", i);
-                }
-            }
-        } else {
-            for (int i = 0; i < options.size(); i++) {
-                if (studyLetter.getBigLetter().equals(options.get(i))) {
-                    map.put("answer", i);
-                }
-            }
-        }
-
     }
 
     /**
