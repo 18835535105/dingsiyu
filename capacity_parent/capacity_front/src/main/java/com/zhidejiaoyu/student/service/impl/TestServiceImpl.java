@@ -493,7 +493,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     private void getLetterWrite(Map<String, Object> map, Letter studyLetter) {
         map.put("type", 3);
-        map.put("mp3url", baiduSpeak.getSentencePath(studyLetter.getBigLetter()));
+        map.put("mp3url", baiduSpeak.getLetterPath(studyLetter.getBigLetter()));
         map.put("bigLetter", studyLetter.getBigLetter());
         map.put("lowercaseLetter", studyLetter.getLowercaseLetters());
     }
@@ -504,36 +504,34 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         //获取题目
         Random random = new Random();
         int ranId = random.nextInt(10);
-        map.put("mp3url", baiduSpeak.getSentencePath(studyLetter.getBigLetter()));
-        List<String> options = new ArrayList<>();
+        map.put("mp3url", baiduSpeak.getLetterPath(studyLetter.getBigLetter()));
+        List<Map<String,Object>> options = new ArrayList<>();
+        Map<String,Object> anwars=new HashMap<>();
         if (ranId > 5) {
             //小写字母题目
-            options.add(studyLetter.getLowercaseLetters());
+            anwars.put("letter",studyLetter.getLowercaseLetters());
+            anwars.put("isTure",true);
+            options.add(anwars);
             for (Letter letter : threeLetter) {
-                options.add(letter.getLowercaseLetters());
+                Map<String,Object> option=new HashMap<>();
+                option.put("letter",letter.getLowercaseLetters());
+                option.put("isTure",true);
+                options.add(option);
             }
         } else {
-            options.add(studyLetter.getBigLetter());
+            anwars.put("letter",studyLetter.getBigLetter());
+            anwars.put("isTure",true);
+            options.add(anwars);
             //大写字母题目
             for (Letter letter : threeLetter) {
-                options.add(letter.getBigLetter());
+                Map<String,Object> option=new HashMap<>();
+                option.put("letter",letter.getBigLetter());
+                option.put("isTure",true);
+                options.add(option);
             }
         }
         Collections.shuffle(options);
         map.put("options", options);
-        if (ranId > 0) {
-            for (int i = 0; i < options.size(); i++) {
-                if (studyLetter.getLowercaseLetters().equals(options.get(i))) {
-                    map.put("answer", i);
-                }
-            }
-        } else {
-            for (int i = 0; i < options.size(); i++) {
-                if (studyLetter.getBigLetter().equals(options.get(i))) {
-                    map.put("answer", i);
-                }
-            }
-        }
     }
 
     private void getLetterPair(Map<String, Object> map, Letter studyLetter) {
@@ -542,38 +540,35 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         //获取题目
         Random random = new Random();
         int ranId = random.nextInt(10);
-        List<String> options = new ArrayList<>();
+        List<Map<String,Object>> options = new ArrayList<>();
+        Map<String,Object> anwars=new HashMap<>();
         if (ranId > 5) {
             //大写字母题目
             map.put("title", studyLetter.getBigLetter());
-            options.add(studyLetter.getLowercaseLetters());
+            anwars.put("letter",studyLetter.getLowercaseLetters());
+            anwars.put("isTrue",true);
+            options.add(anwars);
             for (Letter letter : threeLetter) {
-                options.add(letter.getLowercaseLetters());
+                Map<String,Object> users=new HashMap<>();
+                users.put("letter",letter.getLowercaseLetters());
+                users.put("isTrue",false);
+                options.add(users);
             }
         } else {
             //小写字母题目
             map.put("title", studyLetter.getLowercaseLetters());
-            options.add(studyLetter.getBigLetter());
+            anwars.put("letter",studyLetter.getBigLetter());
+            anwars.put("isTrue",true);
+            options.add(anwars);
             for (Letter letter : threeLetter) {
-                options.add(letter.getBigLetter());
+                Map<String,Object> users=new HashMap<>();
+                users.put("letter",letter.getBigLetter());
+                users.put("isTrue",false);
+                options.add(users);
             }
         }
         Collections.shuffle(options);
         map.put("options", options);
-        if (ranId > 0) {
-            for (int i = 0; i < options.size(); i++) {
-                if (studyLetter.getLowercaseLetters().equals(options.get(i))) {
-                    map.put("answer", i);
-                }
-            }
-        } else {
-            for (int i = 0; i < options.size(); i++) {
-                if (studyLetter.getBigLetter().equals(options.get(i))) {
-                    map.put("answer", i);
-                }
-            }
-        }
-
     }
 
     /**

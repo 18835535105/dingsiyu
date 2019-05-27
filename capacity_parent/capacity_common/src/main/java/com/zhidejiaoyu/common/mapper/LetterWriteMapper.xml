@@ -29,6 +29,10 @@
         select <include refid="base_sql"></include> from letter_write where letter_id=#{letterId} and student_id=#{studentId}
     </select>
 
+    <select id="selByLetterMemoryStrengthAndStudent" parameterType="map" resultType="map">
+        select memory_strength memoryStrength from letter_write where unit_id=#{unitId} and student_id=#{studentId} and letter_id=#{letterId} and memory_strength is not null limit 1
+    </select>
+
 
 
 </mapper>
