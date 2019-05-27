@@ -24,18 +24,6 @@ public class LocationUtil {
     private RestTemplate restTemplate;
 
     /**
-     * ip 问问 key
-     */
-    @Value("${ip.wenwen.key}")
-    private String ipKey;
-
-    /**
-     * ip 问问接口地址
-     */
-    @Value("${ip.wenwen.url}")
-    private String ipUrl;
-
-    /**
      * 根据经纬度精确定位
      */
     @Value("${map.tencent.url}")
@@ -46,6 +34,9 @@ public class LocationUtil {
 
     @Value("${distance.tencent.url}")
     private String distanceUrl;
+
+    @Value("${location.tencent.url}")
+    private String locationUrl;
 
     /**
      * 响应码
@@ -93,17 +84,14 @@ public class LocationUtil {
      * @return
      */
     public LongitudeAndLatitude getLongitudeAndLatitude(String ip) {
-        // 响应成功标志
-        final String success = "Success";
-        String url = ipUrl + "?key=" + ipKey + "&ip=" + ip;
+        String url = locationUrl + "?key=" + mapKey + "&ip=" + ip;
         ResponseEntity<String> ipResponse = restTemplate.getForEntity(url, String.class);
         JSONObject jsonObject = JSONObject.parseObject(ipResponse.getBody());
-        String code = jsonObject.getString("code");
-        if (success.equals(code)) {
-            JSONObject multiArea = jsonObject.getJSONObject("data").getJSONArray("multiAreas").getJSONObject(0);
+        if (jsonObject.getInteger(STATUS) == 0) {
+            JSONObject location = jsonObject.getJSONObject("result").getJSONObject("location");
             LongitudeAndLatitude longitudeAndLatitude = new LongitudeAndLatitude();
-            longitudeAndLatitude.setLatitude(multiArea.getString("lat"));
-            longitudeAndLatitude.setLongitude(multiArea.getString("lng"));
+            longitudeAndLatitude.setLatitude(location.getString("lat"));
+            longitudeAndLatitude.setLongitude(location.getString("lng"));
 
             // 根据经纬度查询位置
             this.getLocation(longitudeAndLatitude);
