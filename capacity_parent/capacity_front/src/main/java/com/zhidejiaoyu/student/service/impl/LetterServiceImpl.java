@@ -402,18 +402,25 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             letterWriteMapper.delByUnitIdAndStudentId(unitId, studentId);
             learnMapper.updLetterPair(studentId, unitId, "字母听写");
         }
+        Integer letterWriteCounts = letterWriteMapper.selStudyLetterCountByUnitIdAndStudent(unitId, studentId);
         //查看是否有到黄金记忆点的字母
         Letter letter = letterMapper.selPushLetterByUnitIdAndStudent(unitId, studentId);
+        Map<String, Object> map = new HashMap<>();
         if (letter == null) {
             List<Long> studyWirteIds = letterWriteMapper.selStudyLetterIdByUnitIdAndStudent(unitId, studentId);
             letter = letterMapper.getStudyLetter(unitId, studyWirteIds);
+            Map<String, Object> stringObjectMap = letterWriteMapper.selByLetterMemoryStrengthAndStudent(letter.getId(), unitId, studentId);
+            map.put("memoryStrength",stringObjectMap.get("memoryStrength"));
+        }else{
+            map.put("memoryStrength",0);
         }
-        Map<String, Object> map = new HashMap<>();
         map.put("id", letter.getId());
         map.put("unitId", unitId);
         map.put("letter", letter.getLowercaseLetters());
         map.put("bigLetter", letter.getBigLetter());
         map.put("listen", baiduSpeak.getSentencePath(letter.getBigLetter()));
+        map.put("total",countByUnitId);
+        map.put("plan",letterWriteCounts+1);
         return ServerResponse.createBySuccess(map);
     }
 

@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -27,4 +28,5 @@ public interface LetterWriteMapper extends BaseMapper<LetterWrite> {
     @Delete("delete from letter_write where unit_id=#{unitId} and student_id=#{studentId}")
     void delByUnitIdAndStudentId(@Param("unitId") Long unitId,@Param("studentId") Long studentId);
 
+    Map<String,Object> selByLetterMemoryStrengthAndStudent(@Param("letterId") Integer letterId, @Param("unitId") Long unitId, @Param("studentId") Long studentId);
 }
