@@ -418,7 +418,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         map.put("unitId", unitId);
         map.put("letter", letter.getLowercaseLetters());
         map.put("bigLetter", letter.getBigLetter());
-        map.put("listen", baiduSpeak.getSentencePath(letter.getBigLetter()));
+        map.put("listen", baiduSpeak.getLetterPath(letter.getBigLetter()));
         map.put("total",countByUnitId);
         map.put("plan",letterWriteCounts+1);
         return ServerResponse.createBySuccess(map);

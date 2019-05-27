@@ -493,7 +493,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     private void getLetterWrite(Map<String, Object> map, Letter studyLetter) {
         map.put("type", 3);
-        map.put("mp3url", baiduSpeak.getSentencePath(studyLetter.getBigLetter()));
+        map.put("mp3url", baiduSpeak.getLetterPath(studyLetter.getBigLetter()));
         map.put("bigLetter", studyLetter.getBigLetter());
         map.put("lowercaseLetter", studyLetter.getLowercaseLetters());
     }
@@ -504,7 +504,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         //获取题目
         Random random = new Random();
         int ranId = random.nextInt(10);
-        map.put("mp3url", baiduSpeak.getSentencePath(studyLetter.getBigLetter()));
+        map.put("mp3url", baiduSpeak.getLetterPath(studyLetter.getBigLetter()));
         List<Map<String,Object>> options = new ArrayList<>();
         Map<String,Object> anwars=new HashMap<>();
         if (ranId > 5) {
