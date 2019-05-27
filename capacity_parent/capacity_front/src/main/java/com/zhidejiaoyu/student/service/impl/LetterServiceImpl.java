@@ -199,7 +199,6 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             learn.setStudyCount(learn.getLearnCount() + 1);
             learnMapper.updateById(learn);
         }
-        studentInfoService.calculateValidTime(session, 30, null, player.getUnitId(), valid);
         return ServerResponse.createBySuccess();
     }
 
@@ -410,10 +409,21 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             List<Long> studyWirteIds = letterWriteMapper.selStudyLetterIdByUnitIdAndStudent(unitId, studentId);
             letter = letterMapper.getStudyLetter(unitId, studyWirteIds);
             map.put("memoryStrength",0);
+            map.put("studyNew",true);
         }else{
             Map<String, Object> stringObjectMap = letterWriteMapper.selByLetterMemoryStrengthAndStudent(letter.getId(), unitId, studentId);
             map.put("memoryStrength",stringObjectMap.get("memoryStrength"));
+            map.put("studyNew",false);
         }
+        //查看生词数量
+        Integer integer = letterWriteMapper.selByNewWords(unitId, studentId);
+        map.put("newWord",integer);
+        //查看待复习数量
+        Integer toReview = letterWriteMapper.selByToReview(unitId, studentId);
+        map.put("toReview",toReview);
+        //查看熟词数量
+        Integer ripeWordsCount=letterWriteMapper.selByRipeWords(unitId, studentId);
+        map.put("ripeWords",ripeWordsCount);
         map.put("id", letter.getId());
         map.put("unitId", unitId);
         map.put("letter", letter.getLowercaseLetters());
@@ -425,7 +435,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     }
 
     @Override
-    public Object saveLetterWrite(Letter letter, HttpSession session, Boolean falg, Long valid) {
+    public Object saveLetterWrite(Letter letter, HttpSession session, Boolean falg) {
         Long studentId = getStudentId(session);
         LetterWrite letterWrite = letterWriteMapper.selByLetterIdAndStudent(letter.getId(), studentId);
         if (letterWrite != null) {
@@ -457,7 +467,6 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             learn.setType(4);
             learnMapper.insert(learn);
         }
-        studentInfoService.calculateValidTime(session, 31, null, letter.getUnitId().longValue(), valid);
         return ServerResponse.createBySuccess();
     }
 

@@ -396,7 +396,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
     private Duration packageDuration(Integer classify, Long courseId, Long unitId, Long validTime, Student student, Date loginTime) {
         Duration duration = new Duration();
-        duration.setCourseId(courseId);
+        if(courseId!=null){
+            duration.setCourseId(courseId);
+        }
         duration.setStudyModel(classify);
         duration.setUnitId(unitId);
         duration.setValidTime(validTime);

@@ -364,6 +364,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
         getUnitTestMsg(testRecord, testRecord.getPoint());
         Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 10);
+        if(integer==null || integer<=0){
+            integer=0;
+        }
         Integer goldCount = 0;
         if (integer <= point) {
             if (point < SIX) {
@@ -515,7 +518,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             for (Letter letter : threeLetter) {
                 Map<String,Object> option=new HashMap<>();
                 option.put("letter",letter.getLowercaseLetters());
-                option.put("isTure",true);
+                option.put("isTure",false);
                 options.add(option);
             }
         } else {
@@ -526,7 +529,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             for (Letter letter : threeLetter) {
                 Map<String,Object> option=new HashMap<>();
                 option.put("letter",letter.getBigLetter());
-                option.put("isTure",true);
+                option.put("isTure",false);
                 options.add(option);
             }
         }

@@ -132,14 +132,9 @@ public class LetterController {
      * 保存字母听写内容
      */
     @RequestMapping("/saveLetterWrite")
-    public Object saveLetterWrite(Letter letter, HttpSession session,Boolean falg,String validTime) {
-        long valid = 0L;
-        try {
-            valid = Long.valueOf(validTime);
-        } catch (Exception e) {
-            log.error("有效时长入参类型错误：学习模块[{}]，validTime[{}]，error=[{}]", 30, validTime, e.getMessage());
-        }
-        return letterService.saveLetterWrite(letter,session,falg,valid);
+    public Object saveLetterWrite(Letter letter, HttpSession session,Boolean falg) {
+
+        return letterService.saveLetterWrite(letter,session,falg);
     }
 }
 

@@ -29,4 +29,10 @@ public interface LetterWriteMapper extends BaseMapper<LetterWrite> {
     void delByUnitIdAndStudentId(@Param("unitId") Long unitId,@Param("studentId") Long studentId);
 
     Map<String,Object> selByLetterMemoryStrengthAndStudent(@Param("letterId") Integer letterId, @Param("unitId") Long unitId, @Param("studentId") Long studentId);
+
+    Integer selByNewWords(@Param("unitId") Long unitId,@Param("studentId") Long studentId);
+
+    Integer selByRipeWords(Long unitId, Long studentId);
+
+    Integer selByToReview(Long unitId, Long studentId);
 }
