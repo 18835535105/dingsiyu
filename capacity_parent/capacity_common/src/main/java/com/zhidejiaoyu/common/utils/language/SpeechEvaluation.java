@@ -62,10 +62,10 @@ public class SpeechEvaluation {
         Credential cred = new Credential(SECRET_ID, SECRET_KEY);
         HttpProfile httpProfile = new HttpProfile();
 
-        /**
-         *  设置访问域名，如果需要就近部署，可以使用 soe-tencentcloudapi.com, 腾讯云将根据访问的地域解析到合适的服务器上，如果调用服务已确定地域，如华南地区
-         *  可以直接使用地域域名，加快访问速度
-         */
+
+        // 设置访问域名，如果需要就近部署，可以使用 soe-tencentcloudapi.com, 腾讯云将根据访问的地域解析到合适的服务器上，如果调用服务已确定地域，如华南地区
+        // 可以直接使用地域域名，加快访问速度
+
         httpProfile.setEndpoint(END_POINT);
         ClientProfile clientProfile = new ClientProfile();
         clientProfile.setHttpProfile(httpProfile);
@@ -127,7 +127,7 @@ public class SpeechEvaluation {
             return resp;
         } catch (TencentCloudSDKException e) {
             // 避免网络丢包数据，可以根据业务情景修改重试策略
-            if (e.getMessage().indexOf("MissingParameter") >= 0){
+            if (e.getMessage().contains("MissingParameter")){
                 TransmitOralProcessResponse resp = client.TransmitOralProcess(req);
                 return resp;
             }
@@ -155,7 +155,7 @@ public class SpeechEvaluation {
             return resp;
         } catch (TencentCloudSDKException e) {
             // 长字符串采用段落模式，可以根据业务情景修改重试策略
-            if (e.getMessage().indexOf("InvalidParameterValue.RefTxtTooLang") >= 0) {
+            if (e.getMessage().contains("InvalidParameterValue.RefTxtTooLang")) {
                 if (req.getEvalMode() == EVAL_MODE_WORD || req.getEvalMode() == EVAL_MODE_SENTENCE) {
                     req.setEvalMode(EVAL_MODE_PARA);
                     return client.InitOralProcess(req);
@@ -180,7 +180,7 @@ public class SpeechEvaluation {
             return out.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
-            log.error("语音评测获取语音文件失败！路径： {}", fileUrl, e.getMessage());
+            log.error("语音评测获取语音文件失败！路径： {}", fileUrl, e);
         } finally {
             try {
                 if (inputStream != null) {
@@ -193,7 +193,7 @@ public class SpeechEvaluation {
         return new byte[0];
     }
 
-    public static String getSessionId() {
+    private static String getSessionId() {
         // sessionID 保证唯一性,建议使用时间戳加随机数或者直接使用 uuid
         return UUID.randomUUID().toString().replaceAll("-", "");
     }

@@ -23,7 +23,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"letter_write"};
+        String[] tableName = {"location"};
 
         /**
          * 配置：

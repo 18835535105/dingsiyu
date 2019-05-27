@@ -13,6 +13,8 @@ import com.zhidejiaoyu.common.utils.TokenUtil;
 import com.zhidejiaoyu.common.utils.ValidateCode;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
+import com.zhidejiaoyu.common.utils.locationUtil.LocationUtil;
+import com.zhidejiaoyu.common.utils.locationUtil.LongitudeAndLatitude;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
@@ -119,6 +121,18 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Autowired
     private ExecutorService executorService;
+
+    @Autowired
+    private TeacherMapper teacherMapper;
+
+    @Autowired
+    private JoinSchoolMapper joinSchoolMapper;
+
+    @Autowired
+    private LocationMapper locationMapper;
+
+    @Autowired
+    private LocationUtil locationUtil;
 
     @Override
     public Student LoginJudge(String account, String password) {
@@ -703,6 +717,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse loginJudge(String account, String password, HttpSession session, HttpServletRequest request, String code) {
 
         // 封装返回数据
@@ -754,7 +769,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             result.put("headUrl", stu.getHeadUrl());
 
             // 记录登录信息
-            saveLoginRunLog(stu, request);
+            String ip = saveLoginRunLog(stu, request);
 
             isStudentEx(stu);
 
@@ -803,10 +818,98 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 值得元老勋章
             medalAwardAsync.oldMan(stu);
 
+            // 判断学生是否是在加盟校半径 1 公里外登录
+            final String finalIP = ip;
+            executorService.execute(() -> this.isOtherLocation(stu, finalIP));
+
             // 正常登陆
             logger.info("学生[{} -> {} -> {}]登录成功。", stu.getId(), stu.getAccount(), stu.getStudentName());
             return ServerResponse.createBySuccess("1", result);
         }
+    }
+
+    /**
+     * 判断学生是否是在加盟校半径 1 公里外登录
+     *
+     * @param stu
+     * @param ip  学生登录的 ip 地址
+     */
+    private void isOtherLocation(Student stu, String ip) {
+        JoinSchool joinSchool = this.getJoinSchool(stu, ip);
+        if (joinSchool == null) {
+            return;
+        }
+
+        // 校验距离
+        this.checkDistance(stu, ip, joinSchool);
+    }
+
+    private void checkDistance(Student stu, String ip, JoinSchool joinSchool) {
+        LongitudeAndLatitude longitudeAndLatitude = locationUtil.getLongitudeAndLatitude("114.249.234.244");
+
+        LongitudeAndLatitude schoolLongitudeAndLatitude = new LongitudeAndLatitude();
+        schoolLongitudeAndLatitude.setLatitude(joinSchool.getLatitude());
+        schoolLongitudeAndLatitude.setLongitude(joinSchool.getLongitude());
+
+        int distance = locationUtil.getDistance(longitudeAndLatitude, schoolLongitudeAndLatitude);
+        // 学生距加盟校的最远距离
+        final int radius = 1000;
+        if (distance > radius) {
+            logger.warn("学生 [{} - {} - {}] 登录距离距加盟校 [{}] 超过 [{}] 米！", stu.getId(), stu.getAccount(), stu.getStudentName(), joinSchool.getSchoolName(), radius);
+            Date date = new Date();
+            // 学生在加盟校 1000 米之外登录，保存异地登录记录
+            Location location = new Location();
+            location.setAccount(stu.getAccount());
+            location.setCreateTime(date);
+            location.setIp(ip);
+            location.setLocation(longitudeAndLatitude.getAddresses());
+            location.setStudentId(stu.getId());
+            location.setUpdateTime(date);
+            try {
+                locationMapper.insert(location);
+            } catch (Exception e) {
+                logger.error("保存学生 [{} - {} - {}]异地登录信息失败！", stu.getId(), stu.getAccount(), stu.getStudentName(), e);
+            }
+        }
+    }
+
+    /**
+     * 获取加盟校信息并做校验
+     *
+     * @param stu
+     * @param ip
+     * @return
+     */
+    private JoinSchool getJoinSchool(Student stu, String ip) {
+        if (stu.getTeacherId() == null) {
+            logger.warn("学生 [{} - {} - {}] 没有所属教师！", stu.getId(), stu.getAccount(), stu.getStudentName());
+            return null;
+        }
+
+        if (StringUtils.isEmpty(ip)) {
+            logger.warn("没有获取到学生 [{} - {} - {}] 的登录 ip", stu.getId(), stu.getAccount(), stu.getStudentName());
+            return null;
+        }
+
+        // 学生的校管 id
+        Integer schoolAdminId = teacherMapper.selectSchoolAdminIdByTeacherId(stu.getTeacherId());
+        if (schoolAdminId == null) {
+            schoolAdminId = Integer.parseInt(stu.getTeacherId().toString());
+        }
+
+        // 查询学生所属加盟校地址
+        JoinSchool joinSchool = joinSchoolMapper.selectByUserId(schoolAdminId);
+
+        if (joinSchool == null) {
+            logger.warn("没有获取到学生 [{} - {} - {}] 所属的加盟校信息！", stu.getId(), stu.getAccount(), stu.getStudentName());
+            return null;
+        }
+
+        if (StringUtils.isEmpty(joinSchool.getLatitude()) || StringUtils.isEmpty(joinSchool.getLongitude())) {
+            logger.warn("学生 [{} - {} - {}] 所属的加盟校信息中没有坐标信息！", stu.getId(), stu.getAccount(), stu.getStudentName());
+            return null;
+        }
+        return joinSchool;
     }
 
     /**
@@ -984,7 +1087,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
     }
 
-    private void saveLoginRunLog(Student stu, HttpServletRequest request) {
+    private String saveLoginRunLog(Student stu, HttpServletRequest request) {
         String ip = null;
         try {
             ip = MacIpUtil.getIpAddr(request);
@@ -998,6 +1101,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         } catch (Exception e) {
             logger.error("学生 {} -> {} 登录信息记录失败！ExceptionMsg:{}", stu.getId(), stu.getStudentName(), e.getMessage(), e);
         }
+        return ip;
     }
 
 
@@ -1042,21 +1146,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             }
         }
     }
-
-    /**
-     * 记录学生退出信息
-     *
-     * @param student
-     */
-    private void saveLogoutInfo(Student student) {
-        RunLog runLog = new RunLog(student.getId(), 1, "学生" + student.getStudentName() + "退出登录", new Date());
-        try {
-            runLogMapper.insert(runLog);
-        } catch (Exception e) {
-            logger.error("记录学生 {}->{} 退出登录信息失败！", student.getId(), student.getStudentName(), e);
-        }
-    }
-
 
     @Override
     public void getValidateCode(HttpSession session, HttpServletResponse response) throws IOException {
