@@ -73,10 +73,10 @@ public class BeanConfig {
 	}
 
 	@Bean
-	public ExecutorService singleThreadPool() {
+	public ExecutorService executorService() {
 		ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
 				.setNameFormat("zdjy-pool-%d").build();
-		return new ThreadPoolExecutor(3, 10,
+		return new ThreadPoolExecutor(4, 10,
 				0L, TimeUnit.MILLISECONDS,
 				new LinkedBlockingQueue<>(50), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
 	}
