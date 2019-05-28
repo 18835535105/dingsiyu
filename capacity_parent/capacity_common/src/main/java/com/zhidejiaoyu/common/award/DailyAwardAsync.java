@@ -50,9 +50,6 @@ public class DailyAwardAsync extends BaseAwardAsync {
     @Autowired
     private TeacherMapper teacherMapper;
 
-    @Autowired
-    private ExecutorService executorService;
-
     /**
      * 保存学生今日完成一个单元
      */
@@ -62,9 +59,13 @@ public class DailyAwardAsync extends BaseAwardAsync {
         // 查看学生今日开启单元个数
         Award award = awardMapper.selectByAwardContentTypeAndType(studentId, DAILY_TYPE, (int) awardContentType);
 
-        if (this.checkAward(award, DAILY_TYPE)) {
-            int openCount = openUnitLogMapper.countTodayOpenCount(studentId);
-            optAward(studentId, awardContentType, openCount, award, DAILY_TYPE);
+        try {
+            if (this.checkAward(award, DAILY_TYPE)) {
+                int openCount = openUnitLogMapper.countTodayOpenCount(studentId);
+                optAward(studentId, awardContentType, openCount, award, DAILY_TYPE);
+            }
+        } catch (Exception e) {
+            log.error("保存日奖励信息出错！", e);
         }
     }
 
@@ -79,19 +80,23 @@ public class DailyAwardAsync extends BaseAwardAsync {
         // 判断学生今日是否闯关成功10个单元闯关测试
         final int awardContentType1 = 4;
 
-        // 闯关成功10个单元
-        Award awardSuccess = awardMapper.selectByAwardContentTypeAndType(studentId, DAILY_TYPE, awardContentType1);
-        if (this.checkAward(awardSuccess, DAILY_TYPE)) {
-            int successCount = testRecordMapper.countUnitTest(studentId, 1);
-            this.optAward(studentId, awardContentType1, successCount, awardSuccess, DAILY_TYPE);
-        }
+        try {
+            // 闯关成功10个单元
+            Award awardSuccess = awardMapper.selectByAwardContentTypeAndType(studentId, DAILY_TYPE, awardContentType1);
+            if (this.checkAward(awardSuccess, DAILY_TYPE)) {
+                int successCount = testRecordMapper.countUnitTest(studentId, 1);
+                this.optAward(studentId, awardContentType1, successCount, awardSuccess, DAILY_TYPE);
+            }
 
-        // 闯关10个单元
-        final int awardContentType2 = 3;
-        Award award = awardMapper.selectByAwardContentTypeAndType(studentId, DAILY_TYPE, awardContentType2);
-        if (this.checkAward(award, DAILY_TYPE)) {
-            int completeCount = testRecordMapper.countUnitTest(studentId, 2);
-            this.optAward(studentId, awardContentType2, completeCount, award, DAILY_TYPE);
+            // 闯关10个单元
+            final int awardContentType2 = 3;
+            Award award = awardMapper.selectByAwardContentTypeAndType(studentId, DAILY_TYPE, awardContentType2);
+            if (this.checkAward(award, DAILY_TYPE)) {
+                int completeCount = testRecordMapper.countUnitTest(studentId, 2);
+                this.optAward(studentId, awardContentType2, completeCount, award, DAILY_TYPE);
+            }
+        } catch (Exception e) {
+            log.error("保存日奖励信息出错！", e);
         }
     }
 
@@ -102,9 +107,13 @@ public class DailyAwardAsync extends BaseAwardAsync {
         Long studentId = student.getId();
         final int awardContentType = 7;
         Award award = awardMapper.selectByAwardContentTypeAndType(studentId, DAILY_TYPE, awardContentType);
-        if (this.checkAward(award, DAILY_TYPE)) {
-            int count = learnMapper.countTodayRestudyAndMemoryStrengthGePercentFifty(student);
-            this.optAward(studentId, awardContentType, count, award, DAILY_TYPE);
+        try {
+            if (this.checkAward(award, DAILY_TYPE)) {
+                int count = learnMapper.countTodayRestudyAndMemoryStrengthGePercentFifty(student);
+                this.optAward(studentId, awardContentType, count, award, DAILY_TYPE);
+            }
+        } catch (Exception e) {
+            log.error("保存日奖励信息出错！", e);
         }
     }
 
@@ -116,10 +125,14 @@ public class DailyAwardAsync extends BaseAwardAsync {
     public void firstLogin(Student student) {
         final int awardContentType = 1;
         Award award = awardMapper.selectByAwardContentTypeAndType(student.getId(), DAILY_TYPE, awardContentType);
-        if (this.checkAward(award, DAILY_TYPE)) {
-            super.optAward(student.getId(), awardContentType, 1, award, DAILY_TYPE);
+        try {
+            if (this.checkAward(award, DAILY_TYPE)) {
+                super.optAward(student.getId(), awardContentType, 1, award, DAILY_TYPE);
+            }
+            this.initDailyAward(student);
+        } catch (Exception e) {
+            log.error("保存日奖励信息出错！", e);
         }
-        this.initDailyAward(student);
     }
 
     /**
@@ -132,36 +145,30 @@ public class DailyAwardAsync extends BaseAwardAsync {
 
         final int awardContentType = 8;
         Award award = awardMapper.selectByAwardContentTypeAndType(student.getId(), DAILY_TYPE, awardContentType);
-        if (this.checkAward(award, DAILY_TYPE)) {
-            // 查询学生昨天的学校排名
-            RankList rankList = rankListMapper.selectByStudentId(studentId);
+        try {
+            if (this.checkAward(award, DAILY_TYPE)) {
+                // 查询学生昨天的学校排名
+                RankList rankList = rankListMapper.selectByStudentId(studentId);
 
-            int up = 0;
-            if (rankList != null) {
-                int rank = rankList.getSchoolDayRank() == null ? 0 : rankList.getSchoolDayRank();
-                // 学生当前全校排名
-                int currentRank = this.getCurrentSchoolRank(student);
-                if (currentRank == 0) {
-                    up = 0;
-                } else {
-                    up = Math.abs(rank - currentRank);
+                int up = 0;
+                if (rankList != null) {
+                    int rank = rankList.getSchoolDayRank() == null ? 0 : rankList.getSchoolDayRank();
+                    // 学生当前全校排名
+                    int currentRank = this.getCurrentSchoolRank(student);
+                    if (currentRank == 0) {
+                        up = 0;
+                    } else {
+                        up = Math.abs(rank - currentRank);
+                    }
                 }
+                int upRank = up >= 0 ? up : 0;
+                this.optAward(studentId, awardContentType, upRank, award, DAILY_TYPE);
             }
-            int upRank = up >= 0 ? up : 0;
-            this.optAward(studentId, awardContentType, upRank, award, DAILY_TYPE);
+        } catch (Exception e) {
+            log.error("保存日奖励信息出错！", e);
         }
     }
 
-    public void completeAllDailyAward(Student student) {
-        final int awardContentType = 9;
-        Award award = awardMapper.selectByAwardContentTypeAndType(student.getId(), DAILY_TYPE, awardContentType);
-        if (this.checkAward(award, DAILY_TYPE)) {
-            int count = awardMapper.countCompleteAllDailyAward(student);
-            this.optAward(student.getId(), awardContentType, count, award, DAILY_TYPE);
-        }
-    }
-
-    @Transactional(rollbackFor = Exception.class)
     public void initAward(Student student) {
 
         this.initGoldAward(student);

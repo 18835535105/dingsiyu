@@ -66,16 +66,20 @@ public class MedalAwardAsync extends BaseAwardAsync {
         int length = MedalConstant.INEXPERIENCED_TOTAL_PLAN.length;
         // 如果最后一个奖励条件已达成，说明其之前奖励都已能领取，不再进行其他计算
         Award award = awardMapper.selectByStudentIdAndMedalType(studentId, (long) MedalConstant.INEXPERIENCED_TOTAL_PLAN[length - 1]);
-        if (super.checkAward(award, MEDAL_TYPE)) {
-            // 学生所有课程下学习的模块
-            List<String> studyModels = learnMapper.selectLearnedModelByStudent(student);
-            int modelSize = studyModels.size();
-            for (int i = 0; i < length; i++) {
-                award = awardMapper.selectByStudentIdAndMedalType(studentId, (long) MedalConstant.INEXPERIENCED_TOTAL_PLAN[i]);
-                if (this.checkAward(award, MEDAL_TYPE)) {
-                    super.optAward(studentId, (long) MedalConstant.INEXPERIENCED_TOTAL_PLAN[i], modelSize, award, MEDAL_TYPE);
+        try {
+            if (super.checkAward(award, MEDAL_TYPE)) {
+                // 学生所有课程下学习的模块
+                List<String> studyModels = learnMapper.selectLearnedModelByStudent(student);
+                int modelSize = studyModels.size();
+                for (int i = 0; i < length; i++) {
+                    award = awardMapper.selectByStudentIdAndMedalType(studentId, (long) MedalConstant.INEXPERIENCED_TOTAL_PLAN[i]);
+                    if (this.checkAward(award, MEDAL_TYPE)) {
+                        super.optAward(studentId, (long) MedalConstant.INEXPERIENCED_TOTAL_PLAN[i], modelSize, award, MEDAL_TYPE);
+                    }
                 }
             }
+        } catch (Exception e) {
+            log.error("保存勋章奖励信息失败！", e);
         }
     }
 
@@ -176,44 +180,48 @@ public class MedalAwardAsync extends BaseAwardAsync {
         List<Medal> children = medalMapper.selectChildrenIdByParentId(17);
         // 如果最后一个奖励条件已达成，说明其之前奖励都已能领取，不再进行其他计算
         Award award = awardMapper.selectByStudentIdAndMedalType(studentId, children.get(children.size() - 1).getId());
-        if (super.checkAward(award, MEDAL_TYPE)) {
-            // 学生当前排行信息
-            RankList rankList = rankListMapper.selectByStudentId(studentId);
+        try {
+            if (super.checkAward(award, MEDAL_TYPE)) {
+                // 学生当前排行信息
+                RankList rankList = rankListMapper.selectByStudentId(studentId);
 
-            if (rankList != null) {
-                Integer schoolDayRank = rankList.getSchoolDayRank();
-                Integer countryDayRank = rankList.getCountryDayRank();
+                if (rankList != null) {
+                    Integer schoolDayRank = rankList.getSchoolDayRank();
+                    Integer countryDayRank = rankList.getCountryDayRank();
 
-                // 学生当前全校排名
-                Map<Long, Map<String, Object>> currentSchoolRank = studentMapper.selectLevelByStuId(student, 2, schoolAdminId);
-                // 学生当前全国排名
-                Map<Long, Map<String, Object>> currentCountryRank = studentMapper.selectLevelByStuId(student, 3, null);
+                    // 学生当前全校排名
+                    Map<Long, Map<String, Object>> currentSchoolRank = studentMapper.selectLevelByStuId(student, 2, schoolAdminId);
+                    // 学生当前全国排名
+                    Map<Long, Map<String, Object>> currentCountryRank = studentMapper.selectLevelByStuId(student, 3, null);
 
-                double schoolRank = 0;
-                if (currentSchoolRank != null && currentSchoolRank.get(student.getId()) != null && currentSchoolRank.get(student.getId()).get("rank") != null) {
-                    schoolRank = Double.parseDouble(currentSchoolRank.get(student.getId()).get("rank").toString());
-                }
+                    double schoolRank = 0;
+                    if (currentSchoolRank != null && currentSchoolRank.get(student.getId()) != null && currentSchoolRank.get(student.getId()).get("rank") != null) {
+                        schoolRank = Double.parseDouble(currentSchoolRank.get(student.getId()).get("rank").toString());
+                    }
 
-                double countryRank = 0;
-                if (currentCountryRank != null && currentCountryRank.get(student.getId()) != null && currentCountryRank.get(student.getId()).get("rank") != null) {
-                    countryRank = Double.parseDouble(currentCountryRank.get(student.getId()).get("rank").toString());
-                }
+                    double countryRank = 0;
+                    if (currentCountryRank != null && currentCountryRank.get(student.getId()) != null && currentCountryRank.get(student.getId()).get("rank") != null) {
+                        countryRank = Double.parseDouble(currentCountryRank.get(student.getId()).get("rank").toString());
+                    }
 
-                Long medalId;
-                for (int i = 0; i < 5; i++) {
-                    medalId = children.get(i).getId();
-                    award = awardMapper.selectByStudentIdAndMedalType(studentId, medalId);
-                    if (i < 3) {
-                        if (super.checkAward(award, MEDAL_TYPE)) {
-                            super.optAward(studentId, medalId, schoolDayRank == null ? 0 : ((int) (schoolDayRank - schoolRank)), award, MEDAL_TYPE);
-                        }
-                    } else {
-                        if (super.checkAward(award, MEDAL_TYPE)) {
-                            super.optAward(studentId, medalId, countryDayRank == null ? 0 : ((int) (countryDayRank - countryRank)), award, MEDAL_TYPE);
+                    Long medalId;
+                    for (int i = 0; i < 5; i++) {
+                        medalId = children.get(i).getId();
+                        award = awardMapper.selectByStudentIdAndMedalType(studentId, medalId);
+                        if (i < 3) {
+                            if (super.checkAward(award, MEDAL_TYPE)) {
+                                super.optAward(studentId, medalId, schoolDayRank == null ? 0 : ((int) (schoolDayRank - schoolRank)), award, MEDAL_TYPE);
+                            }
+                        } else {
+                            if (super.checkAward(award, MEDAL_TYPE)) {
+                                super.optAward(studentId, medalId, countryDayRank == null ? 0 : ((int) (countryDayRank - countryRank)), award, MEDAL_TYPE);
+                            }
                         }
                     }
                 }
             }
+        } catch (NumberFormatException e) {
+            log.error("保存勋章奖励信息失败！", e);
         }
     }
 
@@ -234,33 +242,37 @@ public class MedalAwardAsync extends BaseAwardAsync {
         List<Medal> children = medalMapper.selectChildrenIdByParentId(23);
         // 如果最后一个奖励条件已达成，说明其之前奖励都已能领取，不再进行其他计算
         Award award = awardMapper.selectByStudentIdAndMedalType(studentId, children.get(children.size() - 1).getId());
-        if (super.checkAward(award, MEDAL_TYPE)) {
-            Long medalId;
-            // 上次测试得分
-            Integer prePoint = testRecordMapper.selectPrePoint(studentId);
-            // 如果上次测试是100分，进度+1
-            if (prePoint != null) {
-                for (Medal child : children) {
-                    medalId = child.getId();
-                    award = awardMapper.selectByStudentIdAndMedalType(studentId, medalId);
-                    if (award == null) {
-                        if (prePoint == 100) {
-                            super.optAward(studentId, medalId, 1, null, MEDAL_TYPE);
-                        } else {
-                            super.optAward(studentId, medalId, 0, null, MEDAL_TYPE);
-                        }
-                    } else if (!Objects.equals(award.getCurrentPlan(), award.getTotalPlan())) {
-                        // 如果当前奖励还没有完成
-                        // 分数为100当前进度+1
-                        if (prePoint == 100) {
-                            super.optAward(studentId, medalId, award.getCurrentPlan() + 1, award, MEDAL_TYPE);
-                        } else {
-                            // 分数不等于100当前进度清零
-                            super.optAward(studentId, medalId, 1, award, MEDAL_TYPE);
+        try {
+            if (super.checkAward(award, MEDAL_TYPE)) {
+                Long medalId;
+                // 上次测试得分
+                Integer prePoint = testRecordMapper.selectPrePoint(studentId);
+                // 如果上次测试是100分，进度+1
+                if (prePoint != null) {
+                    for (Medal child : children) {
+                        medalId = child.getId();
+                        award = awardMapper.selectByStudentIdAndMedalType(studentId, medalId);
+                        if (award == null) {
+                            if (prePoint == 100) {
+                                super.optAward(studentId, medalId, 1, null, MEDAL_TYPE);
+                            } else {
+                                super.optAward(studentId, medalId, 0, null, MEDAL_TYPE);
+                            }
+                        } else if (!Objects.equals(award.getCurrentPlan(), award.getTotalPlan())) {
+                            // 如果当前奖励还没有完成
+                            // 分数为100当前进度+1
+                            if (prePoint == 100) {
+                                super.optAward(studentId, medalId, award.getCurrentPlan() + 1, award, MEDAL_TYPE);
+                            } else {
+                                // 分数不等于100当前进度清零
+                                super.optAward(studentId, medalId, 1, award, MEDAL_TYPE);
+                            }
                         }
                     }
                 }
             }
+        } catch (Exception e) {
+            log.error("保存勋章奖励信息失败！", e);
         }
     }
 
@@ -281,10 +293,14 @@ public class MedalAwardAsync extends BaseAwardAsync {
         List<Medal> children = medalMapper.selectChildrenIdByParentId(97);
         // 如果最后一个奖励条件已达成，说明其之前奖励都已能领取，不再进行其他计算
         Award award = awardMapper.selectByStudentIdAndMedalType(studentId, children.get(children.size() - 1).getId());
-        if (super.checkAward(award, MEDAL_TYPE)) {
-            // 测试不及格总次数
-            int totalTestField = testRecordMapper.countTestFailByStudent(student);
-            packagePlan(studentId, children, totalTestField);
+        try {
+            if (super.checkAward(award, MEDAL_TYPE)) {
+                // 测试不及格总次数
+                int totalTestField = testRecordMapper.countTestFailByStudent(student);
+                packagePlan(studentId, children, totalTestField);
+            }
+        } catch (Exception e) {
+            log.error("保存勋章奖励信息失败！", e);
         }
     }
 
@@ -305,11 +321,15 @@ public class MedalAwardAsync extends BaseAwardAsync {
         List<Medal> children = medalMapper.selectChildrenIdByParentId(87);
         // 如果最后一个奖励条件已达成，说明其之前奖励都已能领取，不再进行其他计算
         Award award = awardMapper.selectByStudentIdAndMedalType(studentId, children.get(children.size() - 1).getId());
-        if (super.checkAward(award, MEDAL_TYPE)) {
-            // 在线总时长
-            Long totalOnlineTime = durationMapper.countTotalOnlineTime(student);
-            int totalMonth = totalOnlineTime == null ? 0 : (int) (totalOnlineTime / 2592000);
-            packagePlan(studentId, children, totalMonth);
+        try {
+            if (super.checkAward(award, MEDAL_TYPE)) {
+                // 在线总时长
+                Long totalOnlineTime = durationMapper.countTotalOnlineTime(student);
+                int totalMonth = totalOnlineTime == null ? 0 : (int) (totalOnlineTime / 2592000);
+                packagePlan(studentId, children, totalMonth);
+            }
+        } catch (Exception e) {
+            log.error("保存勋章奖励信息失败！", e);
         }
     }
 
@@ -389,10 +409,14 @@ public class MedalAwardAsync extends BaseAwardAsync {
         if (children != null) {
             // 如果最后一个奖励条件已达成，说明其之前奖励都已能领取，不再进行其他计算
             Award award = awardMapper.selectByStudentIdAndMedalType(studentId, children.get(children.size() - 1).getId());
-            if (super.checkAward(award, MEDAL_TYPE)) {
-                // 熟词、熟句总数
-                int count = learnMapper.countKnownCountByStudentId(student, model);
-                packagePlan(studentId, children, count);
+            try {
+                if (super.checkAward(award, MEDAL_TYPE)) {
+                    // 熟词、熟句总数
+                    int count = learnMapper.countKnownCountByStudentId(student, model);
+                    packagePlan(studentId, children, count);
+                }
+            } catch (Exception e) {
+                log.error("保存勋章奖励信息失败！", e);
             }
         }
     }
@@ -408,13 +432,17 @@ public class MedalAwardAsync extends BaseAwardAsync {
         List<Medal> children = medalMapper.selectChildrenIdByParentId(67);
         // 如果已领取，不再进行其他计算
         Award award = awardMapper.selectByStudentIdAndMedalType(studentId, children.get(children.size() - 1).getId());
-        if (super.checkAward(award, MEDAL_TYPE)) {
-            // 勋章总个数
-            int totalMedal = awardMapper.countTotalMedal(studentId);
-            int getModel = awardMapper.countGetModel(studentId);
-            if (totalMedal == getModel + 1) {
-                super.optAward(studentId, 67, 1, award, MEDAL_TYPE);
+        try {
+            if (super.checkAward(award, MEDAL_TYPE)) {
+                // 勋章总个数
+                int totalMedal = awardMapper.countTotalMedal(studentId);
+                int getModel = awardMapper.countGetModel(studentId);
+                if (totalMedal == getModel + 1) {
+                    super.optAward(studentId, 67, 1, award, MEDAL_TYPE);
+                }
             }
+        } catch (Exception e) {
+            log.error("保存勋章奖励信息失败！", e);
         }
     }
 
@@ -429,12 +457,16 @@ public class MedalAwardAsync extends BaseAwardAsync {
         List<Medal> children = medalMapper.selectChildrenIdByParentId(72);
         // 如果已领取，不再进行其他计算
         Award award = awardMapper.selectByStudentIdAndMedalType(studentId, children.get(children.size() - 1).getId());
-        if (super.checkAward(award, MEDAL_TYPE)) {
-            double totalGold = BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
-            Level level = levelMapper.selectByPrimaryKey(13L);
-            if (totalGold >= level.getGold()) {
-                super.optAward(studentId, 72, 1, award, MEDAL_TYPE);
+        try {
+            if (super.checkAward(award, MEDAL_TYPE)) {
+                double totalGold = BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
+                Level level = levelMapper.selectByPrimaryKey(13L);
+                if (totalGold >= level.getGold()) {
+                    super.optAward(studentId, 72, 1, award, MEDAL_TYPE);
+                }
             }
+        } catch (Exception e) {
+            log.error("保存勋章奖励信息失败！", e);
         }
     }
 
@@ -453,9 +485,13 @@ public class MedalAwardAsync extends BaseAwardAsync {
         List<Medal> children = medalMapper.selectChildrenIdByParentId(77);
         // 如果最后一个奖励条件已达成，说明其之前奖励都已能领取，不再进行其他计算
         Award award = awardMapper.selectByStudentIdAndMedalType(studentId, children.get(children.size() - 1).getId());
-        if (super.checkAward(award, MEDAL_TYPE)) {
-            int byWorshipCount = worshipMapper.countByWorship(studentId);
-            packagePlan(studentId, children, byWorshipCount);
+        try {
+            if (super.checkAward(award, MEDAL_TYPE)) {
+                int byWorshipCount = worshipMapper.countByWorship(studentId);
+                packagePlan(studentId, children, byWorshipCount);
+            }
+        } catch (Exception e) {
+            log.error("保存勋章奖励信息失败！", e);
         }
     }
 
