@@ -135,20 +135,30 @@ public class LoginFilter implements Filter {
     private void replaceSession(HttpServletRequest request, Student student) {
         Long id = student.getId();
         Object sessionObject = redisTemplate.opsForHash().get(RedisKeysConst.LOGIN_SESSION, id);
-        if (sessionObject != null) {
-            String sessionId = (String) sessionObject;
-            HttpSession currentSession = request.getSession();
-            currentSession.removeAttribute("multipleLoginMsg");
-            String currentSessionId = currentSession.getId();
-            if (!Objects.equals(sessionId, currentSessionId)) {
-                try {
-                    String ip = MacIpUtil.getIpAddr(request);
-                    log.error("学生[{}]->[{}] 在ip=[{}]地方异地登录；", student.getId(), student.getStudentName(), ip);
-                } catch (Exception e) {
-                    log.error("获取学生IP地址失败, error=[{}]", e.getMessage());
-                }
-                currentSession.setAttribute("multipleLoginMsg", "您的帐号在另一地点登录，您已被迫下线！请重新登录。");
+        if (sessionObject == null) {
+            return;
+        }
+
+        String sessionId = (String) sessionObject;
+        HttpSession currentSession = request.getSession();
+        currentSession.removeAttribute("multipleLoginMsg");
+        String currentSessionId = currentSession.getId();
+
+        // 当 loginSession 的值为-1 时，说明是管理员从后台强制该学生下线
+        String flag = "-1";
+        if (Objects.equals(flag, sessionObject.toString())) {
+            currentSession.setAttribute("multipleLoginMsg", "系统检测到你异地登录，被强制下线！");
+            return;
+        }
+
+        if (!Objects.equals(sessionId, currentSessionId)) {
+            try {
+                String ip = MacIpUtil.getIpAddr(request);
+                log.error("学生[{}]->[{}] 在ip=[{}]地方异地登录；", student.getId(), student.getStudentName(), ip);
+            } catch (Exception e) {
+                log.error("获取学生IP地址失败, error=[{}]", e.getMessage());
             }
+            currentSession.setAttribute("multipleLoginMsg", "您的帐号在另一地点登录，您已被迫下线！请重新登录。");
         }
     }
 
