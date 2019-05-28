@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.Vo.study.phonetic.Topic;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.PhoneticSymbolService;
@@ -38,16 +39,14 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     private PhoneticSymbolMapper phoneticSymbolMapper;
     @Autowired
     private StudentStudyPlanMapper studentStudyPlanMapper;
-
     @Autowired
     private LearnMapper learnMapper;
-
     @Autowired
     private RedisOpt redisOpt;
-
+    @Autowired
+    private BaiduSpeak baiduSpeak;
     @Value("${ftp.prefix}")
     private String url;
-
     @Value("${ftp.prefix}")
     private String prefix;
 
@@ -62,7 +61,9 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("id", 0);
             returnMap.put("unitName", "暂无课程");
-            map.put("list", returnMap);
+            returnMap.put("isOpen",true);
+            list.add(returnMap);
+            map.put("list", list);
             return ServerResponse.createBySuccess(map);
         }
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selSymbolByStudentId(student.getId());
@@ -122,9 +123,11 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         }
         List<String> symbolsList = phoneticSymbolMapper.selSymbolByUnitId(unitId);
         List<Map<String, Object>> returnList = new ArrayList<>();
+        int isD=0;
         for (String symbol : symbolsList) {
             Map<String, Object> map = new HashMap<>();
             List<Map<String, Object>> list = new ArrayList<>();
+            //获取当前单元下所有的音标
             List<PhoneticSymbol> phoneticSymbols = phoneticSymbolMapper.selAllByUnitIdAndSymbol(unitId, symbol);
             for (PhoneticSymbol phonetic : phoneticSymbols) {
                 Map<String, Object> symbolMap = new HashMap<>();
@@ -176,16 +179,16 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                     list.add(symbolMap);
 
                 }
-
+                if (isD == 0&&phonetic.getStatus()==2) {
+                    Map<String, Object> sMap = new HashMap<>();
+                    sMap.put("title", ".");
+                    returnList.add(sMap);
+                    isD++;
+                }
             }
             map.put("title", symbol);
             map.put("content", list);
             returnList.add(map);
-            if (returnList.size() == 2) {
-                Map<String, Object> sMap = new HashMap<>();
-                sMap.put("title", ".");
-                returnList.add(sMap);
-            }
         }
         Long studentId = getStudentId(session);
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selSymbolByStudentId(studentId);
@@ -292,6 +295,23 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
 
         Collections.shuffle(resultList);
         return ServerResponse.createBySuccess(resultList);
+    }
+
+    /**
+     * 获取所有音标读音
+     *
+     * @return
+     */
+    @Override
+    public ServerResponse getAllSymbolListen() {
+        List<Map<String,Object>> symbols = phoneticSymbolMapper.selAllSymbol();
+        Map<String,Object> map=new HashMap<>();
+        if (symbols != null && symbols.size() > 0) {
+            for(Map<String,Object> symbol:symbols){
+                map.put(symbol.get("symbol").toString().replace(" ",""),url+symbol.get("url"));
+            }
+        }
+        return ServerResponse.createBySuccess(map);
     }
 
     private List<String> getUrlList(List<PhoneticSymbol> otherPhoneticSymbol) {

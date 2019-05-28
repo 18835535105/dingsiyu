@@ -8,6 +8,7 @@ import com.zhidejiaoyu.student.service.LetterService;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -143,6 +144,11 @@ public class LetterController {
     public Object saveLetterWrite(Letter letter, HttpSession session,Boolean falg) {
 
         return letterService.saveLetterWrite(letter,session,falg);
+    }
+
+    @PostMapping("/updLetterSymbolStudyModel")
+    public Object updLetterSymbolStudyModel(Long unitId,Integer type,HttpSession session){
+        return letterService.updLetterSymbolStudyModel(unitId,type,session);
     }
 }
 

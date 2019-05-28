@@ -13,14 +13,15 @@
         <result column="unit_id" property="unitId" />
         <result column="content" property="content" />
         <result column="part_url" property="partUrl" />
+        <result column="status" property="status"/>
     </resultMap>
 
     <sql id="base_sql">
-        id,phonetic_symbol,type,letter,pronunciation_method,url,unit_id,content,part_url
+        id,phonetic_symbol,type,letter,pronunciation_method,url,unit_id,content,part_url,status
     </sql>
     <!--多表查询-->
     <sql id="more_sql">
-        ps.id, ps.phonetic_symbol, ps.type, ps.letter, ps.pronunciation_method, ps.url, ps.unit_id, ps.content, ps.part_url
+        ps.id, ps.phonetic_symbol, ps.type, ps.letter, ps.pronunciation_method, ps.url, ps.unit_id, ps.content, ps.part_url ,ps.status
     </sql>
 
     <select id="selByUnitId" parameterType="integer" resultType="map">
@@ -67,6 +68,10 @@
             </if>
         </where>
         limit 1
+    </select>
+
+    <select id="selAllSymbol" resultType="map">
+        select DISTINCT(symbol.phonetic_symbol) symbol,url url from phonetic_symbol symbol
     </select>
 
 </mapper>

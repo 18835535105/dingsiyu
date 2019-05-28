@@ -82,7 +82,10 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 Map<String, Object> returnMap = new HashMap<>();
                 returnMap.put("id", 0);
                 returnMap.put("unitName", "暂无课程");
-                map.put("list", returnMap);
+                returnMap.put("isOpen",true);
+                List<Object> list=new ArrayList<>();
+                list.add(returnMap);
+                map.put("list", list);
                 return ServerResponse.createBySuccess(map);
             }
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterUnit(studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());
@@ -165,21 +168,6 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 map.put("letterWrite", false);
                 map.put("LettersBreakThrough", false);
                 map.put("LetterPosttest", false);
-            }
-            CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selLetterByStudentId(studentId);
-            if (capacityStudentUnit == null || unitId.equals(capacityStudentUnit.getUnitId())) {
-                StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selLetterSudyByStudentAndUnitId(studentId, unitId);
-                if (capacityStudentUnit == null) {
-                    capacityStudentUnit = new CapacityStudentUnit();
-                }
-                capacityStudentUnit.setEndunit(studentStudyPlan.getEndUnitId());
-                capacityStudentUnit.setStartunit(studentStudyPlan.getStartUnitId());
-                capacityStudentUnit.setUnitId(unitId);
-                if (capacityStudentUnit.getId() == null || capacityStudentUnit.getId().equals("")) {
-                    capacityStudentUnitMapper.insert(capacityStudentUnit);
-                } else {
-                    capacityStudentUnitMapper.updateById(capacityStudentUnit);
-                }
             }
             return ServerResponse.createBySuccess(map);
         }
@@ -288,7 +276,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         }
         Collections.shuffle(options);
         List<Map<String, Object>> returnList = new ArrayList<>();
-        if (ranId > 0) {
+        if (ranId > 5) {
             for (int i = 0; i < options.size(); i++) {
                 Map<String, Object> returnMap = new HashMap<>();
                 if (studyLetter.getLowercaseLetters().equals(options.get(i))) {
@@ -307,6 +295,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                     returnMap.put("letter", options.get(i));
                     returnMap.put("isTurn", true);
                 } else {
+
                     returnMap.put("letter", options.get(i));
                     returnMap.put("isTurn", false);
                 }
@@ -527,6 +516,22 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             return ServerResponse.createByError(400, "操作失败");
         }
 
+        return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    public Object updLetterSymbolStudyModel(Long unitId, Integer type, HttpSession session) {
+        Long studentId = getStudentId(session);
+        CapacityStudentUnit capacityStudentUnit=null;
+        if(type==4){
+            capacityStudentUnit=capacityStudentUnitMapper.selLetterByStudentId(studentId);
+        }else if (type==5){
+            capacityStudentUnit=capacityStudentUnitMapper.selSymbolByStudentId(studentId);
+        }
+        if(capacityStudentUnit!=null){
+            capacityStudentUnit.setUnitId(unitId);
+            capacityStudentUnitMapper.updateById(capacityStudentUnit);
+        }
         return ServerResponse.createBySuccess();
     }
 

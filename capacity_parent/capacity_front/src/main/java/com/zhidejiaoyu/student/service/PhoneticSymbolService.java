@@ -54,4 +54,5 @@ public interface PhoneticSymbolService extends IService<PhoneticSymbol> {
      */
     ServerResponse getUnitTest(HttpSession session, Long unitId);
 
+    ServerResponse getAllSymbolListen();
 }

@@ -92,5 +92,13 @@ public class PhoneticSymbolController {
         return phoneticSymbolService.getUnitTest(session, unitId);
     }
 
+    /**
+     * 获取所有音标读音
+     */
+    @GetMapping("/getAllSymbolListen")
+    public ServerResponse getAllSymbolListen(){
+        return phoneticSymbolService.getAllSymbolListen();
+    }
+
 }
 

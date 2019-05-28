@@ -57,6 +57,8 @@ public class PhoneticSymbol extends Model<PhoneticSymbol> {
 
     private String partUrl;
 
+    private Integer status;
+
 
     @Override
     protected Serializable pkVal() {
