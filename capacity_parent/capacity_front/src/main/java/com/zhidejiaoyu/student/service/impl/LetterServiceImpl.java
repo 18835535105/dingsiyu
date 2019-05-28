@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.LetterService;
 import com.zhidejiaoyu.student.service.StudentInfoService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
  * @since 2019-05-17
  */
 @Service
+@Slf4j
 public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> implements LetterService {
 
     @Autowired
@@ -72,32 +74,40 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         if (capacityStudentUnit != null) {
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterUnit(capacityStudentUnit.getStartunit(), capacityStudentUnit.getEndunit());
             map.put("study", capacityStudentUnit.getUnitId());
-            map.put("list", getLetterUnites(letterUnits,studentId));
+            map.put("list", getLetterUnites(letterUnits, studentId));
         } else {
             StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selLetterByStudentId(studentId);
+            if (studentStudyPlan == null) {
+                map.put("study", 0);
+                Map<String, Object> returnMap = new HashMap<>();
+                returnMap.put("id", 0);
+                returnMap.put("unitName", "暂无课程");
+                map.put("list", returnMap);
+                return ServerResponse.createBySuccess(map);
+            }
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterUnit(studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());
             map.put("study", studentStudyPlan.getStartUnitId());
-            map.put("list", getLetterUnites(letterUnits,studentId));
+            map.put("list", getLetterUnites(letterUnits, studentId));
         }
         return ServerResponse.createBySuccess(map);
     }
 
-    private List<Map<String,Object>> getLetterUnites(List<LetterUnit> list,Long studentId){
-        List<Map<String,Object>> returnList=new ArrayList<>();
-        Boolean isTrue =true;
-        for(LetterUnit unit:list){
-            Map<String,Object> map=new HashMap<>();
-            if(isTrue){
+    private List<Map<String, Object>> getLetterUnites(List<LetterUnit> list, Long studentId) {
+        List<Map<String, Object>> returnList = new ArrayList<>();
+        Boolean isTrue = true;
+        for (LetterUnit unit : list) {
+            Map<String, Object> map = new HashMap<>();
+            if (isTrue) {
                 Integer point = testRecordMapper.selectUnitTestMaxPointByStudyModel(studentId, unit.getId().longValue(), 12);
-                map.put("isOpen",isTrue);
-                if(point == null || point < 100){
-                    isTrue=false;
+                map.put("isOpen", isTrue);
+                if (point == null || point < 100) {
+                    isTrue = false;
                 }
-            }else{
-                map.put("isOpen",isTrue);
+            } else {
+                map.put("isOpen", isTrue);
             }
-            map.put("id",unit.getId());
-            map.put("unitName",unit.getUnitName());
+            map.put("id", unit.getId());
+            map.put("unitName", unit.getUnitName());
             returnList.add(map);
         }
         return returnList;
@@ -193,37 +203,43 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     @Override
     public Object saveLetterListen(Player player, HttpSession session, Long valid) {
         Long studentId = getStudentId(session);
-        int i = playerMapper.selectByType(studentId, player.getUnitId(), 4, player.getWordId());
-        if (i == 0) {
-            player.setStudentId(studentId);
-            player.setType(4);
-            player.setUpdateTime(new Date());
-            player.setLearnCount(1);
-            playerMapper.insert(player);
-        } else {
-            Player player1 = playerMapper.selectPlayerByType(studentId, player.getUnitId(), 4, player.getWordId());
-            player1.setUpdateTime(new Date());
-            player1.setLearnCount(player1.getLearnCount() + 1);
-            playerMapper.updateById(player1);
+        try {
+            int i = playerMapper.selectByType(studentId, player.getUnitId(), 4, player.getWordId());
+            if (i == 0) {
+                player.setStudentId(studentId);
+                player.setType(4);
+                player.setUpdateTime(new Date());
+                player.setLearnCount(1);
+                playerMapper.insert(player);
+            } else {
+                Player player1 = playerMapper.selectPlayerByType(studentId, player.getUnitId(), 4, player.getWordId());
+                player1.setUpdateTime(new Date());
+                player1.setLearnCount(player1.getLearnCount() + 1);
+                playerMapper.updateById(player1);
+            }
+            Learn learn = learnMapper.selLetter(studentId, player.getWordId(), player.getUnitId(), "字母播放器");
+            Date date = new Date();
+            if (learn == null) {
+                learn = new Learn();
+                learn.setStudentId(studentId);
+                learn.setStudyModel("字母播放器");
+                learn.setStatus(1);
+                learn.setUnitId(player.getUnitId());
+                learn.setLearnTime(date);
+                learn.setUpdateTime(date);
+                learn.setStudyCount(1);
+                learn.setType(4);
+                learnMapper.insert(learn);
+            } else {
+                learn.setUpdateTime(date);
+                learn.setStudyCount(learn.getLearnCount() + 1);
+                learnMapper.updateById(learn);
+            }
+        } catch (Exception e) {
+            log.error("学生:" + studentId + " 保存字母播放器出错", e.getMessage());
+            return ServerResponse.createByError(400, "保存失败");
         }
-        Learn learn = learnMapper.selLetter(studentId, player.getWordId(), player.getUnitId(),"字母播放器");
-        Date date = new Date();
-        if (learn == null) {
-            learn = new Learn();
-            learn.setStudentId(studentId);
-            learn.setStudyModel("字母播放器");
-            learn.setStatus(1);
-            learn.setUnitId(player.getUnitId());
-            learn.setLearnTime(date);
-            learn.setUpdateTime(date);
-            learn.setStudyCount(1);
-            learn.setType(4);
-            learnMapper.insert(learn);
-        } else {
-            learn.setUpdateTime(date);
-            learn.setStudyCount(learn.getLearnCount() + 1);
-            learnMapper.updateById(learn);
-        }
+
         return ServerResponse.createBySuccess();
     }
 
@@ -271,52 +287,59 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             }
         }
         Collections.shuffle(options);
-        List<Map<String,Object>> returnList=new ArrayList<>();
+        List<Map<String, Object>> returnList = new ArrayList<>();
         if (ranId > 0) {
             for (int i = 0; i < options.size(); i++) {
-                Map<String,Object> returnMap=new HashMap<>();
+                Map<String, Object> returnMap = new HashMap<>();
                 if (studyLetter.getLowercaseLetters().equals(options.get(i))) {
                     returnMap.put("letter", options.get(i));
-                    returnMap.put("isTurn",true);
-                }else{
+                    returnMap.put("isTurn", true);
+                } else {
                     returnMap.put("letter", options.get(i));
-                    returnMap.put("isTurn",false);
+                    returnMap.put("isTurn", false);
                 }
                 returnList.add(returnMap);
             }
         } else {
             for (int i = 0; i < options.size(); i++) {
-                Map<String,Object> returnMap=new HashMap<>();
+                Map<String, Object> returnMap = new HashMap<>();
                 if (studyLetter.getBigLetter().equals(options.get(i))) {
                     returnMap.put("letter", options.get(i));
-                    returnMap.put("isTurn",true);
-                }else{
+                    returnMap.put("isTurn", true);
+                } else {
                     returnMap.put("letter", options.get(i));
-                    returnMap.put("isTurn",false);
+                    returnMap.put("isTurn", false);
                 }
                 returnList.add(returnMap);
             }
         }
         map.put("options", returnList);
-        map.put("id",studyLetter.getId());
+        map.put("id", studyLetter.getId());
         return ServerResponse.createBySuccess(map);
     }
 
     @Override
     public Object saveLetterPair(LetterPair letterPair, HttpSession session, Long valid) {
         Long studentId = getStudentId(session);
-        Learn learn = new Learn();
-        learn.setStudentId(studentId);
-        learn.setStudyCount(1);
-        learn.setUpdateTime(new Date());
-        learn.setType(4);
-        learn.setStudyModel("字母配对");
-        learn.setType(1);
-        learn.setUnitId(letterPair.getUnitId().longValue());
-        learn.setVocabularyId(letterPair.getLetterId().longValue());
-        learnMapper.insert(learn);
-        letterPair.setStudentId(studentId.intValue());
-        letterPairMapper.insert(letterPair);
+        try {
+
+            Learn learn = new Learn();
+            learn.setStudentId(studentId);
+            learn.setStudyCount(1);
+            learn.setUpdateTime(new Date());
+            learn.setType(4);
+            learn.setStudyModel("字母配对");
+            learn.setType(1);
+            learn.setUnitId(letterPair.getUnitId().longValue());
+            learn.setVocabularyId(letterPair.getLetterId().longValue());
+            learnMapper.insert(learn);
+            letterPair.setStudentId(studentId.intValue());
+            letterPairMapper.insert(letterPair);
+        } catch (Exception e) {
+            log.error("学生:" + studentId + " 保存字母配对出错", e.getMessage());
+            return ServerResponse.createByError(400, "操作失败");
+        }
+
         return ServerResponse.createBySuccess();
     }
 
@@ -326,7 +349,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         if (major.equals("认字母")) {
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterAllUnit();
             Map<String, Object> map = new HashMap<>();
-            List<Object> list=new ArrayList<>();
+            List<Object> list = new ArrayList<>();
             for (LetterUnit letterUnit : letterUnits) {
                 List<Letter> allLetter = letterMapper.getAllLetterByUnitId(letterUnit.getId());
                 List<Letter> returnLetter = new ArrayList<>();
@@ -339,7 +362,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 returnMap.put("list", returnLetter);
                 list.add(returnMap);
             }
-            for(LetterUnit letterUnit:letterUnits){
+            for (LetterUnit letterUnit : letterUnits) {
                 int i = 0;
                 List<Letter> allLetter = letterMapper.getAllLetterByUnitId(letterUnit.getId());
                 for (Letter letter : allLetter) {
@@ -353,12 +376,12 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                         letterMap.put("display", true);
                     }
                     i++;
-                    letterMap.put("line",allLetter.size());
+                    letterMap.put("line", allLetter.size());
                     returnList.add(letterMap);
                 }
             }
             map.put("letterMap", list);
-            map.put("listen",returnList);
+            map.put("listen", returnList);
             return ServerResponse.createBySuccess(map);
         } else {
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterTreasure(major, subordinate);
@@ -422,7 +445,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         Integer countByUnitId = letterMapper.selLetterCountById(unitId);
         Integer letterWriteCount = letterWriteMapper.selStudyLetterCountByUnitIdAndStudent(unitId, studentId);
         if (countByUnitId.equals(letterWriteCount)) {
-            return ServerResponse.createBySuccess(600,"无学习");
+            return ServerResponse.createBySuccess(600, "无学习");
         }
         Integer letterWriteCounts = letterWriteMapper.selStudyLetterCountByUnitIdAndStudent(unitId, studentId);
         //查看是否有到黄金记忆点的字母
@@ -431,20 +454,20 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         if (letter == null) {
             List<Long> studyWirteIds = letterWriteMapper.selStudyLetterIdByUnitIdAndStudent(unitId, studentId);
             letter = letterMapper.getStudyLetter(unitId, studyWirteIds);
-            map.put("memoryStrength",0);
-            map.put("studyNew",true);
-        }else{
+            map.put("memoryStrength", 0);
+            map.put("studyNew", true);
+        } else {
             Map<String, Object> stringObjectMap = letterWriteMapper.selByLetterMemoryStrengthAndStudent(letter.getId(), unitId, studentId);
-            map.put("memoryStrength",stringObjectMap.get("memoryStrength"));
-            map.put("studyNew",false);
+            map.put("memoryStrength", stringObjectMap.get("memoryStrength"));
+            map.put("studyNew", false);
         }
         map.put("id", letter.getId());
         map.put("unitId", unitId);
         map.put("letter", letter.getLowercaseLetters());
         map.put("bigLetter", letter.getBigLetter());
         map.put("listen", baiduSpeak.getLetterPath(letter.getBigLetter()));
-        map.put("total",countByUnitId);
-        map.put("plan",letterWriteCounts+1);
+        map.put("total", countByUnitId);
+        map.put("plan", letterWriteCounts + 1);
         return ServerResponse.createBySuccess(map);
 
     }
@@ -452,45 +475,58 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     @Override
     public Object saveLetterWrite(Letter letter, HttpSession session, Boolean falg) {
         Long studentId = getStudentId(session);
-        LetterWrite letterWrite = letterWriteMapper.selByLetterIdAndStudent(letter.getId(), studentId);
-        if (letterWrite != null) {
-            // 重新计算记忆强度
-            Date push = GoldMemoryTime.getGoldMemoryTime(letterWrite.getMemoryStrength(), new Date());
-            letterWrite.setPush(push);
-            letterWrite.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(letterWrite.getMemoryStrength(), falg));
-            letterWriteMapper.updateById(letterWrite);
-        } else {
-            letterWrite = new LetterWrite();
-            letterWrite.setLetterId(letter.getId());
-            letterWrite.setUnitId(letter.getUnitId());
-            letterWrite.setStudentId(studentId.intValue());
-            letterWrite.setState(1);
-            if (!falg) {
-                letterWrite.setMemoryStrength(0.12);
+        try {
+            LetterWrite letterWrite = letterWriteMapper.selByLetterIdAndStudent(letter.getId(), studentId);
+            if (letterWrite != null) {
+                // 重新计算记忆强度
                 Date push = GoldMemoryTime.getGoldMemoryTime(letterWrite.getMemoryStrength(), new Date());
                 letterWrite.setPush(push);
+                letterWrite.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(letterWrite.getMemoryStrength(), falg));
+                letterWriteMapper.updateById(letterWrite);
+            } else {
+                letterWrite = new LetterWrite();
+                letterWrite.setLetterId(letter.getId());
+                letterWrite.setUnitId(letter.getUnitId());
+                letterWrite.setStudentId(studentId.intValue());
+                letterWrite.setState(1);
+                if (!falg) {
+                    letterWrite.setMemoryStrength(0.12);
+                    Date push = GoldMemoryTime.getGoldMemoryTime(letterWrite.getMemoryStrength(), new Date());
+                    letterWrite.setPush(push);
+                }
+                letterWriteMapper.insert(letterWrite);
+                Date date = new Date();
+                Learn learn = new Learn();
+                learn.setStudentId(studentId);
+                learn.setStudyModel("字母听写");
+                learn.setStatus(1);
+                learn.setUnitId(letter.getUnitId().longValue());
+                learn.setLearnTime(date);
+                learn.setUpdateTime(date);
+                learn.setStudyCount(1);
+                learn.setType(4);
+                learnMapper.insert(learn);
             }
-            letterWriteMapper.insert(letterWrite);
-            Date date = new Date();
-            Learn learn = new Learn();
-            learn.setStudentId(studentId);
-            learn.setStudyModel("字母听写");
-            learn.setStatus(1);
-            learn.setUnitId(letter.getUnitId().longValue());
-            learn.setLearnTime(date);
-            learn.setUpdateTime(date);
-            learn.setStudyCount(1);
-            learn.setType(4);
-            learnMapper.insert(learn);
+        } catch (Exception e) {
+            log.error("学生:" + studentId + " 保存字母听写出错", e.getMessage());
+            return ServerResponse.createBySuccess(400, "操作失败");
         }
+
         return ServerResponse.createBySuccess();
     }
 
     @Override
     public Object updLetter(HttpSession session, Long unitId) {
         Long studentId = getStudentId(session);
-        letterWriteMapper.delByUnitIdAndStudentId(unitId, studentId);
-        learnMapper.updLetterPair(studentId, unitId, "字母听写");
+        try {
+
+            letterWriteMapper.delByUnitIdAndStudentId(unitId, studentId);
+            learnMapper.updLetterPair(studentId, unitId, "字母听写");
+        } catch (Exception e) {
+            log.error("学生:" + studentId + " 去除字母听写出错", e.getMessage());
+            return ServerResponse.createByError(400, "操作失败");
+        }
+
         return ServerResponse.createBySuccess();
     }
 

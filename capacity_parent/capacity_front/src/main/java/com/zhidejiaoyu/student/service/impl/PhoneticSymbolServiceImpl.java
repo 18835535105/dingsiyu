@@ -56,28 +56,50 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         Student student = getStudent(session);
         StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selSymbolByStudentId(student.getId());
         List<Object> list = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
+        if (studentStudyPlan == null) {
+            map.put("study", 0);
+            Map<String, Object> returnMap = new HashMap<>();
+            returnMap.put("id", 0);
+            returnMap.put("unitName", "暂无课程");
+            map.put("list", returnMap);
+            return ServerResponse.createBySuccess(map);
+        }
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selSymbolByStudentId(student.getId());
+        if (capacityStudentUnit != null) {
+            Long unitId = capacityStudentUnit.getUnitId();
+            if (unitId != null) {
+                map.put("study", unitId);
+            }
+        }
         if (studentStudyPlan != null) {
             //获取单元
             List<LetterUnit> letterUnits = letterUnitMapper.selSymbolUnit(studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());
-            Boolean isTrue=true;
+            Boolean isTrue = true;
+            if (map.get("study") == null) {
+                if (letterUnits != null && letterUnits.size() > 0) {
+                    map.put("study", letterUnits.get(0).getId());
+                }
+            }
             for (LetterUnit letterUnit : letterUnits) {
                 Map<String, Object> returnMap = new HashMap<>();
-                returnMap.put("id",letterUnit.getId());
-                returnMap.put("unitName",letterUnit.getUnitName());
+                returnMap.put("id", letterUnit.getId());
+                returnMap.put("unitName", letterUnit.getUnitName());
                 Integer studyCount = learnMapper.selLetterLearn(student.getId(), letterUnit.getId().longValue(), "音标辨音");
                 int count = phoneticSymbolMapper.countByUnitId(letterUnit.getId().longValue());
-                if(isTrue){
-                    returnMap.put("isOpen",true);
-                    if(count>studyCount){
-                        isTrue=false;
+                if (isTrue) {
+                    returnMap.put("isOpen", true);
+                    if (count > studyCount) {
+                        isTrue = false;
                     }
-                }else{
-                    returnMap.put("isOpen",false);
+                } else {
+                    returnMap.put("isOpen", false);
                 }
                 list.add(returnMap);
             }
         }
-        return ServerResponse.createBySuccess(list);
+        map.put("list", list);
+        return ServerResponse.createBySuccess(map);
     }
 
     /**
