@@ -29,6 +29,10 @@ public class LocationUtilTest extends BaseTest {
         LongitudeAndLatitude longitudeAndLatitude1 = locationUtil.getLongitudeAndLatitude("36.17.88.199");
         log.info(longitudeAndLatitude.toString());
         log.info(longitudeAndLatitude1.toString());
+        longitudeAndLatitude.setLongitude("114.993986");
+        longitudeAndLatitude.setLatitude("38.523075");
+        longitudeAndLatitude1.setLongitude("114.99025");
+        longitudeAndLatitude1.setLatitude("38.51626");
         int distance = locationUtil.getDistance(longitudeAndLatitude, longitudeAndLatitude1);
         log.info("distance={}", distance);
     }

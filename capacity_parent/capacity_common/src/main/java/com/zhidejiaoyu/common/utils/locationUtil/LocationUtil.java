@@ -54,27 +54,36 @@ public class LocationUtil {
         if (from == null || to == null) {
             return 0;
         }
-
-        String url = this.getDistanceUrl(from, to);
-
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        String body = response.getBody();
-        JSONObject jsonObject = JSONObject.parseObject(body);
-        if (jsonObject.getInteger(STATUS) == 0) {
-            Integer distance = jsonObject.getJSONObject("result").getJSONArray("elements").getJSONObject(0).getInteger("distance");
-            return Objects.equals(distance, -1) ? 0 : distance;
-        } else {
-            log.warn("获取坐标距离出错！响应信息：{}, 参数：from={}, to={}", body, from.toString(), to.toString());
+        double ew1, ns1, ew2, ns2;
+        double dx, dy, dew;
+        double distance;
+        // 地球半径 m
+        double DEF_R = 6370693.5;
+        // 角度转换为弧度
+        // PI/180.0
+        double DEF_PI180 = 0.01745329252;
+        ew1 = Double.parseDouble(from.getLongitude()) * DEF_PI180;
+        ns1 = Double.parseDouble(from.getLatitude()) * DEF_PI180;
+        ew2 = Double.parseDouble(to.getLongitude()) * DEF_PI180;
+        ns2 = Double.parseDouble(to.getLatitude()) * DEF_PI180;
+        // 经度差
+        dew = ew1 - ew2;
+        // 若跨东经和西经180 度，进行调整
+        // 2*PI
+        double DEF_2PI = 2 * Math.PI;
+        if (dew > Math.PI) {
+            dew = DEF_2PI - dew;
+        } else if (dew < -Math.PI) {
+            dew = DEF_2PI + dew;
         }
-        return 0;
-    }
+        // 东西方向长度(在纬度圈上的投影长度)
 
-    private String getDistanceUrl(LongitudeAndLatitude from, LongitudeAndLatitude to) {
-        return distanceUrl +
-                    "?key=" + mapKey +
-                    "&mode=walking" +
-                    "&from=" + from.getLatitude() + "," + from.getLongitude() +
-                    "&to=" + to.getLatitude() + "," + to.getLongitude();
+        dx = DEF_R * Math.cos(ns1) * dew;
+        // 南北方向长度(在经度圈上的投影长度)
+        dy = DEF_R * (ns1 - ns2);
+        // 勾股定理求斜边长
+        distance = Math.sqrt(dx * dx + dy * dy);
+        return (int) distance;
     }
 
     /**
