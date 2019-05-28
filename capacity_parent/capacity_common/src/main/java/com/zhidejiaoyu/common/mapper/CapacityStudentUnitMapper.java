@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.pojo.CapacityStudentUnit;
 import com.zhidejiaoyu.common.pojo.Student;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * <p>
@@ -44,4 +45,9 @@ public interface CapacityStudentUnitMapper extends BaseMapper<CapacityStudentUni
      * @param type
      */
     void deleteByStudentIdAndType(@Param("studentId") Long studentId, @Param("type") int type);
+
+
+    CapacityStudentUnit selSymbolByStudentId(Long id);
+
+    CapacityStudentUnit selLetterByStudentId(Long studentId);
 }

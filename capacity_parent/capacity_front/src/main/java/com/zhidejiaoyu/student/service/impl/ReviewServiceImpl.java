@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.Vo.student.testCenter.TestCenterVo;
+import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
+import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -23,7 +25,7 @@ import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
 import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
-import com.zhidejiaoyu.student.constant.TestAwardGoldConstant;
+import com.zhidejiaoyu.common.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.ReviewService;
 import com.zhidejiaoyu.student.utils.CcieUtil;
@@ -32,7 +34,6 @@ import com.zhidejiaoyu.student.utils.PetSayUtil;
 import com.zhidejiaoyu.student.utils.PetUrlUtil;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -813,6 +814,9 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     }
 
     @Override
+    @GoldChangeAnnotation
+    @TestChangeAnnotation(isUnitTest = false)
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Integer[] correctWordId,
                                                        Integer[] errorWordId, Long[] unitId, Integer classify, Long courseId,
                                                        HttpSession session, Integer point, String genre, String testDetail) {
@@ -942,18 +946,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
      * @return
      */
     private String matchSelected(Integer integer) {
-        switch (integer) {
-            case 0:
-                return "A";
-            case 1:
-                return "B";
-            case 2:
-                return "C";
-            case 3:
-                return "D";
-            default:
-                return null;
-        }
+        return matchSelected(integer);
     }
 
     /**

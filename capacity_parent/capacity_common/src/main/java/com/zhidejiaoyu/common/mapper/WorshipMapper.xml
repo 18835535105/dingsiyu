@@ -181,7 +181,12 @@
       </where>
       order by w.worship_time desc
     </select>
-    <update id="updateByExampleSelective" parameterType="map" >
+  <select id="countByWorship" resultType="java.lang.Integer" parameterType="map">
+    select count(id)
+    from worship
+    where student_id_by_worship = #{studentId}
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
     update worship
     <set >
       <if test="record.id != null" >

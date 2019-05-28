@@ -16,7 +16,7 @@ import java.io.Serializable;
 public class ServerResponse<T> implements Serializable {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	private int status;
@@ -63,7 +63,7 @@ public class ServerResponse<T> implements Serializable {
 
 	/**
 	 * 自定义响应码及响应信息
-	 * 
+	 *
 	 * @param code
 	 *            响应码
 	 * @param msg
@@ -76,6 +76,10 @@ public class ServerResponse<T> implements Serializable {
 
 	public static <T> ServerResponse<T> createByError(int code, String msg) {
 		return new ServerResponse<T>(code, msg);
+	}
+
+	public static <T> ServerResponse<T> createByError(ResponseCode responseCode) {
+		return new ServerResponse<T>(responseCode.getCode(), responseCode.getMsg());
 	}
 
 	/**

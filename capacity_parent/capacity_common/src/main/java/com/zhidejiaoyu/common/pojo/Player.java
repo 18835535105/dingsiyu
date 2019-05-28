@@ -35,7 +35,7 @@ public class Player extends Model<Player> {
      */
     private Long wordId;
     /**
-     * 1:单词流程中播放机学习记录；2：单词本中播放机学习记录；3：句型本中播放机学习记录
+     * 1:单词流程中播放机学习记录；2：单词本中播放机学习记录；3：句型本中播放机学习记录；4：字母播放器
      */
     private Integer type;
     private Date updateTime;

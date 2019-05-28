@@ -473,9 +473,9 @@
         SELECT
         s.id id,
         CASE
-        WHEN @preRank = s.system_gold THEN
+        WHEN @preRank = s.system_gold + s.offline_gold THEN
         @curRank
-        WHEN @preRank := s.system_gold THEN
+        WHEN @preRank := s.system_gold + s.offline_gold THEN
         @curRank :=@curRank + 1
         END AS `rank`
         FROM
@@ -486,16 +486,34 @@
         ) r
         <where>
             <if test="flag == 2">
-                and teacher_id = #{student.teacherId}
+                <if test="student.teacherId == null">
+                    and teacher_id is null
+                </if>
+                <if test="schoolAdminId != null">
+                    and (teacher_id = #{schoolAdminId} or teacher_id in (select teacher_id from teacher where
+                    school_admin_id = #{schoolAdminId}))
+                </if>
+                <if test="schoolAdminId == null and student.teacherId == null">
+                    and teacher_id = #{student.teacherId}
+                </if>
             </if>
             <if test="flag == 1">
-                <if test="student.classId != null and student.classId != '' ">
+                <if test="student.classId != null and student.classId != ''">
                     and class_id = #{student.classId}
                 </if>
-                <if test="student.classId == null or student.classId == '' ">
-                    and teacher_id = #{student.teacherId} and class_id is null
+                <if test="student.classId == null or student.classId == ''">
+                    and class_id is null
+                </if>
+                <if test="student.teacherId != null">
+                    and teacher_id = #{student.teacherId}
+                </if>
+                <if test="student.teacherId == null">
+                    and teacher_id is null
                 </if>
             </if>
+            and s.role in (1 , 2)
+            and s.status &lt;> 3
+            and s.account_time is not null
         </where>
         ORDER BY
         system_gold + offline_gold DESC
@@ -666,4 +684,23 @@
           </foreach>
             )
     </select>
+    <select id="getVocabularyCountByStudent" parameterType="map" resultType="integer">
+        select
+        ((select count(listen.id) from capacity_listen listen where listen.student_id=stu.id and listen.memory_strength &lt; 1)  +
+        (select count(cwrite.id) from capacity_write cwrite where cwrite.student_id=stu.id and cwrite.memory_strength &lt; 1) +
+        (select count(memory.id) from capacity_memory memory where memory.student_id=stu.id and memory.memory_strength &lt; 1) +
+        (select count(picture.id) from capacity_picture picture where picture.student_id=stu.id and picture.memory_strength &lt; 1) +
+        (select count(simple.id) from simple_capacity simple where simple.student_id=stu.id and simple.memory_strength &lt; 1) ) count
+        from student stu where stu.id =#{studentId}
+    </select>
+
+    <select id="getSentenceCountByStudent" parameterType="map" resultType="integer">
+        select
+        ((select count(translate.id) from sentence_translate translate where translate.student_id=stu.id and translate.memory_strength &lt; 1)  +
+        (select count(cwrite.id) from sentence_write cwrite where cwrite.student_id=stu.id and cwrite.memory_strength   &lt;1) +
+        (select count(memory.id) from sentence_listen memory where memory.student_id=stu.id and memory.memory_strength  &lt; 1)
+        ) count
+        from student stu where stu.id =#{studentId}
+    </select>
+
 </mapper>

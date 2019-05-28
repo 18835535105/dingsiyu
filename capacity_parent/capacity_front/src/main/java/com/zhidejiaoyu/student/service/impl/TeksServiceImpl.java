@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
+import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -12,7 +13,7 @@ import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
-import com.zhidejiaoyu.student.constant.TestAwardGoldConstant;
+import com.zhidejiaoyu.common.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.TeksService;
 import com.zhidejiaoyu.student.utils.PetSayUtil;
@@ -20,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
@@ -576,6 +578,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
     @Override
+    @TestChangeAnnotation(isUnitTest = false)
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> addData(TestRecord testRecord, HttpSession session) {
         //学生对象
         Student student = super.getStudent(session);

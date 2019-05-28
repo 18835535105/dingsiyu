@@ -82,21 +82,16 @@ public interface StudentMapper extends BaseMapper<Student> {
     Student indexData(Long student_id);
 
     /**
-     * 单词unit
-     *
-     * @param student_id
-     * @return
-     */
-    /**
      * 获取学生排名
      * <p>如果当前班级或者学校或者全国只有一名学生，返回字符串"null"</p>
      *
      * @param student
-     * @param flag    1:班级排名；2：学校排名；3：全国排名
+     * @param flag          1:班级排名；2：学校排名；3：全国排名
+     * @param schoolAdminId 校管 id，学校排行使用
      * @return map key:学生id value:map key:学生id value:rank double类型 排名
      */
     @MapKey("id")
-    Map<Long, Map<String, Object>> selectLevelByStuId(@Param("student") Student student, @Param("flag") int flag);
+    Map<Long, Map<String, Object>> selectLevelByStuId(@Param("student") Student student, @Param("flag") int flag, @Param("schoolAdminId") Integer schoolAdminId);
 
     @Select("SELECT unit_id from student where id = #{student_id}")
     Integer selectUnit_id(@Param("student_id") Long student_id);
@@ -123,6 +118,9 @@ public interface StudentMapper extends BaseMapper<Student> {
      * 学生的信息, 证书, 膜拜
      *
      * @param model
+     * @param teacherId
+     * @param classId
+     *
      * @return
      */
     //List<StudentSeniority> selectSeniority();
@@ -237,4 +235,8 @@ public interface StudentMapper extends BaseMapper<Student> {
      */
     @MapKey("id")
     Map<Long, Map<Long, String>> selectHeadUrlMapByStudentId(@Param("studentIds") List<Long> studentIds);
+
+    Integer getVocabularyCountByStudent(@Param("studentId") Long studentId);
+
+    Integer getSentenceCountByStudent(@Param("studentId") Long studentId);
 }

@@ -115,9 +115,17 @@
         <if test="model == 8">
             and study_model = '音译测试'
         </if>
-
         <if test="model == 9">
             and study_model = '课文测试'
+        </if>
+        <if test="model == 10">
+            and study_model = '字母单元闯关'
+        </if>
+        <if test="model == 11">
+            and study_model = '音标测试'
+        </if>
+        <if test="model == 12">
+            and study_model = '字母学后测试'
         </if>
     </sql>
 
@@ -860,5 +868,12 @@
         and unit_id=#{unitId}
         and study_model='例句默写'
         order by id desc limit 1
+    </select>
+    <select id="selectPrePoint" resultType="java.lang.Integer" parameterType="map">
+        select point
+        from test_record
+        where student_id = #{studentId}
+        order by id desc
+        limit 1,1
     </select>
 </mapper>

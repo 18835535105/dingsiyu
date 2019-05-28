@@ -96,9 +96,9 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
     @Override
     public void getLevel(HttpSession session) {
         Student student = getStudent(session);
-        Double gold=student.getSystemGold()+student.getOfflineGold();
+        double gold = student.getSystemGold() + student.getOfflineGold();
         List<Map<String, Object>> levels = redisOpt.getAllLevel();
-        int level = getLevel(gold.intValue(), levels);
+        int level = getLevel((int) gold, levels);
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
         if(studentExpansion != null && studentExpansion.getLevel()<level){
             Integer oldStudy =0;

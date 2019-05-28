@@ -73,4 +73,11 @@ public class BaiduSpeak {
         }
         return youdao +  centreExample.replace("#", " ").replace("$", "") + "@&@" + baidu + centreExample.replace("#", " ").replace("$", "");
     }
+
+    public String getLetterPath(String centreExample) {
+        if (StringUtils.isEmpty(centreExample)) {
+            return "";
+        }
+        return  baidu + centreExample.replace("#", " ").replace("$", "");
+    }
 }
