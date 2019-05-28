@@ -8,8 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Objects;
-
 /**
  * 定位工具
  *
@@ -54,33 +52,32 @@ public class LocationUtil {
         if (from == null || to == null) {
             return 0;
         }
-        double ew1, ns1, ew2, ns2;
         double dx, dy, dew;
         double distance;
         // 地球半径 m
-        double DEF_R = 6370693.5;
+        double r = 6370693.5;
         // 角度转换为弧度
         // PI/180.0
-        double DEF_PI180 = 0.01745329252;
-        ew1 = Double.parseDouble(from.getLongitude()) * DEF_PI180;
-        ns1 = Double.parseDouble(from.getLatitude()) * DEF_PI180;
-        ew2 = Double.parseDouble(to.getLongitude()) * DEF_PI180;
-        ns2 = Double.parseDouble(to.getLatitude()) * DEF_PI180;
+        double pi180 = 0.01745329252;
+        double ew1 = Double.parseDouble(from.getLongitude()) * pi180;
+        double ns1 = Double.parseDouble(from.getLatitude()) * pi180;
+        double ew2 = Double.parseDouble(to.getLongitude()) * pi180;
+        double ns2 = Double.parseDouble(to.getLatitude()) * pi180;
         // 经度差
         dew = ew1 - ew2;
         // 若跨东经和西经180 度，进行调整
         // 2*PI
-        double DEF_2PI = 2 * Math.PI;
+        double pi2 = 2 * Math.PI;
         if (dew > Math.PI) {
-            dew = DEF_2PI - dew;
+            dew = pi2 - dew;
         } else if (dew < -Math.PI) {
-            dew = DEF_2PI + dew;
+            dew = pi2 + dew;
         }
         // 东西方向长度(在纬度圈上的投影长度)
 
-        dx = DEF_R * Math.cos(ns1) * dew;
+        dx = r * Math.cos(ns1) * dew;
         // 南北方向长度(在经度圈上的投影长度)
-        dy = DEF_R * (ns1 - ns2);
+        dy = r * (ns1 - ns2);
         // 勾股定理求斜边长
         distance = Math.sqrt(dx * dx + dy * dy);
         return (int) distance;
@@ -127,6 +124,4 @@ public class LocationUtil {
             log.error("根据经纬度获取地址失败！响应信息：{}, 参数：{}", jsonObject.toString(), longitudeAndLatitude.toString());
         }
     }
-
-
 }
