@@ -120,9 +120,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private SentenceUnitMapper sentenceUnitMapper;
 
     @Autowired
-    private ExecutorService executorService;
-
-    @Autowired
     private TeacherMapper teacherMapper;
 
     @Autowired
@@ -130,6 +127,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Autowired
     private LocationMapper locationMapper;
+
+    @Autowired
+    private ExecutorService executorService;
 
     @Autowired
     private LocationUtil locationUtil;
@@ -845,7 +845,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     private void checkDistance(Student stu, String ip, JoinSchool joinSchool) {
-        LongitudeAndLatitude longitudeAndLatitude = locationUtil.getLongitudeAndLatitude("114.249.234.244");
+        LongitudeAndLatitude longitudeAndLatitude = locationUtil.getLongitudeAndLatitude(ip);
 
         LongitudeAndLatitude schoolLongitudeAndLatitude = new LongitudeAndLatitude();
         schoolLongitudeAndLatitude.setLatitude(joinSchool.getLatitude());
