@@ -845,7 +845,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     private void checkDistance(Student stu, String ip, JoinSchool joinSchool) {
-        LongitudeAndLatitude longitudeAndLatitude = locationUtil.getLongitudeAndLatitude("114.249.234.244");
+        LongitudeAndLatitude longitudeAndLatitude = locationUtil.getLongitudeAndLatitude(ip);
 
         LongitudeAndLatitude schoolLongitudeAndLatitude = new LongitudeAndLatitude();
         schoolLongitudeAndLatitude.setLatitude(joinSchool.getLatitude());
