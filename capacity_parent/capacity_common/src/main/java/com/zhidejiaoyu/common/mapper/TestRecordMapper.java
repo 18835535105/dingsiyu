@@ -270,4 +270,12 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      */
     @Delete("delete from test_record where student_id = #{studentId} and genre = '学前游戏测试'")
     void deleteGameRecord(@Param("studentId") Long studentId);
+
+    /**
+     * 查询学生上次测试成绩得分
+     *
+     * @param studentId
+     * @return
+     */
+    Integer selectPrePoint(@Param("studentId") Long studentId);
 }

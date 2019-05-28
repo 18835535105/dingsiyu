@@ -222,6 +222,10 @@
             <artifactId>guava</artifactId>
             <version>22.0-android</version>
         </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
 
     </dependencies>
 

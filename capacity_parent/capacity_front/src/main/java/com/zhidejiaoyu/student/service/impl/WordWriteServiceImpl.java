@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -25,8 +26,6 @@ import java.util.List;
 
 @Service
 public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabulary> implements WordWriteService {
-
-    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final int pushRise = 3;
     
@@ -65,6 +64,9 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 
     @Autowired
     private CapacityListenMapper capacityListenMapper;
+
+    @Autowired
+    private MedalAwardAsync medalAwardAsync;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -263,6 +265,10 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 
             }
             count = learnMapper.insert(learn);
+
+            // 统计初出茅庐勋章
+            medalAwardAsync.inexperienced(student);
+
             if (count > 0 && total == (plan + 1)) {
                 return ServerResponse.createBySuccess();
             }

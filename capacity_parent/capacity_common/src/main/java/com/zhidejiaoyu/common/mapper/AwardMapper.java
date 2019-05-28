@@ -16,15 +16,9 @@ public interface AwardMapper extends BaseMapper<Award> {
 
     int deleteByExample(AwardExample example);
 
-    int deleteByPrimaryKey(Long id);
-
-    int insertSelective(Award record);
-
     List<Award> selectByExample(AwardExample example);
 
     Award selectByPrimaryKey(Long id);
-
-    int updateByExampleSelective(@Param("record") Award record, @Param("example") AwardExample example);
 
     int updateByExample(@Param("record") Award record, @Param("example") AwardExample example);
 
@@ -50,13 +44,6 @@ public interface AwardMapper extends BaseMapper<Award> {
      * @return
      */
     Award selectByIdAndStuId(@Param("awareId") Long awareId, @Param("stuId") Long stuId);
-
-    /**
-     * 重置学生日奖励信息
-     *
-     * @return
-     */
-    int resetDayAward();
 
     /**
      * 根据学生信息和当前勋章子勋章查询当前勋章的领取情况
@@ -96,4 +83,37 @@ public interface AwardMapper extends BaseMapper<Award> {
     Map<Long, Map<String, Long>> getMapKeyStudentXZ();
 
     List<Map<String, Object>> selAwardCountByStudentId(Long studentId);
+
+    /**
+     * 查询学生指定勋章奖励
+     *
+     * @param studentId
+     * @param medalId
+     * @return
+     */
+    Award selectByStudentIdAndMedalType(@Param("studentId") Long studentId, @Param("medalId") Long medalId);
+
+    /**
+     * 计算学生能够获取的所有勋章总个数
+     *
+     * @param studentId
+     * @return
+     */
+    int countTotalMedal(@Param("studentId") Long studentId);
+
+    /**
+     * 计算学生已经领取的勋章个数
+     *
+     * @param studentId
+     * @return
+     */
+    int countGetModel(@Param("studentId") Long studentId);
+
+    /**
+     * 获取今天学生完成的日奖励个数
+     *
+     * @param student
+     * @return
+     */
+    int countCompleteAllDailyAward(@Param("student") Student student);
 }

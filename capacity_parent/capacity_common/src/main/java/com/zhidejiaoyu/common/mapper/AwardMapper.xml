@@ -97,10 +97,7 @@
         from award
         where id = #{id,jdbcType=BIGINT}
     </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from award
-        where id = #{id,jdbcType=BIGINT}
-    </delete>
+
     <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.AwardExample">
         delete from award
         <if test="_parameter != null">
@@ -108,78 +105,17 @@
         </if>
     </delete>
 
-    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Award">
-        insert into award
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                id,
-            </if>
-            <if test="studentId != null">
-                student_id,
-            </if>
-            <if test="medalType != null">
-                medal_type,
-            </if>
-            <if test="awardContentType != null">
-                award_content_type,
-            </if>
-            <if test="type != null">
-                type,
-            </if>
-            <if test="canGet != null">
-                can_get,
-            </if>
-            <if test="getFlag != null">
-                get_flag,
-            </if>
-            <if test="createTime != null">
-                create_time,
-            </if>
-            <if test="getTime != null">
-                get_time,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id,jdbcType=BIGINT},
-            </if>
-            <if test="studentId != null">
-                #{studentId,jdbcType=BIGINT},
-            </if>
-            <if test="medalType != null">
-                #{medalType,jdbcType=BIGINT},
-            </if>
-            <if test="awardContentType != null">
-                #{awardContentType,jdbcType=INTEGER},
-            </if>
-            <if test="type != null">
-                #{type,jdbcType=VARCHAR},
-            </if>
-            <if test="canGet != null">
-                #{canGet,jdbcType=INTEGER},
-            </if>
-            <if test="getFlag != null">
-                #{getFlag,jdbcType=INTEGER},
-            </if>
-            <if test="createTime != null">
-                #{createTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="getTime != null">
-                #{getTime,jdbcType=TIMESTAMP},
-            </if>
-        </trim>
-    </insert>
     <insert id="insertList" parameterType="map" useGeneratedKeys="true" keyProperty="id">
         insert into award (id, student_id, medal_type,
         award_content_type, type, can_get,
-        get_flag, create_time, get_time)
+        get_flag, create_time, get_time, current_plan, total_plan)
         values
         <foreach collection="awardList" item="award" separator=",">
             (#{award.id,jdbcType=BIGINT}, #{award.studentId,jdbcType=BIGINT}, #{award.medalType,jdbcType=BIGINT},
             #{award.awardContentType,jdbcType=INTEGER}, #{award.type,jdbcType=VARCHAR},
             #{award.canGet,jdbcType=INTEGER},
             #{award.getFlag,jdbcType=INTEGER}, #{award.createTime,jdbcType=TIMESTAMP},
-            #{award.getTime,jdbcType=TIMESTAMP})
+            #{award.getTime,jdbcType=TIMESTAMP}, #{award.currentPlan}, #{award.totalPlan})
         </foreach>
 
     </insert>
@@ -248,41 +184,6 @@
         GROUP BY a.student_id
     </select>
 
-    <update id="updateByExampleSelective" parameterType="map">
-        update award
-        <set>
-            <if test="record.id != null">
-                id = #{record.id,jdbcType=BIGINT},
-            </if>
-            <if test="record.studentId != null">
-                student_id = #{record.studentId,jdbcType=BIGINT},
-            </if>
-            <if test="record.medalType != null">
-                medal_type = #{record.medalType,jdbcType=BIGINT},
-            </if>
-            <if test="record.awardContentType != null">
-                award_content_type = #{record.awardContentType,jdbcType=INTEGER},
-            </if>
-            <if test="record.type != null">
-                type = #{record.type,jdbcType=VARCHAR},
-            </if>
-            <if test="record.canGet != null">
-                can_get = #{record.canGet,jdbcType=INTEGER},
-            </if>
-            <if test="record.getFlag != null">
-                get_flag = #{record.getFlag,jdbcType=INTEGER},
-            </if>
-            <if test="record.createTime != null">
-                create_time = #{record.createTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="record.getTime != null">
-                get_time = #{record.getTime,jdbcType=TIMESTAMP},
-            </if>
-        </set>
-        <if test="_parameter != null">
-            <include refid="Update_By_Example_Where_Clause"/>
-        </if>
-    </update>
     <update id="updateByExample" parameterType="map">
         update award
         set id = #{record.id,jdbcType=BIGINT},
@@ -341,11 +242,6 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <update id="resetDayAward">
-        update award
-        set can_get = 2, get_flag = 2, get_time = null
-    </update>
-
     <select id="selAwardCountByStudentId" parameterType="long" resultType="map">
         select medal.child_name name,count(award.id) number
         from award award
@@ -353,4 +249,32 @@
         where award.medal_type=medal.id and get_flag = 1 and award.student_id=#{studentId}
         group by medal.child_name
     </select>
-</mapper>
+    <select id="selectByStudentIdAndMedalType" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from award
+        where student_id = #{studentId}
+        and medal_type = #{medalId}
+        limit 1
+    </select>
+    <select id="countTotalMedal" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from award
+        where student_id = #{studentId}
+          and type = 3
+    </select>
+    <select id="countGetModel" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from award
+        where student_id = #{studentId}
+          and type = 3
+          and get_flag = 1
+    </select>
+    <select id="countCompleteAllDailyAward" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from award
+        where student_id = #{student.id}
+          and type = 1
+          and can_get = 1
+          and to_days(create_time) = to_days(now())
+    </select></mapper>

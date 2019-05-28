@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.zhidejiaoyu.common.Vo.game.GameOneVo;
 import com.zhidejiaoyu.common.Vo.game.GameTwoVo;
+import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -224,6 +225,7 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
     }
 
     @Override
+    @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<String> saveGameTwo(HttpSession session, GameScore gameScore) {
         Student student = getStudent(session);

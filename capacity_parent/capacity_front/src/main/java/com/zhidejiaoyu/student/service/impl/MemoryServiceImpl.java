@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -74,6 +75,9 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
 
     @Autowired
     private SaveWordLearnAndCapacity saveWordLearnAndCapacity;
+
+    @Autowired
+    private MedalAwardAsync medalAwardAsync;
 
     @Override
     public Object getMemoryWord(HttpSession session, Long unitId) {
@@ -195,6 +199,9 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         }
         // 查询当前单词的学习记录数据
         Learn currentLearn = learnMapper.selectLearn(studentId, learn, "慧记忆", maxCount,1);
+
+        // 统计初出茅庐勋章
+        medalAwardAsync.inexperienced(student);
 
         // 保存学习记录
         // 第一次学习，如果答对记为熟词，答错记为生词

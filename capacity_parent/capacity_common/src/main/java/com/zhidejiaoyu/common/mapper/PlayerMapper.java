@@ -56,4 +56,7 @@ public interface PlayerMapper extends BaseMapper<Player> {
      * @return
      */
     int selectMaxLearnCount(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("type") int type);
+
+    Player selectPlayerByType(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("type") Integer type,
+                              @Param("wordId") Long wordId);
 }

@@ -167,4 +167,9 @@ public class LoginController {
     public void getValidateCode(HttpSession session, HttpServletResponse response) throws IOException {
         loginService.getValidateCode(session, response);
     }
+
+    @GetMapping("/getRiepCount")
+    public Object getRiepCount(HttpSession session){
+        return loginService.getRiepCount(session);
+    }
 }

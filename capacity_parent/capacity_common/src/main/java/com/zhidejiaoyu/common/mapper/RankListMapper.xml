@@ -187,6 +187,11 @@
         FROM
             rank_list r
     </select>
+    <select id="selectByStudentId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from rank_list where student_id = #{studentId} limit 1
+    </select>
     <update id="updateByExampleSelective" parameterType="map">
         update rank_list
         <set>
