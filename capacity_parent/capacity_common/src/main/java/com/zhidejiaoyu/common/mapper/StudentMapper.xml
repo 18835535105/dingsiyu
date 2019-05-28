@@ -684,4 +684,23 @@
           </foreach>
             )
     </select>
+    <select id="getVocabularyCountByStudent" parameterType="map" resultType="integer">
+        select
+        ((select count(listen.id) from capacity_listen listen where listen.student_id=stu.id and listen.memory_strength &lt; 1)  +
+        (select count(cwrite.id) from capacity_write cwrite where cwrite.student_id=stu.id and cwrite.memory_strength &lt; 1) +
+        (select count(memory.id) from capacity_memory memory where memory.student_id=stu.id and memory.memory_strength &lt; 1) +
+        (select count(picture.id) from capacity_picture picture where picture.student_id=stu.id and picture.memory_strength &lt; 1) +
+        (select count(simple.id) from simple_capacity simple where simple.student_id=stu.id and simple.memory_strength &lt; 1) ) count
+        from student stu where stu.id =#{studentId}
+    </select>
+
+    <select id="getSentenceCountByStudent" parameterType="map" resultType="integer">
+        select
+        ((select count(translate.id) from sentence_translate translate where translate.student_id=stu.id and translate.memory_strength &lt; 1)  +
+        (select count(cwrite.id) from sentence_write cwrite where cwrite.student_id=stu.id and cwrite.memory_strength   &lt;1) +
+        (select count(memory.id) from sentence_listen memory where memory.student_id=stu.id and memory.memory_strength  &lt; 1)
+        ) count
+        from student stu where stu.id =#{studentId}
+    </select>
+
 </mapper>

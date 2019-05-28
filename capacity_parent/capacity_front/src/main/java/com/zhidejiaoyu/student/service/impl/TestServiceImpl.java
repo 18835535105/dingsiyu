@@ -364,8 +364,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
         getUnitTestMsg(testRecord, testRecord.getPoint());
         Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 10);
-        if(integer==null || integer<=0){
-            integer=0;
+        if (integer == null || integer <= 0) {
+            integer = 0;
         }
         Integer goldCount = 0;
         if (integer <= point) {
@@ -399,9 +399,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setEnergy(energy);
         getMessage(student, vo, testRecord, point, 100);
         studentMapper.updateById(student);
-        studentInfoService.calculateValidTime(session, 7, null,
-                testRecord.getUnitId().longValue(),
-                (testRecord.getTestStartTime().getTime()-testRecord.getTestEndTime().getTime()));
         return ServerResponse.createBySuccess(vo);
     }
 
@@ -413,12 +410,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         List<Letter> letters = letterMapper.getByUnitId(unitId);
         //打乱顺序
         Collections.shuffle(letters);
-        List<Map<String,Object>> returnList=new ArrayList<>();
+        List<Map<String, Object>> returnList = new ArrayList<>();
         //获取字母配对试题
         List<Letter> letterPairList = letters.subList(0, 5);
-        List<Map<String,Object>> pairList=new ArrayList<>();
+        List<Map<String, Object>> pairList = new ArrayList<>();
         for (Letter letter : letterPairList) {
-            Map<String,Object> letterPairMap=new HashMap<>();
+            Map<String, Object> letterPairMap = new HashMap<>();
             getLetterPair(letterPairMap, letter);
             pairList.add(letterPairMap);
         }
@@ -426,9 +423,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Collections.shuffle(letters);
         //获取字母辨音试题
         List<Letter> letterDiscriminationList = letters.subList(0, 5);
-        List<Map<String,Object>> discriminationList=new ArrayList<>();
-        for(Letter letter:letterDiscriminationList){
-            Map<String,Object> discriminationMap=new HashMap<>();
+        List<Map<String, Object>> discriminationList = new ArrayList<>();
+        for (Letter letter : letterDiscriminationList) {
+            Map<String, Object> discriminationMap = new HashMap<>();
             getLetterDiscrimination(discriminationMap, letter);
             discriminationList.add(discriminationMap);
         }
@@ -436,9 +433,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Collections.shuffle(letters);
         //获取字母听写试题
         List<Letter> letterWriteList = letters.subList(0, 3);
-        List<Map<String,Object>> writeList=new ArrayList<>();
-        for(Letter letter:letterWriteList){
-            Map<String,Object> letterWriteMap=new HashMap<>();
+        List<Map<String, Object>> writeList = new ArrayList<>();
+        for (Letter letter : letterWriteList) {
+            Map<String, Object> letterWriteMap = new HashMap<>();
             getLetterWrite(letterWriteMap, letter);
             writeList.add(letterWriteMap);
         }
@@ -457,6 +454,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         getUnitTestMsg(testRecord, testRecord.getPoint());
         Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 12);
         Integer goldCount = 0;
+        if (integer == null || integer <= 0) {
+            integer = 0;
+        }
         if (integer <= point) {
             if (point < SIX) {
                 goldCount = 0;
@@ -488,9 +488,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setTestEndTime(new Date());
         testRecordMapper.insert(testRecord);
         studentMapper.updateById(student);
-        studentInfoService.calculateValidTime(session, 9, null,
-                testRecord.getUnitId().longValue(),
-                (testRecord.getTestStartTime().getTime()-testRecord.getTestEndTime().getTime()));
         return ServerResponse.createBySuccess(vo);
     }
 
@@ -508,28 +505,28 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Random random = new Random();
         int ranId = random.nextInt(10);
         map.put("mp3url", baiduSpeak.getLetterPath(studyLetter.getBigLetter()));
-        List<Map<String,Object>> options = new ArrayList<>();
-        Map<String,Object> anwars=new HashMap<>();
+        List<Map<String, Object>> options = new ArrayList<>();
+        Map<String, Object> anwars = new HashMap<>();
         if (ranId > 5) {
             //小写字母题目
-            anwars.put("letter",studyLetter.getLowercaseLetters());
-            anwars.put("isTure",true);
+            anwars.put("letter", studyLetter.getLowercaseLetters());
+            anwars.put("isTrue", true);
             options.add(anwars);
             for (Letter letter : threeLetter) {
-                Map<String,Object> option=new HashMap<>();
-                option.put("letter",letter.getLowercaseLetters());
-                option.put("isTure",false);
+                Map<String, Object> option = new HashMap<>();
+                option.put("letter", letter.getLowercaseLetters());
+                option.put("isTrue", false);
                 options.add(option);
             }
         } else {
-            anwars.put("letter",studyLetter.getBigLetter());
-            anwars.put("isTure",true);
+            anwars.put("letter", studyLetter.getBigLetter());
+            anwars.put("isTrue", true);
             options.add(anwars);
             //大写字母题目
             for (Letter letter : threeLetter) {
-                Map<String,Object> option=new HashMap<>();
-                option.put("letter",letter.getBigLetter());
-                option.put("isTure",false);
+                Map<String, Object> option = new HashMap<>();
+                option.put("letter", letter.getBigLetter());
+                option.put("isTrue", false);
                 options.add(option);
             }
         }
@@ -543,30 +540,30 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         //获取题目
         Random random = new Random();
         int ranId = random.nextInt(10);
-        List<Map<String,Object>> options = new ArrayList<>();
-        Map<String,Object> anwars=new HashMap<>();
+        List<Map<String, Object>> options = new ArrayList<>();
+        Map<String, Object> anwars = new HashMap<>();
         if (ranId > 5) {
             //大写字母题目
             map.put("title", studyLetter.getBigLetter());
-            anwars.put("letter",studyLetter.getLowercaseLetters());
-            anwars.put("isTrue",true);
+            anwars.put("letter", studyLetter.getLowercaseLetters());
+            anwars.put("isTrue", true);
             options.add(anwars);
             for (Letter letter : threeLetter) {
-                Map<String,Object> users=new HashMap<>();
-                users.put("letter",letter.getLowercaseLetters());
-                users.put("isTrue",false);
+                Map<String, Object> users = new HashMap<>();
+                users.put("letter", letter.getLowercaseLetters());
+                users.put("isTrue", false);
                 options.add(users);
             }
         } else {
             //小写字母题目
             map.put("title", studyLetter.getLowercaseLetters());
-            anwars.put("letter",studyLetter.getBigLetter());
-            anwars.put("isTrue",true);
+            anwars.put("letter", studyLetter.getBigLetter());
+            anwars.put("isTrue", true);
             options.add(anwars);
             for (Letter letter : threeLetter) {
-                Map<String,Object> users=new HashMap<>();
-                users.put("letter",letter.getBigLetter());
-                users.put("isTrue",false);
+                Map<String, Object> users = new HashMap<>();
+                users.put("letter", letter.getBigLetter());
+                users.put("isTrue", false);
                 options.add(users);
             }
         }
@@ -1007,7 +1004,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }*/
         // 获取当前单元下的所有单词
         List<Vocabulary> vocabularies = redisOpt.getWordInfoInUnit(unitId);
-        learnMapper.updLetterPair(student.getId(),unitId,studyModel);
+        learnMapper.updLetterPair(student.getId(), unitId, studyModel);
         String[] type;
         if ("慧记忆".equals(studyModel)) {
             type = new String[]{"英译汉", "汉译英"};

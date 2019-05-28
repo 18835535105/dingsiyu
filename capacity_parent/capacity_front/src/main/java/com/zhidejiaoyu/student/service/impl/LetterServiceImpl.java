@@ -90,7 +90,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             if(isTrue){
                 Integer point = testRecordMapper.selectUnitTestMaxPointByStudyModel(studentId, unit.getId().longValue(), 12);
                 map.put("isOpen",isTrue);
-                if(point < 100){
+                if(point == null || point < 100){
                     isTrue=false;
                 }
             }else{
@@ -121,16 +121,16 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         if (unitId != null) {
             //查看单词播放器是否学习
             Integer letterCount = letterMapper.selLetterCountById(unitId);
-            Integer letterListen = learnMapper.selLetterLearn(unitId, studentId, "字母播放器");
+            Integer letterListen = learnMapper.selLetterLearn(studentId, unitId, "字母播放器");
             map.put("letterListen", true);
             if (letterListen != null && letterListen >= letterCount) {
                 map.put("letterPair", true);
                 //查看字母配对是否学习
-                Integer letterListenCount = learnMapper.selLetterLearn(unitId, studentId, "字母配对");
+                Integer letterListenCount = learnMapper.selLetterLearn(studentId, unitId, "字母配对");
                 if (letterListenCount != null && letterCount <= letterListenCount) {
                     map.put("letterWrite", true);
                     //查看字母听写是否完成
-                    Integer letterWriteCount = learnMapper.selLetterLearn(unitId, studentId, "字母听写");
+                    Integer letterWriteCount = learnMapper.selLetterLearn(studentId, unitId, "字母听写");
                     if (letterWriteCount != null && letterCount <= letterWriteCount) {
                         map.put("LettersBreakThrough", true);
                         //查看单元闯关是否完成
@@ -201,19 +201,19 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             player.setLearnCount(1);
             playerMapper.insert(player);
         } else {
-            player.setStudentId(studentId);
-            player.setType(4);
-            player.setUpdateTime(new Date());
-            player.setLearnCount(player.getLearnCount() + 1);
-            playerMapper.updateById(player);
+            Player player1 = playerMapper.selectPlayerByType(studentId, player.getUnitId(), 4, player.getWordId());
+            player1.setUpdateTime(new Date());
+            player1.setLearnCount(player1.getLearnCount() + 1);
+            playerMapper.updateById(player1);
         }
-        Learn learn = learnMapper.selLetter(studentId, player.getWordId(), player.getUnitId());
+        Learn learn = learnMapper.selLetter(studentId, player.getWordId(), player.getUnitId(),"字母播放器");
         Date date = new Date();
         if (learn == null) {
             learn = new Learn();
             learn.setStudentId(studentId);
             learn.setStudyModel("字母播放器");
             learn.setStatus(1);
+            learn.setUnitId(player.getUnitId());
             learn.setLearnTime(date);
             learn.setUpdateTime(date);
             learn.setStudyCount(1);
@@ -317,7 +317,6 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         learnMapper.insert(learn);
         letterPair.setStudentId(studentId.intValue());
         letterPairMapper.insert(letterPair);
-        studentInfoService.calculateValidTime(session, 31, null, letterPair.getUnitId().longValue(), valid);
         return ServerResponse.createBySuccess();
     }
 
@@ -477,6 +476,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             learn.setStudentId(studentId);
             learn.setStudyModel("字母听写");
             learn.setStatus(1);
+            learn.setUnitId(letter.getUnitId().longValue());
             learn.setLearnTime(date);
             learn.setUpdateTime(date);
             learn.setStudyCount(1);

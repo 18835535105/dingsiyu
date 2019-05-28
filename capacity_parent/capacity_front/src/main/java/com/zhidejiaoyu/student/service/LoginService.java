@@ -65,4 +65,6 @@ public interface LoginService extends BaseService<Student>{
     void saveDurationInfo(Map<String, Object> sessionMap);
 
     void getValidateCode(HttpSession session, HttpServletResponse response) throws IOException;
+
+    Object getRiepCount(HttpSession session);
 }

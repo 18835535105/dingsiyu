@@ -59,19 +59,21 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         if (studentStudyPlan != null) {
             //获取单元
             List<LetterUnit> letterUnits = letterUnitMapper.selSymbolUnit(studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());
+            Boolean isTrue=true;
             for (LetterUnit letterUnit : letterUnits) {
                 Map<String, Object> returnMap = new HashMap<>();
-                returnMap.put("title", letterUnit.getUnitName());
-                returnMap.put("id", letterUnit.getId());
-                List<Map<String, Object>> maps = phoneticSymbolMapper.selByUnitId(letterUnit.getId());
-                List<Map<String, Object>> symbolList = new ArrayList<>();
-                for (Map<String, Object> map : maps) {
-                    Map<String, Object> unitMap = new HashMap<>();
-                    unitMap.put("title", map.get("type").toString() + map.get("phonetic_symbol") + "的发音方法");
-                    unitMap.put("type", map.get("type").toString() + map.get("phonetic_symbol"));
-                    symbolList.add(unitMap);
+                returnMap.put("id",letterUnit.getId());
+                returnMap.put("unitName",letterUnit.getUnitName());
+                Integer studyCount = learnMapper.selLetterLearn(student.getId(), letterUnit.getId().longValue(), "音标辨音");
+                int count = phoneticSymbolMapper.countByUnitId(letterUnit.getId().longValue());
+                if(isTrue){
+                    returnMap.put("isOpen",true);
+                    if(count>studyCount){
+                        isTrue=false;
+                    }
+                }else{
+                    returnMap.put("isOpen",false);
                 }
-                returnMap.put("child", symbolList);
                 list.add(returnMap);
             }
         }

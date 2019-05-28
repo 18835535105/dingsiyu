@@ -858,7 +858,7 @@ public interface LearnMapper extends BaseMapper<Learn> {
     Integer selLetterLearn(@Param("studentId") Long studentId,@Param("unitId") Long unitId,@Param("studyModel") String studyModel);
 
 
-    Learn selLetter(@Param("studentId") Long studentId,@Param("wordId") Long wordId,@Param("unitId") Long unitId);
+    Learn selLetter(@Param("studentId") Long studentId,@Param("wordId") Long wordId,@Param("unitId") Long unitId,@Param("studyModel") String studyModel);
 
     @Update("update learn set type=2 where student_id=#{studentId} and unit_id =#{unitId} and study_model=#{studyModel}")
     void updLetterPair(@Param("studentId") Long studentId,@Param("unitId") Long unitId,@Param("studyModel") String studyModel);

@@ -47,4 +47,8 @@
           and type = #{type}
     </select>
 
+    <select id="selectPlayerByType" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include> from player where student_id = #{studentId} and unit_id = #{unitId} and type = #{type} and word_id = #{wordId}
+    </select>
+
 </mapper>

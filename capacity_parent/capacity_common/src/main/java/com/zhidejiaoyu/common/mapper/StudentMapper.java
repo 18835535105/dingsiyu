@@ -235,4 +235,8 @@ public interface StudentMapper extends BaseMapper<Student> {
      */
     @MapKey("id")
     Map<Long, Map<Long, String>> selectHeadUrlMapByStudentId(@Param("studentIds") List<Long> studentIds);
+
+    Integer getVocabularyCountByStudent(@Param("studentId") Long studentId);
+
+    Integer getSentenceCountByStudent(@Param("studentId") Long studentId);
 }

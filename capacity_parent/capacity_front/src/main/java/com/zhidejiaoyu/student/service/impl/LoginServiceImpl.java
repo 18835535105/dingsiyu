@@ -1161,6 +1161,18 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         vCode.write(response.getOutputStream());
     }
 
+    @Override
+    public Object getRiepCount(HttpSession session) {
+        Student student = getStudent(session);
+        Map<String,Object> map=new HashMap<>();
+        map.put("partUrl",student.getPartUrl());
+        Integer count = studentMapper.getVocabularyCountByStudent(student.getId());
+        map.put("vocabularyCount",count);
+        Integer sentenceCount = studentMapper.getSentenceCountByStudent(student.getId());
+        map.put("sentenceCount",sentenceCount);
+        return ServerResponse.createBySuccess(map);
+    }
+
     @Test
     public void add() {
         int count = 0;
