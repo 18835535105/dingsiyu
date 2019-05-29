@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.concurrent.ExecutorService;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import static java.lang.Integer.parseInt;
 
@@ -149,20 +151,22 @@ public class DailyAwardAsync extends BaseAwardAsync {
             if (this.checkAward(award, DAILY_TYPE)) {
                 // 查询学生昨天的学校排名
                 RankList rankList = rankListMapper.selectByStudentId(studentId);
-
-                int up = 0;
-                if (rankList != null) {
-                    int rank = rankList.getSchoolDayRank() == null ? 0 : rankList.getSchoolDayRank();
-                    // 学生当前全校排名
-                    int currentRank = this.getCurrentSchoolRank(student);
-                    if (currentRank == 0) {
-                        up = 0;
-                    } else {
-                        up = Math.abs(rank - currentRank);
-                    }
+                int rank;
+                if (rankList == null || rankList.getSchoolDayRank() == null) {
+                    rank = 0;
+                } else {
+                    rank = rankList.getSchoolDayRank();
                 }
-                int upRank = up >= 0 ? up : 0;
-                this.optAward(studentId, awardContentType, upRank, award, DAILY_TYPE);
+
+                // 学生当前全校排名
+                int up;
+                int currentRank = this.getCurrentSchoolRank(student);
+                if (currentRank == 0) {
+                    up = 0;
+                } else {
+                    up = Math.abs(rank - currentRank);
+                }
+                this.optAward(studentId, awardContentType, up, award, DAILY_TYPE);
             }
         } catch (Exception e) {
             log.error("保存日奖励信息出错！", e);

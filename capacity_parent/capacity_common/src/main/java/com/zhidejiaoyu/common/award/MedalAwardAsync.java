@@ -180,48 +180,55 @@ public class MedalAwardAsync extends BaseAwardAsync {
         List<Medal> children = medalMapper.selectChildrenIdByParentId(17);
         // 如果最后一个奖励条件已达成，说明其之前奖励都已能领取，不再进行其他计算
         Award award = awardMapper.selectByStudentIdAndMedalType(studentId, children.get(children.size() - 1).getId());
-        try {
-            if (super.checkAward(award, MEDAL_TYPE)) {
-                // 学生当前排行信息
-                RankList rankList = rankListMapper.selectByStudentId(studentId);
+        if (super.checkAward(award, MEDAL_TYPE)) {
+            // 学生当前排行信息
+            RankList rankList = rankListMapper.selectByStudentId(studentId);
+            int schoolDayRank;
+            int countryDayRank;
+            if (rankList == null) {
+                schoolDayRank = 0;
+                countryDayRank = 0;
+            } else {
+                schoolDayRank = rankList.getSchoolDayRank() == null ? 0 : rankList.getSchoolDayRank();
+                countryDayRank = rankList.getCountryDayRank() == null ? 0 : rankList.getCountryDayRank();
+            }
+            try {
+                // 学生当前全校排名
+                Map<Long, Map<String, Object>> currentSchoolRank = studentMapper.selectLevelByStuId(student, 2, schoolAdminId);
+                // 学生当前全国排名
+                Map<Long, Map<String, Object>> currentCountryRank = studentMapper.selectLevelByStuId(student, 3, null);
 
-                if (rankList != null) {
-                    Integer schoolDayRank = rankList.getSchoolDayRank();
-                    Integer countryDayRank = rankList.getCountryDayRank();
+                double schoolRank = 0;
+                if (currentSchoolRank != null && currentSchoolRank.get(student.getId()) != null && currentSchoolRank.get(student.getId()).get("rank") != null) {
+                    schoolRank = Double.parseDouble(currentSchoolRank.get(student.getId()).get("rank").toString());
+                }
 
-                    // 学生当前全校排名
-                    Map<Long, Map<String, Object>> currentSchoolRank = studentMapper.selectLevelByStuId(student, 2, schoolAdminId);
-                    // 学生当前全国排名
-                    Map<Long, Map<String, Object>> currentCountryRank = studentMapper.selectLevelByStuId(student, 3, null);
+                double countryRank = 0;
+                if (currentCountryRank != null && currentCountryRank.get(student.getId()) != null && currentCountryRank.get(student.getId()).get("rank") != null) {
+                    countryRank = Double.parseDouble(currentCountryRank.get(student.getId()).get("rank").toString());
+                }
 
-                    double schoolRank = 0;
-                    if (currentSchoolRank != null && currentSchoolRank.get(student.getId()) != null && currentSchoolRank.get(student.getId()).get("rank") != null) {
-                        schoolRank = Double.parseDouble(currentSchoolRank.get(student.getId()).get("rank").toString());
-                    }
-
-                    double countryRank = 0;
-                    if (currentCountryRank != null && currentCountryRank.get(student.getId()) != null && currentCountryRank.get(student.getId()).get("rank") != null) {
-                        countryRank = Double.parseDouble(currentCountryRank.get(student.getId()).get("rank").toString());
-                    }
-
-                    Long medalId;
-                    for (int i = 0; i < 5; i++) {
-                        medalId = children.get(i).getId();
-                        award = awardMapper.selectByStudentIdAndMedalType(studentId, medalId);
-                        if (i < 3) {
-                            if (super.checkAward(award, MEDAL_TYPE)) {
-                                super.optAward(studentId, medalId, schoolDayRank == null ? 0 : ((int) (schoolDayRank - schoolRank)), award, MEDAL_TYPE);
-                            }
-                        } else {
-                            if (super.checkAward(award, MEDAL_TYPE)) {
-                                super.optAward(studentId, medalId, countryDayRank == null ? 0 : ((int) (countryDayRank - countryRank)), award, MEDAL_TYPE);
-                            }
+                Long medalId;
+                // 变化名次
+                int change;
+                for (int i = 0; i < 5; i++) {
+                    medalId = children.get(i).getId();
+                    award = awardMapper.selectByStudentIdAndMedalType(studentId, medalId);
+                    if (i < 3) {
+                        if (super.checkAward(award, MEDAL_TYPE)) {
+                            change = (int) (schoolDayRank - schoolRank);
+                            super.optAward(studentId, medalId, change >= 0 ? change : 0, award, MEDAL_TYPE);
+                        }
+                    } else {
+                        if (super.checkAward(award, MEDAL_TYPE)) {
+                            change = (int) (countryDayRank - countryRank);
+                            super.optAward(studentId, medalId, change >= 0 ? change : 0, award, MEDAL_TYPE);
                         }
                     }
                 }
+            } catch (NumberFormatException e) {
+                log.error("保存“天道酬勤”失败！", e);
             }
-        } catch (NumberFormatException e) {
-            log.error("保存勋章奖励信息失败！", e);
         }
     }
 
