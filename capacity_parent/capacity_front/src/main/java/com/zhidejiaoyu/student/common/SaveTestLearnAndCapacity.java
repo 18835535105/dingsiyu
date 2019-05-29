@@ -202,7 +202,7 @@ public class SaveTestLearnAndCapacity {
             learn = learns.get(0);
         } else {
             // 无学习记录
-            log.warn("学生[{}]-[{}]没有当前模块学习记录：单元id[{}],单词id[{}],模块type[{}]", student.getId(), student.getStudentName(), unitId, id, classify);
+            log.warn("学生[{} - {} - {}]没有当前模块学习记录：单元id[{}],单词id[{}],模块type[{}]", student.getId(), student.getAccount(), student.getStudentName(), unitId, id, classify);
             return 0;
         }
         // 保存记忆追踪信息
