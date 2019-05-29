@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.SentenceTranslate;
 import com.zhidejiaoyu.common.pojo.SentenceTranslateExample;
 import org.apache.ibatis.annotations.Delete;
@@ -106,4 +107,5 @@ public interface SentenceTranslateMapper {
 
     @Delete("delete from sentence_translate where student_id=#{studentId} and unit_id=#{unitId}")
     Integer deleteByUnitIdAndStudentId(@Param("studentId") Long id, @Param("unitId") Integer unitId);
+
 }

@@ -385,5 +385,7 @@ public interface CapacityReviewMapper {
 	 */
     int countByPushByCourseId(@Param("studentId") Long studentId, @Param("now") String now, @Param("i") int i);
 
-    List<CapacityReview> selectSentenceCapacitys(@Param("studentId") Long studentId,@Param("classify") Integer classify);
+    CapacityReview selectSentenceCapacitys(@Param("studentId") Long studentId,@Param("classify") Integer classify);
+
+	Integer selSentenceCountCapacitys(@Param("studentId") Long id,@Param("classify") Integer classify);
 }
