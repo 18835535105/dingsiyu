@@ -40,8 +40,12 @@ public class GoldAwardAsync extends BaseAwardAsync{
         // 查看奖励
         Award award = awardMapper.selectByAwardContentTypeAndType(studentId, GOLD_TYPE, awardContentType);
 
-        if (this.checkAward(award, GOLD_TYPE)) {
-            optAward(studentId, awardContentType, 1, award, GOLD_TYPE);
+        try {
+            if (this.checkAward(award, GOLD_TYPE)) {
+                optAward(studentId, awardContentType, 1, award, GOLD_TYPE);
+            }
+        } catch (Exception e) {
+            log.error("保存金币奖励信息失败！", e);
         }
     }
 
@@ -57,21 +61,25 @@ public class GoldAwardAsync extends BaseAwardAsync{
 
         // 如果最后一个奖励条件已达成，说明其之前奖励都已能领取，不再进行其他计算
         Award award = awardMapper.selectByAwardContentTypeAndType(studentId, GOLD_TYPE, awardContentType[length - 1]);
-        if (super.checkAward(award, GOLD_TYPE)) {
-            // 总有效时长
-            Long totalValidTime = durationMapper.countTotalValidTime(studentId);
-            if (totalValidTime == null) {
-                totalValidTime = 0L;
-            } else {
-                totalValidTime /= 60;
-            }
+        try {
+            if (super.checkAward(award, GOLD_TYPE)) {
+                // 总有效时长
+                Long totalValidTime = durationMapper.countTotalValidTime(studentId);
+                if (totalValidTime == null) {
+                    totalValidTime = 0L;
+                } else {
+                    totalValidTime /= 60;
+                }
 
-            for (int i1 : awardContentType) {
-                award = awardMapper.selectByAwardContentTypeAndType(studentId, GOLD_TYPE, i1);
-                if (this.checkAward(award, GOLD_TYPE)) {
-                    super.optAward(studentId, i1, Integer.parseInt(totalValidTime.toString()), award, GOLD_TYPE);
+                for (int i1 : awardContentType) {
+                    award = awardMapper.selectByAwardContentTypeAndType(studentId, GOLD_TYPE, i1);
+                    if (this.checkAward(award, GOLD_TYPE)) {
+                        super.optAward(studentId, i1, Integer.parseInt(totalValidTime.toString()), award, GOLD_TYPE);
+                    }
                 }
             }
+        } catch (NumberFormatException e) {
+            log.error("保存金币奖励信息失败！", e);
         }
     }
 
@@ -87,16 +95,20 @@ public class GoldAwardAsync extends BaseAwardAsync{
 
         // 如果最后一个奖励条件已达成，说明其之前奖励都已能领取，不再进行其他计算
         Award award = awardMapper.selectByAwardContentTypeAndType(studentId, GOLD_TYPE, awardContentType[length - 1]);
-        if (super.checkAward(award, GOLD_TYPE)) {
-            // 查看学生所有课程下单元闯关成功个数
-            int count = testRecordMapper.countUnitTestSuccessByStudentId(student.getId());
+        try {
+            if (super.checkAward(award, GOLD_TYPE)) {
+                // 查看学生所有课程下单元闯关成功个数
+                int count = testRecordMapper.countUnitTestSuccessByStudentId(student.getId());
 
-            for (int i1 : awardContentType) {
-                award = awardMapper.selectByAwardContentTypeAndType(studentId, GOLD_TYPE, i1);
-                if (this.checkAward(award, GOLD_TYPE)) {
-                    super.optAward(studentId, i1, count, award, GOLD_TYPE);
+                for (int i1 : awardContentType) {
+                    award = awardMapper.selectByAwardContentTypeAndType(studentId, GOLD_TYPE, i1);
+                    if (this.checkAward(award, GOLD_TYPE)) {
+                        super.optAward(studentId, i1, count, award, GOLD_TYPE);
+                    }
                 }
             }
+        } catch (Exception e) {
+            log.error("保存金币奖励信息失败！", e);
         }
     }
 }

@@ -690,28 +690,24 @@
         learn
         WHERE
         student_id = #{student.id}
-        AND
-        <if test="model == 1 or model == 2 or model == 3">
-            vocabulary_id
+        <if test="model == 1">
+            and study_model in ('快速单词', '快速句型', '语法辨析', '快速词组', '词汇考点', '慧记忆')
         </if>
-        <if test="model == 4 or model == 5 or model == 6">
-            example_id
+        <if test="model == 2">
+            and study_model = '慧听写'
         </if>
-        NOT IN (
-        SELECT
-        <if test="model == 4 or model == 5 or model == 6">
-            example_id
+        <if test="model == 3">
+            and study_model in ('单词默写', '词组默写', '慧默写')
         </if>
-        <if test="model == 1 or model == 2 or model == 3">
-            vocabulary_id
+        <if test="model == 4">
+            and study_model = '例句听力'
         </if>
-        FROM
-        learn
-        WHERE
-        student_id = #{student.id}
-        <include refid="study_model_sql"/>
-        AND `status` = 0
-        )
+        <if test="model == 5">
+            and study_model = '例句翻译'
+        </if>
+        <if test="model == 6">
+            and study_model = '例句默写'
+        </if>
         AND `status` = 1
     </select>
     <select id="countByWord" parameterType="map" resultType="Integer">

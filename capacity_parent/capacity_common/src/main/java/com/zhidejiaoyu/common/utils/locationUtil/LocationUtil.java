@@ -8,8 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Objects;
-
 /**
  * 定位工具
  *
@@ -54,27 +52,35 @@ public class LocationUtil {
         if (from == null || to == null) {
             return 0;
         }
-
-        String url = this.getDistanceUrl(from, to);
-
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        String body = response.getBody();
-        JSONObject jsonObject = JSONObject.parseObject(body);
-        if (jsonObject.getInteger(STATUS) == 0) {
-            Integer distance = jsonObject.getJSONObject("result").getJSONArray("elements").getJSONObject(0).getInteger("distance");
-            return Objects.equals(distance, -1) ? 0 : distance;
-        } else {
-            log.warn("获取坐标距离出错！响应信息：{}, 参数：from={}, to={}", body, from.toString(), to.toString());
+        double dx, dy, dew;
+        double distance;
+        // 地球半径 m
+        double r = 6370693.5;
+        // 角度转换为弧度
+        // PI/180.0
+        double pi180 = 0.01745329252;
+        double ew1 = Double.parseDouble(from.getLongitude()) * pi180;
+        double ns1 = Double.parseDouble(from.getLatitude()) * pi180;
+        double ew2 = Double.parseDouble(to.getLongitude()) * pi180;
+        double ns2 = Double.parseDouble(to.getLatitude()) * pi180;
+        // 经度差
+        dew = ew1 - ew2;
+        // 若跨东经和西经180 度，进行调整
+        // 2*PI
+        double pi2 = 2 * Math.PI;
+        if (dew > Math.PI) {
+            dew = pi2 - dew;
+        } else if (dew < -Math.PI) {
+            dew = pi2 + dew;
         }
-        return 0;
-    }
+        // 东西方向长度(在纬度圈上的投影长度)
 
-    private String getDistanceUrl(LongitudeAndLatitude from, LongitudeAndLatitude to) {
-        return distanceUrl +
-                    "?key=" + mapKey +
-                    "&mode=walking" +
-                    "&from=" + from.getLatitude() + "," + from.getLongitude() +
-                    "&to=" + to.getLatitude() + "," + to.getLongitude();
+        dx = r * Math.cos(ns1) * dew;
+        // 南北方向长度(在经度圈上的投影长度)
+        dy = r * (ns1 - ns2);
+        // 勾股定理求斜边长
+        distance = Math.sqrt(dx * dx + dy * dy);
+        return (int) distance;
     }
 
     /**
@@ -118,6 +124,4 @@ public class LocationUtil {
             log.error("根据经纬度获取地址失败！响应信息：{}, 参数：{}", jsonObject.toString(), longitudeAndLatitude.toString());
         }
     }
-
-
 }
