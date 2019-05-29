@@ -407,12 +407,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         // 设置游戏测试开始时间
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         //获取单元字母
-        List<Letter> letters = letterMapper.getByUnitId(unitId);
+        List<Letter> letters = letterMapper.getAllLetter();
         //打乱顺序
         Collections.shuffle(letters);
         List<Map<String, Object>> returnList = new ArrayList<>();
         //获取字母配对试题
-        List<Letter> letterPairList = letters.subList(0, 5);
+        List<Letter> letterPairList = letters.subList(0, 10);
         List<Map<String, Object>> pairList = new ArrayList<>();
         for (Letter letter : letterPairList) {
             Map<String, Object> letterPairMap = new HashMap<>();
@@ -420,9 +420,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             pairList.add(letterPairMap);
         }
         returnList.addAll(pairList);
-        Collections.shuffle(letters);
         //获取字母辨音试题
-        List<Letter> letterDiscriminationList = letters.subList(0, 5);
+        List<Letter> letterDiscriminationList = letters.subList(10, 20);
         List<Map<String, Object>> discriminationList = new ArrayList<>();
         for (Letter letter : letterDiscriminationList) {
             Map<String, Object> discriminationMap = new HashMap<>();
@@ -430,9 +429,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             discriminationList.add(discriminationMap);
         }
         returnList.addAll(discriminationList);
-        Collections.shuffle(letters);
         //获取字母听写试题
-        List<Letter> letterWriteList = letters.subList(0, 3);
+        List<Letter> letterWriteList = letters.subList(20,letters.size()-1);
         List<Map<String, Object>> writeList = new ArrayList<>();
         for (Letter letter : letterWriteList) {
             Map<String, Object> letterWriteMap = new HashMap<>();

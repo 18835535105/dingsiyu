@@ -1352,6 +1352,24 @@
           and to_days(sr.update_time) = to_days(now())
           and sc.student_id = #{student.id} and sc.memory_strength >= 0.5
     </select>
+    <select id="selectAllCapacityReview" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from learn where student_id = #{studentId}
+        <if test="classify == 0">
+            and study_model = '单词图鉴'
+        </if>
+        <if test="classify == 1">
+            and study_model = '慧记忆'
+        </if>
+        <if test="classify == 2">
+            and study_model = '慧听写'
+        </if>
+        <if test="classify == 3">
+            and study_model = '慧默写'
+        </if>
+        and vocabulary_id is not null and type = 1
+    </select>
 
 
 </mapper>

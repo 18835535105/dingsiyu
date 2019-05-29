@@ -1409,6 +1409,22 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         return ServerResponse.createBySuccess();
     }
 
+    @Override
+    public ServerResponse<Map<String, Object>> getAllCapacityReview(HttpSession session, Integer classify) {
+        Student student = getStudent(session);
+        List<Learn> learns = learnMapper.selectAllCapacityReview(student.getId(), classify);
+        if (learns.size() > 0) {
+            return packageWordReviewResult(classify, student, learns);
+        }
+        return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    public ServerResponse getAllSentenceReview(HttpSession session, Integer classify){
+        Student student = getStudent(session);
+        return null;
+    }
+
     private ServerResponse<Map<String, Object>> packageWordReviewResult(Integer classify, Student student, List<Learn> learns) {
         // 存储单词id及单元
         List<Map<String, Object>> maps = packageLastLoginLearnWordIds(learns);

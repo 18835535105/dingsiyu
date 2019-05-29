@@ -99,14 +99,8 @@ public class LetterController {
      * @return
      */
     @RequestMapping("/saveLetterPair")
-    public Object saveLetterPair(LetterPair letterPair, HttpSession session,String validTime) {
-        long valid = 0L;
-        try {
-            valid = Long.valueOf(validTime);
-        } catch (Exception e) {
-            log.error("有效时长入参类型错误：学习模块[{}]，validTime[{}]，error=[{}]", 30, validTime, e.getMessage());
-        }
-        return letterService.saveLetterPair(letterPair, session,valid);
+    public Object saveLetterPair(LetterPair letterPair, HttpSession session,Boolean falg) {
+        return letterService.saveLetterPair(letterPair, session,falg);
     }
 
     /**

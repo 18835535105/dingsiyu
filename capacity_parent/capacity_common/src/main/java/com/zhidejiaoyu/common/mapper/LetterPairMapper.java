@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.zhidejiaoyu.common.pojo.Letter;
 import com.zhidejiaoyu.common.pojo.LetterPair;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Delete;
@@ -25,4 +26,8 @@ public interface LetterPairMapper extends BaseMapper<LetterPair> {
 
     @Delete("delete from letter_pair where unit_id=#{unitId} and student_id=#{studentId}")
     void deleteByUnitAndStudent(@Param("unitId") Long unitId,@Param("studentId") Long studentId);
+
+    LetterPair selByLetterIdAndStudent(@Param("letterId") Integer letterId,@Param("studentId") Long studentId);
+
+    LetterPair selPushLetter(@Param("unitId") Long unitId,@Param("studentId") Long studentId);
 }

@@ -256,6 +256,30 @@ public class ReviewController {
         return ServerResponse.createBySuccess();
     }
 
+    /**
+     * 获取智能复习题目，上次登录期间需要复习的单词
+     *
+     * @param classify   0=单词图鉴 1=慧记忆 2=慧听写 3=慧默写
+     * @param session
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/getAllCapacityReview")
+    public ServerResponse<Map<String,Object>> getAllCapacityReview(Integer classify,HttpSession session){
+        if (classify == 0 || classify == 1 || classify == 2 || classify == 3) {
+            return reviewService.getAllCapacityReview(session, classify);
+        }
+        return ServerResponse.createBySuccess();
+    }
+
+    @ResponseBody
+    @GetMapping("/getAllSentenceReview")
+    public ServerResponse getAllSentenceReview(Integer classify,HttpSession session){
+        if(classify == 0 || classify == 1 || classify == 2){
+            return reviewService.getAllSentenceReview(session, classify);
+        }
+        return ServerResponse.createBySuccess();
+    }
 
 
     /**
