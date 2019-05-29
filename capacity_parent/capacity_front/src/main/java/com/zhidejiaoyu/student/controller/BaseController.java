@@ -9,10 +9,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,9 +22,6 @@ import java.util.Map;
 public class BaseController {
 
     @Autowired
-    private HttpServletRequest request;
-
-    @Autowired
     private StudentInfoService studentInfoService;
 
     Student getStudent(HttpSession session) {
@@ -36,19 +31,6 @@ public class BaseController {
     Long getStudentId(HttpSession session) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         return student.getId();
-    }
-
-    public String getParams() {
-        return getParams(request);
-    }
-
-    public static String getParams(HttpServletRequest request) {
-        Map<String, String[]> parameterMap = request.getParameterMap();
-        StringBuilder sb = new StringBuilder();
-        if (parameterMap != null && parameterMap.size() > 0) {
-            parameterMap.forEach((key, value) -> sb.append(key).append(":").append(Arrays.toString(value)).append(";"));
-        }
-        return sb.toString();
     }
 
     /**

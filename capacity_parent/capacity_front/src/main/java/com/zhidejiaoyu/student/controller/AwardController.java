@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.student.controller;
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.aop.log.ControllerLogAnnotation;
+import com.zhidejiaoyu.common.annotation.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.service.AwardService;
 import com.zhidejiaoyu.student.vo.AwardVo;
 import lombok.extern.slf4j.Slf4j;

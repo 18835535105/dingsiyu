@@ -990,17 +990,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     public ServerResponse<List<TestResult>> getWordUnitTest(HttpSession session, Long unitId, String studyModel,
                                                             Boolean isTrue) {
         Student student = getStudent(session);
-        student = studentMapper.selectByPrimaryKey(student.getId());
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-
-        // 判断学生当前单元有无进行单元闯关测试记录，如果已参加过单元闯关测试，提示其需要花费金币购买测试机会，如果还没有测试记录可以免费进行测试
-        // 流程中重复进行单元闯关测试不再扣除金币
-        /*int flag = this.isFirstTest(student, unitId, studyModel, isTrue);
-        if (flag == 1) {
-            return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该单元闯关测试，再次参加需扣除1金币。");
-        } else if (flag == 2) {
-            return ServerResponse.createByError(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
-        }*/
         // 获取当前单元下的所有单词
         List<Vocabulary> vocabularies = redisOpt.getWordInfoInUnit(unitId);
         String[] type;

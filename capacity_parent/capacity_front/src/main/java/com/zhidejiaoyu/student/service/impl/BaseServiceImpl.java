@@ -22,8 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.zhidejiaoyu.student.controller.BaseController.getParams;
-
 /**
  * @author wuchenxi
  * @date 2018/8/29
@@ -122,11 +120,6 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
     Integer getTodayValidTime(Long studentId) {
         String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
         return this.getValidTime(studentId, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
-    }
-
-    @Override
-    public String getParameters() {
-        return getParams(request);
     }
 
     @Override

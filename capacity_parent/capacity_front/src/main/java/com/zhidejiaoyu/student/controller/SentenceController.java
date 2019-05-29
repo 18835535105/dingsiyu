@@ -1,11 +1,9 @@
 package com.zhidejiaoyu.student.controller;
 
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
-import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.common.pojo.Learn;
-import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.aop.log.ControllerLogAnnotation;
+import com.zhidejiaoyu.common.annotation.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.service.SentenceService;
 import com.zhidejiaoyu.student.vo.SentenceWordInfoVo;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +12,6 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.util.List;
 
 /**
  * 例句相关controller

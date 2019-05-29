@@ -114,13 +114,18 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         Student student = getStudent(session);
 
         // 从当前课程随机取10个已学的单词
-        List<Map<String, Object>> needReviewWords = this.getGameTwoSubject(student);
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+        if (capacityStudentUnit == null) {
+            log.warn("学生 [{} - {} - {}] 没有智能版课程，获取“桌牌捕音”游戏数据失败！", student.getId(), student.getAccount(), student.getStudentName());
+            return null;
+        }
+        List<Map<String, Object>> needReviewWords = this.getGameTwoSubject(student, capacityStudentUnit);
 
         List<Long> wordIds = new ArrayList<>(10);
         needReviewWords.forEach(map -> wordIds.add(Long.valueOf(map.get("id").toString())));
 
         // 从学生当前正在学习的课程中随机获取110个单词
-        List<Map<String, String>> wordList = learnMapper.selectWordInCurrentCourse(student.getId(), wordIds);
+        List<Map<String, String>> wordList = learnMapper.selectWordInCurrentCourse(capacityStudentUnit.getCourseId(), wordIds);
         if (wordList.size() < 110) {
             // 如果当前课程下单词总数补足110个，从其他智能版课程随机再取剩余数量的单词
             List<Map<String, String>> otherWordList = learnMapper.selectWordRandomInCourse(student.getId(), 110 - wordList.size(), wordIds);
@@ -191,10 +196,10 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
      * 获取游戏题目
      *
      * @param student
+     * @param capacityStudentUnit
      * @return
      */
-    private List<Map<String, Object>> getGameTwoSubject(Student student) {
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+    private List<Map<String, Object>> getGameTwoSubject(Student student, CapacityStudentUnit capacityStudentUnit) {
         Long courseId = capacityStudentUnit.getCourseId();
         // 从当前单元单词中随机获取10题
         List<Map<String, Object>> unitLearns = learnMapper.selectLearnedByUnitId(student.getId(), capacityStudentUnit.getUnitId(), 0, 10);
