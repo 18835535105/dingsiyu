@@ -50,7 +50,9 @@ public class ControllerLogAop {
                     String url = HttpUtil.getHttpServletRequest().getRequestURI().substring(HttpUtil.getHttpServletRequest().getContextPath().length());
                     Student student = (Student) object;
                     long time = System.currentTimeMillis() - startTime;
-                    log.info("学生[{} -> {} -> {}] 访问接口：[{} -> {}], 用时：[{}], param=[{}]", student.getId(), student.getAccount(), student.getStudentName(), annotation.name(), url, time < 1000 ? (time + " ms") : ((time / 1000) + " s"), BaseController.getParams(HttpUtil.getHttpServletRequest()));
+                    log.info("学生[{} -> {} -> {}] 访问接口：[{} -> {}], 用时：[{}], param=[{}]",
+                            student.getId(), student.getAccount(), student.getStudentName(), annotation.name(),
+                            url, time + " ms", BaseController.getParams(HttpUtil.getHttpServletRequest()));
                 }
             }
         } catch (Exception e) {
