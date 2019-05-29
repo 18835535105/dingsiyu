@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.controller;
 
+import com.zhidejiaoyu.common.annotation.ControllerLogAnnotation;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.StudyFlowService;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.naming.Name;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -48,6 +50,7 @@ public class StudyFlowController {
      *          modelName 节点模块名
      */
     @RequestMapping("/getNode")
+    @ControllerLogAnnotation(name = "获取节点信息")
     public ServerResponse<Object> getNode(Long courseId, Long unitId, Long nodeId, Long grade, @RequestParam(required = false) String isTrueFlow, HttpSession session) {
         return StudyFlowServic.getNode(courseId, unitId, nodeId, grade, isTrueFlow, session);
     }
