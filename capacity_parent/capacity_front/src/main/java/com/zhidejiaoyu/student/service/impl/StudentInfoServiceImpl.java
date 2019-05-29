@@ -75,6 +75,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     @Autowired
     private GoldAwardAsync goldAwardAsync;
 
+    @Autowired
+    private ExecutorService executorService;
+
     @Override
     @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
@@ -324,6 +327,12 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         }
         session.removeAttribute(TimeConstant.BEGIN_VALID_TIME);
 
+        executorService.execute(() -> this.saveAward(session, classify, student));
+
+        return ServerResponse.createBySuccessMessage(tip);
+    }
+
+    private void saveAward(HttpSession session, Integer classify, Student student) {
         // 辉煌荣耀勋章：今天学习效率>目标学习效率 currentPlan ++；否则不操作，每天第一次登录的时候查看昨天是否有更新辉煌荣耀勋章，如果没更新，将其 currentPlan 置为0
         medalAwardAsync.honour(student, super.getTodayValidTime(student.getId()), super.getTodayOnlineTime(session));
 
@@ -332,7 +341,6 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
         // 熟词句相关勋章
         medalAwardAsync.tryHand(student, this.getModel(classify));
-        return ServerResponse.createBySuccessMessage(tip);
     }
 
     private int getModel(Integer classify) {
