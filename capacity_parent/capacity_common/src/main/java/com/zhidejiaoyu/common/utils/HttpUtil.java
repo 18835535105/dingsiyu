@@ -5,6 +5,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Arrays;
+import java.util.Map;
 
 /**
  * @author wuchenxi
@@ -18,5 +20,22 @@ public class HttpUtil {
 
     public static HttpSession getHttpSession() {
         return HttpUtil.getHttpServletRequest().getSession();
+    }
+
+    /**
+     * 获取请求参数
+     *
+     * @return
+     */
+    public static String getParams() {
+        Map<String, String[]> parameterMap = getHttpServletRequest().getParameterMap();
+        StringBuilder sb = new StringBuilder();
+        if (parameterMap != null && parameterMap.size() > 0) {
+            parameterMap.forEach((key, value) -> sb.append(key).append(":").append(Arrays.toString(value)).append(";"));
+        }
+        return sb.toString();
+    }
+
+    private HttpUtil() {
     }
 }

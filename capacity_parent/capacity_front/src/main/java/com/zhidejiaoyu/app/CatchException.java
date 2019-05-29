@@ -3,6 +3,7 @@ package com.zhidejiaoyu.app;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
@@ -38,7 +39,7 @@ public class CatchException extends BaseServiceImpl<StudentMapper, Student> {
     @ResponseBody
     public ServerResponse unknownException(RuntimeException e, HttpServletRequest request) {
         HttpSession session = request.getSession();
-        String param = super.getParameters();
+        String param = HttpUtil.getParams();
         Object studentObject = session.getAttribute(UserConstant.CURRENT_STUDENT);
         String url = request.getRequestURI().substring(request.getContextPath().length());
         if (studentObject != null) {

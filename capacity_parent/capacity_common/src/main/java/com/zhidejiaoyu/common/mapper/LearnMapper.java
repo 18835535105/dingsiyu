@@ -716,11 +716,11 @@ public interface LearnMapper extends BaseMapper<Learn> {
     /**
      * 随机获取学生当前学习的课程下的110个单词
      *
-     * @param stuId
+     * @param courseId
      * @param wordIds   需要过滤掉的单词id
      * @return
      */
-    List<Map<String, String>> selectWordInCurrentCourse(@Param("stuId") Long stuId, @Param("wordIds") List<Long> wordIds);
+    List<Map<String, String>> selectWordInCurrentCourse(@Param("courseId") Long courseId, @Param("wordIds") List<Long> wordIds);
 
     /**
      * 获取学生上次登录期间单词的学习信息

@@ -2,11 +2,9 @@ package com.zhidejiaoyu.student.controller;
 
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.aop.log.ControllerLogAnnotation;
+import com.zhidejiaoyu.common.annotation.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.service.WordWriteService;
-import com.zhidejiaoyu.student.vo.WordWriteStudyVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

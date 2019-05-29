@@ -53,13 +53,6 @@ public interface BaseService<T> extends IService<T> {
     void getLevel(HttpSession session);
 
     /**
-     * 获取数据请求参数字符串
-     *
-     * @return
-     */
-    String getParameters();
-
-    /**
      * 获取学生当前正在学习的流程信息
      *
      * @param studentId

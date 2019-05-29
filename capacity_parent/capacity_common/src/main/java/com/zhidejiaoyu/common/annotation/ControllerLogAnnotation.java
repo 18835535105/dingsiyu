@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.aop.log;
+package com.zhidejiaoyu.common.annotation;
 
 import java.lang.annotation.*;
 

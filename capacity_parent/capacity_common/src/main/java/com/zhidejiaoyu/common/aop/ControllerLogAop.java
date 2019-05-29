@@ -1,9 +1,9 @@
-package com.zhidejiaoyu.student.aop.log;
+package com.zhidejiaoyu.common.aop;
 
+import com.zhidejiaoyu.common.annotation.ControllerLogAnnotation;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.HttpUtil;
-import com.zhidejiaoyu.student.controller.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -26,7 +26,7 @@ import java.lang.reflect.Method;
 @Component
 public class ControllerLogAop {
 
-    @Pointcut(value = "@annotation(com.zhidejiaoyu.student.aop.log.ControllerLogAnnotation)")
+    @Pointcut(value = "@annotation(com.zhidejiaoyu.common.annotation.ControllerLogAnnotation)")
     public void cut() {
     }
 
@@ -50,7 +50,9 @@ public class ControllerLogAop {
                     String url = HttpUtil.getHttpServletRequest().getRequestURI().substring(HttpUtil.getHttpServletRequest().getContextPath().length());
                     Student student = (Student) object;
                     long time = System.currentTimeMillis() - startTime;
-                    log.info("学生[{} -> {} -> {}] 访问接口：[{} -> {}], 用时：[{}], param=[{}]", student.getId(), student.getAccount(), student.getStudentName(), annotation.name(), url, time < 1000 ? (time + " ms") : ((time / 1000) + " s"), BaseController.getParams(HttpUtil.getHttpServletRequest()));
+                    log.info("学生[{} -> {} -> {}] 访问接口：[{} -> {}], 用时：[{}], param=[{}]", student.getId(),
+                            student.getAccount(), student.getStudentName(), annotation.name(), url,
+                            time < 1000 ? (time + " ms") : ((time / 1000) + " s"), HttpUtil.getParams());
                 }
             }
         } catch (Exception e) {
