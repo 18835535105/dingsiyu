@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.mapper.MedalMapper;
 import com.zhidejiaoyu.common.pojo.Award;
 import com.zhidejiaoyu.common.pojo.AwardContentType;
 import com.zhidejiaoyu.common.pojo.Medal;
+import com.zhidejiaoyu.common.pojo.Student;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -150,5 +151,16 @@ class BaseAwardAsync{
         } catch (Exception e) {
             log.error("保存奖励进度失败：award=[{}]", award.toString(), e);
         }
+    }
+
+    /**
+     * 拼接错误日志信息
+     *
+     * @param student
+     * @param msg
+     * @return
+     */
+    String logErrorMsg(Student student, String msg) {
+        return "学生[" + student.getId() + " - " + student.getAccount() + " - " + student.getStudentName() + "] " + msg;
     }
 }

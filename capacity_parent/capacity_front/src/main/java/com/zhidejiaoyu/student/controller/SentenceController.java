@@ -123,6 +123,7 @@ public class SentenceController {
      */
     @ResponseBody
     @GetMapping("/getLearnCourseAndUnit")
+    @ControllerLogAnnotation(name = "获取句型首页数据")
     public ServerResponse<Object> getLearnCourseAndUnit(HttpSession session) {
         return sentenceService.getLearnCourseAndUnit(session);
     }

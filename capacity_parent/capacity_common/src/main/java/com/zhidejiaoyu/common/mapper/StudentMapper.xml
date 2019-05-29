@@ -702,5 +702,11 @@
         ) count
         from student stu where stu.id =#{studentId}
     </select>
+    <select id="countHasLoginLogStudentsBySchoolAdminId" resultType="java.lang.Integer">
+        select count(s.id)
+        from student s
+        where s.account_time is not null
+          and s.teacher_id in (select teacher_id from teacher where school_admin_id = #{schoolAdminId})
+    </select>
 
 </mapper>

@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
+import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -579,6 +580,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Override
     @TestChangeAnnotation(isUnitTest = false)
+    @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> addData(TestRecord testRecord, HttpSession session) {
         //学生对象

@@ -1062,6 +1062,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
                 // 如果昨天辉煌荣耀奖励没有更新，将指定的奖励当前进度置为0
                 medalAwardAsync.updateHonour(stu);
+
+                // 将天道酬勤中未达到领取条件的勋章重置
+                medalAwardAsync.resetLevel(stu);
             });
         }
     }

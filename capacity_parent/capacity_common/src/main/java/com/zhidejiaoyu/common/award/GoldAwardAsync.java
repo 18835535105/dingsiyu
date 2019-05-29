@@ -45,7 +45,7 @@ public class GoldAwardAsync extends BaseAwardAsync{
                 optAward(studentId, awardContentType, 1, award, GOLD_TYPE);
             }
         } catch (Exception e) {
-            log.error("保存金币奖励信息失败！", e);
+            log.error(super.logErrorMsg(student, "保存金币奖励信息失败"), e);
         }
     }
 
@@ -79,7 +79,7 @@ public class GoldAwardAsync extends BaseAwardAsync{
                 }
             }
         } catch (NumberFormatException e) {
-            log.error("保存金币奖励信息失败！", e);
+            log.error(super.logErrorMsg(student, "保存金币奖励信息失败"), e);
         }
     }
 
@@ -108,7 +108,7 @@ public class GoldAwardAsync extends BaseAwardAsync{
                 }
             }
         } catch (Exception e) {
-            log.error("保存金币奖励信息失败！", e);
+            log.error(super.logErrorMsg(student, "保存金币奖励信息失败"), e);
         }
     }
 }
