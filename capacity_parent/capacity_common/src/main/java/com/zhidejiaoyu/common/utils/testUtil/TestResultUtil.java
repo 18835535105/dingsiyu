@@ -383,6 +383,11 @@ public class TestResultUtil implements Serializable {
         return null;
     }
 
+
+
+
+
+
     private void getSentenceWriteVo(List<Sentence> sentences, List<SentenceTranslateVo> vos, Integer type) {
         SentenceTranslateVo sentenceTranslateVo;
         for (Sentence sentence : sentences) {

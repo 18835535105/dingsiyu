@@ -421,7 +421,7 @@
     <select id="selectSentenceCapacitys" resultType="com.zhidejiaoyu.common.pojo.CapacityReview" parameterType="map">
         SELECT * from
         <include refid="classify_sql"/>
-        where student_id = #{studentId}  and push &lt;= now()
+        where student_id = #{studentId}  and push &lt;= now() limit 1
     </select>
 
 
@@ -516,7 +516,7 @@
 
     <select id="selectLastLoginNeedReview" resultType="java.util.Map" parameterType="map">
         select
-        memory_strength memoryStrength, fault_time, vocabulary_id id, unit_id, word, word_chinese wordChinese, syllable wordyj
+        memory_strength memoryStrength, fault_time, vocabulary_id id, unit_id, word, word_chinese wordChinese, syllable wordyj ,course_id courseId
         from
         <include refid="classify_sql"/>
         where student_id = #{studentId} and unit_id in (
@@ -576,4 +576,11 @@
         <include refid="classify_sql"/>
         where student_id = #{studentId} and course_id = #{course} and push &lt; #{now} and memory_strength &lt; 1
     </select>
+
+    <select id="selSentenceCountCapacitys" resultType="integer" parameterType="map">
+        SELECT count(id) from
+        <include refid="classify_sql"/>
+        where student_id = #{studentId}  and push &lt;= now()
+    </select>
+
 </mapper>

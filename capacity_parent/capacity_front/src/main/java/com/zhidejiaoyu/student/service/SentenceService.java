@@ -1,8 +1,7 @@
 package com.zhidejiaoyu.student.service;
 
 import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
-import com.zhidejiaoyu.common.pojo.Learn;
-import com.zhidejiaoyu.common.pojo.Sentence;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.student.vo.SentenceWordInfoVo;
@@ -80,4 +79,7 @@ public interface SentenceService extends BaseService<Sentence> {
     ServerResponse<Object> getSentenceLaterLearnTime(HttpSession session);
 
     ServerResponse<Object> getModuleRelearning(HttpSession session, String studyModel, Integer unitId);
+
+    ServerResponse<SentenceTranslateVo> returnGoldWord(SentenceTranslate sentenceTranslate, Long plan, boolean firstStudy,
+                                                       Long sentenceCount, SentenceListen sentenceListen, SentenceWrite sentenceWrite, Integer type);
 }

@@ -28,6 +28,7 @@ import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.common.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.ReviewService;
+import com.zhidejiaoyu.student.service.SentenceService;
 import com.zhidejiaoyu.student.utils.CcieUtil;
 import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
 import com.zhidejiaoyu.student.utils.PetSayUtil;
@@ -90,6 +91,9 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     private BaiduSpeak baiduSpeak;
 
     @Autowired
+    private SentenceService sentenceService;
+
+    @Autowired
     private SaveTestLearnAndCapacity saveTestLearnAndCapacity;
 
     @Autowired
@@ -97,6 +101,9 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     @Autowired
     private TestRecordInfoMapper testRecordInfoMapper;
 
+
+    @Autowired
+    private SentenceListenMapper sentenceListenMapper;
     /**
      * 记忆难度
      */
@@ -132,6 +139,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
     @Autowired
     private TestGoldUtil testGoldUtil;
+
+    @Autowired
+    private SentenceTranslateMapper sentenceTranslateMapper;
+
 
     @Override
     public Map<String, Integer> testReview(String unit_id, String studentId) {
@@ -1390,6 +1401,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             Map<String, Object> map = new HashMap<>(16);
             map.put("unitId", learn.getUnitId());
             map.put("wordId", learn.getVocabularyId());
+            map.put("courseId",learn.getCourseId());
             maps.add(map);
         });
         return maps;
@@ -1422,18 +1434,23 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     @Override
     public ServerResponse getAllSentenceReview(HttpSession session, Integer classify){
         Student student = getStudent(session);
-        List<CapacityReview> reviews = capacityMapper.selectSentenceCapacitys(student.getId(), classify);
-        List<SentenceTranslateVo> vos = new ArrayList<>(reviews.size());
-        if (reviews.size() > 0) {
-            List<Long> sentenceIds = new ArrayList<>(reviews.size());
-            reviews.forEach(review -> sentenceIds.add(review.getVocabulary_id()));
-            List<Sentence> sentences = sentenceMapper.selectByIds(sentenceIds);
-            vos = testResultUtil.getSentenceTestResults(sentences, classify, 1);
-        }
-        if (vos.size() == 0) {
+        CapacityReview reviews = capacityMapper.selectSentenceCapacitys(student.getId(), classify);
+        //获取总复习数量
+        Integer count = capacityMapper.selSentenceCountCapacitys(student.getId(), classify);
+        if (reviews == null) {
             return ServerResponse.createByErrorMessage("暂无需要复习的内容！");
+        }else{
+            // 转换类型
+            String classifyString = commonMethod.getTestType(classify);
+            if("例句翻译".equals(classifyString)){
+                SentenceTranslate sentenceTranslate = sentenceTranslateMapper.selectByPrimaryKey(reviews.getId());
+                return sentenceService.returnGoldWord(sentenceTranslate, 1L, false, count.longValue(), null, null, 1);
+            }else if("例句听力".equals(classifyString)){
+                SentenceListen sentenceListen = sentenceListenMapper.selectByPrimaryKey(reviews.getId());
+                return sentenceService.returnGoldWord(null, 1L, false, count.longValue(), sentenceListen, null, 1);
+            }
         }
-        return ServerResponse.createBySuccess(vos);
+        return ServerResponse.createBySuccess();
     }
 
     private ServerResponse<Map<String, Object>> packageWordReviewResult(Integer classify, Student student, List<Learn> learns) {

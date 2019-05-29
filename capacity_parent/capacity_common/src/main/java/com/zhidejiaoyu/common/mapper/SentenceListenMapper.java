@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
-public interface SentenceListenMapper {
+public interface SentenceListenMapper  {
     int countByExample(SentenceListenExample example);
 
     int deleteByExample(SentenceListenExample example);

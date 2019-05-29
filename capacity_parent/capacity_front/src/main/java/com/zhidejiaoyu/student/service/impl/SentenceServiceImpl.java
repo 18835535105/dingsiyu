@@ -946,7 +946,8 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
      * @param type
      * @return 例句翻译学习页面展示信息
      */
-    private ServerResponse<SentenceTranslateVo> returnGoldWord(SentenceTranslate sentenceTranslate, Long plan, boolean firstStudy,
+    @Override
+    public ServerResponse<SentenceTranslateVo> returnGoldWord(SentenceTranslate sentenceTranslate, Long plan, boolean firstStudy,
                                                                Long sentenceCount, SentenceListen sentenceListen, SentenceWrite sentenceWrite, Integer type) {
         SentenceTranslateVo sentenceTranslateVo;
         // 例句翻译
@@ -957,13 +958,18 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             sentenceTranslateVo = getSentenceTranslateVo(plan, firstStudy, sentenceCount, type, sentence);
             sentenceTranslateVo.setStudyNew(false);
             sentenceTranslateVo.setMemoryStrength(memoryStrength);
-
+            sentenceTranslateVo.setCourseId(sentenceTranslate.getCourseId().intValue());
+            sentenceTranslateVo.setUnitId(sentenceTranslate.getUnitId().intValue());
         } else if (sentenceListen != null && StringUtils.isNotBlank(sentenceListen.getWord())) {
             // 例句听力
             // 计算当前例句的记忆强度
             Sentence sentence = sentenceMapper.selectByPrimaryKey(sentenceListen.getVocabularyId());
             double memoryStrength = sentenceListen.getMemoryStrength();
             sentenceTranslateVo = this.getSentenceVo(sentence, firstStudy, plan, memoryStrength, sentenceCount, type);
+            sentenceTranslateVo.setOrder(sentenceTranslateVo.getOrderEnglish());
+            sentenceTranslateVo.setRateList(sentenceTranslateVo.getEnglishList());
+            sentenceTranslateVo.setCourseId(sentenceListen.getCourseId().intValue());
+            sentenceTranslateVo.setUnitId(sentenceListen.getUnitId().intValue());
         } else {
             // 例句默写
             // 计算当前例句的记忆强度
@@ -979,6 +985,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
         sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*", " ").replace("$", ""));
         sentenceTranslateVo.setFirstStudy(firstStudy);
+        sentenceTranslateVo.setSentence(sentence.getCentreExample().replace("#", " ").replace("*", " ").replace("$", ""));
         sentenceTranslateVo.setId(sentence.getId());
         sentenceTranslateVo.setPlan(plan);
         sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePath(sentence.getCentreExample()));
@@ -1014,6 +1021,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         sentenceTranslateVo.setMemoryStrength(memoryStrength);
         sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePath(sentence.getCentreExample()));
         sentenceTranslateVo.setSentenceCount(sentenceCount);
+        sentenceTranslateVo.setSentence(sentence.getCentreExample().replace("#", " ").replace("*", " ").replace("$", ""));
         sentenceTranslateVo.setStudyNew(false);
         sentenceTranslateVo.setEnglishList(commonMethod.getEnglishList(sentence.getCentreExample()));
         if (type == 2) {

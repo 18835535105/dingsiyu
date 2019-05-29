@@ -26,6 +26,21 @@ public class SentenceTranslateVo {
     private String english;
 
     /**
+     * 例句英语原文
+     */
+    private String sentence;
+
+    /**
+     * 课程id
+     */
+    private Integer courseId;
+
+    /**
+     * 单元id
+     */
+    private Integer unitId;
+
+    /**
      * 例句中文
      */
     private String chinese;
