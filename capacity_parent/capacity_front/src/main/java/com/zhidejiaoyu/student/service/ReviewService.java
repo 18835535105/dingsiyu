@@ -144,4 +144,8 @@ public interface ReviewService extends BaseService<CapacityMemory> {
      * @return
      */
     ServerResponse<Map<String, Object>> getWordReview(HttpSession session, Integer classify);
+
+    ServerResponse<Map<String, Object>> getAllCapacityReview(HttpSession session, Integer classify);
+
+    ServerResponse getAllSentenceReview(HttpSession session, Integer classify);
 }

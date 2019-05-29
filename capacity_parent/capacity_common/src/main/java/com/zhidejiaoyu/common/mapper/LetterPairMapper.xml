@@ -13,6 +13,10 @@
         <result column="unit_id" property="unitId"/>
     </resultMap>
 
+    <sql id="base_sql">
+        id,letter_id,student_id,push,state,memory_strength,unit_id
+    </sql>
+
     <select id="selCountByUnitAndStudent" parameterType="map" resultType="integer">
         select count(id) from letter_pair where unit_id =#{unitId} and student_id=#{studentId}
     </select>
@@ -21,6 +25,13 @@
     </select>
     <select id="selCountStudyLetter" parameterType="map" resultType="integer">
         select count(id) from letter_pair where unit_id=#{unitId} and student_id=#{studentId}
+    </select>
+    <select id="selByLetterIdAndStudent" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include> from letter_pair where letter_id=#{letterId} and student_id=#{studentId}
+    </select>
+    <select id="selPushLetter" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include> from letter_pair
+        where push &lt; now() and student_id=#{studentId} and unit_id=#{unitId}
     </select>
 
 </mapper>

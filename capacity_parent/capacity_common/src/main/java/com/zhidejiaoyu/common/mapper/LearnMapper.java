@@ -880,4 +880,6 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @return
      */
     int countTodayRestudyAndMemoryStrengthGePercentFifty(@Param("student") Student student);
+
+    List<Learn> selectAllCapacityReview(@Param("studentId") Long id,@Param("classify") Integer classify);
 }

@@ -50,7 +50,7 @@ public class LetterPair extends Model<LetterPair> {
     /**
      * 记忆强度
      */
-    private Integer memoryStrength;
+    private Double memoryStrength;
 
     private Integer unitId;
 

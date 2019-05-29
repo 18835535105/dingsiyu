@@ -242,9 +242,16 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             learnMapper.updLetterPair(studentId, unitId, "字母配对");
         }
         Map<String, Object> map = new HashMap<>();
-        //查看当前单元已经学过的单词
-        List<Long> longs = letterPairMapper.selAllStudyLetter(unitId, studentId);
-        Letter studyLetter = letterMapper.getStudyLetter(unitId, longs);
+        //查看黄金记忆点单词
+        LetterPair letterPair = letterPairMapper.selPushLetter(unitId, studentId);
+        Letter studyLetter=null;
+        if(letterPair==null){
+            //查看当前单元已经学过的单词
+            List<Long> longs = letterPairMapper.selAllStudyLetter(unitId, studentId);
+            studyLetter = letterMapper.getStudyLetter(unitId, longs);
+        }else{
+            studyLetter=letterMapper.selectById(letterPair.getLetterId());
+        }
         //随机获取字母
         List<Letter> threeLetter = letterMapper.getThreeLetter(studyLetter.getId());
         Integer integer = letterPairMapper.selCountStudyLetter(unitId, studentId);
@@ -308,10 +315,61 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     }
 
     @Override
-    public Object saveLetterPair(LetterPair letterPair, HttpSession session, Long valid) {
+    public Object saveLetterWrite(Letter letter, HttpSession session, Boolean falg) {
         Long studentId = getStudentId(session);
         try {
+            LetterWrite letterWrite = letterWriteMapper.selByLetterIdAndStudent(letter.getId(), studentId);
+            if (letterWrite != null) {
+                // 重新计算记忆强度
+                Date push = GoldMemoryTime.getGoldMemoryTime(letterWrite.getMemoryStrength(), new Date());
+                letterWrite.setPush(push);
+                letterWrite.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(letterWrite.getMemoryStrength(), falg));
+                letterWriteMapper.updateById(letterWrite);
+            } else {
+                letterWrite = new LetterWrite();
+                letterWrite.setLetterId(letter.getId());
+                letterWrite.setUnitId(letter.getUnitId());
+                letterWrite.setStudentId(studentId.intValue());
+                letterWrite.setState(1);
+                if (!falg) {
+                    letterWrite.setMemoryStrength(0.12);
+                    Date push = GoldMemoryTime.getGoldMemoryTime(letterWrite.getMemoryStrength(), new Date());
+                    letterWrite.setPush(push);
+                }
+                letterWriteMapper.insert(letterWrite);
+                Date date = new Date();
+                Learn learn = new Learn();
+                learn.setStudentId(studentId);
+                learn.setStudyModel("字母听写");
+                learn.setStatus(1);
+                learn.setUnitId(letter.getUnitId().longValue());
+                learn.setLearnTime(date);
+                learn.setUpdateTime(date);
+                learn.setStudyCount(1);
+                learn.setType(4);
+                learnMapper.insert(learn);
+            }
+        } catch (Exception e) {
+            log.error("学生:" + studentId + " 保存字母听写出错", e.getMessage());
+            return ServerResponse.createBySuccess(400, "操作失败");
+        }
 
+        return ServerResponse.createBySuccess();
+    }
+
+
+    @Override
+    public Object saveLetterPair(LetterPair letterPair, HttpSession session,Boolean falg) {
+        Long studentId = getStudentId(session);
+        try {
+            LetterPair pair = letterPairMapper.selByLetterIdAndStudent(letterPair.getLetterId(), studentId);
+            if(pair!=null){
+                // 重新计算记忆强度
+                Date push = GoldMemoryTime.getGoldMemoryTime(pair.getMemoryStrength(), new Date());
+                pair.setPush(push);
+                pair.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(pair.getMemoryStrength(), falg));
+                letterPairMapper.updateById(pair);
+            }
             Learn learn = new Learn();
             learn.setStudentId(studentId);
             learn.setStudyCount(1);
@@ -322,6 +380,11 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             learn.setUnitId(letterPair.getUnitId().longValue());
             learn.setVocabularyId(letterPair.getLetterId().longValue());
             learnMapper.insert(learn);
+            if (!falg) {
+                letterPair.setMemoryStrength(0.12);
+                Date push = GoldMemoryTime.getGoldMemoryTime(letterPair.getMemoryStrength(), new Date());
+                letterPair.setPush(push);
+            }
             letterPair.setStudentId(studentId.intValue());
             letterPairMapper.insert(letterPair);
         } catch (Exception e) {
@@ -461,48 +524,6 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
 
     }
 
-    @Override
-    public Object saveLetterWrite(Letter letter, HttpSession session, Boolean falg) {
-        Long studentId = getStudentId(session);
-        try {
-            LetterWrite letterWrite = letterWriteMapper.selByLetterIdAndStudent(letter.getId(), studentId);
-            if (letterWrite != null) {
-                // 重新计算记忆强度
-                Date push = GoldMemoryTime.getGoldMemoryTime(letterWrite.getMemoryStrength(), new Date());
-                letterWrite.setPush(push);
-                letterWrite.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(letterWrite.getMemoryStrength(), falg));
-                letterWriteMapper.updateById(letterWrite);
-            } else {
-                letterWrite = new LetterWrite();
-                letterWrite.setLetterId(letter.getId());
-                letterWrite.setUnitId(letter.getUnitId());
-                letterWrite.setStudentId(studentId.intValue());
-                letterWrite.setState(1);
-                if (!falg) {
-                    letterWrite.setMemoryStrength(0.12);
-                    Date push = GoldMemoryTime.getGoldMemoryTime(letterWrite.getMemoryStrength(), new Date());
-                    letterWrite.setPush(push);
-                }
-                letterWriteMapper.insert(letterWrite);
-                Date date = new Date();
-                Learn learn = new Learn();
-                learn.setStudentId(studentId);
-                learn.setStudyModel("字母听写");
-                learn.setStatus(1);
-                learn.setUnitId(letter.getUnitId().longValue());
-                learn.setLearnTime(date);
-                learn.setUpdateTime(date);
-                learn.setStudyCount(1);
-                learn.setType(4);
-                learnMapper.insert(learn);
-            }
-        } catch (Exception e) {
-            log.error("学生:" + studentId + " 保存字母听写出错", e.getMessage());
-            return ServerResponse.createBySuccess(400, "操作失败");
-        }
-
-        return ServerResponse.createBySuccess();
-    }
 
     @Override
     public Object updLetter(HttpSession session, Long unitId) {

@@ -27,7 +27,7 @@ public interface LetterService extends IService<Letter> {
 
     Object getLetterPair(Long unitId, HttpSession session);
 
-    Object saveLetterPair(LetterPair letterPair, HttpSession session,Long vaild);
+    Object saveLetterPair(LetterPair letterPair, HttpSession session,Boolean falg);
 
     Object getLetterTreasure(String major, String subordinate);
 

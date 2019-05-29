@@ -28,4 +28,6 @@ public interface LetterMapper extends BaseMapper<Letter> {
     List<Letter> getThreeLetter(@Param("letterId") Integer letterId);
 
     Letter selPushLetterByUnitIdAndStudent(@Param("unitId") Long unitId,@Param("studentId") Long studentId);
+
+    List<Letter> getAllLetter();
 }

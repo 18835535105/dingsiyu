@@ -61,4 +61,8 @@
         limit 1
     </select>
 
+    <select id="getAllLetter" resultMap="BaseResultMap" parameterType="map">
+        select <include refid="base_sql"></include> from letter
+    </select>
+
 </mapper>
