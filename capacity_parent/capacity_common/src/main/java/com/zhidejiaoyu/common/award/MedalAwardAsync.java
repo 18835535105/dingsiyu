@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.award;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.zhidejiaoyu.common.constant.MedalConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -79,7 +80,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
                 }
             }
         } catch (Exception e) {
-            log.error("保存勋章奖励信息失败！", e);
+            log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
         }
     }
 
@@ -126,7 +127,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
                     }
                 }
             } catch (Exception e) {
-                log.error("实时计算辉煌荣耀勋章出错，studentId=[{}], studentName=[{}], error=[{}]", student.getId(), student.getStudentName(), e);
+                log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
             }
         }
     }
@@ -160,7 +161,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
                     awardMapper.updateById(award);
                 }
             } catch (Exception e) {
-                log.error("首次登陆更新辉煌荣耀勋章奖励信息失败！studentId={}, studentName={}", student.getId(), student.getStudentName(), e);
+                log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
             }
         }
     }
@@ -186,8 +187,8 @@ public class MedalAwardAsync extends BaseAwardAsync {
             int schoolDayRank;
             int countryDayRank;
             if (rankList == null) {
-                schoolDayRank = 0;
-                countryDayRank = 0;
+                schoolDayRank = studentMapper.countHasLoginLogStudentsBySchoolAdminId(schoolAdminId);
+                countryDayRank = studentMapper.selectCount(new EntityWrapper<Student>().isNotNull("account_time"));
             } else {
                 schoolDayRank = rankList.getSchoolDayRank() == null ? 0 : rankList.getSchoolDayRank();
                 countryDayRank = rankList.getCountryDayRank() == null ? 0 : rankList.getCountryDayRank();
@@ -217,17 +218,17 @@ public class MedalAwardAsync extends BaseAwardAsync {
                     if (i < 3) {
                         if (super.checkAward(award, MEDAL_TYPE)) {
                             change = (int) (schoolDayRank - schoolRank);
-                            super.optAward(studentId, medalId, change >= 0 ? change : 0, award, MEDAL_TYPE);
+                            super.optAward(studentId, medalId, change >= 0 ? change : award.getCurrentPlan(), award, MEDAL_TYPE);
                         }
                     } else {
                         if (super.checkAward(award, MEDAL_TYPE)) {
                             change = (int) (countryDayRank - countryRank);
-                            super.optAward(studentId, medalId, change >= 0 ? change : 0, award, MEDAL_TYPE);
+                            super.optAward(studentId, medalId, change >= 0 ? change : award.getCurrentPlan(), award, MEDAL_TYPE);
                         }
                     }
                 }
             } catch (NumberFormatException e) {
-                log.error("保存“天道酬勤”失败！", e);
+                log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
             }
         }
     }
@@ -279,7 +280,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
                 }
             }
         } catch (Exception e) {
-            log.error("保存勋章奖励信息失败！", e);
+            log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
         }
     }
 
@@ -307,7 +308,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
                 packagePlan(studentId, children, totalTestField);
             }
         } catch (Exception e) {
-            log.error("保存勋章奖励信息失败！", e);
+            log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
         }
     }
 
@@ -336,7 +337,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
                 packagePlan(studentId, children, totalMonth);
             }
         } catch (Exception e) {
-            log.error("保存勋章奖励信息失败！", e);
+            log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
         }
     }
 
@@ -423,7 +424,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
                     packagePlan(studentId, children, count);
                 }
             } catch (Exception e) {
-                log.error("保存勋章奖励信息失败！", e);
+                log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
             }
         }
     }
@@ -449,7 +450,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
                 }
             }
         } catch (Exception e) {
-            log.error("保存勋章奖励信息失败！", e);
+            log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
         }
     }
 
@@ -473,7 +474,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
                 }
             }
         } catch (Exception e) {
-            log.error("保存勋章奖励信息失败！", e);
+            log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
         }
     }
 
@@ -498,7 +499,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
                 packagePlan(studentId, children, byWorshipCount);
             }
         } catch (Exception e) {
-            log.error("保存勋章奖励信息失败！", e);
+            log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
         }
     }
 
@@ -509,6 +510,28 @@ public class MedalAwardAsync extends BaseAwardAsync {
             if (super.checkAward(award, MEDAL_TYPE)) {
                 super.optAward(studentId, child.getId(), currentPlan, award, MEDAL_TYPE);
             }
+        }
+    }
+
+    /**
+     * 重置天道酬勤勋章中未达到领取条件的勋章
+     *
+     * @param student
+     */
+    public void resetLevel(Student student) {
+        Long studentId = student.getId();
+        List<Medal> children = medalMapper.selectChildrenIdByParentId(17);
+        Award award;
+        try {
+            for (Medal medal : children) {
+                award = awardMapper.selectByStudentIdAndMedalType(studentId, medal.getId());
+                if (!Objects.equals(award.getCurrentPlan(), award.getTotalPlan())) {
+                    award.setCurrentPlan(0);
+                    awardMapper.updateById(award);
+                }
+            }
+        } catch (Exception e) {
+            log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
         }
     }
 }

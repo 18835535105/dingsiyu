@@ -239,4 +239,12 @@ public interface StudentMapper extends BaseMapper<Student> {
     Integer getVocabularyCountByStudent(@Param("studentId") Long studentId);
 
     Integer getSentenceCountByStudent(@Param("studentId") Long studentId);
+
+    /**
+     * 查询校管下已登陆过系统的所有学生个数
+     *
+     * @param schoolAdminId
+     * @return
+     */
+    int countHasLoginLogStudentsBySchoolAdminId(@Param("schoolAdminId") Integer schoolAdminId);
 }

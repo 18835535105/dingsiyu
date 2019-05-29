@@ -67,7 +67,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
                 optAward(studentId, awardContentType, openCount, award, DAILY_TYPE);
             }
         } catch (Exception e) {
-            log.error("保存日奖励信息出错！", e);
+            log.error(super.logErrorMsg(student, "保存日奖励信息出错"), e);
         }
     }
 
@@ -98,7 +98,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
                 this.optAward(studentId, awardContentType2, completeCount, award, DAILY_TYPE);
             }
         } catch (Exception e) {
-            log.error("保存日奖励信息出错！", e);
+            log.error(super.logErrorMsg(student, "保存日奖励信息出错"), e);
         }
     }
 
@@ -115,7 +115,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
                 this.optAward(studentId, awardContentType, count, award, DAILY_TYPE);
             }
         } catch (Exception e) {
-            log.error("保存日奖励信息出错！", e);
+            log.error(super.logErrorMsg(student, "保存日奖励信息出错"), e);
         }
     }
 
@@ -133,7 +133,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
             }
             this.initDailyAward(student);
         } catch (Exception e) {
-            log.error("保存日奖励信息出错！", e);
+            log.error(super.logErrorMsg(student, "保存日奖励信息出错"), e);
         }
     }
 
@@ -150,10 +150,10 @@ public class DailyAwardAsync extends BaseAwardAsync {
         try {
             if (this.checkAward(award, DAILY_TYPE)) {
                 // 查询学生昨天的学校排名
-                RankList rankList = rankListMapper.selectByStudentId(studentId);
+                 RankList rankList = rankListMapper.selectByStudentId(studentId);
                 int rank;
                 if (rankList == null || rankList.getSchoolDayRank() == null) {
-                    rank = 0;
+                    rank = studentMapper.countHasLoginLogStudentsBySchoolAdminId(this.getSchoolAdminId(student));
                 } else {
                     rank = rankList.getSchoolDayRank();
                 }
@@ -169,8 +169,19 @@ public class DailyAwardAsync extends BaseAwardAsync {
                 this.optAward(studentId, awardContentType, up, award, DAILY_TYPE);
             }
         } catch (Exception e) {
-            log.error("保存日奖励信息出错！", e);
+            log.error(super.logErrorMsg(student, "保存日奖励信息出错"), e);
         }
+    }
+
+    private Integer getSchoolAdminId(Student student) {
+        if (student.getTeacherId() == null) {
+            return null;
+        }
+        Integer schoolAdminId = teacherMapper.getSchoolAdminById(Integer.valueOf(student.getTeacherId().toString()));
+        if (schoolAdminId == null) {
+            return Integer.valueOf(student.getTeacherId().toString());
+        }
+        return schoolAdminId;
     }
 
     public void initAward(Student student) {
@@ -218,7 +229,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
         try {
             awardMapper.insertList(awards);
         } catch (Exception e) {
-            log.error("初始化学生勋章信息失败, student=[{}]", student.toString(), e);
+            log.error(super.logErrorMsg(student, "初始化学生勋章信息失败"), e);
         }
     }
 
@@ -268,9 +279,9 @@ public class DailyAwardAsync extends BaseAwardAsync {
                 awardMapper.insertList(awards);
             } catch (Exception e) {
                 if (type == DAILY_TYPE) {
-                    log.error("初始化日奖励失败：student=[{}]", student.toString(), e);
+                    log.error(super.logErrorMsg(student, "初始化日奖励失败"), e);
                 } else {
-                    log.error("初始化金币奖励失败：student=[{}]", student.toString(), e);
+                    log.error(super.logErrorMsg(student, "初始化金币奖励失败"), e);
                 }
 
             }
