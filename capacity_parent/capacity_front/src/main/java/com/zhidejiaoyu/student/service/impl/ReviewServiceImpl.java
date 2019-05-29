@@ -1422,7 +1422,18 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     @Override
     public ServerResponse getAllSentenceReview(HttpSession session, Integer classify){
         Student student = getStudent(session);
-        return null;
+        List<CapacityReview> reviews = capacityMapper.selectSentenceCapacitys(student.getId(), classify);
+        List<SentenceTranslateVo> vos = new ArrayList<>(reviews.size());
+        if (reviews.size() > 0) {
+            List<Long> sentenceIds = new ArrayList<>(reviews.size());
+            reviews.forEach(review -> sentenceIds.add(review.getVocabulary_id()));
+            List<Sentence> sentences = sentenceMapper.selectByIds(sentenceIds);
+            vos = testResultUtil.getSentenceTestResults(sentences, classify, 1);
+        }
+        if (vos.size() == 0) {
+            return ServerResponse.createByErrorMessage("暂无需要复习的内容！");
+        }
+        return ServerResponse.createBySuccess(vos);
     }
 
     private ServerResponse<Map<String, Object>> packageWordReviewResult(Integer classify, Student student, List<Learn> learns) {

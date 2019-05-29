@@ -384,4 +384,6 @@ public interface CapacityReviewMapper {
 	 * @return
 	 */
     int countByPushByCourseId(@Param("studentId") Long studentId, @Param("now") String now, @Param("i") int i);
+
+    List<CapacityReview> selectSentenceCapacitys(@Param("studentId") Long studentId,@Param("classify") Integer classify);
 }

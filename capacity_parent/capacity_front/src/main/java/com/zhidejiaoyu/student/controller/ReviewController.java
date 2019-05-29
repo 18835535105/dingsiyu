@@ -275,7 +275,7 @@ public class ReviewController {
     @ResponseBody
     @GetMapping("/getAllSentenceReview")
     public ServerResponse getAllSentenceReview(Integer classify,HttpSession session){
-        if(classify == 0 || classify == 1 || classify == 2){
+        if(classify == 4 || classify == 5 || classify == 6){
             return reviewService.getAllSentenceReview(session, classify);
         }
         return ServerResponse.createBySuccess();

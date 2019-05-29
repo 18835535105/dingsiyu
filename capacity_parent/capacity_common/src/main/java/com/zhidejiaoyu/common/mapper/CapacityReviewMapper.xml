@@ -418,6 +418,13 @@
         <include refid="classify_sql"/>
         where student_id = #{studentId} and unit_id = #{unitId} and push &lt;= now()
     </select>
+    <select id="selectSentenceCapacitys" resultType="com.zhidejiaoyu.common.pojo.CapacityReview" parameterType="map">
+        SELECT * from
+        <include refid="classify_sql"/>
+        where student_id = #{studentId}  and push &lt;= now()
+    </select>
+
+
     <select id="selectPictureNeedReviewInCurrentCourse" resultType="java.util.Map" parameterType="map">
         select cp.vocabulary_id id, cp.word
         from capacity_picture cp,

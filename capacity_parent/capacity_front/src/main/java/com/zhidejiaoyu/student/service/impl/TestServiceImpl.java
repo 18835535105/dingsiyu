@@ -395,6 +395,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecordMapper.insert(testRecord);
         TestResultVo vo = new TestResultVo();
         vo.setGold(goldCount);
+        vo.setPetUrl(student.getPartUrl());
         int energy = getEnergy(student, testRecord.getPoint());
         vo.setEnergy(energy);
         getMessage(student, vo, testRecord, point, 100);
@@ -1002,7 +1003,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }*/
         // 获取当前单元下的所有单词
         List<Vocabulary> vocabularies = redisOpt.getWordInfoInUnit(unitId);
-        learnMapper.updLetterPair(student.getId(), unitId, studyModel);
         String[] type;
         if ("慧记忆".equals(studyModel)) {
             type = new String[]{"英译汉", "汉译英"};
@@ -1353,6 +1353,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         studentMapper.updateByPrimaryKeySelective(student);
         getLevel(session);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
+        learnMapper.updLetterPair(student.getId(), wordUnitTestDTO.getUnitId()[0], commonMethod.getTestType(classify));
         return ServerResponse.createBySuccess(vo);
     }
 
