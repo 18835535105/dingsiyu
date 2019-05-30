@@ -18,7 +18,6 @@ import com.zhidejiaoyu.common.utils.locationUtil.LongitudeAndLatitude;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
-import com.zhidejiaoyu.student.common.personal.InitRedPointThread;
 import com.zhidejiaoyu.student.service.LoginService;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
@@ -93,9 +92,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private UnitSentenceMapper unitSentenceMapper;
 
     @Autowired
-    private InitRedPointThread initRedPointThread;
-
-    @Autowired
     private StudentFlowMapper studentFlowMapper;
 
     @Autowired
@@ -165,20 +161,15 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      */
     @Override
     public ServerResponse<Object> index(HttpSession session) {
-
+        Student student = super.getStudent(session);
         // 学生id
-        Long student_id = StudentIdBySession(session);
+        Long studentId = student.getId();
 
         // 封装返回数据
         Map<String, Object> result = new HashMap<>(16);
 
-        // 判断个人中心是否显示红点
-        initRedPointThread.redPoint(getStudent(session), result);
-
-        Student stu = studentMapper.indexData(student_id);
-
         // 判断学生是否有智能版课程
-        int count = studentStudyPlanMapper.countByStudentIdAndType(student_id, 1);
+        int count = studentStudyPlanMapper.countByStudentIdAndType(studentId, 1);
         if (count == 0) {
             result.put("hasCapacity", false);
         } else {
@@ -186,76 +177,84 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
 
         // 判断学生是否需要进行游戏测试
-        int gameCount = testRecordMapper.countGameCount(stu);
+        int gameCount = testRecordMapper.countGameCount(student);
         if (gameCount == 0) {
             // 第一次进行游戏测试
             result.put("game", true);
         }
 
-        // 业务员
-        if (stu.getRole() !=null && stu.getRole() == 2) {
-            result.put("role", "2");
-            // 学生
-        } else {
-            result.put("role", "1");
-        }
-
         // 获取学生当前正在学习的单元信息
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student_id, 1);
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
         if (capacityStudentUnit == null) {
-            logger.error("学生[{}]-[{}]没有智能版课程！", stu.getId(), stu.getStudentName());
+            logger.error("学生[{}]-[{}]没有智能版课程！", student.getId(), student.getStudentName());
             return ServerResponse.createBySuccess(result);
         }
 
         // 判断学生是否已经学完教师分配的所有计划，如果已学完所有计划，开始之旅按钮将被替换并且不能被点击
-        if (isLearnedAllPlan(student_id)) {
+        if (isLearnedAllPlan(studentId)) {
             result.put("learnedAllPlan", true);
         }
 
-        // 学生id
-        result.put("student_id", stu.getId());
-        // 当前单词所学课程id
-        result.put("course_id", capacityStudentUnit.getCourseId());
-        // 当前单词所学课程名
-        result.put("course_name", capacityStudentUnit.getCourseName());
-        // 当前单词所学单元id
-        result.put("unit_id", capacityStudentUnit.getUnitId());
-        // 根据单元id查询单元名 - 需要根据学生单元id实时去查询单元名
-        result.put("unit_name", capacityStudentUnit.getUnitName());
-        result.put("version", capacityStudentUnit.getVersion());
-        // 账号
-        result.put("account", stu.getAccount());
-        // 姓名
-        result.put("studentName", stu.getStudentName());
-        // 头像
-        result.put("headUrl", stu.getHeadUrl());
-        // 宠物
-        result.put("partUrl", stu.getPartUrl());
-        // 宠物名
-        result.put("petName", stu.getPetName());
-        result.put("schoolName", stu.getSchoolName());
+        // 封装学生当前学习的课程信息
+        this.packageUnitInfo(result, capacityStudentUnit);
 
-        this.getIndexTime(session, stu, result);
+        // 封装学生相关信息
+        this.packageStudentInfo(student, result);
 
-        // i参数 1=慧记忆，2=慧听写，3=慧默写，4=例句听力，5=例句翻译，6=例句默写
+        // 封装时长信息
+        this.getIndexTime(session, student, result);
+
         //-- 1.学生当前单词模块学的那个单元
         Integer unitId = null;
-        if (stu.getUnitId() != null) {
+        if (student.getUnitId() != null) {
             unitId = Integer.valueOf(capacityStudentUnit.getUnitId().toString());
         }
 
+        if (unitId == null) {
+            return ServerResponse.createBySuccess(result);
+        }
+
+        // 封装各个学习模块的学习状况信息
+        this.packageModelInfo(studentId, result, unitId);
+
+        // 封装无用字段
+        this.ignoreField(result);
+
+        // 获取学生需要执行的节点信息
+        this.getNode(session, result, student);
+
+        return ServerResponse.createBySuccess(result);
+    }
+
+    /**
+     * 封装无用字段，这些字段在项目中已没有具体含义，但防止前端因字段缺少报错，暂时保留这些字段
+     * 并将对应值写死
+     *
+     * @param result
+     */
+    private void ignoreField(Map<String, Object> result) {
+        result.put("amount1", 0);
+        result.put("amount2", 0);
+        result.put("amount3", 0);
+        result.put("amount0", 0);
+        result.put("hide", false);
+    }
+
+    /**
+     * 封装各个学习模块的学习状况信息
+     *
+     * @param studentId
+     * @param result
+     * @param unitId
+     */
+    private void packageModelInfo(Long studentId, Map<String, Object> result, Integer unitId) {
         // 单词图鉴模块, 单元下共有多少带图片的单词
         Long countWord = null;
+        Map<String, Object> map;
 
+        // i参数 1=慧记忆，2=慧听写，3=慧默写，4=例句听力，5=例句翻译，6=例句默写
         for (int i = 0; i < 4; i++) {
-            Map<String, Object> a = new HashMap<>(16);
-            //-- 如果 2 = NULL 就跳过4步执行5步   condition = 3(方框为空)
-            //-- 如果 2 != NULL 执行4步跳过第5步 , 如果第2步>=80 condition = 1(方框为√), 如果第3步<80 condition = 2(方框为×)
-
-            if (unitId == null) {
-                return ServerResponse.createBySuccess(result);
-            }
-
+            map = new HashMap<>(16);
             if(i == 0){
                 // 单词图鉴单元总单词数
                 countWord = unitVocabularyMapper.selectWordPicCountByUnitId(unitId);
@@ -265,20 +264,16 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             }
 
             //-- 2.某学生某单元某模块单元闯关测试得了多少分max
-            Integer point = testRecordMapper.selectPoint(student_id, unitId, "单元闯关测试", i);
+            Integer point = testRecordMapper.selectPoint(studentId, unitId, "单元闯关测试", i);
 
             //-- 3.某学生某单元某模块单词 学了多少 ./
-            Integer sum = learnMapper.selectNumberByStudentId(student_id, unitId, i);
+            Integer sum = learnMapper.selectNumberByStudentId(studentId, unitId, i);
 
-            if(countWord.equals(sum)){
-                a.put("state", true);
-            }else{
-                a.put("state", false);
-            }
+            map.put("state", false);
 
             //-- 4.某学生某单元某模块学习速度;
             //select SUM(valid_time) from duration where unit_id = 1 and student_id = 1 and study_model = '1'
-            Integer sumValid = durationMapper.valid_timeIndex(student_id, unitId, i);
+            Integer sumValid = durationMapper.valid_timeIndex(studentId, unitId, i);
             if (sumValid == null) {
             	sumValid = 0;
             }
@@ -288,66 +283,71 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 已做单元闯关
             if (point != null) {
                 // 分数
-                a.put("point", point + "");
+                map.put("point", point);
                 // 速度
-                a.put("speed", speed + "");
+                map.put("speed", speed);
                 // 方框状态
                 if (point >= 80) {
-                    a.put("condition", 1);
+                    map.put("condition", 1);
                 } else {
-                    a.put("condition", 2);
+                    map.put("condition", 2);
                 }
-                a.put("sum", "");
-                a.put("countWord", "");
+                map.put("sum", "");
+                map.put("countWord", "");
             } else { // 未做单元闯关
 
-                a.put("sum", sum + "");
-                a.put("countWord", countWord + "");
+                map.put("sum", sum);
+                map.put("countWord", countWord);
                 // 方框状态
-                a.put("condition", 3);
+                map.put("condition", 3);
                 // 分数
-                a.put("point", "");
+                map.put("point", "");
                 // 速度
-                a.put("speed", speed + "");
+                map.put("speed", speed);
             }
-            result.put(i + "", a);
+            result.put(i + "", map);
         }
+    }
 
-        // 封装返回的数据 - 智能记忆智能复习数量
-        // 当前时间
+    /**
+     * 封装学生相关信息
+     *
+     * @param student
+     * @param result
+     */
+    private void packageStudentInfo(Student student, Map<String, Object> result) {
+        // 学生id
+        result.put("student_id", student.getId());
+        result.put("role", "1");
+        // 账号
+        result.put("account", student.getAccount());
+        // 姓名
+        result.put("studentName", student.getStudentName());
+        // 头像
+        result.put("headUrl", student.getHeadUrl());
+        // 宠物
+        result.put("partUrl", student.getPartUrl());
+        // 宠物名
+        result.put("petName", student.getPetName());
+        result.put("schoolName", student.getSchoolName());
+    }
 
-        String datetime = DateUtil.formatYYYYMMDDHHMMSS(new Date());
-
-        CapacityReview cr = new CapacityReview();
-        cr.setUnit_id(Long.valueOf(unitId));
-        cr.setStudent_id(Long.valueOf(student_id));
-        cr.setPush(datetime);
-        // 慧记忆模块需复习量
-        cr.setClassify("1");
-        Integer a = capacityMapper.countCapacity_memory(cr);
-        // 慧听写模块需复习量
-        cr.setClassify("2");
-        Integer b = capacityMapper.countCapacity_memory(cr);
-        // 慧默写模块需复习量
-        cr.setClassify("3");
-        Integer c = capacityMapper.countCapacity_memory(cr);
-        // 单词图鉴需复习量
-        cr.setClassify("0");
-        Integer d = capacityMapper.countCapacity_memory(cr);
-        result.put("amount1", a);
-        result.put("amount2", b);
-        result.put("amount3", c);
-        result.put("amount0", d);
-        // 是否需要隐藏学习模块
-        if (a >= 20 || b >= 10 || c >= 10 || d >=10) {
-            result.put("hide", true);
-        } else {
-            result.put("hide", false);
-        }
-        // 获取学生需要执行的节点信息
-        getNode(session, result, stu);
-
-        return ServerResponse.createBySuccess(result);
+    /**
+     * 封装学生当前学习的课程信息
+     *
+     * @param result
+     * @param capacityStudentUnit
+     */
+    private void packageUnitInfo(Map<String, Object> result, CapacityStudentUnit capacityStudentUnit) {
+        // 当前单词所学课程id
+        result.put("course_id", capacityStudentUnit.getCourseId());
+        // 当前单词所学课程名
+        result.put("course_name", capacityStudentUnit.getCourseName());
+        // 当前单词所学单元id
+        result.put("unit_id", capacityStudentUnit.getUnitId());
+        // 根据单元id查询单元名 - 需要根据学生单元id实时去查询单元名
+        result.put("unit_name", capacityStudentUnit.getUnitName());
+        result.put("version", capacityStudentUnit.getVersion());
     }
 
     /**
@@ -448,76 +448,63 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Override
     public ServerResponse<Object> sentenceIndex(HttpSession session) {
 
-        // 学生id
-        Long student_id = StudentIdBySession(session);
+        Student student = super.getStudent(session);
+        Long studentId = student.getId();
 
         // 封装返回数据
         Map<String, Object> result = new HashMap<>(16);
-
-        // 判断个人中心按钮是否需要红点提示
-        initRedPointThread.redPoint(getStudent(session), result);
-
-        Student stu = studentMapper.indexData(student_id);
-
-        Integer role = studentMapper.judgeUser(Long.valueOf(student_id));
-        // 业务员
-        if (role == 2) {
-            result.put("role", "2");
-            // 学生
-        } else {
-            result.put("role", "1");
-        }
+        result.put("role", "1");
 
         // 学生id
-        result.put("student_id", stu.getId());
+        result.put("student_id", student.getId());
         // 当前例句所学课程id
-        result.put("course_id", stu.getSentenceCourseId());
+        result.put("course_id", student.getSentenceCourseId());
         // 当前例句所学课程名
-        result.put("course_name", stu.getSentenceCourseName());
+        result.put("course_name", student.getSentenceCourseName());
         // 当前例句所学单元id
-        result.put("unit_id", stu.getSentenceUnitId());
+        result.put("unit_id", student.getSentenceUnitId());
         // 当前例句所学单元名
         // result.put("unit_name", stu.getSentenceUnitName());
         // 根据单元id查询单元名
-        result.put("unit_name", sentenceUnitMapper.getUnitNameByUnitId(stu.getSentenceUnitId().longValue()));
+        result.put("unit_name", sentenceUnitMapper.getUnitNameByUnitId(student.getSentenceUnitId().longValue()));
         // 账号
-        result.put("account", stu.getAccount());
+        result.put("account", student.getAccount());
         // 姓名
-        result.put("studentName", stu.getStudentName());
+        result.put("studentName", student.getStudentName());
         // 头像
-        result.put("headUrl", stu.getHeadUrl());
-        result.put("schoolName", stu.getSchoolName());
+        result.put("headUrl", student.getHeadUrl());
+        result.put("schoolName", student.getSchoolName());
 
-        this.getIndexTime(session, stu, result);
+        this.getIndexTime(session, student, result);
 
         // i参数 1=慧记忆，2=慧听写，3=慧默写，4=例句听力，5=例句翻译，6=例句默写
         //-- 1.查询学生当前单词模块学的那个单元
-        Integer unit_id = stu.getSentenceUnitId();
+        Integer unitId = student.getSentenceUnitId();
 
         // 一共有多少例句/.
-        Long countWord = unitSentenceMapper.selectSentenceCountByUnitId((long) unit_id);
+        Long countWord = unitSentenceMapper.selectSentenceCountByUnitId((long) unitId);
 
         for (int i = 4; i < 7; i++) {
             Map<String, Object> a = new HashMap<String, Object>();
             //-- 如果 2 = NULL 就跳过4步执行5步   condition = 3(方框为空)
             //-- 如果 2 != NULL 执行4步跳过第5步 , 如果第2步>=80 condition = 1(方框为√), 如果第3步<80 condition = 2(方框为×)
 
-            if (unit_id == null) {
+            if (unitId == null) {
                 return ServerResponse.createBySuccess(result);
             }
 
             //-- 2.某学生某单元某模块得了多少分
             //select point from test_record where student_id = #{} and unit_id = #{} and genre = '单元闯关测试' and study_model = '慧记忆'
-            Integer point = testRecordMapper.selectPoint(student_id, unit_id, "单元闯关测试", i);
+            Integer point = testRecordMapper.selectPoint(studentId, unitId, "单元闯关测试", i);
 
             //-- 3.某学生某单元某模块单词学了多少 ./
             //select COUNT(id) from learn where student_id = #{} and unit_id = #{} and study_model = '慧记忆' GROUP BY vocabulary_id
-            Integer sum = learnMapper.selectNumberByStudentId(student_id, unit_id, i);
+            Integer sum = learnMapper.selectNumberByStudentId(studentId, unitId, i);
 
             if (point != null && sum != null) {
                 //-- 4.某学生某单元某模块学习速度;  单词已学个数/(有效时长m/3600)
                 //select SUM(valid_time) from duration where unit_id = 1 and student_id = 1 and study_model = '慧记忆'
-                Integer sumValid = durationMapper.valid_timeIndex(student_id, unit_id, i);
+                Integer sumValid = durationMapper.valid_timeIndex(studentId, unitId, i);
 
                 Integer speed = sumValid == null ? 0 : (int) (BigDecimalUtil.div(sum, sumValid)*3600);
                 // 分数
@@ -540,7 +527,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 // 分数
                 a.put("point", "");
                 // 计算学习速度
-                Integer sumValid = durationMapper.valid_timeIndex(student_id, unit_id, i);
+                Integer sumValid = durationMapper.valid_timeIndex(studentId, unitId, i);
                 Integer speed = (int) (BigDecimalUtil.div(sum, sumValid == null ? 0 : sumValid) * 3600);
                 // 速度
                 a.put("speed", speed);
@@ -555,8 +542,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         String datetime = s.format(new Date());
 
         CapacityReview cr = new CapacityReview();
-        cr.setUnit_id(Long.valueOf(unit_id));
-        cr.setStudent_id(student_id);
+        cr.setUnit_id(Long.valueOf(unitId));
+        cr.setStudent_id(studentId);
         cr.setPush(datetime);
         // 听力模块许复习量
         cr.setClassify("4");
