@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.CalculateTimeUtil;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -19,6 +20,7 @@ import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.TeksService;
 import com.zhidejiaoyu.student.utils.PetSayUtil;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -184,16 +186,21 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @Override
     public ServerResponse<Object> selRankingList(Integer unitId, HttpSession session) {
         Student student = getStudent(session);
-        Map<String, Object> getMap = new HashMap<>();
+
+        Map<String, Object> getMap = new HashMap<>(16);
         getMap.put("schoolName", student.getSchoolName());
         getMap.put("unitId", unitId);
-        Map<String, Object> result = new HashMap<>();
+        getMap.put("nowTime", new DateTime().toString(DateUtil.YYYYMMDDHHMMSS));
+        // 28天前日期
+        getMap.put("beforeTime", new DateTime().minusDays(28).toString(DateUtil.YYYYMMDDHHMMSS));
+
+        Map<String, Object> result = new HashMap<>(16);
         //全国排名
-        List<Map<String, Object>> maps = voiceMapper.selectTeksRank(getMap);
-        result.put("nationalRanking", maps);
+        List<Map<String, Object>> countryMap = voiceMapper.selectTextRank(getMap);
+        result.put("nationalRanking", countryMap);
         //全校排名
-        List<Map<String, Object>> mapss = voiceMapper.selectTeksRankSchool(getMap);
-        result.put("shcoolRanking", mapss);
+        List<Map<String, Object>> schoolMap = voiceMapper.selectTextRankSchool(getMap);
+        result.put("shcoolRanking", schoolMap);
         return ServerResponse.createBySuccess(result);
     }
 

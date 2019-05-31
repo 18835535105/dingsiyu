@@ -2,7 +2,6 @@ package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.common.Vo.student.voice.VoiceRankVo;
 import com.zhidejiaoyu.common.Vo.student.voice.VoiceVo;
-import com.zhidejiaoyu.common.constant.FileConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -186,35 +185,27 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
             return ServerResponse.createBySuccess(FileResponseCode.TOO_LARGE.getCode(), FileResponseCode.TOO_LARGE.getMsg());
         }
 
-        // 上传录音文件
-        String file = ftpUtil.uploadGoodVoice(audio, FileConstant.GOOD_VOICE);
-        String fileName = FileConstant.GOOD_VOICE + file;
-
-
-        String url = prefix + fileName;
         int score = 0;
         Map<String, Object> map;
         if (voice.getType() == 1) {
-            if (file != null) {
-                map = goodVoiceUtil.getWordEvaluationRecord(word, url);
-                score = (int) map.get("score");
-                map.put("flow", true);
-                map.put("voiceUrl", url);
-            } else {
-                map = new HashMap<>();
+            map = goodVoiceUtil.getWordEvaluationRecord(word, audio);
+            if (map.isEmpty()) {
+                map = new HashMap<>(16);
                 map.put("score", 0);
                 map.put("heart", 0);
                 map.put("flow", false);
                 map.put("voiceUrl", "");
+            } else {
+                score = (int) map.get("score");
+                map.put("flow", true);
             }
         } else {
-            if (file != null) {
-                map = goodVoiceUtil.getSentenceEvaluationRecord(word, url);
+            map = goodVoiceUtil.getSentenceEvaluationRecord(word, audio);
+            if (!map.isEmpty()) {
                 score = (int) map.get("totalScore");
                 map.put("flow", true);
-                map.put("voiceUrl", url);
             } else {
-                map = new HashMap<>();
+                map = new HashMap<>(16);
                 map.put("flow", false);
                 String[] s = word.split(" ");
                 List<Map<String, Object>> resList = new ArrayList<>();
@@ -246,13 +237,13 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
 
         Long courseId = unitMapper.selectCourseIdByUnitId(voice.getUnitId());
-        if (file != null) {
+        if (!map.isEmpty()) {
             voice.setCourseId(courseId);
             voice.setCreateTime(new Date());
             voice.setScore(score * 1.0);
             voice.setStudentId(student.getId());
             voice.setStudentName(student.getStudentName());
-            voice.setVoiceUrl(fileName);
+            voice.setVoiceUrl(String.valueOf(map.get("voiceUrl")));
             voiceMapper.insert(voice);
         }
         if (type == 2) {

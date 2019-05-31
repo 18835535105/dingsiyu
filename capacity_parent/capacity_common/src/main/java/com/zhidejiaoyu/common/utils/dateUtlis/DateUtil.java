@@ -24,7 +24,7 @@ public class DateUtil implements Serializable {
 
     private static final String YYYYMMDD = "yyyy-MM-dd";
 
-    private static final String YYYYMMDDHHMMSS = "yyyy-MM-dd HH:mm:ss";
+    public static final String YYYYMMDDHHMMSS = "yyyy-MM-dd HH:mm:ss";
 
     private static final String YYYY = "yyyy";
 
