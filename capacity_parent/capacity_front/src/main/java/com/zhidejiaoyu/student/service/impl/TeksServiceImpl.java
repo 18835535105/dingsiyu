@@ -748,8 +748,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         maps.put("studentId", student.getId());
         List<Map<String, Object>> map = teksMapper.selHistoryPronunciation(maps);
         List<Map<String, Object>> resultMap = new ArrayList<>();
+        String url;
         for (Map<String, Object> getMap : map) {
-            getMap.put("url", getMap.get("url"));
+            // todo: 临时处理旧数据，28天后获取 url 可以不做判断
+            url = getMap.get("url") == null ? "" : getMap.get("url").toString();
+            getMap.put("url", url.contains("https") ? url : prefix + url);
             String sentence = getMap.get("sentence").toString();
             getMap.put("sentence",sentence.replace("$","").replace("#"," "));
             resultMap.add(getMap);
