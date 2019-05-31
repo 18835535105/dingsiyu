@@ -743,13 +743,13 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @Override
     public ServerResponse<Object> selHistoryPronunciation(Integer unitId, HttpSession session) {
         Student student = getStudent(session);
-        Map<String, Object> maps = new HashMap<>();
+        Map<String, Object> maps = new HashMap<>(16);
         maps.put("unitId", unitId);
         maps.put("studentId", student.getId());
         List<Map<String, Object>> map = teksMapper.selHistoryPronunciation(maps);
         List<Map<String, Object>> resultMap = new ArrayList<>();
         for (Map<String, Object> getMap : map) {
-            getMap.put("url", prefix + getMap.get("url"));
+            getMap.put("url", getMap.get("url"));
             String sentence = getMap.get("sentence").toString();
             getMap.put("sentence",sentence.replace("$","").replace("#"," "));
             resultMap.add(getMap);

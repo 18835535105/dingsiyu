@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author wuchenxi
@@ -73,7 +74,7 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
     private LearnMapper learnMapper;
 
     @Autowired
-    private TeksMapper teksMapper;
+    private ExecutorService executorService;
 
     @Override
     public ServerResponse getSubjects(HttpSession session, Long unitId, Integer type, Integer flag) {
@@ -235,33 +236,38 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
             }
         }
 
-
         Long courseId = unitMapper.selectCourseIdByUnitId(voice.getUnitId());
         if (!map.isEmpty()) {
-            voice.setCourseId(courseId);
-            voice.setCreateTime(new Date());
-            voice.setScore(score * 1.0);
-            voice.setStudentId(student.getId());
-            voice.setStudentName(student.getStudentName());
-            voice.setVoiceUrl(String.valueOf(map.get("voiceUrl")));
-            voiceMapper.insert(voice);
+            int finalScore = score;
+            Map<String, Object> finalMap = map;
+            executorService.execute(() -> {
+                voice.setCourseId(courseId);
+                voice.setCreateTime(new Date());
+                voice.setScore(finalScore * 1.0);
+                voice.setStudentId(student.getId());
+                voice.setStudentName(student.getStudentName());
+                voice.setVoiceUrl(String.valueOf(finalMap.get("voiceUrl")));
+                voiceMapper.insert(voice);
+            });
         }
         if (type == 2) {
-            Learn learn = new Learn();
-            learn.setLearnTime(new Date());
-            learn.setUpdateTime(new Date());
-            learn.setCourseId(voice.getCourseId());
-            learn.setStudentId(voice.getStudentId());
-            learn.setUnitId(voice.getUnitId());
-            learn.setStudyModel("课文好声音");
-            learn.setType(1);
-            Long aLong = learnMapper.selTeksLearn(learn);
-            if (aLong != null) {
-                learn.setId(aLong);
-                learnMapper.updTeksLearn(learn);
-            } else {
-                learnMapper.insert(learn);
-            }
+            executorService.execute(() -> {
+                Learn learn = new Learn();
+                learn.setLearnTime(new Date());
+                learn.setUpdateTime(new Date());
+                learn.setCourseId(voice.getCourseId());
+                learn.setStudentId(voice.getStudentId());
+                learn.setUnitId(voice.getUnitId());
+                learn.setStudyModel("课文好声音");
+                learn.setType(1);
+                Long aLong = learnMapper.selTeksLearn(learn);
+                if (aLong != null) {
+                    learn.setId(aLong);
+                    learnMapper.updTeksLearn(learn);
+                } else {
+                    learnMapper.insert(learn);
+                }
+            });
         }
         return ServerResponse.createBySuccess(map);
     }
