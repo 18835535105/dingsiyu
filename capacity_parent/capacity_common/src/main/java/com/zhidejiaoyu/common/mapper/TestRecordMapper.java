@@ -183,7 +183,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     Integer selectUnitTestMaxPointByStudyModel(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("model") Integer classify);
 
     List<SeniorityVo> planSeniority(@Param("grade") String grade, @Param("study_paragraph") String study_paragraph, @Param("haveTest") Integer haveTest, @Param("version") String version, @Param("classId")Long classId);
-    
+
     @Select("SELECT COUNT(id) AS testCount FROM test_record WHERE student_id = #{stuId}  GROUP BY student_id")
     Integer onePlanSeniority(@Param("stuId") Long stuId);
 
@@ -278,4 +278,13 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      * @return
      */
     Integer selectPrePoint(@Param("studentId") Long studentId);
+
+    /**
+     * 统计学生今天进行的单元闯关测试次数
+     *
+     * @param studentId
+     * @return
+     */
+    @Select("select count(id) from test_record where student_id = #{studentId} and genre = '单元闯关测试' and TO_DAYS(test_start_time) = TO_DAYS(now())")
+    int countTodayTestUnitCount(@Param("studentId") Long studentId);
 }
