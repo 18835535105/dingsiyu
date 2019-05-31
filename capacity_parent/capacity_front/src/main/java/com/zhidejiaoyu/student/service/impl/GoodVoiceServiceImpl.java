@@ -239,36 +239,30 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
         Long courseId = unitMapper.selectCourseIdByUnitId(voice.getUnitId());
         if (!map.isEmpty()) {
-            int finalScore = score;
-            Map<String, Object> finalMap = map;
-            executorService.execute(() -> {
-                voice.setCourseId(courseId);
-                voice.setCreateTime(new Date());
-                voice.setScore(finalScore * 1.0);
-                voice.setStudentId(student.getId());
-                voice.setStudentName(student.getStudentName());
-                voice.setVoiceUrl(String.valueOf(finalMap.get("voiceUrl")));
-                voiceMapper.insert(voice);
-            });
+            voice.setCourseId(courseId);
+            voice.setCreateTime(new Date());
+            voice.setScore(score * 1.0);
+            voice.setStudentId(student.getId());
+            voice.setStudentName(student.getStudentName());
+            voice.setVoiceUrl(String.valueOf(map.get("voiceUrl")));
+            voiceMapper.insert(voice);
         }
         if (type == 2) {
-            executorService.execute(() -> {
-                Learn learn = new Learn();
-                learn.setLearnTime(new Date());
-                learn.setUpdateTime(new Date());
-                learn.setCourseId(voice.getCourseId());
-                learn.setStudentId(voice.getStudentId());
-                learn.setUnitId(voice.getUnitId());
-                learn.setStudyModel("课文好声音");
-                learn.setType(1);
-                Long aLong = learnMapper.selTeksLearn(learn);
-                if (aLong != null) {
-                    learn.setId(aLong);
-                    learnMapper.updTeksLearn(learn);
-                } else {
-                    learnMapper.insert(learn);
-                }
-            });
+            Learn learn = new Learn();
+            learn.setLearnTime(new Date());
+            learn.setUpdateTime(new Date());
+            learn.setCourseId(voice.getCourseId());
+            learn.setStudentId(voice.getStudentId());
+            learn.setUnitId(voice.getUnitId());
+            learn.setStudyModel("课文好声音");
+            learn.setType(1);
+            Long aLong = learnMapper.selTeksLearn(learn);
+            if (aLong != null) {
+                learn.setId(aLong);
+                learnMapper.updTeksLearn(learn);
+            } else {
+                learnMapper.insert(learn);
+            }
         }
         return ServerResponse.createBySuccess(map);
     }
