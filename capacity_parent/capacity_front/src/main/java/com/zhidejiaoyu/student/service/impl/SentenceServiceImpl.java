@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 /**
@@ -62,9 +63,6 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     private LearnMapper learnMapper;
 
     @Autowired
-    private CourseMapper courseMapper;
-
-    @Autowired
     private UnitSentenceMapper unitSentenceMapper;
 
     @Autowired
@@ -95,9 +93,6 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     private CapacityListenMapper capacityListenMapper;
 
     @Autowired
-    private UnitMapper unitMapper;
-
-    @Autowired
     private StudentMapper studentMapper;
 
     @Autowired
@@ -112,8 +107,12 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     @Autowired
     private StudentStudyPlanMapper studentStudyPlanMapper;
 
+
     @Autowired
     private MedalAwardAsync medalAwardAsync;
+
+    @Autowired
+    private ExecutorService executorService;
 
     @Autowired
     private SentenceCourseMapper sentenceCourseMapper;
@@ -347,7 +346,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             count = learnMapper.insert(learn);
 
             // 统计初出茅庐勋章
-            medalAwardAsync.inexperienced(student);
+            executorService.execute(() -> medalAwardAsync.inexperienced(student));
 
             if (count > 0 && total == (plan + 1)) {
                 return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
