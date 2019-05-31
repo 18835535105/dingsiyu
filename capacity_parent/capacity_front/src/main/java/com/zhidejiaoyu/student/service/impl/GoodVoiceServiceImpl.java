@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 /**
  * @author wuchenxi
@@ -274,15 +275,14 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
     private void packageVoiceRankVo(List<VoiceRankVo> rankVos, List<Voice> voiceRank) {
         if (voiceRank != null && voiceRank.size() > 0) {
-            List<Long> studentIds = new ArrayList<>(voiceRank.size());
-            voiceRank.forEach(voice -> studentIds.add(voice.getStudentId()));
+            List<Long> studentIds = voiceRank.stream().map(Voice::getStudentId).collect(Collectors.toList());
             Map<Long, Map<Long, String>> hearUrlMap = studentMapper.selectHeadUrlMapByStudentId(studentIds);
             VoiceRankVo vo;
             for (Voice voice : voiceRank) {
                 vo = new VoiceRankVo();
                 vo.setScore(Integer.valueOf(voice.getScore().toString().split("\\.")[0]));
                 vo.setStudentName(voice.getStudentName());
-                vo.setVoiceUrl(prefix + voice.getVoiceUrl());
+                vo.setVoiceUrl(voice.getVoiceUrl());
                 if (hearUrlMap.get(voice.getStudentId()) != null) {
                     vo.setHeadUrl(hearUrlMap.get(voice.getStudentId()).get("headUrl"));
                 } else {
