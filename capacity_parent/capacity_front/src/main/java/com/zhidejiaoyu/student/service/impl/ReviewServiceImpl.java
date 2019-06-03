@@ -901,11 +901,11 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     JSONObject finalObject = object;
                     subject.forEach((key, val) -> {
                         if (Objects.equals(subject.get(key), true)) {
-                            finalTestRecordInfo.setAnswer(matchSelected(j[0]));
+                            finalTestRecordInfo.setAnswer(TestServiceImpl.matchSelected(j[0]));
                         }
                         this.setOptions(finalTestRecordInfo, j[0], key);
                         if (finalObject.getJSONObject("userInput") != null) {
-                            selected[0] = this.matchSelected(finalObject.getJSONObject("userInput").getInteger("optionIndex"));
+                            selected[0] = TestServiceImpl.matchSelected(finalObject.getJSONObject("userInput").getInteger("optionIndex"));
                         }
                         finalTestRecordInfo.setWord(word);
                         j[0]++;
@@ -948,16 +948,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 break;
             default:
         }
-    }
-
-    /**
-     * 匹配选项
-     *
-     * @param integer
-     * @return
-     */
-    private String matchSelected(Integer integer) {
-        return matchSelected(integer);
     }
 
     /**
