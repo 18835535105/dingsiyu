@@ -50,7 +50,7 @@
     <select id="selSymbolByStudentId" parameterType="long" resultMap="BaseResultMap">
         select <include refid="base_sql"></include>
         from capacity_student_unit
-        where student_id=#{studentId} and type=5
+        where student_id=#{studentId} and type=5 limit 1
     </select>
 
     <select id="selLetterByStudentId" parameterType="long" resultMap="BaseResultMap">

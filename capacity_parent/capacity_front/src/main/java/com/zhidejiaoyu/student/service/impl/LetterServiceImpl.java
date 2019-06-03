@@ -82,8 +82,8 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 Map<String, Object> returnMap = new HashMap<>();
                 returnMap.put("id", 0);
                 returnMap.put("unitName", "暂无课程");
-                returnMap.put("isOpen",true);
-                List<Object> list=new ArrayList<>();
+                returnMap.put("isOpen", true);
+                List<Object> list = new ArrayList<>();
                 list.add(returnMap);
                 map.put("list", list);
                 return ServerResponse.createBySuccess(map);
@@ -101,7 +101,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         for (LetterUnit unit : list) {
             Map<String, Object> map = new HashMap<>();
             if (isTrue) {
-                Integer point = testRecordMapper.selectUnitTestMaxPointByStudyModel(studentId, unit.getId().longValue(), 12);
+                Integer point = testRecordMapper.selectUnitTestMaxPointByStudyModel(studentId, unit.getId().longValue(), 10);
                 map.put("isOpen", isTrue);
                 if (point == null || point < 100) {
                     isTrue = false;
@@ -146,29 +146,46 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                     Integer letterWriteCount = learnMapper.selLetterLearn(studentId, unitId, "字母听写");
                     if (letterWriteCount != null && letterCount <= letterWriteCount) {
                         map.put("LettersBreakThrough", true);
-                        //查看单元闯关是否完成
-                        Integer testPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(studentId, unitId, 10);
-                        //查看学后测试是否开启
-                        if (testPoint == 100) {
-                            map.put("LetterPosttest", true);
-                        } else {
-                            map.put("LetterPosttest", false);
-                        }
                     } else {
                         map.put("LettersBreakThrough", false);
-                        map.put("LetterPosttest", false);
                     }
                 } else {
                     map.put("letterWrite", false);
                     map.put("LettersBreakThrough", false);
-                    map.put("LetterPosttest", false);
                 }
             } else {
                 map.put("letterPair", false);
                 map.put("letterWrite", false);
                 map.put("LettersBreakThrough", false);
-                map.put("LetterPosttest", false);
             }
+            //查看单元闯关是否完成
+            StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selLetterByStudentId(studentId);
+            List<LetterUnit> letterUnits = letterUnitMapper.selLetterUnit(studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());
+            if (letterUnits != null && letterUnits.size() > 0) {
+                List<Integer> letterUnitIds = new ArrayList<>();
+                for (LetterUnit letterUnit : letterUnits) {
+                    letterUnitIds.add(letterUnit.getId());
+                }
+                Map<Integer, Map<String, Object>> LetterPosttestMap = testRecordMapper.selectUnitTestMaxPointByStudyModels(studentId, letterUnitIds, 10);
+                //查看学后测试是否开启
+                boolean falg = true;
+                for (Integer letterUnitId : letterUnitIds) {
+                    Map<String, Object> maps = LetterPosttestMap.get(letterUnitId);
+                    if (maps != null && maps.get("max") != null) {
+                        Integer max = Integer.getInteger(maps.get("max").toString());
+                        if (max < 100) {
+                            falg = false;
+                        }
+                    }
+                }
+                if(falg){
+                    map.put("LetterPosttest",true);
+                }else{
+                    map.put("LetterPosttest",false);
+                }
+
+            }
+
             return ServerResponse.createBySuccess(map);
         }
         return ServerResponse.createBySuccess(new HashMap<>());
@@ -244,13 +261,13 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         Map<String, Object> map = new HashMap<>();
         //查看黄金记忆点单词
         LetterPair letterPair = letterPairMapper.selPushLetter(unitId, studentId);
-        Letter studyLetter=null;
-        if(letterPair==null){
+        Letter studyLetter = null;
+        if (letterPair == null) {
             //查看当前单元已经学过的单词
             List<Long> longs = letterPairMapper.selAllStudyLetter(unitId, studentId);
             studyLetter = letterMapper.getStudyLetter(unitId, longs);
-        }else{
-            studyLetter=letterMapper.selectById(letterPair.getLetterId());
+        } else {
+            studyLetter = letterMapper.selectById(letterPair.getLetterId());
         }
         //随机获取字母
         List<Letter> threeLetter = letterMapper.getThreeLetter(studyLetter.getId());
@@ -359,11 +376,11 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
 
 
     @Override
-    public Object saveLetterPair(LetterPair letterPair, HttpSession session,Boolean falg) {
+    public Object saveLetterPair(LetterPair letterPair, HttpSession session, Boolean falg) {
         Long studentId = getStudentId(session);
         try {
             LetterPair pair = letterPairMapper.selByLetterIdAndStudent(letterPair.getLetterId(), studentId);
-            if(pair!=null){
+            if (pair != null) {
                 // 重新计算记忆强度
                 Date push = GoldMemoryTime.getGoldMemoryTime(pair.getMemoryStrength(), new Date());
                 pair.setPush(push);
@@ -543,13 +560,13 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     @Override
     public Object updLetterSymbolStudyModel(Long unitId, Integer type, HttpSession session) {
         Long studentId = getStudentId(session);
-        CapacityStudentUnit capacityStudentUnit=null;
-        if(type==4){
-            capacityStudentUnit=capacityStudentUnitMapper.selLetterByStudentId(studentId);
-        }else if (type==5){
-            capacityStudentUnit=capacityStudentUnitMapper.selSymbolByStudentId(studentId);
+        CapacityStudentUnit capacityStudentUnit = null;
+        if (type == 4) {
+            capacityStudentUnit = capacityStudentUnitMapper.selLetterByStudentId(studentId);
+        } else if (type == 5) {
+            capacityStudentUnit = capacityStudentUnitMapper.selSymbolByStudentId(studentId);
         }
-        if(capacityStudentUnit!=null){
+        if (capacityStudentUnit != null) {
             capacityStudentUnit.setUnitId(unitId);
             capacityStudentUnitMapper.updateById(capacityStudentUnit);
         }
