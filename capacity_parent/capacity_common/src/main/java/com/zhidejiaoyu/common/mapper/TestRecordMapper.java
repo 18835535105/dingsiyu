@@ -278,4 +278,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      * @return
      */
     Integer selectPrePoint(@Param("studentId") Long studentId);
+
+    @MapKey("unitId")
+    Map<Integer,Map<String,Object>> selectUnitTestMaxPointByStudyModels(@Param("studentId") Long studentId,@Param("letterUnitIds") List<Integer> letterUnitIds,@Param("model") Integer model);
 }
