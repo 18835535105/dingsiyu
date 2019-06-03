@@ -50,4 +50,6 @@ public interface CapacityStudentUnitMapper extends BaseMapper<CapacityStudentUni
     CapacityStudentUnit selSymbolByStudentId(Long id);
 
     CapacityStudentUnit selLetterByStudentId(Long studentId);
+
+    CapacityStudentUnit selByStudentIdAndType(@Param("studentId") Long id,@Param("type") Integer type);
 }

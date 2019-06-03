@@ -258,7 +258,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             if(i == 0){
                 // 单词图鉴单元总单词数
                 countWord = unitVocabularyMapper.selectWordPicCountByUnitId(unitId);
-            }else if(i == 1){
+            } else if (i == 1) {
                 // 单元下一共有多少单词
                 countWord = unitVocabularyMapper.selectWordCountByUnitId((long) unitId);
             }
@@ -275,7 +275,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             //select SUM(valid_time) from duration where unit_id = 1 and student_id = 1 and study_model = '1'
             Integer sumValid = durationMapper.valid_timeIndex(studentId, unitId, i);
             if (sumValid == null) {
-            	sumValid = 0;
+                sumValid = 0;
             }
             int speed = (int) (BigDecimalUtil.div(sum, sumValid) * 3600);
 
@@ -763,20 +763,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 当日首次登陆奖励5金币（日奖励）
             saveDailyAward(stu);
 
-            // 判断学生是否有同步版课程，没有同步版课程不能进入智能版学习
-            this.hasCapacityCourse(stu, result);
-
-            // 判断学生是否有同步版课程，没有同步版句子课程不能进入智能版学习
-            this.hasCapacitySentence(stu, result);
-
-            // 判断学生是否有同步版课程，没有同步版课文课程不能进入智能版学习
-            this.hasCapacityTeks(stu, result);
-
-            //判断学生是否有同步版阅读课程，没有同步版课文课程不能进入智能版学习
-            result.put("capacityRead",false);
-            //判断学生是否有同步版阅读课程，没有同步版课文课程不能进入智能版学习
-            result.put("capacityAxisMotif",false);
-
             // 一个账户只能登陆一台
             judgeMultipleLogin(session, stu);
 
@@ -1160,6 +1146,34 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         map.put("vocabularyCount",count);
         Integer sentenceCount = studentMapper.getSentenceCountByStudent(student.getId());
         map.put("sentenceCount",sentenceCount);
+        return ServerResponse.createBySuccess(map);
+    }
+
+    @Override
+    public Object getModelStatus(HttpSession session, Integer type) {
+        Student student = getStudent(session);
+        Map<String, Object> map = new HashMap<>();
+        boolean isHave = false;
+        if (type.equals(1)) {
+            CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selByStudentIdAndType(student.getId(), type);
+            if (capacityStudentUnit != null) {
+                isHave = true;
+            }
+        }
+        if (type.equals(2) || type.equals(3)) {
+            List<Map<String, Object>> maps = studentStudyPlanMapper.selByStudentId(student.getId(), type);
+            if (maps != null && maps.size() > 0) {
+                isHave = true;
+            }
+        }
+        if (type.equals(4)) {
+            StudentStudyPlan letterPlan = studentStudyPlanMapper.selSymbolByStudentId(student.getId());
+            StudentStudyPlan symbolPlan = studentStudyPlanMapper.selLetterByStudentId(student.getId());
+            if (letterPlan != null || symbolPlan != null) {
+                isHave = true;
+            }
+        }
+        map.put("isHave", isHave);
         return ServerResponse.createBySuccess(map);
     }
 

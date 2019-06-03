@@ -355,6 +355,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     @Override
+    @GoldChangeAnnotation
+    @TestChangeAnnotation
     public Object saveLetterUnitEntry(HttpSession session, TestRecord testRecord) {
         Student student = getStudent(session);
         Integer point = testRecord.getPoint();
@@ -443,6 +445,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     @Override
+    @GoldChangeAnnotation
+    @TestChangeAnnotation(isUnitTest = false)
     public Object saveLetterAfterLearning(HttpSession session, TestRecord testRecord) {
         Student student = getStudent(session);
         Integer point = testRecord.getPoint();
