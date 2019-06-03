@@ -59,4 +59,9 @@
         where student_id=#{studentId} and type=4
     </select>
 
+    <select id="selByStudentIdAndType" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include>
+        from capacity_student_unit where student_id=#{studentId} and type=#{type}
+    </select>
+
 </mapper>

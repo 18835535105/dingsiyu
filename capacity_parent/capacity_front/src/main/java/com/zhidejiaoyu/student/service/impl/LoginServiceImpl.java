@@ -193,7 +193,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
 
         // 业务员
-        if (stu.getRole() !=null && stu.getRole() == 2) {
+        if (stu.getRole() != null && stu.getRole() == 2) {
             result.put("role", "2");
             // 学生
         } else {
@@ -256,10 +256,10 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 return ServerResponse.createBySuccess(result);
             }
 
-            if(i == 0){
+            if (i == 0) {
                 // 单词图鉴单元总单词数
                 countWord = unitVocabularyMapper.selectWordPicCountByUnitId(unitId);
-            }else if(i == 1){
+            } else if (i == 1) {
                 // 单元下一共有多少单词
                 countWord = unitVocabularyMapper.selectWordCountByUnitId((long) unitId);
             }
@@ -270,9 +270,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             //-- 3.某学生某单元某模块单词 学了多少 ./
             Integer sum = learnMapper.selectNumberByStudentId(student_id, unitId, i);
 
-            if(countWord.equals(sum)){
+            if (countWord.equals(sum)) {
                 a.put("state", true);
-            }else{
+            } else {
                 a.put("state", false);
             }
 
@@ -280,7 +280,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             //select SUM(valid_time) from duration where unit_id = 1 and student_id = 1 and study_model = '1'
             Integer sumValid = durationMapper.valid_timeIndex(student_id, unitId, i);
             if (sumValid == null) {
-            	sumValid = 0;
+                sumValid = 0;
             }
             int speed = (int) (BigDecimalUtil.div(sum, sumValid) * 3600);
 
@@ -339,7 +339,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         result.put("amount3", c);
         result.put("amount0", d);
         // 是否需要隐藏学习模块
-        if (a >= 20 || b >= 10 || c >= 10 || d >=10) {
+        if (a >= 20 || b >= 10 || c >= 10 || d >= 10) {
             result.put("hide", true);
         } else {
             result.put("hide", false);
@@ -426,7 +426,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 flow = studyFlowMapper.getFlowInfoByStudentId(stu.getId());
                 result.put("needReview", "");
             }
-            if(flow != null){
+            if (flow != null) {
                 result.put("nodeId", flow.getId());
                 result.put("nodeName", flow.getFlowName());
 
@@ -519,7 +519,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 //select SUM(valid_time) from duration where unit_id = 1 and student_id = 1 and study_model = '慧记忆'
                 Integer sumValid = durationMapper.valid_timeIndex(student_id, unit_id, i);
 
-                Integer speed = sumValid == null ? 0 : (int) (BigDecimalUtil.div(sum, sumValid)*3600);
+                Integer speed = sumValid == null ? 0 : (int) (BigDecimalUtil.div(sum, sumValid) * 3600);
                 // 分数
                 a.put("point", point + "");
                 // 速度
@@ -641,13 +641,13 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
 
         Map<String, Object> map = new HashMap<>(16);
-        map.put("sex",student.getSex());
+        map.put("sex", student.getSex());
         // 获取今日已学单词
         int learnWord = learnMapper.getTodayWord(DateUtil.formatYYYYMMDD(new Date()), studentId);
         // 获取今日已学例句
         int learnSentence = learnMapper.getTodaySentence(DateUtil.formatYYYYMMDD(new Date()), studentId);
         //获取今日已学课文数
-        int learnTeks=learnMapper.getTodyTeks(DateUtil.formatYYYYMMDD(new Date()),studentId);
+        int learnTeks = learnMapper.getTodyTeks(DateUtil.formatYYYYMMDD(new Date()), studentId);
         map.put("learnWord", learnWord);
         map.put("learnSentence", learnSentence);
         map.put("learnTeks", learnTeks);
@@ -730,8 +730,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             logger.warn("学生账号[{}]账号或密码输入错误，登录失败。", account);
             return ServerResponse.createByErrorMessage("账号或密码输入错误");
             // 2.账号已关闭
-        }else if(stu.getStatus() != null && stu.getStatus()==2) {
-        	return ServerResponse.createByErrorMessage("此账号已关闭");
+        } else if (stu.getStatus() != null && stu.getStatus() == 2) {
+            return ServerResponse.createByErrorMessage("此账号已关闭");
 
         } else if (stu.getStatus() != null && stu.getStatus() == 3) {
             // 账号被删除
@@ -776,20 +776,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 当日首次登陆奖励5金币（日奖励）
             saveDailyAward(stu);
 
-            // 判断学生是否有同步版课程，没有同步版课程不能进入智能版学习
-            this.hasCapacityCourse(stu, result);
-
-            // 判断学生是否有同步版课程，没有同步版句子课程不能进入智能版学习
-            this.hasCapacitySentence(stu, result);
-
-            // 判断学生是否有同步版课程，没有同步版课文课程不能进入智能版学习
-            this.hasCapacityTeks(stu, result);
-
-            //判断学生是否有同步版阅读课程，没有同步版课文课程不能进入智能版学习
-            result.put("capacityRead",false);
-            //判断学生是否有同步版阅读课程，没有同步版课文课程不能进入智能版学习
-            result.put("capacityAxisMotif",false);
-
             // 一个账户只能登陆一台
             judgeMultipleLogin(session, stu);
 
@@ -804,7 +790,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 result.put("account_time", stu.getAccountTime());
 
                 // 学生首次登陆系统，为其初始化7个工作日,以便判断其二级标签
-               // initStudentWorkDay(stu);
+                // initStudentWorkDay(stu);
 
                 // 2.1 跳到完善个人信息页面
                 logger.info("学生[{} -> {} -> {}]登录成功前往完善信息页面。", stu.getId(), stu.getAccount(), stu.getStudentName());
@@ -1043,8 +1029,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     public static void main(String[] args) {
         String str = "20180101";
-        System.out.println(str.substring(0, 4)+"-"+str.substring(4,6)+"-"+str.substring(6,8));
+        System.out.println(str.substring(0, 4) + "-" + str.substring(4, 6) + "-" + str.substring(6, 8));
     }
+
     /**
      * 学生当天首次登陆奖励5金币，并计入日奖励信息
      *
@@ -1098,7 +1085,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             logger.error("获取学生登录IP地址出错，error=[{}]", e.getMessage());
         }
 
-        RunLog runLog = new RunLog(stu.getId(), 1, "学生[" + stu.getStudentName() + "]登录,ip=[" + ip +"]", new Date());
+        RunLog runLog = new RunLog(stu.getId(), 1, "学生[" + stu.getStudentName() + "]登录,ip=[" + ip + "]", new Date());
         try {
             runLogMapper.insert(runLog);
         } catch (Exception e) {
@@ -1157,7 +1144,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         response.setHeader("Content-Type", "application/json;charset=UTF-8");
         response.setHeader("Cache-Control", "no-cache");
         response.setDateHeader("Expires", 0);
-        ValidateCode vCode = new ValidateCode(74,31,4,150);
+        ValidateCode vCode = new ValidateCode(74, 31, 4, 150);
         session.removeAttribute("validateCode");
         vCode.write(response.getOutputStream());
         session.setAttribute("validateCode", vCode.getCode());
@@ -1167,12 +1154,40 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Override
     public Object getRiepCount(HttpSession session) {
         Student student = getStudent(session);
-        Map<String,Object> map=new HashMap<>();
-        map.put("partUrl",student.getPartUrl());
+        Map<String, Object> map = new HashMap<>();
+        map.put("partUrl", student.getPartUrl());
         Integer count = studentMapper.getVocabularyCountByStudent(student.getId());
-        map.put("vocabularyCount",count);
+        map.put("vocabularyCount", count);
         Integer sentenceCount = studentMapper.getSentenceCountByStudent(student.getId());
-        map.put("sentenceCount",sentenceCount);
+        map.put("sentenceCount", sentenceCount);
+        return ServerResponse.createBySuccess(map);
+    }
+
+    @Override
+    public Object getModelStatus(HttpSession session, Integer type) {
+        Student student = getStudent(session);
+        Map<String, Object> map = new HashMap<>();
+        boolean isHave = false;
+        if (type.equals(1)) {
+            CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selByStudentIdAndType(student.getId(), type);
+            if (capacityStudentUnit != null) {
+                isHave = true;
+            }
+        }
+        if (type.equals(2) || type.equals(3)) {
+            List<Map<String, Object>> maps = studentStudyPlanMapper.selByStudentId(student.getId(), type);
+            if (maps != null && maps.size() > 0) {
+                isHave = true;
+            }
+        }
+        if (type.equals(4)) {
+            StudentStudyPlan letterPlan = studentStudyPlanMapper.selSymbolByStudentId(student.getId());
+            StudentStudyPlan symbolPlan = studentStudyPlanMapper.selLetterByStudentId(student.getId());
+            if (letterPlan != null || symbolPlan != null) {
+                isHave = true;
+            }
+        }
+        map.put("isHave", isHave);
         return ServerResponse.createBySuccess(map);
     }
 
