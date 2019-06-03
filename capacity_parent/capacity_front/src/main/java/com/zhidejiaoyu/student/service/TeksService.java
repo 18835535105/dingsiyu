@@ -53,4 +53,5 @@ public interface TeksService extends BaseService<Teks> {
 
     ServerResponse<Map<String, Object>> getIsInto(HttpSession session,Long unitId);
 
+    ServerResponse<Object> getUnitStatus(Long courseId,HttpSession session);
 }
