@@ -14,8 +14,6 @@ import com.zhidejiaoyu.student.common.SaveWordLearnAndCapacity;
 import com.zhidejiaoyu.student.service.WordWriteService;
 import com.zhidejiaoyu.student.vo.WordWriteStudyVo;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,12 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 @Service
 public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabulary> implements WordWriteService {
 
-    private final int pushRise = 3;
-    
     @Autowired
     private MemoryDifficultyUtil memoryDifficultyUtil;
 
@@ -45,12 +42,6 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
     private VocabularyMapper vocabularyMapper;
 
     @Autowired
-    private UnitMapper unitMapper;
-
-    @Autowired
-    private StudyCountMapper studyCountMapper;
-
-    @Autowired
     private StudentMapper studentMapper;
 
     @Autowired
@@ -64,6 +55,9 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 
     @Autowired
     private CapacityListenMapper capacityListenMapper;
+
+    @Autowired
+    private ExecutorService executorService;
 
     @Autowired
     private MedalAwardAsync medalAwardAsync;
@@ -86,10 +80,9 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
         // 记录学生开始学习该单词的时间
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
-        Long courseId = unitMapper.selectCourseIdByUnitId(unitId);
-        Integer maxCount = studyCountMapper.selectMaxCountByCourseId(student.getId(), courseId);
+        Integer maxCount = 1;
         // 查询学生当前单元当前模块下已学习单词的个数，即学习进度
-        Long plan = learnMapper.countLearnWord(student.getId(), unitId, "慧默写", maxCount == null ? 1 : maxCount);
+        Long plan = learnMapper.countLearnWord(student.getId(), unitId, "慧默写", maxCount);
         // 获取当前单元下的所有单词的总个数
         Long wordCount = unitVocabularyMapper.countByUnitId(unitId);
         if (wordCount == 0) {
@@ -114,7 +107,7 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
         // 获取当前学习进度的下一个单词
         if (wordCount - 1 >= plan) {
             // 查询学习记录本模块学习过的所有单词id
-            List<Long> wordIds = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "慧默写", maxCount == null ? 1 : maxCount);
+            List<Long> wordIds = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "慧默写", maxCount);
 
             WordWriteStudyVo wordWriteStudyVo = new WordWriteStudyVo();
             Vocabulary currentStudyWord = vocabularyMapper.selectOneWordNotInIds(wordIds, unitId);
@@ -222,14 +215,15 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
         } else if(classify != null && classify == 0){
             studyModel = "单词图鉴";
         }
-        Integer maxCount = commonMethod.saveStudyCount(session, learn.getCourseId());
 
-        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, studyModel, maxCount == null ? 1 : maxCount,1);
+        // 当前课程最大学习遍数
+        Integer maxCount = 1;
+        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, studyModel, 1,1);
         if (learnIds.size() > 1) {
             List<Long> longs = learnIds.subList(1, learnIds.size());
             learnMapper.deleteBatchIds(longs);
         }
-        Learn currentLearn = learnMapper.selectLearn(studentId, learn, studyModel, maxCount == null ? 1 : maxCount,1);
+        Learn currentLearn = learnMapper.selectLearn(studentId, learn, studyModel, maxCount,1);
         // 保存学习记录
         // 第一次学习，如果答对记为熟词，答错记为生词
         if (currentLearn == null) {
@@ -267,7 +261,7 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
             count = learnMapper.insert(learn);
 
             // 统计初出茅庐勋章
-            medalAwardAsync.inexperienced(student);
+            executorService.execute(() -> medalAwardAsync.inexperienced(student));
 
             if (count > 0 && total == (plan + 1)) {
                 return ServerResponse.createBySuccess();
@@ -310,8 +304,9 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
             currentLearn.setLearnCount(maxCount);
             currentLearn.setUpdateTime(now);
             int i = learnMapper.updateByPrimaryKeySelective(currentLearn);
-            
+
             // 慧默写、慧听写模块错过三次在记忆时间上再加长三小时
+            int pushRise = 3;
             if (classify == 2) {
                 Integer faultTime = capacityListenMapper.getFaultTime(studentId, learn.getVocabularyId());
                 if (faultTime != null && faultTime >= 5) {
@@ -319,21 +314,18 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
                 }
             }
             if(classify == 3) {
-            	// 查询错误次数>=3 
+            	// 查询错误次数>=3
             	Integer faultTime = capacityWriteMapper.getFaultTime(studentId, learn.getVocabularyId());
             	if(faultTime != null && faultTime >= 5) {
             		// 如果错误次数>=3, 黄金记忆时间推迟3小时
             		capacityWriteMapper.updatePush(studentId, learn.getVocabularyId(), pushRise);
             	}
             }
-            
+
             if (i > 0) {
                 return ServerResponse.createBySuccess();
             }
         }
-        
-        
-        
         return ServerResponse.createByErrorMessage("学习记录保存失败");
     }
 

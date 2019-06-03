@@ -180,18 +180,17 @@ public class SaveTestLearnAndCapacity {
      */
     private int saveLearnAndCapacity(HttpSession session, Student student, Long unitId, Integer id, Integer classify,
                                      boolean isTrue) {
-        Long courseId = unitMapper.selectCourseIdByUnitId(unitId);
-        Integer maxCount = studyCountMapper.selectMaxCountByCourseId(student.getId(), courseId);
+        Integer maxCount = 1;
         // 查询学习记录
         List<Learn> learns;
         if (classify <= 3) {
             // 查询单词的学习记录
             learns = learnMapper.selectLearnByIdAmdModel(student.getId(), unitId, Long.valueOf(id.toString()), null,
-                    commonMethod.getTestType(classify), maxCount == null ? 1 : maxCount);
+                    commonMethod.getTestType(classify), maxCount);
         } else {
             // 查询句子的学习记录
             learns = learnMapper.selectLearnByIdAmdModel(student.getId(), unitId, null, Long.valueOf(id.toString()),
-                    commonMethod.getTestType(classify), maxCount == null ? 1 : maxCount);
+                    commonMethod.getTestType(classify), maxCount);
         }
 
         Learn learn;
