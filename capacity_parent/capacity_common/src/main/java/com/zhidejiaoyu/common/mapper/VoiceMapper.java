@@ -56,12 +56,18 @@ public interface VoiceMapper extends BaseMapper<Voice> {
 
     /**
      * 查询课文好声音全校排名
+     *
+     * @param map
+     * @return
      */
-    List<Map<String,Object>> selectTeksRankSchool(Map<String,Object> map);
+    List<Map<String,Object>> selectTextRankSchool(Map<String,Object> map);
     /**
      * 查询课文好声音全国排名
+     *
+     * @param map
+     * @return
      */
-    List<Map<String,Object>> selectTeksRank(Map<String,Object> map);
+    List<Map<String,Object>> selectTextRank(Map<String,Object> map);
 
     /**
      * 获取好声音全校排行

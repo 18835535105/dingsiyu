@@ -1552,7 +1552,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      * @param integer
      * @return
      */
-    private String matchSelected(Integer integer) {
+    public static String matchSelected(Integer integer) {
         switch (integer) {
             case 0:
                 return "A";

@@ -14,8 +14,14 @@ public class StudyCount extends Model<StudyCount> {
 
     private Long courseId;
 
+    /**
+     * 课程的学习遍数
+     */
     private Integer count;
 
+    /**
+     * 课程的学习次数（每次登陆学习该课程任意次都算作一次）
+     */
     private Integer studyCount;
 
     public Long getId() {

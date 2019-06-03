@@ -81,7 +81,7 @@ public class GoodVoiceController {
      */
     @PostMapping("/saveTeks")
     @ControllerLogAnnotation(name = "保存课文跟读")
-    public ServerResponse saveTeks(HttpSession session,  Voice voice,
+    public ServerResponse saveText(HttpSession session, Voice voice,
                                    @NotNull(message = "wordId 不能为空！") Long sentenceId,
                                    @NotEmpty(message = "word 不能为空！") String sentence,
                                    @NotNull(message = "录音不能为空！") MultipartFile audio){

@@ -1,17 +1,14 @@
 package com.zhidejiaoyu.common.study;
 
-import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.*;
 
@@ -21,10 +18,9 @@ import java.util.*;
  * @author wuchenxi
  * @date 2018/5/21 15:34
  */
+@Slf4j
 @Component
 public class CommonMethod implements Serializable {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonMethod.class);
 
     /**
      * 标点数组
@@ -53,70 +49,10 @@ public class CommonMethod implements Serializable {
     private StudentMapper studentMapper;
 
     @Autowired
-    private StudyCountMapper studyCountMapper;
-
-    @Autowired
     private StudentCourseMapper studentCourseMapper;
 
     @Autowired
     private CommonMethod commonMethod;
-
-    /**
-     * 判断本次学生登录是否学习了当前课程
-     * <p>如果是本次登录第一次学习，将课程id放入session中，并在 study_count 表中将课程学习次数加1；如果当前课程是第一次学习，study_count 中不存在该条记录，插入新纪录；</p>
-     * <p>如果不是本次登录第一次学习，不修改表数据</p>
-     *
-     * @param session
-     * @param courseId
-     * @return
-     */
-    public Integer saveStudyCount(HttpSession session, Long courseId) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        Long studentId = student.getId();
-        Object courseObject = session.getAttribute("课程" + courseId);
-        Long cId = null;
-        if (courseObject != null) {
-            cId = Long.valueOf(courseObject.toString());
-        }
-        Integer maxCount = studyCountMapper.selectMaxCountByCourseId(studentId, courseId);
-        if (cId == null) {
-            // 本次登录第一次学习当前课程
-            session.setAttribute("课程" + courseId, courseId);
-            if (maxCount == null) {
-                // 当前课程是学生第一遍学习
-                StudyCount studyCount = new StudyCount();
-                studyCount.setStudentId(studentId);
-                studyCount.setCourseId(courseId);
-                studyCount.setCount(1);
-                studyCount.setStudyCount(1);
-                try {
-                    studyCountMapper.insert(studyCount);
-                } catch (Exception e) {
-                    LOGGER.error("新增 study_count 信息出错！", e);
-                    throw new RuntimeException("新增 study_count 信息出错！");
-                }
-            } else {
-                List<StudyCount> studyCounts = studyCountMapper.selectByCourseIdAndCount(studentId, courseId, maxCount);
-                StudyCount studyCount;
-                if (studyCounts.size() > 0) {
-                    // 如果查询出多条记录，只取第一条记录，其余记录删除
-                    for (int i = 1; i < studyCounts.size(); i++) {
-                        studyCount = studyCounts.get(i);
-                        studyCountMapper.deleteByPrimaryKey(studyCount.getId());
-                    }
-                }
-                studyCount = studyCounts.get(0);
-                studyCount.setStudyCount(studyCount.getStudyCount() + 1);
-                try {
-                    studyCountMapper.updateByPrimaryKeySelective(studyCount);
-                } catch (Exception e) {
-                    LOGGER.error("更新 study_count 信息出错！", e);
-                    throw new RuntimeException("更新 study_count 信息出错！");
-                }
-            }
-        }
-        return maxCount == null ? 1 : maxCount;
-    }
 
 
     /**

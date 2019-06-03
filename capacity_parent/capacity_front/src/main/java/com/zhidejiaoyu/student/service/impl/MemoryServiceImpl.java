@@ -92,14 +92,8 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
             learnMapper.insert(learn);
         }
 
-        // 查询课程id
-        Long courseId = courseMapper.selectIdByUnitId(unitId);
-
         // 查询当前课程的学习遍数
-        Integer maxCount = studyCountMapper.selectMaxCountByCourseId(student.getId(), courseId);
-        if (maxCount == null) {
-            maxCount = 1;
-        }
+        Integer maxCount = 1;
 
         // 查询学生当前单元下已学习单词的个数，即学习进度
         Long plan = learnMapper.countLearnWord(student.getId(), unitId, "慧记忆", maxCount);
@@ -187,12 +181,10 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         Student student = getStudent(session);
 
         Long studentId = student.getId();
-        Long courseId = learn.getCourseId();
 
-        // 保存课程的学习次数
-        Integer maxCount = commonMethod.saveStudyCount(session, courseId);
-
-        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, "慧记忆", maxCount == null ? 1 : maxCount,1);
+        // 当前课程的最大学习遍数
+        Integer maxCount = 1;
+        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, "慧记忆", maxCount,1);
         if (learnIds.size() > 1) {
             List<Long> longs = learnIds.subList(1, learnIds.size());
             learnMapper.deleteBatchIds(longs);

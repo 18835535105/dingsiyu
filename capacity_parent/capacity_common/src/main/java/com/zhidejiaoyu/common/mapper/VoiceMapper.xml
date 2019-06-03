@@ -96,7 +96,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from voice
     where id = #{id,jdbcType=BIGINT}
@@ -200,26 +200,40 @@
         order by v.score desc
         limit 10
     </select>
-  <select id="selectTeksRankSchool" resultType="java.util.Map" parameterType="java.util.Map">
-    select * from
-      (select ROUND(AVG(DISTINCT vo.score)) avgscore , stu.student_name studentName ,  stu.school_name schoolName
-      , stu.part_url url
-      from voice vo  right join student stu on vo.student_id=stu.id
-      where stu.school_name = #{schoolName}
-			and vo.type = 2
-        and vo.unit_id = #{unitId}
-        GROUP BY vo.student_id
-        ) score  order by score.avgscore desc limit 6
+  <select id="selectTextRankSchool" resultType="java.util.Map" parameterType="java.util.Map">
+    select *
+    from (select ROUND(AVG(DISTINCT vo.score)) avgscore
+               , stu.student_name              studentName
+               , stu.school_name               schoolName
+               , stu.part_url                  url
+          from voice vo
+                 right join student stu on vo.student_id = stu.id
+          where stu.school_name = #{schoolName}
+            and vo.type = 2
+            and vo.unit_id = #{unitId}
+            and vo.create_time >= #{beforeTime}
+            and vo.create_time &lt;= #{nowTime}
+          GROUP BY vo.student_id
+         ) score
+    order by score.avgscore desc
+    limit 6
   </select>
-  <select id="selectTeksRank" resultType="java.util.Map" parameterType="java.util.Map">
-    select * from
-      (select ROUND(AVG(DISTINCT vo.score)) avgscore , stu.student_name studentName ,  stu.school_name schoolName
-       , stu.part_url url
-      from voice vo  right join student stu on vo.student_id=stu.id
-      where vo.type = 2
-        and vo.unit_id = #{unitId}
-        GROUP BY vo.student_id
-        ) score  order by score.avgscore desc limit 6
+  <select id="selectTextRank" resultType="java.util.Map" parameterType="java.util.Map">
+    select *
+    from (select ROUND(AVG(DISTINCT vo.score)) avgscore
+               , stu.student_name              studentName
+               , stu.school_name               schoolName
+               , stu.part_url                  url
+          from voice vo
+                 right join student stu on vo.student_id = stu.id
+          where vo.type = 2
+            and vo.unit_id = #{unitId}
+            and vo.create_time >= #{beforeTime}
+            and vo.create_time &lt;= #{nowTime}
+          GROUP BY vo.student_id
+         ) score
+    order by score.avgscore desc
+    limit 6
   </select>
     <update id="updateByExampleSelective" parameterType="map">
     update voice

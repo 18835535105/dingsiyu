@@ -63,7 +63,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
 
         try {
             if (this.checkAward(award, DAILY_TYPE)) {
-                int openCount = openUnitLogMapper.countTodayOpenCount(studentId);
+                int openCount = testRecordMapper.countTodayTestUnitCount(studentId);
                 optAward(studentId, awardContentType, openCount, award, DAILY_TYPE);
             }
         } catch (Exception e) {

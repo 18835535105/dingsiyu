@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.utils.language.SpeechEvaluation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,17 +29,21 @@ public class GoodVoiceUtil {
     /**
      * 获取单词语音评测得分
      *
-     * @param text    评测的内容
-     * @param fileUrl 语音文件地址
+     * @param text 评测的内容
+     * @param file 语音文件
      * @return 测试得分（小数）；满分为 5 分
      */
-    public Map<String, Object> getWordEvaluationRecord(String text, String fileUrl) {
-        String result = speechEvaluation.getEvaluationResult(text, fileUrl);
+    public Map<String, Object> getWordEvaluationRecord(String text, MultipartFile file) {
+        String result = speechEvaluation.getEvaluationResult(text, file);
+        if (log.isDebugEnabled()) {
+            log.debug("语音评测响应结果：[{}]", result);
+        }
         if (result != null) {
             Map<String, Object> map = new HashMap<>(16);
 
             int score;
             Float pronAccuracy = JSONObject.parseObject(result).getFloat("PronAccuracy");
+            String audioUrl = JSONObject.parseObject(result).getString("AudioUrl");
             if (pronAccuracy == -1) {
                 score = 0;
             } else {
@@ -46,6 +51,7 @@ public class GoodVoiceUtil {
             }
             map.put("score", score);
             map.put("heart", getHeart(score));
+            map.put("voiceUrl", audioUrl);
             return map;
         }
         return new HashMap<>(16);
@@ -56,7 +62,7 @@ public class GoodVoiceUtil {
      * 获取例句的语音评测
      *
      * @param text
-     * @param fileUrl
+     * @param file
      * @return 满分为 5 分
      * key:totalScore; 句子总评分<br>
      * key:word; value:List    单词评分信息<br>
@@ -64,14 +70,17 @@ public class GoodVoiceUtil {
      * key:word; 单词英文<br>
      * <p>
      */
-    public Map<String, Object> getSentenceEvaluationRecord(String text, String fileUrl) {
+    public Map<String, Object> getSentenceEvaluationRecord(String text, MultipartFile file) {
         // 得分
         final String pronAccuracy = "PronAccuracy";
         // 句子中各个单词得分信息
         final String words = "Words";
 
         String findText = text.replace("!", ",").replace("?", ",").replace(".", ",");
-        String result = speechEvaluation.getEvaluationResult(findText, fileUrl);
+        String result = speechEvaluation.getEvaluationResult(findText, file);
+        if (log.isDebugEnabled()) {
+            log.debug("语音评测响应结果：[{}]", result);
+        }
         if (result != null) {
             Map<String, Object> map = new HashMap<>(16);
             List<Map<String, Object>> mapList = new ArrayList<>();
@@ -86,6 +95,8 @@ public class GoodVoiceUtil {
 
             map.put("totalScore", totalScore);
             map.put("heart", getHeart(totalScore));
+            String audioUrl = JSONObject.parseObject(result).getString("AudioUrl");
+            map.put("voiceUrl", audioUrl);
 
             int score;
             String[] s = text.split(" ");
@@ -140,7 +151,7 @@ public class GoodVoiceUtil {
             map.put("word", mapList);
             return map;
         }
-        return null;
+        return new HashMap<>(16);
     }
 
     private int getHeart(int score) {

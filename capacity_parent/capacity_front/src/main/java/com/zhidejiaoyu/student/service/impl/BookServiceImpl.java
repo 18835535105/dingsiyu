@@ -220,14 +220,9 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
         boolean flag = WORD_MEMORY.equals(studyModel) || WORD_LISTEN.equals(studyModel) || WORD_WRITE.equals(studyModel);
         if (unitId != 0) {
             // 查看指定单元的单词/例句信息
-            if (flag) {
-                courseId = unitMapper.selectCourseIdByUnitId(unitId);
-            }else{
-                courseId = sentenceUnitMapper.selectCourseIdByUnitId(unitId);
-            }
-            Integer learnCount = studyCountMapper.selectMaxCountByCourseId(studentId, courseId);
-            learnedCount = learnMapper.countLearnWord(studentId, unitId, studyModel, learnCount == null ? 1 : learnCount);
-            notKnow = learnMapper.countNotKnownWord(studentId, unitId, studyModel, learnCount == null ? 1 : learnCount);
+            Integer learnCount = 1;
+            learnedCount = learnMapper.countLearnWord(studentId, unitId, studyModel, learnCount);
+            notKnow = learnMapper.countNotKnownWord(studentId, unitId, studyModel, learnCount);
             if (flag) {
                 // 查看单词本摘要信息
                 total = unitVocabularyMapper.countByUnitId(unitId);
@@ -240,9 +235,9 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
             }
         } else {
             // 查看指定课程的单词/例句信息
-            Integer learnCount = studyCountMapper.selectMaxCountByCourseId(studentId, courseId);
-            learnedCount = learnMapper.countLearnWordByCourse(studentId, courseId, studyModel, learnCount == null ? 1 : learnCount);
-            notKnow = learnMapper.countNotKnownWordByCourse(studentId, courseId, studyModel, learnCount == null ? 1 : learnCount);
+            Integer learnCount = 1;
+            learnedCount = learnMapper.countLearnWordByCourse(studentId, courseId, studyModel, learnCount);
+            notKnow = learnMapper.countNotKnownWordByCourse(studentId, courseId, studyModel, learnCount);
             if (flag) {
                 // 查看单词本摘要信息
                 total = unitVocabularyMapper.countByCourseId(courseId);
@@ -388,9 +383,9 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
     public ServerResponse<String> restudy(HttpSession session, Long courseId, Long unitId, Long[] wordIds, Integer studyModel) {
         Student student = getStudent(session);
         // 查询当前学生当前课程的学习遍数
-        Integer maxStudyCount = studyCountMapper.selectMaxCountByCourseId(student.getId(), courseId);
+        int maxStudyCount = 1;
         // 更新学习记录
-        learnMapper.updateUnknownWords(student, unitId, courseId, wordIds, studyModel, maxStudyCount == null ? 1 : maxStudyCount);
+        learnMapper.updateUnknownWords(student, unitId, courseId, wordIds, studyModel, maxStudyCount);
         // 更新记忆追踪记录
         // 根据条件查询单词是否已经在记忆追踪中，如果在更新记忆追踪；如果不在新增记忆追踪
         List<Long> updateIds = capacityReviewMapper.selectByWordIdsAndStudyModel(student, courseId, unitId, wordIds, studyModel);

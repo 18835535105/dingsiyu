@@ -158,7 +158,7 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
         String chinese;
         Integer studyCount;
 
-        Integer maxCount = studyCountMapper.selectMaxCountByCourseId(studentId, courseId);
+        Integer maxCount = 1;
 
         // 获取单词/例句 中文信息
         String wordMemory = "慧记忆";
@@ -169,14 +169,14 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
                 || wordPicture.equals(studyModel)) {
             chinese = vocabularyMapper.selectWordChineseById(id);
             studyCount = learnMapper.selectStudyCountByCourseId(studentId, courseId, unitId, id, studyModel,
-                    maxCount == null ? 1 : maxCount);
+                    maxCount);
         } else {
             chinese = sentenceMapper.selectChineseByIdAndPhase(id);
             if (StringUtils.isNotEmpty(chinese)) {
                 chinese = chinese.replace("*", "");
             }
             studyCount = learnMapper.selectStudyCountByCourseId(studentId, courseId, unitId, id, studyModel,
-                    maxCount == null ? 1 : maxCount);
+                    maxCount);
         }
 
         if (studyCount == null) {

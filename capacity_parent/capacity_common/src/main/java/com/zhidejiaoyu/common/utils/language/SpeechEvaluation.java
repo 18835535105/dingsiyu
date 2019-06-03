@@ -11,11 +11,8 @@ import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessRequest;
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.UUID;
 
 /**
@@ -57,7 +54,7 @@ public class SpeechEvaluation {
     public static final String FAILED = "Failed";
     public static final String EVALUATING = "Evaluating";
 
-    public String getEvaluationResult(String text, String fileUrl) {
+    public String getEvaluationResult(String text, MultipartFile file) {
 
         Credential cred = new Credential(SECRET_ID, SECRET_KEY);
         HttpProfile httpProfile = new HttpProfile();
@@ -84,7 +81,6 @@ public class SpeechEvaluation {
         req.setScoreCoeff(1.0f);
         try {
             InitOralProcessResponse resp = initWithRetry(client,req);
-            log.info("初始化返回结果:{}", InitOralProcessRequest.toJsonString(resp));
         } catch (Exception e) {
             log.error("初始化语音评测失败！", e);
             return null;
@@ -95,7 +91,7 @@ public class SpeechEvaluation {
         transReq.setVoiceEncodeType(1);
         transReq.setVoiceFileType(WAV);
         try {
-            byte[] buf = getFileOutputStream(fileUrl);
+            byte[] buf = file.getBytes();
             String base64Str = new sun.misc.BASE64Encoder().encode(buf);
             transReq.setUserVoiceData(base64Str);
             transReq.setSeqId(1);
@@ -163,34 +159,6 @@ public class SpeechEvaluation {
             }
             throw e;
         }
-    }
-
-    private byte[] getFileOutputStream(String fileUrl) {
-        InputStream inputStream = null;
-        try {
-            java.net.URL url = new URL(fileUrl);
-            inputStream = url.openStream();
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024 * 4];
-            int n;
-            while ((n = inputStream.read(buffer)) != -1) {
-                out.write(buffer, 0, n);
-            }
-            return out.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.error("语音评测获取语音文件失败！路径： {}", fileUrl, e);
-        } finally {
-            try {
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return new byte[0];
     }
 
     private static String getSessionId() {
