@@ -133,7 +133,13 @@ public class GoodVoiceUtil {
                 }
             } else {
                 wordMap = new HashMap<>(16);
-                score = Math.round(wordArray.getJSONObject(0).getFloat(pronAccuracy));
+                score = 0;
+                if (wordArray.size() == 0) {
+                    log.warn("保存好声音数据响应出错！响应结果：[{}]", result);
+                } else {
+                    score = Math.round(wordArray.getJSONObject(0).getFloat(pronAccuracy));
+                }
+
                 if (score == -1) {
                     score = 0;
                 }
