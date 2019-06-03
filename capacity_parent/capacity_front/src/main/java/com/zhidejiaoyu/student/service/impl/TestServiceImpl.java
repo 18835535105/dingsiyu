@@ -1589,6 +1589,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     @Override
+    @TestChangeAnnotation
+    @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse savePhoneticSymbolUnitTest(HttpSession session, UnitTestDto dto) {
         Student student = super.getStudent(session);
