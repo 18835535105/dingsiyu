@@ -248,7 +248,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
      */
     private ServerResponse<Object> restudy(Student student, Long unitId) {
         learnMapper.updateTypeByStudentIdAndUnitId(student.getId(), unitId, STUDY_MODEL, 2);
-        return ServerResponse.createBySuccess();
+        return ServerResponse.createBySuccess(201, "操作成功");
     }
 
     /**
