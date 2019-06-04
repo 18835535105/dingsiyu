@@ -8,10 +8,7 @@ import com.zhidejiaoyu.student.dto.phonetic.UnitTestDto;
 import com.zhidejiaoyu.student.service.PhoneticSymbolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -53,14 +50,15 @@ public class PhoneticSymbolController {
      * 获取音标辨音题目
      *
      * @param unitId 单元 id
+     * @param restudy 是否重新学习
      * @return
      */
     @GetMapping("/getSymbolListen")
-    public ServerResponse<Object> getSymbolListen(Long unitId, HttpSession session) {
+    public ServerResponse<Object> getSymbolListen(Long unitId, HttpSession session, @RequestParam(required = false, defaultValue = "false") Boolean restudy) {
         if (unitId == null) {
             return ServerResponse.createByError(400, "单元 id 不能为空！");
         }
-        return phoneticSymbolService.getSymbolListen(unitId, session);
+        return phoneticSymbolService.getSymbolListen(unitId, session, restudy);
     }
 
     /**

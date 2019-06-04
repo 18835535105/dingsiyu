@@ -209,9 +209,13 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     }
 
     @Override
-    public ServerResponse<Object> getSymbolListen(Long unitId, HttpSession session) {
+    public ServerResponse<Object> getSymbolListen(Long unitId, HttpSession session, Boolean restudy) {
         Student student = super.getStudent(session);
         Long studentId = student.getId();
+
+        if (restudy) {
+            return this.restudy(student, unitId);
+        }
 
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
@@ -221,7 +225,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
 
         PhoneticSymbol phoneticSymbol = this.getUnLearnedPhoneticSymbol(unitId, studentId);
         if (phoneticSymbol == null) {
-            return ServerResponse.createBySuccess(600, "当前单元已学习完！");
+             return ServerResponse.createBySuccess(600, "当前单元已学习完！");
         }
 
         PhoneticSymbolListenVo vo = new PhoneticSymbolListenVo();
@@ -233,6 +237,18 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         vo.setAudioUrl(prefix + phoneticSymbol.getUrl());
 
         return ServerResponse.createBySuccess(vo);
+    }
+
+    /**
+     * 重新学习
+     *
+     * @param student
+     * @param unitId
+     * @return
+     */
+    private ServerResponse<Object> restudy(Student student, Long unitId) {
+        learnMapper.updateTypeByStudentIdAndUnitId(student.getId(), unitId, STUDY_MODEL, 2);
+        return ServerResponse.createBySuccess();
     }
 
     /**

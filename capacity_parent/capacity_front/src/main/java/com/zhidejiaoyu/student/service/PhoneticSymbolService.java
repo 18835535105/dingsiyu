@@ -3,7 +3,6 @@ package com.zhidejiaoyu.student.service;
 import com.zhidejiaoyu.common.pojo.PhoneticSymbol;
 import com.baomidou.mybatisplus.service.IService;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.dto.phonetic.UnitTestDto;
 
 import javax.servlet.http.HttpSession;
 
@@ -31,9 +30,10 @@ public interface PhoneticSymbolService extends IService<PhoneticSymbol> {
      *
      * @param unitId 单元 id
      * @param session
+     * @param restudy   restudy 是否重新学习
      * @return
      */
-    ServerResponse<Object> getSymbolListen(Long unitId, HttpSession session);
+    ServerResponse<Object> getSymbolListen(Long unitId, HttpSession session, Boolean restudy);
 
     /**
      * 保存音节辨音记录
