@@ -351,14 +351,25 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     private void getTypeThree(List<PhoneticSymbol> symbols, List<PhoneticSymbol> phoneticSymbols, List<Map<String, Object>> resultList) {
 
         Collections.shuffle(symbols);
-        List<PhoneticSymbol> collect = symbols.stream().limit(3).collect(Collectors.toList());
+        List<PhoneticSymbol> collect = symbols.stream().filter(symbol -> !Objects.equals(symbol.getLetter(), phoneticSymbols.get(0).getLetter())).collect(Collectors.toList());
         List<Map<String, Object>> answerList = new ArrayList<>(collect.size());
+
+        // 对答案去重
+        Map<String, String> distinctMap = new HashMap<>(16);
         Map<String, Object> answerMap;
         for (PhoneticSymbol symbol : collect) {
+            if (distinctMap.containsKey(symbol.getLetter())) {
+                continue;
+            } else {
+                distinctMap.put(symbol.getLetter(), symbol.getLetter());
+            }
             answerMap = new HashMap<>(16);
             answerMap.put("word", symbol.getPhoneticSymbol());
             answerMap.put("answer", false);
             answerList.add(answerMap);
+            if (distinctMap.size() == 3) {
+                break;
+            }
         }
         answerMap = new HashMap<>(16);
         answerMap.put("word", phoneticSymbols.get(0).getPhoneticSymbol());
@@ -391,11 +402,21 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         answerMap.put("answer", true);
         list.add(answerMap);
 
-        for (int i = 0; i < 3; i++) {
+        List<PhoneticSymbol> collect = otherPhoneticSymbol.stream().filter(symbol -> !Objects.equals(symbol.getLetter(), val.get(0).getLetter())).collect(Collectors.toList());
+        Map<String, String> distinctMap = new HashMap<>(16);
+        for (PhoneticSymbol symbol : collect) {
+            if (distinctMap.containsKey(symbol.getLetter())) {
+                continue;
+            } else {
+                distinctMap.put(symbol.getLetter(), symbol.getLetter());
+            }
             answerMap = new HashMap<>(16);
-            answerMap.put("word", otherPhoneticSymbol.get(i).getLetter());
+            answerMap.put("word", symbol.getLetter());
             answerMap.put("answer", false);
             list.add(answerMap);
+            if (distinctMap.size() == 3) {
+                break;
+            }
         }
         Collections.shuffle(list);
 

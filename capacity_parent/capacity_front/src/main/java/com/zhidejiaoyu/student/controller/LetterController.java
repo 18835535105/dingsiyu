@@ -69,14 +69,8 @@ public class LetterController {
      * @return
      */
     @RequestMapping("/saveLetterListen")
-    public Object saveLetterListen(Player player, HttpSession session,String validTime) {
-        long valid = 0L;
-        try {
-            valid = Long.valueOf(validTime);
-        } catch (Exception e) {
-            log.error("有效时长入参类型错误：学习模块[{}]，validTime[{}]，error=[{}]", 30, validTime, e.getMessage());
-        }
-        return letterService.saveLetterListen(player, session,valid);
+    public Object saveLetterListen(Player player, HttpSession session) {
+        return letterService.saveLetterListen(player, session);
     }
 
     /**
