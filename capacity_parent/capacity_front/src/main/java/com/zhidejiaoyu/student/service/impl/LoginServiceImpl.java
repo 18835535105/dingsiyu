@@ -1161,7 +1161,12 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             }
         }
         if (type.equals(2) || type.equals(3)) {
-            List<Map<String, Object>> maps = studentStudyPlanMapper.selByStudentId(student.getId(), type);
+            List<Map<String, Object>> maps = null;
+            if(type==2){
+                maps=studentStudyPlanMapper.selBySentenceStudentId(student.getId(), type);
+            }else{
+                maps = studentStudyPlanMapper.selByStudentId(student.getId(), type);
+            }
             if (maps != null && maps.size() > 0) {
                 isHave = true;
             }
