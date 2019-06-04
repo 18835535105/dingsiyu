@@ -207,7 +207,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     }
 
     @Override
-    public Object saveLetterListen(Player player, HttpSession session, Long valid) {
+    public Object saveLetterListen(Player player, HttpSession session) {
         Long studentId = getStudentId(session);
         try {
             int i = playerMapper.selectByType(studentId, player.getUnitId(), 4, player.getWordId());
@@ -242,7 +242,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 learnMapper.updateById(learn);
             }
         } catch (Exception e) {
-            log.error("学生:" + studentId + " 保存字母播放器出错", e.getMessage());
+            log.error("学生: {} 保存字母播放器出错, errMsg=[{}]", studentId, e.getMessage());
             return ServerResponse.createByError(400, "保存失败");
         }
 
