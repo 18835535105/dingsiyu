@@ -345,7 +345,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     private void getTypeThree(List<PhoneticSymbol> symbols, List<PhoneticSymbol> phoneticSymbols, List<Map<String, Object>> resultList) {
 
         Collections.shuffle(symbols);
-        List<PhoneticSymbol> collect = symbols.stream().limit(3).collect(Collectors.toList());
+        List<PhoneticSymbol> collect = symbols.stream().filter(symbol -> !Objects.equals(symbol.getLetter(), phoneticSymbols.get(0).getLetter())).limit(3).collect(Collectors.toList());
         List<Map<String, Object>> answerList = new ArrayList<>(collect.size());
         Map<String, Object> answerMap;
         for (PhoneticSymbol symbol : collect) {
@@ -385,9 +385,10 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         answerMap.put("answer", true);
         list.add(answerMap);
 
-        for (int i = 0; i < 3; i++) {
+        List<PhoneticSymbol> collect = otherPhoneticSymbol.stream().filter(symbol -> !Objects.equals(symbol.getLetter(), val.get(0).getLetter())).limit(3).collect(Collectors.toList());
+        for (PhoneticSymbol symbol : collect) {
             answerMap = new HashMap<>(16);
-            answerMap.put("word", otherPhoneticSymbol.get(i).getLetter());
+            answerMap.put("word", symbol.getLetter());
             answerMap.put("answer", false);
             list.add(answerMap);
         }
