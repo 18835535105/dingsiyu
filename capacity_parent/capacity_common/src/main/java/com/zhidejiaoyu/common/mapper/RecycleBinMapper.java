@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.zhidejiaoyu.common.pojo.Admin;
 import com.zhidejiaoyu.common.pojo.RecycleBin;
 import org.apache.ibatis.annotations.Param;
 
@@ -43,12 +42,4 @@ public interface RecycleBinMapper {
      * @return
      */
     List<RecycleBin> selectByIds(@Param("ids") Long[] ids);
-
-    /**
-     * 批量更新删除状态为恢复状态
-     *
-     * @param ids   回收站id集合
-     * @param admin
-     */
-    void updateDelStatusByIds(@Param("ids") Long[] ids, @Param("admin") Admin admin);
 }

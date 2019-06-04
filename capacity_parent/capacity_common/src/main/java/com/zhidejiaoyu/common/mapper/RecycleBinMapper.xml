@@ -33,14 +33,6 @@
             now())
         </foreach>
     </insert>
-    <update id="updateDelStatusByIds" parameterType="map">
-        update recycle_bin set del_status = 2, update_time = now(), recover_user_id = #{admin.id} , recover_user_name =
-        #{admin.name} where id in (
-        <foreach collection="ids" item="id" separator=",">
-            #{id}
-        </foreach>
-        )
-    </update>
     <select id="selectRecycle" resultType="map" parameterType="map">
         select
         r.id id, r.create_time createTime, s.account account, s.student_name studentName,
