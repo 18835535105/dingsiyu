@@ -281,6 +281,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         Long studentId = student.getId();
         Map<String, Object> studyMap = null;
         List<Map<String, Object>> resultMap;
+        List<CourseUnitVo> courseUnitVos = new ArrayList<>();
+        CourseUnitVo courseUnitVo;
         Map<String, Object> returnMap = new HashMap<>();
         // 学生所有课程id及课程名
         /* List<Map<String, Object>> courses = courseMapper.selectTextCourseIdAndCourseNameByStudentId(studentId);*/
@@ -304,24 +306,48 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                         }
                     }
                 }
+                for (Map<String, Object> courseMap : courses) {
+                    courseUnitVo = new CourseUnitVo();
+                    resultMap = new ArrayList<>();
+                    Long id = learnMapper.selLaterLearnTeks(student.getId(), (Long) courseMap.get("id"));
+                    if (id != null) {
+                        courseUnitVo.setLearnUnit(id.toString());
+                    }
+                    courseUnitVo.setCourseId((Long) courseMap.get("id"));
+                    courseUnitVo.setCourseName(courseMap.get("courseName").toString());
+                    courseUnitVo.setVersion(courseMap.get("version").toString());
+                    courseUnitVo.setGrad(courseMap.get("grade").toString() + courseMap.get("label").toString());
+                    courseUnitVo.setUnitVos(resultMap);
+                    courseUnitVos.add(courseUnitVo);
+                }
                 if (flag) {
                     studyMap = new HashMap<>();
-                    studyMap.put("unitId", learnUnit.get("unit_id"));
+                    Long studyUnitId = Long.parseLong(((Long) learnUnit.get("unit_id")).toString());
+                    studyMap.put("unitId", studyUnitId);
                     studyMap.put("version", learnUnit.get("version"));
-                    studyMap.put("grade", learnUnit.get("grade").toString() + learnUnit.get("label").toString());
+                    TeksUnit teksUnit = teksUnitMapper.selectById(studyUnitId);
+                    studyMap.put("unitName",teksUnit.getUnitName());
+                    studyMap.put("grade", learnUnit.get("grade").toString() +"-"+ learnUnit.get("label").toString());
+                    studyMap.put("courseId",learnUnit.get("courseId"));
                 }else{
                     if(plans.size()!=0){
                         studyMap = new HashMap<>();
-                        studyMap.put("unitId", plans.get(0).getStartUnitId());
+                        Long studyUnitId =plans.get(0).getStartUnitId();
+                        studyMap.put("unitId", studyUnitId);
+                        TeksUnit teksUnit = teksUnitMapper.selectById(studyUnitId);
+                        studyMap.put("unitName",teksUnit.getUnitName());
                         TeksCourse teksCourse = teksCourseMapper.selectById(plans.get(0).getCourseId());
                         studyMap.put("version", teksCourse.getVersion());
-                        studyMap.put("grade", teksCourse.getGrade() + teksCourse.getLabel());
+                        studyMap.put("grade", teksCourse.getGrade() +"-"+ teksCourse.getLabel());
+                        studyMap.put("courseId",teksCourse.getId());
+
                     }
                 }
             }
             List<Map<String, Object>> testList = teksMapper.getStudentAllCourse(studentId, courseIds);
             returnMap.put("present", studyMap);
             returnMap.put("versionList", testList);
+            returnMap.put("list",courseUnitVos);
         }
 
 
@@ -340,7 +366,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         List<Map<String, Object>> resultMap;
         this.getStudyUnit(courseIds, textUnits, studentId);
         // 已经进行过单元闯关的单元
-
         List<Map<String, Object>> courses = studentStudyPlanMapper.selByStudentIdAndCourseIdAndType(studentId,3,courseId);
         if (textUnits.size() > 0) {
             List<Long> unitIds = new ArrayList<>(textUnits.size());
@@ -353,10 +378,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             if (id != null) {
                 courseUnitVo.setLearnUnit(id.toString());
             }
-            courseUnitVo.setCourseId((Long) courseMap.get("id"));
-            courseUnitVo.setCourseName(courseMap.get("courseName").toString());
-            courseUnitVo.setVersion(courseMap.get("version").toString());
-            courseUnitVo.setGrad(courseMap.get("grade").toString() + courseMap.get("label").toString());
             // 存放单元信息
             Map<String, Object> unitInfoMap;
             for (Map<String, Object> unitMap : textUnits) {
@@ -411,13 +432,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                         unitInfoMap.put("teksEntryTest", false);
                     }
                     resultMap.add(unitInfoMap);
-
                 }
             }
             courseUnitVo.setUnitVos(resultMap);
             courseUnitVos.add(courseUnitVo);
         }
-        return null;
+        return ServerResponse.createBySuccess(courseUnitVos);
     }
 
     @Override
