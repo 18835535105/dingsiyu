@@ -359,6 +359,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 Learn learn = new Learn();
                 learn.setStudentId(studentId);
                 learn.setStudyModel("字母听写");
+                learn.setVocabularyId(letter.getId().longValue());
                 learn.setStatus(1);
                 learn.setUnitId(letter.getUnitId().longValue());
                 learn.setLearnTime(date);
@@ -395,6 +396,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             learn.setType(4);
             learn.setStudyModel("字母配对");
             learn.setType(1);
+            learn.setLearnTime(new Date());
             learn.setUnitId(letterPair.getUnitId().longValue());
             learn.setVocabularyId(letterPair.getLetterId().longValue());
             learnMapper.insert(learn);
