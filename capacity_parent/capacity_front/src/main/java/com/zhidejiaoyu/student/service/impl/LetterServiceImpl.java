@@ -176,6 +176,8 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                         if (max < 100) {
                             falg = false;
                         }
+                    }else{
+                        falg = false;
                     }
                 }
                 if(falg){
@@ -183,7 +185,6 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 }else{
                     map.put("LetterPosttest",false);
                 }
-
             }
 
             return ServerResponse.createBySuccess(map);
