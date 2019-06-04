@@ -82,7 +82,7 @@
             </foreach>
         </where>
     </sql>
-    <sql id="Base_Column_List" >
+    <sql id="Base_Column_List">
         id, student_id, course_id, unit_id, genre, test_start_time, test_end_time, point,
         history_best_point, history_bad_point, quantity, `explain`, error_count, right_count,
         study_model, award_gold, better_count, pass
@@ -142,7 +142,7 @@
         select
         <include refid="Base_Column_List"/>
         from test_record where student_id = #{studentId} and unit_id =
-        #{unitId} and genre = #{genre}  order by point desc limit 1
+        #{unitId} and genre = #{genre} order by point desc limit 1
     </select>
 
     <select id="selectByUnitId" resultType="java.lang.Integer"
@@ -194,111 +194,111 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.TestRecord" >
+    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.TestRecord">
         insert into test_record
-        <trim prefix="(" suffix=")" suffixOverrides="," >
-            <if test="id != null" >
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
                 id,
             </if>
-            <if test="studentId != null" >
+            <if test="studentId != null">
                 student_id,
             </if>
-            <if test="courseId != null" >
+            <if test="courseId != null">
                 course_id,
             </if>
-            <if test="unitId != null" >
+            <if test="unitId != null">
                 unit_id,
             </if>
-            <if test="genre != null" >
+            <if test="genre != null">
                 genre,
             </if>
-            <if test="testStartTime != null" >
+            <if test="testStartTime != null">
                 test_start_time,
             </if>
-            <if test="testEndTime != null" >
+            <if test="testEndTime != null">
                 test_end_time,
             </if>
-            <if test="point != null" >
+            <if test="point != null">
                 point,
             </if>
-            <if test="historyBestPoint != null" >
+            <if test="historyBestPoint != null">
                 history_best_point,
             </if>
-            <if test="historyBadPoint != null" >
+            <if test="historyBadPoint != null">
                 history_bad_point,
             </if>
-            <if test="quantity != null" >
+            <if test="quantity != null">
                 quantity,
             </if>
-            <if test="explain != null" >
+            <if test="explain != null">
                 `explain`,
             </if>
-            <if test="errorCount != null" >
+            <if test="errorCount != null">
                 error_count,
             </if>
-            <if test="rightCount != null" >
+            <if test="rightCount != null">
                 right_count,
             </if>
-            <if test="studyModel != null" >
+            <if test="studyModel != null">
                 study_model,
             </if>
-            <if test="awardGold != null" >
+            <if test="awardGold != null">
                 award_gold,
             </if>
-            <if test="betterCount != null" >
+            <if test="betterCount != null">
                 better_count,
             </if>
         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides="," >
-            <if test="id != null" >
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
                 #{id,jdbcType=BIGINT},
             </if>
-            <if test="studentId != null" >
+            <if test="studentId != null">
                 #{studentId,jdbcType=BIGINT},
             </if>
-            <if test="courseId != null" >
+            <if test="courseId != null">
                 #{courseId,jdbcType=BIGINT},
             </if>
-            <if test="unitId != null" >
+            <if test="unitId != null">
                 #{unitId,jdbcType=BIGINT},
             </if>
-            <if test="genre != null" >
+            <if test="genre != null">
                 #{genre,jdbcType=VARCHAR},
             </if>
-            <if test="testStartTime != null" >
+            <if test="testStartTime != null">
                 #{testStartTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="testEndTime != null" >
+            <if test="testEndTime != null">
                 #{testEndTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="point != null" >
+            <if test="point != null">
                 #{point,jdbcType=INTEGER},
             </if>
-            <if test="historyBestPoint != null" >
+            <if test="historyBestPoint != null">
                 #{historyBestPoint,jdbcType=INTEGER},
             </if>
-            <if test="historyBadPoint != null" >
+            <if test="historyBadPoint != null">
                 #{historyBadPoint,jdbcType=INTEGER},
             </if>
-            <if test="quantity != null" >
+            <if test="quantity != null">
                 #{quantity,jdbcType=INTEGER},
             </if>
-            <if test="explain != null" >
+            <if test="explain != null">
                 #{explain,jdbcType=VARCHAR},
             </if>
-            <if test="errorCount != null" >
+            <if test="errorCount != null">
                 #{errorCount,jdbcType=INTEGER},
             </if>
-            <if test="rightCount != null" >
+            <if test="rightCount != null">
                 #{rightCount,jdbcType=INTEGER},
             </if>
-            <if test="studyModel != null" >
+            <if test="studyModel != null">
                 #{studyModel,jdbcType=VARCHAR},
             </if>
-            <if test="awardGold != null" >
+            <if test="awardGold != null">
                 #{awardGold,jdbcType=INTEGER},
             </if>
-            <if test="betterCount != null" >
+            <if test="betterCount != null">
                 #{betterCount,jdbcType=INTEGER},
             </if>
         </trim>
@@ -311,66 +311,66 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </select>
-    <update id="updateByExampleSelective" parameterType="map" >
+    <update id="updateByExampleSelective" parameterType="map">
         update test_record
-        <set >
-            <if test="record.id != null" >
+        <set>
+            <if test="record.id != null">
                 id = #{record.id,jdbcType=BIGINT},
             </if>
-            <if test="record.studentId != null" >
+            <if test="record.studentId != null">
                 student_id = #{record.studentId,jdbcType=BIGINT},
             </if>
-            <if test="record.courseId != null" >
+            <if test="record.courseId != null">
                 course_id = #{record.courseId,jdbcType=BIGINT},
             </if>
-            <if test="record.unitId != null" >
+            <if test="record.unitId != null">
                 unit_id = #{record.unitId,jdbcType=BIGINT},
             </if>
-            <if test="record.genre != null" >
+            <if test="record.genre != null">
                 genre = #{record.genre,jdbcType=VARCHAR},
             </if>
-            <if test="record.testStartTime != null" >
+            <if test="record.testStartTime != null">
                 test_start_time = #{record.testStartTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="record.testEndTime != null" >
+            <if test="record.testEndTime != null">
                 test_end_time = #{record.testEndTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="record.point != null" >
+            <if test="record.point != null">
                 point = #{record.point,jdbcType=INTEGER},
             </if>
-            <if test="record.historyBestPoint != null" >
+            <if test="record.historyBestPoint != null">
                 history_best_point = #{record.historyBestPoint,jdbcType=INTEGER},
             </if>
-            <if test="record.historyBadPoint != null" >
+            <if test="record.historyBadPoint != null">
                 history_bad_point = #{record.historyBadPoint,jdbcType=INTEGER},
             </if>
-            <if test="record.quantity != null" >
+            <if test="record.quantity != null">
                 quantity = #{record.quantity,jdbcType=INTEGER},
             </if>
-            <if test="record.explain != null" >
+            <if test="record.explain != null">
                 `explain` = #{record.explain,jdbcType=VARCHAR},
             </if>
-            <if test="record.errorCount != null" >
+            <if test="record.errorCount != null">
                 error_count = #{record.errorCount,jdbcType=INTEGER},
             </if>
-            <if test="record.rightCount != null" >
+            <if test="record.rightCount != null">
                 right_count = #{record.rightCount,jdbcType=INTEGER},
             </if>
-            <if test="record.studyModel != null" >
+            <if test="record.studyModel != null">
                 study_model = #{record.studyModel,jdbcType=VARCHAR},
             </if>
-            <if test="record.awardGold != null" >
+            <if test="record.awardGold != null">
                 award_gold = #{record.awardGold,jdbcType=INTEGER},
             </if>
-            <if test="record.betterCount != null" >
+            <if test="record.betterCount != null">
                 better_count = #{record.betterCount,jdbcType=INTEGER},
             </if>
         </set>
-        <if test="_parameter != null" >
-            <include refid="Update_By_Example_Where_Clause" />
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
         </if>
     </update>
-    <update id="updateByExample" parameterType="map" >
+    <update id="updateByExample" parameterType="map">
         update test_record
         set id = #{record.id,jdbcType=BIGINT},
         student_id = #{record.studentId,jdbcType=BIGINT},
@@ -389,8 +389,8 @@
         study_model = #{record.studyModel,jdbcType=VARCHAR},
         award_gold = #{record.awardGold,jdbcType=INTEGER},
         better_count = #{record.betterCount,jdbcType=INTEGER}
-        <if test="_parameter != null" >
-            <include refid="Update_By_Example_Where_Clause" />
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
         </if>
     </update>
     <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.TestRecord">
@@ -441,7 +441,7 @@
             <if test="awardGold != null">
                 award_gold = #{awardGold,jdbcType=INTEGER},
             </if>
-            <if test="betterCount != null" >
+            <if test="betterCount != null">
                 better_count = #{betterCount,jdbcType=INTEGER},
             </if>
         </set>
@@ -498,11 +498,11 @@
         where a.student_id = #{student_id}
         <if test="type == 1">
             <!-- 单词类型的测试记录 -->
-          and a.study_model in ('单词图鉴','慧记忆','慧听写','慧默写')
+            and a.study_model in ('单词图鉴','慧记忆','慧听写','慧默写')
         </if>
         <if test="type == 2">
             <!-- 句型类型的测试记录 -->
-          and a.study_model in ('例句翻译','例句听力','例句默写')
+            and a.study_model in ('例句翻译','例句听力','例句默写')
         </if>
         and a.student_id = #{student_id} order by a.test_end_time Desc
     </select>
@@ -520,7 +520,8 @@
     </select>
 
     <select id="selectPoint" parameterType="map" resultType="integer">
-        select max(point) from test_record where student_id = #{student_id} and unit_id = #{unit_id} and genre = #{genre}
+        select max(point) from test_record where student_id = #{student_id} and unit_id = #{unit_id} and genre =
+        #{genre}
         <if test="model == 0">
             and study_model = '单词图鉴'
         </if>
@@ -718,7 +719,7 @@
         JOIN student b ON a.student_id = b.id
         JOIN course c ON a.course_id = c.id
         AND c.study_paragraph = #{study_paragraph} AND c.version = #{version}
-		AND b.teacher_id = #{teacherId}
+        AND b.teacher_id = #{teacherId}
         GROUP BY
         a.student_id
         ORDER BY
@@ -755,7 +756,7 @@
         JOIN student b ON a.student_id = b.id
         JOIN course c ON a.course_id = c.id
         AND c.study_paragraph = #{study_paragraph}
-        AND c.version =  #{version}
+        AND c.version = #{version}
         GROUP BY
         a.student_id
         ORDER BY
@@ -774,7 +775,8 @@
     </select>
 
     <select id="selectHasUnitTest" resultType="java.util.Map" parameterType="map">
-        select unit_id unitId, course_id courseId  from test_record where student_id = #{studentId} and genre = '单元闯关测试' and unit_id in (
+        select unit_id unitId, course_id courseId from test_record where student_id = #{studentId} and genre = '单元闯关测试'
+        and unit_id in (
         <foreach collection="unitIds" separator="," item="unitId">
             #{unitId}
         </foreach>
@@ -862,7 +864,9 @@
     </select>
 
     <select id="selectByStudentIdAndGenre" resultMap="BaseResultMap" parameterType="java.util.Map">
-        select <include refid="Base_Column_List"/> from test_record
+        select
+        <include refid="Base_Column_List"/>
+        from test_record
         where student_id=#{id}
         and genre='单元闯关测试'
         and unit_id=#{unitId}
@@ -875,5 +879,18 @@
         where student_id = #{studentId}
         order by id desc
         limit 1,1
+    </select>
+
+    <select id="selectUnitTestMaxPointByStudyModels" resultType="map" parameterType="map">
+        select max(point) max,unit_id unitId
+        from test_record
+        where unit_id in (
+        <foreach collection="letterUnitIds" separator="," item="unitId">
+            #{unitId}
+        </foreach>
+        )
+        and student_id = #{studentId}
+        <include refid="study_model_sql"/>
+        group by unit_id
     </select>
 </mapper>

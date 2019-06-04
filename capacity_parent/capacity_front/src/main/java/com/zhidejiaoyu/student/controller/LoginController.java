@@ -172,4 +172,9 @@ public class LoginController {
     public Object getRiepCount(HttpSession session){
         return loginService.getRiepCount(session);
     }
+
+    @GetMapping("/getModelStatus")
+    public Object getModelStatus(HttpSession session,Integer type){
+        return loginService.getModelStatus(session,type);
+    }
 }

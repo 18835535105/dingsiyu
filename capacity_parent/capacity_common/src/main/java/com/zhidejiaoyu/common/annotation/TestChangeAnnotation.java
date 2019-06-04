@@ -17,7 +17,7 @@ public @interface TestChangeAnnotation {
      *
      * <ul>
      *     <li>true：当前测试跟单元闯关测试相关奖励有关；比如‘闯关成功10个单元闯关测试’</li>
-     *     <li>true：当前测试跟所有测试相关奖励有关；比如"最有潜力勋章'奖励</li>
+     *     <li>false：当前测试跟所有测试相关奖励有关；比如"最有潜力勋章'奖励</li>
      * </ul>
      *
      * 该属性为 true，否则为 false

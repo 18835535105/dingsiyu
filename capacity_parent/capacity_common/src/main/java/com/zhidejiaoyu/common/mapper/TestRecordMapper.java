@@ -279,6 +279,9 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      */
     Integer selectPrePoint(@Param("studentId") Long studentId);
 
+    @MapKey("unitId")
+    Map<Integer,Map<String,Object>> selectUnitTestMaxPointByStudyModels(@Param("studentId") Long studentId,@Param("letterUnitIds") List<Integer> letterUnitIds,@Param("model") Integer model);
+
     /**
      * 统计学生今天进行的单元闯关测试次数
      *
@@ -288,3 +291,4 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     @Select("select count(id) from test_record where student_id = #{studentId} and genre = '单元闯关测试' and TO_DAYS(test_start_time) = TO_DAYS(now())")
     int countTodayTestUnitCount(@Param("studentId") Long studentId);
 }
+

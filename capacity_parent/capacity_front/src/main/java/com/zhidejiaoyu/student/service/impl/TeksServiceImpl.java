@@ -896,7 +896,20 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         for (Teks teks1 : teks) {
             String sentence = teks1.getSentence();
             String[] s = sentence.split(" ");
-            if (s.length > 1) {
+            boolean isTrue=true;
+            if (s.length <= 1) {
+                isTrue=false;
+            }
+            List<Integer> list=new ArrayList<>();
+            for(int i=0;i<s.length;i++){
+                if (s[i].indexOf("#") == -1 && s[i].indexOf("$") == -1) {
+                    list.add(i);
+                }
+            }
+            if(list.size()<=0){
+                isTrue=false;
+            }
+            if(isTrue){
                 useTeks.add(teks1);
             }
         }
