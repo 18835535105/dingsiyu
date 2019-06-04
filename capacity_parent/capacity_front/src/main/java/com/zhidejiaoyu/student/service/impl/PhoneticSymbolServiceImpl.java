@@ -45,6 +45,8 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     private RedisOpt redisOpt;
     @Autowired
     private BaiduSpeak baiduSpeak;
+    @Autowired
+    private TestRecordMapper testRecordMapper;
     @Value("${ftp.prefix}")
     private String url;
     @Value("${ftp.prefix}")
@@ -86,13 +88,17 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                 Map<String, Object> returnMap = new HashMap<>();
                 returnMap.put("id", letterUnit.getId());
                 returnMap.put("unitName", letterUnit.getUnitName());
-                Integer studyCount = learnMapper.selLetterLearn(student.getId(), letterUnit.getId().longValue(), "音标辨音");
-                int count = phoneticSymbolMapper.countByUnitId(letterUnit.getId().longValue());
+                Integer point = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), letterUnit.getId().longValue(), 10);
                 if (isTrue) {
                     returnMap.put("isOpen", true);
-                    if (count > studyCount) {
+                    if(point!=null){
+                        if (point <100) {
+                            isTrue = false;
+                        }
+                    }else{
                         isTrue = false;
                     }
+
                 } else {
                     returnMap.put("isOpen", false);
                 }
