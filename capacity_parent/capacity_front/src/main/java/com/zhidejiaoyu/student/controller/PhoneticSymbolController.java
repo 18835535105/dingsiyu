@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.controller;
 
 
+import com.zhidejiaoyu.common.annotation.ControllerLogAnnotation;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -47,14 +48,16 @@ public class PhoneticSymbolController {
     }
 
     /**
-     * 获取音标辨音题目
+     * 获取音节辨音题目
      *
      * @param unitId 单元 id
      * @param restudy 是否重新学习
      * @return
      */
     @GetMapping("/getSymbolListen")
-    public ServerResponse<Object> getSymbolListen(Long unitId, HttpSession session, @RequestParam(required = false, defaultValue = "false") Boolean restudy) {
+    @ControllerLogAnnotation(name = "获取音节辨音题目")
+    public ServerResponse<Object> getSymbolListen(Long unitId, HttpSession session,
+                                                  @RequestParam(required = false, defaultValue = "false") Boolean restudy) {
         if (unitId == null) {
             return ServerResponse.createByError(400, "单元 id 不能为空！");
         }
@@ -70,6 +73,7 @@ public class PhoneticSymbolController {
      * @return
      */
     @PostMapping("/saveSymbolListen")
+    @ControllerLogAnnotation(name = "保存音标辨音题目")
     public ServerResponse saveSymbolListen(HttpSession session, Long unitId,  Integer symbolId) {
         if (unitId == null || symbolId == null) {
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT);
@@ -85,6 +89,7 @@ public class PhoneticSymbolController {
      * @return
      */
     @GetMapping("/getUnitTest")
+    @ControllerLogAnnotation(name = "获取音节单元闯关测试题目")
     public ServerResponse getUnitTest(HttpSession session, Long unitId) {
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         return phoneticSymbolService.getUnitTest(session, unitId);
