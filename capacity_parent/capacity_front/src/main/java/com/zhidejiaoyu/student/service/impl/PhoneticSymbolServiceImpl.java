@@ -448,7 +448,8 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
             }).collect(Collectors.toList());
 
             // 添加两个错误答案
-            topics.addAll(phoneticSymbols.stream().filter(phoneticSymbol1 -> !Objects.equals(phoneticSymbol1.getPhoneticSymbol(), phoneticSymbol.getPhoneticSymbol()))
+            topics.addAll(phoneticSymbols.stream().filter(phoneticSymbol1 -> !Objects.equals(phoneticSymbol1.getPhoneticSymbol(), phoneticSymbol.getPhoneticSymbol())
+                    && !Objects.equals(phoneticSymbol1.getLetter(), phoneticSymbol.getLetter()))
                     .limit(2)
                     .map(result -> {
                         Topic topic = new Topic();
