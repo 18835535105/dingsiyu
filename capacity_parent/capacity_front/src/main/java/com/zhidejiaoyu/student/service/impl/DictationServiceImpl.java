@@ -9,7 +9,6 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
-import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.DictationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,24 +27,21 @@ public class DictationServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 	/** 单词 */
 	@Autowired
 	private VocabularyMapper vocabularyMapper;
-	
+
 	/** 单元 */
 	@Autowired
 	private UnitMapper unitMapper;
-	
+
 	/** 记忆追踪,听写*/
 	@Autowired
 	private CapacityListenMapper capacityListenMapper;
-	
+
 	/** 学习信息 */
 	@Autowired
 	private LearnMapper learnMapper;
 
 	@Autowired
 	private StudentMapper studentMapper;
-	
-	@Autowired
-	private YouDaoTranslate youDaoTranslate;
 
 	@Autowired
 	private BaiduSpeak baiduSpeak;
@@ -53,7 +49,7 @@ public class DictationServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 	@Override
 	public Object dictationShow(String unitId, HttpSession session, Long[] ignoreWordId) {
 		Map<String,Object> map = new HashMap<>(16);
-		
+
 		// 获取当前学生信息
 		Student student = getStudent(session);
 		Long id = student.getId();
@@ -68,7 +64,7 @@ public class DictationServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 
 		// 记录学生开始学习该单词/例句的时间
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-        
+
 		// 获取当前时间
 		String dateTime = DateUtil.DateTime();
 
@@ -96,7 +92,7 @@ public class DictationServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 				vocabulary = vocabularyMapper.selectById(wordId);
 			}
 		}
-		
+
 		// 单元单词已学完,去单元测试
         if (vocabulary == null) {
 			return super.toUnitTest();
@@ -124,12 +120,12 @@ public class DictationServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 		// 3. count单元表单词有多少个    /.
 		Integer count = unitMapper.countWordByUnitid(unitId);
 		map.put("wordCount", count);
-		
+
 		// 4. 该单元已学单词  ./
 		//Integer count_ = capacityListenMapper.alreadyStudyWord(unit_id, id);
 		Long count_ = learnMapper.learnCountWord(id, Integer.parseInt(unitId), "慧听写");
 		map.put("plan", count_);
-		
+
 		// 5. 是否是第一次学习慧听写，true:第一次学习，进入学习引导页；false：不是第一次学习
 		Integer the = learnMapper.theFirstTime(id);
 		if(the==null) {
@@ -144,6 +140,6 @@ public class DictationServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 		}
 
 		return ServerResponse.createBySuccess(map);
-	} 
-	
+	}
+
 }

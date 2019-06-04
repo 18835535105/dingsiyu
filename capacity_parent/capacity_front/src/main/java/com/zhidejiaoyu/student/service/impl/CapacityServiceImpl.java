@@ -2,7 +2,6 @@ package com.zhidejiaoyu.student.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
@@ -19,8 +18,6 @@ import com.zhidejiaoyu.student.vo.CapacityListVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,23 +38,6 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
     @Autowired
     private BaiduSpeak baiduSpeak;
 
-    @Autowired
-    private CapacityWriteMapper capacityWriteMapper;
-
-    @Autowired
-    private CapacityListenMapper capacityListenMapper;
-
-    @Autowired
-    private SentenceListenMapper sentenceListenMapper;
-
-    @Autowired
-    private StudyCountMapper studyCountMapper;
-
-    @Autowired
-    private SentenceWriteMapper sentenceWriteMapper;
-
-    @Autowired
-    private SentenceTranslateMapper sentenceTranslateMapper;
 
     @Autowired
     private VocabularyMapper vocabularyMapper;
@@ -70,9 +50,6 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
 
     @Autowired
     private LearnMapper learnMapper;
-
-    @Autowired
-    private StudentMapper studentMapper;
 
     @Autowired
     private CapacityReviewMapper capacityReviewMapper;
@@ -204,7 +181,6 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
         return packageCapacityList(student, courseId, unitId, studyModel, page, size);
     }
 
-    @SuppressWarnings("all")
     private ServerResponse<PageInfo> packageCapacityList(Student student, Long courseId, Long unitId, String studyModel,
                                                          Integer page, Integer size) {
         PageHelper.startPage(page, size);
@@ -339,173 +315,17 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
         }
     }
 
-    /**
-     * 封装例句默写记忆追踪列表页内容
-     *
-     * @param studentId
-     * @param courseId
-     * @param unitId
-     * @param page      当前页
-     * @param size      每页数据量
-     * @return
-     */
-    @SuppressWarnings("all")
-    private ServerResponse<PageInfo> getSentenceWriteCapacityListVo(Long studentId, Long courseId, Long unitId, Integer page,
-                                                                    Integer size) {
-        PageHelper.startPage(page, size);
-        List<SentenceWrite> sentenceWrites = unitId != 0 ? sentenceWriteMapper.selectByUnitIdAndStudentId(unitId, studentId)
-                : sentenceWriteMapper.selectByCourseIdAndStudentId(courseId, studentId);
-        PageInfo info = new PageInfo(sentenceWrites);
-
-        List<CapacityListVo> capacityListVos = new ArrayList<>();
-        for (SentenceWrite sentenceWrite : sentenceWrites) {
-            packageSentenceCapacityListVO(capacityListVos, sentenceWrite);
-        }
-        PageInfo<CapacityListVo> pageInfo = new PageInfo<>(capacityListVos);
-        pageInfo.setPages(info.getPages());
-        pageInfo.setTotal(info.getTotal());
-
-        return ServerResponse.createBySuccess(pageInfo);
-    }
-
-    /**
-     * 封装例句翻译记忆追踪列表页内容
-     *
-     * @param studentId
-     * @param courseId
-     * @param unitId
-     * @param page      当前页
-     * @param size      每页数据量
-     * @return
-     */
-    @SuppressWarnings("all")
-    private ServerResponse<PageInfo> getSentenceTranslateCapacityListVo(Long studentId, Long courseId, Long unitId, Integer page,
-                                                                        Integer size) {
-        PageHelper.startPage(page, size);
-        List<SentenceTranslate> sentenceListens = unitId != 0 ? sentenceTranslateMapper.selectByUnitIdAndStudentId(unitId, studentId)
-                : sentenceTranslateMapper.selectByCourseIdAndStudentId(courseId, studentId);
-        PageInfo info = new PageInfo(sentenceListens);
-
-        List<CapacityListVo> capacityListVos = new ArrayList<>();
-        for (SentenceTranslate sentenceTranslate : sentenceListens) {
-            packageSentenceCapacityListVO(capacityListVos, sentenceTranslate);
-        }
-        PageInfo<CapacityListVo> pageInfo = new PageInfo<>(capacityListVos);
-        pageInfo.setTotal(info.getTotal());
-        pageInfo.setPages(info.getPages());
-
-        return ServerResponse.createBySuccess(pageInfo);
-    }
-
-    /**
-     * 封装例句听力模块记忆追踪列表页内容
-     *
-     * @param studentId
-     * @param courseId
-     * @param unitId
-     * @param page      当前页
-     * @param size      每页数据量
-     * @return
-     */
-    @SuppressWarnings("all")
-    private ServerResponse<PageInfo> getSentenceListenCapacityListVo(Long studentId, Long courseId, Long unitId, Integer page,
-                                                                     Integer size) {
-        PageHelper.startPage(page, size);
-        List<SentenceListen> sentenceListens = unitId != 0 ? sentenceListenMapper.selectByUnitIdAndStudentId(unitId, studentId)
-                : sentenceListenMapper.selectByCourseIdAndStudentId(courseId, studentId);
-        PageInfo info = new PageInfo(sentenceListens);
-
-        List<CapacityListVo> capacityListVos = new ArrayList<>();
-        for (SentenceListen sentenceListen : sentenceListens) {
-            packageSentenceCapacityListVO(capacityListVos, sentenceListen);
-        }
-        PageInfo<CapacityListVo> pageInfo = new PageInfo<>(capacityListVos);
-        pageInfo.setTotal(info.getTotal());
-        pageInfo.setPages(info.getPages());
-
-        return ServerResponse.createBySuccess(pageInfo);
-    }
-
-    private void packageSentenceCapacityListVO(List<CapacityListVo> capacityListVos, SentenceListen sentenceListen) {
-        CapacityListVo capacityListVo = new CapacityListVo();
-        capacityListVo.setChinese(sentenceListen.getWordChinese());
-        capacityListVo.setContent(sentenceListen.getWord().replace("*", " "));
-        capacityListVo.setMemeoryStrength(sentenceListen.getMemoryStrength());
-        capacityListVo.setPush(this.getPushTime(sentenceListen.getPush()));
-        capacityListVo.setReadUrl(baiduSpeak.getLanguagePath(sentenceListen.getWord()));
-        capacityListVo.setSoundMark(commonMethod.getSoundMark(sentenceListen.getWord()));
-        capacityListVos.add(capacityListVo);
-    }
-
-    /**
-     * 封装慧默写模块记忆追踪列表页内容
-     *
-     * @param studentId
-     * @param courseId
-     * @param unitId
-     * @param page      当前页
-     * @param size      每页数据量
-     * @return
-     */
-    @SuppressWarnings("all")
-    private ServerResponse<PageInfo> getCapacityWriteCapacityListVo(Long studentId, Long courseId, Long unitId, Integer page,
-                                                                    Integer size) {
-        PageHelper.startPage(page, size);
-        List<CapacityWrite> capacityWrites = unitId != 0 ? capacityWriteMapper.selectByUnitIdAndStudentId(unitId, studentId)
-                : capacityWriteMapper.selectByCourseIdAndStudentId(courseId, studentId);
-        PageInfo info = new PageInfo(capacityWrites);
-
-        List<CapacityListVo> capacityListVos = new ArrayList<>();
-        for (CapacityWrite capacityWrite : capacityWrites) {
-            packageWordCapacityListVO(capacityListVos, capacityWrite);
-        }
-        PageInfo<CapacityListVo> pageInfo = new PageInfo<>(capacityListVos);
-        pageInfo.setTotal(info.getTotal());
-        pageInfo.setPages(info.getPages());
-
-        return ServerResponse.createBySuccess(pageInfo);
-    }
-
-    /**
-     * 封装慧听写模块记忆追踪列表页内容
-     *
-     * @param studentId
-     * @param courseId
-     * @param unitId
-     * @param page      当前页
-     * @param size      每页数据量
-     * @return
-     */
-    @SuppressWarnings("all")
-    private ServerResponse<PageInfo> getCapacityListenCapacityListVo(Long studentId, Long courseId, Long unitId, Integer page,
-                                                                     Integer size) {
-        PageHelper.startPage(page, size);
-        List<CapacityListen> capacityListens = unitId != 0 ? capacityListenMapper.selectByUnitIdAndStudentId(unitId, studentId)
-                : capacityListenMapper.selectByCourseIdAndStudentId(courseId, studentId);
-        PageInfo info = new PageInfo(capacityListens);
-
-        List<CapacityListVo> capacityListVos = new ArrayList<>();
-        for (CapacityListen capacityListen : capacityListens) {
-            packageWordCapacityListVO(capacityListVos, capacityListen);
-        }
-        PageInfo<CapacityListVo> pageInfo = new PageInfo<>(capacityListVos);
-        pageInfo.setPages(info.getPages());
-        pageInfo.setTotal(info.getTotal());
-
-        return ServerResponse.createBySuccess(pageInfo);
-    }
-
     private void packageWordCapacityListVO(List<CapacityListVo> capacityListVos, CapacityMemory capacityMemory) {
-        CapacityListVo capacityListVo;
         boolean flag = capacityMemory.getWordChinese().contains("*");
-        capacityListVo = new CapacityListVo();
+        Vocabulary vocabulary = vocabularyMapper.selectById(capacityMemory.getVocabularyId());
+        CapacityListVo capacityListVo = new CapacityListVo();
         capacityListVo.setChinese(flag ?
                 capacityMemory.getWordChinese().replace("*", "") : capacityMemory.getWordChinese());
         capacityListVo.setContent(flag ? capacityMemory.getWord() : StringUtils.isEmpty(capacityMemory.getSyllable()) ? capacityMemory.getWord() : capacityMemory.getSyllable());
         capacityListVo.setMemeoryStrength(capacityMemory.getMemoryStrength());
         capacityListVo.setPush(this.getPushTime(capacityMemory.getPush()));
         capacityListVo.setReadUrl(baiduSpeak.getLanguagePath(capacityMemory.getWord()));
-        capacityListVo.setSoundMark(commonMethod.getSoundMark(capacityMemory.getWord()));
+        capacityListVo.setSoundMark(StringUtils.isEmpty(vocabulary.getSoundMark()) ? "" : vocabulary.getSoundMark());
         capacityListVos.add(capacityListVo);
     }
 

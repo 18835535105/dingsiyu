@@ -1181,24 +1181,4 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         map.put("isHave", isHave);
         return ServerResponse.createBySuccess(map);
     }
-
-    @Test
-    public void add() {
-        int count = 0;
-        String regex = "#(.*)#";
-        Pattern pattern = Pattern.compile(regex);
-        List<String> list = new ArrayList<String>();
-        list.add("id为 3155 的学生在 2018-05-24 11:17:22 当日学习两个单元，奖励#20#枚金币");
-        list.add("id为 3155 的学生在 2018-05-24 11:17:22 当日学习两个单元，奖励#20#枚金币");
-        list.add("id为 3155 的学生在 2018-05-24 11:17:22 当日学习两个单元，奖励#2#枚金币");
-        for (String str : list) {
-            Matcher matcher = pattern.matcher(str);//匹配类
-            while (matcher.find()) {
-                count += Integer.parseInt(matcher.group(1));
-                //System.out.println(matcher.group(1));//打印中间字符
-            }
-        }
-        System.out.println(count);
-    }
-
 }

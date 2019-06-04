@@ -5,8 +5,6 @@ import com.zhidejiaoyu.common.Vo.student.voice.VoiceVo;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.study.CommonMethod;
-import com.zhidejiaoyu.common.utils.http.FtpUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.FileResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -14,6 +12,7 @@ import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.GoodVoiceService;
 import com.zhidejiaoyu.student.utils.GoodVoiceUtil;
 import lombok.extern.log4j.Log4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 /**
@@ -54,16 +52,10 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
     private StudentMapper studentMapper;
 
     @Autowired
-    private CommonMethod commonMethod;
-
-    @Autowired
     private BaiduSpeak baiduSpeak;
 
     @Value("${ftp.prefix}")
     private String prefix;
-
-    @Autowired
-    private FtpUtil ftpUtil;
 
     @Autowired
     private GoodVoiceUtil goodVoiceUtil;
@@ -73,9 +65,6 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
     @Autowired
     private LearnMapper learnMapper;
-
-    @Autowired
-    private ExecutorService executorService;
 
     @Override
     public ServerResponse getSubjects(HttpSession session, Long unitId, Integer type, Integer flag) {
@@ -97,7 +86,7 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 voiceVo = new VoiceVo();
                 voiceVo.setChinese(vocabulary.getWordChinese());
                 voiceVo.setId(vocabulary.getId());
-                voiceVo.setSoundMark(commonMethod.getSoundMark(voiceVo.getWord()));
+                voiceVo.setSoundMark(StringUtils.isEmpty(vocabulary.getSoundMark()) ? "" : vocabulary.getSoundMark());
                 voiceVo.setSyllable(vocabulary.getSyllable());
                 voiceVo.setWord(vocabulary.getWord());
                 voiceVo.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));

@@ -198,7 +198,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
             vo.setChinese(wordChinese);
             vo.setContent(StringUtils.isEmpty(vocabulary.getSyllable()) ? vocabulary.getWord() : vocabulary.getSyllable());
             vo.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
-            vo.setSoundMark(commonMethod.getSoundMark(vocabulary.getWord()));
+            vo.setSoundMark(StringUtils.isEmpty(vocabulary.getSoundMark()) ? "" : vocabulary.getSoundMark());
             if (StringUtils.isNotEmpty(vocabulary.getRecordpicurl())) {
                 vo.setPictureUrl(prefix + vocabulary.getRecordpicurl());
             } else {

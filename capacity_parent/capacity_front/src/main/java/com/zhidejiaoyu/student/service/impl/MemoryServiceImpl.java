@@ -151,13 +151,12 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
 
             // 查询单词释义
             String wordChinese = unitVocabularyMapper.selectWordChineseByUnitIdAndWordId(unitId, currentStudyWord.getId());
-            String soundMark = commonMethod.getSoundMark(currentStudyWord.getWord());
 
             MemoryStudyVo memoryStudyVo = new MemoryStudyVo();
             memoryStudyVo.setWordId(currentStudyWord.getId());
             memoryStudyVo.setMemoryDifficulty(0);
             memoryStudyVo.setMemoryStrength(0.00);
-            memoryStudyVo.setSoundMark(soundMark);
+            memoryStudyVo.setSoundMark(StringUtils.isEmpty(currentStudyWord.getSoundMark()) ? "" : currentStudyWord.getSoundMark());
             memoryStudyVo.setReadUrl(baiduSpeak.getLanguagePath(currentStudyWord.getWord()));
             memoryStudyVo.setWord(currentStudyWord.getWord());
             memoryStudyVo.setSyllable(StringUtils.isEmpty(currentStudyWord.getSyllable()) ? currentStudyWord.getWord() : currentStudyWord.getSyllable());
@@ -310,7 +309,6 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
      */
     private ServerResponse<MemoryStudyVo> returnGoldWord(CapacityMemory capacityMemory, Long plan, boolean firstStudy,
                                                          Long wordCount) {
-        String soundMark = commonMethod.getSoundMark(capacityMemory.getWord());
         // 计算当前单词的记忆难度
         int memoryDifficulty = memoryDifficultyUtil.getMemoryDifficulty(capacityMemory, 1);
         // 计算当前单词的记忆强度
@@ -325,7 +323,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         memoryStudyVo.setWordId(vocabularyId);
         memoryStudyVo.setMemoryDifficulty(memoryDifficulty);
         memoryStudyVo.setMemoryStrength(memoryStrength);
-        memoryStudyVo.setSoundMark(soundMark);
+        memoryStudyVo.setSoundMark(StringUtils.isEmpty(vocabulary.getSoundMark()) ? "" : vocabulary.getSoundMark());
         memoryStudyVo.setWord(capacityMemory.getWord());
         memoryStudyVo.setSyllable(capacityMemory.getSyllable());
         memoryStudyVo.setWordChinese(wordChinese);

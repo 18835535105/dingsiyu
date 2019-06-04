@@ -1,23 +1,23 @@
 package com.zhidejiaoyu.common.utils.http;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 /**
+ * 获取单词音节信息
+ *
  * @author wuchenxi
  * @date 2018/5/23 16:38
  */
+@Slf4j
 @Component
 public class SyllableUtil {
-
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * 获取单词的音标
@@ -35,7 +35,7 @@ public class SyllableUtil {
                 }
             }
         } catch (IOException e) {
-            logger.error("单词 {} 的音标获取失败！", word);
+            log.error("单词 {} 的音节获取失败！", word);
         }
         return null;
     }

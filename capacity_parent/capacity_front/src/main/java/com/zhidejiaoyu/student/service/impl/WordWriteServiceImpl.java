@@ -113,7 +113,7 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
             Vocabulary currentStudyWord = vocabularyMapper.selectOneWordNotInIds(wordIds, unitId);
 
             String wordChinese = unitVocabularyMapper.selectWordChineseByUnitIdAndWordId(unitId, currentStudyWord.getId());
-            String soundMark = commonMethod.getSoundMark(currentStudyWord.getWord());
+            String soundMark = StringUtils.isEmpty(currentStudyWord.getSoundMark()) ? "" : currentStudyWord.getSoundMark();
             wordWriteStudyVo.setWordId(currentStudyWord.getId());
             wordWriteStudyVo.setMemoryStrength(0.00);
             wordWriteStudyVo.setSoundmark(soundMark);
@@ -154,12 +154,12 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
     private ServerResponse<WordWriteStudyVo> returnGoldWord(CapacityWrite capacityWrite, Long plan, boolean firstStudy,
                                                             Long wordCount) {
         WordWriteStudyVo wordWriteStudyVo = new WordWriteStudyVo();
-        String soundMark = commonMethod.getSoundMark(capacityWrite.getWord());
+        Vocabulary vocabulary = vocabularyMapper.selectById(capacityWrite.getVocabularyId());
         // 计算当前单词的记忆强度
         double memoryStrength = capacityWrite.getMemoryStrength();
         wordWriteStudyVo.setWordId(capacityWrite.getVocabularyId());
         wordWriteStudyVo.setMemoryStrength(memoryStrength);
-        wordWriteStudyVo.setSoundmark(soundMark);
+        wordWriteStudyVo.setSoundmark(StringUtils.isEmpty(vocabulary.getSoundMark()) ? "" : vocabulary.getSoundMark());
         wordWriteStudyVo.setWord(capacityWrite.getWord());
         wordWriteStudyVo.setSyllable(capacityWrite.getSyllable());
         wordWriteStudyVo.setWordChinese(capacityWrite.getWordChinese());

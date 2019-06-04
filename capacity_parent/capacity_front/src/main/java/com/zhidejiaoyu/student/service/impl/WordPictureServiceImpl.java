@@ -6,10 +6,8 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.WordPictureUtil;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
-import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.service.WordPictureService;
@@ -40,9 +38,6 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
     private CapacityPictureMapper capacityPictureMapper;
 
     @Autowired
-    private YouDaoTranslate youDaoTranslate;
-
-    @Autowired
     private BaiduSpeak baiduSpeak;
 
     @Autowired
@@ -55,20 +50,11 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
     private StudentMapper studentMapper;
 
     @Autowired
-    private StudyCountMapper studyCountMapper;
-
-    @Autowired
-    private RunLogMapper runLogMapper;
-
-    @Autowired
     private WordPictureUtil wordPictureUtil;
 
     @Autowired
     private UnitVocabularyMapper unitVocabularyMapper;
 
-    @Autowired
-    private TestRecordMapper testRecordMapper;
-    
     @Value("${ftp.prefix}")
     private String ftpPrefix;
 

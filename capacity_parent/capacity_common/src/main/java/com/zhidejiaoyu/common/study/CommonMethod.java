@@ -3,7 +3,6 @@ package com.zhidejiaoyu.common.study;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
-import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +31,6 @@ public class CommonMethod implements Serializable {
 
     @Autowired
     private LearnMapper learnMapper;
-
-    @Autowired
-    private YouDaoTranslate youDaoTranslate;
 
     @Autowired
     private CourseMapper courseMapper;
@@ -108,23 +104,6 @@ public class CommonMethod implements Serializable {
             default:
         }
         return phase;
-    }
-
-    /**
-     * 获取单词的音标
-     *
-     * @param word
-     * @return
-     */
-    public String getSoundMark(String word) {
-        Map<String, String> translateMap;
-        try {
-            translateMap = youDaoTranslate.getResultMap(word);
-            String soundMark = "[" + translateMap.get("phonetic").split(";")[0] + "]";
-            return soundMark.length() > 2 ? soundMark : "";
-        } catch (Exception e) {
-            return "";
-        }
     }
 
     /**

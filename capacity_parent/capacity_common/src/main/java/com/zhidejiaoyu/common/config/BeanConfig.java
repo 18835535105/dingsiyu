@@ -4,9 +4,7 @@ import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.spring.stat.DruidStatInterceptor;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.zhidejiaoyu.common.utils.http.FtpUtil;
-import com.zhidejiaoyu.common.utils.http.HttpClientUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
-import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.JdkRegexpMethodPointcut;
@@ -37,26 +35,6 @@ public class BeanConfig {
 	@Bean
 	public BaiduSpeak baiduSpeak() {
 		return new BaiduSpeak();
-	}
-
-	/**
-	 * 获取有道翻译工具类
-	 *
-	 * @return
-	 */
-	@Bean
-	public YouDaoTranslate youDaoTranslate() {
-		return new YouDaoTranslate();
-	}
-
-	/**
-	 * 获取httpClient工具类
-	 *
-	 * @return
-	 */
-	@Bean
-	public HttpClientUtil httpClientUtil() {
-		return new HttpClientUtil();
 	}
 
 	/**

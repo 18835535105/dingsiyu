@@ -257,7 +257,8 @@
         v.syllable,
         v.delStatus,
         v.recordpicurl,
-        v.read_url
+        v.read_url,
+        v.sound_mark
     </sql>
 
     <!-- 根据学生id查询当前单元下指定模块的未学习的所有单词 -->
@@ -595,11 +596,7 @@
 
     <select id="showWord" parameterType="map" resultMap="BaseResultMap">
         SELECT
-            uv.unit_id,
-            v.id,
-            v.word,
-            uv.word_chinese,
-            v.syllable
+           <include refid="unite_Column_List"/>
         FROM
             vocabulary v,
             unit_vocabulary uv
@@ -719,7 +716,7 @@
         </foreach>
         )
     </select>
-    <select id="selectOneWordNotInIds" resultType="com.zhidejiaoyu.common.pojo.Vocabulary" parameterType="map">
+    <select id="selectOneWordNotInIds" resultMap="BaseResultMap" parameterType="map">
         SELECT
         <include refid="unite_Column_List"/>
         FROM
