@@ -92,7 +92,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                 if (isTrue) {
                     returnMap.put("isOpen", true);
                     if(point!=null){
-                        if (point <100) {
+                        if (point <60) {
                             isTrue = false;
                         }
                     }else{
