@@ -254,7 +254,10 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
             learn.setCourseId(voice.getCourseId());
             learn.setStudentId(voice.getStudentId());
             learn.setUnitId(voice.getUnitId());
+            learn.setCourseId(courseId);
+            learn.setExampleId(voice.getWordId());
             learn.setStudyModel("课文好声音");
+            learn.setStatus(1);
             learn.setType(1);
             Long aLong = learnMapper.selTeksLearn(learn);
             if (aLong != null) {
