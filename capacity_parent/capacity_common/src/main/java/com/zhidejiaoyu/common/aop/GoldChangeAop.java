@@ -74,6 +74,8 @@ public class GoldChangeAop {
                 medalAwardAsync.upLevel(student, this.getSchoolAdminId(student));
                 // 女神勋章（男神勋章）
                 medalAwardAsync.godMan(student);
+                // 拔得头筹
+                medalAwardAsync.theFirst(student);
             }
         } catch (Exception e) {
             log.error("[{}] @after操作错误！", this.getClass().getSimpleName(), e);

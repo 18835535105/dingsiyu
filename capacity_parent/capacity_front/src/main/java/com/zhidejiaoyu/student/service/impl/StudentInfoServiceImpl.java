@@ -20,7 +20,6 @@ import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.StudentInfoService;
-import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,9 +64,6 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
     @Autowired
     private CommonMethod commonMethod;
-
-    @Autowired
-    private CountMyGoldUtil countMyGoldUtil;
 
     @Autowired
     private MedalAwardAsync medalAwardAsync;
@@ -323,7 +319,6 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         String tip = null;
         if (classify <= 6) {
             tip = saveGoldAward(session, classify, validTime, loginTime);
-            countMyGoldUtil.countMyGold(student);
         }
         session.removeAttribute(TimeConstant.BEGIN_VALID_TIME);
 

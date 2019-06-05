@@ -503,6 +503,75 @@ public class MedalAwardAsync extends BaseAwardAsync {
         }
     }
 
+
+    /**
+     * 拔得头筹
+     *
+     * 本校金币总数第一名保持一分钟，点亮 拔得头筹 LV1
+     * 本校金币总数第一名保持一小时，点亮 拔得头筹 LV2。
+     * 本校金币总数第一名保持两小时，点亮 拔得头筹 LV3。
+     * 本校金币总数第一名保持一天，点亮 拔得头筹 LV4。
+     * 本校金币总数第一名保持一周，点亮 拔得头筹 LV5。
+     * @param student
+     */
+    public void theFirst(Student student) {
+        Integer schoolAdminId = super.getSchoolAdminId(student);
+        // 查询本校最高的金币数的学生
+        Student maxGoldStudent = studentMapper.selectMaxGoldForSchool(schoolAdminId);
+        if (maxGoldStudent == null) {
+            // 还没有学生获取拔得头筹，给当前学生更新获取拔得头筹的时间
+            student.setSchoolGoldFirstTime(new Date());
+            studentMapper.updateById(student);
+        } else {
+            // 已经有学生获取了拔得头筹
+            double maxGold = maxGoldStudent.getSystemGold() + maxGoldStudent.getOfflineGold();
+            double myGold = student.getSystemGold() + student.getOfflineGold();
+            if (myGold == maxGold) {
+                student.setSchoolGoldFirstTime(new Date());
+                studentMapper.updateById(student);
+            } else if (myGold > maxGold) {
+
+                List<Medal> children = medalMapper.selectChildrenIdByParentId(11);
+
+                // 当前学生金币在本校第一名
+                student.setSchoolGoldFirstTime(new Date());
+                studentMapper.updateById(student);
+
+                // 查询本校所有金币总和为 maxGold 的学生信息
+                List<Student> students = studentMapper.selectMaxGoldForGold(schoolAdminId, maxGold);
+                // 计算保持时间，并保存相应的勋章奖励
+                students.parallelStream().forEach(maxStudent -> {
+                    if (maxStudent.getSchoolGoldFirstTime() != null) {
+                        // 如果最后一个奖励条件已达成，说明其之前奖励都已能领取，不再进行其他计算
+                        Award award = awardMapper.selectByStudentIdAndMedalType(student.getId(), children.get(children.size() - 1).getId());
+                        try {
+                            if (super.checkAward(award, MEDAL_TYPE)) {
+                                // 保持的分钟数
+                                int keepTime = (int) ((System.currentTimeMillis() - maxStudent.getSchoolGoldFirstTime().getTime()) / 60000);
+                                for (Medal child : children) {
+                                    award = awardMapper.selectByStudentIdAndMedalType(student.getId(), child.getId());
+                                    super.optAward(student.getId(), child.getId(), keepTime, award, MEDAL_TYPE);
+                                }
+                            }
+                        } catch (Exception e) {
+                            log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
+                        }
+                    }
+                });
+                // 去掉金币排名不再是学校第一名学生的时间标识
+                if (students.size() > 0) {
+                    studentMapper.updateSchoolGoldFirstTimeToNull(students);
+                }
+            }
+        }
+    }
+
+    /**
+     *
+     * @param studentId
+     * @param children
+     * @param currentPlan
+     */
     private void packagePlan(Long studentId, List<Medal> children, int currentPlan) {
         Award award;
         for (Medal child : children) {

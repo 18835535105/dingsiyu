@@ -38,12 +38,10 @@ import com.zhidejiaoyu.student.dto.phonetic.UnitTestDto;
 import com.zhidejiaoyu.student.service.StudentInfoService;
 import com.zhidejiaoyu.student.service.TestService;
 import com.zhidejiaoyu.student.utils.CcieUtil;
-import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
 import com.zhidejiaoyu.student.utils.PetSayUtil;
 import com.zhidejiaoyu.student.utils.PetUrlUtil;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 import org.apache.commons.lang.StringUtils;
-import org.apache.ibatis.io.ResolverUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,9 +49,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @Service
@@ -109,9 +104,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     @Autowired
     private UnitMapper unitMapper;
-
-    @Autowired
-    private CountMyGoldUtil countMyGoldUtil;
 
     @Autowired
     private CommonMethod commonMethod;
@@ -250,9 +242,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             // 根据游戏分数初始化不同流程
             StudentFlow studentFlow = studentFlowMapper.selectByStudentId(student.getId(), 0, 1);
             this.initStudentFlow(student, testRecord.getPoint(), studentFlow);
-            if (studentFlow == null) {
-                countMyGoldUtil.countMyGold(student);
-            }
         }
         getLevel(session);
         // 流程名称
@@ -1343,7 +1332,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
         vo.setGold(goldCount);
         vo.setEnergy(addEnergy);
-        countMyGoldUtil.countMyGold(student);
         studentMapper.updateByPrimaryKeySelective(student);
         getLevel(session);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
@@ -1424,7 +1412,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "句子测试"));
         vo.setGold(goldCount);
         vo.setEnergy(addEnergy);
-        countMyGoldUtil.countMyGold(student);
         ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0], point);
         studentMapper.updateByPrimaryKeySelective(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
@@ -1641,7 +1628,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setEnergy(super.getEnergy(student, point));
 
         testRecordMapper.insert(testRecord);
-        countMyGoldUtil.countMyGold(student);
         studentMapper.updateById(student);
         getLevel(session);
 
