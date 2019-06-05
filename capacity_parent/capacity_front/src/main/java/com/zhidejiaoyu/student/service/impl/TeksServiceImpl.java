@@ -293,6 +293,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             List<Long> courseIds = new ArrayList<>(courses.size());
             courses.forEach(map -> courseIds.add((Long) map.get("id")));
             Map<String, Object> learnUnit = learnMapper.selTeksLaterCourse(student.getId());
+
             if (learnUnit != null) {
                 List<StudentStudyPlan> plans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, (Long) learnUnit.get("course_id"), 3);
                 boolean flag = false;
@@ -317,6 +318,15 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                         studyMap.put("version", teksCourse.getVersion());
                         studyMap.put("grade", teksCourse.getGrade() + teksCourse.getLabel());
                     }
+                }
+            }else{
+                List<StudentStudyPlan> plans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, (Long) courses.get(0).get("id"), 3);
+                if(plans.size()!=0){
+                    studyMap = new HashMap<>();
+                    studyMap.put("unitId", plans.get(0).getStartUnitId());
+                    TeksCourse teksCourse = teksCourseMapper.selectById(plans.get(0).getCourseId());
+                    studyMap.put("version", teksCourse.getVersion());
+                    studyMap.put("grade", teksCourse.getGrade() + teksCourse.getLabel());
                 }
             }
             List<Map<String, Object>> testList = teksMapper.getStudentAllCourse(studentId, courseIds);

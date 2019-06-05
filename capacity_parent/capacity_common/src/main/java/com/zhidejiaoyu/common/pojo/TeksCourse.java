@@ -76,6 +76,7 @@ public class TeksCourse extends Model<TeksCourse> {
     /**
      * 删除状态: 1:未删除(默认)  2:已删除
      */
+    @TableField("delStatus")
     private Integer delStatus;
 
 
