@@ -38,12 +38,14 @@ public class TeksController  {
 
     @ResponseBody
     @RequestMapping("/getUnitStatus")
+    @ControllerLogAnnotation(name = "获取课文的单元信息")
     public ServerResponse<Object> getUnitStatus(Long courseId,HttpSession session){
         return teksService.getUnitStatus(courseId,session);
     }
 
     @ResponseBody
     @RequestMapping("/getIsInto")
+    @ControllerLogAnnotation(name = "获取课文学习状态")
     public ServerResponse<Map<String,Object>> getIsInto(HttpSession session,Long unitId) {
         return teksService.getIsInto(session,unitId);
     }

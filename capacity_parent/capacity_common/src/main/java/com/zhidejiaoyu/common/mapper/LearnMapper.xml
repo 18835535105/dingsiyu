@@ -1270,7 +1270,7 @@
         order by id desc limit 1
     </select>
     <select id="selTeksLaterCourse" parameterType="java.lang.Long" resultType="java.util.Map">
-        select learn.unit_id , course.grade , course.version , course.label , learn.course_id
+        select learn.unit_id ,learn.course_id courseId, course.grade , course.version , course.label , learn.course_id
         from learn learn
         join teks_course course on course.id=learn.course_id
         where learn.student_id=#{studentId}
