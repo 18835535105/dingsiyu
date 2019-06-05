@@ -279,8 +279,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     public ServerResponse<Map<String, Object>> getCourseAndUnit(HttpSession session) {
         Student student = getStudent(session);
         Long studentId = student.getId();
-        List<CourseUnitVo> courseUnitVos = new ArrayList<>();
-        CourseUnitVo courseUnitVo;
         Map<String, Object> studyMap = null;
         List<Map<String, Object>> resultMap;
         Map<String, Object> returnMap = new HashMap<>();
@@ -294,9 +292,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         if (courses.size() > 0) {
             List<Long> courseIds = new ArrayList<>(courses.size());
             courses.forEach(map -> courseIds.add((Long) map.get("id")));
-            // 获取课程下所有课文的单元信息
-            List<Map<String, Object>> textUnits = new ArrayList<>();
-            this.getStudyUnit(courseIds, textUnits, studentId);
             Map<String, Object> learnUnit = learnMapper.selTeksLaterCourse(student.getId());
             if (learnUnit != null) {
                 List<StudentStudyPlan> plans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, (Long) learnUnit.get("course_id"), 3);
@@ -314,100 +309,115 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                     studyMap.put("unitId", learnUnit.get("unit_id"));
                     studyMap.put("version", learnUnit.get("version"));
                     studyMap.put("grade", learnUnit.get("grade").toString() + learnUnit.get("label").toString());
-                }
-            }
-            // 已经进行过单元闯关的单元
-            Map<Long, Map<Long, Long>> testMap = null;
-            if (textUnits.size() > 0) {
-                List<Long> unitIds = new ArrayList<>(textUnits.size());
-                textUnits.forEach(map -> unitIds.add((Long) map.get("id")));
-                testMap = testRecordMapper.selectHasUnitTest(studentId, unitIds);
-            }
-            for (Map<String, Object> courseMap : courses) {
-                courseUnitVo = new CourseUnitVo();
-                resultMap = new ArrayList<>();
-                Long id = learnMapper.selLaterLearnTeks(student.getId(), (Long) courseMap.get("id"));
-                if (id != null) {
-                    courseUnitVo.setLearnUnit(id.toString());
-                }
-                courseUnitVo.setCourseId((Long) courseMap.get("id"));
-                courseUnitVo.setCourseName(courseMap.get("courseName").toString());
-                courseUnitVo.setVersion(courseMap.get("version").toString());
-                courseUnitVo.setGrad(courseMap.get("grade").toString() + courseMap.get("label").toString());
-                // 存放单元信息
-                Map<String, Object> unitInfoMap;
-                for (Map<String, Object> unitMap : textUnits) {
-                    unitInfoMap = new HashMap<>(16);
-                    if (studyMap == null) {
+                }else{
+                    if(plans.size()!=0){
                         studyMap = new HashMap<>();
-                        studyMap.put("unitId", unitMap.get("id"));
-                        studyMap.put("version", unitMap.get("version"));
-                        studyMap.put("grade", unitMap.get("grade").toString() + unitMap.get("label").toString());
-                    }
-                    if (Objects.equals(courseMap.get("id"), unitMap.get("courseId"))) {
-                        if (id == null && courseUnitVo.getLearnUnit() == null) {
-                            courseUnitVo.setLearnUnit(unitMap.get("id").toString());
-                        }
-                        unitInfoMap.put("unitId", unitMap.get("id"));
-                        unitInfoMap.put("unitName", unitMap.get("unitName"));
-                        if (unitMap.get("number") == null) {
-                            unitInfoMap.put("number", 0);
-                        } else {
-                            unitInfoMap.put("number", unitMap.get("number"));
-                        }
-                        unitInfoMap.put("number", unitMap.get("number"));
-                        if (unitMap.get("number") != null && (Long) unitMap.get("number") > 0) {
-                            // 当前单元已进行过单元闯关，标记为已学习
-                            unitInfoMap.put("state", 4);
-                        } else {
-                            // 当前单元还未学习
-                            unitInfoMap.put("state", 1);
-                        }
-                        List<Teks> id1 = teksMapper.selTeksByUnitId(((Long) unitMap.get("id")).intValue());
-                        Integer teksAudition = learnMapper.selLearnTeks(studentId, "课文试听", (Long) unitMap.get("id"));
-                        if (teksAudition != null && teksAudition > 0) {
-                            unitInfoMap.put("teksAudition", true);
-                        } else {
-                            unitInfoMap.put("teksAudition", false);
-                        }
-                        List<Map<String, Object>> id2 = voiceMapper.selVoiceTeksByStudentAndUnit((Long) unitMap.get("id"), studentId);
-                        if (id2 != null) {
-                            if (id1.size() <= id2.size()) {
-                                unitInfoMap.put("teksGoodVoice", true);
-                            } else {
-                                unitInfoMap.put("teksGoodVoice", false);
-                            }
-                        } else {
-                            unitInfoMap.put("teksGoodVoice", false);
-                        }
-                        Integer teksTest = learnMapper.selLearnTeks(studentId, "课文默写测试", (Long) unitMap.get("id"));
-                        if (teksTest != null && teksTest > 0) {
-                            unitInfoMap.put("teksTest", true);
-                        } else {
-                            unitInfoMap.put("teksTest", false);
-                        }
-
-                        Integer testRecord = learnMapper.selLearnTeks(studentId, "课文测试", (Long) unitMap.get("id"));
-                        if (testRecord != null && testRecord > 0) {
-                            unitInfoMap.put("teksEntryTest", true);
-                        } else {
-                            unitInfoMap.put("teksEntryTest", false);
-                        }
-                        resultMap.add(unitInfoMap);
-
+                        studyMap.put("unitId", plans.get(0).getStartUnitId());
+                        TeksCourse teksCourse = teksCourseMapper.selectById(plans.get(0).getCourseId());
+                        studyMap.put("version", teksCourse.getVersion());
+                        studyMap.put("grade", teksCourse.getGrade() + teksCourse.getLabel());
                     }
                 }
-                courseUnitVo.setUnitVos(resultMap);
-                courseUnitVos.add(courseUnitVo);
             }
             List<Map<String, Object>> testList = teksMapper.getStudentAllCourse(studentId, courseIds);
             returnMap.put("present", studyMap);
             returnMap.put("versionList", testList);
-            returnMap.put("list", courseUnitVos);
         }
 
 
         return ServerResponse.createBySuccess(returnMap);
+    }
+
+    @Override
+    public ServerResponse<Object> getUnitStatus(Long courseId,HttpSession session){
+        Student student = getStudent(session);
+        Long studentId=student.getId();
+        List<Long> courseIds=new ArrayList<>();
+        courseIds.add(courseId);
+        List<CourseUnitVo> courseUnitVos = new ArrayList<>();
+        CourseUnitVo courseUnitVo;
+        List<Map<String, Object>> textUnits = new ArrayList<>();
+        List<Map<String, Object>> resultMap;
+        this.getStudyUnit(courseIds, textUnits, studentId);
+        // 已经进行过单元闯关的单元
+
+        List<Map<String, Object>> courses = studentStudyPlanMapper.selByStudentIdAndCourseIdAndType(studentId,3,courseId);
+        if (textUnits.size() > 0) {
+            List<Long> unitIds = new ArrayList<>(textUnits.size());
+            textUnits.forEach(map -> unitIds.add((Long) map.get("id")));
+        }
+        for (Map<String, Object> courseMap : courses) {
+            courseUnitVo = new CourseUnitVo();
+            resultMap = new ArrayList<>();
+            Long id = learnMapper.selLaterLearnTeks(student.getId(), (Long) courseMap.get("id"));
+            if (id != null) {
+                courseUnitVo.setLearnUnit(id.toString());
+            }
+            courseUnitVo.setCourseId((Long) courseMap.get("id"));
+            courseUnitVo.setCourseName(courseMap.get("courseName").toString());
+            courseUnitVo.setVersion(courseMap.get("version").toString());
+            courseUnitVo.setGrad(courseMap.get("grade").toString() + courseMap.get("label").toString());
+            // 存放单元信息
+            Map<String, Object> unitInfoMap;
+            for (Map<String, Object> unitMap : textUnits) {
+                unitInfoMap = new HashMap<>(16);
+                if (Objects.equals(courseMap.get("id"), unitMap.get("courseId"))) {
+                    if (id == null && courseUnitVo.getLearnUnit() == null) {
+                        courseUnitVo.setLearnUnit(unitMap.get("id").toString());
+                    }
+                    unitInfoMap.put("unitId", unitMap.get("id"));
+                    unitInfoMap.put("unitName", unitMap.get("unitName"));
+                    if (unitMap.get("number") == null) {
+                        unitInfoMap.put("number", 0);
+                    } else {
+                        unitInfoMap.put("number", unitMap.get("number"));
+                    }
+                    unitInfoMap.put("number", unitMap.get("number"));
+                    if (unitMap.get("number") != null && (Long) unitMap.get("number") > 0) {
+                        // 当前单元已进行过单元闯关，标记为已学习
+                        unitInfoMap.put("state", 4);
+                    } else {
+                        // 当前单元还未学习
+                        unitInfoMap.put("state", 1);
+                    }
+                    List<Teks> id1 = teksMapper.selTeksByUnitId(((Long) unitMap.get("id")).intValue());
+                    Integer teksAudition = learnMapper.selLearnTeks(studentId, "课文试听", (Long) unitMap.get("id"));
+                    if (teksAudition != null && teksAudition > 0) {
+                        unitInfoMap.put("teksAudition", true);
+                    } else {
+                        unitInfoMap.put("teksAudition", false);
+                    }
+                    List<Map<String, Object>> id2 = voiceMapper.selVoiceTeksByStudentAndUnit((Long) unitMap.get("id"), studentId);
+                    if (id2 != null) {
+                        if (id1.size() <= id2.size()) {
+                            unitInfoMap.put("teksGoodVoice", true);
+                        } else {
+                            unitInfoMap.put("teksGoodVoice", false);
+                        }
+                    } else {
+                        unitInfoMap.put("teksGoodVoice", false);
+                    }
+                    Integer teksTest = learnMapper.selLearnTeks(studentId, "课文默写测试", (Long) unitMap.get("id"));
+                    if (teksTest != null && teksTest > 0) {
+                        unitInfoMap.put("teksTest", true);
+                    } else {
+                        unitInfoMap.put("teksTest", false);
+                    }
+
+                    Integer testRecord = learnMapper.selLearnTeks(studentId, "课文测试", (Long) unitMap.get("id"));
+                    if (testRecord != null && testRecord > 0) {
+                        unitInfoMap.put("teksEntryTest", true);
+                    } else {
+                        unitInfoMap.put("teksEntryTest", false);
+                    }
+                    resultMap.add(unitInfoMap);
+
+                }
+            }
+            courseUnitVo.setUnitVos(resultMap);
+            courseUnitVos.add(courseUnitVo);
+        }
+        return null;
     }
 
     @Override

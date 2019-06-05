@@ -37,6 +37,12 @@ public class TeksController  {
     }
 
     @ResponseBody
+    @RequestMapping("/getUnitStatus")
+    public ServerResponse<Object> getUnitStatus(Long courseId,HttpSession session){
+        return teksService.getUnitStatus(courseId,session);
+    }
+
+    @ResponseBody
     @RequestMapping("/getIsInto")
     public ServerResponse<Map<String,Object>> getIsInto(HttpSession session,Long unitId) {
         return teksService.getIsInto(session,unitId);
