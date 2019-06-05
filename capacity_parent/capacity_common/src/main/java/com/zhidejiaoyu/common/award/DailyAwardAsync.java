@@ -153,7 +153,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
                  RankList rankList = rankListMapper.selectByStudentId(studentId);
                 int rank;
                 if (rankList == null || rankList.getSchoolDayRank() == null) {
-                    rank = studentMapper.countHasLoginLogStudentsBySchoolAdminId(this.getSchoolAdminId(student));
+                    rank = studentMapper.countHasLoginLogStudentsBySchoolAdminId(super.getSchoolAdminId(student));
                 } else {
                     rank = rankList.getSchoolDayRank();
                 }
@@ -171,17 +171,6 @@ public class DailyAwardAsync extends BaseAwardAsync {
         } catch (Exception e) {
             log.error(super.logErrorMsg(student, "保存日奖励信息出错"), e);
         }
-    }
-
-    private Integer getSchoolAdminId(Student student) {
-        if (student.getTeacherId() == null) {
-            return null;
-        }
-        Integer schoolAdminId = teacherMapper.getSchoolAdminById(Integer.valueOf(student.getTeacherId().toString()));
-        if (schoolAdminId == null) {
-            return Integer.valueOf(student.getTeacherId().toString());
-        }
-        return schoolAdminId;
     }
 
     public void initAward(Student student) {

@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.award;
 import com.zhidejiaoyu.common.mapper.AwardContentTypeMapper;
 import com.zhidejiaoyu.common.mapper.AwardMapper;
 import com.zhidejiaoyu.common.mapper.MedalMapper;
+import com.zhidejiaoyu.common.mapper.TeacherMapper;
 import com.zhidejiaoyu.common.pojo.Award;
 import com.zhidejiaoyu.common.pojo.AwardContentType;
 import com.zhidejiaoyu.common.pojo.Medal;
@@ -20,7 +21,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
-class BaseAwardAsync{
+class BaseAwardAsync {
 
     /**
      * 日奖励类型
@@ -45,6 +46,9 @@ class BaseAwardAsync{
 
     @Autowired
     private MedalMapper medalMapper;
+
+    @Autowired
+    private TeacherMapper teacherMapper;
 
     /**
      * 检验是否需要保存或更新 award
@@ -162,5 +166,16 @@ class BaseAwardAsync{
      */
     String logErrorMsg(Student student, String msg) {
         return "学生[" + student.getId() + " - " + student.getAccount() + " - " + student.getStudentName() + "] " + msg;
+    }
+
+    Integer getSchoolAdminId(Student student) {
+        if (student.getTeacherId() == null) {
+            return null;
+        }
+        Integer schoolAdminId = teacherMapper.getSchoolAdminById(Integer.valueOf(student.getTeacherId().toString()));
+        if (schoolAdminId == null) {
+            return Integer.valueOf(student.getTeacherId().toString());
+        }
+        return schoolAdminId;
     }
 }

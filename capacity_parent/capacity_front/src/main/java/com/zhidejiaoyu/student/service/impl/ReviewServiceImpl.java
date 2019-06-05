@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.Vo.student.testCenter.TestCenterVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
+import com.zhidejiaoyu.common.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -25,12 +26,10 @@ import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
 import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
-import com.zhidejiaoyu.common.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.ReviewService;
 import com.zhidejiaoyu.student.service.SentenceService;
 import com.zhidejiaoyu.student.utils.CcieUtil;
-import com.zhidejiaoyu.student.utils.CountMyGoldUtil;
 import com.zhidejiaoyu.student.utils.PetSayUtil;
 import com.zhidejiaoyu.student.utils.PetUrlUtil;
 import com.zhidejiaoyu.student.vo.TestResultVo;
@@ -127,9 +126,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
     @Autowired
     private PetSayUtil petSayUtil;
-
-    @Autowired
-    private CountMyGoldUtil countMyGoldUtil;
 
     @Autowired
     private DurationMapper durationMapper;
@@ -870,7 +866,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             this.saveTestDetail(testDetail, testRecord.getId(), classify, student);
         }
 
-        countMyGoldUtil.countMyGold(student);
         return ServerResponse.createBySuccess(vo);
     }
 

@@ -658,8 +658,16 @@
         SELECT
         <include refid="Base_Column_List"/>
         FROM student
-        WHERE school_name = #{schoolName}
-        AND school_gold_first_time is not null
+        <where>
+            school_gold_first_time is not null
+            <if test="schoolAdminId == null">
+                and teacher_id is null
+            </if>
+            <if test="schoolAdminId != null">
+                and (teacher_id = #{schoolAdminId} or teacher_id in (select teacher_id from teacher where
+                school_admin_id = #{schoolAdminId}))
+            </if>
+        </where>
         ORDER BY system_gold + offline_gold DESC
         LIMIT 1
     </select>
@@ -668,8 +676,15 @@
         SELECT
         <include refid="Base_Column_List"/>
         FROM student
-        WHERE school_name = #{schoolName}
-        AND system_gold + offline_gold = #{maxGold}
+        WHERE
+        system_gold + offline_gold = #{maxGold}
+        <if test="schoolAdminId == null">
+            and teacher_id is null
+        </if>
+        <if test="schoolAdminId != null">
+            and (teacher_id = #{schoolAdminId} or teacher_id in (select teacher_id from teacher where
+            school_admin_id = #{schoolAdminId}))
+        </if>
     </select>
 
     <select id="getStudentAccountTime" resultType="map" parameterType="map">

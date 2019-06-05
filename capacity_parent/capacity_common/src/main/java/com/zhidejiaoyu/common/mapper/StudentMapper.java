@@ -192,21 +192,13 @@ public interface StudentMapper extends BaseMapper<Student> {
     Integer schoolHeadcountNationwide(@Param("study_paragraph") String study_paragraph, @Param("version") String version);
 
     /**
-     * 查询当前学校金币数最高的学生信息
-     *
-     * @param schoolName
-     * @return
-     */
-    Student selectMaxGoldForSchool(@Param("schoolName") String schoolName);
-
-    /**
      * 获取本校所有总金币数为 maxGold 的学生信息
      *
-     * @param schoolName
+     * @param schoolAdminId
      * @param maxGold
      * @return
      */
-    List<Student> selectMaxGoldForGold(@Param("schoolName") String schoolName, @Param("maxGold") double maxGold);
+    List<Student> selectMaxGoldForGold(@Param("schoolAdminId") Integer schoolAdminId, @Param("maxGold") double maxGold);
 
     /**
      * 将学生第一次获取全校第一名标识置为null
@@ -247,4 +239,12 @@ public interface StudentMapper extends BaseMapper<Student> {
      * @return
      */
     int countHasLoginLogStudentsBySchoolAdminId(@Param("schoolAdminId") Integer schoolAdminId);
+
+    /**
+     * 获取学校金币最多的学生信息
+     *
+     * @param schoolAdminId
+     * @return
+     */
+    Student selectMaxGoldForSchool(@Param("schoolAdminId") Integer schoolAdminId);
 }
