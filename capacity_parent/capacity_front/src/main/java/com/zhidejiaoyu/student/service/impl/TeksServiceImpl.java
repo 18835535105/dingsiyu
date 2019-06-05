@@ -295,7 +295,20 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             List<Long> courseIds = new ArrayList<>(courses.size());
             courses.forEach(map -> courseIds.add((Long) map.get("id")));
             Map<String, Object> learnUnit = learnMapper.selTeksLaterCourse(student.getId());
-
+            for (Map<String, Object> courseMap : courses) {
+                courseUnitVo = new CourseUnitVo();
+                resultMap = new ArrayList<>();
+                Long id = learnMapper.selLaterLearnTeks(student.getId(), (Long) courseMap.get("id"));
+                if (id != null) {
+                    courseUnitVo.setLearnUnit(id.toString());
+                }
+                courseUnitVo.setCourseId((Long) courseMap.get("id"));
+                courseUnitVo.setCourseName(courseMap.get("courseName").toString());
+                courseUnitVo.setVersion(courseMap.get("version").toString());
+                courseUnitVo.setGrad(courseMap.get("grade").toString() +"-"+ courseMap.get("label").toString());
+                courseUnitVo.setUnitVos(resultMap);
+                courseUnitVos.add(courseUnitVo);
+            }
             if (learnUnit != null) {
                 List<StudentStudyPlan> plans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, (Long) learnUnit.get("course_id"), 3);
                 boolean flag = false;
@@ -306,20 +319,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                             flag = true;
                         }
                     }
-                }
-                for (Map<String, Object> courseMap : courses) {
-                    courseUnitVo = new CourseUnitVo();
-                    resultMap = new ArrayList<>();
-                    Long id = learnMapper.selLaterLearnTeks(student.getId(), (Long) courseMap.get("id"));
-                    if (id != null) {
-                        courseUnitVo.setLearnUnit(id.toString());
-                    }
-                    courseUnitVo.setCourseId((Long) courseMap.get("id"));
-                    courseUnitVo.setCourseName(courseMap.get("courseName").toString());
-                    courseUnitVo.setVersion(courseMap.get("version").toString());
-                    courseUnitVo.setGrad(courseMap.get("grade").toString() + courseMap.get("label").toString());
-                    courseUnitVo.setUnitVos(resultMap);
-                    courseUnitVos.add(courseUnitVo);
                 }
                 if (flag) {
                     studyMap = new HashMap<>();
@@ -341,7 +340,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                         studyMap.put("version", teksCourse.getVersion());
                         studyMap.put("grade", teksCourse.getGrade() +"-"+ teksCourse.getLabel());
                         studyMap.put("courseId",teksCourse.getId());
-
                     }
                 }
             }else{
@@ -351,7 +349,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                     studyMap.put("unitId", plans.get(0).getStartUnitId());
                     TeksCourse teksCourse = teksCourseMapper.selectById(plans.get(0).getCourseId());
                     studyMap.put("version", teksCourse.getVersion());
-                    studyMap.put("grade", teksCourse.getGrade() + teksCourse.getLabel());
+                    TeksUnit teksUnit = teksUnitMapper.selectById(plans.get(0).getStartUnitId());
+                    studyMap.put("unitName",teksUnit.getUnitName());
+                    studyMap.put("version", teksCourse.getVersion());
+                    studyMap.put("courseId",teksCourse.getId());
+                    studyMap.put("grade", teksCourse.getGrade() +"-"+ teksCourse.getLabel());
                 }
             }
             List<Map<String, Object>> testList = teksMapper.getStudentAllCourse(studentId, courseIds);
