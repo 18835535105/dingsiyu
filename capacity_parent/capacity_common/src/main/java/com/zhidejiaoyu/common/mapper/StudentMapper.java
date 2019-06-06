@@ -39,10 +39,13 @@ public interface StudentMapper extends BaseMapper<Student> {
      */
     List<String> getSchools(@Param("isNewStudentSchool") Boolean isNewStudentSchool);
 
-    Student LoginJudge(Student st);
-
-    @Select("select role from student where id = #{id}")
-    Integer judgeUser(@Param("id") Long id);
+    /**
+     * 验证学生身份
+     *
+     * @param st
+     * @return
+     */
+    Student loginJudge(Student st);
 
     /**
      * 根据学生id数据批量修改有效期和到期时间

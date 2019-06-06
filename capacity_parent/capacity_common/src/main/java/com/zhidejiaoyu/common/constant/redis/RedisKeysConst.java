@@ -86,4 +86,9 @@ public class RedisKeysConst {
      * 存储音节信息
      */
     public static final String PHONETIC_SYMBOL = "PHONETIC_SYMBOL";
+
+    /**
+     * 存储学生是否是第一次登录信息
+     */
+    public static final String FIRST_LOGIN = "FIRST_LOGIN";
 }

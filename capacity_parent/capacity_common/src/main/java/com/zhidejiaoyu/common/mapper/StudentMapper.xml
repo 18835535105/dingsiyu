@@ -436,13 +436,13 @@
         )
     </update>
 
-    <select id="LoginJudge" parameterType="com.zhidejiaoyu.common.pojo.Student"
+    <select id="loginJudge" parameterType="com.zhidejiaoyu.common.pojo.Student"
             resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from student
         where account = #{account} and
-        password = #{password}
+        password = #{password} limit 1
     </select>
 
     <select id="indexData" parameterType="long"

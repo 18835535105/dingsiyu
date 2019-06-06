@@ -46,6 +46,9 @@ public class RedisOpt {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
+    @Autowired
+    private RunLogMapper runLogMapper;
+
     private static RedisTemplate<String, Object> staticRedisTemplate;
 
     @PostConstruct
@@ -216,5 +219,27 @@ public class RedisOpt {
             log.error("error=[{}]", e.getMessage());
         }
         return object;
+    }
+
+    /**
+     * 判断学生是否是第一次登录系统
+     *
+     * @param studentId
+     * @return  true：是第一次登录系统；false：不是第一次登录系统
+     */
+    public boolean firstLogin(Long studentId) {
+        Object object = redisTemplate.opsForHash().get(RedisKeysConst.FIRST_LOGIN, studentId);
+        if (object != null) {
+           try {
+               return (boolean) object;
+           } catch (Exception e) {
+               log.warn("格式转换错误！studentId=[{}]", studentId, e);
+           }
+        }
+        Integer count = runLogMapper.selectLoginCountByStudentId(studentId);
+        boolean flag = count == 0;
+        redisTemplate.opsForHash().put(RedisKeysConst.FIRST_LOGIN, studentId, flag);
+        redisTemplate.expire(RedisKeysConst.FIRST_LOGIN, 7, TimeUnit.DAYS);
+        return flag ;
     }
 }
