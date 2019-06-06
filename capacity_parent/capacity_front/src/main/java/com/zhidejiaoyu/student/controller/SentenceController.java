@@ -129,6 +129,14 @@ public class SentenceController {
     }
 
     @ResponseBody
+    @GetMapping("/getLearnUnitByCourse")
+    @ControllerLogAnnotation(name = "获取句型首页数据")
+    public ServerResponse<Object> getLearnUnitByCourse(HttpSession session,Long courseId) {
+        return sentenceService.getLearnUnitByCourse(session,courseId);
+    }
+
+
+    @ResponseBody
     @GetMapping("/getSentenceLaterLearnTime")
     public ServerResponse<Object> getSentenceLaterLearnTime(HttpSession session){
         return sentenceService.getSentenceLaterLearnTime(session);

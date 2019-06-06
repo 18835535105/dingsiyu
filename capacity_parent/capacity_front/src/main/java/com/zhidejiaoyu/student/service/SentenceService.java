@@ -82,4 +82,6 @@ public interface SentenceService extends BaseService<Sentence> {
 
     ServerResponse<SentenceTranslateVo> returnGoldWord(SentenceTranslate sentenceTranslate, Long plan, boolean firstStudy,
                                                        Long sentenceCount, SentenceListen sentenceListen, SentenceWrite sentenceWrite, Integer type);
+
+    ServerResponse<Object> getLearnUnitByCourse(HttpSession session, Long courseId);
 }

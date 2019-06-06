@@ -28,10 +28,9 @@
     </select>
 
     <select id="selectCourseByUnitId" resultType="java.util.Map" parameterType="java.lang.Long">
-        select course.id courseId , unit.id unitId , cou.version,cou.label,cou.grade  from student_course course
-          join student student on course.student_id=student.id
-          join sentence_unit unit on unit.course_id=course.course_id
-          join course cou on course.course_id=cou.id
+        select course.id courseId , unit.id unitId , unit.unit_name unitName, course.version,course.label,course.grade
+        from sentence_course course
+        join sentence_unit unit on unit.course_id=course.id
           where unit.id = #{unitId}
 		  limit 1
     </select>

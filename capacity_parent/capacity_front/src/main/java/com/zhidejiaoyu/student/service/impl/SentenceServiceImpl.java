@@ -489,19 +489,128 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     }
 
     @Override
+    public ServerResponse<Object> getLearnUnitByCourse(HttpSession session, Long courseId) {
+        Student student = getStudent(session);
+        List<Long> courseIds = new ArrayList<>();
+        courseIds.add(courseId);
+        List<Map<String, Object>> sentenceUnits = new ArrayList<>();
+        List<Map<String, Object>> resultMap = new ArrayList<>();
+        //查看学生所能学习的单元
+        this.getStudyUnit(courseIds, sentenceUnits, student.getId());
+        // 已经进行过单元闯关的单元
+        Map<Long, Map<Long, Long>> testMap = null;
+        // 还没有学习的单元
+        Map<Long, Map<Long, Long>> unLearnMap = null;
+        if (sentenceUnits.size() > 0) {
+            List<Long> unitIds = new ArrayList<>(sentenceUnits.size());
+            sentenceUnits.forEach(map -> unitIds.add((Long) map.get("id")));
+            testMap = testRecordMapper.selectHasUnitTest(student.getId(), unitIds);
+            unLearnMap = learnMapper.selectUnlearnUnit(student.getId(), unitIds);
+        }
+        Map<String, Object> unitInfoMap;
+        if (sentenceUnits != null && sentenceUnits.size() > 0) {
+            for (Map<String, Object> unitMap : sentenceUnits) {
+                unitInfoMap = new HashMap<>();
+                unitInfoMap.put("unitId", unitMap.get("id"));
+                unitInfoMap.put("unitName", unitMap.get("unitName"));
+                if (testMap != null && testMap.containsKey(unitMap.get("id"))) {
+                    // 当前单元已进行过单元闯关，标记为已学习
+                    unitInfoMap.put("state", 4);
+                } else if (unLearnMap != null && unLearnMap.containsKey(unitMap.get("id"))) {
+                    // 当前单元还未学习
+                    unitInfoMap.put("state", 1);
+                } else {
+                    // 正在学习
+                    unitInfoMap.put("state", 3);
+                }
+                Integer learnCount = 1;
+                Long id = learnMapper.countLearnWord(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(5), learnCount);
+                //获取当前单元有多少例句
+                Long senCount = unitSentenceMapper.selectSentenceCountByUnitId((Long) unitMap.get("id"));
+                if (id < senCount && id > 0) {
+                    unitInfoMap.put("sentenceTranslation", "正在学习");
+                } else if (id >= senCount) {
+                    Long id1 = learnMapper.countLearnWordAndType(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(5), learnCount);
+                    if (id1 < senCount && id1 > 0) {
+                        unitInfoMap.put("sentenceTranslation", "正在学习");
+                    } else if (id1 >= senCount) {
+                        unitInfoMap.put("sentenceTranslation", "已学习");
+                    } else {
+                        unitInfoMap.put("sentenceTranslation", "未学习");
+                    }
+                } else {
+                    unitInfoMap.put("sentenceTranslation", "未学习");
+                }
+                Long id1 = learnMapper.countLearnWord(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(4), learnCount == null ? 1 : learnCount);
+                if (id1 < senCount && id1 > 0) {
+                    unitInfoMap.put("sentenceListening", "正在学习");
+                } else if (id1 >= senCount) {
+                    Long id2 = learnMapper.countLearnWordAndType(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(4), learnCount == null ? 1 : learnCount);
+                    if (id2 < senCount && id2 > 0) {
+                        unitInfoMap.put("sentenceListening", "正在学习");
+                    } else if (id2 >= senCount) {
+                        unitInfoMap.put("sentenceListening", "已学习");
+                    } else {
+                        unitInfoMap.put("sentenceListening", "未学习");
+                    }
+                } else {
+                    unitInfoMap.put("sentenceListening", "未学习");
+                }
+
+                Long id2 = learnMapper.countLearnWord(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(6), learnCount);
+                if (id2 < senCount && id2 > 0) {
+                    unitInfoMap.put("sentenceWriting", "正在学习");
+                } else if (id2 >= senCount) {
+                    Long id3 = learnMapper.countLearnWordAndType(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(6), learnCount);
+                    if (id3 < senCount && id3 > 0) {
+                        unitInfoMap.put("sentenceWriting", "正在学习");
+                    } else if (id3 >= senCount) {
+                        TestRecord testRecord = testRecordMapper.selectByStudentIdAndGenre(student.getId(), Long.parseLong(unitMap.get("id").toString()));
+                        if (id2 != null && id2 != 0) {
+                            //获取最后一个句子的学习时间
+                            Learn learnSentence = learnMapper.selLaterSentence(student.getId(), Long.parseLong(unitMap.get("id").toString()));
+                            if (testRecord != null) {
+                                if (testRecord.getTestEndTime().getTime() > learnSentence.getLearnTime().getTime()) {
+                                    unitInfoMap.put("sentenceWriting", "已学习");
+                                } else {
+                                    unitInfoMap.put("sentenceWriting", "正在学习");
+                                }
+                            } else {
+                                unitInfoMap.put("sentenceWriting", "正在学习");
+                            }
+                        } else {
+                            unitInfoMap.put("sentenceWriting", "正在学习");
+                        }
+
+                    } else {
+                        unitInfoMap.put("sentenceWriting", "未学习");
+                    }
+                } else {
+                    unitInfoMap.put("sentenceWriting", "未学习");
+                }
+                TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
+                        Long.parseLong(unitMap.get("id").toString()), "音译测试", "音译测试");
+                if (testRecordOld != null) {
+                    unitInfoMap.put("transliterationExercise", "已学习");
+                } else {
+                    unitInfoMap.put("transliterationExercise", "未学习");
+                }
+                resultMap.add(unitInfoMap);
+            }
+        }
+        return ServerResponse.createBySuccess(resultMap);
+    }
+
+    @Override
     public ServerResponse<Object> getLearnCourseAndUnit(HttpSession session) {
         Student student = getStudent(session);
         Long studentId = student.getId();
         List<CourseUnitVo> courseUnitVos = new ArrayList<>();
         CourseUnitVo courseUnitVo;
-        List<Map<String, Object>> resultMap;
         Map<String, Object> result = new HashMap<>();
-        // 学生所有课程id及课程名
-        /*   List<Map<String, Object>> courses = courseMapper.selectSentenceCourseIdAndCourseNameByStudentId(studentId);*/
-
         List<Map<String, Object>> courses = studentStudyPlanMapper.selBySentenceStudentId(studentId, 2);
         if (courses == null || courses.size() == 0) {
-            return ServerResponse.createByError(400,"当前学生没有课程，请让老师添加");
+            return ServerResponse.createByError(400, "当前学生没有课程，请让老师添加");
         }
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selGetSentenceByStudentIdAndType(student.getId());
         // 学生课程下所有例句的单元id及单元名
@@ -511,138 +620,38 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
             List<Map<String, Object>> sentenceUnits = new ArrayList<>();
             //查看学生所能学习的单元
             this.getStudyUnit(courseIds, sentenceUnits, studentId);
-            // 已经进行过单元闯关的单元
-            Map<Long, Map<Long, Long>> testMap = null;
-            // 还没有学习的单元
-            Map<Long, Map<Long, Long>> unLearnMap = null;
-            if (sentenceUnits.size() > 0) {
-                List<Long> unitIds = new ArrayList<>(sentenceUnits.size());
-                sentenceUnits.forEach(map -> unitIds.add((Long) map.get("id")));
-                testMap = testRecordMapper.selectHasUnitTest(studentId, unitIds);
-                unLearnMap = learnMapper.selectUnlearnUnit(studentId, unitIds);
-            }
             Map<String, Object> present = null;
             if (capacityStudentUnit != null) {
-                SentenceCourse course = sentenceCourseMapper.selectById(capacityStudentUnit.getCourseId());
-                present = new HashMap<>();
-                present.put("version", course.getVersion());
-                present.put("grade", course.getGrade() + course.getLabel());
-                present.put("unitId", capacityStudentUnit.getUnitId());
+                List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, capacityStudentUnit.getCourseId(), 2);
+                if (studentStudyPlans!=null && studentStudyPlans.size()>0) {
+                    SentenceCourse course = sentenceCourseMapper.selectById(capacityStudentUnit.getCourseId());
+                    present = new HashMap<>();
+                    present.put("version", course.getVersion());
+                    present.put("grade", course.getGrade() + course.getLabel());
+                    present.put("unitId", capacityStudentUnit.getUnitId());
+                    present.put("courseId", course.getId());
+                    SentenceUnit sentenceUnit = sentenceUnitMapper.selectById(capacityStudentUnit.getUnitId());
+                    present.put("unitName", sentenceUnit.getUnitName());
+                }
             }
-
             for (Map<String, Object> courseMap : courses) {
-
                 courseUnitVo = new CourseUnitVo();
-                resultMap = new ArrayList<>();
                 courseUnitVo.setCourseId((Long) courseMap.get("id"));
                 courseUnitVo.setVersion(courseMap.get("version").toString());
                 courseUnitVo.setGrad(courseMap.get("grade").toString() + courseMap.get("label").toString());
-                // 存放单元信息
-                Map<String, Object> unitInfoMap;
                 Long learnUnitId = learnMapper.selByStudentIdAndCourseIdDisVersion(studentId, (Long) courseMap.get("id"));
                 if (learnUnitId != null) {
                     courseUnitVo.setLearnUnit(learnUnitId.toString());
                 }
-                for (Map<String, Object> unitMap : sentenceUnits) {
-                    if (present == null) {
-                        Map<String, Object> map = sentenceCourseMapper.selectCourseByUnitId(Long.parseLong(unitMap.get("id").toString()));
-                        present.put("version", map.get("version"));
-                        present.put("grade", map.get("grade").toString() + map.get("label").toString());
-                        present.put("unitId", map.get("unitId"));
-                    }
-                    unitInfoMap = new HashMap<>(16);
-                    if (Objects.equals(courseMap.get("id"), unitMap.get("courseId"))) {
-                        if (learnUnitId == null && courseUnitVo.getLearnUnit() == null) {
-                            courseUnitVo.setLearnUnit(unitMap.get("id").toString());
-                        }
-                        unitInfoMap.put("unitId", unitMap.get("id"));
-                        unitInfoMap.put("unitName", unitMap.get("unitName"));
-                        if (testMap != null && testMap.containsKey(unitMap.get("id"))) {
-                            // 当前单元已进行过单元闯关，标记为已学习
-                            unitInfoMap.put("state", 4);
-                        } else if (unLearnMap != null && unLearnMap.containsKey(unitMap.get("id"))) {
-                            // 当前单元还未学习
-                            unitInfoMap.put("state", 1);
-                        } else {
-                            // 正在学习
-                            unitInfoMap.put("state", 3);
-                        }
-                        Integer learnCount = 1;
-                        Long id = learnMapper.countLearnWord(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(5), learnCount);
-                        //获取当前单元有多少例句
-                        Long senCount = unitSentenceMapper.selectSentenceCountByUnitId((Long) unitMap.get("id"));
-                        if (id < senCount && id > 0) {
-                            unitInfoMap.put("sentenceTranslation", "正在学习");
-                        } else if (id >= senCount) {
-                            Long id1 = learnMapper.countLearnWordAndType(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(5), learnCount);
-                            if (id1 < senCount && id1 > 0) {
-                                unitInfoMap.put("sentenceTranslation", "正在学习");
-                            } else if (id1 >= senCount) {
-                                unitInfoMap.put("sentenceTranslation", "已学习");
-                            } else {
-                                unitInfoMap.put("sentenceTranslation", "未学习");
-                            }
-                        } else {
-                            unitInfoMap.put("sentenceTranslation", "未学习");
-                        }
-                        Long id1 = learnMapper.countLearnWord(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(4), learnCount == null ? 1 : learnCount);
-                        if (id1 < senCount && id1 > 0) {
-                            unitInfoMap.put("sentenceListening", "正在学习");
-                        } else if (id1 >= senCount) {
-                            Long id2 = learnMapper.countLearnWordAndType(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(4), learnCount == null ? 1 : learnCount);
-                            if (id2 < senCount && id2 > 0) {
-                                unitInfoMap.put("sentenceListening", "正在学习");
-                            } else if (id2 >= senCount) {
-                                unitInfoMap.put("sentenceListening", "已学习");
-                            } else {
-                                unitInfoMap.put("sentenceListening", "未学习");
-                            }
-                        } else {
-                            unitInfoMap.put("sentenceListening", "未学习");
-                        }
-
-                        Long id2 = learnMapper.countLearnWord(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(6), learnCount);
-                        if (id2 < senCount && id2 > 0) {
-                            unitInfoMap.put("sentenceWriting", "正在学习");
-                        } else if (id2 >= senCount) {
-                            Long id3 = learnMapper.countLearnWordAndType(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(6), learnCount);
-                            if (id3 < senCount && id3 > 0) {
-                                unitInfoMap.put("sentenceWriting", "正在学习");
-                            } else if (id3 >= senCount) {
-                                TestRecord testRecord = testRecordMapper.selectByStudentIdAndGenre(student.getId(), Long.parseLong(unitMap.get("id").toString()));
-                                if (id2 != null && id2 != 0) {
-                                    //获取最后一个句子的学习时间
-                                    Learn learnSentence = learnMapper.selLaterSentence(student.getId(), Long.parseLong(unitMap.get("id").toString()));
-                                    if (testRecord != null) {
-                                        if (testRecord.getTestEndTime().getTime() > learnSentence.getLearnTime().getTime()) {
-                                            unitInfoMap.put("sentenceWriting", "已学习");
-                                        } else {
-                                            unitInfoMap.put("sentenceWriting", "正在学习");
-                                        }
-                                    } else {
-                                        unitInfoMap.put("sentenceWriting", "正在学习");
-                                    }
-                                } else {
-                                    unitInfoMap.put("sentenceWriting", "正在学习");
-                                }
-
-                            } else {
-                                unitInfoMap.put("sentenceWriting", "未学习");
-                            }
-                        } else {
-                            unitInfoMap.put("sentenceWriting", "未学习");
-                        }
-                        TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
-                                Long.parseLong(unitMap.get("id").toString()), "音译测试", "音译测试");
-                        if (testRecordOld != null) {
-                            unitInfoMap.put("transliterationExercise", "已学习");
-                        } else {
-                            unitInfoMap.put("transliterationExercise", "未学习");
-                        }
-                        resultMap.add(unitInfoMap);
-                    }
+                if (present == null) {
+                    present=new HashMap<>();
+                    Map<String, Object> map = sentenceCourseMapper.selectCourseByUnitId(Long.parseLong(sentenceUnits.get(0).get("id").toString()));
+                    present.put("version", map.get("version"));
+                    present.put("grade", map.get("grade").toString() + map.get("label").toString());
+                    present.put("unitId", map.get("unitId"));
+                    present.put("courseId", map.get("courseId"));
+                    present.put("unitName", map.get("unitName"));
                 }
-                courseUnitVo.setUnitVos(resultMap);
                 courseUnitVos.add(courseUnitVo);
             }
             List<Map<String, Object>> courseList = sentenceCourseMapper.getAllVersion(student.getId());
@@ -667,7 +676,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selGetSentenceByStudentIdAndType(student.getId());
         SentenceUnit unit = sentenceUnitMapper.selectByPrimaryKey(unitId);
         List<StudentStudyPlan> listSize = studentStudyPlanMapper.selByStudentIdAndCourseIdAndUnitId(student.getId(), courseId, 2, unitId);
-        if(listSize==null||listSize.size()==0){
+        if (listSize == null || listSize.size() == 0) {
             return ServerResponse.createBySuccess();
         }
         if (capacityStudentUnit == null) {
@@ -946,7 +955,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
      */
     @Override
     public ServerResponse<SentenceTranslateVo> returnGoldWord(SentenceTranslate sentenceTranslate, Long plan, boolean firstStudy,
-                                                               Long sentenceCount, SentenceListen sentenceListen, SentenceWrite sentenceWrite, Integer type) {
+                                                              Long sentenceCount, SentenceListen sentenceListen, SentenceWrite sentenceWrite, Integer type) {
         SentenceTranslateVo sentenceTranslateVo;
         // 例句翻译
         if (sentenceTranslate != null && StringUtils.isNotBlank(sentenceTranslate.getWord())) {
@@ -977,6 +986,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         }
         return ServerResponse.createBySuccess(sentenceTranslateVo);
     }
+
 
     private SentenceTranslateVo getSentenceTranslateVo(Long plan, boolean firstStudy, Long sentenceCount, Integer type, Sentence sentence) {
         SentenceTranslateVo sentenceTranslateVo = new SentenceTranslateVo();

@@ -92,9 +92,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private RunLogMapper runLogMapper;
 
     @Autowired
-    private UnitMapper unitMapper;
-
-    @Autowired
     private VoiceMapper voiceMapper;
 
     @Autowired
