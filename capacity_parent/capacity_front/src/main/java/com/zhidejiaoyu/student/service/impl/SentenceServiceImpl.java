@@ -531,6 +531,9 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                     unitInfoMap.put("sentenceTranslation", "正在学习");
                 } else if (id >= senCount) {
                     Long id1 = learnMapper.countLearnWordAndType(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(5), learnCount);
+                    if(id1==null){
+                        id1=0L;
+                    }
                     if (id1 < senCount && id1 > 0) {
                         unitInfoMap.put("sentenceTranslation", "正在学习");
                     } else if (id1 >= senCount) {
@@ -542,10 +545,16 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                     unitInfoMap.put("sentenceTranslation", "未学习");
                 }
                 Long id1 = learnMapper.countLearnWord(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(4), learnCount == null ? 1 : learnCount);
+                if(id1==null){
+                    id1=0L;
+                }
                 if (id1 < senCount && id1 > 0) {
                     unitInfoMap.put("sentenceListening", "正在学习");
                 } else if (id1 >= senCount) {
                     Long id2 = learnMapper.countLearnWordAndType(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(4), learnCount == null ? 1 : learnCount);
+                    if(id2==null){
+                        id2=0L;
+                    }
                     if (id2 < senCount && id2 > 0) {
                         unitInfoMap.put("sentenceListening", "正在学习");
                     } else if (id2 >= senCount) {
@@ -558,10 +567,16 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                 }
 
                 Long id2 = learnMapper.countLearnWord(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(6), learnCount);
+                if(id2==null){
+                    id2=0L;
+                }
                 if (id2 < senCount && id2 > 0) {
                     unitInfoMap.put("sentenceWriting", "正在学习");
                 } else if (id2 >= senCount) {
                     Long id3 = learnMapper.countLearnWordAndType(student.getId(), Long.parseLong(unitMap.get("id").toString()), commonMethod.getTestType(6), learnCount);
+                    if(id3==null){
+                        id3=0L;
+                    }
                     if (id3 < senCount && id3 > 0) {
                         unitInfoMap.put("sentenceWriting", "正在学习");
                     } else if (id3 >= senCount) {
