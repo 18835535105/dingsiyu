@@ -30,22 +30,22 @@ public class SimpleGrowReportServiceImpl implements SimpleGrowReportService {
     private SimpleCommonMethod simpleCommonMethod;
 
     @Autowired
-    private UnitMapper unitMapper;
+    private SimpleUnitMapper unitMapper;
 
     @Autowired
-    private UnitVocabularyMapper unitVocabularyMapper;
+    private SimpleUnitVocabularyMapper simpleUnitVocabularyMapper;
 
     @Autowired
-    private LearnMapper learnMapper;
+    private SimpleLearnMapper learnMapper;
 
     @Autowired
-    private UnitSentenceMapper unitSentenceMapper;
+    private SimpleUnitSentenceMapper simpleUnitSentenceMapper;
 
     @Autowired
-    private DurationMapper durationMapper;
+    private SimpleDurationMapper simpleDurationMapper;
 
     @Autowired
-    private StudentMapper studentMapper;
+    private SimpleStudentMapper simpleStudentMapper;
 
     @Override
     public ServerResponse<ReportVO> getLearnResult(HttpSession session) {
@@ -87,15 +87,15 @@ public class SimpleGrowReportServiceImpl implements SimpleGrowReportService {
 
         // 已学知识点大于learnedCount的学生个数
         int studentCount = learnMapper.countGreaterLearnedCount(learnedCount, phase, student);
-        int studentTotalCount = studentMapper.countByPhaseAndVersion(phase, student);
+        int studentTotalCount = simpleStudentMapper.countByPhaseAndVersion(phase, student);
         learnSuperviseVO.setDefeatRate((int) (BigDecimalUtil.div((studentTotalCount - studentCount) * 1.0, studentTotalCount, 2) * 100));
 
         // 在线总时长
-        Integer totalOnlineTime = durationMapper.selectTotalOnlineByStudentId(student.getId());
+        Integer totalOnlineTime = simpleDurationMapper.selectTotalOnlineByStudentId(student.getId());
         learnSuperviseVO.setTotalOnlineTime((int) BigDecimalUtil.div(totalOnlineTime * 1.0, 3600, 0));
 
         // 学习总时长
-        Long totalValidTime = durationMapper.selectValidTimeByStudentId(student.getId());
+        Long totalValidTime = simpleDurationMapper.selectValidTimeByStudentId(student.getId());
         learnSuperviseVO.setTotalValidTime((int) BigDecimalUtil.div(totalValidTime * 1.0, 3600, 0));
 
         // 学习效率
@@ -182,7 +182,7 @@ public class SimpleGrowReportServiceImpl implements SimpleGrowReportService {
      */
     private void packageSentenceResultVo(Student student, String phase, List<Long> unitIds, LearnResultVO learnResultVO) {
         // 查询学生当前学段下所有应学习的句型个数
-        int shouldMaster = unitSentenceMapper.countSentenceByUnitIds(unitIds);
+        int shouldMaster = simpleUnitSentenceMapper.countSentenceByUnitIds(unitIds);
         // 当前学段掌握的例句个数
         int masterCount = learnMapper.countMasterSentence(student, phase);
         packageResult(learnResultVO, shouldMaster, masterCount);
@@ -198,7 +198,7 @@ public class SimpleGrowReportServiceImpl implements SimpleGrowReportService {
      */
     private void packageWordResultVo(Student student, String phase, List<Long> unitIds, LearnResultVO learnResultVO) {
         // 查询学生当前学段下所有应学习的单词个数
-        Long shouldMaster = unitVocabularyMapper.countWordByUnitIds(unitIds);
+        Long shouldMaster = simpleUnitVocabularyMapper.countWordByUnitIds(unitIds);
         // 当前学段掌握的单词个数
         int masterCount = learnMapper.countMasterWord(student, phase);
         packageResult(learnResultVO, Integer.parseInt(shouldMaster.toString()), masterCount);

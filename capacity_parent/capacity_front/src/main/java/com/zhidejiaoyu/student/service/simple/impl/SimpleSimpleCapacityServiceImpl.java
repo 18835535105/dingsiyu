@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
-import com.zhidejiaoyu.common.mapper.simple.SimpleCapacityMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleSimpleCapacityMapper;
 import com.zhidejiaoyu.common.pojo.SimpleCapacity;
 import com.zhidejiaoyu.student.service.simple.SimpleSimpleCapacityService;
 import org.springframework.stereotype.Service;
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2018-09-06
  */
 @Service
-public class SimpleSimpleCapacityServiceImpl extends ServiceImpl<SimpleCapacityMapper, SimpleCapacity> implements SimpleSimpleCapacityService {
+public class SimpleSimpleCapacityServiceImpl extends ServiceImpl<SimpleSimpleCapacityMapper, SimpleCapacity> implements SimpleSimpleCapacityService {
 
 }

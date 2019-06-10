@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.utils.simple;
 
-import com.zhidejiaoyu.common.mapper.simple.CcieMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleCcieMapper;
 import com.zhidejiaoyu.common.pojo.Ccie;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.DateUtil;
@@ -20,7 +20,7 @@ import java.util.Date;
 public class CcieUtil {
 
     @Autowired
-    private CcieMapper ccieMapper;
+    private SimpleCcieMapper ccieMapper;
 
     /**
      * 测试证书

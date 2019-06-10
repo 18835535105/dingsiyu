@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.common.utils.simple.goldUtil;
 
-import com.zhidejiaoyu.common.mapper.simple.StudentExpansionMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleStudentExpansionMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class TestGoldUtil {
     private static final int MAX_GOLD = 300;
 
     @Autowired
-    private StudentExpansionMapper studentExpansionMapper;
+    private SimpleStudentExpansionMapper simpleStudentExpansionMapper;
 
     /**
      * 可奖励金币个数
@@ -38,7 +38,7 @@ public class TestGoldUtil {
         }
         Long studentId = student.getId();
         int addGold = 0;
-        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(studentId);
+        StudentExpansion studentExpansion = simpleStudentExpansionMapper.selectByStudentId(studentId);
         if (studentExpansion == null) {
             studentExpansion = new StudentExpansion();
             studentExpansion.setTestGoldAdd(gold);
@@ -70,7 +70,7 @@ public class TestGoldUtil {
 
     private void updateStudentExpansion(StudentExpansion studentExpansion, Student student) {
         try {
-            studentExpansionMapper.updateById(studentExpansion);
+            simpleStudentExpansionMapper.updateById(studentExpansion);
         } catch (Exception e) {
             log.error("闯关类每日最多增加金币量更新学生扩展信息失败，[{}]->[{}]", student.getId(), student.getStudentName(), e);
         }
@@ -78,7 +78,7 @@ public class TestGoldUtil {
 
     private void insertStudentExpansion(StudentExpansion studentExpansion, Student student) {
         try {
-            studentExpansionMapper.insert(studentExpansion);
+            simpleStudentExpansionMapper.insert(studentExpansion);
         } catch (Exception e) {
             log.error("闯关类每日最多增加金币量新增学生扩展信息失败，[{}]->[{}]", student.getId(), student.getStudentName(), e);
         }

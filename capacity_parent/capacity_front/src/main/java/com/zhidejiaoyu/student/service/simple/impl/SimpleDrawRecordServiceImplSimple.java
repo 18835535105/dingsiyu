@@ -25,12 +25,12 @@ import java.util.*;
  */
 @Service
 @Log4j
-public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<DrawRecordMapper, DrawRecord> implements SimpleDrawRecordServiceSimple {
+public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<SimpleDrawRecordMapper, DrawRecord> implements SimpleDrawRecordServiceSimple {
 
     @Autowired
-    private DrawRecordMapper drawRecordMapper;
+    private SimpleDrawRecordMapper simpleDrawRecordMapper;
     @Autowired
-    private ExhumationService exhumationService;
+    private SimpleExhumationServiceImplSimple exhumationService;
     @Autowired
     private SimpleSyntheticRewardsListServiceSimple synService;
     @Autowired
@@ -38,15 +38,15 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Dra
     @Autowired
     private SimpleConsumeServiceSimple consumeService;
     @Autowired
-    private RunLogMapper runLogMapper;
+    private SimpleRunLogMapper runLogMapper;
     @Autowired
-    private SyntheticRewardsListMapper synMapper;
+    private SimpleSyntheticRewardsListMapper synMapper;
     @Autowired
-    private ExhumationMapper exhumationMapper;
+    private SimpleExhumationMapper simpleExhumationMapper;
     @Autowired
-    private ConsumeMapper consumeMapper;
+    private SimpleConsumeMapper simpleConsumeMapper;
     @Autowired
-    private StudentMapper studentMapper;
+    private SimpleStudentMapper simpleStudentMapper;
     @Autowired
     private RedisOpt redisOpt;
 
@@ -62,7 +62,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Dra
         map.put("time", format);
         int[] resultInt = new int[2];
         //判断是否为一天第一次抽奖
-        Integer integer = drawRecordMapper.selAwardNow(map);
+        Integer integer = simpleDrawRecordMapper.selAwardNow(map);
         if (integer > 0) {
             if (student.getEnergy() - 5 < 0) {
                 resultInt[0] = 3;
@@ -70,7 +70,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Dra
             }
             //将能量重新存入student中
             student.setEnergy(student.getEnergy() - 5);
-            studentMapper.updateByPrimaryKey(student);
+            simpleStudentMapper.updateByPrimaryKey(student);
             //讲student重新放入session中
             session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         }
@@ -83,7 +83,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Dra
             name = AwardUtil.getAward(type);
         }
         DrawRecord draw = getDraw(name, date, explain, studentId);
-        Integer insert = drawRecordMapper.insert(draw);
+        Integer insert = simpleDrawRecordMapper.insert(draw);
         if (insert > 0) {
             if (type == 0) {
                 resultInt[0] = 1;
@@ -95,7 +95,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Dra
             // 第多少位抽到奖励
             Integer returnSize = 0;
             if (type >= 1 && type <= 7) {
-                size = drawRecordMapper.selDrawSize(name, format);
+                size = simpleDrawRecordMapper.selDrawSize(name, format);
                 // 当天第一位抽奖的时候第 xx 位获得奖品初始值
                 if (size == 1) {
                     // 初始值
@@ -112,7 +112,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Dra
                 for (int i = 8; i <= 17; i++) {
                     names.add(AwardUtil.getAward(i));
                 }
-                size = drawRecordMapper.selDrawSizes(names, date);
+                size = simpleDrawRecordMapper.selDrawSizes(names, date);
                 if (size == 1) {
                     returnSize = 87;
                     redisOpt.addDrawRecordIndex("美丽印记", returnSize);
@@ -125,7 +125,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Dra
                 for (int i = 18; i <= 27; i++) {
                     names.add(AwardUtil.getAward(i));
                 }
-                size = drawRecordMapper.selDrawSizes(names, date);
+                size = simpleDrawRecordMapper.selDrawSizes(names, date);
                 if (size == 1) {
                     returnSize = 87;
                     redisOpt.addDrawRecordIndex("觉醒手套", returnSize);
@@ -138,7 +138,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Dra
                 for (int i = 28; i <= 37; i++) {
                     names.add(AwardUtil.getAward(i));
                 }
-                size = drawRecordMapper.selDrawSizes(names, date);
+                size = simpleDrawRecordMapper.selDrawSizes(names, date);
                 if (size == 1) {
                     returnSize = 103;
                     redisOpt.addDrawRecordIndex("皮肤", returnSize);
@@ -226,9 +226,9 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Dra
         map.put("start", (page - 1) > 0 ? (page - 1) * rows : 0);
         map.put("end", rows);
         //获取抽奖数量
-        Integer integer = drawRecordMapper.selNumber(student.getId().intValue());
+        Integer integer = simpleDrawRecordMapper.selNumber(student.getId().intValue());
         //获取抽奖信息
-        List<DrawRecord> drawRecords = drawRecordMapper.selByStudentId(map);
+        List<DrawRecord> drawRecords = simpleDrawRecordMapper.selByStudentId(map);
         List<DrawRecord> resultRecords = new ArrayList<>();
         for (DrawRecord drawRecord : drawRecords) {
             if (drawRecord.getExplain().contains("惊喜奖励")) {
@@ -262,9 +262,9 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Dra
         Student student = getStudent(session);
         Map<String, Object> map = new HashMap<>();
         //获取学生使用,未使用的手套,印记碎片
-        List<Exhumation> exhumations = exhumationMapper.selExhumation(student.getId().intValue());
+        List<Exhumation> exhumations = simpleExhumationMapper.selExhumation(student.getId().intValue());
         //获取已使用戒指,花瓣 碎片数量
-        List<Map<String, Object>> exhumationss = exhumationMapper.selExhumationByStudentId(student.getId());
+        List<Map<String, Object>> exhumationss = simpleExhumationMapper.selExhumationByStudentId(student.getId());
         Map<String, Object> flowOrglove = new HashMap<>();
         if (exhumationss != null && exhumationss.size() > 0) {
             flowOrglove.put("total", exhumations.size() + ((Long) (exhumationss.get(0).get("count"))));
@@ -278,9 +278,9 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Dra
         flowOrglove.put("isEnter", false);
         map.put("flowOrGlove", flowOrglove);
         //获取学生未使用的皮肤碎片
-        List<Exhumation> exhumations1 = exhumationMapper.selExhumationByStudentIdTOSkin(student.getId());
+        List<Exhumation> exhumations1 = simpleExhumationMapper.selExhumationByStudentIdTOSkin(student.getId());
         //获取学生使用的皮肤碎片
-        List<Map<String, Object>> maps = exhumationMapper.selExhumationSkinByStudentId(student.getId());
+        List<Map<String, Object>> maps = simpleExhumationMapper.selExhumationSkinByStudentId(student.getId());
         Map<String, Object> skin = new HashMap<>();
         if (maps != null && maps.size() > 0) {
             int have = 0;
@@ -305,10 +305,10 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Dra
         consume.setType(1);
 
         //获取共拥有金币
-        Integer allGold = consumeMapper.getAllGoladAndDiamond(consume);
+        Integer allGold = simpleConsumeMapper.getAllGoladAndDiamond(consume);
         //获取共使用金币
         consume.setState(2);
-        Integer downGold = consumeMapper.getAllGoladAndDiamond(consume);
+        Integer downGold = simpleConsumeMapper.getAllGoladAndDiamond(consume);
         Map<String, Object> gold = new HashMap<>();
         gold.put("total", student.getSystemGold().intValue() + student.getOfflineGold().intValue());
         gold.put("have", student.getSystemGold().intValue());
@@ -329,10 +329,10 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Dra
         //获取学生获取钻石和消耗的钻石
         consume.setType(2);
         //已经使用的钻石
-        Integer downDiamond = consumeMapper.getAllGoladAndDiamond(consume);
+        Integer downDiamond = simpleConsumeMapper.getAllGoladAndDiamond(consume);
         consume.setState(1);
         //全部获取的钻石
-        Integer allDiamond = consumeMapper.getAllGoladAndDiamond(consume);
+        Integer allDiamond = simpleConsumeMapper.getAllGoladAndDiamond(consume);
         ;
         Map<String, Object> diamond = new HashMap<>();
         int total = 0;
@@ -383,7 +383,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Dra
         map.put("studentId", student.getId());
         map.put("time", time);
         //获取当前日抽奖数量
-        Integer integer = drawRecordMapper.selAwardNow(map);
+        Integer integer = simpleDrawRecordMapper.selAwardNow(map);
         Map<String, Object> sel = new HashMap<>();
         //获取能量数量
         sel.put("energy", student.getEnergy());

@@ -28,22 +28,22 @@ public class SimpleDictationServiceImpl implements SimpleDictationService {
 
 	/** 单词 */
 	@Autowired
-	private VocabularyMapper vocabularyMapper;
+	private SimpleVocabularyMapper vocabularyMapper;
 
 	/** 单元 */
 	@Autowired
-	private UnitMapper unitMapper;
+	private SimpleUnitMapper unitMapper;
 
 	/** 记忆追踪,听写*/
 	@Autowired
-	private CapacityListenMapper capacityListenMapper;
+	private SimpleCapacityListenMapper capacityListenMapper;
 
 	/** 学习信息 */
 	@Autowired
-	private LearnMapper learnMapper;
+	private SimpleLearnMapper learnMapper;
 
 	@Autowired
-	private StudentMapper studentMapper;
+	private SimpleStudentMapper simpleStudentMapper;
 
 	@Autowired
 	private YouDaoTranslate youDaoTranslate;
@@ -62,8 +62,8 @@ public class SimpleDictationServiceImpl implements SimpleDictationService {
 		if (student.getFirstStudyTime() == null) {
 			// 说明学生是第一次在本系统学习，记录首次学习时间
 			student.setFirstStudyTime(new Date());
-			studentMapper.updateByPrimaryKeySelective(student);
-			student=studentMapper.selectById(student.getId());
+			simpleStudentMapper.updateByPrimaryKeySelective(student);
+			student= simpleStudentMapper.selectById(student.getId());
 			session.setAttribute(UserConstant.CURRENT_STUDENT, student);
 		}
 

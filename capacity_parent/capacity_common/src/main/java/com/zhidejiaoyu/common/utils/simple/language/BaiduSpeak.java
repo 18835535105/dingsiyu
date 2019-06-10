@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.utils.simple.language;
 
 import com.baomidou.mybatisplus.toolkit.StringUtils;
-import com.zhidejiaoyu.common.mapper.simple.VocabularyMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleVocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class BaiduSpeak {
 	private String youdao;
 
 	@Autowired
-	private VocabularyMapper vocabularyMapper;
+	private SimpleVocabularyMapper vocabularyMapper;
 
 	/**
 	 * 需要特殊处理的单词/例句集合

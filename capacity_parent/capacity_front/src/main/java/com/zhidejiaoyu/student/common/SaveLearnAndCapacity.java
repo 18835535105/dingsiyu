@@ -30,28 +30,28 @@ import java.util.concurrent.ExecutorService;
 public class SaveLearnAndCapacity {
 
     @Autowired
-    private SimpleCapacityMapper simpleCapacityMapper;
+    private SimpleSimpleCapacityMapper simpleSimpleCapacityMapper;
 
     @Autowired
     private SimpleMemoryDifficultyUtil simpleMemoryDifficultyUtil;
 
     @Autowired
-    private LearnMapper learnMapper;
+    private SimpleLearnMapper learnMapper;
 
     @Autowired
     private SimpleMemoryStrengthUtil simpleMemoryStrengthUtil;
 
     @Autowired
-    private VocabularyMapper vocabularyMapper;
+    private SimpleVocabularyMapper vocabularyMapper;
 
     @Autowired
     private SimpleCommonMethod simpleCommonMethod;
 
     @Autowired
-    private UnitVocabularyMapper unitVocabularyMapper;
+    private SimpleUnitVocabularyMapper simpleUnitVocabularyMapper;
 
     @Autowired
-    private StudentRestudyMapper studentRestudyMapper;
+    private SimpleStudentRestudyMapper simpleStudentRestudyMapper;
 
     @Autowired
     private DailyAwardAsync awardAsync;
@@ -202,10 +202,10 @@ public class SaveLearnAndCapacity {
 
         // 获取当前内容的记忆追踪信息
         SimpleCapacity simpleCapacity = null;
-        List<SimpleCapacity> simpleCapacities = simpleCapacityMapper.selectSimpleCapacityRecord(student.getId(),
+        List<SimpleCapacity> simpleCapacities = simpleSimpleCapacityMapper.selectSimpleCapacityRecord(student.getId(),
                 learn.getVocabularyId(), learn.getUnitId(), type);
         if (simpleCapacities.size() > 1) {
-            simpleCapacityMapper.deleteById(simpleCapacities.get(1).getId());
+            simpleSimpleCapacityMapper.deleteById(simpleCapacities.get(1).getId());
             simpleCapacity = simpleCapacities.get(0);
         } else if (simpleCapacities.size() == 1) {
             simpleCapacity = simpleCapacities.get(0);
@@ -225,14 +225,14 @@ public class SaveLearnAndCapacity {
                 simpleCapacity.setVocabularyId(learn.getVocabularyId());
                 simpleCapacity.setWord(vocabulary.getWord());
 
-                String wordChinese = unitVocabularyMapper.selectWordChineseByUnitIdAndWordId(learn.getUnitId(), learn.getVocabularyId());
+                String wordChinese = simpleUnitVocabularyMapper.selectWordChineseByUnitIdAndWordId(learn.getUnitId(), learn.getVocabularyId());
                 if (StringUtils.isNotEmpty(wordChinese)) {
                     simpleCapacity.setWordChinese(wordChinese);
                 } else {
                     simpleCapacity.setWordChinese(vocabulary.getWordChinese());
                 }
 
-                simpleCapacityMapper.insert(simpleCapacity);
+                simpleSimpleCapacityMapper.insert(simpleCapacity);
                 return simpleCapacity;
             }
         } else {
@@ -247,7 +247,7 @@ public class SaveLearnAndCapacity {
 
             // 重新计算记忆强度
             simpleCapacity.setMemoryStrength(simpleMemoryStrengthUtil.getTestMemoryStrength(memoryStrength, isKnown));
-            simpleCapacityMapper.updateById(simpleCapacity);
+            simpleSimpleCapacityMapper.updateById(simpleCapacity);
 
             // 保存学生复习记录
             saveStudentRestudy(learn, student, vocabulary, type);
@@ -272,7 +272,7 @@ public class SaveLearnAndCapacity {
         studentRestudy.setVocabularyId(learn.getVocabularyId());
         studentRestudy.setWord(vocabulary.getWord());
         try {
-            studentRestudyMapper.insert(studentRestudy);
+            simpleStudentRestudyMapper.insert(studentRestudy);
         } catch (Exception e) {
             log.error("保存学生复习记录失败，学生信息：[{}]-[{}]=[{}], learn=[{}], vocabulary=[{}]",
                     student.getAccount(), student.getId(), student.getStudentName(), learn.toString(), vocabulary.toString());

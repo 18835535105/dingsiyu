@@ -11,8 +11,8 @@ import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.simple.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.DateUtil;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.DatesUtil;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtilDateUtil;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDatesUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.TimeUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.WeekUtil;
 import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
@@ -46,70 +46,70 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl<CcieMapper, Ccie> implements SimplePersonalCentreServiceSimple {
+public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl<SimpleCcieMapper, Ccie> implements SimplePersonalCentreServiceSimple {
 
     /**
      * 消息中心mapper接口
      */
     @Autowired
-    private NewsMapper newsMapper;
+    private SimpleNewsMapper simpleNewsMapper;
 
     @Autowired
-    private LearnMapper learnMapper;
+    private SimpleLearnMapper learnMapper;
 
     @Autowired
-    private DurationMapper durationMapper;
+    private SimpleDurationMapper simpleDurationMapper;
 
     @Autowired
-    private CourseMapper courseMapper;
+    private SimpleCourseMapper simpleCourseMapper;
 
     @Autowired
-    private VocabularyMapper vocabularyMapper;
+    private SimpleVocabularyMapper vocabularyMapper;
 
     @Autowired
-    private UnitVocabularyMapper unitVocabularyMapper;
+    private SimpleUnitVocabularyMapper simpleUnitVocabularyMapper;
 
     @Autowired
-    private UnitMapper unitMapper;
+    private SimpleUnitMapper unitMapper;
 
     @Autowired
-    private UnitSentenceMapper unitSentenceMapper;
+    private SimpleUnitSentenceMapper simpleUnitSentenceMapper;
 
     @Autowired
-    private StudentMapper studentMapper;
+    private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
-    private TeacherMapper teacherMapper;
+    private SimpleTeacherMapper simpleTeacherMapper;
 
     @Autowired
-    private CcieMapper ccieMapper;
+    private SimpleCcieMapper ccieMapper;
 
     @Autowired
-    private StudentUnitMapper studentUnitMapper;
+    private SimpleStudentUnitMapper simpleStudentUnitMapper;
 
     @Autowired
-    private TestRecordMapper testRecordMapper;
+    private SimpleTestRecordMapper simpleTestRecordMapper;
 
     @Autowired
-    private PayCardMapper payCardMapper;
+    private SimplePayCardMapper simplePayCardMapper;
 
     @Autowired
-    private PayLogMapper payLogMapper;
+    private SimplePayLogMapper simplePayLogMapper;
 
     @Autowired
-    private WorshipMapper worshipMapper;
+    private SimpleWorshipMapper worshipMapper;
 
     @Autowired
-    private RunLogMapper runLogMapper;
+    private SimpleRunLogMapper runLogMapper;
 
     @Autowired
-    private MessageBoardMapper messageBoardMapper;
+    private SimpleMessageBoardMapper simpleMessageBoardMapper;
 
     @Autowired
     private SimpleAwardMapper simpleAwardMapper;
 
     @Autowired
-    private GradeMapper gradeMapper;
+    private SimpleGradeMapper simpleGradeMapper;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -118,7 +118,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
     private RedisOpt redisOpt;
 
     @Autowired
-    private RankingMapper rankingMapper;
+    private SimpleRankingMapper simpleRankingMapper;
 
     @Autowired
     private ExecutorService executorService;
@@ -141,7 +141,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         redPoint(map, id);
 
         // 获取我的总金币
-        Double myGoldD = studentMapper.myGold(id);
+        Double myGoldD = simpleStudentMapper.myGold(id);
         BigDecimal mybd = new BigDecimal(myGoldD).setScale(0, BigDecimal.ROUND_HALF_UP);
         int myGold = Integer.parseInt(mybd.toString());
         map.put("myGold", myGold);
@@ -203,7 +203,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
      * @param studentId
      */
     private void myLucky(Map<String, Object> map, Long studentId) {
-        Student student = studentMapper.selectById(studentId);
+        Student student = simpleStudentMapper.selectById(studentId);
         map.put("lucky", student.getEnergy() == null ? 0 : (student.getEnergy() / 5));
     }
 
@@ -216,7 +216,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         MessageBoardExample messageBoardExample = new MessageBoardExample();
         MessageBoardExample.Criteria criteria = messageBoardExample.createCriteria();
         criteria.andStudentIdEqualTo(studentId).andReadFlagEqualTo(3).andRoleEqualTo(1);
-        return messageBoardMapper.countByExample(messageBoardExample);
+        return simpleMessageBoardMapper.countByExample(messageBoardExample);
     }
 
     private void myCcie(Map<String, Object> map, Long studentId) {
@@ -229,7 +229,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
     private void unReadNews(Map<String, Object> map, Long studentId) {
         NewsExample example = new NewsExample();
         example.createCriteria().andStudentidEqualTo(studentId).andReadEqualTo(2);
-        int i = newsMapper.countByExample(example);
+        int i = simpleNewsMapper.countByExample(example);
         map.put("read", i);
     }
 
@@ -244,7 +244,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         NewsExample example = new NewsExample();
         example.createCriteria().andStudentidEqualTo(id);
         PageHelper.startPage(1, 30);
-        List<News> list = newsMapper.selectByExample(example);
+        List<News> list = simpleNewsMapper.selectByExample(example);
 
         return ServerResponse.createBySuccess(list);
     }
@@ -263,7 +263,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         // 1.删除(根据消息通知id)
         if (state == 1) {
             for (Integer intId : id) {
-                newsMapper.deleteByPrimaryKey(Long.valueOf(intId));
+                simpleNewsMapper.deleteByPrimaryKey(Long.valueOf(intId));
             }
             return ServerResponse.createBySuccessMessage("删除完成");
             // 2.根据通知id标记为已读(根据消息通知id)
@@ -272,12 +272,12 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
             for (Integer intId : id) {
                 ne.setId(Long.valueOf(intId));
                 ne.setRead(1);
-                newsMapper.updateByPrimaryKeySelective(ne);
+                simpleNewsMapper.updateByPrimaryKeySelective(ne);
             }
             return ServerResponse.createBySuccessMessage("已标记为已读");
             // 3.全部标记为已读(根据学生id)
         } else if (state == 3) {
-            newsMapper.updateByRead(studentId);
+            simpleNewsMapper.updateByRead(studentId);
             return ServerResponse.createBySuccessMessage("已全部标记为已读");
         }
 
@@ -311,7 +311,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         int ye = WeekUtil.getWeekOfYear(new Date()) - 1;
 
         // 获取当前年份
-        int we = DateUtil.DateYYYY();
+        int we = SimpleDateUtil.DateYYYY();
 
         // 遍历学生学习过的年份
         for (Integer year : years) {
@@ -334,7 +334,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                 //map.put("weekSort", (i+1));// 周,该字段用于排序
                 map.put("state", false); // 不是本周
                 // 查询循环周的总有效时长(m)
-                Integer duration = durationMapper.totalTime(DateUtil.formatYYYYMMDD(weekStart), DateUtil.formatYYYYMMDD(weekEnd), studentId);
+                Integer duration = simpleDurationMapper.totalTime(SimpleDateUtil.formatYYYYMMDD(weekStart), SimpleDateUtil.formatYYYYMMDD(weekEnd), studentId);
                 String timeStrBySecond = TimeUtil.getTimeStrBySecond(duration);
                 int plan = ((int) (BigDecimalUtil.div((duration == null ? 0 : duration), 12600) * 100));
                 if (plan <= 100) {
@@ -404,7 +404,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         int ye = WeekUtil.getWeekOfYear(new Date()) - 1;
 
         // 获取当前时间所在周
-        int we = DateUtil.DateYYYY();
+        int we = SimpleDateUtil.DateYYYY();
 
         for (Integer year : years) {
 
@@ -432,7 +432,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
 
                 // 每周总学习量
                 // 每周六个模块个个的学习量
-                Map<String, Object> countMap = learnMapper.mapWeekCountQuantity(DateUtil.formatYYYYMMDD(weekStart), DateUtil.formatYYYYMMDD(weekEnd), studentId);
+                Map<String, Object> countMap = learnMapper.mapWeekCountQuantity(SimpleDateUtil.formatYYYYMMDD(weekStart), SimpleDateUtil.formatYYYYMMDD(weekEnd), studentId);
                 Long duration = (Long) countMap.get("count");
                 int plan = ((int) (BigDecimalUtil.div((duration == null ? 0 : duration), 300) * 100));
                 if (plan <= 100) {
@@ -495,7 +495,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         // Map = id, course_name, version, label, learn_count
         // 获取学生学习过得课程id,课程名,版本,标签,课程学习遍数 : id, course_name, version, label, learn_count
         PageHelper.startPage(page, rows);
-        List<Map<String, Object>> courses = courseMapper.courseLearnInfo(studentId);
+        List<Map<String, Object>> courses = simpleCourseMapper.courseLearnInfo(studentId);
 
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(courses);
         resultMapAll.put("page", page);
@@ -517,7 +517,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
             List<Long> courseIds = new ArrayList<>(courses.size());
             courses.forEach(map -> courseIds.add((long) map.get("id")));
 
-            maxUnitIdMap = studentMapper.selectMaxUnitIdMapByCourseIds(courseIds, studentId);
+            maxUnitIdMap = simpleStudentMapper.selectMaxUnitIdMapByCourseIds(courseIds, studentId);
 
             courseWordCountMap = vocabularyMapper.countWordMapByCourseIds(courseIds);
             List<Map<String, Object>> allUnitInCourseList = unitMapper.selectIdAndUnitNameByCourseIds(courseIds);
@@ -625,8 +625,8 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
 
             if (unitIds != null) {
                 List<Long> finalUnitIds = unitIds;
-                Future<Map<Long, Map<Long, Integer>>> unitTestMaxPointMapFuture = executorService.submit(() -> testRecordMapper.selectUnitTestMaxPointMapByUnitIds(studentId, finalUnitIds, modelName));
-                Future<Map<Long, Map<Long, Long>>> unitTotalWordMapFuture = executorService.submit(() -> unitVocabularyMapper.countTotalWordMapByUnitIds(finalUnitIds));
+                Future<Map<Long, Map<Long, Integer>>> unitTestMaxPointMapFuture = executorService.submit(() -> simpleTestRecordMapper.selectUnitTestMaxPointMapByUnitIds(studentId, finalUnitIds, modelName));
+                Future<Map<Long, Map<Long, Long>>> unitTotalWordMapFuture = executorService.submit(() -> simpleUnitVocabularyMapper.countTotalWordMapByUnitIds(finalUnitIds));
                 Future<Map<Long, Map<Long, Long>>> unitLearnWordMapFuture = executorService.submit(() -> learnMapper.countUnitLearnWordMapByUnitIds(studentId, finalUnitIds, modelName));
                 while (true) {
                     if (unitTestMaxPointMapFuture.isDone() && unitTotalWordMapFuture.isDone() && unitLearnWordMapFuture.isDone()) {
@@ -761,11 +761,11 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
 
         if (model < 4) {
             // 查询单元下边有多少单词
-            Long countByWord = unitVocabularyMapper.selectWordCountByUnitId(unitId);
+            Long countByWord = simpleUnitVocabularyMapper.selectWordCountByUnitId(unitId);
             result.put("count", countByWord); // 单元总单词/例句量
         } else if (model > 3) {
             // 查询单元下边有多少例句
-            int countBySentence = unitSentenceMapper.countByUnitId(unitId);
+            int countBySentence = simpleUnitSentenceMapper.countByUnitId(unitId);
             result.put("count", countBySentence); // 单元总单词/例句量
         }
 
@@ -819,7 +819,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         Integer schoolAdminId = super.getSchoolAdminId(student);
 
         // 获取 `清学版每个学生的信息`
-        List<Map<String, Object>> students = studentMapper.selectSeniority(model, teacherId, classId, schoolAdminId);
+        List<Map<String, Object>> students = simpleStudentMapper.selectSeniority(model, teacherId, classId, schoolAdminId);
 
         // 获取等级规则
         List<Map<String, Object>> levels = redisOpt.getAllLevel();
@@ -836,13 +836,13 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         if (queryType == null) {
             if ("3".equals(model)) {
                 // 全国排名
-                classLevel = studentMapper.selectLevelByStuId(student, 3, null);
+                classLevel = simpleStudentMapper.selectLevelByStuId(student, 3, null);
             } else if ("2".equals(model)) {
                 // 学校排名
-                classLevel = studentMapper.selectLevelByStuId(student, 2, schoolAdminId);
+                classLevel = simpleStudentMapper.selectLevelByStuId(student, 2, schoolAdminId);
             } else {
                 // 班级排名
-                classLevel = studentMapper.selectLevelByStuId(student, 1, null);
+                classLevel = simpleStudentMapper.selectLevelByStuId(student, 1, null);
             }
             if (classLevel == null || classLevel.get(student.getId()) == null) {
                 return ServerResponse.createBySuccess(result);
@@ -869,7 +869,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
 
             // 我的排名(今日)
             if (queryType == 1) {
-                queryTypeList = runLogMapper.getAllQueryType(DateUtil.formatYYYYMMDD(new Date()), model, student);
+                queryTypeList = runLogMapper.getAllQueryType(SimpleDateUtil.formatYYYYMMDD(new Date()), model, student);
             }
             // 我的排名(本周)
             if (queryType == 2) {
@@ -892,7 +892,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         int myGold = 0;
         // 全部排行
         if (queryType == null) {
-            Double myGoldD = studentMapper.myGold(student.getId());
+            Double myGoldD = simpleStudentMapper.myGold(student.getId());
             BigDecimal mybd = new BigDecimal(myGoldD).setScale(0, BigDecimal.ROUND_HALF_UP);
             myGold = Integer.parseInt(mybd.toString());
         } else {
@@ -900,7 +900,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
             // 我的排名(今日)
             Map<Long, Map<String, Object>> m = new HashMap();
             if (queryType == 1) {
-                m = runLogMapper.getGoldByStudentId(DateUtil.formatYYYYMMDD(new Date()), model, student);
+                m = runLogMapper.getGoldByStudentId(SimpleDateUtil.formatYYYYMMDD(new Date()), model, student);
             }
             // 我的排名(本周)
             if (queryType == 2) {
@@ -918,7 +918,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         }
 
         // 我被膜拜myMb
-        int myMb = studentMapper.myMb(student.getId());
+        int myMb = simpleStudentMapper.myMb(student.getId());
         // 我的等级myChildName
         String myChildName = "";
         if (myGold >= 50) {
@@ -1082,7 +1082,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         result.put("phDate", list);
 
         if (student.getClassId() != null) {
-            Grade grade = gradeMapper.selectById(student.getClassId());
+            Grade grade = simpleGradeMapper.selectById(student.getClassId());
             if (grade != null) {
                 result.put("myClass", grade.getClassName());
             }
@@ -1104,7 +1104,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
      * @param lista
      */
     private void changeRank(String golds, String worships, String model, Student student, Map<String, Object> myMap, List<Map<String, Object>> lista) {
-        Ranking ranking = rankingMapper.selByStudentId(student.getId());
+        Ranking ranking = simpleRankingMapper.selByStudentId(student.getId());
         int aa = 0;
         Long id = student.getId();
         for (Map m : lista) {
@@ -1115,13 +1115,13 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                     if (golds != null && golds != "") {
                         if (ranking.getGoldClassRank() != aa) {
                             ranking.setGoldClassRank(aa);
-                            rankingMapper.updateById(ranking);
+                            simpleRankingMapper.updateById(ranking);
                         }
                     }
                     if (worships != null && worships != "") {
                         if (ranking.getWorshipClassRank() != aa) {
                             ranking.setWorshipClassRank(aa);
-                            rankingMapper.updateById(ranking);
+                            simpleRankingMapper.updateById(ranking);
                         }
                     }
                 }
@@ -1129,13 +1129,13 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                     if (golds != null && golds != "") {
                         if (ranking.getGoldSchoolRank() != aa) {
                             ranking.setGoldSchoolRank(aa);
-                            rankingMapper.updateById(ranking);
+                            simpleRankingMapper.updateById(ranking);
                         }
                     }
                     if (worships != null && worships != "") {
                         if (ranking.getWorshipSchoolRank() != aa) {
                             ranking.setWorshipSchoolRank(aa);
-                            rankingMapper.updateById(ranking);
+                            simpleRankingMapper.updateById(ranking);
                         }
                     }
                 }
@@ -1143,13 +1143,13 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                     if (golds != null && golds != "") {
                         if (ranking.getGoldCountryRank() != aa) {
                             ranking.setGoldCountryRank(aa);
-                            rankingMapper.updateById(ranking);
+                            simpleRankingMapper.updateById(ranking);
                         }
                     }
                     if (worships != null && worships != "") {
                         if (ranking.getWorshipCountryRank() != aa) {
                             ranking.setWorshipCountryRank(aa);
-                            rankingMapper.updateById(ranking);
+                            simpleRankingMapper.updateById(ranking);
                         }
                     }
                 }
@@ -1280,13 +1280,13 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         Integer adminId = null;
         List<Integer> teacherIds=null;
         if(student.getTeacherId()!=null){
-            adminId=studentMapper.selSchoolAdminId(student.getId());
+            adminId= simpleStudentMapper.selSchoolAdminId(student.getId());
             if(adminId==null){
                 adminId=student.getTeacherId().intValue();
             }
-            teacherIds=teacherMapper.getTeacherIdByAdminId(adminId);
+            teacherIds= simpleTeacherMapper.getTeacherIdByAdminId(adminId);
         }
-        Integer integer = studentMapper.selStudentNumberById(student.getClassId(), student.getTeacherId(), model, adminId,teacherIds,null);
+        Integer integer = simpleStudentMapper.selStudentNumberById(student.getClassId(), student.getTeacherId(), model, adminId,teacherIds,null);
         if (!model.equals("3")) {
             studentMap.put("number", integer);
         } else {
@@ -1312,15 +1312,15 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         List<Map<String, Object>> totalRanking = new ArrayList<>();
         if (model.equals("1")) {
             //获取本班排行参与人数
-            ranking = studentMapper.getRanking(student.getClassId(), student.getTeacherId(), null, worship, model, null, start, rows,teacherIds);
-            totalRanking = studentMapper.getRanking(student.getClassId(), student.getTeacherId(), null, worship, model, null, 0, 100,teacherIds);
+            ranking = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), null, worship, model, null, start, rows,teacherIds);
+            totalRanking = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), null, worship, model, null, 0, 100,teacherIds);
         } else if (model.equals("2")) {
-            ranking = studentMapper.getRanking(null, student.getTeacherId(), null, worship, model, adminId, start, rows,teacherIds);
-            totalRanking = studentMapper.getRanking(null, student.getTeacherId(), null, worship, model, adminId, 0, 100,teacherIds);
+            ranking = simpleStudentMapper.getRanking(null, student.getTeacherId(), null, worship, model, adminId, start, rows,teacherIds);
+            totalRanking = simpleStudentMapper.getRanking(null, student.getTeacherId(), null, worship, model, adminId, 0, 100,teacherIds);
         } else if (model.equals("3")) {
             //获取本班排行参与人数
-            ranking = studentMapper.getRanking(null, null, null, worship, model, null, start, rows,teacherIds);
-            totalRanking = studentMapper.getRanking(null, null, null, worship, model, null, 0, 100,teacherIds);
+            ranking = simpleStudentMapper.getRanking(null, null, null, worship, model, null, start, rows,teacherIds);
+            totalRanking = simpleStudentMapper.getRanking(null, null, null, worship, model, null, 0, 100,teacherIds);
         }
         for (int i = 0; i < ranking.size(); i++) {
             studentIds.add(Long.parseLong(ranking.get(i).get("id").toString()));
@@ -1356,13 +1356,13 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         Integer adminId=null;
         List<Integer> teacherIds=null;
         if(student.getTeacherId()!=null){
-            adminId=studentMapper.selSchoolAdminId(student.getId());
+            adminId= simpleStudentMapper.selSchoolAdminId(student.getId());
             if(adminId==null){
                 adminId=student.getTeacherId().intValue();
             }
-            teacherIds=teacherMapper.getTeacherIdByAdminId(adminId);
+            teacherIds= simpleTeacherMapper.getTeacherIdByAdminId(adminId);
         }
-        Integer integer = studentMapper.selStudentNumberById(student.getClassId(), student.getTeacherId(), model, adminId,teacherIds,null);
+        Integer integer = simpleStudentMapper.selStudentNumberById(student.getClassId(), student.getTeacherId(), model, adminId,teacherIds,null);
         if (!model.equals("3")) {
             studentMap.put("number", integer);
         } else {
@@ -1386,17 +1386,17 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         List<Map<String, Object>> ccieRanking = new ArrayList<>();
         List<Map<String, Object>> ccieRanksing = new ArrayList<>();
         if (model.equals("1")) {
-            ccieRanking = studentMapper.getCcieRanking(student.getClassId(), student.getTeacherId(), model, null, start, rows,teacherIds);
-            ccieRanksing = studentMapper.getCcieRanking(student.getClassId(), student.getTeacherId(), model, null, 0, 100,teacherIds);
+            ccieRanking = simpleStudentMapper.getCcieRanking(student.getClassId(), student.getTeacherId(), model, null, start, rows,teacherIds);
+            ccieRanksing = simpleStudentMapper.getCcieRanking(student.getClassId(), student.getTeacherId(), model, null, 0, 100,teacherIds);
         }
         if (model.equals("2")) {
-            ccieRanking = studentMapper.getCcieRanking(student.getClassId(), student.getTeacherId(), model, adminId, start, rows,teacherIds);
-            ccieRanksing = studentMapper.getCcieRanking(student.getClassId(), student.getTeacherId(), model, adminId.intValue(), 0, 100,teacherIds);
+            ccieRanking = simpleStudentMapper.getCcieRanking(student.getClassId(), student.getTeacherId(), model, adminId, start, rows,teacherIds);
+            ccieRanksing = simpleStudentMapper.getCcieRanking(student.getClassId(), student.getTeacherId(), model, adminId.intValue(), 0, 100,teacherIds);
         }
         if (model.equals("3")) {
             //获取本校排行参与人数
-            ccieRanking = studentMapper.getCcieRanking(null, null, model, null, start, rows,teacherIds);
-            ccieRanksing = studentMapper.getCcieRanking(null, null, model, null, 0, 100,teacherIds);
+            ccieRanking = simpleStudentMapper.getCcieRanking(null, null, model, null, start, rows,teacherIds);
+            ccieRanksing = simpleStudentMapper.getCcieRanking(null, null, model, null, 0, 100,teacherIds);
 
         }
         List<Long> studentIds = new ArrayList<>();
@@ -1433,15 +1433,15 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         Integer adminId=null;
         List<Integer> teacherIds=null;
         if(student.getTeacherId()!=null){
-            adminId=studentMapper.selSchoolAdminId(student.getId());
+            adminId= simpleStudentMapper.selSchoolAdminId(student.getId());
             if(adminId==null){
                 adminId=student.getTeacherId().intValue();
             }
-            teacherIds=teacherMapper.getTeacherIdByAdminId(adminId);
+            teacherIds= simpleTeacherMapper.getTeacherIdByAdminId(adminId);
         }
         Integer integer =0;
         if (!model.equals("3")) {
-            integer=studentMapper.selStudentNumberById(student.getClassId(), student.getTeacherId(), model, adminId,teacherIds,null);
+            integer= simpleStudentMapper.selStudentNumberById(student.getClassId(), student.getTeacherId(), model, adminId,teacherIds,null);
             studentMap.put("number", integer);
         } else {
             studentMap.put("number", "99999+");
@@ -1465,17 +1465,17 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         List<Map<String, Object>> medalRanksing = new ArrayList<>();
         if (model.equals("1")) {
 
-            medalRanking = studentMapper.getMedalRanking(student.getClassId(), student.getTeacherId(), model, null, start, rows,teacherIds);
-            medalRanksing = studentMapper.getMedalRanking(student.getClassId(), student.getTeacherId(), model, null, 0, 100,teacherIds);
+            medalRanking = simpleStudentMapper.getMedalRanking(student.getClassId(), student.getTeacherId(), model, null, start, rows,teacherIds);
+            medalRanksing = simpleStudentMapper.getMedalRanking(student.getClassId(), student.getTeacherId(), model, null, 0, 100,teacherIds);
         }
         if (model.equals("2")) {
-            medalRanking = studentMapper.getMedalRanking(student.getClassId(), student.getTeacherId(), model, adminId, start, rows,teacherIds);
-            medalRanksing = studentMapper.getMedalRanking(student.getClassId(), student.getTeacherId(), model, adminId, 0, 100,teacherIds);
+            medalRanking = simpleStudentMapper.getMedalRanking(student.getClassId(), student.getTeacherId(), model, adminId, start, rows,teacherIds);
+            medalRanksing = simpleStudentMapper.getMedalRanking(student.getClassId(), student.getTeacherId(), model, adminId, 0, 100,teacherIds);
         }
         if (model.equals("3")) {
             //获取本校排行参与人数
-            medalRanking = studentMapper.getMedalRanking(null, null, model, null, start, rows,teacherIds);
-            medalRanksing = studentMapper.getMedalRanking(null, null, model, null, 0, 100,teacherIds);
+            medalRanking = simpleStudentMapper.getMedalRanking(null, null, model, null, start, rows,teacherIds);
+            medalRanksing = simpleStudentMapper.getMedalRanking(null, null, model, null, 0, 100,teacherIds);
         }
         List<Long> studentIds = new ArrayList<>();
         for (int i = 0; i < medalRanking.size(); i++) {
@@ -1512,13 +1512,13 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         Integer adminId=null;
         List<Integer> teacherIds=null;
         if(student.getTeacherId()!=null){
-            adminId=studentMapper.selSchoolAdminId(student.getId());
+            adminId= simpleStudentMapper.selSchoolAdminId(student.getId());
             if(adminId==null){
                 adminId=student.getTeacherId().intValue();
             }
-            teacherIds=teacherMapper.getTeacherIdByAdminId(adminId);
+            teacherIds= simpleTeacherMapper.getTeacherIdByAdminId(adminId);
         }
-        Integer integer = studentMapper.selStudentNumberById(student.getClassId(), student.getTeacherId(), model, adminId,teacherIds,null);
+        Integer integer = simpleStudentMapper.selStudentNumberById(student.getClassId(), student.getTeacherId(), model, adminId,teacherIds,null);
         if (!model.equals("3")) {
             studentMap.put("number", integer);
         } else {
@@ -1544,16 +1544,16 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         List<Map<String, Object>> totalRanking = new ArrayList<>();
         if (model.equals("1")) {
             //获取本班排行参与人数
-            ranking = studentMapper.getRanking(student.getClassId(), student.getTeacherId(), gold, null, model, null, start, rows,teacherIds);
-            totalRanking = studentMapper.getRanking(student.getClassId(), student.getTeacherId(), gold, null, model, null, 0, 100,teacherIds);
+            ranking = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), gold, null, model, null, start, rows,teacherIds);
+            totalRanking = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), gold, null, model, null, 0, 100,teacherIds);
         } else if (model.equals("2")) {
             //获取本校排行参与人数
-            ranking = studentMapper.getRanking(null, student.getTeacherId(), gold, null, model, adminId, start, rows,teacherIds);
-            totalRanking = studentMapper.getRanking(null, student.getTeacherId(), gold, null, model, adminId, 0, 100,teacherIds);
+            ranking = simpleStudentMapper.getRanking(null, student.getTeacherId(), gold, null, model, adminId, start, rows,teacherIds);
+            totalRanking = simpleStudentMapper.getRanking(null, student.getTeacherId(), gold, null, model, adminId, 0, 100,teacherIds);
         } else if (model.equals("3")) {
             //获取全国排行参与人数
-            ranking = studentMapper.getRanking(null, null, gold, null, model, null, start, rows,teacherIds);
-            totalRanking = studentMapper.getRanking(null, null, gold, null, model, null, 0, 100,teacherIds);
+            ranking = simpleStudentMapper.getRanking(null, null, gold, null, model, null, start, rows,teacherIds);
+            totalRanking = simpleStudentMapper.getRanking(null, null, gold, null, model, null, 0, 100,teacherIds);
         }
         for (int i = 0; i < ranking.size(); i++) {
             studentIds.add(Long.parseLong(ranking.get(i).get("id").toString()));
@@ -1614,7 +1614,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         if (ranking == -1) {
             ranking = 101;
         }
-        Ranking rank = rankingMapper.selByStudentId(studentId);
+        Ranking rank = simpleRankingMapper.selByStudentId(studentId);
         if (model.equals("1")) {
             if (type.equals("gold")) {
                 rank.setGoldClassRank(ranking);
@@ -1639,12 +1639,12 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                 rank.setWorshipCountryRank(ranking);
             }
         }
-        rankingMapper.updateById(rank);
+        simpleRankingMapper.updateById(rank);
     }
 
     private void getClassAndSchool(Student student, Map<String, Object> map, List<Map<String, Object>> levels, Map<String, Object> studentMap) {
         studentMap.put("stuId", student.getId());
-        Map<String, Object> classNameAndGoldAndMbAnd = studentMapper.getClassNameAndGoldAndMbAnd(student.getId());
+        Map<String, Object> classNameAndGoldAndMbAnd = simpleStudentMapper.getClassNameAndGoldAndMbAnd(student.getId());
         if (classNameAndGoldAndMbAnd.get("gold") == null) {
             studentMap.put("myGold", 0);
             studentMap.put("myChildName", "");
@@ -1900,9 +1900,9 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         List<Map<String, Object>> result = new ArrayList<>(16);
         if (student.getFirstStudyTime() != null) {
             //获取当前日期
-            Date currentDate = DatesUtil.getCurrentDate(new Date());
+            Date currentDate = SimpleDatesUtil.getCurrentDate(new Date());
             //总周数
-            int timeGapDays = DatesUtil.getTimeGapDays(student.getFirstStudyTime());
+            int timeGapDays = SimpleDatesUtil.getTimeGapDays(student.getFirstStudyTime());
             //开始查找的位置
             int start = rows * (page - 1) + 1;
             //结束的位置
@@ -1910,9 +1910,9 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
             for (int i = start; i < end; i++) {
                 if (i <= timeGapDays + 1) {
                     Map<String, Object> map = new LinkedHashMap<>(16);
-                    Date beforWeekDate = DatesUtil.getBeforeWeekDate(currentDate, i);
-                    Date onMonday = DatesUtil.getOnMonday(beforWeekDate);
-                    Date onSunday = DatesUtil.getOnSunday(beforWeekDate);
+                    Date beforWeekDate = SimpleDatesUtil.getBeforeWeekDate(currentDate, i);
+                    Date onMonday = SimpleDatesUtil.getOnMonday(beforWeekDate);
+                    Date onSunday = SimpleDatesUtil.getOnSunday(beforWeekDate);
                     map.put("statsDate", s.format(onMonday));// 每周开始日期
                     map.put("endDate", s.format(onSunday));// 每周结束日期
                     int week = timeGapDays - i + 1;
@@ -1920,7 +1920,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                     //map.put("weekSort", (i+1));// 周,该字段用于排序
                     map.put("state", false); // 不是本周
                     // 查询循环周的总有效时长(m)
-                    Integer duration = durationMapper.totalTime(DateUtil.formatYYYYMMDD(onMonday), DateUtil.formatYYYYMMDD(onSunday), student.getId());
+                    Integer duration = simpleDurationMapper.totalTime(SimpleDateUtil.formatYYYYMMDD(onMonday), SimpleDateUtil.formatYYYYMMDD(onSunday), student.getId());
                     String timeStrBySecond = TimeUtil.getTimeStrBySecond(duration);
                     int plan = ((int) (BigDecimalUtil.div((duration == null ? 0 : duration), 12600) * 100));
                     if (plan <= 100) {
@@ -2006,7 +2006,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         int ye = WeekUtil.getWeekOfYear(new Date()) - 1;
 
         // 获取当前年份
-        int we = DateUtil.DateYYYY();
+        int we = SimpleDateUtil.DateYYYY();
 
         // 循环里边进行分页操作
         int auto = 0; // 0 定义自增变量
@@ -2044,7 +2044,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                     //map.put("weekSort", (i+1));// 周,该字段用于排序
                     map.put("state", false); // 不是本周
                     // 查询循环周的总有效时长(m)
-                    Integer duration = durationMapper.totalTime(DateUtil.formatYYYYMMDD(weekStart), DateUtil.formatYYYYMMDD(weekEnd), studentId);
+                    Integer duration = simpleDurationMapper.totalTime(SimpleDateUtil.formatYYYYMMDD(weekStart), SimpleDateUtil.formatYYYYMMDD(weekEnd), studentId);
                     String timeStrBySecond = TimeUtil.getTimeStrBySecond(duration);
                     int plan = ((int) (BigDecimalUtil.div((duration == null ? 0 : duration), 12600) * 100));
                     if (plan <= 100) {
@@ -2108,9 +2108,9 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         List<Map<String, Object>> result = new ArrayList<>(16);
         if (student.getFirstStudyTime() != null) {
             //获取当前日期
-            Date currentDate = DatesUtil.getCurrentDate(new Date());
+            Date currentDate = SimpleDatesUtil.getCurrentDate(new Date());
             //总周数
-            int timeGapDays = DatesUtil.getTimeGapDays(student.getFirstStudyTime());
+            int timeGapDays = SimpleDatesUtil.getTimeGapDays(student.getFirstStudyTime());
             //开始查找的位置
             int start = rows * (page - 1) + 1;
             //结束的位置
@@ -2128,10 +2128,10 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
             for (int i = start; i < end; i++) {
                 if (i <= timeGapDays + 1) {
                     map = new LinkedHashMap<>();
-                    beforeWeekDate = DatesUtil.getBeforeWeekDate(currentDate, i);
-                    onMonday = DatesUtil.getOnMonday(beforeWeekDate);
+                    beforeWeekDate = SimpleDatesUtil.getBeforeWeekDate(currentDate, i);
+                    onMonday = SimpleDatesUtil.getOnMonday(beforeWeekDate);
 
-                    onSunday = DatesUtil.getOnSunday(beforeWeekDate);
+                    onSunday = SimpleDatesUtil.getOnSunday(beforeWeekDate);
                     // 每周开始日期
                     map.put("statsDate", s.format(onMonday));
                     // 每周结束日期
@@ -2142,7 +2142,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                     // 不是本周
                     map.put("state", false);
                     // 查询循环周的总有效时长(m)
-                    Map<String, Object> countMap = learnMapper.mapWeekCountQuantity(DateUtil.formatYYYYMMDD(onMonday), DateUtil.formatYYYYMMDD(onSunday), student.getId());
+                    Map<String, Object> countMap = learnMapper.mapWeekCountQuantity(SimpleDateUtil.formatYYYYMMDD(onMonday), SimpleDateUtil.formatYYYYMMDD(onSunday), student.getId());
                     Long duration = (Long) countMap.get("a") + (Long) countMap.get("b") + (Long) countMap.get("c") + (Long) countMap.get("d") +
                             (Long) countMap.get("e") + (Long) countMap.get("f") + (Long) countMap.get("g") + (Long) countMap.get("h") + (Long) countMap.get("i") + (Long) countMap.get("word")
                             + (Long) countMap.get("sentence") + (Long) countMap.get("text");
@@ -2284,13 +2284,13 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         if (model == 1 || model == null) {
             // 已学单元
             if (haveUnit != null && haveUnit > 0) {
-                list = studentUnitMapper.planSeniority(area, school_name, grade, squad, study_paragraph, haveUnit, version);
+                list = simpleStudentUnitMapper.planSeniority(area, school_name, grade, squad, study_paragraph, haveUnit, version);
                 // 已做测试
             } else if (haveTest != null && haveTest > 0) {
-                list = testRecordMapper.planSeniority(area, school_name, grade, squad, study_paragraph, haveTest, version);
+                list = simpleTestRecordMapper.planSeniority(area, school_name, grade, squad, study_paragraph, haveTest, version);
                 // 学习时长
             } else if (haveTime != null && haveTime > 0) {
-                list = durationMapper.planSeniority(area, school_name, grade, squad, study_paragraph, haveTime, version);
+                list = simpleDurationMapper.planSeniority(area, school_name, grade, squad, study_paragraph, haveTime, version);
             }
 
             // 班级总参与人数
@@ -2300,33 +2300,33 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         } else if (model == 2) {
             // 已学单元
             if (haveUnit != null && haveUnit > 0) {
-                list = studentUnitMapper.planSenioritySchool(area, school_name, study_paragraph, haveUnit, version);
+                list = simpleStudentUnitMapper.planSenioritySchool(area, school_name, study_paragraph, haveUnit, version);
                 // 已做测试
             } else if (haveTest != null && haveTest > 0) {
-                list = testRecordMapper.planSenioritySchool(area, school_name, study_paragraph, haveTest, version);
+                list = simpleTestRecordMapper.planSenioritySchool(area, school_name, study_paragraph, haveTest, version);
                 // 学习时长
             } else if (haveTime != null && haveTime > 0) {
-                list = durationMapper.planSenioritySchool(area, school_name, study_paragraph, haveTime, version);
+                list = simpleDurationMapper.planSenioritySchool(area, school_name, study_paragraph, haveTime, version);
             }
 
             // 学校总参与人数
-            result.put("atNumber", studentMapper.schoolHeadcount(area, school_name, version));
+            result.put("atNumber", simpleStudentMapper.schoolHeadcount(area, school_name, version));
 
             // 全国排行
         } else {
             // 已学单元
             if (haveUnit != null && haveUnit > 0) {
-                list = studentUnitMapper.planSeniorityNationwide(study_paragraph, haveUnit, version);
+                list = simpleStudentUnitMapper.planSeniorityNationwide(study_paragraph, haveUnit, version);
                 // 已做测试
             } else if (haveTest != null && haveTest > 0) {
-                list = testRecordMapper.planSeniorityNationwide(study_paragraph, haveTest, version);
+                list = simpleTestRecordMapper.planSeniorityNationwide(study_paragraph, haveTest, version);
                 // 学习时长
             } else if (haveTime != null && haveTime > 0) {
-                list = durationMapper.planSeniorityNationwide(study_paragraph, haveTime, version);
+                list = simpleDurationMapper.planSeniorityNationwide(study_paragraph, haveTime, version);
             }
 
             // 初中/高中总参与人数
-            result.put("atNumber", studentMapper.schoolHeadcountNationwide(study_paragraph, version));
+            result.put("atNumber", simpleStudentMapper.schoolHeadcountNationwide(study_paragraph, version));
 
         }
 
@@ -2343,11 +2343,11 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
 
             // 学生排行
             // 查询单元排行
-            vo.setCountUnit(studentUnitMapper.onePlanSeniority(stuId));
+            vo.setCountUnit(simpleStudentUnitMapper.onePlanSeniority(stuId));
             // 查询已做测试
-            vo.setCountTest(testRecordMapper.onePlanSeniority(stuId));
+            vo.setCountTest(simpleTestRecordMapper.onePlanSeniority(stuId));
             // 查询学习时长
-            vo.setLearnDate(durationMapper.onePlanSeniority(stuId));
+            vo.setLearnDate(simpleDurationMapper.onePlanSeniority(stuId));
 
             // 当前学生排行
             auto++;
@@ -2372,9 +2372,9 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         // 当前学生排行等数据,
         if (result.get("atRanking").equals("0")) {
             result.put("atRanking", "未上榜");
-            result.put("atCountUnit", studentUnitMapper.onePlanSeniority(studentId));
-            result.put("atCountTest", testRecordMapper.onePlanSeniority(studentId));
-            result.put("atLearnDate", durationMapper.onePlanSeniority(studentId));
+            result.put("atCountUnit", simpleStudentUnitMapper.onePlanSeniority(studentId));
+            result.put("atCountTest", simpleTestRecordMapper.onePlanSeniority(studentId));
+            result.put("atLearnDate", simpleDurationMapper.onePlanSeniority(studentId));
         }
 
         return ServerResponse.createBySuccess(result);
@@ -2419,7 +2419,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         List year = new ArrayList<>();
 
         // 获取注册年份
-        int startYear = studentMapper.getYear(studentId);
+        int startYear = simpleStudentMapper.getYear(studentId);
         // 当前年份
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
         Date date = new Date();
@@ -2438,7 +2438,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
 
     @Override
     public ServerResponse<Object> payCardIndex(long studentId) {
-        Map student = studentMapper.getStudentAccountTime(studentId);
+        Map student = simpleStudentMapper.getStudentAccountTime(studentId);
         return ServerResponse.createBySuccess(student);
     }
 
@@ -2446,7 +2446,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
     public ServerResponse<Object> getPayCard(long studentId, int page, int rows) {
         Map resut = new HashMap();
         PageHelper.startPage(page, rows);
-        List<Map> map = payLogMapper.selectPayLogDataByStudentId(studentId);
+        List<Map> map = simplePayLogMapper.selectPayLogDataByStudentId(studentId);
         for (Map ma : map) {
             ma.put("card_dateStr", ma.get("card_date") + "天");
         }
@@ -2474,16 +2474,16 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
      */
     @Override
     public ServerResponse<Object> postPayCard(long studentId, String card) throws ParseException {
-        Student student = studentMapper.selectByPrimaryKey(studentId);
+        Student student = simpleStudentMapper.selectByPrimaryKey(studentId);
         // 学生账号
         String account = student.getAccount();
         // 查询学生账号到期时间
         Date parse = student.getAccountTime();
 
         // 1.修改充值卡状态
-        int up = payCardMapper.updateCreateUserByCardNo(card, account, new Date());
+        int up = simplePayCardMapper.updateCreateUserByCardNo(card, account, new Date());
         if (up != 1) {
-            Long pc = payCardMapper.getIdByCardNo(card);
+            Long pc = simplePayCardMapper.getIdByCardNo(card);
             if (pc == null) {
                 return ServerResponse.createByErrorMessage("卡号不存在");
             } else {
@@ -2492,7 +2492,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         }
 
         // 查询充值卡时间
-        int cardNo = payCardMapper.getValidityTimeByCard(card);
+        int cardNo = simplePayCardMapper.getValidityTimeByCard(card);
 
         // 充值后账号到期日期
         String format = null;
@@ -2514,7 +2514,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
 
         if (up == 1) {
             // 2.把充值卡时间修改到学生表
-            int s = studentMapper.updateAccountTimeByStudentId(studentId, format);
+            int s = simpleStudentMapper.updateAccountTimeByStudentId(studentId, format);
             // 3.记录充值记录表
             if (s == 1) {
                 // 记录充值信息
@@ -2525,7 +2525,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                 pa.setCardNo(card);
                 pa.setFoundDate(date);
                 pa.setRecharge(date);
-                payLogMapper.insert(pa);
+                simplePayLogMapper.insert(pa);
                 return ServerResponse.createBySuccess("充值成功");
             }
         }
@@ -2535,7 +2535,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
 
     @Override
     public void updateFakeData() {
-        List<Student> students = studentMapper.selectListByTeacherId(270);
+        List<Student> students = simpleStudentMapper.selectListByTeacherId(270);
         int size = students.size();
         Student student;
         for (int i = 0; i < size; i++) {
@@ -2544,13 +2544,13 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                 // 学生应该有的证书个数
                 updateCcieCount(student);
             } else {
-                Student student1 = studentMapper.selectById(students.get(i - 1).getId());
+                Student student1 = simpleStudentMapper.selectById(students.get(i - 1).getId());
                 // 上个学生金币总数
                 double totalGold = BigDecimalUtil.add(student1.getSystemGold(), student1.getOfflineGold());
 
                 if (student.getSystemGold() != BigDecimalUtil.sub(totalGold, 500)) {
                     student.setSystemGold(BigDecimalUtil.sub(totalGold, 500));
-                    studentMapper.updateById(student);
+                    simpleStudentMapper.updateById(student);
                 }
                 updateCcieCount(student);
             }

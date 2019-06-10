@@ -7,7 +7,7 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.study.simple.SimpleWordPictureUtil;
 import com.zhidejiaoyu.common.utils.simple.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.simple.language.YouDaoTranslate;
 import com.zhidejiaoyu.common.utils.simple.server.GoldResponseCode;
@@ -45,16 +45,16 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
      * 记忆追踪mapper
      */
     @Autowired
-    private CapacityReviewMapper capacityMapper;
+    private SimpleCapacityReviewMapper capacityMapper;
 
     @Autowired
-    private TestRecordMapper testRecordMapper;
+    private SimpleTestRecordMapper simpleTestRecordMapper;
 
     @Autowired
-    private SentenceMapper sentenceMapper;
+    private SimpleSentenceMapper simpleSentenceMapper;
 
     @Autowired
-    private StudentMapper studentMapper;
+    private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
     private YouDaoTranslate youDaoTranslate;
@@ -66,19 +66,19 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
     private BaiduSpeak baiduSpeak;
 
     @Autowired
-    private CourseMapper courseMapper;
+    private SimpleCourseMapper simpleCourseMapper;
 
     @Autowired
-    private LearnMapper learnMapper;
+    private SimpleLearnMapper learnMapper;
 
     @Autowired
-    private UnitMapper unitMapper;
+    private SimpleUnitMapper unitMapper;
 
     @Autowired
-    private VocabularyMapper vocabularyMapper;
+    private SimpleVocabularyMapper vocabularyMapper;
 
     @Autowired
-    private CapacityPictureMapper capacityPictureMapper;
+    private SimpleCapacityPictureMapper simpleCapacityPictureMapper;
 
     @Autowired
     private SimpleWordPictureUtil simpleWordPictureUtil;
@@ -220,7 +220,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
             ca.setCourse_id(Long.valueOf(course_id));
 
             // 根据课程id获取课程名
-            String courseName = courseMapper.selectByCourseName(course_id);
+            String courseName = simpleCourseMapper.selectByCourseName(course_id);
             map.put("courseId", course_id); // 课程id
             map.put("courseName", courseName); // 课程名
 
@@ -234,7 +234,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         // 查询条件3:模块
         ca.setClassify(classify + "");
         // 查询条件4:当前时间
-        ca.setPush(DateUtil.DateTime());
+        ca.setPush(SimpleDateUtil.DateTime());
 
         // 查询一条需要复习的单词数据
         CapacityReview vo = capacityMapper.ReviewCapacity_memory(ca);
@@ -302,7 +302,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
     public Map<String, Object> ReviewSentence_listen(Long stuId, String unit_id, int classify, String course_id) {
         Map<String, Object> map = new HashMap<>();
         // 当前时间
-        String dateTime = DateUtil.DateTime();
+        String dateTime = SimpleDateUtil.DateTime();
 
         // 例句id
         CapacityReview vo = null;
@@ -335,13 +335,13 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
             }
 
             // 根据课程id获取课程名
-            String courseName = courseMapper.selectByCourseName(course_id);
+            String courseName = simpleCourseMapper.selectByCourseName(course_id);
             map.put("id", course_id);
             map.put("courseName", courseName);
         }
 
         // 2.通过记忆追踪中的例句id-获取例句信息 (vo.getVocabulary_id()是例句id)
-        Sentence sentence = sentenceMapper.selectByPrimaryKey(vo.getVocabulary_id());
+        Sentence sentence = simpleSentenceMapper.selectByPrimaryKey(vo.getVocabulary_id());
 
         String english = sentence.getCentreExample().replace("#", " "); // 分割例句
         String chinese = sentence.getCentreTranslate().replace("*", ""); // 分割翻译
@@ -429,17 +429,17 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         // true 扣除一金币
         if(isTrue){
             // 1.查询学生剩余金币
-            Integer gold = studentMapper.getSystem_gold(student_id);
+            Integer gold = simpleStudentMapper.getSystem_gold(student_id);
             if(gold != null && gold>0){
                 // 扣除1金币
-                int state = studentMapper.updateBySystem_gold((gold-1), student_id);
+                int state = simpleStudentMapper.updateBySystem_gold((gold-1), student_id);
             }else{
                 // 金币不足
                 return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
             }
             // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
         }else{
-            Integer judgeTest = testRecordMapper.selectJudgeTestToModel(course_id, student_id, classify, select);
+            Integer judgeTest = simpleTestRecordMapper.selectJudgeTestToModel(course_id, student_id, classify, select);
             if(judgeTest != null){
                 // 已经测试过, 提示扣除金币是否测试
                 return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
@@ -632,17 +632,17 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         // true 扣除一金币
         if(isTrue){
             // 1.查询学生剩余金币
-            Integer gold = studentMapper.getSystem_gold(studentId);
+            Integer gold = simpleStudentMapper.getSystem_gold(studentId);
             if(gold != null && gold>0){
                 // 扣除1金币
-                int state = studentMapper.updateBySystem_gold((gold-1), studentId);
+                int state = simpleStudentMapper.updateBySystem_gold((gold-1), studentId);
             }else{
                 // 金币不足
                 return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
             }
             // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
         }else{
-            Integer judgeTest = testRecordMapper.selectJudgeTest(course_id, studentId, "单词五维测试");
+            Integer judgeTest = simpleTestRecordMapper.selectJudgeTest(course_id, studentId, "单词五维测试");
             if(judgeTest != null){
                 // 已经测试过, 提示扣除金币是否测试
                 return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
@@ -796,10 +796,10 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         Map<String, Object> correct = null;
         if(judge != null && StringUtils.isNotEmpty(unitId)){
             // 根据单元查询
-            correct = capacityPictureMapper.selectNeedReviewWord(Long.valueOf(unitId), studentId, DateUtil.DateTime());
+            correct = simpleCapacityPictureMapper.selectNeedReviewWord(Long.valueOf(unitId), studentId, SimpleDateUtil.DateTime());
         }else{
             // 根据课程查询 课程复习模块
-            correct = capacityPictureMapper.selectNeedReviewWordCourse(course_id, studentId, DateUtil.DateTime());
+            correct = simpleCapacityPictureMapper.selectNeedReviewWordCourse(course_id, studentId, SimpleDateUtil.DateTime());
             unitId = correct.get("unit_id").toString();
         }
 
@@ -911,7 +911,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         Long studentId = student.getId();
 
         // 获取单元下需要复习的单词
-        List<Vocabulary> list = vocabularyMapper.getMemoryWordPicAll(Long.parseLong(unit_id), studentId, DateUtil.DateTime());
+        List<Vocabulary> list = vocabularyMapper.getMemoryWordPicAll(Long.parseLong(unit_id), studentId, SimpleDateUtil.DateTime());
         // 随机获取带图片的单词, 正确答案的三倍
         List<Vocabulary> listSelect = vocabularyMapper.getWordIdByAll(list.size() * 4);
 
@@ -939,17 +939,17 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         // true 扣除一金币
         if(isTrue){
             // 1.查询学生剩余金币
-            Integer gold = studentMapper.getSystem_gold(student_id);
+            Integer gold = simpleStudentMapper.getSystem_gold(student_id);
             if(gold != null && gold>0){
                 // 扣除1金币
-                int state = studentMapper.updateBySystem_gold((gold-1), student_id);
+                int state = simpleStudentMapper.updateBySystem_gold((gold-1), student_id);
             }else{
                 // 金币不足
                 return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
             }
             // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
         }else{
-            Integer judgeTest = testRecordMapper.selectJudgeTestToModel(courseId, student_id, 0, select);
+            Integer judgeTest = simpleTestRecordMapper.selectJudgeTestToModel(courseId, student_id, 0, select);
             if(judgeTest != null){
                 // 已经测试过, 提示扣除金币是否测试
                 return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");

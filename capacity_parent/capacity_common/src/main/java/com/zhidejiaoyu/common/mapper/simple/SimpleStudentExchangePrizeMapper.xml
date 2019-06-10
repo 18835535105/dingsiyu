@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimpleStudentExchangePrizeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentExchangePrize">
+        <id column="id" property="id" />
+        <result column="prize_id" property="prizeId" />
+        <result column="student_id" property="studentId" />
+        <result column="create_time" property="createTime" />
+        <result column="state" property="state" />
+    </resultMap>
+
+    <select id="getAll" parameterType="map" resultType="map">
+        select stuprize.create_time time ,stuprize.id id, list.prize prizeName,list.exchange_prize gold, stuprize.state
+        from student_exchange_prize stuprize
+        join prize_exchange_list list
+        on stuprize.prize_id = list.id
+        where stuprize.student_id=#{studentId}
+        order by stuprize.create_time desc
+        limit #{start} ,#{number}
+    </select>
+</mapper>

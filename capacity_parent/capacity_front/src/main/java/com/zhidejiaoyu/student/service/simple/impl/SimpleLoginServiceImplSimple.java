@@ -12,7 +12,7 @@ import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.simple.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.simple.ValidateCode;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.LearnTimeUtil;
 import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
@@ -45,27 +45,27 @@ import java.util.regex.Pattern;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentMapper, Student> implements SimpleLoginServiceSimple {
+public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleStudentMapper, Student> implements SimpleLoginServiceSimple {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private StudentMapper studentMapper;
+    private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
-    private RunLogMapper runLogMapper;
+    private SimpleRunLogMapper runLogMapper;
 
     @Autowired
-    private DurationMapper durationMapper;
+    private SimpleDurationMapper simpleDurationMapper;
 
     @Autowired
-    private TestRecordMapper testRecordMapper;
+    private SimpleTestRecordMapper simpleTestRecordMapper;
 
     @Autowired
-    private LearnMapper learnMapper;
+    private SimpleLearnMapper learnMapper;
 
 	@Autowired
-    private UnitVocabularyMapper unitVocabularyMapper;
+    private SimpleUnitVocabularyMapper simpleUnitVocabularyMapper;
 
     @Autowired
     private SimpleAwardMapper simpleAwardMapper;
@@ -74,22 +74,22 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
     private DailyAwardAsync awardAsync;
 
     @Autowired
-    private CapacityReviewMapper capacityMapper;
+    private SimpleCapacityReviewMapper capacityMapper;
 
     @Autowired
-    private UnitMapper unitMapper;
+    private SimpleUnitMapper unitMapper;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
-    private SimpleStudentUnitMapper simpleStudentUnitMapper;
+    private SimpleSimpleStudentUnitMapper simpleSimpleStudentUnitMapper;
 
     @Autowired
     private RedisOpt redisOpt;
 
     @Autowired
-    private CapacityStudentUnitMapper capacityStudentUnitMapper;
+    private SimpleCapacityStudentUnitMapper simpleCapacityStudentUnitMapper;
 
     @Autowired
     private GoldAwardAsync goldAwardAsync;
@@ -105,18 +105,13 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         Student st = new Student();
         st.setAccount(account);
         st.setPassword(password);
-        return studentMapper.LoginJudge(st);
+        return simpleStudentMapper.LoginJudge(st);
     }
 
-    public static void main(String[] args){
-        LoginServiceImpl loginService=new LoginServiceImpl();
-        Student dz000046 = loginService.LoginJudge("dz000046", "111111");
-        System.out.println(dz000046);
-    }
 
     @Override
     public Integer judgeUser(Long id) {
-        return studentMapper.judgeUser(id);
+        return simpleStudentMapper.judgeUser(id);
     }
 
     @Override
@@ -127,7 +122,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         Long studentId = student.getId();
         String account = student.getAccount();
 
-        Integer state = studentMapper.updatePassword(account, password, studentId);
+        Integer state = simpleStudentMapper.updatePassword(account, password, studentId);
         if (state == 1) {
             student.setPassword(password);
 
@@ -159,7 +154,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         // 封装返回数据
         Map<String, Object> result = new HashMap<>(16);
 
-        Student stu = studentMapper.indexData(studentId);
+        Student stu = simpleStudentMapper.indexData(studentId);
 
         // 学生id
         result.put("student_id", stu.getId());
@@ -184,7 +179,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         }
 
         // 判断学生是否有智能版单词
-        int count = capacityStudentUnitMapper.countByType(stu, 1);
+        int count = simpleCapacityStudentUnitMapper.countByType(stu, 1);
         result.put("hasCapacityWord", count > 0);
 
         String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
@@ -206,7 +201,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         result.put("valid", valid);
 
         // 所有模块正在学习的课程id
-        Map<Integer, Map<String, Long>> allCourse = simpleStudentUnitMapper.getAllUnit(stu.getId());
+        Map<Integer, Map<String, Long>> allCourse = simpleSimpleStudentUnitMapper.getAllUnit(stu.getId());
         // 对应模块的课程id
         int courseId = 0;
 
@@ -230,7 +225,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
             Integer sum = learnMapper.selectCourseWordNumberByStudentId(studentId, courseId, i);
 
             //-- 4.某课程某模块学习速度;
-            Integer sumValid = durationMapper.valid_timeIndex(studentId, courseId, i+13);
+            Integer sumValid = simpleDurationMapper.valid_timeIndex(studentId, courseId, i+13);
             if (sumValid == null) {
             	sumValid = 0;
             }
@@ -357,7 +352,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         Integer unitId = student.getSentenceUnitId();
 
         // 一共有多少单词/.
-        Long countWord = unitVocabularyMapper.selectWordCountByUnitId((long) unitId);
+        Long countWord = simpleUnitVocabularyMapper.selectWordCountByUnitId((long) unitId);
 
         for (int i = 4; i < 7; i++) {
             Map<String, Object> a = new HashMap<String, Object>();
@@ -370,7 +365,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
 
             //-- 2.某学生某单元某模块得了多少分
             //select point from test_record where student_id = #{} and unit_id = #{} and genre = '单元闯关测试' and study_model = '慧记忆'
-            Integer point = testRecordMapper.selectPoint(studentId, unitId, "单元闯关测试", i);
+            Integer point = simpleTestRecordMapper.selectPoint(studentId, unitId, "单元闯关测试", i);
 
             //-- 3.某学生某单元某模块单词学了多少 ./
             //select COUNT(id) from learn where student_id = #{} and unit_id = #{} and study_model = '慧记忆' GROUP BY vocabulary_id
@@ -379,7 +374,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
             if (point != null && sum != null) {
                 //-- 4.某学生某单元某模块学习速度;  单词已学个数/(有效时长m/3600)
                 //select SUM(valid_time) from duration where unit_id = 1 and student_id = 1 and study_model = '慧记忆'
-                Integer sumValid = durationMapper.valid_timeIndex(studentId, unitId, i);
+                Integer sumValid = simpleDurationMapper.valid_timeIndex(studentId, unitId, i);
 
                 Integer speed = (int) (BigDecimalUtil.div(sum, sumValid)*3600);
                 a.put("point", point + ""); // 分数
@@ -397,7 +392,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
                 a.put("condition", 3); // 方框状态
                 a.put("point", ""); // 分数
                 // 计算学习速度
-                Integer sumValid = durationMapper.valid_timeIndex(studentId, unitId, i);
+                Integer sumValid = simpleDurationMapper.valid_timeIndex(studentId, unitId, i);
                 Integer speed = (int) (BigDecimalUtil.div(sum, sumValid == null ? 0 : sumValid) * 3600);
                 a.put("speed", speed); // 速度
             }
@@ -441,13 +436,13 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
     @Override
     public Integer validTime(HttpSession session) {
         long student_id = StudentIdBySession(session);
-        return durationMapper.selectValid_time(student_id, DateUtil.formatYYYYMMDD(new Date()) + " 00:00:00", DateUtil.formatYYYYMMDD(new Date()) + " 24:00:00");
+        return simpleDurationMapper.selectValid_time(student_id, SimpleDateUtil.formatYYYYMMDD(new Date()) + " 00:00:00", SimpleDateUtil.formatYYYYMMDD(new Date()) + " 24:00:00");
     }
 
     @Override
     public Integer onlineTime(HttpSession session) {
         long student_id = StudentIdBySession(session);
-        return durationMapper.selectOnline_time(student_id, DateUtil.formatYYYYMMDD(new Date()) + " 00:00:00", DateUtil.formatYYYYMMDD(new Date()) + " 24:00:00");
+        return simpleDurationMapper.selectOnline_time(student_id, SimpleDateUtil.formatYYYYMMDD(new Date()) + " 00:00:00", SimpleDateUtil.formatYYYYMMDD(new Date()) + " 24:00:00");
     }
 
 
@@ -467,7 +462,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
 
     @Override
     public Integer judgePreschoolTest(Long id) {
-        return testRecordMapper.judgePreschoolTest(id);
+        return simpleTestRecordMapper.judgePreschoolTest(id);
     }
 
     /**
@@ -486,14 +481,14 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         Student student = getStudent(session);
 
         // 获取今日已学单词
-        int learnWord = learnMapper.getTodayWord(DateUtil.formatYYYYMMDD(new Date()), studentId);
+        int learnWord = learnMapper.getTodayWord(SimpleDateUtil.formatYYYYMMDD(new Date()), studentId);
         // 获取今日已学例句
-        int learnSentence = learnMapper.getTodaySentence(DateUtil.formatYYYYMMDD(new Date()), studentId);
+        int learnSentence = learnMapper.getTodaySentence(SimpleDateUtil.formatYYYYMMDD(new Date()), studentId);
         map.put("learnWord", learnWord);
         map.put("learnSentence", learnSentence);
         map.put("sex",student.getSex());
         // 获取我的总金币
-        Double myGoldD = studentMapper.myGold(studentId);
+        Double myGoldD = simpleStudentMapper.myGold(studentId);
         BigDecimal mybd = new BigDecimal(myGoldD).setScale(0, BigDecimal.ROUND_HALF_UP);
         int myGold = Integer.parseInt(mybd.toString());
         map.put("myGold", myGold);
@@ -540,7 +535,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         }
 
         // 获取今日获得金币 date_format(learn_time, '%Y-%m-%d')
-        List<String> list = runLogMapper.getStudentGold(DateUtil.formatYYYYMMDD(new Date()), studentId);
+        List<String> list = runLogMapper.getStudentGold(SimpleDateUtil.formatYYYYMMDD(new Date()), studentId);
         double count = 0;
         String regex = "#(.*)#";
         Pattern pattern = Pattern.compile(regex);
@@ -656,7 +651,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
 
     @Override
     public boolean hasCapacityCourse(Student student) {
-        int count = capacityStudentUnitMapper.countByType(student, 1);
+        int count = simpleCapacityStudentUnitMapper.countByType(student, 1);
         return count > 0;
     }
 
@@ -667,7 +662,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
      * @return
      */
     private boolean hasCapacitySentence(Student student) {
-        int count = capacityStudentUnitMapper.countByType(student, 2);
+        int count = simpleCapacityStudentUnitMapper.countByType(student, 2);
         return count > 0;
     }
 
@@ -678,7 +673,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
      * @return
      */
     private boolean hasCapacityTeks(Student student) {
-        int count = capacityStudentUnitMapper.countByType(student, 3);
+        int count = simpleCapacityStudentUnitMapper.countByType(student, 3);
         return count > 0;
     }
 
@@ -702,7 +697,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
             }
         }
 
-        Date loginTime = DateUtil.parseYYYYMMDDHHMMSS(new Date());
+        Date loginTime = SimpleDateUtil.parseYYYYMMDDHHMMSS(new Date());
         session.setAttribute(UserConstant.CURRENT_STUDENT, stu);
         session.setAttribute(TimeConstant.LOGIN_TIME, loginTime);
 
@@ -715,13 +710,13 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         redisTemplate.opsForHash().put(RedisKeysConst.LOGIN_SESSION, stu.getId(), session.getId());
     }
 
-    public static void saveLogoutLog(Student student, RunLogMapper runLogMapper, Logger logger) {
+    public static void saveLogoutLog(Student student, SimpleRunLogMapper simpleRunLogMapper, Logger logger) {
         // 查询学生登录日志中最后一条记录时登录信息还是退出信息
-        RunLog lastRunLog = runLogMapper.selectLastRunLogByOperateUserId(student.getId());
+        RunLog lastRunLog = simpleRunLogMapper.selectLastRunLogByOperateUserId(student.getId());
         if (lastRunLog == null || !lastRunLog.getLogContent().contains("退出登录")) {
             RunLog runLog = new RunLog(student.getId(), 1, "学生[" + student.getStudentName() + "]退出登录", new Date());
             try {
-                runLogMapper.insert(runLog);
+                simpleRunLogMapper.insert(runLog);
             } catch (Exception e) {
                 logger.error("记录学生 [{}]->[{}] 退出登录信息失败！", student.getId(), student.getStudentName(), e);
             }
@@ -781,11 +776,11 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
     public void saveDurationInfo(Map<String, Object> sessionMap) {
         if (sessionMap != null) {
             Student student = (Student) sessionMap.get(UserConstant.CURRENT_STUDENT);
-            Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) sessionMap.get(TimeConstant.LOGIN_TIME));
-            Date loginOutTime = DateUtil.parseYYYYMMDDHHMMSS(new Date());
+            Date loginTime = SimpleDateUtil.parseYYYYMMDDHHMMSS((Date) sessionMap.get(TimeConstant.LOGIN_TIME));
+            Date loginOutTime = SimpleDateUtil.parseYYYYMMDDHHMMSS(new Date());
             if (loginTime != null && loginOutTime != null) {
                 // 判断当前登录时间是否已经记录有在线时长信息，如果没有插入记录，如果有无操作
-                int count = durationMapper.countOnlineTimeWithLoginTime(student, loginTime);
+                int count = simpleDurationMapper.countOnlineTimeWithLoginTime(student, loginTime);
                 if (count == 0) {
                     // 学生 session 失效时将该学生从在线人数中移除
                     redisTemplate.opsForSet().remove(RedisKeysConst.ONLINE_USER, student.getId());
@@ -798,7 +793,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<StudentM
                     duration.setLoginTime(loginTime);
                     duration.setLoginOutTime(loginOutTime);
                     duration.setValidTime(0L);
-                    durationMapper.insert(duration);
+                    simpleDurationMapper.insert(duration);
                 }
             }
         }

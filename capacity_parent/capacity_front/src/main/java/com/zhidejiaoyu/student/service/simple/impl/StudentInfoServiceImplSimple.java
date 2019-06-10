@@ -14,11 +14,11 @@ import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.simple.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.WeekUtil;
 import com.zhidejiaoyu.common.utils.simple.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
-import com.zhidejiaoyu.student.service.simple.StudentInfoService;
+import com.zhidejiaoyu.student.service.simple.SimpleStudentInfoServiceSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,40 +31,40 @@ import java.util.concurrent.ExecutorService;
 
 @Slf4j
 @Service
-public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentMapper, Student> implements StudentInfoService {
+public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleStudentMapper, Student> implements SimpleStudentInfoServiceSimple {
 
     private RunLog runLog;
 
     @Autowired
-    private StudentMapper studentMapper;
+    private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
-    private RunLogMapper runLogMapper;
+    private SimpleRunLogMapper runLogMapper;
 
 
     @Autowired
     private SimpleAwardMapper simpleAwardMapper;
 
     @Autowired
-    private WorshipMapper worshipMapper;
+    private SimpleWorshipMapper worshipMapper;
 
     @Autowired
-    private MedalMapper medalMapper;
+    private SimpleMedalMapper simpleMedalMapper;
 
     @Autowired
-    private DurationMapper durationMapper;
+    private SimpleDurationMapper simpleDurationMapper;
 
     @Autowired
-    private LearnMapper learnMapper;
+    private SimpleLearnMapper learnMapper;
 
     @Autowired
-    private LevelMapper levelMapper;
+    private SimpleLevelMapper simpleLevelMapper;
 
     @Autowired
     private SimpleCommonMethod simpleCommonMethod;
 
     @Autowired
-    private StudentExpansionMapper studentExpansionMapper;
+    private SimpleStudentExpansionMapper simpleStudentExpansionMapper;
 
     @Autowired
     private ExecutorService executorService;
@@ -98,8 +98,8 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
                 studentInfo.setPetName("大明白");
                 studentInfo.setPartUrl("static/img/edit-user-msg/tips.png");
             }
-            int count = studentMapper.updateByPrimaryKeySelective(studentInfo);
-            studentInfo = studentMapper.selectById(studentInfo.getId());
+            int count = simpleStudentMapper.updateByPrimaryKeySelective(studentInfo);
+            studentInfo = simpleStudentMapper.selectById(studentInfo.getId());
             session.setAttribute(UserConstant.CURRENT_STUDENT, studentInfo);
             return count > 0 ? ServerResponse.createBySuccessMessage(tip)
                     : ServerResponse.createByErrorMessage("信息完善失败！");
@@ -181,7 +181,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
             // 完善完必填信息和选填信息（算修改密码），奖励金币30个
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), 30));
             tip = "恭喜获得30枚金币，已收入囊中。";
-            log.info("id为 " + student.getId() + " 的学生在 " + DateUtil.DateTime(new Date()) + " 首次完善资料达 " + scale * 100 + "%，奖励金币#30#枚！");
+            log.info("id为 " + student.getId() + " 的学生在 " + SimpleDateUtil.DateTime(new Date()) + " 首次完善资料达 " + scale * 100 + "%，奖励金币#30#枚！");
             runLog = new RunLog(student.getId(), 4, "id为 " + student.getId() + " 的学生首次完善资料达 " + scale * 100 + "%，奖励金币#30#枚！", new Date());
             runLogMapper.insert(runLog);
             int awardContentType = 11;
@@ -190,7 +190,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
             // 完善完必填信息，奖励金币20个
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), 20));
             tip = "恭喜获得20枚金币，已收入囊中。";
-            log.info("id为 " + student.getId() + " 的学生在 " + DateUtil.DateTime(new Date()) + " 首次完善资料达 " + scale * 100 + "%，奖励金币#20#枚！");
+            log.info("id为 " + student.getId() + " 的学生在 " + SimpleDateUtil.DateTime(new Date()) + " 首次完善资料达 " + scale * 100 + "%，奖励金币#20#枚！");
             runLog = new RunLog(student.getId(), 4, "id为 " + student.getId() + " 的学生首次完善资料达 " + scale * 100 + "%，奖励金币#20#枚！", new Date());
             runLogMapper.insert(runLog);
             int awardContentType = 10;
@@ -220,7 +220,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
             }
         }
 
-        List<Medal> children = medalMapper.selectChildrenIdByParentId(92);
+        List<Medal> children = simpleMedalMapper.selectChildrenIdByParentId(92);
         int[] totalPlan = {1, 7, 14, 21, 30};
         int[] complete = new int[children.size()];
 
@@ -235,10 +235,10 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         if (lastFirstCount == null) {
             lastFirstCount = 0;
         }
-        Student byWorship = studentMapper.selectByPrimaryKey(userId);
+        Student byWorship = simpleStudentMapper.selectByPrimaryKey(userId);
         if (lastFirstCount == 0) {
             byWorship.setWorshipFirstTime(new Date());
-            studentMapper.updateByPrimaryKeySelective(byWorship);
+            simpleStudentMapper.updateByPrimaryKeySelective(byWorship);
 
             List<Student> list = new ArrayList<>();
             list.add(byWorship);
@@ -254,7 +254,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
             // 计算上个第一名保持的时间
             StudentExample studentExample = new StudentExample();
             studentExample.createCriteria().andWorshipFirstTimeIsNotNull().andIdNotEqualTo(userId);
-            List<Student> list = studentMapper.selectByExample(studentExample);
+            List<Student> list = simpleStudentMapper.selectByExample(studentExample);
 
             if (list.size() > 0) {
                 toAward(children, byWorship, list, complete, totalPlan);
@@ -263,18 +263,18 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
             // 将之前第一名的学生的勋章第一名标识删去
             list.forEach(student1 -> {
                 student1.setWorshipFirstTime(null);
-                studentMapper.updateByPrimaryKey(student1);
+                simpleStudentMapper.updateByPrimaryKey(student1);
             });
 
             // 当前被膜拜的学生膜拜次数为全国最高,为其加上标识
             byWorship.setWorshipFirstTime(new Date());
-            studentMapper.updateByPrimaryKeySelective(byWorship);
+            simpleStudentMapper.updateByPrimaryKeySelective(byWorship);
         } else if (canGetCount < children.size() && count + 1 == lastFirstCount) {
             // 当前被膜拜的学生成为全国并列第一名
             // 计算上个第一名保持的时间
             StudentExample studentExample = new StudentExample();
             studentExample.createCriteria().andWorshipFirstTimeIsNotNull();
-            List<Student> list = studentMapper.selectByExample(studentExample);
+            List<Student> list = simpleStudentMapper.selectByExample(studentExample);
             toAward(children, byWorship, list, complete, totalPlan);
         }
 
@@ -306,11 +306,11 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         }
         log.info("studentId=[{}], studentName=[{}], classify=[{}]", student.getId(), student.getStudentName(), classify);
 
-        Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
+        Date loginTime = SimpleDateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
         Duration duration = packageDuration(classify, courseId, unitId, validTime, student, loginTime);
 
         try {
-            durationMapper.insert(duration);
+            simpleDurationMapper.insert(duration);
         } catch (Exception e) {
             log.error("保存时长信息出错", e);
         }
@@ -379,8 +379,8 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         }
         Long classId=student.getClassId();
         Long teacherId=student.getTeacherId();
-        studentMapper.updateByPrimaryKeySelective(student);
-        student = studentMapper.selectById(currentStudent.getId());
+        simpleStudentMapper.updateByPrimaryKeySelective(student);
+        student = simpleStudentMapper.selectById(currentStudent.getId());
         student.setDiamond(currentStudent.getDiamond());
         student.setEnergy(currentStudent.getEnergy());
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
@@ -394,14 +394,14 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         if (stuId == null) {
             student = getStudent(session);
         } else {
-            student = studentMapper.selectById(stuId);
+            student = simpleStudentMapper.selectById(stuId);
             Student currentStudent = getStudent(session);
 
             List<Worship> worships = worshipMapper.selectSevenDaysInfoByStudent(currentStudent);
             if (worships.size() > 0) {
                 // 上次膜拜时间
                 Date lastWorshipTime = worships.get(0).getWorshipTime();
-                if (Objects.equals(DateUtil.formatYYYYMMDD(lastWorshipTime), DateUtil.formatYYYYMMDD(new Date()))) {
+                if (Objects.equals(SimpleDateUtil.formatYYYYMMDD(lastWorshipTime), SimpleDateUtil.formatYYYYMMDD(new Date()))) {
                     // 今天已经膜拜过其他人
                     showFist = false;
                 }
@@ -444,7 +444,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
     private PageInfo<String> getHadMedalByPage(Integer pageNum, Integer pageSize, Student student) {
         Integer sex = student.getSex();
         PageHelper.startPage(pageNum, pageSize);
-        List<String> urlList = medalMapper.selectHadMedalImgUrl(student);
+        List<String> urlList = simpleMedalMapper.selectHadMedalImgUrl(student);
         List<String> urls = new ArrayList<>(urlList.size());
         urlList.forEach(url -> {
             if (url != null && url.contains("#")) {
@@ -462,12 +462,12 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         if (stuId == null) {
             student = getStudent(session);
         } else {
-            student = studentMapper.selectByPrimaryKey(stuId);
+            student = simpleStudentMapper.selectByPrimaryKey(stuId);
         }
 
         Integer sex = student.getSex();
         PageHelper.startPage(pageNum, pageSize);
-        List<String> urlList = medalMapper.selectHadBigMedalImgUrl(student);
+        List<String> urlList = simpleMedalMapper.selectHadBigMedalImgUrl(student);
         PageInfo<String> pageInfo1 = new PageInfo<>(urlList);
 
         List<String> urls = new ArrayList<>(urlList.size());
@@ -492,7 +492,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         Date date = new Date();
         Date firstDayOfWeek = WeekUtil.getFirstDayOfWeek(date);
         Date lastDayOfWeek = WeekUtil.getLastDayOfWeek(date);
-        int count = worshipMapper.countByWorshipedThisWeed(student, DateUtil.formatYYYYMMDD(firstDayOfWeek), DateUtil.formatYYYYMMDD(lastDayOfWeek));
+        int count = worshipMapper.countByWorshipedThisWeed(student, SimpleDateUtil.formatYYYYMMDD(firstDayOfWeek), SimpleDateUtil.formatYYYYMMDD(lastDayOfWeek));
         map.put("count", count);
 
         // 膜拜记录
@@ -509,7 +509,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         if (stuId == null) {
             student = getStudent(session);
         } else {
-            student = studentMapper.selectByPrimaryKey(stuId);
+            student = simpleStudentMapper.selectByPrimaryKey(stuId);
         }
         ChildMedalVo childMedalInfo = getChildMedalInfo(student, medalId);
         return ServerResponse.createBySuccess(childMedalInfo);
@@ -521,10 +521,10 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         if (stuId == null) {
             student = getStudent(session);
         } else {
-            student = studentMapper.selectByPrimaryKey(stuId);
+            student = simpleStudentMapper.selectByPrimaryKey(stuId);
         }
         PageHelper.startPage(pageNum, pageSize);
-        List<Map<String, Object>> medalImgUrlList = medalMapper.selectMedalImgUrl(student);
+        List<Map<String, Object>> medalImgUrlList = simpleMedalMapper.selectMedalImgUrl(student);
         List<Map<String, Object>> medalImgUrlListTemp = getAllMedalImgUrl(student, medalImgUrlList);
 
         PageInfo<Map<String, Object>> mapPageInfo = new PageInfo<>(medalImgUrlList);
@@ -542,14 +542,14 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
     @Override
     public ServerResponse optBackMusic(HttpSession session, Integer status) {
         Long studentId = super.getStudentId(session);
-        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(studentId);
+        StudentExpansion studentExpansion = simpleStudentExpansionMapper.selectByStudentId(studentId);
         if (studentExpansion == null){
             studentExpansion = new StudentExpansion();
             studentExpansion.setAudioStatus(status);
-            studentExpansionMapper.insert(studentExpansion);
+            simpleStudentExpansionMapper.insert(studentExpansion);
         } else {
             studentExpansion.setAudioStatus(status);
-            studentExpansionMapper.updateById(studentExpansion);
+            simpleStudentExpansionMapper.updateById(studentExpansion);
         }
         return ServerResponse.createBySuccess();
     }
@@ -557,7 +557,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
     @Override
     public ServerResponse<Map<String, Integer>> getBackMusicStatus(HttpSession session) {
         Long studentId = super.getStudentId(session);
-        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(studentId);
+        StudentExpansion studentExpansion = simpleStudentExpansionMapper.selectByStudentId(studentId);
         Map<String, Integer> map = new HashMap<>(16);
         if (studentExpansion == null || studentExpansion.getAudioStatus() == null) {
             map.put("state", 1);
@@ -603,7 +603,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
     }
 
     private ChildMedalVo getChildMedalInfo(Student student, long medalId) {
-        List<Map<String, String>> childInfo = medalMapper.selectChildrenInfo(student, medalId);
+        List<Map<String, String>> childInfo = simpleMedalMapper.selectChildrenInfo(student, medalId);
 
         List<String> medalImgUrl = new ArrayList<>(childInfo.size());
         StringBuilder sb = new StringBuilder();
@@ -619,7 +619,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
     }
 
     private Map<String, String> getLevelInfo(LevelVo levelVo, Student student, Map<String, String> parentMap) {
-        List<Level> levels = levelMapper.selectList(new EntityWrapper<Level>().orderBy("id", true));
+        List<Level> levels = simpleLevelMapper.selectList(new EntityWrapper<Level>().orderBy("id", true));
         double gold = BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
         // 获取当前勋章子勋章索引
         Map<String, String> childMap = null;
@@ -680,8 +680,8 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         gold += saveKnownLearnAward(classify, loginTime, learnType, student);
         if (gold > 0) {
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
-            studentMapper.updateByPrimaryKeySelective(student);
-            student=studentMapper.selectById(student.getId());
+            simpleStudentMapper.updateByPrimaryKeySelective(student);
+            student= simpleStudentMapper.selectById(student.getId());
 
             session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         }
@@ -703,7 +703,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         int condition = classify == 1 ? 20 : 10;
         long stuId = student.getId();
         StringBuilder sb = new StringBuilder();
-        int awardCount = runLogMapper.countAwardCount(stuId, DateUtil.formatYYYYMMDDHHMMSS(loginTime), simpleCommonMethod.getTestType(classify), "熟词");
+        int awardCount = runLogMapper.countAwardCount(stuId, SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime), simpleCommonMethod.getTestType(classify), "熟词");
         LearnExample learnExample = new LearnExample();
         learnExample.createCriteria().andStudentIdEqualTo(stuId).andLearnTimeGreaterThanOrEqualTo(loginTime)
                 .andStudyModelEqualTo(learnType)
@@ -711,7 +711,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         learnCount = learnMapper.countByExample(learnExample);
         if (learnCount >= condition * (awardCount + 1)) {
             sb.append("学生").append(student.getStudentName()).append("在").append(learnType)
-                    .append("模块本次新学熟词大于等于").append(condition).append("个单词，获得#1#个金币，登录时间：").append(DateUtil.formatYYYYMMDDHHMMSS(loginTime));
+                    .append("模块本次新学熟词大于等于").append(condition).append("个单词，获得#1#个金币，登录时间：").append(SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime));
             runLog = new RunLog(stuId, 4, sb.toString(), new Date());
             runLogMapper.insert(runLog);
             log.info(sb.toString());
@@ -736,10 +736,10 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         long stuId = student.getId();
         StringBuilder sb = new StringBuilder();
         // 查询本次登录期间当前奖励次数
-        int count = runLogMapper.countAwardCount(stuId, DateUtil.formatYYYYMMDDHHMMSS(loginTime), simpleCommonMethod.getTestType(classify), "有效时长大于等于30分钟");
+        int count = runLogMapper.countAwardCount(stuId, SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime), simpleCommonMethod.getTestType(classify), "有效时长大于等于30分钟");
         if (count == 0 && minute >= condition) {
             sb.append("学生").append(student.getStudentName()).append("在").append(learnType).
-                    append("模块学习过程中有效时长大于等于30分钟，获得#5#个金币，登录时间：").append(DateUtil.formatYYYYMMDDHHMMSS(loginTime));
+                    append("模块学习过程中有效时长大于等于30分钟，获得#5#个金币，登录时间：").append(SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime));
             runLog = new RunLog(stuId, 4, sb.toString(), new Date());
             runLogMapper.insert(runLog);
             log.info(sb.toString());
@@ -763,7 +763,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         int condition = classify == 1 ? 40 : 20;
         long stuId = student.getId();
         StringBuilder sb = new StringBuilder();
-        awardCount = runLogMapper.countAwardCount(stuId, DateUtil.formatYYYYMMDDHHMMSS(loginTime), simpleCommonMethod.getTestType(classify), "新学");
+        awardCount = runLogMapper.countAwardCount(stuId, SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime), simpleCommonMethod.getTestType(classify), "新学");
         LearnExample learnExample = new LearnExample();
         learnExample.createCriteria().andStudentIdEqualTo(stuId).andLearnTimeGreaterThanOrEqualTo(loginTime)
                 .andStudyModelEqualTo(learnType)
@@ -771,7 +771,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
         learnCount = learnMapper.countByExample(learnExample);
         if (learnCount >= condition * (awardCount + 1)) {
             sb.append("学生").append(student.getStudentName()).append("在").append(learnType).append("模块本次登录新学大于等于")
-                    .append(condition).append("个单词，获得#1#个金币，登录时间：").append(DateUtil.formatYYYYMMDDHHMMSS(loginTime));
+                    .append(condition).append("个单词，获得#1#个金币，登录时间：").append(SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime));
             runLog = new RunLog(stuId, 4, sb.toString(), new Date());
             runLogMapper.insert(runLog);
             log.info(sb.toString());
@@ -789,7 +789,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<StudentM
 
             // 当前被膜拜的学生膜拜次数为全国最高,为其加上标识
             byWorship.setWorshipFirstTime(new Date());
-            studentMapper.updateByPrimaryKeySelective(byWorship);
+            simpleStudentMapper.updateByPrimaryKeySelective(byWorship);
         }
     }
 

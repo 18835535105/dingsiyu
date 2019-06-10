@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.config.ServiceInfoUtil;
 import com.zhidejiaoyu.student.service.simple.SimpleQuartzService;
@@ -32,40 +32,40 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
     private int port;
 
     @Autowired
-    private StudentMapper studentMapper;
+    private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
-    private RankListMapper rankListMapper;
+    private SimpleRankListMapper simpleRankListMapper;
 
     @Autowired
-    private NewsMapper newsMapper;
+    private SimpleNewsMapper simpleNewsMapper;
 
     @Autowired
-    private StudentRankMapper studentRankMapper;
+    private SimpleStudentRankMapper simpleStudentRankMapper;
 
     @Autowired
     private SimpleAwardMapper simpleAwardMapper;
 
     @Autowired
-    private WorshipMapper worshipMapper;
+    private SimpleWorshipMapper worshipMapper;
 
     @Autowired
     private RedisOpt redisOpt;
 
     @Autowired
-    private TeacherMapper teacherMapper;
+    private SimpleTeacherMapper simpleTeacherMapper;
 
     @Autowired
-    private StudentExpansionMapper studentExpansionMapper;
+    private SimpleStudentExpansionMapper simpleStudentExpansionMapper;
 
     @Autowired
-    private GauntletMapper gauntletMapper;
+    private SimpleGauntletMapper simpleGauntletMapper;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
-    private LevelMapper levelMapper;
+    private SimpleLevelMapper simpleLevelMapper;
 
     /**
      * 每日 00:10:00 更新提醒消息中学生账号到期提醒
@@ -83,7 +83,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
 
         // 对距离有效期还剩3天的学生进行消息提醒
         // 查询小于等于3天到达有效期的学生
-        List<Student> students = studentMapper.selectAccountTimeLessThreeDays();
+        List<Student> students = simpleStudentMapper.selectAccountTimeLessThreeDays();
         List<Long> ids = new ArrayList<>();
         for (Student student : students) {
             ids.add(student.getId());
@@ -95,7 +95,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
         }
 
         // 根据学生id查询消息
-        List<News> newsList = newsMapper.selectByStuIds(ids);
+        List<News> newsList = simpleNewsMapper.selectByStuIds(ids);
 
         // key:studentId    value:news
         Map<Long, News> map = new HashMap<>(16);
@@ -118,7 +118,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
                 news = new News();
                 news.setTime(new Date());
                 news.setTitle(this.getDay(student.getAccountTime()));
-                news.setContent("亲爱的用户，你的账户即将在" + DateUtil.formatYYYYMMDD(student.getAccountTime()) + "到期,请及时续费，否则将对您产生无法登陆平台的影响，请知晓。");
+                news.setContent("亲爱的用户，你的账户即将在" + SimpleDateUtil.formatYYYYMMDD(student.getAccountTime()) + "到期,请及时续费，否则将对您产生无法登陆平台的影响，请知晓。");
                 news.setStudentid(student.getId());
                 news.setType("提醒消息");
                 news.setRobotspeak("我们还会再见面了吗？在不续费我们就挥手再见了。");
@@ -130,7 +130,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
         // 更新消息
         if (updateList.size() > 0) {
             try {
-                newsMapper.updateByList(updateList);
+                simpleNewsMapper.updateByList(updateList);
             } catch (Exception e) {
                 log.error("批量修改学生有效期倒计时提醒消息出错！", e);
             }
@@ -140,7 +140,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
         if (insertList.size() > 0) {
             try {
 
-                newsMapper.insertList(insertList);
+                simpleNewsMapper.insertList(insertList);
             } catch (Exception e) {
                 log.error("批量增加学生账号有效期到期提醒消息出错", e);
             }
@@ -163,10 +163,10 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
             return;
         }
         log.info("定时任务 -> 能量清零...");
-        studentMapper.updEnergyByAll();
+        simpleStudentMapper.updEnergyByAll();
         log.info("定时任务 -> 能量清零  执行完成...");
         log.info("定时任务 -> 教师创建学生清零...");
-        teacherMapper.updateCreateStudentNumber();
+        simpleTeacherMapper.updateCreateStudentNumber();
         log.info("定时任务 -> 教师创建学生清零 执行完成...");
     }
 
@@ -179,7 +179,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
             return;
         }
         // 班级与学生对应关系
-        List<Student> students = studentMapper.selectList(new EntityWrapper<Student>().isNotNull("account_time").gt("system_gold", 0));
+        List<Student> students = simpleStudentMapper.selectList(new EntityWrapper<Student>().isNotNull("account_time").gt("system_gold", 0));
 
         // 存放各个班级下所有学生信息
         Map<Long, List<Student>> studentClassMap = new HashMap<>(16);
@@ -213,19 +213,19 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
     @Override
     public void updateStudentExpansion() {
         log.info("定时任务 -> 学习力重置...");
-        List<StudentExpansion> studentExpansions = studentExpansionMapper.selectAll();
+        List<StudentExpansion> studentExpansions = simpleStudentExpansionMapper.selectAll();
         for (StudentExpansion studentExpansion : studentExpansions) {
             //查询基础获取学习力
-            Integer study = levelMapper.getStudyById(studentExpansion.getLevel());
+            Integer study = simpleLevelMapper.getStudyById(studentExpansion.getLevel());
             //查询发起挑战的胜利场次获取的学习力
-            List<Gauntlet> gauntlets = gauntletMapper.selectStudy(1, studentExpansion.getStudentId());
+            List<Gauntlet> gauntlets = simpleGauntletMapper.selectStudy(1, studentExpansion.getStudentId());
             for(Gauntlet gauntlet:gauntlets){
                 if(gauntlet.getChallengeStudy()!=null){
                     study=study+gauntlet.getChallengeStudy();
                 }
             }
             //获取发起挑战失败
-            List<Gauntlet> gauntlets1 = gauntletMapper.selectStudy(2, studentExpansion.getStudentId());
+            List<Gauntlet> gauntlets1 = simpleGauntletMapper.selectStudy(2, studentExpansion.getStudentId());
             for(Gauntlet gauntlet:gauntlets1){
                 if(gauntlet.getChallengeStudy()!=null){
                     if(study-gauntlet.getChallengeStudy()>0){
@@ -236,14 +236,14 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
                 }
             }
             //查询被发起挑战的胜利场次获取的学习力
-            List<Gauntlet> gauntlets2 = gauntletMapper.selectStudy(3, studentExpansion.getStudentId());
+            List<Gauntlet> gauntlets2 = simpleGauntletMapper.selectStudy(3, studentExpansion.getStudentId());
             for(Gauntlet gauntlet:gauntlets2){
                 if(gauntlet.getBeChallengeStudy()!=null){
                     study=study+gauntlet.getBeChallengeStudy();
                 }
             }
             //获取发起挑战失败
-            List<Gauntlet> gauntlets3 = gauntletMapper.selectStudy(4, studentExpansion.getStudentId());
+            List<Gauntlet> gauntlets3 = simpleGauntletMapper.selectStudy(4, studentExpansion.getStudentId());
             for(Gauntlet gauntlet:gauntlets3){
                 if(gauntlet.getBeChallengeStudy()!=null){
                     if(study-gauntlet.getBeChallengeStudy()>0){
@@ -254,7 +254,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
                 }
             }
             studentExpansion.setStudyPower(study);
-            studentExpansionMapper.updateById(studentExpansion);
+            simpleStudentExpansionMapper.updateById(studentExpansion);
         }
         log.info("定时任务 -> 学习力重置完成...");
     }
@@ -326,7 +326,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
         });
 
         try {
-            studentRankMapper.insertList(rankList);
+            simpleStudentRankMapper.insertList(rankList);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -361,7 +361,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
         });
 
         try {
-            studentRankMapper.insertList(rankList);
+            simpleStudentRankMapper.insertList(rankList);
         } catch (Exception e) {
             log.error("定时增加学生班级金币月排行信息失败！", e);
             return;
@@ -431,7 +431,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
         }
 
         // 查询需要进行排行的学生信息
-        List<Student> students = studentMapper.selectStudentList();
+        List<Student> students = simpleStudentMapper.selectStudentList();
 
         // 将students按照金币总数降序排列
         students.sort((s1, s2) -> (int) ((s1.getSystemGold() + s1.getOfflineGold()) - (s2.getSystemGold() + s2.getOfflineGold())));
@@ -449,10 +449,10 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
         }
 
         // 查询所有学生的排行榜信息
-        Map<Long, RankList> rankListMap = rankListMapper.selectRankListMap();
+        Map<Long, RankList> rankListMap = simpleRankListMapper.selectRankListMap();
 
         // 每个学生对应的校管 id
-        Map<Long, Map<Long, Integer>> studentSchoolAdminMap = studentMapper.selectStudentSchoolAdminMap(students);
+        Map<Long, Map<Long, Integer>> studentSchoolAdminMap = simpleStudentMapper.selectStudentSchoolAdminMap(students);
 
         List<RankList> insertList = new ArrayList<>();
         List<RankList> updateList = new ArrayList<>();
@@ -584,7 +584,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
 
         if (insertList.size() > 0) {
             try {
-                rankListMapper.insertList(insertList);
+                simpleRankListMapper.insertList(insertList);
             } catch (Exception e) {
                 log.error("新增学校日排行出错！", e);
             }
@@ -593,7 +593,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
 
         if (updateList.size() > 0) {
             try {
-                rankListMapper.updateList(updateList);
+                simpleRankListMapper.updateList(updateList);
             } catch (Exception e) {
                 log.error("更新学校日排行出错！", e);
             }

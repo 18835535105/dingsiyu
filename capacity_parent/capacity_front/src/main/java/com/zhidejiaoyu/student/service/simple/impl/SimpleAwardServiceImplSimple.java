@@ -9,7 +9,7 @@ import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.simple.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
 import com.zhidejiaoyu.student.service.simple.SimpleAwardServiceSimple;
 import lombok.extern.slf4j.Slf4j;
@@ -48,13 +48,13 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
     private static final int MEDAL_TYPE = 3;
 
     @Autowired
-    private StudentMapper studentMapper;
+    private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
-    private RunLogMapper runLogMapper;
+    private SimpleRunLogMapper runLogMapper;
 
     @Autowired
-    private MedalMapper medalMapper;
+    private SimpleMedalMapper simpleMedalMapper;
 
     @Autowired
     private SimpleAwardMapper simpleAwardMapper;
@@ -63,7 +63,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
     private SimpleAwardContentTypeMapper simpleAwardContentTypeMapper;
 
     @Autowired
-    private WorshipMapper worshipMapper;
+    private SimpleWorshipMapper worshipMapper;
 
     @Autowired
     private DailyAwardAsync awardAsync;
@@ -72,10 +72,10 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
     private ExecutorService executorService;
 
     @Autowired
-    private RankingMapper rankingMapper;
+    private SimpleRankingMapper simpleRankingMapper;
 
     @Autowired
-    private TeacherMapper teacherMapper;
+    private SimpleTeacherMapper simpleTeacherMapper;
 
     @Autowired
     private MedalAwardAsync medalAwardAsync;
@@ -142,7 +142,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
             if (object == null) {
                 Integer adminId = null;
                 if (student.getTeacherId() != null) {
-                    adminId = studentMapper.selSchoolAdminId(student.getId());
+                    adminId = simpleStudentMapper.selSchoolAdminId(student.getId());
                     if (adminId == null) {
                         adminId = student.getTeacherId().intValue();
                     }
@@ -171,7 +171,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 } else {
                     Integer adminId = null;
                     if (student.getTeacherId() != null) {
-                        adminId = studentMapper.selSchoolAdminId(student.getId());
+                        adminId = simpleStudentMapper.selSchoolAdminId(student.getId());
                         if (adminId == null) {
                             adminId = student.getTeacherId().intValue();
                         }
@@ -184,7 +184,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 log.error("排行榜类型转换错误，学生[{}]-[{}]排行榜类型转换错误，error=[{}]", student.getId(), student.getStudentName(), e);
                 Integer adminId = null;
                 if (student.getTeacherId() != null) {
-                    adminId = studentMapper.selSchoolAdminId(student.getId());
+                    adminId = simpleStudentMapper.selSchoolAdminId(student.getId());
                     if (adminId == null) {
                         adminId = student.getTeacherId().intValue();
                     }
@@ -226,19 +226,19 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
 
     private void getGoldRank(Student student, Map<String, Object> map, Integer adminId) {
 
-        Ranking ranking = rankingMapper.selByStudentId(student.getId());
+        Ranking ranking = simpleRankingMapper.selByStudentId(student.getId());
 
         List<Integer> teacherIds = null;
         if (student.getTeacherId() != null) {
-            adminId = studentMapper.selSchoolAdminId(student.getId());
+            adminId = simpleStudentMapper.selSchoolAdminId(student.getId());
             if (adminId == null) {
                 adminId = student.getTeacherId().intValue();
             }
-            teacherIds = teacherMapper.getTeacherIdByAdminId(adminId);
+            teacherIds = simpleTeacherMapper.getTeacherIdByAdminId(adminId);
         }
-        List<Map<String, Object>> classStudents = studentMapper.getRanking(student.getClassId(), student.getTeacherId(), "2", null, "1", adminId, 0, 100, teacherIds);
-        List<Map<String, Object>> schoolStudents = studentMapper.getRanking(student.getClassId(), student.getTeacherId(), "2", null, "2", adminId, 0, 100, teacherIds);
-        List<Map<String, Object>> countryStudents = studentMapper.getRanking(student.getClassId(), student.getTeacherId(), "2", null, "3", adminId, 0, 100, teacherIds);
+        List<Map<String, Object>> classStudents = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), "2", null, "1", adminId, 0, 100, teacherIds);
+        List<Map<String, Object>> schoolStudents = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), "2", null, "2", adminId, 0, 100, teacherIds);
+        List<Map<String, Object>> countryStudents = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), "2", null, "3", adminId, 0, 100, teacherIds);
         int classRank = -1;
         int schoolRank = -1;
         int countryRank = -1;
@@ -264,7 +264,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
             if (classRank != -1) {
                 if (ranking.getGoldClassRank() == null) {
                     ranking.setGoldClassRank(classRank);
-                    rankingMapper.updateById(ranking);
+                    simpleRankingMapper.updateById(ranking);
                     map.put("goldClassRank", 100);
                     map.put("isClass", false);
                 } else {
@@ -281,7 +281,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
             } else {
                 if (ranking.getGoldClassRank() == null) {
                     ranking.setGoldClassRank(0);
-                    rankingMapper.updateById(ranking);
+                    simpleRankingMapper.updateById(ranking);
                 }
                 map.put("goldClassRank", 0);
                 if (map.get("isClass") == null && !((Boolean) map.get("isClass"))) {
@@ -291,7 +291,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
             if (schoolRank != -1) {
                 if (ranking.getGoldSchoolRank() == null) {
                     ranking.setGoldSchoolRank(schoolRank);
-                    rankingMapper.updateById(ranking);
+                    simpleRankingMapper.updateById(ranking);
                     map.put("goldSchoolRank", 100);
                     map.put("isSchool", false);
                 } else {
@@ -308,7 +308,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
             } else {
                 if (ranking.getGoldSchoolRank() == null) {
                     ranking.setGoldSchoolRank(0);
-                    rankingMapper.updateById(ranking);
+                    simpleRankingMapper.updateById(ranking);
                 }
                 map.put("goldSchoolRank", 0);
                 if (map.get("isSchool") == null && !((Boolean) map.get("isSchool"))) {
@@ -318,7 +318,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
             if (countryRank != -1) {
                 if (ranking.getGoldCountryRank() == null) {
                     ranking.setGoldCountryRank(countryRank);
-                    rankingMapper.updateById(ranking);
+                    simpleRankingMapper.updateById(ranking);
                     map.put("goldCountryRank", 100);
                     map.put("isCountry", false);
                 } else {
@@ -336,7 +336,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
             } else {
                 if (ranking.getGoldCountryRank() == null) {
                     ranking.setGoldCountryRank(0);
-                    rankingMapper.updateById(ranking);
+                    simpleRankingMapper.updateById(ranking);
                 }
                 map.put("goldCountryRank", 0);
                 if (map.get("isCountry") == null && !((Boolean) map.get("isCountry"))) {
@@ -367,27 +367,27 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
             map.put("isClass", false);
             map.put("isSchool", false);
             map.put("isCountry", false);
-            rankingMapper.insert(rank);
+            simpleRankingMapper.insert(rank);
         }
         redisTemplate.opsForHash().put(RedisKeysConst.SIMPLE_STUDENT_RANKING, student.getId(), map);
         redisTemplate.expire(RedisKeysConst.SIMPLE_STUDENT_RANKING, 3, TimeUnit.MINUTES);
     }
 
     private void getWorship(Student student, Map<String, Object> map, Integer adminId) {
-        Ranking ranking = rankingMapper.selByStudentId(student.getId());
+        Ranking ranking = simpleRankingMapper.selByStudentId(student.getId());
         Integer number = worshipMapper.getNumberByStudent(student.getId());
         map.put("number", number);
         List<Integer> teacherIds = null;
         if (student.getTeacherId() != null) {
-            adminId = studentMapper.selSchoolAdminId(student.getId());
+            adminId = simpleStudentMapper.selSchoolAdminId(student.getId());
             if (adminId == null) {
                 adminId = student.getTeacherId().intValue();
             }
-            teacherIds = teacherMapper.getTeacherIdByAdminId(adminId);
+            teacherIds = simpleTeacherMapper.getTeacherIdByAdminId(adminId);
         }
-        List<Map<String, Object>> classStudents = studentMapper.getRanking(student.getClassId(), student.getTeacherId(), null, "2", "1", adminId, 0, 100, teacherIds);
-        List<Map<String, Object>> schoolStudents = studentMapper.getRanking(student.getClassId(), student.getTeacherId(), null, "2", "2", adminId, 0, 100, teacherIds);
-        List<Map<String, Object>> countryStudents = studentMapper.getRanking(student.getClassId(), student.getTeacherId(), null, "2", "3", adminId, 0, 100, teacherIds);
+        List<Map<String, Object>> classStudents = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), null, "2", "1", adminId, 0, 100, teacherIds);
+        List<Map<String, Object>> schoolStudents = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), null, "2", "2", adminId, 0, 100, teacherIds);
+        List<Map<String, Object>> countryStudents = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), null, "2", "3", adminId, 0, 100, teacherIds);
         boolean classStudentRank = false;
         int worshipClassRank = -1;
         int worshipSchoolRank = -1;
@@ -448,7 +448,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                     map.put("worshipClassRank", ranking.getWorshipClassRank() - worshipClassRank);
                 } else {
                     ranking.setWorshipClassRank(worshipClassRank);
-                    rankingMapper.updateById(ranking);
+                    simpleRankingMapper.updateById(ranking);
                     map.put("worshipClassRank", 100);
                 }
             } else {
@@ -460,7 +460,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                     map.put("worshipSchoolRank", ranking.getWorshipSchoolRank() - worshipSchoolRank);
                 } else {
                     ranking.setWorshipClassRank(worshipSchoolRank);
-                    rankingMapper.updateById(ranking);
+                    simpleRankingMapper.updateById(ranking);
                     map.put("worshipSchoolRank", 100);
 
                 }
@@ -472,7 +472,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                     map.put("worshipCountryRank", ranking.getWorshipCountryRank() - worshipCountryRank);
                 } else {
                     ranking.setWorshipClassRank(worshipCountryRank);
-                    rankingMapper.updateById(ranking);
+                    simpleRankingMapper.updateById(ranking);
                     map.put("worshipCountryRank", 100);
                 }
             } else {
@@ -499,7 +499,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
             map.put("worshipClassRank", 0);
             map.put("worshipSchoolRank", 0);
             map.put("worshipCountryRank", 0);
-            rankingMapper.insert(rank);
+            simpleRankingMapper.insert(rank);
         }
     }
 
@@ -573,11 +573,11 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                     // 金币奖励
                     awardType = award.getType() == 1 ? "日奖励" : "任务奖励";
                     msg = "id为[" + student.getId() + "]的学生[" + student.getStudentName() + "]在["
-                            + DateUtil.DateTime(new Date()) + "]领取了[" + awardType + "]下[" + awardContent + "]的#" + awardGold + "#个金币";
+                            + SimpleDateUtil.DateTime(new Date()) + "]领取了[" + awardType + "]下[" + awardContent + "]的#" + awardGold + "#个金币";
                     // 更新学生金币信息
                     student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
                     try {
-                        studentMapper.updateByPrimaryKeySelective(student);
+                        simpleStudentMapper.updateByPrimaryKeySelective(student);
                     } catch (Exception e) {
                         log.error("id为[{}]的学生在领取[{}]中[{}]奖励时更新学生金币信息出错", student.getId(), awardType, awardContent, e);
                         return ServerResponse.createByErrorMessage("更新学生金币信息出错!");
@@ -588,7 +588,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                     runLog.setCourseId(student.getCourseId());
                     try {
                         runLogMapper.insert(runLog);
-                        student = studentMapper.selectById(student.getId());
+                        student = simpleStudentMapper.selectById(student.getId());
                         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
                         getLevel(session);
                     } catch (Exception e) {
@@ -597,11 +597,11 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 }
             } else {
                 // 领取勋章奖励
-                medal = medalMapper.selectById(award.getMedalType());
+                medal = simpleMedalMapper.selectById(award.getMedalType());
                 awardType = "勋章";
                 awardContent = medal.getMarkedWords();
                 msg = "id为[" + student.getId() + "]的学生[" + student.getStudentName() + "]在["
-                        + DateUtil.DateTime(new Date()) + "]领取了勋章[" + medal.getParentName() + "-" + medal.getChildName() + "]#" + medal.getChildImgUrl() + "# ";
+                        + SimpleDateUtil.DateTime(new Date()) + "]领取了勋章[" + medal.getParentName() + "-" + medal.getChildName() + "]#" + medal.getChildImgUrl() + "# ";
                 RunLog runLog = new RunLog(student.getId(), 7, msg, new Date());
                 runLog.setCourseId(student.getCourseId());
                 runLog.setUnitId(student.getUnitId());

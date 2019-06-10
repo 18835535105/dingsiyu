@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.common.study.simple;
 
-import com.zhidejiaoyu.common.mapper.simple.LearnMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleLearnMapper;
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.LearnExample;
 import com.zhidejiaoyu.common.pojo.SimpleCapacity;
@@ -22,7 +22,7 @@ public class SimpleMemoryDifficultyUtil {
 
 
     @Autowired
-    private LearnMapper learnMapper;
+    private SimpleLearnMapper learnMapper;
 
     @Autowired
     private SimpleCommonMethod simpleCommonMethod;

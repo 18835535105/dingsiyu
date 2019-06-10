@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimpleStudentStudyPlanMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentStudyPlan">
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId" />
+        <result column="course_id" property="courseId" />
+        <result column="start_unit_id" property="startUnitId" />
+        <result column="end_unit_id" property="endUnitId" />
+        <result column="type" property="type"/>
+        <result column="complete" property="complete"/>
+        <result column="current_study_count" property="currentStudyCount"/>
+        <result column="total_study_count" property="totalStudyCount"/>
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    <sql id="base_sql">
+        id,
+        student_id,
+        course_id,
+        start_unit_id,
+        end_unit_id,
+        type,
+        complete,
+        current_study_count,
+        total_study_count,
+        update_time
+    </sql>
+    <select id="getCourseId" parameterType="long" resultType="long">
+        select course_id from student_study_plan where student_id=#{studentId} group by course_id
+    </select>
+
+</mapper>

@@ -102,7 +102,7 @@ public class WeekUtil {
 		c.set(Calendar.DAY_OF_MONTH, 1);
 		// 1号的日期
 		d = c.getTime();
-		return DateUtil.formatYYYYMMDD(d);
+		return SimpleDateUtil.formatYYYYMMDD(d);
 	}
 
 	public static void main(String[] args) {

@@ -10,7 +10,7 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.study.simple.SimpleGoldMemoryTime;
 import com.zhidejiaoyu.common.utils.simple.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
 import com.zhidejiaoyu.student.service.simple.SimpleBookServiceSimple;
@@ -30,7 +30,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<VocabularyMapper, Vocabulary> implements SimpleBookServiceSimple {
+public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<SimpleVocabularyMapper, Vocabulary> implements SimpleBookServiceSimple {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -38,34 +38,34 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<Vocabular
     private SimpleCommonMethod simpleCommonMethod;
 
     @Autowired
-    private LearnMapper learnMapper;
+    private SimpleLearnMapper learnMapper;
 
     @Autowired
-    private RunLogMapper runLogMapper;
+    private SimpleRunLogMapper runLogMapper;
 
     @Autowired
     private BaiduSpeak baiduSpeak;
 
     @Autowired
-    private VocabularyMapper vocabularyMapper;
+    private SimpleVocabularyMapper vocabularyMapper;
 
     @Autowired
-    private SentenceMapper sentenceMapper;
+    private SimpleSentenceMapper simpleSentenceMapper;
 
     @Autowired
-    private StudyCountMapper studyCountMapper;
+    private SimpleStudyCountMapper simpleStudyCountMapper;
 
     @Autowired
-    private UnitMapper unitMapper;
+    private SimpleUnitMapper unitMapper;
 
     @Autowired
-    private CapacityReviewMapper capacityReviewMapper;
+    private SimpleCapacityReviewMapper simpleCapacityReviewMapper;
 
     @Autowired
-    private UnitVocabularyMapper unitVocabularyMapper;
+    private SimpleUnitVocabularyMapper simpleUnitVocabularyMapper;
 
     @Autowired
-    private CourseMapper courseMapper;
+    private SimpleCourseMapper simpleCourseMapper;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -188,7 +188,7 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<Vocabular
             // 学生当前模块总单词数
             List<Unit> units = unitMapper.selectList(new EntityWrapper<Unit>().in("course_id", courseIds));
             List<Long> unitIds = getUnitIdsFromUnits(units);
-            total = unitVocabularyMapper.countWordByUnitIds(unitIds);
+            total = simpleUnitVocabularyMapper.countWordByUnitIds(unitIds);
         }
         long know = learnedCount - notKnow;
 
@@ -210,7 +210,7 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<Vocabular
      * @return
      */
     private List<Long> getAllCourseIdInTypeStr(String typeStr, Long studentId) {
-        List<Map<String, Object>> maps = courseMapper.selectAllCourseByStuIdAndType(studentId, typeStr);
+        List<Map<String, Object>> maps = simpleCourseMapper.selectAllCourseByStuIdAndType(studentId, typeStr);
         List<Long> courseIds = new ArrayList<>(maps.size());
         maps.parallelStream().forEach(map -> courseIds.add(Long.valueOf(map.get("id").toString())));
         return courseIds;
@@ -225,7 +225,7 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<Vocabular
     private Long getWordCountInCourse(Long courseId) {
         List<Unit> units = unitMapper.selectList(new EntityWrapper<Unit>().eq("course_id", courseId));
         List<Long> unitIds = getUnitIdsFromUnits(units);
-        return unitVocabularyMapper.countWordByUnitIds(unitIds);
+        return simpleUnitVocabularyMapper.countWordByUnitIds(unitIds);
     }
 
     private List<Long> getUnitIdsFromUnits(List<Unit> units) {
@@ -277,7 +277,7 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<Vocabular
             return ServerResponse.createByErrorMessage("初始化学习记录失败！");
         }
 
-        Integer maxCount = studyCountMapper.selectMaxCountByCourseId(studentId, courseId);
+        Integer maxCount = simpleStudyCountMapper.selectMaxCountByCourseId(studentId, courseId);
         // 再学一遍时，在 study_count 中新增一条记录，用于记录下一遍的课程学习次数
         StudyCount studyCount = new StudyCount();
         studyCount.setStudyCount(0);
@@ -285,7 +285,7 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<Vocabular
         studyCount.setCourseId(courseId);
         studyCount.setStudentId(studentId);
         try {
-            studyCountMapper.insert(studyCount);
+            simpleStudyCountMapper.insert(studyCount);
         } catch (Exception e) {
             log.error("新增再学一遍记录失败！", e);
             RunLog runLog = new RunLog(2, "新增再学一遍记录失败！", new Date());
@@ -300,12 +300,12 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<Vocabular
     public ServerResponse<String> restudy(HttpSession session, Long courseId, Long unitId, Long[] wordIds, Integer studyModel) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         // 查询当前学生当前课程的学习遍数
-        Integer maxStudyCount = studyCountMapper.selectMaxCountByCourseId(student.getId(), courseId);
+        Integer maxStudyCount = simpleStudyCountMapper.selectMaxCountByCourseId(student.getId(), courseId);
         // 更新学习记录
         learnMapper.updateUnknownWords(student, unitId, courseId, wordIds, studyModel, maxStudyCount == null ? 1 : maxStudyCount);
         // 更新记忆追踪记录
         // 根据条件查询单词是否已经在记忆追踪中，如果在更新记忆追踪；如果不在新增记忆追踪
-        List<Long> updateIds = capacityReviewMapper.selectByWordIdsAndStudyModel(student, courseId, unitId, wordIds, studyModel);
+        List<Long> updateIds = simpleCapacityReviewMapper.selectByWordIdsAndStudyModel(student, courseId, unitId, wordIds, studyModel);
         Double memoryStrength = 0.12;
         Date push = SimpleGoldMemoryTime.getGoldMemoryTime(memoryStrength, new Date());
         if (updateIds.size() < wordIds.length) {
@@ -326,12 +326,12 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<Vocabular
                 List<Vocabulary> vocabularies = vocabularyMapper.selectByWordIds(insertIds);
                 Set<Long> idSet = new HashSet<>();
                 vocabularies.forEach(vocabulary -> idSet.add(vocabulary.getId()));
-                Map<Long, Map<Long, String>> wordChineseMap = unitVocabularyMapper.selectWordChineseMapByUnitIdAndWordIds(unitId, idSet);
+                Map<Long, Map<Long, String>> wordChineseMap = simpleUnitVocabularyMapper.selectWordChineseMapByUnitIdAndWordIds(unitId, idSet);
 
                 for (Vocabulary vocabulary : vocabularies) {
                     capacityReview = new CapacityReview();
                     capacityReview.setClassify(studyModel.toString());
-                    capacityReview.setPush(DateUtil.formatYYYYMMDDHHMMSS(push));
+                    capacityReview.setPush(SimpleDateUtil.formatYYYYMMDDHHMMSS(push));
                     capacityReview.setStudent_id(student.getId());
                     capacityReview.setUnit_id(unitId);
                     capacityReview.setCourse_id(courseId);
@@ -344,11 +344,11 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<Vocabular
                     capacityReviews.add(capacityReview);
                 }
             } else {
-                List<Sentence> sentences = sentenceMapper.selectByIds(insertIds);
+                List<Sentence> sentences = simpleSentenceMapper.selectByIds(insertIds);
                 for (Sentence sentence : sentences) {
                     capacityReview = new CapacityReview();
                     capacityReview.setClassify(studyModel.toString());
-                    capacityReview.setPush(DateUtil.formatYYYYMMDDHHMMSS(push));
+                    capacityReview.setPush(SimpleDateUtil.formatYYYYMMDDHHMMSS(push));
                     capacityReview.setStudent_id(student.getId());
                     capacityReview.setUnit_id(unitId);
                     capacityReview.setCourse_id(courseId);
@@ -360,10 +360,10 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<Vocabular
                     capacityReviews.add(capacityReview);
                 }
             }
-            capacityReviewMapper.insertByBatch(capacityReviews, studyModel);
+            simpleCapacityReviewMapper.insertByBatch(capacityReviews, studyModel);
         }
         if (updateIds.size() > 0) {
-            capacityReviewMapper.updatePushAndMemoryStrengthByPrimaryKeys(updateIds, push, memoryStrength, studyModel);
+            simpleCapacityReviewMapper.updatePushAndMemoryStrengthByPrimaryKeys(updateIds, push, memoryStrength, studyModel);
         }
         return ServerResponse.createBySuccess();
     }

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimpleSentenceMapper">
+
+    <!-- 多表关联查询sentence对象 -->
+    <sql id="relevance_base_sql">
+        s.id, s.centreExample, s.centreTranslate, s.ExampleDisturb, s.TranslateDisturb
+    </sql>
+
+    <!-- 新增sql片段 -->
+    <sql id="insertSentence_sql">
+
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+
+            <if test="centreExample != null">
+                centreExample,
+            </if>
+            <if test="centreTranslate != null">
+                centreTranslate,
+            </if>
+            <if test="exampleDisturb != null">
+                exampleDisturb,
+            </if>
+            <if test="translateDisturb != null">
+                translateDisturb,
+            </if>
+
+        </trim>
+
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+
+            <if test="centreExample != null">
+                #{centreExample},
+            </if>
+            <if test="centreTranslate != null">
+                #{centreTranslate},
+            </if>
+            <if test="ExampleDisturb != null">
+                #{exampleDisturb},
+            </if>
+            <if test="TranslateDisturb != null">
+                #{translateDisturb},
+            </if>
+        </trim>
+
+    </sql>
+
+    <!-- 修改sql片段 -->
+    <sql id="sentenceUpdate_sql">
+        <set>
+            <if test="centreExample != null">
+                centreExample = #{centreExample},
+            </if>
+            <if test="centreTranslate != null">
+                centreTranslate = #{centreTranslate},
+            </if>
+            <if test="ExampleDisturb != null">
+                ExampleDisturb = #{ExampleDisturb},
+            </if>
+            <if test="TranslateDisturb != null">
+                TranslateDisturb = #{TranslateDisturb},
+            </if>
+        </set>
+    </sql>
+
+    <!-- 获取当前单元下的所有例句 -->
+    <select id="selectByUnitId" parameterType="java.lang.Long"
+            resultType="com.zhidejiaoyu.common.pojo.Sentence">
+        select *
+        from sentence a INNER JOIN unit_sentence b ON a.id = b.sentence_id and b.unit_id = #{unitId};
+    </select>
+
+    <!-- 分页数据 -->
+    <!--
+    <select id="sentencePage"
+           parameterType="com.zhidejiaoyu.common.pojo.Sentence"
+           resultType="com.zhidejiaoyu.common.pojo.Sentence">
+       select * from sentence
+       <where>
+           <if test="centreExample != null and centreExample != '' ">
+               centreExample like "%"#{centreExample}"%"
+           </if>
+       </where>
+       order by id desc
+   </select> -->
+    <select id="sentencePage" parameterType="map" resultType="com.zhidejiaoyu.common.pojo.Sentence">
+        select
+        c.*
+        from
+        unit a JOIN unit_sentence b on a.id = b.unit_id JOIN sentence c on b.sentence_id = c.id
+        <if test="course_id != null and course_id != '' ">
+            AND a.course_id = #{course_id}
+        </if>
+        <if test="sentence != null and sentence != '' ">
+            AND c.centreExample like "%"#{sentence}"%"
+        </if>
+        GROUP BY c.id order by c.id desc
+    </select>
+
+
+    <!-- 新增 -->
+    <insert id="sentenceAdd"
+            parameterType="com.zhidejiaoyu.common.pojo.Sentence">
+        insert into sentence
+        <include refid="insertSentence_sql"/>
+    </insert>
+
+    <!-- 编辑 -->
+    <update id="sentenceEdit"
+            parameterType="com.zhidejiaoyu.common.pojo.Sentence">
+        update sentence
+        <include refid="sentenceUpdate_sql"/>
+        where id = #{id}
+    </update>
+
+    <!-- 根据id显示数据 -->
+    <select id="editshow" parameterType="int" resultType="com.zhidejiaoyu.common.pojo.Sentence">
+        select *
+        from sentence
+        where id = #{id}
+    </select>
+
+    <!-- 根据例句id和学段查询当前例句的翻译 -->
+    <select id="selectChineseByIdAndPhase" parameterType="map"
+            resultType="java.lang.String">
+        select
+        <if test="phase == '高中'">
+            tallTranslate
+        </if>
+        <if test="phase == '初中'">
+            centreTranslate
+        </if>
+        from sentence where id = #{id}
+    </select>
+    <select id="selectUnKnowSentenceByUnitId" parameterType="map" resultType="com.zhidejiaoyu.common.pojo.Sentence">
+        select
+        <include refid="relevance_base_sql"/>
+        from sentence s,learn l where s.id = l.example_id and
+        l.example_id is not null and
+        l.unit_id = #{unitId} and l.student_id = #{studentId} and l.study_model = #{studyModel}
+        <if test="condition == 2">
+            -- 生句
+            and l.`status` = 0
+        </if>
+        <if test="condition == 3">
+            -- 熟句
+            and l.`status` = 1
+        </if>
+    </select>
+    <select id="selectUnLearnedSentenceByUnitId" parameterType="map" resultType="com.zhidejiaoyu.common.pojo.Sentence">
+        select
+        <include refid="relevance_base_sql"/>
+        from sentence s where s.id not in (select l.example_id from learn l where l.example_id is not null and
+        l.unit_id = #{unitId} and l.student_id = #{studentId} and l.study_model = #{studyModel})
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultType="com.zhidejiaoyu.common.pojo.Sentence">
+        select *
+        from sentence
+        where id = #{exampleId}
+    </select>
+    <select id="selectByWords" parameterType="java.util.List" resultType="com.zhidejiaoyu.common.pojo.Sentence">
+        select * from sentence where word in
+        <foreach collection="words" open="(" close=")" item="word" separator=",">
+            word
+        </foreach>
+    </select>
+    <select id="selectOneSentenceNotInIds" resultType="com.zhidejiaoyu.common.pojo.Sentence" parameterType="map">
+        SELECT
+        <include refid="relevance_base_sql"/>
+        FROM
+        sentence s,
+        unit_sentence us
+        WHERE
+        s.id = us.sentence_id
+        AND us.unit_id = #{unitId}
+        <if test="ids.size > 0">
+            AND s.id NOT IN (
+            <foreach collection="ids" separator="," item="id">
+                #{id}
+            </foreach>
+            )
+        </if>
+        ORDER BY s.id ASC
+        LIMIT 1
+    </select>
+    <select id="selectByIds" resultType="com.zhidejiaoyu.common.pojo.Sentence" parameterType="map">
+        SELECT
+        <include refid="relevance_base_sql"/>
+        FROM sentence WHERE id IN (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </select>
+    <select id="selectUnKnowSentenceByCourseId" resultType="com.zhidejiaoyu.common.pojo.Sentence" parameterType="map">
+        select
+        <include refid="relevance_base_sql"/>
+        from sentence s,learn l where s.id = l.example_id and
+        l.example_id is not null and
+        l.course_id = #{courseId} and l.student_id = #{studentId} and l.study_model = #{studyModel}
+        <if test="condition == 2">
+            -- 生句
+            and l.`status` = 0
+        </if>
+        <if test="condition == 3">
+            -- 熟句
+            and l.`status` = 1
+        </if>
+    </select>
+    <select id="selectUnLearnedSentenceByCourseId" resultType="com.zhidejiaoyu.common.pojo.Sentence" parameterType="map">
+        select
+        <include refid="relevance_base_sql"/>
+        from sentence s where s.id not in (select l.example_id from learn l where l.example_id is not null and
+        l.course_id = #{courseId} and l.student_id = #{studentId} and l.study_model = #{studyModel})
+    </select>
+
+    <!-- 新增 主建返回-->
+    <insert id="insertSentence"
+            parameterType="com.zhidejiaoyu.common.pojo.Sentence" useGeneratedKeys="true" keyColumn="id"
+            keyProperty="id">
+        insert into sentence
+        <include refid="insertSentence_sql"/>
+    </insert>
+
+    <!-- 删除例句和单元的关联 -->
+    <delete id="delUnit_vocabulary" parameterType="map">
+        delete from
+            unit_sentence
+        where sentence_id = #{id} ${unit_id}
+    </delete>
+
+</mapper>

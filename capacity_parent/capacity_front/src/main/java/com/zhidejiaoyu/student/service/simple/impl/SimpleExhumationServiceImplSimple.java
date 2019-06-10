@@ -1,11 +1,11 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
-import com.zhidejiaoyu.common.mapper.simple.ExhumationMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleExhumationMapper;
 import com.zhidejiaoyu.common.pojo.Exhumation;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.simple.AwardUtil;
 import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
-import com.zhidejiaoyu.student.service.simple.ExhumationService;
+import com.zhidejiaoyu.student.service.simple.SimpleExhumationServiceSimple;
 import com.zhidejiaoyu.student.service.simple.SimpleStudentSkinServiceSimple;
 import com.zhidejiaoyu.student.service.simple.SimpleSyntheticRewardsListServiceSimple;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +26,10 @@ import java.util.Map;
  * @since 2018-11-19
  */
 @Service
-public class SimpleExhumationServiceImplSimple extends SimpleBaseServiceImpl<ExhumationMapper, Exhumation> implements ExhumationService {
+public class SimpleExhumationServiceImplSimple extends SimpleBaseServiceImpl<SimpleExhumationMapper, Exhumation> implements SimpleExhumationServiceSimple {
 
     @Autowired
-    private ExhumationMapper exhumationMapper;
+    private SimpleExhumationMapper simpleExhumationMapper;
 
     @Autowired
     private SimpleSyntheticRewardsListServiceSimple synService;
@@ -38,7 +38,7 @@ public class SimpleExhumationServiceImplSimple extends SimpleBaseServiceImpl<Exh
 
     @Override
     public int addExhumation(String name, String imgUrl, int type, Date date,Integer studentId,String finalName) {
-        return exhumationMapper.insert(getExhumation(name,imgUrl,type,date,studentId,finalName));
+        return simpleExhumationMapper.insert(getExhumation(name,imgUrl,type,date,studentId,finalName));
     }
 
     /**
@@ -48,7 +48,7 @@ public class SimpleExhumationServiceImplSimple extends SimpleBaseServiceImpl<Exh
      */
     @Override
     public List<Exhumation> selExhumationByStudentId(Integer studentId) {
-        return exhumationMapper.selExhumation(studentId);
+        return simpleExhumationMapper.selExhumation(studentId);
     }
 
     /**
@@ -73,13 +73,13 @@ public class SimpleExhumationServiceImplSimple extends SimpleBaseServiceImpl<Exh
         Map<String,Object> selmap=new HashMap<>();
         selmap.put("name",name);
         selmap.put("studentId",student.getId());
-        List<Integer> integers = exhumationMapper.selExhumationId(selmap);
+        List<Integer> integers = simpleExhumationMapper.selExhumationId(selmap);
         //查看每个手套碎片合成的数量
         Map<String,Object> selMap=new HashMap<>();
         selMap.put("name",name);
         selMap.put("finalName",finalName);
         selMap.put("studentId",student.getId());
-        Integer count=exhumationMapper.selExhumationCountByNameAndFinalName(selMap);
+        Integer count= simpleExhumationMapper.selExhumationCountByNameAndFinalName(selMap);
         if(nameInage ==4){
             if(count != null){
                 if(count+number>6){
@@ -101,7 +101,7 @@ public class SimpleExhumationServiceImplSimple extends SimpleBaseServiceImpl<Exh
             Map<String,Object> map=new HashMap<>();
             map.put("finalName",finalName);
             map.put("id",integers.get(i));
-            exhumationMapper.updExhumationFinalNameById(map);
+            simpleExhumationMapper.updExhumationFinalNameById(map);
         }
         //type==1时说明可以合成手套或花瓣
         if(type==1){
@@ -138,13 +138,13 @@ public class SimpleExhumationServiceImplSimple extends SimpleBaseServiceImpl<Exh
         selmap.put("name",name);
         selmap.put("studentId",student.getId());
         //获取未使用的碎片id
-        List<Integer> integers = exhumationMapper.selSkinExhumationId(selmap);
+        List<Integer> integers = simpleExhumationMapper.selSkinExhumationId(selmap);
         //使用碎片
         for(int i=0;i<number;i++){
             Map<String,Object> map=new HashMap<>();
             map.put("finalName",finalName);
             map.put("id",integers.get(i));
-            exhumationMapper.updExhumationFinalNameById(map);
+            simpleExhumationMapper.updExhumationFinalNameById(map);
         }
         //当合成最终皮肤时添加皮肤
         if(type==1){

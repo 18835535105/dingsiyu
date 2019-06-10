@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
 
-import com.zhidejiaoyu.common.mapper.simple.StudentExpansionMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleStudentExpansionMapper;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.student.service.simple.SimpleIStudentExpansionServiceSimple;
 import org.springframework.stereotype.Service;
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2019-03-15
  */
 @Service
-public class StudentExpansionServiceImplSimpleSimple extends SimpleBaseServiceImpl<StudentExpansionMapper, StudentExpansion> implements SimpleIStudentExpansionServiceSimple {
+public class StudentExpansionServiceImplSimpleSimple extends SimpleBaseServiceImpl<SimpleStudentExpansionMapper, StudentExpansion> implements SimpleIStudentExpansionServiceSimple {
 
 }

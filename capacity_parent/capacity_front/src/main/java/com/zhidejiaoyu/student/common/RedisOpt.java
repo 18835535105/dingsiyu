@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.common;
 
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.simple.SimpleCourseMapper;
 import com.zhidejiaoyu.common.pojo.PhoneticSymbol;
 import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
@@ -41,7 +42,7 @@ public class RedisOpt {
     private PhoneticSymbolMapper phoneticSymbolMapper;
 
     @Autowired
-    private com.zhidejiaoyu.common.mapper.simple.CourseMapper courseMapper;
+    private SimpleCourseMapper simpleCourseMapper;
 
     @Autowired
 
@@ -108,7 +109,7 @@ public class RedisOpt {
      */
     private List<Map> getCourses(Long studentId, String typeStr) {
         List<Map> courseList;
-        courseList = courseMapper.getSimpleCourseByStudentIdByType(studentId, typeStr);
+        courseList = simpleCourseMapper.getSimpleCourseByStudentIdByType(studentId, typeStr);
         if (courseList.size() > 0) {
             courseList.forEach(c -> {
                 if (c.get("version") != null && c.get("version").toString().contains("冲刺版")) {
@@ -133,14 +134,14 @@ public class RedisOpt {
         Object object = getRedisObject(unitWordSumKey);
         Map<Long, Map<Long, Object>> unitWordSum;
         if (object == null) {
-            unitWordSum = courseMapper.unitsWordSum(courseId);
+            unitWordSum = simpleCourseMapper.unitsWordSum(courseId);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, unitWordSumKey, unitWordSum);
         } else {
             try {
                 unitWordSum = (Map<Long, Map<Long, Object>>) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], courseId=[{}], error=[{}]", object, courseId, e.getMessage());
-                unitWordSum = courseMapper.unitsWordSum(courseId);
+                unitWordSum = simpleCourseMapper.unitsWordSum(courseId);
                 log.error("重新查询数据：unitWordSum=[{}]", unitWordSum);
             }
         }

@@ -2,7 +2,7 @@ package com.zhidejiaoyu.student.controller.simple;
 
 import com.zhidejiaoyu.common.Vo.simple.StudentGauntletVo;
 import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
-import com.zhidejiaoyu.student.service.simple.IGauntletService;
+import com.zhidejiaoyu.student.service.simple.SimpleIGauntletServiceSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +24,7 @@ import java.util.Map;
 public class SimpleGauntletController {
 
     @Autowired
-    private IGauntletService gauntletService;
+    private SimpleIGauntletServiceSimple gauntletService;
 
     /**
      * 查询挑战的学生

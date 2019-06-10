@@ -8,7 +8,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentCourse;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.simple.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.CalculateTimeUtil;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleCalculateTimeUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
@@ -33,61 +33,61 @@ import java.util.*;
 @Slf4j
 @Service
 @Transactional
-public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseMapper, Course> implements SimpleCourseService {
+public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<SimpleCourseMapper, Course> implements SimpleCourseService {
 
     /**
      * 注入课程mapper
      */
     @Autowired
-    private CourseMapper courseMapper;
+    private SimpleCourseMapper simpleCourseMapper;
 
     @Autowired
-    private VocabularyMapper vocabularyMapper;
+    private SimpleVocabularyMapper vocabularyMapper;
 
     @Autowired
-    private LearnMapper learnMapper;
+    private SimpleLearnMapper learnMapper;
 
     @Autowired
-    private CapacityMemoryMapper capacityMemoryMapper;
+    private SimpleCapacityMemoryMapper simpleCapacityMemoryMapper;
 
     @Autowired
-    private CapacityListenMapper capacityListenMapper;
+    private SimpleCapacityListenMapper capacityListenMapper;
 
     @Autowired
-    private CapacityWriteMapper capacityWriteMapper;
+    private SimpleCapacityWriteMapper simpleCapacityWriteMapper;
 
     @Autowired
-    private SentenceListenMapper sentenceListenMapper;
+    private SimpleSentenceListenMapper simpleSentenceListenMapper;
 
     @Autowired
-    private SentenceWriteMapper sentenceWriteMapper;
+    private SimpleSentenceWriteMapper simpleSentenceWriteMapper;
 
     @Autowired
-    private SentenceMapper sentenceMapper;
+    private SimpleSentenceMapper simpleSentenceMapper;
 
     @Autowired
-    private SentenceTranslateMapper sentenceTranslateMapper;
+    private SimpleSentenceTranslateMapper simpleSentenceTranslateMapper;
 
     @Autowired
-    private StudentMapper studentMapper;
+    private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
-    private UnitMapper unitMapper;
+    private SimpleUnitMapper unitMapper;
 
     @Autowired
-    private TestRecordMapper testRecordMapper;
+    private SimpleTestRecordMapper simpleTestRecordMapper;
 
     @Autowired
-    private StudentCourseMapper studentCourseMapper;
-
-    @Autowired
-    private StudentUnitMapper studentUnitMapper;
+    private SimpleStudentCourseMapper simpleStudentCourseMapper;
 
     @Autowired
     private SimpleStudentUnitMapper simpleStudentUnitMapper;
 
     @Autowired
-    private SimpleCapacityMapper simpleCapacityMapper;
+    private SimpleSimpleStudentUnitMapper simpleSimpleStudentUnitMapper;
+
+    @Autowired
+    private SimpleSimpleCapacityMapper simpleSimpleCapacityMapper;
 
     @Autowired
     private SimpleCommonMethod simpleCommonMethod;
@@ -101,7 +101,7 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
         long id = StudentIdBySession(session);
 
         // 去student_unit查询分配的所有年级
-        List<String> list = courseMapper.chooseGrade(id);
+        List<String> list = simpleCourseMapper.chooseGrade(id);
 
         Course cou = new Course();
         cou.setId(Long.valueOf(id));
@@ -114,7 +114,7 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
             result.put("grade", grade);
 
             cou.setGrade(grade);
-            List<Map<String, Object>> listMap = courseMapper.chooseGradeToLabel(cou);
+            List<Map<String, Object>> listMap = simpleCourseMapper.chooseGradeToLabel(cou);
 
             result.put("listLabel", listMap);
             result.put("msg", false);
@@ -125,17 +125,17 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
 
     @Override
     public List<Course> retGrade() {
-        return courseMapper.retGrade();
+        return simpleCourseMapper.retGrade();
     }
 
     @Override
     public List<Course> retVersion(String grade) {
-        return courseMapper.retVersion(grade);
+        return simpleCourseMapper.retVersion(grade);
     }
 
     @Override
     public List<Course> retLabel(String grade, String version) {
-        return courseMapper.retLabel(grade, version);
+        return simpleCourseMapper.retLabel(grade, version);
     }
 
     @Override
@@ -155,7 +155,7 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
             // 获取慧记忆模块本课程已学单词量和达到黄金记忆点的待复习单词量
             studyModel = "慧记忆";
             learnedCount = learnMapper.countByCourseId(studentId, courseId, studyModel);
-            pushCount = capacityMemoryMapper.countNeedReviewByStudentIdAndCourseId(studentId, courseId);
+            pushCount = simpleCapacityMemoryMapper.countNeedReviewByStudentIdAndCourseId(studentId, courseId);
             this.packageMemoryVo(learnedCount, pushCount, wordCount, studyModel, vos);
 
             studyModel = "单词图鉴";
@@ -173,28 +173,28 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
             // 获取慧默写模块本课程已学单词量和达到黄金记忆点的待复习单词量
             studyModel = "慧默写";
             learnedCount = learnMapper.countByCourseId(studentId, courseId, studyModel);
-            pushCount = capacityWriteMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
+            pushCount = simpleCapacityWriteMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
             this.packageMemoryVo(learnedCount, pushCount, wordCount, studyModel, vos);
 
         } else {
             // 当前课程下例句总量
-            int sentenceCount = sentenceMapper.countByCourseId(courseId);
+            int sentenceCount = simpleSentenceMapper.countByCourseId(courseId);
             // 获取例句听力模块本课程已学例句量和达到黄金记忆点的待复习例句量
             studyModel = "例句听力";
             learnedCount = learnMapper.countByCourseId(studentId, courseId, studyModel);
-            pushCount = sentenceListenMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
+            pushCount = simpleSentenceListenMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
             this.packageMemoryVo(learnedCount, pushCount, sentenceCount, studyModel, vos);
 
             // 获取例句翻译模块本课程已学例句量和达到黄金记忆点的待复习例句量
             studyModel = "例句翻译";
             learnedCount = learnMapper.countByCourseId(studentId, courseId, studyModel);
-            pushCount = sentenceTranslateMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
+            pushCount = simpleSentenceTranslateMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
             this.packageMemoryVo(learnedCount, pushCount, sentenceCount, studyModel, vos);
 
             // 获取例句翻译模块本课程已学例句量和达到黄金记忆点的待复习例句量
             studyModel = "例句默写";
             learnedCount = learnMapper.countByCourseId(studentId, courseId, studyModel);
-            pushCount = sentenceWriteMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
+            pushCount = simpleSentenceWriteMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
             this.packageMemoryVo(learnedCount, pushCount, sentenceCount, studyModel, vos);
         }
         return ServerResponse.createBySuccess(vos);
@@ -219,7 +219,7 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
         Map result = new HashMap();
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
-        String time = DateUtil.DateTime();
+        String time = SimpleDateUtil.DateTime();
 
         int fxlA = 0;
         int fxlB = 0;
@@ -234,12 +234,12 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
         // 单词辨音; 词组辨音; 快速单词; 快速词组; 词汇考点; 快速句型; 语法辨析; 单词默写; 词组默写
         for (int a = 1; a <= 9; a++) {
             // 1.该模型所有需要复习的课程id
-            List<Integer> course_ids0 = simpleCapacityMapper.getReviewCourseIdAllByModel(studentId, a, time);
+            List<Integer> course_ids0 = simpleSimpleCapacityMapper.getReviewCourseIdAllByModel(studentId, a, time);
 
 
             for (Integer course_id : course_ids0) {
                 // 2.返回:课程id  课程名course_name  模块名classify  复习量fxl
-                List<Map<String, Object>> map = simpleCapacityMapper.selectStatusBigTenNine(studentId, course_id, a, time);
+                List<Map<String, Object>> map = simpleSimpleCapacityMapper.selectStatusBigTenNine(studentId, course_id, a, time);
                 for (Map<String, Object> map2 : map) {
                     map2.put("state", Integer.parseInt(map2.get("fxl").toString()) >= 10);
                     if (map2.get("course_name") != null && map2.get("course_name").toString().contains("冲刺版")) {
@@ -296,12 +296,12 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
 
         Map<String, Object> result = new HashMap<String, Object>();
 
-        Integer capacityMemory = capacityMemoryMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
+        Integer capacityMemory = simpleCapacityMemoryMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
         Integer capacityListen = capacityListenMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
-        Integer capacityWrite = capacityWriteMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
-        Integer sentenceListen = sentenceListenMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
-        Integer sentenceTranslate = sentenceTranslateMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
-        Integer sentenceWrite = sentenceWriteMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
+        Integer capacityWrite = simpleCapacityWriteMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
+        Integer sentenceListen = simpleSentenceListenMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
+        Integer sentenceTranslate = simpleSentenceTranslateMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
+        Integer sentenceWrite = simpleSentenceWriteMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
         result.put("capacityMemory", capacityMemory);
         result.put("capacityListen", capacityListen);
         result.put("capacityWrite", capacityWrite);
@@ -333,7 +333,7 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
             // 通过课程名查找learn表中最大的学习时间
             String learnTime = learnMapper.selectBylLearn_time(studentCourse.getCourseId(), studentId);
             if (StringUtils.isNotEmpty(learnTime)) {
-                map.put("learn_time", CalculateTimeUtil.CalculateTime(learnTime));
+                map.put("learn_time", SimpleCalculateTimeUtil.CalculateTime(learnTime));
             } else {
                 continue;
             }
@@ -367,7 +367,7 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
     public ServerResponse<Object> postStudentByCourse(Integer courseId, Integer model, HttpSession session) {
         long id = StudentIdBySession(session);
         // 根据unitId获取
-        Map<String, Object> map = courseMapper.postStudentByCourse(courseId);
+        Map<String, Object> map = simpleCourseMapper.postStudentByCourse(courseId);
 
         Student student = new Student();
         Learn record = new Learn();
@@ -386,14 +386,14 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
             //student.setSentenceUnitName(map.get("unit_name").toString());
         }
         student.setId(id);
-        studentMapper.updateByPrimaryKeySelective(student);
+        simpleStudentMapper.updateByPrimaryKeySelective(student);
 
         // 保存到我的课程
         // 1.查询我的课程中是否存在该课程id-学生id
-        Integer scId = studentCourseMapper.selectCourseisExist(courseId, id);
+        Integer scId = simpleStudentCourseMapper.selectCourseisExist(courseId, id);
         if (scId == null) {
             // 2.根据课程id查询课程名
-            String courseName = courseMapper.selectByCourseName(courseId.toString());
+            String courseName = simpleCourseMapper.selectByCourseName(courseId.toString());
             // 3.保存
             StudentCourse sc = new StudentCourse();
             sc.setCourseId(Long.valueOf(courseId));
@@ -401,7 +401,7 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
             sc.setStudentId(id);
             sc.setUpdateTime(DateUtil.DateTime());
             sc.setType(model);
-            studentCourseMapper.insertSelective(sc);
+            simpleStudentCourseMapper.insertSelective(sc);
         }
 
         return ServerResponse.createBySuccess();
@@ -455,15 +455,15 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
             student.setSentenceUnitName(map.get("unit_name"));
         }
         student.setId(studentId);
-        studentMapper.updateByPrimaryKeySelective(student);
-        student = studentMapper.selectById(student.getId());
+        simpleStudentMapper.updateByPrimaryKeySelective(student);
+        student = simpleStudentMapper.selectById(student.getId());
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess();
     }
 
     @Override
     public ServerResponse<List<Map<String, Object>>> getAllUnit(Long courseId, Boolean showAll) {
-        List<Map<String, Object>> unitsInfo = courseMapper.getAllUnitInfos(courseId);
+        List<Map<String, Object>> unitsInfo = simpleCourseMapper.getAllUnitInfos(courseId);
         if (showAll && unitsInfo.size() > 0) {
             int totalWordCount = 0;
             Map<String, Object> map = new HashMap<>(16);
@@ -484,11 +484,11 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
         long studentId = StudentIdBySession(session);
         // 单词模块
         if (model == 1) {
-            studentMapper.updateUnitId(studentId, unitId);
+            simpleStudentMapper.updateUnitId(studentId, unitId);
             // 例句模块
             return ServerResponse.createBySuccess();
         } else {
-            studentMapper.updatesentenceUnitId(studentId, unitId);
+            simpleStudentMapper.updatesentenceUnitId(studentId, unitId);
             return ServerResponse.createBySuccess();
         }
     }
@@ -506,7 +506,7 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
         List<Map> courseList = redisOpt.getCourseListInType(studentId, typeStr);
 
         // 2.获取选择模块正在学习的课程id
-        Long courseId = simpleStudentUnitMapper.getCourseIdByTypeToStudent(studentId, type);
+        Long courseId = simpleSimpleStudentUnitMapper.getCourseIdByTypeToStudent(studentId, type);
 
         int a = 0;
 
@@ -542,19 +542,19 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
         Student student = super.getStudent(session);
         Long studentId = student.getId();
         // 1.根据课程id获取所有单元(id, 单元名, 开启状态0未开启 1开启),	 返回 id, unit_name, word_status
-        List<Map> unitList = studentUnitMapper.getSimpleUnitByStudentIdByCourseId(studentId, courseId);
+        List<Map> unitList = simpleStudentUnitMapper.getSimpleUnitByStudentIdByCourseId(studentId, courseId);
 
         // 获取已经开启的单元id
-        Map<Long, Map<Long, Object>> map = studentUnitMapper.getOpenUnitId(studentId, courseId);
+        Map<Long, Map<Long, Object>> map = simpleStudentUnitMapper.getOpenUnitId(studentId, courseId);
 
         // 获取已经做了单元闯关测试的单元id
-        Map<Long, Map<Long, Object>> unitTest = testRecordMapper.getUnitTestByCourseId(courseId, studentId);
+        Map<Long, Map<Long, Object>> unitTest = simpleTestRecordMapper.getUnitTestByCourseId(courseId, studentId);
 
         // 2.查询学生当前模块正在学习的单元id
-        Long unitId = simpleStudentUnitMapper.getUnitIdByTypeToStudent(studentId, type);
+        Long unitId = simpleSimpleStudentUnitMapper.getUnitIdByTypeToStudent(studentId, type);
 
         // 获取课程下学生每个单元已学单词数量
-        Map<Long, Map<Long, Object>> learnWordSum = studentMapper.learnUnitsWordSum(studentId, courseId);
+        Map<Long, Map<Long, Object>> learnWordSum = simpleStudentMapper.learnUnitsWordSum(studentId, courseId);
 
         // 获取课程下每个单元单词总量
         Map<Long, Map<Long, Object>> unitWordSum = redisOpt.getWordCountWithUnitInCourse(courseId);
@@ -637,7 +637,7 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
     @Override
     public ServerResponse<Object> getSimpleTestWordCourseAll(long studentId) {
         // 1.获取当前学生当前模块关联的所有单词课程, 返回id,version
-        List<Map> courseList = courseMapper.getSimpleCourseByStudentIdByType(studentId, "单词");
+        List<Map> courseList = simpleCourseMapper.getSimpleCourseByStudentIdByType(studentId, "单词");
         return ServerResponse.createBySuccess(courseList);
     }
 
@@ -647,7 +647,7 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
     @Override
     public ServerResponse<Object> getStudentCourseAll(long studentId) {
         // 获取学生关联的所有课程名
-        List<String> courseAll = courseMapper.getStudentCourseAllByStudentId(studentId);
+        List<String> courseAll = simpleCourseMapper.getStudentCourseAllByStudentId(studentId);
         if (courseAll.size() > 0) {
             List<String> resultCourse = new ArrayList<>(courseAll.size());
             courseAll.forEach(course -> {
@@ -667,7 +667,7 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
     public ServerResponse<List<Map<String, Object>>> getAllCourse(HttpSession session, Integer type, Boolean isAll) {
         Student student = super.getStudent(session);
         String typeStr = simpleCommonMethod.getTestType(type);
-        List<Map<String, Object>> courseMap = courseMapper.selectAllCourseByStuIdAndType(student.getId(), typeStr);
+        List<Map<String, Object>> courseMap = simpleCourseMapper.selectAllCourseByStuIdAndType(student.getId(), typeStr);
 
         if (courseMap.size() > 0) {
             courseMap.forEach(map -> {
@@ -694,7 +694,7 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<CourseM
 
     @Override
     public ServerResponse<Object> postCourseIdAndUnitId(Long studentId, Long courseId, Long unitId, int model) {
-        simpleStudentUnitMapper.updateCourseIdAndUnitIdByCourseIdByModel(courseId, unitId, studentId, model);
+        simpleSimpleStudentUnitMapper.updateCourseIdAndUnitIdByCourseIdByModel(courseId, unitId, studentId, model);
         return ServerResponse.createBySuccess();
     }
 

@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.student.controller.simple;
 
 import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
-import com.zhidejiaoyu.student.service.simple.FeedBackService;
+import com.zhidejiaoyu.student.service.simple.SimpleFeedBackServiceSimple;
 import com.zhidejiaoyu.student.vo.feedbackvo.FeedBackInfoVO;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ import javax.servlet.http.HttpSession;
 public class SimpleFeedBackController {
 
     @Autowired
-    private FeedBackService feedBackService;
+    private SimpleFeedBackServiceSimple feedBackService;
 
     /**
      * 学生发起意见反馈页面数据获取

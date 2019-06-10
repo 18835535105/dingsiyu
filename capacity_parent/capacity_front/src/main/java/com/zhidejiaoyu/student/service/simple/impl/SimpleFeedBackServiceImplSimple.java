@@ -1,15 +1,16 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
 import com.zhidejiaoyu.common.constant.FileConstant;
-import com.zhidejiaoyu.common.mapper.simple.MessageBoardMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleMessageBoardMapper;
 import com.zhidejiaoyu.common.pojo.MessageBoard;
 import com.zhidejiaoyu.common.pojo.MessageBoardExample;
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.http.FtpUtil;
 import com.zhidejiaoyu.common.utils.simple.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
-import com.zhidejiaoyu.student.service.simple.FeedBackService;
+import com.zhidejiaoyu.student.service.FeedBackService;
+import com.zhidejiaoyu.student.service.simple.SimpleFeedBackServiceSimple;
 import com.zhidejiaoyu.student.utils.sensitiveword.SensitiveWordFilter;
 import com.zhidejiaoyu.student.vo.feedbackvo.FeedBackInfoList;
 import com.zhidejiaoyu.student.vo.feedbackvo.FeedBackInfoVO;
@@ -31,13 +32,13 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-public class SimpleFeedBackServiceImplSimple extends SimpleBaseServiceImpl<MessageBoardMapper, MessageBoard> implements FeedBackService {
+public class SimpleFeedBackServiceImplSimple extends SimpleBaseServiceImpl<SimpleMessageBoardMapper, MessageBoard> implements SimpleFeedBackServiceSimple {
 
     @Value("${ftp.prefix}")
     private String ftpPrefix;
 
     @Autowired
-    private MessageBoardMapper messageBoardMapper;
+    private SimpleMessageBoardMapper simpleMessageBoardMapper;
 
     @Autowired
     private FtpUtil ftpUtil;
@@ -60,7 +61,7 @@ public class SimpleFeedBackServiceImplSimple extends SimpleBaseServiceImpl<Messa
     @Override
     public ServerResponse cancelHint(HttpSession session) {
         Student student = getStudent(session);
-        messageBoardMapper.updateHintFlag(student.getId(), 2);
+        simpleMessageBoardMapper.updateHintFlag(student.getId(), 2);
         return ServerResponse.createBySuccess();
     }
 
@@ -83,9 +84,9 @@ public class SimpleFeedBackServiceImplSimple extends SimpleBaseServiceImpl<Messa
     public ServerResponse checkFeedBack(HttpSession session, String content, MultipartFile[] files) {
         Student student = getStudent(session);
         // 如果当前学生在禁言期，无法发起反馈
-        List<MessageBoard> messageBoards = messageBoardMapper.selectStopSpeakTime(student.getId());
+        List<MessageBoard> messageBoards = simpleMessageBoardMapper.selectStopSpeakTime(student.getId());
         if (messageBoards.size() > 0) {
-            return ServerResponse.createByErrorMessage("您已被禁言至 " + DateUtil.formatYYYYMMDDHHMMSS(messageBoards.get(0).getStopSpeakEndTime())
+            return ServerResponse.createByErrorMessage("您已被禁言至 " + SimpleDateUtil.formatYYYYMMDDHHMMSS(messageBoards.get(0).getStopSpeakEndTime())
                     + " ，在此期间无法反馈！");
         }
 
@@ -115,7 +116,7 @@ public class SimpleFeedBackServiceImplSimple extends SimpleBaseServiceImpl<Messa
     @Override
     public ServerResponse<String> cancelRedPoint(HttpSession httpSession) {
         Long studentId = getStudentId(httpSession);
-        messageBoardMapper.updateReadFlag(studentId, 4);
+        simpleMessageBoardMapper.updateReadFlag(studentId, 4);
         return ServerResponse.createBySuccess();
     }
 
@@ -133,7 +134,7 @@ public class SimpleFeedBackServiceImplSimple extends SimpleBaseServiceImpl<Messa
         messageBoard.setContent(content);
         messageBoard.setStudentId(student.getId());
 
-        messageBoardMapper.insert(messageBoard);
+        simpleMessageBoardMapper.insert(messageBoard);
     }
 
     /**
@@ -163,7 +164,7 @@ public class SimpleFeedBackServiceImplSimple extends SimpleBaseServiceImpl<Messa
             feedBackInfoList.setContent(messageBoard.getContent());
             feedBackInfoList.setHeadUrl(headUrl);
             feedBackInfoList.setRole(messageBoard.getRole());
-            feedBackInfoList.setTime(DateUtil.formatYYYYMMDDHHMMSS(messageBoard.getTime()));
+            feedBackInfoList.setTime(SimpleDateUtil.formatYYYYMMDDHHMMSS(messageBoard.getTime()));
 
             // 如果最后一条记录奖励金币数为0，说明当前学生不需要显示奖励金币提示
             if (i == size - 1) {
@@ -185,6 +186,6 @@ public class SimpleFeedBackServiceImplSimple extends SimpleBaseServiceImpl<Messa
         MessageBoardExample messageBoardExample = new MessageBoardExample();
         messageBoardExample.setOrderByClause("id asc");
         messageBoardExample.createCriteria().andStudentIdEqualTo(studentId);
-        return messageBoardMapper.selectByExample(messageBoardExample);
+        return simpleMessageBoardMapper.selectByExample(messageBoardExample);
     }
 }

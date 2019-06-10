@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimpleUnitMapper">
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Unit">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="course_id" property="courseId" jdbcType="BIGINT"/>
+        <result column="unit_name" property="unitName" jdbcType="VARCHAR"/>
+        <result column="joint_name" property="jointName" jdbcType="VARCHAR"/>
+        <result column="del_status" property="delStatus" jdbcType="INTEGER"/>
+        <result column="unit_index" property="unitIndex" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, course_id, unit_name, joint_name
+    </sql>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.UnitOneExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from unit
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from unit
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from unit
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.UnitOneExample">
+        delete from unit
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+
+    <insert id="insertList" parameterType="java.util.List">
+        insert into unit (id, course_id, unit_name,
+        joint_name,unit_index)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id,jdbcType=BIGINT}, #{item.courseId,jdbcType=BIGINT}, #{item.unitName,jdbcType=VARCHAR},
+            #{item.jointName,jdbcType=VARCHAR},#{item.unitIndex,jdbcType=INTEGER})
+        </foreach>
+
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Unit">
+        insert into unit
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="courseId != null">
+                course_id,
+            </if>
+            <if test="unitName != null">
+                unit_name,
+            </if>
+            <if test="jointName != null">
+                joint_name,
+            </if>
+            <if test="unitIndex != null">
+                unit_index,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="courseId != null">
+                #{courseId,jdbcType=BIGINT},
+            </if>
+            <if test="unitName != null">
+                #{unitName,jdbcType=VARCHAR},
+            </if>
+            <if test="jointName != null">
+                #{jointName,jdbcType=VARCHAR},
+            </if>
+            <if test="unitIndex != null">
+                #{unitIndex,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.UnitOneExample"
+            resultType="java.lang.Integer">
+        select count(*) from unit
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update unit
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.courseId != null">
+                course_id = #{record.courseId,jdbcType=BIGINT},
+            </if>
+            <if test="record.unitName != null">
+                unit_name = #{record.unitName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.jointName != null">
+                joint_name = #{record.jointName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.unitIndex != null">
+                joint_name = #{record.unitIndex,jdbcType=INTEGER},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update unit
+        set id = #{record.id,jdbcType=BIGINT},
+        course_id = #{record.courseId,jdbcType=BIGINT},
+        unit_name = #{record.unitName,jdbcType=VARCHAR},
+        joint_name = #{record.jointName,jdbcType=VARCHAR},
+        unit_index = #{record.unitIndex,jdbcType=INTEGER},
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.Unit">
+        update unit
+        <set>
+            <if test="courseId != null">
+                course_id = #{courseId,jdbcType=BIGINT},
+            </if>
+            <if test="unitName != null">
+                unit_name = #{unitName,jdbcType=VARCHAR},
+            </if>
+            <if test="jointName != null">
+                joint_name = #{jointName,jdbcType=VARCHAR},
+            </if>
+            <if test="unitIndex != null">
+                unit_index = #{unitIndex,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.Unit">
+        update unit
+        set course_id  = #{courseId,jdbcType=BIGINT},
+            unit_name  = #{unitName,jdbcType=VARCHAR},
+            unit_index = #{record.unitIndex,jdbcType=INTEGER},
+            joint_name = #{jointName,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="getUnitIdByCourseIdAndUnitNumber" parameterType="map" resultType="map">
+        <!-- select id from (select * from unit a LIMIT 0,${unitNumber}) a WHERE course_id = #{courseId} ORDER BY id DESC LIMIT 0,1 -->
+        select a.id, b.course_name, b.version, b.label from (select * from unit a LIMIT 0,${unitNumber}) a JOIN course b
+        ON a.course_id = b.id WHERE course_id=#{courseId} ORDER BY a.id DESC LIMIT 0,1
+    </select>
+
+    <select id="allUnit" parameterType="int" resultType="map">
+        select
+            id,
+            unit_name
+        from unit
+        where course_id = #{id}
+    </select>
+    <select id="getCourseNameAndUnitName" parameterType="map" resultType="map">
+        SELECT
+            a.course_name,
+            b.unit_name
+        from course a
+            JOIN unit b ON a.id = b.course_id AND a.id = #{courseId} AND b.id = #{unitId}
+    </select>
+    <select id="selectIdMapByCourseIdAndWordIds" resultType="java.util.Map" parameterType="map">
+        SELECT
+        uv.vocabulary_id id,
+        u.id unitId
+        FROM
+        unit u,
+        unit_vocabulary uv,
+        learn l
+        WHERE
+        uv.unit_id = u.id
+        AND l.vocabulary_id = uv.vocabulary_id
+        and l.unit_id = u.id
+        and l.student_id = #{student_id}
+        and u.id = uv.unit_id
+        and l.course_id = #{courseId}
+        AND l.study_model =
+        <if test="model == 0">
+            '单词图鉴'
+        </if>
+        <if test="model == 1">
+            '慧记忆'
+        </if>
+        <if test="model == 2">
+            '慧听写'
+        </if>
+        <if test="model == 3">
+            '慧默写'
+        </if>
+        AND u.course_id = #{courseId}
+        AND uv.vocabulary_id IN(
+        <foreach collection="wordIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+        <!--SELECT
+        uv.vocabulary_id id,
+        u.id unitId
+        FROM
+        unit u,
+        unit_vocabulary uv
+        WHERE
+        uv.unit_id = u.id
+        AND u.course_id = #{courseId}
+        AND uv.vocabulary_id IN (
+        <foreach collection="wordIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )-->
+    </select>
+
+    <select id="selectByUnitIdAndUnitName" parameterType="map" resultType="map">
+    	select id, unit_name from unit where course_id = #{courseIdw}
+    </select>
+    <select id="selectUnitsByCourseId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from unit where course_id = #{courseId} order by id asc
+    </select>
+    <select id="selectByPrimaryKeys" resultMap="BaseResultMap" parameterType="map">
+        select *
+        from unit where id in (
+            <foreach collection="ids" item="id" separator=",">
+                #{id}
+            </foreach>
+        );
+    </select>
+    <select id="selectIdByPhase" resultType="java.lang.Long" parameterType="map">
+        SELECT u.id
+        FROM
+            course c,
+            unit u,
+            student_unit su
+        WHERE
+            c.id = u.course_id
+            AND su.unit_id = u.id
+            AND su.student_id = #{student.id}
+            AND c.study_paragraph = #{phase}
+            AND c.`status` = 1
+            AND u.delStatus = 1
+    </select>
+    <select id="selectFirstUnitByCourseId" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from unit
+        where course_id = #{courseId}
+        order by id asc
+        limit 1
+    </select>
+    <select id="selectIdAndUnitNameByCourseIds" resultType="java.util.Map" parameterType="map">
+        select course_id courseId, id, unit_name unitName from unit where course_id in (
+          <foreach collection="courseIds" item="courseId" separator=",">
+              #{courseId}
+          </foreach>
+            )
+    </select>
+
+</mapper>

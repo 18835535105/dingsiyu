@@ -1,17 +1,17 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
 import com.zhidejiaoyu.common.constant.UserConstant;
-import com.zhidejiaoyu.common.mapper.simple.ExhumationMapper;
-import com.zhidejiaoyu.common.mapper.simple.StudentMapper;
-import com.zhidejiaoyu.common.mapper.simple.StudentSkinMapper;
-import com.zhidejiaoyu.common.mapper.simple.SyntheticRewardsListMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleExhumationMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleStudentMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleStudentSkinMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleSyntheticRewardsListMapper;
 import com.zhidejiaoyu.common.pojo.Exhumation;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentSkin;
 import com.zhidejiaoyu.common.pojo.SyntheticRewardsList;
 import com.zhidejiaoyu.common.utils.simple.AwardUtil;
 import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
-import com.zhidejiaoyu.student.service.simple.ExhumationService;
+import com.zhidejiaoyu.student.service.simple.SimpleExhumationServiceSimple;
 import com.zhidejiaoyu.student.service.simple.SimpleSyntheticRewardsListServiceSimple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,22 +28,22 @@ import java.util.*;
  * @since 2018-11-19
  */
 @Service
-public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServiceImpl<SyntheticRewardsListMapper, SyntheticRewardsList> implements SimpleSyntheticRewardsListServiceSimple {
+public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServiceImpl<SimpleSyntheticRewardsListMapper, SyntheticRewardsList> implements SimpleSyntheticRewardsListServiceSimple {
 
     @Autowired
-    private SyntheticRewardsListMapper syntheticRewardsListMapper;
+    private SimpleSyntheticRewardsListMapper simpleSyntheticRewardsListMapper;
 
     @Autowired
-    private ExhumationService exhumationService;
+    private SimpleExhumationServiceSimple exhumationService;
 
     @Autowired
-    private ExhumationMapper exhumationMapper;
+    private SimpleExhumationMapper simpleExhumationMapper;
 
     @Autowired
-    private StudentMapper studentMapper;
+    private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
-    private StudentSkinMapper studentSkinMapper;
+    private SimpleStudentSkinMapper simpleStudentSkinMapper;
 
     /**
      * 添加合成奖励
@@ -56,7 +56,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
      */
     @Override
     public int addSynthetic(String name, String imgUrl, Integer type, Integer studentId, Integer model) {
-        return syntheticRewardsListMapper.insert(syntheticRewardsList(name, imgUrl, type, studentId, new Date(), model));
+        return simpleSyntheticRewardsListMapper.insert(syntheticRewardsList(name, imgUrl, type, studentId, new Date(), model));
     }
 
     /**
@@ -77,14 +77,14 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
         Map<String, Object> map2 = new HashMap<>();
         map2.put("studentId", student.getId());
         map2.put("type", student.getSex());
-        List<Map<String, Object>> maps = exhumationMapper.selExhumationByStudentId(studentId.longValue());
+        List<Map<String, Object>> maps = simpleExhumationMapper.selExhumationByStudentId(studentId.longValue());
         Map<Object, Object> retrun = new HashMap<>();
         Map<Integer, Object> maps1 = new HashMap<>();
         for (Map<String, Object> ma : maps) {
             Integer finalName = (Integer) AwardUtil.getMaps((String) ma.get("finalName"));
             maps1.put(finalName, ma);
         }
-        List<SyntheticRewardsList> gloveOrFlower = syntheticRewardsListMapper.getGloveOrFlower(studentId);
+        List<SyntheticRewardsList> gloveOrFlower = simpleSyntheticRewardsListMapper.getGloveOrFlower(studentId);
         if (sex == 2) {
             for (int i = 8; i <= 17; i++) {
                 Object o = maps1.get(i);
@@ -182,16 +182,16 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
         HashMap<String, Object> mapss = new HashMap<>();
         mapss.put("studentId", student.getId());
         mapss.put("type", student.getSex());
-        List<HashMap<String, Object>> hashMaps = syntheticRewardsListMapper.selListMap(mapss);
+        List<HashMap<String, Object>> hashMaps = simpleSyntheticRewardsListMapper.selListMap(mapss);
         List<HashMap<String, Object>> list = new ArrayList<>();
         for (HashMap<String, Object> map : hashMaps) {
             Date endTime = (Date) map.get("endTime");
             if (endTime != null) {
-                if (endTime.getTime() > new Date().getTime()) {
+                if (endTime.getTime() > System.currentTimeMillis()) {
                     map.put("status", 2);
                     map.put("beUseing", true);
                     map.put("nameId", AwardUtil.getMaps((String) map.get("name")));
-                    map.put("time", (endTime.getTime() - new Date().getTime()) / 1000);
+                    map.put("time", (endTime.getTime() - System.currentTimeMillis()) / 1000);
                     map.put("type", 1);
                     list.add(map);
                 } else {
@@ -239,7 +239,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
         //获取学生session
         Student student = getStudent(session);
         if (student.getBonusExpires() != null) {
-            if (student.getBonusExpires().getTime() > new Date().getTime()) {
+            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
                 return ServerResponse.createByError();
             }
         }
@@ -248,7 +248,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
         SyntheticRewardsList syntheticRewardsList = new SyntheticRewardsList();
         syntheticRewardsList.setStudentId(student.getId().intValue());
         syntheticRewardsList.setName(name);
-        Integer count = syntheticRewardsListMapper.selCountByStudentIdAndName(syntheticRewardsList);
+        Integer count = simpleSyntheticRewardsListMapper.selCountByStudentIdAndName(syntheticRewardsList);
         //判断使用时间
         Date date = new Date();
         Calendar calendar = Calendar.getInstance();
@@ -260,17 +260,17 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
         Date time = calendar.getTime();
         syntheticRewardsList.setUseEndTime(time);
         //修改所有未使用的当前手套,印记
-        syntheticRewardsListMapper.updUse(syntheticRewardsList);
+        simpleSyntheticRewardsListMapper.updUse(syntheticRewardsList);
         //修改学生信息
         student.setBonusExpires(time);
 
-        studentMapper.updateByPrimaryKeySelective(student);
+        simpleStudentMapper.updateByPrimaryKeySelective(student);
         HashMap mapsss = new HashMap();
         mapsss.put("studentId", student.getId());
         mapsss.put("name", name);
-        exhumationMapper.updExhumationFinalNameByStudentId(mapsss);
+        simpleExhumationMapper.updExhumationFinalNameByStudentId(mapsss);
         //查找修改后的信息
-        Student student1 = studentMapper.selectByPrimaryKey(student.getId());
+        Student student1 = simpleStudentMapper.selectByPrimaryKey(student.getId());
         //将修改后的信息放入session中
         session.setAttribute(UserConstant.CURRENT_STUDENT, student1);
         //正常结束返回
@@ -300,9 +300,9 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
             syntheticRewardsList.setStudentId(student.getId().intValue());
             syntheticRewardsList.setName(name);
             //获取手套,印记个数
-            Integer count = syntheticRewardsListMapper.selCountByStudentIdAndName(syntheticRewardsList);
+            Integer count = simpleSyntheticRewardsListMapper.selCountByStudentIdAndName(syntheticRewardsList);
             //获取手套,印记信息
-            List<SyntheticRewardsList> syntheticRewardsLists = syntheticRewardsListMapper.selGloveOrFlowerByStudentIdAndName(syntheticRewardsList);
+            List<SyntheticRewardsList> syntheticRewardsLists = simpleSyntheticRewardsListMapper.selGloveOrFlowerByStudentIdAndName(syntheticRewardsList);
             //判断是否为空
             if (syntheticRewardsLists.size() > 0) {
                 //取第一个信息
@@ -314,7 +314,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 map.put("time", (48 * count) + "小时0分0秒");
                 Date date = student.getBonusExpires();
                 if (date != null) {
-                    if (date.getTime() > new Date().getTime()) {
+                    if (date.getTime() > System.currentTimeMillis()) {
                         map.put("state", 0);
                     } else {
                         map.put("state", 1);
@@ -329,7 +329,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
             studentSkin.setStudentId(student.getId().intValue());
             studentSkin.setSkinName(name);
             //搜索皮肤信息
-            studentSkin = studentSkinMapper.selSkinBystudentIdAndName(studentSkin);
+            studentSkin = simpleStudentSkinMapper.selSkinBystudentIdAndName(studentSkin);
             //放置返回信息
             map.put("name", name);
             map.put("message", "个性装扮");
@@ -347,13 +347,13 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
             studentId = student.getId().intValue();
             useMap.put("sex",student.getSex()==1?"男":"女");
         }else{
-            Student student = studentMapper.selectById(studentId);
+            Student student = simpleStudentMapper.selectById(studentId);
             useMap.put("sex",student.getSex()==1?"男":"女");
         }
         Map<String, Object> resultMap = new HashMap<>();
         //查询手套印记
-        List<SyntheticRewardsList> gloveOrFlower = syntheticRewardsListMapper.getGloveOrFlower(studentId);
-        SyntheticRewardsList useGloveOrFlower = syntheticRewardsListMapper.getUseGloveOrFlower(studentId);
+        List<SyntheticRewardsList> gloveOrFlower = simpleSyntheticRewardsListMapper.getGloveOrFlower(studentId);
+        SyntheticRewardsList useGloveOrFlower = simpleSyntheticRewardsListMapper.getUseGloveOrFlower(studentId);
         List<Map<String, Object>> gloveOrFlowerList = new ArrayList<>();
 
         for (SyntheticRewardsList synthetic : gloveOrFlower) {
@@ -363,9 +363,9 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 map.put("state", true);
                 map.put("time",48+"小时00分00秒");
             }else{
-                SyntheticRewardsList isUse = syntheticRewardsListMapper.getIsUse(studentId, synthetic.getName());
+                SyntheticRewardsList isUse = simpleSyntheticRewardsListMapper.getIsUse(studentId, synthetic.getName());
                 if(isUse!=null){
-                    Integer count = syntheticRewardsListMapper.selCountByStudentIdAndName(synthetic);
+                    Integer count = simpleSyntheticRewardsListMapper.selCountByStudentIdAndName(synthetic);
                     map.put("state", false);
                     map.put("time",48*count+"小时00分00秒");
                 }else{
@@ -388,7 +388,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
         }
         resultMap.put("gloveOrFlower", gloveOrFlowerList);
         List<Map<String, Object>> skinList = new ArrayList<>();
-        List<StudentSkin> studentSkins = studentSkinMapper.selSkinByStudentIdIsHave(studentId.longValue());
+        List<StudentSkin> studentSkins = simpleStudentSkinMapper.selSkinByStudentIdIsHave(studentId.longValue());
         for (StudentSkin studentSkin : studentSkins) {
             if (studentSkin.getState() == 1) {
                 useMap.put("skin", studentSkin.getImgUrl());

@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.common.study.simple;
 
-import com.zhidejiaoyu.common.mapper.simple.LearnMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleLearnMapper;
 import com.zhidejiaoyu.common.pojo.CapacityMemory;
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.LearnExample;
@@ -18,7 +18,7 @@ import java.util.List;
 public class SimpleMemoryDifficulty {
 
 	@Autowired
-	private LearnMapper learnMapper;
+	private SimpleLearnMapper learnMapper;
 
 	/**
 	 * 计算当前单词的记忆难度

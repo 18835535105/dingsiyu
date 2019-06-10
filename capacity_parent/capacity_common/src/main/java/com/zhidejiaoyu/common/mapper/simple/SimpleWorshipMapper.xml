@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimpleWorshipMapper" >
+  <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Worship" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="student_id_worship" property="studentIdWorship" jdbcType="BIGINT" />
+    <result column="student_id_by_worship" property="studentIdByWorship" jdbcType="BIGINT" />
+    <result column="worship_time" property="worshipTime" jdbcType="TIMESTAMP" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, student_id_worship, student_id_by_worship, worship_time,state
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.WorshipExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from worship
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from worship
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from worship
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.WorshipExample" >
+    delete from worship
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.Worship" >
+    insert into worship (id, student_id_worship, student_id_by_worship,
+      worship_time,state)
+    values (#{id,jdbcType=BIGINT}, #{studentIdWorship,jdbcType=BIGINT}, #{studentIdByWorship,jdbcType=BIGINT},
+      #{worshipTime,jdbcType=TIMESTAMP},#{state,jdbcType=INTEGER} )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Worship" >
+    insert into worship
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="studentIdWorship != null" >
+        student_id_worship,
+      </if>
+      <if test="studentIdByWorship != null" >
+        student_id_by_worship,
+      </if>
+      <if test="worshipTime != null" >
+        worship_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="studentIdWorship != null" >
+        #{studentIdWorship,jdbcType=BIGINT},
+      </if>
+      <if test="studentIdByWorship != null" >
+        #{studentIdByWorship,jdbcType=BIGINT},
+      </if>
+      <if test="worshipTime != null" >
+        #{worshipTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.WorshipExample" resultType="java.lang.Integer" >
+    select count(*) from worship
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <select id="selectSevenDaysInfoByStudent" resultMap="BaseResultMap" parameterType="map">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM
+    worship
+    WHERE
+    student_id_worship = #{student.id}
+    AND TO_DAYS(NOW()) - 7 &lt;= TO_DAYS(worship_time)
+    ORDER BY
+    worship_time DESC
+  </select>
+
+  <select id="getMapKeyStudentWorship" resultType="java.util.Map">
+    	select a.student_id_by_worship as id, count(a.id) as count FROM worship a JOIN student b ON a.student_id_by_worship = b.id AND b.role = 1 GROUP BY a.student_id_by_worship
+  </select>
+
+    <select id="selectStudentNameAndTime" resultType="java.util.Map" parameterType="map">
+        select
+        s.nickname, date_format(w.worship_time, '%Y.%m.%d') time
+        <if test="type == 1">
+            , w.student_id_worship stuId
+        </if>
+        <if test="type == 2">
+          , w.student_id_by_worship stuId
+        </if>
+        from worship w, student s
+        <where>
+            <if test="type == 2">
+                and w.student_id_worship = #{student.id}
+                and s.id = w.student_id_by_worship
+            </if>
+            <if test="type == 1">
+                and w.student_id_by_worship = #{student.id}
+                and s.id = w.student_id_worship
+            </if>
+        </where>
+        order by w.worship_time desc
+    </select>
+    <select id="countWorshipStudentThisWeek" resultType="java.lang.Integer" parameterType="map">
+        SELECT count(id)
+        FROM worship
+        WHERE student_id_worship = #{currentStudent.id}
+          and student_id_by_worship = #{student.id}
+          AND TO_DAYS(NOW()) - 7 &lt;= TO_DAYS(worship_time)
+        ORDER BY worship_time DESC
+    </select>
+  <select id="countWorshipWithStudent" resultType="java.util.Map">
+    select student_id_by_worship studentId, count(id) count
+    from worship
+    group by student_id_by_worship
+  </select>
+
+    <update id="updateByExampleSelective" parameterType="map">
+    update worship
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.studentIdWorship != null" >
+        student_id_worship = #{record.studentIdWorship,jdbcType=BIGINT},
+      </if>
+      <if test="record.studentIdByWorship != null" >
+        student_id_by_worship = #{record.studentIdByWorship,jdbcType=BIGINT},
+      </if>
+      <if test="record.worshipTime != null" >
+        worship_time = #{record.worshipTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update worship
+    set id = #{record.id,jdbcType=BIGINT},
+      student_id_worship = #{record.studentIdWorship,jdbcType=BIGINT},
+      student_id_by_worship = #{record.studentIdByWorship,jdbcType=BIGINT},
+      worship_time = #{record.worshipTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.Worship" >
+    update worship
+    <set >
+      <if test="studentIdWorship != null" >
+        student_id_worship = #{studentIdWorship,jdbcType=BIGINT},
+      </if>
+      <if test="studentIdByWorship != null" >
+        student_id_by_worship = #{studentIdByWorship,jdbcType=BIGINT},
+      </if>
+      <if test="worshipTime != null" >
+        worship_time = #{worshipTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.Worship" >
+    update worship
+    set student_id_worship = #{studentIdWorship,jdbcType=BIGINT},
+      student_id_by_worship = #{studentIdByWorship,jdbcType=BIGINT},
+      worship_time = #{worshipTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <!-- 制作排行假数据 -->
+  <insert id="insertList" parameterType="list">
+  	INSERT INTO ccie (	student_id,	student_name,	unit_id,	get_time,	test_type,	study_model,	ccie_no,	encourage_word,	read_flag)VALUES
+  	<foreach collection="list" item="id" separator=",">
+  		(#{id},'唐氏',2732,'2018-09-30 11:46:58','7','13','N201809301000','名列前茅',1)
+  	</foreach>
+  </insert>
+  <insert id="insertListMB" parameterType="list">
+  	insert into worship(student_id_worship, student_id_by_worship, worship_time) values
+  	<foreach collection="list" item="id" separator=",">
+  		(5687, #{id}, '2018-10-08 18:14:37')
+  	</foreach>
+  </insert>
+  <insert id="insertListXZ" parameterType="list">
+  	insert into award(student_id, medal_type, type, can_get, get_flag) VALUES
+  	<foreach collection="list" item="id" separator=",">
+	(#{id.id}, #{id.index},3,1,1)
+  	</foreach>
+  </insert>
+
+  <select id="selCountWorshipByStudents" parameterType="map" resultType="map">
+    select count(id) worship,student_id_by_worship studentId from worship where student_id_by_worship in (
+    <foreach collection="list" item="studentIds" separator="," >
+      #{studentIds}
+    </foreach>
+    )
+    group by student_id_by_worship
+  </select>
+  <select id="countByWorship" resultType="java.lang.Integer" parameterType="map">
+    select count(id)
+    from worship
+    where student_id_by_worship = #{studentId}
+  </select>
+
+
+</mapper>

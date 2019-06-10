@@ -2,7 +2,7 @@ package com.zhidejiaoyu.student.controller.simple;
 
 
 import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
-import com.zhidejiaoyu.student.service.simple.ExhumationService;
+import com.zhidejiaoyu.student.service.simple.SimpleExhumationServiceSimple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +23,7 @@ import javax.servlet.http.HttpSession;
 public class SimpleExhumationController {
 
     @Autowired
-    private ExhumationService exhumationService;
+    private SimpleExhumationServiceSimple exhumationService;
     /**
      * 合成手套印记碎片
      * @return

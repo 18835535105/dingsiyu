@@ -32,25 +32,25 @@ public class SimpleCommonMethod implements Serializable {
     private final String[] POINT = {".", ",", "?", "!", "，", "。", "？", "！", "、", "：", "“", "”", "《", "》"};
 
     @Autowired
-    private LearnMapper learnMapper;
+    private SimpleLearnMapper learnMapper;
 
     @Autowired
-    private CourseMapper courseMapper;
+    private SimpleCourseMapper simpleCourseMapper;
 
     @Autowired
-    private UnitMapper unitMapper;
+    private SimpleUnitMapper unitMapper;
 
     @Autowired
-    private StudentUnitMapper studentUnitMapper;
+    private SimpleStudentUnitMapper simpleStudentUnitMapper;
 
     @Autowired
-    private StudentMapper studentMapper;
+    private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
-    private StudyCountMapper studyCountMapper;
+    private SimpleStudyCountMapper simpleStudyCountMapper;
 
     @Autowired
-    private StudentCourseMapper studentCourseMapper;
+    private SimpleStudentCourseMapper simpleStudentCourseMapper;
 
     @Autowired
     private SimpleCommonMethod simpleCommonMethod;
@@ -68,7 +68,7 @@ public class SimpleCommonMethod implements Serializable {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         Long studentId = student.getId();
         Long cId = (Long) session.getAttribute("课程" + courseId);
-        Integer maxCount = studyCountMapper.selectMaxCountByCourseId(studentId, courseId);
+        Integer maxCount = simpleStudyCountMapper.selectMaxCountByCourseId(studentId, courseId);
         if (cId == null) {
             // 本次登录第一次学习当前课程
             session.setAttribute("课程" + courseId, courseId);
@@ -80,25 +80,25 @@ public class SimpleCommonMethod implements Serializable {
                 studyCount.setCount(1);
                 studyCount.setStudyCount(1);
                 try {
-                    studyCountMapper.insert(studyCount);
+                    simpleStudyCountMapper.insert(studyCount);
                 } catch (Exception e) {
                     LOGGER.error("新增 study_count 信息出错！", e);
                     throw new RuntimeException("新增 study_count 信息出错！");
                 }
             } else {
-                List<StudyCount> studyCounts = studyCountMapper.selectByCourseIdAndCount(studentId, courseId, maxCount);
+                List<StudyCount> studyCounts = simpleStudyCountMapper.selectByCourseIdAndCount(studentId, courseId, maxCount);
                 StudyCount studyCount;
                 if (studyCounts.size() > 0) {
                     // 如果查询出多条记录，只取第一条记录，其余记录删除
                     for (int i = 1; i < studyCounts.size(); i++) {
                         studyCount = studyCounts.get(i);
-                        studyCountMapper.deleteByPrimaryKey(studyCount.getId());
+                        simpleStudyCountMapper.deleteByPrimaryKey(studyCount.getId());
                     }
                 }
                 studyCount = studyCounts.get(0);
                 studyCount.setStudyCount(studyCount.getStudyCount() + 1);
                 try {
-                    studyCountMapper.updateByPrimaryKeySelective(studyCount);
+                    simpleStudyCountMapper.updateByPrimaryKeySelective(studyCount);
                 } catch (Exception e) {
                     LOGGER.error("更新 study_count 信息出错！", e);
                     throw new RuntimeException("更新 study_count 信息出错！");
@@ -172,7 +172,7 @@ public class SimpleCommonMethod implements Serializable {
     public void initUnit(Student student) {
 
         // 判断学生是否已经推送过当前学段的课程
-        int count = studentUnitMapper.countUnitCountByStudentId(student, simpleCommonMethod.getPhase(student.getGrade()));
+        int count = simpleStudentUnitMapper.countUnitCountByStudentId(student, simpleCommonMethod.getPhase(student.getGrade()));
         if (count > 0) {
             // 当前学生已经推送过课程，不再重复推送
             throw new RuntimeException("学生当前学段课程已经推送！不可重复推送！");
@@ -218,11 +218,11 @@ public class SimpleCommonMethod implements Serializable {
                     }
                     studentUnits.add(studentUnit);
                 }
-                studentUnitMapper.insertList(studentUnits);
+                simpleStudentUnitMapper.insertList(studentUnits);
                 Unit unit = units.get(0);
 
                 // 初始化单词和例句首次学习的课程和单元
-                Course course = courseMapper.selectByPrimaryKey(unit.getCourseId());
+                Course course = simpleCourseMapper.selectByPrimaryKey(unit.getCourseId());
                 long courseId = course.getId();
                 long unitId = unit.getId();
                 String courseName = course.getCourseName();
@@ -232,7 +232,7 @@ public class SimpleCommonMethod implements Serializable {
                 student.setSentenceCourseId(courseId);
                 student.setSentenceCourseName(courseName);
                 student.setSentenceUnitId((int) unitId);
-                studentMapper.updateByPrimaryKeySelective(student);
+                simpleStudentMapper.updateByPrimaryKeySelective(student);
             }
         }
     }
@@ -250,7 +250,7 @@ public class SimpleCommonMethod implements Serializable {
         courseExample.createCriteria().andVersionEqualTo(version).andGradeLike(grade.contains("年级") ? "%年级" : "高%")
                 .andStatusEqualTo(1);
         courseExample.setOrderByClause("id asc");
-        return courseMapper.selectByExample(courseExample);
+        return simpleCourseMapper.selectByExample(courseExample);
     }
 
     private void initMyCourse(Student student, List<Course> courses) {
@@ -262,11 +262,11 @@ public class SimpleCommonMethod implements Serializable {
         studentCourse.setStudentId(student.getId());
         studentCourse.setUpdateTime(DateUtil.formatYYYYMMDDHHMMSS(new Date()));
         studentCourse.setType(1);
-        studentCourseMapper.insertSelective(studentCourse);
+        simpleStudentCourseMapper.insertSelective(studentCourse);
 
         // 初始化例句模块
         studentCourse.setType(2);
-        studentCourseMapper.insertSelective(studentCourse);
+        simpleStudentCourseMapper.insertSelective(studentCourse);
     }
 
     /**

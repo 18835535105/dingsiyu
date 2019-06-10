@@ -8,7 +8,7 @@ import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.utils.simple.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.simple.SimpleBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,33 +27,33 @@ import java.util.Map;
 public class SimpleBaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, T> implements SimpleBaseService<T> {
 
     @Autowired
-    private DurationMapper durationMapper;
+    private SimpleDurationMapper simpleDurationMapper;
 
     @Autowired
-    private TeacherMapper teacherMapper;
+    private SimpleTeacherMapper simpleTeacherMapper;
 
     @Autowired
     private HttpServletRequest request;
 
     @Autowired
-    private StudentMapper studentMapper;
+    private SimpleStudentMapper simpleStudentMapper;
 
 
     @Autowired
     private RedisOpt redisOpt;
 
     @Autowired
-    private StudentExpansionMapper studentExpansionMapper;
+    private SimpleStudentExpansionMapper simpleStudentExpansionMapper;
 
     @Autowired
-    private LevelMapper levelMapper;
+    private SimpleLevelMapper simpleLevelMapper;
 
 
     @Override
     public Student getStudent(HttpSession session) {
         Student student = (Student)session.getAttribute(UserConstant.CURRENT_STUDENT);
         if (student != null) {
-            return studentMapper .selectById(student.getId());
+            return simpleStudentMapper.selectById(student.getId());
         }
         throw new RuntimeException("学生未登录");
     }
@@ -65,13 +65,13 @@ public class SimpleBaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceIm
 
     @Override
     public Integer getValidTime(Long studentId, String beginTime, String endTime) {
-        Integer time = durationMapper.selectValidTime(studentId, beginTime, endTime);
+        Integer time = simpleDurationMapper.selectValidTime(studentId, beginTime, endTime);
         return time == null ? 0 : time;
     }
 
     @Override
     public Integer getOnLineTime(HttpSession session, String beginTime, String endTime) {
-        Integer onlineTime = durationMapper.selectOnlineTime(getStudentId(session), beginTime, endTime);
+        Integer onlineTime = simpleDurationMapper.selectOnlineTime(getStudentId(session), beginTime, endTime);
         int loginTime = (int) (System.currentTimeMillis() - ((Date) session.getAttribute(TimeConstant.LOGIN_TIME)).getTime()) / 1000;
         if (onlineTime == null) {
             onlineTime = loginTime;
@@ -87,10 +87,10 @@ public class SimpleBaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceIm
         Double gold = BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
         List<Map<String, Object>> levels = redisOpt.getAllLevel();
         int level = getLevels(gold.intValue(), levels);
-        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
+        StudentExpansion studentExpansion = simpleStudentExpansionMapper.selectByStudentId(student.getId());
         if(studentExpansion != null && studentExpansion.getLevel()<level){
-            Integer oldStudy = levelMapper.getStudyById(studentExpansion.getLevel());
-            Integer newStudy = levelMapper.getStudyById(level);
+            Integer oldStudy = simpleLevelMapper.getStudyById(studentExpansion.getLevel());
+            Integer newStudy = simpleLevelMapper.getStudyById(level);
             Integer addStudy=0;
             if(oldStudy==null || newStudy==null){
                 if(newStudy==null){
@@ -105,7 +105,7 @@ public class SimpleBaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceIm
 
             studentExpansion.setLevel(level);
             studentExpansion.setStudyPower(studentExpansion.getStudyPower()+addStudy);
-            studentExpansionMapper.updateById(studentExpansion);
+            simpleStudentExpansionMapper.updateById(studentExpansion);
         }
     }
 
@@ -116,7 +116,7 @@ public class SimpleBaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceIm
      * @return
      */
     Integer getTodayOnlineTime(HttpSession session) {
-        String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
+        String formatYYYYMMDD = SimpleDateUtil.formatYYYYMMDD(new Date());
         return this.getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
     }
 
@@ -127,7 +127,7 @@ public class SimpleBaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceIm
      * @return
      */
     Integer getTodayValidTime(Long studentId) {
-        String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
+        String formatYYYYMMDD = SimpleDateUtil.formatYYYYMMDD(new Date());
         return this.getValidTime(studentId, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
     }
 
@@ -153,7 +153,7 @@ public class SimpleBaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceIm
      * @return  校管 id，可能为 null
      */
     Integer getSchoolAdminId(Student student) {
-        return student.getTeacherId() == null ? null : teacherMapper.selectSchoolIdAdminByTeacherId(student.getTeacherId());
+        return student.getTeacherId() == null ? null : simpleTeacherMapper.selectSchoolIdAdminByTeacherId(student.getTeacherId());
     }
 
     public  int getLevels(Integer myGold, List<Map<String, Object>> levels) {

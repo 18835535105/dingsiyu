@@ -51,9 +51,9 @@ import java.util.concurrent.ExecutorService;
 
 @Slf4j
 @Service
-public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecordMapper, TestRecord> implements SimpleTestServiceSimple {
+public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTestRecordMapper, TestRecord> implements SimpleTestServiceSimple {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(TestServiceImpl.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(SimpleTestServiceImplSimple.class);
 
     @Value("${ftp.prefix}")
     private String prefix;
@@ -81,31 +81,31 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
 
 
     @Autowired
-    private SentenceMapper sentenceMapper;
+    private SimpleSentenceMapper simpleSentenceMapper;
 
     @Autowired
-    private VocabularyMapper vocabularyMapper;
+    private SimpleVocabularyMapper vocabularyMapper;
 
     @Autowired
-    private StudentMapper studentMapper;
+    private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
     private TestResultUtil testResultUtil;
 
     @Autowired
-    private TestRecordMapper testRecordMapper;
+    private SimpleTestRecordMapper simpleTestRecordMapper;
 
     @Autowired
-    private RunLogMapper runLogMapper;
+    private SimpleRunLogMapper runLogMapper;
 
     @Autowired
-    private CourseMapper courseMapper;
+    private SimpleCourseMapper simpleCourseMapper;
 
     @Autowired
-    private UnitMapper unitMapper;
+    private SimpleUnitMapper unitMapper;
 
     @Autowired
-    private StudentUnitMapper studentUnitMapper;
+    private SimpleStudentUnitMapper simpleStudentUnitMapper;
 
     @Autowired
     private SimpleCommonMethod simpleCommonMethod;
@@ -117,22 +117,22 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
     private PetSayUtil petSayUtil;
 
     @Autowired
-    private SimpleCapacityMapper simpleCapacityMapper;
+    private SimpleSimpleCapacityMapper simpleSimpleCapacityMapper;
 
     @Autowired
     private BaiduSpeak baiduSpeak;
 
     @Autowired
-    private LearnMapper learnMapper;
+    private SimpleLearnMapper learnMapper;
 
     @Autowired
-    private SimpleStudentUnitMapper simpleStudentUnitMapper;
+    private SimpleSimpleStudentUnitMapper simpleSimpleStudentUnitMapper;
 
     @Autowired
-    private TestRecordInfoMapper testRecordInfoMapper;
+    private SimpleTestRecordInfoMapper simpleTestRecordInfoMapper;
 
     @Autowired
-    private OpenUnitLogMapper openUnitLogMapper;
+    private SimpleOpenUnitLogMapper simpleOpenUnitLogMapper;
 
     @Autowired
     private SimpleMemoryDifficultyUtil simpleMemoryDifficultyUtil;
@@ -228,7 +228,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
         // 查询当前学生游戏测试的次数，如果已经测试两次不再允许游戏测试
         TestRecordExample example = new TestRecordExample();
         example.createCriteria().andStudentIdEqualTo(student.getId()).andGenreEqualTo("学前游戏测试");
-        List<TestRecord> records = testRecordMapper.selectByExample(example);
+        List<TestRecord> records = simpleTestRecordMapper.selectByExample(example);
         Integer point = null;
         if (records.size() > 0) {
             TestRecord testRecord = records.get(0);
@@ -297,7 +297,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
         // 查看当前学生是否已经有游戏测试记录
         TestRecordExample example = new TestRecordExample();
         example.createCriteria().andStudentIdEqualTo(student.getId()).andGenreEqualTo("学前游戏测试");
-        List<TestRecord> records = testRecordMapper.selectByExample(example);
+        List<TestRecord> records = simpleTestRecordMapper.selectByExample(example);
 
         // 已经有游戏测试记录进行记录的更新
         if (records.size() > 0) {
@@ -340,7 +340,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
         int goldCount = this.award(student, testRecord);
         map.put("gold", goldCount);
         testRecord.setAwardGold(goldCount);
-        int count = testRecordMapper.insert(testRecord);
+        int count = simpleTestRecordMapper.insert(testRecord);
         if (count == 0) {
             String errMsg = "id为 " + student.getId() + " 的学生 " + student.getStudentName() + " 游戏测试记录保存失败！";
             LOGGER.error(errMsg);
@@ -392,7 +392,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
         }
 
         // 更新游戏测试记录
-        int count = testRecordMapper.updateByPrimaryKeySelective(testRecord);
+        int count = simpleTestRecordMapper.updateByPrimaryKeySelective(testRecord);
         if (count == 0) {
             String errMsg = "id为 " + student.getId() + " 的学生 " + student.getStudentName() + " 更新游戏测试记录失败！";
             LOGGER.error(errMsg);
@@ -421,7 +421,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
             goldCount = 30;
             this.saveLog(student, goldCount, null, "游戏测试");
         }
-        studentMapper.updateByPrimaryKeySelective(student);
+        simpleStudentMapper.updateByPrimaryKeySelective(student);
 
         return goldCount;
     }
@@ -494,7 +494,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
             courseExample.createCriteria().andVersionEqualTo(version).andGradeEqualTo("高中").andLabelEqualTo("必修一");
             errMsg = "没有找到 " + version + "-高中-必修一 的课程信息！";
         }
-        courses = courseMapper.selectByExample(courseExample);
+        courses = simpleCourseMapper.selectByExample(courseExample);
         if (courses.size() > 0) {
             course = courses.get(0);
 
@@ -511,7 +511,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
                 student.setUnitId(unit.getId());
                 student.setUnitName(unit.getUnitName());
 
-                studentMapper.updateByPrimaryKeySelective(student);
+                simpleStudentMapper.updateByPrimaryKeySelective(student);
 
             } else {
                 LOGGER.error("id为 {} 的课程下没有找到对应的单元信息！", course.getId());
@@ -541,7 +541,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
      */
     private String unlockNextUnit(Student student, Long courseId, Long unitId, Integer type) {
         // 查看当前单元的所有模块是否都已完成单元闯关测试
-        int count = testRecordMapper.selectByUnitId(student.getId(), unitId, type);
+        int count = simpleTestRecordMapper.selectByUnitId(student.getId(), unitId, type);
 
         // 开启下一单元
         return unlockUnit(student, courseId, unitId, type);
@@ -567,16 +567,16 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
 
             // Unit unit = unitMapper.selectByPrimaryKey(wordNextUnitId);
             // 根据学生id，课程id和下一个单元id开启下个单元
-            studentUnitMapper.updateStatus(student.getId(), courseId, wordNextUnitId, type);
+            simpleStudentUnitMapper.updateStatus(student.getId(), courseId, wordNextUnitId, type);
             // 保存到学生当前学习哪个课程,单元
-            simpleStudentUnitMapper.updateCourseIdAndUnitId(courseId, wordNextUnitId, student.getId());
+            simpleSimpleStudentUnitMapper.updateCourseIdAndUnitId(courseId, wordNextUnitId, student.getId());
 
             OpenUnitLog openUnitLog = new OpenUnitLog();
             openUnitLog.setStudentId(student.getId());
             openUnitLog.setCurrentUnitId(unitId);
             openUnitLog.setNextUnitId(wordNextUnitId);
             openUnitLog.setCreateTime(new Date());
-            openUnitLogMapper.insert(openUnitLog);
+            simpleOpenUnitLogMapper.insert(openUnitLog);
             return "1" ;
         }else {
             return "2";
@@ -587,7 +587,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
     public ServerResponse<List<TestResult>> getWordUnitTest(HttpSession session, Long unitId,
                                                             Boolean isTrue, int typeModel, boolean example, Integer model) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        student = studentMapper.selectById(student.getId());
+        student = simpleStudentMapper.selectById(student.getId());
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
         String studyModel = null;
@@ -664,7 +664,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
 
         // 保存测试记录
         // 查看是否已经有该单元当前模块的单元闯关测试记录
-        TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
+        TestRecord testRecord = simpleTestRecordMapper.selectByStudentIdAndUnitId(student.getId(),
                 wordUnitTestDTO.getUnitId()[0], "单元闯关测试", type);
 
         // 只有第一次进行当前单元模块下的单元闯关测试才尝试开启下个单元，避免重复计算当前课程下所有未解锁单元的个数,排除例句默写
@@ -700,7 +700,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
         // 获取测试结果页提示语
         String msg = getMsg(student, vo, classify, testRecord, point);
         if (testRecord.getId() == null) {
-            testRecordMapper.insert(testRecord);
+            simpleTestRecordMapper.insert(testRecord);
         }
         testId = testRecord.getId();
 
@@ -716,7 +716,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
         vo.setGold(goldCount);
         vo.setTestId(testId);
         vo.setEnergy(addEnergy);
-        studentMapper.updateByPrimaryKeySelective(student);
+        simpleStudentMapper.updateByPrimaryKeySelective(student);
         getLevel(session);
         session.removeAttribute("token");
 
@@ -868,7 +868,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
             goldCount = getGoldCount(wordUnitTestDTO, student, point, goldCount);
         } else {
             // 查询当前单元测试历史最高分数
-            int betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), wordUnitTestDTO.getUnitId()[0], simpleCommonMethod.getTestType(wordUnitTestDTO.getClassify()));
+            int betterPoint = simpleTestRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), wordUnitTestDTO.getUnitId()[0], simpleCommonMethod.getTestType(wordUnitTestDTO.getClassify()));
 
             // 非首次测试成绩大于或等于80分并且本次测试成绩大于历史最高分，超过历史最高分次数 +1并且金币奖励翻倍
             if (point >= PASS && betterPoint < wordUnitTestDTO.getPoint()) {
@@ -974,11 +974,11 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
     public ServerResponse<Map<String, Object>> getSentenceUnitTest(HttpSession session, Long unitId, String studyModel,
                                                                    Boolean isSure) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        student = studentMapper.selectById(student.getId());
+        student = simpleStudentMapper.selectById(student.getId());
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
         // 获取当前单元下的所有例句
-        List<Sentence> sentences = sentenceMapper.selectByUnitId(unitId);
+        List<Sentence> sentences = simpleSentenceMapper.selectByUnitId(unitId);
         List<SentenceTestResult> results = testResultUtil.getSentenceTestResults(sentences);
         Map<String, Object> result = new HashMap<>(16);
         result.put("subject", results);
@@ -999,13 +999,13 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
         if(rows != null){
             PageHelper.startPage(page, rows);
         }
-        List<TestRecordVo> records = testRecordMapper.showRecord(studentId);
+        List<TestRecordVo> records = simpleTestRecordMapper.showRecord(studentId);
         PageInfo<TestRecordVo> testRecordPageInfo = new PageInfo<>(records);
 
         // 每个测试记录下含有测试详情个数，如果没有测试详情，不显示详情按钮
         Map<Long, Map<Long, Long>> testDetailCountMap = null;
         if (records.size() > 0) {
-            testDetailCountMap = testRecordInfoMapper.countByRecordIds(records);
+            testDetailCountMap = simpleTestRecordInfoMapper.countByRecordIds(records);
         }
 
         // 封装后返回
@@ -1094,7 +1094,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
 
         TestResultVo vo = new TestResultVo();
         if (Objects.equals(typeModel, "单元前测")) {
-            TestRecord preUnitTest = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), testRecord.getUnitId(), "单元前测", studyModel);
+            TestRecord preUnitTest = simpleTestRecordMapper.selectByStudentIdAndUnitId(student.getId(), testRecord.getUnitId(), "单元前测", studyModel);
             if (preUnitTest != null) {
                 // 当前单元已有单元前测测试记录，不再保存奖励和测试记录
                 int point = testRecord.getPoint();
@@ -1141,7 +1141,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
         testRecord.setGenre(typeModel);
         testRecord.setQuantity(testRecord.getErrorCount() + testRecord.getRightCount());
         testRecord.setType(1);
-        testRecordMapper.insert(testRecord);
+        simpleTestRecordMapper.insert(testRecord);
 
         // 保存测试记录详情
         if (testDetail != null) {
@@ -1152,7 +1152,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, typeModel));
         vo.setTestId(testRecord.getId());
         vo.setEnergy(addEnergy);
-        studentMapper.updateByPrimaryKeySelective(student);
+        simpleStudentMapper.updateByPrimaryKeySelective(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
 
         // 学霸崛起勋章计算
@@ -1376,7 +1376,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
             }
             if (testRecordInfos.size() > 0) {
                 try {
-                    testRecordInfoMapper.insertList(testRecordInfos);
+                    simpleTestRecordInfoMapper.insertList(testRecordInfos);
                 } catch (Exception e) {
                     log.error("学生测试记录详情保存失败：studentId=[{}], testId=[{}], modelType=[{}], error=[{}]",
                             student.getId(), testRecordId, modelType, e.getMessage());
@@ -1455,7 +1455,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
             list = vocabularyMapper.getTestPaperGenerationAll(courseId, typeTwo, unitId);
         } else {
             // 记忆追踪下的题
-            list = simpleCapacityMapper.getTestPaperGenerationAll(courseId, typeTwo, unitId);
+            list = simpleSimpleCapacityMapper.getTestPaperGenerationAll(courseId, typeTwo, unitId);
         }
 
         // 调用封装题
@@ -1478,7 +1478,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
         Student student = getStudent(session);
         Long studentId = student.getId();
         // 获取一道需要复习的单词
-        Map<String, Object> vocabulary = simpleCapacityMapper.getWordLimitOneByStudentIdByCourseId(studentId, courseId, new Date());
+        Map<String, Object> vocabulary = simpleSimpleCapacityMapper.getWordLimitOneByStudentIdByCourseId(studentId, courseId, new Date());
 
         if (vocabulary == null) {
             return ServerResponse.createBySuccess();
@@ -1563,7 +1563,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
     @Override
     public ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId) {
         Student student = getStudent(session);
-        TestDetailVo testDetailVo = testRecordMapper.selectTestDetailVo(student.getId(), testId);
+        TestDetailVo testDetailVo = simpleTestRecordMapper.selectTestDetailVo(student.getId(), testId);
         testDetailVo.setUseTime(getUseTime(testDetailVo.getUseTime()));
         if (StringUtils.isNotEmpty(testDetailVo.getIsWrite())) {
             if (testDetailVo.getIsWrite().contains("默写")) {
@@ -1574,7 +1574,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<TestRecor
         } else {
             testDetailVo.setIsWrite(null);
         }
-        testDetailVo.setInfos(testRecordMapper.selectTestRecordInfo(testId));
+        testDetailVo.setInfos(simpleTestRecordMapper.selectTestRecordInfo(testId));
         return ServerResponse.createBySuccess(testDetailVo);
     }
 

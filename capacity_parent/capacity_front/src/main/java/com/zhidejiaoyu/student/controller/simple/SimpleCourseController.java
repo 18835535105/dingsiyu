@@ -4,7 +4,7 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Course;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
-import com.zhidejiaoyu.student.service.simple.CourseService;
+import com.zhidejiaoyu.student.service.simple.SimpleCourseService;
 import com.zhidejiaoyu.student.vo.CoursePlanVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,7 +34,7 @@ public class SimpleCourseController {
      * 课程业务接口
      */
     @Autowired
-    private CourseService courseService;
+    private SimpleCourseService courseService;
 
 
     /**

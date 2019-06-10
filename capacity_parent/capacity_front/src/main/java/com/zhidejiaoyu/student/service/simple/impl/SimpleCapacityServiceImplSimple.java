@@ -34,7 +34,7 @@ import java.util.*;
 
 @Slf4j
 @Service
-public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<SimpleCapacityMapper, SimpleCapacity> implements SimpleCapacityServiceSimple {
+public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<SimpleSimpleCapacityMapper, SimpleCapacity> implements SimpleCapacityServiceSimple {
 
     @Autowired
     private SimpleCommonMethod simpleCommonMethod;
@@ -43,19 +43,19 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     private BaiduSpeak baiduSpeak;
 
     @Autowired
-    private VocabularyMapper vocabularyMapper;
+    private SimpleVocabularyMapper vocabularyMapper;
 
     @Autowired
-    private CourseMapper courseMapper;
+    private SimpleCourseMapper simpleCourseMapper;
 
     @Autowired
-    private LearnMapper learnMapper;
+    private SimpleLearnMapper learnMapper;
 
     @Autowired
-    private StudentMapper studentMapper;
+    private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
-    private SimpleCapacityMapper simpleCapacityMapper;
+    private SimpleSimpleCapacityMapper simpleSimpleCapacityMapper;
 
     @Autowired
     private SimpleCourseService courseService;
@@ -77,8 +77,8 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     private ServerResponse<CapacityDigestVo> getCapacityDigestVo(Student student, Long courseId, CapacityDigestVo vo, Integer type) {
         Wrapper<SimpleCapacity> wrapper = new EntityWrapper<SimpleCapacity>().eq("student_id", student.getId()).
                 eq("course_id", courseId).eq("type", type).lt("memory_strength", 1);
-        List<SimpleCapacity> simpleCapacities = simpleCapacityMapper.selectList(wrapper.orderBy("push", true));
-        Integer needReview = simpleCapacityMapper.countNeedReview(student, courseId, type);
+        List<SimpleCapacity> simpleCapacities = simpleSimpleCapacityMapper.selectList(wrapper.orderBy("push", true));
+        Integer needReview = simpleSimpleCapacityMapper.countNeedReview(student, courseId, type);
 
         vo.setNeedReview(needReview);
         vo.setStrangenessCount(simpleCapacities.size());
@@ -120,7 +120,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         }
         Integer studyCount = learns.get(0).getStudyCount();
 
-        List<SimpleCapacity> simpleCapacities = simpleCapacityMapper.selectList(new EntityWrapper<SimpleCapacity>()
+        List<SimpleCapacity> simpleCapacities = simpleSimpleCapacityMapper.selectList(new EntityWrapper<SimpleCapacity>()
                 .eq("student_id", student.getId()).eq("course_id", courseId).eq("type", type).eq("vocabulary_id", id));
         SimpleCapacity simpleCapacity = simpleCapacities.get(0);
 
@@ -144,7 +144,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     @SuppressWarnings("all")
     private ServerResponse<PageInfo> packageCapacityList(Student student, Long courseId, Integer type, Integer page, Integer size) {
         PageHelper.startPage(page, size);
-        List<CapacityListVo> vos = simpleCapacityMapper.selectByCourseId(student.getId(), courseId, type);
+        List<CapacityListVo> vos = simpleSimpleCapacityMapper.selectByCourseId(student.getId(), courseId, type);
         for (CapacityListVo vo : vos) {
             vo.setReadUrl(baiduSpeak.getLanguagePath(vo.getReadUrl()));
             vo.setPush(this.getPushTime(vo.getPushTime()));
@@ -159,12 +159,12 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         String typeStr = simpleCommonMethod.getTestType(type);
 
-        String fileName = courseMapper.selectCourseName(Integer.parseInt(courseId.toString()));
+        String fileName = simpleCourseMapper.selectCourseName(Integer.parseInt(courseId.toString()));
 
         List<Long> ids = new ArrayList<>();
         // excel标题
         String[] title = {"序号", "英文", "中文解释", "记忆强度", "距离复习"};
-        List<SimpleCapacity> simpleCapacities = simpleCapacityMapper.selectList(new EntityWrapper<SimpleCapacity>().eq("student_id", student.getId())
+        List<SimpleCapacity> simpleCapacities = simpleSimpleCapacityMapper.selectList(new EntityWrapper<SimpleCapacity>().eq("student_id", student.getId())
                 .eq("course_id", courseId).eq("type", type));
 
         // excel文件名
@@ -220,8 +220,8 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     public ServerResponse<String> cancelTip(HttpSession session) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         student.setShowCapacity(2);
-        studentMapper.updateByPrimaryKeySelective(student);
-        student=studentMapper.selectById(student.getId());
+        simpleStudentMapper.updateByPrimaryKeySelective(student);
+        student= simpleStudentMapper.selectById(student.getId());
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess();
     }
@@ -287,7 +287,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
                 if (map != null) {
                     Long courseId = (Long) map.get("id");
                     Student student = getStudent(session);
-                    Integer countNeedReview = simpleCapacityMapper.countNeedReview(student, courseId, type);
+                    Integer countNeedReview = simpleSimpleCapacityMapper.countNeedReview(student, courseId, type);
                     courseMap.put(type, countNeedReview);
                 }
             } else {

@@ -1,9 +1,9 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
 import com.zhidejiaoyu.common.constant.UserConstant;
-import com.zhidejiaoyu.common.mapper.simple.ExhumationMapper;
-import com.zhidejiaoyu.common.mapper.simple.StudentMapper;
-import com.zhidejiaoyu.common.mapper.simple.StudentSkinMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleExhumationMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleStudentMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleStudentSkinMapper;
 import com.zhidejiaoyu.common.pojo.Exhumation;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentSkin;
@@ -26,16 +26,16 @@ import java.util.*;
  * @since 2018-11-19
  */
 @Service
-public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<StudentSkinMapper, StudentSkin> implements SimpleStudentSkinServiceSimple {
+public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<SimpleStudentSkinMapper, StudentSkin> implements SimpleStudentSkinServiceSimple {
 
     @Autowired
-    private StudentSkinMapper studentSkinMapper;
+    private SimpleStudentSkinMapper simpleStudentSkinMapper;
     @Autowired
-    private ExhumationMapper exhumationMapper;
+    private SimpleExhumationMapper simpleExhumationMapper;
     @Autowired
     private SimpleConsumeServiceSimple consumeService;
     @Autowired
-    private StudentMapper studentMapper;
+    private SimpleStudentMapper simpleStudentMapper;
 
     /**
      * 添加皮肤
@@ -51,17 +51,17 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<St
         skin.setSkinName(name);
         skin.setStudentId(studentId);
         //查找是否已经有试用皮肤
-        StudentSkin studentSkin = studentSkinMapper.selSkinBystudentIdAndName(skin);
+        StudentSkin studentSkin = simpleStudentSkinMapper.selSkinBystudentIdAndName(skin);
         Date now = new Date();
         if (studentSkin == null) {
             //没有添加
-            return studentSkinMapper.insert(getStudentSkin(name, studentId, date, now, imgUrl));
+            return simpleStudentSkinMapper.insert(getStudentSkin(name, studentId, date, now, imgUrl));
         } else {
             //有 修改到期时间
             studentSkin.setEndTime(null);
             studentSkin.setImgUrl(imgUrl);
             studentSkin.setCreateTime(new Date());
-            Integer integer = studentSkinMapper.updUseSkin(studentSkin);
+            Integer integer = simpleStudentSkinMapper.updUseSkin(studentSkin);
             return integer;
         }
 
@@ -91,7 +91,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<St
         skin.setStudentId(student.getId().intValue());
         skin.setImgUrl(imgUrl);
         //查看将皮肤信息
-        StudentSkin studentSkin = studentSkinMapper.selSkinBystudentIdAndName(skin);
+        StudentSkin studentSkin = simpleStudentSkinMapper.selSkinBystudentIdAndName(skin);
         if (studentSkin != null) {
             return ServerResponse.createByError(300, "已有皮肤");
         }
@@ -123,18 +123,18 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<St
         //获取学生信息
         Student student = getStudent(session);
         //获取未使用的皮肤碎片信息
-        List<Exhumation> exhumations = exhumationMapper.selExhumationByStudentIdTOSkin(student.getId());
+        List<Exhumation> exhumations = simpleExhumationMapper.selExhumationByStudentIdTOSkin(student.getId());
         //储存皮肤碎片数量
         map.put("exhumations", exhumations.size());
         //每个皮肤合成使用的碎片数量
-        List<Map<String, Object>> maps = exhumationMapper.selExhumationByStudentIdTOSkinState(student.getId());
+        List<Map<String, Object>> maps = simpleExhumationMapper.selExhumationByStudentIdTOSkinState(student.getId());
         Map<Integer, Object> mapss = new HashMap<>();
         for (Map<String, Object> ma : maps) {
             Integer finalName = (Integer) AwardUtil.getMaps((String) ma.get("finalName"));
             mapss.put(finalName, ma);
         }
         //获取皮肤
-        List<StudentSkin> studentSkins = studentSkinMapper.selSkinByStudentId(student.getId());
+        List<StudentSkin> studentSkins = simpleStudentSkinMapper.selSkinByStudentId(student.getId());
         Map<Integer, Object> map1 = new HashMap<>();
         for (StudentSkin studentSkin : studentSkins) {
             Integer finalName = (Integer) AwardUtil.getMaps(studentSkin.getSkinName());
@@ -142,7 +142,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<St
         }
 
         //查看已使用的皮肤和试用过得皮肤
-        List<Map<String, Object>> maps1 = studentSkinMapper.selTrySkinAndHaveSkin(student.getId());
+        List<Map<String, Object>> maps1 = simpleStudentSkinMapper.selTrySkinAndHaveSkin(student.getId());
         Map<Object, Map> mapsss = new HashMap<>();
         for (Map<String, Object> map2 : maps1) {
             Object finalName = AwardUtil.getMaps((String) map2.get("finalName"));
@@ -228,7 +228,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<St
         //获取学生信息
         Student student =getStudent(session);
         //查询学生下皮肤信息
-        List<StudentSkin> studentSkins = studentSkinMapper.selSkinByStudentIdAndEndTime(student.getId());
+        List<StudentSkin> studentSkins = simpleStudentSkinMapper.selSkinByStudentIdAndEndTime(student.getId());
         //返回值格式确定
         Map<String, Object> map = new HashMap<>();
         //获取钻石数量
@@ -291,7 +291,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<St
                     return ServerResponse.createByError(300, "钻石不足，幸运大转盘等你来获取属于你的幸运大礼！");
                 }
             }
-            StudentSkin aLong = studentSkinMapper.selUseSkinByStudentId(student.getId());
+            StudentSkin aLong = simpleStudentSkinMapper.selUseSkinByStudentId(student.getId());
             if (aLong != null) {
                 //当学生使用皮肤不为空则修改已使用皮肤状态
                 StudentSkin skin = new StudentSkin();
@@ -300,7 +300,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<St
                 skin.setState(0);
                 skin.setEndTime(aLong.getEndTime());
                 skin.setCreateTime(aLong.getCreateTime());
-                studentSkinMapper.updUseSkin(skin);
+                simpleStudentSkinMapper.updUseSkin(skin);
             }
             //判断是否为试用皮肤
             if (dateInteger == 0) {
@@ -309,13 +309,13 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<St
                 calendar.setTime(new Date());
                 calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 1);
                 StudentSkin studentSkin = getStudentSkin(name, student.getId().intValue(), calendar.getTime(), new Date(), imgUrl);
-                StudentSkin studentSkin1 = studentSkinMapper.selSkinBystudentIdAndName(studentSkin);
+                StudentSkin studentSkin1 = simpleStudentSkinMapper.selSkinBystudentIdAndName(studentSkin);
                 if (studentSkin1 == null) {
                     studentSkin.setState(1);
-                    studentSkinMapper.insert(studentSkin);
+                    simpleStudentSkinMapper.insert(studentSkin);
                 } else {
                     studentSkin1.setState(1);
-                    studentSkinMapper.updUseSkin(studentSkin1);
+                    simpleStudentSkinMapper.updUseSkin(studentSkin1);
 
                 }
             } else {
@@ -324,13 +324,13 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<St
                 studentSkin.setStudentId(student.getId().intValue());
                 studentSkin.setSkinName(name);
                 studentSkin.setImgUrl(imgUrl);
-                StudentSkin studentSkin1 = studentSkinMapper.selSkinBystudentIdAndName(studentSkin);
+                StudentSkin studentSkin1 = simpleStudentSkinMapper.selSkinBystudentIdAndName(studentSkin);
                 studentSkin1.setState(1);
-                Integer integer = studentSkinMapper.updUseSkin(studentSkin1);
+                Integer integer = simpleStudentSkinMapper.updUseSkin(studentSkin1);
                 if (integer > 0) {
                     student.setDiamond(student.getDiamond() - 50);
                     consumeService.reduceConsume(2, 50, session);
-                    studentMapper.updateByPrimaryKey(student);
+                    simpleStudentMapper.updateByPrimaryKey(student);
                     session.setAttribute(UserConstant.CURRENT_STUDENT, student);
                 }
             }
@@ -339,10 +339,10 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<St
             StudentSkin studentSkin = new StudentSkin();
             studentSkin.setStudentId(student.getId().intValue());
             studentSkin.setSkinName(name);
-            StudentSkin studentSkin1 = studentSkinMapper.selSkinBystudentIdAndName(studentSkin);
+            StudentSkin studentSkin1 = simpleStudentSkinMapper.selSkinBystudentIdAndName(studentSkin);
             if (studentSkin1 != null) {
                 studentSkin1.setState(0);
-                studentSkinMapper.updUseSkin(studentSkin1);
+                simpleStudentSkinMapper.updUseSkin(studentSkin1);
             }
 
         }
@@ -361,7 +361,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<St
         //获取学生信息
         Student student = getStudent(session);
         //根据学生id获取使用的皮肤信息
-        StudentSkin studentSkin = studentSkinMapper.selUseSkinByStudentId(student.getId());
+        StudentSkin studentSkin = simpleStudentSkinMapper.selUseSkinByStudentId(student.getId());
         //返回数据放入map集合中
         Map<String, Object> map = new HashMap<>();
         if (studentSkin != null) {
