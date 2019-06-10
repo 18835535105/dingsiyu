@@ -88,7 +88,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                 Map<String, Object> returnMap = new HashMap<>();
                 returnMap.put("id", letterUnit.getId());
                 returnMap.put("unitName", letterUnit.getUnitName());
-                Integer point = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), letterUnit.getId().longValue(), 10);
+                Integer point = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), letterUnit.getId().longValue(), 11);
                 if (isTrue) {
                     returnMap.put("isOpen", true);
                     if(point!=null){
