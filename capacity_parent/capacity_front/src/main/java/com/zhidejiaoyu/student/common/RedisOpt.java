@@ -12,10 +12,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -43,6 +40,12 @@ public class RedisOpt {
     @Autowired
     private PhoneticSymbolMapper phoneticSymbolMapper;
 
+    @Autowired
+    private com.zhidejiaoyu.common.mapper.simple.CourseMapper courseMapper;
+
+    @Autowired
+
+
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
@@ -54,6 +57,140 @@ public class RedisOpt {
     @PostConstruct
     public void init() {
         staticRedisTemplate = redisTemplate;
+    }
+
+
+    public void addDrawRecordIndex(String name,Integer count){
+        String hKey = RedisKeysConst.DRAW_COUNT_WITH_NAME;
+        redisTemplate.opsForHash().put(hKey, name, count);
+    }
+    public int selDrawRecordIndex(String name){
+        String hKey = RedisKeysConst.DRAW_COUNT_WITH_NAME;
+        Object object = getRedisDraw(name);
+        if(object!=null){
+            return Integer.parseInt(object+"");
+        }else{
+            return 0;
+        }
+    }
+    public void delDrawRecord(){
+        Set<Object> keys = redisTemplate.opsForHash().keys(RedisKeysConst.DRAW_COUNT_WITH_NAME);
+        redisTemplate.opsForHash().delete(RedisKeysConst.DRAW_COUNT_WITH_NAME, keys);
+    }
+
+    /**
+     * 获取当前学生当前模块关联的所有课程, 返回id,version
+     */
+    public List<Map> getCourseListInType(Long studentId, String typeStr) {
+        String hKey = RedisKeysConst.ALL_COURSE_WITH_STUDENT_IN_TYPE + studentId + ":" + typeStr;
+        List<Map> courseList;
+        Object object = getRedisObject(hKey);
+        if (object == null) {
+            courseList = getCourses(studentId, typeStr);
+            redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, hKey, courseList);
+        } else {
+            try {
+                courseList = (List<Map>) object;
+            } catch (Exception e) {
+                log.error("类型转换错误, object=[{}], studentId=[{}], typeStr=[{}], error=[{}]", object, studentId, typeStr, e.getMessage());
+                courseList = getCourses(studentId, typeStr);
+            }
+        }
+        return courseList;
+    }
+
+    /**
+     * 截取冲刺版字符串
+     *
+     * @param studentId
+     * @param typeStr
+     * @return
+     */
+    private List<Map> getCourses(Long studentId, String typeStr) {
+        List<Map> courseList;
+        courseList = courseMapper.getSimpleCourseByStudentIdByType(studentId, typeStr);
+        if (courseList.size() > 0) {
+            courseList.forEach(c -> {
+                if (c.get("version") != null && c.get("version").toString().contains("冲刺版")) {
+                    String[] versions = c.get("version").toString().split("-");
+                    if (versions.length >= 3) {
+                        c.put("version", versions[0] + " -" + versions[2]);
+                    }
+                }
+            });
+        }
+        return courseList;
+    }
+
+    /**
+     * 获取当前课程下各个单元的单词个数
+     *
+     * @param courseId
+     * @return
+     */
+    public Map<Long, Map<Long, Object>> getWordCountWithUnitInCourse(long courseId) {
+        String unitWordSumKey = RedisKeysConst.WORD_COUNT_WITH_UNIT_IN_COURSE + courseId;
+        Object object = getRedisObject(unitWordSumKey);
+        Map<Long, Map<Long, Object>> unitWordSum;
+        if (object == null) {
+            unitWordSum = courseMapper.unitsWordSum(courseId);
+            redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, unitWordSumKey, unitWordSum);
+        } else {
+            try {
+                unitWordSum = (Map<Long, Map<Long, Object>>) object;
+            } catch (Exception e) {
+                log.error("类型转换错误，object=[{}], courseId=[{}], error=[{}]", object, courseId, e.getMessage());
+                unitWordSum = courseMapper.unitsWordSum(courseId);
+                log.error("重新查询数据：unitWordSum=[{}]", unitWordSum);
+            }
+        }
+        return unitWordSum;
+    }
+
+
+    /**
+     * 获取当前单元下单词个数
+     *
+     * @param unitId
+     * @return
+     */
+    public long getWordCountWithUnit(Long unitId) {
+        String wordCountKey = RedisKeysConst.WORD_COUNT_WITH_UNIT + unitId;
+        Object object = getRedisObject(wordCountKey);
+        long wordCount;
+        if (object == null) {
+            wordCount = unitVocabularyMapper.countByUnitId(unitId);
+            redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, wordCountKey, wordCount);
+        } else {
+            try{
+                wordCount = (int) object;
+            } catch (Exception e) {
+                log.error("类型转换错误，object=[{}], unitId=[{}], error=[{}]", object, unitId, e.getMessage());
+                wordCount = unitVocabularyMapper.countByUnitId(unitId);
+                log.error("重新查询结果：wordCount=[{}]", wordCount);
+            }
+        }
+        return wordCount;
+    }
+
+    private Object getRedisDraw(String key) {
+        Object object = null;
+        try {
+            object = redisTemplate.opsForHash().get(RedisKeysConst.DRAW_COUNT_WITH_NAME, key);
+        } catch (Exception e) {
+            log.error("error=[{}]", e.getMessage());
+        }
+        return object;
+    }
+
+    private Object getRedisObject(String key) {
+        Object object = null;
+        try {
+            object = redisTemplate.opsForHash().get(RedisKeysConst.PREFIX, key);
+        } catch (Exception e) {
+            log.error("error=[{}]", e.getMessage());
+        }
+        return object;
     }
 
     /**

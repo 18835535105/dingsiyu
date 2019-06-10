@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SentenceCourseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.SentenceCourse">
+        <id column="id" property="id" />
+        <result column="study_paragraph" property="studyParagraph" />
+        <result column="grade" property="grade" />
+        <result column="version" property="version" />
+        <result column="label" property="label" />
+        <result column="picture_name" property="pictureName" />
+        <result column="picture_url" property="pictureUrl" />
+        <result column="course_name" property="courseName" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="delStatus" property="delStatus" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, study_paragraph, grade, version, label, picture_name, picture_url, course_name, status, create_time, update_time, delStatus
+    </sql>
+    <select id="selectVersionByPhase" resultType="java.lang.String" parameterType="map">
+        select distinct c.version
+        from sentence_course c, sentence_unit su, unit_sentence us
+        where us.unit_id = su.id
+        <if test="courseName != null and courseName != ''">
+            and c.course_name like concat('%', concat(#{courseName}, '%'))
+        </if>
+        and c.id = su.course_id
+        and c.id not in
+        (select course_id from teacher_course_library where type = 2 and teacher_id = #{teacherId})
+        and c.study_paragraph = #{phase}
+        order by c.version asc
+    </select>
+    <select id="selectCourseNameByVersion" resultType="java.util.Map" parameterType="map">
+        select c.id, c.course_name courseName
+        from sentence_course c,
+             sentence_unit u,
+             unit_sentence us
+        where us.unit_id = u.id
+          and c.id = u.course_id
+          and c.version = #{version}
+          and c.study_paragraph = #{phase}
+          and c.id not in
+              (select course_id from teacher_course_library where type = 2 and teacher_id = #{teacherId})
+        group by c.course_name
+    </select>
+
+</mapper>

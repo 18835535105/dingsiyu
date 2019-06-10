@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.TeacherMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Teacher">
+        <id column="id" property="id"/>
+        <result column="teacher_id" property="teacherId"/>
+        <result column="school" property="school"/>
+        <result column="school_admin_id" property="schoolAdminId"/>
+        <result column="password" property="password"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="area" property="area"/>
+        <result column="nickname" property="nickname"/>
+        <result column="qq" property="qq"/>
+        <result column="platform" property="platform"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, teacher_id, school, school_admin_id, password, province, city, area, nickname, qq, platform
+    </sql>
+    <update id="updatePlatform" parameterType="map">
+        update teacher set platform = #{platform} where teacher_id in (
+        <foreach collection="teachers" separator="," item="teacher">
+            #{teacher.id}
+        </foreach>
+        )
+    </update>
+
+    <sql id="teacher_list_sql">
+        <if test="dto.account != null and dto.account != ''">
+            and u.account like concat(concat('%', #{dto.account}), '%')
+        </if>
+        <if test="dto.name != null and dto.name != ''">
+            and u.name like concat(concat('%', #{dto.name}), '%')
+        </if>
+        <if test="dto.school != null and dto.school != '' and dto.school != '全部'">
+            and t.school like concat(concat('%', #{dto.school}), '%')
+        </if>
+        <if test="dto.status != null and dto.status != '' and dto.status != 0">
+            and u.status like concat(concat('%', #{dto.status}), '%')
+        </if>
+        and u.status &lt;&gt; 3
+        group by u.id order by u.id desc
+    </sql>
+    <select id="selectByTeacherId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from teacher where teacher_id = #{userId} limit 1
+    </select>
+
+    <select id="selectSchoolAdminById" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from teacher where school_admin_id = #{schoolAdminId} and teacher_id is null limit 1
+    </select>
+
+    <select id="selTeacherBYAdminId" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select sys.id id,sys.name name from sys_user sys
+        join teacher teacher
+        on teacher.teacher_id = sys.id
+        where teacher.school_admin_id = #{adminId}
+    </select>
+
+    <select id="selGradeByAdminId" parameterType="java.lang.Integer" resultType="java.util.Map">
+         select grade.id id,grade.class_name className from sys_user sys
+        join teacher teacher on teacher.teacher_id = sys.id
+        join grade grade on grade.teacher_id=teacher.teacher_id
+        where teacher.school_admin_id = #{adminId}
+    </select>
+    <select id="selectTeachersBySchoolAdminId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from teacher
+        where school_admin_id = #{schoolAdminId}
+        and teacher_id is not null
+    </select>
+    <select id="getTeacherIdByAdminId" resultType="integer" parameterType="integer">
+        select teacher_id from teacher where school_admin_id =#{adminId} and teacher_id is not null
+    </select>
+
+</mapper>

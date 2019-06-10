@@ -24,5 +24,5 @@ public class FeedBackInfoVO {
      */
     private Boolean hint;
 
-    private List<FeedBackInfoList> feedBackInfoLists = new ArrayList<>();
+    private List<FeedBackInfoList> feedBackInfoLists;
 }

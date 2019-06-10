@@ -1253,7 +1253,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Student student = getStudent(session);
         if (StringUtils.isEmpty(student.getPetName())) {
             student.setPetName("大明白");
-            student.setPartUrl(PetImageConstant.DEFAULT_IMAGE);
+            student.setPartUrl(PetImageConstant.DEFAULT_IMG);
         }
 
         TestResultVo vo = new TestResultVo();
@@ -1261,9 +1261,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         boolean isFirst = false;
 
         String[] correctWord = wordUnitTestDTO.getCorrectWord();
-        Integer[] correctWordId = wordUnitTestDTO.getCorrectWordId();
+        Long[] correctWordId = wordUnitTestDTO.getCorrectWordId();
         String[] errorWord = wordUnitTestDTO.getErrorWord();
-        Integer[] errorWordId = wordUnitTestDTO.getErrorWordId();
+        Long[] errorWordId = wordUnitTestDTO.getErrorWordId();
         Long[] unitId = wordUnitTestDTO.getUnitId();
         Long courseId = wordUnitTestDTO.getCourseId();
         Integer classify = wordUnitTestDTO.getClassify();
@@ -1356,7 +1356,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Student student = getStudent(session);
         if (StringUtils.isEmpty(student.getPetName())) {
             student.setPetName("大明白");
-            student.setPartUrl(PetImageConstant.DEFAULT_IMAGE);
+            student.setPartUrl(PetImageConstant.DEFAULT_IMG);
         }
 
         TestResultVo vo = new TestResultVo();
@@ -1364,9 +1364,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         boolean isFirst = false;
 
         String[] correctWord = wordUnitTestDTO.getCorrectWord();
-        Integer[] correctWordId = wordUnitTestDTO.getCorrectWordId();
+        Long[] correctWordId = wordUnitTestDTO.getCorrectWordId();
         String[] errorWord = wordUnitTestDTO.getErrorWord();
-        Integer[] errorWordId = wordUnitTestDTO.getErrorWordId();
+        Long[] errorWordId = wordUnitTestDTO.getErrorWordId();
         Long[] unitId = wordUnitTestDTO.getUnitId();
         Long courseId = unitMapper.selectCourseIdByUnitId(unitId[0]);
         Integer classify = wordUnitTestDTO.getClassify();

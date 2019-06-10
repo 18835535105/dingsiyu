@@ -1,12 +1,12 @@
 package com.zhidejiaoyu.student.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.common.Vo.bookVo.BookVo;
 import com.zhidejiaoyu.common.pojo.Player;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.BookService;
-import com.zhidejiaoyu.student.vo.BookInfoVo;
-import com.zhidejiaoyu.student.vo.BookVo;
-import com.zhidejiaoyu.student.vo.PlayerVo;
+import com.zhidejiaoyu.common.Vo.bookVo.BookInfoVo;
+import com.zhidejiaoyu.common.Vo.bookVo.PlayerVo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;

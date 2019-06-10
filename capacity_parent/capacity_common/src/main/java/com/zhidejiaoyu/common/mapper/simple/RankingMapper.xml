@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.RankingMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Ranking">
+        <id column="id" property="id" />
+        <result column="gold_class_rank" property="goldClassRank" />
+        <result column="gold_school_rank" property="goldSchoolRank" />
+        <result column="gold_country_rank" property="goldCountryRank" />
+        <result column="student_id" property="studentId" />
+        <result column="worship_class_rank" property="worshipClassRank" />
+        <result column="worship_school_rank" property="worshipSchoolRank" />
+        <result column="worship_country_rank" property="worshipCountryRank" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, gold_class_rank, gold_school_rank, gold_country_rank, student_id, worship_class_rank, worship_school_rank, worship_country_rank
+    </sql>
+
+    <select id="selByStudentId" resultMap="BaseResultMap" parameterType="map">
+        select <include refid="Base_Column_List"></include> from ranking where student_id =#{studentId}
+    </select>
+
+
+</mapper>

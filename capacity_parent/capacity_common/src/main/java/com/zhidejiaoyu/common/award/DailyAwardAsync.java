@@ -309,4 +309,22 @@ public class DailyAwardAsync extends BaseAwardAsync {
         }
         return 0;
     }
+
+    /**
+     * 今天完成日奖励个数
+     *
+     * @param student
+     */
+    public void completeAllDailyAward(Student student) {
+        final int awardContentType = 9;
+        Award award = awardMapper.selectByAwardContentTypeAndType(student.getId(), DAILY_TYPE, awardContentType);
+        try {
+            if (this.checkAward(award, DAILY_TYPE)) {
+                int count = awardMapper.countCompleteAllDailyAward(student);
+                this.optAward(student.getId(), awardContentType, count, award, DAILY_TYPE);
+            }
+        } catch (Exception e) {
+            log.error("保存日奖励失败！", e);
+        }
+    }
 }

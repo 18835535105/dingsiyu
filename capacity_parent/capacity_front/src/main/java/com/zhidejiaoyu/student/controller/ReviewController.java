@@ -105,7 +105,7 @@ public class ReviewController {
     @ResponseBody
     @PostMapping("/saveTestCenter")
     @ControllerLogAnnotation(name = "保存测试中心测试结果")
-    public ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Integer[] correctWordId, Integer[] errorWordId, Long[] unitId,
+    public ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Long[] correctWordId, Long[] errorWordId, Long[] unitId,
                                                  Integer classify, Long courseId,HttpSession session, Integer point, String genre,String testDetail) {
         final String wordFiveTest = "单词五维测试";
         final String sentenceFiveTest = "例句五维测试";
@@ -155,8 +155,8 @@ public class ReviewController {
     @ResponseBody
     @PostMapping("/saveTestReview")
     @ControllerLogAnnotation(name = "保存测试复习测试记录")
-    public ServerResponse<TestResultVo> saveTestReview(String[] correctWord, String[] errorWord, Integer[] correctWordId,
-                                                       Integer[] errorWordId, Long[] unitId,
+    public ServerResponse<TestResultVo> saveTestReview(String[] correctWord, String[] errorWord, Long[] correctWordId,
+                                                       Long[] errorWordId, Long[] unitId,
                                                        Integer classify, Long courseId,
                                                        HttpSession session, Integer point) {
         Assert.notEmpty(unitId, "unitId can't be null!");

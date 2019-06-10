@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.RunLogMapper">
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.RunLog">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="operate_user_id" property="operateUserId" jdbcType="BIGINT"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="log_content" property="logContent"/>
+    </resultMap>
+    <resultMap id="ResultMapWithBLOBs" type="com.zhidejiaoyu.common.pojo.RunLog" extends="BaseResultMap">
+        <result column="log_content" property="logContent" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, operate_user_id, type, create_time, log_content
+    </sql>
+    <sql id="Blob_Column_List">
+        log_content
+    </sql>
+    <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs"
+            parameterType="com.zhidejiaoyu.common.pojo.RunLogExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from run_log
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.RunLogExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from run_log
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from run_log
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from run_log
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.RunLogExample">
+        delete from run_log
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.RunLog">
+        insert into run_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="operateUserId != null">
+                operate_user_id,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="logContent != null">
+                log_content,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="operateUserId != null">
+                #{operateUserId,jdbcType=BIGINT},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="logContent != null">
+                #{logContent,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.RunLogExample"
+            resultType="java.lang.Integer">
+        select count(*) from run_log
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <select id="selectTodayLogsByOperateUserId" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        run_log
+        WHERE
+        type = 4
+        AND TO_DAYS(create_time) = TO_DAYS(now())
+        AND operate_user_id = #{stuId}
+    </select>
+
+    <select id="countAwardCount" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from run_log
+        where operate_user_id = #{stuId} and log_content like concat(concat('%',#{loginTime}),'%') and log_content like
+        concat(concat('%',#{str}),'%') and log_content like concat(concat('%', #{typeStr}), '%')
+    </select>
+
+    <select id="countStudentTodayLogin" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from run_log
+        where to_days(create_time) = to_days(now())
+          and operate_user_id = #{stu.id}
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update run_log
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.operateUserId != null">
+                operate_user_id = #{record.operateUserId,jdbcType=BIGINT},
+            </if>
+            <if test="record.type != null">
+                type = #{record.type,jdbcType=INTEGER},
+            </if>
+            <if test="record.createTime != null">
+                create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.logContent != null">
+                log_content = #{record.logContent,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExampleWithBLOBs" parameterType="map">
+        update run_log
+        set id = #{record.id,jdbcType=BIGINT},
+        operate_user_id = #{record.operateUserId,jdbcType=BIGINT},
+        type = #{record.type,jdbcType=INTEGER},
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+        log_content = #{record.logContent,jdbcType=LONGVARCHAR}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update run_log
+        set id = #{record.id,jdbcType=BIGINT},
+        operate_user_id = #{record.operateUserId,jdbcType=BIGINT},
+        type = #{record.type,jdbcType=INTEGER},
+        create_time = #{record.createTime,jdbcType=TIMESTAMP}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.RunLog">
+        update run_log
+        <set>
+            <if test="operateUserId != null">
+                operate_user_id = #{operateUserId,jdbcType=BIGINT},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="logContent != null">
+                log_content = #{logContent,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zhidejiaoyu.common.pojo.RunLog">
+        update run_log
+        set operate_user_id = #{operateUserId,jdbcType=BIGINT},
+            type            = #{type,jdbcType=INTEGER},
+            create_time     = #{createTime,jdbcType=TIMESTAMP},
+            log_content     = #{logContent,jdbcType=LONGVARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.RunLog">
+        update run_log
+        set operate_user_id = #{operateUserId,jdbcType=BIGINT},
+            type            = #{type,jdbcType=INTEGER},
+            create_time     = #{createTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectGoldByUnitId" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from run_log where operate_user_id = #{studentId} and type = #{type} and unit_id = #{unitId} order by id desc
+    </select>
+
+    <select id="getCountXZByStudentId" resultType="java.lang.Integer" parameterType="map">
+        select count(id) FROM run_log where type = 7 and operate_user_id = #{studentId}
+    </select>
+
+    <select id="getAllQueryType" resultType="java.lang.Integer" parameterType="map">
+        select z.studentId from (select operate_user_id AS studentId, SUM(substring_index(t.s,'#',1)) AS jb from (SELECT
+        operate_user_id, substring_index(log_content, '#', -2) s, create_time from run_log where type = 4 and
+        log_content like '%#%' AND create_time >= #{date}) t GROUP BY studentId ORDER BY jb desc) z
+        JOIN student s ON z.studentId = s.id
+        <where>
+            <if test="model == '2' or model == '1'">
+                AND s.province = #{student.province}
+                AND s.area = #{student.area}
+                AND s.city = #{student.city}
+                AND s.school_name = #{student.schoolName}
+            </if>
+            <if test="model == '1'">
+                AND s.grade = #{student.grade}
+                <if test="student.squad != '' and student.squad != null ">
+                    AND s.squad = #{student.squad}
+                </if>
+            </if>
+            AND s.role = 1
+        </where>
+    </select>
+
+    <select id="getGoldByStudentId" resultType="java.util.Map" parameterType="map">
+        select operate_user_id AS studentId, SUM(substring_index(t.s,'#',1)) AS jb from (SELECT operate_user_id,
+        substring_index(log_content, '#', -2) s, create_time from run_log where type = 4 and log_content like '%#%' AND
+        create_time >= #{data}) t
+        JOIN student s ON t.operate_user_id = s.id
+        <where>
+            <if test="model == '2' or model == '1'">
+                AND s.province = #{student.province}
+                AND s.area = #{student.area}
+                AND s.city = #{student.city}
+                AND s.school_name = #{student.schoolName}
+            </if>
+            <if test="model == '1'">
+                AND s.grade = #{student.grade}
+                <if test="student.squad != '' and student.squad != null ">
+                    AND s.squad = #{student.squad}
+                </if>
+            </if>
+            AND s.role = 1
+        </where>
+        GROUP BY studentId ORDER BY jb desc
+    </select>
+
+    <select id="getMapKeyStudentrunLog" resultType="java.util.Map">
+        select operate_user_id as id, COUNT(*) as count  from run_log where type = 7 GROUP BY operate_user_id
+    </select>
+    <select id="selectLastRunLogByOperateUserId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from run_log where operate_user_id = #{operateUserId} and type = 1 order by id desc limit 1
+    </select>
+
+</mapper>

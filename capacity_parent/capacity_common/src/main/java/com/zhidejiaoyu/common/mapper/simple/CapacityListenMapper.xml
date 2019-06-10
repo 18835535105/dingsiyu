@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+        namespace="com.zhidejiaoyu.common.mapper.simple.CapacityListenMapper">
+    <resultMap id="BaseResultMap"
+               type="com.zhidejiaoyu.common.pojo.CapacityListen">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="student_id" property="studentId"
+                jdbcType="BIGINT"/>
+        <result column="course_id" property="courseId"
+                jdbcType="BIGINT"/>
+        <result column="unit_id" property="unitId" jdbcType="BIGINT"/>
+        <result column="vocabulary_id" property="vocabularyId"
+                jdbcType="BIGINT"/>
+        <result column="word" property="word" jdbcType="VARCHAR"/>
+        <result column="word_chinese" property="wordChinese"
+                jdbcType="VARCHAR"/>
+        <result column="fault_time" property="faultTime"
+                jdbcType="INTEGER"/>
+        <result column="push" property="push" jdbcType="TIMESTAMP"/>
+        <result column="memory_strength" property="memoryStrength"
+                jdbcType="DOUBLE"/>
+        <result column="syllable" property="syllable" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, student_id, course_id, unit_id, vocabulary_id, word, syllable, word_chinese,
+        fault_time, push, memory_strength
+    </sql>
+
+    <select id="selectByExample" resultMap="BaseResultMap"
+            parameterType="com.zhidejiaoyu.common.pojo.CapacityListenExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from capacity_listen
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from capacity_listen
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from capacity_listen
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.CapacityListenExample">
+        delete from capacity_listen
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.CapacityListen">
+        insert into capacity_listen (id, student_id, course_id,
+                                     unit_id, vocabulary_id, word,
+                                     syllable, word_chinese, fault_time,
+                                     push, memory_strength)
+        values (#{id,jdbcType=BIGINT}, #{studentId,jdbcType=BIGINT}, #{courseId,jdbcType=BIGINT},
+            #{unitId,jdbcType=BIGINT}, #{vocabularyId,jdbcType=BIGINT}, #{word,jdbcType=VARCHAR},
+            #{syllable,jdbcType=VARCHAR}, #{wordChinese,jdbcType=VARCHAR}, #{faultTime,jdbcType=INTEGER},
+            #{push,jdbcType=TIMESTAMP}, #{memoryStrength,jdbcType=DOUBLE})
+    </insert>
+    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.CapacityListen">
+        insert into capacity_listen
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="studentId != null">
+                student_id,
+            </if>
+            <if test="courseId != null">
+                course_id,
+            </if>
+            <if test="unitId != null">
+                unit_id,
+            </if>
+            <if test="vocabularyId != null">
+                vocabulary_id,
+            </if>
+            <if test="word != null">
+                word,
+            </if>
+            <if test="syllable != null">
+                syllable,
+            </if>
+            <if test="wordChinese != null">
+                word_chinese,
+            </if>
+            <if test="faultTime != null">
+                fault_time,
+            </if>
+            <if test="push != null">
+                push,
+            </if>
+            <if test="memoryStrength != null">
+                memory_strength,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="studentId != null">
+                #{studentId,jdbcType=BIGINT},
+            </if>
+            <if test="courseId != null">
+                #{courseId,jdbcType=BIGINT},
+            </if>
+            <if test="unitId != null">
+                #{unitId,jdbcType=BIGINT},
+            </if>
+            <if test="vocabularyId != null">
+                #{vocabularyId,jdbcType=BIGINT},
+            </if>
+            <if test="word != null">
+                #{word,jdbcType=VARCHAR},
+            </if>
+            <if test="syllable != null">
+                #{syllable,jdbcType=VARCHAR},
+            </if>
+            <if test="wordChinese != null">
+                #{wordChinese,jdbcType=VARCHAR},
+            </if>
+            <if test="faultTime != null">
+                #{faultTime,jdbcType=INTEGER},
+            </if>
+            <if test="push != null">
+                #{push,jdbcType=TIMESTAMP},
+            </if>
+            <if test="memoryStrength != null">
+                #{memoryStrength,jdbcType=DOUBLE},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.CapacityListenExample"
+            resultType="java.lang.Integer">
+        select count(*) from capacity_listen
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <select id="countNeedReviewByStudentIdAndCourseId" resultType="java.lang.Integer" parameterType="map">
+        select count(cl.id)
+        from capacity_listen cl, vocabulary v
+        where cl.vocabulary_id = v.id and v.delStatus = 1 and
+              cl.student_id = #{studentId} and
+              cl.course_id = #{courseId} and cl.memory_strength &lt; 1 and cl.push &lt; now()
+    </select>
+    <select id="countNeedReviewByStudentIdAndUnitId" resultType="java.lang.Integer" parameterType="map">
+        select count(cl.id)
+        from capacity_listen cl, vocabulary v
+        where cl.vocabulary_id = v.id and v.delStatus = 1 and
+              cl.student_id = #{studentId} and
+              cl.unit_id = #{unitId} and cl.memory_strength &lt; 1 and cl.push &lt; now()
+    </select>
+    <select id="selectByCourseIdAndStudentId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from capacity_listen where student_id=#{studentId} and course_id=#{courseId} and memory_strength &lt; 1 order by
+        push asc
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update capacity_listen
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.studentId != null">
+                student_id = #{record.studentId,jdbcType=BIGINT},
+            </if>
+            <if test="record.courseId != null">
+                course_id = #{record.courseId,jdbcType=BIGINT},
+            </if>
+            <if test="record.unitId != null">
+                unit_id = #{record.unitId,jdbcType=BIGINT},
+            </if>
+            <if test="record.vocabularyId != null">
+                vocabulary_id = #{record.vocabularyId,jdbcType=BIGINT},
+            </if>
+            <if test="record.word != null">
+                word = #{record.word,jdbcType=VARCHAR},
+            </if>
+            <if test="record.syllable != null">
+                syllable = #{record.syllable,jdbcType=VARCHAR},
+            </if>
+            <if test="record.wordChinese != null">
+                word_chinese = #{record.wordChinese,jdbcType=VARCHAR},
+            </if>
+            <if test="record.faultTime != null">
+                fault_time = #{record.faultTime,jdbcType=INTEGER},
+            </if>
+            <if test="record.push != null">
+                push = #{record.push,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.memoryStrength != null">
+                memory_strength = #{record.memoryStrength,jdbcType=DOUBLE},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update capacity_listen
+        set id = #{record.id,jdbcType=BIGINT},
+        student_id = #{record.studentId,jdbcType=BIGINT},
+        course_id = #{record.courseId,jdbcType=BIGINT},
+        unit_id = #{record.unitId,jdbcType=BIGINT},
+        vocabulary_id = #{record.vocabularyId,jdbcType=BIGINT},
+        word = #{record.word,jdbcType=VARCHAR},
+        syllable = #{record.syllable,jdbcType=VARCHAR},
+        word_chinese = #{record.wordChinese,jdbcType=VARCHAR},
+        fault_time = #{record.faultTime,jdbcType=INTEGER},
+        push = #{record.push,jdbcType=TIMESTAMP},
+        memory_strength = #{record.memoryStrength,jdbcType=DOUBLE}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.CapacityListen">
+        update capacity_listen
+        <set>
+            <if test="studentId != null">
+                student_id = #{studentId,jdbcType=BIGINT},
+            </if>
+            <if test="courseId != null">
+                course_id = #{courseId,jdbcType=BIGINT},
+            </if>
+            <if test="unitId != null">
+                unit_id = #{unitId,jdbcType=BIGINT},
+            </if>
+            <if test="vocabularyId != null">
+                vocabulary_id = #{vocabularyId,jdbcType=BIGINT},
+            </if>
+            <if test="word != null">
+                word = #{word,jdbcType=VARCHAR},
+            </if>
+            <if test="syllable != null">
+                syllable = #{syllable,jdbcType=VARCHAR},
+            </if>
+            <if test="wordChinese != null">
+                word_chinese = #{wordChinese,jdbcType=VARCHAR},
+            </if>
+            <if test="faultTime != null">
+                fault_time = #{faultTime,jdbcType=INTEGER},
+            </if>
+            <if test="push != null">
+                push = #{push,jdbcType=TIMESTAMP},
+            </if>
+            <if test="memoryStrength != null">
+                memory_strength = #{memoryStrength,jdbcType=DOUBLE},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.CapacityListen">
+        update capacity_listen
+        set student_id      = #{studentId,jdbcType=BIGINT},
+            course_id       = #{courseId,jdbcType=BIGINT},
+            unit_id         = #{unitId,jdbcType=BIGINT},
+            vocabulary_id   = #{vocabularyId,jdbcType=BIGINT},
+            word            = #{word,jdbcType=VARCHAR},
+            syllable        = #{syllable,jdbcType=VARCHAR},
+            word_chinese    = #{wordChinese,jdbcType=VARCHAR},
+            fault_time      = #{faultTime,jdbcType=INTEGER},
+            push            = #{push,jdbcType=TIMESTAMP},
+            memory_strength = #{memoryStrength,jdbcType=DOUBLE}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <select id="selectByUnitIdAndId" resultMap="BaseResultMap"
+            parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from capacity_listen where student_id = #{studentId} and unit_id =
+        #{unitId} and vocabulary_id =#{correctWordId} order by push asc
+    </select>
+    <select id="selectByCapacityListen" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from capacity_listen
+        <where>
+            <if test="id != null">
+                and id = #{id,jdbcType=BIGINT}
+            </if>
+            <if test="studentId != null">
+                and student_id = #{studentId,jdbcType=BIGINT}
+            </if>
+            <if test="courseId != null">
+                and course_id = #{courseId,jdbcType=BIGINT}
+            </if>
+            <if test="unitId != null">
+                and unit_id = #{unitId,jdbcType=BIGINT}
+            </if>
+            <if test="vocabularyId != null">
+                and vocabulary_id = #{vocabularyId,jdbcType=BIGINT}
+            </if>
+            <if test="word != null">
+                and word = #{word,jdbcType=VARCHAR}
+            </if>
+            <if test="syllable != null">
+                and syllable = #{syllable,jdbcType=VARCHAR}
+            </if>
+            <if test="wordChinese != null">
+                and word_chinese = #{wordChinese,jdbcType=VARCHAR}
+            </if>
+            <if test="faultTime != null">
+                and fault_time = #{faultTime,jdbcType=INTEGER}
+            </if>
+            <if test="push != null">
+                and push = #{push,jdbcType=TIMESTAMP}
+            </if>
+            <if test="memoryStrength != null">
+                and memory_strength = #{memoryStrength,jdbcType=DOUBLE}
+            </if>
+        </where>
+    </select>
+    <select id="selectByUnitIdAndStudentId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from capacity_listen where student_id = #{studentId} and unit_id = #{unitId} and memory_strength &lt; 1 order by
+        push asc
+    </select>
+    <select id="selectByCourseIdAndId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from capacity_listen where student_id = #{studentId} and course_id = #{courseId}
+        and vocabulary_id =#{correctWordId} group by vocabulary_id
+    </select>
+</mapper>

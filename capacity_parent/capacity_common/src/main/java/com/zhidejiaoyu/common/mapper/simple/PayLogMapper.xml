@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.PayLogMapper">
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.PayLog">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="student_id" property="studentId" jdbcType="BIGINT"/>
+        <result column="recharge" property="recharge" jdbcType="DATE"/>
+        <result column="card_no" property="cardNo" jdbcType="VARCHAR"/>
+        <result column="card_date" property="cardDate" jdbcType="INTEGER"/>
+        <result column="found_date" property="foundDate" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, student_id, recharge, card_no, card_date, found_date
+  </sql>
+
+    <select id="selectPayLogDataByStudentId" resultType="java.util.Map" parameterType="long">
+      select id, student_id, recharge, card_no, card_date, found_date from pay_log WHERE student_id = #{studentId} ORDER BY found_date DESC
+    </select>
+</mapper>

@@ -1,0 +1,16 @@
+package com.zhidejiaoyu.student.service.simple;
+
+import com.baomidou.mybatisplus.service.IService;
+import com.zhidejiaoyu.common.pojo.Grade;
+
+/**
+ * <p>
+ * 班级表 服务类
+ * </p>
+ *
+ * @author zdjy
+ * @since 2018-09-06
+ */
+public interface GradeService extends IService<Grade> {
+
+}

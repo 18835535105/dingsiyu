@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimpleCapacityMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.SimpleCapacity">
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="course_id" property="courseId" />
+        <result column="unit_id" property="unitId" />
+        <result column="vocabulary_id" property="vocabularyId" />
+        <result column="word" property="word" />
+        <result column="word_chinese" property="wordChinese" />
+        <result column="fault_time" property="faultTime" />
+        <result column="push" property="push" />
+        <result column="memory_strength" property="memoryStrength" />
+        <result column="type" property="type" />
+    </resultMap>
+
+	<sql id="base_column_list">
+		id, student_id, course_id, unit_id, vocabulary_id, word, word_chinese, fault_time, push, memory_strength, type
+	</sql>
+
+    <select id="getSimpleWhetherFeview" parameterType="map" resultType="com.zhidejiaoyu.common.Vo.simple.SimpleCapacityVo">
+    	SELECT
+			a.student_id,
+			a.unit_id,
+			a.fault_time,
+			a.memory_strength,
+			a.id            capacityId,
+			b.id,
+			a.word,
+			a.word_chinese,
+			b.example_english,
+			b.example_chinese,
+			b.recordpicurl,
+			b.sound_mark AS soundMark
+		FROM
+			simple_capacity a JOIN vocabulary b ON a.vocabulary_id = b.id
+		AND b.delStatus = 1
+		AND a.memory_strength &lt; 1.0
+		AND a.student_id = #{studentId}
+		AND a.unit_id = #{unitId}
+		AND a.push &lt; #{date}
+		AND a.type = #{type}
+		ORDER BY push ASC
+    </select>
+	<select id="getTestPaperGenerationAll" parameterType="map" resultType="com.zhidejiaoyu.common.pojo.Vocabulary">
+		select
+			 b.id, b.word, if(locate('&lt;', if(locate('>', b.word_chinese) > 0, replace(b.word_chinese, '>', ')'),
+		b.word_chinese)),
+		replace(if(locate('>', b.word_chinese) > 0, replace(b.word_chinese, '>', ')'), b.word_chinese), '&lt;', '('),
+		b.word_chinese) AS wordChinese
+		from simple_capacity a JOIN vocabulary b ON a.vocabulary_id = b.id
+		AND a.course_id = #{courseId} AND b.delStatus = 1
+		<if test="unitId != null and unitId != '' ">
+			AND a.unit_id in ( <foreach collection="unitId" item="id" separator=","> #{id} </foreach> )
+		</if>
+		order by rand() LIMIT ${typeTwo}
+	</select>
+
+
+	<sql id="modelTypeStr">
+		<if test="model == 1">
+		"单词辨音"
+		</if>
+		<if test="model == 2">
+		"词组辨音"
+		</if>
+		<if test="model == 3">
+		"快速单词"
+		</if>
+		<if test="model == 4">
+		"快速词组"
+		</if>
+		<if test="model == 5">
+		"词汇考点"
+		</if>
+		<if test="model == 6">
+		"快速句型"
+		</if>
+		<if test="model == 7">
+		"语法辨析"
+		</if>
+		<if test="model == 8">
+		"单词默写"
+		</if>
+		<if test="model == 9">
+		"词组默写"
+		</if>
+	</sql>
+	<select id="selectStatusBigTenNine" parameterType="map" resultType="map">
+		 SELECT
+			b.id,
+			b.version AS course_name,
+	  		 (select count(id) from simple_capacity
+				where student_id = #{studentId}
+				AND course_id = #{courseId}
+				AND push &lt; #{time}
+				AND memory_strength &lt; 1
+				AND type = #{model}
+			 )
+			AS fxl,
+		   	 <include refid="modelTypeStr" />
+		    AS classify
+		FROM
+			simple_capacity a
+			JOIN course b ON a.course_id = b.id
+		WHERE
+			a.student_id = #{studentId}
+			AND a.course_id = #{courseId}
+			AND a.push &lt; #{time}
+			AND a.memory_strength &lt; 1
+			AND a.type = #{model}
+			GROUP BY b.id
+	</select>
+	<select id="getWordLimitOneByStudentIdByCourseId" parameterType="map" resultType="map">
+		select a.id            capacityId,
+			   a.unit_id,
+			   b.id,
+		       b.recordpicurl,
+			   b.word,
+			   b.word_chinese,
+			   b.example_english,
+			   b.example_chinese,
+			   a.memory_strength,
+			   a.fault_time,
+			   b.sound_mark AS soundMark
+		from simple_capacity a
+				 JOIN vocabulary b ON a.vocabulary_id = b.id
+				AND a.student_id = #{studentId} AND a.course_id = #{courseId} AND a.push &lt; #{date} AND
+									  b.delStatus = 1
+		ORDER BY a.push, a.id desc
+		LIMIT 1
+	</select>
+	<select id="countNeedReview" resultType="java.lang.Integer" parameterType="map">
+		select count(sc.id)
+		from simple_capacity sc
+		where sc.student_id = #{student.id}
+		  and sc.course_id = #{courseId}
+		  and sc.type = #{type}
+		  and sc.push &lt;= now()
+		  and sc.memory_strength &lt; 1
+	</select>
+    <select id="selectByCourseId" resultType="com.zhidejiaoyu.common.Vo.simple.capacityVo.CapacityListVo" parameterType="map">
+        select v.sound_mark            soundMark,
+               sc.word readUrl,
+               sc.word                 content,
+               sc.word_chinese         chinese,
+               sc.memory_strength      memeoryStrength,
+               sc.push                 pushTime
+        from simple_capacity sc,
+             vocabulary v
+        where sc.vocabulary_id = v.id
+          and v.delStatus = 1
+          and sc.student_id = #{stuId}
+          and sc.course_id = #{courseId}
+          and sc.type = #{type}
+          and sc.memory_strength &lt; 1
+        order by push asc
+    </select>
+
+	<select id="selectSimpleCapacityRecord" resultMap="BaseResultMap" parameterType="map">
+		select <include refid="base_column_list"/>
+		from simple_capacity
+		where student_id = #{studentId}
+		  and unit_id = #{unitId}
+		  and vocabulary_id = #{vocabularyId}
+		  and type = #{type}
+	</select>
+</mapper>

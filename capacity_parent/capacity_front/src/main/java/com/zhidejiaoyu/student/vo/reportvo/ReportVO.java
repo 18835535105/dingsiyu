@@ -1,5 +1,8 @@
 package com.zhidejiaoyu.student.vo.reportvo;
 
+import lombok.Data;
+
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -8,31 +11,8 @@ import java.util.List;
  * @author wuchenxi
  * @date 2018/7/20
  */
-public class ReportVO {
+@Data
+public class ReportVO implements Serializable {
     private List<LearnResultVO> learnResult;
     private LearnSuperviseVO learnSupervise;
-
-    public List<LearnResultVO> getLearnResult() {
-        return learnResult;
-    }
-
-    public void setLearnResult(List<LearnResultVO> learnResult) {
-        this.learnResult = learnResult;
-    }
-
-    public LearnSuperviseVO getLearnSupervise() {
-        return learnSupervise;
-    }
-
-    public void setLearnSupervise(LearnSuperviseVO learnSupervise) {
-        this.learnSupervise = learnSupervise;
-    }
-
-    @Override
-    public String toString() {
-        return "ReportVO{" +
-                "learnResult=" + learnResult +
-                ", learnSupervise=" + learnSupervise +
-                '}';
-    }
 }

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.PrizeExchangeListMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.PrizeExchangeList">
+        <id column="id" property="id"/>
+        <result column="prize" property="prize"/>
+        <result column="exchange_prize" property="exchangePrize"/>
+        <result column="total_number" property="totalNumber"/>
+        <result column="surplus_number" property="surplusNumber"/>
+        <result column="prize_url" property="prizeUrl"/>
+        <result column="create_time" property="createTime"/>
+        <result column="state" property="state"/>
+        <result column="school_id" property="schoolId"/>
+        <result column="describes" property="describes"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, prize, exchange_prize, total_number, surplus_number, prize_url, create_time, state, school_id,describes
+    </sql>
+
+    <select id="getAll" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from prize_exchange_list
+        where
+        type = #{type}
+        <if test="schoolId !=null ">
+            and school_id = #{schoolId} and teacher_id is null
+        </if>
+        <if test="teacherId !=null ">
+            and teacher_id = #{teacherId}
+        </if>
+        order by create_time desc
+        limit #{start},#{number}
+    </select>
+
+    <select id="selById" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from prize_exchange_list where id =#{prizeId}
+    </select>
+
+    <select id="getAllByType" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from prize_exchange_list
+        where type = #{type}
+        <if test="teacherId != null">
+            and teacher_id =#{teacherId}
+        </if>
+        <if test="adminId != null">
+            and school_id =#{adminId} and teacher_id is null
+        </if>
+        order by create_time desc
+        limit 5
+    </select>
+
+    <select id="getCountByType" parameterType="map" resultType="int">
+        select count(id) from prize_exchange_list
+        where type = #{type}
+        <if test="teacherId != null">
+            and teacher_id =#{teacherId}
+        </if>
+        <if test="adminId != null">
+            and school_id =#{adminId} and teacher_id is null
+        </if>
+    </select>
+
+
+</mapper>

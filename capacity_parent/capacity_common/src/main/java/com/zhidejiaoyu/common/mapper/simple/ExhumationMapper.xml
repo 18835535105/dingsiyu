@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.ExhumationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Exhumation">
+        <id column="id" property="id" />
+        <result column="student_id" property="studentId" />
+        <result column="create_time" property="createTime" />
+        <result column="name" property="name" />
+        <result column="type" property="type" />
+        <result column="img_url" property="imgUrl" />
+        <result column="state" property="state" />
+        <result column="final_name" property="finalName" />
+    </resultMap>
+    <select id="selExhumation" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select * from exhumation where state=0 and student_id = #{studentId} and type!=3
+    </select>
+    <select id="selExhumationByStudentIdTOSkin" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select * from exhumation where state=0 and student_id=#{studentId} and type=3
+    </select>
+    <select id="selExhumationByStudentIdTOSkinState" parameterType="java.util.Map" resultType="java.util.Map">
+        select final_name finalName,count(id) count  from exhumation where state=1 and student_id=#{studentId} and type=3 group by final_name
+    </select>
+
+    <select id="selExhumationCountByNameAndFinalName" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(id) from exhumation where state=1 and name=#{name} and student_id=#{studentId} and final_name =#{finalName}
+    </select>
+
+</mapper>

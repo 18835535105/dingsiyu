@@ -1,0 +1,1248 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.LearnMapper">
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Learn">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="student_id" property="studentId" jdbcType="BIGINT"/>
+        <result column="course_id" property="courseId" jdbcType="BIGINT"/>
+        <result column="unit_id" property="unitId" jdbcType="BIGINT"/>
+        <result column="vocabulary_id" property="vocabularyId" jdbcType="BIGINT"/>
+        <result column="example_id" property="exampleId" jdbcType="BIGINT"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="learn_time" property="learnTime" jdbcType="TIMESTAMP"/>
+        <result column="study_model" property="studyModel" jdbcType="VARCHAR"/>
+        <result column="study_count" property="studyCount" jdbcType="INTEGER"/>
+        <result column="learn_count" property="learnCount" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="first_study_time" property="firstStudyTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 查询learn中的单词还是例句 -->
+    <sql id="countCourseStudyModel_sql">
+        <if test="model == 0 or model == 1 or model == 2 or model == 3">
+            AND example_id IS NULL
+        </if>
+        <if test="model == 4 or model == 5 or model == 6">
+            AND vocabulary_id IS NULL
+        </if>
+    </sql>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, student_id, course_id, unit_id, vocabulary_id, example_id, status, learn_time,
+        study_model, study_count, learn_count, update_time, first_study_time
+    </sql>
+
+    <!--区分单词例句-->
+    <sql id="model_word_example">
+        <if test="model == 0 or model == 1 or model ==2 or model == 3">
+            AND vocabulary_id IS NOT NULL
+        </if>
+        <if test="model == 4 or model == 5 or model == 6">
+            AND example_id IS NOT NULL
+        </if>
+    </sql>
+
+    <!--类型区分-->
+    <sql id="study_model_sql">
+        <if test="model == 0">
+            and study_model = '单词图鉴'
+        </if>
+        <if test="model == 1">
+            and study_model = '慧记忆'
+        </if>
+        <if test="model == 2">
+            and study_model = '慧听写'
+        </if>
+        <if test="model == 3">
+            and study_model = '慧默写'
+        </if>
+        <if test="model == 4">
+            and study_model = '例句听力'
+        </if>
+        <if test="model == 5">
+            and study_model = '例句翻译'
+        </if>
+        <if test="model == 6">
+            and study_model = '例句默写'
+        </if>
+    </sql>
+
+    <!-- 查询当前单元下生词/生句的个数 -->
+    <select id="countNotKnownWord" resultType="java.lang.Long"
+            parameterType="map">
+        select count(id) from learn l where l.student_id = #{studentId} and
+        l.unit_id = #{unitId}
+        <if
+                test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写' or studyModel == '单词图鉴'">
+            and vocabulary_id is not null and (select v.delStatus from
+            vocabulary v where v.id = l.vocabulary_id) = 1
+            <if
+                    test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
+                and example_id is not null
+            </if>
+        </if>
+        and learn_count = #{count}
+        and study_model = #{studyModel} and status = 0
+    </select>
+
+    <!-- 查询当前课程下的单词/例句的学习次数 -->
+    <select id="selectStudyCountByCourseId" resultType="java.lang.Integer"
+            parameterType="map">
+        select study_count from learn where student_id = #{studentId}
+        <if test="unitId == 0">
+            and course_id = #{courseId}
+        </if>
+        <if test="unitId != 0">
+            and unit_id = #{unitId}
+        </if>
+        and learn_count = #{count}
+        and study_model = #{studyModel}
+         and
+        <if
+                test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写' or studyModel == '单词图鉴'">
+            vocabulary_id = #{id}
+            GROUP BY vocabulary_id
+        </if>
+        <if
+                test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
+            example_id = #{id}
+            GROUP BY example_id
+        </if>
+
+
+    </select>
+
+    <!-- 查询指定单词/句子、模块的学习记录 -->
+    <select id="selectLearnByIdAmdModel" resultMap="BaseResultMap"
+            parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from learn where student_id=#{studentId} and
+        unit_id=#{unitId}
+        <if test="wordId != null">
+            and vocabulary_id=#{wordId}
+        </if>
+        <if test="sentenceId != null">
+            and example_id = #{sentenceId}
+        </if>
+        and learn_count = #{count}
+        and
+        study_model=#{studyModel}
+    </select>
+
+    <select id="selectByCount" resultType="java.lang.Long"
+            parameterType="map">
+        select vocabulary_id
+        from learn
+        where
+            student_id = #{studentId} and unit_id = #{unitId}
+        order by learn_time desc
+        limit 0, #{wordCount}
+    </select>
+
+    <select id="selectLearn" resultMap="BaseResultMap"
+            parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from learn where student_id=#{studentId} and
+        unit_id=#{learn.unitId}
+        <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel =='慧默写' or studyModel =='单词图鉴'">
+            and vocabulary_id=#{learn.vocabularyId}
+        </if>
+        <if test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel =='例句默写'">
+            and example_id=#{learn.exampleId}
+        </if>
+        and learn_count = #{count}
+        and
+        study_model=#{studyModel}
+    </select>
+
+    <select id="selectByExample" resultMap="BaseResultMap"
+            parameterType="com.zhidejiaoyu.common.pojo.LearnExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from learn
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap"
+            parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from learn
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from learn
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByExample"
+            parameterType="com.zhidejiaoyu.common.pojo.LearnExample">
+        delete from learn
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Learn">
+        insert into learn
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="studentId != null">
+                student_id,
+            </if>
+            <if test="courseId != null">
+                course_id,
+            </if>
+            <if test="unitId != null">
+                unit_id,
+            </if>
+            <if test="vocabularyId != null">
+                vocabulary_id,
+            </if>
+            <if test="exampleId != null">
+                example_id,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="learnTime != null">
+                learn_time,
+            </if>
+            <if test="studyModel != null">
+                study_model,
+            </if>
+            <if test="studyCount != null">
+                study_count,
+            </if>
+            <if test="learnCount != null">
+                learn_count,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="firstStudyTime != null">
+                first_study_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="studentId != null">
+                #{studentId,jdbcType=BIGINT},
+            </if>
+            <if test="courseId != null">
+                #{courseId,jdbcType=BIGINT},
+            </if>
+            <if test="unitId != null">
+                #{unitId,jdbcType=BIGINT},
+            </if>
+            <if test="vocabularyId != null">
+                #{vocabularyId,jdbcType=BIGINT},
+            </if>
+            <if test="exampleId != null">
+                #{exampleId,jdbcType=BIGINT},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="learnTime != null">
+                #{learnTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="studyModel != null">
+                #{studyModel,jdbcType=VARCHAR},
+            </if>
+            <if test="studyCount != null">
+                #{studyCount,jdbcType=INTEGER},
+            </if>
+            <if test="learnCount != null">
+                #{learnCount,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="firstStudyTime != null">
+                #{firstStudyTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertList" parameterType="java.util.List">
+        insert into learn (id, student_id, course_id,
+        unit_id, vocabulary_id, example_id,
+        `status`, learn_time, study_model,
+        study_count, learn_count, update_time, first_study_time
+        )
+        values
+        <foreach collection="list" item="learn" separator=",">
+            (#{learn.id,jdbcType=BIGINT}, #{learn.studentId,jdbcType=BIGINT}, #{learn.courseId,jdbcType=BIGINT},
+            #{learn.unitId,jdbcType=BIGINT}, #{learn.vocabularyId,jdbcType=BIGINT},
+            #{learn.exampleId,jdbcType=BIGINT},
+            #{learn.status,jdbcType=INTEGER}, #{learn.learnTime,jdbcType=TIMESTAMP},
+            #{learn.studyModel,jdbcType=VARCHAR},
+            #{learn.studyCount,jdbcType=INTEGER}, #{learn.learnCount,jdbcType=INTEGER},
+            #{learn.updateTime,jdbcType=TIMESTAMP}, #{firstStudyTime,jdbcType=TIMESTAMP})
+        </foreach>
+
+
+    </insert>
+    <select id="countByExample"
+            parameterType="com.zhidejiaoyu.common.pojo.LearnExample"
+            resultType="java.lang.Integer">
+        select count(*) from learn
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <select id="countByCourseId" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from learn
+        where student_id = #{studentId}
+          and course_id = #{courseId}
+          and study_model = #{studyModel}
+          and type = 1
+    </select>
+    <select id="countLearnModelByUnitId" resultType="java.lang.Integer" parameterType="map">
+        select count(distinct study_model)
+        from learn
+        where student_id = #{studentId} and unit_id = #{unitId}
+    </select>
+    <select id="countTodayLearnedByStudyModel" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from learn
+        where student_id = #{studentId}
+          and to_days(update_time) = to_days(now())
+          and unit_id = #{unitId}
+          and study_model = #{studyModel}
+          and type = 1
+    </select>
+    <select id="countTodayLearnedKnownWord" resultType="java.lang.Integer">
+        select count(id)
+        from learn
+        where study_model in ('慧记忆', '慧听写', '慧默写')
+          and to_days(update_time) = to_days(now())
+          and `status` = 1
+          and type = 1
+    </select>
+    <select id="selectLastStudyTimeByStudentId" resultType="java.util.Date" parameterType="java.lang.Long">
+        select max(learn_time)
+        from learn
+        where student_id = #{stuId}
+    </select>
+    <select id="selectByStuIdAndCourseId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from learn where student_id = #{studentId} and course_id = #{courseId} and type = 1
+    </select>
+    <select id="countWordsByCourseId" resultType="java.util.Map" parameterType="java.util.List">
+        SELECT
+        l.course_id id,
+        count(l.id) value
+        FROM
+        learn l
+        <if test="flag == 1">
+            ,vocabulary v
+        </if>
+        WHERE
+        <if test="flag == 1">
+            l.vocabulary_id = v.id
+            AND v.delStatus = 1
+            AND l.vocabulary_id IS NOT NULL
+            AND l.vocabulary_id != ''
+        </if>
+        <if test="flag == 2">
+            l.example_id IS NOT NULL
+            AND l.example_id != ''
+        </if>
+        AND l.student_id = #{stuId}
+        AND l.course_id IN (
+        <foreach collection="list" item="course" separator=",">
+            #{course.id}
+        </foreach>
+        )
+    </select>
+    <select id="selectFirstStudyTimeMapByCourseId" resultType="java.util.Map" parameterType="map">
+        SELECT
+        course_id id,
+        first_study_time value
+        FROM
+        learn
+        WHERE
+        first_study_time IS NOT NULL
+        AND student_id = #{stuId}
+        AND course_id in (
+        <foreach collection="courses" item="course" separator=",">
+            #{course.id}
+        </foreach>
+        )
+    </select>
+    <select id="selectLastStudyTimeMapByCourseId" resultType="java.util.Map" parameterType="map">
+        SELECT
+        course_id id,
+        max(learn_time) value
+        FROM
+        learn
+        WHERE
+        student_id = #{stuId}
+        AND course_id in (
+        <foreach collection="courses" item="course" separator=",">
+            #{course.id}
+        </foreach>
+        )
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update learn
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.studentId != null">
+                student_id = #{record.studentId,jdbcType=BIGINT},
+            </if>
+            <if test="record.courseId != null">
+                course_id = #{record.courseId,jdbcType=BIGINT},
+            </if>
+            <if test="record.unitId != null">
+                unit_id = #{record.unitId,jdbcType=BIGINT},
+            </if>
+            <if test="record.vocabularyId != null">
+                vocabulary_id = #{record.vocabularyId,jdbcType=BIGINT},
+            </if>
+            <if test="record.exampleId != null">
+                example_id = #{record.exampleId,jdbcType=BIGINT},
+            </if>
+            <if test="record.status != null">
+                status = #{record.status,jdbcType=INTEGER},
+            </if>
+            <if test="record.learnTime != null">
+                learn_time = #{record.learnTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.studyModel != null">
+                study_model = #{record.studyModel,jdbcType=VARCHAR},
+            </if>
+            <if test="record.studyCount != null">
+                study_count = #{record.studyCount,jdbcType=INTEGER},
+            </if>
+            <if test="record.learnCount != null">
+                learn_count = #{record.learnCount,jdbcType=INTEGER},
+            </if>
+            <if test="record.updateTime != null">
+                update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.firstStudyTime != null">
+                first_study_time = #{record.firstStudyTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update learn
+        set id = #{record.id,jdbcType=BIGINT},
+        student_id = #{record.studentId,jdbcType=BIGINT},
+        course_id = #{record.courseId,jdbcType=BIGINT},
+        unit_id = #{record.unitId,jdbcType=BIGINT},
+        vocabulary_id = #{record.vocabularyId,jdbcType=BIGINT},
+        example_id = #{record.exampleId,jdbcType=BIGINT},
+        status = #{record.status,jdbcType=INTEGER},
+        learn_time = #{record.learnTime,jdbcType=TIMESTAMP},
+        study_model = #{record.studyModel,jdbcType=VARCHAR},
+        study_count = #{record.studyCount,jdbcType=INTEGER},
+        learn_count = #{record.learnCount,jdbcType=INTEGER},
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+        first_study_time = #{record.firstStudyTime,jdbcType=TIMESTAMP}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.Learn">
+        update learn
+        <set>
+            <if test="studentId != null">
+                student_id = #{studentId,jdbcType=BIGINT},
+            </if>
+            <if test="courseId != null">
+                course_id = #{courseId,jdbcType=BIGINT},
+            </if>
+            <if test="unitId != null">
+                unit_id = #{unitId,jdbcType=BIGINT},
+            </if>
+            <if test="vocabularyId != null">
+                vocabulary_id = #{vocabularyId,jdbcType=BIGINT},
+            </if>
+            <if test="exampleId != null">
+                example_id = #{exampleId,jdbcType=BIGINT},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="learnTime != null">
+                learn_time = #{learnTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="studyModel != null">
+                study_model = #{studyModel,jdbcType=VARCHAR},
+            </if>
+            <if test="studyCount != null">
+                study_count = #{studyCount,jdbcType=INTEGER},
+            </if>
+            <if test="learnCount != null">
+                learn_count = #{learnCount,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="firstStudyTime != null">
+                first_study_time = #{firstStudyTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.Learn">
+        update learn
+        set student_id       = #{studentId,jdbcType=BIGINT},
+            course_id        = #{courseId,jdbcType=BIGINT},
+            unit_id          = #{unitId,jdbcType=BIGINT},
+            vocabulary_id    = #{vocabularyId,jdbcType=BIGINT},
+            example_id       = #{exampleId,jdbcType=BIGINT},
+            status           = #{status,jdbcType=INTEGER},
+            learn_time       = #{learnTime,jdbcType=TIMESTAMP},
+            study_model      = #{studyModel,jdbcType=VARCHAR},
+            study_count      = #{studyCount,jdbcType=INTEGER},
+            learn_count      = #{learnCount,jdbcType=INTEGER},
+            update_time      = #{updateTime,jdbcType=TIMESTAMP},
+            first_study_time = #{firstStudyTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateUnknownWords" parameterType="map">
+        update learn set `status` = 0 where student_id = #{student.id} and course_id = #{courseId} and unit_id =
+        #{unitId} and learn_count = #{studyCount}
+        <include refid="study_model_sql"/>
+        <if test="model == 0 || model == 1 or model == 2 or model == 3">
+            and vocabulary_id
+        </if>
+        <if test="model == 4 or model == 5 or model == 6">
+            and example_id
+        </if>
+        in (
+        <foreach collection="wordIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </update>
+
+
+    <select id="countKnownCountByStudentIdAndCourseId" resultType="java.lang.Integer" parameterType="map">
+        SELECT
+        <if test="model == 1 or model == 2 or model == 3">
+            count(DISTINCT vocabulary_id)
+        </if>
+        <if test="model == 4 or model == 5 or model == 6">
+            count(DISTINCT example_id)
+        </if>
+        FROM
+        learn
+        WHERE
+        student_id = #{stuId}
+        AND learn_count = #{learnCount}
+        AND course_id = #{courseId}
+        <if test="flag == 1">
+            AND `status` = 1
+        </if>
+        <if test="flag == 2">
+            AND `status` = 0
+        </if>
+        <include refid="study_model_sql"/>
+    </select>
+    <select id="selectNumberByStudentId" parameterType="map" resultType="int">
+        select
+        	COUNT(a.id)
+        from
+        	learn a JOIN vocabulary b ON a.vocabulary_id = b.id
+        where
+        	a.student_id = #{student_id}
+        	and a.unit_id = #{unit_id}
+        	and a.study_model = <include refid="simple_test_type"/>
+        	AND b.delStatus = 1
+            and type = 1
+    </select>
+    <select id="countKnownCountByStudentIdAndUnitId" resultType="java.lang.Integer" parameterType="map">
+        SELECT
+        <if test="model == 1 or model == 2 or model == 3">
+            count(DISTINCT vocabulary_id)
+        </if>
+        <if test="model == 4 or model == 5 or model == 6">
+            count(DISTINCT example_id)
+        </if>
+        FROM
+        learn
+        WHERE
+        student_id = #{stuId}
+        AND learn_count = #{learnCount}
+        AND unit_id = #{unitId}
+        <if test="flag == 1">
+            AND `status` = 1
+        </if>
+        <if test="flag == 2">
+            AND `status` = 0
+        </if>
+        <include refid="study_model_sql"/>
+    </select>
+
+    <select id="mapWeekCountQuantity" parameterType="map" resultType="map">
+		SELECT
+			count(id) AS count,
+			(
+				SELECT
+					count(id)
+				FROM
+					learn
+				WHERE
+					date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+				AND date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+				AND student_id = #{studentId}
+				AND study_model = '单词辨音'
+			    and type = 1
+			) AS a,
+			(
+				SELECT
+					count(id)
+				FROM
+					learn
+				WHERE
+					date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+				AND date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+				AND student_id = #{studentId}
+				AND study_model = '词组辨音'
+                and type = 1
+			) AS b,
+			(
+				SELECT
+					count(id)
+				FROM
+					learn
+				WHERE
+					date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+				AND date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+				AND student_id = #{studentId}
+				AND study_model = '快速单词'
+                and type = 1
+			) AS c,
+			(
+				SELECT
+					count(id)
+				FROM
+					learn
+				WHERE
+					date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+				AND date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+				AND student_id = #{studentId}
+				AND study_model = '快速词组'
+                and type = 1
+			) AS d,
+			(
+				SELECT
+					count(id)
+				FROM
+					learn
+				WHERE
+					date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+				AND date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+				AND student_id = #{studentId}
+				AND study_model = '词汇考点'
+                and type = 1
+			) AS e,
+			(
+				SELECT
+					count(id)
+				FROM
+					learn
+				WHERE
+					date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+				AND date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+				AND student_id = #{studentId}
+				AND study_model = '快速句型'
+                and type = 1
+			) AS f,
+			(
+				SELECT
+					count(id)
+				FROM
+					learn
+				WHERE
+					date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+				AND date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+				AND student_id = #{studentId}
+				AND study_model = '语法辨析'
+                and type = 1
+			) AS g,
+			(
+				SELECT
+					count(id)
+				FROM
+					learn
+				WHERE
+					date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+				AND date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+				AND student_id = #{studentId}
+				AND study_model = '单词默写'
+                and type = 1
+			) AS h,
+			(
+				SELECT
+					count(id)
+				FROM
+					learn
+				WHERE
+					date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+				AND date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+				AND student_id = #{studentId}
+				AND study_model = '词组默写'
+                and type = 1
+        ) AS i,
+        (
+        select count(id) from learn where date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+        AND date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+        AND student_id = #{studentId} and study_model in ('单词图鉴','慧记忆','慧听写','慧默写') and type = 1
+        ) word,
+        (
+        select count(id) from learn where date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+        AND date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+        AND student_id = #{studentId} and study_model in ('例句听力','例句默写','例句翻译') and type = 1
+        ) sentence,
+        (
+        select count(id) from test_record where student_id = #{studentId} and genre = '课文测试'
+        and date_format(test_start_time, '%Y-%m-%d') &gt;= #{weekStart}
+        AND date_format(test_start_time, '%Y-%m-%d') &lt;= #{weekEnd}
+        ) text
+		FROM
+			learn
+		WHERE
+			date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+		AND date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+		AND student_id = #{studentId}
+        and type = 1
+    </select>
+
+
+    <select id="countCourseStudyModel" parameterType="map" resultType="String">
+        select
+        count(id)
+        from
+        learn
+        where
+        course_id = #{course_id} AND student_id = #{studentId}
+        <include refid="countCourseStudyModel_sql"/>
+        <include refid="study_model_sql"/>
+    </select>
+
+    <select id="countUnitStudyModel" parameterType="map" resultType="map">
+        select COUNT(id) AS count, sum(id) AS sum from learn where student_id = #{studentId} AND course_id =
+        #{course_id}
+        <include refid="study_model_sql"/>
+        <include refid="countCourseStudyModel_sql"/>
+        AND unit_id =
+        (select MAX(unit_id) from learn where student_id = #{studentId} AND course_id = #{course_id}
+        <include refid="study_model_sql"/>
+        <include refid="countCourseStudyModel_sql"/>) GROUP BY id
+    </select>
+
+    <sql id="countByWordOrderBy_sql">
+        <if test="model == 1 or model == 2 or model == 3">
+            vocabulary_id
+        </if>
+        <if test="model == 4 or model == 5 or model == 6">
+            example_id
+        </if>
+    </sql>
+    <select id="countKnownCountByStudentId" resultType="java.lang.Integer" parameterType="map">
+        SELECT
+        count(id)
+        FROM
+        learn
+        WHERE
+        student_id = #{student.id}
+        <if test="model == 1">
+            and study_model in ('快速单词', '快速句型', '语法辨析', '快速词组', '词汇考点', '慧记忆')
+        </if>
+        <if test="model == 2">
+            and study_model = '慧听写'
+        </if>
+        <if test="model == 3">
+            and study_model in ('单词默写', '词组默写', '慧默写')
+        </if>
+        <if test="model == 4">
+            and study_model = '例句听力'
+        </if>
+        <if test="model == 5">
+            and study_model = '例句翻译'
+        </if>
+        <if test="model == 6">
+            and study_model = '例句默写'
+        </if>
+        AND `status` = 1
+    </select>
+    <select id="countByWord" parameterType="map" resultType="Integer">
+        SELECT * FROM learn a where unit_id = #{unitId} AND student_id = #{studentId} AND study_model =
+        <include refid="study_model_sql"/>
+        <include refid="countCourseStudyModel_sql"/>
+        GROUP BY
+        <include refid="countByWordOrderBy_sql"/>
+    </select>
+    <select id="selectLearnedByStudentId" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        learn
+        WHERE
+        student_id = #{stuId}
+        AND course_id = #{courseId}
+        <include refid="study_model_sql"/>
+        GROUP BY
+        <if test="model == 1 or model == 2 or model == 3">
+            vocabulary_id
+        </if>
+        <if test="model == 4 or model == 5 or model == 6">
+            example_id
+        </if>
+        ORDER BY
+        learn_time DESC
+    </select>
+    <select id="countLearnWordByStudentIdAndCourseIdAndStudyModel" resultType="java.lang.Integer" parameterType="map">
+        SELECT
+        count(DISTINCT vocabulary_id)
+        FROM
+            learn
+        WHERE
+            student_id = #{stuId}
+            AND course_id = #{courseId}
+            <include refid="study_model_sql"/>
+    </select>
+    <select id="selectVocabularyIdByStudentIdAndCourseId" resultType="java.lang.Long" parameterType="map">
+        SELECT DISTINCT
+        <if test="model == 0 or model == 1 or model == 2 or model == 3">
+            l.vocabulary_id
+        </if>
+        <if test="model == 4 or model == 5 or model == 6">
+            l.example_id
+        </if>
+        FROM
+        learn l,
+        <if test="model == 0 or model == 1 or model == 2 or model == 3">
+            unit_vocabulary uv
+        </if>
+        <if test="model == 4 or model == 5 or model == 6">
+            unit_sentence us
+        </if>
+        WHERE
+        l.student_id = #{stuId}
+        AND l.course_id = #{courseId}
+
+        <if test="model == 0 or model == 1 or model == 2 or model == 3">
+            AND uv.unit_id = l.unit_id
+            AND uv.vocabulary_id = l.vocabulary_id
+        </if>
+        <if test="model == 4 or model == 5 or model == 6">
+            AND us.unit_id = l.unit_id
+            AND us.sentence_id = l.example_id
+        </if>
+        <include refid="study_model_sql"/>
+    </select>
+
+    <!-- 查询学生当前单元当前模块下已学习单词/例句的个数，即学习进度 -->
+    <select id="learnCountWord" resultType="java.lang.Long"
+            parameterType="map">
+        select count(id) from learn l where
+        l.student_id=#{studentId}
+        and l.unit_id=#{unitId} and l.study_model =
+        #{studyModel}
+        <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写' or studyModel == '单词图鉴'">
+            and l.vocabulary_id is not null and (select v.delStatus from
+            vocabulary v where v.id = l.vocabulary_id) = 1
+        </if>
+        <if
+                test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
+            and example_id is not null
+        </if>
+    </select>
+    <select id="selectLearnedWordIdByUnitId" resultType="java.lang.Long" parameterType="map">
+        select
+        <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写'">
+            l.vocabulary_id
+        </if>
+        <if test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
+            l.example_id
+        </if>
+        from learn l where
+        l.student_id=#{student.id}
+        and l.unit_id=#{unitId} and l.study_model =
+        #{studyModel}
+        <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写'">
+            and l.vocabulary_id is not null and (select v.delStatus from
+            vocabulary v where v.id = l.vocabulary_id) = 1
+        </if>
+        <if
+                test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
+            and example_id is not null
+        </if>
+        and l.learn_count = #{maxCount}
+    </select>
+    <select id="selectByStudentIdAndWorldId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from learn where student_id = #{studentId} and vocabulary_id = #{wordId}
+    </select>
+    <select id="selectThirtyVocabularyIdByStudentIdAndCourseId" resultType="java.lang.Long" parameterType="map">
+        select distinct vocabulary_id
+        from learn
+        where study_model = '慧记忆' and student_id = #{stuId} and course_id = #{courseId}
+        order by id desc
+        limit 30
+    </select>
+
+    <select id="countLearnWordByCourse" resultType="java.lang.Long" parameterType="map">
+        select count(l.id) from learn l, vocabulary v
+        where v.id = l.vocabulary_id
+        and v.delStatus = 1
+        and l.student_id=#{studentId}
+        and l.study_model = #{typeStr}
+        and l.type = 1
+        <if test="courseIds.size > 0">
+            and l.course_id in (
+            <foreach collection="courseIds" separator="," item="id">
+                #{id}
+            </foreach>
+            )
+        </if>
+    </select>
+
+    <select id="countByStudentId" resultType="java.lang.Integer" parameterType="map">
+        select
+        <if test="flag == 1">
+            count(distinct l.vocabulary_id)
+        </if>
+        <if test="flag == 2">
+            count(distinct l.example_id)
+        </if>
+        from learn l
+        where
+        <if test="flag == 1">
+            l.example_id is null
+        </if>
+        <if test="flag == 2">
+            l.vocabulary_id is null
+        </if>
+        and l.student_id = #{studentId}
+    </select>
+    <select id="countMasterWord" resultType="java.lang.Integer" parameterType="map">
+        SELECT
+            count(DISTINCT m.vocabulary_id)
+        FROM
+            (
+                SELECT
+                    unit_id,
+                    vocabulary_id
+                FROM
+                    learn
+                WHERE
+                    student_id = #{student.id}
+                    AND study_model = '慧记忆'
+                    AND `status` = 1
+            ) m,
+            (
+                SELECT
+                    unit_id,
+                    vocabulary_id
+                FROM
+                    learn
+                WHERE
+                    student_id = #{student.id}
+                    AND study_model = '慧听写'
+                    AND `status` = 1
+            ) l,
+            (
+                SELECT
+                    unit_id,
+                    vocabulary_id
+                FROM
+                    learn
+                WHERE
+                    student_id = #{student.id}
+                    AND study_model = '慧默写'
+                    AND `status` = 1
+            ) w,
+            unit u,
+            course c
+        WHERE
+            m.unit_id = l.unit_id
+            AND l.unit_id = w.unit_id
+            AND m.vocabulary_id = l.vocabulary_id
+            AND w.vocabulary_id = l.vocabulary_id
+            AND m.unit_id = u.id
+            AND u.course_id = c.id
+            AND c.study_paragraph = #{phase}
+    </select>
+    <select id="countMasterSentence" resultType="java.lang.Integer" parameterType="map">
+        SELECT
+            count(DISTINCT m.example_id)
+        FROM
+            (
+                SELECT
+                    unit_id,
+                    example_id
+                FROM
+                    learn
+                WHERE
+                    student_id = #{student.id}
+                    AND study_model = '例句听力'
+                    AND `status` = 1
+            ) m,
+            (
+                SELECT
+                    unit_id,
+                    example_id
+                FROM
+                    learn
+                WHERE
+                    student_id = #{student.id}
+                    AND study_model = '例句翻译'
+                    AND `status` = 1
+            ) l,
+            (
+                SELECT
+                    unit_id,
+                    example_id
+                FROM
+                    learn
+                WHERE
+                    student_id = #{student.id}
+                    AND study_model = '例句默写'
+                    AND `status` = 1
+            ) w,
+            unit u,
+            course c
+        WHERE
+            m.unit_id = l.unit_id
+            AND l.unit_id = w.unit_id
+            AND m.example_id = l.example_id
+            AND w.example_id = l.example_id
+            AND m.unit_id = u.id
+            AND u.course_id = c.id
+            AND c.study_paragraph = #{phase}
+    </select>
+    <select id="countGreaterLearnedCount" resultType="java.lang.Integer" parameterType="map">
+        SELECT count(DISTINCT l.student_id)
+        FROM
+            learn l,
+            (
+                SELECT
+
+                    (
+                        count(DISTINCT l1.example_id) + count(DISTINCT l1.vocabulary_id)
+                    )             num,
+                    l1.student_id student_id
+                FROM
+                    learn l1,
+                    course cs
+                WHERE
+                    l1.course_id = cs.id
+                    AND cs.study_paragraph = #{phase}
+                    AND cs.version = #{student.version}
+                GROUP BY
+                    student_id
+            ) c
+        WHERE
+            l.student_id = c.student_id
+            AND c.num > #{learnedCount}
+    </select>
+    <select id="countUnitAllStudyModel" resultType="java.lang.Integer">
+        select
+        count(id)
+        from
+        learn
+        where
+        unit_id = #{unitId} AND student_id = #{studentId}
+        <include refid="countCourseStudyModel_sql"/>
+        <include refid="study_model_sql"/>
+    </select>
+
+<!-- 简洁版 -->
+	<!-- '1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写;', -->
+	<sql id="simple_test_type">
+		<if test="type == 1">
+			"单词辨音"
+		</if>
+		<if test="type == 2">
+			"词组辨音"
+		</if>
+		<if test="type == 3">
+			"快速单词"
+		</if>
+		<if test="type == 4">
+			"快速词组"
+		</if>
+		<if test="type == 5">
+			"词汇考点"
+		</if>
+		<if test="type == 6">
+			"快速句型"
+		</if>
+		<if test="type == 7">
+			"语法辨析"
+		</if>
+		<if test="type == 8">
+			"单词默写"
+		</if>
+		<if test="type == 9">
+			"词组默写"
+		</if>
+	</sql>
+
+	<select id="getSimpleLearnByStudentIdByModel" parameterType="map" resultType="Long">
+        select count(a.id) from learn a JOIN vocabulary b ON a.vocabulary_id = b.id
+        and a.student_id = #{studentId} AND a.unit_id = #{unitId} and b.delStatus = 1
+        and a.study_model =
+        <include refid="simple_test_type"/>
+        and a.type = 1
+	</select>
+    <select id="countUnknownWord" resultType="java.lang.Long" parameterType="map">
+        select count(l.id) from vocabulary v, learn l
+        where v.id = l.vocabulary_id
+        and v.delStatus = 1
+        and l.student_id = #{studentId}
+        and l.study_model = #{typeStr}
+        and l.type = 1
+        <if test="courseIds.size > 0">
+            and course_id in (
+            <foreach collection="courseIds" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+        and l.status = 0
+    </select>
+    <select id="selectCourseWordNumberByStudentId" parameterType="map" resultType="int">
+    	select
+        	COUNT(a.id)
+        from
+        	learn a JOIN vocabulary b ON a.vocabulary_id = b.id
+        where
+        	a.student_id = #{student_id}
+        	and a.course_id = #{course_id}
+        	and a.study_model = <include refid="simple_test_type"/>
+        	AND b.delStatus = 1
+            and a.type = 1
+    </select>
+
+    <select id="selectLearnRecord" resultMap="BaseResultMap" parameterType="map">
+        select <include refid="Base_Column_List"/>
+        from learn
+        where student_id = #{student.id}
+          and unit_id = #{unitId}
+          and vocabulary_id = #{vocabularyId}
+          and study_model = #{type}
+        and type = 1
+        limit 1
+    </select>
+    <select id="getSimpleCourseId" resultType="com.zhidejiaoyu.common.pojo.StudentCourse" parameterType="map">
+        SELECT a.course_id AS courseId, b.version AS courseName, a.update_time AS updateTime
+        FROM learn a
+                 join student_unit su on su.unit_id = a.unit_id and su.student_id = a.student_id and su.type = 2
+                 JOIN course b ON a.course_id = b.id AND a.student_id = #{student_id} and a.type = 1
+        GROUP BY a.course_id
+        ORDER BY a.update_time DESC
+    </select>
+    <select id="countTodayRestudyAndMemoryStrengthGePercentFifty" resultType="java.lang.Integer" parameterType="map">
+        select count(distinct sr.vocabulary_id)
+        from simple_capacity sc,
+             student_restudy sr
+        where sc.student_id = sr.student_id
+          and sc.unit_id = sr.unit_id
+          and sr.type = 1
+          and to_days(sr.update_time) = to_days(now())
+          and sc.student_id = #{student.id} and sc.memory_strength >= 0.5
+    </select>
+    <select id="countUnitLearnWordMapByUnitIds" resultType="java.util.Map" parameterType="map">
+        select unit_id unitId, count(id) count
+        from learn
+        where student_id = #{studentId}
+        and unit_id in (
+        <foreach collection="unitIds" item="unitId" separator=",">
+            #{unitId}
+        </foreach>
+        )
+        and study_model = #{modelName}
+        and type = 1
+        group by unit_id
+    </select>
+</mapper>
