@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimpleAwardMapper">
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Award">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="student_id" property="studentId" jdbcType="BIGINT"/>
+        <result column="medal_type" property="medalType" jdbcType="BIGINT"/>
+        <result column="award_content_type" property="awardContentType" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="VARCHAR"/>
+        <result column="can_get" property="canGet" jdbcType="INTEGER"/>
+        <result column="get_flag" property="getFlag" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="get_time" property="getTime" jdbcType="TIMESTAMP"/>
+        <result column="current_plan" property="currentPlan" jdbcType="INTEGER"/>
+        <result column="total_plan" property="totalPlan" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, student_id, medal_type, award_content_type, type, can_get, get_flag, get_time, create_time, current_plan, total_plan
+    </sql>
+    <insert id="insertList" parameterType="map" useGeneratedKeys="true" keyProperty="id">
+        insert into award (id, student_id, medal_type,
+        award_content_type, type, can_get,
+        get_flag, create_time, get_time, total_plan, current_plan)
+        values
+        <foreach collection="awardList" item="award" separator=",">
+            (#{award.id,jdbcType=BIGINT}, #{award.studentId,jdbcType=BIGINT}, #{award.medalType,jdbcType=BIGINT},
+            #{award.awardContentType,jdbcType=INTEGER}, #{award.type,jdbcType=VARCHAR},
+            #{award.canGet,jdbcType=INTEGER},
+            #{award.getFlag,jdbcType=INTEGER}, #{award.createTime,jdbcType=TIMESTAMP},
+            #{award.getTime,jdbcType=TIMESTAMP}, #{award.totalPlan}, #{award.currentPlan})
+        </foreach>
+
+    </insert>
+    <delete id="deleteDailyAward">
+        delete
+        from award
+        where type = 1
+    </delete>
+    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.AwardExample" resultType="java.lang.Integer">
+        select count(*) from award
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <select id="selectByAwardContentTypeAndType" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from award
+        where
+        student_id = #{studentId}
+        <if test="type == 1">
+            and to_days(create_time) = to_days(now())
+        </if>
+        and type = #{type} and
+        award_content_type = #{awardContentType} limit 1
+    </select>
+    <select id="selectByIdAndStuId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from award where id = #{awareId} and student_id = #{stuId}
+    </select>
+    <select id="selectMedalByStudentIdAndMedalType" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        award
+        WHERE
+        student_id = #{student.id}
+        AND medal_type IN (
+        <foreach collection="children" item="medal" separator=",">
+            #{medal.id}
+        </foreach>
+        ) order by id asc
+    </select>
+    <select id="selectDailyAwardByStudentId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from award where type = 1 and to_days(create_time) = to_days(now()) and student_id = #{studentId} and can_get =
+        1
+    </select>
+
+    <select id="selectMedalByStudentsIdAndMedalType" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        award
+        WHERE
+        <foreach collection="conditionList" item="condition" separator="or">
+            #{condition}
+        </foreach>
+    </select>
+    <select id="selectMedalUrl" resultType="java.lang.String" parameterType="map">
+        select m.child_img_url
+        from award a,
+             medal m
+        where m.id = a.medal_type
+          and a.type = 3
+          and a.get_flag = 1
+          and a.student_id = #{student.id}
+        group by m.parent_name
+        order by a.id asc
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.Award">
+        update award
+        <set>
+            <if test="studentId != null">
+                student_id = #{studentId,jdbcType=BIGINT},
+            </if>
+            <if test="medalType != null">
+                medal_type = #{medalType,jdbcType=BIGINT},
+            </if>
+            <if test="awardContentType != null">
+                award_content_type = #{awardContentType,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="canGet != null">
+                can_get = #{canGet,jdbcType=INTEGER},
+            </if>
+            <if test="getFlag != null">
+                get_flag = #{getFlag,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="getTime != null">
+                get_time = #{getTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="getMapKeyStudentXZ" resultType="map">
+		select a.student_id AS id, count(a.id) as count from award a join student b ON a.student_id = b.id where a.type = 3 and a.can_get = 1 and a.get_flag = 1 AND b.role = 1 GROUP BY a.student_id
+    </select>
+    <select id="selectLatestMedalInClass" resultType="java.util.Map" parameterType="map">
+        select s.nickname nickName, concat(m.parent_name, m.child_name) medalName
+        from student s,
+        award a,
+        medal m
+        where s.id = a.student_id
+        and a.medal_type = m.id
+        <if test="student.classId == null">
+            and s.teacher_id = #{student.teacherId} and s.class_id is null
+        </if>
+        <if test="student.classId != null">
+            and s.class_id = #{student.classId}
+        </if>
+        and to_days(get_time) = to_days(#{date})
+        order by a.get_time desc
+        limit 10
+    </select>
+    <select id="countMedalWithStudent" resultType="java.util.Map">
+        select student_id studentId, count(id) count
+        from award
+        where type = 3
+          and get_flag = 1
+        group by student_id
+    </select>
+    <select id="selCountAwardByStudentIds" parameterType="map" resultType="map">
+        select count(id) award,student_id studentId from award where type = 3 and get_flag=1 and student_id in(
+        <foreach collection="list" item="studentIds" separator=",">
+            #{studentIds}
+        </foreach>
+        )
+        group by student_Id
+
+    </select>
+    <select id="countCompleteAllDailyAward" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from award
+        where student_id = #{student.id}
+          and type = 1
+          and can_get = 1
+          and to_days(create_time) = to_days(now())
+    </select>
+    <select id="selectAwardVos" resultType="com.zhidejiaoyu.common.Vo.simple.AwardVo" parameterType="map">
+        select a.id,
+               act.img_url                     imgUrl,
+               act.award_content               content,
+               act.award_gold                  gold,
+               act.total_plan                  totalPlan,
+               a.current_plan                  currentPlan,
+               if(a.can_get = 1, true, false)  canGet,
+               if(a.get_flag = 1, true, false) getFlag
+        from award a,
+             award_content_type act
+        where a.award_content_type = act.id
+        and a.student_id = #{student.id}
+        and a.type = #{type}
+        <if test="type == 1">
+            and to_days(a.create_time) = to_days(now())
+        </if>
+        order by a.current_plan / act.total_plan desc
+    </select>
+    <select id="selectByStudentIdAndMedalType" resultMap="BaseResultMap" parameterType="map">
+        select <include refid="Base_Column_List"/>
+        from award
+        where student_id = #{studentId}
+          and medal_type = #{medalId}
+        limit 1
+    </select>
+    <select id="selectMedalAwardVos" resultType="com.zhidejiaoyu.common.Vo.simple.AwardVo" parameterType="map">
+        select a.id,
+               m.child_img_url                 imgUrl,
+               m.marked_words                  content,
+               a.total_plan                    totalPlan,
+               a.current_plan                  currentPlan,
+               if(a.can_get = 1, true, false)  canGet,
+               if(a.get_flag = 1, true, false) getFlag
+        from award a,
+             medal m
+        where a.medal_type = m.id
+          and a.student_id = #{student.id}
+          and a.type = 3
+        order by a.current_plan / a.total_plan desc
+    </select>
+    <select id="countCanGet" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from award
+        where student_id = #{student.id}
+        and type = #{type}
+        <if test="type == 1">
+            and to_days(create_time) = to_days(now())
+        </if>
+        and can_get = 1 and get_flag = 2
+    </select>
+    <select id="countTotalMedal" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from award
+        where student_id = #{studentId}
+          and type = 3
+    </select>
+    <select id="countGetModel" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from award
+        where student_id = #{studentId}
+          and type = 3
+          and get_flag = 1
+    </select>
+
+    <select id="selAwardCountByStudentId" parameterType="long" resultType="map">
+        select medal.child_name name,count(award.id) number
+        from award award
+        join medal medal
+        where award.medal_type=medal.id and get_flag = 1 and award.student_id=#{studentId}
+        group by medal.child_name
+    </select>
+
+
+</mapper>

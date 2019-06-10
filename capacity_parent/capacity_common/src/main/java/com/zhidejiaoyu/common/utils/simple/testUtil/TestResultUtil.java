@@ -4,7 +4,7 @@ import com.zhidejiaoyu.common.mapper.simple.UnitVocabularyMapper;
 import com.zhidejiaoyu.common.mapper.simple.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
-import com.zhidejiaoyu.common.study.simple.CommonMethod;
+import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.simple.language.BaiduSpeak;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -31,7 +31,7 @@ public class TestResultUtil implements Serializable {
     private UnitVocabularyMapper unitVocabularyMapper;
 
     @Autowired
-    private CommonMethod commonMethod;
+    private SimpleCommonMethod simpleCommonMethod;
 
     @Autowired
     private VocabularyMapper vocabularyMapper;
@@ -373,7 +373,7 @@ public class TestResultUtil implements Serializable {
             result = new SentenceTestResult();
             result.setId(sentence.getId());
             result.setSentence(sentence.getCentreExample().replace("#", " "));
-            result.setChaosSentence(commonMethod.getOrderEnglishList(sentence.getCentreExample(), sentence.getExampleDisturb()));
+            result.setChaosSentence(simpleCommonMethod.getOrderEnglishList(sentence.getCentreExample(), sentence.getExampleDisturb()));
             result.setSentenctChinese(sentence.getCentreTranslate().replace("*", ""));
             result.setReadUrl(baiduSpeak.getLanguagePath(sentence.getCentreExample().replace("#", " ")));
             sentenceTestResults.add(result);
