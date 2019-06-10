@@ -881,14 +881,10 @@
         limit 1,1
     </select>
 
-    <select id="selectUnitTestMaxPointByStudyModels" resultType="map" parameterType="map">
-        select max(point) max,unit_id unitId
+    <select id="selectUnitTestMaxPointByStudyModels" resultType="Integer" parameterType="map">
+        select max(point)
         from test_record
-        where unit_id in (
-        <foreach collection="letterUnitIds" separator="," item="unitId">
-            #{unitId}
-        </foreach>
-        )
+        where unit_id = #{letterUnitId}
         and student_id = #{studentId}
         <include refid="study_model_sql"/>
         group by unit_id

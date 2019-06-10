@@ -166,13 +166,12 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 for (LetterUnit letterUnit : letterUnits) {
                     letterUnitIds.add(letterUnit.getId());
                 }
-                Map<Integer, Map<String, Object>> LetterPosttestMap = testRecordMapper.selectUnitTestMaxPointByStudyModels(studentId, letterUnitIds, 10);
+
                 //查看学后测试是否开启
                 boolean falg = true;
                 for (Integer letterUnitId : letterUnitIds) {
-                    Map<String, Object> maps = LetterPosttestMap.get(letterUnitId);
-                    if (maps != null && maps.get("max") != null) {
-                        Integer max = Integer.getInteger(maps.get("max").toString());
+                    Integer max=testRecordMapper.selectUnitTestMaxPointByStudyModels(studentId, letterUnitId, 10);
+                    if (max != null) {
                         if (max < 100) {
                             falg = false;
                         }
