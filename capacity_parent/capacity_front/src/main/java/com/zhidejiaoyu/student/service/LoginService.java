@@ -16,11 +16,6 @@ import java.util.Map;
  * @version 1.0
  */
 public interface LoginService extends BaseService<Student>{
-
-    Student LoginJudge(String account, String password);
-
-    Integer judgeUser(Long id);
-
     /***
      * 修改密码
      *

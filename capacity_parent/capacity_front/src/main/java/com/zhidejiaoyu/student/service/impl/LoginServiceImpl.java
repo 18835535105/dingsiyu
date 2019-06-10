@@ -20,7 +20,6 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.LoginService;
 import org.apache.commons.lang.StringUtils;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,17 +129,14 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Autowired
     private LocationUtil locationUtil;
 
-    @Override
-    public Student LoginJudge(String account, String password) {
+    @Autowired
+    private RedisOpt redisOpt;
+
+    public Student loginJudge(String account, String password) {
         Student st = new Student();
         st.setAccount(account);
         st.setPassword(password);
-        return studentMapper.LoginJudge(st);
-    }
-
-    @Override
-    public Integer judgeUser(Long id) {
-        return studentMapper.judgeUser(id);
+        return studentMapper.loginJudge(st);
     }
 
     @Override
@@ -707,24 +703,24 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse loginJudge(String account, String password, HttpSession session, HttpServletRequest request, String code) {
 
-        // 封装返回数据
-        Map<String, Object> result = new HashMap<>(16);
-
-        Student stu = LoginJudge(account, password);
+        Student stu = this.loginJudge(account, password);
 
         // 1.账号/密码错误
         if (stu == null) {
             logger.warn("学生账号[{}]账号或密码输入错误，登录失败。", account);
             return ServerResponse.createByErrorMessage("账号或密码输入错误");
             // 2.账号已关闭
-        }else if(stu.getStatus() != null && stu.getStatus()==2) {
-        	return ServerResponse.createByErrorMessage("此账号已关闭");
+        } else if (stu.getStatus() != null && stu.getStatus() == 2) {
+            return ServerResponse.createByErrorMessage("此账号已关闭");
 
         } else if (stu.getStatus() != null && stu.getStatus() == 3) {
             // 账号被删除
             return ServerResponse.createByErrorMessage("此账号已被删除");
             // 3.正确
         } else {
+            // 封装返回数据
+            Map<String, Object> result = new HashMap<>(16);
+
             // 将登录的学生放入指定 key 用于统计在线人数
             redisTemplate.opsForSet().add(RedisKeysConst.ONLINE_USER, stu.getId());
 
@@ -766,8 +762,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 一个账户只能登陆一台
             judgeMultipleLogin(session, stu);
 
-            // 每次登陆默认打开背景音
-            openBackAudio(stu);
             // 2.判断是否需要完善个人信息
             if (!StringUtils.isNotBlank(stu.getHeadUrl())) {
 
@@ -775,9 +769,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 result.put("school_name", stu.getSchoolName());
                 // 到期时间
                 result.put("account_time", stu.getAccountTime());
-
-                // 学生首次登陆系统，为其初始化7个工作日,以便判断其二级标签
-               // initStudentWorkDay(stu);
 
                 // 2.1 跳到完善个人信息页面
                 logger.info("学生[{} -> {} -> {}]登录成功前往完善信息页面。", stu.getId(), stu.getAccount(), stu.getStudentName());
@@ -787,9 +778,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 判断学生是否需要进行智能复习,学生登录时在session中增加该字段，在接口 /login/vocabularyIndex 如果获取到该字段不为空，
             // 判断学生是否需要进行智能复习，如果该字段为空不再判断是否需要进行智能复习
             session.setAttribute("needCapacityReview", true);
-
-            // 值得元老勋章
-            medalAwardAsync.oldMan(stu);
 
             // 判断学生是否是在加盟校半径 1 公里外登录
             final String finalIP = ip;
@@ -885,66 +873,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         return joinSchool;
     }
 
-    /**
-     * 每次登陆默认打开背景音乐
-     *
-     * @param student
-     */
-    private void openBackAudio(Student student) {
-        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
-        if (studentExpansion != null) {
-            studentExpansion.setAudioStatus(1);
-            studentExpansionMapper.updateById(studentExpansion);
-        } else {
-            studentExpansion = new StudentExpansion();
-            studentExpansion.setStudentId(student.getId());
-            studentExpansion.setAudioStatus(1);
-            studentExpansionMapper.insert(studentExpansion);
-        }
-    }
-
-    /**
-     * 判断学生是否可以学习同步班课程
-     *
-     * @param student
-     * @param result
-     * @return
-     */
-    private void hasCapacityCourse(Student student, Map<String, Object> result) {
-        int count = capacityStudentUnitMapper.countByType(student, 1);
-        if (count > 0) {
-            result.put("capacity", true);
-        }
-    }
-
-    /**
-     * 判断学生是否可以学习同步班句型课程
-     *
-     * @param student
-     * @param result
-     * @return
-     */
-    private void hasCapacitySentence(Student student, Map<String, Object> result) {
-        int count = capacityStudentUnitMapper.countByType(student, 2);
-        if (count > 0) {
-            result.put("capacitySentence", true);
-        }
-    }
-
-    /**
-     * 判断学生是否可以学习同步班课文课程
-     *
-     * @param student
-     * @param result
-     * @return
-     */
-    private void hasCapacityTeks(Student student, Map<String, Object> result) {
-        int count = capacityStudentUnitMapper.countByType(student, 3);
-        if (count > 0) {
-            result.put("capacityTeks", true);
-        }
-    }
-
     private void judgeMultipleLogin(HttpSession session, Student stu) {
         Object object = redisTemplate.opsForHash().get(RedisKeysConst.LOGIN_SESSION, stu.getId());
         if (object != null) {
@@ -986,32 +914,14 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      * @param stu
      */
     private void initAccountTime(Student stu) {
-        Long stuId = stu.getId();
-        Integer count = runLogMapper.selectLoginCountByStudentId(stuId);
-        if (count == 0) {
+        boolean flag = redisOpt.firstLogin(stu.getId());
+        if (flag) {
             stu.setAccountTime(new Date(System.currentTimeMillis() + stu.getRank() * 24 * 60 * 60 * 1000L));
             studentMapper.updateById(stu);
 
             // 初始化学生勋章信息
             executorService.execute(() -> dailyAwardAsync.initAward(stu));
         }
-    }
-
-    /**
-     * 为学生初始化7个工作日，用于判断二级标签
-     *
-     * @param stu
-     */
-    private void initStudentWorkDay(Student stu) {
-        StudentWorkDay studentWorkDay = new StudentWorkDay();
-        String today = DateUtil.formatDate(new Date(), "yyyy-MM-dd");
-        String endDay = calendarMapper.selectAfterSevenDay(today);
-
-        studentWorkDay.setStudentId(stu.getId());
-        studentWorkDay.setWorkDayBegin(today);
-        studentWorkDay.setWorkDayEnd(endDay);
-
-        studentWorkDayMapper.insert(studentWorkDay);
     }
 
     public static void main(String[] args) {
@@ -1038,6 +948,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
                 // 将天道酬勤中未达到领取条件的勋章重置
                 medalAwardAsync.resetLevel(stu);
+
+                // 值得元老勋章
+                medalAwardAsync.oldMan(stu);
             });
         }
     }
