@@ -399,14 +399,17 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             learn.setUnitId(letterPair.getUnitId().longValue());
             learn.setVocabularyId(letterPair.getLetterId().longValue());
             learnMapper.insert(learn);
-            if (!falg) {
-                letterPair.setMemoryStrength(0.12);
-                Date push = GoldMemoryTime.getGoldMemoryTime(letterPair.getMemoryStrength(), new Date());
-                letterPair.setPush(push);
+            if(pair == null){
+                if (!falg) {
+                    letterPair.setMemoryStrength(0.12);
+                    Date push = GoldMemoryTime.getGoldMemoryTime(letterPair.getMemoryStrength(), new Date());
+                    letterPair.setPush(push);
+                }
+                letterPair.setStudentId(studentId.intValue());
+                letterPairMapper.insert(letterPair);
             }
-            letterPair.setStudentId(studentId.intValue());
-            letterPairMapper.insert(letterPair);
         } catch (Exception e) {
+
             log.error("学生:" + studentId + " 保存字母配对出错", e);
             return ServerResponse.createByError(400, "操作失败");
         }
