@@ -114,4 +114,6 @@ public interface PersonalCentreService extends BaseService<Student> {
 	ServerResponse<Object> getMedalInClass(HttpSession session);
 
     Object getLucky(Integer studentId,HttpSession session);
+
+    ServerResponse<Object> needViewCount(HttpSession session);
 }

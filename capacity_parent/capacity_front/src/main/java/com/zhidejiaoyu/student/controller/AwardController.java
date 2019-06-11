@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.controller;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.annotation.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.service.AwardService;
+import com.zhidejiaoyu.student.service.simple.SimpleAwardServiceSimple;
 import com.zhidejiaoyu.student.vo.AwardVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ public class AwardController extends BaseController {
     private AwardService awardService;
 
     @Autowired
-    private RestTemplate restTemplate;
+    private SimpleAwardServiceSimple simpleAwardService;
 
     /**
      * 获取任务奖励信息
@@ -67,13 +68,7 @@ public class AwardController extends BaseController {
 
     @GetMapping("/getAeardSize")
     @ControllerLogAnnotation(name = "获取奖励排行可领取数量")
-    public ServerResponse<Object> getAwardSize(HttpSession session, int type, @RequestParam(defaultValue = "0") Integer model) {
-        Map<String, Object> paramMap = super.packageParams(session);
-        paramMap.put("type", type);
-        paramMap.put("model", model);
-
-        String url = domain + "/api/award/getAeardSize?type={type}&model={model}&session={session}&studentId={studentId}&loginTime={loginTime}";
-        ResponseEntity<Map> responseEntity = restTemplate.getForEntity(url, Map.class, paramMap);
-        return ServerResponse.createBySuccess(responseEntity.getBody() == null ? null : responseEntity.getBody().get("data"));
+    public ServerResponse<Map<String,Object>> getAwardSize(HttpSession session, int type, @RequestParam(defaultValue = "0") Integer model) {
+       return simpleAwardService.getAwareSize(type, session, model);
     }
 }
