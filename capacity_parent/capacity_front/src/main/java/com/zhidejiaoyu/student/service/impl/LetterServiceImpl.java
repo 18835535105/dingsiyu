@@ -407,7 +407,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             letterPair.setStudentId(studentId.intValue());
             letterPairMapper.insert(letterPair);
         } catch (Exception e) {
-            log.error("学生:" + studentId + " 保存字母配对出错", e.getMessage());
+            log.error("学生:" + studentId + " 保存字母配对出错", e);
             return ServerResponse.createByError(400, "操作失败");
         }
 
