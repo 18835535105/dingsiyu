@@ -166,13 +166,12 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 for (LetterUnit letterUnit : letterUnits) {
                     letterUnitIds.add(letterUnit.getId());
                 }
-                Map<Integer, Map<String, Object>> LetterPosttestMap = testRecordMapper.selectUnitTestMaxPointByStudyModels(studentId, letterUnitIds, 10);
+
                 //查看学后测试是否开启
                 boolean falg = true;
                 for (Integer letterUnitId : letterUnitIds) {
-                    Map<String, Object> maps = LetterPosttestMap.get(letterUnitId);
-                    if (maps != null && maps.get("max") != null) {
-                        Integer max = Integer.getInteger(maps.get("max").toString());
+                    Integer max=testRecordMapper.selectUnitTestMaxPointByStudyModels(studentId, letterUnitId, 10);
+                    if (max != null) {
                         if (max < 100) {
                             falg = false;
                         }
@@ -369,8 +368,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 learnMapper.insert(learn);
             }
         } catch (Exception e) {
-            log.error("学生:" + studentId + " 保存字母听写出错", e.getMessage());
-            return ServerResponse.createBySuccess(400, "操作失败");
+            throw new RuntimeException(e);
         }
 
         return ServerResponse.createBySuccess();
@@ -400,16 +398,17 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             learn.setUnitId(letterPair.getUnitId().longValue());
             learn.setVocabularyId(letterPair.getLetterId().longValue());
             learnMapper.insert(learn);
-            if (!falg) {
-                letterPair.setMemoryStrength(0.12);
-                Date push = GoldMemoryTime.getGoldMemoryTime(letterPair.getMemoryStrength(), new Date());
-                letterPair.setPush(push);
+            if(pair == null){
+                if (!falg) {
+                    letterPair.setMemoryStrength(0.12);
+                    Date push = GoldMemoryTime.getGoldMemoryTime(letterPair.getMemoryStrength(), new Date());
+                    letterPair.setPush(push);
+                }
+                letterPair.setStudentId(studentId.intValue());
+                letterPairMapper.insert(letterPair);
             }
-            letterPair.setStudentId(studentId.intValue());
-            letterPairMapper.insert(letterPair);
         } catch (Exception e) {
-            log.error("学生:" + studentId + " 保存字母配对出错", e.getMessage());
-            return ServerResponse.createByError(400, "操作失败");
+            throw new RuntimeException(e);
         }
 
         return ServerResponse.createBySuccess();
@@ -553,8 +552,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             letterWriteMapper.delByUnitIdAndStudentId(unitId, studentId);
             learnMapper.updLetterPair(studentId, unitId, "字母听写");
         } catch (Exception e) {
-            log.error("学生:" + studentId + " 去除字母听写出错", e.getMessage());
-            return ServerResponse.createByError(400, "操作失败");
+            throw new RuntimeException(e);
         }
 
         return ServerResponse.createBySuccess();

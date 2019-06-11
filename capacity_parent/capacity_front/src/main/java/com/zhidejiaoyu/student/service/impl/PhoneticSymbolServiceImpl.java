@@ -141,7 +141,11 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                 if (phonetic.getPhoneticSymbol().equals(symbol)) {
                     if (map.get("method") == null || map.get("method") == "") {
                         String[] split = phonetic.getPronunciationMethod().split("；");
-                        map.put("method", split);
+                        String[] returnSplit=new String[split.length];
+                        for(int i=0;i<split.length;i++){
+                            returnSplit[i]=split[i].trim();
+                        }
+                        map.put("method", returnSplit);
                     }
                     if (map.get("listen") == null || map.get("listen") == "") {
                         map.put("listen", url + phonetic.getUrl());
@@ -159,7 +163,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                     for (String let : split) {
                         String[] s = let.split(" ");
                         vocabularies.add(s[1].replace("#", ""));
-                        lets.add(let);
+                        lets.add(let.trim());
                         if (lets.size() == 4 && i == 0) {
                             i++;
                             symbolMap2.put("letter", phonetic.getLetter());
