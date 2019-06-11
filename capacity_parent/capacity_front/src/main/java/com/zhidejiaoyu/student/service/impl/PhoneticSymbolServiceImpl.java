@@ -161,7 +161,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                     List<String> lets = new ArrayList<>();
                     int i = 0;
                     for (String let : split) {
-                        String[] s = let.split(" ");
+                        String[] s = let.trim().split(" ");
                         vocabularies.add(s[1].replace("#", ""));
                         lets.add(let.trim());
                         if (lets.size() == 4 && i == 0) {
