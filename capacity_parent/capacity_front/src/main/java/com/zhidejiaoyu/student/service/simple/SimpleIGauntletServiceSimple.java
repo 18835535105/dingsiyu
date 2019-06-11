@@ -3,7 +3,7 @@ package com.zhidejiaoyu.student.service.simple;
 
 import com.zhidejiaoyu.common.Vo.simple.StudentGauntletVo;
 import com.zhidejiaoyu.common.pojo.Gauntlet;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;

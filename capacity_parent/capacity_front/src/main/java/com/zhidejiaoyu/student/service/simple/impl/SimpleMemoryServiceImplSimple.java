@@ -8,9 +8,9 @@ import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.study.simple.SimpleMemoryDifficultyUtil;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.LearnTimeUtil;
-import com.zhidejiaoyu.common.utils.simple.language.BaiduSpeak;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleLearnTimeUtil;
+import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
 import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.common.SaveLearnAndCapacity;
@@ -52,7 +52,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
     private SimpleMemoryDifficultyUtil simpleMemoryDifficultyUtil;
 
     @Autowired
-    private BaiduSpeak baiduSpeak;
+    private SimpleBaiduSpeak simpleBaiduSpeak;
 
     @Autowired
     private SaveLearnAndCapacity saveLearnAndCapacity;
@@ -226,7 +226,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
 
 		// 单词读音url
 		if(type == 1 || type == 2 || type == 3 || type == 4 || type==8 || type == 9) {
-			simpleCapacityVo.setReadUrl(baiduSpeak.getLanguagePath(simpleCapacityVo.getWord()));
+			simpleCapacityVo.setReadUrl(simpleBaiduSpeak.getLanguagePath(simpleCapacityVo.getWord()));
 		}
 
 		// 去掉音标
@@ -350,7 +350,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
         result.put("valid", valid);
         // 今日学习效率 !
         if (valid != null && online != null) {
-            String efficiency = LearnTimeUtil.efficiency(valid, online);
+            String efficiency = SimpleLearnTimeUtil.efficiency(valid, online);
             if ("100%".equals(efficiency) && !valid.equals(online)) {
                 result.put("efficiency", "99%");
             } else {

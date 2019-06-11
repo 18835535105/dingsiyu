@@ -10,15 +10,15 @@ import com.zhidejiaoyu.common.Vo.simple.ccieVo.MyCcieVo;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
-import com.zhidejiaoyu.common.utils.simple.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtilDateUtil;
+import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDatesUtil;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.TimeUtil;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.WeekUtil;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleTimeUtil;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleWeekUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.simple.SimplePersonalCentreServiceSimple;
-import com.zhidejiaoyu.student.utils.simple.CcieUtil;
+import com.zhidejiaoyu.student.utils.simple.SimpleCcieUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -308,7 +308,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         }
 
         // 获取当前时间所在年的周数
-        int ye = WeekUtil.getWeekOfYear(new Date()) - 1;
+        int ye = SimpleWeekUtil.getWeekOfYear(new Date()) - 1;
 
         // 获取当前年份
         int we = SimpleDateUtil.DateYYYY();
@@ -317,7 +317,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         for (Integer year : years) {
 
             // 根据遍历的年份获取有多少周
-            int yearMax = WeekUtil.getMaxWeekNumOfYear(year) - 1; // 如:52
+            int yearMax = SimpleWeekUtil.getMaxWeekNumOfYear(year) - 1; // 如:52
 
             // 遍历一年中的每周
             for (int i = 0; i <= yearMax; i++) {
@@ -325,9 +325,9 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                 Map<String, Object> map = new LinkedHashMap<String, Object>();
 
                 // 3.周的起始日期
-                Date weekStart = WeekUtil.getFirstDayOfWeek(year, i);
+                Date weekStart = SimpleWeekUtil.getFirstDayOfWeek(year, i);
                 // 4.周的结尾日期
-                Date weekEnd = WeekUtil.getLastDayOfWeek(year, i);
+                Date weekEnd = SimpleWeekUtil.getLastDayOfWeek(year, i);
                 map.put("statsDate", s.format(weekStart));// 每周开始日期
                 map.put("endDate", s.format(weekEnd));// 每周结束日期
                 map.put("week", "第" + (i + 1) + "周"); // 第几周
@@ -335,7 +335,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                 map.put("state", false); // 不是本周
                 // 查询循环周的总有效时长(m)
                 Integer duration = simpleDurationMapper.totalTime(SimpleDateUtil.formatYYYYMMDD(weekStart), SimpleDateUtil.formatYYYYMMDD(weekEnd), studentId);
-                String timeStrBySecond = TimeUtil.getTimeStrBySecond(duration);
+                String timeStrBySecond = SimpleTimeUtil.getTimeStrBySecond(duration);
                 int plan = ((int) (BigDecimalUtil.div((duration == null ? 0 : duration), 12600) * 100));
                 if (plan <= 100) {
                     map.put("pluSign", false);// 不显示+号
@@ -401,7 +401,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         }
 
         // 获取当前时间所在年的周数
-        int ye = WeekUtil.getWeekOfYear(new Date()) - 1;
+        int ye = SimpleWeekUtil.getWeekOfYear(new Date()) - 1;
 
         // 获取当前时间所在周
         int we = SimpleDateUtil.DateYYYY();
@@ -409,16 +409,16 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         for (Integer year : years) {
 
             // 1.根据年获取有多少周
-            int yearMax = WeekUtil.getMaxWeekNumOfYear(year) - 1;
+            int yearMax = SimpleWeekUtil.getMaxWeekNumOfYear(year) - 1;
 
             for (int i = 0; i <= yearMax; i++) {
                 // 封装返回结果集
                 Map<String, Object> map = new LinkedHashMap<String, Object>();
 
                 // 3.周的起始日期
-                Date weekStart = WeekUtil.getFirstDayOfWeek(year, i);
+                Date weekStart = SimpleWeekUtil.getFirstDayOfWeek(year, i);
                 // 4.周的结尾日期
-                Date weekEnd = WeekUtil.getLastDayOfWeek(year, i);
+                Date weekEnd = SimpleWeekUtil.getLastDayOfWeek(year, i);
 
                 map.put("statsDate", s.format(weekStart));// 每周开始日期
                 map.put("endDate", s.format(weekEnd));// 每周结束日期
@@ -873,12 +873,12 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
             }
             // 我的排名(本周)
             if (queryType == 2) {
-                Date week = WeekUtil.getFirstDayOfWeek(new Date());
+                Date week = SimpleWeekUtil.getFirstDayOfWeek(new Date());
                 queryTypeList = runLogMapper.getAllQueryType(week.toString(), model, student);
             }
             // 我的排名(本月)
             if (queryType == 3) {
-                queryTypeList = runLogMapper.getAllQueryType(WeekUtil.getMonthOne(new Date()), model, student);
+                queryTypeList = runLogMapper.getAllQueryType(SimpleWeekUtil.getMonthOne(new Date()), model, student);
             }
 
             if (queryTypeList.contains(student.getId().intValue())) {
@@ -904,12 +904,12 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
             }
             // 我的排名(本周)
             if (queryType == 2) {
-                Date week = WeekUtil.getFirstDayOfWeek(new Date());
+                Date week = SimpleWeekUtil.getFirstDayOfWeek(new Date());
                 m = runLogMapper.getGoldByStudentId(week.toString(), model, student);
             }
             // 我的排名(本月)
             if (queryType == 3) {
-                m = runLogMapper.getGoldByStudentId(WeekUtil.getMonthOne(new Date()), model, student);
+                m = runLogMapper.getGoldByStudentId(SimpleWeekUtil.getMonthOne(new Date()), model, student);
             }
 
             if (m.containsKey(student.getId())) {
@@ -1834,8 +1834,8 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         for (Map<String, Object> map : listCcie) {
             ccieVo = new CcieVo();
             time = map.get("time").toString().split("-");
-            String ccieName = CcieUtil.getCcieName(Integer.valueOf(map.get("testType").toString()), Integer.valueOf(map.get("model").toString()));
-            String modelAndTestType = CcieUtil.getModelAndTestType(Integer.valueOf(map.get("model").toString()), map.get("testName"));
+            String ccieName = SimpleCcieUtil.getCcieName(Integer.valueOf(map.get("testType").toString()), Integer.valueOf(map.get("model").toString()));
+            String modelAndTestType = SimpleCcieUtil.getModelAndTestType(Integer.valueOf(map.get("model").toString()), map.get("testName"));
             if (tempMap.get("testName") == null) {
                 tempMap.put("testName", modelAndTestType);
                 myCcieVo.setCcieTypeName(ccieName);
@@ -1869,7 +1869,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                 ccieVo.setDay(time[2]);
                 ccieVo.setPetName(student.getPetName());
                 ccieVo.setPoint(Integer.valueOf(map.get("point").toString()));
-                ccieVo.setModelAndTestType(CcieUtil.getModelAndTestType(Integer.valueOf(map.get("model").toString()), map.get("testName")));
+                ccieVo.setModelAndTestType(SimpleCcieUtil.getModelAndTestType(Integer.valueOf(map.get("model").toString()), map.get("testName")));
             } else {
                 sb.append("于").append(time[0]).append("年").append(time[1]).append("月").append(time[2])
                         .append("日，在\"英语队长智能平台\"完成").append(map.get("testName"))
@@ -1921,7 +1921,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                     map.put("state", false); // 不是本周
                     // 查询循环周的总有效时长(m)
                     Integer duration = simpleDurationMapper.totalTime(SimpleDateUtil.formatYYYYMMDD(onMonday), SimpleDateUtil.formatYYYYMMDD(onSunday), student.getId());
-                    String timeStrBySecond = TimeUtil.getTimeStrBySecond(duration);
+                    String timeStrBySecond = SimpleTimeUtil.getTimeStrBySecond(duration);
                     int plan = ((int) (BigDecimalUtil.div((duration == null ? 0 : duration), 12600) * 100));
                     if (plan <= 100) {
                         map.put("pluSign", false);// 不显示+号
@@ -2003,7 +2003,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         }
 
         // 获取当前时间所在年的周数
-        int ye = WeekUtil.getWeekOfYear(new Date()) - 1;
+        int ye = SimpleWeekUtil.getWeekOfYear(new Date()) - 1;
 
         // 获取当前年份
         int we = SimpleDateUtil.DateYYYY();
@@ -2020,7 +2020,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         for (Integer year : years) {
 
             // 根据遍历的年份获取有多少周
-            int yearMax = WeekUtil.getMaxWeekNumOfYear(year) - 1; // 如:52
+            int yearMax = SimpleWeekUtil.getMaxWeekNumOfYear(year) - 1; // 如:52
 
             // 遍历一年中的每周
             int maxWeek = we == year ? ye : yearMax;
@@ -2034,9 +2034,9 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                     Map<String, Object> map = new LinkedHashMap<String, Object>();
 
                     // 3.周的起始日期
-                    Date weekStart = WeekUtil.getFirstDayOfWeek(year, i);
+                    Date weekStart = SimpleWeekUtil.getFirstDayOfWeek(year, i);
                     // 4.周的结尾日期
-                    Date weekEnd = WeekUtil.getLastDayOfWeek(year, i);
+                    Date weekEnd = SimpleWeekUtil.getLastDayOfWeek(year, i);
                     int week = i + 1;
                     map.put("statsDate", s.format(weekStart));// 每周开始日期
                     map.put("endDate", s.format(weekEnd));// 每周结束日期
@@ -2045,7 +2045,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                     map.put("state", false); // 不是本周
                     // 查询循环周的总有效时长(m)
                     Integer duration = simpleDurationMapper.totalTime(SimpleDateUtil.formatYYYYMMDD(weekStart), SimpleDateUtil.formatYYYYMMDD(weekEnd), studentId);
-                    String timeStrBySecond = TimeUtil.getTimeStrBySecond(duration);
+                    String timeStrBySecond = SimpleTimeUtil.getTimeStrBySecond(duration);
                     int plan = ((int) (BigDecimalUtil.div((duration == null ? 0 : duration), 12600) * 100));
                     if (plan <= 100) {
                         map.put("pluSign", false);// 不显示+号

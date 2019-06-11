@@ -3,7 +3,7 @@ package com.zhidejiaoyu.student.controller.simple;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Course;
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.simple.SimpleCourseService;
 import com.zhidejiaoyu.student.vo.CoursePlanVo;
 import org.springframework.beans.factory.annotation.Autowired;

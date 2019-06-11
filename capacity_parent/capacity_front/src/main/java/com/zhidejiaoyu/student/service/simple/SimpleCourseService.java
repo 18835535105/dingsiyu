@@ -1,9 +1,8 @@
 package com.zhidejiaoyu.student.service.simple;
 
 import com.zhidejiaoyu.common.pojo.Course;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
 import com.zhidejiaoyu.student.vo.CoursePlanVo;
-
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;

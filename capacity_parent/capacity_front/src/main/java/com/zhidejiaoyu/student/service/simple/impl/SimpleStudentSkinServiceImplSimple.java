@@ -7,8 +7,8 @@ import com.zhidejiaoyu.common.mapper.simple.SimpleStudentSkinMapper;
 import com.zhidejiaoyu.common.pojo.Exhumation;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentSkin;
-import com.zhidejiaoyu.common.utils.simple.AwardUtil;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.simple.SimpleAwardUtil;
 import com.zhidejiaoyu.student.service.simple.SimpleConsumeServiceSimple;
 import com.zhidejiaoyu.student.service.simple.SimpleStudentSkinServiceSimple;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +84,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         //获取学生钻石数量
         Integer diamond = student.getDiamond();
         //根据皮肤编号获取皮肤名称
-        String name = AwardUtil.getAward(skinInteger);
+        String name = SimpleAwardUtil.getAward(skinInteger);
         //储存皮肤信息
         StudentSkin skin = new StudentSkin();
         skin.setSkinName(name);
@@ -130,14 +130,14 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         List<Map<String, Object>> maps = simpleExhumationMapper.selExhumationByStudentIdTOSkinState(student.getId());
         Map<Integer, Object> mapss = new HashMap<>();
         for (Map<String, Object> ma : maps) {
-            Integer finalName = (Integer) AwardUtil.getMaps((String) ma.get("finalName"));
+            Integer finalName = (Integer) SimpleAwardUtil.getMaps((String) ma.get("finalName"));
             mapss.put(finalName, ma);
         }
         //获取皮肤
         List<StudentSkin> studentSkins = simpleStudentSkinMapper.selSkinByStudentId(student.getId());
         Map<Integer, Object> map1 = new HashMap<>();
         for (StudentSkin studentSkin : studentSkins) {
-            Integer finalName = (Integer) AwardUtil.getMaps(studentSkin.getSkinName());
+            Integer finalName = (Integer) SimpleAwardUtil.getMaps(studentSkin.getSkinName());
             map1.put(finalName, true);
         }
 
@@ -145,7 +145,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         List<Map<String, Object>> maps1 = simpleStudentSkinMapper.selTrySkinAndHaveSkin(student.getId());
         Map<Object, Map> mapsss = new HashMap<>();
         for (Map<String, Object> map2 : maps1) {
-            Object finalName = AwardUtil.getMaps((String) map2.get("finalName"));
+            Object finalName = SimpleAwardUtil.getMaps((String) map2.get("finalName"));
             Date endTime = (Date) map2.get("endTime");
             //判断皮肤是使用的皮肤还是试用的皮肤
             if (endTime != null) {
@@ -184,12 +184,12 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
             Object o = mapss.get(i);
             Map<String, Object> setMap = new HashMap<>();
             if (o == null) {
-                setMap.put("finalName", AwardUtil.getAward(i));
+                setMap.put("finalName", SimpleAwardUtil.getAward(i));
                 setMap.put("count", 0);
                 setMap.put("finalNameInteger", i);
                 setMap.put("isEnter",false);
             } else {
-                setMap.put("finalName", AwardUtil.getAward(i));
+                setMap.put("finalName", SimpleAwardUtil.getAward(i));
                 HashMap o1 = (HashMap) mapss.get(i);
                 setMap.put("count", o1.get("count"));
                 setMap.put("finalNameInteger", i);
@@ -242,7 +242,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 //皮肤地址
                 maps.put("imgUrl", studentSkin.getImgUrl());
                 //皮肤对应编号
-                maps.put("nameId", AwardUtil.getMaps(studentSkin.getSkinName()));
+                maps.put("nameId", SimpleAwardUtil.getMaps(studentSkin.getSkinName()));
                 //皮肤使用状态
                 if (studentSkin.getState() == 1) {
                     //正在使用的皮肤状态
@@ -279,7 +279,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
     public ServerResponse<Object> useSkin(HttpSession session, Integer skinInteger, Integer dateInteger, Integer type, String imgUrl) {
         //获取学生对象
         Student student = getStudent(session);
-        String name = AwardUtil.getAward(skinInteger);
+        String name = SimpleAwardUtil.getAward(skinInteger);
         if (type == 1) {
             //使用功能
             //获取是否有已经使用的皮肤
@@ -368,11 +368,11 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
             //判断skin的使用时间为空是已获得皮肤,不为空为未获得皮肤
             if (studentSkin.getEndTime() == null) {
                 //已获得皮肤储存皮肤对应编号
-                map.put("skinId", AwardUtil.getMaps(studentSkin.getSkinName()));
+                map.put("skinId", SimpleAwardUtil.getMaps(studentSkin.getSkinName()));
                 //未获得皮肤判断使用时间
             } else if (studentSkin.getEndTime().getTime() > new Date().getTime()) {
                 //使用时间大于当前时间储存皮肤编号
-                map.put("skinId", AwardUtil.getMaps(studentSkin.getSkinName()));
+                map.put("skinId", SimpleAwardUtil.getMaps(studentSkin.getSkinName()));
             } else {
                 //当前无使用皮肤返回0
                 map.put("skinId", 0);

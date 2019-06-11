@@ -3,8 +3,8 @@ package com.zhidejiaoyu.student.service.simple.impl;
 import com.zhidejiaoyu.common.mapper.simple.SimpleExhumationMapper;
 import com.zhidejiaoyu.common.pojo.Exhumation;
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.utils.simple.AwardUtil;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.simple.SimpleAwardUtil;
 import com.zhidejiaoyu.student.service.simple.SimpleExhumationServiceSimple;
 import com.zhidejiaoyu.student.service.simple.SimpleStudentSkinServiceSimple;
 import com.zhidejiaoyu.student.service.simple.SimpleSyntheticRewardsListServiceSimple;
@@ -64,11 +64,11 @@ public class SimpleExhumationServiceImplSimple extends SimpleBaseServiceImpl<Sim
     @Override
     public ServerResponse<Object> addExhumationAndSyntheticRewardsList(Integer nameInage, Integer finalNameInage, String finalImgUrl, Integer number, Integer type, HttpSession session) {
         //获取手套印记名称
-        String name = AwardUtil.getAward(nameInage);
+        String name = SimpleAwardUtil.getAward(nameInage);
         //获取学生信息
         Student student = getStudent(session);
         //获取最终合成物名称
-        String finalName = AwardUtil.getAward(finalNameInage);
+        String finalName = SimpleAwardUtil.getAward(finalNameInage);
         //查看碎片数量
         Map<String,Object> selmap=new HashMap<>();
         selmap.put("name",name);
@@ -129,9 +129,9 @@ public class SimpleExhumationServiceImplSimple extends SimpleBaseServiceImpl<Sim
     @Override
     public ServerResponse<Object> addSkinExhumationAndStudentSkin(HttpSession session, Integer nameInteger, Integer finalNameInteger, String finalImageUrl, Integer number, Integer type, String imgUrl) {
         //获取皮肤碎片名称
-        String name = AwardUtil.getAward(nameInteger);
+        String name = SimpleAwardUtil.getAward(nameInteger);
         //获取最终合成物名称
-        String finalName = AwardUtil.getAward(finalNameInteger);
+        String finalName = SimpleAwardUtil.getAward(finalNameInteger);
         //获取学生信息
         Student student = getStudent(session);
         Map<String,Object> selmap=new HashMap<>();

@@ -12,11 +12,11 @@ import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.SimpleCapacity;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.DateUtil;
-import com.zhidejiaoyu.common.utils.simple.excelUtil.ExcelUtil;
-import com.zhidejiaoyu.common.utils.simple.excelUtil.ExportUtil;
-import com.zhidejiaoyu.common.utils.simple.language.BaiduSpeak;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
+import com.zhidejiaoyu.common.utils.simple.excelUtil.SimpleExcelUtil;
+import com.zhidejiaoyu.common.utils.simple.excelUtil.SimpleExportUtil;
+import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
 import com.zhidejiaoyu.student.service.simple.SimpleCapacityServiceSimple;
 import com.zhidejiaoyu.student.service.simple.SimpleCourseService;
 import com.zhidejiaoyu.student.utils.CapacityFontUtil;
@@ -40,7 +40,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     private SimpleCommonMethod simpleCommonMethod;
 
     @Autowired
-    private BaiduSpeak baiduSpeak;
+    private SimpleBaiduSpeak simpleBaiduSpeak;
 
     @Autowired
     private SimpleVocabularyMapper vocabularyMapper;
@@ -102,7 +102,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         wordInfo.setFontWeight(capacityFontUtil.getFontWeight());
         wordInfo.setUnitId(simpleCapacity.getUnitId());
         wordInfo.setShowInfo(false);
-        wordInfo.setReadUrl(baiduSpeak.getLanguagePath(simpleCapacity.getWord()));
+        wordInfo.setReadUrl(simpleBaiduSpeak.getLanguagePath(simpleCapacity.getWord()));
         wordInfos.add(wordInfo);
     }
 
@@ -126,7 +126,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
 
         capacityContentVo.setFaultCount(simpleCapacity.getFaultTime());
         capacityContentVo.setMemoryStrength(simpleCapacity.getMemoryStrength());
-        capacityContentVo.setPush(this.getPushTime(DateUtil.parseYYYYMMDDHHMMSS(simpleCapacity.getPush())));
+        capacityContentVo.setPush(this.getPushTime(SimpleDateUtil.parseYYYYMMDDHHMMSS(simpleCapacity.getPush())));
 
         capacityContentVo.setChinese(chinese);
         capacityContentVo.setStudyCount(studyCount);
@@ -146,7 +146,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         PageHelper.startPage(page, size);
         List<CapacityListVo> vos = simpleSimpleCapacityMapper.selectByCourseId(student.getId(), courseId, type);
         for (CapacityListVo vo : vos) {
-            vo.setReadUrl(baiduSpeak.getLanguagePath(vo.getReadUrl()));
+            vo.setReadUrl(simpleBaiduSpeak.getLanguagePath(vo.getReadUrl()));
             vo.setPush(this.getPushTime(vo.getPushTime()));
         }
         PageInfo<CapacityMemory> info = new PageInfo(vos);
@@ -178,10 +178,10 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         fileName = fileNameSb.toString();
 
         // 创建HSSFWorkbook
-        HSSFWorkbook wb = ExcelUtil.getHSSFWorkbook(sheetName, title, content, null);
+        HSSFWorkbook wb = SimpleExcelUtil.getHSSFWorkbook(sheetName, title, content, null);
         // 响应到客户端
         try {
-            ExportUtil.exportExcel(response, fileName, wb);
+            SimpleExportUtil.exportExcel(response, fileName, wb);
         } catch (Exception e) {
             log.error("学生 {} 导出 {} 模块下记忆追踪信息失败！", student.getId(), typeStr, e.getMessage(), e);
         }
@@ -201,10 +201,10 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             map = vocabularyMapper.selectSyllableByWordId(ids);
             for (int i = 0; i < size; i++) {
                 simpleCapacity = simpleCapacities.get(i);
-                if(map.get(simpleCapacity.getVocabularyId())!=null){
+                if (map.get(simpleCapacity.getVocabularyId()) != null) {
                     syllable = map.get(simpleCapacity.getVocabularyId()).get("syllable");
-                }else{
-                    syllable=null;
+                } else {
+                    syllable = null;
                 }
                 pushTime = this.getPushTime(simpleCapacity.getPush());
                 content[i][0] = (i + 1) + "";
@@ -221,7 +221,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         student.setShowCapacity(2);
         simpleStudentMapper.updateByPrimaryKeySelective(student);
-        student= simpleStudentMapper.selectById(student.getId());
+        student = simpleStudentMapper.selectById(student.getId());
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess();
     }

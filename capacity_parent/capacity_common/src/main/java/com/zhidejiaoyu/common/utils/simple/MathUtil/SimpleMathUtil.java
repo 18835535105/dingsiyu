@@ -8,7 +8,7 @@ import java.util.Random;
  * @author wuchenxi
  * @date 2018-12-14
  */
-public class MathUtil {
+public class SimpleMathUtil {
 
     /**
      * 获取指定范围内的随机数 [begin, end]
@@ -35,7 +35,7 @@ public class MathUtil {
 
     public static void main(String[] args) {
         for (int i = 0; i < 100; i++) {
-            System.out.println(MathUtil.getRandom(2, 3));
+            System.out.println(SimpleMathUtil.getRandom(2, 3));
         }
     }
 

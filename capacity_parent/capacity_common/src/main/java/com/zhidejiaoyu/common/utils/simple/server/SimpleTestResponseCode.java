@@ -6,7 +6,7 @@ package com.zhidejiaoyu.common.utils.simple.server;
  * @author wuchenxi
  * @date 2018/7/13
  */
-public enum  TestResponseCode {
+public enum SimpleTestResponseCode {
     /**
      * 可以进行单元测试
      */
@@ -27,7 +27,7 @@ public enum  TestResponseCode {
     private Integer code;
     private String msg;
 
-    TestResponseCode(Integer code, String msg) {
+    SimpleTestResponseCode(Integer code, String msg) {
         this.code = code;
         this.msg = msg;
     }

@@ -2,7 +2,7 @@ package com.zhidejiaoyu.common.utils.simple.excelUtil;
 
 import org.apache.poi.hssf.usermodel.*;
 
-public class ExcelUtil {
+public class SimpleExcelUtil {
 
 	/**
 	 * 导出Excel

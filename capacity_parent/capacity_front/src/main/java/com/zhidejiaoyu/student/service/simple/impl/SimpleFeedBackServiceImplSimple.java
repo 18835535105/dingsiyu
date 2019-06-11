@@ -5,11 +5,10 @@ import com.zhidejiaoyu.common.mapper.simple.SimpleMessageBoardMapper;
 import com.zhidejiaoyu.common.pojo.MessageBoard;
 import com.zhidejiaoyu.common.pojo.MessageBoardExample;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.http.FtpUtil;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
-import com.zhidejiaoyu.common.utils.simple.http.FtpUtil;
-import com.zhidejiaoyu.common.utils.simple.server.ResponseCode;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
-import com.zhidejiaoyu.student.service.FeedBackService;
+import com.zhidejiaoyu.common.utils.simple.server.SimpleResponseCode;
 import com.zhidejiaoyu.student.service.simple.SimpleFeedBackServiceSimple;
 import com.zhidejiaoyu.student.utils.sensitiveword.SensitiveWordFilter;
 import com.zhidejiaoyu.student.vo.feedbackvo.FeedBackInfoList;
@@ -94,7 +93,7 @@ public class SimpleFeedBackServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         sensitiveWordFilter.init();
         boolean containsSensitiveWord = sensitiveWordFilter.isContainsSensitiveWord(content, SensitiveWordFilter.maxMatchType);
         if (containsSensitiveWord) {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.SENSITIVE_WORD.getCode(), ResponseCode.SENSITIVE_WORD.getMsg());
+            return ServerResponse.createByErrorCodeMessage(SimpleResponseCode.SENSITIVE_WORD.getCode(), SimpleResponseCode.SENSITIVE_WORD.getMsg());
         }
 
         if (files != null && files.length > 0) {

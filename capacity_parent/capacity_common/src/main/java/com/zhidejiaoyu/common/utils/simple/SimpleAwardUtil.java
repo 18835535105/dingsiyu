@@ -3,7 +3,7 @@ package com.zhidejiaoyu.common.utils.simple;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AwardUtil {
+public class SimpleAwardUtil {
 
     /**
      * 将清学版 抽奖 数字转化为产品

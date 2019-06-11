@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class TestGoldUtil {
+public class SimpleTestGoldUtil {
 
     /**
      * 闯关类每日最多增加金币量

@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.student.service.simple;
 
 import com.zhidejiaoyu.common.pojo.MessageBoard;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.vo.feedbackvo.FeedBackInfoVO;
 import org.springframework.web.multipart.MultipartFile;
 

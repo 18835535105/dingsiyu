@@ -6,14 +6,14 @@ import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.study.simple.SimpleWordPictureUtil;
-import com.zhidejiaoyu.common.utils.simple.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
-import com.zhidejiaoyu.common.utils.simple.language.BaiduSpeak;
-import com.zhidejiaoyu.common.utils.simple.language.YouDaoTranslate;
-import com.zhidejiaoyu.common.utils.simple.server.GoldResponseCode;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
-import com.zhidejiaoyu.common.utils.simple.testUtil.TestResult;
-import com.zhidejiaoyu.common.utils.simple.testUtil.TestResultUtil;
+import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
+import com.zhidejiaoyu.common.utils.simple.language.SimpleYouDaoTranslate;
+import com.zhidejiaoyu.common.utils.simple.server.SimpleGoldResponseCode;
+import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResult;
+import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResultUtil;
 import com.zhidejiaoyu.student.service.simple.SimpleReviewService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
     private Logger logger = LoggerFactory.getLogger(SimpleSimpleReviewServiceImpl.class);
 
     @Autowired
-    private TestResultUtil testResultUtil;
+    private SimpleTestResultUtil simpleTestResultUtil;
 
     /**
      * 记忆追踪mapper
@@ -57,13 +57,13 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
     private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
-    private YouDaoTranslate youDaoTranslate;
+    private SimpleYouDaoTranslate simpleYouDaoTranslate;
 
     @Autowired
     private SimpleCommonMethod simpleCommonMethod;
 
     @Autowired
-    private BaiduSpeak baiduSpeak;
+    private SimpleBaiduSpeak simpleBaiduSpeak;
 
     @Autowired
     private SimpleCourseMapper simpleCourseMapper;
@@ -166,7 +166,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
             vocabularies = capacityMapper.selectCapacity(ca);
 
             // 处理结果
-            List<TestResult> testResults = testResultUtil.getWordTestesForUnit(type, vocabularies.size(), vocabularies, Long.valueOf(unit_id));
+            List<SimpleTestResult> testResults = simpleTestResultUtil.getWordTestesForUnit(type, vocabularies.size(), vocabularies, Long.valueOf(unit_id));
             return ServerResponse.createBySuccess(testResults);
         }
 		/*else if() {
@@ -256,7 +256,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
             map.put("wordyj", word); // 单词
         }
         try {
-            Map<String, String> resultMap = youDaoTranslate.getResultMap(word);
+            Map<String, String> resultMap = simpleYouDaoTranslate.getResultMap(word);
             // 音标
             String phonetic = resultMap.get("phonetic");
             // 判断音标是否为null
@@ -265,7 +265,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
             }else{
                 map.put("soundmark", null);
             }
-            map.put("readUrl", baiduSpeak.getLanguagePath(word)); // 读音
+            map.put("readUrl", simpleBaiduSpeak.getLanguagePath(word)); // 读音
         } catch (Exception e) {
         }
 
@@ -349,7 +349,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         // 例句id
         map.put("id", sentence.getId());
         // 例句读音
-        map.put("readUrl", baiduSpeak.getLanguagePath(english));
+        map.put("readUrl", simpleBaiduSpeak.getLanguagePath(english));
         // 例句翻译
         map.put("word_Chinese", chinese);
         // 例句英文原文
@@ -435,14 +435,14 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
                 int state = simpleStudentMapper.updateBySystem_gold((gold-1), student_id);
             }else{
                 // 金币不足
-                return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
+                return ServerResponse.createBySuccess(SimpleGoldResponseCode.LESS_GOLD.getCode(), "金币不足");
             }
             // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
         }else{
             Integer judgeTest = simpleTestRecordMapper.selectJudgeTestToModel(course_id, student_id, classify, select);
             if(judgeTest != null){
                 // 已经测试过, 提示扣除金币是否测试
-                return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
+                return ServerResponse.createBySuccess(SimpleGoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
             }
         }
 
@@ -478,14 +478,14 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
             }
 
             // 处理结果
-            List<TestResult> testResults = testResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, Long.valueOf(course_id));
+            List<SimpleTestResult> testResults = simpleTestResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, Long.valueOf(course_id));
 
             // 获取课程下的单词id-单元id
             List<Long> ids = learnMapper.selectVocabularyIdByStudentIdAndCourseId(student_id, Long.valueOf(course_id), 1);
             Map<Long, Map<Long, Long>> longMapMap = unitMapper.selectIdMapByCourseIdAndWordIds(Long.valueOf(course_id), ids, student_id, classify);
 
             // 处理结果添加单元id
-            for(TestResult reList: testResults){
+            for(SimpleTestResult reList: testResults){
                 // 单词id
                 Long wordId = reList.getId();
                 // 封装单元id
@@ -523,7 +523,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
                     if(classify == 2) {
                         try {
                             // 单词读音
-                            map.put("readUrl", baiduSpeak.getLanguagePath(vo.getWord()));
+                            map.put("readUrl", simpleBaiduSpeak.getLanguagePath(vo.getWord()));
                         } catch (Exception e) {
                             logger.error("获取单词" + vo.getWord() + "读音报错!");
                         }
@@ -576,7 +576,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
             vo = capacityMapper.ripeCentreReviewSentence_listen(student_id, unitId, classifyStr);
         }
         // 1.例句读音
-        map.put("readUrl", baiduSpeak.getLanguagePath(vo.getCentreExample()));
+        map.put("readUrl", simpleBaiduSpeak.getLanguagePath(vo.getCentreExample()));
         // 2.例句翻译
         map.put("word_Chinese", vo.getCentreTranslate());
         // 3.正确顺序例句
@@ -591,11 +591,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         Object[] wrongWord = list.toArray();
         map.put("wrongWord", wrongWord);
 
-        /*// 4.打乱顺序例句, 打乱除了例句默写
-        if (classify != 6) {
-            String[] wrongWord = NumberUtil.randomWord(justWord);
-            map.put("wrongWord", wrongWord);
-        }*/
+
 
         return map;
     }
@@ -617,7 +613,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         List<Vocabulary> vocabularies = capacityMapper.testeffect(course_id, student_id);
 
         // 处理结果
-        List<TestResult> testResults = testResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, Long.valueOf(course_id));
+        List<SimpleTestResult> testResults = simpleTestResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, Long.valueOf(course_id));
         return ServerResponse.createBySuccess(testResults);
     }
 
@@ -638,14 +634,14 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
                 int state = simpleStudentMapper.updateBySystem_gold((gold-1), studentId);
             }else{
                 // 金币不足
-                return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
+                return ServerResponse.createBySuccess(SimpleGoldResponseCode.LESS_GOLD.getCode(), "金币不足");
             }
             // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
         }else{
             Integer judgeTest = simpleTestRecordMapper.selectJudgeTest(course_id, studentId, "单词五维测试");
             if(judgeTest != null){
                 // 已经测试过, 提示扣除金币是否测试
-                return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
+                return ServerResponse.createBySuccess(SimpleGoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
             }
         }
 
@@ -696,11 +692,11 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         String[] type_a = {"英译汉"};
         String[] type_b = {"汉译英"};
         String[] type_c = {"听力理解"};
-        List<TestResult> testResults_a = testResultUtil.getWordTestesForCourse(type_a, vocabularies.subList(0, vocabularies.size()/3).size(),
+        List<SimpleTestResult> testResults_a = simpleTestResultUtil.getWordTestesForCourse(type_a, vocabularies.subList(0, vocabularies.size()/3).size(),
                 vocabularies.subList(0,vocabularies.size()/3), Long.valueOf(course_id));
-        List<TestResult> testResults_b = testResultUtil.getWordTestesForCourse(type_b, vocabularies.subList(vocabularies.size()/3, (int) BigDecimalUtil.div((double)vocabularies.size(),1.5,0)).size(),
+        List<SimpleTestResult> testResults_b = simpleTestResultUtil.getWordTestesForCourse(type_b, vocabularies.subList(vocabularies.size()/3, (int) BigDecimalUtil.div((double)vocabularies.size(),1.5,0)).size(),
                 vocabularies.subList(vocabularies.size()/3, (int) BigDecimalUtil.div((double)vocabularies.size(),1.5,0)), Long.valueOf(course_id));
-        List<TestResult> testResults_c = testResultUtil.getWordTestesForCourse(type_c, vocabularies.subList((int) BigDecimalUtil.div((double)vocabularies.size(),1.5,0), vocabularies.size()).size(),
+        List<SimpleTestResult> testResults_c = simpleTestResultUtil.getWordTestesForCourse(type_c, vocabularies.subList((int) BigDecimalUtil.div((double)vocabularies.size(),1.5,0), vocabularies.size()).size(),
                 vocabularies.subList((int) BigDecimalUtil.div((double)vocabularies.size(),1.5,0), vocabularies.size()), Long.valueOf(course_id));
 
         result.put("testResults_a", testResults_a);
@@ -724,7 +720,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
                 m.put("word", vo.getWord());
                 try {
                     // 单词读音
-                    m.put("readUrl", baiduSpeak.getLanguagePath(vo.getWord()));
+                    m.put("readUrl", simpleBaiduSpeak.getLanguagePath(vo.getWord()));
                 }catch (Exception e){
                     logger.error("获取单词"+vo.getWord()+"读音报错!");
                 }
@@ -833,7 +829,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
 //        correct.put("memoryDifficulty", hard);
 
         try {
-            Map<String, String> resultMap = youDaoTranslate.getResultMap(correct.get("word").toString());
+            Map<String, String> resultMap = simpleYouDaoTranslate.getResultMap(correct.get("word").toString());
             // 音标
             String phonetic = resultMap.get("phonetic");
             if(StringUtils.isNotBlank(phonetic) && !"null".equals(phonetic)) {
@@ -842,7 +838,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
                 correct.put("soundmark", null);
             }
             // 读音url
-            correct.put("readUrl", baiduSpeak.getLanguagePath(correct.get("word").toString()));
+            correct.put("readUrl", simpleBaiduSpeak.getLanguagePath(correct.get("word").toString()));
             // 词性
             // String explains = resultMap.get("explains");
             //String exp = explains.substring(2, explains.indexOf(".") + 1);
@@ -945,14 +941,14 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
                 int state = simpleStudentMapper.updateBySystem_gold((gold-1), student_id);
             }else{
                 // 金币不足
-                return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
+                return ServerResponse.createBySuccess(SimpleGoldResponseCode.LESS_GOLD.getCode(), "金币不足");
             }
             // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
         }else{
             Integer judgeTest = simpleTestRecordMapper.selectJudgeTestToModel(courseId, student_id, 0, select);
             if(judgeTest != null){
                 // 已经测试过, 提示扣除金币是否测试
-                return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
+                return ServerResponse.createBySuccess(SimpleGoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
             }
         }
 

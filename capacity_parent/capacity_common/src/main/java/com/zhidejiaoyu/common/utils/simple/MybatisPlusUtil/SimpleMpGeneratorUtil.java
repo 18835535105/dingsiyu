@@ -15,10 +15,10 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2018/9/5
  */
 @Slf4j
-public class MpGeneratorUtil {
+public class SimpleMpGeneratorUtil {
 
     public static void main(String[] args) {
-        MpGeneratorUtil.create();
+        SimpleMpGeneratorUtil.create();
     }
 
     private static void create() {

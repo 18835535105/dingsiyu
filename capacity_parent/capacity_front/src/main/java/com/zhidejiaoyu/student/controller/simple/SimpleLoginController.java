@@ -2,7 +2,7 @@ package com.zhidejiaoyu.student.controller.simple;
 
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.simple.SimpleLoginServiceSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;

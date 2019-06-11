@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.service.simple;
 
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.vo.reportvo.ReportVO;
 
 import javax.servlet.http.HttpSession;

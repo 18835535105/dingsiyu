@@ -2,7 +2,7 @@ package com.zhidejiaoyu.student.service.simple;
 
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.pojo.SimpleCapacity;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.vo.CapacityContentVo;
 import com.zhidejiaoyu.student.vo.CapacityDigestVo;
 

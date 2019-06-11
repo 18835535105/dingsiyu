@@ -3,8 +3,8 @@ package com.zhidejiaoyu.student.service.simple.impl;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.utils.simple.AwardUtil;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.simple.SimpleAwardUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.simple.*;
 import lombok.extern.log4j.Log4j;
@@ -80,7 +80,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
         if (type == 0) {
             name = "名言";
         } else {
-            name = AwardUtil.getAward(type);
+            name = SimpleAwardUtil.getAward(type);
         }
         DrawRecord draw = getDraw(name, date, explain, studentId);
         Integer insert = simpleDrawRecordMapper.insert(draw);
@@ -110,7 +110,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
             } else if (type >= 8 && type <= 17) {
                 List<String> names = new ArrayList<>(10);
                 for (int i = 8; i <= 17; i++) {
-                    names.add(AwardUtil.getAward(i));
+                    names.add(SimpleAwardUtil.getAward(i));
                 }
                 size = simpleDrawRecordMapper.selDrawSizes(names, date);
                 if (size == 1) {
@@ -123,7 +123,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
             } else if (type >= 18 && type <= 27) {
                 List<String> names = new ArrayList<>(10);
                 for (int i = 18; i <= 27; i++) {
-                    names.add(AwardUtil.getAward(i));
+                    names.add(SimpleAwardUtil.getAward(i));
                 }
                 size = simpleDrawRecordMapper.selDrawSizes(names, date);
                 if (size == 1) {
@@ -136,7 +136,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
             } else if (type >= 28 && type <= 37) {
                 List<String> names = new ArrayList<>(10);
                 for (int i = 28; i <= 37; i++) {
-                    names.add(AwardUtil.getAward(i));
+                    names.add(SimpleAwardUtil.getAward(i));
                 }
                 size = simpleDrawRecordMapper.selDrawSizes(names, date);
                 if (size == 1) {

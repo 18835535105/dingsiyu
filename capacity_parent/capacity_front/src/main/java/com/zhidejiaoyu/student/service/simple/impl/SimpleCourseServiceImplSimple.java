@@ -7,10 +7,10 @@ import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentCourse;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
-import com.zhidejiaoyu.common.utils.simple.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleCalculateTimeUtil;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.DateUtil;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.simple.SimpleCourseService;
 import com.zhidejiaoyu.student.vo.CoursePlanVo;
@@ -296,12 +296,12 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<SimpleC
 
         Map<String, Object> result = new HashMap<String, Object>();
 
-        Integer capacityMemory = simpleCapacityMemoryMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
-        Integer capacityListen = capacityListenMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
-        Integer capacityWrite = simpleCapacityWriteMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
-        Integer sentenceListen = simpleSentenceListenMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
-        Integer sentenceTranslate = simpleSentenceTranslateMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
-        Integer sentenceWrite = simpleSentenceWriteMapper.countByPushByCourseid(student_id, DateUtil.DateTime());
+        Integer capacityMemory = simpleCapacityMemoryMapper.countByPushByCourseid(student_id, SimpleDateUtil.DateTime());
+        Integer capacityListen = capacityListenMapper.countByPushByCourseid(student_id, SimpleDateUtil.DateTime());
+        Integer capacityWrite = simpleCapacityWriteMapper.countByPushByCourseid(student_id, SimpleDateUtil.DateTime());
+        Integer sentenceListen = simpleSentenceListenMapper.countByPushByCourseid(student_id, SimpleDateUtil.DateTime());
+        Integer sentenceTranslate = simpleSentenceTranslateMapper.countByPushByCourseid(student_id, SimpleDateUtil.DateTime());
+        Integer sentenceWrite = simpleSentenceWriteMapper.countByPushByCourseid(student_id, SimpleDateUtil.DateTime());
         result.put("capacityMemory", capacityMemory);
         result.put("capacityListen", capacityListen);
         result.put("capacityWrite", capacityWrite);
@@ -399,7 +399,7 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<SimpleC
             sc.setCourseId(Long.valueOf(courseId));
             sc.setCourseName(courseName);
             sc.setStudentId(id);
-            sc.setUpdateTime(DateUtil.DateTime());
+            sc.setUpdateTime(SimpleDateUtil.DateTime());
             sc.setType(model);
             simpleStudentCourseMapper.insertSelective(sc);
         }

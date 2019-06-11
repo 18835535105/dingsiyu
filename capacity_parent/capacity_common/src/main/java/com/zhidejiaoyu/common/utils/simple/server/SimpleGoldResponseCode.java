@@ -6,7 +6,7 @@ package com.zhidejiaoyu.common.utils.simple.server;
  * @author wuchenxi
  * @date 2018/7/13
  */
-public enum GoldResponseCode {
+public enum SimpleGoldResponseCode {
     /**
      * 金币不足
      */
@@ -19,7 +19,7 @@ public enum GoldResponseCode {
     private Integer code;
     private String msg;
 
-    GoldResponseCode(Integer code, String msg) {
+    SimpleGoldResponseCode(Integer code, String msg) {
         this.code = code;
         this.msg = msg;
     }

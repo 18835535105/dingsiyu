@@ -10,11 +10,11 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.utils.simple.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.simple.ValidateCode;
+import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.simple.SimpleValidateCode;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.LearnTimeUtil;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleLearnTimeUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.simple.SimpleLoginServiceSimple;
 import org.apache.commons.lang.StringUtils;
@@ -182,7 +182,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         int count = simpleCapacityStudentUnitMapper.countByType(stu, 1);
         result.put("hasCapacityWord", count > 0);
 
-        String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
+        String formatYYYYMMDD = SimpleDateUtil.formatYYYYMMDD(new Date());
         // 有效时长  !
         Integer valid = getValidTime(studentId, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
         // 在线时长 !
@@ -192,7 +192,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
             if (valid >= online) {
                 logger.error("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, stu);
             }
-            String efficiency = LearnTimeUtil.efficiency(valid, online);
+            String efficiency = SimpleLearnTimeUtil.efficiency(valid, online);
             result.put("efficiency", efficiency);
         } else {
             result.put("efficiency", "0%");
@@ -337,11 +337,11 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         Integer valid = super.getTodayValidTime(studentId);
         // 在线时长 !
         Integer online = super.getTodayOnlineTime(session);
-        result.put("online", LearnTimeUtil.validOnlineTime(online));
-        result.put("valid", LearnTimeUtil.validOnlineTime(valid));
+        result.put("online", SimpleLearnTimeUtil.validOnlineTime(online));
+        result.put("valid", SimpleLearnTimeUtil.validOnlineTime(valid));
         // 今日学习效率 !
         if (valid != null && online != null) {
-            String efficiency = LearnTimeUtil.efficiency(valid, online);
+            String efficiency = SimpleLearnTimeUtil.efficiency(valid, online);
             result.put("efficiency", efficiency);
         } else {
             result.put("efficiency", "0%");
@@ -805,7 +805,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Cache-Control", "no-cache");
         response.setDateHeader("Expires", 0);
-        ValidateCode vCode = new ValidateCode(150, 40, 4, 150);
+        SimpleValidateCode vCode = new SimpleValidateCode(150, 40, 4, 150);
         session.removeAttribute("validateCode");
         vCode.write(response.getOutputStream());
         session.setAttribute("validateCode", vCode.getCode());

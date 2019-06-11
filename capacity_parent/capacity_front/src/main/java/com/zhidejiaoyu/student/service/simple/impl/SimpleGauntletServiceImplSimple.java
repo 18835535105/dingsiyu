@@ -7,10 +7,10 @@ import com.zhidejiaoyu.common.Vo.simple.StudentGauntletVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.utils.simple.LevelUtils;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.simple.SimpleLevelUtils;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
-import com.zhidejiaoyu.common.utils.simple.language.BaiduSpeak;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.simple.SimpleIGauntletServiceSimple;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     private SimpleVocabularyMapper vocabularyMapper;
 
     @Autowired
-    private BaiduSpeak baiduSpeak;
+    private SimpleBaiduSpeak simpleBaiduSpeak;
 
     @Autowired
     private SimpleStudentStudyPlanMapper simpleStudentStudyPlanMapper;
@@ -344,10 +344,10 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
                 Map<String, Double> map = new HashMap<>();
                 if (gauntlet.getChallengerPoint() - point > 0) {
                     List<Map<String, Object>> maps = simpleAwardMapper.selAwardCountByStudentId(challengerStudnet.getId());
-                    map = LevelUtils.getAddition(challengeLevel, beChallengeLevel, 1, challengerStudnet.getId(), map,maps);
+                    map = SimpleLevelUtils.getAddition(challengeLevel, beChallengeLevel, 1, challengerStudnet.getId(), map,maps);
                 } else if (gauntlet.getChallengerPoint() - point == 0) {
                     List<Map<String, Object>> maps = simpleAwardMapper.selAwardCountByStudentId(challengerStudnet.getId());
-                    map = LevelUtils.getAddition(challengeLevel, beChallengeLevel, 2, challengerStudnet.getId(), map,maps);
+                    map = SimpleLevelUtils.getAddition(challengeLevel, beChallengeLevel, 2, challengerStudnet.getId(), map,maps);
                 }
                 gauntlet.setBeChallengerPoint(point);
                 if (gauntlet.getChallengerPoint() > point) {
@@ -816,7 +816,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             gameTwoVo = new GameTwoVo();
             gameTwoVo.setBigBossIndex(bigBossIndex);
             gameTwoVo.setMinBossIndex(minBossIndex);
-            gameTwoVo.setReadUrl(baiduSpeak.getLanguagePath(needReviewWord.getWord()));
+            gameTwoVo.setReadUrl(simpleBaiduSpeak.getLanguagePath(needReviewWord.getWord()));
             // 封装纸牌的试题集合并打乱顺序；
             list = new ArrayList<>(12);
             list.add(needReviewWord);

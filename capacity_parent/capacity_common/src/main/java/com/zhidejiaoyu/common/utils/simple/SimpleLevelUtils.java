@@ -10,7 +10,7 @@ import java.util.Map;
  * 个人学习力与战力排版
  */
 @Component
-public class LevelUtils {
+public class SimpleLevelUtils {
 
     /**
      * 获取每一个等级所能获取的战斗力

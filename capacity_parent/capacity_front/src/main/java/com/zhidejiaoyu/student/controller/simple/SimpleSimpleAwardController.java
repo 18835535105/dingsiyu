@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.student.controller.simple;
 
 import com.zhidejiaoyu.common.Vo.simple.AwardVo;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.simple.SimpleAwardServiceSimple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;

@@ -12,7 +12,7 @@ import java.util.Map;
  * @date 2018年5月8日
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class TestResult implements Serializable{
+public class SimpleTestResult implements Serializable{
 
 	/**
 	 *

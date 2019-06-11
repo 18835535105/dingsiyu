@@ -11,7 +11,7 @@ import java.util.List;
  * @author wuchenxi
  * @date 2018/8/3
  */
-public class ValidateUtil {
+public class SimpleValidateUtil {
 
     /**
      * 如果入参非法，返回错误信息，否则返回ok字符串

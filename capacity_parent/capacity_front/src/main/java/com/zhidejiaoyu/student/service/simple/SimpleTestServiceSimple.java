@@ -3,8 +3,8 @@ package com.zhidejiaoyu.student.service.simple;
 import com.zhidejiaoyu.common.Vo.simple.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.TestRecord;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
-import com.zhidejiaoyu.common.utils.simple.testUtil.TestResult;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResult;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 
@@ -49,7 +49,7 @@ public interface SimpleTestServiceSimple extends SimpleBaseService<TestRecord> {
      * @param model
      * @return
      */
-    ServerResponse<List<TestResult>> getWordUnitTest(HttpSession session, Long unitId,
+    ServerResponse<List<SimpleTestResult>> getWordUnitTest(HttpSession session, Long unitId,
                                                      Boolean isTrue, int type, boolean example, Integer model);
 
     /**

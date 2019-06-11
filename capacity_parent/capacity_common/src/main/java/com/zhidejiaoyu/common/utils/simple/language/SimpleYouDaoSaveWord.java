@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.utils.simple.language;
 
 import com.zhidejiaoyu.common.constant.FileConstant;
-import com.zhidejiaoyu.common.utils.simple.http.FtpUtil;
+import com.zhidejiaoyu.common.utils.http.FtpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Header;
@@ -33,10 +33,10 @@ import java.util.UUID;
  */
 @Component
 @Slf4j
-public class YouDaoSaveWord {
+public class SimpleYouDaoSaveWord {
 
     @Autowired
-    private FtpUtil ftpUtil;
+    private FtpUtil simpleFtpUtil;
 
     @Value("${youdao.create.url}")
     private String url;
@@ -112,7 +112,7 @@ public class YouDaoSaveWord {
         //合成成功
         if (result != null) {
             try {
-                ftpUtil.uploadByInputStream(new ByteArrayInputStream(result), FileConstant.WORD_AUDIO, fileName);
+                simpleFtpUtil.uploadByInputStream(new ByteArrayInputStream(result), FileConstant.WORD_AUDIO, fileName);
             } catch (Exception e) {
                 log.error("单词[{}]读音上传到服务器失败！", text, e);
                 return null;

@@ -20,7 +20,7 @@ import java.util.Map;
  */
 @Component
 @Slf4j
-public class BaiduSpeak {
+public class SimpleBaiduSpeak {
 
 	@Value("${ftp.prefix}")
 	private String prefix;

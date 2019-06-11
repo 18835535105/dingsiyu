@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author wuchenxi
  * @date 2018/8/28
  */
-public class CcieUtilTest extends BaseTest {
+public class SimpleCcieUtilTest extends BaseTest {
 
     @Autowired
     private CcieUtil ccieUtil;

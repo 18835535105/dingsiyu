@@ -13,11 +13,11 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
-import com.zhidejiaoyu.common.utils.simple.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.WeekUtil;
-import com.zhidejiaoyu.common.utils.simple.server.ResponseCode;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleWeekUtil;
+import com.zhidejiaoyu.common.utils.simple.server.SimpleResponseCode;
 import com.zhidejiaoyu.student.service.simple.SimpleStudentInfoServiceSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -209,14 +209,14 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         if (worships.size() > 0) {
             // 上次膜拜时间
             Date lastWorshipTime = worships.get(0).getWorshipTime();
-            if (Objects.equals(DateUtil.formatYYYYMMDD(lastWorshipTime), DateUtil.formatYYYYMMDD(new Date()))) {
+            if (Objects.equals(SimpleDateUtil.formatYYYYMMDD(lastWorshipTime), SimpleDateUtil.formatYYYYMMDD(new Date()))) {
                 // 今天已经膜拜过其他人
-                return ServerResponse.createByErrorCodeMessage(ResponseCode.TIME_LESS_ONE_DAY.getCode(), ResponseCode.TIME_LESS_ONE_DAY.getMsg());
+                return ServerResponse.createByErrorCodeMessage(SimpleResponseCode.TIME_LESS_ONE_DAY.getCode(), SimpleResponseCode.TIME_LESS_ONE_DAY.getMsg());
             }
             long count = worships.stream().filter(worship -> worship.getStudentIdByWorship().equals(userId)).count();
             if (count > 0) {
                 // 本周已膜拜过该同学，不能再次膜拜
-                return ServerResponse.createByErrorCodeMessage(ResponseCode.TIME_LESS_ONE_WEEK.getCode(), ResponseCode.TIME_LESS_ONE_WEEK.getMsg());
+                return ServerResponse.createByErrorCodeMessage(SimpleResponseCode.TIME_LESS_ONE_WEEK.getCode(), SimpleResponseCode.TIME_LESS_ONE_WEEK.getMsg());
             }
         }
 
@@ -364,7 +364,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     public ServerResponse<String> judgeOldPassword(String nowPassword, String oldPassword) {
 
         if (!Objects.equals(nowPassword, oldPassword)) {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.PASSWORD_ERROR.getCode(), ResponseCode.PASSWORD_ERROR.getMsg());
+            return ServerResponse.createByErrorCodeMessage(SimpleResponseCode.PASSWORD_ERROR.getCode(), SimpleResponseCode.PASSWORD_ERROR.getMsg());
         }
         return ServerResponse.createBySuccess();
     }
@@ -490,8 +490,8 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         Map<String, Object> map = new HashMap<>(16);
         // 本周我被膜拜的次数
         Date date = new Date();
-        Date firstDayOfWeek = WeekUtil.getFirstDayOfWeek(date);
-        Date lastDayOfWeek = WeekUtil.getLastDayOfWeek(date);
+        Date firstDayOfWeek = SimpleWeekUtil.getFirstDayOfWeek(date);
+        Date lastDayOfWeek = SimpleWeekUtil.getLastDayOfWeek(date);
         int count = worshipMapper.countByWorshipedThisWeed(student, SimpleDateUtil.formatYYYYMMDD(firstDayOfWeek), SimpleDateUtil.formatYYYYMMDD(lastDayOfWeek));
         map.put("count", count);
 

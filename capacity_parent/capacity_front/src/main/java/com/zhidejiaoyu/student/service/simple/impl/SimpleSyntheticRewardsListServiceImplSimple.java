@@ -9,8 +9,8 @@ import com.zhidejiaoyu.common.pojo.Exhumation;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentSkin;
 import com.zhidejiaoyu.common.pojo.SyntheticRewardsList;
-import com.zhidejiaoyu.common.utils.simple.AwardUtil;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.simple.SimpleAwardUtil;
 import com.zhidejiaoyu.student.service.simple.SimpleExhumationServiceSimple;
 import com.zhidejiaoyu.student.service.simple.SimpleSyntheticRewardsListServiceSimple;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +81,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
         Map<Object, Object> retrun = new HashMap<>();
         Map<Integer, Object> maps1 = new HashMap<>();
         for (Map<String, Object> ma : maps) {
-            Integer finalName = (Integer) AwardUtil.getMaps((String) ma.get("finalName"));
+            Integer finalName = (Integer) SimpleAwardUtil.getMaps((String) ma.get("finalName"));
             maps1.put(finalName, ma);
         }
         List<SyntheticRewardsList> gloveOrFlower = simpleSyntheticRewardsListMapper.getGloveOrFlower(studentId);
@@ -90,15 +90,15 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 Object o = maps1.get(i);
                 boolean isTrue=true;
                 for(SyntheticRewardsList syn:gloveOrFlower){
-                    if(AwardUtil.getAward(i).equals(syn.getName())){
+                    if(SimpleAwardUtil.getAward(i).equals(syn.getName())){
                         isTrue=false;
                     }
                 }
                 if(isTrue){
                     if (o == null) {
                         Map<String, Object> setMap = new HashMap<>();
-                        setMap.put("finalName", AwardUtil.getAward(i));
-                        setMap.put("number", AwardUtil.getNumber(i));
+                        setMap.put("finalName", SimpleAwardUtil.getAward(i));
+                        setMap.put("number", SimpleAwardUtil.getNumber(i));
                         setMap.put("count", 0);
                         setMap.put("finalNameInteger", i);
                         setMap.put("isEnter", false);
@@ -107,7 +107,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                         Map<String, Object> setMap = new HashMap<>();
                         HashMap o1 = (HashMap) maps1.get(i);
                         setMap.put("finalName", o1.get("finalName"));
-                        setMap.put("number", AwardUtil.getNumber(i));
+                        setMap.put("number", SimpleAwardUtil.getNumber(i));
                         setMap.put("count", o1.get("count"));
                         setMap.put("finalNameInteger", i);
                         setMap.put("isEnter", false);
@@ -115,8 +115,8 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                     }
                 }else{
                     Map<String, Object> setMap = new HashMap<>();
-                    setMap.put("finalName", AwardUtil.getAward(i));
-                    setMap.put("number", AwardUtil.getNumber(i));
+                    setMap.put("finalName", SimpleAwardUtil.getAward(i));
+                    setMap.put("number", SimpleAwardUtil.getNumber(i));
                     setMap.put("count", 6);
                     setMap.put("finalNameInteger", i);
                     setMap.put("isEnter", false);
@@ -128,15 +128,15 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 Object o = maps1.get(i);
                 boolean isTrue=true;
                 for(SyntheticRewardsList syn:gloveOrFlower){
-                    if(AwardUtil.getAward(i).equals(syn.getName())){
+                    if(SimpleAwardUtil.getAward(i).equals(syn.getName())){
                         isTrue=false;
                     }
                 }
                 if(isTrue){
                     if (o == null) {
                         Map<String, Object> setMap = new HashMap<>();
-                        setMap.put("finalName", AwardUtil.getAward(i));
-                        setMap.put("number", AwardUtil.getNumber(i));
+                        setMap.put("finalName", SimpleAwardUtil.getAward(i));
+                        setMap.put("number", SimpleAwardUtil.getNumber(i));
                         setMap.put("count", 0);
                         setMap.put("finalNameInteger", i);
                         setMap.put("isEnter", false);
@@ -145,7 +145,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                         Map<String, Object> setMap = new HashMap<>();
                         HashMap o1 = (HashMap) maps1.get(i);
                         setMap.put("finalName", o1.get("finalName"));
-                        setMap.put("number", AwardUtil.getNumber(i));
+                        setMap.put("number", SimpleAwardUtil.getNumber(i));
                         setMap.put("count", o1.get("count"));
                         setMap.put("finalNameInteger", i);
                         setMap.put("isEnter", false);
@@ -153,8 +153,8 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                     }
                 }else{
                     Map<String, Object> setMap = new HashMap<>();
-                    setMap.put("finalName", AwardUtil.getAward(i));
-                    setMap.put("number", AwardUtil.getNumber(i));
+                    setMap.put("finalName", SimpleAwardUtil.getAward(i));
+                    setMap.put("number", SimpleAwardUtil.getNumber(i));
                     setMap.put("count", 5);
                     setMap.put("finalNameInteger", i);
                     setMap.put("isEnter", false);
@@ -190,7 +190,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 if (endTime.getTime() > System.currentTimeMillis()) {
                     map.put("status", 2);
                     map.put("beUseing", true);
-                    map.put("nameId", AwardUtil.getMaps((String) map.get("name")));
+                    map.put("nameId", SimpleAwardUtil.getMaps((String) map.get("name")));
                     map.put("time", (endTime.getTime() - System.currentTimeMillis()) / 1000);
                     map.put("type", 1);
                     list.add(map);
@@ -204,7 +204,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                     }
                     map.put("beUseing", false);
                     if (((Long) map.get("useNumber")) .equals( (Long) map.get("count"))) {
-                        map.put("nameId", AwardUtil.getMaps((String) map.get("name")));
+                        map.put("nameId", SimpleAwardUtil.getMaps((String) map.get("name")));
                         map.put("type", 1);
                         list.add(map);
                     }
@@ -218,7 +218,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                     map.put("time", (48 * count) + "小时0分0秒");
                 }
                 map.put("beUseing", false);
-                map.put("nameId", AwardUtil.getMaps((String) map.get("name")));
+                map.put("nameId", SimpleAwardUtil.getMaps((String) map.get("name")));
                 map.put("type", 1);
                 list.add(map);
             }
@@ -243,7 +243,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 return ServerResponse.createByError();
             }
         }
-        String name = AwardUtil.getAward(nameInteger);
+        String name = SimpleAwardUtil.getAward(nameInteger);
         //根据学生id和name获取手套和印记的数
         SyntheticRewardsList syntheticRewardsList = new SyntheticRewardsList();
         syntheticRewardsList.setStudentId(student.getId().intValue());
@@ -290,7 +290,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
         //获取学生信息
         Student student = getStudent(session);
         //获取查找名
-        String name = AwardUtil.getAward(nameInteger);
+        String name = SimpleAwardUtil.getAward(nameInteger);
         //返回值格式
         Map<String, Object> map = new HashMap<>();
         //1为手套,印记    2为皮肤
@@ -309,7 +309,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 syntheticRewardsList = syntheticRewardsLists.get(0);
                 //放置返回信息
                 map.put("name", name);
-                map.put("message", "得到的金币加成" + AwardUtil.getNumber(nameInteger) + "%");
+                map.put("message", "得到的金币加成" + SimpleAwardUtil.getNumber(nameInteger) + "%");
                 map.put("createName", syntheticRewardsList.getCreateTime());
                 map.put("time", (48 * count) + "小时0分0秒");
                 Date date = student.getBonusExpires();
@@ -373,10 +373,10 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                     map.put("time",48+"小时00分00秒");
                 }
             }
-            map.put("syntheticInteger", AwardUtil.getMaps(synthetic.getName()));
+            map.put("syntheticInteger", SimpleAwardUtil.getMaps(synthetic.getName()));
             map.put("type", "gloveOrFlower");
             map.put("name",synthetic.getName());
-            map.put("message", "得到的金币加成" + AwardUtil.getNumber(Integer.parseInt(AwardUtil.getMaps(synthetic.getName()).toString())) + "%");
+            map.put("message", "得到的金币加成" + SimpleAwardUtil.getNumber(Integer.parseInt(SimpleAwardUtil.getMaps(synthetic.getName()).toString())) + "%");
             map.put("createTime", synthetic.getCreateTime());
             gloveOrFlowerList.add(map);
         }
@@ -401,7 +401,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 map.put("state", false);
             }
             map.put("type", "skin");
-            map.put("skinIngter", AwardUtil.getMaps(studentSkin.getSkinName()));
+            map.put("skinIngter", SimpleAwardUtil.getMaps(studentSkin.getSkinName()));
             map.put("id",studentSkin.getId());
             map.put("name",studentSkin.getSkinName());
             map.put("message", "个性装扮");

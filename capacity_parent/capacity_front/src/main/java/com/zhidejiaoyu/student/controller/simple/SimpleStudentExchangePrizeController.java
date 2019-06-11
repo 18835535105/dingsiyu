@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.controller.simple;
 
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.simple.SimpleIStudentExchangePrizeServiceSimple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

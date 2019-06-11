@@ -17,14 +17,14 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.study.simple.SimpleMemoryDifficultyUtil;
-import com.zhidejiaoyu.common.utils.simple.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.simple.goldUtil.TestGoldUtil;
-import com.zhidejiaoyu.common.utils.simple.language.BaiduSpeak;
-import com.zhidejiaoyu.common.utils.simple.server.ServerResponse;
-import com.zhidejiaoyu.common.utils.simple.server.TestResponseCode;
-import com.zhidejiaoyu.common.utils.simple.testUtil.SentenceTestResult;
-import com.zhidejiaoyu.common.utils.simple.testUtil.TestResult;
-import com.zhidejiaoyu.common.utils.simple.testUtil.TestResultUtil;
+import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.simple.goldUtil.SimpleTestGoldUtil;
+import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
+import com.zhidejiaoyu.common.utils.simple.server.SimpleTestResponseCode;
+import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleSentenceTestResult;
+import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResult;
+import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResultUtil;
 import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.common.SaveLearnAndCapacity;
 import com.zhidejiaoyu.student.constant.PetImageConstant;
@@ -34,7 +34,7 @@ import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.simple.SimpleTestServiceSimple;
 import com.zhidejiaoyu.student.utils.PetSayUtil;
 import com.zhidejiaoyu.student.utils.PetUrlUtil;
-import com.zhidejiaoyu.student.utils.simple.CcieUtil;
+import com.zhidejiaoyu.student.utils.simple.SimpleCcieUtil;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -90,7 +90,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
-    private TestResultUtil testResultUtil;
+    private SimpleTestResultUtil simpleTestResultUtil;
 
     @Autowired
     private SimpleTestRecordMapper simpleTestRecordMapper;
@@ -120,7 +120,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     private SimpleSimpleCapacityMapper simpleSimpleCapacityMapper;
 
     @Autowired
-    private BaiduSpeak baiduSpeak;
+    private SimpleBaiduSpeak simpleBaiduSpeak;
 
     @Autowired
     private SimpleLearnMapper learnMapper;
@@ -138,10 +138,10 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     private SimpleMemoryDifficultyUtil simpleMemoryDifficultyUtil;
 
     @Autowired
-    private CcieUtil ccieUtil;
+    private SimpleCcieUtil simpleCcieUtil;
 
     @Autowired
-    private TestGoldUtil testGoldUtil;
+    private SimpleTestGoldUtil simpleTestGoldUtil;
 
     @Autowired
     private DailyAwardAsync dailyAwardAsync;
@@ -192,12 +192,12 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         }
 
         // 处理结果
-        List<TestResult> testResults = null;
+        List<SimpleTestResult> testResults = null;
         if (typeModel != 3) {
-            testResults = testResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, courseId);
+            testResults = simpleTestResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, courseId);
         } else {
             // 能力值测试
-            testResults = testResultUtil.getWordTestesForCourse5DTest(type, vocabularies.size(), vocabularies, studyParagraph, "单词");
+            testResults = simpleTestResultUtil.getWordTestesForCourse5DTest(type, vocabularies.size(), vocabularies, studyParagraph, "单词");
         }
 
         // 当测试模块是“慧默写”时，将题目修改为中文
@@ -237,8 +237,8 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             // 测试次数
             String time = explain.split("#")[1];
             if ("2".equals(time)) {
-                return ServerResponse.createByErrorCodeMessage(TestResponseCode.GAME_TESTED_SECOND.getCode(),
-                        TestResponseCode.GAME_TESTED_SECOND.getMsg());
+                return ServerResponse.createByErrorCodeMessage(SimpleTestResponseCode.GAME_TESTED_SECOND.getCode(),
+                        SimpleTestResponseCode.GAME_TESTED_SECOND.getMsg());
             }
         }
 
@@ -263,7 +263,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
         String[] type = {"汉译英"};
         // 游戏测试从取当前学段的预科库中的单词25个,其中有5个未预备单词，即可以直接跳过
-        List<TestResult> testResults = testResultUtil.getWordTestes(type, 26, vocabularies, student.getVersion(), phase);
+        List<SimpleTestResult> testResults = simpleTestResultUtil.getWordTestes(type, 26, vocabularies, student.getVersion(), phase);
         Map<String, Object> map = new HashMap<>(16);
         map.put("testResults", testResults);
         if (point != null) {
@@ -584,7 +584,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     }
 
     @Override
-    public ServerResponse<List<TestResult>> getWordUnitTest(HttpSession session, Long unitId,
+    public ServerResponse<List<SimpleTestResult>> getWordUnitTest(HttpSession session, Long unitId,
                                                             Boolean isTrue, int typeModel, boolean example, Integer model) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         student = simpleStudentMapper.selectById(student.getId());
@@ -617,10 +617,10 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             type = new String[]{"英译汉", "汉译英"};
         }
 
-        List<TestResult> results = testResultUtil.getWordTestesForUnit(type, subjectNum, vocabularies, unitId);
+        List<SimpleTestResult> results = simpleTestResultUtil.getWordTestesForUnit(type, subjectNum, vocabularies, unitId);
         // 改为听力理解,方便前台使用
         if(!"慧记忆".equals(studyModel)) {
-            for (TestResult testResult : results) {
+            for (SimpleTestResult testResult : results) {
                 testResult.setType("听力理解");
             }
         }
@@ -685,7 +685,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             addEnergy = getEnergy(student, point);
 
             if (point >= 60) {
-                ccieUtil.saveCcieTest(student, 1, 1, 10 + classify, point);
+                simpleCcieUtil.saveCcieTest(student, 1, 1, 10 + classify, point);
             }
 
             // 根据不同分数奖励学生金币
@@ -885,7 +885,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
                 goldCount = getGoldCount(wordUnitTestDTO, student, point, goldCount);
             }
         }
-        return testGoldUtil.addGold(student, goldCount);
+        return simpleTestGoldUtil.addGold(student, goldCount);
     }
 
     /**
@@ -979,7 +979,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
         // 获取当前单元下的所有例句
         List<Sentence> sentences = simpleSentenceMapper.selectByUnitId(unitId);
-        List<SentenceTestResult> results = testResultUtil.getSentenceTestResults(sentences);
+        List<SimpleSentenceTestResult> results = simpleTestResultUtil.getSentenceTestResults(sentences);
         Map<String, Object> result = new HashMap<>(16);
         result.put("subject", results);
         result.put("total", sentences.size());
@@ -1228,7 +1228,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
                 packagePassTestRecordVo(testRecord, student, vo, point);
             }
         }
-        return testGoldUtil.addGold(student, gold);
+        return simpleTestGoldUtil.addGold(student, gold);
     }
 
     private void packageUnPassTestRecordVo(TestRecord testRecord, Student student, TestResultVo vo, int point) {
@@ -1305,16 +1305,16 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         if (type == 2) {
             typeModel = "学后测试";
             if (point >= 90) {
-                ccieUtil.saveCcieTest(student, 8, 1, 10 + modelType, point);
+                simpleCcieUtil.saveCcieTest(student, 8, 1, 10 + modelType, point);
             }
         } else if (type == 3) {
             typeModel = "单元前测";
             if (point >= 60) {
-                ccieUtil.saveCcieTest(student, 9, 1, 10 + modelType, point);
+                simpleCcieUtil.saveCcieTest(student, 9, 1, 10 + modelType, point);
             }
         } else if (type == 4) {
             typeModel = "能力值测试";
-            ccieUtil.saveCcieTest(student, 10, 1, -1, point);
+            simpleCcieUtil.saveCcieTest(student, 10, 1, -1, point);
             testRecord.setStudyModel(typeModel);
         }
         return typeModel;
@@ -1460,7 +1460,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
         // 调用封装题
         String[] type = {"英译汉"};
-        List<TestResult> wordTestesForCourse = testResultUtil.getWordTestesForCourse(type, list.size(), list, courseId);
+        List<SimpleTestResult> wordTestesForCourse = simpleTestResultUtil.getWordTestesForCourse(type, list.size(), list, courseId);
 
         return ServerResponse.createBySuccess(wordTestesForCourse);
     }
@@ -1494,7 +1494,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
         // 读音
         if (type == 1 || type == 2 || type == 3 || type == 4 || type==8 || type == 9) {
-            vocabulary.put("readUrl", baiduSpeak.getLanguagePath(word));
+            vocabulary.put("readUrl", simpleBaiduSpeak.getLanguagePath(word));
         }
 
         // 该课程已学单词

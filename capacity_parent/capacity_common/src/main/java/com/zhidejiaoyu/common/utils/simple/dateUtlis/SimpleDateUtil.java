@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Administrator
  */
-public class DateUtil implements Serializable {
+public class SimpleDateUtil implements Serializable {
 
     /**
      *

@@ -3,7 +3,7 @@ package com.zhidejiaoyu.student.utils.simple;
 import com.zhidejiaoyu.common.mapper.simple.SimpleCcieMapper;
 import com.zhidejiaoyu.common.pojo.Ccie;
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ import java.util.Date;
  * @date 2018/8/27
  */
 @Component
-public class CcieUtil {
+public class SimpleCcieUtil {
 
     @Autowired
     private SimpleCcieMapper ccieMapper;
@@ -64,7 +64,7 @@ public class CcieUtil {
         } else if (type == 2) {
             sb.append("K");
         }
-        String today = DateUtil.formatDate(new Date(), "yyyyMMdd");
+        String today = SimpleDateUtil.formatDate(new Date(), "yyyyMMdd");
         sb.append(today);
         String maxCcieNo = ccieMapper.selectMaxCcieNo(type, today);
         if (StringUtils.isEmpty(maxCcieNo)) {
