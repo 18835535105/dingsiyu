@@ -368,8 +368,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 learnMapper.insert(learn);
             }
         } catch (Exception e) {
-            log.error("学生:" + studentId + " 保存字母听写出错", e.getMessage());
-            return ServerResponse.createBySuccess(400, "操作失败");
+            throw new RuntimeException(e);
         }
 
         return ServerResponse.createBySuccess();
@@ -409,9 +408,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 letterPairMapper.insert(letterPair);
             }
         } catch (Exception e) {
-
-            log.error("学生:" + studentId + " 保存字母配对出错", e);
-            return ServerResponse.createByError(400, "操作失败");
+            throw new RuntimeException(e);
         }
 
         return ServerResponse.createBySuccess();
@@ -555,8 +552,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             letterWriteMapper.delByUnitIdAndStudentId(unitId, studentId);
             learnMapper.updLetterPair(studentId, unitId, "字母听写");
         } catch (Exception e) {
-            log.error("学生:" + studentId + " 去除字母听写出错", e.getMessage());
-            return ServerResponse.createByError(400, "操作失败");
+            throw new RuntimeException(e);
         }
 
         return ServerResponse.createBySuccess();
