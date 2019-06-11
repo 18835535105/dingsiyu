@@ -383,6 +383,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             }
         }
         testRecord.setTestEndTime(new Date());
+        testRecord.setAwardGold(goldCount);
         testRecordMapper.insert(testRecord);
         TestResultVo vo = new TestResultVo();
         vo.setGold(goldCount);
@@ -476,8 +477,10 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setGold(goldCount);
         int energy = getEnergy(student, testRecord.getPoint());
         vo.setEnergy(energy);
+        vo.setPetUrl(student.getPartUrl());
         getMessage(student, vo, testRecord, point, 100);
         testRecord.setTestEndTime(new Date());
+        testRecord.setAwardGold(goldCount);
         testRecordMapper.insert(testRecord);
         studentMapper.updateById(student);
         return ServerResponse.createBySuccess(vo);
