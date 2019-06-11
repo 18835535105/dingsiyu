@@ -594,7 +594,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
         try {
             for (Medal medal : children) {
                 award = awardMapper.selectByStudentIdAndMedalType(studentId, medal.getId());
-                if (!Objects.equals(award.getCurrentPlan(), award.getTotalPlan())) {
+                if (award != null && !Objects.equals(award.getCurrentPlan(), award.getTotalPlan())) {
                     award.setCurrentPlan(0);
                     awardMapper.updateById(award);
                 }
