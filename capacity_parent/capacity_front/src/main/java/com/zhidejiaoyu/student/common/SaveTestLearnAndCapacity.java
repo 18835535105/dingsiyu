@@ -92,8 +92,8 @@ public class SaveTestLearnAndCapacity {
      * @param classify      学习类型 0=单词图鉴 1=慧记忆 2=慧听写 3=慧默写 4=例句听写 5=例句翻译 6=例句默写
      * @return 响应信息
      */
-    public void saveLearnAndCapacity(String[] correctWord, String[] errorWord, Integer[] correctWordId,
-                                                       Integer[] errorWordId, HttpSession session, Student student,
+    public void saveLearnAndCapacity(String[] correctWord, String[] errorWord, Long[] correctWordId,
+                                     Long[] errorWordId, HttpSession session, Student student,
                                                        Long[] unitId, Integer classify) {
         // 保存正确单词/例句的学习记录和记忆追踪信息
         if (correctWord != null && correctWordId != null && correctWord.length > 0
@@ -134,8 +134,8 @@ public class SaveTestLearnAndCapacity {
      * @param type   1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写;
      * @return 响应信息
      */
-    public int saveTestAndCapacity(String[] correctWord, String[] errorWord, Integer[] correctWordId,
-                                    Integer[] errorWordId, HttpSession session,
+    public int saveTestAndCapacity(String[] correctWord, String[] errorWord, Long[] correctWordId,
+                                    Long[] errorWordId, HttpSession session,
                                     Long[] unitId, Integer type) {
 
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
@@ -160,9 +160,9 @@ public class SaveTestLearnAndCapacity {
             int errorWordLength = errorWord.length;
             for (int i = 0; i < errorWordLength; i++) {
                 if (unitId.length == 1) {
-                    count = this.saveLearnAndCapacity(session, student, unitId[0], Integer.valueOf(errorWordId[i].toString()), type, false);
+                    count = this.saveLearnAndCapacity(session, student, unitId[0], errorWordId[i], type, false);
                 } else {
-                    count = this.saveLearnAndCapacity(session, student, unitId[i], Integer.valueOf(errorWordId[i].toString()), type, false);
+                    count = this.saveLearnAndCapacity(session, student, unitId[i], errorWordId[i], type, false);
                 }
             }
         }
@@ -178,7 +178,7 @@ public class SaveTestLearnAndCapacity {
      * @param id      单词或句子的id
      * @param isTrue  题目是否答对
      */
-    private int saveLearnAndCapacity(HttpSession session, Student student, Long unitId, Integer id, Integer classify,
+    private int saveLearnAndCapacity(HttpSession session, Student student, Long unitId, Long id, Integer classify,
                                      boolean isTrue) {
         Integer maxCount = 1;
         // 查询学习记录

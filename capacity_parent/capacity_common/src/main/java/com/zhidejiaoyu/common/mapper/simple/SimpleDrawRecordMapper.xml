@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimpleDrawRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.DrawRecord">
+        <id column="id" property="id" />
+        <result column="student_id" property="studentId" />
+        <result column="create_time" property="createTime" />
+        <result column="name" property="name" />
+        <result column="explain" property="explain" />
+    </resultMap>
+    <sql id="select_list">
+        id,student_id,create_time,name,explain
+    </sql>
+
+    <select id="selByStudentId" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select * from draw_record where student_id=#{studentId} order by create_time desc limit #{start},#{end}
+    </select>
+
+    <select id="selAwardNow" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(id) from draw_record where student_id=#{studentId} and create_time like concat('%',#{time},'%');
+    </select>
+
+    <select id="selDrawSize" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(id) from draw_record where name=#{name} and create_time like concat('%',#{time},'%')
+    </select>
+
+    <select id="selDrawSizes" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(id) from draw_record where create_time like concat('%',#{time},'%') and name in
+        <foreach collection="names" item="name"
+                 index="index" open="(" close=")" separator=",">
+            #{name}
+        </foreach>
+    </select>
+
+</mapper>

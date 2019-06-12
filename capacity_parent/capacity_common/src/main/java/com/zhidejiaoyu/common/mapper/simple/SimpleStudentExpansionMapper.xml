@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimpleStudentExpansionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentExpansion">
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="study_power" property="studyPower"/>
+        <result column="level" property="level"/>
+        <result column="is_look" property="isLook"/>
+        <result column="audio_status" property="audioStatus"/>
+        <result column="pk_explain" property="pkExplain"/>
+        <result column="test_gold_add" property="testGoldAdd"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, student_id, study_power , level ,is_look, audio_status, test_gold_add, pk_explain
+    </sql>
+
+    <select id="isHave" parameterType="long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from student_expansion where student_id=#{studentId}
+    </select>
+
+    <insert id="addStudy" parameterType="map">
+        insert into student_expansion(student_id,study_power,level,is_look)
+        values(#{studentId},#{study},#{level},#{isLook})
+    </insert>
+
+    <select id="selectByStudentId" parameterType="long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from student_expansion where student_id=#{studentId} limit 1
+    </select>
+
+    <select id="getMaxStudyTwenty" parameterType="map" resultType="map">
+        select
+        stu.id studentId,stu.nickname name,stuex.study_power study,
+        (select count(id) from gauntlet gaunt where gaunt.challenger_student_id = stu.id and challenge_status=1) mePkOthers,
+        (select count(id) from gauntlet gaunt where gaunt.be_challenger_student_id = stu.id and be_challenger_status=1) othersPkMe
+        from  student stu
+        left join student_expansion stuex on stu.id=stuex.student_id
+        where stu.status &lt;> 3 and stu.head_url is not null
+        <if test="type == 1">
+            <if test="classId!=null and classId!=''">
+                and stu.class_id=#{classId}
+            </if>
+            <if test="(classId==null or classId=='') and (teacherId!=null and teacherId !='')">
+                and stu.class_id is null and stu.teacher_id=#{teacherId}
+            </if>
+            <if test="(classId==null or classId=='') and (teacherId==null or teacherId =='')">
+                and stu.class_id is null and teacher_id is null
+            </if>
+        </if>
+        <if test="type == 2">
+            and (stu.teacher_id = #{schoolAdminId}
+            <if test="teachers != null and teachers.size>0">
+                or stu.teacher_id in (
+                <foreach collection="teachers" item="teacherId" separator=",">
+                    #{teacherId}
+                </foreach>
+                )
+            </if>
+            )
+        </if>
+        group by stu.id
+        order by study_power desc
+        limit 20
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from student_expansion
+    </select>
+
+</mapper>

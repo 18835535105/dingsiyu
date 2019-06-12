@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimpleCcieMapper" >
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Ccie">
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="course_name" property="courseName"/>
+        <result column="student_name" property="studentName"/>
+        <result column="get_time" property="getTime"/>
+        <result column="test_type" property="testType"/>
+        <result column="study_model" property="studyModel"/>
+        <result column="ccie_no" property="ccieNo"/>
+        <result column="encourage_word" property="encourageWord"/>
+        <result column="read_flag" property="readFlag"/>
+        <result column="courseName" property="courseName"/>
+        <result column="point" property="point"/>
+    </resultMap>
+    <sql id="Base_Column_List" >
+        id, student_id, unit_id, course_name, student_name, get_time, test_type, study_model, ccie_no, encourage_word, read_flag, `point`
+    </sql>
+    <insert id="insertWithNeedCount" parameterType="map">
+        insert into ccie (student_id, unit_id, student_name, get_time, test_type, study_model, ccie_no,
+                          encourage_word, read_flag, `point`, course_name)
+        select student_id,
+               unit_id,
+               student_name ,
+               get_time,
+               test_type,
+               study_model,
+               ccie_no,
+               encourage_word,
+               read_flag,
+               `point`,
+               course_name
+        from ccie
+        where student_id = #{studentId}
+        limit #{count}
+    </insert>
+
+    <select id="selectAllCcieByStudentIdAndDate" parameterType="map" resultType="map">
+        select a.id,
+               a.student_id,
+               a.student_name,
+               date_format(a.get_time, '%Y-%m-%d') AS time,
+               (case a.test_type
+                    when 1 then '单元闯关'
+                    when 2 then '复习测试'
+                    when 3 then '已学测试'
+                    when 4 then '生词测试'
+                    when 5 then '熟词测试'
+        when 6 then '五维测试' when 7 then '学前测试' when 8 then '学后测试' when 9 then '单元前测'
+        when 10 then '能力值测试' end)
+                                                   AS testName,
+               a.test_type testType,
+               a.point,
+               a.study_model model,
+               a.ccie_no,
+               a.encourage_word                       encourageWord,
+               a.read_flag                            readFlag
+        from
+        ccie a where a.student_id = #{studentId}
+        <if test="(model >= 11 and model &lt;= 19)">
+            AND a.study_model = #{model}
+        </if>
+        <!-- 能力值测试 -->
+        <if test="model == 7">
+            and a.study_model = -1 and a.test_type &lt;> 6
+        </if>
+        <if test="model == 1">
+            AND a.study_model in (-1, 0, 1, 2, 3) and a.test_type &lt;> 10
+        </if>
+        order by a.test_type desc, a.study_model desc, a.get_time desc
+    </select>
+
+  <select id="getMapKeyStudentCCie" resultType="java.util.Map">
+      select a.student_id as id, count(a.id) as count
+      from ccie a
+               JOIN student b ON a.student_id = b.id AND b.role = 1
+      GROUP BY a.student_id
+  </select>
+    <select id="selectMaxCcieNo" resultType="java.lang.String" parameterType="map">
+        select ccie_no
+        from ccie
+        <where>
+            <if test="type == 1">
+                and ccie_no like concat('N', concat(#{today}, '%'))
+            </if>
+            <if test="type == 2">
+                and ccie_no like concat('K', concat(#{today}, '%'))
+            </if>
+        </where>
+        order by id desc
+        limit 1
+    </select>
+    <select id="countByStudentId" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from ccie
+        where student_id = #{studentId}
+    </select>
+    <select id="selCountCcieByStudents" resultType="map" parameterType="map">
+        select count(id) ccie,student_id id from ccie where student_id in(
+        <foreach collection="list" item="studentIds" separator="," >
+            #{studentIds}
+        </foreach>
+        )
+        group by student_id
+    </select>
+</mapper>

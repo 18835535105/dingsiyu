@@ -824,8 +824,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     @GoldChangeAnnotation
     @TestChangeAnnotation(isUnitTest = false)
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Integer[] correctWordId,
-                                                       Integer[] errorWordId, Long[] unitId, Integer classify, Long courseId,
+    public ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Long[] correctWordId,
+                                                       Long[] errorWordId, Long[] unitId, Integer classify, Long courseId,
                                                        HttpSession session, Integer point, String genre, String testDetail) {
         Student student = getStudent(session);
 
@@ -844,8 +844,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 把已学测试,生词测试,熟词测试保存慧追踪中
         if (!"单词五维测试".equals(genre) && !"例句五维测试".equals(genre)) {
             // 保存学习记录和慧追踪信息
-            saveTestLearnAndCapacity.saveLearnAndCapacity(correctWord, errorWord,
-                    correctWordId, errorWordId, session, student, unitId, classify);
+            saveTestLearnAndCapacity.saveLearnAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, student, unitId, classify);
         }
         WordUnitTestDTO wordUnitTestDTO = new WordUnitTestDTO();
         wordUnitTestDTO.setPoint(point);
@@ -1104,8 +1103,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     }
 
     @Override
-    public ServerResponse<TestResultVo> saveTestReview(String[] correctWord, String[] errorWord, Integer[] correctWordId,
-                                                       Integer[] errorWordId, Long[] unitId, Integer classify, Long courseId,
+    public ServerResponse<TestResultVo> saveTestReview(String[] correctWord, String[] errorWord, Long[] correctWordId,
+                                                       Long[] errorWordId, Long[] unitId, Integer classify, Long courseId,
                                                        HttpSession session, Integer point, String genre, String testDetail) {
         if (correctWord == null && errorWord == null) {
             return ServerResponse.createByErrorMessage("参数错误！");
@@ -1120,19 +1119,19 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
         String[] correctWord = new String[0];
         String[] errorWord = new String[0];
-        Integer[] correctWordId = new Integer[0];
-        Integer[] errorWordId = new Integer[0];
+        Long[] correctWordId = new Long[0];
+        Long[] errorWordId = new Long[0];
 
         if (isKnown) {
             correctWord = new String[1];
-            correctWordId = new Integer[1];
+            correctWordId = new Long[1];
             correctWord[0] = word;
-            correctWordId[0] = Integer.parseInt(id.toString());
+            correctWordId[0] = id;
         } else {
             errorWord = new String[1];
-            errorWordId = new Integer[1];
+            errorWordId = new Long[1];
             errorWord[0] = word;
-            errorWordId[0] = Integer.parseInt(id.toString());
+            errorWordId[0] = id;
         }
 
         // 保存学习记录和慧追踪信息

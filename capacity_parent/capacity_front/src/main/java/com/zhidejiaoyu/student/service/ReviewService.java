@@ -87,7 +87,7 @@ public interface ReviewService extends BaseService<CapacityMemory> {
      * @param genre         测试类型：已学测试, 生词测试, 熟词测试, 五维测试
      * @return 响应信息
      */
-    ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Integer[] correctWordId, Integer[] errorWordId, Long[] unitId, Integer classify, Long courseId, HttpSession session, Integer point, String genre,String testDetail);
+    ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Long[] correctWordId, Long[] errorWordId, Long[] unitId, Integer classify, Long courseId, HttpSession session, Integer point, String genre,String testDetail);
 
     /**
      * 保存智能复习/测试复习测试记录
@@ -104,7 +104,7 @@ public interface ReviewService extends BaseService<CapacityMemory> {
      * @param genre         测试类型：效果测试，复习测试
      * @return 响应信息
      */
-    ServerResponse<TestResultVo> saveTestReview(String[] correctWord, String[] errorWord, Integer[] correctWordId, Integer[] errorWordId, Long[] unitId, Integer classify, Long courseId, HttpSession session, Integer point, String genre,String testDetail);
+    ServerResponse<TestResultVo> saveTestReview(String[] correctWord, String[] errorWord, Long[] correctWordId, Long[] errorWordId, Long[] unitId, Integer classify, Long courseId, HttpSession session, Integer point, String genre,String testDetail);
 
     /**
      * 保存 智能复习 学习记录

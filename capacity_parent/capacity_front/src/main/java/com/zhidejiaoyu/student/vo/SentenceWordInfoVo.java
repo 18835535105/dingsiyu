@@ -1,6 +1,9 @@
 package com.zhidejiaoyu.student.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * 点击例句中某个单词，返回该单词的相关信息
@@ -8,8 +11,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author wuchenxi
  * @date 2018/6/28 17:02
  */
+@Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class SentenceWordInfoVo {
+public class SentenceWordInfoVo implements Serializable {
 
     private Long wordId;
 
@@ -41,51 +45,4 @@ public class SentenceWordInfoVo {
      */
     private Integer state;
 
-    public Long getCourseId() {
-        return courseId;
-    }
-
-    public void setCourseId(Long courseId) {
-        this.courseId = courseId;
-    }
-
-    public Integer getState() {
-        return state;
-    }
-
-    public void setState(Integer state) {
-        this.state = state;
-    }
-
-    public Long getWordId() {
-        return wordId;
-    }
-
-    public void setWordId(Long wordId) {
-        this.wordId = wordId;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public String getWord() {
-        return word;
-    }
-
-    public void setWord(String word) {
-        this.word = word;
-    }
-
-    public String getWordChinese() {
-        return wordChinese;
-    }
-
-    public void setWordChinese(String wordChinese) {
-        this.wordChinese = wordChinese;
-    }
 }

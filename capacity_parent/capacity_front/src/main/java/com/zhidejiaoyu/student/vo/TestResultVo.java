@@ -3,6 +3,8 @@ package com.zhidejiaoyu.student.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 测试结果页响应数据
  *
@@ -11,7 +13,7 @@ import lombok.Data;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class TestResultVo {
+public class TestResultVo implements Serializable {
     /**
      * 奖励金币数
      */
@@ -49,4 +51,8 @@ public class TestResultVo {
      */
     private String lockMsg;
 
+    /**
+     * 测试id
+     */
+    private Long testId;
 }

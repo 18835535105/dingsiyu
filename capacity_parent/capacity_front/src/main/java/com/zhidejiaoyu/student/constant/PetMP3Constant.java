@@ -106,38 +106,104 @@ public class PetMP3Constant {
     public static final int[] COURSE_TEST_EIGHTY_TO_HUNDRED = {53, 54, 55, 56};
 
     /**
-     * 单元前测 0-80
+     * 单元前测 第一阶段得分 <br>
+     * <ul>单词默写、词组默写
+     * <li>x<50：65, 66, 67, 68</li>
+     * </ul>
+     *
+     * <ul>单词辩音、词组辩音
+     * <li>x<60：65, 66, 67, 68</li>
+     * </ul>
+     *
+     * <ul>快速单词、快速词组、快速句型、词汇考点、语法辨析
+     * <li>x<80：65, 66, 67, 68</li>
+     * </ul>
      */
-    public static final int[] BEFORE_UNIT_TEST_LESS_EIGHTY = {65, 66, 67, 68};
+    public static final int[] BEFORE_UNIT_FIRST_LEVEL = {65, 66, 67, 68};
     /**
-     * 单元前测 0-90
+     * 单元前测 第二阶段得分
+     * <ul>单词默写、词组默写
+     * <li>50≤x<90：69, 70, 71, 72</li>
+     * </ul>
+     *
+     * <ul>单词辩音、词组辩音
+     * <li>60≤x≤90：73, 74, 75, 76</li>
+     * </ul>
+     *
+     * <ul>
+     * 快速单词、快速词组、快速句型、词汇考点、语法辨析
+     * <li>80≤x<90：69, 70, 71, 72</li>
+     * </ul>
      */
-    public static final int[] BEFORE_UNIT_EIGHTY_TO_NINETY = {69, 70, 71, 72};
+    public static final int[] BEFORE_UNIT_SECOND_LEVEL = {69, 70, 71, 72};
     /**
-     * 单元前测 90-100
+     * 单元前测 第三阶段得分
+     * <ul>单词默写、词组默写
+     * <li>90≤x≤100：73, 74, 75, 76</li>
+     * </ul>
+     *
+     * <ul>单词辩音、词组辩音
+     * <li>90≤x≤100：73, 74, 75, 76</li>
+     * </ul>
+     *
+     * <ul>
+     * 快速单词、快速词组、快速句型、词汇考点、语法辨析
+     * <li>90≤x≤100：73, 74, 75, 76</li>
+     * </ul>
      */
-    public static final int[] BEFORE_UNIT_NINETY_TO_HUNDRED = {73, 74, 75, 76};
+    public static final int[] BEFORE_UNIT_THIRD_LEVEL = {73, 74, 75, 76};
 
     /**
-     * 单元后测 0-80
+     * 单元闯关 第一阶段得分
+     * <ul>
+     *     单词默写、词组默写
+     *     <li>x<50分：37, 38, 39, 40</li>
+     * </ul>
+     *
+     * <ul>
+     * 单词辩音、词组辩音
+     * <li>x<60分：37, 38, 39, 40</li>
+     * </ul>
+     *
+     * <ul>
+     * 快速单词、快速词组、快速句型、词汇考点、语法辨析
+     * <li>x<80：37, 38, 39, 40</li>
+     * </ul>
      */
-    public static final int[] AFTER_UNIT_TEST_LESS_EIGHTY = {37, 38, 39, 40};
+    public static final int[] AFTER_UNIT_FIRST_LEVEL = {37, 38, 39, 40};
     /**
-     * 单元后测 0-90
+     * 单元闯关 第二阶段得分
+     * <ul>
+     * 单词默写、词组默写、单词辩音、词组辩音
+     * <li>60≤x<100：41, 42, 43, 44</li>
+     * </ul>
+     *
+     * <ul>
+     * 快速单词、快速词组、快速句型、词汇考点、语法辨析
+     * <li>80≤x<100：41, 42, 43, 44</li>
+     * </ul>
      */
-    public static final int[] AFTER_UNIT_EIGHTY_TO_NINETY = {41, 42, 43, 44};
+    public static final int[] AFTER_UNIT_SECOND_LEVEL = {41, 42, 43, 44};
     /**
-     * 单元后测 90-100
+     * 单元闯关 第三阶段得分
+     * <ul>
+     * 单词默写、词组默写、单词辩音、词组辩音
+     * <li>x=100：45, 46, 47, 48</li>
+     * </ul>
+     *
+     * <ul>
+     * 快速单词、快速词组、快速句型、词汇考点、语法辨析
+     * <li>x=100：45, 46, 47, 48</li>
+     * </ul>
      */
-    public static final int[] AFTER_UNIT_NINETY_TO_HUNDRED = {45, 46, 47, 48};
+    public static final int[] AFTER_UNIT_THIRD_LEVEL = {45, 46, 47, 48};
 
     /**
-     * 词汇量测试 0-80
+     * 能力值测试 0-80  x<80：57,78,79,80
      */
     public static final int[] WORD_TEST_LESS_EIGHTY = {57, 78, 79, 80};
     /**
-     * 词汇量测试 80-100分
+     * 能力值测试 80-100分    80≤x≤100：81, 82, 83, 84
      */
     public static final int[] WORD_TEST_EIGHTY_TO_HUNDRED = {81, 82, 83, 84};
-
 }

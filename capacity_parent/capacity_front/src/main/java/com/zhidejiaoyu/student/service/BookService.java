@@ -1,12 +1,12 @@
 package com.zhidejiaoyu.student.service;
 
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.common.Vo.bookVo.BookVo;
 import com.zhidejiaoyu.common.pojo.Player;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.vo.BookInfoVo;
-import com.zhidejiaoyu.student.vo.BookVo;
-import com.zhidejiaoyu.student.vo.PlayerVo;
+import com.zhidejiaoyu.common.Vo.bookVo.BookInfoVo;
+import com.zhidejiaoyu.common.Vo.bookVo.PlayerVo;
 
 import javax.servlet.http.HttpSession;
 

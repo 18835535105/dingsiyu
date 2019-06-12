@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  * @date 2018年5月18日 上午9:21:27
  */
 @Data
-public class CapacityDigestVo {
+public class CapacityDigestVo implements Serializable {
     /**
      * 本课程生词/生句个数
      */

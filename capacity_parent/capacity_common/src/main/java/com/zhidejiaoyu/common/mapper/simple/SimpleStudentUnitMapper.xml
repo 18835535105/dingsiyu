@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimpleStudentUnitMapper">
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentUnit">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="student_id" property="studentId" jdbcType="BIGINT"/>
+        <result column="course_id" property="courseId" jdbcType="BIGINT"/>
+        <result column="unit_id" property="unitId" jdbcType="BIGINT"/>
+        <result column="word_status" property="wordStatus" jdbcType="INTEGER"/>
+        <result column="sentence_status" property="sentenceStatus" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, student_id, course_id, unit_id, word_status, sentence_status
+    </sql>
+    <select id="selectByExample" resultMap="BaseResultMap"
+            parameterType="com.zhidejiaoyu.common.pojo.StudentUnitExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from student_unit
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from student_unit
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from student_unit
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.StudentUnitExample">
+        delete from student_unit
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from student_unit where student_id in
+        <foreach collection="students" separator="," open="(" close=")" item="student">
+            student.id
+        </foreach>
+    </delete>
+    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.StudentUnit">
+        insert into student_unit (id, student_id, course_id,
+                                  unit_id, word_status, sentence_status)
+        values (#{id,jdbcType=BIGINT}, #{studentId,jdbcType=BIGINT}, #{courseId,jdbcType=BIGINT},
+                #{unitId,jdbcType=BIGINT}, #{wordStatus,jdbcType=INTEGER}, #{sentenceStatus,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertList" parameterType="java.util.List">
+        insert into student_unit (id, student_id, course_id,
+        unit_id, word_status, sentence_status ,type )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id,jdbcType=BIGINT}, #{item.studentId,jdbcType=BIGINT}, #{item.courseId,jdbcType=BIGINT},
+            #{item.unitId,jdbcType=BIGINT}, #{item.wordStatus,jdbcType=INTEGER},
+            #{item.sentenceStatus,jdbcType=INTEGER},#{item.type,jdbcType=INTEGER})
+        </foreach>
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.StudentUnit">
+        insert into student_unit
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="studentId != null">
+                student_id,
+            </if>
+            <if test="courseId != null">
+                course_id,
+            </if>
+            <if test="unitId != null">
+                unit_id,
+            </if>
+            <if test="wordStatus != null">
+                word_status,
+            </if>
+            <if test="sentenceStatus != null">
+                sentence_status,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="studentId != null">
+                #{studentId,jdbcType=BIGINT},
+            </if>
+            <if test="courseId != null">
+                #{courseId,jdbcType=BIGINT},
+            </if>
+            <if test="unitId != null">
+                #{unitId,jdbcType=BIGINT},
+            </if>
+            <if test="wordStatus != null">
+                #{wordStatus,jdbcType=INTEGER},
+            </if>
+            <if test="sentenceStatus != null">
+                #{sentenceStatus,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.StudentUnitExample"
+            resultType="java.lang.Integer">
+        select count(*) from student_unit
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <select id="countUnlockUnitMapByStudentIdAndCourseId" resultType="java.util.Map" parameterType="map">
+        SELECT
+        course_id id,
+        count(id) value
+        FROM
+        student_unit
+        WHERE
+        student_id = #{stuId}
+        <if test="flag == 1">
+            AND word_status = 1
+        </if>
+        <if test="flag == 2">
+            AND sentence_status = 1
+        </if>
+        AND course_id IN (
+        <foreach collection="courses" item="course" separator=",">
+            #{course.id}
+        </foreach>
+        )
+        GROUP BY course_id
+    </select>
+    <select id="countOpenCourseByStudentId" resultType="java.lang.Integer" parameterType="java.lang.Long">
+        SELECT
+            COUNT(id)
+        FROM
+            student_unit
+        WHERE
+            student_id = #{stuId}
+            AND (
+                word_status = 1
+                OR sentence_status = 1
+            )
+    </select>
+    <select id="selectNextCourse" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from student_unit
+        where student_id = #{student.id} and course_id > #{courseId}
+        group by course_id
+        order by course_id asc
+    </select>
+    <select id="countUnitCountByStudentId" resultType="java.lang.Integer" parameterType="map">
+        select count(su.id)
+        from student_unit su, course c
+        where su.student_id = #{student.id}
+        <if test="grade != null and grade != ''">
+            and su.course_id = c.id and c.study_paragraph = #{grade}
+        </if>
+    </select>
+    <select id="planSeniority" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+    /* 本班排行, 单元排行@Param("area") String area, @Param("school_name") String school_name, @Param("grade") String grade,
+    @Param("squad") String squad, @Param("study_paragraph") String study_paragraph, @Param("haveUnit") Integer haveUnit*/
+     select a.student_id, SUM(a.sumUnit) AS countUnit from (select student_id,course_id, SUM(word_status) AS sumUnit FROM student_unit GROUP BY course_id,student_id) a
+     JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
+      AND b.area = #{area}	AND b.school_name = #{school_name} AND b.grade = #{grade} AND b.squad = #{squad}  -- AND b.id = 3169
+	  AND c.study_paragraph = #{study_paragraph} AND c.version = #{version} GROUP BY a.student_id ORDER BY countUnit <if test="haveUnit == 1">ASC</if> <if test="haveUnit == 2">DESC</if>
+    </select>
+    <select id="planSenioritySchool" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+        select a.student_id, SUM(a.sumUnit) AS countUnit from (select student_id,course_id, SUM(word_status) AS sumUnit FROM student_unit GROUP BY course_id,student_id) a
+        JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
+        AND b.area = #{area} AND b.school_name = #{school_name}-- AND b.id = 3169
+        AND c.study_paragraph = #{study_paragraph} AND c.version = #{version} GROUP BY a.student_id ORDER BY countUnit <if test="haveUnit == 1">ASC</if> <if test="haveUnit == 2">DESC</if> LIMIT 50;
+    </select>
+    <select id="planSeniorityNationwide" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+        select a.student_id, SUM(a.sumUnit) AS countUnit from (select student_id,course_id, SUM(word_status) AS sumUnit FROM student_unit GROUP BY course_id,student_id) a
+        JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
+        AND c.study_paragraph = #{study_paragraph} AND c.version = #{version} GROUP BY a.student_id ORDER BY countUnit <if test="haveUnit == 1">ASC</if> <if test="haveUnit == 2">DESC</if> LIMIT 50;
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.StudentUnit">
+        update student_unit
+        <set>
+            <if test="studentId != null">
+                student_id = #{studentId,jdbcType=BIGINT},
+            </if>
+            <if test="courseId != null">
+                course_id = #{courseId,jdbcType=BIGINT},
+            </if>
+            <if test="unitId != null">
+                unit_id = #{unitId,jdbcType=BIGINT},
+            </if>
+            <if test="wordStatus != null">
+                word_status = #{wordStatus,jdbcType=INTEGER},
+            </if>
+            <if test="sentenceStatus != null">
+                sentence_status = #{sentenceStatus,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.StudentUnit">
+        update student_unit
+        set student_id      = #{studentId,jdbcType=BIGINT},
+            course_id       = #{courseId,jdbcType=BIGINT},
+            unit_id         = #{unitId,jdbcType=BIGINT},
+            word_status     = #{wordStatus,jdbcType=INTEGER},
+            sentence_status = #{sentenceStatus,jdbcType=INTEGER}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateStatus" parameterType="map">
+        update student_unit set word_status = 1
+        where student_id = #{studentId} and course_id = #{courseId} and unit_id = #{nextUnitId}
+    </update>
+
+    <select id="getSimpleUnitByStudentIdByCourseId" parameterType="map" resultType="map">
+        select b.id, b.unit_name, a.word_status
+        from student_unit a
+                 JOIN unit b ON a.unit_id = b.id
+            AND a.student_id = #{studentId}
+            AND a.course_id = #{courseId}
+        group by b.id
+    </select>
+    <select id="getOpenUnitId" parameterType="map" resultType="map">
+    	select u.id, if(count(distinct v.id) &lt;= count(distinct l.id), 1, 2) isAll
+		from unit u,
+		     unit_vocabulary uv,
+		     vocabulary v,
+		     learn l,
+		     student_unit su
+		where u.id = uv.unit_id
+		  and uv.vocabulary_id = v.id
+		  and l.unit_id = u.id
+		  and l.vocabulary_id = v.id
+		  and su.unit_id = u.id
+		  and v.delStatus = 1
+		  and l.type = 1
+		  and l.student_id = #{studentId}
+		  and l.course_id = #{courseId}
+		group by u.id
+    </select>
+    <select id="countCapacity" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from student_unit
+        where student_id = #{student.id}
+          and type = 1
+    </select>
+
+    <select id="getAllCourseIdByTypeToStudent" parameterType="map" resultType="long">
+        select course.id
+        from student_unit unit
+        join course course on unit.course_id=course.id
+        where unit.student_id=#{studentId} and unit.type=#{type}
+        and course.version like '%单词辨音%' group by course.id
+    </select>
+</mapper>

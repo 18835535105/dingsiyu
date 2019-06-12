@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimpleCapacityStudentUnitMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.CapacityStudentUnit">
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="course_id" property="courseId"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="type" property="type"/>
+        <result column="unit_name" property="unitName"/>
+        <result column="course_name" property="courseName"/>
+        <result column="version" property="version"/>
+        <result column="startunit" property="startunit"/>
+        <result column="endunit" property="endunit"/>
+    </resultMap>
+
+    <sql id="base_sql">
+        id,
+        student_id,
+        course_id,
+        unit_id,
+        type,
+        unit_name,
+        course_name,
+        version,
+        startunit,
+        endunit
+    </sql>
+    <delete id="deleteByStudentIdAndType" parameterType="map">
+        delete
+        from capacity_student_unit
+        where student_id = #{studentId}
+          and type = #{type}
+    </delete>
+
+    <select id="selectCurrentUnitIdByStudentIdAndType"
+            resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from capacity_student_unit where student_id = #{studentId} and type = #{type} limit 1
+    </select>
+
+    <select id="selGetSentenceByStudentIdAndType" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select <include refid="base_sql"></include>
+        from  capacity_student_unit where student_id=#{studentId} and type=2
+    </select>
+    <update id="updById" parameterType="java.util.Map">
+        update capacity_student_unit(student_id,course_id,unit_id,type,course_name,unit_name,version) set
+        values(#{studentId},#{coureseId},#{unitId},#{type},#{courseName},#{unitName},#{version}) where id=#{id}
+    </update>
+
+
+</mapper>

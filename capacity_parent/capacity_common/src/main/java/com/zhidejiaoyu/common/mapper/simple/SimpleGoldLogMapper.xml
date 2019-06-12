@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimpleGoldLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.GoldLog">
+        <id column="id" property="id"/>
+        <result column="operator_id" property="operatorId"/>
+        <result column="student_id" property="studentId"/>
+        <result column="gold_add" property="goldAdd"/>
+        <result column="gold_reduce" property="goldReduce"/>
+        <result column="reason" property="reason"/>
+        <result column="create_time" property="createTime"/>
+        <result column="read_flag" property="readFlag"/>
+    </resultMap>
+</mapper>
