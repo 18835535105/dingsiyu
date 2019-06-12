@@ -233,6 +233,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
 
         int total = phoneticSymbolMapper.countByUnitId(unitId);
 
+        // 获取当前单元还未学习的音标
         PhoneticSymbol phoneticSymbol = this.getUnLearnedPhoneticSymbol(unitId, studentId);
         if (phoneticSymbol == null) {
              return ServerResponse.createBySuccess(600, "当前单元已学习完！");
@@ -487,16 +488,21 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         if (phoneticSymbols.size() > 0) {
             Collections.shuffle(phoneticSymbols);
             // 添加正确答案
-            List<Topic> topics = phoneticSymbols.stream().filter(phoneticSymbol1 -> Objects.equals(phoneticSymbol1.getPhoneticSymbol(), phoneticSymbol.getPhoneticSymbol())).map(result -> {
+            // 存放 letter，防止错误答案中有与正确答案重复的数据
+            Map<String, String> map = new HashMap<>(16);
+            List<Topic> topics = phoneticSymbols.stream()
+                    .filter(phoneticSymbol1 -> Objects.equals(phoneticSymbol1.getPhoneticSymbol(), phoneticSymbol.getPhoneticSymbol()))
+                    .map(result -> {
                 Topic topic = new Topic();
                 topic.setAnswer(true);
                 topic.setWord(result.getLetter());
+                map.put(result.getLetter(), result.getLetter());
                 return topic;
             }).collect(Collectors.toList());
 
             // 添加两个错误答案
             topics.addAll(phoneticSymbols.stream().filter(phoneticSymbol1 -> !Objects.equals(phoneticSymbol1.getPhoneticSymbol(), phoneticSymbol.getPhoneticSymbol())
-                    && !Objects.equals(phoneticSymbol1.getLetter(), phoneticSymbol.getLetter()))
+                    && !Objects.equals(phoneticSymbol1.getLetter(), phoneticSymbol.getLetter()) && !map.containsKey(phoneticSymbol1.getLetter()))
                     .limit(2)
                     .map(result -> {
                         Topic topic = new Topic();
