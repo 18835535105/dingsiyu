@@ -1015,6 +1015,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             Student student = (Student) sessionMap.get(UserConstant.CURRENT_STUDENT);
             Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) sessionMap.get(TimeConstant.LOGIN_TIME));
             Date loginOutTime = DateUtil.parseYYYYMMDDHHMMSS(new Date());
+            //存放登入退出时间
+            redisTemplate.opsForHash().put(RedisKeysConst.STUDENT_LOGINOUT_TIME, student.getId(), DateUtil.DateTime(new Date()));
             if (loginTime != null && loginOutTime != null) {
                 // 判断当前登录时间是否已经记录有在线时长信息，如果没有插入记录，如果有无操作
                 int count = durationMapper.countOnlineTimeWithLoginTime(student, loginTime);

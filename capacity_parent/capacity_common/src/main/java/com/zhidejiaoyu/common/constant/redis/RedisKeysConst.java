@@ -107,4 +107,9 @@ public class RedisKeysConst {
      * 存储学生是否是第一次登录信息
      */
     public static final String FIRST_LOGIN = "FIRST_LOGIN";
+
+    /**
+     * 记录学生登出时间
+     */
+    public static final String STUDENT_LOGINOUT_TIME = "STUDENT_LOGINOUT_TIME";
 }
