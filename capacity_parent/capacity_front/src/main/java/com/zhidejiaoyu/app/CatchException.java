@@ -44,7 +44,7 @@ public class CatchException extends BaseServiceImpl<StudentMapper, Student> {
         String url = request.getRequestURI().substring(request.getContextPath().length());
         if (studentObject != null) {
             Student student = (Student) studentObject;
-            log.error("学生[{}]->[{}],请求 URL=[{}],操作出现系统异常,param=[{}]", student.getId(), student.getStudentName(), url, param, e);
+            log.error("学生[{} - {} - {}],请求 URL=[{}],操作出现系统异常,param=[{}]", student.getId(), student.getAccount(), student.getStudentName(), url, param, e);
         } else {
             log.error("学生操作出现系统异常,param=[{}], URL=[{}]", param, url, e);
         }

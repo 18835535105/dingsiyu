@@ -1539,7 +1539,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         StringBuilder msg = new StringBuilder();
         long stuId = student.getId();
         TestRecord testRecord = new TestRecord();
-        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+        Object timeSession = session.getAttribute(TimeConstant.BEGIN_START_TIME);
+        testRecord.setTestStartTime(timeSession == null ? new Date() : (Date) timeSession);
         testRecord.setTestEndTime(new Date());
         testRecord.setStudyModel(studyModel);
         testRecord.setStudentId(stuId);
