@@ -231,7 +231,7 @@ public class RedisOpt {
         Object object = redisTemplate.opsForHash().get(RedisKeysConst.FIRST_LOGIN, studentId);
         if (object != null) {
            try {
-               return (boolean) object;
+               return false;
            } catch (Exception e) {
                log.warn("格式转换错误！studentId=[{}]", studentId, e);
            }
