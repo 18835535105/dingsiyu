@@ -6,7 +6,6 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.annotation.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.service.ReviewService;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 import lombok.extern.slf4j.Slf4j;
@@ -104,7 +103,6 @@ public class ReviewController {
      */
     @ResponseBody
     @PostMapping("/saveTestCenter")
-    @ControllerLogAnnotation(name = "保存测试中心测试结果")
     public ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Integer[] correctWordId, Integer[] errorWordId, Long[] unitId,
                                                  Integer classify, Long courseId,HttpSession session, Integer point, String genre,String testDetail) {
         final String wordFiveTest = "单词五维测试";
@@ -154,7 +152,6 @@ public class ReviewController {
      */
     @ResponseBody
     @PostMapping("/saveTestReview")
-    @ControllerLogAnnotation(name = "保存测试复习测试记录")
     public ServerResponse<TestResultVo> saveTestReview(String[] correctWord, String[] errorWord, Integer[] correctWordId,
                                                        Integer[] errorWordId, Long[] unitId,
                                                        Integer classify, Long courseId,
@@ -180,7 +177,6 @@ public class ReviewController {
      */
     @ResponseBody
     @PostMapping("/saveCapacityReview")
-    @ControllerLogAnnotation(name = "保存智能复习")
     public ServerResponse<String> saveCapacityReview(HttpSession session, Long[] unitId, Integer classify, String word,
                                                      Long courseId, Long id, boolean isKnown) {
         if (unitId == null || unitId.length == 0 || courseId == null || classify == null || id == null) {

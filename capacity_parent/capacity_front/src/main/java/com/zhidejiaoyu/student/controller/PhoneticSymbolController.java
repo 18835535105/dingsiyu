@@ -1,18 +1,15 @@
 package com.zhidejiaoyu.student.controller;
 
 
-import com.zhidejiaoyu.common.annotation.ControllerLogAnnotation;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.dto.phonetic.UnitTestDto;
 import com.zhidejiaoyu.student.service.PhoneticSymbolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 import java.util.Date;
 
 /**
@@ -55,7 +52,6 @@ public class PhoneticSymbolController {
      * @return
      */
     @GetMapping("/getSymbolListen")
-    @ControllerLogAnnotation(name = "获取音节辨音题目")
     public ServerResponse<Object> getSymbolListen(Long unitId, HttpSession session,
                                                   @RequestParam(required = false, defaultValue = "false") Boolean restudy) {
         if (unitId == null) {
@@ -73,7 +69,6 @@ public class PhoneticSymbolController {
      * @return
      */
     @PostMapping("/saveSymbolListen")
-    @ControllerLogAnnotation(name = "保存音标辨音题目")
     public ServerResponse saveSymbolListen(HttpSession session, Long unitId,  Integer symbolId) {
         if (unitId == null || symbolId == null) {
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT);
@@ -89,7 +84,6 @@ public class PhoneticSymbolController {
      * @return
      */
     @GetMapping("/getUnitTest")
-    @ControllerLogAnnotation(name = "获取音节单元闯关测试题目")
     public ServerResponse getUnitTest(HttpSession session, Long unitId) {
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         return phoneticSymbolService.getUnitTest(session, unitId);

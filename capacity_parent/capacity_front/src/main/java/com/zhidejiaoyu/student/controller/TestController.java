@@ -7,7 +7,6 @@ import com.zhidejiaoyu.common.utils.ValidateUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.testUtil.TestResult;
-import com.zhidejiaoyu.common.annotation.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.dto.phonetic.UnitTestDto;
 import com.zhidejiaoyu.student.service.TestService;
@@ -160,7 +159,6 @@ public class TestController {
      * @return
      */
     @PostMapping("/saveWordUnitTest")
-    @ControllerLogAnnotation(name = "保存单元闯关测试记录")
     public ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, @Valid WordUnitTestDTO wordUnitTestDTO,
                                                          BindingResult bindingResult, String testDetail) {
         String msg = ValidateUtil.validate(bindingResult);
@@ -219,7 +217,6 @@ public class TestController {
      * @return
      */
     @PostMapping("/saveCapSentenceTest")
-    @ControllerLogAnnotation(name = "保存音译练习记录")
     public ServerResponse saveCapSentenceTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
         if (wordUnitTestDTO.getUnitId() == null) {
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
@@ -233,7 +230,6 @@ public class TestController {
      * @param wordUnitTestDTO
      * @return
      */
-    @ControllerLogAnnotation(name = "保存音译练习记录")
     @PostMapping("/saveCapTeksTest")
     public ServerResponse<Object> saveCapTeksTest(HttpSession session,WordUnitTestDTO wordUnitTestDTO){
         if (wordUnitTestDTO.getUnitId() == null) {

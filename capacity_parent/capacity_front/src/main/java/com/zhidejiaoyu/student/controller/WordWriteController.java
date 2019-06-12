@@ -2,7 +2,6 @@ package com.zhidejiaoyu.student.controller;
 
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.annotation.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.service.WordWriteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,7 +49,6 @@ public class WordWriteController {
      * @return
      */
     @PostMapping("/saveWriteWord")
-    @ControllerLogAnnotation(name = "保存单词默写/听写/图鉴")
     public ServerResponse<String> saveWriteWord(HttpSession session, Learn learn, Boolean isKnown, Integer plan,
                                                 Integer total, Integer classify) {
         if (plan == null) {
