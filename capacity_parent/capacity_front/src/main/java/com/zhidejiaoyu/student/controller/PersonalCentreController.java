@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.AwardService;
 import com.zhidejiaoyu.student.service.PersonalCentreService;
+import com.zhidejiaoyu.student.service.simple.SimpleDrawRecordServiceSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +43,9 @@ public class PersonalCentreController extends BaseController {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private SimpleDrawRecordServiceSimple drawRecordService;
+
 
     /**
      * 点击个人中心
@@ -67,9 +71,7 @@ public class PersonalCentreController extends BaseController {
      */
     @GetMapping("/needViewCount")
     public ServerResponse<Object> needViewCount(HttpSession session) {
-        String url = domain + "/api/personal/needViewCount?session={session}&studentId={studentId}&loginTime={loginTime}";
-        ResponseEntity<Map> responseEntity = restTemplate.getForEntity(url, Map.class, super.packageParams(session));
-        return ServerResponse.createBySuccess(responseEntity.getBody() == null ? null : responseEntity.getBody().get("data"));
+        return personalCentreService.needViewCount(session);
     }
 
 
@@ -308,10 +310,7 @@ public class PersonalCentreController extends BaseController {
      */
     @PostMapping("/getRecord")
     public ServerResponse<Object> getRecord(HttpSession session) {
-        HttpHeaders headers = super.packageHeader(session);
-        String url = domain + "/api/drawRecord/getRecord";
-        ResponseEntity<Map> responseEntity = restTemplate.postForEntity(url, headers, Map.class);
-        return ServerResponse.createBySuccess(responseEntity.getBody() == null ? null : responseEntity.getBody().get("data"));
+        return drawRecordService.selAwardNow(session);
     }
 
     /**
@@ -319,15 +318,22 @@ public class PersonalCentreController extends BaseController {
      */
     @PostMapping("/addAward")
     public ServerResponse<Object> addAward(HttpSession session, Integer type, String explain, String imgUrl) {
-        HttpHeaders headers = super.packageHeader(session);
-        headers.add("explain", explain);
-        headers.add("type", type.toString());
-        if (imgUrl != null) {
-            headers.add("imgUrl", imgUrl);
+        int[] i = drawRecordService.addAward(session, type, explain, imgUrl);
+        int index = i[0];
+        ServerResponse<Object> result;
+        if (index == 3) {
+            result = ServerResponse.createByError(300, "无能量");
+        } else if (index > 0) {
+            String str = "0";
+            if (i[1] != 0) {
+                str = i[1] + "";
+            }
+            result = ServerResponse.createBySuccess(str);
+
+        } else {
+            result = ServerResponse.createBySuccess(601, "失败");
         }
-        String url = domain + "/api/drawRecord/AddAward";
-        ResponseEntity<Map> responseEntity = restTemplate.postForEntity(url, headers, Map.class);
-        return ServerResponse.createBySuccess(responseEntity.getBody() == null ? null : responseEntity.getBody().get("data"));
+        return result;
     }
 
 

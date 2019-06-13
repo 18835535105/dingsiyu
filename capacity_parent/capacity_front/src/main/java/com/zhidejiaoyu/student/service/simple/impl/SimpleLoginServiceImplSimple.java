@@ -11,6 +11,7 @@ import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.SimpleValidateCode;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
@@ -778,6 +779,8 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
             Student student = (Student) sessionMap.get(UserConstant.CURRENT_STUDENT);
             Date loginTime = SimpleDateUtil.parseYYYYMMDDHHMMSS((Date) sessionMap.get(TimeConstant.LOGIN_TIME));
             Date loginOutTime = SimpleDateUtil.parseYYYYMMDDHHMMSS(new Date());
+            //存放登入退出时间
+            redisTemplate.opsForHash().put(RedisKeysConst.STUDENT_LOGINOUT_TIME, student.getId(), DateUtil.DateTime(new Date()));
             if (loginTime != null && loginOutTime != null) {
                 // 判断当前登录时间是否已经记录有在线时长信息，如果没有插入记录，如果有无操作
                 int count = simpleDurationMapper.countOnlineTimeWithLoginTime(student, loginTime);

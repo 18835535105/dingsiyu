@@ -558,7 +558,7 @@
           and type = 1
     </select>
 
-    <select id="selectTestDetailVo" resultType="com.zhidejiaoyu.common.Vo.testVo.TestDetailVo" parameterType="map">
+    <select id="selectTestDetailVo" resultType="com.zhidejiaoyu.common.Vo.simple.testVo.TestDetailVo" parameterType="map">
         select concat(concat(concat('清学智能', c.version), '-'), t.genre)              title,
                s.student_name                                                       name,
                concat('测试时间：', date_format(if(t.test_start_time is null, now(), t.test_start_time), '%Y-%m-%d %H:%i:%s')) testTime,

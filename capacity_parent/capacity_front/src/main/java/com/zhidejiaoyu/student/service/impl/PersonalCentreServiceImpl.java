@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.simple.SimpleMessageBoardMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.AwardUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
@@ -78,9 +79,6 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
 
     @Autowired
     private StudentMapper studentMapper;
-
-    @Autowired
-    private AwardMapper awardMapper;
 
     @Autowired
     private LevelMapper levelMapper;
@@ -1731,6 +1729,42 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         resultMap.put("skin", skinList);
         resultMap.put("use", useMap);
         return ServerResponse.createBySuccess(resultMap);
+    }
+
+    @Override
+    public ServerResponse needViewCount(HttpSession session) {
+        Student student = super.getStudent(session);
+
+        // 留言反馈未阅读信息数量
+        int feedBackCount = unReadFeedBackCount(student.getId());
+        // 可抽奖次数
+        int lotteryCount = lotteryCount(student);
+
+        Map<String, Integer> map = new HashMap<>(16);
+
+        map.put("count",  feedBackCount + lotteryCount);
+        return ServerResponse.createBySuccess(map);
+    }
+
+    private int unReadFeedBackCount(Long studentId) {
+        MessageBoardExample messageBoardExample = new MessageBoardExample();
+        MessageBoardExample.Criteria criteria = messageBoardExample.createCriteria();
+        criteria.andStudentIdEqualTo(studentId).andReadFlagEqualTo(3).andRoleEqualTo(1);
+        return messageBoardMapper.countByExample(messageBoardExample);
+    }
+
+    /**
+     * 可抽奖次数
+     *
+     * @param student
+     * @return
+     */
+    private int lotteryCount(Student student) {
+        Integer energy = student.getEnergy();
+        if (energy != null) {
+            return energy / 5;
+        }
+        return 0;
     }
 
 }
