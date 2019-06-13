@@ -19,7 +19,7 @@
     </select>
 
     <select id="selAwardNow" parameterType="java.util.Map" resultType="java.lang.Integer">
-        select count(id) from draw_record where student_id=#{studentId} and create_time like concat('%',#{time},'%');
+        select count(id) from draw_record where student_id=#{studentId} and to_days(create_time) = to_days(now())
     </select>
 
     <select id="selDrawSize" parameterType="java.util.Map" resultType="java.lang.Integer">
