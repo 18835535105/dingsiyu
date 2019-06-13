@@ -133,4 +133,7 @@ public interface CapacityMemoryMapper extends BaseMapper<CapacityMemory> {
 	 */
 	@Delete("delete from capacity_memory where student_id = #{studentId} and unit_id >= #{startUnit} and unit_id <= #{endUnit}")
 	void deleteByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("startUnit") Long startUnit, @Param("endUnit") Long endUnit);
+
+	@Delete("delete from capacity_memory where student_id = #{studentId} and unit_id = #{unitId}")
+	void deleteByStudentIdAndStudyUnitId(@Param("studentId") Long studentId,@Param("unitId") Long unitId);
 }

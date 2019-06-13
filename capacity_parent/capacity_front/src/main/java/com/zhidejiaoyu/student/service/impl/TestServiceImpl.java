@@ -153,6 +153,15 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Autowired
     private StudentInfoService studentInfoService;
 
+    @Autowired
+    private CapacityWriteMapper capacityWriteMapper;
+
+    @Autowired
+    private CapacityMemoryMapper capacityMemoryMapper;
+
+    @Autowired
+    private CapacityListenMapper capacityListenMapper;
+
     /**
      * 游戏测试题目获取，获取20个单词供测试
      *
@@ -423,7 +432,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
         returnList.addAll(discriminationList);
         //获取字母听写试题
-        List<Letter> letterWriteList = letters.subList(20,letters.size()-1);
+        List<Letter> letterWriteList = letters.subList(20, letters.size() - 1);
         List<Map<String, Object>> writeList = new ArrayList<>();
         for (Letter letter : letterWriteList) {
             Map<String, Object> letterWriteMap = new HashMap<>();
@@ -1339,6 +1348,17 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         getLevel(session);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         learnMapper.updLetterPair(student.getId(), wordUnitTestDTO.getUnitId()[0], commonMethod.getTestType(classify));
+        if (classify >= 1 && classify <= 3) {
+            if (classify == 1) {
+                capacityMemoryMapper.deleteByStudentIdAndStudyUnitId(student.getId(), wordUnitTestDTO.getUnitId()[0]);
+            }
+            if (classify == 2) {
+                capacityListenMapper.deleteByStudentIdAndStudyUnitId(student.getId(), wordUnitTestDTO.getUnitId()[0]);
+            }
+            if (classify == 3) {
+                capacityWriteMapper.deleteByStudentIdAndStudyUnitId(student.getId(), wordUnitTestDTO.getUnitId()[0]);
+            }
+        }
         return ServerResponse.createBySuccess(vo);
     }
 
