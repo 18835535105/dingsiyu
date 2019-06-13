@@ -862,7 +862,7 @@
         </if>
         where stu.status &lt;> 3 and stu.account_time is not null
         <if test="account!=null and account!=''">
-            and stu.account like concat('%',#{account},'%')
+            and to_days(stu.account) = to_days(#{account})
         </if>
         <if test="model==1">
             <if test="classId!=null and classId!=''">

@@ -295,7 +295,7 @@ public interface SimpleStudentMapper extends BaseMapper<Student> {
 
     Integer selStudentNumberById(@Param("classId") Long classId, @Param("teacherId") Long teacherId,
                                  @Param("model") String model, @Param("adminId") Integer adminId,
-                                 @Param("teacherIds") List<Integer> teacherIds, @Param("account") String account);
+                                 @Param("teacherIds") List<Integer> teacherIds, @Param("account") Date account);
 
     List<Map<String, Object>> getRanking(@Param("classId") Long classId, @Param("teacherId") Long teacherId
             , @Param("gold") String gold, @Param("worship") String worShip

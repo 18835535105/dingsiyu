@@ -43,7 +43,19 @@ public interface SimpleDrawRecordMapper extends BaseMapper<DrawRecord> {
     @Select("select count(id) from draw_record where student_id=#{studentId}")
     Integer selNumber(Integer studentId);
 
+    /**
+     * 查看当天抽奖数量
+     * @param name
+     * @param date
+     * @return
+     */
     Integer selDrawSize(@Param("name") String name, @Param("time") String date);
 
+    /**
+     * 查看奖品抽奖人数量
+     * @param names
+     * @param date
+     * @return
+     */
     Integer selDrawSizes(@Param("names") List<String> names, @Param("time") Date date);
 }

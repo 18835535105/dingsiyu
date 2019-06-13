@@ -23,11 +23,11 @@
     </select>
 
     <select id="selDrawSize" parameterType="java.util.Map" resultType="java.lang.Integer">
-        select count(id) from draw_record where name=#{name} and create_time like concat('%',#{time},'%')
+        select count(id) from draw_record where name=#{name} and to_days(create_time) = to_days(now())
     </select>
 
     <select id="selDrawSizes" parameterType="java.util.Map" resultType="java.lang.Integer">
-        select count(id) from draw_record where create_time like concat('%',#{time},'%') and name in
+        select count(id) from draw_record where to_days(create_time) = to_days(now()) and name in
         <foreach collection="names" item="name"
                  index="index" open="(" close=")" separator=",">
             #{name}
