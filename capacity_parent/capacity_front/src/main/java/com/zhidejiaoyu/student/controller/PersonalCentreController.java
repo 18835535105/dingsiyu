@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.AwardService;
 import com.zhidejiaoyu.student.service.PersonalCentreService;
 import com.zhidejiaoyu.student.service.simple.SimpleDrawRecordServiceSimple;
+import com.zhidejiaoyu.student.service.simple.SimplePersonalCentreServiceSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpSession;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -45,6 +47,9 @@ public class PersonalCentreController extends BaseController {
 
     @Autowired
     private SimpleDrawRecordServiceSimple drawRecordService;
+
+    @Autowired
+    private SimplePersonalCentreServiceSimple simplePersonalCentreServiceSimple;
 
 
     /**
@@ -293,8 +298,8 @@ public class PersonalCentreController extends BaseController {
      * @return
      */
     @GetMapping("/getLatestMedalInClass")
-    public ServerResponse<Object> getMedalInClass(HttpSession session) {
-        return personalCentreService.getMedalInClass(session);
+    public ServerResponse<List<Map<String,Object>>> getMedalInClass(HttpSession session) {
+        return simplePersonalCentreServiceSimple.getMedalInClass(session);
     }
 
     @GetMapping("/getLucky")
