@@ -3,7 +3,6 @@ package com.zhidejiaoyu.student.controller;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.student.level.ChildMedalVo;
 import com.zhidejiaoyu.common.Vo.student.level.LevelVo;
-import com.zhidejiaoyu.common.annotation.ControllerLogAnnotation;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -251,7 +250,6 @@ public class StudentInfoController extends BaseController {
      * @return
      */
     @PostMapping("/endValidTime")
-    @ControllerLogAnnotation(name = "保存有效时长信息")
     public ServerResponse<String> endValidTime(HttpSession session, Integer classify,
                                                Long courseId, Long unitId, String validTime, @RequestParam(required = false) Integer num) {
         if (classify == null) {

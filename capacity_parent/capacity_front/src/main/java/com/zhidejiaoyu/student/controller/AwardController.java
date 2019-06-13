@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.student.controller;
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.annotation.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.service.AwardService;
 import com.zhidejiaoyu.student.service.simple.SimpleAwardServiceSimple;
 import com.zhidejiaoyu.student.vo.AwardVo;
@@ -67,7 +66,6 @@ public class AwardController extends BaseController {
     }
 
     @GetMapping("/getAeardSize")
-    @ControllerLogAnnotation(name = "获取奖励排行可领取数量")
     public ServerResponse<Map<String,Object>> getAwardSize(HttpSession session, int type, @RequestParam(defaultValue = "0") Integer model) {
        return simpleAwardService.getAwareSize(type, session, model);
     }

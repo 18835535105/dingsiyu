@@ -3,7 +3,6 @@ package com.zhidejiaoyu.student.controller;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.annotation.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.service.SentenceService;
 import com.zhidejiaoyu.student.vo.SentenceWordInfoVo;
 import lombok.extern.slf4j.Slf4j;
@@ -63,7 +62,6 @@ public class SentenceController {
      * @return
      */
     @PostMapping("/saveSentenceTranslate")
-    @ControllerLogAnnotation(name = "保存句型学习记录")
     public ServerResponse<String> saveSentenceTranslate(HttpSession session, Learn learn, Boolean isKnown, Integer plan,
                                                         Integer total, String classify,Integer unitId) {
         if (plan == null || total == null) {
@@ -123,14 +121,12 @@ public class SentenceController {
      */
     @ResponseBody
     @GetMapping("/getLearnCourseAndUnit")
-    @ControllerLogAnnotation(name = "获取句型首页数据")
     public ServerResponse<Object> getLearnCourseAndUnit(HttpSession session) {
         return sentenceService.getLearnCourseAndUnit(session);
     }
 
     @ResponseBody
     @GetMapping("/getLearnUnitByCourse")
-    @ControllerLogAnnotation(name = "获取句型首页数据")
     public ServerResponse<Object> getLearnUnitByCourse(HttpSession session,Long courseId) {
         return sentenceService.getLearnUnitByCourse(session,courseId);
     }

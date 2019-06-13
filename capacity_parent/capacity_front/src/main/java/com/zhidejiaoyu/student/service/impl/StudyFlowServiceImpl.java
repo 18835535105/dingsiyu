@@ -17,9 +17,30 @@ import java.util.Date;
 import java.util.Objects;
 
 @Service
-@Transactional
 @Slf4j
 public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, StudyFlow> implements StudyFlowService {
+
+    /**
+     * 进入流程 1 标识
+     */
+    private static final int TO_FLOW_ONE = -3;
+
+    /**
+     * 进入流程 2 标识
+     */
+    private static final int TO_FLOW_TWO = -1;
+
+    /**
+     * 流程 1 起始节点
+     */
+    private static final int FLOW_ONE = 11;
+
+    /**
+     * 流程 2 起始节点
+     */
+    private static final int FLOW_TWO = 24;
+
+    private final String FLOW_ONE_STR = "流程1";
 
     @Resource
     private StudyFlowMapper studyFlowMapper;
@@ -68,6 +89,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
     @Autowired
     private CcieUtil ccieUtil;
+
     /**
      * 节点学完, 把下一节初始化到student_flow表, 并把下一节点返回
      *
@@ -266,6 +288,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> getNode(Long courseId, Long unitId, Long nodeId, Long grade, String isTrueFlow, HttpSession session) {
         Student student = getStudent(session);
         StudyFlow studyFlow = studyFlowMapper.selectById(nodeId);
@@ -275,22 +298,22 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             if (studyFlow.getNextTrueFlow() == 0) {
                 // 开启下一单元并且返回需要学习的流程信息
                 return openNextUnitAndReturn(unitId, session, student, studyFlow, grade);
-            } else if (Objects.equals(-1, studyFlow.getNextTrueFlow())) {
+            } else if (Objects.equals(TO_FLOW_TWO, studyFlow.getNextTrueFlow())) {
                 // 进入流程2
                 return toAnotherFlow(student, 24);
-            } else if (Objects.equals(-3, studyFlow.getNextTrueFlow())) {
+            } else if (Objects.equals(TO_FLOW_ONE, studyFlow.getNextTrueFlow())) {
                 // 进入流程1
                 // 判断当前单元流程1学习次数，如果没有学习，初始化同一单元的流程1；如果已学习初始化下一单元的流程1
-                int count = learnMapper.countByStudentIdAndFlow(student.getId(), unitId, "流程1");
+                int count = learnMapper.countByStudentIdAndFlow(student.getId(), unitId, FLOW_ONE_STR);
                 if (count == 0) {
-                    return toAnotherFlow(student, 11);
+                    return toAnotherFlow(student, FLOW_ONE);
                 } else {
                     String s = this.unlockNextUnit(student, unitId, session, studyFlow, grade);
                     if (s != null) {
-                        toAnotherFlow(student, 11);
+                        toAnotherFlow(student, FLOW_ONE);
                         return ServerResponse.createBySuccess(300, s);
                     } else {
-                        return toAnotherFlow(student, 11);
+                        return toAnotherFlow(student, FLOW_ONE);
                     }
                 }
             } else if (Objects.equals(-2, studyFlow.getNextTrueFlow())) {
@@ -304,10 +327,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                     return this.toAnotherFlow(student, studyFlow.getNextTrueFlow());
                 } else {
                     // 判断下个节点
-                    ServerResponse<Object> x = judgeNextNode(student, grade, isTrueFlow, studyFlow);
-                    if (x != null) {
-                        return x;
-                    }
+                    return judgeNextNode(student, grade, isTrueFlow, studyFlow);
                 }
             }
         }
@@ -400,16 +420,25 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
      */
     private ServerResponse<Object> toAnotherFlow(Student student, int flowId) {
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
-        if (capacityStudentUnit == null) {
-            log.error("教师已经删除[{} -> {} -> {}]正在学习的学习计划。不影响程序继续执行！", student.getId(), student.getAccount(), student.getStudentName());
-            throw new RuntimeException("学生学习计划已被教师删除！不影响程序继续执行！");
-        }
         studentFlowMapper.updateFlowByStudentId(student.getId(), flowId);
         StudyFlow byPrimaryKey = studyFlowMapper.selectById(flowId);
-        byPrimaryKey.setCourseId(capacityStudentUnit.getCourseId());
-        byPrimaryKey.setUnitId(capacityStudentUnit.getUnitId());
-        byPrimaryKey.setCourseName(capacityStudentUnit.getCourseName());
-        byPrimaryKey.setUnitName(capacityStudentUnit.getUnitName());
+
+        if (Objects.equals(TO_FLOW_ONE, byPrimaryKey.getNextTrueFlow())) {
+            log.info("[{} -{} -{}] 前往流程 1.", student.getId(), student.getAccount(), student.getStudentName());
+            return toAnotherFlow(student, FLOW_ONE);
+        } else if (Objects.equals(TO_FLOW_TWO, byPrimaryKey.getNextTrueFlow())) {
+            log.info("[{} -{} -{}] 前往流程 2.", student.getId(), student.getAccount(), student.getStudentName());
+            return toAnotherFlow(student, FLOW_TWO);
+        }
+
+        if (capacityStudentUnit != null) {
+            byPrimaryKey.setCourseId(capacityStudentUnit.getCourseId());
+            byPrimaryKey.setUnitId(capacityStudentUnit.getUnitId());
+            byPrimaryKey.setCourseName(capacityStudentUnit.getCourseName());
+            byPrimaryKey.setUnitName(capacityStudentUnit.getUnitName());
+        } else {
+            log.error("教师已经删除[{} -> {} -> {}]正在学习的学习计划。", student.getId(), student.getAccount(), student.getStudentName());
+        }
         return ServerResponse.createBySuccess("true", byPrimaryKey);
     }
 
@@ -428,9 +457,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         // 开启下一单元
         String s = unlockNextUnit(student, unitId, session, studyFlow, grade);
         // 获取流程信息
-
         if (s != null) {
-            if ("流程1".equals(studyFlow.getFlowName())) {
+            if (FLOW_ONE_STR.equals(studyFlow.getFlowName())) {
                 this.toAnotherFlow(student, 11);
             } else {
                 this.toAnotherFlow(student, 24);
@@ -439,7 +467,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             return ServerResponse.createBySuccess(300, s);
         }
 
-        if ("流程1".equals(studyFlow.getFlowName())) {
+        if (FLOW_ONE_STR.equals(studyFlow.getFlowName())) {
             return this.toAnotherFlow(student, 11);
         } else {
             return this.toAnotherFlow(student, 24);
@@ -473,9 +501,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             // 初始化当前流程的初始单元
             // 获取流程信息
             if ("流程1".equals(studyFlow.getFlowName())) {
-                this.toAnotherFlow(student, 11);
+                this.toAnotherFlow(student, FLOW_ONE);
             } else {
-                this.toAnotherFlow(student, 24);
+                this.toAnotherFlow(student, FLOW_TWO);
             }
 
             // 判断学生是否能获取课程证书,每个课程智能获取一个课程证书
