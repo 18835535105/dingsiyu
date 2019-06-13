@@ -139,4 +139,7 @@ public interface CapacityListenMapper extends BaseMapper<CapacityListen> {
      * @return
      */
     Long selectUnknownWordByUnitId(@Param("student") Student student, @Param("unitId") String unitId, @Param("ignoreWordId") Long[] ignoreWordId);
+
+    @Delete("delete from capacity_listen where student_id = #{studentId} and unit_id = #{unitId}")
+    void deleteByStudentIdAndStudyUnitId(@Param("studentId") Long studentId,@Param("unitId") Long aLong);
 }
