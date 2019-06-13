@@ -3,7 +3,6 @@ package com.zhidejiaoyu.student.controller;
 
 import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.annotation.ControllerLogAnnotation;
 import com.zhidejiaoyu.student.service.TeksService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,21 +30,18 @@ public class TeksController  {
      */
     @ResponseBody
     @RequestMapping("/getTextCourseAndUnit")
-    @ControllerLogAnnotation(name = "获取课文的课程及单元信息")
     public ServerResponse<Map<String,Object>> getCourseAndUnit(HttpSession session) {
         return teksService.getCourseAndUnit(session);
     }
 
     @ResponseBody
     @RequestMapping("/getUnitStatus")
-    @ControllerLogAnnotation(name = "获取课文的单元信息")
     public ServerResponse<Object> getUnitStatus(Long courseId,HttpSession session){
         return teksService.getUnitStatus(courseId,session);
     }
 
     @ResponseBody
     @RequestMapping("/getIsInto")
-    @ControllerLogAnnotation(name = "获取课文学习状态")
     public ServerResponse<Map<String,Object>> getIsInto(HttpSession session,Long unitId) {
         return teksService.getIsInto(session,unitId);
     }
@@ -69,7 +65,6 @@ public class TeksController  {
      */
     @ResponseBody
     @RequestMapping("/saveTeksAudition")
-    @ControllerLogAnnotation(name = "保存课文试听记录")
     public ServerResponse<Map<String,Object>> saveTeksAudition(HttpSession session,Integer unitId,Integer courseId){
         return teksService.saveTeksAudition(session,unitId,courseId);
     }

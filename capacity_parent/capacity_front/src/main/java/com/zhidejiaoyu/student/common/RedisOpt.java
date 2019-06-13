@@ -368,11 +368,7 @@ public class RedisOpt {
     public boolean firstLogin(Long studentId) {
         Object object = redisTemplate.opsForHash().get(RedisKeysConst.FIRST_LOGIN, studentId);
         if (object != null) {
-           try {
-               return (boolean) object;
-           } catch (Exception e) {
-               log.warn("格式转换错误！studentId=[{}]", studentId, e);
-           }
+            return false;
         }
         Integer count = runLogMapper.selectLoginCountByStudentId(studentId);
         boolean flag = count == 0;
