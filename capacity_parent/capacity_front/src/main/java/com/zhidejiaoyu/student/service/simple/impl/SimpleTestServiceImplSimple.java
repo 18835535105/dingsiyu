@@ -690,8 +690,8 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
             // 根据不同分数奖励学生金币
             goldCount = this.saveGold(true, wordUnitTestDTO, student, null);
-            // 保存日志表, 修改学生金币
-            goldCount = this.saveLog(student, goldCount, wordUnitTestDTO, "单元闯关测试");
+            /*// 保存日志表, 修改学生金币
+            goldCount = this.saveLog(student, goldCount, wordUnitTestDTO, "单元闯关测试");*/
 
             testRecord = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, goldCount);
         }
