@@ -298,6 +298,8 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
         	tr.setUnitId(learn.getUnitId());
         	tr.setGenre("单元闯关测试");
         	tr.setStudyModel(type == 5 ? "词汇考点" : "语法辨析");
+        	tr.setTestStartTime(new Date());
+        	tr.setTestEndTime(new Date());
         	simpleTestRecordMapper.insert(tr);
 
         	if(("1").equals(state)) {
