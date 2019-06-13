@@ -142,4 +142,7 @@ public interface CapacityWriteMapper extends BaseMapper<CapacityWrite> {
 	 * @return
 	 */
 	CapacityWrite selectUnknownWordByUnitId(@Param("student") Student student, @Param("unitId") Long unitId, @Param("ignoreWordId") Long[] ignoreWordId);
+
+	@Delete("delete from capacity_write where student_id = #{studentId} and unit_id = #{unitId} ")
+    void deleteByStudentIdAndStudyUnitId(@Param("studentId") Long studentId,@Param("unitId") Long unitId);
 }
