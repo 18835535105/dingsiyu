@@ -1,15 +1,19 @@
 package com.zhidejiaoyu.common.study;
 
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.pojo.Learn;
+import com.zhidejiaoyu.common.pojo.LearnExample;
+import com.zhidejiaoyu.common.pojo.SimpleCapacity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 学生用户使用过程中重复使用的功用方法
@@ -31,25 +35,6 @@ public class CommonMethod implements Serializable {
 
     @Autowired
     private LearnMapper learnMapper;
-
-    @Autowired
-    private CourseMapper courseMapper;
-
-    @Autowired
-    private UnitMapper unitMapper;
-
-    @Autowired
-    private StudentUnitMapper studentUnitMapper;
-
-    @Autowired
-    private StudentMapper studentMapper;
-
-    @Autowired
-    private StudentCourseMapper studentCourseMapper;
-
-    @Autowired
-    private CommonMethod commonMethod;
-
 
     /**
      * 判断学生是否是第一次学习指定的模块
@@ -114,9 +99,18 @@ public class CommonMethod implements Serializable {
      */
     public int getFontSize(Object object) {
         try {
-            double memoryStrength = (Double) memoryDifficultyUtil.getFieldValue(object, object.getClass().getField("memoryStrength"));
-            Date push = (Date) memoryDifficultyUtil.getFieldValue(object, object.getClass().getField("push"));
-            if (push == null) {
+            double memoryStrength;
+            Date push;
+            if (object instanceof SimpleCapacity) {
+                SimpleCapacity simpleCapacity = (SimpleCapacity) object;
+                memoryStrength = simpleCapacity.getMemoryStrength();
+                push = simpleCapacity.getPush();
+            } else {
+                memoryStrength = (Double) memoryDifficultyUtil.getFieldValue(object, object.getClass().getField("memoryStrength"));
+                push = (Date) memoryDifficultyUtil.getFieldValue(object, object.getClass().getField("push"));
+            }
+
+           if (push == null) {
                 return 0;
             }
             double timeLag = this.timeLag(push);
@@ -143,8 +137,8 @@ public class CommonMethod implements Serializable {
             } else if ((memoryStrength >= 0.9 && memoryStrength < 1) || timeLag > 1) {
                 return 1;
             }
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.warn("获取字体大小出错！", e);
         }
         return 0;
     }

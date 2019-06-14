@@ -164,57 +164,6 @@ public class SimpleCommonMethod implements Serializable {
     }
 
     /**
-     * 计算记忆追踪中字体大小等级
-     *
-     * @param simpleCapacity
-     * @return -1:数据有误，其他：字体等级
-     */
-    public int getFontSize(SimpleCapacity simpleCapacity) {
-        Double memoryStrength = simpleCapacity.getMemoryStrength();
-        Date push = simpleCapacity.getPush();
-        if (push == null) {
-            return 0;
-        }
-        double timeLag = this.timeLag(push);
-        if (timeLag < 0) {
-            return 0;
-        } else if ((memoryStrength >= 0 && memoryStrength < 0.1) || timeLag > 10) {
-            return 10;
-        } else if ((memoryStrength >= 0.1 && memoryStrength < 0.2) || timeLag > 9) {
-            return 9;
-        } else if ((memoryStrength >= 0.2 && memoryStrength < 0.3) || timeLag > 8) {
-            return 8;
-        } else if ((memoryStrength >= 0.3 && memoryStrength < 0.4) || timeLag > 7) {
-            return 7;
-        } else if ((memoryStrength >= 0.4 && memoryStrength < 0.5) || timeLag > 6) {
-            return 6;
-        } else if ((memoryStrength >= 0.5 && memoryStrength < 0.6) || timeLag > 5) {
-            return 5;
-        } else if ((memoryStrength >= 0.6 && memoryStrength < 0.7) || timeLag > 4) {
-            return 4;
-        } else if ((memoryStrength >= 0.7 && memoryStrength < 0.8) || timeLag > 3) {
-            return 3;
-        } else if ((memoryStrength >= 0.8 && memoryStrength < 0.9) || timeLag > 2) {
-            return 2;
-        } else if ((memoryStrength >= 0.9 && memoryStrength < 1) || timeLag > 1) {
-            return 1;
-        }
-        return 0;
-    }
-
-    /**
-     * 计算当前时间黄金记忆点时间差
-     *
-     * @param push 黄金记忆点时间
-     * @return <0:未到达黄金记忆点； >0:超过黄金记忆点的分钟
-     */
-    private double timeLag(Date push) {
-        long pushTime = push.getTime();
-        long nowTime = System.currentTimeMillis();
-        return (nowTime * 1.0 - pushTime) / 60000;
-    }
-
-    /**
      * 将例句顺序分割，其中的标点单独占用一个下标
      *
      * @param sentence 需要处理的例句
