@@ -1,15 +1,15 @@
 package com.zhidejiaoyu.common.study.simple;
 
-import com.zhidejiaoyu.common.mapper.simple.*;
-import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.study.CommonMethod;
-import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.mapper.simple.SimpleLearnMapper;
+import com.zhidejiaoyu.common.pojo.Learn;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 学生用户使用过程中重复使用的功用方法
@@ -28,22 +28,6 @@ public class SimpleCommonMethod implements Serializable {
 
     @Autowired
     private SimpleLearnMapper learnMapper;
-
-    @Autowired
-    private SimpleCourseMapper simpleCourseMapper;
-
-    @Autowired
-    private SimpleUnitMapper unitMapper;
-
-    @Autowired
-    private SimpleStudentUnitMapper simpleStudentUnitMapper;
-
-    @Autowired
-    private SimpleStudentMapper simpleStudentMapper;
-
-    @Autowired
-    private SimpleStudentCourseMapper simpleStudentCourseMapper;
-
 
     /**
      * 学生第一次学习完成学习引导页内容后，将该学生新信息置为不是第一次学习，可直接进入学习页面
@@ -140,31 +124,6 @@ public class SimpleCommonMethod implements Serializable {
     }
 
     /**
-     * 将例句中文翻译顺序分割，其中的标点单独占用一个下标
-     *
-     * @param sentence 需要处理的例句
-     * @return
-     */
-    public List<String> getChineseList(String sentence) {
-        for (String s : POINT) {
-            if (sentence.contains(s)) {
-                sentence = sentence.replace(s, "*" + s + "*");
-            }
-        }
-
-        List<String> list = new ArrayList<>();
-        String[] arr = sentence.split("\\*");
-        for (String s : arr) {
-            if (s.contains("*")) {
-                list.add(s.replace("*", ""));
-            } else {
-                list.add(s);
-            }
-        }
-        return list;
-    }
-
-    /**
      * 将清学版测试类型转换为汉字
      *
      * @param classify 1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写
@@ -199,12 +158,5 @@ public class SimpleCommonMethod implements Serializable {
         }
         return null;
     }
-
-    public static void main(String[] args) {
-        SimpleCommonMethod simpleCommonMethod = new SimpleCommonMethod();
-        String str = "你已经*读过《小妇人》了吗？不，我还没有读过。";
-        System.out.println(simpleCommonMethod.getChineseList(str));
-    }
-
 
 }
