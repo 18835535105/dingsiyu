@@ -88,6 +88,12 @@ public class TestRecord extends Model<TestRecord> {
      */
     private Integer betterCount;
 
+
+    /**
+     * 针对清学版。目的是不清楚学生的测试记录。1：学习时需要统计的测试；2：学习时不需要统计的测试
+     */
+    private Integer type;
+
     /**
      * 1：测试通过；2：测试未通过
      */

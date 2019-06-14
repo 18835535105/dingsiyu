@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimpleNewsMapper">
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.News">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="studentId" property="studentid" jdbcType="BIGINT"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="time" property="time" jdbcType="TIMESTAMP"/>
+        <result column="type" property="type" jdbcType="VARCHAR"/>
+        <result column="robot" property="robot" jdbcType="VARCHAR"/>
+        <result column="robotSpeak" property="robotspeak" jdbcType="VARCHAR"/>
+        <result column="read" property="read" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        id, studentId, title, content, `time`, type, robot, robotSpeak, `read`
+    </sql>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.NewsExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from news
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from news
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from news
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.NewsExample">
+        delete from news
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.News">
+        insert into news (id, studentId, title,
+                          content, time, type,
+                          robot, robotSpeak, `read`
+        )
+        values (#{id,jdbcType=BIGINT}, #{studentid,jdbcType=BIGINT}, #{title,jdbcType=VARCHAR},
+                #{content,jdbcType=VARCHAR}, #{time,jdbcType=TIMESTAMP}, #{type,jdbcType=VARCHAR},
+                #{robot,jdbcType=VARCHAR}, #{robotspeak,jdbcType=VARCHAR}, #{read,jdbcType=INTEGER}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.News">
+        insert into news
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="studentid != null">
+                studentId,
+            </if>
+            <if test="title != null">
+                title,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="time != null">
+                time,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="robot != null">
+                robot,
+            </if>
+            <if test="robotspeak != null">
+                robotSpeak,
+            </if>
+            <if test="read != null">
+                `read`,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="studentid != null">
+                #{studentid,jdbcType=BIGINT},
+            </if>
+            <if test="title != null">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="time != null">
+                #{time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="robot != null">
+                #{robot,jdbcType=VARCHAR},
+            </if>
+            <if test="robotspeak != null">
+                #{robotspeak,jdbcType=VARCHAR},
+            </if>
+            <if test="read != null">
+                #{read,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertList" parameterType="map">
+        insert into news
+        (<include refid="Base_Column_List"/>)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (null,#{item.studentid}, #{item.title}, #{item.content}, #{item.time}, #{item.type}, #{item.robot},
+            #{item.robotspeak},
+            #{item.read})
+        </foreach>
+    </insert>
+    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.NewsExample" resultType="java.lang.Integer">
+        select count(*) from news
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <select id="selectByStuIds" resultMap="BaseResultMap" parameterType="map">
+        select <include refid="Base_Column_List"/> from news where (title like '%有效期%' or title like '%到期%') and studentId in
+        <foreach collection="list" item="item" separator="," close=")" open="(">
+            #{item}
+        </foreach>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update news
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.studentid != null">
+                studentId = #{record.studentid,jdbcType=BIGINT},
+            </if>
+            <if test="record.title != null">
+                title = #{record.title,jdbcType=VARCHAR},
+            </if>
+            <if test="record.content != null">
+                content = #{record.content,jdbcType=VARCHAR},
+            </if>
+            <if test="record.time != null">
+                time = #{record.time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.type != null">
+                type = #{record.type,jdbcType=VARCHAR},
+            </if>
+            <if test="record.robot != null">
+                robot = #{record.robot,jdbcType=VARCHAR},
+            </if>
+            <if test="record.robotspeak != null">
+                robotSpeak = #{record.robotspeak,jdbcType=VARCHAR},
+            </if>
+            <if test="record.read != null">
+                `read` = #{record.read,jdbcType=INTEGER},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update news
+        set id = #{record.id,jdbcType=BIGINT},
+        studentId = #{record.studentid,jdbcType=BIGINT},
+        title = #{record.title,jdbcType=VARCHAR},
+        content = #{record.content,jdbcType=VARCHAR},
+        time = #{record.time,jdbcType=TIMESTAMP},
+        type = #{record.type,jdbcType=VARCHAR},
+        robot = #{record.robot,jdbcType=VARCHAR},
+        robotSpeak = #{record.robotspeak,jdbcType=VARCHAR},
+        `read` = #{record.read,jdbcType=INTEGER}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.News">
+        update news
+        <set>
+            <if test="studentid != null">
+                studentId = #{studentid,jdbcType=BIGINT},
+            </if>
+            <if test="title != null">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                content = #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="time != null">
+                time = #{time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="robot != null">
+                robot = #{robot,jdbcType=VARCHAR},
+            </if>
+            <if test="robotspeak != null">
+                robotSpeak = #{robotspeak,jdbcType=VARCHAR},
+            </if>
+            <if test="read != null">
+                `read` = #{read,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.News">
+        update news
+        set studentId  = #{studentid,jdbcType=BIGINT},
+            title      = #{title,jdbcType=VARCHAR},
+            content    = #{content,jdbcType=VARCHAR},
+            time       = #{time,jdbcType=TIMESTAMP},
+            type       = #{type,jdbcType=VARCHAR},
+            robot      = #{robot,jdbcType=VARCHAR},
+            robotSpeak = #{robotspeak,jdbcType=VARCHAR},
+            `read`       = #{read,jdbcType=INTEGER}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByList" parameterType="map">
+        update news
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="title =case" suffix="end,">
+                <foreach collection="updateList" item="item" index="index">
+                    <if test="item.title != '' and item.title != null">
+                        when id=#{item.id} then #{item.title}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="time =case" suffix="end,">
+                <foreach collection="updateList" item="item" index="index">
+                    <if test="item.time != null">
+                        when id=#{item.id} then #{item.time}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="updateList" index="index" item="item"
+                 separator="," open="(" close=")">
+            #{item.id,jdbcType=BIGINT}
+        </foreach>
+    </update>
+</mapper>

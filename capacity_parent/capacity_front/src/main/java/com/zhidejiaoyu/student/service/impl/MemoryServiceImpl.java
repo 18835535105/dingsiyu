@@ -14,7 +14,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.common.SaveWordLearnAndCapacity;
 import com.zhidejiaoyu.student.service.MemoryService;
-import com.zhidejiaoyu.student.vo.MemoryStudyVo;
+import com.zhidejiaoyu.common.Vo.study.MemoryStudyVo;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

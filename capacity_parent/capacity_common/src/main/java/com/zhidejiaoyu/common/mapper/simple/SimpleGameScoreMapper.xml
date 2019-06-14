@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimpleGameScoreMapper" >
+  <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.GameScore" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="student_id" property="studentId" jdbcType="BIGINT" />
+    <result column="game_id" property="gameId" jdbcType="BIGINT" />
+    <result column="game_name" property="gameName" jdbcType="VARCHAR" />
+    <result column="game_start_time" property="gameStartTime" jdbcType="TIMESTAMP" />
+    <result column="game_end_time" property="gameEndTime" jdbcType="TIMESTAMP" />
+    <result column="score" property="score" jdbcType="INTEGER" />
+    <result column="award_gold" property="awardGold" jdbcType="INTEGER" />
+    <result column="pass_flag" property="passFlag" jdbcType="INTEGER" />
+    <result column="explain" property="explain" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, student_id, game_id, game_name, game_start_time, game_end_time, score, award_gold,
+    pass_flag, `explain`
+  </sql>
+
+</mapper>

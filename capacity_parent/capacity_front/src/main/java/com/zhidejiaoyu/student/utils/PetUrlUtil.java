@@ -91,10 +91,62 @@ public class PetUrlUtil {
                 return robotCenterTestImgUrl(point);
             case "五维测试":
                 return robotFiveTestImgUrl(point);
+            case "学前测试":
+            case "学后测试":
+                return robotCourseTestImgUrl(point);
+            case "单元前测":
+                return robotBeforeUnitTestImgUrl(point);
+            case "能力值测试":
+                return robotWordTestIngUrl(point);
             default:
         }
         return "";
     }
+
+    /**
+     * 能力值测试
+     *
+     * @param point
+     * @return
+     */
+    private static String robotWordTestIngUrl(Integer point) {
+        if (point < EIGHTY) {
+            return PetImageConstant.INSIST;
+        } else {
+            return PetImageConstant.FOREVER;
+        }
+    }
+
+    /**
+     * 课程前测，后测
+     *
+     * @param point
+     * @return
+     */
+    private static String robotCourseTestImgUrl(Integer point) {
+        if (point < EIGHTY) {
+            return PetImageConstant.HOWEVER;
+        } else {
+            return PetImageConstant.SUCCEED;
+        }
+    }
+
+    /**
+     * 单元前测
+     *
+     * @param point
+     * @return
+     */
+    private static String robotBeforeUnitTestImgUrl(Integer point) {
+        if (point < EIGHTY) {
+            return PetImageConstant.WALK;
+        } else if (point < NINETY) {
+            return PetImageConstant.WIN;
+        } else {
+            return PetImageConstant.GOOD;
+        }
+    }
+
 
     /**
      * 五维测试

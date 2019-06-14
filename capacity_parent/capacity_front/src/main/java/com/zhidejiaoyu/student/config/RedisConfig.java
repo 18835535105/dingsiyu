@@ -39,9 +39,4 @@ public class RedisConfig {
         redisTemplate.expire(RedisKeysConst.PREFIX, 12, TimeUnit.HOURS);
         return redisTemplate;
     }
-
-//    @Bean("springSessionDefaultRedisSerializer")
-//    public RedisSerializer<Object> defaultRedisSerializer(){
-//        return new GenericJackson2JsonRedisSerializer();
-//    }
 }

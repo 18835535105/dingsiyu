@@ -39,19 +39,17 @@ public class WordUnitTestDTO {
     /**
      * 正确单词id
      */
-    private Integer[] correctWordId;
+    private Long[] correctWordId;
 
     /**
      * 错误单词id
      */
-    private Integer[] errorWordId;
+    private Long[] errorWordId;
 
     /**
      * 类型 0=单词图鉴 1=慧记忆 2=听写 3=默写 4=例句听力 5=例句翻译 6=例句默写 8=例句测试 9=课文测试 11=音标测试
      */
     @NotNull(message = "测试类型不能为空")
-    @Min(value = 0, message = "测试类型最小值为0")
-    @Max(value = 9, message = "测试类型最大值为7")
     private Integer classify;
 
     /**

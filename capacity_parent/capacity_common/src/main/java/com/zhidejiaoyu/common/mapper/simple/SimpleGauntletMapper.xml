@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimpleGauntletMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Gauntlet">
+        <id column="id" property="id"/>
+        <result column="challenger_student_id" property="challengerStudentId"/>
+        <result column="be_challenger_student_id" property="beChallengerStudentId"/>
+        <result column="course_id" property="courseId"/>
+        <result column="bet_gold" property="betGold"/>
+        <result column="challenge_name" property="challengeName"/>
+        <result column="challenger_point" property="challengerPoint"/>
+        <result column="be_challenger_point" property="beChallengerPoint"/>
+        <result column="challenger_msg" property="challengerMsg"/>
+        <result column="challenge_status" property="challengeStatus"/>
+        <result column="be_challenger_status" property="beChallengerStatus"/>
+        <result column="challenge_study" property="challengeStudy"/>
+        <result column="be_challenge_study" property="beChallengeStudy"/>
+        <result column="challenge_gold" property="challengeGold"/>
+        <result column="be_challenge_gold" property="beChallengeGold"/>
+        <result column="concede" property="concede"/>
+        <result column="create_time" property="createTime"/>
+        <result column="challenger_study_now" property="challengerStudyNow"/>
+        <result column="be_challenger_study_now" property="beChallengerStudyNow"/>
+        <result column="grade" property="grade"/>
+        <result column="award" property="award"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, challenger_student_id, be_challenger_student_id, course_id, bet_gold, challenge_name, challenger_point,
+        be_challenger_point, challenger_msg, challenge_status, be_challenger_status, challenge_study,
+        be_challenge_study, challenge_gold, be_challenge_gold,concede,create_time,challenger_study_now,be_challenger_study_now,
+        grade,award
+    </sql>
+
+    <select id="selByStudentIdAndFormat" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from gauntlet where challenger_student_id=#{studentId} and
+        to_days(create_time) = to_days(#{time}) and challenger_point is not null;
+    </select>
+
+    <select id="getInformation" parameterType="map" resultType="int">
+        select count(id) from gauntlet
+        where 1=1 and challenger_point is not null
+        <if test="type == 1 or type ==2">
+            and challenger_student_id=#{studentId}
+            <if test="type==1">
+                and challenge_status &lt;> 3 and challenge_status &lt;> 4 and challenge_status &lt;>6
+            </if>
+            <if test="type==2">
+                and challenge_status=1
+            </if>
+        </if>
+        <if test="type ==3 or type ==4">
+            and be_challenger_student_id=#{studentId}
+            <if test="type==3">
+                and be_challenger_status &lt;> 3 and be_challenger_status &lt;> 4  and be_challenger_status &lt;> 6
+            </if>
+            <if test="type==4">
+                and be_challenger_status = 1
+            </if>
+        </if>
+    </select>
+
+    <select id="getCountPkForMe" parameterType="map" resultType="int">
+        select count(id) from gauntlet where
+        challenger_point is not null
+        <if test="type==1">
+            and be_challenger_student_id=#{beStudentId} and challenger_student_id=#{studentId} and challenge_status &lt;>3 and challenge_status &lt;>4 and challenge_status &lt;>6
+        </if>
+        <if test="type==2">
+            and be_challenger_student_id=#{studentId} and challenger_student_id=#{beStudentId} and challenge_status &lt;>3 and challenge_status &lt;>4 and challenge_status &lt;>6
+        </if>
+    </select>
+
+    <select id="selGauntletByTypeAndChallengeType" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from gauntlet
+        where
+        challenger_point is not null
+        <if test="type==1">
+            and challenger_student_id=#{studentId}
+            <if test="challengeType!=0">
+                and challenge_status=#{challengeType}
+                <if test="challengeType==4">
+                    and create_time > #{time}
+                </if>
+            </if>
+            <if test="challengeType==0">
+                and (challenge_status =1 or challenge_status =2
+                or challenge_status =3 or
+                (challenge_status =4 and create_time > #{time}) or challenge_status =5  or challenge_status =6)
+            </if>
+        </if>
+        <if test="type!=1">
+            and be_challenger_student_id=#{studentId}
+            <if test="challengeType!=0">
+                and be_challenger_status=#{challengeType}
+                <if test="challengeType==4">
+                    and create_time > #{time}
+                </if>
+            </if>
+            <if test="challengeType==0">
+                and (be_challenger_status =1 or be_challenger_status =2  or be_challenger_status =3
+                or (be_challenger_status =4 and create_time > #{time}) or be_challenger_status =5  or be_challenger_status =6)
+            </if>
+        </if>
+        order by create_time desc
+        limit #{start},#{end}
+
+    </select>
+
+    <select id="getCount" parameterType="map" resultType="int">
+        select count(id) from gauntlet
+        where challenger_point is not null
+            <if test="type==1">
+                and challenger_student_id=#{studentId}
+                <if test="challengeType!=0">
+                    and challenge_status=#{challengeType}
+                    <if test="challengeType==4">
+                        and create_time > #{time}
+                    </if>
+                </if>
+                <if test="challengeType==0">
+                    and (challenge_status =1 or challenge_status =2
+                    or challenge_status =3 or
+                    (challenge_status =4 and create_time > #{time}) or challenge_status =5  or challenge_status =6)
+                </if>
+            </if>
+            <if test="type!=1">
+                and be_challenger_student_id=#{studentId}
+                <if test="challengeType!=0">
+                    and be_challenger_status=#{challengeType}
+                    <if test="challengeType==4">
+                        and create_time > #{time}
+                    </if>
+                </if>
+                <if test="challengeType==0">
+                    and (be_challenger_status =1 or be_challenger_status =2  or be_challenger_status =3
+                    or (be_challenger_status =4 and create_time > #{time}) or be_challenger_status =5  or be_challenger_status =6)
+                </if>
+            </if>
+
+        order by id desc
+    </select>
+
+    <select id="getByStudentIdAndBeStudentId" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"></include>
+        from gauntlet
+        where challenger_student_id=#{studentId} and be_challenger_student_id=#{beStudentId} and challenge_status=3 and challenger_point is not null
+        limit 1
+    </select>
+
+    <select id="getInformationById" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from gauntlet
+        where id=#{gauntletId}
+    </select>
+
+    <select id="selByStudentId" parameterType="long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"></include>
+        from gauntlet
+        where
+
+        <if test="type ==0">
+            ((challenger_student_id=#{studentId} and (challenge_status &lt;>3 and challenge_status &lt;> 4 and challenge_status &lt;> 6))
+            or (be_challenger_student_id=#{studentId} and (be_challenger_status &lt;>3 and be_challenger_status &lt;> 4 and be_challenger_status &lt;> 6)))
+        </if>
+        <if test="type !=0">
+            ((challenger_student_id=#{studentId} and challenge_status =#{type})
+            or (be_challenger_student_id=#{studentId} and be_challenger_status=#{type}))
+        </if>
+        and challenger_point is not null
+        order by create_time desc
+        limit #{start},#{end}
+    </select>
+
+    <select id="selCountByStudentId" parameterType="long" resultType="int">
+        select
+        count(id)
+        from gauntlet
+        where ((challenger_student_id=#{studentId} and (challenge_status &lt;>3 and challenge_status &lt;> 4 and challenge_status &lt;> 6))
+        or (be_challenger_student_id=#{studentId} and (be_challenger_status &lt;>3 and be_challenger_status &lt;> 4 and be_challenger_status &lt;> 6)))
+        and challenger_point is not null
+    </select>
+
+    <select id="selDelGauntlet" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from gauntlet
+        where ((challenger_student_id=#{studentId} and challenge_status = 3 ) or (be_challenger_student_id=#{studentId} and be_challenger_status = 3))
+        and create_time &lt; #{format}
+    </select>
+
+    <update id="updateStatus" parameterType="map" >
+        update gauntlet
+        set challenge_status=4 and be_challenger_status=4
+        where id in (
+        <foreach collection="gauntletIds" separator="," item="gauntletId">
+            #{gauntletId}
+        </foreach>
+        )
+    </update>
+
+    <select id="selectStudy" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from gauntlet
+        where 1=1
+        <if test="type==1">
+            and challenge_status=1 and challenger_student_id=#{studentId}
+        </if>
+        <if test="type==2">
+            and challenge_status=2 and challenger_student_id=#{studentId}
+        </if>
+        <if test="type==3">
+            and be_challenger_status=1 and be_challenger_student_id=#{studentId}
+        </if>
+        <if test="type==4">
+            and be_challenger_status=2 and be_challenger_student_id=#{studentId}
+        </if>
+    </select>
+
+
+
+
+</mapper>

@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -421,5 +422,27 @@ public class FtpUtil {
             }
         }
         return flag ? ftpFileName : null;
+    }
+    /**
+     * 将文件流上传到ftp服务器
+     *
+     * @param inputStream
+     * @param ftpDirectory
+     * @param fileName
+     * @throws Exception 文件上传失败
+     */
+    public void uploadByInputStream(InputStream inputStream, String ftpDirectory, String fileName) throws Exception {
+        this.open();
+        if (!ftpClient.isConnected()) {
+            return;
+        }
+        changeDir(ftpDirectory);
+
+        ftpClient.setBufferSize(100000);
+        ftpClient.setControlEncoding("UTF-8");
+        // 设置文件类型（二进制）
+        ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
+        // 上传
+        ftpClient.storeFile(new String(fileName.getBytes(), "iso-8859-1"), inputStream);
     }
 }

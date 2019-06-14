@@ -2,15 +2,17 @@ package com.zhidejiaoyu.student.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 慧默写学习数据vo
- * 
+ *
  * @author wuchenxi
  * @date 2018年5月17日 下午4:46:43
  *
  */
 @Data
-public class WordWriteStudyVo {
+public class WordWriteStudyVo implements Serializable {
 
 	/** 单词id */
 	private Long wordId;

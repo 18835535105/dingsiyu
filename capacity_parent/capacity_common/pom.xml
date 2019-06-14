@@ -26,12 +26,6 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- jdbc -->
-		<!-- <dependency>
-             <groupId>org.springframework.boot</groupId>
-             <artifactId>spring-boot-starter-jdbc</artifactId>
-         </dependency>-->
-
 		<!-- 腾讯语音评测 -->
 		<dependency>
 			<groupId>com.tencentcloudapi</groupId>

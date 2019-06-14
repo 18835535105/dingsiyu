@@ -7,15 +7,15 @@ package com.zhidejiaoyu.student.constant;
  * @date 2018/7/26
  */
 public class PetImageConstant {
- /**
-  * 大明白默认头像
-  */
- public static final String DEFAULT_IMAGE = "static/img/edit-user-msg/tips.png";
+    /**
+     * 大明白默认头像
+     */
+    public static final String DEFAULT_IMG = "static/img/edit-user-msg/tips.png";
 
- /**
+    /**
      * 大明白 标语：机会
-  */
- public static final String CHANCE = "static/img/edit-user-msg/tips.png";
+     */
+    public static final String CHANCE = "static/img/edit-user-msg/tips.png";
     /**
      * 大明白 标语：土豪
      */
@@ -24,10 +24,10 @@ public class PetImageConstant {
      * 大明白 标语：财富
      */
     public static final String TREASURE = "static/img/edit-user-msg/tips1-2.png";
-   /**
+    /**
      * 大明白 标语：温故
-    */
-   public static final String OLD = "static/img/edit-user-msg/tips1-12.png";
+     */
+    public static final String OLD = "static/img/edit-user-msg/tips1-12.png";
     /**
      * 大明白 标语：大明白
      */

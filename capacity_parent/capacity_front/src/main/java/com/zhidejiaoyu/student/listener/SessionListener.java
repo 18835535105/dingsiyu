@@ -2,11 +2,11 @@ package com.zhidejiaoyu.student.listener;
 
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
-import com.zhidejiaoyu.common.mapper.RunLogMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleRunLogMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.student.config.ServiceInfoUtil;
-import com.zhidejiaoyu.student.service.LoginService;
 import com.zhidejiaoyu.student.service.impl.LoginServiceImpl;
+import com.zhidejiaoyu.student.service.simple.impl.SimpleLoginServiceImplSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,10 +33,10 @@ public class SessionListener implements HttpSessionListener {
     private String port;
 
     @Autowired
-    private LoginService loginService;
+    private SimpleLoginServiceImplSimple loginService;
 
     @Autowired
-    private RunLogMapper runLogMapper;
+    private SimpleRunLogMapper runLogMapper;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -56,6 +56,7 @@ public class SessionListener implements HttpSessionListener {
      * @param se the HttpSessionEvent containing the session
      */
     @Override
+    @SuppressWarnings("all")
     public void sessionDestroyed(HttpSessionEvent se) {
         int currentPort = ServiceInfoUtil.getPort();
         // 当 session 失效时只有 8082 端口的服务负责保存学生时长信息
@@ -79,7 +80,7 @@ public class SessionListener implements HttpSessionListener {
     private void saveLogoutInfo(HttpSession session) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         if (student != null) {
-            LoginServiceImpl.saveLogoutLog(student, runLogMapper, log);
+            SimpleLoginServiceImplSimple.saveLogoutLog(student, runLogMapper, log);
         }
     }
 }

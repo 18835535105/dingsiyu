@@ -34,6 +34,11 @@ public class Level extends Model<Level> {
      */
     private String imgUrlWord;
 
+    /**
+     * 学习力
+     */
+    private Integer studyPower;
+
     @Override
     protected Serializable pkVal() {
         return this.id;
