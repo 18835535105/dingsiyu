@@ -252,10 +252,10 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
                     learn.getVocabularyId());
             falg = capacityPictures.size() > 0 && capacityPictures.get(0).getPush().getTime() < System.currentTimeMillis();
         }
-        if(falg){
+        if (currentLearn == null && falg) {
             if (classify == 3) {
-               capacityWriteMapper.deleteByStudentIdAndUnitIdAndVocabulary(student.getId(), learn.getUnitId(),
-                       learn.getVocabularyId());
+                capacityWriteMapper.deleteByStudentIdAndUnitIdAndVocabulary(student.getId(), learn.getUnitId(),
+                        learn.getVocabularyId());
             } else if (classify == 2) {
                 capacityListenMapper.deleteByStudentIdAndUnitIdAndVocabulary(student.getId(), learn.getUnitId(),
                         learn.getVocabularyId());

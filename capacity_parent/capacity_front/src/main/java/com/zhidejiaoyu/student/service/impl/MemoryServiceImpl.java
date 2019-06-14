@@ -197,7 +197,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         List<CapacityMemory> capacityMemoryList = capacityMemoryMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
                 learn.getVocabularyId());
         boolean falg = capacityMemoryList.size() > 0 && capacityMemoryList.get(0).getPush().getTime() < System.currentTimeMillis();
-        if(falg){
+        if(currentLearn == null && falg){
             capacityMemoryMapper.deleteByStudentIdAndUnitIdAndVocabularyId(student.getId(),learn.getUnitId(),learn.getVocabularyId());
             return  ServerResponse.createBySuccess();
         }
