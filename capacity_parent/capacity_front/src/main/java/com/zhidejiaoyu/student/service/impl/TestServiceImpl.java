@@ -150,18 +150,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Autowired
     private BaiduSpeak baiduSpeak;
 
-    @Autowired
-    private StudentInfoService studentInfoService;
-
-    @Autowired
-    private CapacityWriteMapper capacityWriteMapper;
-
-    @Autowired
-    private CapacityMemoryMapper capacityMemoryMapper;
-
-    @Autowired
-    private CapacityListenMapper capacityListenMapper;
-
     /**
      * 游戏测试题目获取，获取20个单词供测试
      *
@@ -320,10 +308,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         // 封装各组信息
         ServerResponse<Map<String, Object>> resultMap = packageStrengthVo(student, rightVocabularies, map, size,
                 errorSize, errorVocabularies);
-        if (resultMap != null) {
-            return resultMap;
-        }
-        return null;
+        return resultMap;
     }
 
     @Override
@@ -1566,7 +1551,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
     }
 
-
     /**
      * 保存金币变化日志信息
      *
@@ -1789,7 +1773,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Override
     public ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId, Integer type, Integer pageNum) {
         Student student = getStudent(session);
-        student = studentMapper.selectByPrimaryKey(student.getId());
         if (session.getAttribute(TimeConstant.BEGIN_START_TIME) == null) {
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         }
@@ -1868,14 +1851,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         mapPageInfo.setPages(testRecordPageInfo.getPages());
         mapPageInfo.setPageNum(testRecordPageInfo.getPageNum());
         return ServerResponse.createBySuccess(mapPageInfo);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<String> pushGameCourse(HttpSession session, Integer point) {
-        Student student = getStudent(session);
-        String courseName = this.pushCourse(point, student, "学前游戏测试");
-        return ServerResponse.createBySuccess(courseName);
     }
 
     /**

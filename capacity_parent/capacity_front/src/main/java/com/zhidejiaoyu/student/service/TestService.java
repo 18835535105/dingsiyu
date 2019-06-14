@@ -95,16 +95,6 @@ public interface TestService extends BaseService<TestRecord> {
      */
     ServerResponse<Object> showRecord(String course_id, Integer type, HttpSession session, Integer page, Integer rows);
 
-
-    /**
-     * 游戏测试推送课程
-     *
-     * @param session
-     * @param point 游戏测试得分
-     * @return
-     */
-    ServerResponse<String> pushGameCourse(HttpSession session, Integer point);
-
     ServerResponse<Object> getPreSchoolTest(HttpSession session);
 
     /**
