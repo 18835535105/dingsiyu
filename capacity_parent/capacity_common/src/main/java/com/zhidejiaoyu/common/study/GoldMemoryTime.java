@@ -23,7 +23,7 @@ public class GoldMemoryTime {
 	 */
 	public static Date getGoldMemoryTime(Double memoryStrength, Date studyEnd) {
 		if (studyEnd == null) {
-			throw new RuntimeException(" 本单词最后学习结束时间不能为空！");
+			studyEnd = new Date();
 		}
 		if (memoryStrength >= 0 && memoryStrength < 0.2) {
 			return getTime(studyEnd, 10);
