@@ -14,6 +14,7 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
@@ -247,7 +248,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         List<Vocabulary> vocabularies;
         // 根据当前学生所学学段去对应的单词预科库中查找对应的单词和释义
         String grade = student.getGrade();
-        String phase = simpleCommonMethod.getPhase(grade);
+        String phase = CommonMethod.getPhase(grade);
 
         // todo: 以下取题以后改为从预科库中获取
         if ("初中".equals(phase)) {
@@ -443,7 +444,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      * @param genre   测试类型 学前摸底测试，学前游戏测试
      */
     private String pushCourse(Integer point, Student student, String genre) {
-        String phase = simpleCommonMethod.getPhase(student.getGrade());
+        String phase = CommonMethod.getPhase(student.getGrade());
         if ("学前游戏测试".equals(genre)) {
             if (point < PASS) {
                 // 推送当前学段的 预科班教程
@@ -481,7 +482,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      * @param student
      */
     private void initLowerCourse(Student student) {
-        String phase = simpleCommonMethod.getPhase(student.getGrade());
+        String phase = CommonMethod.getPhase(student.getGrade());
         String version = student.getVersion();
         List<Course> courses;
         Course course;
@@ -527,8 +528,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      * @param student
      */
     private void initReadyCourse(Student student) {
-        // TODO:推送预科班课程
-        String phase = simpleCommonMethod.getPhase(student.getGrade());
+       CommonMethod.getPhase(student.getGrade());
     }
 
     /**

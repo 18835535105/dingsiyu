@@ -1,16 +1,13 @@
 package com.zhidejiaoyu.common.study.simple;
 
-import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.*;
 
@@ -23,8 +20,6 @@ import java.util.*;
 @Slf4j
 @Component
 public class SimpleCommonMethod implements Serializable {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleCommonMethod.class);
 
     /**
      * 标点数组
@@ -47,83 +42,8 @@ public class SimpleCommonMethod implements Serializable {
     private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
-    private SimpleStudyCountMapper simpleStudyCountMapper;
-
-    @Autowired
     private SimpleStudentCourseMapper simpleStudentCourseMapper;
 
-    @Autowired
-    private SimpleCommonMethod simpleCommonMethod;
-
-    /**
-     * 判断本次学生登录是否学习了当前课程
-     * <p>如果是本次登录第一次学习，将课程id放入session中，并在 study_count 表中将课程学习次数加1；如果当前课程是第一次学习，study_count 中不存在该条记录，插入新纪录；</p>
-     * <p>如果不是本次登录第一次学习，不修改表数据</p>
-     *
-     * @param session
-     * @param courseId
-     * @return
-     */
-    public Integer saveStudyCount(HttpSession session, Long courseId) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        Long studentId = student.getId();
-        Long cId = (Long) session.getAttribute("课程" + courseId);
-        Integer maxCount = simpleStudyCountMapper.selectMaxCountByCourseId(studentId, courseId);
-        if (cId == null) {
-            // 本次登录第一次学习当前课程
-            session.setAttribute("课程" + courseId, courseId);
-            if (maxCount == null) {
-                // 当前课程是学生第一遍学习
-                StudyCount studyCount = new StudyCount();
-                studyCount.setStudentId(studentId);
-                studyCount.setCourseId(courseId);
-                studyCount.setCount(1);
-                studyCount.setStudyCount(1);
-                try {
-                    simpleStudyCountMapper.insert(studyCount);
-                } catch (Exception e) {
-                    LOGGER.error("新增 study_count 信息出错！", e);
-                    throw new RuntimeException("新增 study_count 信息出错！");
-                }
-            } else {
-                List<StudyCount> studyCounts = simpleStudyCountMapper.selectByCourseIdAndCount(studentId, courseId, maxCount);
-                StudyCount studyCount;
-                if (studyCounts.size() > 0) {
-                    // 如果查询出多条记录，只取第一条记录，其余记录删除
-                    for (int i = 1; i < studyCounts.size(); i++) {
-                        studyCount = studyCounts.get(i);
-                        simpleStudyCountMapper.deleteByPrimaryKey(studyCount.getId());
-                    }
-                }
-                studyCount = studyCounts.get(0);
-                studyCount.setStudyCount(studyCount.getStudyCount() + 1);
-                try {
-                    simpleStudyCountMapper.updateByPrimaryKeySelective(studyCount);
-                } catch (Exception e) {
-                    LOGGER.error("更新 study_count 信息出错！", e);
-                    throw new RuntimeException("更新 study_count 信息出错！");
-                }
-            }
-        }
-        return maxCount == null ? 1 : maxCount;
-    }
-
-
-    /**
-     * 判断学生是否是第一次学习指定的模块
-     * true:第一次学习当前模块，进入引导页
-     * false：不是第一次学习当前模块，直接获取题目
-     *
-     * @param stuId      当前登录学生id
-     * @param studyModel 学习模块 （慧记忆，慧听写，慧默写，例句听力，例句翻译，例句默写）
-     * @return
-     */
-    public boolean isFirst(Long stuId, String studyModel) {
-        LearnExample learnExample = new LearnExample();
-        learnExample.createCriteria().andStudentIdEqualTo(stuId).andStudyModelEqualTo(studyModel);
-        List<Learn> learns = learnMapper.selectByExample(learnExample);
-        return learns.size() == 0;
-    }
 
     /**
      * 学生第一次学习完成学习引导页内容后，将该学生新信息置为不是第一次学习，可直接进入学习页面
@@ -139,32 +59,6 @@ public class SimpleCommonMethod implements Serializable {
     }
 
     /**
-     * 获取当前年级所在的学段
-     *
-     * @param grade 当前年级
-     * @return 初中 高中
-     */
-    public String getPhase(String grade) {
-        String phase = null;
-        switch (grade) {
-            case "七年级":
-            case "八年级":
-            case "九年级":
-                phase = "初中";
-                break;
-
-            case "高一":
-            case "高二":
-            case "高三":
-            case "高中":
-                phase = "高中";
-                break;
-            default:
-        }
-        return phase;
-    }
-
-    /**
      * 初始化学生与单元之间的关系 默认开启所有课程的第一单元供学生选择，其余单元需通过学习进行
      *
      * @param student
@@ -172,7 +66,7 @@ public class SimpleCommonMethod implements Serializable {
     public void initUnit(Student student) {
 
         // 判断学生是否已经推送过当前学段的课程
-        int count = simpleStudentUnitMapper.countUnitCountByStudentId(student, simpleCommonMethod.getPhase(student.getGrade()));
+        int count = simpleStudentUnitMapper.countUnitCountByStudentId(student, CommonMethod.getPhase(student.getGrade()));
         if (count > 0) {
             // 当前学生已经推送过课程，不再重复推送
             throw new RuntimeException("学生当前学段课程已经推送！不可重复推送！");

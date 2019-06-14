@@ -7,8 +7,8 @@ import com.zhidejiaoyu.common.Vo.bookVo.BookVo;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
-import com.zhidejiaoyu.common.study.simple.SimpleGoldMemoryTime;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
@@ -307,7 +307,7 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<SimpleVoc
         // 根据条件查询单词是否已经在记忆追踪中，如果在更新记忆追踪；如果不在新增记忆追踪
         List<Long> updateIds = simpleCapacityReviewMapper.selectByWordIdsAndStudyModel(student, courseId, unitId, wordIds, studyModel);
         Double memoryStrength = 0.12;
-        Date push = SimpleGoldMemoryTime.getGoldMemoryTime(memoryStrength, new Date());
+        Date push = GoldMemoryTime.getGoldMemoryTime(memoryStrength, new Date());
         if (updateIds.size() < wordIds.length) {
             // 说明有些单词在记忆追踪中还不存在
             Map<Long, Long> map = new HashMap<>(16);

@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.service.simple.impl;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -50,7 +51,7 @@ public class SimpleGrowReportServiceImpl implements SimpleGrowReportService {
     @Override
     public ServerResponse<ReportVO> getLearnResult(HttpSession session) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        String phase = simpleCommonMethod.getPhase(student.getGrade());
+        String phase = CommonMethod.getPhase(student.getGrade());
         ReportVO reportVO = new ReportVO();
 
         // 学习成果

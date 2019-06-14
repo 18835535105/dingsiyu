@@ -5,10 +5,10 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
+import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
-import com.zhidejiaoyu.common.study.simple.SimpleGoldMemoryTime;
-import com.zhidejiaoyu.common.study.simple.SimpleMemoryStrengthUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ public class SaveLearnAndCapacity {
     private SimpleLearnMapper learnMapper;
 
     @Autowired
-    private SimpleMemoryStrengthUtil simpleMemoryStrengthUtil;
+    private MemoryStrengthUtil memoryStrengthUtil;
 
     @Autowired
     private SimpleVocabularyMapper vocabularyMapper;
@@ -218,7 +218,7 @@ public class SaveLearnAndCapacity {
                 simpleCapacity.setCourseId(learn.getCourseId());
                 simpleCapacity.setFaultTime(1);
                 simpleCapacity.setMemoryStrength(0.12);
-                simpleCapacity.setPush(SimpleGoldMemoryTime.getGoldMemoryTime(0.12, new Date()));
+                simpleCapacity.setPush(GoldMemoryTime.getGoldMemoryTime(0.12, new Date()));
                 simpleCapacity.setStudentId(student.getId());
                 simpleCapacity.setType(type);
                 simpleCapacity.setUnitId(learn.getUnitId());
@@ -242,11 +242,11 @@ public class SaveLearnAndCapacity {
             }
             // 重新计算黄金记忆点时间
             double memoryStrength = simpleCapacity.getMemoryStrength();
-            Date push = SimpleGoldMemoryTime.getGoldMemoryTime(memoryStrength, new Date());
+            Date push = GoldMemoryTime.getGoldMemoryTime(memoryStrength, new Date());
             simpleCapacity.setPush(push);
 
             // 重新计算记忆强度
-            simpleCapacity.setMemoryStrength(simpleMemoryStrengthUtil.getTestMemoryStrength(memoryStrength, isKnown));
+            simpleCapacity.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(memoryStrength, isKnown));
             simpleSimpleCapacityMapper.updateById(simpleCapacity);
 
             // 保存学生复习记录
