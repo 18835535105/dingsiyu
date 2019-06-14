@@ -434,10 +434,8 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     public ServerResponse<Object> getChallengeInformation(HttpSession session) {
         Student student = getStudent(session);
         Date date = new Date();
-        SimpleDateFormat simple = new SimpleDateFormat("yyyy-MM-dd");
-        String format = simple.format(date);
         Map<String, Object> returnMap = new HashMap<>();
-        List<Gauntlet> gauntlets = simpleGauntletMapper.selByStudentIdAndFormat(student.getId(), format);
+        List<Gauntlet> gauntlets = simpleGauntletMapper.selByStudentIdAndFormat(student.getId());
         if (gauntlets != null) {
             if (gauntlets.size() < 3) {
                 if (gauntlets.size() > 0) {

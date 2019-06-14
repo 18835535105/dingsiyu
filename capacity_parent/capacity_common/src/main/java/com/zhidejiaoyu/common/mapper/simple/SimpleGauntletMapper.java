@@ -18,7 +18,7 @@ import java.util.List;
  */
 public interface SimpleGauntletMapper extends BaseMapper<Gauntlet> {
 
-     List<Gauntlet> selByStudentIdAndFormat(@Param("studentId") Long studentId, @Param("format") String format);
+     List<Gauntlet> selByStudentIdAndFormat(@Param("studentId") Long studentId);
 
     /**
      * 查询数据

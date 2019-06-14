@@ -36,8 +36,8 @@
     </sql>
 
     <select id="selByStudentIdAndFormat" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"></include> from gauntlet where challenger_student_id=#{studentId} and
-        to_days(create_time) = to_days(format) and challenger_point is not null;
+        select <include refid="Base_Column_List"/> from gauntlet where challenger_student_id=#{studentId} and
+        to_days(create_time) = to_days(now()) and challenger_point is not null;
     </select>
 
     <select id="getInformation" parameterType="map" resultType="int">
