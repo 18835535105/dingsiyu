@@ -138,10 +138,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     public ServerResponse<StudentGauntletVo> getStudyInteger(HttpSession session) {
         //获取个人的数据
         Student student = getStudent(session);
-        Date date = new Date();
-        SimpleDateFormat simple = new SimpleDateFormat("yy-MM-dd");
-        String format = simple.format(date);
-        List<Gauntlet> gauntlets = simpleGauntletMapper.selByStudentIdAndFormat(student.getId(), format);
+        List<Gauntlet> gauntlets = simpleGauntletMapper.selByStudentIdAndFormat(student.getId(), new Date());
         StudentGauntletVo studentGauntletVo = new StudentGauntletVo();
         studentGauntletVo.setId(student.getId());
         studentGauntletVo.setName(student.getNickname());
@@ -182,11 +179,8 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     public ServerResponse<Object> addPkRecord(HttpSession session, String gameName, Long studentId, Integer gold, Long courseId, String challengerMsg) {
         Student student = getStudent(session);
         Gauntlet gauntlet = new Gauntlet();
-        Date date = new Date();
-        SimpleDateFormat simple = new SimpleDateFormat("yyyy-MM-dd");
-        String format = simple.format(date);
         //获取今日是否有挑战的数据
-        List<Gauntlet> gauntlets = simpleGauntletMapper.selByStudentIdAndFormat(student.getId(), format);
+        List<Gauntlet> gauntlets = simpleGauntletMapper.selByStudentIdAndFormat(student.getId(), new Date());
         //获取挑战人学习力等数据
         StudentExpansion studentExpansion = simpleStudentExpansionMapper.selectByStudentId(student.getId());
         //获取被挑战人学习力等数据
@@ -433,9 +427,8 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     @Override
     public ServerResponse<Object> getChallengeInformation(HttpSession session) {
         Student student = getStudent(session);
-        Date date = new Date();
         Map<String, Object> returnMap = new HashMap<>();
-        List<Gauntlet> gauntlets = simpleGauntletMapper.selByStudentIdAndFormat(student.getId());
+        List<Gauntlet> gauntlets = simpleGauntletMapper.selByStudentIdAndFormat(student.getId(), new Date());
         if (gauntlets != null) {
             if (gauntlets.size() < 3) {
                 if (gauntlets.size() > 0) {
@@ -533,9 +526,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         //在一人接受挑战时清楚其他发出的挑战记录
         Gauntlet gauntlet = simpleGauntletMapper.selectById(gauntletId);
         Date createTime = gauntlet.getCreateTime();
-        SimpleDateFormat simple = new SimpleDateFormat("yyyy-MM-dd");
-        String format = simple.format(createTime);
-        List<Gauntlet> gauntlets = simpleGauntletMapper.selByStudentIdAndFormat(gauntlet.getChallengerStudentId(), format);
+        List<Gauntlet> gauntlets = simpleGauntletMapper.selByStudentIdAndFormat(gauntlet.getChallengerStudentId(), createTime);
         for (Gauntlet gauntlet1 : gauntlets) {
             if (!gauntlet1.getId().equals(gauntletId)) {
                 simpleGauntletMapper.updateByStatus(gauntlet1.getId());

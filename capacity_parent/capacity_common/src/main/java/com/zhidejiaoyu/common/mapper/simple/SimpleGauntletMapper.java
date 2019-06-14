@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,7 +19,13 @@ import java.util.List;
  */
 public interface SimpleGauntletMapper extends BaseMapper<Gauntlet> {
 
-     List<Gauntlet> selByStudentIdAndFormat(@Param("studentId") Long studentId);
+    /**
+     * 学生当天已发出的挑战
+     *
+     * @param studentId
+     * @return
+     */
+     List<Gauntlet> selByStudentIdAndFormat(@Param("studentId") Long studentId, @Param("time") Date time);
 
     /**
      * 查询数据
