@@ -171,7 +171,7 @@ public class MemoryDifficultyUtil {
         }
 
         if (errCount > studyCount) {
-            log.error("学生 {} 在单元 {} 模块 {} 下的单词 {} 错误次数大于了学习次数！", simpleCapacity.getStudentId(),
+            log.warn("学生 {} 在单元 {} 模块 {} 下的单词 {} 错误次数大于了学习次数！", simpleCapacity.getStudentId(),
                     simpleCapacity.getUnitId(), simpleCommonMethod.getTestType(type), simpleCapacity.getVocabularyId());
             errCount = studyCount;
         }
