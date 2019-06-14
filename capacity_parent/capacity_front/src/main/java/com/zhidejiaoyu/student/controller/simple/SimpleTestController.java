@@ -181,21 +181,6 @@ public class SimpleTestController {
     }
 
     /**
-     * 游戏测试推送课程
-     *
-     * @param session
-     * @param point   游戏测试得分
-     * @return
-     */
-    @PostMapping("/pushGameCourse")
-    public ServerResponse<String> pushGameCourse(HttpSession session, Integer point) {
-        if (point == null) {
-            return ServerResponse.createByErrorMessage("point can't be null!");
-        }
-        return testService.pushGameCourse(session, point);
-    }
-
-    /**
      * 获取例句相关单元闯关的测试题
      *
      * @param session

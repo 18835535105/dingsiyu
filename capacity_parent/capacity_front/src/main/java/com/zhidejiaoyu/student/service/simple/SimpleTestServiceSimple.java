@@ -74,16 +74,6 @@ public interface SimpleTestServiceSimple extends SimpleBaseService<TestRecord> {
 
     ServerResponse<Object> showRecord(String course_id, HttpSession session, Integer page, Integer rows);
 
-
-    /**
-     * 游戏测试推送课程
-     *
-     * @param session
-     * @param point 游戏测试得分
-     * @return
-     */
-    ServerResponse<String> pushGameCourse(HttpSession session, Integer point);
-
 	ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, TestRecord testRecord, int type, int typeModel, String testDetail);
 
 	ServerResponse<Object> getTestPaper(long courseId, int typeOne, int typeTwo, String[] unitId);
