@@ -14,9 +14,9 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
-import com.zhidejiaoyu.common.study.simple.SimpleMemoryDifficultyUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.goldUtil.SimpleTestGoldUtil;
@@ -135,7 +135,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     private SimpleOpenUnitLogMapper simpleOpenUnitLogMapper;
 
     @Autowired
-    private SimpleMemoryDifficultyUtil simpleMemoryDifficultyUtil;
+    private MemoryDifficultyUtil memoryDifficultyUtil;
 
     @Autowired
     private SimpleCcieUtil simpleCcieUtil;
@@ -1512,7 +1512,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         simpleCapacity.setUnitId(Long.valueOf(vocabulary.get("unit_id").toString()));
         simpleCapacity.setFaultTime(Integer.parseInt(vocabulary.get("fault_time").toString()));
         simpleCapacity.setMemoryStrength(Double.valueOf(vocabulary.get("memory_strength").toString()));
-        int hard = simpleMemoryDifficultyUtil.getMemoryDifficulty(simpleCapacity, type);
+        int hard = memoryDifficultyUtil.getMemoryDifficulty(simpleCapacity, type);
         vocabulary.put("memoryDifficulty", hard);
         vocabulary.put("engine", PerceiveEngine.getPerceiveEngine(hard, simpleCapacity.getMemoryStrength()));
 

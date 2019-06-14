@@ -5,9 +5,9 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.study.simple.SimpleGoldMemoryTime;
-import com.zhidejiaoyu.common.study.simple.SimpleMemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleMemoryStrengthUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -33,7 +33,7 @@ public class SaveLearnAndCapacity {
     private SimpleSimpleCapacityMapper simpleSimpleCapacityMapper;
 
     @Autowired
-    private SimpleMemoryDifficultyUtil simpleMemoryDifficultyUtil;
+    private MemoryDifficultyUtil memoryDifficultyUtil;
 
     @Autowired
     private SimpleLearnMapper learnMapper;
@@ -171,9 +171,9 @@ public class SaveLearnAndCapacity {
         SimpleCapacity capacity = saveCapacityMemory(learn, student, isTrue, type);
 
         // 计算记忆难度
-        Integer memoryDifficult = 0;
+        int memoryDifficult = 0;
         if (capacity != null) {
-            memoryDifficult = simpleMemoryDifficultyUtil.getMemoryDifficulty(capacity, type);
+            memoryDifficult = memoryDifficultyUtil.getMemoryDifficulty(capacity, type);
         }
         // 更新学习记录
         learn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
