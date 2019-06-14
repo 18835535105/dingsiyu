@@ -62,6 +62,10 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
     @Autowired
     private MedalAwardAsync medalAwardAsync;
 
+    @Autowired
+    private CapacityPictureMapper capacityPictureMapper;
+
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object getWriteWord(HttpSession session, Long unitId, Long[] ignoreWordId) {
@@ -212,18 +216,58 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
             studyModel = "慧听写";
         } else if (classify != null && classify == 3) {
             studyModel = "慧默写";
-        } else if(classify != null && classify == 0){
+        } else if (classify != null && classify == 0) {
             studyModel = "单词图鉴";
         }
 
         // 当前课程最大学习遍数
         Integer maxCount = 1;
-        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, studyModel, 1,1);
+        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, studyModel, 1, 1);
         if (learnIds.size() > 1) {
             List<Long> longs = learnIds.subList(1, learnIds.size());
             learnMapper.deleteBatchIds(longs);
         }
-        Learn currentLearn = learnMapper.selectLearn(studentId, learn, studyModel, maxCount,1);
+        Learn currentLearn = learnMapper.selectLearn(studentId, learn, studyModel, maxCount, 1);
+        // 不是第一次学习
+
+        /**
+         * 查看慧默写  会听写  单词图鉴是否为上次学习 如果是 删除
+         * 开始
+         */
+        CapacityWrite capacityWrite = null;
+        CapacityListen capacityListen = null;
+        CapacityPicture capacityPicture = null;
+        boolean falg = false;
+        if (classify == 3) {
+            // 慧默写
+            List<CapacityWrite> capacityWrites = capacityWriteMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
+                    learn.getVocabularyId());
+            falg = capacityWrites.size() > 0 && capacityWrites.get(0).getPush().getTime() < System.currentTimeMillis();
+        } else if (classify == 2) {
+            List<CapacityListen> capacityListens = capacityListenMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
+                    learn.getVocabularyId());
+            falg = capacityListens.size() > 0 && capacityListens.get(0).getPush().getTime() < System.currentTimeMillis();
+        } else if (classify == 0) {
+            List<CapacityPicture> capacityPictures = capacityPictureMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
+                    learn.getVocabularyId());
+            falg = capacityPictures.size() > 0 && capacityPictures.get(0).getPush().getTime() < System.currentTimeMillis();
+        }
+        if(falg){
+            if (classify == 3) {
+               capacityWriteMapper.deleteByStudentIdAndUnitIdAndVocabulary(student.getId(), learn.getUnitId(),
+                       learn.getVocabularyId());
+            } else if (classify == 2) {
+                capacityListenMapper.deleteByStudentIdAndUnitIdAndVocabulary(student.getId(), learn.getUnitId(),
+                        learn.getVocabularyId());
+            } else if (classify == 0) {
+                capacityPictureMapper.deleteByStudentIdAndUnitIdAndVocabulary(student.getId(), learn.getUnitId(),
+                        learn.getVocabularyId());
+            }
+            return ServerResponse.createBySuccess();
+        }
+        /**
+         * 结束
+         */
         // 保存学习记录
         // 第一次学习，如果答对记为熟词，答错记为生词
         if (currentLearn == null) {
@@ -253,7 +297,7 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
                     saveWordLearnAndCapacity.saveCapacityMemory(learn, student, false, 3);
                 } else if (classify == 2) {
                     saveWordLearnAndCapacity.saveCapacityMemory(learn, student, false, 2);
-                }else if(classify == 0) {
+                } else if (classify == 0) {
                     saveWordLearnAndCapacity.saveCapacityMemory(learn, student, false, 0);
                 }
 
@@ -270,16 +314,12 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
                 return ServerResponse.createBySuccess();
             }
         } else {
-            // 不是第一次学习
-            CapacityWrite capacityWrite = null;
-            CapacityListen capacityListen = null;
-            CapacityPicture capacityPicture = null;
             if (isKnown) {
                 if (classify == 3) {
                     capacityWrite = (CapacityWrite) saveWordLearnAndCapacity.saveCapacityMemory(learn, student, true, 3);
                 } else if (classify == 2) {
                     capacityListen = (CapacityListen) saveWordLearnAndCapacity.saveCapacityMemory(learn, student, true, 2);
-                } else if(classify == 0) {
+                } else if (classify == 0) {
                     capacityPicture = (CapacityPicture) saveWordLearnAndCapacity.saveCapacityMemory(learn, student, true, 0);
                 }
             } else {
@@ -313,13 +353,13 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
                     capacityListenMapper.updatePush(studentId, learn.getVocabularyId(), pushRise);
                 }
             }
-            if(classify == 3) {
-            	// 查询错误次数>=3
-            	Integer faultTime = capacityWriteMapper.getFaultTime(studentId, learn.getVocabularyId());
-            	if(faultTime != null && faultTime >= 5) {
-            		// 如果错误次数>=3, 黄金记忆时间推迟3小时
-            		capacityWriteMapper.updatePush(studentId, learn.getVocabularyId(), pushRise);
-            	}
+            if (classify == 3) {
+                // 查询错误次数>=3
+                Integer faultTime = capacityWriteMapper.getFaultTime(studentId, learn.getVocabularyId());
+                if (faultTime != null && faultTime >= 5) {
+                    // 如果错误次数>=3, 黄金记忆时间推迟3小时
+                    capacityWriteMapper.updatePush(studentId, learn.getVocabularyId(), pushRise);
+                }
             }
 
             if (i > 0) {

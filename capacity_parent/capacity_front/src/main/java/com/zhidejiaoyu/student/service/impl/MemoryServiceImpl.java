@@ -136,7 +136,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
      * @param maxCount
      * @param plan       当前学习进度
      * @param wordCount  当前单元单词总数
-     * @return  如果当前单词是本单元最后一个单词，返回 null
+     * @return 如果当前单词是本单元最后一个单词，返回 null
      */
     private ServerResponse<MemoryStudyVo> getNextMemoryWord(HttpSession session, Long unitId, Student student, boolean firstStudy,
                                                             Integer maxCount, Long plan, Long wordCount) {
@@ -183,17 +183,24 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
 
         // 当前课程的最大学习遍数
         Integer maxCount = 1;
-        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, "慧记忆", maxCount,1);
+        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, "慧记忆", maxCount, 1);
         if (learnIds.size() > 1) {
             List<Long> longs = learnIds.subList(1, learnIds.size());
             learnMapper.deleteBatchIds(longs);
         }
         // 查询当前单词的学习记录数据
-        Learn currentLearn = learnMapper.selectLearn(studentId, learn, "慧记忆", maxCount,1);
+        Learn currentLearn = learnMapper.selectLearn(studentId, learn, "慧记忆", maxCount, 1);
 
         // 统计初出茅庐勋章
         medalAwardAsync.inexperienced(student);
-
+        //查看慧记忆是否为上次学习 如果是删除
+        List<CapacityMemory> capacityMemoryList = capacityMemoryMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
+                learn.getVocabularyId());
+        boolean falg = capacityMemoryList.size() > 0 && capacityMemoryList.get(0).getPush().getTime() < System.currentTimeMillis();
+        if(falg){
+            capacityMemoryMapper.deleteByStudentIdAndUnitIdAndVocabularyId(student.getId(),learn.getUnitId(),learn.getVocabularyId());
+            return  ServerResponse.createBySuccess();
+        }
         // 保存学习记录
         // 第一次学习，如果答对记为熟词，答错记为生词
         if (currentLearn == null) {
@@ -246,8 +253,8 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
      * “慧记忆”模块首次学习当前单元当前单词，保存其学习记录和慧追踪记录
      *
      * @param session
-     * @param learn            当前学习信息
-     * @param known            是否熟悉当前单词
+     * @param learn     当前学习信息
+     * @param known     是否熟悉当前单词
      * @param total
      * @param plan
      * @param student
@@ -282,6 +289,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
             // 如果认识该单词，记为熟词
             learn.setStatus(1);
             learn.setFirstIsKnown(1);
+            saveWordLearnAndCapacity.saveCapacityMemory(learn, student, known, 1);
         } else {
             learn.setStatus(0);
             learn.setFirstIsKnown(0);
