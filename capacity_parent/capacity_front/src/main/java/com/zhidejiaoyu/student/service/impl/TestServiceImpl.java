@@ -1348,17 +1348,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         getLevel(session);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         learnMapper.updLetterPair(student.getId(), wordUnitTestDTO.getUnitId()[0], commonMethod.getTestType(classify));
-        if (classify >= 1 && classify <= 3) {
-            if (classify == 1) {
-                capacityMemoryMapper.deleteByStudentIdAndStudyUnitId(student.getId(), wordUnitTestDTO.getUnitId()[0]);
-            }
-            if (classify == 2) {
-                capacityListenMapper.deleteByStudentIdAndStudyUnitId(student.getId(), wordUnitTestDTO.getUnitId()[0]);
-            }
-            if (classify == 3) {
-                capacityWriteMapper.deleteByStudentIdAndStudyUnitId(student.getId(), wordUnitTestDTO.getUnitId()[0]);
-            }
-        }
         return ServerResponse.createBySuccess(vo);
     }
 
