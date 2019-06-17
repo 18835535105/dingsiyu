@@ -64,8 +64,6 @@
         <!-- 此日志文件记录warn级以上级别的 -->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>warn</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
         </filter>
     </appender>
 
