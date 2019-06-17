@@ -68,6 +68,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
             map.put("list", list);
             return ServerResponse.createBySuccess(map);
         }
+        //获取当前学习的课程
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(),5);
         if (capacityStudentUnit != null) {
             Long unitId = capacityStudentUnit.getUnitId();
@@ -75,6 +76,9 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                 map.put("study", unitId);
             }
         }
+        /**
+         * 获取单元开启信息
+         */
         if (studentStudyPlan != null) {
             //获取单元
             List<LetterUnit> letterUnits = letterUnitMapper.selSymbolUnit(studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());

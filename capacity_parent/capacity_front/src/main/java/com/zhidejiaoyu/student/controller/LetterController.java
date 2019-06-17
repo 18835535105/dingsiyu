@@ -134,6 +134,13 @@ public class LetterController {
         return letterService.saveLetterWrite(letter,session,falg);
     }
 
+    /**
+     * 修改单元学习信息
+     * @param unitId
+     * @param type
+     * @param session
+     * @return
+     */
     @PostMapping("/updLetterSymbolStudyModel")
     public Object updLetterSymbolStudyModel(Long unitId,Integer type,HttpSession session){
         return letterService.updLetterSymbolStudyModel(unitId,type,session);

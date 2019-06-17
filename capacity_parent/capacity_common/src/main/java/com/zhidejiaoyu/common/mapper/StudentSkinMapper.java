@@ -60,5 +60,10 @@ public interface StudentSkinMapper extends BaseMapper<StudentSkin> {
     StudentSkin selUseSkinByStudentIdAndName(Long studentId);
 
 
+    /**
+     * 获取试用皮肤信息
+     * @param id
+     * @return
+     */
     List<Map<String,Object>> selTrySkinAndHaveSkin(Long id);
 }

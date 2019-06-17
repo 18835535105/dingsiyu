@@ -18,8 +18,19 @@ import java.util.Map;
  */
 public interface PhoneticSymbolMapper extends BaseMapper<PhoneticSymbol> {
 
+    /**
+     * 根据单元id获取信息
+     * @param id
+     * @return
+     */
     List<Map<String,Object>> selByUnitId(Integer id);
 
+    /**
+     * 根据单元id和音标获取信息
+     * @param unitId
+     * @param symbol
+     * @return
+     */
     List<PhoneticSymbol> selAllByUnitIdAndSymbol(@Param("unitId") Integer unitId,@Param("symbol") String symbol);
 
     @Select(" select phonetic_symbol from phonetic_symbol where unit_id=#{unitId} group by phonetic_symbol")

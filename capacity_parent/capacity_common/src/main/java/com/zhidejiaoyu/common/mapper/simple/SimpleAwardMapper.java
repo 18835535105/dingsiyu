@@ -161,6 +161,11 @@ public interface SimpleAwardMapper extends BaseMapper<Award> {
      */
     int countGetModel(@Param("studentId") Long studentId);
 
+    /**
+     * 获取学生勋章数量
+     * @param studentId
+     * @return
+     */
     List<Map<String,Object>> selAwardCountByStudentId(@Param("studentId") Long studentId);
 
     /**

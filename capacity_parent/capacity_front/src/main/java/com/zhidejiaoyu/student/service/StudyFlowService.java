@@ -7,7 +7,6 @@ import javax.servlet.http.HttpSession;
 
 public interface StudyFlowService extends BaseService<StudyFlow> {
 
-    ServerResponse<Object> initializeNode(long studentId, long courseId, long unitId, long node, Long grade, HttpSession session);
 
     /**
      * 节点学完, 把下一节点初始化到student_flow表, 并把下一节点返回

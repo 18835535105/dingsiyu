@@ -69,14 +69,18 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     @Override
     public Object getLetterUnit(HttpSession session) {
         Long studentId = getStudentId(session);
+        //获取是否有当前学习的单元信息
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selLetterByStudentId(studentId);
         Map<String, Object> map = new HashMap<>();
         if (capacityStudentUnit != null) {
+            //查询单元信息
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterUnit(capacityStudentUnit.getStartunit(), capacityStudentUnit.getEndunit());
             map.put("study", capacityStudentUnit.getUnitId());
             map.put("list", getLetterUnites(letterUnits, studentId));
         } else {
+            //查询学习计划信息
             StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selLetterByStudentId(studentId);
+            //如果没有学习计划返回
             if (studentStudyPlan == null) {
                 map.put("study", 0);
                 Map<String, Object> returnMap = new HashMap<>();
@@ -98,6 +102,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     private List<Map<String, Object>> getLetterUnites(List<LetterUnit> list, Long studentId) {
         List<Map<String, Object>> returnList = new ArrayList<>();
         Boolean isTrue = true;
+        //根据单元测试判断单元是否开启
         for (LetterUnit unit : list) {
             Map<String, Object> map = new HashMap<>();
             if (isTrue) {
@@ -116,10 +121,17 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         return returnList;
     }
 
+    /**
+     * 获取单元模块开启详情
+     * @param session
+     * @param unitId
+     * @return
+     */
     @Override
     public Object getLetterUnitStatus(HttpSession session, Long unitId) {
         Long studentId = getStudentId(session);
         Map<String, Object> map = new HashMap<>();
+        //在unitId未传入时查看信息
         if (unitId == null) {
             CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selLetterByStudentId(studentId);
             if (capacityStudentUnit != null) {
@@ -131,19 +143,23 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 }
             }
         }
+        //根据unitId查询单元信息
         if (unitId != null) {
             //查看单词播放器是否学习
             Integer letterCount = letterMapper.selLetterCountById(unitId);
             Integer letterListen = learnMapper.selLetterLearn(studentId, unitId, "字母播放器");
             map.put("letterListen", true);
+            //判断是否开启单元配对
             if (letterListen != null && letterListen >= letterCount) {
                 map.put("letterPair", true);
                 //查看字母配对是否学习
                 Integer letterListenCount = learnMapper.selLetterLearn(studentId, unitId, "字母配对");
+                //判断是否开起单元默写
                 if (letterListenCount != null && letterCount <= letterListenCount) {
                     map.put("letterWrite", true);
                     //查看字母听写是否完成
                     Integer letterWriteCount = learnMapper.selLetterLearn(studentId, unitId, "字母听写");
+                    //判断是否开启单元闯关
                     if (letterWriteCount != null && letterCount <= letterWriteCount) {
                         map.put("LettersBreakThrough", true);
                     } else {
@@ -158,7 +174,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 map.put("letterWrite", false);
                 map.put("LettersBreakThrough", false);
             }
-            //查看单元闯关是否完成
+            //查看说有单元闯关是否完成
             StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selLetterByStudentId(studentId);
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterUnit(studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());
             if (letterUnits != null && letterUnits.size() > 0) {
@@ -166,7 +182,6 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 for (LetterUnit letterUnit : letterUnits) {
                     letterUnitIds.add(letterUnit.getId());
                 }
-
                 //查看学后测试是否开启
                 boolean falg = true;
                 for (Integer letterUnitId : letterUnitIds) {
@@ -191,8 +206,12 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         return ServerResponse.createBySuccess(new HashMap<>());
     }
 
+
     @Override
     public Object getLetterListen(Long unitId, HttpSession session) {
+        /**
+         * 查看字母播放器全部数据
+         */
         Long studentId = getStudentId(session);
         StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selLetterSudyByStudentAndUnitId(studentId, unitId);
         if (studentStudyPlan == null) {
@@ -207,6 +226,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
 
     @Override
     public Object saveLetterListen(Player player, HttpSession session) {
+        //保存字母播放器数据
         Long studentId = getStudentId(session);
         try {
             int i = playerMapper.selectByType(studentId, player.getUnitId(), 4, player.getWordId());
@@ -513,7 +533,9 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     @Override
     public Object getLetterWrite(Long unitId, HttpSession session) {
         Long studentId = getStudentId(session);
+        //获取学习总数量
         Integer countByUnitId = letterMapper.selLetterCountById(unitId);
+        //获取以学习字母默写数量
         Integer letterWriteCount = letterWriteMapper.selStudyLetterCountByUnitIdAndStudent(unitId, studentId);
         if (countByUnitId.equals(letterWriteCount)) {
             return ServerResponse.createBySuccess(600, "无学习");
@@ -548,7 +570,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     public Object updLetter(HttpSession session, Long unitId) {
         Long studentId = getStudentId(session);
         try {
-
+            //修改字母听写数据
             letterWriteMapper.delByUnitIdAndStudentId(unitId, studentId);
             learnMapper.updLetterPair(studentId, unitId, "字母听写");
         } catch (Exception e) {

@@ -127,6 +127,9 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         return studyFlowMapper.selectCurrentFlowByStudentId(studentId);
     }
 
+    /**
+     *  判断扩展表信息是否已有  如果没有添加
+     */
     @Override
     public void isStudentEx(Student student) {
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
