@@ -61,8 +61,8 @@
             <!-- 记录日志的编码:此处设置字符集 - -->
             <charset>UTF-8</charset>
         </encoder>
-        <!-- 此日志文件只记录warn级别的 -->
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+        <!-- 此日志文件记录warn级以上级别的 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>warn</level>
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
