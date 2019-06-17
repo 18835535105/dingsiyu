@@ -3,13 +3,13 @@ package com.zhidejiaoyu.student.common;
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
-import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ import java.util.List;
  */
 @Component
 @Slf4j
-public class SaveLearnAndCapacity extends BaseServiceImpl {
+public class SaveLearnAndCapacity {
 
     @Autowired
     private SimpleSimpleCapacityMapper simpleSimpleCapacityMapper;
@@ -110,7 +110,7 @@ public class SaveLearnAndCapacity extends BaseServiceImpl {
                                                        Long[] errorWordId, HttpSession session,
                                                        Long[] unitId, Integer type) {
 
-        Student student = super.getStudent(session);
+        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
 
         // 保存正确单词/例句的学习记录和记忆追踪信息
         if (correctWord != null && correctWordId != null && correctWord.length > 0
