@@ -645,8 +645,8 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         for (Student student : all) {
             StudentExpansion isHave = simpleStudentExpansionMapper.isHave(student.getId());
             if (isHave == null) {
-                double gold = student.getSystemGold() + student.getOfflineGold();
-                int level = super.getLevels((int) gold, levels);
+                Double gold = student.getSystemGold() + student.getOfflineGold();
+                int level = getLevels(gold.intValue(), levels);
                 Integer study = simpleLevelMapper.getStudyById(level);
                 simpleStudentExpansionMapper.addStudy(student.getId(), study, level, 2);
             }

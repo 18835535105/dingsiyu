@@ -1338,8 +1338,8 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
             } else {
                 stuMap.put("xz", 0);
             }
-            long gold1 = Math.round(Double.parseDouble(stuMap.get("gold").toString()));
-            String level = getLevel((int) gold1, levels);
+            Long gold1 = Math.round(Double.parseDouble(stuMap.get("gold").toString()));
+            String level = getLevel(gold1.intValue(), levels);
             stuMap.put("childName", level);
             getMap.add(stuMap);
         }
@@ -1683,6 +1683,8 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                 myrecord = levelGold;
                 myauto++;
             }
+            myrecord = 0;
+            myauto = 0;
         }
         return level;
     }
