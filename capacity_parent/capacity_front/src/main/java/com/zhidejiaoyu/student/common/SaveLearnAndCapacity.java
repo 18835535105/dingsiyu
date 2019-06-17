@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
+import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 /**
  * 测试结束保存学习记忆追踪和测试记忆追踪
@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutorService;
  */
 @Component
 @Slf4j
-public class SaveLearnAndCapacity {
+public class SaveLearnAndCapacity extends BaseServiceImpl {
 
     @Autowired
     private SimpleSimpleCapacityMapper simpleSimpleCapacityMapper;
@@ -55,10 +55,6 @@ public class SaveLearnAndCapacity {
 
     @Autowired
     private DailyAwardAsync awardAsync;
-
-    @Autowired
-    private ExecutorService executorService;
-
 
     /**
      * 学习模块保存指定模块的学习记录和慧追踪信息
@@ -114,10 +110,7 @@ public class SaveLearnAndCapacity {
                                                        Long[] errorWordId, HttpSession session,
                                                        Long[] unitId, Integer type) {
 
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-
-        log.info("======== 测试模块 保存学习记录和记忆追踪信息 ========");
-        log.info("correctWordId:{}; errorWordId:{}; studentId:{}; unitId:{}; type:{};", correctWordId, errorWordId, student.getId(), unitId, type);
+        Student student = super.getStudent(session);
 
         // 保存正确单词/例句的学习记录和记忆追踪信息
         if (correctWord != null && correctWordId != null && correctWord.length > 0
