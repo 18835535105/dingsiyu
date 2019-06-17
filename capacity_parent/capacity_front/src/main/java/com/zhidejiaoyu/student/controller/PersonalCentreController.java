@@ -1,33 +1,25 @@
 package com.zhidejiaoyu.student.controller;
 
-import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.service.AwardService;
 import com.zhidejiaoyu.student.service.PersonalCentreService;
 import com.zhidejiaoyu.student.service.simple.SimpleDrawRecordServiceSimple;
 import com.zhidejiaoyu.student.service.simple.SimplePersonalCentreServiceSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpSession;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 /**
  * 个人中心
- * 
+ *
  * @author qizhentao
  * @version 1.0
  */
@@ -41,9 +33,6 @@ public class PersonalCentreController extends BaseController {
 
     @Value("${domain}")
     private String domain;
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     @Autowired
     private SimpleDrawRecordServiceSimple drawRecordService;
@@ -129,7 +118,7 @@ public class PersonalCentreController extends BaseController {
      * 我的报告 - 分页
      * 1.每周时长
      *
-     * @year 0=全部, 2018=指定年份
+     * @param year 0=全部, 2018=指定年份
      */
     @RequestMapping("/weekDurationPage")
     public ServerResponse<Object> weekDurationIndexTest(HttpSession session, int page, int rows, Integer year) {

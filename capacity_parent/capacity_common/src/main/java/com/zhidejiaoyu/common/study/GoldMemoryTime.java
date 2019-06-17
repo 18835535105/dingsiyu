@@ -14,7 +14,7 @@ import java.util.Date;
 public class GoldMemoryTime {
 	/**
 	 * 获取黄金记忆点
-	 * 
+	 *
 	 * @param memoryStrength
 	 *            记忆强度,学习本单词之前的记忆强度。（在更新本次记忆追踪之前获取到的记忆强度）
 	 * @param studyEnd
@@ -23,7 +23,7 @@ public class GoldMemoryTime {
 	 */
 	public static Date getGoldMemoryTime(Double memoryStrength, Date studyEnd) {
 		if (studyEnd == null) {
-			throw new RuntimeException(" 本单词最后学习结束时间不能为空！");
+			studyEnd = new Date();
 		}
 		if (memoryStrength >= 0 && memoryStrength < 0.2) {
 			return getTime(studyEnd, 10);
@@ -49,14 +49,14 @@ public class GoldMemoryTime {
 
 	/**
 	 * 获取本单词最后学习结束时间若干秒后的时间
-	 * 
+	 *
 	 * @param studyEnd
 	 * @param second
 	 * @return
 	 */
 	private static Date getTime(Date studyEnd, int second) {
-		Long time = studyEnd.getTime() + second * 1000;
+		long time = studyEnd.getTime() + second * 1000;
 		return new Date(time);
 	}
-	
+
 }

@@ -150,18 +150,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Autowired
     private BaiduSpeak baiduSpeak;
 
-    @Autowired
-    private StudentInfoService studentInfoService;
-
-    @Autowired
-    private CapacityWriteMapper capacityWriteMapper;
-
-    @Autowired
-    private CapacityMemoryMapper capacityMemoryMapper;
-
-    @Autowired
-    private CapacityListenMapper capacityListenMapper;
-
     /**
      * 游戏测试题目获取，获取20个单词供测试
      *
@@ -320,10 +308,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         // 封装各组信息
         ServerResponse<Map<String, Object>> resultMap = packageStrengthVo(student, rightVocabularies, map, size,
                 errorSize, errorVocabularies);
-        if (resultMap != null) {
-            return resultMap;
-        }
-        return null;
+        return resultMap;
     }
 
     @Override
@@ -800,111 +785,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         return goldCount;
     }
 
-    /**
-     * <p>
-     * 游戏测试： 时根据学生最高分来判断学生下一步是进入“预科班课程”学习还是进行“等级测试”
-     * 如游戏最高分低于NINETY_POINT分，系统强制推送本学生所在学段‘预科班课程’；如游戏最高分高于NINETY_POINT分，进入‘等级测试’
-     * </p>
-     * 等级测试：
-     * </p>
-     * 当测试成绩在80-NINETY_POINT分，系统强制学习‘七年级课程’，可在‘我的课程’中查看七年级课程并学习。成绩反馈结果提示为‘本课程就是为你量身而做，快去学习吧。’。（初中高中各奖励1个金币）
-     * <p>
-     * 当成绩>=NINETY_POINT分，系统强制学习七年级课程，可在‘我的课程’中查看七年级课程并学习。成绩反馈结果提示为‘哎呦~，不错哦，推荐你做一下’‘五维测试’。（小学初中高中各奖励1个金币）
-     * </p>
-     *
-     * @param point   游戏测试最高分数
-     * @param student 学生信息
-     * @param genre   测试类型 学前摸底测试，学前游戏测试
-     */
-    private String pushCourse(Integer point, Student student, String genre) {
-        String phase = commonMethod.getPhase(student.getGrade());
-        if ("学前游戏测试".equals(genre)) {
-            if (point < PASS) {
-                // 推送当前学段的 预科班教程
-                this.initReadyCourse(student);
-                // 初始化学生的课程、单元信息
-                commonMethod.initUnit(student);
-                return "高中".equals(phase) ? "根据游戏成绩反馈，系统已推送‘高中预科库’可供您学习，快去学习吧"
-                        : "根据游戏成绩反馈，系统已推送‘初中预科库’可供您学习，快去学习吧";
-            }
-        } else if ("学前摸底测试".contentEquals(genre)) {
-            if (point < PASS) {
-                // 推送当前学段的 预科班教程
-                this.initReadyCourse(student);
-                // 初始化学生的课程、单元信息
-                commonMethod.initUnit(student);
-                return "根据你的情况，下面我们来开始学习吧。";
-            } else if (point < NINETY_POINT) {
-                // 根据学段推送低年级课程，初中推送七年级课程，高中推送高一课程
-                this.initLowerCourse(student);
-                return "本课程就是为你量身而做，快去学习吧！";
-            } else {
-                // 根据学段推送低年级课程，初中推送七年级课程，高中推送高一课程
-                this.initLowerCourse(student);
-                // 初始化学生的课程、单元信息
-                commonMethod.initUnit(student);
-                return "不要让小事遮住视线，我们还有更大的世界！";
-            }
-        }
-        return null;
-    }
-
-    /**
-     * 根据学段推送低年级课程，初中推送七年级课程，高中推送高一课程
-     *
-     * @param student
-     */
-    private void initLowerCourse(Student student) {
-        String phase = commonMethod.getPhase(student.getGrade());
-        String version = student.getVersion();
-        List<Course> courses;
-        Course course;
-        CourseExample courseExample = new CourseExample();
-        String errMsg = "";
-        if ("初中".equals(phase)) {
-            courseExample.createCriteria().andVersionEqualTo(version).andGradeEqualTo("七年级").andLabelEqualTo("上册");
-            errMsg = "没有找到 " + version + "-七年级-上册 的课程信息！";
-        } else if ("高中".equals(phase)) {
-            courseExample.createCriteria().andVersionEqualTo(version).andGradeEqualTo("高中").andLabelEqualTo("必修一");
-            errMsg = "没有找到 " + version + "-高中-必修一 的课程信息！";
-        }
-        courses = courseMapper.selectByExample(courseExample);
-        if (courses.size() > 0) {
-            course = courses.get(0);
-
-            UnitOneExample unitOneExample = new UnitOneExample();
-            unitOneExample.setOrderByClause("id asc");
-            unitOneExample.createCriteria().andCourseIdEqualTo(course.getId());
-            List<Unit> units = unitMapper.selectByExample(unitOneExample);
-
-            student.setCourseId(course.getId());
-            student.setCourseName(course.getCourseName());
-
-            if (units.size() > 0) {
-                Unit unit = units.get(0);
-                student.setUnitId(unit.getId());
-                student.setUnitName(unit.getUnitName());
-
-                studentMapper.updateByPrimaryKeySelective(student);
-
-            } else {
-                LOGGER.error("id为 {} 的课程下没有找到对应的单元信息！", course.getId());
-            }
-        } else {
-            LOGGER.error(errMsg);
-        }
-    }
-
-    /**
-     * 当游戏测试或者等级测试未通过时，为学生推送当前学段下的预科班课程
-     *
-     * @param student
-     */
-    private void initReadyCourse(Student student) {
-        // TODO:推送预科班课程
-        String phase = commonMethod.getPhase(student.getGrade());
-    }
-
     @Override
     public ServerResponse<Map<String, Object>> getLevelTest(HttpSession session) {
         Student student = getStudent(session);
@@ -924,7 +804,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         List<Vocabulary> vocabularies;
         // 根据当前学生所学学段去对应的单词预科库中查找对应的单词和释义
         String grade = student.getGrade();
-        String phase = commonMethod.getPhase(grade);
+        String phase = CommonMethod.getPhase(grade);
         String courseName;
 
         // todo:以下取题以后改为从预科库中获取
@@ -1566,7 +1446,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
     }
 
-
     /**
      * 保存金币变化日志信息
      *
@@ -1789,7 +1668,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Override
     public ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId, Integer type, Integer pageNum) {
         Student student = getStudent(session);
-        student = studentMapper.selectByPrimaryKey(student.getId());
         if (session.getAttribute(TimeConstant.BEGIN_START_TIME) == null) {
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         }
@@ -1868,14 +1746,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         mapPageInfo.setPages(testRecordPageInfo.getPages());
         mapPageInfo.setPageNum(testRecordPageInfo.getPageNum());
         return ServerResponse.createBySuccess(mapPageInfo);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<String> pushGameCourse(HttpSession session, Integer point) {
-        Student student = getStudent(session);
-        String courseName = this.pushCourse(point, student, "学前游戏测试");
-        return ServerResponse.createBySuccess(courseName);
     }
 
     /**

@@ -50,7 +50,7 @@ public class GrowReportServiceImpl implements GrowReportService {
     @Override
     public ServerResponse<ReportVO> getLearnResult(HttpSession session) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        String phase = commonMethod.getPhase(student.getGrade());
+        String phase = CommonMethod.getPhase(student.getGrade());
         ReportVO reportVO = new ReportVO();
 
         // 学习成果

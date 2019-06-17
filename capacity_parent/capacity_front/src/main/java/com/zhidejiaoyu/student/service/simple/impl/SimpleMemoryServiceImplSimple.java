@@ -6,8 +6,8 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
-import com.zhidejiaoyu.common.study.simple.SimpleMemoryDifficultyUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleLearnTimeUtil;
 import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
@@ -49,7 +49,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
     private SimpleLearnMapper learnMapper;
 
     @Autowired
-    private SimpleMemoryDifficultyUtil simpleMemoryDifficultyUtil;
+    private MemoryDifficultyUtil memoryDifficultyUtil;
 
     @Autowired
     private SimpleBaiduSpeak simpleBaiduSpeak;
@@ -219,7 +219,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
         simpleCapacity.setUnitId(simpleCapacityVo.getUnit_id());
         simpleCapacity.setFaultTime(simpleCapacityVo.getFault_time());
         simpleCapacity.setMemoryStrength(simpleCapacityVo.getMemory_strength());
-        int hard = simpleMemoryDifficultyUtil.getMemoryDifficulty(simpleCapacity, type);
+        int hard = memoryDifficultyUtil.getMemoryDifficulty(simpleCapacity, type);
         simpleCapacityVo.setMemoryDifficulty(hard);
 
         simpleCapacityVo.setEngine(PerceiveEngine.getPerceiveEngine(hard, simpleCapacityVo.getMemory_strength()));

@@ -1,15 +1,19 @@
 package com.zhidejiaoyu.common.study;
 
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.pojo.Learn;
+import com.zhidejiaoyu.common.pojo.LearnExample;
+import com.zhidejiaoyu.common.pojo.SimpleCapacity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 学生用户使用过程中重复使用的功用方法
@@ -31,25 +35,6 @@ public class CommonMethod implements Serializable {
 
     @Autowired
     private LearnMapper learnMapper;
-
-    @Autowired
-    private CourseMapper courseMapper;
-
-    @Autowired
-    private UnitMapper unitMapper;
-
-    @Autowired
-    private StudentUnitMapper studentUnitMapper;
-
-    @Autowired
-    private StudentMapper studentMapper;
-
-    @Autowired
-    private StudentCourseMapper studentCourseMapper;
-
-    @Autowired
-    private CommonMethod commonMethod;
-
 
     /**
      * 判断学生是否是第一次学习指定的模块
@@ -86,7 +71,7 @@ public class CommonMethod implements Serializable {
      * @param grade 当前年级
      * @return 初中 高中
      */
-    public String getPhase(String grade) {
+    public static String getPhase(String grade) {
         String phase = null;
         switch (grade) {
             case "七年级":
@@ -107,112 +92,6 @@ public class CommonMethod implements Serializable {
     }
 
     /**
-     * 初始化学生与单元之间的关系 默认开启所有课程的第一单元供学生选择，其余单元需通过学习进行
-     *
-     * @param student
-     */
-    public void initUnit(Student student) {
-
-        // 判断学生是否已经推送过当前学段的课程
-        int count = studentUnitMapper.countUnitCountByStudentId(student, commonMethod.getPhase(student.getGrade()));
-        if (count > 0) {
-            // 当前学生已经推送过课程，不再重复推送
-            throw new RuntimeException("学生当前学段课程已经推送！不可重复推送！");
-        }
-
-        // 推送当前学段下所有课程
-        List<Course> courses = getCourses(student);
-
-        if (courses.size() > 0) {
-            // 初始化我的课程页面数据
-            initMyCourse(student, courses);
-            // 查找课程下的所有单元
-            List<Long> courseIds = new ArrayList<>();
-            for (Course course : courses) {
-                courseIds.add(course.getId());
-            }
-
-            UnitOneExample unitExample = new UnitOneExample();
-            unitExample.createCriteria().andCourseIdIn(courseIds).andDelstatusEqualTo(1);
-            unitExample.setOrderByClause("course_id asc,unit_name asc");
-            List<Unit> units = unitMapper.selectByExample(unitExample);
-
-            // 用于存放课程id，在下面循环中判断新map中是否包含当前单元所属的课程id
-            // 如果包含说明当前循环的单元不属于课程的第一单元，如果不包含说明当前单元属于课程的第一单元
-            Map<Long, Long> map = new HashMap<>(16);
-
-            if (units.size() > 0) {
-                List<StudentUnit> studentUnits = new ArrayList<>();
-                StudentUnit studentUnit;
-                for (Unit unit1 : units) {
-                    studentUnit = new StudentUnit();
-                    studentUnit.setCourseId(unit1.getCourseId());
-                    studentUnit.setUnitId(unit1.getId());
-                    studentUnit.setStudentId(student.getId());
-                    if (!map.containsKey(unit1.getCourseId())) {
-                        // 所有课程的第一单元默认开启
-                        map.put(unit1.getCourseId(), unit1.getCourseId());
-                        studentUnit.setWordStatus(1);
-                        studentUnit.setSentenceStatus(1);
-                    } else {
-                        studentUnit.setWordStatus(0);
-                        studentUnit.setSentenceStatus(0);
-                    }
-                    studentUnits.add(studentUnit);
-                }
-                studentUnitMapper.insertList(studentUnits);
-                Unit unit = units.get(0);
-
-                // 初始化单词和例句首次学习的课程和单元
-                Course course = courseMapper.selectByPrimaryKey(unit.getCourseId());
-                long courseId = course.getId();
-                long unitId = unit.getId();
-                String courseName = course.getCourseName();
-                student.setCourseName(courseName);
-                student.setCourseId(courseId);
-                student.setUnitId(unitId);
-                student.setSentenceCourseId(courseId);
-                student.setSentenceCourseName(courseName);
-                student.setSentenceUnitId((int) unitId);
-                studentMapper.updateByPrimaryKeySelective(student);
-            }
-        }
-    }
-
-    /**
-     * 获取当前学生可学习的所有课程
-     *
-     * @param student
-     * @return
-     */
-    public List<Course> getCourses(Student student) {
-        String version = student.getVersion();
-        String grade = student.getGrade();
-
-        CourseExample courseExample = new CourseExample();
-        courseExample.createCriteria().andVersionEqualTo(version).andGradeLike(grade.contains("年级") ? "%年级" : "高%")
-                .andStatusEqualTo(1);
-        courseExample.setOrderByClause("id asc");
-        return courseMapper.selectByExample(courseExample);
-    }
-
-    private void initMyCourse(Student student, List<Course> courses) {
-        Course course = courses.get(0);
-        // 初始化单词模块
-        StudentCourse studentCourse = new StudentCourse();
-        studentCourse.setCourseId(course.getId());
-        studentCourse.setCourseName(course.getCourseName());
-        studentCourse.setStudentId(student.getId());
-        studentCourse.setUpdateTime(DateUtil.formatYYYYMMDDHHMMSS(new Date()));
-        studentCourse.setType(1);
-        studentCourseMapper.insertSelective(studentCourse);
-
-        // 初始化例句模块
-        studentCourse.setType(2);
-        studentCourseMapper.insertSelective(studentCourse);
-    }
-
-    /**
      * 计算记忆追踪中字体大小等级
      *
      * @param object
@@ -220,9 +99,18 @@ public class CommonMethod implements Serializable {
      */
     public int getFontSize(Object object) {
         try {
-            double memoryStrength = (Double) memoryDifficultyUtil.getFieldValue(object, object.getClass().getField("memoryStrength"));
-            Date push = (Date) memoryDifficultyUtil.getFieldValue(object, object.getClass().getField("push"));
-            if (push == null) {
+            double memoryStrength;
+            Date push;
+            if (object instanceof SimpleCapacity) {
+                SimpleCapacity simpleCapacity = (SimpleCapacity) object;
+                memoryStrength = simpleCapacity.getMemoryStrength();
+                push = simpleCapacity.getPush();
+            } else {
+                memoryStrength = (Double) memoryDifficultyUtil.getFieldValue(object, object.getClass().getField("memoryStrength"));
+                push = (Date) memoryDifficultyUtil.getFieldValue(object, object.getClass().getField("push"));
+            }
+
+           if (push == null) {
                 return 0;
             }
             double timeLag = this.timeLag(push);
@@ -249,8 +137,8 @@ public class CommonMethod implements Serializable {
             } else if ((memoryStrength >= 0.9 && memoryStrength < 1) || timeLag > 1) {
                 return 1;
             }
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.warn("获取字体大小出错！", e);
         }
         return 0;
     }

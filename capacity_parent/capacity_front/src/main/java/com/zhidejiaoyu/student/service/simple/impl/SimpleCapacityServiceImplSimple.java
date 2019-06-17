@@ -11,7 +11,7 @@ import com.zhidejiaoyu.common.pojo.CapacityMemory;
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.SimpleCapacity;
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
+import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.excelUtil.SimpleExcelUtil;
@@ -37,7 +37,7 @@ import java.util.*;
 public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<SimpleSimpleCapacityMapper, SimpleCapacity> implements SimpleCapacityServiceSimple {
 
     @Autowired
-    private SimpleCommonMethod simpleCommonMethod;
+    private CommonMethod commonMethod;
 
     @Autowired
     private SimpleBaiduSpeak simpleBaiduSpeak;
@@ -92,7 +92,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
 
     private void packageWordInfo(List<CapacityDigestVo.WordInfo> wordInfos, SimpleCapacity simpleCapacity) {
         CapacityDigestVo.WordInfo wordInfo = new CapacityDigestVo.WordInfo();
-        int fontNum = simpleCommonMethod.getFontSize(simpleCapacity);
+        int fontNum = commonMethod.getFontSize(simpleCapacity);
         CapacityFontUtil capacityFontUtil = new CapacityFontUtil(fontNum);
         wordInfo.setContent(simpleCapacity.getWord());
         wordInfo.setUnitId(simpleCapacity.getUnitId());
@@ -157,7 +157,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     public void downloadCapacity(HttpSession session, HttpServletResponse response, Integer type, Long courseId,
                                  Integer pageNum, Integer pageSize) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        String typeStr = simpleCommonMethod.getTestType(type);
+        String typeStr = commonMethod.getTestType(type);
 
         String fileName = simpleCourseMapper.selectCourseName(Integer.parseInt(courseId.toString()));
 
