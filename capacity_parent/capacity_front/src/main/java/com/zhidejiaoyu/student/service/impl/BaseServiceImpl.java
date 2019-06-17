@@ -86,7 +86,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
      * @param session
      * @return
      */
-    Integer getTodayOnlineTime(HttpSession session) {
+    protected Integer getTodayOnlineTime(HttpSession session) {
         String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
         return this.getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
     }
@@ -96,7 +96,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         Student student = getStudent(session);
         double gold = student.getSystemGold() + student.getOfflineGold();
         List<Map<String, Object>> levels = redisOpt.getAllLevel();
-        int level = getLevel((int) gold, levels);
+        int level = this.getLevels((int) gold, levels);
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
         if(studentExpansion != null && studentExpansion.getLevel()<level){
             Integer oldStudy =0;
@@ -117,7 +117,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
      * @param studentId
      * @return
      */
-    Integer getTodayValidTime(Long studentId) {
+    protected Integer getTodayValidTime(Long studentId) {
         String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
         return this.getValidTime(studentId, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
     }
@@ -135,8 +135,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
         if (studentExpansion == null) {
             List<Map<String, Object>> levels = redisOpt.getAllLevel();
-            Double gold = student.getSystemGold() + student.getOfflineGold();
-            int level = getLevel(gold.intValue(), levels);
+            double gold = student.getSystemGold() + student.getOfflineGold();
+            int level = this.getLevels((int) gold, levels);
             Integer study = levelMapper.getStudyById(level);
             studentExpansion = new StudentExpansion();
             studentExpansion.setStudentId(student.getId());
@@ -193,8 +193,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         return addEnergy;
     }
 
-
-    private int getLevel(Integer myGold, List<Map<String, Object>> levels) {
+    protected int getLevels(Integer myGold, List<Map<String, Object>> levels) {
         int level = 0;
         if (myGold >= 50) {
             int myrecord = 0;
@@ -203,9 +202,9 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
                 // 循环的当前等级分数
                 int levelGold = (int) levels.get(i).get("gold");
                 // 下一等级分数
-                int xlevelGold = (int) levels.get((i + 1) < levels.size() ? (i + 1) : i).get("gold");
+                int xLevelGold = (int) levels.get((i + 1) < levels.size() ? (i + 1) : i).get("gold");
 
-                if (myGold >= myrecord && myGold < xlevelGold) {
+                if (myGold >= myrecord && myGold < xLevelGold) {
                     level = i + 1;
                     break;
                     // 等级循环完还没有确定等级 = 最高等级
@@ -216,10 +215,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
                 myrecord = levelGold;
                 myauto++;
             }
-            myrecord = 0;
-            myauto = 0;
-        }else{
-            level=1;
+        } else {
+            level = 1;
         }
         return level;
     }
