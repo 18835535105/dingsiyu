@@ -1323,7 +1323,7 @@
     <select id="selLaterSentence" parameterType="java.util.Map" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from learn where student_id=#{studentId} and type=1 and unit_id=#{unitId} and study_model='例句默写' order by id
+        from learn where student_id=#{studentId} and unit_id=#{unitId} and study_model='例句默写' order by id
         desc limit 1;
     </select>
     <select id="countByStudentIdAndStudyModel" resultType="integer" parameterType="map">
