@@ -188,7 +188,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
             int countryDayRank;
             if (rankList == null) {
                 schoolDayRank = studentMapper.countHasLoginLogStudentsBySchoolAdminId(schoolAdminId);
-                countryDayRank = studentMapper.selectCount(new EntityWrapper<Student>().isNotNull("account_time"));
+                countryDayRank = studentMapper.selectCount(new EntityWrapper<Student>().isNotNull("account_time").in("role", new Object[]{1, 2}).ne("status", 3));
             } else {
                 schoolDayRank = rankList.getSchoolDayRank() == null ? 0 : rankList.getSchoolDayRank();
                 countryDayRank = rankList.getCountryDayRank() == null ? 0 : rankList.getCountryDayRank();

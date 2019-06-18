@@ -200,15 +200,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 封装时长信息
         this.getIndexTime(session, student, result);
 
-        //-- 1.学生当前单词模块学的那个单元
-        Integer unitId = null;
-        if (student.getUnitId() != null) {
-            unitId = Integer.valueOf(capacityStudentUnit.getUnitId().toString());
-        }
-
-        if (unitId == null) {
-            return ServerResponse.createBySuccess(result);
-        }
+        // 1.学生当前单词模块学的那个单元
+        Integer unitId = Integer.valueOf(capacityStudentUnit.getUnitId().toString());
 
         // 封装各个学习模块的学习状况信息
         this.packageModelInfo(studentId, result, unitId);
@@ -445,7 +438,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     public ServerResponse<Object> sentenceIndex(HttpSession session) {
 
         Student student = super.getStudent(session);
-        Long studentId = student.getId();
 
         // 封装返回数据
         Map<String, Object> result = new HashMap<>(16);
@@ -453,16 +445,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         // 学生id
         result.put("student_id", student.getId());
-        // 当前例句所学课程id
-        result.put("course_id", student.getSentenceCourseId());
-        // 当前例句所学课程名
-        result.put("course_name", student.getSentenceCourseName());
-        // 当前例句所学单元id
-        result.put("unit_id", student.getSentenceUnitId());
-        // 当前例句所学单元名
-        // result.put("unit_name", stu.getSentenceUnitName());
-        // 根据单元id查询单元名
-        result.put("unit_name", sentenceUnitMapper.getUnitNameByUnitId(student.getSentenceUnitId().longValue()));
         // 账号
         result.put("account", student.getAccount());
         // 姓名
@@ -472,95 +454,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         result.put("schoolName", student.getSchoolName());
 
         this.getIndexTime(session, student, result);
-
-        // i参数 1=慧记忆，2=慧听写，3=慧默写，4=例句听力，5=例句翻译，6=例句默写
-        //-- 1.查询学生当前单词模块学的那个单元
-        Integer unitId = student.getSentenceUnitId();
-
-        // 一共有多少例句/.
-        Long countWord = unitSentenceMapper.selectSentenceCountByUnitId((long) unitId);
-
-        for (int i = 4; i < 7; i++) {
-            Map<String, Object> a = new HashMap<String, Object>();
-            //-- 如果 2 = NULL 就跳过4步执行5步   condition = 3(方框为空)
-            //-- 如果 2 != NULL 执行4步跳过第5步 , 如果第2步>=80 condition = 1(方框为√), 如果第3步<80 condition = 2(方框为×)
-
-            if (unitId == null) {
-                return ServerResponse.createBySuccess(result);
-            }
-
-            //-- 2.某学生某单元某模块得了多少分
-            //select point from test_record where student_id = #{} and unit_id = #{} and genre = '单元闯关测试' and study_model = '慧记忆'
-            Integer point = testRecordMapper.selectPoint(studentId, unitId, "单元闯关测试", i);
-
-            //-- 3.某学生某单元某模块单词学了多少 ./
-            //select COUNT(id) from learn where student_id = #{} and unit_id = #{} and study_model = '慧记忆' GROUP BY vocabulary_id
-            Integer sum = learnMapper.selectNumberByStudentId(studentId, unitId, i);
-
-            if (point != null && sum != null) {
-                //-- 4.某学生某单元某模块学习速度;  单词已学个数/(有效时长m/3600)
-                //select SUM(valid_time) from duration where unit_id = 1 and student_id = 1 and study_model = '慧记忆'
-                Integer sumValid = durationMapper.valid_timeIndex(studentId, unitId, i);
-
-                Integer speed = sumValid == null ? 0 : (int) (BigDecimalUtil.div(sum, sumValid)*3600);
-                // 分数
-                a.put("point", point + "");
-                // 速度
-                a.put("speed", speed + "");
-                // 方框状态
-                if (point >= 80) {
-                    a.put("condition", 1);
-                } else {
-                    a.put("condition", 2);
-                }
-                a.put("sum", "");
-                a.put("countWord", "");
-            } else {
-                a.put("sum", sum + "");
-                a.put("countWord", countWord + "");
-                // 方框状态
-                a.put("condition", 3);
-                // 分数
-                a.put("point", "");
-                // 计算学习速度
-                Integer sumValid = durationMapper.valid_timeIndex(studentId, unitId, i);
-                Integer speed = (int) (BigDecimalUtil.div(sum, sumValid == null ? 0 : sumValid) * 3600);
-                // 速度
-                a.put("speed", speed);
-            }
-
-            result.put(i + "", a);
-        }
-
-        // 封装返回的数据 - 智能记忆智能复习数量
-        // 当前时间
-        SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String datetime = s.format(new Date());
-
-        CapacityReview cr = new CapacityReview();
-        cr.setUnit_id(Long.valueOf(unitId));
-        cr.setStudent_id(studentId);
-        cr.setPush(datetime);
-        // 听力模块许复习量
-        cr.setClassify("4");
-        Integer d = capacityMapper.countCapacity_memory(cr);
-        // 翻译模块许复习量
-        cr.setClassify("5");
-        Integer e = capacityMapper.countCapacity_memory(cr);
-        // 默写模块许复习量
-        cr.setClassify("6");
-        Integer f = capacityMapper.countCapacity_memory(cr);
-        result.put("amount4", d);
-        result.put("amount5", e);
-        result.put("amount6", f);
-        // 是否需要隐藏学习模块
-        if (d >= 10 || e >= 10 || f >= 10) {
-            result.put("hide", true);
-            //宠物图片
-            // result.put("partWGUrl", "../../static/img/edit-user-msg/tips1-6.png");
-        } else {
-            result.put("hide", false);
-        }
 
         return ServerResponse.createBySuccess(result);
     }
@@ -582,20 +475,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
         result.put("online", online);
         result.put("valid", valid);
-    }
-
-    /**
-     * 从session中获取学生id(本类方法)
-     *
-     * @param session
-     * @return
-     */
-    @SuppressWarnings("unused")
-    private long StudentIdBySession(HttpSession session) {
-        // 获取当前学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        return student.getId();
-        //return 3155;
     }
 
     @Override
