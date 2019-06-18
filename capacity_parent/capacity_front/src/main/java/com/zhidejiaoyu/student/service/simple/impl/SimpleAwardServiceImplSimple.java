@@ -265,7 +265,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 if (ranking.getGoldClassRank() == null) {
                     ranking.setGoldClassRank(classRank);
                     simpleRankingMapper.updateById(ranking);
-                    map.put("goldClassRank", 100);
+                    map.put("goldClassRank", 0);
                     map.put("isClass", false);
                 } else {
                     classRank = ranking.getGoldClassRank() - classRank;
@@ -292,7 +292,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 if (ranking.getGoldSchoolRank() == null) {
                     ranking.setGoldSchoolRank(schoolRank);
                     simpleRankingMapper.updateById(ranking);
-                    map.put("goldSchoolRank", 100);
+                    map.put("goldSchoolRank", 0);
                     map.put("isSchool", false);
                 } else {
                     schoolRank = ranking.getGoldSchoolRank() - schoolRank;
@@ -319,7 +319,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 if (ranking.getGoldCountryRank() == null) {
                     ranking.setGoldCountryRank(countryRank);
                     simpleRankingMapper.updateById(ranking);
-                    map.put("goldCountryRank", 100);
+                    map.put("goldCountryRank", 0);
                     map.put("isCountry", false);
                 } else {
                     countryRank = ranking.getGoldCountryRank() - countryRank;
@@ -449,7 +449,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 } else {
                     ranking.setWorshipClassRank(worshipClassRank);
                     simpleRankingMapper.updateById(ranking);
-                    map.put("worshipClassRank", 100);
+                    map.put("worshipClassRank", 0);
                 }
             } else {
                 map.put("worshipClassRank", 0);
@@ -461,7 +461,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 } else {
                     ranking.setWorshipClassRank(worshipSchoolRank);
                     simpleRankingMapper.updateById(ranking);
-                    map.put("worshipSchoolRank", 100);
+                    map.put("worshipSchoolRank", 0);
 
                 }
             } else {
@@ -473,7 +473,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 } else {
                     ranking.setWorshipClassRank(worshipCountryRank);
                     simpleRankingMapper.updateById(ranking);
-                    map.put("worshipCountryRank", 100);
+                    map.put("worshipCountryRank", 0);
                 }
             } else {
                 map.put("worshipCountryRank", 0);
