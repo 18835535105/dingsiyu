@@ -102,4 +102,12 @@ public interface RunLogMapper extends BaseMapper<RunLog> {
 
     @MapKey("id")
     Map<Long,Map<String,Long>> getMapKeyStudentrunLog();
+
+    /**
+     * 查询学生最后一条登录/退出日志
+     *
+     * @param operateUserId
+     * @return
+     */
+    RunLog selectLastRunLogByOperateUserId(@Param("operateUserId") Long operateUserId);
 }

@@ -341,12 +341,4 @@
         </where>
     </select>
 
-    <select id="countOnlineTimeWithLoginTime" resultType="java.lang.Integer" parameterType="map">
-        select count(id)
-        from duration
-        where student_id = #{student.id}
-          and login_time = #{loginTime}
-          and online_time &lt;> 0
-    </select>
-
 </mapper>

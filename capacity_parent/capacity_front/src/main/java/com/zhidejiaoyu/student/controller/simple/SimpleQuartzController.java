@@ -45,4 +45,9 @@ public class SimpleQuartzController {
        simpleQuartzService.updateStudentExpansion();
     }
 
+    @GetMapping("/deleteSessionMap")
+    public void deleteSessionMap() {
+        simpleQuartzService.deleteSessionMap();
+    }
+
 }

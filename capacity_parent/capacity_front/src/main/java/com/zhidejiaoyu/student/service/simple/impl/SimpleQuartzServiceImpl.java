@@ -643,9 +643,9 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
         log.info("定时清除 sessionMap 完成");
 
         log.info("定时清理在线人数开始");
-        Set<Object> members = redisTemplate.opsForSet().members(RedisKeysConst.ONLINE_USER);
+        Set<Object> members = redisTemplate.opsForZSet().range(RedisKeysConst.ZSET_ONLINE_USER, 0 , -1);
         if (members != null) {
-            members.forEach(obj -> redisTemplate.opsForSet().remove(RedisKeysConst.ONLINE_USER, obj));
+            members.forEach(o -> redisTemplate.opsForZSet().remove(RedisKeysConst.ZSET_ONLINE_USER, o));
         }
         log.info("定时清理在线人数完成");
     }

@@ -62,7 +62,7 @@ public class LoginController {
 
     @GetMapping("/getOnlineUserCount")
     public ServerResponse getOnlineUserCount() {
-        Long size = redisTemplate.opsForSet().size(RedisKeysConst.ONLINE_USER);
+        Long size = redisTemplate.opsForZSet().size(RedisKeysConst.ZSET_ONLINE_USER);
         return ServerResponse.createBySuccess(size);
     }
 

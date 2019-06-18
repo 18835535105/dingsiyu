@@ -2,11 +2,11 @@ package com.zhidejiaoyu.student.listener;
 
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
-import com.zhidejiaoyu.common.mapper.simple.SimpleRunLogMapper;
+import com.zhidejiaoyu.common.mapper.RunLogMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.student.config.ServiceInfoUtil;
+import com.zhidejiaoyu.student.service.LoginService;
 import com.zhidejiaoyu.student.service.impl.LoginServiceImpl;
-import com.zhidejiaoyu.student.service.simple.impl.SimpleLoginServiceImplSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,10 +33,10 @@ public class SessionListener implements HttpSessionListener {
     private String port;
 
     @Autowired
-    private SimpleLoginServiceImplSimple loginService;
+    private LoginService loginService;
 
     @Autowired
-    private SimpleRunLogMapper runLogMapper;
+    private RunLogMapper runLogMapper;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -67,6 +67,9 @@ public class SessionListener implements HttpSessionListener {
             Object object = redisTemplate.opsForHash().get(RedisKeysConst.SESSION_MAP, session.getId());
             if (object != null) {
                 sessionMap = (Map<String, Object>) object;
+                Student student = (Student) sessionMap.get(UserConstant.CURRENT_STUDENT);
+                // 学生 session 失效时将该学生从在线人数中移除
+                redisTemplate.opsForZSet().remove(RedisKeysConst.ZSET_ONLINE_USER, student.getId());
             }
             loginService.saveDurationInfo(sessionMap);
         }
@@ -80,7 +83,7 @@ public class SessionListener implements HttpSessionListener {
     private void saveLogoutInfo(HttpSession session) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         if (student != null) {
-            SimpleLoginServiceImplSimple.saveLogoutLog(student, runLogMapper, log);
+            LoginServiceImpl.saveLogoutLog(student, runLogMapper, log);
         }
     }
 }

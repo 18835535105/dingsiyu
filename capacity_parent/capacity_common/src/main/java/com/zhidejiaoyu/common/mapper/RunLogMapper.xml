@@ -281,6 +281,11 @@
     <select id="getMapKeyStudentrunLog" resultType="java.util.Map">
         select operate_user_id as id, COUNT(*) as count  from run_log where type = 7 GROUP BY operate_user_id
     </select>
+    <select id="selectLastRunLogByOperateUserId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from run_log where operate_user_id = #{operateUserId} and type = 1 order by id desc limit 1
+    </select>
     <update id="updateByExampleSelective" parameterType="map" >
         update run_log
         <set >

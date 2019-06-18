@@ -1,34 +1,28 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
-import com.zhidejiaoyu.common.MacIpUtil;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
-import com.zhidejiaoyu.common.award.DailyAwardAsync;
 import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
-import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
-import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.simple.*;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.pojo.Award;
+import com.zhidejiaoyu.common.pojo.CapacityReview;
+import com.zhidejiaoyu.common.pojo.RunLog;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.SimpleValidateCode;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleLearnTimeUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.simple.SimpleLoginServiceSimple;
-import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -72,16 +66,10 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     private SimpleAwardMapper simpleAwardMapper;
 
     @Autowired
-    private DailyAwardAsync awardAsync;
-
-    @Autowired
     private SimpleCapacityReviewMapper capacityMapper;
 
     @Autowired
     private SimpleUnitMapper unitMapper;
-
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
     private SimpleSimpleStudentUnitMapper simpleSimpleStudentUnitMapper;
@@ -96,24 +84,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     private GoldAwardAsync goldAwardAsync;
 
     @Autowired
-    private DailyAwardAsync dailyAwardAsync;
-
-    @Autowired
     private MedalAwardAsync medalAwardAsync;
-
-    @Override
-    public Student LoginJudge(String account, String password) {
-        Student st = new Student();
-        st.setAccount(account);
-        st.setPassword(password);
-        return simpleStudentMapper.LoginJudge(st);
-    }
-
-
-    @Override
-    public Integer judgeUser(Long id) {
-        return simpleStudentMapper.judgeUser(id);
-    }
 
     @Override
     @GoldChangeAnnotation
@@ -150,7 +121,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     @Override
     public ServerResponse<Object> index(HttpSession session) {
         // 学生id
-        Long studentId = StudentIdBySession(session);
+        Long studentId = super.getStudentId(session);
 
         // 封装返回数据
         Map<String, Object> result = new HashMap<>(16);
@@ -434,19 +405,6 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         return ServerResponse.createBySuccess(result);
     }
 
-    @Override
-    public Integer validTime(HttpSession session) {
-        long student_id = StudentIdBySession(session);
-        return simpleDurationMapper.selectValid_time(student_id, SimpleDateUtil.formatYYYYMMDD(new Date()) + " 00:00:00", SimpleDateUtil.formatYYYYMMDD(new Date()) + " 24:00:00");
-    }
-
-    @Override
-    public Integer onlineTime(HttpSession session) {
-        long student_id = StudentIdBySession(session);
-        return simpleDurationMapper.selectOnline_time(student_id, SimpleDateUtil.formatYYYYMMDD(new Date()) + " 00:00:00", SimpleDateUtil.formatYYYYMMDD(new Date()) + " 24:00:00");
-    }
-
-
     /**
      * 从session中获取学生id(本类方法)
      *
@@ -461,11 +419,6 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         //return 3155;
     }
 
-    @Override
-    public Integer judgePreschoolTest(Long id) {
-        return simpleTestRecordMapper.judgePreschoolTest(id);
-    }
-
     /**
      * 点击头像,需要展示的信息
      * <p>
@@ -477,8 +430,8 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     @Override
     public ServerResponse<Object> clickPortrait(HttpSession session) {
 
-        Map<String, Object> map = new HashMap<String, Object>();
-        long studentId = StudentIdBySession(session);
+        Map<String, Object> map = new HashMap<>(16);
+        long studentId = super.getStudentId(session);
         Student student = getStudent(session);
 
         // 获取今日已学单词
@@ -552,254 +505,9 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     }
 
     @Override
-    public ServerResponse loginJudge(String account, String password, HttpSession session, String code, HttpServletRequest request) {
-
-        // 封装返回数据
-        Map<String, Object> result = new HashMap<>(16);
-
-        Student stu = LoginJudge(account, password);
-
-        // 1.账号/密码错误
-        if (stu == null) {
-            return ServerResponse.createByErrorMessage("账号或密码输入错误");
-            // 2.账号已关闭
-        }else if(stu.getStatus() != null && stu.getStatus()==2) {
-        	return ServerResponse.createByErrorMessage("此账号已关闭");
-
-        } else if (stu.getStatus() != null && stu.getStatus() == 3) {
-            // 账号被删除
-            return ServerResponse.createByErrorMessage("此账号已被删除");
-            // 3.正确
-        } else {
-
-            // 将登录的学生放入指定 key 用于统计在线人数
-            redisTemplate.opsForSet().add(RedisKeysConst.ONLINE_USER, stu.getId());
-
-            // 学生首次登陆系统，初始化其账号有效期，勋章信息
-            initAccountTime(stu);
-
-            // 账号有效期
-            Date date = stu.getAccountTime();
-            // 当前时间
-            Date current = new Date();
-            // 2.此账号已失效
-            if (date == null || date.getTime() < current.getTime()) {
-                return ServerResponse.createByErrorMessage("此账号已失效");
-            }
-            // 3.账号即将过期，请及时续期
-            long difference = (date.getTime() - current.getTime()) / 86400000;
-            long l = Math.abs(difference);
-            if (l <= 1) {
-                result.put("accountDate", "账号即将过期，请及时续期");
-            }
-
-            // 学生id
-            result.put("student_id", stu.getId());
-            // 账号
-            result.put("account", stu.getAccount());
-            // 姓名
-            result.put("studentName", stu.getStudentName());
-            // 头像
-            result.put("headUrl", stu.getHeadUrl());
-
-            // 记录登录信息
-            saveLoginRunLog(stu, request);
-
-            // 当日首次登陆奖励5金币（日奖励）
-            saveDailyAward(stu);
-
-            // 判断学生是否有同步版课程，没有同步版课程不能进入智能版学习
-            boolean hasCapacityCourse = this.hasCapacityCourse(stu);
-            if (hasCapacityCourse) {
-                result.put("capacity", true);
-            }
-
-            // 判断学生是否有同步版课程，没有同步版句子课程不能进入智能版学习
-            boolean hasCapacityCourseSentence=this.hasCapacitySentence(stu);
-            if(hasCapacityCourseSentence){
-                result.put("capacitySentence", true);
-            }
-
-            // 判断学生是否有同步版课程，没有同步版课文课程不能进入智能版学习
-            boolean hasCapacityTeks=this.hasCapacityTeks(stu);
-            if(hasCapacityTeks){
-                result.put("capacityTeks", true);
-            }
-            //判断学生是否有同步版阅读课程，没有同步版课文课程不能进入智能版学习
-            result.put("capacityRead",false);
-            //判断学生是否有同步版阅读课程，没有同步版课文课程不能进入智能版学习
-            result.put("capacityAxisMotif",false);
-
-            // 一个账户只能登陆一台
-            judgeMultipleLogin(session, stu);
-
-            // 2.判断是否需要完善个人信息
-            if (!StringUtils.isNotBlank(stu.getHeadUrl()) || StringUtils.isEmpty(stu.getPetName())) {
-
-                // 学校
-                result.put("school_name", stu.getSchoolName());
-                // 到期时间
-                result.put("account_time", stu.getAccountTime());
-
-                // 2.1 跳到完善个人信息页面
-                return ServerResponse.createBySuccess("2", result);
-            }
-
-            // 正常登陆
-            return ServerResponse.createBySuccess("1", result);
-        }
-    }
-
-    @Override
     public boolean hasCapacityCourse(Student student) {
         int count = simpleCapacityStudentUnitMapper.countByType(student, 1);
         return count > 0;
-    }
-
-    /**
-     * 判断学生是否可以学习同步班句型课程
-     *
-     * @param student
-     * @return
-     */
-    private boolean hasCapacitySentence(Student student) {
-        int count = simpleCapacityStudentUnitMapper.countByType(student, 2);
-        return count > 0;
-    }
-
-    /**
-     * 判断学生是否可以学习同步班课文课程
-     *
-     * @param student
-     * @return
-     */
-    private boolean hasCapacityTeks(Student student) {
-        int count = simpleCapacityStudentUnitMapper.countByType(student, 3);
-        return count > 0;
-    }
-
-    private void judgeMultipleLogin(HttpSession session, Student stu) {
-        Object object = redisTemplate.opsForHash().get(RedisKeysConst.LOGIN_SESSION, stu.getId());
-        if (object != null) {
-            Long oldStudentId = null;
-            Map<String, Object> oldSessionMap = RedisOpt.getSessionMap(object.toString());
-            if (oldSessionMap != null && oldSessionMap.get(UserConstant.CURRENT_STUDENT) != null) {
-                oldStudentId = ((Student) oldSessionMap.get(UserConstant.CURRENT_STUDENT)).getId();
-            }
-
-            // 如果账号 session 相同说明是同一个浏览器中，并且不是同一个账号，不再更改其 session 中登录信息
-            if (Objects.equals(oldStudentId, stu.getId()) && Objects.equals(object, session.getId())) {
-                return;
-            }
-            // 如果账号登录的session不同，保存前一个session的信息
-            if (oldSessionMap != null) {
-                saveDurationInfo(oldSessionMap);
-                saveLogoutLog(stu, runLogMapper, logger);
-            }
-        }
-
-        Date loginTime = SimpleDateUtil.parseYYYYMMDDHHMMSS(new Date());
-        session.setAttribute(UserConstant.CURRENT_STUDENT, stu);
-        session.setAttribute(TimeConstant.LOGIN_TIME, loginTime);
-
-        Map<String, Object> sessionMap = new HashMap<>(16);
-        sessionMap.put(UserConstant.CURRENT_STUDENT, stu);
-        sessionMap.put(TimeConstant.LOGIN_TIME, loginTime);
-        sessionMap.put("sessionId", session.getId());
-
-        redisTemplate.opsForHash().put(RedisKeysConst.SESSION_MAP, session.getId(), sessionMap);
-        redisTemplate.opsForHash().put(RedisKeysConst.LOGIN_SESSION, stu.getId(), session.getId());
-    }
-
-    public static void saveLogoutLog(Student student, SimpleRunLogMapper simpleRunLogMapper, Logger logger) {
-        // 查询学生登录日志中最后一条记录时登录信息还是退出信息
-        RunLog lastRunLog = simpleRunLogMapper.selectLastRunLogByOperateUserId(student.getId());
-        if (lastRunLog == null || !lastRunLog.getLogContent().contains("退出登录")) {
-            RunLog runLog = new RunLog(student.getId(), 1, "学生[" + student.getStudentName() + "]退出登录", new Date());
-            try {
-                simpleRunLogMapper.insert(runLog);
-            } catch (Exception e) {
-                logger.error("记录学生 [{}]->[{}] 退出登录信息失败！", student.getId(), student.getStudentName(), e);
-            }
-        }
-    }
-
-    /**
-     * 学生首次登陆系统初始化其账号有效期
-     *
-     * @param stu
-     */
-    private void initAccountTime(Student stu) {
-        Long stuId = stu.getId();
-        Integer count = runLogMapper.selectLoginCountByStudentId(stuId);
-        if (count == 0) {
-            stu.setAccountTime(new Date(System.currentTimeMillis() + stu.getRank() * 24 * 60 * 60 * 1000L));
-
-            // 初始化学生勋章信息
-            awardAsync.initAward(stu);
-        }
-    }
-
-    /**
-     * 学生当天首次登陆奖励5金币，并计入日奖励信息
-     *
-     * @param stu
-     */
-    private void saveDailyAward(Student stu) {
-        int count = runLogMapper.countStudentTodayLogin(stu);
-        if (count == 1) {
-            // 每日首次登陆奖励
-            dailyAwardAsync.firstLogin(stu);
-
-            // 如果昨天辉煌荣耀奖励没有更新，将指定的奖励当前进度置为0
-            medalAwardAsync.updateHonour(stu);
-        }
-    }
-
-    private void saveLoginRunLog(Student stu, HttpServletRequest request) {
-        String ip = null;
-        try {
-            ip = MacIpUtil.getIpAddr(request);
-        } catch (Exception e) {
-            logger.error("获取学生登录IP地址出错，error=[{}]", e.getMessage());
-        }
-
-        RunLog runLog = new RunLog(stu.getId(), 1, "学生[" + stu.getStudentName() + "]登录,ip=[" + ip + "]", new Date());
-        try {
-            runLogMapper.insert(runLog);
-        } catch (Exception e) {
-            logger.error("学生 {} -> {} 登录信息记录失败！ExceptionMsg:{}", stu.getId(), stu.getStudentName(), e.getMessage(), e);
-        }
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void saveDurationInfo(Map<String, Object> sessionMap) {
-        if (sessionMap != null) {
-            Student student = (Student) sessionMap.get(UserConstant.CURRENT_STUDENT);
-            Date loginTime = SimpleDateUtil.parseYYYYMMDDHHMMSS((Date) sessionMap.get(TimeConstant.LOGIN_TIME));
-            Date loginOutTime = SimpleDateUtil.parseYYYYMMDDHHMMSS(new Date());
-            //存放登入退出时间
-            redisTemplate.opsForHash().put(RedisKeysConst.STUDENT_LOGINOUT_TIME, student.getId(), DateUtil.DateTime(new Date()));
-            if (loginTime != null && loginOutTime != null) {
-                // 判断当前登录时间是否已经记录有在线时长信息，如果没有插入记录，如果有无操作
-                int count = simpleDurationMapper.countOnlineTimeWithLoginTime(student, loginTime);
-                if (count == 0) {
-                    // 学生 session 失效时将该学生从在线人数中移除
-                    redisTemplate.opsForSet().remove(RedisKeysConst.ONLINE_USER, student.getId());
-                    redisTemplate.opsForHash().delete(RedisKeysConst.LOGIN_SESSION, student.getId());
-
-                    Long onlineTime = (loginOutTime.getTime() - loginTime.getTime()) / 1000;
-                    Duration duration = new Duration();
-                    duration.setStudentId(student.getId());
-                    duration.setOnlineTime(onlineTime);
-                    duration.setLoginTime(loginTime);
-                    duration.setLoginOutTime(loginOutTime);
-                    duration.setValidTime(0L);
-                    simpleDurationMapper.insert(duration);
-                }
-            }
-        }
     }
 
     @Override
@@ -813,26 +521,6 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         vCode.write(response.getOutputStream());
         session.setAttribute("validateCode", vCode.getCode());
         vCode.write(response.getOutputStream());
-    }
-
-
-    @Test
-    public void add() {
-        int count = 0;
-        String regex = "#(.*)#";
-        Pattern pattern = Pattern.compile(regex);
-        List<String> list = new ArrayList<String>();
-        list.add("id为 3155 的学生在 2018-05-24 11:17:22 当日学习两个单元，奖励#20#枚金币");
-        list.add("id为 3155 的学生在 2018-05-24 11:17:22 当日学习两个单元，奖励#20#枚金币");
-        list.add("id为 3155 的学生在 2018-05-24 11:17:22 当日学习两个单元，奖励#2#枚金币");
-        for (String str : list) {
-            Matcher matcher = pattern.matcher(str);//匹配类
-            while (matcher.find()) {
-                count += Integer.parseInt(matcher.group(1));
-                //System.out.println(matcher.group(1));//打印中间字符
-            }
-        }
-        System.out.println(count);
     }
 
 }

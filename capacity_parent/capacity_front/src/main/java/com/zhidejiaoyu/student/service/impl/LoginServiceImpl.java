@@ -722,7 +722,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             Map<String, Object> result = new HashMap<>(16);
 
             // 将登录的学生放入指定 key 用于统计在线人数
-            redisTemplate.opsForSet().add(RedisKeysConst.ONLINE_USER, stu.getId());
+            redisTemplate.opsForZSet().add(RedisKeysConst.ZSET_ONLINE_USER, stu.getId(), 1);
 
             // 学生首次登陆系统，初始化其账号有效期，勋章信息
             initAccountTime(stu);
@@ -993,13 +993,16 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         return ip;
     }
 
-
     public static void saveLogoutLog(Student student, RunLogMapper runLogMapper, Logger logger) {
-        RunLog runLog = new RunLog(student.getId(), 1, "学生[" + student.getStudentName() + "]退出登录", new Date());
-        try {
-            runLogMapper.insert(runLog);
-        } catch (Exception e) {
-            logger.error("记录学生 [{}]->[{}] 退出登录信息失败！", student.getId(), student.getStudentName(), e);
+        // 查询学生登录日志中最后一条记录时登录信息还是退出信息
+        RunLog lastRunLog = runLogMapper.selectLastRunLogByOperateUserId(student.getId());
+        if (lastRunLog == null || !lastRunLog.getLogContent().contains("退出登录")) {
+            RunLog runLog = new RunLog(student.getId(), 1, "学生[" + student.getStudentName() + "]退出登录", new Date());
+            try {
+                runLogMapper.insert(runLog);
+            } catch (Exception e) {
+                logger.error("记录学生 [{}]->[{}] 退出登录信息失败！", student.getId(), student.getStudentName(), e);
+            }
         }
     }
 
@@ -1021,8 +1024,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 // 判断当前登录时间是否已经记录有在线时长信息，如果没有插入记录，如果有无操作
                 int count = durationMapper.countOnlineTimeWithLoginTime(student, loginTime);
                 if (count == 0) {
-                    // 学生 session 失效时将该学生从在线人数中移除
-                    redisTemplate.opsForSet().remove(RedisKeysConst.ONLINE_USER, student.getId());
                     redisTemplate.opsForHash().delete(RedisKeysConst.LOGIN_SESSION, student.getId());
 
                     Long onlineTime = (loginOutTime.getTime() - loginTime.getTime()) / 1000;

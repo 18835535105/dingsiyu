@@ -151,13 +151,4 @@ public interface SimpleDurationMapper extends BaseMapper<Duration> {
      */
     @Select("select sum(valid_time) from duration where to_days(now()) = to_days(login_time) and student_id = #{stuId} and study_model = #{model} and unit_id = #{unitId}")
     Long sumTodayModelValidTime(@Param("stuId") Long stuId, @Param("model") int model, @Param("unitId") Long unitId);
-
-    /**
-     * 查看学生当前登录记录的在线时长个数
-     *
-     * @param student
-     * @param loginTime
-     * @return
-     */
-    int countOnlineTimeWithLoginTime(@Param("student") Student student, @Param("loginTime") Date loginTime);
 }

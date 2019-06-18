@@ -62,7 +62,7 @@ public class RedisKeysConst {
     /**
      * 统计在线人数
      */
-    public static final String ONLINE_USER = "ONLINE_USER";
+    public static final String ZSET_ONLINE_USER = "ZSET_ONLINE_USER";
 
     /**
      * 用于存储学生时长信息及学生信息

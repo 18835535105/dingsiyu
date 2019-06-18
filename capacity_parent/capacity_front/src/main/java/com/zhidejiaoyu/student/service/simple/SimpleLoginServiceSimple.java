@@ -16,11 +16,6 @@ import java.util.Map;
  * @version 1.0
  */
 public interface SimpleLoginServiceSimple extends SimpleBaseService<Student> {
-
-    Student LoginJudge(String account, String password);
-
-    Integer judgeUser(Long id);
-
     /***
      * 修改密码
      *
@@ -33,44 +28,9 @@ public interface SimpleLoginServiceSimple extends SimpleBaseService<Student> {
 
     ServerResponse<Object> index(HttpSession session);
 
-    /**
-     * 获取有效时长
-     *
-     * @param session
-     * @return
-     */
-    Integer validTime(HttpSession session);
-
-    /**
-     * 获取在线时长
-     *
-     * @param session
-     * @return
-     */
-    Integer onlineTime(HttpSession session);
-
     ServerResponse<Object> sentenceIndex(HttpSession session);
 
-    Integer judgePreschoolTest(Long id);
-
     ServerResponse<Object> clickPortrait(HttpSession session);
-
-    /**
-     * 登录
-     *
-     * @param account
-     * @param password
-     * @param session
-     * @return
-     */
-    ServerResponse loginJudge(String account, String password, HttpSession session, String code, HttpServletRequest request);
-
-    /**
-     * session过期和系统重启时保存学生时长相关信息
-     *
-     * @param sessionMap
-     */
-    void saveDurationInfo(Map<String, Object> sessionMap);
 
     void getValidateCode(HttpSession session, HttpServletResponse response) throws IOException;
 

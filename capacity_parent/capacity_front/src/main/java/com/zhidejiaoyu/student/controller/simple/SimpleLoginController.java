@@ -35,26 +35,6 @@ public class SimpleLoginController {
     private SimpleLoginServiceSimple loginService;
 
     /**
-     * 登陆
-     *
-     * @param account  账号
-     * @param password 密码
-     * @param code 验证码
-     * @param session
-     * @return
-     */
-    @SuppressWarnings("all")
-    @RequestMapping(value = "/judge", method = RequestMethod.POST)
-    public ServerResponse loginJudge(HttpServletRequest request, String account, String password, HttpSession session, String code) {
-        if (StringUtils.isEmpty(account) || StringUtils.isEmpty(password)) {
-            return ServerResponse.createByErrorMessage("用户名和密码不能为空！");
-        }
-        account = account.trim();
-        password = password.trim();
-        return loginService.loginJudge(account, password, session, code, request);
-    }
-
-    /**
      * 首页数据 - 精简版首页
      *
      * @param session
