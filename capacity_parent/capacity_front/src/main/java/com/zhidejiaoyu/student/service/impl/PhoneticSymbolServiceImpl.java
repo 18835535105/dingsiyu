@@ -1,16 +1,15 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.study.phonetic.PhoneticSymbolListenVo;
 import com.zhidejiaoyu.common.Vo.study.phonetic.Topic;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.PhoneticSymbolService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,13 +43,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     @Autowired
     private RedisOpt redisOpt;
     @Autowired
-    private BaiduSpeak baiduSpeak;
-    @Autowired
     private TestRecordMapper testRecordMapper;
-    @Value("${ftp.prefix}")
-    private String url;
-    @Value("${ftp.prefix}")
-    private String prefix;
 
     @Override
     public Object getSymbolUnit(HttpSession session) {
@@ -152,10 +145,10 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                         map.put("method", returnSplit);
                     }
                     if (map.get("listen") == null || map.get("listen") == "") {
-                        map.put("listen", url + phonetic.getUrl());
+                        map.put("listen", GetOssFile.getUrl(phonetic.getUrl()));
                     }
                     if (map.get("partUrl") == null || map.get("partUrl") == "") {
-                        map.put("partUrl", url + phonetic.getPartUrl());
+                        map.put("partUrl", GetOssFile.getUrl(phonetic.getPartUrl()));
                     }
                 }
                 symbolMap.put("letter", phonetic.getLetter());
@@ -249,7 +242,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         vo.setPlan(learnCount);
         vo.setTotal(total);
         vo.setTopics(this.getTopics(phoneticSymbol));
-        vo.setAudioUrl(prefix + phoneticSymbol.getUrl());
+        vo.setAudioUrl(GetOssFile.getUrl(phoneticSymbol.getUrl()));
 
         return ServerResponse.createBySuccess(vo);
     }
@@ -339,7 +332,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         Map<String,Object> map=new HashMap<>();
         if (symbols != null && symbols.size() > 0) {
             for(Map<String,Object> symbol:symbols){
-                map.put(symbol.get("symbol").toString().replace(" ",""),url+symbol.get("url"));
+                map.put(symbol.get("symbol").toString().replace(" ",""),GetOssFile.getUrl(String.valueOf(symbol.get("url"))));
             }
         }
         return ServerResponse.createBySuccess(map);
@@ -403,7 +396,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     private void getTypeTwo(List<PhoneticSymbol> otherPhoneticSymbol, List<Map<String, Object>> resultList, List<PhoneticSymbol> val) {
         Map<String, Object> map = new HashMap<>(16);
         map.put("type", 2);
-        map.put("title", prefix + val.get(0).getUrl());
+        map.put("title", GetOssFile.getUrl(val.get(0).getUrl()));
 
         List<Map<String, Object>> list = new ArrayList<>(4);
         Map<String, Object> answerMap = new HashMap<>(16);
@@ -450,12 +443,12 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         Map<String, Object> answerMap;
         for (int i = 0; i < 3; i++) {
             answerMap = new HashMap<>(16);
-            answerMap.put("url", prefix + phoneticSymbolList.get(i));
+            answerMap.put("url", GetOssFile.getUrl(phoneticSymbolList.get(i)));
             answerMap.put("answer", false);
             list.add(answerMap);
         }
         answerMap = new HashMap<>(16);
-        answerMap.put("url", prefix + val.get(0).getUrl());
+        answerMap.put("url", GetOssFile.getUrl(val.get(0).getUrl()));
         answerMap.put("answer", true);
         list.add(answerMap);
         Collections.shuffle(list);

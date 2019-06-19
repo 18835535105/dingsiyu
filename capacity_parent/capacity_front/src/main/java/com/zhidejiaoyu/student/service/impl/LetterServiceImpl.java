@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
@@ -10,7 +11,6 @@ import com.zhidejiaoyu.student.service.LetterService;
 import com.zhidejiaoyu.student.service.StudentInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
@@ -55,10 +55,6 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     private MemoryStrengthUtil memoryStrengthUtil;
     @Autowired
     private StudentInfoService studentInfoService;
-
-
-    @Value("${ftp.prefix}")
-    private String partUrl;
 
     /**
      * 获取字母单元
@@ -445,7 +441,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 List<Letter> allLetter = letterMapper.getAllLetterByUnitId(letterUnit.getId());
                 List<Letter> returnLetter = new ArrayList<>();
                 allLetter.forEach(letter -> {
-                    letter.setGifUrl(partUrl + letter.getGifUrl());
+                    letter.setGifUrl(GetOssFile.getUrl(letter.getGifUrl()));
                     returnLetter.add(letter);
                 });
                 Map<String, Object> returnMap = new HashMap<>();
@@ -459,7 +455,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 for (Letter letter : allLetter) {
                     Map<String, Object> letterMap = new HashMap<>();
                     letterMap.put("title", letterUnit.getUnitName());
-                    letter.setGifUrl(partUrl + letter.getGifUrl());
+                    letter.setGifUrl(GetOssFile.getUrl(letter.getGifUrl()));
                     letterMap.put("letter", letter);
                     if (i == 0) {
                         letterMap.put("marge", true);

@@ -1,8 +1,8 @@
 package com.zhidejiaoyu.common.study;
 
+import aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -13,9 +13,6 @@ import java.util.*;
 @Slf4j
 @Component
 public class WordPictureUtil {
-
-    @Value("${ftp.prefix}")
-    private String prefix;
 
     /**
      * 分配题型‘看词选图’、‘听音选图’、‘看图选词’3:3:4  listSelect的长度要是list的三倍
@@ -48,9 +45,9 @@ public class WordPictureUtil {
                 m.put("type", "看图选词");
                 m.put("id", vo.getId());
                 m.put("chinese", vo.getWordChinese());
-                m.put("title", prefix + vo.getRecordpicurl());
+                m.put("title", GetOssFile.getUrl(vo.getRecordpicurl()));
                 m.put("word", vo.getWord());
-                m.put("recordpicurl", prefix + vo.getRecordpicurl());
+                m.put("recordpicurl", GetOssFile.getUrl(vo.getRecordpicurl()));
                 for (int i = 0; i < 4; i++) {
                     if(i==0){
                         t.put(vo.getWord(), true);

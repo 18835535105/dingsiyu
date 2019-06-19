@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.utils.simple.language;
 
+import aliyunoss.getObject.GetOssFile;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.zhidejiaoyu.common.mapper.simple.SimpleVocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
@@ -21,9 +22,6 @@ import java.util.Map;
 @Component
 @Slf4j
 public class SimpleBaiduSpeak {
-
-	@Value("${ftp.prefix}")
-	private String prefix;
 
 	@Value("${baidu}")
 	private String baidu;
@@ -60,7 +58,7 @@ public class SimpleBaiduSpeak {
 	public String getLanguagePath(String text) {
 		Vocabulary vocabulary = vocabularyMapper.selectByWord(text);
 		if (vocabulary != null && StringUtils.isNotEmpty(vocabulary.getReadUrl())) {
-			return prefix + vocabulary.getReadUrl();
+			return GetOssFile.getUrl(vocabulary.getReadUrl());
 		} else {
 			if (wordMap.containsKey(text)) {
 				return youdao + text + "&type=1";

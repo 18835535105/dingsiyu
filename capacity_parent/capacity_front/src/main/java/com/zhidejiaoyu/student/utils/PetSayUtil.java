@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.student.utils;
 
+import aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.FileConstant;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -14,13 +14,7 @@ import org.springframework.util.StringUtils;
 @Component
 public class PetSayUtil {
 
-
-    @Value("${ftp.prefix}")
-    private String ftpPrefix;
-
     private String[] petNames = {"李糖心", "威士顿", "大明白", "无名"};
-
-    private StringBuilder sb = new StringBuilder();
 
     /**
      * 拼接MP3路径
@@ -36,15 +30,12 @@ public class PetSayUtil {
     }
 
     private String appendMP3Url(String petName, int[] mp3Name) {
-        sb.setLength(0);
-        sb.append(ftpPrefix).append(FileConstant.PET_SAY_AUDIO);
         for (int i = 0; i < petNames.length; i++) {
             if (petNames[i].equals(petName)) {
-                sb.append(mp3Name[i]);
-                break;
+               return GetOssFile.getUrl(FileConstant.PET_SAY_AUDIO + mp3Name[i] + ".mp3");
             }
         }
-        return sb.append(".mp3").toString();
+        return null;
     }
 
     /**

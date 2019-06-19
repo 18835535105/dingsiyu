@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
+import aliyunoss.getObject.GetOssFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
@@ -55,9 +56,6 @@ import java.util.concurrent.ExecutorService;
 public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTestRecordMapper, TestRecord> implements SimpleTestServiceSimple {
 
     private static Logger LOGGER = LoggerFactory.getLogger(SimpleTestServiceImplSimple.class);
-
-    @Value("${ftp.prefix}")
-    private String prefix;
 
     /**
      * 50分
@@ -1373,7 +1371,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         }
 
         if (vocabulary.get("recordpicurl") != null && vocabulary.get("recordpicurl") != "") {
-            vocabulary.put("recordpicurl", prefix + vocabulary.get("recordpicurl"));
+            vocabulary.put("recordpicurl", GetOssFile.getUrl(String.valueOf(vocabulary.get("recordpicurl"))));
         } else {
             vocabulary.put("recordpicurl", "");
         }

@@ -55,9 +55,6 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
     @Autowired
     private UnitVocabularyMapper unitVocabularyMapper;
 
-    @Value("${ftp.prefix}")
-    private String ftpPrefix;
-
     /**
      * 获取单词图鉴学习数据
      *
@@ -102,8 +99,6 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
             // 记忆强度
             correct.put("memoryStrength", correct.get("memory_strength"));
         }
-        // 图片前缀
-        correct.put("ftpPrefix", ftpPrefix);
 
         // 记录学生开始学习的时间
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());

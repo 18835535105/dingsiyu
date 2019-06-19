@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.common.Vo.study.MemoryStudyVo;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
@@ -14,12 +16,10 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.common.SaveWordLearnAndCapacity;
 import com.zhidejiaoyu.student.service.MemoryService;
-import com.zhidejiaoyu.common.Vo.study.MemoryStudyVo;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,9 +34,6 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @Value("${ftp.prefix}")
-    private String prefix;
-
     @Autowired
     private CommonMethod commonMethod;
 
@@ -48,9 +45,6 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
 
     @Autowired
     private UnitMapper unitMapper;
-
-    @Autowired
-    private StudyCountMapper studyCountMapper;
 
     @Autowired
     private UnitVocabularyMapper unitVocabularyMapper;
@@ -66,9 +60,6 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
 
     @Autowired
     private StudentMapper studentMapper;
-
-    @Autowired
-    private CourseMapper courseMapper;
 
     @Autowired
     private BaiduSpeak baiduSpeak;
@@ -167,7 +158,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
             memoryStudyVo.setWordCount(wordCount);
             memoryStudyVo.setEngine(1);
             memoryStudyVo.setWordChineseList(this.getChinese(unitId, currentStudyWord.getId(), wordChinese));
-            memoryStudyVo.setImgUrl(prefix + currentStudyWord.getRecordpicurl());
+            memoryStudyVo.setImgUrl(GetOssFile.getUrl(currentStudyWord.getRecordpicurl()));
             return ServerResponse.createBySuccess(memoryStudyVo);
         }
         return null;
@@ -342,7 +333,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         memoryStudyVo.setReadUrl(baiduSpeak.getLanguagePath(capacityMemory.getWord()));
         memoryStudyVo.setEngine(PerceiveEngine.getPerceiveEngine(memoryDifficulty, memoryStrength));
         memoryStudyVo.setWordChineseList(this.getChinese(unitId, vocabularyId, wordChinese));
-        memoryStudyVo.setImgUrl(vocabulary == null ? "" : prefix + vocabulary.getRecordpicurl());
+        memoryStudyVo.setImgUrl(GetOssFile.getUrl(vocabulary.getRecordpicurl()));
 
         return ServerResponse.createBySuccess(memoryStudyVo);
 

@@ -1,8 +1,10 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
+import com.zhidejiaoyu.common.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -15,14 +17,12 @@ import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
-import com.zhidejiaoyu.common.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.TeksService;
 import com.zhidejiaoyu.student.utils.PetSayUtil;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -106,9 +106,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @Autowired
     private TestGoldUtil testGoldUtil;
 
-    @Value("${ftp.prefix}")
-    private String prefix;
-
     @Autowired
     private TeksCourseMapper teksCourseMapper;
 
@@ -172,7 +169,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> resultMap = new ArrayList<>();
         for (Map<String, Object> getMap : map) {
-            getMap.put("url", prefix + getMap.get("url"));
+            getMap.put("url", GetOssFile.getUrl(String.valueOf(getMap.get("url"))));
             resultMap.add(getMap);
         }
         result.put("list", resultMap);
@@ -789,9 +786,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         List<Map<String, Object>> resultMap = new ArrayList<>();
         String url;
         for (Map<String, Object> getMap : map) {
-            // todo: 临时处理旧数据，28天后获取 url 可以不做判断
             url = getMap.get("url") == null ? "" : getMap.get("url").toString();
-            getMap.put("url", url.contains("https") ? url : prefix + url);
+            getMap.put("url", url);
             String sentence = getMap.get("sentence").toString();
             getMap.put("sentence",sentence.replace("$","").replace("#"," "));
             resultMap.add(getMap);

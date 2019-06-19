@@ -1,20 +1,18 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
+import aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
-import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.simple.SimpleIStudentExchangePrizeServiceSimple;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 
 /**
  * <p>
@@ -34,8 +32,6 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
     @Autowired
     private SimpleStudentExchangePrizeMapper simpleStudentExchangePrizeMapper;
     @Autowired
-    private SimpleOperationLogMapper simpleOperationLogMapper;
-    @Autowired
     private SimpleGoldLogMapper simpleGoldLogMapper;
     @Autowired
     private SimpleCampusMapper simpleCampusMapper;
@@ -43,14 +39,6 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
     private SimpleTeacherMapper simpleTeacherMapper;
     @Autowired
     private SimpleRunLogMapper runLogMapper;
-    @Value("${ftp.prefix}")
-    private String ftpPrefix;
-
-    @Autowired
-    private ExecutorService executorService;
-
-    @Autowired
-    private MedalAwardAsync medalAwardAsync;
 
 
     @Override
@@ -171,7 +159,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         for(PrizeExchangeList prize : list){
             Map<String, Object> dataMap = new HashMap<>();
             dataMap.put("id", prize.getId());
-            dataMap.put("partUrl", ftpPrefix + prize.getPrizeUrl());
+            dataMap.put("partUrl", GetOssFile.getUrl(prize.getPrizeUrl()));
             dataMap.put("name", prize.getPrize());
             dataMap.put("gold", prize.getExchangePrize());
             dataMap.put("surplus", prize.getSurplusNumber());

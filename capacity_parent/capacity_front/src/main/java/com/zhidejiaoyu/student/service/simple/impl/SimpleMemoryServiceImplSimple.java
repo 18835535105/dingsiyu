@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
+import aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.simple.SimpleCapacityVo;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
@@ -19,13 +20,11 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 
 
 @Service
@@ -35,9 +34,6 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
 
     /** 默写模块答错3次, 黄金记忆点时间延长一个小时*/
     private final int pushRise = 3;
-
-    @Value("${ftp.prefix}")
-    private String ftpPrefix;
 
     @Autowired
     private SimpleCommonMethod simpleCommonMethod;
@@ -73,16 +69,10 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
     private SimpleTestServiceImplSimple testServiceImpl;
 
     @Autowired
-    private SimpleUnitVocabularyMapper simpleUnitVocabularyMapper;
-
-    @Autowired
     private RedisOpt redisOpt;
 
     @Autowired
     private MedalAwardAsync medalAwardAsync;
-
-    @Autowired
-    private ExecutorService executorService;
 
     /**
      * 9大学习页面
@@ -205,7 +195,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
 		}
         // 图片url
         if (StringUtils.isNotEmpty(simpleCapacityVo.getRecordpicurl())) {
-            simpleCapacityVo.setRecordpicurl(ftpPrefix+simpleCapacityVo.getRecordpicurl());
+            simpleCapacityVo.setRecordpicurl(GetOssFile.getUrl(simpleCapacityVo.getRecordpicurl()));
         }
         // 已学单元单词
         simpleCapacityVo.setPlan(plan);

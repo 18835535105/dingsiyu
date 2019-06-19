@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import aliyunoss.getObject.GetOssFile;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.bookVo.BookVo;
@@ -30,9 +31,6 @@ import java.util.*;
 public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabulary> implements BookService {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
-
-    @Value("${ftp.prefix}")
-    private String prefix;
 
     @Autowired
     private CommonMethod commonMethod;
@@ -199,7 +197,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
             vo.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
             vo.setSoundMark(StringUtils.isEmpty(vocabulary.getSoundMark()) ? "" : vocabulary.getSoundMark());
             if (StringUtils.isNotEmpty(vocabulary.getRecordpicurl())) {
-                vo.setPictureUrl(prefix + vocabulary.getRecordpicurl());
+                vo.setPictureUrl(GetOssFile.getUrl(vocabulary.getRecordpicurl()));
             } else {
                 vo.setPictureUrl(null);
             }

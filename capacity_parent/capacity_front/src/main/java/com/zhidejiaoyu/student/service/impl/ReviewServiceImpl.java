@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import aliyunoss.getObject.GetOssFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
@@ -37,7 +38,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,9 +58,6 @@ import java.util.stream.Collectors;
 public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, CapacityMemory> implements ReviewService {
 
     private Logger logger = LoggerFactory.getLogger(ReviewServiceImpl.class);
-
-    @Value("${ftp.prefix}")
-    private String ftpPrefix;
 
     @Autowired
     private TestResultUtil testResultUtil;
@@ -1170,7 +1167,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         if (correct == null) {
             return ServerResponse.createBySuccess();
         }
-        correct.put("recordpicurl", ftpPrefix + correct.get("recordpicurl"));
+        correct.put("recordpicurl", GetOssFile.getUrl(String.valueOf(correct.get("recordpicurl"))));
         // 记忆强度
         correct.put("memoryStrength", correct.get("memory_strength"));
 
@@ -1453,7 +1450,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
         // 单词图鉴相关内容
         if (classify == 0) {
-            map.put("recordpicurl", ftpPrefix + vocabulary.getRecordpicurl());
+            map.put("recordpicurl", GetOssFile.getUrl(vocabulary.getRecordpicurl()));
             List<Map<String, Object>> mapErrorVocabulary = vocabularyMapper.getWordIdByUnit(new Long(map.get("id").toString()), map.get("unit_id").toString());
             if (mapErrorVocabulary.size() < 3) {
                 List<Map<String, Object>> otherErrorVocabulary = vocabularyMapper.selectPictureWordFromLearned(student.getId(), 3 - mapErrorVocabulary.size());
@@ -1478,7 +1475,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             map.put("subject", subject);
         } else if (classify == 1) {
             map.put("wordChineseList", this.getChinese(Long.parseLong(map.get("unit_id").toString()), vocabulary.getId(), map.get("wordChinese").toString()));
-            map.put("recordpicurl", ftpPrefix + vocabulary.getRecordpicurl());
+            map.put("recordpicurl", GetOssFile.getUrl(vocabulary.getRecordpicurl()));
         }
         return ServerResponse.createBySuccess(map);
     }

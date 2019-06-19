@@ -54,9 +54,6 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Autowired
     private BaiduSpeak baiduSpeak;
 
-    @Value("${ftp.prefix}")
-    private String prefix;
-
     @Autowired
     private GoodVoiceUtil goodVoiceUtil;
 
@@ -268,8 +265,7 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 vo = new VoiceRankVo();
                 vo.setScore(Integer.valueOf(voice.getScore().toString().split("\\.")[0]));
                 vo.setStudentName(voice.getStudentName());
-                // todo: 临时处理旧数据，28天后获取 url 可以不做判断
-                vo.setVoiceUrl(voice.getVoiceUrl().contains("http") ? voice.getVoiceUrl() : prefix + voice.getVoiceUrl());
+                vo.setVoiceUrl(voice.getVoiceUrl());
                 if (hearUrlMap.get(voice.getStudentId()) != null) {
                     vo.setHeadUrl(hearUrlMap.get(voice.getStudentId()).get("headUrl"));
                 } else {
