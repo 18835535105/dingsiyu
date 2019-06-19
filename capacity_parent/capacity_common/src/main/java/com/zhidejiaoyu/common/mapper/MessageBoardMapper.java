@@ -94,4 +94,12 @@ public interface MessageBoardMapper extends BaseMapper<MessageBoard> {
      * @return
      */
     List<MessageBoard> selectStopSpeakTime(@Param("stuId") Long stuId);
+
+    /**
+     * 查询学生的意见反馈
+     *
+     * @param studentId
+     * @return
+     */
+    List<MessageBoard> selectByStudentId(Long studentId);
 }

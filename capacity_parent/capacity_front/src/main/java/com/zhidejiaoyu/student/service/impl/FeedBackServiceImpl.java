@@ -38,7 +38,7 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
         Student student = getStudent(session);
 
         // 获取当前学生所有的反馈及被回复信息
-        List<MessageBoard> messageBoards = getMessageBoards(student.getId());
+        List<MessageBoard> messageBoards = messageBoardMapper.selectByStudentId(student.getId());
         if (messageBoards.size() > 0) {
             return ServerResponse.createBySuccess(packageFeedBackInfoVO(messageBoards, student.getHeadUrl()));
         }
@@ -71,6 +71,9 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
                 return ServerResponse.createByErrorMessage("图片存储占用超过15MB！");
             }
             List<String> fileNames = OssUpload.uploadFiles(files, FileConstant.FEEDBACK_IMG, null);
+            if (fileNames == null) {
+                return ServerResponse.createByError();
+            }
             fileName = String.join(",", fileNames);
         }
         // 保存反馈内容
@@ -115,28 +118,26 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
         return size <= 15728640;
     }
 
-
     private FeedBackInfoVO packageFeedBackInfoVO(List<MessageBoard> messageBoards, String headUrl) {
         FeedBackInfoVO feedBackInfoVO = new FeedBackInfoVO();
         List<FeedBackInfoList> feedBackInfoLists = new ArrayList<>(messageBoards.size());
         FeedBackInfoList feedBackInfoList;
         MessageBoard messageBoard;
         int size = messageBoards.size();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < size; i++) {
             messageBoard = messageBoards.get(i);
             feedBackInfoList = new FeedBackInfoList();
-            feedBackInfoList.setContent(messageBoard.getContent());
             feedBackInfoList.setHeadUrl(headUrl);
             feedBackInfoList.setRole(messageBoard.getRole());
             feedBackInfoList.setTime(DateUtil.formatYYYYMMDDHHMMSS(messageBoard.getTime()));
-            // 封装反馈的图片路径
-            if (messageBoard.getUrl() != null) {
-                String[] split = messageBoard.getUrl().split(",");
-                List<String> urls = new ArrayList<>(split.length);
-                for (String url : split) {
-                    urls.add(GetOssFile.getUrl(url));
-                }
-                feedBackInfoList.setUrl(urls);
+
+            // 如果反馈内容中有图片，拼接图片信息
+            if (messageBoard.getContent().contains("<img>")) {
+                getContent(messageBoard, sb);
+                feedBackInfoList.setContent(sb.toString());
+            } else {
+                feedBackInfoList.setContent(messageBoard.getContent());
             }
 
             // 如果最后一条记录奖励金币数为0，说明当前学生不需要显示奖励金币提示
@@ -154,10 +155,23 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
         return feedBackInfoVO;
     }
 
-    private List<MessageBoard> getMessageBoards(Long studentId) {
-        MessageBoardExample messageBoardExample = new MessageBoardExample();
-        messageBoardExample.setOrderByClause("id asc");
-        messageBoardExample.createCriteria().andStudentIdEqualTo(studentId);
-        return messageBoardMapper.selectByExample(messageBoardExample);
+    /**
+     * 拼接图片信息
+     *
+     * @param messageBoard
+     * @param sb
+     */
+    private void getContent(MessageBoard messageBoard, StringBuilder sb) {
+        String[] split = messageBoard.getUrl().split(",");
+        String[] arr = messageBoard.getContent().split("<img>");
+        sb.setLength(0);
+        for (int i1 = 0; i1 < split.length; i1++) {
+            if (arr.length > 0) {
+                sb.append(arr[i1]).append("<img src='").append(GetOssFile.getUrl(split[i1])).append("' class='infoImg'>");
+            } else {
+                sb.append("<img src='").append(GetOssFile.getUrl(split[i1])).append("' class='infoImg'>");
+            }
+
+        }
     }
 }

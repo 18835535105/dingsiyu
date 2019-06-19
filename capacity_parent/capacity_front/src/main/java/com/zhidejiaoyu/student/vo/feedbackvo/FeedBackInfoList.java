@@ -31,9 +31,4 @@ public class FeedBackInfoList {
      * 反馈及回复时间
      */
     private String time;
-
-    /**
-     * 反馈的图片路径
-     */
-    private List<String> url;
 }

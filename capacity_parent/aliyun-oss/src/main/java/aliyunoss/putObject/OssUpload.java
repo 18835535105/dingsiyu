@@ -24,7 +24,7 @@ public class OssUpload {
 
     private static OSS client;
 
-    static {
+    public static void init() {
         // 创建ClientConfiguration实例，按照您的需要修改默认参数。
         ClientBuilderConfiguration clientBuilderConfiguration = new ClientBuilderConfiguration();
         // 开启支持CNAME。CNAME是指将自定义域名绑定到存储空间上。
@@ -44,6 +44,7 @@ public class OssUpload {
         fileName = getFileName(file, fileName);
 
         try {
+            OssUpload.init();
             client.putObject(AliyunInfoConst.bucketName, dir + fileName, file.getInputStream());
         } catch (IOException e) {
             log.error("文件上传到 OSS 失败！", e);
@@ -65,8 +66,20 @@ public class OssUpload {
      */
     public static List<String> uploadFiles(MultipartFile[] files, String dir, String fileName) {
         List<String> fileNameList = new ArrayList<>(files.length);
-        for (MultipartFile file : files) {
-            fileNameList.add(OssUpload.upload(file, dir, fileName));
+        try {
+            OssUpload.init();
+            for (MultipartFile file : files) {
+                fileName = getFileName(file, fileName);
+                client.putObject(AliyunInfoConst.bucketName, dir + fileName, file.getInputStream());
+                fileNameList.add(dir + fileName);
+            }
+        } catch (IOException e) {
+            log.error("文件上传到 OSS 失败！", e);
+            return null;
+        } finally {
+            if (client != null) {
+                client.shutdown();
+            }
         }
         return fileNameList;
     }
