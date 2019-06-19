@@ -700,13 +700,53 @@
             )
     </select>
     <select id="getVocabularyCountByStudent" parameterType="map" resultType="integer">
-        select
-        ((select count(listen.id) from capacity_listen listen where listen.student_id=stu.id and listen.memory_strength &lt; 1 and push &lt; now())  +
-        (select count(cwrite.id) from capacity_write cwrite where cwrite.student_id=stu.id and cwrite.memory_strength &lt; 1 and push &lt; now()) +
-        (select count(memory.id) from capacity_memory memory where memory.student_id=stu.id and memory.memory_strength &lt; 1 and push &lt; now()) +
-        (select count(picture.id) from capacity_picture picture where picture.student_id=stu.id and picture.memory_strength &lt; 1 and push &lt; now())
-        ) count
-        from student stu where stu.id =#{studentId}
+        select ((select count(listen.id)
+                 from capacity_listen listen,
+                      learn l
+                 where l.vocabulary_id = listen.vocabulary_id
+                   and l.type = 1
+                   and l.study_model = '慧听写'
+                   and l.student_id = stu.id
+                   and listen.unit_id = l.unit_id
+                   and listen.student_id = stu.id
+                   and listen.memory_strength &lt; 1
+                   and push &lt; now()) +
+                (select count(cwrite.id)
+                 from capacity_write cwrite,
+                      learn l
+                 where l.vocabulary_id = cwrite.vocabulary_id
+                   and l.type = 1
+                   and l.study_model = '慧默写'
+                   and l.student_id = stu.id
+                   and cwrite.unit_id = l.unit_id
+                   and cwrite.student_id = stu.id
+                   and cwrite.memory_strength &lt; 1
+                   and push &lt; now()) +
+                (select count(memory.id)
+                 from capacity_memory memory,
+                      learn l
+                 where l.vocabulary_id = memory.vocabulary_id
+                   and l.type = 1
+                   and l.study_model = '慧记忆'
+                   and l.student_id = stu.id
+                   and memory.unit_id = l.unit_id
+                   and memory.student_id = stu.id
+                   and memory.memory_strength &lt; 1
+                   and push &lt; now()) +
+                (select count(picture.id)
+                 from capacity_picture picture,
+                      learn l
+                 where l.vocabulary_id = picture.vocabulary_id
+                   and l.type = 1
+                   and l.study_model = '单词图鉴'
+                   and l.student_id = stu.id
+                   and picture.unit_id = l.unit_id
+                   and picture.student_id = stu.id
+                   and picture.memory_strength &lt; 1
+                   and push &lt; now())
+                   ) count
+        from student stu
+        where stu.id = #{studentId}
     </select>
 
     <select id="getSentenceCountByStudent" parameterType="map" resultType="integer">
