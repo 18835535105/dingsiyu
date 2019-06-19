@@ -3,7 +3,6 @@ package com.zhidejiaoyu.common.config;
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.spring.stat.DruidStatInterceptor;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.zhidejiaoyu.common.utils.http.FtpUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
@@ -35,14 +34,6 @@ public class BeanConfig {
 	@Bean
 	public BaiduSpeak baiduSpeak() {
 		return new BaiduSpeak();
-	}
-
-	/**
-	 * 获取FtpUtil工具类
-	 */
-	@Bean
-	public FtpUtil ftpUtil() {
-		return new FtpUtil();
 	}
 
 	@Bean

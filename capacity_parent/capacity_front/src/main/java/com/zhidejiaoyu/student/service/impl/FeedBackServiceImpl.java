@@ -1,21 +1,19 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import aliyunoss.getObject.GetOssFile;
+import aliyunoss.putObject.OssUpload;
 import com.zhidejiaoyu.common.constant.FileConstant;
 import com.zhidejiaoyu.common.mapper.MessageBoardMapper;
 import com.zhidejiaoyu.common.pojo.MessageBoard;
 import com.zhidejiaoyu.common.pojo.MessageBoardExample;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
-import com.zhidejiaoyu.common.utils.http.FtpUtil;
-import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.FeedBackService;
-import com.zhidejiaoyu.student.utils.sensitiveword.SensitiveWordFilter;
 import com.zhidejiaoyu.student.vo.feedbackvo.FeedBackInfoList;
 import com.zhidejiaoyu.student.vo.feedbackvo.FeedBackInfoVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,17 +30,8 @@ import java.util.List;
 @Slf4j
 public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, MessageBoard> implements FeedBackService {
 
-    @Value("${ftp.prefix}")
-    private String ftpPrefix;
-
     @Autowired
     private MessageBoardMapper messageBoardMapper;
-
-    @Autowired
-    private FtpUtil ftpUtil;
-
-    @Autowired
-    private SensitiveWordFilter sensitiveWordFilter;
 
     @Override
     public ServerResponse<FeedBackInfoVO> getFeedBacks(HttpSession session) {
@@ -64,22 +53,8 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
     }
 
     @Override
-    public ServerResponse saveFeedBack(HttpSession session, String content) {
+    public ServerResponse saveFeedBack(HttpSession session, String content, MultipartFile[] files) {
 
-        Student student = getStudent(session);
-
-        // 保存反馈内容
-        try {
-            saveFeedBackContent(content, student);
-        } catch (Exception e) {
-            log.error("保存学生 {}->{} 意见反馈失败！", student.getId(), student.getStudentName(), e);
-            return ServerResponse.createByErrorMessage("提交失败！");
-        }
-        return ServerResponse.createBySuccess();
-    }
-
-    @Override
-    public ServerResponse checkFeedBack(HttpSession session, String content, MultipartFile[] files) {
         Student student = getStudent(session);
         // 如果当前学生在禁言期，无法发起反馈
         List<MessageBoard> messageBoards = messageBoardMapper.selectStopSpeakTime(student.getId());
@@ -88,32 +63,27 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
                     + " ，在此期间无法反馈！");
         }
 
-        // 验证是否含有敏感词
-        sensitiveWordFilter.init();
-        boolean containsSensitiveWord = sensitiveWordFilter.isContainsSensitiveWord(content, SensitiveWordFilter.maxMatchType);
-        if (containsSensitiveWord) {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.SENSITIVE_WORD.getCode(), ResponseCode.SENSITIVE_WORD.getMsg());
-        }
-
+        String fileName = null;
         if (files != null && files.length > 0) {
             // 校验图片大小
             boolean flag = checkImgSize(files);
             if (!flag) {
                 return ServerResponse.createByErrorMessage("图片存储占用超过15MB！");
             }
-            List<String> fileNames = ftpUtil.uploadFile(FileConstant.FEEDBACK_IMG, files);
-            if (fileNames.size() > 0) {
-                List<String> returnFileNames = new ArrayList<>(fileNames.size());
-                for (String fileName : fileNames) {
-                    returnFileNames.add(ftpPrefix + FileConstant.FEEDBACK_IMG + fileName);
-                }
-                return ServerResponse.createBySuccess(returnFileNames);
-            }
+            List<String> fileNames = OssUpload.uploadFiles(files, FileConstant.FEEDBACK_IMG, null);
+            fileName = String.join(",", fileNames);
+        }
+        // 保存反馈内容
+        try {
+            saveFeedBackContent(content, student, fileName);
+        } catch (Exception e) {
+            log.error("保存学生 {}->{} 意见反馈失败！", student.getId(), student.getStudentName(), e);
+            return ServerResponse.createByErrorMessage("提交失败！");
         }
         return ServerResponse.createBySuccess();
     }
 
-    private void saveFeedBackContent(String content, Student student) {
+    private void saveFeedBackContent(String content, Student student, String url) {
         MessageBoard messageBoard = new MessageBoard();
         messageBoard.setRole(0);
         messageBoard.setHintFlag(2);
@@ -126,6 +96,7 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
         messageBoard.setAwardGold(0);
         messageBoard.setContent(content);
         messageBoard.setStudentId(student.getId());
+        messageBoard.setUrl(url);
 
         messageBoardMapper.insert(messageBoard);
     }
@@ -158,10 +129,18 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
             feedBackInfoList.setHeadUrl(headUrl);
             feedBackInfoList.setRole(messageBoard.getRole());
             feedBackInfoList.setTime(DateUtil.formatYYYYMMDDHHMMSS(messageBoard.getTime()));
+            // 封装反馈的图片路径
+            if (messageBoard.getUrl() != null) {
+                String[] split = messageBoard.getUrl().split(",");
+                List<String> urls = new ArrayList<>(split.length);
+                for (String url : split) {
+                    urls.add(GetOssFile.getUrl(url));
+                }
+                feedBackInfoList.setUrl(urls);
+            }
 
             // 如果最后一条记录奖励金币数为0，说明当前学生不需要显示奖励金币提示
             if (i == size - 1) {
-
                 if (messageBoard.getHintFlag() != null && messageBoard.getHintFlag() == 1){
                     feedBackInfoVO.setHint(true);
                     feedBackInfoVO.setAwardGold(messageBoard.getAwardGold());

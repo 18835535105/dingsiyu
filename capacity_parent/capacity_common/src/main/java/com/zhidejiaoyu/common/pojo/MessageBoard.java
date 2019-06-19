@@ -85,6 +85,11 @@ public class MessageBoard extends Model<MessageBoard> {
      */
     private Date stopSpeakEndTime;
 
+    /**
+     * 反馈图片路径
+     */
+    private String url;
+
     @Override
     protected Serializable pkVal() {
         return this.id;

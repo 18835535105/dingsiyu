@@ -30,17 +30,8 @@ public interface FeedBackService extends BaseService<MessageBoard> {
      *
      * @param session
      * @param content 反馈内容
+     * @param files
      * @return
      */
-    ServerResponse saveFeedBack(HttpSession session, String content);
-
-    /**
-     * 提交意见反馈之前校验文字信息并上传文件
-     *
-     * @param session
-     * @param content 反馈内容
-     * @param files   上传的图片
-     * @return 返回图片在服务器中的地址路径
-     */
-    ServerResponse checkFeedBack(HttpSession session, String content, MultipartFile[] files);
+    ServerResponse saveFeedBack(HttpSession session, String content, MultipartFile[] files);
 }

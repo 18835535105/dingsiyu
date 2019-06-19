@@ -51,35 +51,13 @@ public class FeedBackController {
 
     /**
      * 保存意见反馈
-     * <br>
-     * <ul>
-     * <li>如果参数中有图片信息，先验证 <code>content</code> 中是否含有敏感词信息，如果含有敏感词信息，返回响应的响应信息并不上传图片；
-     * 如果不含有敏感词信息，上传图片，并返回图片在服务器中的路径信息</li>
-     * <li>如果参数中不含有图片信息，保存<code>content</code>内容</li>
-     * </ul>
      *
      * @param session
      * @param content 反馈内容
      * @return
      */
     @PostMapping("/saveFeedBack")
-    public ServerResponse saveFeedBack(HttpSession session, String content) {
-        if (StringUtils.isEmpty(content)) {
-            return ServerResponse.createByErrorMessage("反馈内容不能为空！");
-        }
-        return feedBackService.saveFeedBack(session, content);
-    }
-
-    /**
-     * 提交意见反馈之前校验文字信息并上传文件
-     *
-     * @param session
-     * @param content 反馈内容
-     * @param files   上传的图片
-     * @return 返回图片在服务器中的地址路径
-     */
-    @PostMapping("/checkFeedBack")
-    public ServerResponse checkFeedBack(HttpSession session, String content, @RequestParam(required = false) MultipartFile[] files) {
+    public ServerResponse saveFeedBack(HttpSession session, String content, @RequestParam(required = false) MultipartFile[] files) {
         // 上传图片不能超过20张
         if (files != null && files.length > 20) {
             return ServerResponse.createByErrorMessage("反馈图片不能超过20张，请修改后重新提交！");
@@ -91,6 +69,6 @@ public class FeedBackController {
         if (content.length() > 200) {
             return ServerResponse.createByErrorMessage("输入文字过长！");
         }
-        return feedBackService.checkFeedBack(session, content, files);
+        return feedBackService.saveFeedBack(session, content, files);
     }
 }
