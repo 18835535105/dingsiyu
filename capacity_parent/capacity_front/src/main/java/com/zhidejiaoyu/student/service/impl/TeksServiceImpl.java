@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
-import aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;

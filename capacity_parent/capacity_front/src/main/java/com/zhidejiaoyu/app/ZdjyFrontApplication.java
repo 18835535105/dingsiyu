@@ -28,7 +28,7 @@ import static org.springframework.boot.SpringApplication.run;
 @EnableScheduling
 @ServletComponentScan
 @EnableAutoConfiguration
-@ComponentScan("com.zhidejiaoyu")
+@ComponentScan(basePackages = {"com.zhidejiaoyu", "com.zhidejiaoyu.aliyunoss"})
 @MapperScan(basePackages = {"com.zhidejiaoyu.common.mapper"})
 @EnableRedisHttpSession(redisNamespace = "spring:session:student")
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class, JpaRepositoriesAutoConfiguration.class})

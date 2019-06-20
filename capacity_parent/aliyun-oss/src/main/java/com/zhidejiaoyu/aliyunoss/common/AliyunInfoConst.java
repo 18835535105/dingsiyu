@@ -1,4 +1,4 @@
-package aliyunoss.common;
+package com.zhidejiaoyu.aliyunoss.common;
 
 /**
  * @author wuchenxi

@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.utils;
 
-import aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.FileConstant;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;

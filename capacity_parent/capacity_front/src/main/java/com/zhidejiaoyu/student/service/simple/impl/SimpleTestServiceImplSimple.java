@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
-import aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
@@ -43,7 +43,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,13 +1,12 @@
-package aliyunoss.putObject;
+package com.zhidejiaoyu.aliyunoss.putObject;
 
-import aliyunoss.common.AliyunInfoConst;
-import com.aliyun.oss.ClientBuilderConfiguration;
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.aliyun.oss.OSS;
-import com.aliyun.oss.OSSClientBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -24,12 +23,12 @@ public class OssUpload {
 
     private static OSS client;
 
-    public static void init() {
-        // 创建ClientConfiguration实例，按照您的需要修改默认参数。
-        ClientBuilderConfiguration clientBuilderConfiguration = new ClientBuilderConfiguration();
-        // 开启支持CNAME。CNAME是指将自定义域名绑定到存储空间上。
-        clientBuilderConfiguration.setSupportCname(true);
-        client = new OSSClientBuilder().build(AliyunInfoConst.endpoint, AliyunInfoConst.accessKeyId, AliyunInfoConst.accessKeySecret, clientBuilderConfiguration);
+    @Resource
+    private OSS ossClient;
+
+    @PostConstruct
+    public void init() {
+        client = this.ossClient;
     }
 
     /**
@@ -44,15 +43,10 @@ public class OssUpload {
         fileName = getFileName(file, fileName);
 
         try {
-            OssUpload.init();
             client.putObject(AliyunInfoConst.bucketName, dir + fileName, file.getInputStream());
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("文件上传到 OSS 失败！", e);
             return null;
-        } finally {
-            if (client != null) {
-                client.shutdown();
-            }
         }
         return dir + fileName;
     }
@@ -67,19 +61,14 @@ public class OssUpload {
     public static List<String> uploadFiles(MultipartFile[] files, String dir, String fileName) {
         List<String> fileNameList = new ArrayList<>(files.length);
         try {
-            OssUpload.init();
             for (MultipartFile file : files) {
                 fileName = getFileName(file, fileName);
                 client.putObject(AliyunInfoConst.bucketName, dir + fileName, file.getInputStream());
                 fileNameList.add(dir + fileName);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("文件上传到 OSS 失败！", e);
             return null;
-        } finally {
-            if (client != null) {
-                client.shutdown();
-            }
         }
         return fileNameList;
     }

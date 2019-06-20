@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
-import aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;

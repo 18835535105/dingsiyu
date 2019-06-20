@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
-import aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;

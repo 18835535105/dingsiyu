@@ -1,11 +1,10 @@
 package com.zhidejiaoyu.student.service.impl;
 
-import aliyunoss.getObject.GetOssFile;
-import aliyunoss.putObject.OssUpload;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.aliyunoss.putObject.OssUpload;
 import com.zhidejiaoyu.common.constant.FileConstant;
 import com.zhidejiaoyu.common.mapper.MessageBoardMapper;
 import com.zhidejiaoyu.common.pojo.MessageBoard;
-import com.zhidejiaoyu.common.pojo.MessageBoardExample;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -13,6 +12,7 @@ import com.zhidejiaoyu.student.service.FeedBackService;
 import com.zhidejiaoyu.student.vo.feedbackvo.FeedBackInfoList;
 import com.zhidejiaoyu.student.vo.feedbackvo.FeedBackInfoVO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -133,7 +133,7 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
             feedBackInfoList.setTime(DateUtil.formatYYYYMMDDHHMMSS(messageBoard.getTime()));
 
             // 如果反馈内容中有图片，拼接图片信息
-            if (messageBoard.getContent().contains("<img>")) {
+            if (messageBoard.getContent().contains("<img>") && StringUtils.isNotEmpty(messageBoard.getUrl())) {
                 getContent(messageBoard, sb);
                 feedBackInfoList.setContent(sb.toString());
             } else {

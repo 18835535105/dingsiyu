@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -14,7 +15,6 @@ import com.zhidejiaoyu.student.service.WordPictureService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
@@ -128,6 +128,7 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
 
         // 读音url
         correct.put("readUrl", baiduSpeak.getLanguagePath(correct.get("word").toString()));
+        correct.put("recordpicurl", GetOssFile.getUrl(String.valueOf(correct.get("recordpicurl"))));
 
         // 2. 从本课程非本单元下随机获取三个题, 三个作为错题, 并且id不等于正确题id
         List<Map<String, Object>> mapErrorVocabulary = vocabularyMapper.getWordIdByCourse(new Long(correct.get("id").toString()), courseId, unitId);

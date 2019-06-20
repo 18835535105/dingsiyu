@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
-import aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.study.phonetic.PhoneticSymbolListenVo;
 import com.zhidejiaoyu.common.Vo.study.phonetic.Topic;
 import com.zhidejiaoyu.common.constant.TimeConstant;

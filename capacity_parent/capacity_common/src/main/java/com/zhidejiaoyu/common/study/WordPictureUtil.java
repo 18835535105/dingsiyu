@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.common.study;
 
-import aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

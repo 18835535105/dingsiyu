@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.common.utils.language;
 
-import aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
