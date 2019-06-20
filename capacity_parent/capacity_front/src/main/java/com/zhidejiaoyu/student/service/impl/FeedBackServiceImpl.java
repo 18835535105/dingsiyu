@@ -162,16 +162,20 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
      * @param sb
      */
     private void getContent(MessageBoard messageBoard, StringBuilder sb) {
-        String[] split = messageBoard.getUrl().split(",");
-        String[] arr = messageBoard.getContent().split("<img>");
+        String[] urlArr = messageBoard.getUrl().split(",");
+        String[] contentArr = messageBoard.getContent().split("<img>");
+        int urlArrLength = urlArr.length;
+        int contentArrLength = contentArr.length;
         sb.setLength(0);
-        for (int i1 = 0; i1 < split.length; i1++) {
-            if (arr.length > 0) {
-                sb.append(arr[i1]).append("<img src='").append(GetOssFile.getUrl(split[i1])).append("' class='infoImg'>");
+        for (int i1 = 0; i1 < urlArrLength; i1++) {
+            if (contentArr.length > 0) {
+                sb.append(i1 < contentArrLength ? contentArr[i1] : "").append("<img src='").append(GetOssFile.getUrl(urlArr[i1])).append("' class='infoImg'>");
             } else {
-                sb.append("<img src='").append(GetOssFile.getUrl(split[i1])).append("' class='infoImg'>");
+                sb.append("<img src='").append(GetOssFile.getUrl(urlArr[i1])).append("' class='infoImg'>");
             }
-
+        }
+        if (contentArrLength > urlArrLength) {
+            sb.append(contentArr[contentArrLength - 1]);
         }
     }
 }

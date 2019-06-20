@@ -3,6 +3,7 @@ package com.zhidejiaoyu.aliyunoss.putObject;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.aliyun.oss.OSS;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
@@ -19,6 +20,7 @@ import java.util.UUID;
  * @date 2019-06-18
  */
 @Slf4j
+@Component
 public class OssUpload {
 
     private static OSS client;

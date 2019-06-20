@@ -1,10 +1,10 @@
 package com.zhidejiaoyu.aliyunoss.config;
 
-import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.aliyun.oss.ClientBuilderConfiguration;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
-import com.aliyun.oss.common.comm.Protocol;
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
  * @author wuchenxi
  * @date 2019-06-20
  */
+@Slf4j
 @Configuration
 public class OssClientConfig {
 
@@ -25,8 +26,9 @@ public class OssClientConfig {
         ClientBuilderConfiguration clientBuilderConfiguration = new ClientBuilderConfiguration();
         // 开启支持CNAME。CNAME是指将自定义域名绑定到存储空间上。
         clientBuilderConfiguration.setSupportCname(true);
-        clientBuilderConfiguration.setProtocol(Protocol.HTTPS);
+//        clientBuilderConfiguration.setProtocol(Protocol.HTTPS);
         clientBuilderConfiguration.setMaxConnections(200);
+        log.info("OssClient 初始化成功!");
         return new OSSClientBuilder().build(AliyunInfoConst.endpoint, AliyunInfoConst.accessKeyId, AliyunInfoConst.accessKeySecret, clientBuilderConfiguration);
     }
 }

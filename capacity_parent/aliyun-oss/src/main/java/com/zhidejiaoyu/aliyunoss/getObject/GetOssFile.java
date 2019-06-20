@@ -3,6 +3,7 @@ package com.zhidejiaoyu.aliyunoss.getObject;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.aliyun.oss.OSS;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -16,6 +17,7 @@ import java.util.Date;
  * @date 2019-06-18
  */
 @Slf4j
+@Component
 public class GetOssFile {
 
     private static OSS client;
