@@ -14,6 +14,18 @@
           <element id="module-output" name="capacity_front" />
         </element>
         <element id="directory" name="lib">
+          <element id="archive" name="aliyun-oss-1.0-SNAPSHOT.jar">
+            <element id="module-output" name="aliyun-oss" />
+          </element>
+          <element id="library" level="project" name="Maven: com.aliyun.oss:aliyun-sdk-oss:3.4.2" />
+          <element id="library" level="project" name="Maven: org.jdom:jdom:1.1" />
+          <element id="library" level="project" name="Maven: org.codehaus.jettison:jettison:1.1" />
+          <element id="library" level="project" name="Maven: stax:stax-api:1.0.1" />
+          <element id="library" level="project" name="Maven: com.aliyun:aliyun-java-sdk-core:3.4.0" />
+          <element id="library" level="project" name="Maven: com.aliyun:aliyun-java-sdk-ram:3.0.0" />
+          <element id="library" level="project" name="Maven: com.aliyun:aliyun-java-sdk-sts:3.0.0" />
+          <element id="library" level="project" name="Maven: com.aliyun:aliyun-java-sdk-ecs:4.2.0" />
+          <element id="library" level="project" name="Maven: org.projectlombok:lombok:1.16.20" />
           <element id="archive" name="capacity_common-1.0-SNAPSHOT.jar">
             <element id="module-output" name="capacity_common" />
           </element>
@@ -50,8 +62,6 @@
           <element id="library" level="project" name="Maven: org.apache.poi:poi-ooxml:3.12" />
           <element id="library" level="project" name="Maven: org.apache.poi:poi-ooxml-schemas:3.12" />
           <element id="library" level="project" name="Maven: org.apache.xmlbeans:xmlbeans:2.6.0" />
-          <element id="library" level="project" name="Maven: stax:stax-api:1.0.1" />
-          <element id="library" level="project" name="Maven: org.projectlombok:lombok:1.16.20" />
           <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpclient:4.5.5" />
           <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpcore:4.4.9" />
           <element id="library" level="project" name="Maven: commons-net:commons-net:3.6" />
