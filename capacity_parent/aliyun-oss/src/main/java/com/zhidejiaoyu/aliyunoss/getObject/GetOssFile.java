@@ -38,7 +38,7 @@ public class GetOssFile {
      * @return
      */
     public static String getPublicObjectUrl(String objectName) {
-        return "http://oss.yydz100.com/" + objectName;
+        return AliyunInfoConst.host + objectName;
     }
 
     /**
