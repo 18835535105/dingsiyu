@@ -32,7 +32,7 @@ public class PetSayUtil {
     private String appendMP3Url(String petName, int[] mp3Name) {
         for (int i = 0; i < petNames.length; i++) {
             if (petNames[i].equals(petName)) {
-               return GetOssFile.getUrl(FileConstant.PET_SAY_AUDIO + mp3Name[i] + ".mp3");
+               return GetOssFile.getPublicObjectUrl(FileConstant.PET_SAY_AUDIO + mp3Name[i] + ".mp3");
             }
         }
         return null;

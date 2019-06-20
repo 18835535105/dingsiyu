@@ -195,7 +195,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
 		}
         // 图片url
         if (StringUtils.isNotEmpty(simpleCapacityVo.getRecordpicurl())) {
-            simpleCapacityVo.setRecordpicurl(GetOssFile.getUrl(simpleCapacityVo.getRecordpicurl()));
+            simpleCapacityVo.setRecordpicurl(GetOssFile.getPublicObjectUrl(simpleCapacityVo.getRecordpicurl()));
         }
         // 已学单元单词
         simpleCapacityVo.setPlan(plan);

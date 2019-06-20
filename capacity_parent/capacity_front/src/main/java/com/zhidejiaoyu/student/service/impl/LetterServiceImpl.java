@@ -441,7 +441,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 List<Letter> allLetter = letterMapper.getAllLetterByUnitId(letterUnit.getId());
                 List<Letter> returnLetter = new ArrayList<>();
                 allLetter.forEach(letter -> {
-                    letter.setGifUrl(GetOssFile.getUrl(letter.getGifUrl()));
+                    letter.setGifUrl(GetOssFile.getPublicObjectUrl(letter.getGifUrl()));
                     returnLetter.add(letter);
                 });
                 Map<String, Object> returnMap = new HashMap<>();
@@ -455,7 +455,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 for (Letter letter : allLetter) {
                     Map<String, Object> letterMap = new HashMap<>();
                     letterMap.put("title", letterUnit.getUnitName());
-                    letter.setGifUrl(GetOssFile.getUrl(letter.getGifUrl()));
+                    letter.setGifUrl(GetOssFile.getPublicObjectUrl(letter.getGifUrl()));
                     letterMap.put("letter", letter);
                     if (i == 0) {
                         letterMap.put("marge", true);

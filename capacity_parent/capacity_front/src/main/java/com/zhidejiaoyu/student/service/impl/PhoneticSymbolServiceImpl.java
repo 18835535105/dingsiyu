@@ -145,10 +145,10 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                         map.put("method", returnSplit);
                     }
                     if (map.get("listen") == null || map.get("listen") == "") {
-                        map.put("listen", GetOssFile.getUrl(phonetic.getUrl()));
+                        map.put("listen", GetOssFile.getPublicObjectUrl(phonetic.getUrl()));
                     }
                     if (map.get("partUrl") == null || map.get("partUrl") == "") {
-                        map.put("partUrl", GetOssFile.getUrl(phonetic.getPartUrl()));
+                        map.put("partUrl", GetOssFile.getPublicObjectUrl(phonetic.getPartUrl()));
                     }
                 }
                 symbolMap.put("letter", phonetic.getLetter());
@@ -242,7 +242,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         vo.setPlan(learnCount);
         vo.setTotal(total);
         vo.setTopics(this.getTopics(phoneticSymbol));
-        vo.setAudioUrl(GetOssFile.getUrl(phoneticSymbol.getUrl()));
+        vo.setAudioUrl(GetOssFile.getPublicObjectUrl(phoneticSymbol.getUrl()));
 
         return ServerResponse.createBySuccess(vo);
     }
@@ -332,7 +332,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         Map<String,Object> map=new HashMap<>();
         if (symbols != null && symbols.size() > 0) {
             for(Map<String,Object> symbol:symbols){
-                map.put(symbol.get("symbol").toString().replace(" ",""),GetOssFile.getUrl(String.valueOf(symbol.get("url"))));
+                map.put(symbol.get("symbol").toString().replace(" ",""),GetOssFile.getPublicObjectUrl(String.valueOf(symbol.get("url"))));
             }
         }
         return ServerResponse.createBySuccess(map);
@@ -396,7 +396,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     private void getTypeTwo(List<PhoneticSymbol> otherPhoneticSymbol, List<Map<String, Object>> resultList, List<PhoneticSymbol> val) {
         Map<String, Object> map = new HashMap<>(16);
         map.put("type", 2);
-        map.put("title", GetOssFile.getUrl(val.get(0).getUrl()));
+        map.put("title", GetOssFile.getPublicObjectUrl(val.get(0).getUrl()));
 
         List<Map<String, Object>> list = new ArrayList<>(4);
         Map<String, Object> answerMap = new HashMap<>(16);
@@ -443,12 +443,12 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         Map<String, Object> answerMap;
         for (int i = 0; i < 3; i++) {
             answerMap = new HashMap<>(16);
-            answerMap.put("url", GetOssFile.getUrl(phoneticSymbolList.get(i)));
+            answerMap.put("url", GetOssFile.getPublicObjectUrl(phoneticSymbolList.get(i)));
             answerMap.put("answer", false);
             list.add(answerMap);
         }
         answerMap = new HashMap<>(16);
-        answerMap.put("url", GetOssFile.getUrl(val.get(0).getUrl()));
+        answerMap.put("url", GetOssFile.getPublicObjectUrl(val.get(0).getUrl()));
         answerMap.put("answer", true);
         list.add(answerMap);
         Collections.shuffle(list);

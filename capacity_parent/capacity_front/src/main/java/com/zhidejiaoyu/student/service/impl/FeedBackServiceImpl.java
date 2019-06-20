@@ -169,9 +169,9 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
         sb.setLength(0);
         for (int i1 = 0; i1 < urlArrLength; i1++) {
             if (contentArr.length > 0) {
-                sb.append(i1 < contentArrLength ? contentArr[i1] : "").append("<img src='").append(GetOssFile.getUrl(urlArr[i1])).append("' class='infoImg'>");
+                sb.append(i1 < contentArrLength ? contentArr[i1] : "").append("<img src='").append(GetOssFile.getPublicObjectUrl(urlArr[i1])).append("' class='infoImg'>");
             } else {
-                sb.append("<img src='").append(GetOssFile.getUrl(urlArr[i1])).append("' class='infoImg'>");
+                sb.append("<img src='").append(GetOssFile.getPublicObjectUrl(urlArr[i1])).append("' class='infoImg'>");
             }
         }
         if (contentArrLength > urlArrLength) {

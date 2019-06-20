@@ -196,7 +196,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
             vo.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
             vo.setSoundMark(StringUtils.isEmpty(vocabulary.getSoundMark()) ? "" : vocabulary.getSoundMark());
             if (StringUtils.isNotEmpty(vocabulary.getRecordpicurl())) {
-                vo.setPictureUrl(GetOssFile.getUrl(vocabulary.getRecordpicurl()));
+                vo.setPictureUrl(GetOssFile.getPublicObjectUrl(vocabulary.getRecordpicurl()));
             } else {
                 vo.setPictureUrl(null);
             }

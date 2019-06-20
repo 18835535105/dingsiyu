@@ -158,7 +158,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
             memoryStudyVo.setWordCount(wordCount);
             memoryStudyVo.setEngine(1);
             memoryStudyVo.setWordChineseList(this.getChinese(unitId, currentStudyWord.getId(), wordChinese));
-            memoryStudyVo.setImgUrl(GetOssFile.getUrl(currentStudyWord.getRecordpicurl()));
+            memoryStudyVo.setImgUrl(GetOssFile.getPublicObjectUrl(currentStudyWord.getRecordpicurl()));
             return ServerResponse.createBySuccess(memoryStudyVo);
         }
         return null;
@@ -333,7 +333,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         memoryStudyVo.setReadUrl(baiduSpeak.getLanguagePath(capacityMemory.getWord()));
         memoryStudyVo.setEngine(PerceiveEngine.getPerceiveEngine(memoryDifficulty, memoryStrength));
         memoryStudyVo.setWordChineseList(this.getChinese(unitId, vocabularyId, wordChinese));
-        memoryStudyVo.setImgUrl(GetOssFile.getUrl(vocabulary.getRecordpicurl()));
+        memoryStudyVo.setImgUrl(GetOssFile.getPublicObjectUrl(vocabulary.getRecordpicurl()));
 
         return ServerResponse.createBySuccess(memoryStudyVo);
 

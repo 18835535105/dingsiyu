@@ -1370,7 +1370,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         }
 
         if (vocabulary.get("recordpicurl") != null && vocabulary.get("recordpicurl") != "") {
-            vocabulary.put("recordpicurl", GetOssFile.getUrl(String.valueOf(vocabulary.get("recordpicurl"))));
+            vocabulary.put("recordpicurl", GetOssFile.getPublicObjectUrl(String.valueOf(vocabulary.get("recordpicurl"))));
         } else {
             vocabulary.put("recordpicurl", "");
         }

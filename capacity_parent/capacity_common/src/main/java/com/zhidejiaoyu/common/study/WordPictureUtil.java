@@ -45,9 +45,9 @@ public class WordPictureUtil {
                 m.put("type", "看图选词");
                 m.put("id", vo.getId());
                 m.put("chinese", vo.getWordChinese());
-                m.put("title", GetOssFile.getUrl(vo.getRecordpicurl()));
+                m.put("title", GetOssFile.getPublicObjectUrl(vo.getRecordpicurl()));
                 m.put("word", vo.getWord());
-                m.put("recordpicurl", GetOssFile.getUrl(vo.getRecordpicurl()));
+                m.put("recordpicurl", GetOssFile.getPublicObjectUrl(vo.getRecordpicurl()));
                 for (int i = 0; i < 4; i++) {
                     if(i==0){
                         t.put(vo.getWord(), true);

@@ -1167,7 +1167,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         if (correct == null) {
             return ServerResponse.createBySuccess();
         }
-        correct.put("recordpicurl", GetOssFile.getUrl(String.valueOf(correct.get("recordpicurl"))));
+        correct.put("recordpicurl", GetOssFile.getPublicObjectUrl(String.valueOf(correct.get("recordpicurl"))));
         // 记忆强度
         correct.put("memoryStrength", correct.get("memory_strength"));
 
@@ -1450,7 +1450,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
         // 单词图鉴相关内容
         if (classify == 0) {
-            map.put("recordpicurl", GetOssFile.getUrl(vocabulary.getRecordpicurl()));
+            map.put("recordpicurl", GetOssFile.getPublicObjectUrl(vocabulary.getRecordpicurl()));
             List<Map<String, Object>> mapErrorVocabulary = vocabularyMapper.getWordIdByUnit(new Long(map.get("id").toString()), map.get("unit_id").toString());
             if (mapErrorVocabulary.size() < 3) {
                 List<Map<String, Object>> otherErrorVocabulary = vocabularyMapper.selectPictureWordFromLearned(student.getId(), 3 - mapErrorVocabulary.size());
@@ -1475,7 +1475,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             map.put("subject", subject);
         } else if (classify == 1) {
             map.put("wordChineseList", this.getChinese(Long.parseLong(map.get("unit_id").toString()), vocabulary.getId(), map.get("wordChinese").toString()));
-            map.put("recordpicurl", GetOssFile.getUrl(vocabulary.getRecordpicurl()));
+            map.put("recordpicurl", GetOssFile.getPublicObjectUrl(vocabulary.getRecordpicurl()));
         }
         return ServerResponse.createBySuccess(map);
     }

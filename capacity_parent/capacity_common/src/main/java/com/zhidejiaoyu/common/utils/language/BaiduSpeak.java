@@ -54,7 +54,7 @@ public class BaiduSpeak {
     public String getLanguagePath(String text) {
         Vocabulary vocabulary = vocabularyMapper.selectByWord(text);
         if (vocabulary != null && StringUtils.isNotEmpty(vocabulary.getReadUrl())) {
-            return GetOssFile.getUrl(vocabulary.getReadUrl());
+            return GetOssFile.getPublicObjectUrl(vocabulary.getReadUrl());
         } else {
             if (wordMap.containsKey(text)) {
                 return youdao + text + "&type=1";

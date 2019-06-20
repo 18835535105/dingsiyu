@@ -169,7 +169,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> resultMap = new ArrayList<>();
         for (Map<String, Object> getMap : map) {
-            getMap.put("url", GetOssFile.getUrl(String.valueOf(getMap.get("url"))));
+            getMap.put("url", GetOssFile.getPublicObjectUrl(String.valueOf(getMap.get("url"))));
             resultMap.add(getMap);
         }
         result.put("list", resultMap);

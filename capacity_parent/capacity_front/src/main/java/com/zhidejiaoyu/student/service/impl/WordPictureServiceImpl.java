@@ -128,7 +128,7 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
 
         // 读音url
         correct.put("readUrl", baiduSpeak.getLanguagePath(correct.get("word").toString()));
-        correct.put("recordpicurl", GetOssFile.getUrl(String.valueOf(correct.get("recordpicurl"))));
+        correct.put("recordpicurl", GetOssFile.getPublicObjectUrl(String.valueOf(correct.get("recordpicurl"))));
 
         // 2. 从本课程非本单元下随机获取三个题, 三个作为错题, 并且id不等于正确题id
         List<Map<String, Object>> mapErrorVocabulary = vocabularyMapper.getWordIdByCourse(new Long(correct.get("id").toString()), courseId, unitId);

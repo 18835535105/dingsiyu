@@ -159,7 +159,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         for(PrizeExchangeList prize : list){
             Map<String, Object> dataMap = new HashMap<>();
             dataMap.put("id", prize.getId());
-            dataMap.put("partUrl", GetOssFile.getUrl(prize.getPrizeUrl()));
+            dataMap.put("partUrl", GetOssFile.getPublicObjectUrl(prize.getPrizeUrl()));
             dataMap.put("name", prize.getPrize());
             dataMap.put("gold", prize.getExchangePrize());
             dataMap.put("surplus", prize.getSurplusNumber());
