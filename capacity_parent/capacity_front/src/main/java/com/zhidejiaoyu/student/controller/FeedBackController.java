@@ -71,4 +71,15 @@ public class FeedBackController {
         }
         return feedBackService.saveFeedBack(session, content, files);
     }
+
+    /**
+     * 学生阅读管理员回复的信息后，将阅读状态置为学生已读状态
+     *
+     * @param httpSession
+     * @return
+     */
+    @PostMapping("/cancelRedPoint")
+    public ServerResponse<String> cancelRedPoint(HttpSession httpSession) {
+        return feedBackService.cancelRedPoint(httpSession);
+    }
 }
