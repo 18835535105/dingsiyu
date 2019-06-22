@@ -315,7 +315,6 @@
     </select>
     <select id="getCountCcieByStudentId" resultType="java.lang.Integer" parameterType="map">
       select count(id) from ccie where student_id = #{studentId}
-      /*AND get_time >= '2018-08-29 00:00:00'*/
     </select>
   <select id="getMapKeyStudentCCie" resultType="java.util.Map">
     select student_id as id, count(*) as count from ccie GROUP BY student_id

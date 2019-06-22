@@ -19,7 +19,7 @@ public class RankKeysConst {
     /**
      * 学生全国金币排行 key
      */
-    public static final String COUNTRY_GOLD_RANK = "COUNTRY_GOLD_RANK:";
+    public static final String COUNTRY_GOLD_RANK = "COUNTRY_GOLD_RANK";
 
 
     /**

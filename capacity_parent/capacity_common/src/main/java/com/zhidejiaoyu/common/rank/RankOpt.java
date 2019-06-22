@@ -65,9 +65,10 @@ public class RankOpt {
     public void optGoldRank(Student student) {
         try {
             // 更新 redis 中金币排行数据
-            this.addOrUpdate(RankKeysConst.CLASS_GOLD_RANK + student.getClassId(), student.getId(), BigDecimalUtil.add(student.getOfflineGold(), student.getSystemGold()));
-            this.addOrUpdate(RankKeysConst.SCHOOL_GOLD_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId(), BigDecimalUtil.add(student.getOfflineGold(), student.getSystemGold()));
-            this.addOrUpdate(RankKeysConst.COUNTRY_GOLD_RANK, student.getId(), BigDecimalUtil.add(student.getOfflineGold(), student.getSystemGold()));
+            double gold = BigDecimalUtil.add(student.getOfflineGold(), student.getSystemGold());
+            this.addOrUpdate(RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), gold);
+            this.addOrUpdate(RankKeysConst.SCHOOL_GOLD_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId(), gold);
+            this.addOrUpdate(RankKeysConst.COUNTRY_GOLD_RANK, student.getId(), gold);
         } catch (Exception e) {
             log.error("修改 redis 排行中的金币排行信息失败！[{} - {} - {}]", student.getId(), student.getAccount(), student.getStudentName(), e);
         }
@@ -81,7 +82,7 @@ public class RankOpt {
     public void optCcieRank(Student student) {
         try {
             int countCcieByStudentId = ccieMapper.getCountCcieByStudentId(student.getId());
-            this.addOrUpdate(RankKeysConst.CLASS_CCIE_RANK + student.getClassId(), student.getId(), countCcieByStudentId * 1.0);
+            this.addOrUpdate(RankKeysConst.CLASS_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), countCcieByStudentId * 1.0);
             this.addOrUpdate(RankKeysConst.SCHOOL_CCIE_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId(), countCcieByStudentId * 1.0);
             this.addOrUpdate(RankKeysConst.COUNTRY_CCIE_RANK, student.getId(), countCcieByStudentId * 1.0);
         } catch (Exception e) {
@@ -97,7 +98,7 @@ public class RankOpt {
     public void optMedalRank(Student student) {
         try {
             int medalCount = awardMapper.countGetModel(student.getId());
-            this.addOrUpdate(RankKeysConst.CLASS_MEDAL_RANK + student.getClassId(), student.getId(), medalCount * 1.0);
+            this.addOrUpdate(RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), medalCount * 1.0);
             this.addOrUpdate(RankKeysConst.SCHOOL_MEDAL_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId(), medalCount * 1.0);
             this.addOrUpdate(RankKeysConst.COUNTRY_MEDAL_RANK, student.getId(), medalCount * 1.0);
         } catch (Exception e) {
@@ -113,7 +114,7 @@ public class RankOpt {
     public void optWorshipRank(Student student) {
         try {
             int byWorshipCount = worshipMapper.countByWorship(student.getId());
-            this.addOrUpdate(RankKeysConst.CLASS_MEDAL_RANK + student.getClassId(), student.getId(), byWorshipCount * 1.0);
+            this.addOrUpdate(RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), byWorshipCount * 1.0);
             this.addOrUpdate(RankKeysConst.SCHOOL_WORSHIP_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId(), byWorshipCount * 1.0);
             this.addOrUpdate(RankKeysConst.COUNTRY_MEDAL_RANK, student.getId(), byWorshipCount * 1.0);
         } catch (Exception e) {
@@ -147,24 +148,6 @@ public class RankOpt {
         }
         return objects.stream().map(o -> (long) (int) o).collect(Collectors.toList());
     }
-
-    /**
-     * 按照 score 从低到高查询指定范围内的学生 id
-     *
-     * @param key
-     * @param start 起始索引
-     * @param end   结束索引
-     * @return
-     */
-    public List<Long> getRangeMembersBetweenStartAndEnd(String key, Long start, Long end) {
-
-        Set<Object> objects = redisTemplate.opsForZSet().reverseRange(key, start, 100);
-        if (objects == null) {
-            return new ArrayList<>();
-        }
-        return new ArrayList<>(objects.stream().map(o -> (Long) o).sorted(Comparator.reverseOrder()).collect(Collectors.toList()).subList(Integer.valueOf(start.toString()), end >= 100 ? 100 : Integer.valueOf(end.toString())));
-    }
-
 
     /**
      * 获取 score
