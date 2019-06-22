@@ -116,4 +116,13 @@ public interface AwardMapper extends BaseMapper<Award> {
      * @return
      */
     int countCompleteAllDailyAward(@Param("student") Student student);
+
+    /**
+     * 查询指定学生获取的勋章个数
+     *
+     * @param students
+     * @return
+     */
+    @MapKey("studentId")
+    Map<Long, Map<Long, Long>> countGetModelByStudents(@Param("students") List<Student> students);
 }

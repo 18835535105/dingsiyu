@@ -846,14 +846,11 @@
     </select>
 
     <select id="getClassNameAndGoldAndMbAnd" parameterType="java.lang.Long" resultType="map">
-        select grade.class_name className,
-        (stu.system_gold+stu.offline_gold) gold ,
-        (select count(wor.id) from worship wor where student_id_by_worship =#{studentId})
-        worship
+        select grade.class_name className
         from student stu
-        left join grade grade
-        on grade.id=stu.class_id
-        where stu.id=#{studentId};
+                 left join grade grade
+                           on grade.id = stu.class_id
+        where stu.id = #{studentId};
     </select>
     <select id="selStudentNumberById" parameterType="map" resultType="java.lang.Integer">
         select count(DISTINCT  stu.id) from student stu

@@ -1,12 +1,16 @@
 package com.zhidejiaoyu.student.controller.simple;
 
+import com.zhidejiaoyu.common.dto.rank.RankDto;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.simple.SimplePersonalCentreServiceSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +23,7 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
+@Validated
 @RequestMapping("/api/personal")
 public class SimplePersonalCentreController {
 
@@ -155,19 +160,25 @@ public class SimplePersonalCentreController {
     /**
      * 我的排名
      *
-     * @param model       本班排行模块  model = 1
-     *                    本校模块 model = 2
-     *                    全国模块 model = 3
-     * @param gold        金币 1=正序 2=倒叙  - 默认金币倒叙排行
-     * @param badge       勋章 1=正序 2=倒叙
-     * @param certificate 证书 1=正序 2=倒叙
-     * @param worship     膜拜 1=正序 2=倒叙
+     * @param rankDto
      */
     @RequestMapping(value = "/classSeniority", method = RequestMethod.POST)
-    public ServerResponse<Object> classSeniority(HttpSession session, Integer page, Integer rows,
-                                                 @RequestParam(required = false, defaultValue = "1") String model,
-                                                 String gold, String badge, String certificate, String worship, Integer queryType) {
-        return personalCentreService.rankingSeniority(session, page, rows, gold, badge, certificate, worship, model, queryType);
+    public ServerResponse<Object> classSeniority(HttpSession session, @Valid RankDto rankDto, BindingResult result) {
+
+        if (rankDto.getType() == null) {
+            rankDto.setType(1);
+        }
+        if (rankDto.getModel() == null) {
+            rankDto.setModel(1);
+        }
+        if (rankDto.getPage() == null) {
+            rankDto.setPage(1);
+        }
+        if (rankDto.getRows() == null) {
+            rankDto.setRows(12);
+        }
+
+        return personalCentreService.rankingSeniority(session, rankDto);
     }
 
     /**

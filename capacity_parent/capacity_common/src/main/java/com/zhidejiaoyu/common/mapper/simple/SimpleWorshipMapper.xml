@@ -279,6 +279,16 @@
     from worship
     where student_id_by_worship = #{studentId}
   </select>
+  <select id="countWorshipWithStudents" resultType="java.util.Map" parameterType="map">
+    select student_id_by_worship studentId, count(id) count
+    from worship
+    where student_id_by_worship in (
+        <foreach collection="students" item="student" separator=",">
+          #{student.id}
+        </foreach>
+      )
+    group by student_id_by_worship
+  </select>
 
 
 </mapper>

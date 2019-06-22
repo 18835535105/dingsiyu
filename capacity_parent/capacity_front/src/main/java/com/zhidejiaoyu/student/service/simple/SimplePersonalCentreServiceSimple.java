@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.simple;
 
+import com.zhidejiaoyu.common.dto.rank.RankDto;
 import com.zhidejiaoyu.common.pojo.Ccie;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
@@ -71,8 +72,14 @@ public interface SimplePersonalCentreServiceSimple extends SimpleBaseService<Cci
      */
     ServerResponse<Object> classSeniority(HttpSession session, Integer page, Integer rows, String gold, String badge, String certificate, String worship, String model, Integer queryType);
 
-
-    ServerResponse<Object> rankingSeniority(HttpSession session, Integer page, Integer rows, String gold, String badge, String certificate, String worship, String model, Integer queryType);
+    /**
+     * 查询排行数据
+     *
+     * @param session
+     * @param rankDto
+     * @return
+     */
+    ServerResponse<Object> rankingSeniority(HttpSession session, RankDto rankDto);
 
     /**
      * 默认0全部显示, 点击的那个模块(9个模块) 10:单词辨音; 11:词组辨音; 12:快速单词; 13:快速词组; 14:词汇考点; 15:快速句型;

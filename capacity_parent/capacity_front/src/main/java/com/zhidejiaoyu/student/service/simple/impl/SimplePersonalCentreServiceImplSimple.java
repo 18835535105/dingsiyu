@@ -7,10 +7,14 @@ import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
 import com.zhidejiaoyu.common.Vo.simple.ccieVo.CcieVo;
 import com.zhidejiaoyu.common.Vo.simple.ccieVo.MyCcieVo;
+import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
+import com.zhidejiaoyu.common.dto.rank.RankDto;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDatesUtil;
@@ -125,6 +129,9 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
 
     @Autowired
     private SimpleCommonMethod simpleCommonMethod;
+
+    @Autowired
+    private RankOpt rankOpt;
 
     @Override
     public ServerResponse<Object> personalIndex(HttpSession session) {
@@ -784,7 +791,6 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
      * @param certificates 证书 1=正序 2=倒叙
      * @param worships     膜拜 1=正序 2=倒叙
      */
-    @SuppressWarnings("unlikely-arg-type")
     @Override
     public ServerResponse<Object> classSeniority(HttpSession session, Integer page, Integer rows,
                                                  String golds, String badges, String certificates, String worships, String model, Integer queryType) {
@@ -1157,509 +1163,284 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         }
     }
 
-
     /**
      * 我的排名
      *
-     * @param model       本班排行模块  model = 1
-     *                    本校模块 model = 2
-     *                    全国模块 model = 3
-     * @param queryType   空代表全部查询，1=今日排行 2=本周排行 3=本月排行
-     * @param gold        金币 1=正序 2=倒叙  - 默认金币倒叙排行
-     * @param badge       勋章 1=正序 2=倒叙
-     * @param certificate 证书 1=正序 2=倒叙
-     * @param worship     膜拜 1=正序 2=倒叙
+     * @param rankDto
      */
     @Override
-    public ServerResponse<Object> rankingSeniority(HttpSession session, Integer page, Integer rows, String gold, String badge, String certificate, String worship, String model, Integer queryType) {
-        if (!(gold.equals("1") || gold.equals("2")) && !(badge.equals("1") || badge.equals("2")) && !(certificate.equals("2") || certificate.equals("1")) && !(worship.equals("1") || worship.equals("2"))) {
-            gold = "2";
-        }
-        Map<String, Object> map = new HashMap<>(16);
-        map.put("page", page);
-        Student student = getStudent(session);
-        Integer start = page == 1 ? 0 : (page - 1) * rows;
-        if (gold != null && !gold.equals("")) {
-            // 获取当前学生信息
-            final String KEY = "simple_student_rank";
-            final String FIELD = "condition:" + student.getId() + ":" + page + ":" + rows + ":" + "gold=" + gold + "model=" + model + "queryType=" + queryType;
-            try {
-                Object object = redisTemplate.opsForHash().get(KEY, FIELD);
-                if (object != null) {
-                    map = (Map<String, Object>) object;
-                    return ServerResponse.createBySuccess(map);
-                }
-            } catch (Exception e) {
-                log.error("排行榜类型转换错误，学生[{}]-[{}]排行榜类型转换错误，error=[{}]", student.getId(), student.getStudentName(), e.getMessage());
-            }
+    public ServerResponse<Object> rankingSeniority(HttpSession session, RankDto rankDto) {
+        Integer type = rankDto.getType();
 
-            getGoldRanking(model, gold, student, map, start, rows);
-            redisTemplate.opsForHash().put(KEY, FIELD, map);
-            if(model.equals("3")){
-                redisTemplate.expire(KEY, 7, TimeUnit.DAYS);
-            }else{
-                redisTemplate.expire(KEY, 3, TimeUnit.MINUTES);
-            }
-            return ServerResponse.createBySuccess(map);
-        }
-        if (badge != null && !badge.equals("")) {
-            // 获取当前学生信息
-            final String KEY = "simple_student_rank";
-            final String FIELD = "condition:" + student.getId() + ":" + page + ":" + rows + ":" + "badge=" + badge + "model=" + model + "queryType=" + queryType;
-            try {
-                Object object = redisTemplate.opsForHash().get(KEY, FIELD);
-                if (object != null) {
-                    map = (Map<String, Object>) object;
-                    return ServerResponse.createBySuccess(map);
-                }
-            } catch (Exception e) {
-                log.error("排行榜类型转换错误，学生[{}]-[{}]排行榜类型转换错误，error=[{}]", student.getId(), student.getStudentName(), e.getMessage());
-            }
-            getbadgeRanking(model, badge, student, map, start, rows);
-            redisTemplate.opsForHash().put(KEY, FIELD, map);
-            if(model.equals("3")){
-                redisTemplate.expire(KEY, 7, TimeUnit.DAYS);
-            }else{
-                redisTemplate.expire(KEY, 3, TimeUnit.MINUTES);
-            }
-            return ServerResponse.createBySuccess(map);
-        }
-        if (certificate != null && !certificate.equals("")) {
-            // 获取当前学生信息
-            final String KEY = "simple_student_rank";
-            final String FIELD = "condition:" + student.getId() + ":" + page + ":" + rows + ":" + "certificate=" + certificate + "model=" + model + "queryType=" + queryType;
-            try {
-                Object object = redisTemplate.opsForHash().get(KEY, FIELD);
-                if (object != null) {
-                    map = (Map<String, Object>) object;
-                    return ServerResponse.createBySuccess(map);
-                }
-            } catch (Exception e) {
-                log.error("排行榜类型转换错误，学生[{}]-[{}]排行榜类型转换错误，error=[{}]", student.getId(), student.getStudentName(), e.getMessage());
-            }
-            getCertificaterRanking(model, certificate, student, map, start, rows);
-            redisTemplate.opsForHash().put(KEY, FIELD, map);
-            if(model.equals("3")){
-                redisTemplate.expire(KEY, 7, TimeUnit.DAYS);
-            }else{
-                redisTemplate.expire(KEY, 3, TimeUnit.MINUTES);
-            }
-            return ServerResponse.createBySuccess(map);
-        }
-        if (worship != null && !worship.equals("")) {
-            // 获取当前学生信息
-            final String KEY = "simple_student_rank";
-            final String FIELD = "condition:" + student.getId() + ":" + page + ":" + rows + ":" + "worship=" + worship + "model=" + model + "queryType=" + queryType;
-            try {
-                Object object = redisTemplate.opsForHash().get(KEY, FIELD);
-                if (object != null) {
-                    map = (Map<String, Object>) object;
-                    return ServerResponse.createBySuccess(map);
-                }
-            } catch (Exception e) {
-                log.error("排行榜类型转换错误，学生[{}]-[{}]排行榜类型转换错误，error=[{}]", student.getId(), student.getStudentName(), e.getMessage());
-            }
-            getWorshipRanking(model, worship, student, map, start, rows);
-            redisTemplate.opsForHash().put(KEY, FIELD, map);
-            if(model.equals("3")){
-                redisTemplate.expire(KEY, 7, TimeUnit.DAYS);
-            }else{
-                redisTemplate.expire(KEY, 3, TimeUnit.MINUTES);
-            }
-            return ServerResponse.createBySuccess(map);
-        }
-        return null;
-    }
+        Student student = super.getStudent(session);
 
-    //获取膜拜排行
-    private void getWorshipRanking(String model, String worship, Student student, Map<String, Object> map, Integer start, Integer rows) {
-        List<Map<String, Object>> levels = redisOpt.getAllLevel();
-        Map<String, Object> studentMap = new HashMap<>();
-        List<Map<String, Object>> getMap = new ArrayList<>();
-        getClassAndSchool(student, map, levels, studentMap);
-        Integer adminId = null;
-        List<Integer> teacherIds=null;
-        if(student.getTeacherId()!=null){
-            adminId= simpleStudentMapper.selSchoolAdminId(student.getId());
-            if(adminId==null){
-                adminId=student.getTeacherId().intValue();
-            }
-            teacherIds= simpleTeacherMapper.getTeacherIdByAdminId(adminId);
-        }
-        Integer integer = simpleStudentMapper.selStudentNumberById(student.getClassId(), student.getTeacherId(), model, adminId,teacherIds,null);
-        if (!model.equals("3")) {
-            studentMap.put("number", integer);
-        } else {
-            studentMap.put("number", "99999+");
-        }
-        if (model.equals("3")) {
-            map.put("total", (100 / rows) + 1);
-        } else {
-            if (integer > 100) {
-                map.put("total", (100 / rows) + 1);
-            } else {
-                map.put("total", integer % rows > 0 ? integer / rows + 1 : integer / rows);
-            }
-        }
-        if (start > 100) {
-            return;
-        }
-        if (start + rows > 100) {
-            rows = 100 - start;
-        }
-        List<Map<String, Object>> ranking = new ArrayList<>();
-        List<Long> studentIds = new ArrayList<>();
-        List<Map<String, Object>> totalRanking = new ArrayList<>();
-        if (model.equals("1")) {
-            //获取本班排行参与人数
-            ranking = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), null, worship, model, null, start, rows,teacherIds);
-            totalRanking = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), null, worship, model, null, 0, 100,teacherIds);
-        } else if (model.equals("2")) {
-            ranking = simpleStudentMapper.getRanking(null, student.getTeacherId(), null, worship, model, adminId, start, rows,teacherIds);
-            totalRanking = simpleStudentMapper.getRanking(null, student.getTeacherId(), null, worship, model, adminId, 0, 100,teacherIds);
-        } else if (model.equals("3")) {
-            //获取本班排行参与人数
-            ranking = simpleStudentMapper.getRanking(null, null, null, worship, model, null, start, rows,teacherIds);
-            totalRanking = simpleStudentMapper.getRanking(null, null, null, worship, model, null, 0, 100,teacherIds);
-        }
-        for (int i = 0; i < ranking.size(); i++) {
-            studentIds.add(Long.parseLong(ranking.get(i).get("id").toString()));
-        }
-        Map<Long, Map<String, Object>> longMapMap = ccieMapper.selCountCcieByStudents(studentIds);
-        Map<Long, Map<String, Object>> longMapMap1 = simpleAwardMapper.selCountAwardByStudentIds(studentIds);
-        for (Map<String, Object> stuMap : ranking) {
-            if (longMapMap.get(stuMap.get("id")) != null) {
-                stuMap.put("zs", longMapMap.get(stuMap.get("id")).get("ccie"));
-            } else {
-                stuMap.put("zs", 0);
-            }
-            if (longMapMap1.get(stuMap.get("id")) != null) {
-                stuMap.put("xz", longMapMap1.get(stuMap.get("id")).get("award"));
-            } else {
-                stuMap.put("xz", 0);
-            }
-            Long gold1 = Math.round(Double.parseDouble(stuMap.get("gold").toString()));
-            String level = getLevel(gold1.intValue(), levels);
-            stuMap.put("childName", level);
-            getMap.add(stuMap);
-        }
-        saveRanking(worship, student.getId(), map, getMap, studentMap, totalRanking, model, "worship");
-
-    }
-
-    //获取证书排行
-    private void getCertificaterRanking(String model, String certificate, Student student, Map<String, Object> map, Integer start, Integer rows) {
-        List<Map<String, Object>> levels = redisOpt.getAllLevel();
-        Map<String, Object> studentMap = new HashMap<>();
-        List<Map<String, Object>> getMap = new ArrayList<>();
-        getClassAndSchool(student, map, levels, studentMap);
-        Integer adminId=null;
-        List<Integer> teacherIds=null;
-        if(student.getTeacherId()!=null){
-            adminId= simpleStudentMapper.selSchoolAdminId(student.getId());
-            if(adminId==null){
-                adminId=student.getTeacherId().intValue();
-            }
-            teacherIds= simpleTeacherMapper.getTeacherIdByAdminId(adminId);
-        }
-        Integer integer = simpleStudentMapper.selStudentNumberById(student.getClassId(), student.getTeacherId(), model, adminId,teacherIds,null);
-        if (!model.equals("3")) {
-            studentMap.put("number", integer);
-        } else {
-            studentMap.put("number", "99999+");
-        }
-        if (model.equals("3")) {
-            map.put("total", (100 / rows) + 1);
-        } else {
-            if (integer > 100) {
-                map.put("total", (100 / rows) + 1);
-            } else {
-                map.put("total", integer % rows > 0 ? integer / rows + 1 : integer / rows);
-            }
-        }
-        if (start > 100) {
-            return;
-        }
-        if (start + rows > 100) {
-            rows = 100 - start;
-        }
-        List<Map<String, Object>> ccieRanking = new ArrayList<>();
-        List<Map<String, Object>> ccieRanksing = new ArrayList<>();
-        if (model.equals("1")) {
-            ccieRanking = simpleStudentMapper.getCcieRanking(student.getClassId(), student.getTeacherId(), model, null, start, rows,teacherIds);
-            ccieRanksing = simpleStudentMapper.getCcieRanking(student.getClassId(), student.getTeacherId(), model, null, 0, 100,teacherIds);
-        }
-        if (model.equals("2")) {
-            ccieRanking = simpleStudentMapper.getCcieRanking(student.getClassId(), student.getTeacherId(), model, adminId, start, rows,teacherIds);
-            ccieRanksing = simpleStudentMapper.getCcieRanking(student.getClassId(), student.getTeacherId(), model, adminId.intValue(), 0, 100,teacherIds);
-        }
-        if (model.equals("3")) {
-            //获取本校排行参与人数
-            ccieRanking = simpleStudentMapper.getCcieRanking(null, null, model, null, start, rows,teacherIds);
-            ccieRanksing = simpleStudentMapper.getCcieRanking(null, null, model, null, 0, 100,teacherIds);
-
-        }
-        List<Long> studentIds = new ArrayList<>();
-        for (int i = 0; i < ccieRanking.size(); i++) {
-            studentIds.add(Long.parseLong(ccieRanking.get(i).get("id").toString()));
-        }
-        Map<Long, Map<String, Object>> longMapMap = worshipMapper.selCountWorshipByStudents(studentIds);
-        Map<Long, Map<String, Object>> longMapMap1 = simpleAwardMapper.selCountAwardByStudentIds(studentIds);
-        for (Map<String, Object> stuMap : ccieRanking) {
-            if (longMapMap.get(stuMap.get("id")) != null) {
-                stuMap.put("mb", longMapMap.get(stuMap.get("id")).get("worship"));
-            } else {
-                stuMap.put("mb", 0);
-            }
-            if (longMapMap1.get(stuMap.get("id")) != null) {
-                stuMap.put("xz", longMapMap1.get(stuMap.get("id")).get("award"));
-            } else {
-                stuMap.put("xz", 0);
-            }
-            Long gold1 = Math.round(Double.parseDouble(stuMap.get("gold").toString()));
-            String level = getLevel(gold1.intValue(), levels);
-            stuMap.put("childName", level);
-            getMap.add(stuMap);
-        }
-        saveRanking(certificate, student.getId(), map, getMap, studentMap, ccieRanksing, model, "ccie");
-    }
-
-    //获取勋章排行
-    private void getbadgeRanking(String model, String badge, Student student, Map<String, Object> map, Integer start, Integer rows) {
-        List<Map<String, Object>> levels = redisOpt.getAllLevel();
-        Map<String, Object> studentMap = new HashMap<>();
-        List<Map<String, Object>> getMap = new ArrayList<>();
-        getClassAndSchool(student, map, levels, studentMap);
-        Integer adminId=null;
-        List<Integer> teacherIds=null;
-        if(student.getTeacherId()!=null){
-            adminId= simpleStudentMapper.selSchoolAdminId(student.getId());
-            if(adminId==null){
-                adminId=student.getTeacherId().intValue();
-            }
-            teacherIds= simpleTeacherMapper.getTeacherIdByAdminId(adminId);
-        }
-        Integer integer =0;
-        if (!model.equals("3")) {
-            integer= simpleStudentMapper.selStudentNumberById(student.getClassId(), student.getTeacherId(), model, adminId,teacherIds,null);
-            studentMap.put("number", integer);
-        } else {
-            studentMap.put("number", "99999+");
-        }
-        if (start > 100) {
-            return;
-        }
-        if (start + rows > 100) {
-            rows = 100 - start;
-        }
-        if (model.equals("3")) {
-            map.put("total", (100 / rows) + 1);
-        } else {
-            if (integer > 100) {
-                map.put("total", (100 / rows) + 1);
-            } else {
-                map.put("total", integer % rows > 0 ? integer / rows + 1 : integer / rows);
-            }
-        }
-        List<Map<String, Object>> medalRanking = new ArrayList<>();
-        List<Map<String, Object>> medalRanksing = new ArrayList<>();
-        if (model.equals("1")) {
-
-            medalRanking = simpleStudentMapper.getMedalRanking(student.getClassId(), student.getTeacherId(), model, null, start, rows,teacherIds);
-            medalRanksing = simpleStudentMapper.getMedalRanking(student.getClassId(), student.getTeacherId(), model, null, 0, 100,teacherIds);
-        }
-        if (model.equals("2")) {
-            medalRanking = simpleStudentMapper.getMedalRanking(student.getClassId(), student.getTeacherId(), model, adminId, start, rows,teacherIds);
-            medalRanksing = simpleStudentMapper.getMedalRanking(student.getClassId(), student.getTeacherId(), model, adminId, 0, 100,teacherIds);
-        }
-        if (model.equals("3")) {
-            //获取本校排行参与人数
-            medalRanking = simpleStudentMapper.getMedalRanking(null, null, model, null, start, rows,teacherIds);
-            medalRanksing = simpleStudentMapper.getMedalRanking(null, null, model, null, 0, 100,teacherIds);
-        }
-        List<Long> studentIds = new ArrayList<>();
-        for (int i = 0; i < medalRanking.size(); i++) {
-            studentIds.add(Long.parseLong(medalRanking.get(i).get("id").toString()));
-        }
-        Map<Long, Map<String, Object>> longMapMap = worshipMapper.selCountWorshipByStudents(studentIds);
-        Map<Long, Map<String, Object>> longMapMap1 = ccieMapper.selCountCcieByStudents(
-                studentIds);
-        for (Map<String, Object> stuMap : medalRanking) {
-            if (longMapMap.get(stuMap.get("id")) != null) {
-                stuMap.put("mb", longMapMap.get(stuMap.get("id")).get("worship"));
-            } else {
-                stuMap.put("mb", 0);
-            }
-            if (longMapMap1.get(stuMap.get("id")) != null) {
-                stuMap.put("zs", longMapMap1.get(stuMap.get("id")).get("ccie"));
-            } else {
-                stuMap.put("zs", 0);
-            }
-            Long gold1 = Math.round(Double.parseDouble(stuMap.get("gold").toString()));
-            String level = getLevel(gold1.intValue(), levels);
-            stuMap.put("childName", level);
-            getMap.add(stuMap);
-        }
-        saveRanking(badge, student.getId(), map, getMap, studentMap, medalRanksing, model, "award");
-    }
-
-    //获取金币排行
-    private void getGoldRanking(String model, String gold, Student student, Map<String, Object> map, Integer start, Integer rows) {
-        List<Map<String, Object>> levels = redisOpt.getAllLevel();
-        Map<String, Object> studentMap = new HashMap<>();
-        List<Map<String, Object>> getMap = new ArrayList<>();
-        getClassAndSchool(student, map, levels, studentMap);
-        Integer adminId=null;
-        List<Integer> teacherIds=null;
-        if(student.getTeacherId()!=null){
-            adminId= simpleStudentMapper.selSchoolAdminId(student.getId());
-            if(adminId==null){
-                adminId=student.getTeacherId().intValue();
-            }
-            teacherIds= simpleTeacherMapper.getTeacherIdByAdminId(adminId);
-        }
-        Integer integer = simpleStudentMapper.selStudentNumberById(student.getClassId(), student.getTeacherId(), model, adminId,teacherIds,null);
-        if (!model.equals("3")) {
-            studentMap.put("number", integer);
-        } else {
-            studentMap.put("number", "99999+");
-        }
-        if (model.equals("3")) {
-            map.put("total", (100 / rows) + 1);
-        } else {
-            if (integer > 100) {
-                map.put("total", (100 / rows) + 1);
-            } else {
-                map.put("total", integer % rows > 0 ? integer / rows + 1 : integer / rows);
-            }
-        }
-        if (start > 100) {
-            return;
-        }
-        if (start + rows > 100) {
-            rows = 100 - start;
-        }
-        List<Long> studentIds = new ArrayList<>();
-        List<Map<String, Object>> ranking = new ArrayList<>();
-        List<Map<String, Object>> totalRanking = new ArrayList<>();
-        if (model.equals("1")) {
-            //获取本班排行参与人数
-            ranking = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), gold, null, model, null, start, rows,teacherIds);
-            totalRanking = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), gold, null, model, null, 0, 100,teacherIds);
-        } else if (model.equals("2")) {
-            //获取本校排行参与人数
-            ranking = simpleStudentMapper.getRanking(null, student.getTeacherId(), gold, null, model, adminId, start, rows,teacherIds);
-            totalRanking = simpleStudentMapper.getRanking(null, student.getTeacherId(), gold, null, model, adminId, 0, 100,teacherIds);
-        } else if (model.equals("3")) {
-            //获取全国排行参与人数
-            ranking = simpleStudentMapper.getRanking(null, null, gold, null, model, null, start, rows,teacherIds);
-            totalRanking = simpleStudentMapper.getRanking(null, null, gold, null, model, null, 0, 100,teacherIds);
-        }
-        for (int i = 0; i < ranking.size(); i++) {
-            studentIds.add(Long.parseLong(ranking.get(i).get("id").toString()));
-        }
-        Map<Long, Map<String, Object>> longMapMap = ccieMapper.selCountCcieByStudents(studentIds);
-        Map<Long, Map<String, Object>> longMapMap1 = simpleAwardMapper.selCountAwardByStudentIds(studentIds);
-        for (Map<String, Object> stuMap : ranking) {
-            if (longMapMap.get(stuMap.get("id")) != null) {
-                stuMap.put("zs", longMapMap.get(stuMap.get("id")).get("ccie"));
-            } else {
-                stuMap.put("zs", 0);
-            }
-            if (longMapMap1.get(stuMap.get("id")) != null) {
-                stuMap.put("xz", longMapMap1.get(stuMap.get("id")).get("award"));
-            } else {
-                stuMap.put("xz", 0);
-            }
-            Long gold1 = Math.round(Double.parseDouble(stuMap.get("gold").toString()));
-            String level = getLevel(gold1.intValue(), levels);
-            stuMap.put("childName", level);
-            getMap.add(stuMap);
-        }
-        saveRanking(gold, student.getId(), map, getMap, studentMap, totalRanking, model, "gold");
-    }
-
-    private void saveRanking(String order, Long id, Map<String, Object> map,
-                             List<Map<String, Object>> getMap, Map<String, Object> studentMap,
-                             List<Map<String, Object>> totalRnking, String model, String type) {
-        Integer ranking = -1;
-        worshipMapper.updState(id);
-        for (int i = 0; i < totalRnking.size(); i++) {
-            Long studentId = Long.parseLong(totalRnking.get(i).get("id").toString());
-            if (id.equals(studentId)) {
-                ranking = i + 1;
-            }
-        }
-        if (type.equals("gold") || type.equals("worship")) {
-            updateRanking(model, type, ranking, id);
-        }
-        if (ranking != -1) {
-            studentMap.put("myRanking", ranking);
-        } else {
-            studentMap.put("myRanking", "未上榜");
-        }
-        map.put("myDate", studentMap);
-        if (order.equals("2")) {
-            map.put("phDate", getMap);
-        } else {
-            List<Map<String, Object>> getGolds = new ArrayList<>();
-            for (int i = getMap.size() - 1; i >= 0; i--) {
-                getGolds.add(getMap.get(i));
-            }
-            map.put("phDate", getGolds);
+        switch (type) {
+            case 1:
+                // 金币排行
+                return ServerResponse.createBySuccess(this.getGoldRank(student, rankDto));
+            case 2:
+                // 勋章排行
+                return ServerResponse.createBySuccess(this.getMedalRank(student, rankDto));
+            case 3:
+                // 证书排行
+                return ServerResponse.createBySuccess(this.getCcieRank(student, rankDto));
+            case 4:
+                // 膜拜排行
+                return ServerResponse.createBySuccess(this.getWorshipRank(student, rankDto));
+            default:
+                return ServerResponse.createBySuccess(new HashMap<>(16));
         }
     }
 
-    private void updateRanking(String model, String type, Integer ranking, Long studentId) {
-        if (ranking == -1) {
-            ranking = 101;
+    /**
+     * 获取膜拜排行
+     *
+     * @param student
+     * @param rankDto
+     * @return
+     */
+    private Object getWorshipRank(Student student, RankDto rankDto) {
+        String key;
+        if (rankDto.getModel() == 1) {
+            // 本班参与排行的人数
+            key = RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId();
+        } else if (rankDto.getModel() == 2) {
+            // 本校参与排行的人数
+            key = RankKeysConst.SCHOOL_WORSHIP_RANK + TeacherInfoUtil.getSchoolAdminId(student);
+        } else {
+            key = RankKeysConst.COUNTRY_WORSHIP_RANK;
         }
-        Ranking rank = simpleRankingMapper.selByStudentId(studentId);
-        if (model.equals("1")) {
-            if (type.equals("gold")) {
-                rank.setGoldClassRank(ranking);
-            }
-            if (type.equals("worship")) {
-                rank.setWorshipClassRank(ranking);
-            }
-        }
-        if (model.equals("2")) {
-            if (type.equals("gold")) {
-                rank.setGoldSchoolRank(ranking);
-            }
-            if (type.equals("worship")) {
-                rank.setWorshipSchoolRank(ranking);
-            }
-        }
-        if (model.equals("3")) {
-            if (type.equals("gold")) {
-                rank.setGoldCountryRank(ranking);
-            }
-            if (type.equals("worship")) {
-                rank.setWorshipCountryRank(ranking);
-            }
-        }
-        simpleRankingMapper.updateById(rank);
+
+        return packageResultMap(student, rankDto, key);
     }
 
-    private void getClassAndSchool(Student student, Map<String, Object> map, List<Map<String, Object>> levels, Map<String, Object> studentMap) {
-        studentMap.put("stuId", student.getId());
+    /**
+     * 获取证书排行
+     *
+     * @param student
+     * @param rankDto
+     * @return
+     */
+    private Object getCcieRank(Student student, RankDto rankDto) {
+        String key;
+        if (rankDto.getModel() == 1) {
+            // 本班参与排行的人数
+            key = RankKeysConst.CLASS_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId();
+        } else if (rankDto.getModel() == 2) {
+            // 本校参与排行的人数
+            key = RankKeysConst.SCHOOL_CCIE_RANK + TeacherInfoUtil.getSchoolAdminId(student);
+        } else {
+            key = RankKeysConst.COUNTRY_CCIE_RANK;
+        }
+
+        return packageResultMap(student, rankDto, key);
+    }
+
+    /**
+     * 获取勋章排行
+     *
+     * @param student
+     * @param rankDto
+     * @return
+     */
+    private Object getMedalRank(Student student, RankDto rankDto) {
+        String key;
+        if (rankDto.getModel() == 1) {
+            // 本班参与排行的人数
+            key = RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId();
+        } else if (rankDto.getModel() == 2) {
+            // 本校参与排行的人数
+            key = RankKeysConst.SCHOOL_MEDAL_RANK + TeacherInfoUtil.getSchoolAdminId(student);
+        } else {
+            key = RankKeysConst.COUNTRY_MEDAL_RANK;
+        }
+
+        return packageResultMap(student, rankDto, key);
+    }
+
+    /**
+     * 获取金币排行
+     *
+     * @param student
+     * @param rankDto
+     * @return
+     */
+    private Object getGoldRank(Student student, RankDto rankDto) {
+
+        String key;
+        if (rankDto.getModel() == 1) {
+            // 本班参与排行的人数
+            key = RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId();
+        } else if (rankDto.getModel() == 2) {
+            // 本校参与排行的人数
+            key = RankKeysConst.SCHOOL_GOLD_RANK + TeacherInfoUtil.getSchoolAdminId(student);
+        } else {
+            key = RankKeysConst.COUNTRY_GOLD_RANK;
+        }
+
+        return packageResultMap(student, rankDto, key);
+    }
+
+    /**
+     * 封装响应结果
+     *
+     * @param student
+     * @param rankDto
+     * @param key
+     * @return
+     */
+    private Map<String, Object> packageResultMap(Student student, RankDto rankDto, String key) {
+        // 参与排行的人数
+        long number;
+        // 排行总页数
+        long totalPages;
+        // 当前学生的个人数据
+        Map<String, Object> myData = packageMyData(student, rankDto, key);
+        Integer rows = rankDto.getRows();
+        if (rankDto.getModel() == 1) {
+            number = rankOpt.getMembers(key);
+            totalPages = getTotalPages(rows, number);
+            myData.put("number", number);
+        } else if (rankDto.getModel() == 2) {
+            number = rankOpt.getMembers(key);
+            totalPages = getTotalPages(rows, number);
+            myData.put("number", number);
+        } else {
+            // 全国排行
+            myData.put("number", "99999+");
+            totalPages = 100 / rows + 1;
+        }
+
+        Map<String, Object> resultMap = new HashMap<>(16);
         Map<String, Object> classNameAndGoldAndMbAnd = simpleStudentMapper.getClassNameAndGoldAndMbAnd(student.getId());
-        if (classNameAndGoldAndMbAnd.get("gold") == null) {
-            studentMap.put("myGold", 0);
-            studentMap.put("myChildName", "");
-        } else {
-            Long myGold = Math.round(Double.parseDouble(classNameAndGoldAndMbAnd.get("gold").toString()));
-            studentMap.put("myGold", myGold);
-            String level = getLevel(myGold.intValue(), levels);
-            studentMap.put("myChildName", level);
-        }
+        resultMap.put("mySchool", student.getSchoolName());
+        resultMap.put("myClass", classNameAndGoldAndMbAnd == null ? null : classNameAndGoldAndMbAnd.get("className"));
+        resultMap.put("total", totalPages);
+        resultMap.put("page", rankDto.getPage());
+        resultMap.put("phDate", packagePhData(rankDto, key, rows));
+        resultMap.put("myDate", myData);
 
-        studentMap.put("myMb", classNameAndGoldAndMbAnd.get("worship"));
+        updateRanking(student, rankDto, myData);
 
-        map.put("mySchool", student.getSchoolName());
-        map.put("myClass", classNameAndGoldAndMbAnd.get("className"));
+        return resultMap;
     }
+
+    /**
+     * 更新学生排名信息
+     *
+     * @param student
+     * @param rankDto
+     * @param myData
+     */
+    private void updateRanking(Student student, RankDto rankDto, Map<String, Object> myData) {
+        if (rankDto.getType() == 1 || rankDto.getType() == 4) {
+            Ranking rank = simpleRankingMapper.selByStudentId(student.getId());
+
+            Integer model = rankDto.getModel();
+            Integer type = rankDto.getType();
+
+            Object myRanking = myData.get("myRanking");
+            int ranking = (myRanking == null || Objects.equals(myRanking.toString(), "未上榜")) ? 101 : Integer.parseInt(myRanking.toString());
+            if (model == 1) {
+                if (type == 1) {
+                    rank.setGoldClassRank(ranking);
+                } else {
+                    rank.setWorshipClassRank(ranking);
+                }
+            } else if (model == 2) {
+                if (type == 1) {
+                    rank.setGoldSchoolRank(ranking);
+                } else {
+                    rank.setWorshipSchoolRank(ranking);
+                }
+            } else if (model == 3) {
+                if (type == 1) {
+                    rank.setGoldCountryRank(ranking);
+                } else {
+                    rank.setWorshipCountryRank(ranking);
+                }
+            }
+            simpleRankingMapper.updateById(rank);
+        }
+    }
+
+    /**
+     * 排行榜列表数据
+     *
+     * @param rankDto
+     * @param key
+     * @param rows
+     */
+    private List<Map<String, Object>> packagePhData(RankDto rankDto, String key, Integer rows) {
+        List<Map<String, Object>> phData = new ArrayList<>();
+
+        Integer page = rankDto.getPage();
+        long startIndex = (long) page == 1 ? 0 : (page - 1) * rows;
+        List<Long> studentIds = rankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, startIndex + rows);
+        if (studentIds.size() > 0) {
+            studentIds.forEach(id -> {
+                Map<String, Object> dataMap = new HashMap<>(16);
+                Student student1 = simpleStudentMapper.selectById(id);
+                dataMap.put("zs", rankOpt.getScore(RankKeysConst.COUNTRY_CCIE_RANK, id));
+                dataMap.put("xz", rankOpt.getScore(RankKeysConst.COUNTRY_MEDAL_RANK, id));
+                dataMap.put("mb", rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, id));
+                dataMap.put("area", student1.getArea());
+                dataMap.put("city", student1.getCity());
+                dataMap.put("province", student1.getProvince());
+                dataMap.put("headUrl", student1.getHeadUrl());
+                dataMap.put("studentName", student1.getNickname());
+                dataMap.put("id", id);
+                dataMap.put("gold", Math.round(BigDecimalUtil.add(student1.getOfflineGold(), student1.getSystemGold())));
+                dataMap.put("childName", getLevel((int) BigDecimalUtil.add(student1.getOfflineGold(), student1.getSystemGold()), redisOpt.getAllLevel()));
+                phData.add(dataMap);
+            });
+        }
+        return phData;
+    }
+
+    private Map<String, Object> packageMyData(Student student, RankDto rankDto, String key) {
+        Map<String, Object> studentMap = new HashMap<>(16);
+        double totalGold = BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
+        studentMap.put("stuId", student.getId());
+        studentMap.put("myGold", Math.round(totalGold));
+        studentMap.put("myChildName", getLevel((int) Math.round(totalGold), redisOpt.getAllLevel()));
+        studentMap.put("myMb", rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId()));
+        packageMyRanking(student, rankDto, studentMap, key);
+        return studentMap;
+    }
+
+    /**
+     * 金币排行中获取我的名次
+     *
+     * @param student
+     * @param rankDto
+     * @param studentMap
+     */
+    private void packageMyRanking(Student student, RankDto rankDto, Map<String, Object> studentMap, String key) {
+        if (rankDto.getModel() == 1) {
+            studentMap.put("myRanking", rankOpt.getRank(key, student.getId()) + 1);
+        } else if (rankDto.getModel() == 2) {
+            studentMap.put("myRanking", rankOpt.getRank(key, student.getId()) + 1);
+        } else {
+            long rank = rankOpt.getRank(key, student.getId());
+            if (rank > 99) {
+                studentMap.put("myRanking", "未上榜");
+            } else {
+                studentMap.put("myRanking", rank + 1);
+            }
+        }
+    }
+
+    private long getTotalPages(Integer rows, long number) {
+        long totalPages;
+        if (number > 100) {
+            totalPages = 100 / rows + 1;
+        } else {
+            totalPages = number % rows > 0 ? number / rows + 1 : number / rows;
+        }
+        return totalPages;
+    }
+
 
     private String getLevel(Integer myGold, List<Map<String, Object>> levels) {
         String level = "";
@@ -1683,12 +1464,9 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                 myrecord = levelGold;
                 myauto++;
             }
-            myrecord = 0;
-            myauto = 0;
         }
         return level;
     }
-
 
     // 金币降序
     static class MapGoldDesc implements Comparator<Map<String, Object>> {

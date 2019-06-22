@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Worship;
 import com.zhidejiaoyu.common.pojo.WorshipExample;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -115,6 +116,15 @@ public interface SimpleWorshipMapper {
      * @return
      */
     int countByWorship(@Param("studentId") Long studentId);
+
+    /**
+     * 查看指定学生被膜拜的次数
+     *
+     * @param students
+     * @return
+     */
+    @MapKey("studentId")
+    Map<Long, Map<Long, Long>> countWorshipWithStudents(@Param("students") List<Student> students);
 }
 
 
