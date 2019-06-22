@@ -58,4 +58,9 @@ public interface SimpleQuartzService {
      void deleteDrawRedis();
 
     void updateStudentExpansion();
+
+    /**
+     * 初始化排行缓存信息
+     */
+    void initRankCache();
 }

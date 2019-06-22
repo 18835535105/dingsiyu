@@ -50,4 +50,15 @@ public class SimpleQuartzController {
         simpleQuartzService.deleteSessionMap();
     }
 
+    /**
+     * 初始化排行缓存信息
+     *
+     * @return
+     */
+    @GetMapping("/initRankCache")
+    public ServerResponse initRankCache() {
+        simpleQuartzService.initRankCache();
+        return ServerResponse.createBySuccess();
+    }
+
 }
