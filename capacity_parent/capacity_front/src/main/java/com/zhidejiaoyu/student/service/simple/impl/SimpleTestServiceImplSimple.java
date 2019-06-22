@@ -8,6 +8,7 @@ import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.simple.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.Vo.simple.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
+import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
 import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
@@ -532,6 +533,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
     @Override
     @GoldChangeAnnotation
+    @TestChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO, String testDetail) {
 
@@ -613,24 +615,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         getLevel(session);
         session.removeAttribute("token");
 
-        executorService.execute(() -> saveGoldAward(student, point));
-
         return ServerResponse.createBySuccess(vo);
-    }
-
-    private void saveGoldAward(Student student, Integer point) {
-        // 验证学生今日是否完成一个单元
-        dailyAwardAsync.todayLearnOneUnit(student);
-        // 验证学生今日是否完成10个单元闯关测试
-        dailyAwardAsync.todayCompleteTenUnitTest(student);
-        // 验证学生单元闯关成功个数
-        goldAwardAsync.completeUnitTest(student);
-        if (point != null && point == 100) {
-            // 学霸崛起勋章计算
-            medalAwardAsync.superStudent(student);
-        }
-        // 最有潜力勋章
-        medalAwardAsync.potentialMan(student);
     }
 
     private String getMsg(Student student, TestResultVo vo, Integer classify, TestRecord testRecord, Integer point) {
@@ -962,6 +947,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      */
     @Override
     @GoldChangeAnnotation
+    @TestChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, TestRecord testRecord, int type,
                                                           int modelType, String testDetail) {
@@ -1039,13 +1025,6 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         vo.setEnergy(addEnergy);
         simpleStudentMapper.updateByPrimaryKeySelective(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
-
-        // 学霸崛起勋章计算
-        if (point == 100) {
-            medalAwardAsync.superStudent(student);
-        }
-        // 最有潜力勋章
-        medalAwardAsync.potentialMan(student);
         return ServerResponse.createBySuccess(vo);
     }
 
