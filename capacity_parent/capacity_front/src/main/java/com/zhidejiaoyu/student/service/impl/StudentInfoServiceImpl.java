@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -70,6 +71,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
     @Autowired
     private GoldAwardAsync goldAwardAsync;
+
+    @Autowired
+    private RankOpt rankOpt;
 
     @Autowired
     private ExecutorService executorService;
@@ -281,8 +285,11 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         worship.setWorshipTime(new Date());
         worshipMapper.insert(worship);
 
-        // 众望所归勋章
-        medalAwardAsync.enjoyPopularConfidence(student);
+        executorService.execute(() -> {
+            // 众望所归勋章
+            medalAwardAsync.enjoyPopularConfidence(student);
+            rankOpt.optWorshipRank(student);
+        });
 
         return ServerResponse.createBySuccessMessage("膜拜成功");
     }

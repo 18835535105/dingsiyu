@@ -2,11 +2,12 @@ package com.zhidejiaoyu.student.utils;
 
 import com.zhidejiaoyu.common.mapper.CcieMapper;
 import com.zhidejiaoyu.common.mapper.CourseMapper;
-import com.zhidejiaoyu.common.mapper.UnitMapper;
 import com.zhidejiaoyu.common.pojo.Ccie;
 import com.zhidejiaoyu.common.pojo.Course;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ import java.util.Date;
  * @author wuchenxi
  * @date 2018/8/27
  */
+@Slf4j
 @Component
 public class CcieUtil {
 
@@ -27,6 +29,9 @@ public class CcieUtil {
 
     @Autowired
     private CourseMapper courseMapper;
+
+    @Autowired
+    private RankOpt rankOpt;
 
     /**
      * 测试证书
@@ -71,6 +76,8 @@ public class CcieUtil {
         ccie.setReadFlag(0);
         ccie.setCcieNo(getNo(type));
         ccieMapper.insert(ccie);
+
+        rankOpt.optCcieRank(student);
     }
 
     /**

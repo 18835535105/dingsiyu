@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.TeacherMapper;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.rank.RankOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
@@ -44,6 +45,9 @@ public class GoldChangeAop {
     @Autowired
     private TeacherMapper teacherMapper;
 
+    @Autowired
+    private RankOpt rankOpt;
+
     private Double systemGold = null;
 
     @Pointcut("@annotation(com.zhidejiaoyu.common.annotation.GoldChangeAnnotation)")
@@ -76,6 +80,8 @@ public class GoldChangeAop {
                 medalAwardAsync.godMan(student);
                 // 拔得头筹
                 medalAwardAsync.theFirst(student);
+
+                rankOpt.optGoldRank(student);
             }
         } catch (Exception e) {
             log.error("[{}] @after操作错误！", this.getClass().getSimpleName(), e);

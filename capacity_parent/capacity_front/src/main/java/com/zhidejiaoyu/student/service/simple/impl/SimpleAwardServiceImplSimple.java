@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
@@ -68,9 +69,6 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
     private DailyAwardAsync awardAsync;
 
     @Autowired
-    private ExecutorService executorService;
-
-    @Autowired
     private SimpleRankingMapper simpleRankingMapper;
 
     @Autowired
@@ -81,6 +79,9 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired
+    private RankOpt rankOpt;
 
     /**
      * 获取学生任务奖励信息
@@ -606,6 +607,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 runLog.setUnitId(student.getUnitId());
                 try {
                     runLogMapper.insert(runLog);
+                    rankOpt.optMedalRank(student);
                 } catch (Exception e) {
                     log.error("id为[{}]的学生在领取勋章[{}-{}]时保存日志出错！", student.getId(), medal.getParentName(), medal.getChildName(), e);
                 }
