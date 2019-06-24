@@ -34,4 +34,12 @@ public interface FeedBackService extends BaseService<MessageBoard> {
      * @return
      */
     ServerResponse saveFeedBack(HttpSession session, String content, MultipartFile[] files);
+
+    /**
+     * 学生阅读管理员回复的信息后，将阅读状态置为学生已读状态
+     *
+     * @param httpSession
+     * @return
+     */
+    ServerResponse<String> cancelRedPoint(HttpSession httpSession);
 }

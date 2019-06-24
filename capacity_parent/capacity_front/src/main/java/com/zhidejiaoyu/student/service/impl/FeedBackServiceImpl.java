@@ -102,6 +102,13 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
         return ServerResponse.createBySuccess();
     }
 
+    @Override
+    public ServerResponse<String> cancelRedPoint(HttpSession httpSession) {
+        Long studentId = getStudentId(httpSession);
+        messageBoardMapper.updateReadFlag(studentId, 4);
+        return ServerResponse.createBySuccess();
+    }
+
     private void saveFeedBackContent(String content, Student student, String url) {
         MessageBoard messageBoard = new MessageBoard();
         messageBoard.setRole(0);
