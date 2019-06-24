@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.service.impl;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.aliyunoss.putObject.OssUpload;
 import com.zhidejiaoyu.common.constant.FileConstant;
+import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.mapper.MessageBoardMapper;
 import com.zhidejiaoyu.common.pojo.MessageBoard;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -14,13 +15,14 @@ import com.zhidejiaoyu.student.vo.feedbackvo.FeedBackInfoVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author wuchenxi
@@ -32,6 +34,12 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
 
     @Autowired
     private MessageBoardMapper messageBoardMapper;
+    @Autowired
+    private RestTemplate restTemplate;
+    @Value("${adminDomin}")
+    private String adminDomin;
+
+
 
     @Override
     public ServerResponse<FeedBackInfoVO> getFeedBacks(HttpSession session) {
@@ -79,6 +87,14 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
         // 保存反馈内容
         try {
             saveFeedBackContent(content, student, fileName);
+            try{
+                Map<String, Object> paramMap = new HashMap<>(16);
+                paramMap.put("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)));
+                String url = adminDomin + "/dept/socket/getMessage";
+                restTemplate.getForEntity(url, Map.class, paramMap);
+            }catch (Exception e){
+                throw new RuntimeException(e);
+            }
         } catch (Exception e) {
             log.error("保存学生 {}->{} 意见反馈失败！", student.getId(), student.getStudentName(), e);
             return ServerResponse.createByErrorMessage("提交失败！");
@@ -107,7 +123,6 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
         messageBoard.setContent(content);
         messageBoard.setStudentId(student.getId());
         messageBoard.setUrl(url);
-
         messageBoardMapper.insert(messageBoard);
     }
 

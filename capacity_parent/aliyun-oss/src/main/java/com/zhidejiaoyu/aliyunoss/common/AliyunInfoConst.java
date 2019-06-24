@@ -10,5 +10,5 @@ public class AliyunInfoConst {
     public static String accessKeySecret = "XNACDGtXpOYHfFNG4hN6m5SBnYJgS0";
     public static String bucketName = "zdjy-back-oss";
 
-    public static String host = "http://oss.yydz100.com/";
+    public static String host = "https://oss.yydz100.com/";
 }

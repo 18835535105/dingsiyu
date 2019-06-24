@@ -726,9 +726,9 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
         if (port != localPort) {
             return;
         }
-        log.error("定时删除日奖励信息开始");
+        log.info("定时删除日奖励信息开始");
         simpleAwardMapper.deleteDailyAward();
-        log.error("定时删除日奖励信息结束");
+        log.info("定时删除日奖励信息结束");
     }
 
     @Override
