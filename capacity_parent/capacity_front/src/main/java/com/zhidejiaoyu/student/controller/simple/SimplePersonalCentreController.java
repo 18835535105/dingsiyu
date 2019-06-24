@@ -5,12 +5,10 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.simple.SimplePersonalCentreServiceSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -158,12 +156,16 @@ public class SimplePersonalCentreController {
     }
 
     /**
-     * 我的排名
-     *
+     * 排行榜
+     * <ul>
+     *     <li>每次学生的金币数量、勋章数量、被膜拜次数、证书数量发生变化时，更新 redis 缓存中的相关学生数据</li>
+     *     <li>系统后台针对学生的班级、教师进行操作时，更新 redis 缓存中相关的学生数据</li>
+     *     <li>系统后台删除学生、从回收站恢复学生时，更新 redis 缓存中相关的学生数据</li>
+     * </ul>
      * @param rankDto
      */
     @RequestMapping(value = "/classSeniority", method = RequestMethod.POST)
-    public ServerResponse<Object> classSeniority(HttpSession session, @Valid RankDto rankDto, BindingResult result) {
+    public ServerResponse<Object> classSeniority(HttpSession session, RankDto rankDto) {
 
         if (rankDto.getType() == null) {
             rankDto.setType(1);

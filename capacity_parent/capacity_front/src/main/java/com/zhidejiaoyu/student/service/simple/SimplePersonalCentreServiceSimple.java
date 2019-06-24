@@ -58,21 +58,6 @@ public interface SimplePersonalCentreServiceSimple extends SimpleBaseService<Cci
                                                  Integer unitNumber);
 
     /**
-     * 我的排名
-     * 本班排行
-     * 默认金币倒叙排行
-     *
-     * @param rows
-     * @param page
-     * @param gold        金币 1=正序 2=倒叙  - 默认金币倒叙排行
-     * @param badge       徽章 1=正序 2=倒叙
-     * @param certificate 证书 1=正序 2=倒叙
-     * @param worship     膜拜 1=正序 2=倒叙
-     * @param model
-     */
-    ServerResponse<Object> classSeniority(HttpSession session, Integer page, Integer rows, String gold, String badge, String certificate, String worship, String model, Integer queryType);
-
-    /**
      * 查询排行数据
      *
      * @param session

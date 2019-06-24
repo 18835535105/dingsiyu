@@ -845,7 +845,7 @@
         from student where teacher_id = #{teacherId} order by system_gold + offline_gold desc
     </select>
 
-    <select id="getClassNameAndGoldAndMbAnd" parameterType="java.lang.Long" resultType="map">
+    <select id="selectClassNameByStudentId" parameterType="java.lang.Long" resultType="map">
         select grade.class_name className
         from student stu
                  left join grade grade

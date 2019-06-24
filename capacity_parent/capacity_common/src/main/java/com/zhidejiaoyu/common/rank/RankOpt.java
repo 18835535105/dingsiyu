@@ -128,7 +128,7 @@ public class RankOpt {
      * @param key
      * @return
      */
-    public Long getMembers(String key) {
+    public Long getMemberSize(String key) {
         Long size = redisTemplate.opsForZSet().size(key);
         return size == null ? 0L : size;
     }
