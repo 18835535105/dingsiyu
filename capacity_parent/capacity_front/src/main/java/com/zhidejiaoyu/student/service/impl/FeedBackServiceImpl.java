@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -90,8 +91,8 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
             try{
                 Map<String, Object> paramMap = new HashMap<>(16);
                 paramMap.put("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)));
-                String url = adminDomin + "/dept/socket/getMessage";
-                restTemplate.getForEntity(url, Map.class, paramMap);
+                String url = adminDomin + "/socket/getMessage";
+                ResponseEntity<Map> forEntity = restTemplate.getForEntity(url, Map.class, paramMap);
             }catch (Exception e){
                 throw new RuntimeException(e);
             }
