@@ -37,7 +37,7 @@
                         <foreach collection="criteria.criteria" item="criterion">
                             <choose>
                                 <when test="criterion.noValue">
-                                and ${criterion.condition}
+                                    and ${criterion.condition}
                                 </when>
                                 <when test="criterion.singleValue">
                                     and ${criterion.condition} #{criterion.value}
@@ -233,7 +233,7 @@
         </if>
         and learn_count = #{count}
         and study_model = #{studyModel}
-         and
+        and
         <if
                 test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写' or studyModel == '单词图鉴'">
             vocabulary_id = #{id}
@@ -579,13 +579,17 @@
     <select id="selectNumberByStudentId" parameterType="map" resultType="int">
         <!-- 单词 -->
         <if test="model &lt; 4">
-          select COUNT(a.id) from learn a JOIN vocabulary b ON a.vocabulary_id = b.id where a.student_id = #{student_id} and a.unit_id = #{unit_id}
-          and a.example_id is null <include refid="study_model_sql"/> AND b.delStatus = 1
+            select COUNT(a.id) from learn a JOIN vocabulary b ON a.vocabulary_id = b.id where a.student_id =
+            #{student_id} and a.unit_id = #{unit_id}
+            and a.example_id is null
+            <include refid="study_model_sql"/>
+            AND b.delStatus = 1
         </if>
         <!-- 例句 -->
         <if test="model &gt; 3">
-          select COUNT(a.id) from learn a where a.student_id = #{student_id} and a.unit_id = #{unit_id}
-          and a.example_id is NOT null <include refid="study_model_sql"/>
+            select COUNT(a.id) from learn a where a.student_id = #{student_id} and a.unit_id = #{unit_id}
+            and a.example_id is NOT null
+            <include refid="study_model_sql"/>
         </if>
     </select>
     <select id="countKnownCountByStudentIdAndUnitId" resultType="java.lang.Integer" parameterType="map">
@@ -740,11 +744,11 @@
         SELECT
         count(DISTINCT vocabulary_id)
         FROM
-            learn
+        learn
         WHERE
-            student_id = #{stuId}
-            AND course_id = #{courseId}
-            <include refid="study_model_sql"/>
+        student_id = #{stuId}
+        AND course_id = #{courseId}
+        <include refid="study_model_sql"/>
     </select>
     <select id="selectVocabularyIdByStudentIdAndCourseId" resultType="java.lang.Long" parameterType="map">
         SELECT DISTINCT
@@ -998,9 +1002,9 @@
             AND c.num > #{learnedCount}
     </select>
     <select id="countHaveToLearnByModelAll" resultType="java.lang.Integer">
-      SELECT COUNT(*) FROM learn WHERE student_id = #{studentId} AND unit_id = #{unitId}
-      <include refid="model_word_example" />
-      <include refid="study_model_sql" />
+        SELECT COUNT(*) FROM learn WHERE student_id = #{studentId} AND unit_id = #{unitId}
+        <include refid="model_word_example"/>
+        <include refid="study_model_sql"/>
     </select>
     <select id="countUnitAllStudyModel" resultType="java.lang.Integer">
         select
@@ -1144,7 +1148,9 @@
         WHERE student_id = #{stuId}
     </select>
     <select id="learnCourseCountSentence" parameterType="map" resultType="java.lang.Integer">
-       SELECT count(id) from learn where course_id = #{courseId} AND student_id = #{studentId} <include refid="study_model_sql" /> AND example_id IS not NULL
+        SELECT count(id) from learn where course_id = #{courseId} AND student_id = #{studentId}
+        <include refid="study_model_sql"/>
+        AND example_id IS not NULL
     </select>
 
     <select id="selectWordInCurrentCourse" resultType="java.util.Map" parameterType="map">
@@ -1246,7 +1252,7 @@
           and student_id = #{studentId}
           and study_model = #{studyModel}
     </update>
-    <select  id="selByStudentIdAndCourseIdDisVersion" parameterType="java.util.Map" resultType="java.lang.Long">
+    <select id="selByStudentIdAndCourseIdDisVersion" parameterType="java.util.Map" resultType="java.lang.Long">
         select DISTINCT learn.unit_id from learn learn
         where learn.student_id= #{studentId}
         and learn.course_id= #{courseId}
@@ -1274,7 +1280,7 @@
         from learn learn
         join teks_course course on course.id=learn.course_id
         where learn.student_id=#{studentId}
-
+        and type=1
         and vocabulary_id is null
         and example_id is null
         order by learn.update_time desc limit 1
@@ -1292,7 +1298,7 @@
         where student_id=#{studentId}
         and unit_id in (
         <foreach collection="unitIds" item="unitId" separator=",">
-          #{unitId}
+            #{unitId}
         </foreach>
         )
         and study_model=#{studyModel}
@@ -1339,7 +1345,8 @@
         select count(id) from learn where  student_id=#{studentId} and unit_id=#{unitId} and study_model=#{studyModel};
     </select>
     <select id="selLetter" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"></include> from learn where   student_id=#{studentId} and type=4 and unit_id=#{unitId} and study_model=#{studyModel} and vocabulary_id=#{wordId};
+        select <include refid="Base_Column_List"></include> from learn where student_id=#{studentId} and type=4 and
+        unit_id=#{unitId} and study_model=#{studyModel} and vocabulary_id=#{wordId};
     </select>
     <select id="countTodayRestudyAndMemoryStrengthGePercentFifty" resultType="java.lang.Integer" parameterType="map">
         select count(distinct sr.vocabulary_id)
