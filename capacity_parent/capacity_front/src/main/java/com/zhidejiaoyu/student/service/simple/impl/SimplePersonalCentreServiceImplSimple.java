@@ -813,12 +813,11 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
      * @return
      */
     private Map<String, Object> getWorshipRank(Student student, RankDto rankDto) {
+        // 缓存中相对应的 key 值
         String key;
         if (rankDto.getModel() == 1) {
-            // 本班参与排行的人数
             key = RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId();
         } else if (rankDto.getModel() == 2) {
-            // 本校参与排行的人数
             key = RankKeysConst.SCHOOL_WORSHIP_RANK + TeacherInfoUtil.getSchoolAdminId(student);
         } else {
             key = RankKeysConst.COUNTRY_WORSHIP_RANK;
@@ -835,12 +834,11 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
      * @return
      */
     private Map<String, Object> getCcieRank(Student student, RankDto rankDto) {
+        // 缓存中相对应的 key 值
         String key;
         if (rankDto.getModel() == 1) {
-            // 本班参与排行的人数
             key = RankKeysConst.CLASS_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId();
         } else if (rankDto.getModel() == 2) {
-            // 本校参与排行的人数
             key = RankKeysConst.SCHOOL_CCIE_RANK + TeacherInfoUtil.getSchoolAdminId(student);
         } else {
             key = RankKeysConst.COUNTRY_CCIE_RANK;
@@ -857,12 +855,11 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
      * @return
      */
     private Map<String, Object> getMedalRank(Student student, RankDto rankDto) {
+        // 缓存中相对应的 key 值
         String key;
         if (rankDto.getModel() == 1) {
-            // 本班参与排行的人数
             key = RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId();
         } else if (rankDto.getModel() == 2) {
-            // 本校参与排行的人数
             key = RankKeysConst.SCHOOL_MEDAL_RANK + TeacherInfoUtil.getSchoolAdminId(student);
         } else {
             key = RankKeysConst.COUNTRY_MEDAL_RANK;
@@ -879,13 +876,11 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
      * @return
      */
     private Map<String, Object> getGoldRank(Student student, RankDto rankDto) {
-
+        // 缓存中相对应的 key 值
         String key;
         if (rankDto.getModel() == 1) {
-            // 本班参与排行的人数
             key = RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId();
         } else if (rankDto.getModel() == 2) {
-            // 本校参与排行的人数
             key = RankKeysConst.SCHOOL_GOLD_RANK + TeacherInfoUtil.getSchoolAdminId(student);
         } else {
             key = RankKeysConst.COUNTRY_GOLD_RANK;
@@ -899,7 +894,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
      *
      * @param student
      * @param rankDto
-     * @param key
+     * @param key   缓存中相对应的 key 值
      * @return
      */
     private Map<String, Object> packageResultMap(Student student, RankDto rankDto, String key) {
