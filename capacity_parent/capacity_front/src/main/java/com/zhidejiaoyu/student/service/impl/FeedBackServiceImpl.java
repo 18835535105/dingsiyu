@@ -92,7 +92,7 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
                 Map<String, Object> paramMap = new HashMap<>(16);
                 paramMap.put("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)));
                 String url = adminDomin + "/socket/getMessage";
-                ResponseEntity<Map> forEntity = restTemplate.getForEntity(url, Map.class, paramMap);
+                restTemplate.getForEntity(url, Map.class, paramMap);
             }catch (Exception e){
                 throw new RuntimeException(e);
             }
