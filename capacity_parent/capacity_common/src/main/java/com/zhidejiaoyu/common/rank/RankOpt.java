@@ -10,11 +10,11 @@ import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -114,9 +114,9 @@ public class RankOpt {
     public void optWorshipRank(Student student) {
         try {
             int byWorshipCount = worshipMapper.countByWorship(student.getId());
-            this.addOrUpdate(RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), byWorshipCount * 1.0);
+            this.addOrUpdate(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), byWorshipCount * 1.0);
             this.addOrUpdate(RankKeysConst.SCHOOL_WORSHIP_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId(), byWorshipCount * 1.0);
-            this.addOrUpdate(RankKeysConst.COUNTRY_MEDAL_RANK, student.getId(), byWorshipCount * 1.0);
+            this.addOrUpdate(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId(), byWorshipCount * 1.0);
         } catch (Exception e) {
             log.error("修改 redis 排行中的勋章排行信息失败！[{} - {} - {}]", student.getId(), student.getAccount(), student.getStudentName(), e);
         }
@@ -142,11 +142,11 @@ public class RankOpt {
      * @return
      */
     public List<Long> getReverseRangeMembersBetweenStartAndEnd(String key, Long start, Long end) {
-        Set<Object> objects = redisTemplate.opsForZSet().reverseRange(key, start, end - 1 >= 100 ? 100 : end - 1);
-        if (objects == null) {
+        Set<ZSetOperations.TypedTuple<Object>> typedTuples = redisTemplate.opsForZSet().reverseRangeWithScores(key, start, end - 1 >= 100 ? 100 : end - 1);
+        if (typedTuples == null || typedTuples.size() == 0) {
             return new ArrayList<>();
         }
-        return objects.stream().map(o -> (long) (int) o).collect(Collectors.toList());
+        return typedTuples.stream().map(typedTuple -> Long.valueOf(String.valueOf(typedTuple.getValue()))).collect(Collectors.toList());
     }
 
     /**

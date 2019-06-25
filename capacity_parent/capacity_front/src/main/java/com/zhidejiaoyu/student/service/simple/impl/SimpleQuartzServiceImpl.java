@@ -288,7 +288,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
         Map<Long, Map<Long, Long>> medalCount = awardMapper.countGetModelByStudents(students);
         // 各个学生获取的证书个数
         Map<Long, Map<Long, Long>> ccieCount = ccieMapper.countCcieByStudents(students);
-        students.parallelStream().forEach(student -> {
+        students.forEach(student -> {
             Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
 
             double goldCount = BigDecimalUtil.add(student.getOfflineGold(), student.getSystemGold());

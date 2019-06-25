@@ -41,7 +41,7 @@ public class RankKeysConst {
      */
     public static final String CLASS_MEDAL_RANK = "CLASS_MEDAL_RANK:";
     /**
-     * 学生班级勋章排行 key
+     * 学生学校勋章排行 key
      */
     public static final String SCHOOL_MEDAL_RANK = "SCHOOL_MEDAL_RANK:";
     /**
@@ -55,7 +55,7 @@ public class RankKeysConst {
      */
     public static final String CLASS_CCIE_RANK = "CLASS_CCIE_RANK:";
     /**
-     * 学生班级证书排行 key
+     * 学生学校证书排行 key
      */
     public static final String SCHOOL_CCIE_RANK = "SCHOOL_CCIE_RANK:";
     /**

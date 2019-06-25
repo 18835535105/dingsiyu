@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
+import java.util.Set;
 
 /**
  * @author wuchenxi
@@ -37,5 +38,16 @@ public class BaseTest {
 
         stringObjectZSetOperations.add(RankKeysConst.CLASS_GOLD_RANK + 301 + ":" + null, 9604, score + 10);
         log.info("修改后分数:{}", stringObjectZSetOperations.score(RankKeysConst.CLASS_GOLD_RANK + 301 + ":" + null, 9604));
+
+
+    }
+
+    @Test
+    public void testReverseRangeWithScores() {
+        Set<ZSetOperations.TypedTuple<Object>> typedTuples = redisTemplate.opsForZSet().reverseRangeWithScores(RankKeysConst.COUNTRY_GOLD_RANK, 0, 11);
+        for (ZSetOperations.TypedTuple<Object> typedTuple : typedTuples) {
+            log.info("typedTuple.getScore()", typedTuple.getScore());
+            log.info("typedTuple.getValue()", typedTuple.getValue());
+        }
     }
 }

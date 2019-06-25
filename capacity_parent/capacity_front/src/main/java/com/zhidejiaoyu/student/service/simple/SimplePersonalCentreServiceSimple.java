@@ -44,20 +44,6 @@ public interface SimplePersonalCentreServiceSimple extends SimpleBaseService<Cci
     ServerResponse<Object> courseStatistics(HttpSession session, int page, int rows) throws Exception;
 
     /**
-     * 我的报告
-     * 3.课程统计
-     * 点击某个课程某个模块下的某个单元 显示 已学/单词总量
-     *
-     * @param session
-     * @param courseId   课程id
-     * @param model      模块: 1=慧记忆，2=慧听写，3=慧默写，4=例句听力，5=例句翻译，6=例句默写
-     * @param unitNumber 第几个单元
-     * @return
-     */
-    ServerResponse<Object> courseStatisticsCount(HttpSession session, Integer courseId, Integer model,
-                                                 Integer unitNumber);
-
-    /**
      * 查询排行数据
      *
      * @param session
@@ -75,8 +61,6 @@ public interface SimplePersonalCentreServiceSimple extends SimpleBaseService<Cci
      * @return
      */
     ServerResponse<Object> showCcie(HttpSession session, Integer model);
-
-    ServerResponse<Object> weekDurationIndexPage(HttpSession session, int page, int rows, Integer year);
 
     ServerResponse<Object> durationSeniority(HttpSession session, Integer model, Integer haveUnit, Integer haveTest, Integer haveTime, Integer page, Integer rows);
 

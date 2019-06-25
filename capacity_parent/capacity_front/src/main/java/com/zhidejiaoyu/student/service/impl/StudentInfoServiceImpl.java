@@ -288,7 +288,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         executorService.execute(() -> {
             // 众望所归勋章
             medalAwardAsync.enjoyPopularConfidence(student);
-            rankOpt.optWorshipRank(student);
+            rankOpt.optWorshipRank(byWorship);
         });
 
         return ServerResponse.createBySuccessMessage("膜拜成功");
