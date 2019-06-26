@@ -1294,7 +1294,7 @@
         and example_id is null
     </select>
     <select id="selAllTeksLearn" parameterType="java.util.Map" resultType="java.lang.Integer">
-        select count(id) from learn
+        select count(distinct unit_id) from learn
         where student_id=#{studentId}
         and unit_id in (
         <foreach collection="unitIds" item="unitId" separator=",">
