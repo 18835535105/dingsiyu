@@ -103,8 +103,14 @@ public interface SimpleWorshipMapper {
     @Select("select count(id) from worship where student_id_by_worship =#{studentId} and state=2")
     Integer getNumberByStudent(Long id);
 
+    /**
+     * 更新勋章状态为已查看
+     *
+     * @param studentId
+     * @return
+     */
     @Update("update worship set state=1 where student_id_by_worship =#{studentId} and state=2")
-    Integer updState(Long studentId);
+    Integer updateState(Long studentId);
 
     @MapKey("studentId")
     Map<Long, Map<String, Object>> selCountWorshipByStudents(@Param("list") List<Long> studentIds);
