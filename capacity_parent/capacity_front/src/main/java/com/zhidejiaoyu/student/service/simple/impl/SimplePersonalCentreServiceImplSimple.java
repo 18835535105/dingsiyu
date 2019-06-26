@@ -876,48 +876,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         resultMap.put("phDate", packagePhData(rankDto, key, rows));
         resultMap.put("myDate", myData);
 
-        updateRanking(student, rankDto, myData);
-
         return resultMap;
-    }
-
-    /**
-     * 更新学生排名信息
-     *
-     * @param student
-     * @param rankDto
-     * @param myData
-     */
-    private void updateRanking(Student student, RankDto rankDto, Map<String, Object> myData) {
-        if (rankDto.getType() == 1 || rankDto.getType() == 4) {
-            Ranking rank = simpleRankingMapper.selByStudentId(student.getId());
-
-            Integer model = rankDto.getModel();
-            Integer type = rankDto.getType();
-
-            Object myRanking = myData.get("myRanking");
-            int ranking = (myRanking == null || Objects.equals(myRanking.toString(), "未上榜")) ? 101 : Integer.parseInt(myRanking.toString());
-            if (model == 1) {
-                if (type == 1) {
-                    rank.setGoldClassRank(ranking);
-                } else {
-                    rank.setWorshipClassRank(ranking);
-                }
-            } else if (model == 2) {
-                if (type == 1) {
-                    rank.setGoldSchoolRank(ranking);
-                } else {
-                    rank.setWorshipSchoolRank(ranking);
-                }
-            } else if (model == 3) {
-                if (type == 1) {
-                    rank.setGoldCountryRank(ranking);
-                } else {
-                    rank.setWorshipCountryRank(ranking);
-                }
-            }
-            simpleRankingMapper.updateById(rank);
-        }
     }
 
     /**
@@ -937,9 +896,9 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
             studentIds.forEach(id -> {
                 Map<String, Object> dataMap = new HashMap<>(16);
                 Student student1 = simpleStudentMapper.selectById(id);
-                dataMap.put("zs", rankOpt.getScore(RankKeysConst.COUNTRY_CCIE_RANK, id));
-                dataMap.put("xz", rankOpt.getScore(RankKeysConst.COUNTRY_MEDAL_RANK, id));
-                dataMap.put("mb", rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, id));
+                dataMap.put("zs", rankOpt.getScore(RankKeysConst.COUNTRY_CCIE_RANK, id) == -1 ? 0 : rankOpt.getScore(RankKeysConst.COUNTRY_CCIE_RANK, id));
+                dataMap.put("xz", rankOpt.getScore(RankKeysConst.COUNTRY_MEDAL_RANK, id) == -1 ? 0 : rankOpt.getScore(RankKeysConst.COUNTRY_MEDAL_RANK, id));
+                dataMap.put("mb", rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, id) == -1 ? 0 : rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, id));
                 dataMap.put("area", student1.getArea());
                 dataMap.put("city", student1.getCity());
                 dataMap.put("province", student1.getProvince());
@@ -960,7 +919,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         studentMap.put("stuId", student.getId());
         studentMap.put("myGold", Math.round(totalGold));
         studentMap.put("myChildName", getLevel((int) Math.round(totalGold), redisOpt.getAllLevel()));
-        studentMap.put("myMb", rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId()));
+        studentMap.put("myMb", rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId()) == -1 ? 0 : rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId()));
         studentMap.put("myRanking", getMyRanking(student, rankDto, key));
         return studentMap;
     }
@@ -974,7 +933,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
     private Object getMyRanking(Student student, RankDto rankDto, String key) {
         if (rankDto.getModel() == 3) {
             long rank = rankOpt.getRank(key, student.getId());
-            return rank > 99 ? "未上榜" : rank + 1;
+            return rank > 99 || rank == -1 ? "未上榜" : rank;
         }
         return rankOpt.getRank(key, student.getId()) + 1;
     }

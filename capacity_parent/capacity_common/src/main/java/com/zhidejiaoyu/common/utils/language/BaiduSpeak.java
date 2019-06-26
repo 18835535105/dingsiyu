@@ -43,6 +43,7 @@ public class BaiduSpeak {
         wordMap.put("before", "before");
         wordMap.put("fast", "fast");
         wordMap.put("hang", "hang");
+        wordMap.put("fritter", "fritter");
     }
 
     /**

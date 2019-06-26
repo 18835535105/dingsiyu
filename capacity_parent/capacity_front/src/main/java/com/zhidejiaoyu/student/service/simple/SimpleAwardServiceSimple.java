@@ -38,5 +38,15 @@ public interface SimpleAwardServiceSimple extends SimpleBaseService<Award> {
      *
      * @return
      */
-    ServerResponse<Map<String, Object>> getAwareSize(int type, HttpSession session, Integer model);
+    ServerResponse<Object> getAwareSize(int type, HttpSession session, Integer model);
+
+    /**
+     * 更新学生名次
+     * 将学生名次表中的数据修改为学生当前的名次
+     *
+     * @param session
+     * @param type  1：班级排行；2：学校排行；3：全国排行
+     * @return
+     */
+    ServerResponse<Object> updateRanking(HttpSession session, Integer type);
 }

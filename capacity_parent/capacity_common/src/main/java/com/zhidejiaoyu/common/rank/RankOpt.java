@@ -159,7 +159,7 @@ public class RankOpt {
     public long getScore(String key, Long member) {
         Double score = redisTemplate.opsForZSet().score(key, member);
         if (score == null) {
-            return 0;
+            return -1;
         }
         return Math.round(score);
     }
@@ -169,11 +169,11 @@ public class RankOpt {
      *
      * @param key
      * @param member
-     * @return
+     * @return  获取的排名从 1 开始
      */
     public long getRank(String key, Long member) {
         Long rank = redisTemplate.opsForZSet().reverseRank(key, member);
-        return rank == null ? 0 : rank;
+        return rank == null ? -1 : rank;
     }
 
 }
