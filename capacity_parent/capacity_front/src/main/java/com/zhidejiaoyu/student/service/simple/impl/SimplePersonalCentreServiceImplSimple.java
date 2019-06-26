@@ -817,6 +817,8 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
             key = RankKeysConst.COUNTRY_MEDAL_RANK;
         }
 
+        worshipMapper.updateState(student.getId());
+
         return packageResultMap(student, rankDto, key);
     }
 
