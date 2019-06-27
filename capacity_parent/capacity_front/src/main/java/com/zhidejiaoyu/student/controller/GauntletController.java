@@ -63,24 +63,6 @@ public class GauntletController {
     }
 
     /**
-     * 添加挑战信息
-     * @param session session
-     * @param gameName 游戏名称
-     * @param studentId 被挑战人id
-     * @param gold 挑战金币
-     * @param courseId 课程id
-     * @param challengerMsg 挑战话语
-     * @return
-     */
-    @RequestMapping("/addPkRecord")
-    public ServerResponse<Object> addPkRecord(HttpSession session, String gameName, Long studentId, Integer gold, Long courseId, String challengerMsg) {
-        if(gold==null){
-            log.error("添加挑战信息时 金币为空");
-        }
-        return gauntletService.addPkRecord(session, gameName, studentId, gold, courseId, challengerMsg);
-    }
-
-    /**
      * 获取游戏信息
      * @param pageNum 页数
      * @param courseId 课程id
