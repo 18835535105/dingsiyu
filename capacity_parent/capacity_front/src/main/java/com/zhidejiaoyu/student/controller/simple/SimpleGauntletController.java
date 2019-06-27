@@ -77,6 +77,9 @@ public class SimpleGauntletController {
         if(gold==null){
             log.error("添加挑战信息时 金币为空");
         }
+        if(beStudentId==null){
+            return ServerResponse.createByError();
+        }
         return gauntletService.addPkRecord(session, gameName, beStudentId, gold, courseId, challengerMsg);
     }
 
