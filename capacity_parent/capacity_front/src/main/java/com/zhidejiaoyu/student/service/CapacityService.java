@@ -67,4 +67,11 @@ public interface CapacityService extends BaseService<CapacityWrite> {
      * @param pageSize
      */
     void downloadCapacity(HttpSession session, HttpServletResponse response, String studyModel, Long courseId, Long unitId, Integer pageNum, Integer pageSize);
+
+    /**
+     * 慧追踪不再提示
+     *
+     * @param session
+     */
+    void cancelTip(HttpSession session);
 }
