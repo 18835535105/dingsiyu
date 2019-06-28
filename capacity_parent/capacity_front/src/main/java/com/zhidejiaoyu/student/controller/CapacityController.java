@@ -59,7 +59,7 @@ public class CapacityController extends BaseController{
 
     /**
      * 记忆追踪中鼠标悬浮到指定单词或例句上时，页面展示的该单词或者例句的详细学习状况
-     * 
+     *
      * @param session
      * @param studyModel 学习模块（慧记忆，慧听写，慧默写，例句听力，例句翻译，例句默写）
      * @param courseId   课程id
@@ -136,12 +136,7 @@ public class CapacityController extends BaseController{
     @ResponseBody
     @PostMapping("/cancelTip")
     public ServerResponse<Object> cancelTip(HttpSession session) {
-        Student student = super.getStudent(session);
-        if (!Objects.equals(student.getShowCapacity(), 2)) {
-            HttpHeaders headers = super.packageHeader(session);
-            String url = domain + "/api/capacity/cancelTip";
-            restTemplate.postForEntity(url, headers, Map.class);
-        }
+        capacityService.cancelTip(session);
         return ServerResponse.createBySuccess();
     }
 }

@@ -23,10 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -56,6 +53,9 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
 
     @Autowired
     private UnitMapper unitMapper;
+
+    @Autowired
+    private StudentMapper studentMapper;
 
     @Override
     public ServerResponse<CapacityDigestVo> getCapacityDigestVo(HttpSession session, Long courseId, Long unitId, String studyModel) {
@@ -251,7 +251,16 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
         try {
             ExportUtil.exportExcel(response, fileName, wb);
         } catch (Exception e) {
-            log.error("学生 {} 导出 {} 模块下记忆追踪信息失败！", studentId, studyModel, e.getMessage(), e);
+            log.error("学生 {} 导出 {} 模块下记忆追踪信息失败！", studentId, studyModel, e);
+        }
+    }
+
+    @Override
+    public void cancelTip(HttpSession session) {
+        Student student = super.getStudent(session);
+        if (!Objects.equals(student.getShowCapacity(), 2)) {
+            student.setShowCapacity(2);
+            studentMapper.updateById(student);
         }
     }
 
