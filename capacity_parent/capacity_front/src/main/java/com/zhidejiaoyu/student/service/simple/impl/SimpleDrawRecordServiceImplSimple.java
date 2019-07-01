@@ -313,7 +313,12 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
         gold.put("total", student.getSystemGold().intValue() + student.getOfflineGold().intValue());
         gold.put("have", student.getSystemGold().intValue());
         gold.put("use", student.getOfflineGold().intValue());
-        gold.put("luckDrawAll", allGold);
+        if (allGold != null) {
+            gold.put("luckDrawAll", allGold);
+        }else{
+            gold.put("luckDrawAll", 0);
+        }
+
         if (student.getOfflineGold() != null && allGold != null) {
             if (allGold <= student.getOfflineGold()) {
                 gold.put("luckDrawUse", allGold);
