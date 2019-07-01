@@ -224,4 +224,19 @@ public class SimpleTestController {
         }
         return testService.getTestDetail(session, testId);
     }
+
+    /**
+     *
+     * @param courseId 课程id
+     * @param unitId   单元id
+     * @param type     1，单元前测   2，单元后测
+     * @param model    1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写; 20:能力值测试
+     * @param session
+     * @return
+     */
+    //跳过绝招好课单元测试和学后测试
+    @PostMapping("/skipTest")
+    public Object skipTest(Integer courseId,Integer unitId,Integer type,Integer model,HttpSession session){
+        return testService.skipTest(courseId,unitId,type,model,session);
+    }
 }

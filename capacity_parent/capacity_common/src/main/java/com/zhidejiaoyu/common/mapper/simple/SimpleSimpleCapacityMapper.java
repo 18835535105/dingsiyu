@@ -25,40 +25,40 @@ import java.util.Map;
  */
 public interface SimpleSimpleCapacityMapper extends BaseMapper<SimpleCapacity> {
 
-	/**
-	 * 查询9个模块是否有需要复习的数据
-	 *
-	 * @return
-	 */
-	List<SimpleCapacityVo> getSimpleWhetherFeview(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("date") Date date, @Param("type") int type);
-
-	/**
-	 * 生成试卷-根据条件取记忆追踪的题
-	 *
-	 * @param courseId 课程id
-	 * @param typeTwo 题量
-	 * @return
-	 */
-	List<Vocabulary> getTestPaperGenerationAll(@Param("courseId") long courseId, @Param("typeTwo") int typeTwo, @Param("unitId") String[] unitId);
-
-	@Select("select DISTINCT(course_id) from simple_capacity where student_id = #{studentId} AND type = #{a} AND push < #{time}")
-	List<Integer> getReviewCourseIdAllByModel(@Param("studentId") Long studentId, @Param("a") int a, @Param("time") String time);
-
-	List<Map<String, Object>> selectStatusBigTenNine(@Param("studentId") Long studentId, @Param("courseId") Integer courseId, @Param("model") int model, @Param("time") String time);
-
-	Map<String, Object> getWordLimitOneByStudentIdByCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId, @Param("date") Date date);
-
-	@Delete("delete from simple_capacity where student_id = #{studentId} and unit_id = #{unitId}")
-	void deleteByStudenIdByUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
-
-	/**
-	 * 查询需要复习的单词个数
+    /**
+     * 查询9个模块是否有需要复习的数据
      *
-	 * @param student
-	 * @param courseId
-	 * @param type
-	 * @return
-	 */
+     * @return
+     */
+    List<SimpleCapacityVo> getSimpleWhetherFeview(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("date") Date date, @Param("type") int type);
+
+    /**
+     * 生成试卷-根据条件取记忆追踪的题
+     *
+     * @param courseId 课程id
+     * @param typeTwo  题量
+     * @return
+     */
+    List<Vocabulary> getTestPaperGenerationAll(@Param("courseId") long courseId, @Param("typeTwo") int typeTwo, @Param("unitId") String[] unitId);
+
+    @Select("select DISTINCT(course_id) from simple_capacity where student_id = #{studentId} AND type = #{a} AND push < #{time}")
+    List<Integer> getReviewCourseIdAllByModel(@Param("studentId") Long studentId, @Param("a") int a, @Param("time") String time);
+
+    List<Map<String, Object>> selectStatusBigTenNine(@Param("studentId") Long studentId, @Param("courseId") Integer courseId, @Param("model") int model, @Param("time") String time);
+
+    Map<String, Object> getWordLimitOneByStudentIdByCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId, @Param("date") Date date);
+
+    @Delete("delete from simple_capacity where student_id = #{studentId} and unit_id = #{unitId} and type=#{type}")
+    void deleteByStudenIdByUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("type") Integer type);
+
+    /**
+     * 查询需要复习的单词个数
+     *
+     * @param student
+     * @param courseId
+     * @param type
+     * @return
+     */
     Integer countNeedReview(@Param("student") Student student, @Param("courseId") Long courseId, @Param("type") Integer type);
 
     /**
@@ -81,7 +81,7 @@ public interface SimpleSimpleCapacityMapper extends BaseMapper<SimpleCapacity> {
      * @return
      */
     @Select("select fault_time from simple_capacity where student_id = #{studentId} AND vocabulary_id = #{vocabularyId} AND type = #{type} and unit_id = #{unitId}")
-	Integer getFaultTime(@Param("studentId") Long id, @Param("vocabularyId") Long vocabularyId, @Param("unitId") Long unitId, @Param("type") Integer type);
+    Integer getFaultTime(@Param("studentId") Long id, @Param("vocabularyId") Long vocabularyId, @Param("unitId") Long unitId, @Param("type") Integer type);
 
     /**
      * 黄金记忆时间加指定的3小时
@@ -91,16 +91,16 @@ public interface SimpleSimpleCapacityMapper extends BaseMapper<SimpleCapacity> {
      * @param pushRise
      */
     @Update("update simple_capacity set push = date_add(push, interval ${pushRise} hour) where student_id = #{studentId} AND vocabulary_id = #{vocabularyId} AND type = #{type}")
-	void updatePush(@Param("studentId") Long id, @Param("vocabularyId") Long vocabularyId, @Param("pushRise") int pushRise, @Param("type") int type);
+    void updatePush(@Param("studentId") Long id, @Param("vocabularyId") Long vocabularyId, @Param("pushRise") int pushRise, @Param("type") int type);
 
-	/**
-	 * 获取当前学生当前学习内容的记忆追踪信息
-	 *
-	 * @param studentId
-	 * @param vocabularyId
-	 * @param unitId
-	 * @param type
-	 * @return
-	 */
+    /**
+     * 获取当前学生当前学习内容的记忆追踪信息
+     *
+     * @param studentId
+     * @param vocabularyId
+     * @param unitId
+     * @param type
+     * @return
+     */
     List<SimpleCapacity> selectSimpleCapacityRecord(@Param("studentId") Long studentId, @Param("vocabularyId") Long vocabularyId, @Param("unitId") Long unitId, @Param("type") Integer type);
 }

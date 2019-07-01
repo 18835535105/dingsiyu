@@ -105,4 +105,6 @@ public interface SimpleTestServiceSimple extends SimpleBaseService<TestRecord> {
 	 * @return
 	 */
 	ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId);
+
+    Object skipTest(Integer courseId, Integer unitId, Integer type, Integer model, HttpSession session);
 }

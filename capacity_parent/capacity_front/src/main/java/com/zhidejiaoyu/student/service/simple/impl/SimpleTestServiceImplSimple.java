@@ -38,6 +38,7 @@ import com.zhidejiaoyu.student.utils.PetSayUtil;
 import com.zhidejiaoyu.student.utils.PetUrlUtil;
 import com.zhidejiaoyu.student.utils.simple.SimpleCcieUtil;
 import com.zhidejiaoyu.student.vo.TestResultVo;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -155,10 +156,10 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
     /**
      * 学前测试/学后测试,从课程取50道题
-     *  保存的时候只保存测试记录
+     * 保存的时候只保存测试记录
      *
-     * @param typeModel 1=学前测试 2=学后测试 3=能力值测试
-     * @param modelType 1=辨音模块 2=慧记忆模块 3=慧默写模块
+     * @param typeModel      1=学前测试 2=学后测试 3=能力值测试
+     * @param modelType      1=辨音模块 2=慧记忆模块 3=慧默写模块
      * @param studyParagraph 1=小学, 2=初中, 3=高中 - 只能力值测试有该字段
      * @param session
      * @return
@@ -168,14 +169,14 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
         // 1.题类型
         String[] type;
-        if((modelType != null && modelType == 2) || typeModel == 3) {
+        if ((modelType != null && modelType == 2) || typeModel == 3) {
             type = new String[]{"英译汉", "汉译英", "听力理解"};
-        }else {
+        } else {
             type = new String[]{"听力理解"};
         }
 
         // 例句模块测试
-        if(example) {
+        if (example) {
             type = new String[]{"英译汉", "汉译英"};
         }
 
@@ -470,15 +471,15 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             openUnitLog.setNextUnitId(wordNextUnitId);
             openUnitLog.setCreateTime(new Date());
             simpleOpenUnitLogMapper.insert(openUnitLog);
-            return "1" ;
-        }else {
+            return "1";
+        } else {
             return "2";
         }
     }
 
     @Override
     public ServerResponse<List<SimpleTestResult>> getWordUnitTest(HttpSession session, Long unitId,
-                                                            Boolean isTrue, int typeModel, boolean example, Integer model) {
+                                                                  Boolean isTrue, int typeModel, boolean example, Integer model) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         student = simpleStudentMapper.selectById(student.getId());
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
@@ -500,19 +501,19 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         Integer subjectNum = vocabularies.size();
         String[] type;
         if ("慧记忆".equals(studyModel)) {
-            type = new String[]{"英译汉","汉译英","听力理解"};
+            type = new String[]{"英译汉", "汉译英", "听力理解"};
         } else {
             type = new String[]{"听力理解"};
         }
 
         // 例句模块, 快速单词, 快速词组
-        if(example || model == 3 || model == 4) {
+        if (example || model == 3 || model == 4) {
             type = new String[]{"英译汉", "汉译英"};
         }
 
         List<SimpleTestResult> results = simpleTestResultUtil.getWordTestesForUnit(type, subjectNum, vocabularies, unitId);
         // 改为听力理解,方便前台使用
-        if(!"慧记忆".equals(studyModel)) {
+        if (!"慧记忆".equals(studyModel)) {
             for (SimpleTestResult testResult : results) {
                 testResult.setType("听力理解");
             }
@@ -639,7 +640,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             if (point < FIVE) {
                 msg = "很遗憾，闯关失败。但是，绊脚石乃是进身之阶。";
                 vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.AFTER_UNIT_FIRST_LEVEL));
-                vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
+                vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
                 testRecord.setPass(2);
             } else if (point < FULL_MARK) {
                 msg = "闯关成功。彪悍的人生不需要解释！";
@@ -667,7 +668,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      * @param student
      * @param vo
      * @param point
-     * @param pass  及格线
+     * @param pass       及格线
      * @param testRecord
      * @return
      */
@@ -676,7 +677,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         if (point < pass) {
             msg = "很遗憾，闯关失败。但是，绊脚石乃是进身之阶。";
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.AFTER_UNIT_FIRST_LEVEL));
-            vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
+            vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
             testRecord.setPass(2);
         } else if (point < FULL_MARK) {
             msg = "闯关成功。彪悍的人生不需要解释。";
@@ -791,7 +792,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      * @return
      */
     private int getGoldCount(WordUnitTestDTO wordUnitTestDTO, Student student, int point, int goldCount) {
-        if(point >= PASS){
+        if (point >= PASS) {
             if (point < FULL_MARK) {
                 goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_FULL;
                 this.saveLog(student, goldCount, wordUnitTestDTO, null);
@@ -811,7 +812,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      * @param session
      * @param wordUnitTestDTO
      * @param goldCount       奖励的金币数
-     * @return  此时 testrecord 没有 id
+     * @return 此时 testrecord 没有 id
      */
     private TestRecord saveTestRecord(Long courseId, Student student, HttpSession session, WordUnitTestDTO wordUnitTestDTO, Integer goldCount) {
         // 新生成的测试记录
@@ -886,10 +887,10 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         Student student = super.getStudent(session);
         Long studentId = student.getId();
 
-        if(page == null){
+        if (page == null) {
             page = 1;
         }
-        if(rows != null){
+        if (rows != null) {
             PageHelper.startPage(page, rows);
         }
         List<TestRecordVo> records = simpleTestRecordMapper.showRecord(studentId);
@@ -905,13 +906,13 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         List<Map<String, Object>> result = new ArrayList<>();
 
         Long recordId;
-        for(TestRecordVo record: records){
+        for (TestRecordVo record : records) {
             recordId = record.getId();
             Map<String, Object> map = new HashMap<>(16);
             map.put("id", recordId);
-            if("能力值测试".equals(record.getStudyModel())) {
+            if ("能力值测试".equals(record.getStudyModel())) {
                 map.put("genre", record.getGenre());
-            }else {
+            } else {
                 map.put("genre", StringUtils.isEmpty(record.getStudyModel()) ? record.getGenre() : record.getStudyModel() + "-" + record.getGenre());
             }
 
@@ -937,8 +938,8 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             map.put("unitName", record.getUnitName());
             String explain = record.getExplain();
             if (StringUtils.isNotEmpty(explain) && explain.contains("#")) {
-                map.put("explain", explain.substring(explain.lastIndexOf("#")+1));
-            }else {
+                map.put("explain", explain.substring(explain.lastIndexOf("#") + 1));
+            } else {
                 map.put("explain", explain);
             }
             result.add(map);
@@ -997,7 +998,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         Object startTime = session.getAttribute(TimeConstant.BEGIN_START_TIME);
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
 
-        if(StringUtils.isNotEmpty(studyModel)) {
+        if (StringUtils.isNotEmpty(studyModel)) {
             testRecord.setStudyModel(studyModel);
         }
         int point = testRecord.getPoint();
@@ -1049,14 +1050,74 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         return ServerResponse.createBySuccess(vo);
     }
 
+    @Override
+    public Object skipTest(Integer courseId, Integer unitId, Integer type, Integer model, HttpSession session) {
+        //  1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写;
+        String studyModel = matchStudyModel(model);
+        Date date = new Date();
+        Student student = getStudent(session);
+        TestRecord testRecord = new TestRecord();
+        testRecord.setAwardGold(0);
+        testRecord.setCourseId(courseId.longValue());
+        testRecord.setUnitId(unitId.longValue());
+        testRecord.setErrorCount(0);
+        testRecord.setRightCount(0);
+        testRecord.setExplain("未测试");
+        testRecord.setTestStartTime(date);
+        testRecord.setTestEndTime(date);
+        testRecord.setType(1);
+        testRecord.setStudyModel(studyModel);
+        testRecord.setPass(2);
+        testRecord.setQuantity(0);
+        testRecord.setPoint(-1);
+        testRecord.setStudentId(student.getId());
+        if (type == 1) {
+            testRecord.setGenre("单元前测");
+        } else if (type == 2) {
+            testRecord.setGenre("单元闯关测试");
+        } else if (type == 3) {
+            testRecord.setGenre("学前测试");
+        }
+        if (type == 2) {
+            TestRecord lookTest = simpleTestRecordMapper.selectByStudentIdAndUnitId(student.getId(),
+                    unitId.longValue(), "单元闯关测试", studyModel);
+            List<Unit> units = unitMapper.selectUnitsByCourseId(courseId.longValue());
+            if (units != null && units.size() > 0) {
+                int unitSize = 0;
+                for (int i = 0; i < units.size(); i++) {
+                    if (units.get(i).getId().equals(unitId.longValue())) {
+                        unitSize = i;
+                    }
+                }
+                if (lookTest == null) {
+                    this.unlockNextUnit(student, courseId.longValue(), unitId.longValue(), model);
+                }
+                simpleTestRecordMapper.updateByStudentAndUnitId(student.getId(), unitId.longValue());
+                simpleTestRecordMapper.insert(testRecord);
+                if (unitSize != units.size() - 1) {
+                    return ServerResponse.createBySuccess(units.get(unitSize + 1).getId());
+                } else {
+                    return ServerResponse.createBySuccess(unitId);
+                }
+
+            }
+        } else if(type==1){
+            learnMapper.updateTypeByStudentIdAndUnitId(student.getId(), unitId.longValue(), studyModel);
+            simpleSimpleCapacityMapper.deleteByStudenIdByUnitId(student.getId(), unitId.longValue(), model);
+        }
+        simpleTestRecordMapper.insert(testRecord);
+        return ServerResponse.createBySuccess(unitId);
+    }
+
+
     private int getPreSchoolTestGold(TestRecord testRecord, int modelType, Student student, String typeModel, TestResultVo vo, int point) {
         int gold = 0;
-        if("学后测试".equals(typeModel)) {
+        if ("学后测试".equals(typeModel)) {
             if (point < 80) {
                 vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.COURSE_TEST_LESS_EIGHTY));
                 testRecord.setExplain("你和优秀的人差的不是智商，是努力。");
                 vo.setMsg("你和优秀的人差的不是智商，是努力。");
-                vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
+                vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
                 testRecord.setPass(2);
             } else {
                 gold = 5;
@@ -1068,7 +1129,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             }
         }
 
-        if("单元前测".equals(typeModel)) {
+        if ("单元前测".equals(typeModel)) {
             // 单词默写; 词组默写
             if (modelType == 8 || modelType == 9) {
                 if (point < 50) {
@@ -1098,12 +1159,12 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             }
         }
 
-        if("能力值测试".equals(typeModel)) {
+        if ("能力值测试".equals(typeModel)) {
             if (point < 80) {
                 testRecord.setExplain("学海攀崖，尽力而为，曙光必见。");
                 vo.setMsg("学海攀崖，尽力而为，曙光必见。");
                 vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.WORD_TEST_LESS_EIGHTY));
-                vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
+                vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
                 testRecord.setPass(2);
             } else if (point < 90) {
                 gold = 5;
@@ -1120,7 +1181,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         testRecord.setExplain("测试失败，有潜力的人总是厚积薄发。");
         vo.setMsg("测试失败，有潜力的人总是厚积薄发。");
         vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.BEFORE_UNIT_FIRST_LEVEL));
-        vo.setBackMsg(new String[] {"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"} );
+        vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
         testRecord.setPass(2);
     }
 
@@ -1162,7 +1223,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             studyModel = "快速句型";
         } else if (modelType == 7) {
             studyModel = "语法辨析";
-        }else if(modelType == 8) {
+        } else if (modelType == 8) {
             studyModel = "单词默写";
         } else if (modelType == 9) {
             studyModel = "词组默写";
@@ -1313,9 +1374,9 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      * 生成试卷
      *
      * @param courseId 课程id
-     * @param typeOne 取题范围: 1=全部 2=追词纪
-     * @param typeTwo 取题范围: 1=较少(20) 2=普通(40) 3=较多(100)
-     * @param unitId 单元id null=全部
+     * @param typeOne  取题范围: 1=全部 2=追词纪
+     * @param typeTwo  取题范围: 1=较少(20) 2=普通(40) 3=较多(100)
+     * @param unitId   单元id null=全部
      * @return
      */
     @Override
@@ -1355,7 +1416,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      *
      * @param session
      * @param courseId
-     * @param type      1-9测试类型
+     * @param type     1-9测试类型
      * @return 一道题
      */
     @Override
@@ -1378,7 +1439,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         String word = vocabulary.get("word").toString();
 
         // 读音
-        if (type == 1 || type == 2 || type == 3 || type == 4 || type==8 || type == 9) {
+        if (type == 1 || type == 2 || type == 3 || type == 4 || type == 8 || type == 9) {
             vocabulary.put("readUrl", simpleBaiduSpeak.getLanguagePath(word));
         }
 
@@ -1410,7 +1471,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      *
      * @param type
      * @return
-      */
+     */
     private String typeToModelStr(int type) {
         if (type == 1) {
             return "单词辨音";
@@ -1462,6 +1523,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         testDetailVo.setInfos(simpleTestRecordMapper.selectTestRecordInfo(testId));
         return ServerResponse.createBySuccess(testDetailVo);
     }
+
 
     /**
      * 计算测试用时

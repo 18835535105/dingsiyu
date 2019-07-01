@@ -32,7 +32,9 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    /** 默写模块答错3次, 黄金记忆点时间延长一个小时*/
+    /**
+     * 默写模块答错3次, 黄金记忆点时间延长一个小时
+     */
     private final int pushRise = 3;
 
     @Autowired
@@ -76,7 +78,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
 
     /**
      * 9大学习页面
-     * 	1 2 3 4 6 8 9模块需要测试-
+     * 1 2 3 4 6 8 9模块需要测试-
      */
     @Override
     public Object getMemoryWord(HttpSession session, int type, Long courseId, Long unitId, boolean flag, boolean anew) {
@@ -90,35 +92,35 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
         boolean testModel = testModel(type);
 
         // 判断是否需要重置当前学生该单元数据
-        if(anew) {
-        	// 课程所有单词 == 课程已学单词
+        if (anew) {
+            // 课程所有单词 == 课程已学单词
             int allCount = redisOpt.wordCountInCourse(courseId);
             int allLearn = learnMapper.getAllCountWordByCourse(courseId, studentId);
-        	if(allLearn >= allCount) {
-	        	// 是否做了课后测试
+            if (allLearn >= allCount) {
+                // 是否做了课后测试
                 Long courseTest = simpleTestRecordMapper.getXHTest(courseId, studentId);
                 if (courseTest == null && testModel) {
                     // 弹框强制测试
                     return super.toUnitTest(301, "学后测试");
-	    		}
-        	}
+                }
+            }
 
-        	Long lastUnitId = unitMapper.selectMaxUnitIdInCourse(courseId);
-        	if (Objects.equals(lastUnitId, unitId)) {
+            Long lastUnitId = unitMapper.selectMaxUnitIdInCourse(courseId);
+            if (Objects.equals(lastUnitId, unitId)) {
                 // 获取单元新单词
                 SimpleCapacityVo simpleCapacityNew = vocabularyMapper.showWordSimple(unitId, studentId, type);
                 // 表示本课程已学完
-                if(simpleCapacityNew == null) {
-                    resetTheUnit(studentId, unitId, simpleCommonMethod.getTestType(type));
+                if (simpleCapacityNew == null) {
+                    resetTheUnit(studentId, unitId, simpleCommonMethod.getTestType(type), type);
                     return ServerResponse.createBySuccess(302, "当前选择课程已学习完毕，可以重新学习，温故知新哦。");
                 }
             }
-    		// 清除数据
-        	resetTheUnit(studentId, unitId, simpleCommonMethod.getTestType(type));
+            // 清除数据
+            resetTheUnit(studentId, unitId, simpleCommonMethod.getTestType(type), type);
         }
 
-        if(testModel) {
-	        // 1.判断是否需要单元前测
+        if (testModel) {
+            // 1.判断是否需要单元前测
             testId = simpleTestRecordMapper.getWhetherTest(studentId, courseId, unitId, type, "单元前测");
             if (testId == null) {
                 // 需要进行单元前测
@@ -140,11 +142,11 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
         // 判断是否需要单元闯关测试或学后测试
         if (plan >= wordCount && testModel) {
             testId = simpleTestRecordMapper.getWhetherTest(studentId, courseId, unitId, type, "单元闯关测试");
-        	// 强制学生进行单元闯关测试
- 	        if(testId == null) {
+            // 强制学生进行单元闯关测试
+            if (testId == null) {
                 // 弹框强制测试
                 return super.toUnitTest(301, "单元闯关测试");
- 	        }
+            }
         }
 
         // 获取单元新单词
@@ -153,21 +155,21 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
         // 1.查询有没有需要复习的数据
         List<SimpleCapacityVo> simpleWhetherReviews = simpleSimpleCapacityMapper.getSimpleWhetherFeview(studentId, unitId, new Date(), type);
 
-    	SimpleCapacityVo simpleCapacityVo = null;
-    	if (simpleWhetherReviews.size() > 1) {
+        SimpleCapacityVo simpleCapacityVo = null;
+        if (simpleWhetherReviews.size() > 1) {
             simpleSimpleCapacityMapper.deleteById(simpleWhetherReviews.get(1).getCapacityId());
             simpleCapacityVo = simpleWhetherReviews.get(0);
-         } else if (simpleWhetherReviews.size() == 1) {
-    	    simpleCapacityVo = simpleWhetherReviews.get(0);
+        } else if (simpleWhetherReviews.size() == 1) {
+            simpleCapacityVo = simpleWhetherReviews.get(0);
         }
         // 2. 如果记忆追踪中没有需要复习的, 去单词表中取出一个单词,条件是(learn表中单词id不存在的)
         if (simpleCapacityVo == null) {
-        	simpleCapacityVo = simpleCapacityNew;
+            simpleCapacityVo = simpleCapacityNew;
 
-        	if (simpleCapacityVo == null && testModel) {
+            if (simpleCapacityVo == null && testModel) {
                 testId = simpleTestRecordMapper.getWhetherTest(studentId, courseId, unitId, type, "单元闯关测试");
                 // 强制学生进行单元闯关测试
-                if(testId == null) {
+                if (testId == null) {
                     // 弹框强制测试
                     return super.toUnitTest(301, "单元闯关测试");
                 }
@@ -176,7 +178,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
             // 词汇考点或者语法辨析当前课程如果学习完毕进行提示
             if (simpleCapacityVo == null && !testModel) {
                 // 清除数据
-                resetTheUnit(studentId, unitId, simpleCommonMethod.getTestType(type));
+                resetTheUnit(studentId, unitId, simpleCommonMethod.getTestType(type), type);
                 return ServerResponse.createBySuccess(302, "当前选择课程已学习完毕，可以重新学习，温故知新哦。");
             }
 
@@ -189,10 +191,10 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
             // 学生id
             simpleCapacityVo.setStudent_id(studentId);
 
-		}else {
-			// 不是新词
-			simpleCapacityVo.setStudyNew(false);
-		}
+        } else {
+            // 不是新词
+            simpleCapacityVo.setStudyNew(false);
+        }
         // 图片url
         if (StringUtils.isNotEmpty(simpleCapacityVo.getRecordpicurl())) {
             simpleCapacityVo.setRecordpicurl(GetOssFile.getPublicObjectUrl(simpleCapacityVo.getRecordpicurl()));
@@ -214,23 +216,23 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
 
         simpleCapacityVo.setEngine(PerceiveEngine.getPerceiveEngine(hard, simpleCapacityVo.getMemory_strength()));
 
-		// 单词读音url
-		if(type == 1 || type == 2 || type == 3 || type == 4 || type==8 || type == 9) {
-			simpleCapacityVo.setReadUrl(simpleBaiduSpeak.getLanguagePath(simpleCapacityVo.getWord()));
-		}
+        // 单词读音url
+        if (type == 1 || type == 2 || type == 3 || type == 4 || type == 8 || type == 9) {
+            simpleCapacityVo.setReadUrl(simpleBaiduSpeak.getLanguagePath(simpleCapacityVo.getWord()));
+        }
 
-		// 去掉音标
-		if(type != 1 && type != 3 && type != 8) {
-			simpleCapacityVo.setSoundMark(null);
-		}
+        // 去掉音标
+        if (type != 1 && type != 3 && type != 8) {
+            simpleCapacityVo.setSoundMark(null);
+        }
 
         // 说明学生是第一次在本系统学习,记录首次学习时间
         if (student.getFirstStudyTime() == null) {
-			student.setFirstStudyTime(new Date());
-			simpleStudentMapper.updateByPrimaryKeySelective(student);
-			student= simpleStudentMapper.selectById(student.getId());
-			session.setAttribute(UserConstant.CURRENT_STUDENT, student);
-		}
+            student.setFirstStudyTime(new Date());
+            simpleStudentMapper.updateByPrimaryKeySelective(student);
+            student = simpleStudentMapper.selectById(student.getId());
+            session.setAttribute(UserConstant.CURRENT_STUDENT, student);
+        }
         // 记录学生开始学习该单词/词组/例句的有效时长
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
@@ -239,30 +241,30 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
 
     /**
      * 重置学生该单元所有数据
-     *  @param studentId
+     *
+     * @param studentId
      * @param unitId
      * @param studyModel
      */
-    private void resetTheUnit(Long studentId, Long unitId, String studyModel) {
+    private void resetTheUnit(Long studentId, Long unitId, String studyModel, Integer type) {
         learnMapper.updateTypeByStudentIdAndUnitId(studentId, unitId, studyModel);
-    	simpleSimpleCapacityMapper.deleteByStudenIdByUnitId(studentId, unitId);
+        simpleSimpleCapacityMapper.deleteByStudenIdByUnitId(studentId, unitId, type);
         simpleTestRecordMapper.updateByStudentAndUnitId(studentId, unitId);
-	}
+    }
 
 
-
-	/**
+    /**
      * 需要测试的模块
      *
      * @param type
      */
     private boolean testModel(int type) {
-    	if(type == 1 || type == 2 || type == 3 || type == 4 || type == 6 || type == 8 || type == 9) {
-    		return true;
-    	}else {
-    		return false;
-    	}
-	}
+        if (type == 1 || type == 2 || type == 3 || type == 4 || type == 6 || type == 8 || type == 9) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -277,40 +279,40 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
 
         // 5,7没有测试的模块开启下一单元
         // 已学 >= 总单词
-        if((type == 5 || type == 7) && plan + 1 >= total) {
-        	String state = testServiceImpl.unlockUnit(student, learn.getCourseId(), learn.getUnitId(), 0);
+        if ((type == 5 || type == 7) && plan + 1 >= total) {
+            String state = testServiceImpl.unlockUnit(student, learn.getCourseId(), learn.getUnitId(), 0);
 
-        	// 5或7模块写入单元闯关测试记录, 用于遍历单元使用
-        	TestRecord tr = new TestRecord();
-        	tr.setStudentId(learn.getStudentId());
-        	tr.setPoint(0);
-        	tr.setCourseId(learn.getCourseId());
-        	tr.setUnitId(learn.getUnitId());
-        	tr.setGenre("单元闯关测试");
-        	tr.setStudyModel(type == 5 ? "词汇考点" : "语法辨析");
-        	tr.setTestStartTime(new Date());
-        	tr.setTestEndTime(new Date());
-        	simpleTestRecordMapper.insert(tr);
+            // 5或7模块写入单元闯关测试记录, 用于遍历单元使用
+            TestRecord tr = new TestRecord();
+            tr.setStudentId(learn.getStudentId());
+            tr.setPoint(0);
+            tr.setCourseId(learn.getCourseId());
+            tr.setUnitId(learn.getUnitId());
+            tr.setGenre("单元闯关测试");
+            tr.setStudyModel(type == 5 ? "词汇考点" : "语法辨析");
+            tr.setTestStartTime(new Date());
+            tr.setTestEndTime(new Date());
+            simpleTestRecordMapper.insert(tr);
 
-        	if(("1").equals(state)) {
-        		return ServerResponse.createBySuccess(303, "当前单元已学完，已为你开启下一单元");
-        	}
+            if (("1").equals(state)) {
+                return ServerResponse.createBySuccess(303, "当前单元已学完，已为你开启下一单元");
+            }
         }
 
         // 默写模块错过三次在记忆时间上再加长两小时
-        if(type == 8 || type == 9) {
-        	// 查询错误次数>=3
-        	Integer faultTime;
-            try{
+        if (type == 8 || type == 9) {
+            // 查询错误次数>=3
+            Integer faultTime;
+            try {
                 faultTime = simpleSimpleCapacityMapper.getFaultTime(student.getId(), learn.getVocabularyId(), learn.getUnitId(), type);
             } catch (Exception e) {
                 log.error("学生[{}->{}]查询第[{}]单元类型为[{}]的单词[{}]错误次数时出错", student.getStudentName(), student.getId(), learn.getUnitId(), type, learn.getVocabularyId(), e);
                 return ServerResponse.createByError();
             }
-            if(faultTime != null && faultTime >= 3) {
-        		// 如果错误次数>=3, 黄金记忆时间推迟3小时
-        		simpleSimpleCapacityMapper.updatePush(student.getId(), learn.getVocabularyId(), pushRise, type);
-        	}
+            if (faultTime != null && faultTime >= 3) {
+                // 如果错误次数>=3, 黄金记忆时间推迟3小时
+                simpleSimpleCapacityMapper.updatePush(student.getId(), learn.getVocabularyId(), pushRise, type);
+            }
         }
 
         // 统计初出茅庐勋章
