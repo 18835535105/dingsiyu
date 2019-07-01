@@ -291,7 +291,13 @@ public interface SimpleStudentMapper extends BaseMapper<Student> {
     @MapKey("studentId")
     Map<Long, Map<Long, Integer>> selectStudentSchoolAdminMap(@Param("students") List<Student> students);
 
-    Map<String, Object> getClassNameAndGoldAndMbAnd(Long id);
+    /**
+     * 查询学生的班级名称
+     *
+     * @param studentId
+     * @return
+     */
+    String selectClassNameByStudentId(Long studentId);
 
     Integer selStudentNumberById(@Param("classId") Long classId, @Param("teacherId") Long teacherId,
                                  @Param("model") String model, @Param("adminId") Integer adminId,

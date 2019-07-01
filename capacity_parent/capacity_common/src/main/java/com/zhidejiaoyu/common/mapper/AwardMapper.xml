@@ -277,4 +277,17 @@
           and type = 1
           and can_get = 1
           and to_days(create_time) = to_days(now())
-    </select></mapper>
+    </select>
+    <select id="countGetModelByStudents" resultType="java.util.Map" parameterType="map">
+        select student_id studentId, count(id) count
+        from award
+        where student_id in (
+        <foreach collection="students" separator="," item="student">
+            #{student.id}
+        </foreach>
+        )
+        and type = 3
+        and get_flag = 1
+        group by student_id
+    </select>
+</mapper>

@@ -5,24 +5,22 @@ import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.UserConstant;
-import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
+import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.student.service.simple.SimpleAwardServiceSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author wuchenxi
@@ -69,19 +67,13 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
     private DailyAwardAsync awardAsync;
 
     @Autowired
-    private ExecutorService executorService;
-
-    @Autowired
     private SimpleRankingMapper simpleRankingMapper;
-
-    @Autowired
-    private SimpleTeacherMapper simpleTeacherMapper;
 
     @Autowired
     private MedalAwardAsync medalAwardAsync;
 
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    @Autowired
+    private RankOpt rankOpt;
 
     /**
      * 获取学生任务奖励信息
@@ -113,7 +105,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
 
 
     @Override
-    public ServerResponse<Map<String, Object>> getAwareSize(int type, HttpSession session, Integer model) {
+    public ServerResponse<Object> getAwareSize(int type, HttpSession session, Integer model) {
         Student student = super.getStudent(session);
         Map<String, Object> map = new HashMap<>(16);
         int size = 0;
@@ -128,30 +120,23 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
         //获取日奖励领取数量
         if (type == 1) {
             map.put("dailyReward", dailyAwardCanGet);
+            return ServerResponse.createBySuccess(map);
         }
         //获取金币奖励
         if (type == 2) {
             map.put("goldReward", goldAwardCanGet);
+            return ServerResponse.createBySuccess(map);
         }
         //勋章奖励领取数量
         if (type == 3) {
             map.put("medalReward", medalAwardCanGet);
+            return ServerResponse.createBySuccess(map);
         }
+
         if (type == 4) {
-            Object object = redisTemplate.opsForHash().get(RedisKeysConst.SIMPLE_STUDENT_RANKING, student.getId());
-            if (object == null) {
-                Integer adminId = null;
-                if (student.getTeacherId() != null) {
-                    adminId = simpleStudentMapper.selSchoolAdminId(student.getId());
-                    if (adminId == null) {
-                        adminId = student.getTeacherId().intValue();
-                    }
-                }
-                getWorship(student, map, adminId);
-                getGoldRank(student, map, adminId);
-            } else {
-                map = (Map<String, Object>) object;
-            }
+            getWorship(student, map);
+            getGoldRank(student, map);
+
             if ((boolean) map.get("isClass")) {
                 size += 1;
             }
@@ -161,345 +146,195 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
             if ((boolean) map.get("isCountry")) {
                 size += 1;
             }
+            map = new HashMap<>(16);
             map.put("all", size + dailyAwardCanGet + goldAwardCanGet + medalAwardCanGet);
         }
         if (type == 5) {
-            try {
-                Object object = redisTemplate.opsForHash().get(RedisKeysConst.SIMPLE_STUDENT_RANKING, student.getId());
-                if (object != null) {
-                    map = (Map<String, Object>) object;
-                } else {
-                    Integer adminId = null;
-                    if (student.getTeacherId() != null) {
-                        adminId = simpleStudentMapper.selSchoolAdminId(student.getId());
-                        if (adminId == null) {
-                            adminId = student.getTeacherId().intValue();
-                        }
-                    }
-                    getWorship(student, map, adminId);
-                    getGoldRank(student, map, adminId);
-                    return ServerResponse.createBySuccess(map);
-                }
-            } catch (Exception e) {
-                log.error("排行榜类型转换错误，学生[{}]-[{}]排行榜类型转换错误，error=[{}]", student.getId(), student.getStudentName(), e);
-                Integer adminId = null;
-                if (student.getTeacherId() != null) {
-                    adminId = simpleStudentMapper.selSchoolAdminId(student.getId());
-                    if (adminId == null) {
-                        adminId = student.getTeacherId().intValue();
-                    }
-                }
-                getWorship(student, map, adminId);
-                getGoldRank(student, map, adminId);
-                return ServerResponse.createBySuccess(map);
+
+            getWorship(student, map);
+            getGoldRank(student, map);
+
+            // 消除指定模块的红色角标
+            if (Objects.equals(model, 1)) {
+                map.put("isClass", false);
+            } else if (Objects.equals(model, 2)) {
+                map.put("isSchool", false);
+            } else if (Objects.equals(model, 3)) {
+                map.put("isCountry", false);
             }
-            if (!model.equals(0)) {
-                if (model.equals(1)) {
-                    boolean isTrue = (boolean) map.get("isClass");
-                    if (isTrue) {
-                        map.put("isClass", false);
-                        redisTemplate.opsForHash().put(RedisKeysConst.SIMPLE_STUDENT_RANKING, student.getId(), map);
-                        redisTemplate.expire(RedisKeysConst.SIMPLE_STUDENT_RANKING, 3, TimeUnit.MINUTES);
-                    }
-                }
-                if (model.equals(2)) {
-                    boolean isTrue = (boolean) map.get("isSchool");
-                    if (isTrue) {
-                        map.put("isSchool", false);
-                        redisTemplate.opsForHash().put(RedisKeysConst.SIMPLE_STUDENT_RANKING, student.getId(), map);
-                        redisTemplate.expire(RedisKeysConst.SIMPLE_STUDENT_RANKING, 3, TimeUnit.MINUTES);
-                    }
-                }
-                if (model.equals(3)) {
-                    boolean isTrue = (boolean) map.get("isCountry");
-                    if (isTrue) {
-                        map.put("isCountry", false);
-                        redisTemplate.opsForHash().put(RedisKeysConst.SIMPLE_STUDENT_RANKING, student.getId(), map);
-                        redisTemplate.expire(RedisKeysConst.SIMPLE_STUDENT_RANKING, 3, TimeUnit.MINUTES);
-                    }
-                }
-            }
-            return ServerResponse.createBySuccess(map);
+
         }
         return ServerResponse.createBySuccess(map);
     }
 
-    private void getGoldRank(Student student, Map<String, Object> map, Integer adminId) {
+    @Override
+    public ServerResponse<Object> updateRanking(HttpSession session, Integer type) {
+        Student student = super.getStudent(session);
+        Long studentId = student.getId();
 
-        Ranking ranking = simpleRankingMapper.selByStudentId(student.getId());
+        Ranking ranking = simpleRankingMapper.selByStudentId(studentId);
 
-        List<Integer> teacherIds = null;
-        if (student.getTeacherId() != null) {
-            adminId = simpleStudentMapper.selSchoolAdminId(student.getId());
-            if (adminId == null) {
-                adminId = student.getTeacherId().intValue();
-            }
-            teacherIds = simpleTeacherMapper.getTeacherIdByAdminId(adminId);
+        switch (type) {
+            case 1:
+                // 更新班级排行名次
+                long classGoldRank = rankOpt.getRank(RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), studentId);
+                long classWorshipRank = rankOpt.getRank(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), studentId);
+                ranking.setGoldClassRank(classGoldRank == -1 ? 0 : (int) classGoldRank);
+                ranking.setWorshipClassRank(classWorshipRank == -1 ? 0 : (int) classWorshipRank);
+                simpleRankingMapper.updateById(ranking);
+                break;
+            case 2:
+                // 更新学校排行名次
+                long schoolGoldRank = rankOpt.getRank(RankKeysConst.SCHOOL_GOLD_RANK + TeacherInfoUtil.getSchoolAdminId(student), studentId);
+                long schoolWorshipRank = rankOpt.getRank(RankKeysConst.SCHOOL_WORSHIP_RANK + TeacherInfoUtil.getSchoolAdminId(student), studentId);
+                ranking.setGoldSchoolRank(schoolGoldRank == -1 ? 0 : (int) schoolGoldRank);
+                ranking.setWorshipSchoolRank(schoolWorshipRank == -1 ? 0 : (int) schoolWorshipRank);
+                simpleRankingMapper.updateById(ranking);
+                break;
+            case 3:
+                // 更新全国排行名次
+                long countryGoldRank = rankOpt.getRank(RankKeysConst.COUNTRY_GOLD_RANK, studentId);
+                long countryWorshipRank = rankOpt.getRank(RankKeysConst.COUNTRY_WORSHIP_RANK, studentId);
+                ranking.setGoldCountryRank(countryGoldRank == -1 ? 0 : (int) countryGoldRank);
+                ranking.setWorshipCountryRank(countryWorshipRank == -1 ? 0 : (int) countryWorshipRank);
+                simpleRankingMapper.updateById(ranking);
+                break;
+            default:
         }
-        List<Map<String, Object>> classStudents = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), "2", null, "1", adminId, 0, 100, teacherIds);
-        List<Map<String, Object>> schoolStudents = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), "2", null, "2", adminId, 0, 100, teacherIds);
-        List<Map<String, Object>> countryStudents = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), "2", null, "3", adminId, 0, 100, teacherIds);
-        int classRank = -1;
-        int schoolRank = -1;
-        int countryRank = -1;
-        for (int i = 0; i < classStudents.size(); i++) {
-            Long id = Long.parseLong(classStudents.get(i).get("id").toString());
-            if (id.equals(student.getId())) {
-                classRank = i + 1;
-            }
-        }
-        for (int i = 0; i < schoolStudents.size(); i++) {
-            Long id = Long.parseLong(schoolStudents.get(i).get("id").toString());
-            if (id.equals(student.getId())) {
-                schoolRank = i + 1;
-            }
-        }
-        for (int i = 0; i < countryStudents.size(); i++) {
-            Long id = Long.parseLong(countryStudents.get(i).get("id").toString());
-            if (id.equals(student.getId())) {
-                countryRank = i + 1;
-            }
-        }
+        return ServerResponse.createBySuccess();
+    }
+
+    /**
+     * 获取学生的金币排名及排名上升或下降的名次
+     *
+     * @param student
+     * @param map
+     */
+    private void getGoldRank(Student student, Map<String, Object> map) {
+        Long studentId = student.getId();
+
+        Ranking ranking = simpleRankingMapper.selByStudentId(studentId);
+
+        long classRank = rankOpt.getRank(RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), studentId);
+        long schoolRank = rankOpt.getRank(RankKeysConst.SCHOOL_GOLD_RANK + TeacherInfoUtil.getSchoolAdminId(student), studentId);
+        long countryRank = rankOpt.getRank(RankKeysConst.COUNTRY_GOLD_RANK, studentId);
+
         if (ranking != null) {
-            if (classRank != -1) {
-                if (ranking.getGoldClassRank() == null) {
-                    ranking.setGoldClassRank(classRank);
-                    simpleRankingMapper.updateById(ranking);
-                    map.put("goldClassRank", 0);
-                    map.put("isClass", false);
-                } else {
-                    classRank = ranking.getGoldClassRank() - classRank;
-                    if (map.get("isClass") == null && !((Boolean) map.get("isClass"))) {
-                        if (classRank != 0) {
-                            map.put("isClass", true);
-                        } else {
-                            map.put("isClass", false);
-                        }
-                    }
-                    map.put("goldClassRank", classRank);
-                }
-            } else {
-                if (ranking.getGoldClassRank() == null) {
-                    ranking.setGoldClassRank(0);
-                    simpleRankingMapper.updateById(ranking);
-                }
+            // 学生金币班级排行变化名次
+            if (ranking.getGoldClassRank() == null) {
                 map.put("goldClassRank", 0);
-                if (map.get("isClass") == null && !((Boolean) map.get("isClass"))) {
-                    map.put("isClass", false);
-                }
-            }
-            if (schoolRank != -1) {
-                if (ranking.getGoldSchoolRank() == null) {
-                    ranking.setGoldSchoolRank(schoolRank);
-                    simpleRankingMapper.updateById(ranking);
-                    map.put("goldSchoolRank", 0);
-                    map.put("isSchool", false);
-                } else {
-                    schoolRank = ranking.getGoldSchoolRank() - schoolRank;
-                    if (map.get("isSchool") == null && !((Boolean) map.get("isSchool"))) {
-                        if (schoolRank != 0) {
-                            map.put("isSchool", true);
-                        } else {
-                            map.put("isSchool", false);
-                        }
-                    }
-                    map.put("goldSchoolRank", schoolRank);
-                }
+                map.put("isClass", false);
             } else {
-                if (ranking.getGoldSchoolRank() == null) {
-                    ranking.setGoldSchoolRank(0);
-                    simpleRankingMapper.updateById(ranking);
+                int changeRank = (int) (ranking.getGoldClassRank() - classRank);
+                if (map.get("isClass") != null && !((Boolean) map.get("isClass"))) {
+                    map.put("isClass", changeRank != 0);
                 }
-                map.put("goldSchoolRank", 0);
-                if (map.get("isSchool") == null && !((Boolean) map.get("isSchool"))) {
-                    map.put("isSchool", false);
-                }
+                map.put("goldClassRank", changeRank);
             }
-            if (countryRank != -1) {
-                if (ranking.getGoldCountryRank() == null) {
-                    ranking.setGoldCountryRank(countryRank);
-                    simpleRankingMapper.updateById(ranking);
-                    map.put("goldCountryRank", 0);
-                    map.put("isCountry", false);
-                } else {
-                    countryRank = ranking.getGoldCountryRank() - countryRank;
-                    if (map.get("isCountry") == null && !((Boolean) map.get("isCountry"))) {
-                        if (countryRank != 0) {
-                            map.put("isCountry", true);
-                        } else {
-                            map.put("isCountry", false);
-                        }
-                    }
-                    map.put("goldCountryRank", countryRank);
 
-                }
+            // 学生金币学校排行变化名次
+            if (ranking.getGoldSchoolRank() == null) {
+                map.put("goldSchoolRank", 0);
+                map.put("isSchool", false);
             } else {
-                if (ranking.getGoldCountryRank() == null) {
-                    ranking.setGoldCountryRank(0);
-                    simpleRankingMapper.updateById(ranking);
+                int changeRank = (int) (ranking.getGoldSchoolRank() - schoolRank);
+                if (map.get("isSchool") != null && !((Boolean) map.get("isSchool"))) {
+                    map.put("isSchool", changeRank != 0);
                 }
+                map.put("goldSchoolRank", changeRank);
+            }
+
+            // 学生金币全国排行变化名次
+            if (ranking.getGoldCountryRank() == null) {
                 map.put("goldCountryRank", 0);
-                if (map.get("isCountry") == null && !((Boolean) map.get("isCountry"))) {
-                    map.put("isCountry", false);
+                map.put("isCountry", false);
+            } else {
+                int changeRank = (int) (ranking.getGoldCountryRank() - countryRank);
+                if (map.get("isCountry") != null && !((Boolean) map.get("isCountry"))) {
+                    map.put("isCountry", changeRank != 0);
                 }
+                map.put("goldCountryRank", changeRank);
             }
         } else {
             Ranking rank = new Ranking();
-            rank.setStudentId(student.getId());
-            if (classRank != -1) {
-                rank.setGoldClassRank(classRank);
-            } else {
-                rank.setGoldClassRank(0);
-            }
-            if (countryRank != -1) {
-                rank.setGoldCountryRank(countryRank);
-            } else {
-                rank.setGoldCountryRank(0);
-            }
-            if (schoolRank != -1) {
-                rank.setGoldSchoolRank(schoolRank);
-            } else {
-                rank.setGoldSchoolRank(0);
-            }
+            rank.setStudentId(studentId);
+            rank.setGoldClassRank(classRank == -1 ? 0 : (int) classRank);
+            rank.setGoldSchoolRank(schoolRank == -1 ? 0 : (int) schoolRank);
+            rank.setGoldCountryRank(countryRank == -1 ? 0 : (int) countryRank);
+            simpleRankingMapper.insert(rank);
+
             map.put("goldClassRank", 0);
             map.put("goldSchoolRank", 0);
             map.put("goldCountryRank", 0);
             map.put("isClass", false);
             map.put("isSchool", false);
             map.put("isCountry", false);
-            simpleRankingMapper.insert(rank);
         }
-        redisTemplate.opsForHash().put(RedisKeysConst.SIMPLE_STUDENT_RANKING, student.getId(), map);
-        redisTemplate.expire(RedisKeysConst.SIMPLE_STUDENT_RANKING, 3, TimeUnit.MINUTES);
     }
 
-    private void getWorship(Student student, Map<String, Object> map, Integer adminId) {
-        Ranking ranking = simpleRankingMapper.selByStudentId(student.getId());
-        Integer number = worshipMapper.getNumberByStudent(student.getId());
-        map.put("number", number);
-        List<Integer> teacherIds = null;
-        if (student.getTeacherId() != null) {
-            adminId = simpleStudentMapper.selSchoolAdminId(student.getId());
-            if (adminId == null) {
-                adminId = student.getTeacherId().intValue();
-            }
-            teacherIds = simpleTeacherMapper.getTeacherIdByAdminId(adminId);
-        }
-        List<Map<String, Object>> classStudents = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), null, "2", "1", adminId, 0, 100, teacherIds);
-        List<Map<String, Object>> schoolStudents = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), null, "2", "2", adminId, 0, 100, teacherIds);
-        List<Map<String, Object>> countryStudents = simpleStudentMapper.getRanking(student.getClassId(), student.getTeacherId(), null, "2", "3", adminId, 0, 100, teacherIds);
-        boolean classStudentRank = false;
-        int worshipClassRank = -1;
-        int worshipSchoolRank = -1;
-        int worshipCountryRank = -1;
-        for (int i = 0; i < classStudents.size(); i++) {
-            Long id = Long.parseLong(classStudents.get(i).get("id").toString());
-            if (id.equals(student.getId())) {
-                classStudentRank = true;
-                worshipClassRank = i + 1;
-            }
-        }
-        if (worshipClassRank != -1) {
-            if (number != null && number > 0) {
-                map.put("isClass", true);
+    /**
+     * 获取学生的勋章排名及排名上升或下降的名次
+     *
+     * @param student
+     * @param map
+     */
+    private void getWorship(Student student, Map<String, Object> map) {
+        Long studentId = student.getId();
+
+        Ranking ranking = simpleRankingMapper.selByStudentId(studentId);
+        // 学生新被膜拜次数
+        Integer numberByStudent = worshipMapper.getNumberByStudent(student.getId());
+        map.put("number", numberByStudent);
+
+        long classRank = rankOpt.getRank(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), studentId);
+        long schoolRank = rankOpt.getRank(RankKeysConst.SCHOOL_WORSHIP_RANK + TeacherInfoUtil.getSchoolAdminId(student), studentId);
+        long countryRank = rankOpt.getRank(RankKeysConst.COUNTRY_WORSHIP_RANK, studentId);
+
+        if (ranking != null) {
+            // 膜拜班级排行变化名次
+            if (ranking.getWorshipClassRank() != null) {
+                long change = ranking.getWorshipClassRank() - classRank;
+                map.put("worshipClassRank", change);
+                map.put("isClass", change != 0);
             } else {
+                map.put("worshipClassRank", 0);
                 map.put("isClass", false);
             }
-        } else {
-            map.put("isClass", false);
-        }
-        boolean schoolStudentRank = false;
-        for (int i = 0; i < schoolStudents.size(); i++) {
-            Long id = Long.parseLong(schoolStudents.get(i).get("id").toString());
-            if (id.equals(student.getId())) {
-                schoolStudentRank = true;
-                worshipSchoolRank = i + 1;
-            }
-        }
-        if (worshipSchoolRank != -1) {
-            if (number != null && number > 0) {
-                map.put("isSchool", true);
+
+            // 膜拜学校排行变化名次
+            if (ranking.getWorshipSchoolRank() != null) {
+                long change = ranking.getWorshipSchoolRank() - schoolRank;
+                map.put("worshipSchoolRank", change);
+                map.put("isSchool", change != 0);
             } else {
+                map.put("worshipSchoolRank", 0);
                 map.put("isSchool", false);
             }
-        } else {
-            map.put("isSchool", false);
-        }
-        boolean countryStudentRank = false;
-        for (int i = 0; i < countryStudents.size(); i++) {
-            Long id = Long.parseLong(countryStudents.get(i).get("id").toString());
-            if (id.equals(student.getId())) {
-                countryStudentRank = true;
-                worshipCountryRank = i + 1;
-            }
-        }
-        if (worshipCountryRank != -1) {
-            if (number != null && number > 0) {
-                map.put("isCountry", true);
+
+            // 膜拜全校排行变化名次
+            if (ranking.getWorshipCountryRank() != null) {
+                long change = ranking.getWorshipCountryRank() - countryRank;
+                map.put("worshipCountryRank", change);
+                map.put("isCountry", change != 0);
             } else {
+                map.put("worshipCountryRank", 0);
                 map.put("isCountry", false);
             }
         } else {
-            map.put("isCountry", false);
-        }
-        if (ranking != null) {
-            if (classStudentRank) {
-                if (ranking.getWorshipClassRank() != null) {
-                    map.put("worshipClassRank", ranking.getWorshipClassRank() - worshipClassRank);
-                } else {
-                    ranking.setWorshipClassRank(worshipClassRank);
-                    simpleRankingMapper.updateById(ranking);
-                    map.put("worshipClassRank", 0);
-                }
-            } else {
-                map.put("worshipClassRank", 0);
-
-            }
-            if (schoolStudentRank) {
-                if (ranking.getWorshipSchoolRank() != null) {
-                    map.put("worshipSchoolRank", ranking.getWorshipSchoolRank() - worshipSchoolRank);
-                } else {
-                    ranking.setWorshipClassRank(worshipSchoolRank);
-                    simpleRankingMapper.updateById(ranking);
-                    map.put("worshipSchoolRank", 0);
-
-                }
-            } else {
-                map.put("worshipSchoolRank", 0);
-            }
-            if (countryStudentRank) {
-                if (ranking.getWorshipCountryRank() != null) {
-                    map.put("worshipCountryRank", ranking.getWorshipCountryRank() - worshipCountryRank);
-                } else {
-                    ranking.setWorshipClassRank(worshipCountryRank);
-                    simpleRankingMapper.updateById(ranking);
-                    map.put("worshipCountryRank", 0);
-                }
-            } else {
-                map.put("worshipCountryRank", 0);
-            }
-        } else {
             Ranking rank = new Ranking();
-            rank.setStudentId(student.getId());
-            if (worshipClassRank != -1) {
-                rank.setWorshipClassRank(worshipClassRank);
-            } else {
-                rank.setWorshipClassRank(0);
-            }
-            if (worshipCountryRank != -1) {
-                rank.setWorshipCountryRank(worshipCountryRank);
-            } else {
-                rank.setWorshipCountryRank(0);
-            }
-            if (worshipSchoolRank != -1) {
-                rank.setWorshipSchoolRank(worshipSchoolRank);
-            } else {
-                rank.setWorshipSchoolRank(0);
-            }
+            rank.setStudentId(studentId);
+            rank.setWorshipClassRank(classRank == -1 ? 0 : (int) classRank);
+            rank.setWorshipSchoolRank(schoolRank == -1 ? 0 : (int) schoolRank);
+            rank.setWorshipCountryRank(countryRank == -1 ? 0 : (int) countryRank);
+            simpleRankingMapper.insert(rank);
+
+            map.put("isClass", false);
+            map.put("isSchool", false);
+            map.put("isCountry", false);
+
             map.put("worshipClassRank", 0);
             map.put("worshipSchoolRank", 0);
             map.put("worshipCountryRank", 0);
-            simpleRankingMapper.insert(rank);
         }
     }
 
@@ -607,6 +442,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 runLog.setUnitId(student.getUnitId());
                 try {
                     runLogMapper.insert(runLog);
+                    rankOpt.optMedalRank(student);
                 } catch (Exception e) {
                     log.error("id为[{}]的学生在领取勋章[{}-{}]时保存日志出错！", student.getId(), medal.getParentName(), medal.getChildName(), e);
                 }

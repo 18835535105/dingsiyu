@@ -5,10 +5,13 @@ import com.zhidejiaoyu.common.award.DailyAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.TokenUtil;
 import com.zhidejiaoyu.common.utils.ValidateCode;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -72,23 +75,11 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Autowired
     private LevelMapper levelMapper;
 
-    @Autowired
-    private CapacityReviewMapper capacityMapper;
-
-    @Autowired
-    private StudentWorkDayMapper studentWorkDayMapper;
-
-    @Autowired
-    private CalendarMapper calendarMapper;
-
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
     @Resource
     private StudyFlowMapper studyFlowMapper;
-
-    @Resource
-    private UnitSentenceMapper unitSentenceMapper;
 
     @Autowired
     private StudentFlowMapper studentFlowMapper;
@@ -112,9 +103,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private DailyAwardAsync dailyAwardAsync;
 
     @Autowired
-    private SentenceUnitMapper sentenceUnitMapper;
-
-    @Autowired
     private TeacherMapper teacherMapper;
 
     @Autowired
@@ -131,6 +119,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Autowired
     private RedisOpt redisOpt;
+
+    @Autowired
+    private RankOpt rankOpt;
 
     public Student loginJudge(String account, String password) {
         Student st = new Student();
@@ -790,17 +781,51 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     /**
      * 学生首次登陆系统初始化其账号有效期
      *
-     * @param stu
+     * @param student
      */
-    private void initAccountTime(Student stu) {
-        boolean flag = redisOpt.firstLogin(stu.getId());
+    private void initAccountTime(Student student) {
+        boolean flag = redisOpt.firstLogin(student.getId());
         if (flag) {
-            stu.setAccountTime(new Date(System.currentTimeMillis() + stu.getRank() * 24 * 60 * 60 * 1000L));
-            studentMapper.updateById(stu);
+            student.setAccountTime(new Date(System.currentTimeMillis() + student.getRank() * 24 * 60 * 60 * 1000L));
+            studentMapper.updateById(student);
 
-            // 初始化学生勋章信息
-            executorService.execute(() -> dailyAwardAsync.initAward(stu));
+
+            executorService.execute(() -> {
+                // 初始化学生勋章信息
+                dailyAwardAsync.initAward(student);
+
+                // 初始化学生排行数据
+                initRankInfo(student);
+            });
+
+
         }
+    }
+
+    /**
+     * 初始化学生排行数据
+     *
+     * @param student
+     */
+    private void initRankInfo(Student student) {
+        Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
+
+        double goldCount = BigDecimalUtil.add(student.getOfflineGold(), student.getSystemGold());
+        rankOpt.addOrUpdate(RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), goldCount);
+        rankOpt.addOrUpdate(RankKeysConst.SCHOOL_GOLD_RANK + schoolAdminId, student.getId(), goldCount);
+        rankOpt.addOrUpdate(RankKeysConst.COUNTRY_GOLD_RANK, student.getId(), goldCount);
+
+        rankOpt.addOrUpdate(RankKeysConst.CLASS_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), 0.0);
+        rankOpt.addOrUpdate(RankKeysConst.SCHOOL_CCIE_RANK + schoolAdminId, student.getId(), 0.0);
+        rankOpt.addOrUpdate(RankKeysConst.COUNTRY_CCIE_RANK, student.getId(), 0.0);
+
+        rankOpt.addOrUpdate(RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), 0.0);
+        rankOpt.addOrUpdate(RankKeysConst.SCHOOL_MEDAL_RANK + schoolAdminId, student.getId(), 0.0);
+        rankOpt.addOrUpdate(RankKeysConst.COUNTRY_MEDAL_RANK, student.getId(), 0.0);
+
+        rankOpt.addOrUpdate(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), 0.0);
+        rankOpt.addOrUpdate(RankKeysConst.SCHOOL_WORSHIP_RANK + schoolAdminId, student.getId(), 0.0);
+        rankOpt.addOrUpdate(RankKeysConst.COUNTRY_WORSHIP_RANK , student.getId(), 0.0);
     }
 
     public static void main(String[] args) {

@@ -1,9 +1,17 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
+import com.zhidejiaoyu.common.mapper.AwardMapper;
+import com.zhidejiaoyu.common.mapper.CcieMapper;
+import com.zhidejiaoyu.common.mapper.StudentMapper;
+import com.zhidejiaoyu.common.mapper.WorshipMapper;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.rank.RankOpt;
+import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.config.ServiceInfoUtil;
@@ -66,6 +74,18 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
 
     @Autowired
     private SimpleLevelMapper simpleLevelMapper;
+
+    @Autowired
+    private StudentMapper studentMapper;
+
+    @Autowired
+    private AwardMapper awardMapper;
+
+    @Autowired
+    private CcieMapper ccieMapper;
+
+    @Autowired
+    private RankOpt rankOpt;
 
     /**
      * 每日 00:10:00 更新提醒消息中学生账号到期提醒
@@ -257,6 +277,54 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
             simpleStudentExpansionMapper.updateById(studentExpansion);
         }
         log.info("定时任务 -> 学习力重置完成...");
+    }
+
+    @Override
+    public void initRankCache() {
+        List<Student> students = studentMapper.selectHasRank();
+        // 各个学生被膜拜的次数
+        Map<Long, Map<Long, Long>> byWorshipCount = worshipMapper.countWorshipWithStudents(students);
+        // 各个学生获取的勋章个数
+        Map<Long, Map<Long, Long>> medalCount = awardMapper.countGetModelByStudents(students);
+        // 各个学生获取的证书个数
+        Map<Long, Map<Long, Long>> ccieCount = ccieMapper.countCcieByStudents(students);
+        students.forEach(student -> {
+            Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
+
+            double goldCount = BigDecimalUtil.add(student.getOfflineGold(), student.getSystemGold());
+            rankOpt.addOrUpdate(RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), goldCount);
+            rankOpt.addOrUpdate(RankKeysConst.SCHOOL_GOLD_RANK + schoolAdminId, student.getId(), goldCount);
+            rankOpt.addOrUpdate(RankKeysConst.COUNTRY_GOLD_RANK, student.getId(), goldCount);
+            log.info("学生[{} - {} - {}] 金币数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), goldCount);
+
+            Long count =  0L;
+            if (ccieCount.get(student.getId()) != null && ccieCount.get(student.getId()).get("count") != null) {
+                count = ccieCount.get(student.getId()).get("count");
+            }
+            rankOpt.addOrUpdate(RankKeysConst.CLASS_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
+            rankOpt.addOrUpdate(RankKeysConst.SCHOOL_CCIE_RANK + schoolAdminId, student.getId(), count * 1.0);
+            rankOpt.addOrUpdate(RankKeysConst.COUNTRY_CCIE_RANK, student.getId(), count * 1.0);
+            log.info("学生[{} - {} - {}] 证书个数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
+
+            count = 0L;
+            if (medalCount.get(student.getId()) != null && medalCount.get(student.getId()).get("count") != null) {
+                count = medalCount.get(student.getId()).get("count");
+            }
+            rankOpt.addOrUpdate(RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
+            rankOpt.addOrUpdate(RankKeysConst.SCHOOL_MEDAL_RANK + schoolAdminId, student.getId(), count * 1.0);
+            rankOpt.addOrUpdate(RankKeysConst.COUNTRY_MEDAL_RANK, student.getId(), count * 1.0);
+            log.info("学生[{} - {} - {}] 勋章个数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
+
+            count = 0L;
+            if (byWorshipCount.get(student.getId()) != null && byWorshipCount.get(student.getId()).get("count") != null) {
+                count = byWorshipCount.get(student.getId()).get("count");
+            }
+            rankOpt.addOrUpdate(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
+            rankOpt.addOrUpdate(RankKeysConst.SCHOOL_WORSHIP_RANK + schoolAdminId, student.getId(), count * 1.0);
+            rankOpt.addOrUpdate(RankKeysConst.COUNTRY_WORSHIP_RANK , student.getId(), count * 1.0);
+            log.info("学生[{} - {} - {}] 被膜拜次数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
+
+        });
     }
 
     /**

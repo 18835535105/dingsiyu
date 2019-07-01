@@ -283,7 +283,7 @@
         read_flag = #{readFlag,jdbcType=INTEGER}
     where id = #{id,jdbcType=BIGINT}
   </update>
-  
+
   <select id="selectAllCcieByStudentIdAndDate" parameterType="map" resultType="map">
     select
     a.id, a.student_id, a.student_name, date_format(a.get_time, '%Y-%m-%d') AS time,
@@ -292,7 +292,7 @@
     then '五维测试' end) testName,
  		 (case a.study_model when 1 then '慧记忆' when 2 then '慧听写' when 3 then '慧默写' when 4 then '例句听力'  when 5 then '例句翻译'  when 6 then '例句默写'  when 7 then '五维测试' end) AS model,
     a.ccie_no, a.encourage_word encourageWord, a.course_name courseName
-	from 
+	from
 		ccie a where a.student_id = #{studentId}
 		<if test="model != 0">
 		  AND a.study_model = #{model}
@@ -315,7 +315,6 @@
     </select>
     <select id="getCountCcieByStudentId" resultType="java.lang.Integer" parameterType="map">
       select count(id) from ccie where student_id = #{studentId}
-      /*AND get_time >= '2018-08-29 00:00:00'*/
     </select>
   <select id="getMapKeyStudentCCie" resultType="java.util.Map">
     select student_id as id, count(*) as count from ccie GROUP BY student_id
@@ -328,5 +327,13 @@
       and u.course_id = #{courseId}
       and c.student_id = #{studentId}
       and c.ccie_no like 'K%'
+  </select>
+  <select id="countCcieByStudents" resultType="java.util.Map">
+    select student_id studentId, count(id) count from ccie where student_id in (
+    <foreach collection="students" item="student" separator=",">
+      #{student.id}
+    </foreach>
+    )
+    group by student_id
   </select>
 </mapper>

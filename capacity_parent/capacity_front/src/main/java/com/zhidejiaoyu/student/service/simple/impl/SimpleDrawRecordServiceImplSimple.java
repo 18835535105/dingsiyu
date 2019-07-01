@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
+import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -51,6 +52,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
     private RedisOpt redisOpt;
 
     @Override
+    @GoldChangeAnnotation
     public int[] addAward(HttpSession session, Integer type, String explain, String imgUrl) {
         //获取学生信息
         Student student = getStudent(session);

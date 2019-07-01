@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.mapper;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Ccie;
 import com.zhidejiaoyu.common.pojo.CcieExample;
+import com.zhidejiaoyu.common.pojo.Student;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -89,4 +90,13 @@ public interface CcieMapper extends BaseMapper<Ccie> {
      * @return
      */
     int countCourseCcieByCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
+
+    /**
+     * 获取指定学生的获取的证书个数
+     *
+     * @param students
+     * @return
+     */
+    @MapKey("studentId")
+    Map<Long, Map<Long, Long>> countCcieByStudents(@Param("students") List<Student> students);
 }

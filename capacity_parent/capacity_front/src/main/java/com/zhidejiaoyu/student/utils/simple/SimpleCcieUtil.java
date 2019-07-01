@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.utils.simple;
 import com.zhidejiaoyu.common.mapper.simple.SimpleCcieMapper;
 import com.zhidejiaoyu.common.pojo.Ccie;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class SimpleCcieUtil {
 
     @Autowired
     private SimpleCcieMapper ccieMapper;
+
+    @Autowired
+    private RankOpt rankOpt;
 
     /**
      * 测试证书
@@ -49,6 +53,8 @@ public class SimpleCcieUtil {
         ccie.setCcieNo(getNo(type));
         ccie.setPoint(point);
         ccieMapper.insert(ccie);
+
+        rankOpt.optCcieRank(student);
     }
 
     /**

@@ -250,4 +250,11 @@ public interface StudentMapper extends BaseMapper<Student> {
      * @return
      */
     Student selectMaxGoldForSchool(@Param("schoolAdminId") Integer schoolAdminId);
+
+    /**
+     * 查询需要参加排行的学生信息（未删除且登陆过系统）
+     *
+     * @return
+     */
+    List<Student> selectHasRank();
 }
