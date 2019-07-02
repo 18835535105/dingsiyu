@@ -5,10 +5,7 @@ import com.zhidejiaoyu.common.pojo.Course;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentUnit;
 import com.zhidejiaoyu.common.pojo.StudentUnitExample;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.MapKey;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 import java.util.Map;
@@ -102,12 +99,12 @@ public interface SimpleStudentUnitMapper {
     /**
      * 查看当前学生所有单元的个数
      * <ul>
-     *     <li>如果 grade 不为空，查询当前学生当前学段的所有单元个数</li>
-     *     <li>如果 grade 为空，查询当前学生所有单元个数</li>
+     * <li>如果 grade 不为空，查询当前学生当前学段的所有单元个数</li>
+     * <li>如果 grade 为空，查询当前学生所有单元个数</li>
      * </ul>
      *
      * @param student
-     * @param grade 学段
+     * @param grade   学段
      * @return
      */
     int countUnitCountByStudentId(@Param("student") Student student, @Param("grade") String grade);
@@ -123,12 +120,13 @@ public interface SimpleStudentUnitMapper {
      *
      * @param student
      * @param courseId
-     * @return  剩余的所有可学习的课程，集合中第一个课程即为下个课程
+     * @return 剩余的所有可学习的课程，集合中第一个课程即为下个课程
      */
     List<Course> selectNextCourse(@Param("student") Student student, @Param("courseId") Long courseId);
 
     /**
      * 根据课程查询单词模块开启了几个单元
+     *
      * @param courseIdw 课程id
      * @return
      */
@@ -137,6 +135,7 @@ public interface SimpleStudentUnitMapper {
 
     /**
      * 根据课程查询单元模块开启了几个单元
+     *
      * @param courseIdw 课程id
      * @return
      */
@@ -154,6 +153,7 @@ public interface SimpleStudentUnitMapper {
 
     /**
      * 当前所学单元 - 单词模块
+     *
      * @param course_id
      * @param studentId
      * @return
@@ -163,6 +163,7 @@ public interface SimpleStudentUnitMapper {
 
     /**
      * 当前所学单元 - 例句模块
+     *
      * @param course_id
      * @param studentId
      * @return
@@ -170,10 +171,10 @@ public interface SimpleStudentUnitMapper {
     @Select("select MAX(unit_id) from student_unit where student_id = #{studentId} AND course_id = #{course_id} AND sentence_status = 1")
     Integer maxUnitIdBySentenceByCourseIdByStudentIdBy(@Param("course_id") Long course_id, @Param("studentId") Long studentId);
 
-	List<Map> getSimpleUnitByStudentIdByCourseId(@Param("studentId") long studentId, @Param("courseId") long courseId);
+    List<Map> getSimpleUnitByStudentIdByCourseId(@Param("studentId") long studentId, @Param("courseId") long courseId);
 
-	@MapKey("id")
-	Map<Long, Map<Long, Object>> getOpenUnitId(@Param("studentId") long studentId, @Param("courseId") long courseId);
+    @MapKey("id")
+    Map<Long, Map<Long, Object>> getOpenUnitId(@Param("studentId") long studentId, @Param("courseId") long courseId);
 
     /**
      * 统计学生智能版课程数量
@@ -182,6 +183,9 @@ public interface SimpleStudentUnitMapper {
      * @return
      */
     int countCapacity(@Param("student") Student student);
+
+    @Update("update simple_student_unit set unit_id=#{unitId} where student_id=#{studentId} and type=#{type}")
+    int updUnitByStudentIdAndType(@Param("studentId") Long studentId,@Param("type") int type,@Param("unitId") Long unitId);
 
     List<Long> getAllCourseIdByTypeToStudent(@Param("studentId") Long studentId, @Param("type") int type);
 }

@@ -1031,10 +1031,17 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
     @Override
     public Object skipTest(Integer courseId, Integer unitId, Integer type, Integer model, HttpSession session) {
-        //  1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写;
         String studyModel = matchStudyModel(model);
-        Date date = new Date();
         Student student = getStudent(session);
+        if (type == 2) {
+            simpleTestRecordMapper.updateByStudentAndUnitId(student.getId(), unitId.longValue());
+            learnMapper.updateTypeByStudentIdAndUnitId(student.getId(), unitId.longValue(), studyModel);
+            simpleSimpleCapacityMapper.deleteByStudenIdByUnitId(student.getId(), unitId.longValue(), model);
+            simpleStudentUnitMapper.updUnitByStudentIdAndType(student.getId(),model,unitId.longValue());
+            return ServerResponse.createBySuccess(unitId);
+        }
+        //  1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写;
+        Date date = new Date();
         TestRecord testRecord = new TestRecord();
         testRecord.setAwardGold(0);
         testRecord.setCourseId(courseId.longValue());
@@ -1050,14 +1057,14 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         testRecord.setQuantity(0);
         testRecord.setPoint(-1);
         testRecord.setStudentId(student.getId());
-        if (type == 1) {
-            testRecord.setGenre("单元前测");
-        } else if (type == 2) {
+        /*if (type == 1) {*/
+        testRecord.setGenre("单元前测");
+       /* } else if (type == 2) {
             testRecord.setGenre("单元闯关测试");
         } else if (type == 3) {
             testRecord.setGenre("学前测试");
-        }
-        if (type == 2) {
+        }*/
+        /*if (type == 2) {
             TestRecord lookTest = simpleTestRecordMapper.selectByStudentIdAndUnitId(student.getId(),
                     unitId.longValue(), "单元闯关测试", studyModel);
             List<Unit> units = unitMapper.selectUnitsByCourseId(courseId.longValue());
@@ -1080,10 +1087,10 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
                 }
 
             }
-        } else if(type==1){
-            learnMapper.updateTypeByStudentIdAndUnitId(student.getId(), unitId.longValue(), studyModel);
-            simpleSimpleCapacityMapper.deleteByStudenIdByUnitId(student.getId(), unitId.longValue(), model);
-        }
+        } else if(type==1){*/
+        learnMapper.updateTypeByStudentIdAndUnitId(student.getId(), unitId.longValue(), studyModel);
+        simpleSimpleCapacityMapper.deleteByStudenIdByUnitId(student.getId(), unitId.longValue(), model);
+        /*}*/
         simpleTestRecordMapper.insert(testRecord);
         return ServerResponse.createBySuccess(unitId);
     }
