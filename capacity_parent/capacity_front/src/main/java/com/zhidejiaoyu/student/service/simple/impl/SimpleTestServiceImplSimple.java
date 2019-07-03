@@ -1033,11 +1033,14 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     public Object skipTest(Integer courseId, Integer unitId, Integer type, Integer model, HttpSession session) {
         String studyModel = matchStudyModel(model);
         Student student = getStudent(session);
+        if (courseId == null || unitId == null || type == null || model == null) {
+            return ServerResponse.createByError(500,"数据异常+"+courseId+"   "+unitId+"  "+type+"   "+model);
+        }
         if (type == 2) {
             simpleTestRecordMapper.updateByStudentAndUnitId(student.getId(), unitId.longValue());
             learnMapper.updateTypeByStudentIdAndUnitId(student.getId(), unitId.longValue(), studyModel);
             simpleSimpleCapacityMapper.deleteByStudenIdByUnitId(student.getId(), unitId.longValue(), model);
-            simpleStudentUnitMapper.updUnitByStudentIdAndType(student.getId(),model,unitId.longValue());
+            simpleStudentUnitMapper.updUnitByStudentIdAndType(student.getId(), model, unitId.longValue());
             return ServerResponse.createBySuccess(unitId);
         }
         //  1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写;
