@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
 import com.github.pagehelper.PageHelper;
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.Vo.simple.GameTwoVo;
 import com.zhidejiaoyu.common.Vo.simple.StrengthGameVo;
 import com.zhidejiaoyu.common.Vo.simple.StudentGauntletVo;
@@ -142,7 +143,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         StudentGauntletVo studentGauntletVo = new StudentGauntletVo();
         studentGauntletVo.setId(student.getId());
         studentGauntletVo.setName(student.getNickname());
-        studentGauntletVo.setHeadUrl(student.getHeadUrl());
+        studentGauntletVo.setHeadUrl(AliyunInfoConst.host + student.getHeadUrl());
         //获取每天的挑战次数
         if (gauntlets != null && gauntlets.size() > 0) {
             boolean isTrue = true;
@@ -230,7 +231,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             getGameOne(courseId, subjects);
             Map<String, Object> map = new HashMap<>();
             map.put("testResults", subjects);
-            map.put("petUrl", student.getPartUrl());
+            map.put("petUrl", AliyunInfoConst.host + student.getPartUrl());
             return ServerResponse.createBySuccess(map);
         }
         if ("桌牌捕音".equals(gameName)) {
@@ -516,7 +517,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         for (Gauntlet gauntlet : gauntlets) {
             Map<String, Object> map = new HashMap<>();
             map.put("name", student.getNickname());
-            map.put("headUrl", student.getHeadUrl());
+            map.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
             if (gauntlet.getChallengerStudentId().equals(student.getId())) {
                 map.put("status", gauntlet.getChallengeStatus());
                 map.put("study", gauntlet.getChallengerStudyNow());
@@ -683,12 +684,12 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             }
             Student student = simpleStudentMapper.selectByPrimaryKey(gauntlet.getChallengerStudentId());
             returnMap.put("oneself", student.getNickname());
-            returnMap.put("oneselfUrl", student.getHeadUrl());
+            returnMap.put("oneselfUrl", AliyunInfoConst.host + student.getHeadUrl());
             returnMap.put("oneselfPoint", gauntlet.getChallengerPoint());
             returnMap.put("challengePoint", gauntlet.getBeChallengerPoint());
             Student challengeStudent = simpleStudentMapper.selectByPrimaryKey(gauntlet.getBeChallengerStudentId());
             returnMap.put("challenge", challengeStudent.getNickname());
-            returnMap.put("challengeUrl", challengeStudent.getHeadUrl());
+            returnMap.put("challengeUrl", AliyunInfoConst.host + challengeStudent.getHeadUrl());
             returnMap.put("gradeGold", gauntlet.getGrade());
             returnMap.put("awardGold", gauntlet.getAward());
         } else {
@@ -704,10 +705,10 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             returnMap.put("challengePoint", gauntlet.getChallengerPoint());
             Student student = simpleStudentMapper.selectByPrimaryKey(gauntlet.getChallengerStudentId());
             returnMap.put("challenge", student.getNickname());
-            returnMap.put("challengeUrl", student.getHeadUrl());
+            returnMap.put("challengeUrl", AliyunInfoConst.host + student.getHeadUrl());
             Student challengeStudent = simpleStudentMapper.selectByPrimaryKey(gauntlet.getBeChallengerStudentId());
             returnMap.put("oneself", challengeStudent.getNickname());
-            returnMap.put("oneselfUrl", challengeStudent.getHeadUrl());
+            returnMap.put("oneselfUrl", AliyunInfoConst.host + challengeStudent.getHeadUrl());
             returnMap.put("gradeGold", 0);
             returnMap.put("awardGold", 0);
         }
