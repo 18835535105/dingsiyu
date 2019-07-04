@@ -1071,18 +1071,20 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
 
         }
         //计算总挑战次数
-        Integer pkNumber = pkNumberforHis + pkNumberForMe;
+        int pkNumber = pkNumberforHis + pkNumberForMe;
         //计算总赢次数
-        Integer winnerNumber = winnerNumberForHis + winnerNumberForMe;
+        int winnerNumber = winnerNumberForHis + winnerNumberForMe;
 
-        if (pkNumber != null && pkNumber != 0) {
+        if (pkNumber != 0) {
             studentGauntletVo.setPkNumber(pkNumber);
-            Double pk = 1.0 * winnerNumber / pkNumber * 100;
-            studentGauntletVo.setWinner(pk.intValue() + "%");
+            double pk = 1.0 * winnerNumber / pkNumber * 100;
+            studentGauntletVo.setWinner((int) pk + "%");
         } else {
             studentGauntletVo.setPkNumber(0);
             studentGauntletVo.setWinner("0");
         }
+
+        studentGauntletVo.setHeadUrl(AliyunInfoConst.host + studentGauntletVo.getHeadUrl());
     }
 
 
