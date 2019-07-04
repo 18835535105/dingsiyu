@@ -618,7 +618,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         List<String> medalImgUrl = new ArrayList<>(childInfo.size());
         StringBuilder sb = new StringBuilder();
         childInfo.forEach(info -> {
-            medalImgUrl.add(info.get("imgUrl"));
+            medalImgUrl.add(AliyunInfoConst.host + info.get("imgUrl"));
             sb.append(info.get("content"));
         });
 
