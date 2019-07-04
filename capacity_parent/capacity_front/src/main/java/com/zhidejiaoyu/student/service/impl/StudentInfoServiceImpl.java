@@ -506,9 +506,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         List<String> urls = new ArrayList<>(urlList.size());
         urlList.forEach(url -> {
             if (url != null && url.contains("#")) {
-                urls.add(sex == 1 ? url.split("#")[0] : url.split("#")[1]);
+                urls.add(sex == 1 ? AliyunInfoConst.host + url.split("#")[0] : AliyunInfoConst.host + url.split("#")[1]);
             } else {
-                urls.add(url);
+                urls.add(AliyunInfoConst.host + url);
             }
         });
         PageInfo<String> pageInfo = new PageInfo<>(urls);
@@ -651,12 +651,12 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
                 // 判断当前金币所处的等级
                 boolean flag = ((i == 0 && gold < level.getGold()) || gold >= level.getGold()) && gold < nextLevel.getGold();
                 if (flag) {
-                    levelVo.setLevelImgUrl(level.getImgUrlLevel());
+                    levelVo.setLevelImgUrl(AliyunInfoConst.host + level.getImgUrlLevel());
                     levelVo.setChildName(level.getImgUrlWord());
                     break;
                 }
             } else {
-                levelVo.setLevelImgUrl(level.getImgUrlLevel());
+                levelVo.setLevelImgUrl(AliyunInfoConst.host + level.getImgUrlLevel());
                 levelVo.setChildName(level.getImgUrlWord());
                 break;
             }

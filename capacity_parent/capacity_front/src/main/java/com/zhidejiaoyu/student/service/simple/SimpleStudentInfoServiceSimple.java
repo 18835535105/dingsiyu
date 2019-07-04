@@ -60,28 +60,6 @@ public interface SimpleStudentInfoServiceSimple extends SimpleBaseService<Studen
     ServerResponse<String> updateStudentInfo(HttpSession session, Student student);
 
     /**
-     * 获取学生的等级信息
-     *
-     * @param session
-     * @param stuId 为空时查看当前学生的等级信息；不为空时查看选中的学生的等级信息
-     * @param pageNum
-     * @param pageSize
-     * @return
-     */
-    ServerResponse<LevelVo> getLevel(HttpSession session, Long stuId, Integer pageNum, Integer pageSize);
-
-    /**
-     * 分页获取学生已领取的勋章信息
-     *
-     * @param session
-     * @param stuId
-     * @param pageNum
-     * @param pageSize
-     * @return
-     */
-    ServerResponse<PageInfo<String>> getMedalByPage(HttpSession session, Long stuId, Integer pageNum, Integer pageSize);
-
-    /**
      * 获取学生膜拜数据
      *
      * @param session
