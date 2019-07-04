@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -126,7 +127,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         Student student = getStudent(session);
         Long id = student.getId();
         map.put("name", student.getStudentName());
-        map.put("headUrl", student.getHeadUrl());
+        map.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
 
         // 判断有哪些模块有未处理的信息
         redPoint(map, id);
