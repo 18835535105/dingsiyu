@@ -531,21 +531,21 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             if (myGold >= myrecord && myGold < xlevelGold) {
                 map.put("childName", levels.get(i).get("child_name"));// 我的等级
                 map.put("jap", (xlevelGold - myGold)); // 距离下一等级还差多少金币
-                map.put("imgUrl", levels.get(i).get("img_url"));// 我的等级图片
+                map.put("imgUrl", AliyunInfoConst.host + levels.get(i).get("img_url"));// 我的等级图片
                 // 下一个等级名/ 下一个等级需要多少金币 / 下一个等级图片
                 map.put("childNameBelow", levels.get(si).get("child_name"));// 下一级等级名
                 map.put("japBelow", (xlevelGold)); // 下一级金币数量
-                map.put("imgUrlBelow", levels.get(si).get("img_url"));// 下一级等级图片
+                map.put("imgUrlBelow", AliyunInfoConst.host + levels.get(si).get("img_url"));// 下一级等级图片
                 break;
                 // 等级循环完还没有确定等级 = 最高等级
             } else if (myauto == levels.size()) {
                 map.put("childName", levels.get(i).get("child_name"));// 我的等级
                 map.put("jap", (xlevelGold - myGold)); // 距离下一等级还差多少金币
-                map.put("imgUrl", levels.get(i).get("img_url"));// 我的等级图片
+                map.put("imgUrl", AliyunInfoConst.host + levels.get(i).get("img_url"));// 我的等级图片
                 // 下一个等级名/ 下一个等级需要多少金币 / 下一个等级图片
                 map.put("childNameBelow", levels.get(si).get("child_name"));// 下一级等级名
                 map.put("japBelow", (xlevelGold)); // 下一级金币数量
-                map.put("imgUrlBelow", levels.get(si).get("img_url"));// 下一级等级图片
+                map.put("imgUrlBelow", AliyunInfoConst.host + levels.get(si).get("img_url"));// 下一级等级图片
                 break;
             }
 
