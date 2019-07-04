@@ -205,14 +205,14 @@
     from (select ROUND(AVG(DISTINCT vo.score)) avgscore
                , stu.student_name              studentName
                , stu.school_name               schoolName
-               , stu.part_url                  url
+               , concat(#{host}, stu.part_url) url
           from voice vo
                  right join student stu on vo.student_id = stu.id
-          where stu.school_name = #{schoolName}
+          where stu.school_name = #{map.schoolName}
             and vo.type = 2
-            and vo.unit_id = #{unitId}
-            and vo.create_time >= #{beforeTime}
-            and vo.create_time &lt;= #{nowTime}
+            and vo.unit_id = #{map.unitId}
+            and vo.create_time >= #{map.beforeTime}
+            and vo.create_time &lt;= #{map.nowTime}
           GROUP BY vo.student_id
          ) score
     order by score.avgscore desc
@@ -223,13 +223,13 @@
     from (select ROUND(AVG(DISTINCT vo.score)) avgscore
                , stu.student_name              studentName
                , stu.school_name               schoolName
-               , stu.part_url                  url
+               , concat(#{host}, stu.part_url) url
           from voice vo
                  right join student stu on vo.student_id = stu.id
           where vo.type = 2
-            and vo.unit_id = #{unitId}
-            and vo.create_time >= #{beforeTime}
-            and vo.create_time &lt;= #{nowTime}
+            and vo.unit_id = #{map.unitId}
+            and vo.create_time >= #{map.beforeTime}
+            and vo.create_time &lt;= #{map.nowTime}
           GROUP BY vo.student_id
          ) score
     order by score.avgscore desc

@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -190,10 +191,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
         Map<String, Object> result = new HashMap<>(16);
         //全国排名
-        List<Map<String, Object>> countryMap = voiceMapper.selectTextRank(getMap);
+        List<Map<String, Object>> countryMap = voiceMapper.selectTextRank(getMap, AliyunInfoConst.host);
         result.put("nationalRanking", countryMap);
         //全校排名
-        List<Map<String, Object>> schoolMap = voiceMapper.selectTextRankSchool(getMap);
+        List<Map<String, Object>> schoolMap = voiceMapper.selectTextRankSchool(getMap, AliyunInfoConst.host);
         result.put("shcoolRanking", schoolMap);
         return ServerResponse.createBySuccess(result);
     }
@@ -772,7 +773,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             testRecord.setPass(1);
         }
         map.put("point", point);
-        map.put("imgUrl", student.getPartUrl());
+        map.put("imgUrl", AliyunInfoConst.host + student.getPartUrl());
         return map;
     }
 
