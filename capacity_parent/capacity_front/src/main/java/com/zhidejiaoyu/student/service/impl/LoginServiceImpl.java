@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.MacIpUtil;
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
@@ -304,9 +305,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 姓名
         result.put("studentName", student.getStudentName());
         // 头像
-        result.put("headUrl", student.getHeadUrl());
+        result.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
         // 宠物
-        result.put("partUrl", student.getPartUrl());
+        result.put("partUrl", AliyunInfoConst.host + student.getPartUrl());
         // 宠物名
         result.put("petName", student.getPetName());
         result.put("schoolName", student.getSchoolName());
@@ -441,7 +442,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 姓名
         result.put("studentName", student.getStudentName());
         // 头像
-        result.put("headUrl", student.getHeadUrl());
+        result.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
         result.put("schoolName", student.getSchoolName());
 
         this.getIndexTime(session, student, result);
@@ -619,7 +620,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 姓名
             result.put("studentName", stu.getStudentName());
             // 头像
-            result.put("headUrl", stu.getHeadUrl());
+            result.put("headUrl", AliyunInfoConst.host + stu.getHeadUrl());
 
             // 记录登录信息
             String ip = saveLoginRunLog(stu, request);
@@ -961,7 +962,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     public Object getRiepCount(HttpSession session) {
         Student student = getStudent(session);
         Map<String,Object> map=new HashMap<>();
-        map.put("partUrl",student.getPartUrl());
+        map.put("partUrl", AliyunInfoConst.host + student.getPartUrl());
         Integer count = studentMapper.getVocabularyCountByStudent(student.getId());
         map.put("vocabularyCount",count);
         Integer sentenceCount = studentMapper.getSentenceCountByStudent(student.getId());
