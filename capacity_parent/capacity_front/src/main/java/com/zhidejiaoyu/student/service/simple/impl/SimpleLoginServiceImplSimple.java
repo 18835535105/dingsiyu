@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
@@ -15,8 +16,8 @@ import com.zhidejiaoyu.common.utils.simple.SimpleValidateCode;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleLearnTimeUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
+import com.zhidejiaoyu.student.constant.PetImageConstant;
 import com.zhidejiaoyu.student.service.simple.SimpleLoginServiceSimple;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,10 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -137,9 +141,9 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         // 昵称
         result.put("studentName", stu.getStudentName());
         // 头像
-        result.put("headUrl", stu.getHeadUrl());
+        result.put("headUrl", AliyunInfoConst.host + stu.getHeadUrl());
         // 宠物
-        result.put("partUrl", stu.getPartUrl());
+        result.put("partUrl", AliyunInfoConst.host + stu.getPartUrl());
         // 宠物名
         result.put("petName", stu.getPetName());
         result.put("schoolName", stu.getSchoolName());
@@ -303,7 +307,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         // 姓名
         result.put("studentName", student.getStudentName());
         // 头像
-        result.put("headUrl", student.getHeadUrl());
+        result.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
 
         // 有效时长  !
         Integer valid = super.getTodayValidTime(studentId);
@@ -397,26 +401,12 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         if (d >= 10 || e >= 10 || f >= 10) {
             result.put("hide", true);
             //宠物图片
-            result.put("partWGUrl", "static/img/edit-user-msg/tips1-6.png");
+            result.put("partWGUrl", PetImageConstant.WIN);
         } else {
             result.put("hide", false);
         }
 
         return ServerResponse.createBySuccess(result);
-    }
-
-    /**
-     * 从session中获取学生id(本类方法)
-     *
-     * @param session
-     * @return
-     */
-    @SuppressWarnings("unused")
-    private long StudentIdBySession(HttpSession session) {
-        // 获取当前学生信息
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        return student.getId();
-        //return 3155;
     }
 
     /**
