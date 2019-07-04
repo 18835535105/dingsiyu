@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.aliyunoss.putObject.OssUpload;
 import com.zhidejiaoyu.common.constant.FileConstant;
@@ -16,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,7 +49,7 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
         // 获取当前学生所有的反馈及被回复信息
         List<MessageBoard> messageBoards = messageBoardMapper.selectByStudentId(student.getId());
         if (messageBoards.size() > 0) {
-            return ServerResponse.createBySuccess(packageFeedBackInfoVO(messageBoards, student.getHeadUrl()));
+            return ServerResponse.createBySuccess(packageFeedBackInfoVO(messageBoards, AliyunInfoConst.host + student.getHeadUrl()));
         }
         return ServerResponse.createBySuccess(new FeedBackInfoVO());
     }
@@ -88,19 +88,20 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
         // 保存反馈内容
         try {
             saveFeedBackContent(content, student, fileName);
-            try{
-                Map<String, Object> paramMap = new HashMap<>(16);
-                paramMap.put("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)));
-                String url = adminDomin + "/socket/getMessage";
-                System.out.println("url:   "+url);
-                restTemplate.getForEntity(url, Map.class, paramMap);
-            }catch (Exception e){
-                throw new RuntimeException(e);
-            }
         } catch (Exception e) {
             log.error("保存学生 {}->{} 意见反馈失败！", student.getId(), student.getStudentName(), e);
             return ServerResponse.createByErrorMessage("提交失败！");
         }
+
+        try{
+            Map<String, Object> paramMap = new HashMap<>(16);
+            paramMap.put("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)));
+            String url = adminDomin + "/socket/getMessage";
+            restTemplate.getForEntity(url, Map.class, paramMap);
+        }catch (Exception e){
+            log.error("[{} - {} -{}]提交反馈信息请求后台 socket 失败！", student.getId(), student.getAccount(), student.getStudentName(), e);
+        }
+
         return ServerResponse.createBySuccess();
     }
 
