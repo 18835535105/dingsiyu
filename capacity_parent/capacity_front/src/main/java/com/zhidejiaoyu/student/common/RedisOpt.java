@@ -278,7 +278,7 @@ public class RedisOpt {
             try{
                 allLevel = (List<Map<String, Object>>) object;
             } catch (Exception e) {
-                log.error("类型转换错误，object=[{}]", object, e.getMessage());
+                log.error("类型转换错误，object=[{}]", object, e);
                 allLevel = levelMapper.selectAll();
                 log.error("重新查询结果：allLevel=[{}]", allLevel);
             }

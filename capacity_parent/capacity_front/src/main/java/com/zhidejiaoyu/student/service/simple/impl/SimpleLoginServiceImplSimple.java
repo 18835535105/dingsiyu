@@ -17,6 +17,7 @@ import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleLearnTimeUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.constant.PetImageConstant;
+import com.zhidejiaoyu.student.service.impl.LoginServiceImpl;
 import com.zhidejiaoyu.student.service.simple.SimpleLoginServiceSimple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,14 +28,11 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 登陆业务实现层
@@ -419,8 +417,6 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
      */
     @Override
     public ServerResponse<Object> clickPortrait(HttpSession session) {
-
-        Map<String, Object> map = new HashMap<>(16);
         long studentId = super.getStudentId(session);
         Student student = getStudent(session);
 
@@ -428,68 +424,20 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         int learnWord = learnMapper.getTodayWord(SimpleDateUtil.formatYYYYMMDD(new Date()), studentId);
         // 获取今日已学例句
         int learnSentence = learnMapper.getTodaySentence(SimpleDateUtil.formatYYYYMMDD(new Date()), studentId);
+
+        Map<String, Object> map = new HashMap<>(16);
         map.put("learnWord", learnWord);
         map.put("learnSentence", learnSentence);
-        map.put("sex",student.getSex());
+        map.put("sex", student.getSex());
         // 获取我的总金币
-        Double myGoldD = simpleStudentMapper.myGold(studentId);
-        BigDecimal mybd = new BigDecimal(myGoldD).setScale(0, BigDecimal.ROUND_HALF_UP);
-        int myGold = Integer.parseInt(mybd.toString());
+        int myGold = (int) BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
         map.put("myGold", myGold);
 
-        // 获取等级规则
-        List<Map<String, Object>> levels = redisOpt.getAllLevel();
+        LoginServiceImpl.getMyLevelInfo(map, myGold, redisOpt);
 
-        // 我的等级myChildName
-        int myrecord = 0;
-        int myauto = 1;
-        int bre = 0; // 跳出循环
-
-        for (int i = 0; i < levels.size(); i++) {
-            // 循环的当前等级分数
-            int levelGold = (int) levels.get(i).get("gold");
-            // 下一等级分数
-            int xlevelGold = (int) levels.get((i + 1) < levels.size() ? (i + 1) : i).get("gold");
-            // 下一等级索引
-            int si = (i + 1) < levels.size() ? (i + 1) : i;
-
-            if (myGold >= myrecord && myGold < xlevelGold) {
-                map.put("childName", levels.get(i).get("child_name"));// 我的等级
-                map.put("jap", (xlevelGold - myGold)); // 距离下一等级还差多少金币
-                map.put("imgUrl", levels.get(i).get("img_url"));// 我的等级图片
-                // 下一个等级名/ 下一个等级需要多少金币 / 下一个等级图片
-                map.put("childNameBelow", levels.get(si).get("child_name"));// 下一级等级名
-                map.put("japBelow", (xlevelGold)); // 下一级金币数量
-                map.put("imgUrlBelow", levels.get(si).get("img_url"));// 下一级等级图片
-                break;
-                // 等级循环完还没有确定等级 = 最高等级
-            } else if (myauto == levels.size()) {
-                map.put("childName", levels.get(i).get("child_name"));// 我的等级
-                map.put("jap", (xlevelGold - myGold)); // 距离下一等级还差多少金币
-                map.put("imgUrl", levels.get(i).get("img_url"));// 我的等级图片
-                // 下一个等级名/ 下一个等级需要多少金币 / 下一个等级图片
-                map.put("childNameBelow", levels.get(si).get("child_name"));// 下一级等级名
-                map.put("japBelow", (xlevelGold)); // 下一级金币数量
-                map.put("imgUrlBelow", levels.get(si).get("img_url"));// 下一级等级图片
-                break;
-            }
-
-            myrecord = levelGold;
-            myauto++;
-        }
-
-        // 获取今日获得金币 date_format(learn_time, '%Y-%m-%d')
+        // 获取今日获得金币
         List<String> list = runLogMapper.getStudentGold(SimpleDateUtil.formatYYYYMMDD(new Date()), studentId);
-        double count = 0;
-        String regex = "#(.*)#";
-        Pattern pattern = Pattern.compile(regex);
-        for (String str : list) {
-            Matcher matcher = pattern.matcher(str);//匹配类
-            while (matcher.find()) {
-                count += Double.parseDouble(matcher.group(1));
-            }
-        }
-        map.put("myThisGold", count);
+        LoginServiceImpl.getTodayGold(map, list);
 
         return ServerResponse.createBySuccess(map);
     }
