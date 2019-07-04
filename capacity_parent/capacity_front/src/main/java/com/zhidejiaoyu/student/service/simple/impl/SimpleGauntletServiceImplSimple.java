@@ -143,7 +143,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         StudentGauntletVo studentGauntletVo = new StudentGauntletVo();
         studentGauntletVo.setId(student.getId());
         studentGauntletVo.setName(student.getNickname());
-        studentGauntletVo.setHeadUrl(AliyunInfoConst.host + student.getHeadUrl());
+        studentGauntletVo.setHeadUrl(student.getHeadUrl());
         //获取每天的挑战次数
         if (gauntlets != null && gauntlets.size() > 0) {
             boolean isTrue = true;
