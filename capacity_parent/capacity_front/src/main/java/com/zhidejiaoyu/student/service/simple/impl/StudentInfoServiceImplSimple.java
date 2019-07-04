@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.service.simple.impl;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.Vo.simple.studentInfoVo.ChildMedalVo;
 import com.zhidejiaoyu.common.Vo.simple.studentInfoVo.LevelVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -18,6 +19,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleWeekUtil;
 import com.zhidejiaoyu.common.utils.simple.server.SimpleResponseCode;
+import com.zhidejiaoyu.student.constant.PetImageConstant;
 import com.zhidejiaoyu.student.service.simple.SimpleStudentInfoServiceSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -96,7 +98,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         try {
             if (StringUtils.isEmpty(studentInfo.getPetName())) {
                 studentInfo.setPetName("大明白");
-                studentInfo.setPartUrl("static/img/edit-user-msg/tips.png");
+                studentInfo.setPartUrl(PetImageConstant.DEFAULT_IMG);
             }
             int count = simpleStudentMapper.updateByPrimaryKeySelective(studentInfo);
             studentInfo = simpleStudentMapper.selectById(studentInfo.getId());
@@ -414,7 +416,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         }
 
         LevelVo levelVo = new LevelVo();
-        levelVo.setHeadUrl(student.getHeadUrl());
+        levelVo.setHeadUrl(AliyunInfoConst.host + student.getHeadUrl());
         levelVo.setShowFist(showFist);
         levelVo.setNickname(student.getNickname());
         // 获取当前勋章父勋章的索引

@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -270,7 +271,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             map.put("point", point);
         }
         // 宠物url,用于跳过游戏时显示
-        map.put("petUrl", student.getPartUrl());
+        map.put("petUrl", AliyunInfoConst.host + student.getPartUrl());
 
         return ServerResponse.createBySuccess(map);
     }
