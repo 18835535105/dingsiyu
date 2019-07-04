@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.service.impl;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.Vo.student.level.ChildMedalVo;
 import com.zhidejiaoyu.common.Vo.student.level.LevelVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -469,7 +470,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         }
 
         LevelVo levelVo = new LevelVo();
-        levelVo.setHeadUrl(student.getHeadUrl());
+        levelVo.setHeadUrl(AliyunInfoConst.host + student.getHeadUrl());
         levelVo.setShowFist(showFist);
         levelVo.setNickname(student.getNickname());
         // 获取当前勋章父勋章的索引
