@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.Vo.student.voice.VoiceRankVo;
 import com.zhidejiaoyu.common.Vo.student.voice.VoiceVo;
 import com.zhidejiaoyu.common.constant.UserConstant;
@@ -14,7 +15,6 @@ import com.zhidejiaoyu.student.utils.GoodVoiceUtil;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -267,9 +267,9 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 vo.setStudentName(voice.getStudentName());
                 vo.setVoiceUrl(voice.getVoiceUrl());
                 if (hearUrlMap.get(voice.getStudentId()) != null) {
-                    vo.setHeadUrl(hearUrlMap.get(voice.getStudentId()).get("headUrl"));
+                    vo.setHeadUrl(AliyunInfoConst.host + hearUrlMap.get(voice.getStudentId()).get("headUrl"));
                 } else {
-                    vo.setHeadUrl("static/img/portrait/17.png");
+                    vo.setHeadUrl(AliyunInfoConst.host + "static/img/portrait/17.png");
                 }
                 rankVos.add(vo);
             }
