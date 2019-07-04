@@ -535,7 +535,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         mapPageInfo1.setPages(mapPageInfo.getPages());
 
         Map<String, Object> map = new HashMap<>(16);
-        map.put("petName", student.getPetName());
+        map.put("petName", AliyunInfoConst.host + student.getPetName());
         map.put("list", mapPageInfo1);
 
         return ServerResponse.createBySuccess(map);
@@ -601,9 +601,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         medalImgUrlList.forEach(map -> {
             Map<String, Object> mapTemp = new HashMap<>(16);
             if (map.get("imgUrl").toString().contains("#")) {
-                mapTemp.put("imgUrl", sex == 1 ? map.get("imgUrl").toString().split("#")[0] : map.get("imgUrl").toString().split("#")[1]);
+                mapTemp.put("imgUrl", sex == 1 ? AliyunInfoConst.host + map.get("imgUrl").toString().split("#")[0] : AliyunInfoConst.host + map.get("imgUrl").toString().split("#")[1]);
             } else {
-                mapTemp.put("imgUrl", map.get("imgUrl"));
+                mapTemp.put("imgUrl", AliyunInfoConst.host + map.get("imgUrl"));
             }
             mapTemp.put("id", map.get("id"));
             medalImgUrlListTemp.add(mapTemp);
