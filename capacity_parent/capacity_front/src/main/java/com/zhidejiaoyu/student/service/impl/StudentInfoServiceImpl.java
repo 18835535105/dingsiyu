@@ -535,7 +535,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         mapPageInfo1.setPages(mapPageInfo.getPages());
 
         Map<String, Object> map = new HashMap<>(16);
-        map.put("petName", AliyunInfoConst.host + student.getPetName());
+        map.put("petName", student.getPetName());
         map.put("list", mapPageInfo1);
 
         return ServerResponse.createBySuccess(map);
