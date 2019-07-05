@@ -34,12 +34,24 @@ public class TeksController  {
         return teksService.getCourseAndUnit(session);
     }
 
+    /**
+     * 查看课程下所有单元状态
+     * @param courseId
+     * @param session
+     * @return
+     */
     @ResponseBody
     @RequestMapping("/getUnitStatus")
     public ServerResponse<Object> getUnitStatus(Long courseId,HttpSession session){
         return teksService.getUnitStatus(courseId,session);
     }
 
+    /**
+     * 查看单个课程信息
+     * @param session
+     * @param unitId
+     * @return
+     */
     @ResponseBody
     @RequestMapping("/getIsInto")
     public ServerResponse<Map<String,Object>> getIsInto(HttpSession session,Long unitId) {

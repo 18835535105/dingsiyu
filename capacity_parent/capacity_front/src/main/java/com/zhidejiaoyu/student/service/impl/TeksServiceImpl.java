@@ -143,7 +143,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             int i = 0;
             for (Teks teks1 : teks) {
                 teks1.setPronunciation(baiduSpeak.getSentencePath(teks1.getSentence()).replace("#", " ").replace("$", ""));
-                teks1.setSentence(teks1.getSentence().replace("#"," ").replace("$",""));
+                teks1.setSentence(teks1.getSentence().replace("#", " ").replace("$", ""));
                 i++;
                 resultTeks.add(teks1);
             }
@@ -282,7 +282,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         /* List<Map<String, Object>> courses = courseMapper.selectTextCourseIdAndCourseNameByStudentId(studentId);*/
         List<Map<String, Object>> courses = studentStudyPlanMapper.selByStudentId(studentId, 3);
         if (courses == null || courses.size() == 0) {
-            return ServerResponse.createByError(400,"当前学生没有课程，请让老师添加");
+            return ServerResponse.createByError(400, "当前学生没有课程，请让老师添加");
         }
         // 学生课程下所有例句的单元id及单元名
         if (courses.size() > 0) {
@@ -299,7 +299,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 courseUnitVo.setCourseId((Long) courseMap.get("id"));
                 courseUnitVo.setCourseName(courseMap.get("courseName").toString());
                 courseUnitVo.setVersion(courseMap.get("version").toString());
-                courseUnitVo.setGrad(courseMap.get("grade").toString() +"-"+ courseMap.get("label").toString());
+                courseUnitVo.setGrad(courseMap.get("grade").toString() + "-" + courseMap.get("label").toString());
                 courseUnitVo.setUnitVos(resultMap);
                 courseUnitVos.add(courseUnitVo);
             }
@@ -320,40 +320,40 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                     studyMap.put("unitId", studyUnitId);
                     studyMap.put("version", learnUnit.get("version"));
                     TeksUnit teksUnit = teksUnitMapper.selectById(studyUnitId);
-                    studyMap.put("unitName",teksUnit.getUnitName());
-                    studyMap.put("grade", learnUnit.get("grade").toString() +"-"+ learnUnit.get("label").toString());
-                    studyMap.put("courseId",learnUnit.get("courseId"));
-                }else{
-                    if(plans.size()!=0){
+                    studyMap.put("unitName", teksUnit.getUnitName());
+                    studyMap.put("grade", learnUnit.get("grade").toString() + "-" + learnUnit.get("label").toString());
+                    studyMap.put("courseId", learnUnit.get("courseId"));
+                } else {
+                    if (plans.size() != 0) {
                         studyMap = new HashMap<>();
-                        Long studyUnitId =plans.get(0).getStartUnitId();
+                        Long studyUnitId = plans.get(0).getStartUnitId();
                         studyMap.put("unitId", studyUnitId);
                         TeksUnit teksUnit = teksUnitMapper.selectById(studyUnitId);
-                        studyMap.put("unitName",teksUnit.getUnitName());
+                        studyMap.put("unitName", teksUnit.getUnitName());
                         TeksCourse teksCourse = teksCourseMapper.selectById(plans.get(0).getCourseId());
                         studyMap.put("version", teksCourse.getVersion());
-                        studyMap.put("grade", teksCourse.getGrade() +"-"+ teksCourse.getLabel());
-                        studyMap.put("courseId",teksCourse.getId());
+                        studyMap.put("grade", teksCourse.getGrade() + "-" + teksCourse.getLabel());
+                        studyMap.put("courseId", teksCourse.getId());
                     }
                 }
-            }else{
+            } else {
                 List<StudentStudyPlan> plans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, (Long) courses.get(0).get("id"), 3);
-                if(plans.size()!=0){
+                if (plans.size() != 0) {
                     studyMap = new HashMap<>();
                     studyMap.put("unitId", plans.get(0).getStartUnitId());
                     TeksCourse teksCourse = teksCourseMapper.selectById(plans.get(0).getCourseId());
                     studyMap.put("version", teksCourse.getVersion());
                     TeksUnit teksUnit = teksUnitMapper.selectById(plans.get(0).getStartUnitId());
-                    studyMap.put("unitName",teksUnit.getUnitName());
+                    studyMap.put("unitName", teksUnit.getUnitName());
                     studyMap.put("version", teksCourse.getVersion());
-                    studyMap.put("courseId",teksCourse.getId());
-                    studyMap.put("grade", teksCourse.getGrade() +"-"+ teksCourse.getLabel());
+                    studyMap.put("courseId", teksCourse.getId());
+                    studyMap.put("grade", teksCourse.getGrade() + "-" + teksCourse.getLabel());
                 }
             }
             List<Map<String, Object>> testList = teksMapper.getStudentAllCourse(studentId, courseIds);
             returnMap.put("present", studyMap);
             returnMap.put("versionList", testList);
-            returnMap.put("list",courseUnitVos);
+            returnMap.put("list", courseUnitVos);
         }
 
 
@@ -361,10 +361,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
     @Override
-    public ServerResponse<Object> getUnitStatus(Long courseId,HttpSession session){
+    public ServerResponse<Object> getUnitStatus(Long courseId, HttpSession session) {
         Student student = getStudent(session);
-        Long studentId=student.getId();
-        List<Long> courseIds=new ArrayList<>();
+        Long studentId = student.getId();
+        List<Long> courseIds = new ArrayList<>();
         courseIds.add(courseId);
         List<CourseUnitVo> courseUnitVos = new ArrayList<>();
         CourseUnitVo courseUnitVo;
@@ -372,7 +372,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         List<Map<String, Object>> resultMap;
         this.getStudyUnit(courseIds, textUnits, studentId);
         // 已经进行过单元闯关的单元
-        List<Map<String, Object>> courses = studentStudyPlanMapper.selByStudentIdAndCourseIdAndType(studentId,3,courseId);
+        List<Map<String, Object>> courses = studentStudyPlanMapper.selByStudentIdAndCourseIdAndType(studentId, 3, courseId);
         if (textUnits.size() > 0) {
             List<Long> unitIds = new ArrayList<>(textUnits.size());
             textUnits.forEach(map -> unitIds.add((Long) map.get("id")));
@@ -407,7 +407,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                         // 当前单元还未学习
                         unitInfoMap.put("state", 1);
                     }
-                    List<Teks> id1 = teksMapper.selTeksByUnitId(((Long) unitMap.get("id")).intValue());
+                   /* List<Teks> id1 = teksMapper.selTeksByUnitId(((Long) unitMap.get("id")).intValue());
                     Integer teksAudition = learnMapper.selLearnTeks(studentId, "课文试听", (Long) unitMap.get("id"));
                     if (teksAudition != null && teksAudition > 0) {
                         unitInfoMap.put("teksAudition", true);
@@ -436,7 +436,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                         unitInfoMap.put("teksEntryTest", true);
                     } else {
                         unitInfoMap.put("teksEntryTest", false);
-                    }
+                    }*/
+                    addCourseStatus(Long.parseLong(unitMap.get("id").toString()), studentId, unitInfoMap);
                     resultMap.add(unitInfoMap);
                 }
             }
@@ -444,6 +445,45 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             courseUnitVos.add(courseUnitVo);
         }
         return ServerResponse.createBySuccess(courseUnitVos);
+    }
+
+    /**
+     * 查询自定课程信息
+     * @param unitId
+     * @param studentId
+     * @param unitInfoMap
+     */
+    private void addCourseStatus(Long unitId, Long studentId, Map<String, Object> unitInfoMap) {
+        List<Teks> id1 = teksMapper.selTeksByUnitId(unitId.intValue());
+        Integer teksAudition = learnMapper.selLearnTeks(studentId, "课文试听", unitId);
+        if (teksAudition != null && teksAudition > 0) {
+            unitInfoMap.put("teksAudition", true);
+        } else {
+            unitInfoMap.put("teksAudition", false);
+        }
+        List<Map<String, Object>> id2 = voiceMapper.selVoiceTeksByStudentAndUnit(unitId, studentId);
+        if (id2 != null) {
+            if (id1.size() <= id2.size()) {
+                unitInfoMap.put("teksGoodVoice", true);
+            } else {
+                unitInfoMap.put("teksGoodVoice", false);
+            }
+        } else {
+            unitInfoMap.put("teksGoodVoice", false);
+        }
+        Integer teksTest = learnMapper.selLearnTeks(studentId, "课文默写测试", unitId);
+        if (teksTest != null && teksTest > 0) {
+            unitInfoMap.put("teksTest", true);
+        } else {
+            unitInfoMap.put("teksTest", false);
+        }
+
+        Integer testRecord = learnMapper.selLearnTeks(studentId, "课文测试", unitId);
+        if (testRecord != null && testRecord > 0) {
+            unitInfoMap.put("teksEntryTest", true);
+        } else {
+            unitInfoMap.put("teksEntryTest", false);
+        }
     }
 
     @Override
@@ -459,13 +499,13 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             unitInfoMap.put("teksTest", true);
             if (teksTest != null && teksTest != 0) {
                 TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitIdAndGenre(studentId, unitId, "课文默写测试");
-                if(testRecord!=null){
+                if (testRecord != null) {
                     if (testRecord.getPoint() >= 70) {
                         unitInfoMap.put("testRecord", true);
                     } else {
                         unitInfoMap.put("testRecord", false);
                     }
-                }else{
+                } else {
                     unitInfoMap.put("testRecord", false);
                 }
 
@@ -476,7 +516,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             unitInfoMap.put("teksTest", false);
             unitInfoMap.put("testRecord", false);
         }
-
+        Map<String, Object> unitData = new HashMap<>();
+        addCourseStatus(unitId, studentId, unitData);
+        unitInfoMap.put("unitInfoMap", unitData);
         return ServerResponse.createBySuccess(unitInfoMap);
     }
 
@@ -654,11 +696,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         testRecord.setTestStartTime(startTime);
         testRecord.setTestEndTime(endTime);
         getLevel(session);
-        if(student.getBonusExpires()!=null){
-            if(student.getBonusExpires().getTime()>System.currentTimeMillis()){
-                Double doubleGOld=goldCount*0.2;
+        if (student.getBonusExpires() != null) {
+            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
+                Double doubleGOld = goldCount * 0.2;
                 student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), doubleGOld));
-                goldCount=goldCount+doubleGOld.intValue();
+                goldCount = goldCount + doubleGOld.intValue();
             }
         }
         // 封装响应数据
@@ -789,7 +831,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             url = getMap.get("url") == null ? "" : getMap.get("url").toString();
             getMap.put("url", url);
             String sentence = getMap.get("sentence").toString();
-            getMap.put("sentence",sentence.replace("$","").replace("#"," "));
+            getMap.put("sentence", sentence.replace("$", "").replace("#", " "));
             resultMap.add(getMap);
         }
         return ServerResponse.createBySuccess(resultMap);
@@ -819,9 +861,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             for (int j = 0; j < NAMELIST.size(); j++) {
                 if (strList[i].endsWith(",") || strList[i].endsWith("?") || strList[i].endsWith(".") || strList[i].endsWith("!")) {
                     if (strList[i].endsWith("...")) {
-                        if(strList[i].length()==3){
+                        if (strList[i].length() == 3) {
                             falg = false;
-                        }else{
+                        } else {
                             String str = strList[i].replace("...", "");
                             if (str.equals(NAMELIST.get(j))) {
                                 falg = false;
@@ -931,20 +973,20 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         for (Teks teks1 : teks) {
             String sentence = teks1.getSentence();
             String[] s = sentence.split(" ");
-            boolean isTrue=true;
+            boolean isTrue = true;
             if (s.length <= 1) {
-                isTrue=false;
+                isTrue = false;
             }
-            List<Integer> list=new ArrayList<>();
-            for(int i=0;i<s.length;i++){
+            List<Integer> list = new ArrayList<>();
+            for (int i = 0; i < s.length; i++) {
                 if (s[i].indexOf("#") == -1 && s[i].indexOf("$") == -1) {
                     list.add(i);
                 }
             }
-            if(list.size()<=0){
-                isTrue=false;
+            if (list.size() <= 0) {
+                isTrue = false;
             }
-            if(isTrue){
+            if (isTrue) {
                 useTeks.add(teks1);
             }
         }
@@ -1277,7 +1319,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             if (words[i].contains("*")) {
                 words[i] = words[i].replace("*", " ");
             }
-            if(words[i].contains("$")){
+            if (words[i].contains("$")) {
                 words[i] = words[i].replace("$", " ");
             }
             list.add(words[i].trim());

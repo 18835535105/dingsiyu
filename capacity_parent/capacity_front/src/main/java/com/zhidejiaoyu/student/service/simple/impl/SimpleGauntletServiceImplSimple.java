@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.Vo.simple.StudentGauntletVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.SimpleLevelUtils;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
@@ -87,18 +88,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         Map<String, Object> returnMap = new HashMap<>();
         //获取教师id
         if (type == 2) {
-            if (student.getTeacherId() != null) {
-                Integer schoolAdminById = simpleTeacherMapper.getSchoolAdminById(student.getTeacherId().intValue());
-                if (schoolAdminById == null) {
-                    Integer teacherCountByAdminId = simpleTeacherMapper.getTeacherCountByAdminId(student.getTeacherId());
-                    if (teacherCountByAdminId != null && teacherCountByAdminId > 0) {
-                        schoolAdminId = student.getTeacherId();
-                    }
-                } else {
-                    schoolAdminId = schoolAdminById.longValue();
-                }
-            }
-            teachers = simpleTeacherMapper.getTeacherIdByAdminId(schoolAdminId.intValue());
+            schoolAdminId = TeacherInfoUtil.getSchoolAdminIdAndTeacherId(student, teachers);
         }
         Integer integer = 0;
         //获取学生数据数量
@@ -599,18 +589,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         List<Integer> teachers = null;
         //获取教师id
         if (type == 2) {
-            if (student.getTeacherId() != null) {
-                Integer schoolAdminById = simpleTeacherMapper.getSchoolAdminById(student.getTeacherId().intValue());
-                if (schoolAdminById == null) {
-                    Integer teacherCountByAdminId = simpleTeacherMapper.getTeacherCountByAdminId(student.getTeacherId());
-                    if (teacherCountByAdminId != null && teacherCountByAdminId > 0) {
-                        schoolAdminId = student.getTeacherId();
-                    }
-                } else {
-                    schoolAdminId = schoolAdminById.longValue();
-                }
-            }
-            teachers = simpleTeacherMapper.getTeacherIdByAdminId(schoolAdminId.intValue());
+            schoolAdminId = TeacherInfoUtil.getSchoolAdminIdAndTeacherId(student, teachers);
         }
         //搜索数据
         List<Map<String, Object>> maxStudyTwenty = simpleStudentExpansionMapper.getMaxStudyTwenty(student.getClassId(), student.getTeacherId(), teachers, schoolAdminId, type);
