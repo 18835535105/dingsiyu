@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.MacIpUtil;
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
@@ -304,9 +305,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 姓名
         result.put("studentName", student.getStudentName());
         // 头像
-        result.put("headUrl", student.getHeadUrl());
+        result.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
         // 宠物
-        result.put("partUrl", student.getPartUrl());
+        result.put("partUrl", AliyunInfoConst.host + student.getPartUrl());
         // 宠物名
         result.put("petName", student.getPetName());
         result.put("schoolName", student.getSchoolName());
@@ -441,7 +442,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 姓名
         result.put("studentName", student.getStudentName());
         // 头像
-        result.put("headUrl", student.getHeadUrl());
+        result.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
         result.put("schoolName", student.getSchoolName());
 
         this.getIndexTime(session, student, result);
@@ -506,54 +507,44 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         map.put("learnTeks", learnTeks);
 
         // 获取我的总金币
-        Double myGoldD = studentMapper.myGold(studentId);
-        BigDecimal mybd = new BigDecimal(myGoldD).setScale(0, BigDecimal.ROUND_HALF_UP);
-        int myGold = Integer.parseInt(mybd.toString());
+        int myGold = (int) BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
         map.put("myGold", myGold);
+        getMyLevelInfo(map, myGold);
 
-        // 获取等级规则
-        List<Map<String, Object>> levels = levelMapper.selectAll();
+        // 获取今日获得金币
+        getTodayGold(studentId, map);
 
-        // 我的等级myChildName
-        int myrecord = 0;
-        int myauto = 1;
-        int bre = 0; // 跳出循环
+        return ServerResponse.createBySuccess(map);
+    }
 
-        for (int i = 0; i < levels.size(); i++) {
-            // 循环的当前等级分数
-            int levelGold = (int) levels.get(i).get("gold");
-            // 下一等级分数
-            int xlevelGold = (int) levels.get((i + 1) < levels.size() ? (i + 1) : i).get("gold");
-            // 下一等级索引
-            int si = (i + 1) < levels.size() ? (i + 1) : i;
-
-            if (myGold >= myrecord && myGold < xlevelGold) {
-                map.put("childName", levels.get(i).get("child_name"));// 我的等级
-                map.put("jap", (xlevelGold - myGold)); // 距离下一等级还差多少金币
-                map.put("imgUrl", levels.get(i).get("img_url"));// 我的等级图片
-                // 下一个等级名/ 下一个等级需要多少金币 / 下一个等级图片
-                map.put("childNameBelow", levels.get(si).get("child_name"));// 下一级等级名
-                map.put("japBelow", (xlevelGold)); // 下一级金币数量
-                map.put("imgUrlBelow", levels.get(si).get("img_url"));// 下一级等级图片
-                break;
-                // 等级循环完还没有确定等级 = 最高等级
-            } else if (myauto == levels.size()) {
-                map.put("childName", levels.get(i).get("child_name"));// 我的等级
-                map.put("jap", (xlevelGold - myGold)); // 距离下一等级还差多少金币
-                map.put("imgUrl", levels.get(i).get("img_url"));// 我的等级图片
-                // 下一个等级名/ 下一个等级需要多少金币 / 下一个等级图片
-                map.put("childNameBelow", levels.get(si).get("child_name"));// 下一级等级名
-                map.put("japBelow", (xlevelGold)); // 下一级金币数量
-                map.put("imgUrlBelow", levels.get(si).get("img_url"));// 下一级等级图片
-                break;
-            }
-
-            myrecord = levelGold;
-            myauto++;
-        }
-
-        // 获取今日获得金币 date_format(learn_time, '%Y-%m-%d')
+    /**
+     * 封装今日得到的金币数
+     *
+     * @param studentId
+     * @param map
+     */
+    private void getTodayGold(Long studentId, Map<String, Object> map) {
         List<String> list = runLogMapper.getStudentGold(DateUtil.formatYYYYMMDD(new Date()), studentId);
+        getTodayGold(map, list);
+    }
+
+    /**
+     * 封装我的等级信息
+     *
+     * @param map
+     * @param myGold
+     */
+    private void getMyLevelInfo(Map<String, Object> map, int myGold) {
+        getMyLevelInfo(map, myGold, redisOpt);
+    }
+
+    /**
+     * 封装今日得到的金币数
+     *
+     * @param map
+     * @param list
+     */
+    public static void getTodayGold(Map<String, Object> map, List<String> list) {
         double count = 0.0;
         String regex = "#(.*)#";
         Pattern pattern = Pattern.compile(regex);
@@ -565,8 +556,49 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             }
         }
         map.put("myThisGold", count);
+    }
 
-        return ServerResponse.createBySuccess(map);
+    /**
+     * 封装我的等级信息
+     *
+     * @param map
+     * @param myGold
+     */
+    public static void getMyLevelInfo(Map<String, Object> map, int myGold, RedisOpt redisOpt) {
+        // 获取等级规则
+        List<Map<String, Object>> levels = redisOpt.getAllLevel();
+
+        int myrecord = 0;
+        // 下一等级索引
+        int j = 1;
+        int size = levels.size();
+        for (int i = 0; i < size; i++) {
+            // 循环的当前等级分数
+            int levelGold = (int) levels.get(i).get("gold");
+            // 下一等级分数
+            int nextLevelGold = (int) levels.get((i + 1) < levels.size() ? (i + 1) : i).get("gold");
+            // 下一等级索引
+            int si = (i + 1) < size ? (i + 1) : i;
+            boolean flag = (myGold >= myrecord && myGold < nextLevelGold) || j == size;
+            if (flag) {
+                // 我的等级
+                map.put("childName", levels.get(i).get("child_name"));
+                // 距离下一等级还差多少金币
+                map.put("jap", (nextLevelGold - myGold));
+                // 我的等级图片
+                map.put("imgUrl", AliyunInfoConst.host + levels.get(i).get("img_url"));
+                // 下一个等级名/ 下一个等级需要多少金币 / 下一个等级图片
+                // 下一级等级名
+                map.put("childNameBelow", levels.get(si).get("child_name"));
+                // 下一级金币数量
+                map.put("japBelow", (nextLevelGold));
+                // 下一级等级图片
+                map.put("imgUrlBelow", AliyunInfoConst.host + levels.get(si).get("img_url"));
+                break;
+            }
+            myrecord = levelGold;
+            j++;
+        }
     }
 
     @Override
@@ -619,7 +651,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 姓名
             result.put("studentName", stu.getStudentName());
             // 头像
-            result.put("headUrl", stu.getHeadUrl());
+            result.put("headUrl", AliyunInfoConst.host + stu.getHeadUrl());
 
             // 记录登录信息
             String ip = saveLoginRunLog(stu, request);
@@ -961,7 +993,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     public Object getRiepCount(HttpSession session) {
         Student student = getStudent(session);
         Map<String,Object> map=new HashMap<>();
-        map.put("partUrl",student.getPartUrl());
+        map.put("partUrl", AliyunInfoConst.host + student.getPartUrl());
         Integer count = studentMapper.getVocabularyCountByStudent(student.getId());
         map.put("vocabularyCount",count);
         Integer sentenceCount = studentMapper.getSentenceCountByStudent(student.getId());

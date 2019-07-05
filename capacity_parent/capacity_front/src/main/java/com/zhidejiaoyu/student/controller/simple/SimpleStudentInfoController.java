@@ -262,36 +262,6 @@ public class SimpleStudentInfoController {
     }
 
     /**
-     * 获取学生的等级信息
-     *
-     * @param stuId 为空时查看当前学生的等级信息；不为空时查看选中的学生的等级信息
-     * @param session
-     * @return
-     */
-    @GetMapping("/getLevel")
-    public ServerResponse<LevelVo> getLevel(HttpSession session, @RequestParam(required = false) Long stuId,
-                                            @RequestParam(required = false, defaultValue = "1") Integer pageNum,
-                                            @RequestParam(required = false, defaultValue = "12") Integer pageSize) {
-        return studentInfoService.getLevel(session, stuId, pageNum, pageSize);
-    }
-
-    /**
-     * 分页获取学生已领取的勋章信息
-     *
-     * @param session
-     * @param stuId 为空时查看当前学生勋章信息，不为空时查询选中的学生的勋章信息
-     * @param pageNum
-     * @param pageSize
-     * @return
-     */
-    @GetMapping("/getMedalByPage")
-    public ServerResponse<PageInfo<String>> getMedalByPage(HttpSession session, @RequestParam(required = false) Long stuId,
-                                                           @RequestParam(required = false, defaultValue = "1") Integer pageNum,
-                                                           @RequestParam(required = false, defaultValue = "2") Integer pageSize) {
-        return studentInfoService.getMedalByPage(session, stuId, pageNum, pageSize);
-    }
-
-    /**
      * 获取学生膜拜数据
      *
      * @param session

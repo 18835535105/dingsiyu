@@ -60,14 +60,14 @@ public interface VoiceMapper extends BaseMapper<Voice> {
      * @param map
      * @return
      */
-    List<Map<String,Object>> selectTextRankSchool(Map<String,Object> map);
+    List<Map<String,Object>> selectTextRankSchool(@Param("map") Map<String,Object> map, @Param("host") String host);
     /**
      * 查询课文好声音全国排名
      *
      * @param map
      * @return
      */
-    List<Map<String,Object>> selectTextRank(Map<String,Object> map);
+    List<Map<String,Object>> selectTextRank(@Param("map") Map<String,Object> map, @Param("host") String host);
 
     /**
      * 获取好声音全校排行

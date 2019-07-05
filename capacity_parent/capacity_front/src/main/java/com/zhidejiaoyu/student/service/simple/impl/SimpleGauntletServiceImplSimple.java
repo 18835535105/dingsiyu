@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
 import com.github.pagehelper.PageHelper;
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.Vo.simple.GameTwoVo;
 import com.zhidejiaoyu.common.Vo.simple.StrengthGameVo;
 import com.zhidejiaoyu.common.Vo.simple.StudentGauntletVo;
@@ -220,7 +221,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             getGameOne(courseId, subjects);
             Map<String, Object> map = new HashMap<>();
             map.put("testResults", subjects);
-            map.put("petUrl", student.getPartUrl());
+            map.put("petUrl", AliyunInfoConst.host + student.getPartUrl());
             return ServerResponse.createBySuccess(map);
         }
         if ("桌牌捕音".equals(gameName)) {
@@ -506,7 +507,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         for (Gauntlet gauntlet : gauntlets) {
             Map<String, Object> map = new HashMap<>();
             map.put("name", student.getNickname());
-            map.put("headUrl", student.getHeadUrl());
+            map.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
             if (gauntlet.getChallengerStudentId().equals(student.getId())) {
                 map.put("status", gauntlet.getChallengeStatus());
                 map.put("study", gauntlet.getChallengerStudyNow());
@@ -662,12 +663,12 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             }
             Student student = simpleStudentMapper.selectByPrimaryKey(gauntlet.getChallengerStudentId());
             returnMap.put("oneself", student.getNickname());
-            returnMap.put("oneselfUrl", student.getHeadUrl());
+            returnMap.put("oneselfUrl", AliyunInfoConst.host + student.getHeadUrl());
             returnMap.put("oneselfPoint", gauntlet.getChallengerPoint());
             returnMap.put("challengePoint", gauntlet.getBeChallengerPoint());
             Student challengeStudent = simpleStudentMapper.selectByPrimaryKey(gauntlet.getBeChallengerStudentId());
             returnMap.put("challenge", challengeStudent.getNickname());
-            returnMap.put("challengeUrl", challengeStudent.getHeadUrl());
+            returnMap.put("challengeUrl", AliyunInfoConst.host + challengeStudent.getHeadUrl());
             returnMap.put("gradeGold", gauntlet.getGrade());
             returnMap.put("awardGold", gauntlet.getAward());
         } else {
@@ -683,10 +684,10 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             returnMap.put("challengePoint", gauntlet.getChallengerPoint());
             Student student = simpleStudentMapper.selectByPrimaryKey(gauntlet.getChallengerStudentId());
             returnMap.put("challenge", student.getNickname());
-            returnMap.put("challengeUrl", student.getHeadUrl());
+            returnMap.put("challengeUrl", AliyunInfoConst.host + student.getHeadUrl());
             Student challengeStudent = simpleStudentMapper.selectByPrimaryKey(gauntlet.getBeChallengerStudentId());
             returnMap.put("oneself", challengeStudent.getNickname());
-            returnMap.put("oneselfUrl", challengeStudent.getHeadUrl());
+            returnMap.put("oneselfUrl", AliyunInfoConst.host + challengeStudent.getHeadUrl());
             returnMap.put("gradeGold", 0);
             returnMap.put("awardGold", 0);
         }
@@ -1049,18 +1050,20 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
 
         }
         //计算总挑战次数
-        Integer pkNumber = pkNumberforHis + pkNumberForMe;
+        int pkNumber = pkNumberforHis + pkNumberForMe;
         //计算总赢次数
-        Integer winnerNumber = winnerNumberForHis + winnerNumberForMe;
+        int winnerNumber = winnerNumberForHis + winnerNumberForMe;
 
-        if (pkNumber != null && pkNumber != 0) {
+        if (pkNumber != 0) {
             studentGauntletVo.setPkNumber(pkNumber);
-            Double pk = 1.0 * winnerNumber / pkNumber * 100;
-            studentGauntletVo.setWinner(pk.intValue() + "%");
+            double pk = 1.0 * winnerNumber / pkNumber * 100;
+            studentGauntletVo.setWinner((int) pk + "%");
         } else {
             studentGauntletVo.setPkNumber(0);
             studentGauntletVo.setWinner("0");
         }
+
+        studentGauntletVo.setHeadUrl(AliyunInfoConst.host + studentGauntletVo.getHeadUrl());
     }
 
 

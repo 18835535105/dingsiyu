@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.service.simple.impl;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
 import com.zhidejiaoyu.common.Vo.simple.ccieVo.CcieVo;
 import com.zhidejiaoyu.common.Vo.simple.ccieVo.MyCcieVo;
@@ -138,7 +139,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         Student student = getStudent(session);
         Long id = student.getId();
         map.put("name", student.getStudentName());
-        map.put("headUrl", student.getHeadUrl());
+        map.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
         map.put("nickname", student.getNickname());
         map.put("sex", student.getSex() == null || student.getSex() == 1 ? "男" : "女");
 
@@ -904,7 +905,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                 dataMap.put("area", student1.getArea());
                 dataMap.put("city", student1.getCity());
                 dataMap.put("province", student1.getProvince());
-                dataMap.put("headUrl", student1.getHeadUrl());
+                dataMap.put("headUrl", AliyunInfoConst.host + student1.getHeadUrl());
                 dataMap.put("studentName", student1.getNickname());
                 dataMap.put("id", id);
                 dataMap.put("gold", Math.round(BigDecimalUtil.add(student1.getOfflineGold(), student1.getSystemGold())));

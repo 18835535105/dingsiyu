@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.service.impl;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.Vo.student.level.ChildMedalVo;
 import com.zhidejiaoyu.common.Vo.student.level.LevelVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -469,7 +470,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         }
 
         LevelVo levelVo = new LevelVo();
-        levelVo.setHeadUrl(student.getHeadUrl());
+        levelVo.setHeadUrl(AliyunInfoConst.host + student.getHeadUrl());
         levelVo.setShowFist(showFist);
         levelVo.setNickname(student.getNickname());
         // 获取当前勋章父勋章的索引
@@ -505,9 +506,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         List<String> urls = new ArrayList<>(urlList.size());
         urlList.forEach(url -> {
             if (url != null && url.contains("#")) {
-                urls.add(sex == 1 ? url.split("#")[0] : url.split("#")[1]);
+                urls.add(sex == 1 ? AliyunInfoConst.host + url.split("#")[0] : AliyunInfoConst.host + url.split("#")[1]);
             } else {
-                urls.add(url);
+                urls.add(AliyunInfoConst.host + url);
             }
         });
         PageInfo<String> pageInfo = new PageInfo<>(urls);
@@ -600,9 +601,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         medalImgUrlList.forEach(map -> {
             Map<String, Object> mapTemp = new HashMap<>(16);
             if (map.get("imgUrl").toString().contains("#")) {
-                mapTemp.put("imgUrl", sex == 1 ? map.get("imgUrl").toString().split("#")[0] : map.get("imgUrl").toString().split("#")[1]);
+                mapTemp.put("imgUrl", sex == 1 ? AliyunInfoConst.host + map.get("imgUrl").toString().split("#")[0] : AliyunInfoConst.host + map.get("imgUrl").toString().split("#")[1]);
             } else {
-                mapTemp.put("imgUrl", map.get("imgUrl"));
+                mapTemp.put("imgUrl", AliyunInfoConst.host + map.get("imgUrl"));
             }
             mapTemp.put("id", map.get("id"));
             medalImgUrlListTemp.add(mapTemp);
@@ -617,7 +618,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         List<String> medalImgUrl = new ArrayList<>(childInfo.size());
         StringBuilder sb = new StringBuilder();
         childInfo.forEach(info -> {
-            medalImgUrl.add(info.get("imgUrl"));
+            medalImgUrl.add(AliyunInfoConst.host + info.get("imgUrl"));
             sb.append(info.get("content"));
         });
 
@@ -650,12 +651,12 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
                 // 判断当前金币所处的等级
                 boolean flag = ((i == 0 && gold < level.getGold()) || gold >= level.getGold()) && gold < nextLevel.getGold();
                 if (flag) {
-                    levelVo.setLevelImgUrl(level.getImgUrlLevel());
+                    levelVo.setLevelImgUrl(AliyunInfoConst.host + level.getImgUrlLevel());
                     levelVo.setChildName(level.getImgUrlWord());
                     break;
                 }
             } else {
-                levelVo.setLevelImgUrl(level.getImgUrlLevel());
+                levelVo.setLevelImgUrl(AliyunInfoConst.host + level.getImgUrlLevel());
                 levelVo.setChildName(level.getImgUrlWord());
                 break;
             }

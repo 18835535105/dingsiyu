@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.Vo.game.StrengthGameVo;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.Vo.testVo.TestDetailVo;
@@ -201,7 +202,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             map.put("point", point);
         }
         // 宠物url,用于跳过游戏时显示
-        map.put("petUrl", student.getPartUrl());
+        map.put("petUrl", AliyunInfoConst.host + student.getPartUrl());
 
         return ServerResponse.createBySuccess(map);
     }
@@ -381,7 +382,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecordMapper.insert(testRecord);
         TestResultVo vo = new TestResultVo();
         vo.setGold(goldCount);
-        vo.setPetUrl(student.getPartUrl());
+        vo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
         int energy = getEnergy(student, testRecord.getPoint());
         vo.setEnergy(energy);
         getMessage(student, vo, testRecord, point, 100);
@@ -471,7 +472,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setGold(goldCount);
         int energy = getEnergy(student, testRecord.getPoint());
         vo.setEnergy(energy);
-        vo.setPetUrl(student.getPartUrl());
+        vo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
         getMessage(student, vo, testRecord, point, 100);
         testRecord.setTestEndTime(new Date());
         testRecord.setAwardGold(goldCount);
@@ -1083,7 +1084,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             testRecord.setPass(1);
         }
         resultMap.put("point", point);
-        resultMap.put("imgUrl", student.getPartUrl());
+        resultMap.put("imgUrl", AliyunInfoConst.host + student.getPartUrl());
 
         testRecordMapper.insert(testRecord);
         studentMapper.updateByPrimaryKeySelective(student);

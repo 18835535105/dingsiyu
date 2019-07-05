@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.service.simple.impl;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.Vo.simple.studentInfoVo.ChildMedalVo;
 import com.zhidejiaoyu.common.Vo.simple.studentInfoVo.LevelVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -18,6 +19,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleWeekUtil;
 import com.zhidejiaoyu.common.utils.simple.server.SimpleResponseCode;
+import com.zhidejiaoyu.student.constant.PetImageConstant;
 import com.zhidejiaoyu.student.service.simple.SimpleStudentInfoServiceSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -96,7 +98,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         try {
             if (StringUtils.isEmpty(studentInfo.getPetName())) {
                 studentInfo.setPetName("大明白");
-                studentInfo.setPartUrl("static/img/edit-user-msg/tips.png");
+                studentInfo.setPartUrl(PetImageConstant.DEFAULT_IMG);
             }
             int count = simpleStudentMapper.updateByPrimaryKeySelective(studentInfo);
             studentInfo = simpleStudentMapper.selectById(studentInfo.getId());
@@ -388,103 +390,6 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     }
 
     @Override
-    public ServerResponse<LevelVo> getLevel(HttpSession session, Long stuId, Integer pageNum, Integer pageSize) {
-        Student student;
-        boolean showFist = true;
-        if (stuId == null) {
-            student = getStudent(session);
-        } else {
-            student = simpleStudentMapper.selectById(stuId);
-            Student currentStudent = getStudent(session);
-
-            List<Worship> worships = worshipMapper.selectSevenDaysInfoByStudent(currentStudent);
-            if (worships.size() > 0) {
-                // 上次膜拜时间
-                Date lastWorshipTime = worships.get(0).getWorshipTime();
-                if (Objects.equals(SimpleDateUtil.formatYYYYMMDD(lastWorshipTime), SimpleDateUtil.formatYYYYMMDD(new Date()))) {
-                    // 今天已经膜拜过其他人
-                    showFist = false;
-                }
-                long count = worships.stream().filter(worship -> worship.getStudentIdByWorship().equals(student.getId())).count();
-                if (count > 0) {
-                    // 本周已膜拜过该同学，不能再次膜拜
-                    showFist = false;
-                }
-            }
-        }
-
-        LevelVo levelVo = new LevelVo();
-        levelVo.setHeadUrl(student.getHeadUrl());
-        levelVo.setShowFist(showFist);
-        levelVo.setNickname(student.getNickname());
-        // 获取当前勋章父勋章的索引
-        Map<String, String> parentMap = new HashMap<>(16);
-
-        // 获取学生当前的等级信息
-        Map<String, String> childMap = getLevelInfo(levelVo, student, parentMap);
-
-        levelVo.setChildLevelIndex(childMap == null ? 1 : childMap.size());
-        levelVo.setParentLevelIndex(parentMap.size() == 0 ? 1 : parentMap.size());
-
-        // 获取学生已获取的勋章图片url
-        PageInfo<String> pageInfo = getHadMedalByPage(pageNum, pageSize, student);
-        levelVo.setMedalImgUrl(pageInfo);
-
-        return ServerResponse.createBySuccess(levelVo);
-    }
-
-    /**
-     * 获取已经获取的勋章图片
-     *
-     * @param pageNum
-     * @param pageSize
-     * @param student
-     * @return
-     */
-    private PageInfo<String> getHadMedalByPage(Integer pageNum, Integer pageSize, Student student) {
-        Integer sex = student.getSex();
-        PageHelper.startPage(pageNum, pageSize);
-        List<String> urlList = simpleMedalMapper.selectHadMedalImgUrl(student);
-        List<String> urls = new ArrayList<>(urlList.size());
-        urlList.forEach(url -> {
-            if (url != null && url.contains("#")) {
-                urls.add(sex == 1 ? url.split("#")[0] : url.split("#")[1]);
-            } else {
-                urls.add(url);
-            }
-        });
-        return new PageInfo<>(urls);
-    }
-
-    @Override
-    public ServerResponse<PageInfo<String>> getMedalByPage(HttpSession session, Long stuId, Integer pageNum, Integer pageSize) {
-        Student student;
-        if (stuId == null) {
-            student = getStudent(session);
-        } else {
-            student = simpleStudentMapper.selectByPrimaryKey(stuId);
-        }
-
-        Integer sex = student.getSex();
-        PageHelper.startPage(pageNum, pageSize);
-        List<String> urlList = simpleMedalMapper.selectHadBigMedalImgUrl(student);
-        PageInfo<String> pageInfo1 = new PageInfo<>(urlList);
-
-        List<String> urls = new ArrayList<>(urlList.size());
-        urlList.forEach(url -> {
-            if (url != null && url.contains("#")) {
-                urls.add(sex == 1 ? url.split("#")[0] : url.split("#")[1]);
-            } else {
-                urls.add(url);
-            }
-        });
-        PageInfo<String> pageInfo = new PageInfo<>(urls);
-        pageInfo.setPages(pageInfo1.getPages());
-        pageInfo.setTotal(pageInfo1.getTotal());
-        return ServerResponse.createBySuccess(pageInfo);
-    }
-
-    @Override
     public ServerResponse<Map<String, Object>> getWorship(HttpSession session, Integer type, Integer pageNum, Integer pageSize) {
         Student student = getStudent(session);
         Map<String, Object> map = new HashMap<>(16);
@@ -533,7 +438,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         mapPageInfo1.setPages(mapPageInfo.getPages());
 
         Map<String, Object> map = new HashMap<>(16);
-        map.put("petName", student.getPetName());
+        map.put("petName", AliyunInfoConst.host + student.getPetName());
         map.put("list", mapPageInfo1);
 
         return ServerResponse.createBySuccess(map);
@@ -591,9 +496,9 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         medalImgUrlList.forEach(map -> {
             Map<String, Object> mapTemp = new HashMap<>(16);
             if (map.get("imgUrl").toString().contains("#")) {
-                mapTemp.put("imgUrl", sex == 1 ? map.get("imgUrl").toString().split("#")[0] : map.get("imgUrl").toString().split("#")[1]);
+                mapTemp.put("imgUrl", sex == 1 ? AliyunInfoConst.host +  map.get("imgUrl").toString().split("#")[0] : AliyunInfoConst.host +  map.get("imgUrl").toString().split("#")[1]);
             } else {
-                mapTemp.put("imgUrl", map.get("imgUrl"));
+                mapTemp.put("imgUrl", AliyunInfoConst.host + map.get("imgUrl"));
             }
             mapTemp.put("id", map.get("id"));
             medalImgUrlListTemp.add(mapTemp);

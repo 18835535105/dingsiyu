@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.Vo.simple.AwardVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
@@ -95,7 +96,9 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 awardVos.addAll(simpleAwardMapper.selectAwardVos(student, GOLD_TYPE));
                 break;
             case MEDAL_TYPE:
-                awardVos.addAll(simpleAwardMapper.selectMedalAwardVos(student));
+                List<AwardVo> awardVos1 = simpleAwardMapper.selectMedalAwardVos(student);
+                awardVos1.forEach(awardVo -> awardVo.setImgUrl(AliyunInfoConst.host + awardVo.getImgUrl()));
+                awardVos.addAll(awardVos1);
                 break;
             default:
         }

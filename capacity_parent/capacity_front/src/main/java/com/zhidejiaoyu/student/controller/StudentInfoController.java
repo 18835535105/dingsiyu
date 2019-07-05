@@ -57,7 +57,7 @@ public class StudentInfoController extends BaseController {
      */
     @GetMapping("/getStudentInfo")
     public ServerResponse<Student> getStudentInfo(HttpSession session, @RequestParam(value = "studentId", required = false) Long studentId) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = super.getStudent(session);
         if (StringUtils.isNotEmpty(student.getHeadUrl()) && studentId == null) {
             session.invalidate();
             // 学生已经完善过信息，不可重复完善信息
