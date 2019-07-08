@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.study;
 
 import com.zhidejiaoyu.common.mapper.LearnMapper;
+import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleLearnMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
@@ -29,6 +30,9 @@ public class MemoryDifficultyUtil {
 
     @Autowired
     private SimpleCommonMethod simpleCommonMethod;
+
+    @Autowired
+    private StudentMapper studentMapper;
 
     /**
      * 计算同步版当前单词/例句的记忆难度
@@ -171,8 +175,15 @@ public class MemoryDifficultyUtil {
         }
 
         if (errCount > studyCount) {
-            log.warn("学生 {} 在单元 {} 模块 {} 下的单词 {} 错误次数大于了学习次数！", simpleCapacity.getStudentId(),
-                    simpleCapacity.getUnitId(), simpleCommonMethod.getTestType(type), simpleCapacity.getVocabularyId());
+            Student student = studentMapper.selectById(simpleCapacity.getStudentId());
+            if (student != null) {
+                log.warn("学生 [{} - {} - {}] 在单元 {} 模块 {} 下的单词 {} 错误次数大于了学习次数！", student.getId(), student.getAccount(), student.getStudentName(),
+                        simpleCapacity.getUnitId(), simpleCommonMethod.getTestType(type), simpleCapacity.getVocabularyId());
+            } else {
+                log.warn("学生 [{}] 在单元 {} 模块 {} 下的单词 {} 错误次数大于了学习次数！", simpleCapacity.getStudentId(),
+                        simpleCapacity.getUnitId(), simpleCommonMethod.getTestType(type), simpleCapacity.getVocabularyId());
+            }
+
             errCount = studyCount;
         }
 
