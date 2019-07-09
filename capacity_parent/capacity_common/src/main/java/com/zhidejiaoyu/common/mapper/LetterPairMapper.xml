@@ -31,7 +31,7 @@
     </select>
     <select id="selPushLetter" parameterType="map" resultMap="BaseResultMap">
         select <include refid="base_sql"></include> from letter_pair
-        where push &lt; now() and student_id=#{studentId} and unit_id=#{unitId} limit 1
+        where push &lt; now() and student_id=#{studentId} and unit_id=#{unitId} and memory_strength is not null limit 1
     </select>
 
 </mapper>

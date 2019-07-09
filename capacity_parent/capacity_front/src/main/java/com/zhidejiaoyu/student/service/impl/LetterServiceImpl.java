@@ -407,7 +407,6 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             learn.setStudentId(studentId);
             learn.setStudyCount(1);
             learn.setUpdateTime(new Date());
-            learn.setType(4);
             learn.setStudyModel("字母配对");
             learn.setType(1);
             learn.setLearnTime(new Date());
