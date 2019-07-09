@@ -86,7 +86,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
         Long studentId = student.getId();
 
         // 是否需要课程前测,课后测试,单元前测,单元闯关
-        String testId;
+        String testId = null;
 
         // 判断当前模块是否需要走测试逻辑
         boolean testModel = testModel(type);
@@ -149,9 +149,6 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
             }
         }
 
-        // 获取单元新单词
-        SimpleCapacityVo simpleCapacityNew = vocabularyMapper.showWordSimple(unitId, studentId, type);
-
         // 1.查询有没有需要复习的数据
         List<SimpleCapacityVo> simpleWhetherReviews = simpleSimpleCapacityMapper.getSimpleWhetherFeview(studentId, unitId, new Date(), type);
 
@@ -164,7 +161,8 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
         }
         // 2. 如果记忆追踪中没有需要复习的, 去单词表中取出一个单词,条件是(learn表中单词id不存在的)
         if (simpleCapacityVo == null) {
-            simpleCapacityVo = simpleCapacityNew;
+            // 获取单元新单词
+            simpleCapacityVo = vocabularyMapper.showWordSimple(unitId, studentId, type);
 
             if (simpleCapacityVo == null && testModel) {
                 testId = simpleTestRecordMapper.getWhetherTest(studentId, courseId, unitId, type, "单元闯关测试");
@@ -180,6 +178,10 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
                 // 清除数据
                 resetTheUnit(studentId, unitId, simpleCommonMethod.getTestType(type), type);
                 return ServerResponse.createBySuccess(302, "当前选择课程已学习完毕，可以重新学习，温故知新哦。");
+            }
+
+            if (simpleCapacityVo == null) {
+                log.error("排查 NPE 问题，查询新单词为空！plan=[{}], wordCount=[{}], testId=[{}]", plan, wordCount, testId);
             }
 
             // 是新单词
@@ -202,7 +204,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
         // 已学单元单词
         simpleCapacityVo.setPlan(plan);
         // 总单元单词数量
-        simpleCapacityVo.setWordCount((long) wordCount);
+        simpleCapacityVo.setWordCount(wordCount);
 
         // 记忆难度
         SimpleCapacity simpleCapacity = new SimpleCapacity();
@@ -259,11 +261,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
      * @param type
      */
     private boolean testModel(int type) {
-        if (type == 1 || type == 2 || type == 3 || type == 4 || type == 6 || type == 8 || type == 9) {
-            return true;
-        } else {
-            return false;
-        }
+        return type == 1 || type == 2 || type == 3 || type == 4 || type == 6 || type == 8 || type == 9;
     }
 
     @Override

@@ -16,6 +16,7 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.study.StudyModelContant;
 import com.zhidejiaoyu.common.constant.study.TestGenreConstant;
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
@@ -272,6 +273,10 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
 
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
+        if (capacityStudentUnit == null) {
+            throw new ServiceException(500, "学生未分配智能版单词学习计划！");
+        }
+
         // 随机选出20个正确单词信息
         PageHelper.startPage(1, 20);
         List<Vocabulary> rightVocabularies = vocabularyMapper.selectByStartUnitIdAndEndUnitId(capacityStudentUnit.getStartunit(), capacityStudentUnit.getEndunit());

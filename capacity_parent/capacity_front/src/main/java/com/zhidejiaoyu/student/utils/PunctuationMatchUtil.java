@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.student.utils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Stack;
 import java.util.regex.Pattern;
 
@@ -10,6 +12,7 @@ import java.util.regex.Pattern;
  *  @author wuchenxi
  * @date 2018/6/6 10:37
  */
+@Slf4j
 public class PunctuationMatchUtil {
 
     private static final String MATCHES = "[a-zA-Z\\s]";
@@ -23,6 +26,7 @@ public class PunctuationMatchUtil {
      * @return 格式化后的例句
      */
     public static String matchPunctuation(String str) {
+        STACK.clear();
         matchAndUpdate(str);
         return print();
     }
@@ -47,6 +51,7 @@ public class PunctuationMatchUtil {
                 }
 
                 if (!previousIsMatch && !isBlank) {
+                    log.info("句子 [{}] 单词后面紧跟符号，没有空格！", str);
                     STACK.push(" ");
                 }
             }
@@ -67,5 +72,10 @@ public class PunctuationMatchUtil {
         char[] chars = new char[1];
         chars[0] = character;
         return new String(chars);
+    }
+
+    public static void main(String[] args) {
+        String str = "I felt as if I had stumbled into a nightmare country, as you sometimes do in dreams.";
+        System.out.println(PunctuationMatchUtil.matchPunctuation(str));
     }
 }
