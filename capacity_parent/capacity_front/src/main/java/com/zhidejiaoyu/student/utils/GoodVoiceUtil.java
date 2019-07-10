@@ -71,8 +71,6 @@ public class GoodVoiceUtil {
      * <p>
      */
     public Map<String, Object> getSentenceEvaluationRecord(String text, MultipartFile file) {
-        // 得分
-        final String pronAccuracy = "PronAccuracy";
         // 句子中各个单词得分信息
         final String words = "Words";
 
@@ -84,14 +82,10 @@ public class GoodVoiceUtil {
         if (result != null) {
             Map<String, Object> map = new HashMap<>(16);
             List<Map<String, Object>> mapList = new ArrayList<>();
-            Map<String, Object> wordMap;
 
             JSONObject jsonObject = JSONObject.parseObject(result);
 
-            int totalScore = Math.round(jsonObject.getFloat(pronAccuracy));
-            if (totalScore == -1) {
-                totalScore = 0;
-            }
+            int totalScore = this.getScore(jsonObject);
 
             map.put("totalScore", totalScore);
             map.put("heart", getHeart(totalScore));
@@ -102,62 +96,97 @@ public class GoodVoiceUtil {
             String[] s = text.split(" ");
 
             JSONArray wordArray = jsonObject.getJSONArray(words);
+            // 存储单词
+            Map<String, Object> wordMap;
+            // 存储标点
+            Map<String, Object> pointMap;
             if (s.length > 1) {
+                // 语音评测结果为空或者评测结果数据比文本数据多（比如文本中含有 “25”这个数字，评测结果会把它拆分成两个单词），默认各个单词默认分数为 0
+                if (wordArray.size() == 0 || wordArray.size() > s.length) {
+                    packageDefaultSentenceGoodVoiceResult(mapList, s);
+                    map.put("word", mapList);
+                    return map;
+                }
+                // 语音评测结果不为空
                 int j = 0;
                 for (Object o : wordArray) {
                     JSONObject wordJsonObject = (JSONObject) o;
                     if ("*".equals(wordJsonObject.getString("Word")) || ",".equals(wordJsonObject.getString("Word"))) {
                         continue;
                     }
-                    score = Math.round(wordJsonObject.getFloat(pronAccuracy));
-                    if (score == -1) {
-                        score = 0;
-                    }
-                    wordMap = new HashMap<>(16);
-                    if (s[j].endsWith(",") || s[j].endsWith("!") || s[j].endsWith("?") || s[j].endsWith(".")) {
-                        wordMap.put("word", s[j].substring(0, s[j].length() - 1));
-                    } else {
-                        wordMap.put("word", s[j]);
-                    }
-                    wordMap.put("pronAccuracy", score);
-                    wordMap.put("color", getColor(score));
-                    mapList.add(wordMap);
-
-                    if (s[j].endsWith(",") || s[j].endsWith("!") || s[j].endsWith("?") || s[j].endsWith(".")) {
-                        wordMap = new HashMap<>(16);
-                        wordMap.put("word", s[j].substring(s[j].length() - 1));
-                        wordMap.put("color", "#fff");
-                        mapList.add(wordMap);
-                    }
+                    score = getScore(wordJsonObject);
+                    packageSentenceGoodVoiceResultMap(mapList, score, s[j]);
                     j++;
                 }
             } else {
                 wordMap = new HashMap<>(16);
-                score = 0;
                 if (wordArray.size() == 0) {
-                    log.warn("保存好声音数据响应出错！响应结果：[{}]", result);
-                } else {
-                    score = Math.round(wordArray.getJSONObject(0).getFloat(pronAccuracy));
+                    packageDefaultSentenceGoodVoiceResult(mapList, s);
+                    map.put("word", mapList);
+                    return map;
                 }
-
-                if (score == -1) {
-                    score = 0;
-                }
+                score = getScore(wordArray.getJSONObject(0));
                 wordMap.put("word", s[0].substring(0, s[0].length() - 1));
                 wordMap.put("score", score);
                 wordMap.put("color", getColor(score));
                 wordMap.put("heart", getHeart(score));
                 mapList.add(wordMap);
-                Map<String, Object> msm = new HashMap<>();
-                msm.put("word", s[0].substring(s[0].length() - 1));
-                msm.put("color", "#fff");
-                mapList.add(msm);
-            }
 
+                pointMap = new HashMap<>(16);
+                pointMap.put("word", s[0].substring(s[0].length() - 1));
+                pointMap.put("color", "#fff");
+                mapList.add(pointMap);
+            }
             map.put("word", mapList);
             return map;
         }
         return new HashMap<>(16);
+    }
+
+    private int getScore(JSONObject jsonObject) {
+        int score = Math.round(jsonObject.getFloat("PronAccuracy"));
+        return score == -1 ? 0 : score;
+    }
+
+    /**
+     * 封装句子语音评测默认结果（没有评测结果或者封装响应数据出错）
+     *
+     * @param mapList 需要响应的数据集合
+     * @param words   句子中单词数组
+     */
+    private void packageDefaultSentenceGoodVoiceResult(List<Map<String, Object>> mapList, String[] words) {
+        for (String word : words) {
+            packageSentenceGoodVoiceResultMap(mapList, 0, word);
+        }
+    }
+
+    /**
+     * 封装句子语音评测响应结果
+     *
+     * @param mapList 需要响应的数据集合
+     * @param score   得分
+     * @param word    当前单词
+     */
+    private void packageSentenceGoodVoiceResultMap(List<Map<String, Object>> mapList, int score, String word) {
+        Map<String, Object> wordMap;
+        Map<String, Object> pointMap;
+        wordMap = new HashMap<>(16);
+        boolean endWithPoint = word.endsWith(",") || word.endsWith("!") || word.endsWith("?") || word.endsWith(".");
+        if (endWithPoint) {
+            wordMap.put("word", word.substring(0, word.length() - 1));
+        } else {
+            wordMap.put("word", word);
+        }
+        wordMap.put("pronAccuracy", score);
+        wordMap.put("color", getColor(score));
+        mapList.add(wordMap);
+
+        if (endWithPoint) {
+            pointMap = new HashMap<>(16);
+            pointMap.put("word", word.substring(word.length() - 1));
+            pointMap.put("color", "#fff");
+            mapList.add(pointMap);
+        }
     }
 
     private int getHeart(int score) {
