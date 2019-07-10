@@ -64,4 +64,6 @@ public interface LoginService extends BaseService<Student>{
     Object getRiepCount(HttpSession session);
 
     Object getModelStatus(HttpSession session, Integer type);
+
+    Object isLoginOut(HttpSession session, String teacherAccount);
 }

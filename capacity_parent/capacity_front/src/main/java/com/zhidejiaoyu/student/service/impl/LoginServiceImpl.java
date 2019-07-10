@@ -74,7 +74,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private UnitVocabularyMapper unitVocabularyMapper;
 
     @Autowired
-    private LevelMapper levelMapper;
+    private SysUserMapper sysUserMapper;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -236,7 +236,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // i参数 1=慧记忆，2=慧听写，3=慧默写，4=例句听力，5=例句翻译，6=例句默写
         for (int i = 0; i < 4; i++) {
             map = new HashMap<>(16);
-            if(i == 0){
+            if (i == 0) {
                 // 单词图鉴单元总单词数
                 countWord = unitVocabularyMapper.selectWordPicCountByUnitId(unitId);
             } else if (i == 1) {
@@ -407,7 +407,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 flow = studyFlowMapper.getFlowInfoByStudentId(stu.getId());
                 result.put("needReview", "");
             }
-            if(flow != null){
+            if (flow != null) {
                 result.put("nodeId", flow.getId());
                 result.put("nodeName", flow.getFlowName());
 
@@ -495,13 +495,13 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
 
         Map<String, Object> map = new HashMap<>(16);
-        map.put("sex",student.getSex());
+        map.put("sex", student.getSex());
         // 获取今日已学单词
         int learnWord = learnMapper.getTodayWord(DateUtil.formatYYYYMMDD(new Date()), studentId);
         // 获取今日已学例句
         int learnSentence = learnMapper.getTodaySentence(DateUtil.formatYYYYMMDD(new Date()), studentId);
         //获取今日已学课文数
-        int learnTeks=learnMapper.getTodyTeks(DateUtil.formatYYYYMMDD(new Date()),studentId);
+        int learnTeks = learnMapper.getTodyTeks(DateUtil.formatYYYYMMDD(new Date()), studentId);
         map.put("learnWord", learnWord);
         map.put("learnSentence", learnSentence);
         map.put("learnTeks", learnTeks);
@@ -857,13 +857,14 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         rankOpt.addOrUpdate(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), 0.0);
         rankOpt.addOrUpdate(RankKeysConst.SCHOOL_WORSHIP_RANK + schoolAdminId, student.getId(), 0.0);
-        rankOpt.addOrUpdate(RankKeysConst.COUNTRY_WORSHIP_RANK , student.getId(), 0.0);
+        rankOpt.addOrUpdate(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId(), 0.0);
     }
 
     public static void main(String[] args) {
         String str = "20180101";
-        System.out.println(str.substring(0, 4)+"-"+str.substring(4,6)+"-"+str.substring(6,8));
+        System.out.println(str.substring(0, 4) + "-" + str.substring(4, 6) + "-" + str.substring(6, 8));
     }
+
     /**
      * 学生当天首次登陆奖励5金币，并计入日奖励信息
      *
@@ -920,7 +921,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             logger.error("获取学生登录IP地址出错，error=[{}]", e.getMessage());
         }
 
-        RunLog runLog = new RunLog(stu.getId(), 1, "学生[" + stu.getStudentName() + "]登录,ip=[" + ip +"]", new Date());
+        RunLog runLog = new RunLog(stu.getId(), 1, "学生[" + stu.getStudentName() + "]登录,ip=[" + ip + "]", new Date());
         try {
             runLogMapper.insert(runLog);
         } catch (Exception e) {
@@ -982,7 +983,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         response.setHeader("Content-Type", "application/json;charset=UTF-8");
         response.setHeader("Cache-Control", "no-cache");
         response.setDateHeader("Expires", 0);
-        ValidateCode vCode = new ValidateCode(74,31,4,150);
+        ValidateCode vCode = new ValidateCode(74, 31, 4, 150);
         session.removeAttribute("validateCode");
         vCode.write(response.getOutputStream());
         session.setAttribute("validateCode", vCode.getCode());
@@ -992,12 +993,12 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Override
     public Object getRiepCount(HttpSession session) {
         Student student = getStudent(session);
-        Map<String,Object> map=new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("partUrl", AliyunInfoConst.host + student.getPartUrl());
         Integer count = studentMapper.getVocabularyCountByStudent(student.getId());
-        map.put("vocabularyCount",count);
+        map.put("vocabularyCount", count);
         Integer sentenceCount = studentMapper.getSentenceCountByStudent(student.getId());
-        map.put("sentenceCount",sentenceCount);
+        map.put("sentenceCount", sentenceCount);
         return ServerResponse.createBySuccess(map);
     }
 
@@ -1014,9 +1015,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
         if (type.equals(2) || type.equals(3)) {
             List<Map<String, Object>> maps = null;
-            if(type==2){
-                maps=studentStudyPlanMapper.selBySentenceStudentId(student.getId(), type);
-            }else{
+            if (type == 2) {
+                maps = studentStudyPlanMapper.selBySentenceStudentId(student.getId(), type);
+            } else {
                 maps = studentStudyPlanMapper.selByStudentId(student.getId(), type);
             }
             if (maps != null && maps.size() > 0) {
@@ -1031,6 +1032,55 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             }
         }
         map.put("isHave", isHave);
+        return ServerResponse.createBySuccess(map);
+    }
+
+    @Override
+    public Object isLoginOut(HttpSession session, String isTeacherAccount) {
+        Map<String, Object> map = new HashMap<>();
+        Student student = getStudent(session);
+        if (student.getTeacherId().equals(1)) {
+            if ("admin".equals(isTeacherAccount.trim())) {
+                map.put("isLoginOut", true);
+            } else {
+                map.put("isLoginOut", false);
+            }
+            return ServerResponse.createBySuccess(map);
+        }
+        String adminAccount = null;
+        String teacherAccount = null;
+        boolean falg = false;
+        if (student.getTeacherId() != null) {
+            SysUser sysUser = sysUserMapper.selectById(student.getTeacherId());
+            if (sysUser.getAccount().indexOf("xg") != -1) {
+                adminAccount = sysUser.getAccount();
+            } else {
+                if (sysUser.getAccount() != null) {
+                    if (sysUser.getAccount().equals(isTeacherAccount.trim())) {
+                        falg = true;
+                    }
+                }
+                if (!falg) {
+                    Integer schoolAdminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
+                    if (schoolAdminId != null) {
+                        SysUser schoolAdminUser = sysUserMapper.selectById(schoolAdminId);
+                        if (schoolAdminUser != null) {
+                            adminAccount = schoolAdminUser.getAccount();
+                        }
+                    }
+                }
+            }
+        }
+        if (adminAccount != null) {
+            if (adminAccount.equals(isTeacherAccount.trim())) {
+                falg = true;
+            }
+        }
+        if (falg) {
+            map.put("isLoginOut", true);
+        } else {
+            map.put("isLoginOut", false);
+        }
         return ServerResponse.createBySuccess(map);
     }
 }

@@ -177,4 +177,9 @@ public class LoginController {
     public Object getModelStatus(HttpSession session,Integer type){
         return loginService.getModelStatus(session,type);
     }
+
+    @GetMapping("/isLoginOut")
+    public Object isLoginOut(HttpSession session,String teacherAccount){
+        return loginService.isLoginOut(session,teacherAccount);
+    }
 }
