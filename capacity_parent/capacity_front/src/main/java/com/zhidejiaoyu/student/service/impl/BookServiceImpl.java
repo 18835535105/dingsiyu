@@ -246,16 +246,26 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
             }
         }
 
+        // 如果总学习数大于总大次数，将总学习数置为总单词数
+        if (learnedCount > total) {
+            learnedCount = total;
+        }
+        // 如果生词数大于总学习数，将生词数置为总学习数
+        if (notKnow > learnedCount) {
+            notKnow = learnedCount;
+        }
+
         Long know = learnedCount - notKnow;
 
         BookInfoVo vo = new BookInfoVo();
-
         vo.setKnow(know);
         vo.setNotKnow(notKnow);
-        vo.setPlan(BigDecimalUtil.div(learnedCount * 1.0, total, 2));
+        double plan = BigDecimalUtil.div(learnedCount * 1.0, total, 2);
+        vo.setPlan(plan > 1.0 ? 1.0 : plan);
         vo.setResidue(total - learnedCount);
         vo.setTotal(total);
-        vo.setScale(BigDecimalUtil.div(notKnow * 1.0, total, 2));
+        double scale = BigDecimalUtil.div(notKnow * 1.0, total, 2);
+        vo.setScale(scale > 1.0 ? 1.0 : scale);
         return ServerResponse.createBySuccess(vo);
     }
 
