@@ -977,7 +977,17 @@
     </select>
 
     <select id="selectBookVoByUnitId" resultType="com.zhidejiaoyu.common.Vo.bookVo.BookVo" parameterType="map">
-        <include refid="selectBookVoSql"/>
+         SELECT distinct v.id,
+                        v.word_chinese                                                chinese,
+                        v.word                                                        content,
+                        v.word                                                        readUrl,
+                        v.sound_mark                                                  soundMark
+        FROM vocabulary v,
+             unit_vocabulary uv,
+             unit u
+        WHERE v.delStatus = 1
+          AND v.id = uv.vocabulary_id
+          AND u.id = uv.unit_id
         and u.id = #{unitId}
     </select>
 
