@@ -779,24 +779,71 @@ public interface LearnMapper extends BaseMapper<Learn> {
      */
     List<Map<String, Object>> selectLearnedByUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("beginRow") Integer beginRow, @Param("pageSize") Integer pageSize);
 
-    Integer updLearnByUnitIdAndStudyModelAndStudentId(@Param("studentId")Long id,@Param("studyModel")String studyModel,@Param("unitId") Integer unitId);
+    /**
+     * 修改单元下正在学习单词学习状态
+     * @param studentId
+     * @param studyModel
+     * @param unitId
+     * @return
+     */
+    Integer updLearnByUnitIdAndStudyModelAndStudentId(@Param("studentId")Long studentId,@Param("studyModel")String studyModel,@Param("unitId") Integer unitId);
 
     Long selByStudentIdAndCourseIdDisVersion(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
 
+    /**
+     * 查看课文id
+     * @param learn
+     * @return
+     */
     @Select("select id from learn where unit_id =#{unitId} and student_id=#{studentId} and course_id=#{courseId} and study_model=#{studyModel} and vocabulary_id is null and example_id is null")
     Long selTeksLearn(Learn learn);
 
+    /**
+     * 根据id修改学习时间
+     * @param learn
+     * @return
+     */
     @Update("update learn set update_time=#{updateTime} where id=#{id} ")
     Integer updTeksLearn(Learn learn);
 
-    List<Map<String, Object>> selectTeksLaterLearnTimeByStudentId(Long id);
+    /**
+     * 获取最后学习课文信息
+     * @param studentId
+     * @return
+     */
+    List<Map<String, Object>> selectTeksLaterLearnTimeByStudentId(@Param("studentId") Long studentId);
 
+    /**
+     * 获取最后学习课文单元
+     * @param studentId
+     * @param courseId
+     * @return
+     */
     Long selLaterLearnTeks(@Param("studentId") Long studentId,@Param("courseId") Long courseId);
 
-    Map<String,Object> selTeksLaterCourse(Long id);
+    /**
+     * 获取最后学习课文信息
+     * @param studentId
+     * @return
+     */
+    Map<String,Object> selTeksLaterCourse(Long studentId);
 
+    /**
+     * 查看学习课文数量
+     * @param studentId
+     * @param studyModel
+     * @param unitId
+     * @return
+     */
     Integer selLearnTeks(@Param("studentId") Long studentId,@Param("studyModel")String studyModel,@Param("unitId") Long unitId);
 
+    /**
+     * 获取单元，模块下学习单元数量
+     * @param studentId
+     * @param unitId
+     * @param studyModel
+     * @return
+     */
     Integer selAllTeksLearn(@Param("studentId") Long studentId,@Param("unitIds")  List<Long> unitId,@Param("studyModel") String studyModel);
 
     /**
@@ -842,6 +889,12 @@ public interface LearnMapper extends BaseMapper<Learn> {
      */
     int countByStudentIdAndFlow(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("flowName") String flowName);
 
+    /**
+     * 获取最后句子学习时间
+     * @param studentId
+     * @param unitId
+     * @return
+     */
     Learn selLaterSentence(@Param("studentId") Long studentId,@Param("unitId") long unitId);
 
     /**
