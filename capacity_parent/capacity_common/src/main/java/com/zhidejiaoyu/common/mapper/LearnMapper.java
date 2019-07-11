@@ -847,19 +847,40 @@ public interface LearnMapper extends BaseMapper<Learn> {
     /**
      * 统计学生当前模块的当前已经学习
      *
-     * @param studentId
-     * @param studyModel
-     * @param unitId
+     * @param studentId 学生id
+     * @param studyModel 模块类型
+     * @param unitId 单元id
      * @return
      */
     int countByStudentIdAndStudyModel(@Param("studentId") Long studentId, @Param("studyModel") String studyModel, @Param("unitId") Long unitId);
 
 
+    /**
+     * 查看字母学习数量
+     * @param studentId  学生id
+     * @param unitId     单元id
+     * @param studyModel 模块类型
+     * @return
+     */
     Integer selLetterLearn(@Param("studentId") Long studentId,@Param("unitId") Long unitId,@Param("studyModel") String studyModel);
 
 
+    /**
+     * 查看已学字母播放器字母
+     * @param studentId
+     * @param wordId
+     * @param unitId
+     * @param studyModel
+     * @return
+     */
     Learn selLetter(@Param("studentId") Long studentId,@Param("wordId") Long wordId,@Param("unitId") Long unitId,@Param("studyModel") String studyModel);
 
+    /**
+     * 修改模块学习状态
+     * @param studentId 学生id
+     * @param unitId    单元id
+     * @param studyModel  模块类型
+     */
     @Update("update learn set type=2 where student_id=#{studentId} and unit_id =#{unitId} and study_model=#{studyModel}")
     void updLetterPair(@Param("studentId") Long studentId,@Param("unitId") Long unitId,@Param("studyModel") String studyModel);
 
