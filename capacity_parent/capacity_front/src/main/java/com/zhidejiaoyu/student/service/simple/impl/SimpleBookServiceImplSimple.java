@@ -176,29 +176,41 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<SimpleVoc
 
             // 当前课程单词总个数
             total = getWordCountInCourse(courseId);
-        }else {
+        } else {
             List<Long> courseIds = getAllCourseIdInTypeStr(typeStr, studentId);
 
             // 学生当前模块学习的总单词数
             learnedCount = learnMapper.countLearnWordByCourse(studentId, courseIds, typeStr);
 
-            // 学生当前模块学习的所有生词数
-            notKnow = learnMapper.countUnknownWord(studentId, courseIds, typeStr);
-
             // 学生当前模块总单词数
             List<Unit> units = unitMapper.selectList(new EntityWrapper<Unit>().in("course_id", courseIds));
             List<Long> unitIds = getUnitIdsFromUnits(units);
             total = simpleUnitVocabularyMapper.countWordByUnitIds(unitIds);
+
+            // 学生当前模块学习的所有生词数
+            notKnow = learnMapper.countUnknownWord(studentId, courseIds, typeStr);
         }
+
+        // 如果总学习数大于总大次数，将总学习数置为总单词数
+        if (learnedCount > total) {
+            learnedCount = total;
+        }
+        // 如果生词数大于总学习数，将生词数置为总学习数
+        if (notKnow > learnedCount) {
+            notKnow = learnedCount;
+        }
+
         long know = learnedCount - notKnow;
 
         BookInfoVo vo = new BookInfoVo();
-        vo.setKnow(know);
+        vo.setKnow(know < 0 ? 0 : know);
         vo.setNotKnow(notKnow);
-        vo.setPlan(BigDecimalUtil.div(learnedCount * 1.0, total, 2));
+        double plan = BigDecimalUtil.div(learnedCount * 1.0, total, 2);
+        vo.setPlan(plan > 1.0 ? 1.0 : plan);
         vo.setResidue(total - learnedCount);
         vo.setTotal(total);
-        vo.setScale(BigDecimalUtil.div(notKnow * 1.0, total, 2));
+        double scale = BigDecimalUtil.div(notKnow * 1.0, total, 2);
+        vo.setScale(scale > 1.0 ? 1.0 : scale);
         return ServerResponse.createBySuccess(vo);
     }
 
