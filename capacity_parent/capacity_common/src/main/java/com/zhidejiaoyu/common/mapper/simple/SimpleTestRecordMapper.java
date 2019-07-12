@@ -187,7 +187,7 @@ public interface SimpleTestRecordMapper extends BaseMapper<TestRecord> {
 	 * @param testType 测试类型
 	 * @return id
 	 */
-	String getWhetherTest(@Param("studentId") Long studentId, @Param("courseId") Long courseId,
+	Long getWhetherTest(@Param("studentId") Long studentId, @Param("courseId") Long courseId,
                           @Param("unitId") Long unitId, @Param("type") int type, @Param("testType") String testType);
 
 	/**

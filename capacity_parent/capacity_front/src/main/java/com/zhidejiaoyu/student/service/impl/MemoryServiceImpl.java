@@ -187,8 +187,8 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         //查看慧记忆是否为上次学习 如果是删除
         List<CapacityMemory> capacityMemoryList = capacityMemoryMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
                 learn.getVocabularyId());
-        boolean falg = capacityMemoryList.size() > 0 && capacityMemoryList.get(0).getPush().getTime() < System.currentTimeMillis();
-        if(currentLearn == null && falg){
+        boolean flag = capacityMemoryList.size() > 0 && capacityMemoryList.get(0).getPush().getTime() < System.currentTimeMillis();
+        if(currentLearn == null && flag){
             capacityMemoryMapper.deleteByStudentIdAndUnitIdAndVocabularyId(student.getId(),learn.getUnitId(),learn.getVocabularyId());
             return  ServerResponse.createBySuccess();
         }
@@ -223,7 +223,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
             capacityMemory = saveWordLearnAndCapacity.saveCapacityMemory(learn, student, false, 1);
         }
         // 计算记忆难度
-        Integer memoryDifficult = memoryDifficultyUtil.getMemoryDifficulty(capacityMemory, 1);
+        int memoryDifficult = memoryDifficultyUtil.getMemoryDifficulty(capacityMemory, 1);
         // 更新学习记录
         currentLearn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
         currentLearn.setStudyCount(currentLearn.getStudyCount() + 1);

@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.Vo.simple.SimpleCapacityVo;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.mapper.TestRecordMapper;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
@@ -76,6 +77,9 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
     @Autowired
     private MedalAwardAsync medalAwardAsync;
 
+    @Autowired
+    private TestRecordMapper testRecordMapper;
+
     /**
      * 9大学习页面
      * 1 2 3 4 6 8 9模块需要测试-
@@ -86,7 +90,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
         Long studentId = student.getId();
 
         // 是否需要课程前测,课后测试,单元前测,单元闯关
-        String testId = null;
+        Long testId = null;
 
         // 判断当前模块是否需要走测试逻辑
         boolean testModel = testModel(type);
@@ -139,14 +143,15 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
         // 查询学生当前单元当前模块下已学习单词的个数
         Long plan = learnMapper.getSimpleLearnByStudentIdByModel(studentId, unitId, type);
 
-        // 判断是否需要单元闯关测试或学后测试
+        // 判断是否需要单元闯关测试
         if (plan >= wordCount && testModel) {
             testId = simpleTestRecordMapper.getWhetherTest(studentId, courseId, unitId, type, "单元闯关测试");
             // 强制学生进行单元闯关测试
-            if (testId == null) {
-                // 弹框强制测试
-                return super.toUnitTest(301, "单元闯关测试");
+            if (testId != null) {
+               testRecordMapper.deleteById(testId);
             }
+            // 弹框强制测试
+            return super.toUnitTest(301, "单元闯关测试");
         }
 
         // 1.查询有没有需要复习的数据
@@ -164,15 +169,6 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
             // 获取单元新单词
             simpleCapacityVo = vocabularyMapper.showWordSimple(unitId, studentId, type);
 
-            if (simpleCapacityVo == null && testModel) {
-                testId = simpleTestRecordMapper.getWhetherTest(studentId, courseId, unitId, type, "单元闯关测试");
-                // 强制学生进行单元闯关测试
-                if (testId == null) {
-                    // 弹框强制测试
-                    return super.toUnitTest(301, "单元闯关测试");
-                }
-            }
-
             // 词汇考点或者语法辨析当前课程如果学习完毕进行提示
             if (simpleCapacityVo == null && !testModel) {
                 // 清除数据
@@ -180,6 +176,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
                 return ServerResponse.createBySuccess(302, "当前选择课程已学习完毕，可以重新学习，温故知新哦。");
             }
 
+            // todo: 2019-08-10 可删除该日志
             if (simpleCapacityVo == null) {
                 log.error("排查 NPE 问题，查询新单词为空！plan=[{}], wordCount=[{}], testId=[{}]", plan, wordCount, testId);
             }
