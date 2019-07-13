@@ -35,7 +35,7 @@ public class ControllerLogAop {
 
     private void printLog(long startTime) {
         try {
-            long maxTime = 1000;
+            long maxTime = 2000;
             Object object = HttpUtil.getHttpSession().getAttribute(UserConstant.CURRENT_STUDENT);
             if (object != null) {
                 String url = HttpUtil.getHttpServletRequest().getRequestURI().substring(HttpUtil.getHttpServletRequest().getContextPath().length());
