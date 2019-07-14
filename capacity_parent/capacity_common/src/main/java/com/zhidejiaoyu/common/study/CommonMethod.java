@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.common.study;
 
-import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.LearnMapper;
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.LearnExample;
 import com.zhidejiaoyu.common.pojo.SimpleCapacity;
@@ -179,8 +179,11 @@ public class CommonMethod implements Serializable {
         List<String> list = new ArrayList<>();
         String[] arr = sentence.split(" ");
         for (String s : arr) {
-            if (s.contains("#")||s.contains("*")||s.contains("$")) {
-                list.add(s.replace("#", " ").replace("*"," ").replace("$",""));
+            if ("".equals(s)) {
+                continue;
+            }
+            if (s.contains("#") || s.contains("*") || s.contains("$")) {
+                list.add(s.replace("#", " ").replace("*", " ").replace("$", ""));
             } else {
                 list.add(s.trim());
             }
@@ -215,6 +218,9 @@ public class CommonMethod implements Serializable {
         List<String> list = new ArrayList<>();
         // 去除固定搭配中的#
         for (int i = 0; i < words.length; i++) {
+            if ("".equals(words[i])) {
+                continue;
+            }
             if (words[i].contains("#")) {
                 words[i] = words[i].replace("#", " ");
             }
@@ -237,9 +243,8 @@ public class CommonMethod implements Serializable {
 
     public static void main(String[] args) {
         CommonMethod commonMethod = new CommonMethod();
-        String str = "刚才*在街上*，我*碰巧*看见了我的叔叔。";
-        System.out.println(commonMethod.getOrderChineseList(str, "昨天"));
-        System.out.println(commonMethod.getChineseList(str));
+        String str = "Hello! I'm   $Henry$. I come from France.  ";
+        System.out.println(commonMethod.getEnglishList(str));
     }
 
     /**
