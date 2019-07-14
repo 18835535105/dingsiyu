@@ -7,10 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
 
@@ -249,8 +247,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
 
     private void initSaveAwards(Student student, Long studentId, Date date, List<Long> ids, int type) {
         List<AwardContentType> contentTypes = awardContentTypeMapper.selectByIds(ids);
-        List<Award> awards = new ArrayList<>(contentTypes.size());
-        contentTypes.forEach(contentType -> {
+        List<Award> awards = contentTypes.stream().map(awardContentType -> {
             Award award = new Award();
             award.setCanGet(2);
             award.setGetFlag(2);
@@ -258,10 +255,10 @@ public class DailyAwardAsync extends BaseAwardAsync {
             award.setCreateTime(date);
             award.setType(type);
             award.setCurrentPlan(0);
-            award.setTotalPlan(contentType.getTotalPlan());
-            award.setAwardContentType(contentType.getId());
-            awards.add(award);
-        });
+            award.setTotalPlan(awardContentType.getTotalPlan());
+            award.setAwardContentType(awardContentType.getId());
+            return award;
+        }).collect(Collectors.toList());
 
         if (awards.size() > 0) {
             try {
@@ -285,14 +282,14 @@ public class DailyAwardAsync extends BaseAwardAsync {
     private void initDailyAward(Student student) {
         Long studentId = student.getId();
         Date date = new Date();
-        List<Long> ids = new ArrayList<>();
+        Set<Long> ids = new HashSet<>();
         ids.add(2L);
         ids.add(3L);
         ids.add(4L);
         ids.add(7L);
         ids.add(8L);
         ids.add(9L);
-        initSaveAwards(student, studentId, date, ids, DAILY_TYPE);
+        initSaveAwards(student, studentId, date, new ArrayList<>(ids), DAILY_TYPE);
     }
 
     /**
