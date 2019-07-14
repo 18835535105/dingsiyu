@@ -334,7 +334,7 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
         capacityListVo.setMemeoryStrength(capacityMemory.getMemoryStrength());
         capacityListVo.setPush(this.getPushTime(capacityMemory.getPush()));
         capacityListVo.setReadUrl(baiduSpeak.getLanguagePath(capacityMemory.getWord()));
-        capacityListVo.setSoundMark(StringUtils.isEmpty(vocabulary.getSoundMark()) ? "" : vocabulary.getSoundMark());
+        capacityListVo.setSoundMark((vocabulary == null || StringUtils.isEmpty(vocabulary.getSoundMark())) ? "" : vocabulary.getSoundMark());
         capacityListVos.add(capacityListVo);
     }
 
