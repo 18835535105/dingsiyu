@@ -37,7 +37,6 @@ import com.zhidejiaoyu.student.constant.PetImageConstant;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.dto.phonetic.UnitTestDto;
-import com.zhidejiaoyu.student.service.StudentInfoService;
 import com.zhidejiaoyu.student.service.TestService;
 import com.zhidejiaoyu.student.utils.CcieUtil;
 import com.zhidejiaoyu.student.utils.PetSayUtil;
@@ -56,7 +55,6 @@ import java.util.*;
 @Service
 public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecord> implements TestService {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(TestServiceImpl.class);
     /**
      * 50分
      */
@@ -100,9 +98,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     @Autowired
     private RunLogMapper runLogMapper;
-
-    @Autowired
-    private CourseMapper courseMapper;
 
     @Autowired
     private UnitMapper unitMapper;
@@ -151,6 +146,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     @Autowired
     private BaiduSpeak baiduSpeak;
+
+    @Autowired
+    private CapacityReviewMapper capacityReviewMapper;
 
     /**
      * 游戏测试题目获取，获取20个单词供测试
@@ -709,7 +707,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         int count = testRecordMapper.insertSelective(testRecord);
         if (count == 0) {
             String errMsg = "id为 " + student.getId() + " 的学生 " + student.getStudentName() + " 游戏测试记录保存失败！";
-            LOGGER.error(errMsg);
+            log.error(errMsg);
             RunLog runLog = new RunLog(2, errMsg, new Date());
             runLogMapper.insertSelective(runLog);
         }
@@ -761,7 +759,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         int count = testRecordMapper.updateByPrimaryKeySelective(testRecord);
         if (count == 0) {
             String errMsg = "id为 " + student.getId() + " 的学生 " + student.getStudentName() + " 更新游戏测试记录失败！";
-            LOGGER.error(errMsg);
+            log.error(errMsg);
             RunLog runLog = new RunLog(2, errMsg, new Date());
             runLogMapper.insert(runLog);
         }
@@ -848,19 +846,19 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             englishToChinese = vocabularies.subList(0, 10);
             results = testResultUtil.getWordTestes(type, englishToChinese.size(), englishToChinese, student.getVersion(), phase);
         } catch (Exception e) {
-            LOGGER.error("摸底测试单词不足10个！", e.getMessage());
+            log.error("摸底测试单词不足10个！", e.getMessage());
         }
         try {
             chineseToEnglish = vocabularies.subList(10, 20);
             results1 = testResultUtil.getWordTestes(type1, chineseToEnglish.size(), chineseToEnglish, student.getVersion(), phase);
         } catch (Exception e) {
-            LOGGER.error("摸底测试单词不足20个！", e.getMessage());
+            log.error("摸底测试单词不足20个！", e.getMessage());
         }
         try {
             listen = vocabularies.subList(20, 30);
             results2 = testResultUtil.getWordTestes(type2, listen.size(), listen, student.getVersion(), phase);
         } catch (Exception e) {
-            LOGGER.error("摸底测试单词不足30个！", e.getMessage());
+            log.error("摸底测试单词不足30个！", e.getMessage());
         }
 
         results.forEach(testResult -> testResult.setType(type[0]));
@@ -1234,6 +1232,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         getLevel(session);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         learnMapper.updLetterPair(student.getId(), wordUnitTestDTO.getUnitId()[0], commonMethod.getTestType(classify));
+        capacityReviewMapper.deleteByStudentIdAndUnitId(student.getId(), wordUnitTestDTO.getUnitId()[0], classify);
         return ServerResponse.createBySuccess(vo);
     }
 
@@ -1405,7 +1404,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 try {
                     testRecordInfoMapper.insertList(testRecordInfos);
                 } catch (Exception e) {
-                    LOGGER.error("学生测试记录详情保存失败：studentId=[{}], testId=[{}], modelType=[{}], error=[{}]",
+                    log.error("学生测试记录详情保存失败：studentId=[{}], testId=[{}], modelType=[{}], error=[{}]",
                             student.getId(), testRecordId, modelType, e.getMessage());
                 }
             }
@@ -1473,7 +1472,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         runLog.setCourseId(student.getCourseId());
         runLog.setUnitId(student.getUnitId());
         runLogMapper.insert(runLog);
-        LOGGER.info(msg);
+        log.info(msg);
     }
 
     @Override
