@@ -11,27 +11,25 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleLearnTimeUtil;
 import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
 import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.common.SaveLearnAndCapacity;
 import com.zhidejiaoyu.student.service.simple.SimpleMemoryServiceSimple;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
-
+@Slf4j
 @Service
 public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleVocabularyMapper, Vocabulary> implements SimpleMemoryServiceSimple {
-
-    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * 默写模块答错3次, 黄金记忆点时间延长一个小时
@@ -321,38 +319,6 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         simpleCommonMethod.clearFirst(student.getId(), studyModel);
         return ServerResponse.createBySuccess();
-    }
-
-    @Override
-    public ServerResponse<Object> todayTime(HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        Long id = student.getId();
-
-        // 封装返回数据
-        Map<String, Object> result = new HashMap<>(16);
-
-        // 有效时长  !
-        Integer valid = super.getTodayValidTime(id);
-        // 在线时长 !
-        Integer online = super.getTodayOnlineTime(session);
-        result.put("online", online);
-        result.put("valid", valid);
-        // 今日学习效率 !
-        if (valid != null && online != null) {
-            String efficiency = SimpleLearnTimeUtil.efficiency(valid, online);
-            if ("100%".equals(efficiency) && !valid.equals(online)) {
-                result.put("efficiency", "99%");
-            } else {
-                result.put("efficiency", efficiency);
-            }
-        } else {
-            result.put("efficiency", "0%");
-        }
-        // todo:跟踪日志
-        if (valid == null) {
-            log.error("今日有效时长 valid = null;");
-        }
-        return ServerResponse.createBySuccess(result);
     }
 
 
