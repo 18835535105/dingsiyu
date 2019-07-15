@@ -65,7 +65,7 @@ public class CatchException extends BaseServiceImpl<StudentMapper, Student> {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ServerResponse constraintViolationException(ConstraintViolationException e) {
-        log.error("参数校验异常:{}", e.getMessage());
+        packageLogMsg(e, HttpUtil.getHttpServletRequest());
         return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), new ArrayList<>(e.getConstraintViolations()).get(0).getMessageTemplate());
     }
 
