@@ -1323,6 +1323,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             if (words[i].contains("$")) {
                 words[i] = words[i].replace("$", " ");
             }
+            // 防止形如 My name is $Jenny$#Green. 的句子中 Jenny Green 中间含有两个空格问题
+            if (words[i].contains("  ")) {
+                words[i] = words[i].replace("  ", " ");
+            }
             list.add(words[i].trim());
         }
 
@@ -1332,5 +1336,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
         Collections.shuffle(list);
         return list;
+    }
+
+    public static void main(String[] args) {
+        String str = "We have green sweaters for only $15!";
+        TeksServiceImpl teksService = new TeksServiceImpl();
+        System.out.println(teksService.getOrderEnglishList(str, null));
     }
 }
