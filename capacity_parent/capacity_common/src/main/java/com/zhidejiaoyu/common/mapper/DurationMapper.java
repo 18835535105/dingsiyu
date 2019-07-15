@@ -190,4 +190,12 @@ public interface DurationMapper {
      * @return
      */
     int countByLoginOutTime(@Param("studentId") Long studentId, @Param("loginOutTime") String loginOutTime);
+
+    /**
+     * 查询学生当天最后保存有效时长的时间（不包含退出时的时间）
+     *
+     * @param studentId
+     * @return
+     */
+    Duration selectLastDuration(@Param("studentId") Long studentId);
 }

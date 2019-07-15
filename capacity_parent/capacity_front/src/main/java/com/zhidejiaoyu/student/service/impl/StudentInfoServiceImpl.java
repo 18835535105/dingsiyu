@@ -21,6 +21,7 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.dto.EndValidTimeDto;
 import com.zhidejiaoyu.student.service.StudentInfoService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -298,8 +299,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     @Override
     @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<String> calculateValidTime(HttpSession session, Integer classify, Long courseId, Long unitId,
-                                                     Long validTime) {
+    public ServerResponse<String> calculateValidTime(HttpSession session, EndValidTimeDto dto) {
 
         Student student = getStudent(session);
 
@@ -314,10 +314,12 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             return ServerResponse.createBySuccessMessage("本次学习获得金币：0 个");
         }
 
+        // 判断有效时长是否大于上个模块退出至当前模块退出时间差, 如果大于，置为最大时间差；否则正常保存
+        long validTime = checkTimeDifference(student, dto);
+
         Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
 
-        Duration duration = packageDuration(classify, courseId, unitId, validTime, student, loginTime);
-
+        Duration duration = packageDuration(dto, student, loginTime);
         try {
             durationMapper.insert(duration);
         } catch (Exception e) {
@@ -325,14 +327,41 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         }
 
         String tip = null;
+        Integer classify = dto.getClassify();
         if (classify <= 6) {
             tip = saveGoldAward(session, classify, validTime, loginTime);
+        } else if (classify >= 14 && classify <= 22) {
+            int type = classify - 13;
+            tip = saveGoldAward(session, type, validTime, loginTime);
         }
         session.removeAttribute(TimeConstant.BEGIN_VALID_TIME);
 
         executorService.execute(() -> this.saveAward(session, classify, student));
 
         return ServerResponse.createBySuccessMessage(tip);
+    }
+
+    /**
+     * 校验有效时长是否大于上个模块保存后至当前时间的时间差，如果大于将有效时长置为时间差，否则不操作
+     *
+     * @param student
+     * @return
+     */
+    private Long checkTimeDifference(Student student, EndValidTimeDto dto) {
+        try {
+            Duration lastDuration = durationMapper.selectLastDuration(student.getId());
+            if (lastDuration != null && lastDuration.getLoginOutTime() != null) {
+                long timeDifference = System.currentTimeMillis() - lastDuration.getLoginOutTime().getTime();
+                if (timeDifference / 1000 < dto.getValid()) {
+                    log.warn("学生 [{} -{} - {}] 保存有效时长过大！classify=[{}], courseId=[{}], unitId=[{}], validTime=[{}s]",
+                            student.getId(), student.getAccount(), student.getStudentName(), dto.getClassify(), dto.getCourseId(), dto.getUnitId(), dto.getValid());
+                    return timeDifference / 1000;
+                }
+            }
+        } catch (Exception e) {
+            log.warn("获取有效时长出错！不影响正常使用！", e);
+        }
+        return dto.getValid();
     }
 
     private void saveAward(HttpSession session, Integer classify, Student student) {
@@ -352,6 +381,14 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         }
         if (classify < 7) {
             return classify;
+        }
+        // 单词记忆模块
+        if (classify == 16 || classify == 19 || classify == 20 || classify == 17 || classify == 18) {
+            return 1;
+        }
+        // 默写模块
+        if (classify == 21 || classify == 22) {
+            return 3;
         }
         return 0;
     }
@@ -405,14 +442,12 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         }
     }
 
-    private Duration packageDuration(Integer classify, Long courseId, Long unitId, Long validTime, Student student, Date loginTime) {
+    private Duration packageDuration(EndValidTimeDto dto, Student student, Date loginTime) {
         Duration duration = new Duration();
-        if(courseId!=null){
-            duration.setCourseId(courseId);
-        }
-        duration.setStudyModel(classify);
-        duration.setUnitId(unitId);
-        duration.setValidTime(validTime);
+        duration.setCourseId(dto.getCourseId());
+        duration.setStudyModel(dto.getClassify());
+        duration.setUnitId(dto.getUnitId());
+        duration.setValidTime(dto.getValid());
         duration.setLoginTime(loginTime);
         duration.setStudentId(student.getId());
         duration.setOnlineTime(0L);

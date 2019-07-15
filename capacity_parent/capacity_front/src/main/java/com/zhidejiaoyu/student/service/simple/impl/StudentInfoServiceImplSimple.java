@@ -54,9 +54,6 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     private SimpleMedalMapper simpleMedalMapper;
 
     @Autowired
-    private SimpleDurationMapper simpleDurationMapper;
-
-    @Autowired
     private SimpleLearnMapper learnMapper;
 
     @Autowired
@@ -67,9 +64,6 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
 
     @Autowired
     private SimpleStudentExpansionMapper simpleStudentExpansionMapper;
-
-    @Autowired
-    private ExecutorService executorService;
 
     @Autowired
     private GoldAwardAsync goldAwardAsync;
@@ -292,74 +286,6 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         medalAwardAsync.enjoyPopularConfidence(student);
 
         return ServerResponse.createBySuccessMessage("膜拜成功");
-    }
-
-    @Override
-    @GoldChangeAnnotation
-    @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<String> calculateValidTime(HttpSession session, Integer classify, Long courseId, Long unitId,
-                                                     Long validTime) {
-
-        Student student = super.getStudent(session);
-
-        // 学生超过30分钟无操作后，session过期会导致student为空，点击退出按钮会出现NPE，在此进行处理
-        if (student == null) {
-            return ServerResponse.createBySuccess();
-        }
-        log.info("studentId=[{}], studentName=[{}], classify=[{}]", student.getId(), student.getStudentName(), classify);
-
-        Date loginTime = SimpleDateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
-        Duration duration = packageDuration(classify, courseId, unitId, validTime, student, loginTime);
-
-        try {
-            simpleDurationMapper.insert(duration);
-        } catch (Exception e) {
-            log.error("保存时长信息出错", e);
-        }
-
-        String tip = "";
-        if (classify >= 14 && classify <= 22) {
-            int type = classify - 13;
-            tip = saveGoldAward(session, type, validTime, loginTime);
-        }
-        session.removeAttribute(TimeConstant.BEGIN_VALID_TIME);
-
-        // 辉煌荣耀勋章：今天学习效率>目标学习效率 currentPlan ++；否则不操作，每天第一次登录的时候查看昨天是否有更新辉煌荣耀勋章，如果没更新，将其 currentPlan 置为0
-        medalAwardAsync.honour(student, super.getTodayValidTime(student.getId()), super.getTodayOnlineTime(session));
-
-        // 学习总有效时长金币奖励
-        goldAwardAsync.totalValidTime(student);
-
-        // 熟词句相关勋章
-        medalAwardAsync.tryHand(student, this.getModel(classify));
-
-        return ServerResponse.createBySuccessMessage(tip);
-    }
-
-    private int getModel(Integer classify) {
-        if (classify == null) {
-            return 0;
-        }
-        if (classify == 16 || classify == 19 || classify == 20 || classify == 17 || classify == 18) {
-            return 1;
-        }
-        if (classify == 21 || classify == 22) {
-            return 3;
-        }
-        return 0;
-    }
-
-    private Duration packageDuration(Integer classify, Long courseId, Long unitId, Long validTime, Student student, Date loginTime) {
-        Duration duration = new Duration();
-        duration.setCourseId(courseId);
-        duration.setStudyModel(classify);
-        duration.setUnitId(unitId);
-        duration.setValidTime(validTime);
-        duration.setLoginTime(loginTime);
-        duration.setStudentId(student.getId());
-        duration.setOnlineTime(0L);
-        duration.setLoginOutTime(new Date());
-        return duration;
     }
 
     @Override
