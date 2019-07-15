@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -41,7 +42,8 @@ public class ControllerLogAop {
                 String url = HttpUtil.getHttpServletRequest().getRequestURI().substring(HttpUtil.getHttpServletRequest().getContextPath().length());
                 Student student = (Student) object;
                 long time = System.currentTimeMillis() - startTime;
-                if (time > maxTime) {
+                // 保存好声音的接口不打印 warn 级别日志
+                if (time > maxTime && StringUtils.isNotEmpty(url) && !url.contains("/voice/")) {
                     log.warn("学生[{} -> {} -> {}] 访问接口：[{}], 用时：[{}], thread：[{}] param=[{}]",
                             student.getId(), student.getAccount(), student.getStudentName(),
                             url, time + " ms", Thread.currentThread().getName(), HttpUtil.getParams());
