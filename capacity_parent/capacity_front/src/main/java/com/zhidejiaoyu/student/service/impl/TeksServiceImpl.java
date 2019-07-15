@@ -450,6 +450,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     /**
      * 查询自定课程信息
+     *
      * @param unitId
      * @param studentId
      * @param unitInfoMap
@@ -1212,7 +1213,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         for (int i = 0; i < hearingList.size(); i++) {
             Collections.shuffle(optionList);
             List<Teks> list = new ArrayList<>();
-            list.addAll(optionList);
+            for (Teks teks : optionList) {
+                if(!teks.getSentence().equals(hearingList.get(i).getSentence())){
+                    list.add(teks);
+                }
+            }
             list.remove(hearingList.get(i));
             /*Integer ss =1; //(int) Math.ceil((Math.random() * 2));*/
             Map<String, Object> returnMap = new HashMap<>();

@@ -23,7 +23,8 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"location"};
+        String[] tableName = {"read_arder","read_blanks","read_choose","read_choose_blanks",
+        "read_content","read_course","read_judge","read_question_answering","read_type","read_wise_counsel","read_word"};
 
         /**
          * 配置：
@@ -38,7 +39,7 @@ public class MpGeneratorUtil {
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig
                 //设置代码生成路径
-                .setOutputDir("/Users/wuchenxi/Desktop/zdjy")
+                .setOutputDir("F://pojo")
                 //设置作者
                 .setAuthor("zdjy")
                 //设置二级缓存的开闭
