@@ -162,11 +162,6 @@
 			</foreach>
 		</if>
 	</insert>
-    <delete id="deleteByStudentIdAndUnitId" parameterType="map">
-        delete from
-        <include refid="classify_sql"/>
-        where student_id = #{studentId} and unit_id = #{unitId}
-    </delete>
 
     <select id="countCapacity_memory" resultType="int" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview">
 		<!-- 学生id , 单元id , 1...分类表 -->

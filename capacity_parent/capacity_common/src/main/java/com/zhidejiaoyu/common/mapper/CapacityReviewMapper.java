@@ -389,13 +389,4 @@ public interface CapacityReviewMapper {
 
 	Integer selSentenceCountCapacitys(@Param("studentId") Long id,@Param("classify") Integer classify);
 
-	/**
-	 * 删除学生指定单元指定类型的慧追踪信息
-	 *
-	 * @param studentId
-	 * @param unitId
-	 * @param classify
-	 * @return
-	 */
-    int deleteByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("classify") Integer classify);
 }

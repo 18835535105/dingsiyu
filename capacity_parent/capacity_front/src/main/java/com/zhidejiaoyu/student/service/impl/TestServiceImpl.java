@@ -1231,8 +1231,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         studentMapper.updateByPrimaryKeySelective(student);
         getLevel(session);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
-        learnMapper.updLetterPair(student.getId(), wordUnitTestDTO.getUnitId()[0], commonMethod.getTestType(classify));
-        capacityReviewMapper.deleteByStudentIdAndUnitId(student.getId(), wordUnitTestDTO.getUnitId()[0], classify);
         return ServerResponse.createBySuccess(vo);
     }
 
