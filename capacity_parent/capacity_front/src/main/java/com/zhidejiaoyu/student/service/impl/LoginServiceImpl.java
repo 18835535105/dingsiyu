@@ -459,9 +459,12 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         if (valid != null && online != null) {
             if (valid >= online) {
                 logger.warn("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, student);
+                valid = online - 1;
+                result.put("efficiency", "99%");
+            } else {
+                String efficiency = LearnTimeUtil.efficiency(valid, online);
+                result.put("efficiency", efficiency);
             }
-            String efficiency = LearnTimeUtil.efficiency(valid, online);
-            result.put("efficiency", efficiency);
         } else {
             result.put("efficiency", "0%");
         }

@@ -165,9 +165,12 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         if (valid != null && online != null) {
             if (valid >= online) {
                 logger.error("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, stu);
+                valid = online - 1;
+                result.put("efficiency", "99%");
+            } else {
+                String efficiency = SimpleLearnTimeUtil.efficiency(valid, online);
+                result.put("efficiency", efficiency);
             }
-            String efficiency = SimpleLearnTimeUtil.efficiency(valid, online);
-            result.put("efficiency", efficiency);
         } else {
             result.put("efficiency", "0%");
         }
