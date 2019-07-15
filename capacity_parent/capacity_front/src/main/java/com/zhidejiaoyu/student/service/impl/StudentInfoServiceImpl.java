@@ -349,10 +349,13 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             Duration lastDuration = durationMapper.selectLastDuration(student.getId());
             if (lastDuration != null && lastDuration.getLoginOutTime() != null) {
                 long timeDifference = System.currentTimeMillis() - lastDuration.getLoginOutTime().getTime();
-                if (timeDifference / 1000 < dto.getValid()) {
+                // 最大可保存时间
+                long maxTime = timeDifference / 1000;
+                if (maxTime < dto.getValid()) {
                     log.warn("学生 [{} -{} - {}] 保存有效时长过大！classify=[{}], courseId=[{}], unitId=[{}], validTime=[{}s], 实际最大可保存为[{}s]",
-                            student.getId(), student.getAccount(), student.getStudentName(), dto.getClassify(), dto.getCourseId(), dto.getUnitId(), dto.getValid(), timeDifference / 1000);
-                    return timeDifference / 1000;
+                            student.getId(), student.getAccount(), student.getStudentName(), dto.getClassify(), dto.getCourseId(), dto.getUnitId(), dto.getValid(), maxTime);
+                    dto.setValid(maxTime);
+                    return maxTime;
                 }
             }
         } catch (Exception e) {
