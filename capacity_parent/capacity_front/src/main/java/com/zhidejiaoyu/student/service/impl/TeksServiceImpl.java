@@ -1214,7 +1214,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             Collections.shuffle(optionList);
             List<Teks> list = new ArrayList<>();
             for (Teks teks : optionList) {
-                if(!teks.getSentence().equals(hearingList.get(i).getSentence())){
+                if(!teks.getSentence().trim().equals(hearingList.get(i).getSentence().trim())){
                     list.add(teks);
                 }
             }
