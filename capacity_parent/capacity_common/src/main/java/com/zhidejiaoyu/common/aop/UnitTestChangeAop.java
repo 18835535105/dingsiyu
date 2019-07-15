@@ -53,10 +53,13 @@ public class UnitTestChangeAop {
     @Around("testPoint()")
     public Object optTest(ProceedingJoinPoint pjp) throws Throwable {
         Object proceed = pjp.proceed();
+        Student student = this.getStudent();
         try {
             this.opt(pjp);
         } catch (Exception e) {
-            log.error("[{}] @Arount 操作出错", this.getClass().getName(), e);
+            if (student != null) {
+                log.error("学生[{} - {} -{}] 操作出错", student.getId(), student.getAccount(), student.getStudentName(), e);
+            }
         }
         return proceed;
     }

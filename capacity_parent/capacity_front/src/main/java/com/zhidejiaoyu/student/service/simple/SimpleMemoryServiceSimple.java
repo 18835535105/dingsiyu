@@ -50,5 +50,4 @@ public interface SimpleMemoryServiceSimple extends SimpleBaseService<Vocabulary>
 	 */
     ServerResponse<String> clearFirst(HttpSession session, String studyModel);
 
-	ServerResponse<Object> todayTime(HttpSession session);
 }

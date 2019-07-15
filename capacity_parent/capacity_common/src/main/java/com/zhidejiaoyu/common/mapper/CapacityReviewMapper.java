@@ -15,7 +15,7 @@ import java.util.Set;
 
 /**
  * 记忆追踪mapper
- * 
+ *
  * @author qizhentao
  * @version 1.0
  */
@@ -35,17 +35,17 @@ public interface CapacityReviewMapper {
 	List<Vocabulary> selectCapacity(CapacityReview ca);
 
 	double selectMemory_strength(CapacityReview cr);
-	
+
 	/** 根据{学生id, 单词或例句, 单元id} 修改记忆强度*/
 	void updateMemory_strength(CapacityReview cr);
-	
+
 	CapacityReview ReviewCapacity_memory(CapacityReview ca);
 
 	@Select("select vocabulary_id, word, word_chinese, memory_strength from sentence_listen where student_id = #{student_id} and unit_id = #{unit_id} and push < #{dateTime} order by push asc limit 0,1")
 	CapacityReview ReviewSentence_listen(@Param("student_id") Long student_id,@Param("unit_id") String unit_id,@Param("dateTime") String dateTime);
 	@Select("select vocabulary_id, word, word_chinese, memory_strength, unit_id from sentence_listen where student_id = #{student_id} and course_id = #{course_id} and push < #{dateTime} order by push asc limit 0,1")
 	CapacityReview ReviewSentence_listenCourseId(@Param("student_id") Long student_id,@Param("course_id") String course_id,@Param("dateTime") String dateTime);
-	
+
 	void updatePush(CapacityReview cr);
 
 	void updateLearn(CapacityReview cr);
@@ -167,7 +167,7 @@ public interface CapacityReviewMapper {
 	List<Sentence> accrueCentreReviewSentence_listen(@Param("student_id") Long student_id, @Param("unit_id") String unit_id, @Param("classifyStr") String classifyStr);
 	@Select("select a.id, a.centreExample, a.centreTranslate from learn b INNER JOIN sentence a on a.id = b.example_id and b.unit_id = #{unit_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} and type=1 and b.status = 1  limit 0,20")
 	List<Sentence> ripeCentreReviewSentence_listen(@Param("student_id") Long student_id, @Param("unit_id") String unit_id, @Param("classifyStr") String classifyStr);
-	
+
 	// 4,5,6模块高中已学题
 	@Select("select a.id, a.tallExample, a.tallTranslate from learn b INNER JOIN sentence a on a.id = b.example_id and b.course_id = #{course_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} limit 0,20")
 	Sentence tallReviewSentence_listen(@Param("student_id") Long student_id,@Param("course_id") String course_id,@Param("classifyStr") String classifyStr);
@@ -175,7 +175,7 @@ public interface CapacityReviewMapper {
 	Sentence accrueTallReviewSentence_listen(Long student_id, String course_id, String classifyStr);
 	@Select("select a.id, a.tallExample, a.tallTranslate from learn b INNER JOIN sentence a on a.id = b.example_id and b.course_id = #{course_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} and b.status = 1  limit 0,20")
 	Sentence ripeTallReviewSentence_listen(Long student_id, String course_id, String classifyStr);
-	
+
 	//-- 根据单词,课程查询单元id
 	@Select("SELECT a.id FROM unit a INNER JOIN unit_vocabulary b on a.id = b.unit_id INNER JOIN vocabulary c on b.vocabulary_id = c.id and c.word = #{word} and a.course_id = #{course_id} LIMIT 0,1")
 	Long selectWordUnit_id(@Param("word") String word,@Param("course_id") Integer course_id);
@@ -191,7 +191,7 @@ public interface CapacityReviewMapper {
 	//@Select("select c.id, c.word, b.word_chinese from unit a JOIN unit_vocabulary b ON a.id = b.unit_id JOIN vocabulary c ON b.vocabulary_id = c.id AND a.course_id = #{course_id} AND c.delStatus = 1 limit 0,30")
 	@Select("select a.id, a.word, a.word_chinese as wordChinese from vocabulary a INNER join learn b on a.id = b.vocabulary_id and b.course_id = #{course_id} and b.student_id = #{student_id} AND a.delStatus = 1 limit 0,30")
 	List<Vocabulary> testeffect(@Param("course_id") String course_id,@Param("student_id") Long student_id);
-	
+
 	@Delete("delete from capacity_listen where student_id = #{student_id} and course_id = #{course_id}")
 	void delClearCourseDataOne(@Param("course_id") Integer course_id,@Param("student_id")  Long student_id);
 	@Delete("delete from capacity_memory where student_id = #{student_id} and course_id = #{course_id}")
@@ -206,7 +206,7 @@ public interface CapacityReviewMapper {
 	void delClearCourseDataSix(@Param("course_id") Integer course_id,@Param("student_id") Long student_id);
 	@Delete("delete from learn where student_id = #{student_id} and course_id = #{course_id}")
 	void delClearCourseDataSeven(Integer course_id, Long student_id);
-	
+
 	List<Vocabulary> fiveDimensionTest(@Param("course_id")String course_id, @Param("b")int b);
 
 	List<Vocabulary> fiveDimensionTestTwo(@Param("course_id")String course_id, @Param("b")int b, @Param("c")int c);
@@ -388,4 +388,5 @@ public interface CapacityReviewMapper {
     CapacityReview selectSentenceCapacitys(@Param("studentId") Long studentId,@Param("classify") Integer classify);
 
 	Integer selSentenceCountCapacitys(@Param("studentId") Long id,@Param("classify") Integer classify);
+
 }

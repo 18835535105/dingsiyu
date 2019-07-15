@@ -54,9 +54,6 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     private SimpleMedalMapper simpleMedalMapper;
 
     @Autowired
-    private SimpleDurationMapper simpleDurationMapper;
-
-    @Autowired
     private SimpleLearnMapper learnMapper;
 
     @Autowired
@@ -67,9 +64,6 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
 
     @Autowired
     private SimpleStudentExpansionMapper simpleStudentExpansionMapper;
-
-    @Autowired
-    private ExecutorService executorService;
 
     @Autowired
     private GoldAwardAsync goldAwardAsync;
@@ -295,74 +289,6 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     }
 
     @Override
-    @GoldChangeAnnotation
-    @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<String> calculateValidTime(HttpSession session, Integer classify, Long courseId, Long unitId,
-                                                     Long validTime) {
-
-        Student student = super.getStudent(session);
-
-        // 学生超过30分钟无操作后，session过期会导致student为空，点击退出按钮会出现NPE，在此进行处理
-        if (student == null) {
-            return ServerResponse.createBySuccess();
-        }
-        log.info("studentId=[{}], studentName=[{}], classify=[{}]", student.getId(), student.getStudentName(), classify);
-
-        Date loginTime = SimpleDateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
-        Duration duration = packageDuration(classify, courseId, unitId, validTime, student, loginTime);
-
-        try {
-            simpleDurationMapper.insert(duration);
-        } catch (Exception e) {
-            log.error("保存时长信息出错", e);
-        }
-
-        String tip = "";
-        if (classify >= 14 && classify <= 22) {
-            int type = classify - 13;
-            tip = saveGoldAward(session, type, validTime, loginTime);
-        }
-        session.removeAttribute(TimeConstant.BEGIN_VALID_TIME);
-
-        // 辉煌荣耀勋章：今天学习效率>目标学习效率 currentPlan ++；否则不操作，每天第一次登录的时候查看昨天是否有更新辉煌荣耀勋章，如果没更新，将其 currentPlan 置为0
-        medalAwardAsync.honour(student, super.getTodayValidTime(student.getId()), super.getTodayOnlineTime(session));
-
-        // 学习总有效时长金币奖励
-        goldAwardAsync.totalValidTime(student);
-
-        // 熟词句相关勋章
-        medalAwardAsync.tryHand(student, this.getModel(classify));
-
-        return ServerResponse.createBySuccessMessage(tip);
-    }
-
-    private int getModel(Integer classify) {
-        if (classify == null) {
-            return 0;
-        }
-        if (classify == 16 || classify == 19 || classify == 20 || classify == 17 || classify == 18) {
-            return 1;
-        }
-        if (classify == 21 || classify == 22) {
-            return 3;
-        }
-        return 0;
-    }
-
-    private Duration packageDuration(Integer classify, Long courseId, Long unitId, Long validTime, Student student, Date loginTime) {
-        Duration duration = new Duration();
-        duration.setCourseId(courseId);
-        duration.setStudyModel(classify);
-        duration.setUnitId(unitId);
-        duration.setValidTime(validTime);
-        duration.setLoginTime(loginTime);
-        duration.setStudentId(student.getId());
-        duration.setOnlineTime(0L);
-        duration.setLoginOutTime(new Date());
-        return duration;
-    }
-
-    @Override
     public ServerResponse<String> judgeOldPassword(String nowPassword, String oldPassword) {
 
         if (!Objects.equals(nowPassword, oldPassword)) {
@@ -557,132 +483,6 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
             }
         }
         return childMap;
-    }
-
-    /**
-     * 计算学生本次学习获得的金币数
-     *
-     * @param session
-     * @param classify
-     * @param second    本次学习的有效时长，从进入学习页到退出学习页的时长
-     * @param loginTime
-     * @return
-     */
-    private String saveGoldAward(HttpSession session, Integer classify, Long second, Date loginTime) {
-        Student student = super.getStudent(session);
-        String learnType = simpleCommonMethod.getTestType(classify);
-        // 金币数
-        double gold = 0;
-        // 提示语
-        if(student.getBonusExpires()!=null){
-            if(student.getBonusExpires().getTime() > System.currentTimeMillis()){
-                gold *= 1.2;
-            }
-        }
-        StringBuilder tip = new StringBuilder("本次学习获得金币：");
-        gold += saveNewLearnAward(classify, loginTime, learnType, student);
-        gold += saveValidLearnAward(loginTime, learnType, student, second, classify);
-        gold += saveKnownLearnAward(classify, loginTime, learnType, student);
-        if (gold > 0) {
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
-            simpleStudentMapper.updateByPrimaryKeySelective(student);
-            student= simpleStudentMapper.selectById(student.getId());
-
-            session.setAttribute(UserConstant.CURRENT_STUDENT, student);
-        }
-        tip.append(Math.round(gold)).append(" 个");
-        return tip.toString();
-    }
-
-    /**
-     * 本次学习熟词达到指定数量奖励金币
-     *
-     * @param classify
-     * @param loginTime
-     * @param learnType
-     * @param student
-     * @return
-     */
-    private int saveKnownLearnAward(Integer classify, Date loginTime, String learnType, Student student) {
-        int learnCount;
-        int condition = classify == 1 ? 20 : 10;
-        long stuId = student.getId();
-        StringBuilder sb = new StringBuilder();
-        int awardCount = runLogMapper.countAwardCount(stuId, SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime), simpleCommonMethod.getTestType(classify), "熟词");
-        LearnExample learnExample = new LearnExample();
-        learnExample.createCriteria().andStudentIdEqualTo(stuId).andLearnTimeGreaterThanOrEqualTo(loginTime)
-                .andStudyModelEqualTo(learnType)
-                .andStudyCountEqualTo(1).andStatusEqualTo(1);
-        learnCount = learnMapper.countByExample(learnExample);
-        if (learnCount >= condition * (awardCount + 1)) {
-            sb.append("学生").append(student.getStudentName()).append("在").append(learnType)
-                    .append("模块本次新学熟词大于等于").append(condition).append("个单词，获得#1#个金币，登录时间：").append(SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime));
-            runLog = new RunLog(stuId, 4, sb.toString(), new Date());
-            runLogMapper.insert(runLog);
-            log.info(sb.toString());
-            return 1;
-        }
-        return 0;
-    }
-
-    /**
-     * 本次登录学习有效时长达到30分钟后奖励金币
-     *
-     * @param loginTime
-     * @param learnType
-     * @param student
-     * @param second
-     * @param classify
-     * @return
-     */
-    private int saveValidLearnAward(Date loginTime, String learnType, Student student, Long second, Integer classify) {
-        int condition = 30;
-        long minute = second / 60;
-        long stuId = student.getId();
-        StringBuilder sb = new StringBuilder();
-        // 查询本次登录期间当前奖励次数
-        int count = runLogMapper.countAwardCount(stuId, SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime), simpleCommonMethod.getTestType(classify), "有效时长大于等于30分钟");
-        if (count == 0 && minute >= condition) {
-            sb.append("学生").append(student.getStudentName()).append("在").append(learnType).
-                    append("模块学习过程中有效时长大于等于30分钟，获得#5#个金币，登录时间：").append(SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime));
-            runLog = new RunLog(stuId, 4, sb.toString(), new Date());
-            runLogMapper.insert(runLog);
-            log.info(sb.toString());
-            return 5;
-        }
-        return 0;
-    }
-
-    /**
-     * 新学若干单词后奖励金币，本次登录期间只有学习指定模块单词的整数倍才奖励相应金币
-     *
-     * @param classify
-     * @param loginTime
-     * @param learnType 学习模块
-     * @param student
-     * @return 金币个数
-     */
-    private int saveNewLearnAward(Integer classify, Date loginTime, String learnType, Student student) {
-        int awardCount;
-        int learnCount;
-        int condition = classify == 1 ? 40 : 20;
-        long stuId = student.getId();
-        StringBuilder sb = new StringBuilder();
-        awardCount = runLogMapper.countAwardCount(stuId, SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime), simpleCommonMethod.getTestType(classify), "新学");
-        LearnExample learnExample = new LearnExample();
-        learnExample.createCriteria().andStudentIdEqualTo(stuId).andLearnTimeGreaterThanOrEqualTo(loginTime)
-                .andStudyModelEqualTo(learnType)
-                .andStudyCountEqualTo(1);
-        learnCount = learnMapper.countByExample(learnExample);
-        if (learnCount >= condition * (awardCount + 1)) {
-            sb.append("学生").append(student.getStudentName()).append("在").append(learnType).append("模块本次登录新学大于等于")
-                    .append(condition).append("个单词，获得#1#个金币，登录时间：").append(SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime));
-            runLog = new RunLog(stuId, 4, sb.toString(), new Date());
-            runLogMapper.insert(runLog);
-            log.info(sb.toString());
-            return 1;
-        }
-        return 0;
     }
 
     private void toAward(List<Medal> children, Student byWorship, List<Student> list, int[] complete, int[] totalPlan) {

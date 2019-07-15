@@ -68,8 +68,8 @@ public class GoldChangeAop {
 
     @After("goldPoint()")
     public void afterChange() {
+        Student student = this.getStudent();
         try {
-            Student student = this.getStudent();
             if (student != null && systemGold != null && !Objects.equals(this.systemGold, student.getSystemGold())) {
                 // 金币有变化
                 //今日全校排行榜上升10名以上
@@ -84,7 +84,9 @@ public class GoldChangeAop {
                 rankOpt.optGoldRank(student);
             }
         } catch (Exception e) {
-            log.error("[{}] @after操作错误！", this.getClass().getSimpleName(), e);
+            if (student != null) {
+                log.error("学生[{} - {} - {}] 操作错误！", student.getId(), student.getAccount(), student.getStudentName(), e);
+            }
         }
     }
 

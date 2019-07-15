@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.service.MemoryService;
 import com.zhidejiaoyu.student.service.simple.SimpleMemoryServiceSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,10 @@ import javax.validation.constraints.NotNull;
 public class SimpleMemoryController {
 
     @Autowired
-    private SimpleMemoryServiceSimple memoryService;
+    private SimpleMemoryServiceSimple simpleMemoryService;
+
+    @Autowired
+    private MemoryService memoryService;
 
     /**
      * 获取个个模块的学习题 - 精简版
@@ -45,7 +49,7 @@ public class SimpleMemoryController {
      */
     @PostMapping("/getMemoryWord")
     public Object getMemoryWord(HttpSession session, int type, Long courseId, Long unitId, boolean falg, boolean anew) {
-        return memoryService.getMemoryWord(session, type, courseId, unitId, falg, anew);
+        return simpleMemoryService.getMemoryWord(session, type, courseId, unitId, falg, anew);
     }
 
     /**
@@ -67,7 +71,7 @@ public class SimpleMemoryController {
             log.error("保存单词信息时单词id=null, studentId=[{}], learn=[{}], type=[{}]", student.getId(), learn, type);
             return ServerResponse.createBySuccess("ok");
         }
-        return memoryService.saveMemoryWord(session, learn, isKnown, plan, total, type);
+        return simpleMemoryService.saveMemoryWord(session, learn, isKnown, plan, total, type);
     }
 
     /**
@@ -79,7 +83,7 @@ public class SimpleMemoryController {
      */
     @PostMapping("/clearFirst")
     public ServerResponse<String> clearFirst(HttpSession session, String studyModel) {
-        return memoryService.clearFirst(session, studyModel);
+        return simpleMemoryService.clearFirst(session, studyModel);
     }
 
     /**

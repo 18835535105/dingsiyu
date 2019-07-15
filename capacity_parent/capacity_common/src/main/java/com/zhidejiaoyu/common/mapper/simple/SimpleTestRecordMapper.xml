@@ -529,7 +529,7 @@
 		</if>
 	</sql>
 
-    <select id="getWhetherTest" parameterType="map" resultType="String">
+    <select id="getWhetherTest" parameterType="map" resultType="long">
     	SELECT
 			id
 		FROM

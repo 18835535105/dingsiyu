@@ -187,8 +187,8 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         //查看慧记忆是否为上次学习 如果是删除
         List<CapacityMemory> capacityMemoryList = capacityMemoryMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
                 learn.getVocabularyId());
-        boolean falg = capacityMemoryList.size() > 0 && capacityMemoryList.get(0).getPush().getTime() < System.currentTimeMillis();
-        if(currentLearn == null && falg){
+        boolean flag = capacityMemoryList.size() > 0 && capacityMemoryList.get(0).getPush().getTime() < System.currentTimeMillis();
+        if(currentLearn == null && flag){
             capacityMemoryMapper.deleteByStudentIdAndUnitIdAndVocabularyId(student.getId(),learn.getUnitId(),learn.getVocabularyId());
             return  ServerResponse.createBySuccess();
         }
@@ -223,7 +223,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
             capacityMemory = saveWordLearnAndCapacity.saveCapacityMemory(learn, student, false, 1);
         }
         // 计算记忆难度
-        Integer memoryDifficult = memoryDifficultyUtil.getMemoryDifficulty(capacityMemory, 1);
+        int memoryDifficult = memoryDifficultyUtil.getMemoryDifficulty(capacityMemory, 1);
         // 更新学习记录
         currentLearn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
         currentLearn.setStudyCount(currentLearn.getStudyCount() + 1);
@@ -360,29 +360,31 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
 
     @Override
     public ServerResponse<Object> todayTime(HttpSession session) {
-        Student student = getStudent(session);
+        Student student = super.getStudent(session);
         Long id = student.getId();
 
         // 封装返回数据
         Map<String, Object> result = new HashMap<>(16);
 
         // 有效时长  !
-        Integer valid = getTodayValidTime(id);
+        Integer valid = super.getTodayValidTime(id);
         // 在线时长 !
-        Integer online = getTodayOnlineTime(session);
-        result.put("online", online);
-        result.put("valid", valid);
+        Integer online = super.getTodayOnlineTime(session);
         // 今日学习效率 !
-        if (valid != null) {
-            String efficiency = LearnTimeUtil.efficiency(valid, online);
-            if ("100%".equals(efficiency) && !valid.equals(online)) {
+        if (valid != null && online != null) {
+            if (valid > online) {
+                log.error("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, student);
+                valid = online - 1;
                 result.put("efficiency", "99%");
             } else {
+                String efficiency = LearnTimeUtil.efficiency(valid, online);
                 result.put("efficiency", efficiency);
             }
         } else {
             result.put("efficiency", "0%");
         }
+        result.put("online", online);
+        result.put("valid", valid);
         // todo:跟踪日志
         if (valid == null) {
             log.error("今日有效时长 valid = null;");

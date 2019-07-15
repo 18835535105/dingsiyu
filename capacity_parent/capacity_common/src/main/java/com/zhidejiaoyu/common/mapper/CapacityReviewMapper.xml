@@ -188,29 +188,29 @@
   	</resultMap>
 	<!-- 根据模块,学生id,单元: 查询记忆追踪 词汇 需要复习的单词 -->
     <select id="selectCapacity" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview" resultMap="Vocabulary_map">
-		select vocabulary_id, word, word_chinese from  
+		select vocabulary_id, word, word_chinese from
 		<include refid="classify_sql" />
 		where push &lt; #{push} and student_id = #{student_id} and unit_id = #{unit_id} order by push asc
 	</select>
 
     <select id="selectMemory_strength" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview" resultType="Double">
-		select memory_strength from 
+		select memory_strength from
 		<include refid="classify_sql" />
 		where student_id = #{student_id} and word = #{word}
 			<if test="unit_id != null and unit_id!='' ">
-				and unit_id = #{unit_id}  
+				and unit_id = #{unit_id}
 			</if>
 	</select>
 
     <update id="updateMemory_strength" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview">
 		update <include refid="classify_sql" />
-		 set memory_strength = #{memory_strength} 
+		 set memory_strength = #{memory_strength}
 		 where student_id = #{student_id} and word = #{word}
 			<if test="unit_id != null and unit_id !='' ">
-				and unit_id = #{unit_id}  
+				and unit_id = #{unit_id}
 			</if>
 	</update>
-	
+
 	<!-- 智能复习单词,翻译 -->
     <select id="ReviewCapacity_memory" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview"
             resultType="com.zhidejiaoyu.common.pojo.CapacityReview">
@@ -229,93 +229,93 @@
 	and a.memory_strength &lt; 1
 	order by a.push asc limit 0,1
 </select>
-	
+
 	<!-- 修改黄金记忆时间 -->
     <update id="updatePush" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview">
-		update 
+		update
 		<include refid="classify_sql" />
-		set 
-			push = #{push} 
-		where 
-			student_id = #{student_id} and word = #{word} 
+		set
+			push = #{push}
+		where
+			student_id = #{student_id} and word = #{word}
 			<if test="unit_id != null and unit_id !='' ">
-				and unit_id = #{unit_id} 
-			</if> 
+				and unit_id = #{unit_id}
+			</if>
 	</update>
-	
+
 	<!-- 修改学习信息表 -->
     <update id="updateLearn" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview">
-		update learn 
-			set study_count = study_count + 1  
-		where 
+		update learn
+			set study_count = study_count + 1
+		where
 			student_id = #{student_id}
-			
+
 			<if test="unit_id != null and unit_id !='' ">
-				and unit_id = #{unit_id} 
-			</if> 
-			
+				and unit_id = #{unit_id}
+			</if>
+
 			<if test="classify == 1 or classify == 2 or classify == 3">
 				and vocabulary_id = #{vocabulary_id}
 			</if>
 			<if test="classify == 4 or classify == 5 or classify == 6">
 				and example_id = #{vocabulary_id}
 			</if>
-			
+
 			<if test="classify == 1">
-				and study_model = '慧记忆' 
+				and study_model = '慧记忆'
 			</if>
 			<if test="classify == 2">
-				and study_model = '慧听写' 
+				and study_model = '慧听写'
 			</if>
 			<if test="classify == 3">
-				and study_model = '慧默写' 
+				and study_model = '慧默写'
 			</if>
 			<if test="classify == 4">
-				and study_model = '例句听力' 
+				and study_model = '例句听力'
 			</if>
 			<if test="classify == 5">
-				and study_model = '例句翻译' 
+				and study_model = '例句翻译'
 			</if>
 			<if test="classify == 6">
-				and study_model = '例句默写' 
+				and study_model = '例句默写'
 			</if>
 	</update>
-	
+
 	<!-- 成为熟词 -->
     <update id="updateLearnStudy_count" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview">
-		update learn 
-			set study_count = study_count + 1 , status = 1 
-		where 
+		update learn
+			set study_count = study_count + 1 , status = 1
+		where
 			student_id = #{student_id}
-			
+
 			<if test="unit_id != null and unit_id !='' ">
-				and unit_id = #{unit_id} 
-			</if> 
-			
+				and unit_id = #{unit_id}
+			</if>
+
 			<if test="classify == 1 or classify == 2 or classify == 3">
 				and vocabulary_id = #{vocabulary_id}
 			</if>
 			<if test="classify == 4 or classify == 5 or classify == 6">
 				and example_id = #{vocabulary_id}
 			</if>
-			
+
 			<if test="classify == 1">
-				and study_model = '慧记忆' 
+				and study_model = '慧记忆'
 			</if>
 			<if test="classify == 2">
-				and study_model = '慧听写' 
+				and study_model = '慧听写'
 			</if>
 			<if test="classify == 3">
-				and study_model = '慧默写' 
+				and study_model = '慧默写'
 			</if>
 			<if test="classify == 4">
-				and study_model = '例句听力' 
+				and study_model = '例句听力'
 			</if>
 			<if test="classify == 5">
-				and study_model = '例句翻译' 
+				and study_model = '例句翻译'
 			</if>
 			<if test="classify == 6">
-				and study_model = '例句默写' 
+				and study_model = '例句默写'
 			</if>
 	</update>
 	<update id="updatePushAndMemoryStrengthByPrimaryKeys" parameterType="map">

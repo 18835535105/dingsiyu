@@ -5,32 +5,31 @@ import com.zhidejiaoyu.common.Vo.simple.SimpleCapacityVo;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.mapper.TestRecordMapper;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleLearnTimeUtil;
 import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
 import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.common.SaveLearnAndCapacity;
 import com.zhidejiaoyu.student.service.simple.SimpleMemoryServiceSimple;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
-
+@Slf4j
 @Service
 public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleVocabularyMapper, Vocabulary> implements SimpleMemoryServiceSimple {
-
-    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * 默写模块答错3次, 黄金记忆点时间延长一个小时
@@ -76,6 +75,9 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
     @Autowired
     private MedalAwardAsync medalAwardAsync;
 
+    @Autowired
+    private TestRecordMapper testRecordMapper;
+
     /**
      * 9大学习页面
      * 1 2 3 4 6 8 9模块需要测试-
@@ -86,7 +88,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
         Long studentId = student.getId();
 
         // 是否需要课程前测,课后测试,单元前测,单元闯关
-        String testId = null;
+        Long testId = null;
 
         // 判断当前模块是否需要走测试逻辑
         boolean testModel = testModel(type);
@@ -139,14 +141,15 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
         // 查询学生当前单元当前模块下已学习单词的个数
         Long plan = learnMapper.getSimpleLearnByStudentIdByModel(studentId, unitId, type);
 
-        // 判断是否需要单元闯关测试或学后测试
+        // 判断是否需要单元闯关测试
         if (plan >= wordCount && testModel) {
             testId = simpleTestRecordMapper.getWhetherTest(studentId, courseId, unitId, type, "单元闯关测试");
             // 强制学生进行单元闯关测试
-            if (testId == null) {
-                // 弹框强制测试
-                return super.toUnitTest(301, "单元闯关测试");
+            if (testId != null) {
+               testRecordMapper.deleteById(testId);
             }
+            // 弹框强制测试
+            return super.toUnitTest(301, "单元闯关测试");
         }
 
         // 1.查询有没有需要复习的数据
@@ -164,15 +167,6 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
             // 获取单元新单词
             simpleCapacityVo = vocabularyMapper.showWordSimple(unitId, studentId, type);
 
-            if (simpleCapacityVo == null && testModel) {
-                testId = simpleTestRecordMapper.getWhetherTest(studentId, courseId, unitId, type, "单元闯关测试");
-                // 强制学生进行单元闯关测试
-                if (testId == null) {
-                    // 弹框强制测试
-                    return super.toUnitTest(301, "单元闯关测试");
-                }
-            }
-
             // 词汇考点或者语法辨析当前课程如果学习完毕进行提示
             if (simpleCapacityVo == null && !testModel) {
                 // 清除数据
@@ -180,6 +174,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
                 return ServerResponse.createBySuccess(302, "当前选择课程已学习完毕，可以重新学习，温故知新哦。");
             }
 
+            // todo: 2019-08-10 可删除该日志
             if (simpleCapacityVo == null) {
                 log.error("排查 NPE 问题，查询新单词为空！plan=[{}], wordCount=[{}], testId=[{}]", plan, wordCount, testId);
             }
@@ -324,38 +319,6 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         simpleCommonMethod.clearFirst(student.getId(), studyModel);
         return ServerResponse.createBySuccess();
-    }
-
-    @Override
-    public ServerResponse<Object> todayTime(HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        Long id = student.getId();
-
-        // 封装返回数据
-        Map<String, Object> result = new HashMap<>(16);
-
-        // 有效时长  !
-        Integer valid = super.getTodayValidTime(id);
-        // 在线时长 !
-        Integer online = super.getTodayOnlineTime(session);
-        result.put("online", online);
-        result.put("valid", valid);
-        // 今日学习效率 !
-        if (valid != null && online != null) {
-            String efficiency = SimpleLearnTimeUtil.efficiency(valid, online);
-            if ("100%".equals(efficiency) && !valid.equals(online)) {
-                result.put("efficiency", "99%");
-            } else {
-                result.put("efficiency", efficiency);
-            }
-        } else {
-            result.put("efficiency", "0%");
-        }
-        // todo:跟踪日志
-        if (valid == null) {
-            log.error("今日有效时长 valid = null;");
-        }
-        return ServerResponse.createBySuccess(result);
     }
 
 

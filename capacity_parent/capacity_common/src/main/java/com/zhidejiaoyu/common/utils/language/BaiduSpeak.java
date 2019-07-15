@@ -1,14 +1,16 @@
 package com.zhidejiaoyu.common.utils.language;
 
-import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.baomidou.mybatisplus.toolkit.StringUtils;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
+import com.zhidejiaoyu.common.utils.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,14 +57,14 @@ public class BaiduSpeak {
     public String getLanguagePath(String text) {
         Vocabulary vocabulary = vocabularyMapper.selectByWord(text);
         if (vocabulary != null && StringUtils.isNotEmpty(vocabulary.getReadUrl())) {
-            return GetOssFile.getPublicObjectUrl(vocabulary.getReadUrl());
-        } else {
-            if (wordMap.containsKey(text)) {
-                return youdao + text + "&type=1";
-            } else {
-                return youdao + text;
+            HttpSession session = HttpUtil.getHttpSession();
+            Object attribute = session.getAttribute(GetOssFile.DESKTOP);
+            if (attribute != null && !"".equals(attribute)) {
+                return "static/" + vocabulary.getReadUrl();
             }
+            return GetOssFile.getPublicObjectUrl(vocabulary.getReadUrl());
         }
+        return youdao + text;
     }
 
     public String getSentencePath(String centreExample) {

@@ -502,4 +502,10 @@
         select count(id)
         from duration where student_id = #{studentId} and login_out_time like concat(#{loginOutTime}, '%')
     </select>
+    <select id="selectLastDuration" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from duration where student_id = #{studentId} and to_days(login_time) = to_days(now()) and online_time = 0
+        order by id desc limit 1
+    </select>
 </mapper>
