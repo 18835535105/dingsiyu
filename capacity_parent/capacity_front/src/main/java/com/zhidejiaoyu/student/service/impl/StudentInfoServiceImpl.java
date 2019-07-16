@@ -313,6 +313,10 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
         // 判断有效时长是否大于上个模块退出至当前模块退出时间差, 如果大于，置为最大时间差；否则正常保存
         long validTime = checkTimeDifference(student, dto);
+        if (validTime == 0) {
+            // 如果 validTime == 0，说明该条记录与上次保存的记录是重复的，不再保存
+            return ServerResponse.createBySuccessMessage("本次学习获得金币：0 个");
+        }
 
         Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
 
