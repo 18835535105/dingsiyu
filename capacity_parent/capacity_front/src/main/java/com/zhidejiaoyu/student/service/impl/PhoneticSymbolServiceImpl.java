@@ -56,13 +56,13 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("id", 0);
             returnMap.put("unitName", "暂无课程");
-            returnMap.put("isOpen",true);
+            returnMap.put("isOpen", true);
             list.add(returnMap);
             map.put("list", list);
             return ServerResponse.createBySuccess(map);
         }
         //获取当前学习的课程
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(),5);
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 5);
         if (capacityStudentUnit != null) {
             Long unitId = capacityStudentUnit.getUnitId();
             if (unitId != null) {
@@ -88,11 +88,11 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                 Integer point = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), letterUnit.getId().longValue(), 11);
                 if (isTrue) {
                     returnMap.put("isOpen", true);
-                    if(point!=null){
-                        if (point <60) {
+                    if (point != null) {
+                        if (point < 60) {
                             isTrue = false;
                         }
-                    }else{
+                    } else {
                         isTrue = false;
                     }
 
@@ -126,7 +126,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         }
         List<String> symbolsList = phoneticSymbolMapper.selSymbolByUnitId(unitId);
         List<Map<String, Object>> returnList = new ArrayList<>();
-        int isD=0;
+        int isD = 0;
         for (String symbol : symbolsList) {
             Map<String, Object> map = new HashMap<>();
             List<Map<String, Object>> list = new ArrayList<>();
@@ -138,9 +138,9 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                 if (phonetic.getPhoneticSymbol().equals(symbol)) {
                     if (map.get("method") == null || map.get("method") == "") {
                         String[] split = phonetic.getPronunciationMethod().split("；");
-                        String[] returnSplit=new String[split.length];
-                        for(int i=0;i<split.length;i++){
-                            returnSplit[i]=split[i].trim();
+                        String[] returnSplit = new String[split.length];
+                        for (int i = 0; i < split.length; i++) {
+                            returnSplit[i] = split[i].trim();
                         }
                         map.put("method", returnSplit);
                     }
@@ -186,7 +186,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
                     list.add(symbolMap);
 
                 }
-                if (isD == 0&&phonetic.getStatus()==2) {
+                if (isD == 0 && phonetic.getStatus() == 2) {
                     Map<String, Object> sMap = new HashMap<>();
                     sMap.put("title", ".");
                     returnList.add(sMap);
@@ -233,7 +233,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         // 获取当前单元还未学习的音标
         PhoneticSymbol phoneticSymbol = this.getUnLearnedPhoneticSymbol(unitId, studentId);
         if (phoneticSymbol == null) {
-             return ServerResponse.createBySuccess(600, "当前单元已学习完！");
+            return ServerResponse.createBySuccess(600, "当前单元已学习完！");
         }
 
         PhoneticSymbolListenVo vo = new PhoneticSymbolListenVo();
@@ -328,11 +328,15 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
      */
     @Override
     public ServerResponse getAllSymbolListen() {
-        List<Map<String,Object>> symbols = phoneticSymbolMapper.selAllSymbol();
-        Map<String,Object> map=new HashMap<>();
+        List<Map<String, Object>> symbols = phoneticSymbolMapper.selSymbolAll();
+        Map<String, Object> map = new HashMap<>();
         if (symbols != null && symbols.size() > 0) {
-            for(Map<String,Object> symbol:symbols){
-                map.put(symbol.get("symbol").toString().replace(" ",""),GetOssFile.getPublicObjectUrl(String.valueOf(symbol.get("url"))));
+            for (Map<String, Object> symbol : symbols) {
+                String persymbol = symbol.get("symbol").toString().replace(" ", "");
+                if ("/dz/".equals(persymbol)) {
+                    map.put("dz/", GetOssFile.getPublicObjectUrl(String.valueOf(symbol.get("url"))));
+                }
+                map.put(persymbol, GetOssFile.getPublicObjectUrl(String.valueOf(symbol.get("url"))));
             }
         }
         return ServerResponse.createBySuccess(map);
@@ -490,12 +494,12 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
             List<Topic> topics = phoneticSymbols.stream()
                     .filter(phoneticSymbol1 -> Objects.equals(phoneticSymbol1.getPhoneticSymbol(), phoneticSymbol.getPhoneticSymbol()))
                     .map(result -> {
-                Topic topic = new Topic();
-                topic.setAnswer(true);
-                topic.setWord(result.getLetter());
-                map.put(result.getLetter(), result.getLetter());
-                return topic;
-            }).collect(Collectors.toList());
+                        Topic topic = new Topic();
+                        topic.setAnswer(true);
+                        topic.setWord(result.getLetter());
+                        map.put(result.getLetter(), result.getLetter());
+                        return topic;
+                    }).collect(Collectors.toList());
 
             // 添加两个错误答案
             topics.addAll(phoneticSymbols.stream().filter(phoneticSymbol1 -> !Objects.equals(phoneticSymbol1.getPhoneticSymbol(), phoneticSymbol.getPhoneticSymbol())

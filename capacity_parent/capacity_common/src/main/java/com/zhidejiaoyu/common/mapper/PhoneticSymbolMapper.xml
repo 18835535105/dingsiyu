@@ -74,4 +74,7 @@
         select DISTINCT(symbol.phonetic_symbol) symbol,url url from phonetic_symbol symbol
     </select>
 
+    <select id="selSymbolAll" resultType="map">
+        select  symbol.phonetic_symbol symbol,url url from phonetic_symbol symbol GROUP BY BINARY symbol.phonetic_symbol
+    </select>
 </mapper>

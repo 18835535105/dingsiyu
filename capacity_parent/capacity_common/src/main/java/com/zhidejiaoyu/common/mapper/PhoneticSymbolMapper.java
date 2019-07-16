@@ -65,4 +65,6 @@ public interface PhoneticSymbolMapper extends BaseMapper<PhoneticSymbol> {
     PhoneticSymbol selectUnLearnPhoneticSymbolByPhoneticSymbols(@Param("unitId") Long unitId, @Param("phoneticSymbols") List<String> phoneticSymbols);
 
     List<Map<String,Object>> selAllSymbol();
+
+    List<Map<String,Object>> selSymbolAll();
 }
