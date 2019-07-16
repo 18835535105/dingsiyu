@@ -397,11 +397,15 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         try {
             LetterPair pair = letterPairMapper.selByLetterIdAndStudent(letterPair.getLetterId(), studentId);
             if (pair != null) {
-                // 重新计算记忆强度
-                Date push = GoldMemoryTime.getGoldMemoryTime(pair.getMemoryStrength(), new Date());
-                pair.setPush(push);
-                pair.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(pair.getMemoryStrength(), falg));
-                letterPairMapper.updateById(pair);
+                if(pair.getPush()!=null){
+                    // 重新计算记忆强度
+                    Date push = GoldMemoryTime.getGoldMemoryTime(pair.getMemoryStrength(), new Date());
+                    pair.setPush(push);
+                    pair.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(pair.getMemoryStrength(), falg));
+                    letterPairMapper.updateById(pair);
+                }else{
+                    return ServerResponse.createBySuccess();
+                }
             }
             Learn learn = new Learn();
             learn.setStudentId(studentId);
