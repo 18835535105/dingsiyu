@@ -125,4 +125,12 @@ public interface AwardMapper extends BaseMapper<Award> {
      */
     @MapKey("studentId")
     Map<Long, Map<Long, Long>> countGetModelByStudents(@Param("students") List<Student> students);
+
+    /**
+     * 获取学生今日的所有日奖励信息
+     *
+     * @param student
+     * @return
+     */
+    List<Award> selectDailyAward(@Param("student") Student student);
 }

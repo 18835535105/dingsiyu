@@ -130,8 +130,27 @@ public class DailyAwardAsync extends BaseAwardAsync {
                 super.optAward(student.getId(), awardContentType, 1, award, DAILY_TYPE);
             }
             this.initDailyAward(student);
+            // 如果日奖励初始化过多，删除多余的日奖励
+            this.deleteOtherDailyAward(student);
         } catch (Exception e) {
             log.error(super.logErrorMsg(student, "保存日奖励信息出错"), e);
+        }
+    }
+
+    /**
+     * 删除多余的日奖励信息
+     *
+     * @param student
+     */
+    private void deleteOtherDailyAward(Student student) {
+        List<Award> awards = awardMapper.selectDailyAward(student);
+        if (awards != null && awards.size() > 7) {
+            try {
+                List<Award> needDeleteAward = awards.subList(7, awards.size());
+                awardMapper.deleteBatchIds(needDeleteAward.stream().map(Award::getId).collect(Collectors.toList()));
+            } catch (Exception e) {
+                log.error("删除学生[{} - {} -{}]多余日奖励信息出错!", student.getId(), student.getAccount(), student.getStudentName(), e);
+            }
         }
     }
 
