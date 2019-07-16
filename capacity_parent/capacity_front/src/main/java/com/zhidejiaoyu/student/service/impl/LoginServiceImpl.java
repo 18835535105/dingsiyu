@@ -1042,7 +1042,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 if (student.getRank() < 7) {
                     isHave = true;
                 }
-                isHave=true;
             }
         }
         map.put("isHave", isHave);
