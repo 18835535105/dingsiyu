@@ -290,4 +290,9 @@
         and get_flag = 1
         group by student_id
     </select>
+    <select id="selectDailyAward" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from award where student_id = #{student.id} and type = 1 and to_days(create_time) = to_days(now())
+    </select>
 </mapper>
