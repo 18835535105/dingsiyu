@@ -114,7 +114,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
 
         String chinese = vocabularyMapper.selectWordChineseById(id);
         List<Learn> learns = learnMapper.selectList(new EntityWrapper<Learn>().eq("student_id", student.getId())
-                .eq("course_id", courseId).eq("vocabulary_id", id));
+                .eq("course_id", courseId).eq("vocabulary_id", id).eq("type", 1));
         if (learns.isEmpty()) {
             return ServerResponse.createByErrorMessage("当前单词无学习记录");
         }
