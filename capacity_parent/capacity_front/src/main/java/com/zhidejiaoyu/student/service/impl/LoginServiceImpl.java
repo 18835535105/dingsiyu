@@ -491,12 +491,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         Student student = getStudent(session);
         Long studentId = student.getId();
 
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
-        if (capacityStudentUnit == null) {
-            logger.error("学生：[{}]-[{}] 没有初始化智能版课程！", studentId, student.getStudentName());
-            return ServerResponse.createBySuccess(ResponseCode.FORBIDDEN.getCode(), ResponseCode.FORBIDDEN.getMsg());
-        }
-
         Map<String, Object> map = new HashMap<>(16);
         map.put("sex", student.getSex());
         // 获取今日已学单词

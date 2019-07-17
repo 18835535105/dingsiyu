@@ -233,6 +233,7 @@
         </if>
         and learn_count = #{count}
         and study_model = #{studyModel}
+        and type = 1
         and
         <if
                 test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写' or studyModel == '单词图鉴'">
