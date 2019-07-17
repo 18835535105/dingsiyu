@@ -118,13 +118,19 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         if (learns.isEmpty()) {
             return ServerResponse.createByErrorMessage("当前单词无学习记录");
         }
-        Integer studyCount = learns.get(0).getStudyCount();
 
         List<SimpleCapacity> simpleCapacities = simpleSimpleCapacityMapper.selectList(new EntityWrapper<SimpleCapacity>()
                 .eq("student_id", student.getId()).eq("course_id", courseId).eq("type", type).eq("vocabulary_id", id));
         SimpleCapacity simpleCapacity = simpleCapacities.get(0);
 
-        capacityContentVo.setFaultCount(simpleCapacity.getFaultTime());
+        Integer studyCount = learns.get(0).getStudyCount();
+        Integer faultTime = simpleCapacity.getFaultTime();
+        // 如果学习次数小于错误次数，将错误次数置为学习次数
+        if (faultTime != null && studyCount != null && studyCount < faultTime) {
+            faultTime = studyCount;
+        }
+
+        capacityContentVo.setFaultCount(faultTime);
         capacityContentVo.setMemoryStrength(simpleCapacity.getMemoryStrength());
         capacityContentVo.setPush(this.getPushTime(SimpleDateUtil.parseYYYYMMDDHHMMSS(simpleCapacity.getPush())));
 

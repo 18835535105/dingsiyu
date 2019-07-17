@@ -161,8 +161,14 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
         }
 
         CapacityReview capacityReview = capacityReviewMapper.selectByCourseIdOrUnitId(student, courseId, unitId, id, studyModel);
+        int faultTime = capacityReview.getFault_time();
+        // 如果学习次数小于错误次数，将错误次数置为学习次数
+        if (studyCount < faultTime) {
+            faultTime = studyCount;
+        }
+
         CapacityContentVo capacityContentVo = new CapacityContentVo();
-        capacityContentVo.setFaultCount(capacityReview.getFault_time());
+        capacityContentVo.setFaultCount(faultTime);
         capacityContentVo.setMemoryStrength(capacityReview.getMemory_strength());
         capacityContentVo.setPush(this.getPushTime(DateUtil.parseYYYYMMDDHHMMSS(capacityReview.getPush())));
         if(studyModel.equals("例句听力")||studyModel.equals("例句翻译")||studyModel.equals("例句默写")){
