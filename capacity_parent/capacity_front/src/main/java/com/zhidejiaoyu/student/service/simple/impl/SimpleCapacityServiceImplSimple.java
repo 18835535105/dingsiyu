@@ -7,10 +7,7 @@ import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.simple.capacityVo.CapacityListVo;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
-import com.zhidejiaoyu.common.pojo.CapacityMemory;
-import com.zhidejiaoyu.common.pojo.Learn;
-import com.zhidejiaoyu.common.pojo.SimpleCapacity;
-import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
@@ -110,18 +107,27 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     public ServerResponse<CapacityContentVo> getCapacityContent(HttpSession session, Integer type, Long courseId, Long id) {
         Student student = getStudent(session);
 
-        CapacityContentVo capacityContentVo = new CapacityContentVo();
-
-        String chinese = vocabularyMapper.selectWordChineseById(id);
         List<Learn> learns = learnMapper.selectList(new EntityWrapper<Learn>().eq("student_id", student.getId())
                 .eq("course_id", courseId).eq("vocabulary_id", id).eq("type", 1));
         if (learns.isEmpty()) {
             return ServerResponse.createByErrorMessage("当前单词无学习记录");
         }
 
+        Vocabulary vocabulary = vocabularyMapper.selectById(id);
+        if (vocabulary == null) {
+            return ServerResponse.createByErrorMessage("未查询到当前单词信息！");
+        }
+
         List<SimpleCapacity> simpleCapacities = simpleSimpleCapacityMapper.selectList(new EntityWrapper<SimpleCapacity>()
                 .eq("student_id", student.getId()).eq("course_id", courseId).eq("type", type).eq("vocabulary_id", id));
-        SimpleCapacity simpleCapacity = simpleCapacities.get(0);
+        SimpleCapacity simpleCapacity;
+        if (simpleCapacities != null && simpleCapacities.size() > 0) {
+            simpleCapacity = simpleCapacities.get(0);
+        } else  {
+            simpleCapacity = new SimpleCapacity();
+            simpleCapacity.setMemoryStrength(0.12);
+            simpleCapacity.setPush(new Date());
+        }
 
         Integer studyCount = learns.get(0).getStudyCount();
         Integer faultTime = simpleCapacity.getFaultTime();
@@ -130,11 +136,12 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             faultTime = studyCount;
         }
 
+        CapacityContentVo capacityContentVo = new CapacityContentVo();
         capacityContentVo.setFaultCount(faultTime);
         capacityContentVo.setMemoryStrength(simpleCapacity.getMemoryStrength());
         capacityContentVo.setPush(this.getPushTime(SimpleDateUtil.parseYYYYMMDDHHMMSS(simpleCapacity.getPush())));
 
-        capacityContentVo.setChinese(chinese);
+        capacityContentVo.setChinese(vocabulary.getWordChinese());
         capacityContentVo.setStudyCount(studyCount);
         return ServerResponse.createBySuccess(capacityContentVo);
     }
