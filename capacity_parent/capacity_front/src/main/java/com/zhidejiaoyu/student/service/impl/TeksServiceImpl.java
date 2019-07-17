@@ -1151,9 +1151,14 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     //四选四题目挖空并储存选项和答案
     private void answersFour(Teks teks, List<Object> senOption, List<Map<String, Object>> answers, Integer index, List<String> returnAnswers) {
         String sentence = teks.getSentence();
+        Integer teksId = teks.getId();
         String[] s = sentence.split(" ");
         List<String> arrList = new ArrayList<>();
-        Integer location = changeInteger(s);
+        Integer location = 0;
+        //句子在teksId为103935时挖空位置固定为0
+        if (!teksId.equals(103935)) {
+            location=changeInteger(s);
+        }
         for (int i = 0; i < s.length; i++) {
             Map<String, Object> returnMap = new HashMap<>();
             if (i == location) {
@@ -1214,7 +1219,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             Collections.shuffle(optionList);
             List<Teks> list = new ArrayList<>();
             for (Teks teks : optionList) {
-                if(!teks.getSentence().trim().equals(hearingList.get(i).getSentence().trim())){
+                if (!teks.getSentence().trim().equals(hearingList.get(i).getSentence().trim())) {
                     list.add(teks);
                 }
             }
