@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -177,5 +178,18 @@ class BaseAwardAsync {
             return Integer.valueOf(student.getTeacherId().toString());
         }
         return schoolAdminId;
+    }
+
+    Award getByAwardContentTypeAndType(Long studentId, int type, int awardContentType) {
+        List<Award> awards = awardMapper.selectByAwardContentTypeAndType(studentId, type, awardContentType);
+        if (awards != null) {
+            if (awards.size() > 1) {
+                Award award = awards.get(0);
+                awardMapper.deleteById(award.getId());
+                return awards.get(1);
+            }
+            return awards.size() == 0 ? null : awards.get(0);
+        }
+        return null;
     }
 }
