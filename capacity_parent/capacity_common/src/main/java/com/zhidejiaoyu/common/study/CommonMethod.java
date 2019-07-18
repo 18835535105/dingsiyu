@@ -92,7 +92,9 @@ public class CommonMethod implements Serializable {
     }
 
     /**
-     * 计算记忆追踪中字体大小等级
+     * 计算记忆追踪中字体大小等级 <br>
+     * 未达到黄金记忆点时：字体最小 <br>
+     * 达到黄金记忆点：记忆轻度越小，字体越大越粗；如果记忆强度范围相同，超过黄金记忆点时间越多，字体越大越粗
      *
      * @param object
      * @return -1:数据有误，其他：字体等级
