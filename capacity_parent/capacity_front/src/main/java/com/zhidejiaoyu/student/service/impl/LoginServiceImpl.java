@@ -156,14 +156,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 封装返回数据
         Map<String, Object> result = new HashMap<>(16);
 
-        // 判断学生是否有智能版课程
-        int count = studentStudyPlanMapper.countByStudentIdAndType(studentId, 1);
-        if (count == 0) {
-            result.put("hasCapacity", false);
-        } else {
-            result.put("hasCapacity", true);
-        }
-
         // 判断学生是否需要进行游戏测试
         int gameCount = testRecordMapper.countGameCount(student);
         if (gameCount == 0) {
@@ -173,9 +165,13 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         // 获取学生当前正在学习的单元信息
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
-        if (capacityStudentUnit == null) {
-            logger.error("学生[{}]-[{}]没有智能版课程！", student.getId(), student.getStudentName());
-            return ServerResponse.createBySuccess(result);
+        if (capacityStudentUnit != null) {
+            // 封装学生当前学习的课程信息
+            this.packageUnitInfo(result, capacityStudentUnit);
+            // 1.学生当前单词模块学的那个单元
+            Integer unitId = Integer.valueOf(capacityStudentUnit.getUnitId().toString());
+            // 封装各个学习模块的学习状况信息
+            this.packageModelInfo(studentId, result, unitId);
         }
 
         // 判断学生是否已经学完教师分配的所有计划，如果已学完所有计划，开始之旅按钮将被替换并且不能被点击
@@ -183,20 +179,11 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             result.put("learnedAllPlan", true);
         }
 
-        // 封装学生当前学习的课程信息
-        this.packageUnitInfo(result, capacityStudentUnit);
-
         // 封装学生相关信息
         this.packageStudentInfo(student, result);
 
         // 封装时长信息
         this.getIndexTime(session, student, result);
-
-        // 1.学生当前单词模块学的那个单元
-        Integer unitId = Integer.valueOf(capacityStudentUnit.getUnitId().toString());
-
-        // 封装各个学习模块的学习状况信息
-        this.packageModelInfo(studentId, result, unitId);
 
         // 封装无用字段
         this.ignoreField(result);
