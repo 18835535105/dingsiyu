@@ -76,6 +76,9 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
     @Autowired
     private RankOpt rankOpt;
 
+    @Autowired
+    private DailyAwardAsync dailyAwardAsync;
+
     /**
      * 获取学生任务奖励信息
      *
@@ -379,6 +382,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
      * @param student
      */
     private List<AwardVo> getDailyAward(Student student) {
+        dailyAwardAsync.deleteOtherDailyAward(student);
         awardAsync.completeAllDailyAward(student);
         return simpleAwardMapper.selectAwardVos(student, DAILY_TYPE);
     }

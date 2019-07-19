@@ -57,7 +57,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
         Long studentId = student.getId();
         final long awardContentType = 2;
         // 查看学生今日开启单元个数
-        Award award = awardMapper.selectByAwardContentTypeAndType(studentId, DAILY_TYPE, (int) awardContentType);
+        Award award = super.getByAwardContentTypeAndType(studentId, DAILY_TYPE, (int) awardContentType);
 
         try {
             if (this.checkAward(award, DAILY_TYPE)) {
@@ -82,7 +82,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
 
         try {
             // 闯关成功10个单元
-            Award awardSuccess = awardMapper.selectByAwardContentTypeAndType(studentId, DAILY_TYPE, awardContentType1);
+            Award awardSuccess = super.getByAwardContentTypeAndType(studentId, DAILY_TYPE, awardContentType1);
             if (this.checkAward(awardSuccess, DAILY_TYPE)) {
                 int successCount = testRecordMapper.countUnitTest(studentId, 1);
                 this.optAward(studentId, awardContentType1, successCount, awardSuccess, DAILY_TYPE);
@@ -90,7 +90,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
 
             // 闯关10个单元
             final int awardContentType2 = 3;
-            Award award = awardMapper.selectByAwardContentTypeAndType(studentId, DAILY_TYPE, awardContentType2);
+            Award award = super.getByAwardContentTypeAndType(studentId, DAILY_TYPE, awardContentType2);
             if (this.checkAward(award, DAILY_TYPE)) {
                 int completeCount = testRecordMapper.countUnitTest(studentId, 2);
                 this.optAward(studentId, awardContentType2, completeCount, award, DAILY_TYPE);
@@ -106,7 +106,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
     public void todayReview(Student student) {
         Long studentId = student.getId();
         final int awardContentType = 7;
-        Award award = awardMapper.selectByAwardContentTypeAndType(studentId, DAILY_TYPE, awardContentType);
+        Award award = super.getByAwardContentTypeAndType(studentId, DAILY_TYPE, awardContentType);
         try {
             if (this.checkAward(award, DAILY_TYPE)) {
                 int count = learnMapper.countTodayRestudyAndMemoryStrengthGePercentFifty(student);
@@ -124,7 +124,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
      */
     public void firstLogin(Student student) {
         final int awardContentType = 1;
-        Award award = awardMapper.selectByAwardContentTypeAndType(student.getId(), DAILY_TYPE, awardContentType);
+        Award award = super.getByAwardContentTypeAndType(student.getId(), DAILY_TYPE, awardContentType);
         try {
             if (this.checkAward(award, DAILY_TYPE)) {
                 super.optAward(student.getId(), awardContentType, 1, award, DAILY_TYPE);
@@ -142,7 +142,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
      *
      * @param student
      */
-    private void deleteOtherDailyAward(Student student) {
+    public void deleteOtherDailyAward(Student student) {
         List<Award> awards = awardMapper.selectDailyAward(student);
         if (awards != null && awards.size() > 7) {
             try {
@@ -163,7 +163,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
         Long studentId = student.getId();
 
         final int awardContentType = 8;
-        Award award = awardMapper.selectByAwardContentTypeAndType(student.getId(), DAILY_TYPE, awardContentType);
+        Award award = super.getByAwardContentTypeAndType(student.getId(), DAILY_TYPE, awardContentType);
         try {
             if (this.checkAward(award, DAILY_TYPE)) {
                 // 查询学生昨天的学校排名
@@ -333,7 +333,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
      */
     public void completeAllDailyAward(Student student) {
         final int awardContentType = 9;
-        Award award = awardMapper.selectByAwardContentTypeAndType(student.getId(), DAILY_TYPE, awardContentType);
+        Award award = super.getByAwardContentTypeAndType(student.getId(), DAILY_TYPE, awardContentType);
         try {
             if (this.checkAward(award, DAILY_TYPE)) {
                 int count = awardMapper.countCompleteAllDailyAward(student);

@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.dto.NodeDto;
 import com.zhidejiaoyu.student.service.StudyFlowService;
 import com.zhidejiaoyu.student.utils.CcieUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -93,45 +94,32 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     /**
      * 节点学完, 把下一节初始化到student_flow表, 并把下一节点返回
      *
-     * @param studentId 学生id
-     * @param courseId 课程id
-     * @param unitId 单元id
-     * @param node 当前节点
-     * @param grade 得分
-     *
      * @return  id 节点id
      *          model_name 节点模块名
      */
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<Object> getNode(Long courseId, Long unitId, Long nodeId, Long grade, String isTrueFlow, HttpSession session) {
+    public ServerResponse<Object> getNode(NodeDto dto, String isTrueFlow, HttpSession session) {
         Student student = getStudent(session);
-        StudyFlow studyFlow = studyFlowMapper.selectById(nodeId);
+        StudyFlow studyFlow = studyFlowMapper.selectById(dto.getNodeId());
+
+        dto.setStudyFlow(studyFlow);
+        dto.setSession(session);
+        dto.setStudent(student);
 
         if (studyFlow != null) {
             // 学习下一单元, 前端需要一个弹框提示
             if (studyFlow.getNextTrueFlow() == 0) {
                 // 开启下一单元并且返回需要学习的流程信息
-                return openNextUnitAndReturn(unitId, session, student, studyFlow, grade);
+                return openNextUnitAndReturn(dto);
             } else if (Objects.equals(TO_FLOW_TWO, studyFlow.getNextTrueFlow())) {
                 // 进入流程2
-                return toAnotherFlow(student, 24);
+                return toAnotherFlow(dto, 24);
             } else if (Objects.equals(TO_FLOW_ONE, studyFlow.getNextTrueFlow())) {
                 // 进入流程1
                 // 判断当前单元流程1学习次数，如果没有学习，初始化同一单元的流程1；如果已学习初始化下一单元的流程1
-                int count = learnMapper.countByStudentIdAndFlow(student.getId(), unitId, FLOW_ONE_STR);
-                if (count == 0) {
-                    return toAnotherFlow(student, FLOW_ONE);
-                } else {
-                    String s = this.unlockNextUnit(student, unitId, session, studyFlow, grade);
-                    if (s != null) {
-                        toAnotherFlow(student, FLOW_ONE);
-                        return ServerResponse.createBySuccess(300, s);
-                    } else {
-                        return toAnotherFlow(student, FLOW_ONE);
-                    }
-                }
+                return toFlowOne(dto);
             } else if (Objects.equals(-2, studyFlow.getNextTrueFlow())) {
                 // 继续上次流程
                 StudyFlow lastStudyFlow = studyFlowMapper.selectStudentCurrentFlow(student.getId(), 1);
@@ -140,23 +128,46 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 // 其余正常流程
                 if (studyFlow.getNextFalseFlow() == null) {
                     // 直接进入下个流程节点
-                    return this.toAnotherFlow(student, studyFlow.getNextTrueFlow());
+                    return this.toAnotherFlow(dto, studyFlow.getNextTrueFlow());
                 } else {
                     // 判断下个节点
-                    return judgeNextNode(student, grade, isTrueFlow, studyFlow);
+                    return judgeNextNode(dto);
                 }
             }
         }
         return null;
     }
 
-    private ServerResponse<Object> judgeNextNode(Student student, Long grade, String isTrueFlow, StudyFlow studyFlow) {
+    /**
+     * 前往流程 1 的时候判断是当前单元的流程 1 还是下一单元的流程 1
+     *
+     * @param dto
+     * @return
+     */
+    private ServerResponse<Object> toFlowOne(NodeDto dto) {
+        int count = learnMapper.countByStudentIdAndFlow(dto.getStudent().getId(), dto.getUnitId(), FLOW_ONE_STR);
+        if (count == 0) {
+            return toAnotherFlow(dto, FLOW_ONE);
+        } else {
+            String s = this.unlockNextUnit(dto);
+            if (s != null) {
+                toAnotherFlow(dto, FLOW_ONE);
+                return ServerResponse.createBySuccess(300, s);
+            } else {
+                return toAnotherFlow(dto, FLOW_ONE);
+            }
+        }
+    }
+
+    private ServerResponse<Object> judgeNextNode(NodeDto dto) {
+        String isTrueFlow = dto.getTrueFlow();
+        StudyFlow studyFlow = dto.getStudyFlow();
         // 学生选择项，是否进行下一个节点， true：进行下一个节点；否则跳过下个节点
         if (isTrueFlow != null) {
             if (Objects.equals("true", isTrueFlow)) {
-                return toAnotherFlow(student, studyFlow.getNextTrueFlow());
+                return toAnotherFlow(dto, studyFlow.getNextTrueFlow());
             } else {
-                return toAnotherFlow(student, studyFlow.getNextFalseFlow());
+                return toAnotherFlow(dto, studyFlow.getNextFalseFlow());
             }
         }
 
@@ -165,21 +176,22 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             StudyFlow falseFlow = studyFlowMapper.selectById(studyFlow.getNextFalseFlow());
             StudyFlow trueFlow = studyFlowMapper.selectById(studyFlow.getNextTrueFlow());
             if (Objects.equals(3, falseFlow.getType())) {
-                ServerResponse<Object> x = toNextNode(student, grade, falseFlow);
+                ServerResponse<Object> x = toNextNode(dto, falseFlow);
                 if (x != null) {
                     return x;
                 }
             } else if (Objects.equals(3, trueFlow.getType())) {
-                ServerResponse<Object> x = toNextNode(student, grade, trueFlow);
+                ServerResponse<Object> x = toNextNode(dto, trueFlow);
                 if (x != null) {
                     return x;
                 }
             }
 
+            Long grade = dto.getGrade();
             if (grade >= studyFlow.getType()) {
-                return toAnotherFlow(student, studyFlow.getNextTrueFlow());
+                return toAnotherFlow(dto, studyFlow.getNextTrueFlow());
             } else if (grade < studyFlow.getType()) {
-                return toAnotherFlow(student, studyFlow.getNextFalseFlow());
+                return toAnotherFlow(dto, studyFlow.getNextFalseFlow());
             } else {
                 // 判断是否进行单词好声音
                 return ServerResponse.createBySuccess("true", studyFlow);
@@ -191,19 +203,18 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     /**
      * 注意：该方法将删除学生学习相关信息
      *
-     * @param student
-     * @param grade
      * @param flow
      * @return
      */
-    private ServerResponse<Object> toNextNode(Student student, Long grade, StudyFlow flow) {
+    private ServerResponse<Object> toNextNode(NodeDto dto, StudyFlow flow) {
+        Long grade = dto.getGrade();
         if (grade != null) {
             // 50 <= 分数 < 90分走 nextTrue 流程，分数 < 50 走 nextFalse 流程
             if (grade >= 50 && grade < 90) {
-                return toAnotherFlow(student, flow.getNextTrueFlow());
+                return toAnotherFlow(dto, flow.getNextTrueFlow());
             } else if (grade < 90) {
-                clearLearnRecord(student);
-                return toAnotherFlow(student, flow.getNextFalseFlow());
+                clearLearnRecord(dto.getStudent());
+                return toAnotherFlow(dto, flow.getNextFalseFlow());
             }
         }
         return null;
@@ -230,21 +241,21 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     /**
      * 进入其他流程
      *
-     * @param student
-     * @param flowId  其他流程初始流程id
      * @return
      */
-    private ServerResponse<Object> toAnotherFlow(Student student, int flowId) {
+    private ServerResponse<Object> toAnotherFlow(NodeDto dto, int flowId) {
+        Student student = dto.getStudent();
+
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
         studentFlowMapper.updateFlowByStudentId(student.getId(), flowId);
         StudyFlow byPrimaryKey = studyFlowMapper.selectById(flowId);
 
         if (Objects.equals(TO_FLOW_ONE, byPrimaryKey.getNextTrueFlow())) {
             log.info("[{} -{} -{}] 前往流程 1.", student.getId(), student.getAccount(), student.getStudentName());
-            return toAnotherFlow(student, FLOW_ONE);
+            return toFlowOne(dto);
         } else if (Objects.equals(TO_FLOW_TWO, byPrimaryKey.getNextTrueFlow())) {
             log.info("[{} -{} -{}] 前往流程 2.", student.getId(), student.getAccount(), student.getStudentName());
-            return toAnotherFlow(student, FLOW_TWO);
+            return toAnotherFlow(dto, FLOW_TWO);
         }
 
         if (capacityStudentUnit != null) {
@@ -261,46 +272,43 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     /**
      * 开启下一单元并且返回需要学习的流程信息
      *
-     * @param unitId
-     * @param session
-     * @param student
-     * @param studyFlow
-     * @param grade
      * @return
      */
-    private ServerResponse<Object> openNextUnitAndReturn(Long unitId, HttpSession session, Student student,
-                                                         StudyFlow studyFlow, Long grade) {
+    private ServerResponse<Object> openNextUnitAndReturn(NodeDto dto) {
+        String flowName = dto.getStudyFlow().getFlowName();
+
         // 开启下一单元
-        String s = unlockNextUnit(student, unitId, session, studyFlow, grade);
+        String s = unlockNextUnit(dto);
         // 获取流程信息
         if (s != null) {
-            if (FLOW_ONE_STR.equals(studyFlow.getFlowName())) {
-                this.toAnotherFlow(student, 11);
+            if (FLOW_ONE_STR.equals(flowName)) {
+                this.toAnotherFlow(dto, 11);
             } else {
-                this.toAnotherFlow(student, 24);
+                this.toAnotherFlow(dto, 24);
             }
             // 分配单元已学习完
             return ServerResponse.createBySuccess(300, s);
         }
 
-        if (FLOW_ONE_STR.equals(studyFlow.getFlowName())) {
-            return this.toAnotherFlow(student, 11);
+        if (FLOW_ONE_STR.equals(flowName)) {
+            return this.toAnotherFlow(dto, 11);
         } else {
-            return this.toAnotherFlow(student, 24);
+            return this.toAnotherFlow(dto, 24);
         }
     }
 
     /**
      * 当前流程学习完毕后开启下一单元
      *
-     * @param unitId   单元id（当前单元闯关测试的单元id）
-     * @param studyFlow
-     * @param grade
      * @return
      */
-    private String unlockNextUnit(Student student, Long unitId, HttpSession session, StudyFlow studyFlow, Long grade) {
+    private String unlockNextUnit(NodeDto dto) {
+        Student student = dto.getStudent();
         Long studentId = student.getId();
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+        Long grade = dto.getGrade();
+
+
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
         // 清除学生当前已分配的单元学习记录
         Long startUnit = capacityStudentUnit.getStartunit();
         Long endUnit = capacityStudentUnit.getEndunit();
@@ -316,10 +324,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
             // 初始化当前流程的初始单元
             // 获取流程信息
-            if ("流程1".equals(studyFlow.getFlowName())) {
-                this.toAnotherFlow(student, FLOW_ONE);
+            if ("流程1".equals(dto.getStudyFlow().getFlowName())) {
+                this.toAnotherFlow(dto, FLOW_ONE);
             } else {
-                this.toAnotherFlow(student, FLOW_TWO);
+                this.toAnotherFlow(dto, FLOW_TWO);
             }
 
             // 判断学生是否能获取课程证书,每个课程智能获取一个课程证书
@@ -376,11 +384,11 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             studentStudyPlanMapper.updateById(studentStudyPlan);
 
             updateCapacityStudentUnit(capacityStudentUnit, nextUnitId, null);
-            saveOpenUnitLog(student, unitId, nextUnitId);
+            saveOpenUnitLog(student, dto.getUnitId(), nextUnitId);
 
             // 更新学生session
             Student student1 = studentMapper.selectByPrimaryKey(student.getId());
-            session.setAttribute(UserConstant.CURRENT_STUDENT, student1);
+            dto.getSession().setAttribute(UserConstant.CURRENT_STUDENT, student1);
         }
         return null;
     }

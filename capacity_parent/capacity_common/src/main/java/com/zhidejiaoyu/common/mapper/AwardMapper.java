@@ -34,7 +34,7 @@ public interface AwardMapper extends BaseMapper<Award> {
      * @param awardContentType 奖励内容类型,详细类别在award_content_type表中
      * @return
      */
-    Award selectByAwardContentTypeAndType(@Param("studentId") Long studentId, @Param("type") int type, @Param("awardContentType") int awardContentType);
+    List<Award> selectByAwardContentTypeAndType(@Param("studentId") Long studentId, @Param("type") int type, @Param("awardContentType") int awardContentType);
 
     /**
      * 查询当前学生指定的奖励信息

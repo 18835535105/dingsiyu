@@ -38,7 +38,7 @@ public class GoldAwardAsync extends BaseAwardAsync{
     public void dailyAward(Student student, Integer awardContentType) {
         Long studentId = student.getId();
         // 查看奖励
-        Award award = awardMapper.selectByAwardContentTypeAndType(studentId, GOLD_TYPE, awardContentType);
+        Award award = super.getByAwardContentTypeAndType(studentId, GOLD_TYPE, awardContentType);
 
         try {
             if (this.checkAward(award, GOLD_TYPE)) {
@@ -60,7 +60,7 @@ public class GoldAwardAsync extends BaseAwardAsync{
         int length = awardContentType.length;
 
         // 如果最后一个奖励条件已达成，说明其之前奖励都已能领取，不再进行其他计算
-        Award award = awardMapper.selectByAwardContentTypeAndType(studentId, GOLD_TYPE, awardContentType[length - 1]);
+        Award award = super.getByAwardContentTypeAndType(studentId, GOLD_TYPE, awardContentType[length - 1]);
         try {
             if (super.checkAward(award, GOLD_TYPE)) {
                 // 总有效时长
@@ -72,7 +72,7 @@ public class GoldAwardAsync extends BaseAwardAsync{
                 }
 
                 for (int i1 : awardContentType) {
-                    award = awardMapper.selectByAwardContentTypeAndType(studentId, GOLD_TYPE, i1);
+                    award = super.getByAwardContentTypeAndType(studentId, GOLD_TYPE, i1);
                     if (this.checkAward(award, GOLD_TYPE)) {
                         super.optAward(studentId, i1, Integer.parseInt(totalValidTime.toString()), award, GOLD_TYPE);
                     }
@@ -94,14 +94,14 @@ public class GoldAwardAsync extends BaseAwardAsync{
         int length = awardContentType.length;
 
         // 如果最后一个奖励条件已达成，说明其之前奖励都已能领取，不再进行其他计算
-        Award award = awardMapper.selectByAwardContentTypeAndType(studentId, GOLD_TYPE, awardContentType[length - 1]);
+        Award award = super.getByAwardContentTypeAndType(studentId, GOLD_TYPE, awardContentType[length - 1]);
         try {
             if (super.checkAward(award, GOLD_TYPE)) {
                 // 查看学生所有课程下单元闯关成功个数
                 int count = testRecordMapper.countUnitTestSuccessByStudentId(student.getId());
 
                 for (int i1 : awardContentType) {
-                    award = awardMapper.selectByAwardContentTypeAndType(studentId, GOLD_TYPE, i1);
+                    award = super.getByAwardContentTypeAndType(studentId, GOLD_TYPE, i1);
                     if (this.checkAward(award, GOLD_TYPE)) {
                         super.optAward(studentId, i1, count, award, GOLD_TYPE);
                     }
