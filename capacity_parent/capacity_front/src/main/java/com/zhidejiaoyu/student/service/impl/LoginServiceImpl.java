@@ -163,6 +163,14 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             result.put("game", true);
         }
 
+        // 判断学生是否有智能版课程
+        int count = studentStudyPlanMapper.countByStudentIdAndType(studentId, 1);
+        if (count == 0) {
+            result.put("hasCapacity", false);
+        } else {
+            result.put("hasCapacity", true);
+        }
+
         // 获取学生当前正在学习的单元信息
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
         if (capacityStudentUnit != null) {
