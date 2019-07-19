@@ -217,6 +217,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 map.put("chinese", teks1.getParaphrase());
                 map.put("pronunciation", baiduSpeak.getSentencePath(teks1.getSentence().replace("#", " ").replace("$", "")));
                 map.put("id", teks1.getId());
+                List<String> vocabularyArray=new ArrayList<>();
                 String[] sentenceList = teks1.getSentence().trim().split(" ");
                 List blankSentenceArray = new ArrayList();
                 List sentence = new ArrayList();
@@ -228,24 +229,29 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                         if (sentenceList[i].endsWith("...")) {
                             blankSentenceArray.add(sentenceList[i].substring(sentenceList[i].length() - 3).replace("#", " ").replace("$", ""));
                             sentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#", " ").replace("$", ""));
+                            vocabularyArray.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#", " ").replace("$", ""));
                             sentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
                         } else {
                             blankSentenceArray.add(sentenceList[i].substring(sentenceList[i].length() - 1).replace("#", " ").replace("$", ""));
                             sentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#", " ").replace("$", ""));
+                            vocabularyArray.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#", " ").replace("$", ""));
                             sentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
                         }
 
                     } else {
                         blankSentenceArray.add(null);
                         sentence.add(sentenceList[i].replace("#", " ").replace("$", ""));
+                        vocabularyArray.add(sentenceList[i].replace("#", " ").replace("$", ""));
                     }
-                    //返回的填空单词 以及句子填空位置
+                    /*//返回的填空单词 以及句子填空位置
                     if (teks1.getSentence().indexOf("...") != -1) {
                         String substring = teks1.getSentence().replace("...", "");
                         map.put("vocabularyArray", getOrderEnglishList(substring, null));
                     } else {
                         map.put("vocabularyArray", getOrderEnglishList(teks1.getSentence(), null));
-                    }
+                    }*/
+                    Collections.shuffle(vocabularyArray);
+                    map.put("vocabularyArray",vocabularyArray);
                     map.put("blankSentenceArray", blankSentenceArray);
                     map.put("sentence", sentence);
                 }
