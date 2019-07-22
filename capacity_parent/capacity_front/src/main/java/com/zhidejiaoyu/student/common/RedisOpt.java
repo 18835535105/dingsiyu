@@ -376,4 +376,19 @@ public class RedisOpt {
         redisTemplate.expire(RedisKeysConst.FIRST_LOGIN, 7, TimeUnit.DAYS);
         return flag ;
     }
+
+    /**
+     * 将当前 sessionId 标记为异地登录被挤掉的 sessionId，在 session 失效时不保存该 session 的时长信息
+     *
+     * @param oldSessionId
+     */
+    public void markMultipleLoginSessionId(String oldSessionId) {
+        try {
+            String key = RedisKeysConst.MULTIPLE_LOGIN_SESSION_ID + oldSessionId;
+            redisTemplate.opsForValue().set(key, oldSessionId);
+            redisTemplate.expire(key, 40, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            log.error("标记 oldSessionId 出错！oldSessionId=[{}]", oldSessionId, e);
+        }
+    }
 }
