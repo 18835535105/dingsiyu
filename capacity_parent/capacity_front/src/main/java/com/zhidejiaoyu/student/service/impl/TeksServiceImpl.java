@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -63,7 +64,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     /**
      * 标点数组
      */
-    private final String[] POINT = {".", ",", "?", "!", "，", "。", "？", "！", "、", "：", "“", "”", "《", "》"};
+    private final String[] POINT = {".", ",", "?", "!", "，", "。", "？", "！", "、", "：", "“", "”", "《", "》", "\"", "-", "..."};
 
     private static final List<String> NAMELIST = new ArrayList<String>() {{
         add("Zhang");
@@ -112,6 +113,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Autowired
     private TeksUnitMapper teksUnitMapper;
+
 
     @Override
     public ServerResponse<List<Teks>> selTeksByUnitId(Integer unitId) {
@@ -217,44 +219,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 map.put("chinese", teks1.getParaphrase());
                 map.put("pronunciation", baiduSpeak.getSentencePath(teks1.getSentence().replace("#", " ").replace("$", "")));
                 map.put("id", teks1.getId());
-                List<String> vocabularyArray=new ArrayList<>();
                 String[] sentenceList = teks1.getSentence().trim().split(" ");
-                List blankSentenceArray = new ArrayList();
-                List sentence = new ArrayList();
-                //获取填空位置
-                for (int i = 0; i < sentenceList.length; i++) {
-                    sentenceList[i] = sentenceList[i].trim();
-                    if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
-                        blankSentenceArray.add(null);
-                        if (sentenceList[i].endsWith("...")) {
-                            blankSentenceArray.add(sentenceList[i].substring(sentenceList[i].length() - 3).replace("#", " ").replace("$", ""));
-                            sentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#", " ").replace("$", ""));
-                            vocabularyArray.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#", " ").replace("$", ""));
-                            sentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
-                        } else {
-                            blankSentenceArray.add(sentenceList[i].substring(sentenceList[i].length() - 1).replace("#", " ").replace("$", ""));
-                            sentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#", " ").replace("$", ""));
-                            vocabularyArray.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#", " ").replace("$", ""));
-                            sentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                        }
-
-                    } else {
-                        blankSentenceArray.add(null);
-                        sentence.add(sentenceList[i].replace("#", " ").replace("$", ""));
-                        vocabularyArray.add(sentenceList[i].replace("#", " ").replace("$", ""));
-                    }
-                    /*//返回的填空单词 以及句子填空位置
-                    if (teks1.getSentence().indexOf("...") != -1) {
-                        String substring = teks1.getSentence().replace("...", "");
-                        map.put("vocabularyArray", getOrderEnglishList(substring, null));
-                    } else {
-                        map.put("vocabularyArray", getOrderEnglishList(teks1.getSentence(), null));
-                    }*/
-                    Collections.shuffle(vocabularyArray);
-                    map.put("vocabularyArray",vocabularyArray);
-                    map.put("blankSentenceArray", blankSentenceArray);
-                    map.put("sentence", sentence);
-                }
+                getList(sentenceList, map);
                 resultList.add(map);
                 resultMap.put("list", resultList);
                 resultMap.put("number", teks.size());
@@ -273,6 +239,68 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             return ServerResponse.createBySuccess(resultMap);
         }
         return ServerResponse.createByError();
+    }
+
+
+    private void getList(String[] split, Map<String, Object> map) {
+        // 正确顺序
+        List<String> rightList = new ArrayList<>();
+        // 存储标点
+        List<String> pointList = new ArrayList<>();
+        // 乱序
+        List<String> orderList = new ArrayList<>();
+
+        // 以字母或数字结尾
+        final String END_MATCH = ".*[a-zA-Z0-9$]$";
+        // 以字母或数据开头
+        final String START_MATCH = "^[a-zA-Z0-9$].*";
+
+        StringBuilder sb = new StringBuilder();
+        for (String s : split) {
+            s = s.replace("#", " ").replace("$", "");
+            if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
+                rightList.add(s);
+                pointList.add(null);
+                orderList.add(s);
+            } else {
+                char[] chars = s.toCharArray();
+                sb.setLength(0);
+                int length = chars.length;
+                for (int i = 0; i < length; i++) {
+                    char aChar = chars[i];
+                    // 当前下标的数据
+                    String s1 = new String(new char[]{aChar});
+                    // 是字母或者数字，拼接字符串
+                    if (Pattern.matches(END_MATCH, s1)) {
+                        sb.append(s1);
+                    } else {
+                        if (sb.length() > 0) {
+                            rightList.add(sb.toString());
+                            orderList.add(sb.toString());
+                            sb.setLength(0);
+                        }
+                        // 如果符号前面是字母需要在符号列表中加 null
+                        if (i > 0 && Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
+                            pointList.add(null);
+                        }
+                        rightList.add(s1);
+                        pointList.add(s1);
+                    }
+
+                    // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
+                    if (sb.length() > 0 && i == length - 1) {
+                        rightList.add(sb.toString());
+                        orderList.add(sb.toString());
+                        pointList.add(null);
+                        sb.setLength(0);
+                    }
+                }
+            }
+        }
+        Collections.shuffle(orderList);
+        map.put("sentence", rightList);
+        map.put("vocabularyArray", orderList);
+        map.put("blankSentenceArray", pointList);
     }
 
     @Override
@@ -296,6 +324,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             List<Long> courseIds = new ArrayList<>(courses.size());
             courses.forEach(map -> courseIds.add((Long) map.get("id")));
             Map<String, Object> learnUnit = learnMapper.selTeksLaterCourse(student.getId());
+
             for (Map<String, Object> courseMap : courses) {
                 courseUnitVo = new CourseUnitVo();
                 resultMap = new ArrayList<>();
@@ -341,6 +370,19 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                         studyMap.put("version", teksCourse.getVersion());
                         studyMap.put("grade", teksCourse.getGrade() + "-" + teksCourse.getLabel());
                         studyMap.put("courseId", teksCourse.getId());
+                    }else{
+                        List<StudentStudyPlan> allPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, (Long) courses.get(0).get("id"), 3);
+                        if (allPlans.size() != 0) {
+                            studyMap = new HashMap<>();
+                            studyMap.put("unitId", allPlans.get(0).getStartUnitId());
+                            TeksCourse teksCourse = teksCourseMapper.selectById(allPlans.get(0).getCourseId());
+                            studyMap.put("version", teksCourse.getVersion());
+                            TeksUnit teksUnit = teksUnitMapper.selectById(allPlans.get(0).getStartUnitId());
+                            studyMap.put("unitName", teksUnit.getUnitName());
+                            studyMap.put("version", teksCourse.getVersion());
+                            studyMap.put("courseId", teksCourse.getId());
+                            studyMap.put("grade", teksCourse.getGrade() + "-" + teksCourse.getLabel());
+                        }
                     }
                 }
             } else {
@@ -414,36 +456,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                         // 当前单元还未学习
                         unitInfoMap.put("state", 1);
                     }
-                   /* List<Teks> id1 = teksMapper.selTeksByUnitId(((Long) unitMap.get("id")).intValue());
-                    Integer teksAudition = learnMapper.selLearnTeks(studentId, "课文试听", (Long) unitMap.get("id"));
-                    if (teksAudition != null && teksAudition > 0) {
-                        unitInfoMap.put("teksAudition", true);
-                    } else {
-                        unitInfoMap.put("teksAudition", false);
-                    }
-                    List<Map<String, Object>> id2 = voiceMapper.selVoiceTeksByStudentAndUnit((Long) unitMap.get("id"), studentId);
-                    if (id2 != null) {
-                        if (id1.size() <= id2.size()) {
-                            unitInfoMap.put("teksGoodVoice", true);
-                        } else {
-                            unitInfoMap.put("teksGoodVoice", false);
-                        }
-                    } else {
-                        unitInfoMap.put("teksGoodVoice", false);
-                    }
-                    Integer teksTest = learnMapper.selLearnTeks(studentId, "课文默写测试", (Long) unitMap.get("id"));
-                    if (teksTest != null && teksTest > 0) {
-                        unitInfoMap.put("teksTest", true);
-                    } else {
-                        unitInfoMap.put("teksTest", false);
-                    }
-
-                    Integer testRecord = learnMapper.selLearnTeks(studentId, "课文测试", (Long) unitMap.get("id"));
-                    if (testRecord != null && testRecord > 0) {
-                        unitInfoMap.put("teksEntryTest", true);
-                    } else {
-                        unitInfoMap.put("teksEntryTest", false);
-                    }*/
                     addCourseStatus(Long.parseLong(unitMap.get("id").toString()), studentId, unitInfoMap);
                     resultMap.add(unitInfoMap);
                 }
@@ -545,98 +557,44 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 map.put("pronunciation", baiduSpeak.getSentencePath(teks.getSentence()).replace("#", " ").replace("$", ""));
                 map.put("sentence", teks.getSentence().replace("#", " ").replace("$", ""));
                 map.put("id", teks.getId());
-                String[] sentenceList = teks.getSentence().split(" ");
-                for (int i = 0; i < sentenceList.length; i++) {
-                    sentenceList[i] = sentenceList[i].trim();
-                }
-                //获取空格出现的位置
-               /* if(sentenceList.length>6){
-                    integers=wirterBlank(sentenceList.length,3);
-                }else*/
+                List<String> sentenceList = getRegitList(teks.getSentence());
                 int[] integers;
                 List<String> blanceSentence = new ArrayList<>();
                 List<String> vocabulary = new ArrayList<>();
-                if (sentenceList.length != 1) {
+                if (sentenceList.size() > 2) {
                     integers = wirterBlank(sentenceList);
                     if (integers.length == 1) {
                         //当空格数为一时调用
-                        for (int i = 0; i < sentenceList.length; i++) {
+                        for (int i = 0; i < sentenceList.size(); i++) {
                             if (i == (integers[0])) {
-                                addList(sentenceList[i], blanceSentence, vocabulary);
+                                addList(sentenceList.get(i), blanceSentence, vocabulary);
                             } else {
-                                if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
-                                    if (sentenceList[i].endsWith("...")) {
-                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#", " ").replace("$", ""));
-                                        vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 3));
-                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#", " ").replace("$", ""));
-                                        blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
-                                    } else {
-                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#", " ").replace("$", ""));
-                                        vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#", " ").replace("$", ""));
-                                        blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                                    }
-                                } else {
-                                    vocabulary.add(sentenceList[i].replace("#", " ").replace("$", ""));
-                                    blanceSentence.add(sentenceList[i].replace("#", " ").replace("$", ""));
-                                }
+                                vocabulary.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
+                                blanceSentence.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
                             }
                         }
                         map.put("blanceSentence", blanceSentence);
                         map.put("vocabulary", vocabulary);
                     } else if (integers.length == 2) {
                         //当空格数为二时调用
-                        for (int i = 0; i < sentenceList.length; i++) {
+                        for (int i = 0; i < sentenceList.size(); i++) {
                             if (i == (integers[0]) || i == (integers[1])) {
-                                addList(sentenceList[i], blanceSentence, vocabulary);
+                                addList(sentenceList.get(i), blanceSentence, vocabulary);
                             } else {
-                                if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
-                                    if (sentenceList[i].endsWith("...")) {
-                                        if (sentenceList[i].length() == 3) {
-                                            vocabulary.add(sentenceList[i]);
-                                            blanceSentence.add(sentenceList[i]);
-                                        } else {
-                                            vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#", " ").replace("$", ""));
-                                            vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 3));
-                                            blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#", " ").replace("$", ""));
-                                            blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
-                                        }
-                                    } else {
-                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#", " ").replace("$", ""));
-                                        vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#", " ").replace("$", ""));
-                                        blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                                    }
-                                } else {
-                                    vocabulary.add(sentenceList[i].replace("#", " ").replace("$", ""));
-                                    blanceSentence.add(sentenceList[i].replace("#", " ").replace("$", ""));
-                                }
+                                vocabulary.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
+                                blanceSentence.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
                             }
                         }
                         map.put("blanceSentence", blanceSentence);
                         map.put("vocabulary", vocabulary);
                     } else if (integers.length == 3) {
                         //当空格数为三时调用
-                        for (int i = 0; i < sentenceList.length; i++) {
+                        for (int i = 0; i < sentenceList.size(); i++) {
                             if (i == (integers[0] - 1) || i == (integers[1] - 1) || i == (integers[2] - 1)) {
-                                addList(sentenceList[i], blanceSentence, vocabulary);
+                                addList(sentenceList.get(i), blanceSentence, vocabulary);
                             } else {
-                                if (sentenceList[i].endsWith(",") || sentenceList[i].endsWith(".") || sentenceList[i].endsWith("?") || sentenceList[i].endsWith("!")) {
-                                    if (sentenceList[i].endsWith("...")) {
-                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#", " ").replace("$", ""));
-                                        vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 3));
-                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 3).replace("#", " ").replace("$", ""));
-                                        blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 3));
-                                    } else {
-                                        vocabulary.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#", " ").replace("$", ""));
-                                        vocabulary.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                                        blanceSentence.add(sentenceList[i].substring(0, sentenceList[i].length() - 1).replace("#", " ").replace("$", ""));
-                                        blanceSentence.add(sentenceList[i].substring(sentenceList[i].length() - 1));
-                                    }
-                                } else {
-                                    vocabulary.add(sentenceList[i].replace("#", " ").replace("$", ""));
-                                    blanceSentence.add(sentenceList[i].replace("#", " ").replace("$", ""));
-                                }
+                                vocabulary.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
+                                blanceSentence.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
                             }
                         }
                         map.put("blanceSentence", blanceSentence);
@@ -646,21 +604,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                     resultTeks.add(map);
 
                 } else {
-                    if (sentenceList[0].endsWith(",") || sentenceList[0].endsWith(".") || sentenceList[0].endsWith("?") || sentenceList[0].endsWith("!")) {
-                        if (sentenceList[0].endsWith("...")) {
-                            vocabulary.add(sentenceList[0].substring(0, sentenceList[0].length() - 3));
-                            vocabulary.add(sentenceList[0].substring(sentenceList[0].length() - 3));
-                            blanceSentence.add(sentenceList[0].substring(0, sentenceList[0].length() - 3));
-                            blanceSentence.add(sentenceList[0].substring(sentenceList[0].length() - 3));
-                        } else {
-                            vocabulary.add(sentenceList[0].substring(0, sentenceList[0].length() - 1));
-                            vocabulary.add(sentenceList[0].substring(sentenceList[0].length() - 1));
-                            blanceSentence.add(sentenceList[0].substring(0, sentenceList[0].length() - 1));
-                            blanceSentence.add(sentenceList[0].substring(sentenceList[0].length() - 1));
-                        }
-                    } else {
-                        vocabulary.add(sentenceList[0]);
-                        blanceSentence.add(sentenceList[0]);
+                    for (String voca : sentenceList) {
+                        vocabulary.add(voca);
+                        blanceSentence.add(voca);
                     }
                     map.put("blanceSentence", blanceSentence);
                     map.put("vocabulary", vocabulary);
@@ -669,6 +615,48 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             return ServerResponse.createBySuccess(resultTeks);
         }
         return ServerResponse.createByError();
+    }
+
+    private List<String> getRegitList(String sentence) {
+        // 正确顺序
+        List<String> rightList = new ArrayList<>();
+        // 以字母或数字结尾
+        final String END_MATCH = ".*[a-zA-Z0-9$]$";
+        // 以字母或数据开头
+        final String START_MATCH = "^[a-zA-Z0-9$].*";
+        String[] split = sentence.trim().split(" ");
+        StringBuilder sb = new StringBuilder();
+        for (String s : split) {
+            if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
+                rightList.add(s);
+            } else {
+                char[] chars = s.toCharArray();
+                sb.setLength(0);
+                int length = chars.length;
+                for (int i = 0; i < length; i++) {
+                    char aChar = chars[i];
+                    // 当前下标的数据
+                    String s1 = new String(new char[]{aChar});
+                    // 是字母或者数字，拼接字符串
+                    if (Pattern.matches(END_MATCH, s1)) {
+                        sb.append(s1);
+                    } else {
+                        if (sb.length() > 0) {
+                            rightList.add(sb.toString());
+                            sb.setLength(0);
+                        }
+                        rightList.add(s1);
+                    }
+
+                    // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
+                    if (sb.length() > 0 && i == length - 1) {
+                        rightList.add(sb.toString());
+                        sb.setLength(0);
+                    }
+                }
+            }
+        }
+        return rightList;
     }
 
     @Override
@@ -861,42 +849,27 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
 
     //判断空格出现位置
-    public int[] wirterBlank(String[] strList) {
+    public int[] wirterBlank(List<String> strList) {
         Random random = new Random();
         List<Integer> shuZhuString = new ArrayList<>();
-        for (int i = 0; i < strList.length; i++) {
+        final String END_MATCH = ".*[a-zA-Z0-9$]$";
+        // 以字母或数据开头
+        final String START_MATCH = "^[a-zA-Z0-9$].*";
+        for (int i = 0; i < strList.size(); i++) {
             boolean falg = true;
             for (int j = 0; j < NAMELIST.size(); j++) {
-                if (strList[i].endsWith(",") || strList[i].endsWith("?") || strList[i].endsWith(".") || strList[i].endsWith("!")) {
-                    if (strList[i].endsWith("...")) {
-                        if (strList[i].length() == 3) {
-                            falg = false;
-                        } else {
-                            String str = strList[i].replace("...", "");
-                            if (str.equals(NAMELIST.get(j))) {
-                                falg = false;
-                            }
-                        }
-                    } else {
-                        String str = strList[i].substring(0, strList[i].length() - 1);
-                        if (str.equals(NAMELIST.get(j))) {
-                            falg = false;
-                        }
-                    }
-                } else {
-                    if (strList[i].equals(NAMELIST.get(j))) {
-                        falg = false;
-                    }
-                }
-                if (strList[i].indexOf("#") != -1 || strList[i].indexOf("$") != -1) {
+                String str = strList.get(i).substring(0, strList.get(i).length() - 1);
+                if (str.equals(NAMELIST.get(j))) {
                     falg = false;
                 }
+            }
+            if (!Pattern.matches(END_MATCH, strList.get(i)) && !Pattern.matches(START_MATCH, strList.get(i))) {
+                falg = false;
             }
             if (falg) {
                 shuZhuString.add(i);
             }
         }
-
 
         int choose = 0;
         if (shuZhuString.size() > 3) {
@@ -930,42 +903,14 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 }
             }
         }
-        /*if(choose==3){
-            while(integers[choose-1]==0){
-                int i=((int)(Math.random()*number))+1;
-                if(s==0){
-                    integers[0]=i;
-                }
-                if(s==1){
-                    if(integers[0]!=i){
-                        integers[1]=i;
-                        s++;
-                    }
-                }
-                if(s==2){
-                    if(integers[0]!=i&&integers[1]!=i){
-                        integers[2]=i;
-                        s++;
-                    }
-                }
-
-            }
-        }*/
         return integers;
     }
 
 
     //添加数据
     public void addList(String str, List<String> blanceSentence, List<String> vocabulary) {
-        if (str.endsWith(",") || str.endsWith(".") || str.endsWith("?") || str.endsWith("!")) {
-            vocabulary.add(str.substring(0, str.length() - 1));
-            vocabulary.add(str.substring(str.length() - 1));
-            blanceSentence.add(null);
-            blanceSentence.add(str.substring(str.length() - 1));
-        } else {
-            vocabulary.add(str);
-            blanceSentence.add(null);
-        }
+        vocabulary.add(str.replace("#", " ").replace("$", ""));
+        blanceSentence.add(null);
     }
 
     /**
@@ -1008,7 +953,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
     @Override
-    public ServerResponse<Map<String, Object>> saveTeksAudition(HttpSession session, Integer unitId, Integer courseId) {
+    public ServerResponse<Map<String, Object>> saveTeksAudition(HttpSession session, Integer unitId, Integer
+            courseId) {
         Student student = getStudent(session);
         Learn learn = new Learn();
         learn.setType(1);
@@ -1116,7 +1062,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
     //排列习题循序
-    private void arrayList(List<Map<String, Object>> choseFour, List<Map<String, Object>> hearingList, List<Map<String, Object>> returnList) {
+    private void arrayList
+    (List<Map<String, Object>> choseFour, List<Map<String, Object>> hearingList, List<Map<String, Object>> returnList) {
         if (choseFour.size() >= hearingList.size()) {
             for (int i = 0; i < choseFour.size(); i++) {
                 returnList.add(choseFour.get(i));
@@ -1155,64 +1102,46 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
     //四选四题目挖空并储存选项和答案
-    private void answersFour(Teks teks, List<Object> senOption, List<Map<String, Object>> answers, Integer index, List<String> returnAnswers) {
+    private void answersFour(Teks teks, List<Object> senOption, List<Map<String, Object>> answers, Integer
+            index, List<String> returnAnswers) {
         String sentence = teks.getSentence();
         Integer teksId = teks.getId();
-        String[] s = sentence.split(" ");
+        List<String> regitList = getRegitList(teks.getSentence());
         List<String> arrList = new ArrayList<>();
         Integer location = 0;
         //句子在teksId为103935时挖空位置固定为0
         if (!teksId.equals(103935)) {
-            location=changeInteger(s);
+            location = changeInteger(regitList);
         }
-        for (int i = 0; i < s.length; i++) {
+        for (int i = 0; i < regitList.size(); i++) {
             Map<String, Object> returnMap = new HashMap<>();
             if (i == location) {
-                String option = s[i];
+                String option = regitList.get(i);
                 arrList.add(null);
-                if (option.endsWith(",") || option.endsWith(".") || option.endsWith("!") || option.endsWith("?")) {
-                    if (option.endsWith("...")) {
-                        returnMap.put("name", 5);
-                        returnMap.put("value", option.replace("...", ""));
-                        arrList.add("...");
-                        returnAnswers.add(option.replace("...", ""));
-                    } else {
-                        returnMap.put("name", 5);
-                        returnMap.put("value", option.substring(0, option.length() - 1));
-                        arrList.add(option.substring(option.length() - 1));
-                        returnAnswers.add(option.substring(0, option.length() - 1));
-                    }
-
-                } else {
-                    returnMap.put("name", 5);
-                    returnMap.put("value", option);
-                    returnAnswers.add(option);
-                }
+                returnMap.put("name", 5);
+                returnMap.put("value", option);
+                returnAnswers.add(option);
                 answers.add(returnMap);
             } else {
-                String option = s[i];
-                if (option.endsWith(",") || option.endsWith(".") || option.endsWith("!") || option.endsWith("?")) {
-                    if (option.endsWith("...")) {
-                        arrList.add(option.replace("...", "").replace("#", " ").replace("$", ""));
-                        arrList.add("...");
-                    } else {
-                        arrList.add(option.substring(0, option.length() - 1).replace("#", " ").replace("$", ""));
-                        arrList.add(option.substring(option.length() - 1));
-                    }
-                } else {
-                    arrList.add(option.replace("#", " ").replace("$", ""));
-                }
+                String option = regitList.get(i);
+                arrList.add(option.replace("#", " ").replace("$", ""));
             }
         }
         senOption.add(arrList);
     }
 
     //获取挖空的位置
-    private int changeInteger(String[] str) {
+    private int changeInteger(List<String> sentenceList) {
         List<Integer> list = new ArrayList<>();
-        for (int i = 0; i < str.length; i++) {
-            if (str[i].indexOf("#") == -1 && str[i].indexOf("$") == -1) {
-                list.add(i);
+        // 以字母或数字结尾
+        final String END_MATCH = ".*[a-zA-Z0-9$]$";
+        // 以字母或数据开头
+        final String START_MATCH = "^[a-zA-Z0-9$].*";
+        for (int i = 0; i < sentenceList.size(); i++) {
+            if (sentenceList.get(i).indexOf("#") == -1 && sentenceList.get(i).indexOf("$") == -1) {
+                if (Pattern.matches(END_MATCH, sentenceList.get(i)) && Pattern.matches(START_MATCH, sentenceList.get(i))) {
+                    list.add(i);
+                }
             }
         }
         int integer = (int) Math.ceil(Math.random() * (list.size() - 1));
@@ -1220,7 +1149,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
     //获取听力题
-    private void hearing(List<Teks> hearingList, List<Map<String, Object>> returnList, List<Teks> optionList) {
+    private void hearing
+    (List<Teks> hearingList, List<Map<String, Object>> returnList, List<Teks> optionList) {
         for (int i = 0; i < hearingList.size(); i++) {
             Collections.shuffle(optionList);
             List<Teks> list = new ArrayList<>();
@@ -1230,21 +1160,13 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 }
             }
             list.remove(hearingList.get(i));
-            /*Integer ss =1; //(int) Math.ceil((Math.random() * 2));*/
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("id", hearingList.get(i).getId());
             returnMap.put("chinese", hearingList.get(i).getParaphrase());
             returnMap.put("pronunciation", baiduSpeak.getSentencePath(hearingList.get(i).getSentence().replace("#", " ").replace("$", "")));
             returnMap.put("english", hearingList.get(i).getSentence().replace("#", " ").replace("$", ""));
-            //英选汉 原有两个选项现改为一个
-              /*  if (ss == 1) {
-                    returnMap.put("type", "BritishElectHan");
-                    BritishElectHan(teks.get(i), new ArrayList<Teks>(list.subList(0, 3)), returnMap);
-                    //汉选英
-                } else {*/
             returnMap.put("type", "HanElectBritish");
             HanElectBritish(hearingList.get(i), new ArrayList<Teks>(list.subList(0, 3)), returnMap);
-            /*}*/
             returnList.add(returnMap);
         }
     }
@@ -1354,9 +1276,4 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         return list;
     }
 
-    public static void main(String[] args) {
-        String str = "We have green sweaters for only $15!";
-        TeksServiceImpl teksService = new TeksServiceImpl();
-        System.out.println(teksService.getOrderEnglishList(str, null));
-    }
 }

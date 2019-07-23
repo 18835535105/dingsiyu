@@ -53,8 +53,6 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     private BaiduSpeak baiduSpeak;
     @Autowired
     private MemoryStrengthUtil memoryStrengthUtil;
-    @Autowired
-    private StudentInfoService studentInfoService;
 
     /**
      * 获取字母单元
