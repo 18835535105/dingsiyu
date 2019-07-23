@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * 获取学生测试题 util
@@ -33,6 +34,7 @@ public class TestResultUtil implements Serializable {
 
     @Autowired
     private CommonMethod commonMethod;
+
 
     @Autowired
     private VocabularyMapper vocabularyMapper;
@@ -421,23 +423,261 @@ public class TestResultUtil implements Serializable {
                 nextInt=2;
             }
             if (nextInt % 2 == 0) {
-                if (type == 2) {
-                    sentenceTranslateVo.setOrder(commonMethod.getOrderEnglishList(sentence.getCentreExample(), sentence.getExampleDisturb()));
-                }else {
-                    sentenceTranslateVo.setOrder(commonMethod.getOrderEnglishList(sentence.getCentreExample(), null));
-                }
-                sentenceTranslateVo.setRateList(commonMethod.getEnglishList(sentence.getCentreExample()));
+                getOrderEnglishList(sentenceTranslateVo,sentence.getCentreExample(),sentence.getExampleDisturb(),type);
             } else {
-                if (type == 2) {
-                    sentenceTranslateVo.setOrder(commonMethod.getOrderChineseList(sentence.getCentreTranslate(), sentence.getTranslateDisturb()));
-                } else {
-                    sentenceTranslateVo.setOrder(commonMethod.getOrderChineseList(sentence.getCentreTranslate(), null));
-                }
-                sentenceTranslateVo.setRateList(commonMethod.getChineseList(sentence.getCentreTranslate()));
+                getOrderChineseList(sentenceTranslateVo,sentence.getCentreTranslate(),sentence.getTranslateDisturb(),type);
             }
             vos.add(sentenceTranslateVo);
         }
     }
+
+    public void getOrderChineseList(Map<String,Object> sentenceTranslateVo, String centreTranslates, String translateDisturb, Integer type) {
+        // 将例句按照空格拆分
+        String[] centreTranslate = centreTranslates.split(" ");
+        List<String> centreTranslatelist=new ArrayList<>();
+        for(String s:centreTranslate){
+            String[] split = s.split("\\*");
+            centreTranslatelist.addAll(Arrays.asList(split));
+        }
+        // 正确顺序
+        List<String> rightList = new ArrayList<>();
+        // 乱序
+        List<String> orderList = new ArrayList<>();
+        // 以字母或数字结尾
+        final String END_MATCH = ".*[a-zA-z0-9\\u4e00-\\u9fa5]$";
+        // 以字母或数据开头
+        final String START_MATCH = "^[a-zA-z0-9\\u4e00-\\u9fa5].*";
+        StringBuilder sb = new StringBuilder();
+        for (String s : centreTranslatelist) {
+            if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
+                rightList.add(s);
+                orderList.add(s);
+            } else {
+                char[] chars = s.toCharArray();
+                sb.setLength(0);
+                int length = chars.length;
+                for (int i = 0; i < length; i++) {
+                    char aChar = chars[i];
+                    // 当前下标的数据
+                    String s1 = new String(new char[]{aChar});
+                    // 是字母或者数字，拼接字符串
+                    if (Pattern.matches(END_MATCH, s1)) {
+                        sb.append(s1);
+                    } else {
+                        if (sb.length() > 0) {
+                            rightList.add(sb.toString());
+                            orderList.add(sb.toString());
+                            sb.setLength(0);
+                        }
+                        // 如果符号前面是字母需要在符号列表中加 null
+                        rightList.add(s1);
+                    }
+                    // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
+                    if (sb.length() > 0 && i == length - 1) {
+                        rightList.add(sb.toString());
+                        orderList.add(sb.toString());
+                        sb.setLength(0);
+                    }
+                }
+            }
+        }
+        if (type.equals(2)) {
+            if (StringUtils.isNotEmpty(translateDisturb)) {
+                orderList.add(translateDisturb.replace("*", " ").replace("$", ""));
+            }
+        }
+        Collections.shuffle(orderList);
+        sentenceTranslateVo.put("order",orderList);
+        sentenceTranslateVo.put("rateList",rightList);
+    }
+
+    public void getOrderChineseList(SentenceTranslateVo sentenceTranslateVo, String centreTranslates, String translateDisturb, Integer type) {
+        // 将例句按照空格拆分
+        String[] centreTranslate = centreTranslates.split(" ");
+        List<String> centreTranslatelist=new ArrayList<>();
+        for(String s:centreTranslate){
+            String[] split = s.split("\\*");
+            centreTranslatelist.addAll(Arrays.asList(split));
+        }
+        // 正确顺序
+        List<String> rightList = new ArrayList<>();
+        // 乱序
+        List<String> orderList = new ArrayList<>();
+        // 以字母或数字结尾
+        final String END_MATCH = ".*[a-zA-z0-9\\u4e00-\\u9fa5]$";
+        // 以字母或数据开头
+        final String START_MATCH = "^[a-zA-z0-9\\u4e00-\\u9fa5].*";
+        StringBuilder sb = new StringBuilder();
+        for (String s : centreTranslatelist) {
+            if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
+                rightList.add(s);
+                orderList.add(s);
+            } else {
+                char[] chars = s.toCharArray();
+                sb.setLength(0);
+                int length = chars.length;
+                for (int i = 0; i < length; i++) {
+                    char aChar = chars[i];
+                    // 当前下标的数据
+                    String s1 = new String(new char[]{aChar});
+                    // 是字母或者数字，拼接字符串
+                    if (Pattern.matches(END_MATCH, s1)) {
+                        sb.append(s1);
+                    } else {
+                        if (sb.length() > 0) {
+                            rightList.add(sb.toString());
+                            orderList.add(sb.toString());
+                            sb.setLength(0);
+                        }
+                        // 如果符号前面是字母需要在符号列表中加 null
+                        rightList.add(s1);
+                    }
+                    // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
+                    if (sb.length() > 0 && i == length - 1) {
+                        rightList.add(sb.toString());
+                        orderList.add(sb.toString());
+                        sb.setLength(0);
+                    }
+                }
+            }
+        }
+        if (type.equals(2)) {
+            if (StringUtils.isNotEmpty(translateDisturb)) {
+                orderList.add(translateDisturb.replace("*", " ").replace("$", ""));
+            }
+        }
+        Collections.shuffle(orderList);
+        sentenceTranslateVo.setOrder(orderList);
+        sentenceTranslateVo.setRateList(rightList);
+    }
+
+    /**
+     * 将例句单词顺序打乱
+     *
+     * @param sentence
+     * @param exampleDisturb 例句英文干扰项  为空时无干扰项
+     * @return
+     */
+    public void getOrderEnglishList(Map<String,Object> sentenceTranslateVo, String sentence, String exampleDisturb, Integer type) {
+        // 将例句按照空格拆分
+        String[] words = sentence.split(" ");
+        // 正确顺序
+        List<String> rightList = new ArrayList<>();
+        // 乱序
+        List<String> orderList = new ArrayList<>();
+        // 以字母或数字结尾
+        final String END_MATCH = ".*[a-zA-Z0-9$]$";
+        // 以字母或数据开头
+        final String START_MATCH = "^[a-zA-Z0-9$].*";
+        StringBuilder sb = new StringBuilder();
+        for (String s : words) {
+            s = s.replace("#", " ").replace("$", "");
+            if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
+                rightList.add(s);
+                orderList.add(s);
+            } else {
+                char[] chars = s.toCharArray();
+                sb.setLength(0);
+                int length = chars.length;
+                for (int i = 0; i < length; i++) {
+                    char aChar = chars[i];
+                    // 当前下标的数据
+                    String s1 = new String(new char[]{aChar});
+                    // 是字母或者数字，拼接字符串
+                    if (Pattern.matches(END_MATCH, s1)) {
+                        sb.append(s1);
+                    } else {
+                        if (sb.length() > 0) {
+                            rightList.add(sb.toString());
+                            orderList.add(sb.toString());
+                            sb.setLength(0);
+                        }
+                        // 如果符号前面是字母需要在符号列表中加 null
+                        rightList.add(s1);
+                    }
+                    // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
+                    if (sb.length() > 0 && i == length - 1) {
+                        rightList.add(sb.toString());
+                        orderList.add(sb.toString());
+                        sb.setLength(0);
+                    }
+                }
+            }
+        }
+        if (type.equals(2)) {
+            if (StringUtils.isNotEmpty(exampleDisturb)) {
+                orderList.add(exampleDisturb.replace("#", " ").replace("$", ""));
+            }
+        }
+        Collections.shuffle(orderList);
+        sentenceTranslateVo.put("order",orderList);
+        sentenceTranslateVo.put("rateList",rightList);
+    }
+
+    /**
+     * 将例句单词顺序打乱
+     *
+     * @param sentence
+     * @param exampleDisturb 例句英文干扰项  为空时无干扰项
+     * @return
+     */
+    public void getOrderEnglishList(SentenceTranslateVo sentenceTranslateVo, String sentence, String exampleDisturb, Integer type) {
+        // 将例句按照空格拆分
+        String[] words = sentence.split(" ");
+        // 正确顺序
+        List<String> rightList = new ArrayList<>();
+        // 乱序
+        List<String> orderList = new ArrayList<>();
+        // 以字母或数字结尾
+        final String END_MATCH = ".*[a-zA-Z0-9$]$";
+        // 以字母或数据开头
+        final String START_MATCH = "^[a-zA-Z0-9$].*";
+        StringBuilder sb = new StringBuilder();
+        for (String s : words) {
+            s = s.replace("#", " ").replace("$", "");
+            if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
+                rightList.add(s);
+                orderList.add(s);
+            } else {
+                char[] chars = s.toCharArray();
+                sb.setLength(0);
+                int length = chars.length;
+                for (int i = 0; i < length; i++) {
+                    char aChar = chars[i];
+                    // 当前下标的数据
+                    String s1 = new String(new char[]{aChar});
+                    // 是字母或者数字，拼接字符串
+                    if (Pattern.matches(END_MATCH, s1)) {
+                        sb.append(s1);
+                    } else {
+                        if (sb.length() > 0) {
+                            rightList.add(sb.toString());
+                            orderList.add(sb.toString());
+                            sb.setLength(0);
+                        }
+                        // 如果符号前面是字母需要在符号列表中加 null
+                        rightList.add(s1);
+                    }
+                    // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
+                    if (sb.length() > 0 && i == length - 1) {
+                        rightList.add(sb.toString());
+                        orderList.add(sb.toString());
+                        sb.setLength(0);
+                    }
+                }
+            }
+        }
+        if (type.equals(2)) {
+            if (StringUtils.isNotEmpty(exampleDisturb)) {
+                orderList.add(exampleDisturb.replace("#", " ").replace("$", ""));
+            }
+        }
+        Collections.shuffle(orderList);
+        sentenceTranslateVo.setOrder(orderList);
+        sentenceTranslateVo.setRateList(rightList);
+    }
+
+
 
     /**
      * 获取指定数量的随机题目
