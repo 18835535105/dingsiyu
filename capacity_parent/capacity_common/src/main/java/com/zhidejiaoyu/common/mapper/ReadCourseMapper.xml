@@ -16,6 +16,9 @@
         id,course_name,month,week,grade,create_time
     </sql>
 
+    <select id="selCourseByStartUnitAndEndUnit" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="sql"></include> from read_course where unit>=#{startUnitId} and unit &lt;=#{endUnitId}
+    </select>
 
 
 </mapper>

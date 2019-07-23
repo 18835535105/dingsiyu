@@ -21,6 +21,8 @@ public interface StudentStudyPlanMapper extends BaseMapper<StudentStudyPlan> {
 
     List<Map<String,Object>> selByStudentId(@Param("studentId") Long studentId,@Param("type") int type);
 
+    List<StudentStudyPlan> selReadCourseByStudentId(@Param("studentId")Long studentId);
+
     List<Map<String,Object>> selByStudentIdAndCourseIdAndType(@Param("studentId") Long studentId,@Param("type") int type,@Param("courseId")Long courseId);
 
     List<Map<String,Object>> selBySentenceStudentId(@Param("studentId") Long studentId,@Param("type") int type);
