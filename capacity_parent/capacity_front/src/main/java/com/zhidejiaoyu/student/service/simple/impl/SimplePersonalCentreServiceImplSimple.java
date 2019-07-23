@@ -899,6 +899,11 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
             studentIds.forEach(id -> {
                 Map<String, Object> dataMap = new HashMap<>(16);
                 Student student1 = simpleStudentMapper.selectById(id);
+                if (student1 == null) {
+                    rankOpt.deleteMember(key, id);
+                    log.warn("未查询到 id 为[{}]的学生！", id);
+                    return;
+                }
                 dataMap.put("zs", rankOpt.getScore(RankKeysConst.COUNTRY_CCIE_RANK, id) == -1 ? 0 : rankOpt.getScore(RankKeysConst.COUNTRY_CCIE_RANK, id));
                 dataMap.put("xz", rankOpt.getScore(RankKeysConst.COUNTRY_MEDAL_RANK, id) == -1 ? 0 : rankOpt.getScore(RankKeysConst.COUNTRY_MEDAL_RANK, id));
                 dataMap.put("mb", rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, id) == -1 ? 0 : rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, id));
