@@ -3,7 +3,6 @@ package com.zhidejiaoyu.student.service.impl;
 import com.zhidejiaoyu.common.mapper.ReadCourseMapper;
 import com.zhidejiaoyu.common.mapper.StudentStudyPlanMapper;
 import com.zhidejiaoyu.common.pojo.ReadCourse;
-import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentStudyPlan;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.ReadCourseService;
@@ -34,7 +33,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selReadCourseByStudentId(studentId);
         if (studentStudyPlans != null && studentStudyPlans.size() > 0) {
             //去掉重复添加的阅读数据
-            this.getReadCourse(studentStudyPlans);
+            List<ReadCourse> readCourse = this.getReadCourse(studentStudyPlans);
         }
 
         return ServerResponse.createByError(500, "未分配课程");
