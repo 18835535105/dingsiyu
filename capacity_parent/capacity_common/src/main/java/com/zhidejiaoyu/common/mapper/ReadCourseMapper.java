@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.ReadCourse;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -15,6 +16,9 @@ import java.util.List;
  * @since 2019-07-15
  */
 public interface ReadCourseMapper extends BaseMapper<ReadCourse> {
+
+
+    List<ReadCourse> selCourseByStartUnitAndEndUnit(@Param("startUnitId") Long startUnitId,@Param("endUnitId") Long endUnitId);
 
 
 }
