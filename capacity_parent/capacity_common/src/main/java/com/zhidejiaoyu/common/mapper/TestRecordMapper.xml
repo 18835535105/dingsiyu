@@ -785,6 +785,9 @@
 
     <select id="selectMaxPointByUnitStudentModel" parameterType="java.util.Map" resultType="java.lang.Integer">
         select Max(point) from test_record where unit_id=#{unitId} and student_id=#{studentId} and study_model=#{model}
+        <if test="genre != null">
+            and genre = #{genre}
+        </if>
     </select>
     <select id="selectTestDetailVo" resultType="com.zhidejiaoyu.common.Vo.testVo.TestDetailVo" parameterType="map">
         select concat(c.course_name, concat('-', concat(u.unit_name,
