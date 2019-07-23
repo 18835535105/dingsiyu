@@ -1066,9 +1066,7 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
             // 计算当前例句的记忆强度
             Sentence sentence = sentenceMapper.selectByPrimaryKey(sentenceListen.getVocabularyId());
             double memoryStrength = sentenceListen.getMemoryStrength();
-            sentenceTranslateVo = this.getSentenceVo(sentence, firstStudy, plan, memoryStrength, sentenceCount, type);
-            sentenceTranslateVo.setOrder(sentenceTranslateVo.getOrderEnglish());
-            sentenceTranslateVo.setRateList(sentenceTranslateVo.getEnglishList());
+            sentenceTranslateVo = this.getListenSentenceVo(sentence, firstStudy, plan, memoryStrength, sentenceCount, type);
             sentenceTranslateVo.setCourseId(sentenceListen.getCourseId().intValue());
             sentenceTranslateVo.setUnitId(sentenceListen.getUnitId().intValue());
         } else {
@@ -1103,7 +1101,21 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
         return sentenceTranslateVo;
     }
 
-
+    private SentenceTranslateVo getListenSentenceVo(Sentence sentence, boolean firstStudy, Long plan, double memoryStrength, Long sentenceCount, Integer type) {
+        SentenceTranslateVo sentenceTranslateVo = new SentenceTranslateVo();
+        sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
+        sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*", " ").replace("$", ""));
+        sentenceTranslateVo.setFirstStudy(firstStudy);
+        sentenceTranslateVo.setId(sentence.getId());
+        sentenceTranslateVo.setPlan(plan);
+        sentenceTranslateVo.setMemoryStrength(memoryStrength);
+        sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePath(sentence.getCentreExample()));
+        sentenceTranslateVo.setSentenceCount(sentenceCount);
+        sentenceTranslateVo.setSentence(sentence.getCentreExample().replace("#", " ").replace("*", " ").replace("$", ""));
+        sentenceTranslateVo.setStudyNew(false);
+        testResultUtil.getOrderEnglishList(sentenceTranslateVo,sentence.getCentreExample(),sentence.getTranslateDisturb(),type);
+        return sentenceTranslateVo;
+    }
 
     private SentenceTranslateVo getSentenceVo(Sentence sentence, boolean firstStudy, Long plan, double memoryStrength, Long sentenceCount, Integer type) {
         SentenceTranslateVo sentenceTranslateVo = new SentenceTranslateVo();
