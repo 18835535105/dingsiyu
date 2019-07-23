@@ -1,20 +1,18 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
-import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
-import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.simple.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.Vo.simple.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
-import com.zhidejiaoyu.common.award.DailyAwardAsync;
-import com.zhidejiaoyu.common.award.GoldAwardAsync;
-import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.mapper.TestRecordMapper;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
@@ -22,8 +20,8 @@ import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.utils.simple.goldUtil.SimpleTestGoldUtil;
 import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
 import com.zhidejiaoyu.common.utils.simple.server.SimpleTestResponseCode;
 import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleSentenceTestResult;
@@ -40,7 +38,6 @@ import com.zhidejiaoyu.student.utils.PetSayUtil;
 import com.zhidejiaoyu.student.utils.PetUrlUtil;
 import com.zhidejiaoyu.student.utils.simple.SimpleCcieUtil;
 import com.zhidejiaoyu.student.vo.TestResultVo;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -51,7 +48,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 
 @Slf4j
 @Service
@@ -80,6 +76,8 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      */
     private static final int FULL_MARK = 100;
 
+    @Autowired
+    private TestRecordMapper testRecordMapper;
 
     @Autowired
     private SimpleSentenceMapper simpleSentenceMapper;
@@ -98,9 +96,6 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
     @Autowired
     private SimpleRunLogMapper runLogMapper;
-
-    @Autowired
-    private SimpleCourseMapper simpleCourseMapper;
 
     @Autowired
     private SimpleUnitMapper unitMapper;
@@ -142,19 +137,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     private SimpleCcieUtil simpleCcieUtil;
 
     @Autowired
-    private SimpleTestGoldUtil simpleTestGoldUtil;
-
-    @Autowired
-    private DailyAwardAsync dailyAwardAsync;
-
-    @Autowired
-    private GoldAwardAsync goldAwardAsync;
-
-    @Autowired
-    private MedalAwardAsync medalAwardAsync;
-
-    @Autowired
-    private ExecutorService executorService;
+    private TestGoldUtil testGoldUtil;
 
     /**
      * 学前测试/学后测试,从课程取50道题
@@ -586,7 +569,10 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             }
 
             // 根据不同分数奖励学生金币
-            goldCount = this.saveGold(true, wordUnitTestDTO, student, null);
+            TestRecord testRecord1 = new TestRecord();
+            testRecord1.setGenre("单元闯关测试");
+            testRecord1.setStudyModel(simpleCommonMethod.getTestType(wordUnitTestDTO.getClassify()));
+            goldCount = this.saveGold(testRecord1, wordUnitTestDTO, student);
             /*// 保存日志表, 修改学生金币
             goldCount = this.saveLog(student, goldCount, wordUnitTestDTO, "单元闯关测试");*/
 
@@ -735,37 +721,21 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     /**
      * 根据测试成绩计算奖励金币数
      *
-     * @param isFirst         是否是第一次进行该模块下的单元闯关测试
      * @param wordUnitTestDTO
      * @param student
-     * @param testRecord
      * @return 学生应奖励金币数
      */
-    private Integer saveGold(boolean isFirst, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord) {
+    private Integer saveGold(TestRecord testRecord, WordUnitTestDTO wordUnitTestDTO, Student student) {
         int point = wordUnitTestDTO.getPoint();
-        int goldCount = 0;
-        if (isFirst) {
-            goldCount = getGoldCount(wordUnitTestDTO, student, point, goldCount);
-        } else {
-            // 查询当前单元测试历史最高分数
-            int betterPoint = simpleTestRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), wordUnitTestDTO.getUnitId()[0], simpleCommonMethod.getTestType(wordUnitTestDTO.getClassify()));
-
-            // 非首次测试成绩大于或等于80分并且本次测试成绩大于历史最高分，超过历史最高分次数 +1并且金币奖励翻倍
-            if (point >= PASS && betterPoint < wordUnitTestDTO.getPoint()) {
-                int betterCount = testRecord.getBetterCount() + 1;
-                testRecord.setBetterCount(betterCount);
-                if (point < FULL_MARK) {
-                    goldCount = betterCount * TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_FULL;
-                    this.saveLog(student, goldCount, wordUnitTestDTO, null);
-                } else if (point == FULL_MARK) {
-                    goldCount = betterCount * TestAwardGoldConstant.UNIT_TEST_FULL;
-                    this.saveLog(student, goldCount, wordUnitTestDTO, null);
-                }
-            } else {
-                goldCount = getGoldCount(wordUnitTestDTO, student, point, goldCount);
-            }
+        // 查询当前单元测试历史最高分数
+        testRecord.setUnitId(wordUnitTestDTO.getUnitId()[0]);
+        Integer betterPoint = this.getMaxPoint(testRecord, student);
+        // 当前成绩没有超过历史最高分
+        if (betterPoint != null && betterPoint >= wordUnitTestDTO.getPoint()) {
+            return 0;
         }
-        return simpleTestGoldUtil.addGold(student, goldCount);
+        int goldCount = getGoldCount(wordUnitTestDTO, student, point);
+        return testGoldUtil.addGold(student, goldCount);
     }
 
     /**
@@ -774,10 +744,10 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      * @param wordUnitTestDTO
      * @param student
      * @param point
-     * @param goldCount
      * @return
      */
-    private int getGoldCount(WordUnitTestDTO wordUnitTestDTO, Student student, int point, int goldCount) {
+    private int getGoldCount(WordUnitTestDTO wordUnitTestDTO, Student student, int point) {
+        int goldCount = 0;
         if (point >= PASS) {
             if (point < FULL_MARK) {
                 goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_FULL;
@@ -988,6 +958,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         if (StringUtils.isNotEmpty(studyModel)) {
             testRecord.setStudyModel(studyModel);
         }
+        testRecord.setGenre(typeModel);
         int point = testRecord.getPoint();
         int addEnergy = getEnergy(student, point);
 
@@ -1011,7 +982,6 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         testRecord.setStudentId(student.getId());
         testRecord.setTestStartTime(startTime == null ? new Date() : (Date) startTime);
         testRecord.setTestEndTime(new Date());
-        testRecord.setGenre(typeModel);
         testRecord.setQuantity(testRecord.getErrorCount() + testRecord.getRightCount());
         testRecord.setType(1);
         simpleTestRecordMapper.insert(testRecord);
@@ -1102,6 +1072,11 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
     private int getPreSchoolTestGold(TestRecord testRecord, int modelType, Student student, String typeModel, TestResultVo vo, int point) {
         int gold = 0;
+        Integer maxPoint = this.getMaxPoint(testRecord, student);
+        // 当前得分没有超过当前得分没有超过历史最高分不给金币
+        if (maxPoint != null && maxPoint >= point) {
+            return 0;
+        }
         if ("学后测试".equals(typeModel)) {
             if (point < 80) {
                 vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.COURSE_TEST_LESS_EIGHTY));
@@ -1164,7 +1139,16 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
                 packagePassTestRecordVo(testRecord, student, vo, point);
             }
         }
-        return simpleTestGoldUtil.addGold(student, gold);
+        return testGoldUtil.addGold(student, gold);
+    }
+
+    private Integer getMaxPoint(TestRecord testRecord, Student student) {
+        Map<String, Object> selMap = new HashMap<>();
+        selMap.put("unitId", testRecord.getUnitId());
+        selMap.put("studentId", student.getId());
+        selMap.put("model", testRecord.getStudyModel());
+        selMap.put("genre", testRecord.getGenre());
+        return testRecordMapper.selectMaxPointByUnitStudentModel(selMap);
     }
 
     private void packageUnPassTestRecordVo(TestRecord testRecord, Student student, TestResultVo vo, int point) {
