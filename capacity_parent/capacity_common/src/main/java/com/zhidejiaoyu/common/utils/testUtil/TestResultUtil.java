@@ -675,6 +675,8 @@ public class TestResultUtil implements Serializable {
         Collections.shuffle(orderList);
         sentenceTranslateVo.setOrder(orderList);
         sentenceTranslateVo.setRateList(rightList);
+        sentenceTranslateVo.setEnglishList(rightList);
+        sentenceTranslateVo.setOrderEnglish(orderList);
     }
 
 
