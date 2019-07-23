@@ -314,6 +314,7 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
                 return ServerResponse.createBySuccess();
             }
         } else {
+            learn.setStudyCount(currentLearn.getStudyCount() + 1);
             if (isKnown) {
                 if (classify == 3) {
                     capacityWrite = (CapacityWrite) saveWordLearnAndCapacity.saveCapacityMemory(learn, student, true, 3);

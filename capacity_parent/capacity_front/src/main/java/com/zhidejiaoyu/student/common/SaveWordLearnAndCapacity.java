@@ -123,7 +123,11 @@ public class SaveWordLearnAndCapacity {
                 capacity.setMemoryStrength(memoryStrengthUtil.getStudyMemoryStrength(memoryStrength, true));
             } else {
                 // 错误次数在原基础上 +1
-                capacity.setFaultTime(capacity.getFaultTime() + 1);
+                int afterFaultTime = capacity.getFaultTime() + 1;
+                if (learn != null && learn.getStudyCount() != null && afterFaultTime > learn.getStudyCount()) {
+                    afterFaultTime = learn.getStudyCount();
+                }
+                capacity.setFaultTime(afterFaultTime);
                 // 重新计算黄金记忆点时间
                 double memoryStrength = capacity.getMemoryStrength();
                 Date push = GoldMemoryTime.getGoldMemoryTime(memoryStrength, new Date());
