@@ -213,29 +213,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             if (grade >= 50 && grade < 90) {
                 return toAnotherFlow(dto, flow.getNextTrueFlow());
             } else if (grade < 90) {
-                clearLearnRecord(dto.getStudent());
                 return toAnotherFlow(dto, flow.getNextFalseFlow());
             }
         }
         return null;
-    }
-
-    /**
-     * 清除学生当前单元学习、测试、记忆追踪信息
-     *
-     * @param student
-     */
-    private void clearLearnRecord(Student student) {
-        Long studentId = student.getId();
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
-        Long unitId = capacityStudentUnit.getUnitId();
-
-        learnMapper.updateTypeToLearned(studentId, 1, unitId, unitId);
-        learnMapper.deleteByStudentIdAndUnitId(studentId, unitId);
-        capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, unitId, unitId);
-        capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, unitId, unitId);
-        capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, unitId, unitId);
-        capacityListenMapper.deleteByStudentIdAndUnitId(studentId, unitId, unitId);
     }
 
     /**
