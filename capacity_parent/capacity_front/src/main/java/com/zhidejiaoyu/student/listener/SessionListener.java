@@ -19,6 +19,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author wuchenxi
@@ -62,6 +63,11 @@ public class SessionListener implements HttpSessionListener {
         // 当 session 失效时只有 8082 端口的服务负责保存学生时长信息
         if (currentPort == Integer.valueOf(port)) {
             HttpSession session = se.getSession();
+            if (checkMultipleLoginSession(session)) {
+                redisTemplate.opsForValue().set(RedisKeysConst.MULTIPLE_LOGIN_SESSION_ID + session.getId(), null);
+                return;
+            }
+
             saveLogoutInfo(session);
             Map<String, Object> sessionMap = null;
             Object object = redisTemplate.opsForHash().get(RedisKeysConst.SESSION_MAP, session.getId());
@@ -73,6 +79,17 @@ public class SessionListener implements HttpSessionListener {
             }
             loginService.saveDurationInfo(sessionMap);
         }
+    }
+
+    /**
+     * 判断当前 session 是否是学生异地登录时被挤掉的 session
+     *
+     * @param session
+     * @return true：是被挤掉的 session <br>
+     * false：是正常的 session
+     */
+    private boolean checkMultipleLoginSession(HttpSession session) {
+        return Objects.equals(redisTemplate.opsForValue().get(RedisKeysConst.MULTIPLE_LOGIN_SESSION_ID + session.getId()), session.getId());
     }
 
     /**

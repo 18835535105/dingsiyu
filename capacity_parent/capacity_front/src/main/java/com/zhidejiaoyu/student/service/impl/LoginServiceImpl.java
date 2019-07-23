@@ -19,7 +19,6 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
 import com.zhidejiaoyu.common.utils.locationUtil.LocationUtil;
 import com.zhidejiaoyu.common.utils.locationUtil.LongitudeAndLatitude;
-import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.LoginService;
@@ -36,8 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.regex.Matcher;
@@ -768,16 +765,17 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     private void judgeMultipleLogin(HttpSession session, Student stu) {
-        Object object = redisTemplate.opsForHash().get(RedisKeysConst.LOGIN_SESSION, stu.getId());
-        if (object != null) {
+        Object oldSessionIdObject = redisTemplate.opsForHash().get(RedisKeysConst.LOGIN_SESSION, stu.getId());
+        if (oldSessionIdObject != null) {
             Long oldStudentId = null;
-            Map<String, Object> oldSessionMap = RedisOpt.getSessionMap(object.toString());
+            String oldSessionId = oldSessionIdObject.toString();
+            Map<String, Object> oldSessionMap = RedisOpt.getSessionMap(oldSessionId);
             if (oldSessionMap != null && oldSessionMap.get(UserConstant.CURRENT_STUDENT) != null) {
                 oldStudentId = ((Student) oldSessionMap.get(UserConstant.CURRENT_STUDENT)).getId();
             }
 
             // 如果账号 session 相同说明是同一个浏览器中，并且不是同一个账号，不再更改其 session 中登录信息
-            if (Objects.equals(oldStudentId, stu.getId()) && Objects.equals(object, session.getId())) {
+            if (Objects.equals(oldStudentId, stu.getId()) && Objects.equals(oldSessionIdObject, session.getId())) {
                 return;
             }
 
@@ -785,6 +783,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             if (oldSessionMap != null) {
                 saveDurationInfo(oldSessionMap);
                 saveLogoutLog(stu, runLogMapper, logger);
+                redisOpt.markMultipleLoginSessionId(oldSessionId);
             }
         }
 

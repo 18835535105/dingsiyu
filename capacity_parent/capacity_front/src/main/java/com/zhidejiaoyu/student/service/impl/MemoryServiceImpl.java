@@ -215,6 +215,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
      */
     private ServerResponse<String> saveMemoryNotFirstLearnRecord(HttpSession session, Learn learn, Boolean known,
                                                                  Student student, Integer maxCount, Learn currentLearn) {
+        learn.setStudyCount(currentLearn.getStudyCount() + 1);
         CapacityMemory capacityMemory;
         if (known) {
             capacityMemory = saveWordLearnAndCapacity.saveCapacityMemory(learn, student, true, 1);

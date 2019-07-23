@@ -112,4 +112,9 @@ public class RedisKeysConst {
      * 记录学生登出时间
      */
     public static final String STUDENT_LOGINOUT_TIME = "STUDENT_LOGINOUT_TIME";
+
+    /**
+     * 被标记为异地登录被挤掉的 sessionId
+     */
+    public static final String MULTIPLE_LOGIN_SESSION_ID = "MULTIPLE_LOGIN_SESSION_ID:";
 }
