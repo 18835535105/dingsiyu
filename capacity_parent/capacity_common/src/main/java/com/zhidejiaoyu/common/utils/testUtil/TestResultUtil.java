@@ -562,10 +562,9 @@ public class TestResultUtil implements Serializable {
         final String START_MATCH = "^[a-zA-Z0-9$].*";
         StringBuilder sb = new StringBuilder();
         for (String s : words) {
-            s = s.replace("#", " ").replace("$", "");
             if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
-                rightList.add(s);
-                orderList.add(s);
+                rightList.add(s.replace("#", " ").replace("$", ""));
+                orderList.add(s.replace("#", " ").replace("$", ""));
             } else {
                 char[] chars = s.toCharArray();
                 sb.setLength(0);
@@ -579,8 +578,8 @@ public class TestResultUtil implements Serializable {
                         sb.append(s1);
                     } else {
                         if (sb.length() > 0) {
-                            rightList.add(sb.toString());
-                            orderList.add(sb.toString());
+                            rightList.add(sb.toString().replace("#", " ").replace("$", ""));
+                            orderList.add(sb.toString().replace("#", " ").replace("$", ""));
                             sb.setLength(0);
                         }
                         // 如果符号前面是字母需要在符号列表中加 null
@@ -588,8 +587,8 @@ public class TestResultUtil implements Serializable {
                     }
                     // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
                     if (sb.length() > 0 && i == length - 1) {
-                        rightList.add(sb.toString());
-                        orderList.add(sb.toString());
+                        rightList.add(sb.toString().replace("#", " ").replace("$", ""));
+                        orderList.add(sb.toString().replace("#", " ").replace("$", ""));
                         sb.setLength(0);
                     }
                 }
@@ -620,15 +619,14 @@ public class TestResultUtil implements Serializable {
         // 乱序
         List<String> orderList = new ArrayList<>();
         // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$]$";
+        final String END_MATCH = ".*[a-zA-Z0-9$#]$";
         // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$].*";
+        final String START_MATCH = "^[a-zA-Z0-9$#].*";
         StringBuilder sb = new StringBuilder();
         for (String s : words) {
-            s = s.replace("#", " ").replace("$", "");
             if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
-                rightList.add(s);
-                orderList.add(s);
+                rightList.add(s.replace("#", " ").replace("$", ""));
+                orderList.add(s.replace("#", " ").replace("$", ""));
             } else {
                 char[] chars = s.toCharArray();
                 sb.setLength(0);
@@ -642,8 +640,8 @@ public class TestResultUtil implements Serializable {
                         sb.append(s1);
                     } else {
                         if (sb.length() > 0) {
-                            rightList.add(sb.toString());
-                            orderList.add(sb.toString());
+                            rightList.add(sb.toString().replace("#", " ").replace("$", ""));
+                            orderList.add(sb.toString().replace("#", " ").replace("$", ""));
                             sb.setLength(0);
                         }
                         // 如果符号前面是字母需要在符号列表中加 null
@@ -651,8 +649,8 @@ public class TestResultUtil implements Serializable {
                     }
                     // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
                     if (sb.length() > 0 && i == length - 1) {
-                        rightList.add(sb.toString());
-                        orderList.add(sb.toString());
+                        rightList.add(sb.toString().replace("#", " ").replace("$", ""));
+                        orderList.add(sb.toString().replace("#", " ").replace("$", ""));
                         sb.setLength(0);
                     }
                 }
