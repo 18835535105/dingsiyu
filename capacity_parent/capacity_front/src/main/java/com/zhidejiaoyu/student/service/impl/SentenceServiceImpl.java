@@ -16,6 +16,7 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
+import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
 import com.zhidejiaoyu.student.service.SentenceService;
 import com.zhidejiaoyu.student.vo.SentenceWordInfoVo;
 import org.apache.commons.lang.StringUtils;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -35,7 +37,7 @@ import java.util.stream.Collectors;
  * @date 2018/5/21 15:15
  */
 @Service
-public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentence> implements SentenceService {
+public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, Sentence> implements SentenceService {
 
     private Logger log = LoggerFactory.getLogger(SentenceService.class);
 
@@ -43,6 +45,9 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
      * 三小时
      */
     private final int pushRise = 3;
+
+    @Autowired
+    private TestResultUtil testResultUtil;
 
     @Autowired
     private MemoryDifficultyUtil memoryDifficultyUtil;
@@ -1091,22 +1096,14 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
 
         int nextInt = new Random().nextInt(10);
         if (nextInt > 2) {
-            if (type == 2) {
-                sentenceTranslateVo.setOrder(commonMethod.getOrderEnglishList(sentence.getCentreExample(), sentence.getExampleDisturb()));
-            } else {
-                sentenceTranslateVo.setOrder(commonMethod.getOrderEnglishList(sentence.getCentreExample(), null));
-            }
-            sentenceTranslateVo.setRateList(commonMethod.getEnglishList(sentence.getCentreExample()));
+            testResultUtil.getOrderEnglishList(sentenceTranslateVo, sentence.getCentreExample(), sentence.getCentreTranslate(), type);
         } else {
-            if (type == 2) {
-                sentenceTranslateVo.setOrder(commonMethod.getOrderChineseList(sentence.getCentreTranslate(), sentence.getTranslateDisturb()));
-            } else {
-                sentenceTranslateVo.setOrder(commonMethod.getOrderChineseList(sentence.getCentreTranslate(), null));
-            }
-            sentenceTranslateVo.setRateList(commonMethod.getChineseList(sentence.getCentreTranslate()));
+            testResultUtil.getOrderChineseList(sentenceTranslateVo,sentence.getCentreTranslate(),sentence.getTranslateDisturb(),type);
         }
         return sentenceTranslateVo;
     }
+
+
 
     private SentenceTranslateVo getSentenceVo(Sentence sentence, boolean firstStudy, Long plan, double memoryStrength, Long sentenceCount, Integer type) {
         SentenceTranslateVo sentenceTranslateVo = new SentenceTranslateVo();

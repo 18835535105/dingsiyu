@@ -433,35 +433,11 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 记忆强度
         map.put("memoryStrength", vo.getMemory_strength());
         //if (classify != 6) {
-        if (type == 2) {
-            if (nextInt == 1) {
-                // 例句英文乱序集合
-                map.put("order", commonMethod.getOrderEnglishList(sentence.getCentreExample(), sentence.getExampleDisturb()));
-                // 例句英文正序集合，含有标点
-                map.put("rateList", commonMethod.getEnglishList(sentence.getCentreExample()));
-            }
-            if (nextInt == 2) {
-                // 例句翻译中含有乱序的中文解释和干扰项
-                map.put("order", commonMethod.getOrderChineseList(sentence.getCentreTranslate(), sentence.getTranslateDisturb()));
-                // 正确顺序翻译
-                map.put("rateList", commonMethod.getChineseList(sentence.getCentreTranslate()));
-            }
-        } else {
-            if (nextInt == 1) {
-                // 例句英文乱序集合
-                map.put("order", commonMethod.getOrderEnglishList(sentence.getCentreExample(), null));
-                // 例句英文正序集合，含有标点
-                map.put("rateList", commonMethod.getEnglishList(sentence.getCentreExample()));
-            }
-            if (nextInt == 2) {
-                // 例句翻译中含有乱序的中文解释和干扰项
-                map.put("order", commonMethod.getOrderChineseList(sentence.getCentreTranslate(), null));
-                // 正确顺序翻译
-                map.put("rateList", commonMethod.getChineseList(sentence.getCentreTranslate()));
-            }
+        if(nextInt==1){
+            testResultUtil.getOrderEnglishList(map,sentence.getCentreExample(),sentence.getExampleDisturb(),type);
+        }else{
+            testResultUtil.getOrderChineseList(map,sentence.getCentreTranslate(),sentence.getTranslateDisturb(),type);
         }
-
-
         return map;
     }
 
@@ -668,8 +644,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         } else if (select == 3) {
             sentences = capacityMapper.ripeCentreReviewSentence_listen(studentId, unitId, classifyStr);
         }
-
-
         return testResultUtil.getSentenceTestResults(sentences, classify, type);
     }
 
