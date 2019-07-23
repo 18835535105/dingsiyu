@@ -176,4 +176,13 @@ public class RankOpt {
         return rank == null ? -1 : rank;
     }
 
+    /**
+     * 删除多余的排行信息
+     *
+     * @param key
+     * @param studentId
+     */
+    public void deleteMember(String key, Long studentId) {
+        redisTemplate.opsForZSet().remove(key, studentId);
+    }
 }
