@@ -5,11 +5,21 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.ReadWord">
         <id column="id" property="id" />
+        <result column="student_id" property="studentId" />
         <result column="course_id" property="courseId" />
         <result column="word_id" property="wordId" />
         <result column="type" property="type" />
         <result column="push" property="push" />
         <result column="memory_strength" property="memoryStrength" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
     </resultMap>
+    <select id="countByCourseIdAndWordIdAndNotKnow" resultType="java.lang.Integer" parameterType="map">
+        select count(*)
+        from read_word
+        where student_id = #{studentId}
+          and course_id = #{courseId}
+          and word_id = #{wordId}
+    </select>
 
 </mapper>

@@ -52,8 +52,8 @@ public class TestResultUtil implements Serializable {
      * @param type       测试题类型数组 ["英译汉","汉译英","听力理解"]
      * @param subjectNum 测试题总个数
      * @param target     需要封装的测试题集合
-     * @param version   学习版本
-     * @param phase 学段
+     * @param version    学习版本
+     * @param phase      学段
      * @return
      */
     public List<TestResult> getWordTestes(String[] type, Integer subjectNum, List<Vocabulary> target, String version, String phase) {
@@ -151,7 +151,7 @@ public class TestResultUtil implements Serializable {
      * @return
      */
     public List<TestResult> getWordTestesForUnit(String[] type, Integer subjectNum, List<Vocabulary> target, Long unitId) {
-    	if (type == null || type.length == 0) {
+        if (type == null || type.length == 0) {
             throw new RuntimeException("测试题类型不能为空！");
         }
         if (target == null || target.size() == 0) {
@@ -229,7 +229,7 @@ public class TestResultUtil implements Serializable {
      */
     private void toGetSubject(String[] type, Integer subjectNum, List<Vocabulary> target, List<TestResult> results,
                               Map<Long, Vocabulary> map, Map<Long, Map<Long, String>> chineseMap, Iterator<Long> iterator) {
-    	String wordChinese;
+        String wordChinese;
         String chinese;
         for (int i = 0; i < type.length; i++) {
             // 控制每类题型的数量
@@ -378,16 +378,12 @@ public class TestResultUtil implements Serializable {
             if (classify == 6) {
                 getSentenceWriteVo(sentences, vos, type);
             } else {
-                getSentenceTranslateVo(sentences, vos, type,classify);
+                getSentenceTranslateVo(sentences, vos, type, classify);
             }
             return vos;
         }
         return null;
     }
-
-
-
-
 
 
     private void getSentenceWriteVo(List<Sentence> sentences, List<SentenceTranslateVo> vos, Integer type) {
@@ -396,7 +392,7 @@ public class TestResultUtil implements Serializable {
             sentenceTranslateVo = new SentenceTranslateVo();
             sentenceTranslateVo.setId(sentence.getId());
             sentenceTranslateVo.setMemoryStrength(0.00);
-            sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("$",""));
+            sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("$", ""));
             sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
             sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePath(sentence.getCentreExample()));
             if (type == 2) {
@@ -409,33 +405,33 @@ public class TestResultUtil implements Serializable {
         }
     }
 
-    private void getSentenceTranslateVo(List<Sentence> sentences, List<SentenceTranslateVo> vos, int type,int classify) {
+    private void getSentenceTranslateVo(List<Sentence> sentences, List<SentenceTranslateVo> vos, int type, int classify) {
         SentenceTranslateVo sentenceTranslateVo;
         for (Sentence sentence : sentences) {
             sentenceTranslateVo = new SentenceTranslateVo();
             sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
-            sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*"," ").replace("$",""));
+            sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*", " ").replace("$", ""));
             sentenceTranslateVo.setId(sentence.getId());
             sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePath(sentence.getCentreExample()));
 
             int nextInt = new Random().nextInt();
-            if(classify==4){
-                nextInt=2;
+            if (classify == 4) {
+                nextInt = 2;
             }
             if (nextInt % 2 == 0) {
-                getOrderEnglishList(sentenceTranslateVo,sentence.getCentreExample(),sentence.getExampleDisturb(),type);
+                getOrderEnglishList(sentenceTranslateVo, sentence.getCentreExample(), sentence.getExampleDisturb(), type);
             } else {
-                getOrderChineseList(sentenceTranslateVo,sentence.getCentreTranslate(),sentence.getTranslateDisturb(),type);
+                getOrderChineseList(sentenceTranslateVo, sentence.getCentreTranslate(), sentence.getTranslateDisturb(), type);
             }
             vos.add(sentenceTranslateVo);
         }
     }
 
-    public void getOrderChineseList(Map<String,Object> sentenceTranslateVo, String centreTranslates, String translateDisturb, Integer type) {
+    public void getOrderChineseList(Map<String, Object> sentenceTranslateVo, String centreTranslates, String translateDisturb, Integer type) {
         // 将例句按照空格拆分
         String[] centreTranslate = centreTranslates.split(" ");
-        List<String> centreTranslatelist=new ArrayList<>();
-        for(String s:centreTranslate){
+        List<String> centreTranslatelist = new ArrayList<>();
+        for (String s : centreTranslate) {
             String[] split = s.split("\\*");
             centreTranslatelist.addAll(Arrays.asList(split));
         }
@@ -487,15 +483,15 @@ public class TestResultUtil implements Serializable {
             }
         }
         Collections.shuffle(orderList);
-        sentenceTranslateVo.put("order",orderList);
-        sentenceTranslateVo.put("rateList",rightList);
+        sentenceTranslateVo.put("order", orderList);
+        sentenceTranslateVo.put("rateList", rightList);
     }
 
     public void getOrderChineseList(SentenceTranslateVo sentenceTranslateVo, String centreTranslates, String translateDisturb, Integer type) {
         // 将例句按照空格拆分
         String[] centreTranslate = centreTranslates.split(" ");
-        List<String> centreTranslatelist=new ArrayList<>();
-        for(String s:centreTranslate){
+        List<String> centreTranslatelist = new ArrayList<>();
+        for (String s : centreTranslate) {
             String[] split = s.split("\\*");
             centreTranslatelist.addAll(Arrays.asList(split));
         }
@@ -509,35 +505,30 @@ public class TestResultUtil implements Serializable {
         final String START_MATCH = "^[a-zA-z0-9\\u4e00-\\u9fa5].*";
         StringBuilder sb = new StringBuilder();
         for (String s : centreTranslatelist) {
-            if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
-                rightList.add(s);
-                orderList.add(s);
-            } else {
-                char[] chars = s.toCharArray();
-                sb.setLength(0);
-                int length = chars.length;
-                for (int i = 0; i < length; i++) {
-                    char aChar = chars[i];
-                    // 当前下标的数据
-                    String s1 = new String(new char[]{aChar});
-                    // 是字母或者数字，拼接字符串
-                    if (Pattern.matches(END_MATCH, s1)) {
-                        sb.append(s1);
-                    } else {
-                        if (sb.length() > 0) {
-                            rightList.add(sb.toString());
-                            orderList.add(sb.toString());
-                            sb.setLength(0);
-                        }
-                        // 如果符号前面是字母需要在符号列表中加 null
-                        rightList.add(s1);
-                    }
-                    // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
-                    if (sb.length() > 0 && i == length - 1) {
+            char[] chars = s.toCharArray();
+            sb.setLength(0);
+            int length = chars.length;
+            for (int i = 0; i < length; i++) {
+                char aChar = chars[i];
+                // 当前下标的数据
+                String s1 = new String(new char[]{aChar});
+                // 是字母或者数字，拼接字符串
+                if (Pattern.matches(END_MATCH, s1)) {
+                    sb.append(s1);
+                } else {
+                    if (sb.length() > 0) {
                         rightList.add(sb.toString());
                         orderList.add(sb.toString());
                         sb.setLength(0);
                     }
+                    // 如果符号前面是字母需要在符号列表中加 null
+                    rightList.add(s1);
+                }
+                // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
+                if (sb.length() > 0 && i == length - 1) {
+                    rightList.add(sb.toString());
+                    orderList.add(sb.toString());
+                    sb.setLength(0);
                 }
             }
         }
@@ -558,7 +549,7 @@ public class TestResultUtil implements Serializable {
      * @param exampleDisturb 例句英文干扰项  为空时无干扰项
      * @return
      */
-    public void getOrderEnglishList(Map<String,Object> sentenceTranslateVo, String sentence, String exampleDisturb, Integer type) {
+    public void getOrderEnglishList(Map<String, Object> sentenceTranslateVo, String sentence, String exampleDisturb, Integer type) {
         // 将例句按照空格拆分
         String[] words = sentence.split(" ");
         // 正确顺序
@@ -571,10 +562,9 @@ public class TestResultUtil implements Serializable {
         final String START_MATCH = "^[a-zA-Z0-9$].*";
         StringBuilder sb = new StringBuilder();
         for (String s : words) {
-            s = s.replace("#", " ").replace("$", "");
             if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
-                rightList.add(s);
-                orderList.add(s);
+                rightList.add(s.replace("#", " ").replace("$", ""));
+                orderList.add(s.replace("#", " ").replace("$", ""));
             } else {
                 char[] chars = s.toCharArray();
                 sb.setLength(0);
@@ -588,8 +578,8 @@ public class TestResultUtil implements Serializable {
                         sb.append(s1);
                     } else {
                         if (sb.length() > 0) {
-                            rightList.add(sb.toString());
-                            orderList.add(sb.toString());
+                            rightList.add(sb.toString().replace("#", " ").replace("$", ""));
+                            orderList.add(sb.toString().replace("#", " ").replace("$", ""));
                             sb.setLength(0);
                         }
                         // 如果符号前面是字母需要在符号列表中加 null
@@ -597,8 +587,8 @@ public class TestResultUtil implements Serializable {
                     }
                     // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
                     if (sb.length() > 0 && i == length - 1) {
-                        rightList.add(sb.toString());
-                        orderList.add(sb.toString());
+                        rightList.add(sb.toString().replace("#", " ").replace("$", ""));
+                        orderList.add(sb.toString().replace("#", " ").replace("$", ""));
                         sb.setLength(0);
                     }
                 }
@@ -610,8 +600,8 @@ public class TestResultUtil implements Serializable {
             }
         }
         Collections.shuffle(orderList);
-        sentenceTranslateVo.put("order",orderList);
-        sentenceTranslateVo.put("rateList",rightList);
+        sentenceTranslateVo.put("order", orderList);
+        sentenceTranslateVo.put("rateList", rightList);
     }
 
     /**
@@ -629,15 +619,14 @@ public class TestResultUtil implements Serializable {
         // 乱序
         List<String> orderList = new ArrayList<>();
         // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$]$";
+        final String END_MATCH = ".*[a-zA-Z0-9$#]$";
         // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$].*";
+        final String START_MATCH = "^[a-zA-Z0-9$#].*";
         StringBuilder sb = new StringBuilder();
         for (String s : words) {
-            s = s.replace("#", " ").replace("$", "");
             if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
-                rightList.add(s);
-                orderList.add(s);
+                rightList.add(s.replace("#", " ").replace("$", ""));
+                orderList.add(s.replace("#", " ").replace("$", ""));
             } else {
                 char[] chars = s.toCharArray();
                 sb.setLength(0);
@@ -651,8 +640,8 @@ public class TestResultUtil implements Serializable {
                         sb.append(s1);
                     } else {
                         if (sb.length() > 0) {
-                            rightList.add(sb.toString());
-                            orderList.add(sb.toString());
+                            rightList.add(sb.toString().replace("#", " ").replace("$", ""));
+                            orderList.add(sb.toString().replace("#", " ").replace("$", ""));
                             sb.setLength(0);
                         }
                         // 如果符号前面是字母需要在符号列表中加 null
@@ -660,8 +649,8 @@ public class TestResultUtil implements Serializable {
                     }
                     // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
                     if (sb.length() > 0 && i == length - 1) {
-                        rightList.add(sb.toString());
-                        orderList.add(sb.toString());
+                        rightList.add(sb.toString().replace("#", " ").replace("$", ""));
+                        orderList.add(sb.toString().replace("#", " ").replace("$", ""));
                         sb.setLength(0);
                     }
                 }
@@ -675,8 +664,9 @@ public class TestResultUtil implements Serializable {
         Collections.shuffle(orderList);
         sentenceTranslateVo.setOrder(orderList);
         sentenceTranslateVo.setRateList(rightList);
+        sentenceTranslateVo.setEnglishList(rightList);
+        sentenceTranslateVo.setOrderEnglish(orderList);
     }
-
 
 
     /**

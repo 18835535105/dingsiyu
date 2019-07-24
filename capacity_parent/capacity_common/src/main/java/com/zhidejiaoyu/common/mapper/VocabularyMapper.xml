@@ -1125,5 +1125,20 @@
         uv.word_chinese not like '%……%'
         group by v.id) t where t.i = 0
     </select>
+    <select id="selectByPhaseNotInWord" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        distinct <include refid="unite_Column_List"/>
+        FROM vocabulary v, unit_vocabulary uv, unit u, course c
+        WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
+        u.course_id = c.id and c.study_paragraph = #{studyParagraph}
+        <if test="ignoreList.size > 0">
+            and v.word not in (
+            <foreach collection="ignoreList" item="map" separator=",">
+                #{map.word}
+            </foreach>
+            )
+        </if>
+        group by v.id
+    </select>
 
 </mapper>

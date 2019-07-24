@@ -1023,14 +1023,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             }
         }
         if (type.equals(5)) {
-            Integer role = student.getRole();
-            if (role.equals(4)) {
-                isHave = true;
-            } else {
-                if (student.getRank() <= 7) {
-                    isHave = true;
-                }
-            }
+            isHave = true;
         }
         map.put("isHave", isHave);
         return ServerResponse.createBySuccess(map);

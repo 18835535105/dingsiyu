@@ -28,7 +28,7 @@ public class OssClientConfig {
         clientBuilderConfiguration.setSupportCname(true);
 //        clientBuilderConfiguration.setProtocol(Protocol.HTTPS);
         clientBuilderConfiguration.setMaxConnections(200);
-        log.info("OssClient 初始化成功!");
+        log.info("Init OssClient");
         return new OSSClientBuilder().build(AliyunInfoConst.endpoint, AliyunInfoConst.accessKeyId, AliyunInfoConst.accessKeySecret, clientBuilderConfiguration);
     }
 }

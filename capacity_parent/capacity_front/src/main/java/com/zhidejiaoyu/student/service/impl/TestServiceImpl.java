@@ -356,28 +356,31 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (integer == null || integer <= 0) {
             integer = 0;
         }
+        //获取历史最高分
         Integer goldCount = 0;
-        if (integer <= point) {
-            if (point < SIX) {
-                goldCount = 0;
-            } else if (point < SEVENTY) {
-                goldCount = TestAwardGoldConstant.UNIT_TEST_SIXTY_TO_SEVENTY;
-            } else if (point < PASS) {
-                goldCount = TestAwardGoldConstant.UNIT_TEST_SEVENTY_TO_EIGHTY;
-            } else if (point < NINETY_POINT) {
-                goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_NINETY;
-            } else if (point < FULL_MARK) {
-                goldCount = TestAwardGoldConstant.UNIT_TEST_NINETY_TO_FULL;
-            } else {
-                goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
+        if (point > integer) {
+            if (integer <= point) {
+                if (point < SIX) {
+                    goldCount = 0;
+                } else if (point < SEVENTY) {
+                    goldCount = TestAwardGoldConstant.UNIT_TEST_SIXTY_TO_SEVENTY;
+                } else if (point < PASS) {
+                    goldCount = TestAwardGoldConstant.UNIT_TEST_SEVENTY_TO_EIGHTY;
+                } else if (point < NINETY_POINT) {
+                    goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_NINETY;
+                } else if (point < FULL_MARK) {
+                    goldCount = TestAwardGoldConstant.UNIT_TEST_NINETY_TO_FULL;
+                } else {
+                    goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
+                }
             }
-        }
-        this.saveLog(student, goldCount, null, "字母单元闯关测试");
-        if (student.getBonusExpires() != null) {
-            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
-                Double doubleGoldCount = goldCount * 0.2;
-                student.setSystemGold(student.getSystemGold() + doubleGoldCount);
-                testRecord.setAwardGold(goldCount + doubleGoldCount.intValue());
+            this.saveLog(student, goldCount, null, "字母单元闯关测试");
+            if (student.getBonusExpires() != null) {
+                if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
+                    Double doubleGoldCount = goldCount * 0.2;
+                    student.setSystemGold(student.getSystemGold() + doubleGoldCount);
+                    testRecord.setAwardGold(goldCount + doubleGoldCount.intValue());
+                }
             }
         }
         testRecord.setTestEndTime(new Date());
@@ -448,7 +451,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (integer == null || integer <= 0) {
             integer = 0;
         }
-        if (integer <= point) {
+        if (integer < point) {
             if (point < SIX) {
                 goldCount = 0;
             } else if (point < SEVENTY) {
@@ -1564,18 +1567,23 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     private Integer saveGold(boolean isFirst, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord) {
         int point = wordUnitTestDTO.getPoint();
         int goldCount = 0;
+        // 查询当前单元测试历史最高分数
+        Integer betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), wordUnitTestDTO.getUnitId()[0],
+                wordUnitTestDTO.getClassify());
+        // 当前分数没有超过历史最高分，不获取金币
+        if (betterPoint != null && betterPoint >= point) {
+            return 0;
+        }
+
         if (isFirst) {
             goldCount = getGoldCount(wordUnitTestDTO, student, point);
         } else {
-            // 查询当前单元测试历史最高分数
-            Integer betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), wordUnitTestDTO.getUnitId()[0],
-                    wordUnitTestDTO.getClassify());
             if (betterPoint == null) {
                 betterPoint = 0;
             }
 
             // 非首次测试成绩本次测试成绩大于历史最高分，超过历史最高分次数 +1并且金币奖励翻倍
-            if (betterPoint < wordUnitTestDTO.getPoint()) {
+            if (betterPoint < point) {
                 int betterCount = (testRecord.getBetterCount() == null ? 0 : testRecord.getBetterCount()) + 1;
                 testRecord.setBetterCount(betterCount);
                 goldCount = getGoldCount(wordUnitTestDTO, student, point);

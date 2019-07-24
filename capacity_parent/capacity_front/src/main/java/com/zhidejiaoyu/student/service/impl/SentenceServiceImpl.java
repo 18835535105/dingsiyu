@@ -275,12 +275,7 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
         sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("$", ""));
         sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", "").replace("$", ""));
         sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePath(sentence.getCentreExample()));
-        if (type == 2) {
-            sentenceTranslateVo.setOrderEnglish(commonMethod.getOrderEnglishList(sentence.getCentreExample(), sentence.getExampleDisturb()));
-        } else {
-            sentenceTranslateVo.setOrderEnglish(commonMethod.getOrderEnglishList(sentence.getCentreExample(), null));
-        }
-        sentenceTranslateVo.setEnglishList(commonMethod.getEnglishList(sentence.getCentreExample()));
+        testResultUtil.getOrderEnglishList(sentenceTranslateVo,sentence.getCentreExample(),sentence.getExampleDisturb(),type);
         sentenceTranslateVo.setPlan(plan);
         sentenceTranslateVo.setStudyNew(true);
         sentenceTranslateVo.setFirstStudy(firstStudy);
