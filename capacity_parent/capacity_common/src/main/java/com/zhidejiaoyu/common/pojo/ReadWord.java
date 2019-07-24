@@ -27,6 +27,9 @@ public class ReadWord extends Model<ReadWord> {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
+
+    private Long studentId;
+
     /**
      * 课程id
      */
@@ -46,7 +49,11 @@ public class ReadWord extends Model<ReadWord> {
     /**
      * 记忆强度
      */
-    private Integer memoryStrength;
+    private Double memoryStrength;
+
+    private Date createTime;
+
+    private Date updateTime;
 
 
     @Override

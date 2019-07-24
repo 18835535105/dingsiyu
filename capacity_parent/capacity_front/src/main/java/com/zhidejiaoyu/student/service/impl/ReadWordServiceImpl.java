@@ -5,12 +5,17 @@ import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.ReadWordMapper;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.ReadWord;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
+import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.language.SimpleYouDaoTranslate;
 import com.zhidejiaoyu.student.service.ReadWordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpSession;
+import java.util.Date;
 
 /**
  * @author wuchenxi
@@ -33,6 +38,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         Vocabulary vocabulary = vocabularyMapper.selectByWord(word);
         WordInfoVo wordInfoVo = simpleYouDaoTranslate.getWordInfoVo(word);
         if (vocabulary == null) {
+            wordInfoVo.setWordId(null);
             wordInfoVo.setCanAddNewWordsBook(false);
         } else {
             wordInfoVo.setWordId(vocabulary.getId());
@@ -42,12 +48,39 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
     }
 
     @Override
-    public ServerResponse<Object> addNewWordsBook(Long wordId) {
+    public ServerResponse<Object> addNewWordsBook(HttpSession session, Long courseId, Long wordId) {
         Vocabulary vocabulary = vocabularyMapper.selectById(wordId);
         if (vocabulary == null) {
-            throw new ServiceException(500, "未查询到 id=[" + wordId+"] 的单词信息！");
+            throw new ServiceException(500, "未查询到 id=[" + wordId + "] 的单词信息！");
         }
 
-        return null;
+        this.saveReadWord(session, courseId);
+
+        return ServerResponse.createBySuccess();
+    }
+
+    private void saveReadWord(HttpSession session, Long courseId) {
+        Date now = new Date();
+        Date pushTime = GoldMemoryTime.getGoldMemoryTime(0.12, now);
+
+        Student student = super.getStudent(session);
+        ReadWord readWord = new ReadWord();
+        readWord.setCourseId(courseId);
+        readWord.setStudentId(student.getId());
+        readWord.setType(1);
+        readWord.setMemoryStrength(0.12);
+        readWord.setPush(pushTime);
+        readWord.setCreateTime(now);
+        readWord.setUpdateTime(now);
+        this.insert(readWord);
+
+        readWord.setType(2);
+        this.insert(readWord);
+
+        readWord.setType(3);
+        this.insert(readWord);
+
+        readWord.setType(4);
+        this.insert(readWord);
     }
 }

@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.controller;
 
-import com.zhidejiaoyu.common.exception.Enum.ServiceExceptionEnum;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.ReadWordService;
@@ -11,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpSession;
 
 /**
  * 生词手册相关
@@ -48,11 +49,11 @@ public class ReadWordController {
      * @return
      */
     @PostMapping("/addNewWordsBook")
-    public ServerResponse<Object> addNewWordsBook(Long wordId) {
-        if (wordId == null) {
-            log.warn("阅读模块添加生词本出错！wordId=null");
+    public ServerResponse<Object> addNewWordsBook(HttpSession session, Long courseId, Long wordId) {
+        if (wordId == null || courseId == null) {
+            log.warn("阅读模块添加生词本出错！wordId=[{}], courseId=[{}]", wordId, courseId);
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT);
         }
-        return readWordService.addNewWordsBook(wordId);
+        return readWordService.addNewWordsBook(session, courseId, wordId);
     }
 }

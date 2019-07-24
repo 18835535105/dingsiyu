@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -105,25 +106,31 @@ public class SimpleYouDaoTranslate {
         if (jsonObject == null) {
             return null;
         }
+        String errorCode = jsonObject.getString("errorCode");
+        String successCode = "0";
+        if (!Objects.equals(successCode, errorCode)) {
+            log.error("请求有道翻译接口出错！错误码=[{}]", errorCode);
+        }
 
-        JSONArray translations = jsonObject.getJSONArray("translation");
+        JSONObject basic = jsonObject.getJSONObject("basic");
+        JSONArray translations = basic.getJSONArray("explains");
         // 释义
         List<String> translates = translations.stream().map(object -> {
             if (object == null) {
                 return "";
             }
-           return jsonObject.toString();
+            return object.toString();
         }).collect(Collectors.toList());
-        String usPhonetic = jsonObject.getJSONObject("basic").getString("us-phonetic");
-        String usReadUrl = jsonObject.getJSONObject("basic").getString("us-speech");
-        String ukPhonetic = jsonObject.getJSONObject("basic").getString("uk-phonetic");
-        String ukReadUrl = jsonObject.getJSONObject("basic").getString("uk-speech");
+        String usPhonetic = basic.getString("us-phonetic");
+        String usReadUrl = basic.getString("us-speech");
+        String ukPhonetic = basic.getString("uk-phonetic");
+        String ukReadUrl = basic.getString("uk-speech");
 
         WordInfoVo wordInfoVo = new WordInfoVo();
         wordInfoVo.setWord(word);
         wordInfoVo.setTranslates(translates);
-        wordInfoVo.setUkPhonetic(ukPhonetic);
-        wordInfoVo.setUsPhonetic(usPhonetic);
+        wordInfoVo.setUkPhonetic("[" + ukPhonetic + "]");
+        wordInfoVo.setUsPhonetic("[" + usPhonetic + "]");
         wordInfoVo.setUsReadUrl(usReadUrl);
         wordInfoVo.setUkReadUrl(ukReadUrl);
 
