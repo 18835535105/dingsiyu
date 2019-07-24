@@ -32,9 +32,6 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
     private GameStoreMapper gameStoreMapper;
 
     @Autowired
-    private CapacityReviewMapper capacityReviewMapper;
-
-    @Autowired
     private LearnMapper learnMapper;
 
     @Autowired
@@ -51,6 +48,9 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
 
     @Autowired
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
+
+    @Autowired
+    private CourseMapper courseMapper;
 
     @Autowired
     private BaiduSpeak baiduSpeak;
@@ -217,9 +217,18 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         List<Vocabulary> vocabularies = vocabularyMapper.selectByCourseIdNotInWord(courseId, ignoreList);
         int size = unitLearns.size() + vocabularies.size();
         if (size < 10) {
+            // 如果当前课程没有进行游戏的单词补足 10 个，从下一课程中取数据
             PageHelper.startPage(1, 10 - size);
             vocabularies.addAll(vocabularyMapper.selectByCourseIdNotInWord(courseId + 1, ignoreList));
+            size = unitLearns.size() + vocabularies.size();
+            if (size < 10) {
+                // 如果还补足 10 个，从同一学段中随机取余下单词
+                Course course = courseMapper.selectById(courseId);
+                PageHelper.startPage(1, 10 - size);
+                vocabularies.addAll(vocabularyMapper.selectByPhaseNotInWord(course.getStudyParagraph(), ignoreList));
+            }
         }
+
         vocabularies.forEach(vocabulary -> {
             Map<String, Object> map = new HashMap<>(16);
             map.put("word", vocabulary.getWord());

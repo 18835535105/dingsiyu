@@ -1,9 +1,11 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.UnitVocabulary;
+import com.zhidejiaoyu.common.pojo.Vocabulary;
+import com.zhidejiaoyu.common.pojo.VocabularyExample;
 import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -397,7 +399,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     List<Map<String, String>> selectWordByCourseId(@Param("courseId") long courseId, @Param("limitStart") int limitStart,
-                                      @Param("limitEnd") int limitEnd, @Param("wordIds") List<Long> wordIds);
+                                                   @Param("limitEnd") int limitEnd, @Param("wordIds") List<Long> wordIds);
 
     /**
      * 获取指定数量的学生已学含有图片的单词信息
@@ -436,4 +438,12 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      */
     List<Vocabulary> selectByCourseIdWithoutWordIds(@Param("courseId") long courseId, @Param("vocabularies") List<Vocabulary> vocabularies);
 
+    /**
+     * 查询当前学段并且不在ignoreList中的单词
+     *
+     * @param studyParagraph 学段
+     * @param ignoreList     需要忽略的单词数据
+     * @return
+     */
+    List<Vocabulary> selectByPhaseNotInWord(@Param("studyParagraph") String studyParagraph, @Param("ignoreList") List<Map<String, Object>> ignoreList);
 }
