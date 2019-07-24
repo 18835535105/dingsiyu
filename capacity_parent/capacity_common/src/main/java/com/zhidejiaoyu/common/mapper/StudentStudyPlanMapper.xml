@@ -102,6 +102,9 @@
     <select id="selLetterSudyByStudentAndUnitId" parameterType="map" resultMap="BaseResultMap">
         select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type=4 and (start_unit_id &lt;=#{unitId} and end_unit_id>=#{unitId}) limit 1
     </select>
+    <select id="selStudyReadPlanByStudentIdAndUnitId" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type=6 and (start_unit_id &lt;=#{unitId} and end_unit_id>=#{unitId}) limit 1
+    </select>
 
 
 </mapper>

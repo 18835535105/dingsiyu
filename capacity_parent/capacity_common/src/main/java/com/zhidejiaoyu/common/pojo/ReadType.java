@@ -63,6 +63,11 @@ public class ReadType extends Model<ReadType> {
      */
     @TableField("test_type")
     private int testType;
+    /**
+     * 题目数量
+     */
+    @TableField("read_count")
+    private int readCount;
 
     @Override
     protected Serializable pkVal() {

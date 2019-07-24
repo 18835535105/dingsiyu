@@ -18,13 +18,29 @@ public class ReadCourseController extends BaseController {
 
     /**
      * 获取全部分配的课程
+     *
      * @param session
      * @return
      */
     @RequestMapping("/getAllCourse")
-    public ServerResponse<Object> getAllCourse(HttpSession session){
+    public ServerResponse<Object> getAllCourse(HttpSession session) {
         return readService.getAllCourse(session);
     }
 
+    /**
+     * 修改正在学习课程信息
+     *
+     * @param session
+     * @param courseId 要修改的课程id
+     * @return
+     */
+    @RequestMapping("/updStudyPlan")
+    public ServerResponse<Object> updStudyPlan(HttpSession session, Long courseId) {
+        return readService.updStudyPlan(session, courseId);
+    }
 
+    @RequestMapping("/getStudyCourse")
+    public ServerResponse<Object> getStudyCourse(HttpSession session, Long courseId) {
+        return readService.getStudyCourse(session, courseId);
+    }
 }

@@ -1,9 +1,7 @@
 package com.zhidejiaoyu.student.service.impl;
 
-import com.zhidejiaoyu.common.mapper.ReadCourseMapper;
-import com.zhidejiaoyu.common.mapper.StudentStudyPlanMapper;
-import com.zhidejiaoyu.common.pojo.ReadCourse;
-import com.zhidejiaoyu.common.pojo.StudentStudyPlan;
+import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.ReadCourseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +17,16 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
     private StudentStudyPlanMapper studentStudyPlanMapper;
 
     @Autowired
+    private TestRecordMapper testRecordMapper;
+
+    @Autowired
     private ReadCourseMapper readCourseMapper;
+
+    @Autowired
+    private CapacityStudentUnitMapper capacityStudentUnitMapper;
+
+    @Autowired
+    private ReadTypeMapper readTypeMapper;
 
     /**
      * 获取全部单元信息
@@ -33,10 +40,120 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selReadCourseByStudentId(studentId);
         if (studentStudyPlans != null && studentStudyPlans.size() > 0) {
             //去掉重复添加的阅读数据
-            List<ReadCourse> readCourse = this.getReadCourse(studentStudyPlans);
+            List<ReadCourse> readCourses = this.getReadCourse(studentStudyPlans);
+            //获取当前学习单元
+            CapacityStudentUnit unit = capacityStudentUnitMapper.selByStudentIdAndType(studentId, 6);
+            Map<String, Object> returnMap = new HashMap<>();
+            returnMap.put("list", readCourses);
+            Map<String, Object> present = new HashMap<>();
+            //判断正在学习单元拥有
+            if (unit != null) {
+                for (ReadCourse course : readCourses) {
+                    if (unit.getUnitId().equals(course.getId())) {
+                        present.put("courseId", unit.getCourseId());
+                        present.put("courseName", unit.getCourseName());
+                    }
+                }
+            }
+            //在未拥有当前学习的课程时调用
+            if (present.size() <= 0) {
+                present = new HashMap<>();
+                ReadCourse readCourse = readCourses.get(0);
+                present.put("courseId", readCourse.getId());
+                present.put("courseName", readCourse.getCourseName());
+                //更改正在学习的信息
+                updStudyPlan(readCourse, unit, studentId);
+            }
+            returnMap.put("present", present);
+            return ServerResponse.createBySuccess(returnMap);
         }
-
         return ServerResponse.createByError(500, "未分配课程");
+    }
+
+    /**
+     * 修改正在学习的单元信息
+     *
+     * @param session
+     * @param courseId
+     * @return
+     */
+    @Override
+    public ServerResponse<Object> updStudyPlan(HttpSession session, Long courseId) {
+        Long studentId = getStudentId(session);
+        ReadCourse readCourse = readCourseMapper.selectById(courseId);
+        CapacityStudentUnit unit = capacityStudentUnitMapper.selByStudentIdAndType(studentId, 6);
+        updStudyPlan(readCourse, unit, studentId);
+        return ServerResponse.createBySuccess();
+    }
+
+    /**
+     * 获取当前单元阅读课程信息
+     *
+     * @param session
+     * @param courseId
+     * @return
+     */
+    @Override
+    public ServerResponse<Object> getStudyCourse(HttpSession session, Long courseId) {
+        Student student = getStudent(session);
+        List<ReadType> readTypes = readTypeMapper.selByCourseId(courseId);
+        List<Map<String, Object>> returnList = new ArrayList<>();
+        for (ReadType readType : readTypes) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("typeId", readType.getId());
+            map.put("typesOfEssays", readType.getTypesOfEssays());
+            map.put("difficulty", readType.getDifficulty());
+            map.put("wordQuantity", readType.getWordQuantity());
+            String learnTime = readType.getLearnTime().replace("s", "");
+            Integer second = Integer.parseInt(learnTime);
+            Integer minute = second / 60;
+            Integer residueSecond = second % 60;
+            StringBuilder strB = new StringBuilder();
+            if (minute != null && minute != 0) {
+                strB.append(minute + "分");
+            }
+            if (residueSecond != null && residueSecond != 0) {
+                strB.append(residueSecond + "秒");
+            }
+            map.put("lookLearnTime", strB.toString());
+            map.put("calculationLearnTime", second);
+            map.put("questions", readType.getReadCount());
+            TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitIdAndGenre(student.getId(), readType.getId(), "阅读测试", "阅读测试");
+            if (testRecord != null) {
+                map.put("rightCount", testRecord.getRightCount());
+            } else {
+                map.put("rightCount", 0);
+            }
+            returnList.add(map);
+        }
+        return null;
+    }
+
+
+    /**
+     * 更改正在学习的课程
+     *
+     * @param readCourse 正要课程信息
+     * @param unit       正在学习课程信息
+     * @param studentId  学生id
+     */
+    private void updStudyPlan(ReadCourse readCourse, CapacityStudentUnit unit, Long studentId) {
+        if (unit == null) {
+            unit = new CapacityStudentUnit();
+            unit.setStudentId(studentId);
+        }
+        unit.setUnitName(readCourse.getCourseName());
+        unit.setCourseName(readCourse.getCourseName());
+        unit.setType(6);
+        unit.setUnitId(readCourse.getId());
+        StudentStudyPlan plan = studentStudyPlanMapper.selStudyReadPlanByStudentIdAndUnitId(studentId, readCourse.getId());
+        unit.setStartunit(plan.getStartUnitId());
+        unit.setEndunit(plan.getEndUnitId());
+        if (unit.getId() != null) {
+            capacityStudentUnitMapper.updateById(unit);
+        } else {
+            capacityStudentUnitMapper.insert(unit);
+        }
     }
 
     //去重数据

@@ -12,12 +12,16 @@
         <result column="learn_time" property="learnTime" />
         <result column="read_name" property="readName" />
         <result column="test_type" property="testType" />
+        <result column="read_count" property="readCount" />
+
     </resultMap>
 
     <sql id="baseSql">
         id,types_of_essays,difficulty,course_id,word_quantity,learn_time,read_name,test_type
     </sql>
 
-
+    <select id="selByCourseId" resultMap="BaseResultMap" parameterType="map">
+        select <include refid="baseSql"></include> from read_type where course_id=#{courseId}
+    </select>
 
 </mapper>
