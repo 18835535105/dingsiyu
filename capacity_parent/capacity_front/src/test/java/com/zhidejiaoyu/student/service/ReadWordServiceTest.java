@@ -18,7 +18,7 @@ public class ReadWordServiceTest extends BaseTest {
 
     @Test
     public void getWordInfo() {
-        ServerResponse<Object> response = readWordService.getWordInfo("hello");
+        ServerResponse<Object> response = readWordService.getWordInfo(null, null, "hello");
         Object data = response.getData();
         if (data != null) {
             log.info("result=[{}]", data.toString());

@@ -34,12 +34,12 @@ public class ReadWordController {
      * @return
      */
     @GetMapping("/getWordInfo")
-    public ServerResponse<Object> getWordInfo(String word) {
-        if (StringUtils.isEmpty(word)) {
-            log.error("阅读模块获取指定单词信息出错，参数 word=[{}]", word);
+    public ServerResponse<Object> getWordInfo(HttpSession session, Long courseId, String word) {
+        if (StringUtils.isEmpty(word) || courseId == null) {
+            log.error("阅读模块获取指定单词信息出错，参数 word=[{}], courseId=[{}]", word, courseId);
             return ServerResponse.createByError();
         }
-        return readWordService.getWordInfo(word);
+        return readWordService.getWordInfo(session, courseId, word);
     }
 
     /**
@@ -48,7 +48,7 @@ public class ReadWordController {
      * @param wordId
      * @return
      */
-    @PostMapping("/addNewWordsBook")
+    @PostMapping("/saveNewWordsBook")
     public ServerResponse<Object> addNewWordsBook(HttpSession session, Long courseId, Long wordId) {
         if (wordId == null || courseId == null) {
             log.warn("阅读模块添加生词本出错！wordId=[{}], courseId=[{}]", wordId, courseId);

@@ -34,17 +34,27 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
     private VocabularyMapper vocabularyMapper;
 
     @Override
-    public ServerResponse<Object> getWordInfo(String word) {
+    public ServerResponse<Object> getWordInfo(HttpSession session, Long courseId, String word) {
         Vocabulary vocabulary = vocabularyMapper.selectByWord(word);
         WordInfoVo wordInfoVo = simpleYouDaoTranslate.getWordInfoVo(word);
         if (vocabulary == null) {
             wordInfoVo.setWordId(null);
             wordInfoVo.setCanAddNewWordsBook(false);
+            return ServerResponse.createBySuccess(wordInfoVo);
+        }
+
+        wordInfoVo.setWordId(vocabulary.getId());
+        Student student = super.getStudent(session);
+        int count = readWordMapper.countByCourseIdAndWordIdAndNotKnow(student.getId(), courseId, vocabulary.getId());
+        // 如果当前选中的单词存在于当前课程的生词手册中，隐藏“添加到生词手册”按钮
+        if (count > 0) {
+            wordInfoVo.setCanAddNewWordsBook(false);
         } else {
-            wordInfoVo.setWordId(vocabulary.getId());
             wordInfoVo.setCanAddNewWordsBook(true);
         }
         return ServerResponse.createBySuccess(wordInfoVo);
+
+
     }
 
     @Override
