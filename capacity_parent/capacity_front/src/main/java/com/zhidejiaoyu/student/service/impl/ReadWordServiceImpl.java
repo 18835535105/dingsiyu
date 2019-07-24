@@ -53,20 +53,28 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         if (vocabulary == null) {
             throw new ServiceException(500, "未查询到 id=[" + wordId + "] 的单词信息！");
         }
+        Student student = super.getStudent(session);
+        Long studentId = student.getId();
 
-        this.saveReadWord(session, courseId);
+        int count = readWordMapper.countByCourseIdAndWordIdAndNotKnow(studentId, courseId, wordId);
+        // 如果当前单词在当前课程的生词手册中已经存在，不再进行保存，否则正常保存
+        if (count > 0) {
+            return ServerResponse.createBySuccess();
+        }
+
+        this.saveReadWord(studentId, courseId, wordId);
 
         return ServerResponse.createBySuccess();
     }
 
-    private void saveReadWord(HttpSession session, Long courseId) {
+    private void saveReadWord(Long studentId, Long courseId, Long wordId) {
         Date now = new Date();
         Date pushTime = GoldMemoryTime.getGoldMemoryTime(0.12, now);
 
-        Student student = super.getStudent(session);
         ReadWord readWord = new ReadWord();
         readWord.setCourseId(courseId);
-        readWord.setStudentId(student.getId());
+        readWord.setWordId(wordId);
+        readWord.setStudentId(studentId);
         readWord.setType(1);
         readWord.setMemoryStrength(0.12);
         readWord.setPush(pushTime);

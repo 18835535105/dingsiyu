@@ -14,5 +14,12 @@
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
     </resultMap>
+    <select id="countByCourseIdAndWordIdAndNotKnow" resultType="java.lang.Integer" parameterType="map">
+        select count(*)
+        from read_word
+        where student_id = #{studentId}
+          and course_id = #{courseId}
+          and word_id = #{wordId}
+    </select>
 
 </mapper>

@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.utils.simple.language;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.Vo.read.WordInfoVo;
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.utils.simple.http.SimpleHttpClientUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -110,6 +111,7 @@ public class SimpleYouDaoTranslate {
         String successCode = "0";
         if (!Objects.equals(successCode, errorCode)) {
             log.error("请求有道翻译接口出错！错误码=[{}]", errorCode);
+            throw new ServiceException("请求有道翻译接口出错！");
         }
 
         JSONObject basic = jsonObject.getJSONObject("basic");
