@@ -413,7 +413,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
     }
 
     private String getStringGrade(Long gradeLong) {
-        Integer grade=gradeLong.intValue();
+        Integer grade = gradeLong.intValue();
         if (grade.equals(1)) {
             return "一年级";
         }
@@ -451,6 +451,86 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             return "高三";
         }
         return "三年级";
+    }
+
+    private Integer getMonthSort(String month) {
+        if (month.equals("一月份")) {
+            return 1;
+        }
+        if (month.equals("二月份")) {
+            return 2;
+        }
+        if (month.equals("三月份")) {
+            return 3;
+        }
+        if (month.equals("四月份")) {
+            return 4;
+        }
+        if (month.equals("五月份")) {
+            return 5;
+        }
+        if (month.equals("六月份")) {
+            return 6;
+        }
+        if (month.equals("七月份")) {
+            return 7;
+        }
+        if (month.equals("八月份")) {
+            return 8;
+        }
+        if (month.equals("九月份")) {
+            return 9;
+        }
+        if (month.equals("十月份")) {
+            return 10;
+        }
+        if (month.equals("十一月份")) {
+            return 11;
+        }
+        if (month.equals("十二月份")) {
+            return 12;
+        }
+        return 0;
+    }
+
+    private String getMonthSort(Integer month) {
+        if (month.equals(1)) {
+            return "一月份";
+        }
+        if (month.equals(2)) {
+            return "二月份";
+        }
+        if (month.equals(3)) {
+            return "三月份";
+        }
+        if (month.equals(4)) {
+            return "四月份";
+        }
+        if (month.equals(5)) {
+            return "五月份";
+        }
+        if (month.equals(6)) {
+            return "六月份";
+        }
+        if (month.equals(7)) {
+            return "七月份";
+        }
+        if (month.equals(8)) {
+            return "八月份";
+        }
+        if (month.equals(9)) {
+            return "九月份";
+        }
+        if (month.equals(10)) {
+            return "十月份";
+        }
+        if (month.equals(11)) {
+            return "十一月份";
+        }
+        if (month.equals(12)) {
+            return "十二月份";
+        }
+        return "一月份";
     }
 
     private Integer getGradeInteger(String grade) {
