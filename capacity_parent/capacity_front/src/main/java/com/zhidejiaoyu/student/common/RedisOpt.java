@@ -294,6 +294,9 @@ public class RedisOpt {
      * @return true:是重复提交；false：是正常提交
      */
     public boolean isRepeatSubmit(Long studentId, Date testStartTime) {
+        if (testStartTime == null) {
+            return true;
+        }
         String key = RedisKeysConst.TEST_SUBMIT + ":" + studentId;
         Object object = redisTemplate.opsForValue().get(key);
         redisTemplate.opsForValue().set(key, testStartTime);

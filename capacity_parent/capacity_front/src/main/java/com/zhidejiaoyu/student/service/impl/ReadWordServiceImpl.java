@@ -47,12 +47,12 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
     /**
      * 是否以单词或者数字或者 ' 结尾
      */
-    private static final String END_MATCH = ".*[a-zA-z0-9']$";
+    private static final String END_MATCH = ".*[a-zA-z0-9'\\u4e00-\\u9fa5]$";
 
     /**
      * 是否以单词或者数字或者 ' 开头
      */
-    private static final String START_MATCH = "^[a-zA-z0-9'].*";
+    private static final String START_MATCH = "^[a-zA-z0-9'\\u4e00-\\u9fa5].*";
 
     @Autowired
     private ReadWordMapper readWordMapper;
