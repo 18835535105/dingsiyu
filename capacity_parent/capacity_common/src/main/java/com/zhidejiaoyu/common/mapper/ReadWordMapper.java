@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.ReadWord;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * <p>
  * 阅读生词手册 Mapper 接口
@@ -23,4 +25,13 @@ public interface ReadWordMapper extends BaseMapper<ReadWord> {
      * @return 大于0 说明单词已存在于当前课程的生词手册中；否则不存在
      */
     int countByCourseIdAndWordIdAndNotKnow(@Param("studentId") Long studentId, @Param("courseId") Long courseId, @Param("wordId") Long wordId);
+
+    /**
+     * 查询学生单钱课程的生词
+     *
+     * @param studentId
+     * @param courseId
+     * @return
+     */
+    List<ReadWord> selectByStudentIdCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
 }
