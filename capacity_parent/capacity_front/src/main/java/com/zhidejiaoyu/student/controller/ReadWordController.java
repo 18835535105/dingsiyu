@@ -56,4 +56,20 @@ public class ReadWordController {
         }
         return readWordService.addNewWordsBook(session, courseId, wordId);
     }
+
+    /**
+     * 获取生词本列表数据
+     *
+     * @param session
+     * @param courseId 当前课程 id
+     * @return
+     */
+    @GetMapping("/getNewWordsBook")
+    public ServerResponse getNewWordsBook(HttpSession session, Long courseId) {
+        if (courseId == null) {
+            log.error("获取生词本列表数据参数错误！courseId=null");
+            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT);
+        }
+        return readWordService.getNewWordsBook(session, courseId);
+    }
 }

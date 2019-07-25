@@ -34,4 +34,13 @@ public interface ReadWordService extends BaseService<ReadWord> {
      * @return
      */
     ServerResponse<Object> addNewWordsBook(HttpSession session, Long courseId, Long wordId);
+
+    /**
+     * 获取生词本列表数据
+     *
+     * @param session
+     * @param courseId
+     * @return
+     */
+    ServerResponse getNewWordsBook(HttpSession session, Long courseId);
 }
