@@ -15,5 +15,5 @@ import org.apache.ibatis.annotations.Param;
 public interface ReadBlanksMapper extends BaseMapper<ReadBlanks> {
 
 
-
+    ReadBlanks selByTypeId(Long typeId);
 }

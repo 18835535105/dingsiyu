@@ -13,7 +13,11 @@
     <sql id="sql">
         id,read_type_id,content,analysis
     </sql>
-
+    <select id="selByTypeId" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="sql"></include>
+        from read_choose_blanks
+        where read_type_id=#{typeId}
+    </select>
 
 
 </mapper>

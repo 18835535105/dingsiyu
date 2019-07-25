@@ -4,7 +4,6 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.ReadCourseService;
-import net.sf.jsqlparser.expression.operators.relational.OldOracleJoinBinaryExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +40,12 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
 
     @Autowired
     private ReadQuestionAnsweringMapper readQuestionAnsweringMapper;
+
+    @Autowired
+    private ReadChooseBlanksMapper readChooseBlanksMapper;
+
+    @Autowired
+    private ReadBlanksMapper readBlanksMapper;
 
     /**
      * 获取全部单元信息
@@ -88,39 +93,31 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selReadCourseByStudentId(studentId);
         if (studentStudyPlans != null && studentStudyPlans.size() > 0) {
             CapacityStudentUnit unit = capacityStudentUnitMapper.selByStudentIdAndType(studentId, 6);
-            //存放正在学习单元信息
-            Map<String, Object> present = new HashMap<>();
             //存放全部版本信息
             List<Map<String, Object>> courseList = new ArrayList<>();
-            //存放全部版本
-            List<String> versionList = new ArrayList<>();
             //获取去重后的数据  及存放正在学习的版本
-            List<Map<String, Object>> list = this.getReadCourseList(studentStudyPlans, present, unit);
+            List<Map<String, Object>> list = this.getReadCourseList(studentStudyPlans, unit);
             //存放返回信息
             Map<String, Object> returnMap = new HashMap<>();
             for (Map<String, Object> map : list) {
                 //获取年级
                 String grade = map.get("grade").toString();
-                //将年级放入版本信息中
-                versionList.add(grade);
                 //获取所有版本list集合
                 List<Long> unitList = (List<Long>) map.get("unitMap");
                 //获取月份信息
                 List<Map<String, Object>> maps = readCourseMapper.selSort(grade, unitList);
                 //判断正在学习的课程是否拥有，如果未拥有放入当前版本信息
-                if (present == null || present.size() == 0) {
-                    present = new HashMap<>();
-                    present.put("grade", grade);
-                    present.put("unitId", maps.get(0).get("unitId"));
-                }
                 Map<String, Object> versionMap = new HashMap<>();
                 versionMap.put("grade", grade);
-                versionMap.put("unitList", maps);
+                List<Map<String, Object>> sList = new ArrayList<>();
+                for (Map<String, Object> sMap : maps) {
+                    sMap.put("text", "未完成");
+                    sList.add(sMap);
+                }
+                versionMap.put("unitList", sList);
                 courseList.add(versionMap);
             }
             returnMap.put("course", courseList);
-            returnMap.put("version", versionList);
-            returnMap.put("present", present);
             return ServerResponse.createBySuccess(returnMap);
         }
         return ServerResponse.createByError(500, "未分配课程");
@@ -180,6 +177,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             if (residueSecond != null && residueSecond != 0) {
                 strB.append(residueSecond + "秒");
             }
+            map.put("readName", readType.getReadName());
             map.put("lookLearnTime", strB.toString());
             map.put("calculationLearnTime", second);
             map.put("questions", readType.getReadCount());
@@ -205,13 +203,43 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
     public ServerResponse<Object> getContent(Long typeId, Long courseId) {
         Map<String, Object> map = new HashMap<>();
 
-        if (typeId == null) {
+        if (typeId != null) {
             //查看趣味阅读
             this.getInterestingReadingData(typeId, map);
         } else {
             //查看队长讲英语课程
         }
-        return null;
+        return ServerResponse.createBySuccess(map);
+    }
+
+    @Override
+    public ServerResponse<Object> getVersion(HttpSession session) {
+        Long studentId = getStudentId(session);
+        List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selReadCourseByStudentId(studentId);
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selByStudentIdAndType(studentId, 6);
+        List<Map<String, Object>> returnList = new ArrayList<>();
+        if (studentStudyPlans.size() == 0) {
+            return ServerResponse.createByError();
+        }
+        boolean isTrue = true;
+        int index = 0;
+        for (StudentStudyPlan plan : studentStudyPlans) {
+            index++;
+            Map<String, Object> map = new HashMap<>();
+            map.put("version", getStringGrade(plan.getCourseId()));
+            if (capacityStudentUnit != null && capacityStudentUnit.getCourseId().equals(plan.getCourseId())) {
+                map.put("isStudy", true);
+                isTrue = false;
+            } else {
+                map.put("isStudy", false);
+            }
+            if (isTrue && studentStudyPlans.size() == index) {
+                map.put("isStudy", true);
+            }
+            returnList.add(map);
+        }
+
+        return ServerResponse.createBySuccess(returnList);
     }
 
     /**
@@ -225,11 +253,13 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         List<ReadContent> readContents = readContentMapper.selectByTypeId(typeId);
         List<List<ReadContent>> returnList = new ArrayList<>();
         List<ReadContent> readList = new ArrayList<>();
+        int i = 0;
         for (ReadContent readContent : readContents) {
             if (readList.size() == 0) {
                 readList = new ArrayList<>();
                 readContent.setSentence(readContent.getSentence().replace("#&#", ""));
                 readList.add(readContent);
+                i++;
             } else {
                 if (readContent.getSentence().indexOf("#&#") != -1) {
                     returnList.add(readList);
@@ -237,10 +267,14 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
                 }
                 readContent.setSentence(readContent.getSentence().replace("#&#", ""));
                 readList.add(readContent);
+                i++;
+            }
+            if (i == readContents.size()) {
+                returnList.add(readList);
             }
         }
         map.put("sentenceList", returnList);
-
+        map.put("type", readType.getTestType());
         if (readType.getTestType() == 1) {
             this.getChoiceQuestions(typeId, null, map);
         }
@@ -252,12 +286,56 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         }
 
         if (readType.getTestType() == 3) {
-
+            this.getChooseSentences(typeId, map);
         }
 
         if (readType.getTestType() == 5) {
-
+            this.getBlanks(typeId, map);
         }
+
+    }
+
+    private void getBlanks(Long typeId, Map<String, Object> map) {
+        ReadBlanks readBlanks = readBlanksMapper.selByTypeId(typeId);
+        String[] answerList = readBlanks.getAnswer().split("&@&");
+        String[] analysisList = readBlanks.getAnalysis().split("&@&");
+        List<Map<String,Object>> returnList=new ArrayList<>();
+        for (int i = 0; i < analysisList.length; i++) {
+            Map<String,Object> returnMap=new HashMap<>();
+            returnMap.put("word",answerList[i]);
+            returnMap.put("analysis",analysisList[i]);
+            returnList.add(returnMap);
+        }
+        map.put("topic",returnList);
+    }
+
+    /**
+     * 选句填空
+     *
+     * @param typeId
+     * @param map
+     */
+    private void getChooseSentences(Long typeId, Map<String, Object> map) {
+        ReadChooseBlanks readChooseBlanks = readChooseBlanksMapper.selByTypeId(typeId);
+        String analysis = readChooseBlanks.getAnalysis();
+        String content = readChooseBlanks.getContent();
+        List<String> analysisList = Arrays.asList(analysis.split("&@&"));
+        List<String> contentList = Arrays.asList(content.split("&@&"));
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (int i = 0; i < contentList.size(); i++) {
+            Map<String, Object> returnMap = new HashMap<>();
+            if (i >= analysisList.size()) {
+                returnMap.put("isTrue", false);
+                returnMap.put("analysisList", null);
+                returnMap.put("sentence", contentList.get(i));
+            } else {
+                returnMap.put("isTrue", true);
+                returnMap.put("analysisList", analysisList.get(i));
+                returnMap.put("sentence", contentList.get(i));
+            }
+            list.add(returnMap);
+        }
+        map.put("topic", list);
     }
 
 
@@ -361,7 +439,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
      * @param plans
      * @return
      */
-    private List<Map<String, Object>> getReadCourseList(List<StudentStudyPlan> plans, Map<String, Object> present, CapacityStudentUnit unit) {
+    private List<Map<String, Object>> getReadCourseList(List<StudentStudyPlan> plans, CapacityStudentUnit unit) {
         //获取全部课程id 去重
         List<Map<String, Object>> list = new ArrayList<>();
         Map<Long, List<StudentStudyPlan>> collect = plans.stream().collect(Collectors.groupingBy(vo -> vo.getCourseId()));
@@ -381,10 +459,6 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             List<Long> unitList = new ArrayList<>();
             Set<Long> longs = unitMap.keySet();
             for (Long sortId : longs) {
-                if (grade.equals(unitGrade) && unit.getUnitId().equals(sortId)) {
-                    present.put("grade", grade);
-                    present.put("unitId", sortId);
-                }
                 unitList.add(sortId);
             }
             gradeMap.put("grade", grade);

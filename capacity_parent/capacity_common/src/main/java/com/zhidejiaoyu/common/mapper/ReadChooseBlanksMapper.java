@@ -15,4 +15,5 @@ import org.apache.ibatis.annotations.Param;
 public interface ReadChooseBlanksMapper extends BaseMapper<ReadChooseBlanks> {
 
 
+    ReadChooseBlanks selByTypeId(@Param("typeId") Long typeId);
 }

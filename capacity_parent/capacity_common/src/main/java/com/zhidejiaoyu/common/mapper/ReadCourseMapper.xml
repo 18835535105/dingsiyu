@@ -33,7 +33,7 @@
     </select>
 
     <select id="selSort" parameterType="map" resultType="map">
-        select read_sort unitId ,month month
+        select read_sort unitId ,month month,id courseId
         from read_course
         where grade=#{grade}
         and read_sort in (

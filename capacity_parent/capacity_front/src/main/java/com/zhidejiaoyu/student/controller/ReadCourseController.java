@@ -56,4 +56,9 @@ public class ReadCourseController extends BaseController {
     public ServerResponse<Object> getContent(Long typeId, Long courseId) {
         return readService.getContent(typeId, courseId);
     }
+
+    @RequestMapping("/getVersion")
+    public ServerResponse<Object> getVersion(HttpSession session){
+        return readService.getVersion(session);
+    }
 }
