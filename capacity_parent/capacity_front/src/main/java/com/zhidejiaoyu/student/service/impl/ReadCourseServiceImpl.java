@@ -28,6 +28,18 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
     @Autowired
     private ReadTypeMapper readTypeMapper;
 
+    @Autowired
+    private ReadContentMapper readContentMapper;
+
+    @Autowired
+    private ReadChooseMapper readChooseMapper;
+
+    @Autowired
+    private ReadJudgeMapper readJudgeMapper;
+
+    @Autowired
+    private ReadQuestionAnsweringMapper readQuestionAnsweringMapper;
+
     /**
      * 获取全部单元信息
      *
@@ -127,6 +139,142 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             returnList.add(map);
         }
         return null;
+    }
+
+    /**
+     * 获取阅读课文文章
+     *
+     * @param typeId
+     * @param courseId
+     * @return
+     */
+    @Override
+    public ServerResponse<Object> getContent(Long typeId, Long courseId) {
+        Map<String, Object> map = new HashMap<>();
+
+        if (typeId == null) {
+            //查看趣味阅读
+            this.getInterestingReadingData(typeId, map);
+        } else {
+            //查看队长讲英语课程
+        }
+        return null;
+    }
+
+    /**
+     * 获取趣味阅读返回格式
+     *
+     * @param typeId
+     * @param map
+     */
+    private void getInterestingReadingData(Long typeId, Map<String, Object> map) {
+        ReadType readType = readTypeMapper.selectById(typeId);
+        List<ReadContent> readContents = readContentMapper.selectByTypeId(typeId);
+        List<List<ReadContent>> returnList = new ArrayList<>();
+        List<ReadContent> readList=new ArrayList<>();
+        for (ReadContent readContent : readContents) {
+            if (readList.size() == 0) {
+                readList = new ArrayList<>();
+                readContent.setSentence(readContent.getSentence().replace("#&#", ""));
+                readList.add(readContent);
+            } else {
+                if (readContent.getSentence().indexOf("#&#") != -1) {
+                    returnList.add(readList);
+                    readList = new ArrayList<>();
+                }
+                readContent.setSentence(readContent.getSentence().replace("#&#", ""));
+                readList.add(readContent);
+            }
+        }
+        map.put("sentenceList", returnList);
+
+        if (readType.getTestType() == 1) {
+            this.getChoiceQuestions(typeId, null, map);
+        }
+        if (readType.getTestType() == 2) {
+            this.getJudgmentQuestions(typeId, null, map);
+        }
+        if (readType.getTestType() == 4) {
+            this.getAnswersToQuestions(typeId, map);
+        }
+
+        if (readType.getTestType() == 3) {
+
+        }
+
+        if (readType.getTestType() == 5) {
+
+        }
+    }
+
+
+    /**
+     * 获取回答问题题目
+     *
+     * @param typeId
+     * @param map
+     */
+    private void getAnswersToQuestions(Long typeId, Map<String, Object> map) {
+        List<ReadQuestionAnswering> readQuestionAnswerings = readQuestionAnsweringMapper.selectByTypeIdOrCourseId(typeId);
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (ReadQuestionAnswering question : readQuestionAnswerings) {
+            Map<String, Object> qyestioneMap = new HashMap<>();
+            qyestioneMap.put("subject", question.getSubject());
+            qyestioneMap.put("analysis", question.getAnalysis());
+            String[] split = question.getAnswer().split("&@&");
+            List<String> answerList = Arrays.asList(split);
+            qyestioneMap.put("answer", answerList);
+            list.add(qyestioneMap);
+        }
+        map.put("topic", list);
+    }
+
+    /**
+     * 获取判断题
+     *
+     * @param typeId
+     * @param courseId
+     * @param map
+     */
+    private void getJudgmentQuestions(Long typeId, Long courseId, Map<String, Object> map) {
+        List<ReadJudge> readJudges = readJudgeMapper.selectByTypeIdOrCourseId(typeId, courseId);
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (ReadJudge judge : readJudges) {
+            Map<String, Object> judgeMap = new HashMap<>();
+            judgeMap.put("subject", judge.getSubject());
+            judgeMap.put("analysis", judge.getAnalysis());
+            boolean answer = judge.getAnswer().trim().equals("T") ? true : false;
+            judgeMap.put("answer", judge.getAnswer());
+            list.add(judgeMap);
+        }
+        map.put("topic", list);
+    }
+
+    /**
+     * 获取选择题
+     *
+     * @param typeId
+     * @param courseId
+     * @param map
+     */
+    private void getChoiceQuestions(Long typeId, Long courseId, Map<String, Object> map) {
+        List<ReadChoose> readChooses = readChooseMapper.selectByTypeIdOrCourseId(typeId, courseId);
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (ReadChoose choose : readChooses) {
+            Map<String, Object> chooseMap = new HashMap<>();
+            chooseMap.put("subject", choose.getSubject());
+            Map<String, Object> answerMap = new HashMap<>();
+            answerMap.put(choose.getAnswer(), true);
+            String[] wronganswers = choose.getWrongAnswer().split("&@&");
+            List<String> wrongList = Arrays.asList(wronganswers);
+            for (String str : wrongList.subList(0, 3)) {
+                answerMap.put(str, false);
+            }
+            chooseMap.put("analysis", choose.getAnalysis());
+            chooseMap.put("answer", answerMap);
+            list.add(chooseMap);
+        }
+        map.put("topic", list);
     }
 
 

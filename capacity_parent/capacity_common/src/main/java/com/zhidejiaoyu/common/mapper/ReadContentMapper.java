@@ -2,6 +2,9 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.ReadContent;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.zhidejiaoyu.common.pojo.ReadContent;
  */
 public interface ReadContentMapper extends BaseMapper<ReadContent> {
 
+    List<ReadContent> selectByTypeId(@Param("typeId") Long typeId);
 }

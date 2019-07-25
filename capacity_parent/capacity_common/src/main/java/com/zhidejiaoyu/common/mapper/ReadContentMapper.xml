@@ -8,7 +8,14 @@
         <result column="read_type_id" property="readTypeId" />
         <result column="sentence" property="sentence" />
         <result column="translate" property="translate" />
-        <result column="types" property="types" />
     </resultMap>
+
+    <sql id="basesql">
+        id,read_type_id,sentence,translate
+    </sql>
+
+    <select id="selectByTypeId" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="basesql"></include> from read_content where read_type_id=#{typeId}
+    </select>
 
 </mapper>

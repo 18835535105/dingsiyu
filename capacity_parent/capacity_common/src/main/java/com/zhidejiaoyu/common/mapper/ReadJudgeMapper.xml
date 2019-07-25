@@ -16,5 +16,19 @@
         id,course_id,read_type_id,subject,answer,analysis
     </sql>
 
+    <select id="selectByTypeIdOrCourseId" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="sql"></include>
+        from
+        read_judge
+        <where>
+            <if test="courseId!=null">
+                and course_id=#{courseId}
+            </if>
+            <if test="typeId!=null">
+                and read_type_id=#{typeId}
+            </if>
+        </where>
+    </select>
 
 </mapper>

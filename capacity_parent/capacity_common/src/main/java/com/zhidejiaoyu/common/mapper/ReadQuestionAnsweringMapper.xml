@@ -4,17 +4,24 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.ReadQuestionAnswering">
-        <id column="id" property="id" />
-        <result column="read_type_id" property="readTypeId" />
-        <result column="subject" property="subject" />
-        <result column="answer" property="answer" />
-        <result column="analysis" property="analysis" />
+        <id column="id" property="id"/>
+        <result column="read_type_id" property="readTypeId"/>
+        <result column="subject" property="subject"/>
+        <result column="answer" property="answer"/>
+        <result column="analysis" property="analysis"/>
     </resultMap>
 
     <sql id="sql">
         id,read_type_id,subject,answer,analysis
     </sql>
 
+    <select id="selectByTypeIdOrCourseId" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="sql"></include>
+        from read_question_answering
+        where
+        read_type_id=#{typeId}
+    </select>
 
 
 </mapper>

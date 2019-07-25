@@ -39,8 +39,20 @@ public class ReadCourseController extends BaseController {
         return readService.updStudyPlan(session, courseId);
     }
 
+    /**
+     * 获取正在学习的课程信息
+     * @param session
+     * @param courseId
+     * @return
+     */
     @RequestMapping("/getStudyCourse")
     public ServerResponse<Object> getStudyCourse(HttpSession session, Long courseId) {
         return readService.getStudyCourse(session, courseId);
+    }
+
+
+    @RequestMapping("/getContent")
+    public ServerResponse<Object> getContent(Long typeId,Long courseId){
+        return readService.getContent(typeId,courseId);
     }
 }

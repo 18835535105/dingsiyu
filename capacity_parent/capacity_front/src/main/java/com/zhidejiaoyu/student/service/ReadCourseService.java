@@ -13,4 +13,6 @@ public interface ReadCourseService extends IService<ReadCourse> {
     ServerResponse<Object> updStudyPlan(HttpSession session, Long courseId);
 
     ServerResponse<Object> getStudyCourse(HttpSession session, Long courseId);
+
+    ServerResponse<Object> getContent(Long typeId, Long courseId);
 }
