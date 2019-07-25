@@ -1567,18 +1567,23 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     private Integer saveGold(boolean isFirst, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord) {
         int point = wordUnitTestDTO.getPoint();
         int goldCount = 0;
+        // 查询当前单元测试历史最高分数
+        Integer betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), wordUnitTestDTO.getUnitId()[0],
+                wordUnitTestDTO.getClassify());
+        // 当前分数没有超过历史最高分，不获取金币
+        if (betterPoint != null && betterPoint >= point) {
+            return 0;
+        }
+
         if (isFirst) {
             goldCount = getGoldCount(wordUnitTestDTO, student, point);
         } else {
-            // 查询当前单元测试历史最高分数
-            Integer betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), wordUnitTestDTO.getUnitId()[0],
-                    wordUnitTestDTO.getClassify());
             if (betterPoint == null) {
                 betterPoint = 0;
             }
 
             // 非首次测试成绩本次测试成绩大于历史最高分，超过历史最高分次数 +1并且金币奖励翻倍
-            if (betterPoint < wordUnitTestDTO.getPoint()) {
+            if (betterPoint < point) {
                 int betterCount = (testRecord.getBetterCount() == null ? 0 : testRecord.getBetterCount()) + 1;
                 testRecord.setBetterCount(betterCount);
                 goldCount = getGoldCount(wordUnitTestDTO, student, point);

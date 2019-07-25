@@ -228,6 +228,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 selMap.put("unitId", unitId);
                 selMap.put("studentId", student.getId());
                 selMap.put("model", "课文默写测试");
+                selMap.put("genre", null);
                 Integer integer = testRecordMapper.selectMaxPointByUnitStudentModel(selMap);
                 if (integer == null) {
                     resultMap.put("maxScore", 0);
