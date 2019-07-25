@@ -557,9 +557,9 @@ public class TestResultUtil implements Serializable {
         // 乱序
         List<String> orderList = new ArrayList<>();
         // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$]$";
+        final String END_MATCH = ".*[a-zA-Z0-9$']$";
         // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$].*";
+        final String START_MATCH = "^[a-zA-Z0-9$'].*";
         StringBuilder sb = new StringBuilder();
         for (String s : words) {
             if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
@@ -619,9 +619,9 @@ public class TestResultUtil implements Serializable {
         // 乱序
         List<String> orderList = new ArrayList<>();
         // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$#]$";
+        final String END_MATCH = ".*[a-zA-Z0-9$#']$";
         // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$#].*";
+        final String START_MATCH = "^[a-zA-Z0-9$#'].*";
         StringBuilder sb = new StringBuilder();
         for (String s : words) {
             if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {

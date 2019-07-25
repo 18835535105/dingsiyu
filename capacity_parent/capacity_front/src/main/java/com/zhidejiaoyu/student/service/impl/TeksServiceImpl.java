@@ -251,9 +251,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         List<String> orderList = new ArrayList<>();
 
         // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$]$";
+        final String END_MATCH = ".*[a-zA-Z0-9$']$";
         // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$].*";
+        final String START_MATCH = "^[a-zA-Z0-9$'].*";
 
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
@@ -621,9 +621,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         // 正确顺序
         List<String> rightList = new ArrayList<>();
         // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$]$";
+        final String END_MATCH = ".*[a-zA-Z0-9$']$";
         // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$].*";
+        final String START_MATCH = "^[a-zA-Z0-9$'].*";
         String[] split = sentence.trim().split(" ");
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
@@ -852,9 +852,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     public int[] wirterBlank(List<String> strList) {
         Random random = new Random();
         List<Integer> shuZhuString = new ArrayList<>();
-        final String END_MATCH = ".*[a-zA-Z0-9$]$";
+        final String END_MATCH = ".*[a-zA-Z0-9$']$";
         // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$].*";
+        final String START_MATCH = "^[a-zA-Z0-9$'].*";
         for (int i = 0; i < strList.size(); i++) {
             boolean falg = true;
             for (int j = 0; j < NAMELIST.size(); j++) {
@@ -1134,9 +1134,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private int changeInteger(List<String> sentenceList) {
         List<Integer> list = new ArrayList<>();
         // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$]$";
+        final String END_MATCH = ".*[a-zA-Z0-9$']$";
         // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$].*";
+        final String START_MATCH = "^[a-zA-Z0-9$'].*";
         for (int i = 0; i < sentenceList.size(); i++) {
             if (sentenceList.get(i).indexOf("#") == -1 && sentenceList.get(i).indexOf("$") == -1) {
                 if (Pattern.matches(END_MATCH, sentenceList.get(i)) && Pattern.matches(START_MATCH, sentenceList.get(i))) {
