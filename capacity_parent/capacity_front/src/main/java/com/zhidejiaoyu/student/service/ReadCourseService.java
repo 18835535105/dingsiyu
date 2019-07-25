@@ -10,9 +10,9 @@ public interface ReadCourseService extends IService<ReadCourse> {
 
     ServerResponse<Object> getAllCourse(HttpSession session);
 
-    ServerResponse<Object> updStudyPlan(HttpSession session, Long courseId);
+    ServerResponse<Object> updStudyPlan(HttpSession session, Long courseId, String grade);
 
-    ServerResponse<Object> getStudyCourse(HttpSession session, Long courseId);
+    ServerResponse<Object> getStudyCourse(HttpSession session, Long unitId, String grade);
 
     ServerResponse<Object> getContent(Long typeId, Long courseId);
 }

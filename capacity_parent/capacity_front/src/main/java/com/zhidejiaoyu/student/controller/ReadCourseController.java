@@ -31,28 +31,29 @@ public class ReadCourseController extends BaseController {
      * 修改正在学习课程信息
      *
      * @param session
-     * @param courseId 要修改的课程id
+     * @param unitId  要修改的课程id
      * @return
      */
     @RequestMapping("/updStudyPlan")
-    public ServerResponse<Object> updStudyPlan(HttpSession session, Long courseId) {
-        return readService.updStudyPlan(session, courseId);
+    public ServerResponse<Object> updStudyPlan(HttpSession session, Long unitId, String grade) {
+        return readService.updStudyPlan(session, unitId, grade);
     }
 
     /**
      * 获取正在学习的课程信息
+     *
      * @param session
-     * @param courseId
+     * @param unitId
      * @return
      */
     @RequestMapping("/getStudyCourse")
-    public ServerResponse<Object> getStudyCourse(HttpSession session, Long courseId) {
-        return readService.getStudyCourse(session, courseId);
+    public ServerResponse<Object> getStudyCourse(HttpSession session, Long unitId, String grade) {
+        return readService.getStudyCourse(session, unitId, grade);
     }
 
 
     @RequestMapping("/getContent")
-    public ServerResponse<Object> getContent(Long typeId,Long courseId){
-        return readService.getContent(typeId,courseId);
+    public ServerResponse<Object> getContent(Long typeId, Long courseId) {
+        return readService.getContent(typeId, courseId);
     }
 }

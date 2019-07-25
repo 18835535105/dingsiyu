@@ -91,7 +91,7 @@
           and type = #{type}
     </select>
     <select id="selReadCourseByStudentId" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type = 6
+        select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type = 6 order by course_id
     </select>
     <select id="selSymbolByStudentId" resultMap="BaseResultMap" parameterType="long">
         select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type = 5 limit 1
@@ -104,6 +104,9 @@
     </select>
     <select id="selStudyReadPlanByStudentIdAndUnitId" parameterType="map" resultMap="BaseResultMap">
         select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type=6 and (start_unit_id &lt;=#{unitId} and end_unit_id>=#{unitId}) limit 1
+    </select>
+    <select id="selByCourseIdAndUnitIdAndType" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and course_id=#{courseId} and type=#{type} and (start_unit_id &lt;=#{unitId} and end_unit_id>=#{unitId}) limit 1
     </select>
 
 

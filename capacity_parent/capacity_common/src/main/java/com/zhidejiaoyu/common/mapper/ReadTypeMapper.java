@@ -16,5 +16,17 @@ import java.util.List;
  */
 public interface ReadTypeMapper extends BaseMapper<ReadType> {
 
+    /**
+     * 根据课程id获取信息
+     * @param courseId
+     * @return
+     */
     List<ReadType> selByCourseId(@Param("courseId") Long courseId);
+
+    /**
+     * 根据课程集合获取信息
+     * @param courseIds
+     * @return
+     */
+    List<ReadType> selByCourseList(@Param("courseIds") List<Long> courseIds);
 }

@@ -53,6 +53,9 @@ public class ReadCourse extends Model<ReadCourse> {
     @TableField("create_time")
     private Date createTime;
 
+    @TableField("read_sort")
+    private Integer readSort;
+
 
     @Override
     protected Serializable pkVal() {

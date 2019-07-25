@@ -10,6 +10,7 @@
         <result column="week" property="week"/>
         <result column="grade" property="grade"/>
         <result column="create_time" property="createTime"/>
+        <result column="read_sort" property="readSort"/>
     </resultMap>
 
     <sql id="sql">
@@ -18,6 +19,36 @@
 
     <select id="selCourseByStartUnitAndEndUnit" parameterType="map" resultMap="BaseResultMap">
         select <include refid="sql"></include> from read_course where unit>=#{startUnitId} and unit &lt;=#{endUnitId}
+    </select>
+
+    <select id="selReadSortByStartReadSortAndEndReadSort" parameterType="map" resultType="long">
+        select
+        read_sort
+        from read_course
+        where read_sort >= #{startUnitId}
+        and read_sort &lt;= #{endUnitId}
+        and grade=#{grade}
+        group by read_sort
+        order by read_sort
+    </select>
+
+    <select id="selSort" parameterType="map" resultType="map">
+        select read_sort unitId ,month month
+        from read_course
+        where grade=#{grade}
+        and read_sort in (
+        <foreach collection="unitList" separator="," item="list">
+            #{list}
+        </foreach>
+        )
+        group by read_sort
+    </select>
+
+    <select id="selBySortAndGrade" resultType="long" parameterType="map">
+        select id
+        from read_course
+        where read_sort=#{sort}
+        and grade=#{grade}
     </select>
 
 

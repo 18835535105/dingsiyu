@@ -4,11 +4,13 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.ReadCourseService;
+import net.sf.jsqlparser.expression.operators.relational.OldOracleJoinBinaryExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, ReadCourse> implements ReadCourseService {
@@ -48,11 +50,12 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
      */
     @Override
     public ServerResponse<Object> getAllCourse(HttpSession session) {
-        Long studentId = getStudentId(session);
+        //修改前数据
+       /* Long studentId = getStudentId(session);
         List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selReadCourseByStudentId(studentId);
         if (studentStudyPlans != null && studentStudyPlans.size() > 0) {
             //去掉重复添加的阅读数据
-            List<ReadCourse> readCourses = this.getReadCourse(studentStudyPlans);
+            List<ReadCourse> readCourses = this.getReadCourseList(studentStudyPlans);
             //获取当前学习单元
             CapacityStudentUnit unit = capacityStudentUnitMapper.selByStudentIdAndType(studentId, 6);
             Map<String, Object> returnMap = new HashMap<>();
@@ -78,6 +81,47 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             }
             returnMap.put("present", present);
             return ServerResponse.createBySuccess(returnMap);
+        }*/
+        //修改后数据
+        Long studentId = getStudentId(session);
+        //获取学习计划
+        List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selReadCourseByStudentId(studentId);
+        if (studentStudyPlans != null && studentStudyPlans.size() > 0) {
+            CapacityStudentUnit unit = capacityStudentUnitMapper.selByStudentIdAndType(studentId, 6);
+            //存放正在学习单元信息
+            Map<String, Object> present = new HashMap<>();
+            //存放全部版本信息
+            List<Map<String, Object>> courseList = new ArrayList<>();
+            //存放全部版本
+            List<String> versionList = new ArrayList<>();
+            //获取去重后的数据  及存放正在学习的版本
+            List<Map<String, Object>> list = this.getReadCourseList(studentStudyPlans, present, unit);
+            //存放返回信息
+            Map<String, Object> returnMap = new HashMap<>();
+            for (Map<String, Object> map : list) {
+                //获取年级
+                String grade = map.get("grade").toString();
+                //将年级放入版本信息中
+                versionList.add(grade);
+                //获取所有版本list集合
+                List<Long> unitList = (List<Long>) map.get("unitMap");
+                //获取月份信息
+                List<Map<String, Object>> maps = readCourseMapper.selSort(grade, unitList);
+                //判断正在学习的课程是否拥有，如果未拥有放入当前版本信息
+                if (present == null || present.size() == 0) {
+                    present = new HashMap<>();
+                    present.put("grade", grade);
+                    present.put("unitId", maps.get(0).get("unitId"));
+                }
+                Map<String, Object> versionMap = new HashMap<>();
+                versionMap.put("grade", grade);
+                versionMap.put("unitList", maps);
+                courseList.add(versionMap);
+            }
+            returnMap.put("course", courseList);
+            returnMap.put("version", versionList);
+            returnMap.put("present", present);
+            return ServerResponse.createBySuccess(returnMap);
         }
         return ServerResponse.createByError(500, "未分配课程");
     }
@@ -86,15 +130,16 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
      * 修改正在学习的单元信息
      *
      * @param session
-     * @param courseId
+     * @param grade
      * @return
      */
     @Override
-    public ServerResponse<Object> updStudyPlan(HttpSession session, Long courseId) {
+    public ServerResponse<Object> updStudyPlan(HttpSession session, Long unitId, String grade) {
         Long studentId = getStudentId(session);
-        ReadCourse readCourse = readCourseMapper.selectById(courseId);
+        Integer gradeInteger = getGradeInteger(grade);
+        StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selByCourseIdAndUnitIdAndType(gradeInteger, unitId, 6, studentId);
         CapacityStudentUnit unit = capacityStudentUnitMapper.selByStudentIdAndType(studentId, 6);
-        updStudyPlan(readCourse, unit, studentId);
+        updStudyPlan(studentStudyPlan, unit, studentId, unitId);
         return ServerResponse.createBySuccess();
     }
 
@@ -102,13 +147,21 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
      * 获取当前单元阅读课程信息
      *
      * @param session
-     * @param courseId
+     * @param unitId
+     * @param grade
      * @return
      */
     @Override
-    public ServerResponse<Object> getStudyCourse(HttpSession session, Long courseId) {
+    public ServerResponse<Object> getStudyCourse(HttpSession session, Long unitId, String grade) {
         Student student = getStudent(session);
-        List<ReadType> readTypes = readTypeMapper.selByCourseId(courseId);
+        //获取年级月份下的全部的课程
+        if (unitId == null || grade == null) {
+            return ServerResponse.createByError();
+        }
+        List<Long> courseIds = readCourseMapper.selBySortAndGrade(unitId, grade);
+        //获取月份下的所有课程
+        List<ReadType> readTypes = readTypeMapper.selByCourseList(courseIds);
+        //List<ReadType> readTypes = readTypeMapper.selByCourseId(courseId);
         List<Map<String, Object>> returnList = new ArrayList<>();
         for (ReadType readType : readTypes) {
             Map<String, Object> map = new HashMap<>();
@@ -138,7 +191,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             }
             returnList.add(map);
         }
-        return null;
+        return ServerResponse.createBySuccess(returnList);
     }
 
     /**
@@ -171,7 +224,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         ReadType readType = readTypeMapper.selectById(typeId);
         List<ReadContent> readContents = readContentMapper.selectByTypeId(typeId);
         List<List<ReadContent>> returnList = new ArrayList<>();
-        List<ReadContent> readList=new ArrayList<>();
+        List<ReadContent> readList = new ArrayList<>();
         for (ReadContent readContent : readContents) {
             if (readList.size() == 0) {
                 readList = new ArrayList<>();
@@ -244,7 +297,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             judgeMap.put("subject", judge.getSubject());
             judgeMap.put("analysis", judge.getAnalysis());
             boolean answer = judge.getAnswer().trim().equals("T") ? true : false;
-            judgeMap.put("answer", judge.getAnswer());
+            judgeMap.put("answer", answer);
             list.add(judgeMap);
         }
         map.put("topic", list);
@@ -281,22 +334,20 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
     /**
      * 更改正在学习的课程
      *
-     * @param readCourse 正要课程信息
-     * @param unit       正在学习课程信息
-     * @param studentId  学生id
+     * @param studentStudyPlan 正要课程信息
+     * @param unit             正在学习课程信息
+     * @param studentId        学生id
      */
-    private void updStudyPlan(ReadCourse readCourse, CapacityStudentUnit unit, Long studentId) {
+    private void updStudyPlan(StudentStudyPlan studentStudyPlan, CapacityStudentUnit unit, Long studentId, Long unitId) {
         if (unit == null) {
             unit = new CapacityStudentUnit();
             unit.setStudentId(studentId);
         }
-        unit.setUnitName(readCourse.getCourseName());
-        unit.setCourseName(readCourse.getCourseName());
         unit.setType(6);
-        unit.setUnitId(readCourse.getId());
-        StudentStudyPlan plan = studentStudyPlanMapper.selStudyReadPlanByStudentIdAndUnitId(studentId, readCourse.getId());
-        unit.setStartunit(plan.getStartUnitId());
-        unit.setEndunit(plan.getEndUnitId());
+        unit.setUnitId(unitId);
+        unit.setCourseId(studentStudyPlan.getCourseId());
+        unit.setStartunit(studentStudyPlan.getStartUnitId());
+        unit.setEndunit(studentStudyPlan.getEndUnitId());
         if (unit.getId() != null) {
             capacityStudentUnitMapper.updateById(unit);
         } else {
@@ -304,7 +355,46 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         }
     }
 
-    //去重数据
+    /**
+     * 修改后版本
+     *
+     * @param plans
+     * @return
+     */
+    private List<Map<String, Object>> getReadCourseList(List<StudentStudyPlan> plans, Map<String, Object> present, CapacityStudentUnit unit) {
+        //获取全部课程id 去重
+        List<Map<String, Object>> list = new ArrayList<>();
+        Map<Long, List<StudentStudyPlan>> collect = plans.stream().collect(Collectors.groupingBy(vo -> vo.getCourseId()));
+        String unitGrade = getStringGrade(unit.getCourseId());
+        Set<Long> courses = collect.keySet();
+        for (Long course : courses) {
+            List<StudentStudyPlan> studentStudyPlans = collect.get(course);
+            String grade = getStringGrade(course);
+            Map<String, Object> gradeMap = new HashMap<>();
+            Map<Long, Long> unitMap = new HashMap<>();
+            for (StudentStudyPlan studentStudyPlan : studentStudyPlans) {
+                List<Long> longs = readCourseMapper.selReadSortByStartReadSortAndEndReadSort(studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId(), grade);
+                for (Long readSort : longs) {
+                    unitMap.put(readSort, readSort);
+                }
+            }
+            List<Long> unitList = new ArrayList<>();
+            Set<Long> longs = unitMap.keySet();
+            for (Long sortId : longs) {
+                if (grade.equals(unitGrade) && unit.getUnitId().equals(sortId)) {
+                    present.put("grade", grade);
+                    present.put("unitId", sortId);
+                }
+                unitList.add(sortId);
+            }
+            gradeMap.put("grade", grade);
+            gradeMap.put("unitMap", unitList);
+            list.add(gradeMap);
+        }
+        return list;
+    }
+
+    //去重数据 修改前版本
     private List<ReadCourse> getReadCourse(List<StudentStudyPlan> plans) {
         //获取全部课程id 去重
         Map<Long, ReadCourse> map = new HashMap<>();
@@ -320,5 +410,86 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             list.add(map.get(courseId));
         }
         return list;
+    }
+
+    private String getStringGrade(Long gradeLong) {
+        Integer grade=gradeLong.intValue();
+        if (grade.equals(1)) {
+            return "一年级";
+        }
+        if (grade.equals(2)) {
+            return "二年级";
+        }
+        if (grade.equals(3)) {
+            return "三年级";
+        }
+        if (grade.equals(4)) {
+            return "四年级";
+        }
+        if (grade.equals(5)) {
+            return "五年级";
+        }
+        if (grade.equals(6)) {
+            return "六年级";
+        }
+        if (grade.equals(7)) {
+            return "七年级";
+        }
+        if (grade.equals(8)) {
+            return "八年级";
+        }
+        if (grade.equals(9)) {
+            return "九年级";
+        }
+        if (grade.equals(10)) {
+            return "高一";
+        }
+        if (grade.equals(11)) {
+            return "高二";
+        }
+        if (grade.equals(12)) {
+            return "高三";
+        }
+        return "三年级";
+    }
+
+    private Integer getGradeInteger(String grade) {
+        if (grade.equals("一年级")) {
+            return 1;
+        }
+        if (grade.equals("二年级")) {
+            return 2;
+        }
+        if (grade.equals("三年级")) {
+            return 3;
+        }
+        if (grade.equals("四年级")) {
+            return 4;
+        }
+        if (grade.equals("五年级")) {
+            return 5;
+        }
+        if (grade.equals("六年级")) {
+            return 6;
+        }
+        if (grade.equals("七年级")) {
+            return 7;
+        }
+        if (grade.equals("八年级")) {
+            return 8;
+        }
+        if (grade.equals("九年级")) {
+            return 9;
+        }
+        if (grade.equals("高一")) {
+            return 10;
+        }
+        if (grade.equals("高二")) {
+            return 11;
+        }
+        if (grade.equals("高三")) {
+            return 12;
+        }
+        return 1;
     }
 }
