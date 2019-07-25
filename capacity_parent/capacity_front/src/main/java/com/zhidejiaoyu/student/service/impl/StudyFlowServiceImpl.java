@@ -1,6 +1,8 @@
 package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.exception.Enum.ServiceExceptionEnum;
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -290,6 +292,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
 
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
+        if (capacityStudentUnit == null) {
+            log.error("学生[{} - {} - {}]还没有初始化同步版课程！", studentId, student.getAccount(), student.getStudentName());
+            throw new ServiceException(ServiceExceptionEnum.NO_CAPACITY_COURSE);
+        }
         // 清除学生当前已分配的单元学习记录
         Long startUnit = capacityStudentUnit.getStartunit();
         Long endUnit = capacityStudentUnit.getEndunit();
