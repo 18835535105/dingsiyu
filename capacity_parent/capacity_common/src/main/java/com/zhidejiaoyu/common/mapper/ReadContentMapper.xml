@@ -10,6 +10,16 @@
         <result column="translate" property="translate" />
     </resultMap>
 
+    <sql id="base_sql">
+        id, read_type_id, sentence, translate
+    </sql>
+
+    <select id="selectByReadTypeId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from read_content where read_type_id = #{readTypeId}
+    </select>
+
     <sql id="basesql">
         id,read_type_id,sentence,translate
     </sql>

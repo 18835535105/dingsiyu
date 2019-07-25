@@ -34,5 +34,12 @@
         and course_id = #{courseId}
         group by word_id
     </select>
+    <select id="selectNeedMarkRedWords" resultType="java.lang.String" parameterType="map">
+        select distinct v.word word from vocabulary v, read_word rw where rw.word_id = v.id and binary v.word in (
+        <foreach collection="allWords" item="word" separator=",">
+            #{word}
+        </foreach>
+        )
+    </select>
 
 </mapper>

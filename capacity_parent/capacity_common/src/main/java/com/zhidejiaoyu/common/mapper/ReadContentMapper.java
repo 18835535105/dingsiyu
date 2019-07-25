@@ -16,5 +16,13 @@ import java.util.List;
  */
 public interface ReadContentMapper extends BaseMapper<ReadContent> {
 
+
+    /**
+     * 获取当前阅读类型下的所有句子信息
+     *
+     * @param readTypeId
+     * @return
+     */
+    List<ReadContent> selectByReadTypeId(@Param("readTypeId") Long readTypeId);
     List<ReadContent> selectByTypeId(@Param("typeId") Long typeId);
 }

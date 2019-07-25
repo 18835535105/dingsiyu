@@ -72,4 +72,20 @@ public class ReadWordController {
         }
         return readWordService.getNewWordsBook(session, courseId);
     }
+
+    /**
+     * 单词标红
+     *
+     * @param session
+     * @param readTypeId 阅读类型 id 阅读 A/B
+     * @return
+     */
+    @GetMapping("/markWordRed")
+    public ServerResponse markWordRed(HttpSession session, Long courseId, Long readTypeId) {
+        if (readTypeId == null) {
+            log.error("单词标红参数错误，readTypeId=[null]");
+            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT);
+        }
+        return readWordService.markWordRed(session, courseId, readTypeId);
+    }
 }
