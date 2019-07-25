@@ -17,4 +17,14 @@ public interface ReadCourseService extends IService<ReadCourse> {
     ServerResponse<Object> getContent(Long typeId, Long courseId);
 
     ServerResponse<Object> getVersion(HttpSession session);
+
+    /**
+     * 智能匹配
+     *
+     * @param session
+     * @param courseId
+     * @param readTypeId
+     * @return
+     */
+    ServerResponse capacityMatching(HttpSession session, Long courseId, Long readTypeId);
 }

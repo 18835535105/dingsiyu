@@ -1,7 +1,9 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.zhidejiaoyu.common.constant.read.ReadContentConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.ReadCourseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,8 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.zhidejiaoyu.student.service.impl.ReadWordServiceImpl.getAllWords;
 
 @Service
 public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, ReadCourse> implements ReadCourseService {
@@ -46,6 +50,9 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
 
     @Autowired
     private ReadBlanksMapper readBlanksMapper;
+
+    @Autowired
+    private ReadWordMapper readWordMapper;
 
     /**
      * 获取全部单元信息
@@ -240,6 +247,43 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         }
 
         return ServerResponse.createBySuccess(returnList);
+    }
+
+    @Override
+    public ServerResponse capacityMatching(HttpSession session, Long courseId, Long readTypeId) {
+        List<ReadContent> readContents = readContentMapper.selectByReadTypeId(readTypeId);
+        Map<String, Object> returnMap = new HashMap<>(16);
+        if (readContents.size() == 0) {
+            returnMap.put("rate", "100%");
+            return ServerResponse.createBySuccess(returnMap);
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        // 将文章中需要挖空的数据替换为空字符串
+        readContents.forEach(readContent -> sb.append(readContent.getSentence().replace(ReadContentConstant.BLANK + ".", "").replace(ReadContentConstant.BLANK, "")).append(" "));
+        // 整篇文章所有句子
+        String text = sb.toString().trim();
+        List<String> allWords = getAllWords(text);
+
+        Student student = super.getStudent(session);
+        // 当前文章的生词
+        List<String> needMarkRedWords = readWordMapper.selectNeedMarkRedWords(student.getId(), courseId, allWords, readTypeId);
+        // 当前文章所有单词数
+        String[] words = text.split(" ");
+
+        int totalWords = words.length;
+        int newWords = needMarkRedWords.size();
+
+        if (totalWords < newWords) {
+            returnMap.put("rate", "0%");
+            return ServerResponse.createBySuccess(returnMap);
+        }
+
+        double div = BigDecimalUtil.div(newWords, totalWords, 2);
+        long rate = Math.round((1 - div) * 100);
+        returnMap.put("rate", rate + "%");
+        return ServerResponse.createBySuccess(returnMap);
     }
 
     /**

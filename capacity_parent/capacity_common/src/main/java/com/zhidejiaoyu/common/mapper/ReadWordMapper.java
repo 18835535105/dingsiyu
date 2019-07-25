@@ -34,4 +34,14 @@ public interface ReadWordMapper extends BaseMapper<ReadWord> {
      * @return
      */
     List<ReadWord> selectByStudentIdCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
+
+    /**
+     * 获取学生当前课程下的生词数据
+     *
+     * @param studentId
+     * @param courseId
+     * @param allWords  在当前单词中获取生词
+     * @return
+     */
+    List<String> selectNeedMarkRedWords(@Param("studentId") Long studentId, @Param("courseId") Long courseId, @Param("allWords") List<String> allWords, @Param("readTypeId") Long readTypeId);
 }

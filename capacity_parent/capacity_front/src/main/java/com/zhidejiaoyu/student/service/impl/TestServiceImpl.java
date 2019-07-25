@@ -1234,6 +1234,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         studentMapper.updateByPrimaryKeySelective(student);
         getLevel(session);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
+        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
         return ServerResponse.createBySuccess(vo);
     }
 

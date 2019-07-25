@@ -7,6 +7,7 @@
         <id column="id" property="id" />
         <result column="student_id" property="studentId" />
         <result column="course_id" property="courseId" />
+        <result column="read_type_id" property="readTypeId"/>
         <result column="word_id" property="wordId" />
         <result column="type" property="type" />
         <result column="push" property="push" />
@@ -16,7 +17,7 @@
     </resultMap>
 
     <sql id="base_sql">
-        id, student_id, course_id, word_id, type, push, memory_strength, create_time, update_time
+        id, student_id, course_id, read_type_id, word_id, type, push, memory_strength, create_time, update_time
     </sql>
 
     <select id="countByCourseIdAndWordIdAndNotKnow" resultType="java.lang.Integer" parameterType="map">
@@ -33,6 +34,16 @@
         where student_id = #{studentId}
         and course_id = #{courseId}
         group by word_id
+    </select>
+    <select id="selectNeedMarkRedWords" resultType="java.lang.String" parameterType="map">
+        select distinct v.word word from vocabulary v, read_word rw where rw.word_id = v.id and binary v.word in (
+        <foreach collection="allWords" item="word" separator=",">
+            #{word}
+        </foreach>
+        )
+        <if test="readTypeId != null">
+            and rw.read_type_id = #{readTypeId}
+        </if>
     </select>
 
 </mapper>

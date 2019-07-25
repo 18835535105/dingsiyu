@@ -627,36 +627,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         final String START_MATCH = "^[a-zA-Z0-9$].*";
         String[] split = sentence.trim().split(" ");
         StringBuilder sb = new StringBuilder();
-        for (String s : split) {
-            if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
-                rightList.add(s);
-            } else {
-                char[] chars = s.toCharArray();
-                sb.setLength(0);
-                int length = chars.length;
-                for (int i = 0; i < length; i++) {
-                    char aChar = chars[i];
-                    // 当前下标的数据
-                    String s1 = new String(new char[]{aChar});
-                    // 是字母或者数字，拼接字符串
-                    if (Pattern.matches(END_MATCH, s1)) {
-                        sb.append(s1);
-                    } else {
-                        if (sb.length() > 0) {
-                            rightList.add(sb.toString());
-                            sb.setLength(0);
-                        }
-                        rightList.add(s1);
-                    }
-
-                    // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
-                    if (sb.length() > 0 && i == length - 1) {
-                        rightList.add(sb.toString());
-                        sb.setLength(0);
-                    }
-                }
-            }
-        }
+        ReadWordServiceImpl.splitPoint(rightList, sb, split, END_MATCH, START_MATCH);
         return rightList;
     }
 
