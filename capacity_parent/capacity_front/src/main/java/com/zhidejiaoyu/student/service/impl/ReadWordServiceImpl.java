@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.read.NewWordsBookVo;
 import com.zhidejiaoyu.common.Vo.read.WordInfoVo;
+import com.zhidejiaoyu.common.constant.read.ReadContentConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.ReadContentMapper;
 import com.zhidejiaoyu.common.mapper.ReadWordMapper;
@@ -33,16 +34,6 @@ import java.util.stream.Collectors;
  */
 @Service
 public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWord> implements ReadWordService {
-
-    /**
-     * 区分段落标识符
-     */
-    private static final String PARAGRAPH_SPLIT = "#@#";
-
-    /**
-     * 区分句子中挖空的数据
-     */
-    private static final String BLANK = "&@&";
 
     /**
      * 是否以单词或者数字或者 ' 结尾
@@ -94,21 +85,22 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
     }
 
     @Override
-    public ServerResponse<Object> addNewWordsBook(HttpSession session, Long courseId, Long wordId) {
-        Vocabulary vocabulary = vocabularyMapper.selectById(wordId);
+    public ServerResponse<Object> addNewWordsBook(HttpSession session, ReadWord readWord) {
+        Vocabulary vocabulary = vocabularyMapper.selectById(readWord.getWordId());
         if (vocabulary == null) {
-            throw new ServiceException(500, "未查询到 id=[" + wordId + "] 的单词信息！");
+            throw new ServiceException(500, "未查询到 id=[" + readWord.getWordId() + "] 的单词信息！");
         }
         Student student = super.getStudent(session);
         Long studentId = student.getId();
 
-        int count = readWordMapper.countByCourseIdAndWordIdAndNotKnow(studentId, courseId, wordId);
+        int count = readWordMapper.countByCourseIdAndWordIdAndNotKnow(studentId, readWord.getCourseId(), readWord.getWordId());
         // 如果当前单词在当前课程的生词手册中已经存在，不再进行保存，否则正常保存
         if (count > 0) {
             return ServerResponse.createBySuccess();
         }
 
-        this.saveReadWord(studentId, courseId, wordId);
+        readWord.setStudentId(studentId);
+        this.saveReadWord(readWord);
 
         return ServerResponse.createBySuccess();
     }
@@ -153,7 +145,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
 
         Map<String, String> translateMap = new HashMap<>(16);
         readContents.forEach(readContent -> {
-            sb.append(readContent.getSentence().replace(BLANK, "。")).append(" ");
+            sb.append(readContent.getSentence().replace(ReadContentConstant.BLANK, "。")).append(" ");
             translateMap.put(readContent.getSentence(), readContent.getTranslate());
         });
         // 整篇文章
@@ -161,7 +153,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
 
         Student student = super.getStudent(session);
         // 需要标红的单词
-        List<String> needMarkRedWords = readWordMapper.selectNeedMarkRedWords(student.getId(), courseId, allWords);
+        List<String> needMarkRedWords = readWordMapper.selectNeedMarkRedWords(student.getId(), courseId, allWords, readTypeId);
 
         if (needMarkRedWords == null || needMarkRedWords.size() == 0) {
             return ServerResponse.createBySuccess(301, "未查询到生词信息！");
@@ -201,7 +193,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         StringBuilder sentence = new StringBuilder();
         for (String word : allWords) {
             wordInfoMap = new HashMap<>(16);
-            if (PARAGRAPH_SPLIT.equals(word)) {
+            if (ReadContentConstant.PARAGRAPH_SPLIT.equals(word)) {
                 // 整个段落结束
                 returnList.add(sentenceInfoList);
                 sentenceInfoList = new ArrayList<>();
@@ -209,7 +201,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
                 if ("。".equals(word)) {
                     // 说明该处是挖出的空格，让学生选择或者填写
                     packageWordInfoList(wordInfoList, wordInfoMap, null, false);
-                    sentence.append(BLANK);
+                    sentence.append(ReadContentConstant.BLANK);
                 } else {
                     packageWordInfoList(wordInfoList, wordInfoMap, word, false);
                     sentence.append(word);
@@ -246,10 +238,10 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         wordInfoList.add(wordInfoMap);
     }
 
-    private List<String> getAllWords(String text) {
+    static List<String> getAllWords(String text) {
 
         // 把各个段落分开
-        String[] split = text.split(PARAGRAPH_SPLIT);
+        String[] split = text.split(ReadContentConstant.PARAGRAPH_SPLIT);
         // 存放所有单词和
         List<String> rightList = new ArrayList<>();
 
@@ -257,7 +249,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         for (String sentence : split) {
             String[] words = sentence.split(" ");
             splitPoint(rightList, sb, words, END_MATCH, START_MATCH);
-            rightList.add(PARAGRAPH_SPLIT);
+            rightList.add(ReadContentConstant.PARAGRAPH_SPLIT);
         }
         return rightList;
     }
@@ -303,14 +295,10 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         }
     }
 
-    private void saveReadWord(Long studentId, Long courseId, Long wordId) {
+    private void saveReadWord(ReadWord readWord) {
         Date now = new Date();
         Date pushTime = GoldMemoryTime.getGoldMemoryTime(0.12, now);
 
-        ReadWord readWord = new ReadWord();
-        readWord.setCourseId(courseId);
-        readWord.setWordId(wordId);
-        readWord.setStudentId(studentId);
         readWord.setType(1);
         readWord.setMemoryStrength(0.12);
         readWord.setPush(pushTime);

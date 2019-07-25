@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.controller;
 
+import com.zhidejiaoyu.common.pojo.ReadWord;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.ReadWordService;
@@ -45,16 +46,16 @@ public class ReadWordController {
     /**
      * 添加单词到生词本
      *
-     * @param wordId
+     * @param readWord
      * @return
      */
     @PostMapping("/saveNewWordsBook")
-    public ServerResponse<Object> addNewWordsBook(HttpSession session, Long courseId, Long wordId) {
-        if (wordId == null || courseId == null) {
-            log.warn("阅读模块添加生词本出错！wordId=[{}], courseId=[{}]", wordId, courseId);
+    public ServerResponse<Object> addNewWordsBook(HttpSession session, ReadWord readWord) {
+        if (readWord.getWordId() == null || readWord.getCourseId() == null || readWord.getReadTypeId() == null) {
+            log.warn("阅读模块添加生词本出错！wordId=[{}], courseId=[{}], readTypeId=[{}]", readWord.getWordId(), readWord.getCourseId(), readWord.getReadTypeId());
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT);
         }
-        return readWordService.addNewWordsBook(session, courseId, wordId);
+        return readWordService.addNewWordsBook(session, readWord);
     }
 
     /**

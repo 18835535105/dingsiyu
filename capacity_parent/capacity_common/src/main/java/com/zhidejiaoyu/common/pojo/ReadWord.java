@@ -55,6 +55,8 @@ public class ReadWord extends Model<ReadWord> {
 
     private Date updateTime;
 
+    private Long readTypeId;
+
 
     @Override
     protected Serializable pkVal() {
