@@ -776,11 +776,13 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
             // 如果账号 session 相同说明是同一个浏览器中，并且不是同一个账号，不再更改其 session 中登录信息
             if (Objects.equals(oldStudentId, stu.getId()) && Objects.equals(oldSessionIdObject, session.getId())) {
+                logger.warn("学生[{} -{} -{}]在同一浏览器打开多个系统页面！", stu.getId(), stu.getAccount(), stu.getStudentName());
                 return;
             }
 
             // 如果账号登录的session不同，保存前一个session的信息
             if (oldSessionMap != null) {
+                logger.warn("学生[{} -{} -{}]在不同浏览器登录！", stu.getId(), stu.getAccount(), stu.getStudentName());
                 saveDurationInfo(oldSessionMap);
                 saveLogoutLog(stu, runLogMapper, logger);
                 redisOpt.markMultipleLoginSessionId(oldSessionId);
