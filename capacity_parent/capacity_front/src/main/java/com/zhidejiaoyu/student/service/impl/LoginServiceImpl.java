@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
-import com.zhidejiaoyu.common.MacIpUtil;
+import com.zhidejiaoyu.common.utils.MacIpUtil;
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;

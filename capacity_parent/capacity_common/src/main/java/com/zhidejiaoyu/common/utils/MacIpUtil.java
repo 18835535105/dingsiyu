@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.common;
+package com.zhidejiaoyu.common.utils;
 
 import lombok.extern.slf4j.Slf4j;
 
