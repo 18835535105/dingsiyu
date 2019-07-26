@@ -27,7 +27,12 @@
         select count(id) from letter_pair where unit_id=#{unitId} and student_id=#{studentId}
     </select>
     <select id="selByLetterIdAndStudent" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include> from letter_pair where letter_id=#{letterId} and student_id=#{studentId}
+        select <include refid="base_sql"></include>
+        from letter_pair
+         where letter_id=#{letterId}
+         and student_id=#{studentId}
+         and push is not null
+         limit 1
     </select>
     <select id="selPushLetter" parameterType="map" resultMap="BaseResultMap">
         select <include refid="base_sql"></include> from letter_pair
