@@ -252,13 +252,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         List<String> orderList = new ArrayList<>();
 
         // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$']$";
+        final String END_MATCH = ".*[a-zA-Z0-9$#']$";
         // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$'].*";
+        final String START_MATCH = "^[a-zA-Z0-9$#'].*";
 
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
-            s = s.replace("#", " ").replace("$", "");
             if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
                 rightList.add(s);
                 pointList.add(null);
@@ -290,8 +289,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
                     // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
                     if (sb.length() > 0 && i == length - 1) {
-                        rightList.add(sb.toString());
-                        orderList.add(sb.toString());
+                        rightList.add(sb.toString().replace("#", " ").replace("$", ""));
+                        orderList.add(sb.toString().replace("#", " ").replace("$", ""));
                         pointList.add(null);
                         sb.setLength(0);
                     }
@@ -622,9 +621,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         // 正确顺序
         List<String> rightList = new ArrayList<>();
         // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$']$";
+        final String END_MATCH = ".*[a-zA-Z0-9$#']$";
         // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$'].*";
+        final String START_MATCH = "^[a-zA-Z0-9$#'].*";
         String[] split = sentence.trim().split(" ");
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
@@ -643,7 +642,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                         sb.append(s1);
                     } else {
                         if (sb.length() > 0) {
-                            rightList.add(sb.toString());
+                            rightList.add(sb.toString().replace("$","").replace("#"," "));
                             sb.setLength(0);
                         }
                         rightList.add(s1);
@@ -651,7 +650,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
                     // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
                     if (sb.length() > 0 && i == length - 1) {
-                        rightList.add(sb.toString());
+                        rightList.add(sb.toString().replace("$","").replace("#"," "));
                         sb.setLength(0);
                     }
                 }
@@ -853,14 +852,14 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     public int[] wirterBlank(List<String> strList) {
         Random random = new Random();
         List<Integer> shuZhuString = new ArrayList<>();
-        final String END_MATCH = ".*[a-zA-Z0-9$']$";
+        final String END_MATCH = ".*[a-zA-Z0-9$#']$";
         // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$'].*";
+        final String START_MATCH = "^[a-zA-Z0-9$#'].*";
         for (int i = 0; i < strList.size(); i++) {
             boolean falg = true;
             for (int j = 0; j < NAMELIST.size(); j++) {
                 String str = strList.get(i).substring(0, strList.get(i).length() - 1);
-                if (str.equals(NAMELIST.get(j))) {
+                if (str.indexOf(NAMELIST.get(j))==-1) {
                     falg = false;
                 }
             }
