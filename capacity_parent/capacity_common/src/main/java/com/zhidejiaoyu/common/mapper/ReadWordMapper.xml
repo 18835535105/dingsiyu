@@ -4,20 +4,21 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.ReadWord">
-        <id column="id" property="id" />
-        <result column="student_id" property="studentId" />
-        <result column="course_id" property="courseId" />
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="course_id" property="courseId"/>
         <result column="read_type_id" property="readTypeId"/>
-        <result column="word_id" property="wordId" />
-        <result column="type" property="type" />
-        <result column="push" property="push" />
-        <result column="memory_strength" property="memoryStrength" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
+        <result column="word_id" property="wordId"/>
+        <result column="type" property="type"/>
+        <result column="push" property="push"/>
+        <result column="memory_strength" property="memoryStrength"/>
+        <result column="error_count" property="errorCount"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <sql id="base_sql">
-        id, student_id, course_id, read_type_id, word_id, type, push, memory_strength, create_time, update_time
+        id, student_id, course_id, read_type_id, word_id, type, push, memory_strength, error_count, create_time, update_time
     </sql>
 
     <select id="countByCourseIdAndWordIdAndNotKnow" resultType="java.lang.Integer" parameterType="map">
@@ -44,6 +45,43 @@
         <if test="readTypeId != null">
             and rw.read_type_id = #{readTypeId}
         </if>
+    </select>
+    <select id="selectNeedReview" resultType="com.zhidejiaoyu.common.Vo.study.MemoryStudyVo" parameterType="map">
+        select v.id               wordId,
+               v.word             word,
+               v.syllable         syllable,
+               v.word_chinese     wordChinese,
+               v.sound_mark       soundMark,
+               rw.memory_strength memoryStrength,
+               v.recordpicurl     imgUrl
+        from read_word rw,
+             vocabulary v
+        where rw.word_id = v.id
+          and rw.student_id = #{studentId}
+          and rw.course_id = #{courseId}
+          and rw.memory_strength &lt; 1
+          and rw.push &lt;= now()
+          and rw.type = #{type}
+        order by rw.push desc
+        limit 1
+    </select>
+    <select id="countNeedReview" resultType="java.lang.Long" parameterType="map">
+        select count(*)
+        from read_word rw
+        where rw.student_id = #{studentId}
+          and rw.course_id = #{courseId}
+          and rw.memory_strength &lt; 1
+          and rw.push &lt;= now()
+          and rw.type = #{type}
+    </select>
+    <select id="selectByStudentIdAndCourseIdAndWordId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from read_word rw
+        where rw.student_id = #{studentId}
+        and rw.course_id = #{courseId}
+        and rw.word_id = #{wordId}
+        and rw.type = #{type}
     </select>
 
 </mapper>

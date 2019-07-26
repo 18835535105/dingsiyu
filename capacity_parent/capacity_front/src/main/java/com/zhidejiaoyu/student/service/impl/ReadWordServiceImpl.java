@@ -2,8 +2,10 @@ package com.zhidejiaoyu.student.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.read.NewWordsBookVo;
 import com.zhidejiaoyu.common.Vo.read.WordInfoVo;
+import com.zhidejiaoyu.common.Vo.study.MemoryStudyVo;
 import com.zhidejiaoyu.common.constant.read.ReadContentConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.ReadContentMapper;
@@ -14,11 +16,14 @@ import com.zhidejiaoyu.common.pojo.ReadWord;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
+import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
+import com.zhidejiaoyu.common.utils.math.MathUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.language.SimpleYouDaoTranslate;
+import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.service.ReadWordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,6 +64,9 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
 
     @Autowired
     private BaiduSpeak baiduSpeak;
+
+    @Autowired
+    private MemoryDifficultyUtil memoryDifficultyUtil;
 
     @Override
     public ServerResponse<Object> getWordInfo(HttpSession session, Long courseId, String word) {
@@ -169,6 +177,45 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
 
         List<Object> returnList = this.getMarkWordRedList(translateMap, allWords, newWordsMap);
         return ServerResponse.createBySuccess(returnList);
+    }
+
+    @Override
+    public ServerResponse startStrengthen(HttpSession session, Long courseId, Integer type) {
+        Student student = super.getStudent(session);
+        Long studentId = student.getId();
+        MemoryStudyVo memoryStudyVo = readWordMapper.selectNeedReview(studentId, courseId, type);
+        if (memoryStudyVo == null) {
+            return ServerResponse.createByError(300, "当前模块没有需要强化的单词！");
+        }
+        Long totalNeedReviewCount = readWordMapper.countNeedReview(studentId, courseId, type);
+        memoryStudyVo.setImgUrl(GetOssFile.getPublicObjectUrl(memoryStudyVo.getImgUrl()));
+        memoryStudyVo.setReadUrl(baiduSpeak.getLanguagePath(memoryStudyVo.getWord()));
+        memoryStudyVo.setWordCount(totalNeedReviewCount);
+        memoryStudyVo.setStudyNew(false);
+
+        ReadWord readWord = readWordMapper.selectByStudentIdAndCourseIdAndWordId(studentId, courseId, memoryStudyVo.getWordId(), type);
+        memoryStudyVo.setMemoryDifficulty(memoryDifficultyUtil.getReadWordDifficulty(readWord));
+        memoryStudyVo.setEngine(PerceiveEngine.getPerceiveEngine(memoryStudyVo.getMemoryDifficulty(), memoryStudyVo.getMemoryStrength()));
+
+        if (type == 2) {
+            // 封装单词图鉴
+            int random = MathUtil.getRandom(1, 1000);
+            List<Vocabulary> vocabularies = vocabularyMapper.selectPictureRandom(random, 3);
+
+            List<Map<String, Boolean>> mapList = new ArrayList<>(4);
+            Map<String, Boolean> map = new HashMap<>(16);
+            map.put(memoryStudyVo.getWord(), true);
+            mapList.add(map);
+            for (Vocabulary vocabulary : vocabularies) {
+                map = new HashMap<>(16);
+                map.put(vocabulary.getWord(), false);
+                mapList.add(map);
+            }
+            Collections.shuffle(mapList);
+            memoryStudyVo.setWordChineseList(mapList);
+        }
+
+        return ServerResponse.createBySuccess(memoryStudyVo);
     }
 
     /**
@@ -304,6 +351,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         readWord.setPush(pushTime);
         readWord.setCreateTime(now);
         readWord.setUpdateTime(now);
+        readWord.setErrorCount(1);
         this.insert(readWord);
 
         readWord.setType(2);

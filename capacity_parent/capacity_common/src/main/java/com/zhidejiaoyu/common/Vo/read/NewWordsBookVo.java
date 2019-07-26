@@ -2,6 +2,8 @@ package com.zhidejiaoyu.common.Vo.read;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 生词本列表数据
  *
@@ -9,7 +11,7 @@ import lombok.Data;
  * @date 2019-07-24
  */
 @Data
-public class NewWordsBookVo {
+public class NewWordsBookVo implements Serializable {
 
     private String word;
 
