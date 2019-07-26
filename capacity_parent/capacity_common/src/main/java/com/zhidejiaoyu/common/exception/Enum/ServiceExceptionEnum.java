@@ -14,6 +14,8 @@ public enum ServiceExceptionEnum implements BaseExceptionEnum {
      */
     EXCEPTION(500, "系统异常"),
 
+    NO_CAPACITY_COURSE(500, "学生还没有初始化同步版课程学习计划！"),
+
     /**
      * 用户名或密码不能为空
      */
