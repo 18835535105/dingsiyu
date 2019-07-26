@@ -22,6 +22,7 @@
         select <include refid="base_sql"></include>
         from read_arder
         where course_id=#{courseId}
+        and text_types =#{textTypes}
     </select>
 
 

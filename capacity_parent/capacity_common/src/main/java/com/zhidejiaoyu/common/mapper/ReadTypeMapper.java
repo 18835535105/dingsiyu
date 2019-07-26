@@ -29,4 +29,6 @@ public interface ReadTypeMapper extends BaseMapper<ReadType> {
      * @return
      */
     List<ReadType> selByCourseList(@Param("courseIds") List<Long> courseIds);
+
+    Integer selCountByCourseId(@Param("courseId") long courseId);
 }

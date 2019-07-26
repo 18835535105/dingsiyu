@@ -18,5 +18,5 @@ import java.util.List;
 public interface ReadArderMapper extends BaseMapper<ReadArder> {
 
 
-    List<ReadArder> selByCourseId(@Param("courseId") Long courseId,@Param("type") Integer type ,Integer textTypes);
+    List<ReadArder> selByCourseId(@Param("courseId") Long courseId,@Param("textTypes") Integer textTypes);
 }

@@ -903,4 +903,12 @@
         <include refid="study_model_sql"/>
         group by unit_id
     </select>
+
+    <select id="selectReadCountByCourseId" resultType="Integer" parameterType="map">
+        select
+        count(distinct unit_id)
+        from test_record
+        where course_id=#{courseId}
+        and study_model="阅读测试"
+    </select>
 </mapper>

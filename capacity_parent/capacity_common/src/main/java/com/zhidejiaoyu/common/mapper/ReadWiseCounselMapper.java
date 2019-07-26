@@ -14,4 +14,5 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface ReadWiseCounselMapper extends BaseMapper<ReadWiseCounsel> {
 
+    ReadWiseCounsel getByCourseId(@Param("courseId") Long courseId);
 }

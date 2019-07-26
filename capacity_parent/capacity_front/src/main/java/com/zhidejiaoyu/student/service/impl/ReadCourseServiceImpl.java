@@ -126,7 +126,16 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
                 versionMap.put("isStudy", unit.getUnitId());
                 List<Map<String, Object>> sList = new ArrayList<>();
                 for (Map<String, Object> sMap : maps) {
-                    sMap.put("text", "未完成");
+                    long courseId = Long.parseLong(sMap.get("courseId").toString());
+                    //获取课程下阅读数量
+                    Integer typeCount = readTypeMapper.selCountByCourseId(courseId);
+                    //获取课程下所有考试结果
+                    Integer recprdCourseId = testRecordMapper.selectReadCountByCourseId(courseId);
+                    if (typeCount.equals(recprdCourseId)) {
+                        sMap.put("text", "已完成");
+                    } else {
+                        sMap.put("text", "未完成");
+                    }
                     sList.add(sMap);
                 }
                 versionMap.put("unitList", sList);
@@ -228,7 +237,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             this.getInterestingReadingData(typeId, map);
         } else {
             //查看队长讲英语课程
-            this.getSpeakEnglishData(courseId,map);
+            this.getSpeakEnglishData(courseId, map);
         }
         return ServerResponse.createBySuccess(map);
     }
@@ -236,7 +245,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
     @Override
     public ServerResponse<Object> getVersion(HttpSession session) {
         Long studentId = getStudentId(session);
-        List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selReadCourseByStudentId(studentId,null);
+        List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selReadCourseByStudentId(studentId, null);
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selByStudentIdAndType(studentId, 6);
         List<Map<String, Object>> returnList = new ArrayList<>();
         if (studentStudyPlans.size() == 0) {
@@ -354,15 +363,44 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
     }
 
     private void getSpeakEnglishData(Long courseId, Map<String, Object> map) {
+        List<List<ReadArder>> returnList = new ArrayList<>();
+        List<ReadArder> readList = new ArrayList<>();
         //获取队长讲英语课文
-        List<ReadArder> readArders = readArderMapper.selByCourseId(courseId,0,1);
+        List<ReadArder> readArders = readArderMapper.selByCourseId(courseId, 1);
         //获取队长讲英语锦囊妙计
+        ReadWiseCounsel readWiseCounsel = readWiseCounselMapper.getByCourseId(courseId);
+        map.put("wiseCounsel", readWiseCounsel.getContent());
+        int i = 0;
+        for (ReadArder readArder : readArders) {
+            if (readList.size() == 0) {
+                readList = new ArrayList<>();
+                readList.add(readArder);
+                i++;
+            } else {
+                if (readArder.getSentence().indexOf("#&#") != -1) {
+                    returnList.add(readList);
+                    readList = new ArrayList<>();
+                }
+                readList.add(readArder);
+                i++;
+            }
+            if (i == readArders.size()) {
+                returnList.add(readList);
+            }
+        }
+        map.put("sentenceList", returnList);
 
-        readArders.get(0).getType();
-
+        //获取考试类型
+        Integer type = readArders.get(0).getType();
+        map.put("type", type);
+        if (type == 1) {
+            this.getChoiceQuestions(null, courseId, map);
+        }
+        if (type == 2) {
+            this.getJudgmentQuestions(null, courseId, map);
+        }
 
     }
-
 
 
     private void getBlanks(Long typeId, Map<String, Object> map) {

@@ -263,21 +263,45 @@ public class TestController {
         return testService.getLetterUnitEntry(session,unitId);
     }
 
+    /**
+     * 保存字母闯关内容
+     * @param session
+     * @param testRecord
+     * @return
+     */
     @RequestMapping("/saveLetterUnitEntry")
     public Object saveLetterUnitEntry(HttpSession session,TestRecord testRecord){
         return testService.saveLetterUnitEntry(session,testRecord);
     }
 
+    /**
+     * 获取学后测试内容
+     * @param session
+     * @param unitId
+     * @return
+     */
     @RequestMapping("/getLetterAfterLearning")
     public Object getLetterAfterLearning(HttpSession session,Long unitId){
         return testService.getLetterAfterLearning(session,unitId);
     }
 
+    /**
+     * 保存学后测试内容
+     * @param session
+     * @param testRecord
+     * @return
+     */
     @RequestMapping("/saveLetterAfterLearning")
     public Object saveLetterAfterLearning(HttpSession session,TestRecord testRecord){
         return testService.saveLetterAfterLearning(session,testRecord);
     }
 
+    /**
+     * 保存阅读测试结果
+     * @param session
+     * @param testRecord
+     * @return
+     */
     @RequestMapping("/saveReadTest")
     public Object saveReadTest(HttpSession session ,TestRecord testRecord){
         return testService.saveReadTest(session,testRecord);

@@ -24,6 +24,10 @@
         select <include refid="baseSql"></include> from read_type where course_id=#{courseId}
     </select>
 
+    <select id="selCountByCourseId" parameterType="map" resultType="integer">
+        select count(id) from read_type where course_id=#{courseId}
+    </select>
+
     <select id="selByCourseList" resultMap="BaseResultMap" parameterType="map">
         select <include refid="baseSql"></include> from read_type where course_id in (
         <foreach collection="courseIds" item="courseId" separator=",">

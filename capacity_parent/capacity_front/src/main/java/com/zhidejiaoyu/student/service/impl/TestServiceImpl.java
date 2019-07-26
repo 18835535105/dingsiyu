@@ -494,7 +494,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Student student = getStudent(session);
         Integer point = testRecord.getPoint();
         testRecord.setStudentId(student.getId());
-        testRecord.setGenre("阅读测试");
+        testRecord.setGenre("单元闯关测试");
         testRecord.setStudyModel("阅读测试");
         testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
         getUnitTestMsg(testRecord, testRecord.getPoint());
