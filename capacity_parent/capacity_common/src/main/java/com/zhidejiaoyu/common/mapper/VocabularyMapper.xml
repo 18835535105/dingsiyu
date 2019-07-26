@@ -1140,5 +1140,11 @@
         </if>
         group by v.id
     </select>
+    <select id="selectPictureRandom" resultMap="BaseResultMap" parameterType="map">
+        select <include refid="Base_Column_List"/>
+        from vocabulary
+        where recordpicurl is not null
+        limit #{offset}, #{limit}
+    </select>
 
 </mapper>

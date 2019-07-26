@@ -57,6 +57,11 @@ public class ReadWord extends Model<ReadWord> {
 
     private Long readTypeId;
 
+    /**
+     * 错误次数
+     */
+    private Integer errorCount;
+
 
     @Override
     protected Serializable pkVal() {

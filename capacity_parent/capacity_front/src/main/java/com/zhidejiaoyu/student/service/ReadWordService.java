@@ -51,4 +51,14 @@ public interface ReadWordService extends BaseService<ReadWord> {
      * @return
      */
     ServerResponse markWordRed(HttpSession session, Long courseId, Long readTypeId);
+
+    /**
+     * 开始强化
+     *
+     * @param session
+     * @param courseId  课程 id
+     * @param type  强化类型：1.慧记忆;2.单词图鉴3.慧听写4.慧默写
+     * @return
+     */
+    ServerResponse startStrengthen(HttpSession session, Long courseId, Integer type);
 }

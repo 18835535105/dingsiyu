@@ -89,4 +89,21 @@ public class ReadWordController {
         }
         return readWordService.markWordRed(session, courseId, readTypeId);
     }
+
+    /**
+     * 开始强化
+     *
+     * @param session
+     * @param courseId 课程 id
+     * @param type     强化类型：1.慧记忆;2.单词图鉴3.慧听写4.慧默写
+     * @return
+     */
+    @GetMapping("/startStrengthen")
+    public ServerResponse startStrengthen(HttpSession session, Long courseId, Integer type) {
+        if (courseId == null || type == null) {
+            log.error("学生开始强化参数错误！courseId=[{}], type=[{}]", courseId, type);
+            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT);
+        }
+        return readWordService.startStrengthen(session, courseId, type);
+    }
 }

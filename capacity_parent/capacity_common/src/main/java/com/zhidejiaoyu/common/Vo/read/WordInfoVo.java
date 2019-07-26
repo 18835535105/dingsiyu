@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.Vo.read;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ import java.util.List;
  * @date 2019-07-23
  */
 @Data
-public class WordInfoVo {
+public class WordInfoVo implements Serializable {
 
     /**
      * 单词 id

@@ -76,7 +76,7 @@ public class MemoryDifficultyUtil {
 
             // 保存记忆追踪时计算记忆难度：由于先保存的记忆追踪信息，其中的错误次数已经+1，而学习次数还是原来的，可能出现错误次数>学习次数的的情况，所以学习次数也要在原基础上+1
             if (errCount > studyCount) {
-                studyCount ++;
+                studyCount++;
             }
 
             if (errCount > studyCount) {
@@ -88,6 +88,61 @@ public class MemoryDifficultyUtil {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    /**
+     * 获取阅读模块下生词手册中单词的记忆强度
+     *
+     * @param readWord
+     * @return
+     */
+    public int getReadWordDifficulty(ReadWord readWord) {
+        if (readWord == null) {
+            log.error("获取学生阅读生词强化记忆难度数据时，readWord=null");
+            return 0;
+        }
+        Integer type = readWord.getType();
+        String studyModel = getReadWordStudyModel(type);
+
+        if (studyModel == null) {
+            log.warn("未获取到学生阅读生词手册类型！type=[{}]", type);
+            return 0;
+        }
+
+        Learn learn = learnMapper.selectReadWord(readWord, studyModel);
+        int studyCount;
+        if (learn == null) {
+            studyCount = 1;
+        } else {
+            studyCount = learn.getStudyCount();
+        }
+        Integer errorCount = readWord.getErrorCount();
+        if (errorCount > studyCount) {
+            log.warn("学生 {} 在单元 课程 {} 模块 {} 下的单词 {} 错误次数大于了学习次数！", readWord.getStudentId(), readWord.getCourseId(), studyModel, readWord.getWordId());
+            errorCount = studyCount;
+        }
+        return getMemoryDifficulty(readWord.getMemoryStrength(), errorCount, studyCount);
+    }
+
+    /**
+     * 获取生词手册类型
+     *
+     * @param type
+     * @return
+     */
+    private String getReadWordStudyModel(Integer type) {
+        switch (type) {
+            case 1:
+                return "阅读生词手册-慧记忆";
+            case 2:
+                return "阅读生词手册-单词图鉴";
+            case 3:
+                return "阅读生词手册-慧听写";
+            case 4:
+                return "阅读生词手册-慧默写";
+            default:
+                return null;
+        }
     }
 
     private int getMemoryDifficulty(Double memoryStrength, Integer errCount, Integer studyCount) {
@@ -154,7 +209,7 @@ public class MemoryDifficultyUtil {
      * 计算清学版当前单词/例句的记忆难度
      *
      * @param simpleCapacity 记忆追踪模块对象
-     * @param type 1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写;
+     * @param type           1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写;
      * @return 当前单词的记忆难度 0:熟词；其余情况为生词
      */
     public int getMemoryDifficulty(SimpleCapacity simpleCapacity, Integer type) {
@@ -195,7 +250,7 @@ public class MemoryDifficultyUtil {
      *
      * @param studentId
      * @param unitId
-     * @param id         当前单词/例句id
+     * @param id        当前单词/例句id
      * @param type
      * @return
      */

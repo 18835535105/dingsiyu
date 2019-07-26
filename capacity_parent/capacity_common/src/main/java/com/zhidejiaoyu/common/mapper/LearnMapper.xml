@@ -1377,6 +1377,16 @@
         </if>
         and vocabulary_id is not null and type = 1
     </select>
+    <select id="selectReadWord" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from learn
+        where student_id = #{readWord.studentId}
+        and course_id = #{readWord.courseId}
+        and vocabulary_id = #{readWord.wordId}
+        and study_model = #{studyModel}
+        limit 1
+    </select>
 
 
 </mapper>

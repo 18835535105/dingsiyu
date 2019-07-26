@@ -1,10 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.zhidejiaoyu.common.pojo.Course;
-import com.zhidejiaoyu.common.pojo.Learn;
-import com.zhidejiaoyu.common.pojo.LearnExample;
-import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.*;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Param;
 
@@ -956,4 +953,13 @@ public interface LearnMapper extends BaseMapper<Learn> {
     int countTodayRestudyAndMemoryStrengthGePercentFifty(@Param("student") Student student);
 
     List<Learn> selectAllCapacityReview(@Param("studentId") Long id,@Param("classify") Integer classify);
+
+    /**
+     * 获取学生阅读生词手册中单词的学习信息
+     *
+     * @param readWord
+     * @param studyModel
+     * @return
+     */
+    Learn selectReadWord(@Param("readWord") ReadWord readWord, @Param("studyModel") String studyModel);
 }

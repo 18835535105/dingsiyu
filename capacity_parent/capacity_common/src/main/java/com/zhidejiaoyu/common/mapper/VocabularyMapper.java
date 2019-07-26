@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.pojo.UnitVocabulary;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.pojo.VocabularyExample;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -446,4 +447,13 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     List<Vocabulary> selectByPhaseNotInWord(@Param("studyParagraph") String studyParagraph, @Param("ignoreList") List<Map<String, Object>> ignoreList);
+
+    /**
+     * 获取指定个数含有图片的单词信息
+     *
+     * @param offset 从第多少条开始获取
+     * @param limit  需要获取的个数
+     * @return
+     */
+    List<Vocabulary> selectPictureRandom(@Param("offset") int offset, @Param("limit") int limit);
 }
