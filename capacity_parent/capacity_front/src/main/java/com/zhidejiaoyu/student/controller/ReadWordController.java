@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.controller;
 
+import com.zhidejiaoyu.common.dto.read.SaveStrengthenDto;
 import com.zhidejiaoyu.common.pojo.ReadWord;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -7,12 +8,15 @@ import com.zhidejiaoyu.student.service.ReadWordService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 /**
  * 生词手册相关
@@ -21,6 +25,7 @@ import javax.servlet.http.HttpSession;
  * @date 2019-07-23
  */
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/newWords")
 public class ReadWordController {
@@ -105,5 +110,19 @@ public class ReadWordController {
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT);
         }
         return readWordService.startStrengthen(session, courseId, type);
+    }
+
+    /**
+     * 保存强化信息
+     * <br>
+     * 如果当前单词的记忆强度达到 1，说明是熟词，删除该单词信息以及该单词的学习记录
+     *
+     * @param session
+     * @param dto
+     * @return
+     */
+    @PostMapping("/saveStrengthen")
+    public ServerResponse saveStrengthen(HttpSession session, @Valid SaveStrengthenDto dto, BindingResult result) {
+        return readWordService.saveStrengthen(session, dto);
     }
 }
