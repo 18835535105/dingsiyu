@@ -23,8 +23,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"read_arder","read_blanks","read_choose","read_choose_blanks",
-        "read_content","read_course","read_judge","read_question_answering","read_type","read_wise_counsel","read_word"};
+        String[] tableName = {"read_picture"};
 
         /**
          * 配置：

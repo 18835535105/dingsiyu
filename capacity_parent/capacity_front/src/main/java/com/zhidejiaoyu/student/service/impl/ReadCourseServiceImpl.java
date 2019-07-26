@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.constant.read.ReadContentConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -56,6 +57,9 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
 
     @Autowired
     private ReadWordMapper readWordMapper;
+
+    @Autowired
+    private ReadPictureMapper readPictureMapper;
 
     @Autowired
     private ReadWiseCounselMapper readWiseCounselMapper;
@@ -309,6 +313,22 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         return ServerResponse.createBySuccess(returnMap);
     }
 
+    @Override
+    public ServerResponse<Object> getEnglishParadise(Long courseId, Integer type) {
+        Map<String, Object> map = new HashMap<>();
+        List<ReadArder> readArders = readArderMapper.selByCourseId(courseId, type+1);
+        getEnglishData(readArders, map);
+        if (type == 2 || type == 3) {
+            List<ReadPicture> readPictures = readPictureMapper.selByCourseIdAndType(courseId, type);
+            List<String> partList = new ArrayList<>();
+            for (ReadPicture readPicture : readPictures) {
+                partList.add(AliyunInfoConst.host + readPicture.getPartUrl());
+            }
+            map.put("partList", partList);
+        }
+        return ServerResponse.createBySuccess(map);
+    }
+
     /**
      * 获取趣味阅读返回格式
      *
@@ -342,6 +362,22 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         }
         map.put("sentenceList", returnList);
         map.put("type", readType.getTestType());
+        Integer learnTime = Integer.parseInt(readType.getLearnTime().replace("s", ""));
+        map.put("learnTime", learnTime);
+        ReadCourse readCourse = readCourseMapper.selectById(readType.getCourseId());
+        map.put("courseName", readCourse.getGrade() + "-" + readCourse.getMonth());
+        map.put("courseId", readCourse.getId());
+
+        Integer minute = learnTime / 60;
+        Integer residueSecond = learnTime % 60;
+        StringBuilder strB = new StringBuilder();
+        if (minute != null && minute != 0) {
+            strB.append(minute + "分");
+        }
+        if (residueSecond != null && residueSecond != 0) {
+            strB.append(residueSecond + "秒");
+        }
+        map.put("lookTime", strB.toString());
         if (readType.getTestType() == 1) {
             this.getChoiceQuestions(typeId, null, map);
         }
@@ -363,13 +399,29 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
     }
 
     private void getSpeakEnglishData(Long courseId, Map<String, Object> map) {
-        List<List<ReadArder>> returnList = new ArrayList<>();
-        List<ReadArder> readList = new ArrayList<>();
+
         //获取队长讲英语课文
         List<ReadArder> readArders = readArderMapper.selByCourseId(courseId, 1);
         //获取队长讲英语锦囊妙计
         ReadWiseCounsel readWiseCounsel = readWiseCounselMapper.getByCourseId(courseId);
         map.put("wiseCounsel", readWiseCounsel.getContent());
+        getEnglishData(readArders, map);
+        //获取考试类型
+        Integer type = readArders.get(0).getType();
+        map.put("type", type);
+        if (type == 1) {
+            this.getChoiceQuestions(null, courseId, map);
+        }
+        if (type == 2) {
+            this.getJudgmentQuestions(null, courseId, map);
+        }
+
+    }
+
+
+    private void getEnglishData(List<ReadArder> readArders, Map<String, Object> map) {
+        List<List<ReadArder>> returnList = new ArrayList<>();
+        List<ReadArder> readList = new ArrayList<>();
         int i = 0;
         for (ReadArder readArder : readArders) {
             if (readList.size() == 0) {
@@ -389,19 +441,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             }
         }
         map.put("sentenceList", returnList);
-
-        //获取考试类型
-        Integer type = readArders.get(0).getType();
-        map.put("type", type);
-        if (type == 1) {
-            this.getChoiceQuestions(null, courseId, map);
-        }
-        if (type == 2) {
-            this.getJudgmentQuestions(null, courseId, map);
-        }
-
     }
-
 
     private void getBlanks(Long typeId, Map<String, Object> map) {
         ReadBlanks readBlanks = readBlanksMapper.selByTypeId(typeId);

@@ -82,4 +82,15 @@ public class ReadCourseController extends BaseController {
     public ServerResponse<Object> getVersion(HttpSession session){
         return readService.getVersion(session);
     }
+
+    /**
+     *
+     * @param courseId
+     * @param type  1,开心一刻   2,迷你英语   3,队长游世界
+     * @return
+     */
+    @GetMapping("getEnglishParadise")
+    public ServerResponse<Object> getEnglishParadise(Long courseId,Integer type){
+        return readService.getEnglishParadise(courseId,type);
+    }
 }

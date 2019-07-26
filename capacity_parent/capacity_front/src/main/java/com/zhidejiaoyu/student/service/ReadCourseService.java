@@ -27,4 +27,6 @@ public interface ReadCourseService extends IService<ReadCourse> {
      * @return
      */
     ServerResponse capacityMatching(HttpSession session, Long courseId, Long readTypeId);
+
+    ServerResponse<Object> getEnglishParadise(Long courseId, Integer type);
 }
