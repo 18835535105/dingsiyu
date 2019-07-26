@@ -624,6 +624,7 @@ public class TestResultUtil implements Serializable {
         final String START_MATCH = "^[a-zA-Z0-9$#'].*";
         StringBuilder sb = new StringBuilder();
         for (String s : words) {
+            s = s.replace("#", " ").replace("$", "");
             if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
                 rightList.add(s.replace("#", " ").replace("$", ""));
                 orderList.add(s.replace("#", " ").replace("$", ""));
