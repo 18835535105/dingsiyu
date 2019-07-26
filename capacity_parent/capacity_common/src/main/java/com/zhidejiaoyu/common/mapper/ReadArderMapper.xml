@@ -18,6 +18,12 @@
         id,type,sentence,translate,course_id,text_types,part_url,title
     </sql>
 
+    <select id="selByCourseId" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include>
+        from read_arder
+        where course_id=#{courseId}
+    </select>
+
 
 
 </mapper>

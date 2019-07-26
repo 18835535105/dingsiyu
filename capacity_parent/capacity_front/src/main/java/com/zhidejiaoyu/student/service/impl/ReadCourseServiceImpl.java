@@ -52,7 +52,13 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
     private ReadBlanksMapper readBlanksMapper;
 
     @Autowired
+    private ReadArderMapper readArderMapper;
+
+    @Autowired
     private ReadWordMapper readWordMapper;
+
+    @Autowired
+    private ReadWiseCounselMapper readWiseCounselMapper;
 
     /**
      * 获取全部单元信息
@@ -61,7 +67,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
      * @return
      */
     @Override
-    public ServerResponse<Object> getAllCourse(HttpSession session) {
+    public ServerResponse<Object> getAllCourse(HttpSession session, String gradeString) {
         //修改前数据
        /* Long studentId = getStudentId(session);
         List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selReadCourseByStudentId(studentId);
@@ -96,8 +102,9 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         }*/
         //修改后数据
         Long studentId = getStudentId(session);
+        Integer gradeInteger = getGradeInteger(gradeString);
         //获取学习计划
-        List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selReadCourseByStudentId(studentId);
+        List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selReadCourseByStudentId(studentId, gradeInteger);
         if (studentStudyPlans != null && studentStudyPlans.size() > 0) {
             CapacityStudentUnit unit = capacityStudentUnitMapper.selByStudentIdAndType(studentId, 6);
             //存放全部版本信息
@@ -116,6 +123,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
                 //判断正在学习的课程是否拥有，如果未拥有放入当前版本信息
                 Map<String, Object> versionMap = new HashMap<>();
                 versionMap.put("grade", grade);
+                versionMap.put("isStudy", unit.getUnitId());
                 List<Map<String, Object>> sList = new ArrayList<>();
                 for (Map<String, Object> sMap : maps) {
                     sMap.put("text", "未完成");
@@ -168,6 +176,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         //List<ReadType> readTypes = readTypeMapper.selByCourseId(courseId);
         List<Map<String, Object>> returnList = new ArrayList<>();
         for (ReadType readType : readTypes) {
+            Map<String, Object> returnMap = new HashMap<>();
             Map<String, Object> map = new HashMap<>();
             map.put("typeId", readType.getId());
             map.put("typesOfEssays", readType.getTypesOfEssays());
@@ -191,10 +200,14 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitIdAndGenre(student.getId(), readType.getId(), "阅读测试", "阅读测试");
             if (testRecord != null) {
                 map.put("rightCount", testRecord.getRightCount());
+                map.put("isClose", true);
             } else {
                 map.put("rightCount", 0);
+                map.put("isClose", false);
             }
-            returnList.add(map);
+            returnMap.put("title", readType.getReadName());
+            returnMap.put("data", map);
+            returnList.add(returnMap);
         }
         return ServerResponse.createBySuccess(returnList);
     }
@@ -215,6 +228,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             this.getInterestingReadingData(typeId, map);
         } else {
             //查看队长讲英语课程
+            this.getSpeakEnglishData(courseId,map);
         }
         return ServerResponse.createBySuccess(map);
     }
@@ -222,7 +236,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
     @Override
     public ServerResponse<Object> getVersion(HttpSession session) {
         Long studentId = getStudentId(session);
-        List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selReadCourseByStudentId(studentId);
+        List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selReadCourseByStudentId(studentId,null);
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selByStudentIdAndType(studentId, 6);
         List<Map<String, Object>> returnList = new ArrayList<>();
         if (studentStudyPlans.size() == 0) {
@@ -339,18 +353,30 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
 
     }
 
+    private void getSpeakEnglishData(Long courseId, Map<String, Object> map) {
+        //获取队长讲英语课文
+        List<ReadArder> readArders = readArderMapper.selByCourseId(courseId,0,1);
+        //获取队长讲英语锦囊妙计
+
+        readArders.get(0).getType();
+
+
+    }
+
+
+
     private void getBlanks(Long typeId, Map<String, Object> map) {
         ReadBlanks readBlanks = readBlanksMapper.selByTypeId(typeId);
         String[] answerList = readBlanks.getAnswer().split("&@&");
         String[] analysisList = readBlanks.getAnalysis().split("&@&");
-        List<Map<String,Object>> returnList=new ArrayList<>();
+        List<Map<String, Object>> returnList = new ArrayList<>();
         for (int i = 0; i < analysisList.length; i++) {
-            Map<String,Object> returnMap=new HashMap<>();
-            returnMap.put("word",answerList[i]);
-            returnMap.put("analysis",analysisList[i]);
+            Map<String, Object> returnMap = new HashMap<>();
+            returnMap.put("word", answerList[i]);
+            returnMap.put("analysis", analysisList[i]);
             returnList.add(returnMap);
         }
-        map.put("topic",returnList);
+        map.put("topic", returnList);
     }
 
     /**
@@ -487,7 +513,6 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         //获取全部课程id 去重
         List<Map<String, Object>> list = new ArrayList<>();
         Map<Long, List<StudentStudyPlan>> collect = plans.stream().collect(Collectors.groupingBy(vo -> vo.getCourseId()));
-        String unitGrade = getStringGrade(unit.getCourseId());
         Set<Long> courses = collect.keySet();
         for (Long course : courses) {
             List<StudentStudyPlan> studentStudyPlans = collect.get(course);

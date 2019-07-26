@@ -27,8 +27,8 @@ public class ReadCourseController extends BaseController {
      * @return
      */
     @RequestMapping("/getAllCourse")
-    public ServerResponse<Object> getAllCourse(HttpSession session) {
-        return readService.getAllCourse(session);
+    public ServerResponse<Object> getAllCourse(HttpSession session,String grade) {
+        return readService.getAllCourse(session,grade);
     }
 
     /**

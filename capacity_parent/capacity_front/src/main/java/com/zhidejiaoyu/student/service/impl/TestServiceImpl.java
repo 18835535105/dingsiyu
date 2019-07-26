@@ -487,6 +487,37 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         return ServerResponse.createBySuccess(vo);
     }
 
+    @Override
+    @GoldChangeAnnotation
+    @TestChangeAnnotation(isUnitTest = false)
+    public Object saveReadTest(HttpSession session, TestRecord testRecord) {
+        Student student = getStudent(session);
+        Integer point = testRecord.getPoint();
+        testRecord.setStudentId(student.getId());
+        testRecord.setGenre("阅读测试");
+        testRecord.setStudyModel("阅读测试");
+        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+        getUnitTestMsg(testRecord, testRecord.getPoint());
+        Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 13);
+        Integer gold=0;
+        Integer energy=0;
+        if (integer != null && integer < 60) {
+            if (point >= 60) {
+                gold=5;
+                energy=2;
+                this.saveLog(student, gold, null, "阅读测试");
+                studentMapper.updateById(student);
+            }
+        }
+        TestResultVo vo = new TestResultVo();
+        vo.setGold(gold);
+        vo.setEnergy(energy);
+        vo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
+        testRecordMapper.insert(testRecord);
+        return ServerResponse.createBySuccess(vo);
+    }
+
+
     private void getLetterWrite(Map<String, Object> map, Letter studyLetter) {
         map.put("type", 3);
         map.put("mp3url", baiduSpeak.getLetterPath(studyLetter.getBigLetter()));

@@ -278,4 +278,9 @@ public class TestController {
         return testService.saveLetterAfterLearning(session,testRecord);
     }
 
+    @RequestMapping("/saveReadTest")
+    public Object saveReadTest(HttpSession session ,TestRecord testRecord){
+        return testService.saveReadTest(session,testRecord);
+    }
+
 }

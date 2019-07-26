@@ -8,7 +8,7 @@ import javax.servlet.http.HttpSession;
 
 public interface ReadCourseService extends IService<ReadCourse> {
 
-    ServerResponse<Object> getAllCourse(HttpSession session);
+    ServerResponse<Object> getAllCourse(HttpSession session,String grade);
 
     ServerResponse<Object> updStudyPlan(HttpSession session, Long courseId, String grade);
 

@@ -127,6 +127,9 @@
         <if test="model == 12">
             and study_model = '字母学后测试'
         </if>
+        <if test="model == 13">
+            and study_model = '阅读测试'
+        </if>
     </sql>
 
     <select id="selectByStudentIdAndUnitId"
