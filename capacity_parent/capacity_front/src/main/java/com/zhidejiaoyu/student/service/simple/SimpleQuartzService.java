@@ -62,5 +62,12 @@ public interface SimpleQuartzService {
     /**
      * 初始化排行缓存信息
      */
-    void initRankCache();
+    void initRankCaches();
+
+    /**
+     * 初始化所有指定学生排行缓存信息
+     *
+     * @return
+     */
+    void initRankCache(Long studentId);
 }

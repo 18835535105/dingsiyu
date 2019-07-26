@@ -6,7 +6,6 @@ import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.AwardMapper;
 import com.zhidejiaoyu.common.mapper.CcieMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
-import com.zhidejiaoyu.common.mapper.WorshipMapper;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
@@ -25,8 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 /**
  * @author wuchenxi
@@ -280,8 +279,12 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
     }
 
     @Override
-    public void initRankCache() {
+    public void initRankCaches() {
         List<Student> students = studentMapper.selectHasRank();
+        initCache(students);
+    }
+
+    private void initCache(List<Student> students) {
         // 各个学生被膜拜的次数
         Map<Long, Map<Long, Long>> byWorshipCount = worshipMapper.countWorshipWithStudents(students);
         // 各个学生获取的勋章个数
@@ -325,6 +328,14 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
             log.info("学生[{} - {} - {}] 被膜拜次数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
 
         });
+    }
+
+    @Override
+    public void initRankCache(Long studentId) {
+        Student student = studentMapper.selectById(studentId);
+        List<Student> students = new ArrayList<>();
+        students.add(student);
+        initCache(students);
     }
 
     /**
