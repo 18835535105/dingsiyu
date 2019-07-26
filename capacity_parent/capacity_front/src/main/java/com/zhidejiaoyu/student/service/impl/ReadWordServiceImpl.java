@@ -7,16 +7,16 @@ import com.zhidejiaoyu.common.Vo.read.NewWordsBookVo;
 import com.zhidejiaoyu.common.Vo.read.WordInfoVo;
 import com.zhidejiaoyu.common.Vo.study.MemoryStudyVo;
 import com.zhidejiaoyu.common.constant.read.ReadContentConstant;
+import com.zhidejiaoyu.common.dto.read.SaveStrengthenDto;
 import com.zhidejiaoyu.common.exception.ServiceException;
+import com.zhidejiaoyu.common.mapper.LearnMapper;
 import com.zhidejiaoyu.common.mapper.ReadContentMapper;
 import com.zhidejiaoyu.common.mapper.ReadWordMapper;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
-import com.zhidejiaoyu.common.pojo.ReadContent;
-import com.zhidejiaoyu.common.pojo.ReadWord;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.Vocabulary;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
+import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
@@ -27,6 +27,7 @@ import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.service.ReadWordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
@@ -68,6 +69,12 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
     @Autowired
     private MemoryDifficultyUtil memoryDifficultyUtil;
 
+    @Autowired
+    private LearnMapper learnMapper;
+
+    @Autowired
+    private MemoryStrengthUtil memoryStrengthUtil;
+
     @Override
     public ServerResponse<Object> getWordInfo(HttpSession session, Long courseId, String word) {
         Vocabulary vocabulary = vocabularyMapper.selectByWord(word);
@@ -93,6 +100,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> addNewWordsBook(HttpSession session, ReadWord readWord) {
         Vocabulary vocabulary = vocabularyMapper.selectById(readWord.getWordId());
         if (vocabulary == null) {
@@ -217,6 +225,48 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
 
         return ServerResponse.createBySuccess(memoryStudyVo);
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ServerResponse saveStrengthen(HttpSession session, SaveStrengthenDto dto) {
+
+        Student student = super.getStudent(session);
+
+        ReadWord readWord = readWordMapper.selectByStudentIdAndCourseIdAndWordId(student.getId(), dto.getCourseId(), dto.getWordId(), dto.getType());
+        Double memoryStrength = memoryStrengthUtil.getStudyMemoryStrength(readWord.getMemoryStrength(), dto.getIsKnown());
+        Learn learn = this.getLearnInfo(dto, student);
+        if (memoryStrength == 1) {
+            readWordMapper.deleteById(readWord.getId());
+            if (learn != null) {
+                learnMapper.deleteById(learn.getId());
+            }
+            return ServerResponse.createBySuccess();
+        }
+
+        readWord.setMemoryStrength(memoryStrength);
+        readWord.setPush(GoldMemoryTime.getGoldMemoryTime(memoryStrength, new Date()));
+        if (!dto.getIsKnown()) {
+            readWord.setErrorCount(readWord.getErrorCount() + 1);
+        }
+        readWord.setUpdateTime(new Date());
+        readWordMapper.updateById(readWord);
+
+        if (learn != null) {
+            learn.setStudyCount(learn.getStudyCount() + 1);
+            learnMapper.updateById(learn);
+        }
+
+        return ServerResponse.createBySuccess();
+    }
+
+    private Learn getLearnInfo(SaveStrengthenDto dto, Student student) {
+        ReadWord readWord = new ReadWord();
+        readWord.setCourseId(dto.getCourseId());
+        readWord.setStudentId(student.getId());
+        readWord.setWordId(dto.getWordId());
+        return learnMapper.selectReadWord(readWord, memoryDifficultyUtil.getReadWordStudyModel(dto.getType()));
+    }
+
 
     /**
      * 获取生词标红响应数据

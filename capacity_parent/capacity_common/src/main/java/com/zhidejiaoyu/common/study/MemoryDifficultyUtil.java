@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -113,6 +114,7 @@ public class MemoryDifficultyUtil {
         int studyCount;
         if (learn == null) {
             studyCount = 1;
+            this.saveLearn(readWord);
         } else {
             studyCount = learn.getStudyCount();
         }
@@ -124,13 +126,32 @@ public class MemoryDifficultyUtil {
         return getMemoryDifficulty(readWord.getMemoryStrength(), errorCount, studyCount);
     }
 
+    private void saveLearn(ReadWord readWord) {
+        Date date = new Date();
+        Learn learn = new Learn();
+        learn.setStudentId(readWord.getStudentId());
+        learn.setStudyCount(1);
+        learn.setStatus(0);
+        learn.setCourseId(readWord.getCourseId());
+        learn.setLearnCount(1);
+        learn.setVocabularyId(readWord.getWordId());
+        learn.setType(1);
+        learn.setUpdateTime(date);
+        learn.setUnitId(0L);
+        learn.setStudyModel(this.getReadWordStudyModel(readWord.getType()));
+        learn.setFirstIsKnown(0);
+        learn.setFirstStudyTime(date);
+        learn.setLearnTime(date);
+        learnMapper.insert(learn);
+    }
+
     /**
      * 获取生词手册类型
      *
      * @param type
      * @return
      */
-    private String getReadWordStudyModel(Integer type) {
+    public String getReadWordStudyModel(Integer type) {
         switch (type) {
             case 1:
                 return "阅读生词手册-慧记忆";

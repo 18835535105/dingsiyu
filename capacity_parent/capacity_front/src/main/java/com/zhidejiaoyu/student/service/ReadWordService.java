@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service;
 
+import com.zhidejiaoyu.common.dto.read.SaveStrengthenDto;
 import com.zhidejiaoyu.common.pojo.ReadWord;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
@@ -61,4 +62,12 @@ public interface ReadWordService extends BaseService<ReadWord> {
      * @return
      */
     ServerResponse startStrengthen(HttpSession session, Long courseId, Integer type);
+
+    /**
+     * 保存强化信息
+     *
+     * @param dto
+     * @return
+     */
+    ServerResponse saveStrengthen(HttpSession session, SaveStrengthenDto dto);
 }
