@@ -276,6 +276,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                         sb.append(s1);
                     } else {
                         if (sb.length() > 0) {
+                            rightList.add(sb.toString().replace("#", " ").replace("$", ""));
+                            orderList.add(sb.toString().replace("#", " ").replace("$", ""));
                             sb.setLength(0);
                         }
                         // 如果符号前面是字母需要在符号列表中加 null
