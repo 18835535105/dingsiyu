@@ -75,7 +75,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         add("Amy");
         add("Anne");
         add("Mingming");
-
+        add("Jones");
+        add("mr");
+        add("Mr");
     }};
 
 
