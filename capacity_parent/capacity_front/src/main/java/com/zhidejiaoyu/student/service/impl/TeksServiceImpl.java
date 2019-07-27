@@ -258,6 +258,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
+            s = s.replace("#", " ").replace("$", "");
             if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
                 rightList.add(s);
                 pointList.add(null);
@@ -275,8 +276,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                         sb.append(s1);
                     } else {
                         if (sb.length() > 0) {
-                            rightList.add(sb.toString());
-                            orderList.add(sb.toString());
                             sb.setLength(0);
                         }
                         // 如果符号前面是字母需要在符号列表中加 null
