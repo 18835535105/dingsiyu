@@ -73,6 +73,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         add("Wang");
         add("Han");
         add("Amy");
+        add("Anne");
+        add("Mingming");
+
     }};
 
 
@@ -857,17 +860,18 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         // 以字母或数据开头
         final String START_MATCH = "^[a-zA-Z0-9$#'].*";
         for (int i = 0; i < strList.size(); i++) {
-            boolean falg = true;
-            for (int j = 0; j < NAMELIST.size(); j++) {
-                String str = strList.get(i).substring(0, strList.get(i).length() - 1);
-                if (str.indexOf(NAMELIST.get(j))==-1) {
-                    falg = false;
+            boolean flag = true;
+            for (String s : NAMELIST) {
+                String str = strList.get(i);
+                if (str.contains(s)) {
+                    flag = false;
+                    break;
                 }
             }
             if (!Pattern.matches(END_MATCH, strList.get(i)) && !Pattern.matches(START_MATCH, strList.get(i))) {
-                falg = false;
+                flag = false;
             }
-            if (falg) {
+            if (flag) {
                 shuZhuString.add(i);
             }
         }
