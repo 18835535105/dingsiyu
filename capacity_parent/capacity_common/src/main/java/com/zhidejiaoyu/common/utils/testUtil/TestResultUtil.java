@@ -557,9 +557,9 @@ public class TestResultUtil implements Serializable {
         // 乱序
         List<String> orderList = new ArrayList<>();
         // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$']$";
+        final String END_MATCH = ".*[a-zA-Z0-9$ ']$";
         // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$'].*";
+        final String START_MATCH = "^[a-zA-Z0-9$ '].*";
         StringBuilder sb = new StringBuilder();
         for (String s : words) {
             s = s.replace("#", " ").replace("$", "");
@@ -605,6 +605,13 @@ public class TestResultUtil implements Serializable {
         sentenceTranslateVo.put("rateList", rightList);
     }
 
+    public static void main(String[] args) {
+        SentenceTranslateVo sentenceTranslateVo = new SentenceTranslateVo();
+        TestResultUtil testResultUtil = new TestResultUtil();
+        testResultUtil.getOrderEnglishList(sentenceTranslateVo, "That's a funny time for#breakfast.", "eat breakfast", 1);
+        System.out.println(sentenceTranslateVo);
+    }
+
     /**
      * 将例句单词顺序打乱
      *
@@ -620,9 +627,9 @@ public class TestResultUtil implements Serializable {
         // 乱序
         List<String> orderList = new ArrayList<>();
         // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$#']$";
+        final String END_MATCH = ".*[a-zA-Z0-9$# ']$";
         // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$#'].*";
+        final String START_MATCH = "^[a-zA-Z0-9$# '].*";
         StringBuilder sb = new StringBuilder();
         for (String s : words) {
             s = s.replace("#", " ").replace("$", "");
