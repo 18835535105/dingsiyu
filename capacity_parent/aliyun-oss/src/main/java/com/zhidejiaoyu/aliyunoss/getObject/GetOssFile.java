@@ -47,7 +47,7 @@ public class GetOssFile {
     public static String getPublicObjectUrl(String objectName) {
         // 藏宝阁图片路径
         String prizeImg = "prizeImg/";
-        if (objectName.contains(prizeImg)) {
+        if (objectName != null && objectName.contains(prizeImg)) {
             return AliyunInfoConst.host + objectName;
         }
         try {
