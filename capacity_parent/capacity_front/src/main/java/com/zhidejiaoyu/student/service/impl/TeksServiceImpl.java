@@ -963,8 +963,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         final String START_MATCH = "^[a-zA-Z0-9$#'].*";
         for (int i = 0; i < strList.size(); i++) {
             boolean flag = true;
+            String str = strList.get(i);
             for (String s : NAMELIST) {
-                String str = strList.get(i);
+
                 if (str.contains(s)) {
                     flag = false;
                     break;
@@ -973,7 +974,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             if (!Pattern.matches(END_MATCH, strList.get(i)) && !Pattern.matches(START_MATCH, strList.get(i))) {
                 flag = false;
             }
-            if ("$".indexOf(strList.get(i)) != -1 || "#".indexOf(strList.get(i)) != -1) {
+
+            if (str.indexOf("$") != -1 || str.indexOf("#") != -1) {
                 flag = false;
             }
             if (flag) {
@@ -1216,7 +1218,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             index, List<String> returnAnswers) {
         String sentence = teks.getSentence();
         Integer teksId = teks.getId();
-        List<String> regitList = getRegitList(teks.getSentence());
+        List<String> regitList = getLeterRegitList(teks.getSentence());
         List<String> arrList = new ArrayList<>();
         Integer location = 0;
         //句子在teksId为103935时挖空位置固定为0
