@@ -282,8 +282,6 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         List<Map<String, Object>> wordInfoList = new ArrayList<>();
         // 当前整句话的信息
         List<Map<String, Object>> sentenceInfoList = new ArrayList<>();
-        // 如果当前元素不是单词，有可能是整句话，查找该句话的翻译
-        Map<String, Object> sentenceMap;
         // 存放当前单词、该单词是不是生词
         Map<String, Object> wordInfoMap;
         // 将单词和字符拼接成句子
@@ -298,19 +296,12 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
                 if ("。".equals(word)) {
                     // 说明该处是挖出的空格，让学生选择或者填写
                     packageWordInfoList(wordInfoList, wordInfoMap, null, false);
-                    sentence.append(ReadContentConstant.BLANK);
+                    sentence.append(" ").append(ReadContentConstant.BLANK);
+                    wordInfoList = packageSentenceInfoList(translateMap, wordInfoList, sentenceInfoList, sentence);
                 } else {
                     packageWordInfoList(wordInfoList, wordInfoMap, word, false);
                     sentence.append(word);
-                    String sentenceTrim = sentence.toString().trim();
-                    if (translateMap.containsKey(sentenceTrim)) {
-                        sentenceMap = new HashMap<>(16);
-                        sentenceMap.put("translate", translateMap.get(sentenceTrim));
-                        sentenceMap.put("words", wordInfoList);
-                        sentenceInfoList.add(sentenceMap);
-                        wordInfoList = new ArrayList<>();
-                        sentence.setLength(0);
-                    }
+                    wordInfoList = packageSentenceInfoList(translateMap, wordInfoList, sentenceInfoList, sentence);
                 }
             } else {
                 // 当前元素是单词，正常拼接
@@ -319,6 +310,29 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
             }
         }
         return returnList;
+    }
+
+    /**
+     * 封装每句话的数据
+     *
+     * @param translateMap     每句话的翻译
+     * @param wordInfoList     单词状态
+     * @param sentenceInfoList 每句话翻译和单词的组合
+     * @param sentence         当前整句话
+     * @return
+     */
+    private List<Map<String, Object>> packageSentenceInfoList(Map<String, String> translateMap, List<Map<String, Object>> wordInfoList, List<Map<String, Object>> sentenceInfoList, StringBuilder sentence) {
+        String sentenceTrim = sentence.toString().trim();
+        if (translateMap.containsKey(sentenceTrim)) {
+            // 如果当前元素不是单词，有可能是整句话，查找该句话的翻译
+            Map<String, Object> sentenceMap = new HashMap<>(16);
+            sentenceMap.put("translate", translateMap.get(sentenceTrim));
+            sentenceMap.put("words", wordInfoList);
+            sentenceInfoList.add(sentenceMap);
+            wordInfoList = new ArrayList<>();
+            sentence.setLength(0);
+        }
+        return wordInfoList;
     }
 
     /**
