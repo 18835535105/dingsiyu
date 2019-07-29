@@ -48,13 +48,11 @@ public class SentenceTranslateVo {
     /**
      * 例句乱序
      */
-    @Deprecated
     private List<String> orderEnglish;
 
     /**
      * 例句顺序集合，包含标点
      */
-    @Deprecated
     private List<String> englishList;
 
     /**
