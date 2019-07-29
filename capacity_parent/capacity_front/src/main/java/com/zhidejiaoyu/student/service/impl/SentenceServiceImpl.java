@@ -1089,9 +1089,9 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
 
         int nextInt = new Random().nextInt(10);
         if (nextInt > 2) {
-            testResultUtil.getOrderEnglishList(sentenceTranslateVo, sentence.getCentreExample(), sentence.getCentreTranslate(), type);
+            testResultUtil.getOrderEnglishList(sentenceTranslateVo, sentence.getCentreExample(), sentence.getExampleDisturb(), type);
         } else {
-            testResultUtil.getOrderChineseList(sentenceTranslateVo,sentence.getCentreTranslate(),sentence.getTranslateDisturb(),type);
+            testResultUtil.getOrderChineseList(sentenceTranslateVo, sentence.getCentreTranslate(), sentence.getTranslateDisturb(), type);
         }
         return sentenceTranslateVo;
     }
