@@ -354,7 +354,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
 
             if (readList.size() == 0) {
                 readList = new ArrayList<>();
-                readContent.setSentence(readContent.getSentence().replace("#&#", ""));
+                readContent.setSentence(readContent.getSentence().replace("#&#", "").replace("&@&","&nbsp;&nbsp;&nbsp;"));
                 readList.add(readContent);
                 i++;
             } else {
@@ -362,7 +362,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
                     returnList.add(readList);
                     readList = new ArrayList<>();
                 }
-                readContent.setSentence(readContent.getSentence().replace("#&#", ""));
+                readContent.setSentence(readContent.getSentence().replace("#&#", "").replace("&@&","&nbsp;&nbsp;&nbsp;"));
                 readList.add(readContent);
                 i++;
             }

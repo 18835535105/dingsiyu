@@ -23,7 +23,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"read_picture"};
+        String[] tableName = {"memory_capacity"};
 
         /**
          * 配置：
