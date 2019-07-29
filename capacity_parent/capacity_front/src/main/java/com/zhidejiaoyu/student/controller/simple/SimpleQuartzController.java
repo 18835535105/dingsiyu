@@ -51,13 +51,24 @@ public class SimpleQuartzController {
     }
 
     /**
-     * 初始化排行缓存信息
+     * 初始化所有学生排行缓存信息
+     *
+     * @return
+     */
+    @GetMapping("/initRankCaches")
+    public ServerResponse initRankCaches() {
+        simpleQuartzService.initRankCaches();
+        return ServerResponse.createBySuccess();
+    }
+
+    /**
+     * 初始化所有指定学生排行缓存信息
      *
      * @return
      */
     @GetMapping("/initRankCache")
-    public ServerResponse initRankCache() {
-        simpleQuartzService.initRankCache();
+    public ServerResponse initRankCache(Long studentId) {
+        simpleQuartzService.initRankCache(studentId);
         return ServerResponse.createBySuccess();
     }
 
