@@ -261,7 +261,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         final String END_MATCH = ".*[a-zA-Z0-9$# ']$";
         // 以字母或数据开头
         final String START_MATCH = "^[a-zA-Z0-9$# '].*";
-
+        // 以字母或数字结尾
+        final String END_MATCH2 = ".*[a-zA-Z0-9$# '-]$";
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
             s = s.replace("#", " ").replace("$", "");
@@ -281,17 +282,52 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                     if (Pattern.matches(END_MATCH, s1)) {
                         sb.append(s1);
                     } else {
-                        if (sb.length() > 0) {
-                            rightList.add(sb.toString().replace("#", " ").replace("$", ""));
-                            orderList.add(sb.toString().replace("#", " ").replace("$", ""));
-                            sb.setLength(0);
+                        if (i == 0) {
+                            if (sb.length() > 0) {
+                                rightList.add(sb.toString().replace("#", " ").replace("$", ""));
+                                orderList.add(sb.toString().replace("#", " ").replace("$", ""));
+                                sb.setLength(0);
+                            }
+                            // 如果符号前面是字母需要在符号列表中加 null
+                            if (i > 0 && Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
+                                pointList.add(null);
+                            }
+                            rightList.add(s1);
+                            pointList.add(s1);
+                        } else {
+                            if (i < (length - 1)) {
+                                char longChar=chars[i+1];
+                                String s2 = new String(new char[]{longChar});
+                                if(Pattern.matches(END_MATCH, s2)){
+                                    sb.append(s1);
+                                }else{
+                                    if (sb.length() > 0) {
+                                        rightList.add(sb.toString().replace("#", " ").replace("$", ""));
+                                        orderList.add(sb.toString().replace("#", " ").replace("$", ""));
+                                        sb.setLength(0);
+                                    }
+                                    // 如果符号前面是字母需要在符号列表中加 null
+                                    if (i > 0 && Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
+                                        pointList.add(null);
+                                    }
+                                    rightList.add(s1);
+                                    pointList.add(s1);
+                                }
+                            }else{
+                                if (sb.length() > 0) {
+                                    rightList.add(sb.toString().replace("#", " ").replace("$", ""));
+                                    orderList.add(sb.toString().replace("#", " ").replace("$", ""));
+                                    sb.setLength(0);
+                                }
+                                // 如果符号前面是字母需要在符号列表中加 null
+                                if (i > 0 && Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
+                                    pointList.add(null);
+                                }
+                                rightList.add(s1);
+                                pointList.add(s1);
+                            }
                         }
-                        // 如果符号前面是字母需要在符号列表中加 null
-                        if (i > 0 && Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
-                            pointList.add(null);
-                        }
-                        rightList.add(s1);
-                        pointList.add(s1);
+
                     }
 
                     // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
