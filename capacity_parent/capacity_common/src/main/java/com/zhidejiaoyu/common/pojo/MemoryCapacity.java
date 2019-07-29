@@ -46,7 +46,7 @@ public class MemoryCapacity extends Model<MemoryCapacity> {
     /**
      * 学生id
      */
-    private Integer studentId;
+    private Long studentId;
 
 
     @Override
