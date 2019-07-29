@@ -52,7 +52,7 @@
         <json-smart.version>2.3</json-smart.version>
         <json-lib.version>2.4</json-lib.version>
         <org.json.version>chargebee-1.0</org.json.version>
-        <fastjson.version>1.2.41</fastjson.version>
+        <fastjson.version>1.2.58</fastjson.version>
         <jackson-annotations.version>2.9.5</jackson-annotations.version>
 
         <durid.version>1.1.9</durid.version>
