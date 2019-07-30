@@ -549,16 +549,26 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         List<Map<String, Object>> list = new ArrayList<>();
         for (ReadChoose choose : readChooses) {
             Map<String, Object> chooseMap = new HashMap<>();
+            //放入题目
             chooseMap.put("subject", choose.getSubject());
+            //放入选择答案
+            List<Map<String,Object>> reList=new ArrayList<>();
             Map<String, Object> answerMap = new HashMap<>();
-            answerMap.put(choose.getAnswer(), true);
+            answerMap.put("answer",choose.getAnswer());
+            answerMap.put("falg",true);
+            reList.add(answerMap);
+            //获取错误答案
             String[] wronganswers = choose.getWrongAnswer().split("&@&");
             List<String> wrongList = Arrays.asList(wronganswers);
+            //放入错误答案
             for (String str : wrongList.subList(0, 3)) {
-                answerMap.put(str, false);
+                Map<String,Object> worngMap=new HashMap<>();
+                worngMap.put("answer",str);
+                worngMap.put("falg",false);
+                reList.add(worngMap);
             }
             chooseMap.put("analysis", choose.getAnalysis());
-            chooseMap.put("answer", answerMap);
+            chooseMap.put("answer", reList);
             list.add(chooseMap);
         }
         map.put("topic", list);
