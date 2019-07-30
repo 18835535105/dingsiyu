@@ -120,6 +120,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @Autowired
     private TeksUnitMapper teksUnitMapper;
 
+    // 以字母或数字结尾
+    private final String END_MATCH = ".*[a-zA-Z0-9$# ']$";
+    // 以字母或数据开头
+    private final String START_MATCH = "^[a-zA-Z0-9$# '].*";
+    // 以字母或数字结尾
+    private final String END_MATCH2 = ".*[a-zA-Z0-9$# '-]$";
 
     @Override
     public ServerResponse<List<Teks>> selTeksByUnitId(Integer unitId) {
@@ -257,12 +263,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         // 乱序
         List<String> orderList = new ArrayList<>();
 
-        // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$# ']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$# '].*";
-        // 以字母或数字结尾
-        final String END_MATCH2 = ".*[a-zA-Z0-9$# '-]$";
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
             s = s.replace("#", " ").replace("$", "");
@@ -282,6 +282,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                     if (Pattern.matches(END_MATCH, s1)) {
                         sb.append(s1);
                     } else {
+                        //判断是否为第一位
                         if (i == 0) {
                             if (sb.length() > 0) {
                                 rightList.add(sb.toString().replace("#", " ").replace("$", ""));
@@ -289,12 +290,13 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                                 sb.setLength(0);
                             }
                             // 如果符号前面是字母需要在符号列表中加 null
-                            if (i > 0 && Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
+                            if (Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
                                 pointList.add(null);
                             }
                             rightList.add(s1);
                             pointList.add(s1);
                         } else {
+                            //如果中间出现符号则掠过
                             if (i < (length - 1)) {
                                 char longChar = chars[i + 1];
                                 String s2 = new String(new char[]{longChar});
@@ -307,7 +309,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                                         sb.setLength(0);
                                     }
                                     // 如果符号前面是字母需要在符号列表中加 null
-                                    if (i > 0 && Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
+                                    if ( Pattern.matches(END_MATCH2, new String(new char[]{chars[i - 1]}))) {
                                         pointList.add(null);
                                     }
                                     rightList.add(s1);
@@ -320,7 +322,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                                     sb.setLength(0);
                                 }
                                 // 如果符号前面是字母需要在符号列表中加 null
-                                if (i > 0 && Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
+                                if ( Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
                                     pointList.add(null);
                                 }
                                 rightList.add(s1);
@@ -393,6 +395,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                         }
                     }
                 }
+                //判断是否有正在学习的单元
                 if (flag) {
                     studyMap = new HashMap<>();
                     Long studyUnitId = Long.parseLong(((Long) learnUnit.get("unit_id")).toString());
@@ -403,6 +406,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                     studyMap.put("grade", learnUnit.get("grade").toString() + "-" + learnUnit.get("label").toString());
                     studyMap.put("courseId", learnUnit.get("courseId"));
                 } else {
+                    //如果没有在plans中取出
                     if (plans.size() != 0) {
                         studyMap = new HashMap<>();
                         Long studyUnitId = plans.get(0).getStartUnitId();
@@ -600,7 +604,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 map.put("pronunciation", baiduSpeak.getSentencePath(teks.getSentence()).replace("#", " ").replace("$", ""));
                 map.put("sentence", teks.getSentence().replace("#", " ").replace("$", ""));
                 map.put("id", teks.getId());
-                List<String> sentenceList = getLeterRegitList(teks.getSentence());
+                List<String> sentenceList = getRegitList(teks.getSentence());
                 int[] integers;
                 List<String> blanceSentence = new ArrayList<>();
                 List<String> vocabulary = new ArrayList<>();
@@ -663,12 +667,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private List<String> getLeterRegitList(String sentence) {
         // 正确顺序
         List<String> rightList = new ArrayList<>();
-        // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$#']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$#'].*";
-        // 以字母或数字结尾
-        final String END_MATCH2 = ".*[a-zA-Z0-9$#-']$";
         String[] split = sentence.trim().split(" ");
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
@@ -723,13 +721,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         return rightList;
     }
 
+    //获取数据正确排序
     private List<String> getRegitList(String sentence) {
         // 正确顺序
         List<String> rightList = new ArrayList<>();
-        // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$#']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$#'].*";
         String[] split = sentence.trim().split(" ");
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
@@ -790,7 +785,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
         TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), testRecord.getUnitId(), model, model);
 
-        int goldCount = this.getGold(testRecord, student, testRecordOld, 7);
+        int goldCount = this.getGold(testRecord, student, testRecordOld);
         testRecord.setGenre(model);
         testRecord.setAwardGold(goldCount);
         testRecord.setStudentId(student.getId());
@@ -832,11 +827,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         return ServerResponse.createBySuccess(map);
     }
 
-    private int getGold(TestRecord testRecord, Student student, TestRecord testRecordOld, Integer classify) {
+    private int getGold(TestRecord testRecord, Student student, TestRecord testRecordOld) {
 
         int goldCount = 0;
         if (testRecordOld == null) {
-            goldCount = getGoldCount(classify, student, testRecord.getPoint(), testRecord.getStudyModel());
+            goldCount = getGoldCount(7, student, testRecord.getPoint(), testRecord.getStudyModel());
         } else {
             // 查询当前单元测试历史最高分数
             int betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 7);
@@ -845,7 +840,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             if (betterPoint < testRecord.getPoint()) {
                 int betterCount = testRecordOld.getBetterCount() + 1;
                 testRecord.setBetterCount(betterCount);
-                goldCount = getGoldCount(classify, student, testRecord.getPoint(), testRecord.getStudyModel());
+                goldCount = getGoldCount(7, student, testRecord.getPoint(), testRecord.getStudyModel());
             }
         }
         return testGoldUtil.addGold(student, goldCount);
@@ -888,9 +883,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         } else {
             msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + goldCount + "#枚金币";
         }
-        RunLog runLog = new RunLog(student.getId(), 4, msg, new Date());
-        runLog.setCourseId(student.getCourseId());
-        runLog.setUnitId(student.getUnitId());
+        RunLog runLog = new RunLog(student.getId(), 4, msg, new Date(),student.getCourseId(),student.getUnitId());
         runLogMapper.insert(runLog);
     }
 
@@ -955,12 +948,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
 
     //判断空格出现位置
-    public int[] wirterBlank(List<String> strList) {
+    private int[] wirterBlank(List<String> strList) {
         Random random = new Random();
         List<Integer> shuZhuString = new ArrayList<>();
-        final String END_MATCH = ".*[a-zA-Z0-9$#']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$#'].*";
         for (int i = 0; i < strList.size(); i++) {
             boolean flag = true;
             String str = strList.get(i);
@@ -1002,7 +992,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             int index = 0;
             while (integers[choose - 1] == 0) {
                 int i = random.nextInt(shuZhuString.size());
-                if (choose == 2 && s == 1) {
+                if (s == 1) {
                     if (i != index) {
                         integers[s] = shuZhuString.get(i);
                     }
@@ -1020,7 +1010,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
 
     //添加数据
-    public void addList(String str, List<String> blanceSentence, List<String> vocabulary) {
+    private void addList(String str, List<String> blanceSentence, List<String> vocabulary) {
         vocabulary.add(str.replace("#", " ").replace("$", ""));
         blanceSentence.add(null);
     }
@@ -1044,7 +1034,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             }
             List<Integer> list = new ArrayList<>();
             for (int i = 0; i < s.length; i++) {
-                if (s[i].indexOf("#") == -1 && s[i].indexOf("$") == -1) {
+                if (!s[i].contains("#") && !s[i].contains("$")) {
                     list.add(i);
                 }
             }
@@ -1218,9 +1208,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             index, List<String> returnAnswers) {
         String sentence = teks.getSentence();
         Integer teksId = teks.getId();
-        List<String> regitList = getLeterRegitList(teks.getSentence());
+        List<String> regitList = getRegitList(teks.getSentence());
         List<String> arrList = new ArrayList<>();
-        Integer location = 0;
+        int location = 0;
         //句子在teksId为103935时挖空位置固定为0
         if (!teksId.equals(103935)) {
             location = changeInteger(regitList);
@@ -1244,13 +1234,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     //获取挖空的位置
     private int changeInteger(List<String> sentenceList) {
+        //获取可挖空位置放入集合
         List<Integer> list = new ArrayList<>();
-        // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$'].*";
         for (int i = 0; i < sentenceList.size(); i++) {
-            if (sentenceList.get(i).indexOf("#") == -1 && sentenceList.get(i).indexOf("$") == -1) {
+            if (!sentenceList.get(i).contains("#") && !sentenceList.get(i).contains("$")) {
                 if (Pattern.matches(END_MATCH, sentenceList.get(i)) && Pattern.matches(START_MATCH, sentenceList.get(i))) {
                     list.add(i);
                 }
@@ -1261,29 +1248,28 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
     //获取听力题
-    private void hearing
-    (List<Teks> hearingList, List<Map<String, Object>> returnList, List<Teks> optionList) {
-        for (int i = 0; i < hearingList.size(); i++) {
+    private void hearing(List<Teks> hearingList, List<Map<String, Object>> returnList, List<Teks> optionList) {
+        for (Teks hearingTeks:hearingList) {
             Collections.shuffle(optionList);
             List<Teks> list = new ArrayList<>();
             for (Teks teks : optionList) {
-                if (!teks.getSentence().trim().equals(hearingList.get(i).getSentence().trim())) {
+                if (!teks.getSentence().trim().equals(hearingTeks.getSentence().trim())) {
                     list.add(teks);
                 }
             }
-            list.remove(hearingList.get(i));
+            list.remove(hearingTeks);
             Map<String, Object> returnMap = new HashMap<>();
-            returnMap.put("id", hearingList.get(i).getId());
-            returnMap.put("chinese", hearingList.get(i).getParaphrase());
-            returnMap.put("pronunciation", baiduSpeak.getSentencePath(hearingList.get(i).getSentence().replace("#", " ").replace("$", "")));
-            returnMap.put("english", hearingList.get(i).getSentence().replace("#", " ").replace("$", ""));
+            returnMap.put("id", hearingTeks.getId());
+            returnMap.put("chinese", hearingTeks.getParaphrase());
+            returnMap.put("pronunciation", baiduSpeak.getSentencePath(hearingTeks.getSentence().replace("#", " ").replace("$", "")));
+            returnMap.put("english", hearingTeks.getSentence().replace("#", " ").replace("$", ""));
             returnMap.put("type", "HanElectBritish");
-            HanElectBritish(hearingList.get(i), new ArrayList<Teks>(list.subList(0, 3)), returnMap);
+            hanElectBritish(hearingTeks, new ArrayList<Teks>(list.subList(0, 3)), returnMap);
             returnList.add(returnMap);
         }
     }
 
-    private void HanElectBritish(Teks teks, List<Teks> optionList, Map<String, Object> returnMap) {
+    private void hanElectBritish(Teks teks, List<Teks> optionList, Map<String, Object> returnMap) {
         List<String> option = new ArrayList<>();
         option.add(teks.getSentence().replace("#", " ").replace("$", ""));
         for (int i = 0; i < 3; i++) {
@@ -1297,21 +1283,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         }
         returnMap.put("option", option);
 
-    }
-
-    private void BritishElectHan(Teks teks, List<Teks> optionList, Map<String, Object> returnMap) {
-        optionList.add(teks);
-        Collections.shuffle(optionList);
-        List<String> english = new ArrayList<>();
-        List<String> option = new ArrayList<>();
-        for (int i = 0; i < optionList.size(); i++) {
-            if (optionList.get(i).getSentence().equals(teks.getSentence())) {
-                returnMap.put("answer", i);
-            }
-            english.add(optionList.get(i).getSentence());
-            option.add(baiduSpeak.getSentencePath(optionList.get(i).getSentence()));
-        }
-        returnMap.put("option", option);
     }
 
     private void getStudyUnit(List<Long> courseIds, List<Map<String, Object>> returnCourse, Long studentId) {
@@ -1337,55 +1308,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         }
     }
 
-    /**
-     * 将例句单词顺序打乱
-     *
-     * @param sentence
-     * @param exampleDisturb 例句英文干扰项  为空时无干扰项
-     * @return
-     */
-    public List<String> getOrderEnglishList(String sentence, String exampleDisturb) {
-        // 去除标点
-        for (String s : POINT) {
-            if (sentence.contains(s)) {
-                if (".".equals(s)) {
-                    sentence = sentence.replace(". ", " ");
-                    if (sentence.substring(sentence.length() - 1).equals(".")) {
-                        sentence = sentence.substring(0, sentence.length() - 1);
-                    }
-                } else {
-                    sentence = sentence.replace(s, "");
-                }
-            }
-        }
-        // 将例句按照空格拆分
-        String[] words = sentence.split(" ");
 
-        List<String> list = new ArrayList<>();
-        // 去除固定搭配中的#
-        for (int i = 0; i < words.length; i++) {
-            if (words[i].contains("#")) {
-                words[i] = words[i].replace("#", " ");
-            }
-            if (words[i].contains("*")) {
-                words[i] = words[i].replace("*", " ");
-            }
-            if (words[i].contains("$")) {
-                words[i] = words[i].replace("$", " ");
-            }
-            // 防止形如 My name is $Jenny$#Green. 的句子中 Jenny Green 中间含有两个空格问题
-            if (words[i].contains("  ")) {
-                words[i] = words[i].replace("  ", " ");
-            }
-            list.add(words[i].trim());
-        }
-
-        if (StringUtils.isNotEmpty(exampleDisturb)) {
-            list.add(exampleDisturb.replace("#", " "));
-        }
-
-        Collections.shuffle(list);
-        return list;
-    }
 
 }

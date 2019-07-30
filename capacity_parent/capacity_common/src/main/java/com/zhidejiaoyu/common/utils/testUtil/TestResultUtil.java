@@ -45,6 +45,29 @@ public class TestResultUtil implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * 以字母或数字结尾
+      */
+
+    private final String END_MATCH = ".*[a-zA-z0-9\\u4e00-\\u9fa5]$";
+    /**
+     * 以字母或数据开头
+     */
+    private final String START_MATCH = "^[a-zA-z0-9\\u4e00-\\u9fa5].*";
+    /**
+     * 二次判断以字母或数字结尾
+     */
+    final String END_MATCH2 = ".*[a-zA-Z0-9$# '-]$";
+
+    /**
+     *  以字母或数字结尾
+     */
+    final String END_MATCH_CHESE = ".*[a-zA-z0-9\\u4e00-\\u9fa5]$";
+    /**
+     * 以字母或数据开头
+     */
+    final String START_MATCH_CHESE = "^[a-zA-z0-9\\u4e00-\\u9fa5].*";
+
+    /**
      * 封装指定类型的单词测试题，适用于 "英译汉"："汉译英"："听力理解" = 3 ：3 ：4 的题型
      * <p>
      * 用于学前测试：游戏测试，等级测试
@@ -439,13 +462,10 @@ public class TestResultUtil implements Serializable {
         List<String> rightList = new ArrayList<>();
         // 乱序
         List<String> orderList = new ArrayList<>();
-        // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-z0-9\\u4e00-\\u9fa5]$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-z0-9\\u4e00-\\u9fa5].*";
+
         StringBuilder sb = new StringBuilder();
         for (String s : centreTranslatelist) {
-            if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
+            if (Pattern.matches(END_MATCH_CHESE, s) && Pattern.matches(START_MATCH_CHESE, s)) {
                 rightList.add(s);
                 orderList.add(s);
             } else {
@@ -457,7 +477,7 @@ public class TestResultUtil implements Serializable {
                     // 当前下标的数据
                     String s1 = new String(new char[]{aChar});
                     // 是字母或者数字，拼接字符串
-                    if (Pattern.matches(END_MATCH, s1)) {
+                    if (Pattern.matches(END_MATCH_CHESE, s1)) {
                         sb.append(s1);
                     } else {
                         if (sb.length() > 0) {
@@ -499,10 +519,7 @@ public class TestResultUtil implements Serializable {
         List<String> rightList = new ArrayList<>();
         // 乱序
         List<String> orderList = new ArrayList<>();
-        // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-z0-9\\u4e00-\\u9fa5]$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-z0-9\\u4e00-\\u9fa5].*";
+
         StringBuilder sb = new StringBuilder();
         for (String s : centreTranslatelist) {
             char[] chars = s.toCharArray();
@@ -556,10 +573,6 @@ public class TestResultUtil implements Serializable {
         List<String> rightList = new ArrayList<>();
         // 乱序
         List<String> orderList = new ArrayList<>();
-        // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$ ']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$ '].*";
         StringBuilder sb = new StringBuilder();
         for (String s : words) {
             s = s.replace("#", " ").replace("$", "");
@@ -627,13 +640,6 @@ public class TestResultUtil implements Serializable {
         // 乱序
         List<String> orderList = new ArrayList<>();
         // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$# ']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$# '].*";
-        // 二次判断以字母或数字结尾
-        final String END_MATCH2 = ".*[a-zA-Z0-9$# '-]$";
-        // 二次判断以字母或数据开头
-        final String START_MATCH2 = "^[a-zA-Z0-9$# '-].*";
         StringBuilder sb = new StringBuilder();
         for (String s : words) {
             s = s.replace("#", " ").replace("$", "");

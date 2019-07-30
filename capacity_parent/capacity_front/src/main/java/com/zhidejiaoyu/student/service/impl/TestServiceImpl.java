@@ -513,7 +513,15 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setGold(gold);
         vo.setEnergy(energy);
         vo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
+        vo.setPoint(point);
         testRecordMapper.insert(testRecord);
+        if (point < PASS) {
+            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
+        } else if (point < NINETY_POINT) {
+            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
+        } else {
+            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+        }
         return ServerResponse.createBySuccess(vo);
     }
 

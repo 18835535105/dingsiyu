@@ -84,9 +84,12 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                     case 5:
                         gold = 5;
                         break;
+                    default:
+                        gold = 0;
+                        break;
                 }
             }
-            try{
+            try {
                 Date date = new Date();
                 MemoryCapacity memoryCapacity = new MemoryCapacity();
                 memoryCapacity.setCreateTime(date);
@@ -100,7 +103,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                 runLogMapper.insert(runLog);
                 student.setSystemGold(student.getSystemGold() + gold);
                 studentMapper.updateById(student);
-            }catch (Exception e){
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }

@@ -357,7 +357,7 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
 
         Long now = System.currentTimeMillis();
         Long pushTime = push.getTime();
-        Long sub = (pushTime - now) / 1000;
+        long sub = (pushTime - now) / 1000;
 
         // 已到达黄金记忆点
         if (sub <= 0) {

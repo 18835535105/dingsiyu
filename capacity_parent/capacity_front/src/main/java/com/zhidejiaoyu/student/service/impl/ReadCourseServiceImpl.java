@@ -347,23 +347,21 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
     private void getInterestingReadingData(Long typeId, Map<String, Object> map) {
         ReadType readType = readTypeMapper.selectById(typeId);
         List<ReadContent> readContents = readContentMapper.selectByTypeId(typeId);
-        List<List<ReadContent>> returnList = new ArrayList<>();
-        List<ReadContent> readList = new ArrayList<>();
+        List<List<Map<String, Object>>> returnList = new ArrayList<>();
+        List<Map<String, Object>> readList = new ArrayList<>();
         int i = 0;
         for (ReadContent readContent : readContents) {
 
             if (readList.size() == 0) {
                 readList = new ArrayList<>();
-                readContent.setSentence(readContent.getSentence().replace("#&#", "").replace("&@&","<span class=spanck></span>"));
-                readList.add(readContent);
+                getWordList(readContent,readList);
                 i++;
             } else {
                 if (readContent.getSentence().indexOf("#&#") != -1) {
                     returnList.add(readList);
                     readList = new ArrayList<>();
                 }
-                readContent.setSentence(readContent.getSentence().replace("#&#", "").replace("&@&","<span class=spanck></span>"));
-                readList.add(readContent);
+                getWordList(readContent,readList);
                 i++;
             }
             if (i == readContents.size()) {
@@ -551,16 +549,26 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         List<Map<String, Object>> list = new ArrayList<>();
         for (ReadChoose choose : readChooses) {
             Map<String, Object> chooseMap = new HashMap<>();
+            //放入题目
             chooseMap.put("subject", choose.getSubject());
+            //放入选择答案
+            List<Map<String,Object>> reList=new ArrayList<>();
             Map<String, Object> answerMap = new HashMap<>();
-            answerMap.put(choose.getAnswer(), true);
+            answerMap.put("answer",choose.getAnswer());
+            answerMap.put("falg",true);
+            reList.add(answerMap);
+            //获取错误答案
             String[] wronganswers = choose.getWrongAnswer().split("&@&");
             List<String> wrongList = Arrays.asList(wronganswers);
+            //放入错误答案
             for (String str : wrongList.subList(0, 3)) {
-                answerMap.put(str, false);
+                Map<String,Object> worngMap=new HashMap<>();
+                worngMap.put("answer",str);
+                worngMap.put("falg",false);
+                reList.add(worngMap);
             }
             chooseMap.put("analysis", choose.getAnalysis());
-            chooseMap.put("answer", answerMap);
+            chooseMap.put("answer", reList);
             list.add(chooseMap);
         }
         map.put("topic", list);
