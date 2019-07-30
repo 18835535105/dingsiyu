@@ -100,10 +100,22 @@ public class PetImageConstant {
      * 李糖心测试通过
      */
     public static final String HONEY_PASS = AliyunInfoConst.host + "static/img/edit-user-msg/honey-pass.png";
+
+    /**
+     * 李糖心 100 分
+     */
+    public static final String HONEY_ONE_HUNDRED = AliyunInfoConst.host + "static/img/edit-user-msg/honey-one-hundred.png";
+
     /**
      * 李糖心测试未通过
      */
     public static final String HONEY_NOT_PASS = AliyunInfoConst.host + "static/img/edit-user-msg/honey-not-pass.png";
+
+    /**
+     * 李糖心 100 分
+     */
+    public static final String CAT_ONE_HUNDRED = AliyunInfoConst.host + "static/img/edit-user-msg/cat-one-hundred.png";
+
     /**
      * 威士顿测试通过
      */
@@ -112,6 +124,12 @@ public class PetImageConstant {
      * 威士顿测试未通过
      */
     public static final String CAT_NOT_PASS = AliyunInfoConst.host + "static/img/edit-user-msg/cat-not-pass.png";
+
+    /**
+     * 无名 100 分
+     */
+    public static final String HERO_ONE_HUNDRED = AliyunInfoConst.host + "static/img/edit-user-msg/hero-one-hundred.png";
+
     /**
      * 无名测试通过
      */
