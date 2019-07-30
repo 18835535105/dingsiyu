@@ -347,23 +347,21 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
     private void getInterestingReadingData(Long typeId, Map<String, Object> map) {
         ReadType readType = readTypeMapper.selectById(typeId);
         List<ReadContent> readContents = readContentMapper.selectByTypeId(typeId);
-        List<List<ReadContent>> returnList = new ArrayList<>();
-        List<ReadContent> readList = new ArrayList<>();
+        List<List<Map<String, Object>>> returnList = new ArrayList<>();
+        List<Map<String, Object>> readList = new ArrayList<>();
         int i = 0;
         for (ReadContent readContent : readContents) {
 
             if (readList.size() == 0) {
                 readList = new ArrayList<>();
-                readContent.setSentence(readContent.getSentence().replace("#&#", "").replace("&@&","<span class=spanck></span>"));
-                readList.add(readContent);
+                getWordList(readContent,readList);
                 i++;
             } else {
                 if (readContent.getSentence().indexOf("#&#") != -1) {
                     returnList.add(readList);
                     readList = new ArrayList<>();
                 }
-                readContent.setSentence(readContent.getSentence().replace("#&#", "").replace("&@&","<span class=spanck></span>"));
-                readList.add(readContent);
+                getWordList(readContent,readList);
                 i++;
             }
             if (i == readContents.size()) {
