@@ -4,7 +4,7 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.RunLogMapper;
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.student.config.ServiceInfoUtil;
+import com.zhidejiaoyu.student.utils.ServiceInfoUtil;
 import com.zhidejiaoyu.student.service.LoginService;
 import com.zhidejiaoyu.student.service.impl.LoginServiceImpl;
 import lombok.extern.slf4j.Slf4j;

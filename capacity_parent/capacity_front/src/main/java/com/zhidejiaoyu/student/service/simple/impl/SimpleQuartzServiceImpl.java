@@ -13,7 +13,7 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
-import com.zhidejiaoyu.student.config.ServiceInfoUtil;
+import com.zhidejiaoyu.student.utils.ServiceInfoUtil;
 import com.zhidejiaoyu.student.service.simple.SimpleQuartzService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
