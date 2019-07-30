@@ -401,6 +401,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                     pair.setPush(push);
                     pair.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(pair.getMemoryStrength(), falg));
                     letterPairMapper.updateById(pair);
+                    return ServerResponse.createBySuccess();
                 }else{
                     return ServerResponse.createBySuccess();
                 }

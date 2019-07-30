@@ -47,6 +47,15 @@ public class RunLog extends Model<RunLog> {
 		this.createTime = createTime;
 	}
 
+	public RunLog(Long operateUserId, Integer type, String logContent, Date createTime,Long courseId,Long unitId) {
+		this.operateUserId = operateUserId;
+		this.type = type;
+		this.logContent = logContent;
+		this.createTime = createTime;
+		this.courseId=courseId;
+		this.unitId=unitId;
+	}
+
 	@Override
 	protected Serializable pkVal() {
 		return this.id;

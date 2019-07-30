@@ -35,4 +35,5 @@ public interface LetterWriteMapper extends BaseMapper<LetterWrite> {
     Integer selByRipeWords(Long unitId, Long studentId);
 
     Integer selByToReview(Long unitId, Long studentId);
+
 }
