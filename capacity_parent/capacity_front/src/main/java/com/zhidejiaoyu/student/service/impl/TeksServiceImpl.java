@@ -120,11 +120,19 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @Autowired
     private TeksUnitMapper teksUnitMapper;
 
-    // 以字母或数字结尾
+    /**
+     * 以字母或数字结尾
+     */
     private final String END_MATCH = ".*[a-zA-Z0-9$# ']$";
-    // 以字母或数据开头
+
+    /**
+     * 以字母或数据开头
+     */
     private final String START_MATCH = "^[a-zA-Z0-9$# '].*";
-    // 以字母或数字结尾
+
+    /**
+     * 以字母或数字结尾
+     */
     private final String END_MATCH2 = ".*[a-zA-Z0-9$# '-]$";
 
     @Override
