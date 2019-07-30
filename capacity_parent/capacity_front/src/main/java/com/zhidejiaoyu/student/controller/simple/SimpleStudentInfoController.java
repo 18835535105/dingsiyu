@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.controller.simple;
 
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.simple.studentInfoVo.ChildMedalVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
@@ -52,6 +53,8 @@ public class SimpleStudentInfoController {
             return ServerResponse.createByError(443,"您已经完善过个人信息，不可再次执行该操作！");
         }
         student.setPassword(null);
+        student.setHeadUrl(GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
+        student.setPartUrl(GetOssFile.getPublicObjectUrl(student.getPartUrl()));
         return ServerResponse.createBySuccess(student);
     }
 
