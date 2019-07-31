@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.dto.EndValidTimeDto;
 import com.zhidejiaoyu.student.service.StudentInfoService;
+import com.zhidejiaoyu.student.service.simple.SimpleStudentInfoServiceSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -50,6 +51,9 @@ public class StudentInfoController extends BaseController {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private SimpleStudentInfoServiceSimple simpleStudentInfoServiceSimple;
 
     /**
      * 完善学生信息、修改学生信息时获取学生信息
@@ -96,11 +100,7 @@ public class StudentInfoController extends BaseController {
      */
     @PostMapping("/updateStudentInfo")
     public ServerResponse<String> updateStudentInfo(HttpSession session, Student student) {
-        ServerResponse<String> stringServerResponse = checkStudentCommon(student);
-        if (stringServerResponse != null) {
-            return stringServerResponse;
-        }
-        return studentInfoService.updateStudentInfo(session, student);
+        return simpleStudentInfoServiceSimple.updateStudentInfo(session, student);
     }
 
     /**

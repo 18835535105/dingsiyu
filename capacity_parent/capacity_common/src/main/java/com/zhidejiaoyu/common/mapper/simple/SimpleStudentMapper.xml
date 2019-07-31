@@ -392,13 +392,6 @@
               password = #{password}
     </select>
 
-    <select id="indexData" parameterType="long"
-            resultMap="BaseResultMap">
-        select *
-        from student
-        where id = #{student_id}
-    </select>
-
     <sql id="ID_GRADE">
         id, grade, version
     </sql>

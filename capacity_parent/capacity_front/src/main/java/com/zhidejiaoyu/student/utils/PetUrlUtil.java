@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.utils;
 
+import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.student.constant.PetImageConstant;
 import org.springframework.util.Assert;
@@ -12,14 +13,11 @@ import org.springframework.util.Assert;
  */
 public class PetUrlUtil {
 
-    private static final int EIGHTY = 80;
-    private static final int NINETY = 90;
-    private static final int FULL = 100;
     /**
      * 获取测试结果页宠物图片
      *
-     * @param student   学生信息
-     * @param point 学生分数
+     * @param student  学生信息
+     * @param point    学生分数
      * @param testType 测试类型
      *                 <ul>
      *                 <li>摸底测试</li>
@@ -38,32 +36,66 @@ public class PetUrlUtil {
         Assert.notNull(point, "point can't be null!");
         String petName = student.getPetName();
         Assert.notNull(petName, "petName is null！");
-        if (point < EIGHTY) {
-            switch (petName) {
-                case "李糖心":
-                    return PetImageConstant.HONEY_NOT_PASS;
-                case "威士顿":
-                    return PetImageConstant.CAT_NOT_PASS;
-                case "大明白":
-                    return robotImg(point, testType);
-                case "无名":
-                    return PetImageConstant.HERO_NOT_PASS;
-                default:
-            }
-        } else {
-            switch (petName) {
-                case "李糖心":
-                    return PetImageConstant.HONEY_PASS;
-                case "威士顿":
-                    return PetImageConstant.CAT_PASS;
-                case "大明白":
-                    return robotImg(point, testType);
-                case "无名":
-                    return PetImageConstant.HERO_PASS;
-                default:
-            }
+        switch (petName) {
+            case "李糖心":
+                return getHoneyImg(point);
+            case "威士顿":
+                return getCatImg(point);
+            case "大明白":
+                return robotImg(point, testType);
+            case "无名":
+                return getHeroImg(point);
+            default:
         }
         return null;
+    }
+
+    /**
+     * 获取无名测试结果页图片
+     *
+     * @param point
+     * @return
+     */
+    private static String getHeroImg(Integer point) {
+        if (point < PointConstant.EIGHTY.getPoint()) {
+            return PetImageConstant.HERO_NOT_PASS;
+        }
+        if (point < PointConstant.HUNDRED.getPoint()) {
+            return PetImageConstant.HERO_PASS;
+        }
+        return PetImageConstant.HERO_ONE_HUNDRED;
+    }
+
+    /**
+     * 获取威士顿测试结果页图片
+     *
+     * @param point
+     * @return
+     */
+    private static String getCatImg(Integer point) {
+        if (point < PointConstant.EIGHTY.getPoint()) {
+            return PetImageConstant.CAT_NOT_PASS;
+        }
+        if (point < PointConstant.HUNDRED.getPoint()) {
+            return PetImageConstant.CAT_PASS;
+        }
+        return PetImageConstant.CAT_ONE_HUNDRED;
+    }
+
+    /**
+     * 获取李糖心测试结果页图片
+     *
+     * @param point
+     * @return
+     */
+    private static String getHoneyImg(Integer point) {
+        if (point < PointConstant.EIGHTY.getPoint()) {
+            return PetImageConstant.HONEY_NOT_PASS;
+        }
+        if (point < PointConstant.HUNDRED.getPoint()) {
+            return PetImageConstant.HONEY_PASS;
+        }
+        return PetImageConstant.HONEY_ONE_HUNDRED;
     }
 
     /**
@@ -110,11 +142,10 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotWordTestIngUrl(Integer point) {
-        if (point < EIGHTY) {
+        if (point < PointConstant.EIGHTY.getPoint()) {
             return PetImageConstant.INSIST;
-        } else {
-            return PetImageConstant.FOREVER;
         }
+        return PetImageConstant.FOREVER;
     }
 
     /**
@@ -124,11 +155,10 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotCourseTestImgUrl(Integer point) {
-        if (point < EIGHTY) {
+        if (point < PointConstant.EIGHTY.getPoint()) {
             return PetImageConstant.HOWEVER;
-        } else {
-            return PetImageConstant.SUCCEED;
         }
+        return PetImageConstant.SUCCEED;
     }
 
     /**
@@ -138,13 +168,13 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotBeforeUnitTestImgUrl(Integer point) {
-        if (point < EIGHTY) {
+        if (point < PointConstant.EIGHTY.getPoint()) {
             return PetImageConstant.WALK;
-        } else if (point < NINETY) {
-            return PetImageConstant.WIN;
-        } else {
-            return PetImageConstant.GOOD;
         }
+        if (point < PointConstant.NINETY.getPoint()) {
+            return PetImageConstant.WIN;
+        }
+        return PetImageConstant.GOOD;
     }
 
 
@@ -155,11 +185,10 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotFiveTestImgUrl(Integer point) {
-        if (point < EIGHTY) {
+        if (point < PointConstant.EIGHTY.getPoint()) {
             return PetImageConstant.INSIST;
-        } else {
-            return PetImageConstant.FOREVER;
         }
+        return PetImageConstant.FOREVER;
     }
 
     /**
@@ -169,13 +198,14 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotCenterTestImgUrl(Integer point) {
-        if (point < EIGHTY) {
+        if (point < PointConstant.EIGHTY.getPoint()) {
             return PetImageConstant.WALK;
-        } else if (point < NINETY) {
-            return PetImageConstant.DEFEAT;
-        } else {
-            return PetImageConstant.GOOD;
         }
+        if (point < PointConstant.NINETY.getPoint()) {
+            return PetImageConstant.DEFEAT;
+        }
+        return PetImageConstant.GOOD;
+
     }
 
     /**
@@ -185,11 +215,11 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotReviewTestImgUrl(Integer point) {
-        if (point < EIGHTY) {
+        if (point < PointConstant.EIGHTY.getPoint()) {
             return PetImageConstant.HOWEVER;
-        } else {
-            return PetImageConstant.COOL;
         }
+        return PetImageConstant.COOL;
+
     }
 
     /**
@@ -199,11 +229,11 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotStageTestImgUrl(Integer point) {
-        if (point < EIGHTY) {
+        if (point < PointConstant.EIGHTY.getPoint()) {
             return PetImageConstant.CONTINUE;
-        } else {
-            return PetImageConstant.SUCCEED;
         }
+        return PetImageConstant.SUCCEED;
+
     }
 
     /**
@@ -213,13 +243,14 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotUnitTestImgUrl(Integer point) {
-        if (point < EIGHTY) {
+        if (point < PointConstant.EIGHTY.getPoint()) {
             return PetImageConstant.LOSE;
-        } else if (point < FULL) {
-            return PetImageConstant.WIN;
-        } else {
-            return PetImageConstant.STAR;
         }
+        if (point < PointConstant.HUNDRED.getPoint()) {
+            return PetImageConstant.WIN;
+        }
+        return PetImageConstant.STAR;
+
     }
 
     /**
@@ -229,12 +260,13 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotLevelTestImgUrl(Integer point) {
-        if (point < EIGHTY) {
+        if (point < PointConstant.EIGHTY.getPoint()) {
             return PetImageConstant.JIONG;
-        } else if (point < NINETY) {
-            return PetImageConstant.HAHA;
-        } else {
-            return PetImageConstant.BANG;
         }
+        if (point < PointConstant.NINETY.getPoint()) {
+            return PetImageConstant.HAHA;
+        }
+        return PetImageConstant.BANG;
+
     }
 }

@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Select;
 
 /**
  * <p>
- *  Mapper 接口
+ * Mapper 接口
  * </p>
  *
  * @author zdjy
@@ -17,9 +17,10 @@ public interface MemoryCapacityMapper extends BaseMapper<MemoryCapacity> {
 
     /**
      * 判断今天是否已经学过记忆容量了
+     *
      * @param studentId
      * @return
      */
-    @Select("select count(id) from memory_capacity where student_id=#{studentId} and to_days(create_time) = to_days(now())")
-    Integer selTodayMemoryCapacity(@Param("studentId") Long studentId);
+    @Select("select count(id) from memory_capacity where student_id=#{studentId} and to_days(create_time) = to_days(now()) and type =#{type}")
+    Integer selTodayMemoryCapacity(@Param("studentId") Long studentId, @Param("type") Integer type);
 }

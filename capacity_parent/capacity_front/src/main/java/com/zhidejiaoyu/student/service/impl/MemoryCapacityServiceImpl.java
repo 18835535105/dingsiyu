@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.mapper.MemoryCapacityMapper;
 import com.zhidejiaoyu.common.mapper.RunLogMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
@@ -42,7 +43,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
     @Override
     public ServerResponse<Object> getEnterMemoryCapacity(HttpSession session) {
         Long studentId = getStudentId(session);
-        Integer count = memoryCapacityMapper.selTodayMemoryCapacity(studentId);
+        Integer count = memoryCapacityMapper.selTodayMemoryCapacity(studentId, 1);
         Map<String, Object> map = new HashMap<>();
         if (count == null || count.equals(0)) {
             map.put("isEnter", true);
@@ -57,7 +58,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
     public ServerResponse<Object> saveMemoryCapacity(HttpSession session, Integer grade, Integer fraction) {
         //判断是否为当日第一次保存
         Student student = getStudent(session);
-        Integer count = memoryCapacityMapper.selTodayMemoryCapacity(student.getId());
+        Integer count = memoryCapacityMapper.selTodayMemoryCapacity(student.getId(), 1);
         Map<String, Object> map = new HashMap<>();
         Integer gold = 0;
         String url;
@@ -96,6 +97,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                 memoryCapacity.setGold(gold);
                 memoryCapacity.setGrade(grade);
                 memoryCapacity.setStudentId(student.getId());
+                memoryCapacity.setType(1);
                 memoryCapacityMapper.insert(memoryCapacity);
 
                 RunLog runLog = new RunLog(student.getId(), 4, "学生[" + student.getStudentName() + "]在记忆容量《"
@@ -107,15 +109,65 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                 throw new RuntimeException(e);
             }
         }
-        if (fraction <= 40) {
+        getReturn(fraction, student, gold, map);
+        return ServerResponse.createBySuccess(map);
+    }
+
+    @Override
+    public ServerResponse<Object> saveTrain(HttpSession session, Integer point) {
+        Student student = getStudent(session);
+        Integer count = memoryCapacityMapper.selTodayMemoryCapacity(student.getId(), 2);
+        Map<String, Object> map = new HashMap<>();
+        Integer gold = 0;
+        if (point == null) {
+            point = 0;
+        }
+        if (count == null || count.equals(0)) {
+            //当前为第一次测试 添加金币
+            //根据等级添加金币
+            if (point > 20 && point <= 36) {
+                gold = 1;
+            } else if (point > 36 && point <= 72) {
+                gold = 2;
+            } else if (point > 72 && point <= 85) {
+                gold = 3;
+            } else if (point > 85 && point <= 99) {
+                gold = 4;
+            } else if (point == 100) {
+                gold = 6;
+            }
+            try {
+                Date date = new Date();
+                MemoryCapacity memoryCapacity = new MemoryCapacity();
+                memoryCapacity.setCreateTime(date);
+                memoryCapacity.setGold(gold);
+                memoryCapacity.setStudentId(student.getId());
+                memoryCapacity.setType(2);
+                memoryCapacityMapper.insert(memoryCapacity);
+                RunLog runLog = new RunLog(student.getId(), 4, "学生[" + student.getStudentName() + "]在眼脑训练"
+                        + "中奖励#" + gold + "#枚金币", date);
+                runLogMapper.insert(runLog);
+                student.setSystemGold(student.getSystemGold() + gold);
+                studentMapper.updateById(student);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        getReturn(point, student, gold, map);
+        return ServerResponse.createBySuccess(map);
+    }
+
+    private void getReturn(Integer point, Student student, Integer gold, Map<String, Object> map) {
+        String url;
+        if (point <= 40) {
             url = petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY);
-        } else if (fraction <= 80) {
+        } else if (point <= 80) {
             url = petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED);
         } else {
             url = petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED);
         }
         map.put("gold", gold);
         map.put("listen", url);
-        return ServerResponse.createBySuccess(map);
+        map.put("petUrl", AliyunInfoConst.host + student.getPartUrl());
     }
 }

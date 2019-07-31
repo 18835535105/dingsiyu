@@ -44,16 +44,27 @@ public class TestResultUtil implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    // 以字母或数字结尾
+    /**
+     * 以字母或数字结尾
+      */
+
     private final String END_MATCH = ".*[a-zA-z0-9\\u4e00-\\u9fa5]$";
-    // 以字母或数据开头
+    /**
+     * 以字母或数据开头
+     */
     private final String START_MATCH = "^[a-zA-z0-9\\u4e00-\\u9fa5].*";
-    // 二次判断以字母或数字结尾
+    /**
+     * 二次判断以字母或数字结尾
+     */
     final String END_MATCH2 = ".*[a-zA-Z0-9$# '-]$";
 
-    // 以字母或数字结尾
+    /**
+     *  以字母或数字结尾
+     */
     final String END_MATCH_CHESE = ".*[a-zA-z0-9\\u4e00-\\u9fa5]$";
-    // 以字母或数据开头
+    /**
+     * 以字母或数据开头
+     */
     final String START_MATCH_CHESE = "^[a-zA-z0-9\\u4e00-\\u9fa5].*";
 
     /**

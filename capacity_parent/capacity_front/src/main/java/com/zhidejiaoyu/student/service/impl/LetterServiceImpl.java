@@ -415,15 +415,13 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             learn.setUnitId(letterPair.getUnitId().longValue());
             learn.setVocabularyId(letterPair.getLetterId().longValue());
             learnMapper.insert(learn);
-            if (pair == null) {
-                if (!falg) {
-                    letterPair.setMemoryStrength(0.12);
-                    Date push = GoldMemoryTime.getGoldMemoryTime(letterPair.getMemoryStrength(), new Date());
-                    letterPair.setPush(push);
-                }
-                letterPair.setStudentId(studentId.intValue());
-                letterPairMapper.insert(letterPair);
+            if (!falg) {
+                letterPair.setMemoryStrength(0.12);
+                Date push = GoldMemoryTime.getGoldMemoryTime(letterPair.getMemoryStrength(), new Date());
+                letterPair.setPush(push);
             }
+            letterPair.setStudentId(studentId.intValue());
+            letterPairMapper.insert(letterPair);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

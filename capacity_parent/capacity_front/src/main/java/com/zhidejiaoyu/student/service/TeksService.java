@@ -10,10 +10,21 @@ import java.util.Map;
 
 public interface TeksService extends BaseService<Teks> {
 
-    //获取所有课文
+    /**
+     * 获取所有课文
+     *
+     * @param unitId
+     * @return
+     */
     ServerResponse<List<Teks>> selTeksByUnitId(Integer unitId);
 
-    //获取课文选词填空
+    /**
+     * 获取课文选词填空
+     *
+     * @param unitId
+     * @param session
+     * @return
+     */
     ServerResponse<Object> selChooseTeks(Integer unitId,HttpSession session);
 
     /**
@@ -24,7 +35,12 @@ public interface TeksService extends BaseService<Teks> {
      */
     ServerResponse<Map<String,Object>> getCourseAndUnit(HttpSession session);
 
-    //获取默写课文
+    /**
+     * 获取默写课文
+     *
+     * @param unitId
+     * @return
+     */
     ServerResponse<Object> selWriteTeks(Integer unitId);
 
     /**

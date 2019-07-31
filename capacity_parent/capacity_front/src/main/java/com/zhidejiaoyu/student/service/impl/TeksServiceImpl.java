@@ -120,11 +120,19 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @Autowired
     private TeksUnitMapper teksUnitMapper;
 
-    // 以字母或数字结尾
+    /**
+     * 以字母或数字结尾
+     */
     private final String END_MATCH = ".*[a-zA-Z0-9$# ']$";
-    // 以字母或数据开头
+
+    /**
+     * 以字母或数据开头
+     */
     private final String START_MATCH = "^[a-zA-Z0-9$# '].*";
-    // 以字母或数字结尾
+
+    /**
+     * 以字母或数字结尾
+     */
     private final String END_MATCH2 = ".*[a-zA-Z0-9$# '-]$";
 
     @Override
@@ -417,7 +425,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                         studyMap.put("version", teksCourse.getVersion());
                         studyMap.put("grade", teksCourse.getGrade() + "-" + teksCourse.getLabel());
                         studyMap.put("courseId", teksCourse.getId());
-                    }else{
+                    } else {
                         List<StudentStudyPlan> allPlans = studentStudyPlanMapper.selByStudentIdAndCourseId(studentId, (Long) courses.get(0).get("id"), 3);
                         if (allPlans.size() != 0) {
                             studyMap = new HashMap<>();
@@ -953,14 +961,19 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         List<Integer> shuZhuString = new ArrayList<>();
         for (int i = 0; i < strList.size(); i++) {
             boolean flag = true;
+            String str = strList.get(i);
             for (String s : NAMELIST) {
-                String str = strList.get(i);
+
                 if (str.contains(s)) {
                     flag = false;
                     break;
                 }
             }
             if (!Pattern.matches(END_MATCH, strList.get(i)) && !Pattern.matches(START_MATCH, strList.get(i))) {
+                flag = false;
+            }
+
+            if (str.indexOf("$") != -1 || str.indexOf("#") != -1) {
                 flag = false;
             }
             if (flag) {
