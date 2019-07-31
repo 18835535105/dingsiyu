@@ -122,38 +122,37 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
      */
     @Override
     public ServerResponse<Object> index(HttpSession session) {
+        Student student = super.getStudent(session);
         // 学生id
-        Long studentId = super.getStudentId(session);
+        Long studentId = student.getId();
 
         // 封装返回数据
         Map<String, Object> result = new HashMap<>(16);
 
-        Student stu = simpleStudentMapper.indexData(studentId);
-
         // 学生id
-        result.put("student_id", stu.getId());
+        result.put("student_id", student.getId());
         // 课程包
         result.put("coursePackage", "课程中心");
         // 账号
-        result.put("account", stu.getAccount());
+        result.put("account", student.getAccount());
         // 昵称
-        result.put("studentName", stu.getStudentName());
+        result.put("studentName", student.getStudentName());
         // 头像
-        result.put("headUrl", AliyunInfoConst.host + stu.getHeadUrl());
+        result.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
         // 宠物
-        result.put("partUrl", AliyunInfoConst.host + stu.getPartUrl());
+        result.put("partUrl", AliyunInfoConst.host + student.getPartUrl());
         // 宠物名
-        result.put("petName", stu.getPetName());
-        result.put("schoolName", stu.getSchoolName());
+        result.put("petName", student.getPetName());
+        result.put("schoolName", student.getSchoolName());
         //性别
-        if(1==stu.getSex()){
+        if(1==student.getSex()){
             result.put("sex","男");
         }else{
             result.put("sex","女");
         }
 
         // 判断学生是否有智能版单词
-        int count = simpleCapacityStudentUnitMapper.countByType(stu, 1);
+        int count = simpleCapacityStudentUnitMapper.countByType(student, 1);
         result.put("hasCapacityWord", count > 0);
 
         String formatYYYYMMDD = SimpleDateUtil.formatYYYYMMDD(new Date());
@@ -164,7 +163,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         // 今日学习效率 !
         if (valid != null && online != null) {
             if (valid >= online) {
-                logger.error("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, stu);
+                logger.error("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, student);
                 valid = online - 1;
                 result.put("efficiency", "99%");
             } else {
@@ -178,7 +177,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         result.put("valid", valid);
 
         // 所有模块正在学习的课程id
-        Map<Integer, Map<String, Long>> allCourse = simpleSimpleStudentUnitMapper.getAllUnit(stu.getId());
+        Map<Integer, Map<String, Long>> allCourse = simpleSimpleStudentUnitMapper.getAllUnit(student.getId());
         // 对应模块的课程id
         int courseId = 0;
 
@@ -229,7 +228,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         }
 
         // 值得元老勋章
-        medalAwardAsync.oldMan(stu);
+        medalAwardAsync.oldMan(student);
 
         return ServerResponse.createBySuccess(result);
     }
