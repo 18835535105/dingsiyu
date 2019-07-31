@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.pojo;
 
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.enums.IdType;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotations.TableId;
@@ -42,12 +43,18 @@ public class MemoryCapacity extends Model<MemoryCapacity> {
     /**
      * 挑战时间
      */
+    @TableField("create_time")
     private Date createTime;
     /**
      * 学生id
      */
+    @TableField("student_id")
     private Long studentId;
 
+    /**
+     *类型
+     */
+    private Integer type;
 
     @Override
     protected Serializable pkVal() {
