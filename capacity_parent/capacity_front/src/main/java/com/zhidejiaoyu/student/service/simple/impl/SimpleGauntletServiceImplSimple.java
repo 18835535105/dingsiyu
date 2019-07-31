@@ -83,18 +83,19 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         Student student = getStudent(session);
         //更改过时挑战
         delGauntlets(student);
-        Long schoolAdminId = null;
+        Integer schoolAdminId = null;
         List<Integer> teachers = null;
         List<StudentGauntletVo> classOrSchoolStudents = null;
         Map<String, Object> returnMap = new HashMap<>();
         //获取教师id
         if (type == 2) {
-            schoolAdminId = TeacherInfoUtil.getSchoolAdminIdAndTeacherId(student, teachers);
+            schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
+            teachers = simpleTeacherMapper.getTeacherIdByAdminId(schoolAdminId);
         }
-        Integer integer = 0;
+        Integer integer;
         //获取学生数据数量
         if (schoolAdminId != null) {
-            integer = simpleStudentMapper.selNumberById(student.getClassId(), student.getTeacherId(), type.toString(), schoolAdminId.intValue(), teachers, account, student.getId());
+            integer = simpleStudentMapper.selNumberById(student.getClassId(), student.getTeacherId(), type.toString(), schoolAdminId, teachers, account, student.getId());
         } else {
             integer = simpleStudentMapper.selNumberById(student.getClassId(), student.getTeacherId(), type.toString(), null, teachers, account, student.getId());
         }
@@ -586,11 +587,12 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         //查看英雄榜数据
         Student student = getStudent(session);
         delGauntlets(student);
-        Long schoolAdminId = null;
+        Integer schoolAdminId = null;
         List<Integer> teachers = null;
         //获取教师id
         if (type == 2) {
-            schoolAdminId = TeacherInfoUtil.getSchoolAdminIdAndTeacherId(student, teachers);
+            schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
+            teachers = simpleTeacherMapper.getTeacherIdByAdminId(schoolAdminId);
         }
         //搜索数据
         List<Map<String, Object>> maxStudyTwenty = simpleStudentExpansionMapper.getMaxStudyTwenty(student.getClassId(), student.getTeacherId(), teachers, schoolAdminId, type);
@@ -598,7 +600,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         int index = 0;
         for (Map<String, Object> map : maxStudyTwenty) {
             index += 1;
-            Integer pkNumber = 0;
+            int pkNumber = 0;
             map.put("index", index);
             Object mePkOthers = map.get("mePkOthers");
             if (mePkOthers != null) {
@@ -608,10 +610,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             if (othersPkMe != null) {
                 pkNumber += Integer.parseInt(othersPkMe.toString());
             }
-            Object study = map.get("study");
-            if (study == null) {
-                map.put("study", 0);
-            }
+            map.putIfAbsent("study", 0);
             map.put("pkNumber", pkNumber);
             returnList.add(map);
         }
