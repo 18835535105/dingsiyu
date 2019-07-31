@@ -369,14 +369,14 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             }
         }
         if (readType.getTestType() == 5) {
-            this.getBlanks(typeId, map,returnList);
+            this.getBlanks(typeId, map, returnList);
         }
         if (readType.getTestType() == 3) {
             this.getChooseSentences(typeId, map);
         }
-       /* if (readType.getTestType() != 5) {*/
-            map.put("sentenceList", returnList);
-       /* }*/
+        /* if (readType.getTestType() != 5) {*/
+        map.put("sentenceList", returnList);
+        /* }*/
 
         map.put("type", readType.getTestType());
         Integer learnTime = Integer.parseInt(readType.getLearnTime().replace("s", ""));
@@ -452,7 +452,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         map.put("sentenceList", returnList);
     }
 
-    private void getBlanks(Long typeId, Map<String, Object> map,List<List<Map<String, Object>>> sList) {
+    private void getBlanks(Long typeId, Map<String, Object> map, List<List<Map<String, Object>>> sList) {
         ReadBlanks readBlanks = readBlanksMapper.selByTypeId(typeId);
         String[] answerList = readBlanks.getAnswer().split("&@&");
         String[] analysisList = readBlanks.getAnalysis().split("&@&");
@@ -498,20 +498,13 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         ReadChooseBlanks readChooseBlanks = readChooseBlanksMapper.selByTypeId(typeId);
         String analysis = readChooseBlanks.getAnalysis();
         String content = readChooseBlanks.getContent();
-        List<String> analysisList = Arrays.asList(analysis.split("&@&"));
         List<String> contentList = Arrays.asList(content.split("&@&"));
         List<Map<String, Object>> list = new ArrayList<>();
         for (int i = 0; i < contentList.size(); i++) {
             Map<String, Object> returnMap = new HashMap<>();
-            if (i >= analysisList.size()) {
-                returnMap.put("isTrue", false);
-                returnMap.put("analysisList", null);
-                returnMap.put("sentence", contentList.get(i));
-            } else {
-                returnMap.put("isTrue", true);
-                returnMap.put("analysisList", analysisList.get(i));
-                returnMap.put("sentence", contentList.get(i));
-            }
+            returnMap.put("number", i);
+            returnMap.put("analysisList", null);
+            returnMap.put("sentence", contentList.get(i));
             list.add(returnMap);
         }
 

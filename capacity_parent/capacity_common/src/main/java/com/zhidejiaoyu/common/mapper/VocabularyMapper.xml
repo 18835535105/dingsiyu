@@ -265,7 +265,8 @@
     <select id="selectUnlearnedByUnitId" resultMap="BaseResultMap"
             parameterType="map">
         SELECT
-        distinct <include refid="unite_Column_List"/>
+        distinct
+        <include refid="unite_Column_List"/>
         FROM
         unit_vocabulary uv,
         vocabulary v
@@ -294,7 +295,8 @@
     <select id="selectUnknownWordByUnitId" resultMap="BaseResultMap"
             parameterType="map">
         SELECT
-        distinct <include refid="unite_Column_List"/>
+        distinct
+        <include refid="unite_Column_List"/>
         FROM vocabulary v,learn l where v.id =
         l.vocabulary_id and
         v.delStatus =
@@ -596,30 +598,30 @@
 
     <select id="showWord" parameterType="map" resultMap="BaseResultMap">
         SELECT
-           <include refid="unite_Column_List"/>
+        <include refid="unite_Column_List"/>
         FROM
-            vocabulary v,
-            unit_vocabulary uv
+        vocabulary v,
+        unit_vocabulary uv
         WHERE
-            v.id = uv.vocabulary_id
-            AND uv.unit_id = #{unit_id}
-            AND v.delStatus = 1
-            AND v.id NOT IN (
-                SELECT l1.vocabulary_id
-                FROM
-                    learn l1
-                WHERE
-                    l1.student_id = #{id}
-                  and l1.type = 1
-                  AND l1.unit_id = #{unit_id}
-                  AND l1.study_model = '慧听写')
+        v.id = uv.vocabulary_id
+        AND uv.unit_id = #{unit_id}
+        AND v.delStatus = 1
+        AND v.id NOT IN (
+        SELECT l1.vocabulary_id
+        FROM
+        learn l1
+        WHERE
+        l1.student_id = #{id}
+        and l1.type = 1
+        AND l1.unit_id = #{unit_id}
+        AND l1.study_model = '慧听写')
         LIMIT 0, 1
     </select>
     <select id="countByCourseId" resultType="java.lang.Integer" parameterType="map">
         select count(uv.vocabulary_id)
         from vocabulary v, unit_vocabulary uv, unit u
         where v.id = uv.vocabulary_id and v.delStatus = 1
-              and uv.unit_id = u.id and u.course_id = #{courseId}
+        and uv.unit_id = u.id and u.course_id = #{courseId}
         <if test="flag == 1">
             and v.recordpicurl is not null
         </if>
@@ -744,14 +746,16 @@
     </select>
     <select id="selectByCourseId" resultMap="BaseResultMap" parameterType="map">
         SELECT
-        distinct <include refid="unite_Column_List"/>
+        distinct
+        <include refid="unite_Column_List"/>
         FROM vocabulary v, unit_vocabulary uv, unit u
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = #{courseId}
     </select>
     <select id="selectUnknownWordByCourseId" resultMap="BaseResultMap" parameterType="map">
         SELECT
-        distinct <include refid="unite_Column_List"/>
+        distinct
+        <include refid="unite_Column_List"/>
         FROM vocabulary v,learn l where v.id =
         l.vocabulary_id and
         v.delStatus =
@@ -772,7 +776,8 @@
     </select>
     <select id="selectUnlearnedByCourseId" resultMap="BaseResultMap" parameterType="map">
         SELECT
-        distinct <include refid="unite_Column_List"/>
+        distinct
+        <include refid="unite_Column_List"/>
         FROM
         unit_vocabulary uv,
         vocabulary v,
@@ -838,7 +843,7 @@
         <where>
             recordpicurl is not null
             <if test="word != null and word != '' ">
-               and word like '%${word}%'
+                and word like '%${word}%'
             </if>
         </where>
         order by id desc
@@ -899,7 +904,8 @@
     </select>
     <select id="selectByUnitIdAndStudyModel" resultMap="BaseResultMap" parameterType="map">
         SELECT
-        distinct <include refid="unite_Column_List"/>
+        distinct
+        <include refid="unite_Column_List"/>
         FROM vocabulary
         v, unit_vocabulary uv
         where uv.unit_id = #{unitId}
@@ -910,7 +916,8 @@
     </select>
     <select id="selectByCourseIdAndStudyModel" resultMap="BaseResultMap" parameterType="map">
         SELECT
-        distinct <include refid="unite_Column_List"/>
+        distinct
+        <include refid="unite_Column_List"/>
         FROM vocabulary v, unit_vocabulary uv, unit u
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id
         <if test="studyModel == '单词图鉴'">
@@ -990,7 +997,8 @@
     </select>
     <select id="selectByCourseIdNotInWord" resultMap="BaseResultMap" parameterType="map">
         SELECT
-        distinct <include refid="unite_Column_List"/>
+        distinct
+        <include refid="unite_Column_List"/>
         FROM vocabulary v, unit_vocabulary uv, unit u
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = #{courseId}
@@ -1127,7 +1135,8 @@
     </select>
     <select id="selectByPhaseNotInWord" resultMap="BaseResultMap" parameterType="map">
         SELECT
-        distinct <include refid="unite_Column_List"/>
+        distinct
+        <include refid="unite_Column_List"/>
         FROM vocabulary v, unit_vocabulary uv, unit u, course c
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = c.id and c.study_paragraph = #{studyParagraph}
@@ -1141,10 +1150,27 @@
         group by v.id
     </select>
     <select id="selectPictureRandom" resultMap="BaseResultMap" parameterType="map">
-        select <include refid="Base_Column_List"/>
+        select
+        <include refid="Base_Column_List"/>
         from vocabulary
         where recordpicurl is not null
         limit #{offset}, #{limit}
+    </select>
+
+
+    <select id="selByStudentIdLimitTen" resultType="string" parameterType="map">
+        select voca.word from vocabulary voca
+        <if test="type==1">
+            join learn learn on learn.vocabulary_id=voca.id
+            where learn.student_id=#{studentId}
+            and study_model in ('慧记忆','慧听写','慧默写','单词图鉴','例句听力''例句翻译','例句默写')
+            and learn.vocabulary_id is not null
+            group by vocabulary_id
+        </if>
+        <if test="type!=1">
+            where voca.id &lt; 14294 or voca.id > 20510
+        </if>
+        order by rand() limit 10
     </select>
 
 </mapper>

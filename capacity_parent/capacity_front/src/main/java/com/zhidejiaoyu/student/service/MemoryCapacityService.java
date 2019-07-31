@@ -15,9 +15,11 @@ import javax.servlet.http.HttpSession;
  */
 public interface MemoryCapacityService extends BaseService<MemoryCapacity> {
 
-    ServerResponse<Object> getEnterMemoryCapacity(HttpSession session);
+    ServerResponse<Object> getEnterMemoryCapacity(HttpSession session, Integer type);
 
     ServerResponse<Object> saveMemoryCapacity(HttpSession session, Integer grade, Integer fraction);
 
     ServerResponse<Object> saveTrain(HttpSession session, Integer point);
+
+    ServerResponse<Object> getTrainTest(HttpSession session);
 }

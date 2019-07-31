@@ -456,4 +456,11 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     List<Vocabulary> selectPictureRandom(@Param("offset") int offset, @Param("limit") int limit);
+
+    /**
+     *  眼脑训练取10个单词
+     * @param studentId 学生id
+     * @param type  1，查询已学的单词  2查询全部单词
+     */
+    List<String> selByStudentIdLimitTen(@Param("studentId") Long studentId,@Param("type") int type);
 }

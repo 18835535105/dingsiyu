@@ -4,6 +4,7 @@ import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.mapper.MemoryCapacityMapper;
 import com.zhidejiaoyu.common.mapper.RunLogMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
+import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.MemoryCapacity;
 import com.zhidejiaoyu.common.pojo.RunLog;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -16,9 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -39,13 +38,15 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
     private RunLogMapper runLogMapper;
     @Autowired
     private StudentMapper studentMapper;
+    @Autowired
+    private VocabularyMapper vocabularyMapper;
 
     @Override
-    public ServerResponse<Object> getEnterMemoryCapacity(HttpSession session) {
-        Long studentId = getStudentId(session);
-        Integer count = memoryCapacityMapper.selTodayMemoryCapacity(studentId, 1);
+    public ServerResponse<Object> getEnterMemoryCapacity(HttpSession session, Integer type) {
+        Student student = getStudent(session);
+        Integer count = memoryCapacityMapper.selTodayMemoryCapacity(student.getId(), type);
         Map<String, Object> map = new HashMap<>();
-        if (count == null || count.equals(0)) {
+        if (count == null || count.equals(0) || student.getRole().equals(4)) {
             map.put("isEnter", true);
         } else {
             map.put("isEnter", false);
@@ -65,9 +66,11 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         if (fraction == null) {
             fraction = 0;
         }
-        if (count == null || count.equals(0)) {
+        Integer enger = 0;
+        if (count == null || count.equals(0) || student.getRole().equals(4)) {
             //当前为第一次测试 添加金币
             if (fraction >= 80) {
+                enger = 2;
                 //根据等级添加金币
                 switch (grade) {
                     case 1:
@@ -104,12 +107,13 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                         + grade + "》中奖励#" + gold + "#枚金币", date);
                 runLogMapper.insert(runLog);
                 student.setSystemGold(student.getSystemGold() + gold);
+                student.setEnergy(student.getEnergy() + enger);
                 studentMapper.updateById(student);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
-        getReturn(fraction, student, gold, map);
+        getReturn(fraction, student, gold, map, enger);
         return ServerResponse.createBySuccess(map);
     }
 
@@ -122,19 +126,25 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         if (point == null) {
             point = 0;
         }
-        if (count == null || count.equals(0)) {
+        Integer enger = 0;
+        if (count == null || count.equals(0) || student.getRole().equals(4)) {
             //当前为第一次测试 添加金币
             //根据等级添加金币
             if (point > 20 && point <= 36) {
                 gold = 1;
+                enger = 1;
             } else if (point > 36 && point <= 72) {
                 gold = 2;
+                enger = 1;
             } else if (point > 72 && point <= 85) {
                 gold = 3;
+                enger = 2;
             } else if (point > 85 && point <= 99) {
                 gold = 4;
+                enger = 2;
             } else if (point == 100) {
                 gold = 6;
+                enger = 3;
             }
             try {
                 Date date = new Date();
@@ -148,16 +158,87 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                         + "中奖励#" + gold + "#枚金币", date);
                 runLogMapper.insert(runLog);
                 student.setSystemGold(student.getSystemGold() + gold);
+                student.setEnergy(student.getEnergy() + enger);
                 studentMapper.updateById(student);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
-        getReturn(point, student, gold, map);
+        getReturn(point, student, gold, map, enger);
         return ServerResponse.createBySuccess(map);
     }
 
-    private void getReturn(Integer point, Student student, Integer gold, Map<String, Object> map) {
+    @Override
+    public ServerResponse<Object> getTrainTest(HttpSession session) {
+        Student student = getStudent(session);
+        //获取熟词中的单词
+        List<String> strings = vocabularyMapper.selByStudentIdLimitTen(student.getId(), 1);
+        if (strings.size() < 3) {
+            //如果不够三个单词查询全部单词
+            strings = vocabularyMapper.selByStudentIdLimitTen(student.getId(), 2);
+        }
+        List<String> returnList = new ArrayList<>();
+        //获取展示数据
+        for (int i = 0; i < 10; i++) {
+            Integer number = (int) (Math.random() * strings.size());
+            returnList.add(strings.get(number));
+        }
+        //获取正确答案
+        String answer = returnList.get(2);
+        //获取答案出现次数
+        int frequency = 0;
+        for (String string : returnList) {
+            if (string.equals(answer)) {
+                frequency++;
+            }
+        }
+        //获取选项集合
+        List<Integer> number = new ArrayList<>();
+        number.add(frequency);
+        //获取选项错误答案
+        wrongAnswer(number);
+        //将选项放入集合中
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (Integer integer : number) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("answer", integer);
+            if (integer.equals(frequency)) {
+                map.put("falg", true);
+            } else {
+                map.put("falg", false);
+            }
+            list.add(map);
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("list", returnList);
+        map.put("answer", answer);
+        Collections.shuffle(list);
+        map.put("options", list);
+        return ServerResponse.createBySuccess(map);
+    }
+
+    private void wrongAnswer(List<Integer> numbers) {
+        while (numbers.size() < 4) {
+            getNumber(numbers);
+        }
+    }
+
+    private void getNumber(List<Integer> numbers) {
+        Integer number = (int) (Math.random() * 10);
+        boolean isFalg = true;
+        for (Integer option : numbers) {
+            if (option.equals(number)) {
+                isFalg = false;
+            }
+        }
+        if (!isFalg) {
+            getNumber(numbers);
+        } else {
+            numbers.add(number);
+        }
+    }
+
+    private void getReturn(Integer point, Student student, Integer gold, Map<String, Object> map, Integer enger) {
         String url;
         if (point <= 40) {
             url = petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY);
@@ -166,6 +247,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         } else {
             url = petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED);
         }
+        map.put("enger", enger);
         map.put("gold", gold);
         map.put("listen", url);
         map.put("petUrl", AliyunInfoConst.host + student.getPartUrl());
