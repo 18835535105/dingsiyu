@@ -65,9 +65,11 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         if (fraction == null) {
             fraction = 0;
         }
+        Integer enger = 0;
         if (count == null || count.equals(0) || student.getRole().equals(4)) {
             //当前为第一次测试 添加金币
             if (fraction >= 80) {
+                enger = 2;
                 //根据等级添加金币
                 switch (grade) {
                     case 1:
@@ -104,12 +106,13 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                         + grade + "》中奖励#" + gold + "#枚金币", date);
                 runLogMapper.insert(runLog);
                 student.setSystemGold(student.getSystemGold() + gold);
+                student.setEnergy(student.getEnergy()+enger);
                 studentMapper.updateById(student);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
-        getReturn(fraction, student, gold, map);
+        getReturn(fraction, student, gold, map, enger);
         return ServerResponse.createBySuccess(map);
     }
 
@@ -122,19 +125,25 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         if (point == null) {
             point = 0;
         }
+        Integer enger=0;
         if (count == null || count.equals(0) || student.getRole().equals(4)) {
             //当前为第一次测试 添加金币
             //根据等级添加金币
             if (point > 20 && point <= 36) {
                 gold = 1;
+                enger=1;
             } else if (point > 36 && point <= 72) {
                 gold = 2;
+                enger=1;
             } else if (point > 72 && point <= 85) {
                 gold = 3;
+                enger=2;
             } else if (point > 85 && point <= 99) {
                 gold = 4;
+                enger=2;
             } else if (point == 100) {
                 gold = 6;
+                enger=3;
             }
             try {
                 Date date = new Date();
@@ -148,16 +157,17 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                         + "中奖励#" + gold + "#枚金币", date);
                 runLogMapper.insert(runLog);
                 student.setSystemGold(student.getSystemGold() + gold);
+                student.setEnergy(student.getEnergy()+enger);
                 studentMapper.updateById(student);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
-        getReturn(point, student, gold, map);
+        getReturn(point, student, gold, map,enger);
         return ServerResponse.createBySuccess(map);
     }
 
-    private void getReturn(Integer point, Student student, Integer gold, Map<String, Object> map) {
+    private void getReturn(Integer point, Student student, Integer gold, Map<String, Object> map,Integer enger) {
         String url;
         if (point <= 40) {
             url = petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY);
@@ -166,6 +176,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         } else {
             url = petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED);
         }
+        map.put("enger",enger);
         map.put("gold", gold);
         map.put("listen", url);
         map.put("petUrl", AliyunInfoConst.host + student.getPartUrl());
