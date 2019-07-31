@@ -500,9 +500,9 @@ public class TestResultUtil implements Serializable {
         // 乱序
         List<String> orderList = new ArrayList<>();
         // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-z0-9\\u4e00-\\u9fa5]$";
+        final String END_MATCH = ".*[a-zA-z0-9\\u4e00-\\u9fa5@]$";
         // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-z0-9\\u4e00-\\u9fa5].*";
+        final String START_MATCH = "^[a-zA-z0-9\\u4e00-\\u9fa5@].*";
         StringBuilder sb = new StringBuilder();
         for (String s : centreTranslatelist) {
             char[] chars = s.toCharArray();
