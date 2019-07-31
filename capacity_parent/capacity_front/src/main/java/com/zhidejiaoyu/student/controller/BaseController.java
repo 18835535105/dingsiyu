@@ -24,7 +24,7 @@ public class BaseController {
     @Autowired
     private StudentInfoService studentInfoService;
 
-    Student getStudent(HttpSession session) {
+    public Student getStudent(HttpSession session) {
         return studentInfoService.selectById(this.getStudentId(session));
     }
 

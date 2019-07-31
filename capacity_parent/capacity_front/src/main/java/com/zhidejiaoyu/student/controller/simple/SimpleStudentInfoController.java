@@ -3,10 +3,10 @@ package com.zhidejiaoyu.student.controller.simple;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.simple.studentInfoVo.ChildMedalVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.controller.BaseController;
 import com.zhidejiaoyu.student.dto.EndValidTimeDto;
 import com.zhidejiaoyu.student.service.StudentInfoService;
 import com.zhidejiaoyu.student.service.simple.SimpleStudentInfoServiceSimple;
@@ -31,7 +31,7 @@ import static com.zhidejiaoyu.student.controller.StudentInfoController.getString
 @Slf4j
 @RestController
 @RequestMapping("/api/student")
-public class SimpleStudentInfoController {
+public class SimpleStudentInfoController extends BaseController {
 
     @Autowired
     private SimpleStudentInfoServiceSimple simpleStudentInfoServiceSimple;
@@ -46,7 +46,7 @@ public class SimpleStudentInfoController {
      */
     @GetMapping("/getStudentInfo")
     public ServerResponse<Student> getStudentInfo(HttpSession session, @RequestParam(value = "studentId", required = false) Long studentId) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = super.getStudent(session);
         if (StringUtils.isNotEmpty(student.getPetName()) && studentId == null) {
 //            session.invalidate();
             // 学生已经完善过信息，不可重复完善信息
@@ -105,7 +105,7 @@ public class SimpleStudentInfoController {
      */
     @PostMapping("/judgeOldPassword")
     public ServerResponse<String> judgeOldPassword(HttpSession session, String oldPassword) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = super.getStudent(session);
         String password = student.getPassword();
         int minPasswordLength = 6;
         int maxPasswordLength = 10;
@@ -126,7 +126,7 @@ public class SimpleStudentInfoController {
      * @return
      */
     private ServerResponse<String> validStudentInfo(HttpSession session, Student student, String oldPassword, String newPassword) {
-        Student studentInfo = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student studentInfo = super.getStudent(session);
 
         int minPasswordLength = 6;
         int maxPasswordLength = 10;
