@@ -41,11 +41,11 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
     private StudentMapper studentMapper;
 
     @Override
-    public ServerResponse<Object> getEnterMemoryCapacity(HttpSession session) {
-        Long studentId = getStudentId(session);
-        Integer count = memoryCapacityMapper.selTodayMemoryCapacity(studentId, 1);
+    public ServerResponse<Object> getEnterMemoryCapacity(HttpSession session, Integer type) {
+        Student student = getStudent(session);
+        Integer count = memoryCapacityMapper.selTodayMemoryCapacity(student.getId(), type);
         Map<String, Object> map = new HashMap<>();
-        if (count == null || count.equals(0)) {
+        if (count == null || count.equals(0) || student.getRole().equals(4)) {
             map.put("isEnter", true);
         } else {
             map.put("isEnter", false);
@@ -65,7 +65,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         if (fraction == null) {
             fraction = 0;
         }
-        if (count == null || count.equals(0)) {
+        if (count == null || count.equals(0) || student.getRole().equals(4)) {
             //当前为第一次测试 添加金币
             if (fraction >= 80) {
                 //根据等级添加金币
@@ -122,7 +122,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         if (point == null) {
             point = 0;
         }
-        if (count == null || count.equals(0)) {
+        if (count == null || count.equals(0) || student.getRole().equals(4)) {
             //当前为第一次测试 添加金币
             //根据等级添加金币
             if (point > 20 && point <= 36) {

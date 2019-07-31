@@ -30,12 +30,13 @@ public class MemoryCapacityController {
      * @param session
      */
     @RequestMapping("/getEnterMemoryCapacity")
-    public ServerResponse<Object> getEnterMemoryCapacity(HttpSession session) {
-        return memoryCapacityService.getEnterMemoryCapacity(session);
+    public ServerResponse<Object> getEnterMemoryCapacity(HttpSession session, Integer type) {
+        return memoryCapacityService.getEnterMemoryCapacity(session, type);
     }
 
     /**
      * 保存当日记忆容量获取金币
+     *
      * @param session
      * @param grade
      * @param fraction
@@ -48,13 +49,14 @@ public class MemoryCapacityController {
 
     /**
      * 保存眼脑训练
+     *
      * @param session
      * @param point
      * @return
      */
     @RequestMapping("/saveTrain")
-    public ServerResponse<Object> saveTrain(HttpSession session,Integer point){
-        return memoryCapacityService.saveTrain(session,point);
+    public ServerResponse<Object> saveTrain(HttpSession session, Integer point) {
+        return memoryCapacityService.saveTrain(session, point);
     }
 
 
