@@ -374,9 +374,9 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         if (readType.getTestType() == 3) {
             this.getChooseSentences(typeId, map);
         }
-        if (readType.getTestType() != 5) {
+       /* if (readType.getTestType() != 5) {*/
             map.put("sentenceList", returnList);
-        }
+       /* }*/
 
         map.put("type", readType.getTestType());
         Integer learnTime = Integer.parseInt(readType.getLearnTime().replace("s", ""));
@@ -463,7 +463,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             returnMap.put("analysis", analysisList[i]);
             returnList.add(returnMap);
         }
-        int brank = 0;
+       /* int brank = 0;
         List<List<Map<String, Object>>> reList = new ArrayList<>();
         for (List<Map<String, Object>> rList : sList) {
             List<Map<String, Object>> tList = new ArrayList<>();
@@ -484,7 +484,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             }
             reList.add(tList);
         }
-        map.put("sentenceList", reList);
+        map.put("sentenceList", reList);*/
         map.put("topic", returnList);
     }
 
