@@ -329,11 +329,11 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         return ServerResponse.createBySuccess(map);
     }
 
-    private void getWordList(ReadContent readContent,List<Map<String, Object>> readList){
+    private void getWordList(ReadContent readContent, List<Map<String, Object>> readList) {
         Map<String, Object> wordMap = new HashMap<>();
         String[] replace = readContent.getSentence().replace("#&#", "").split(" ");
-        List<String> wordList=Arrays.asList(replace);
-        wordMap.put("wordList",wordList);
+        List<String> wordList = Arrays.asList(replace);
+        wordMap.put("wordList", wordList);
         wordMap.put("translate", readContent.getTranslate());
         readList.add(wordMap);
     }
@@ -354,21 +354,30 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
 
             if (readList.size() == 0) {
                 readList = new ArrayList<>();
-                getWordList(readContent,readList);
+                getWordList(readContent, readList);
                 i++;
             } else {
                 if (readContent.getSentence().indexOf("#&#") != -1) {
                     returnList.add(readList);
                     readList = new ArrayList<>();
                 }
-                getWordList(readContent,readList);
+                getWordList(readContent, readList);
                 i++;
             }
             if (i == readContents.size()) {
                 returnList.add(readList);
             }
         }
-        map.put("sentenceList", returnList);
+        if (readType.getTestType() == 5) {
+            this.getBlanks(typeId, map,returnList);
+        }
+        if (readType.getTestType() == 3) {
+            this.getChooseSentences(typeId, map);
+        }
+        if (readType.getTestType() != 5) {
+            map.put("sentenceList", returnList);
+        }
+
         map.put("type", readType.getTestType());
         Integer learnTime = Integer.parseInt(readType.getLearnTime().replace("s", ""));
         map.put("learnTime", learnTime);
@@ -394,14 +403,6 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         }
         if (readType.getTestType() == 4) {
             this.getAnswersToQuestions(typeId, map);
-        }
-
-        if (readType.getTestType() == 3) {
-            this.getChooseSentences(typeId, map);
-        }
-
-        if (readType.getTestType() == 5) {
-            this.getBlanks(typeId, map);
         }
 
     }
@@ -451,7 +452,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         map.put("sentenceList", returnList);
     }
 
-    private void getBlanks(Long typeId, Map<String, Object> map) {
+    private void getBlanks(Long typeId, Map<String, Object> map,List<List<Map<String, Object>>> sList) {
         ReadBlanks readBlanks = readBlanksMapper.selByTypeId(typeId);
         String[] answerList = readBlanks.getAnswer().split("&@&");
         String[] analysisList = readBlanks.getAnalysis().split("&@&");
@@ -462,6 +463,28 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             returnMap.put("analysis", analysisList[i]);
             returnList.add(returnMap);
         }
+        int brank = 0;
+        List<List<Map<String, Object>>> reList = new ArrayList<>();
+        for (List<Map<String, Object>> rList : sList) {
+            List<Map<String, Object>> tList = new ArrayList<>();
+            for (Map<String, Object> rMap : rList) {
+                List<String> wordList = (List<String>) rMap.get("wordList");
+                List<Map<String,Object>> wordsList=new ArrayList<>();
+                for (String word : wordList) {
+                    Map<String,Object> wordMap=new HashMap<>();
+                    wordMap.put("word",word);
+                    if (word.contains("&@&")) {
+                        wordMap.put("answer", answerList[brank]);
+                        brank++;
+                    }
+                    wordsList.add(wordMap);
+                }
+                rMap.put("wordList",wordsList);
+                tList.add(rMap);
+            }
+            reList.add(tList);
+        }
+        map.put("sentenceList", reList);
         map.put("topic", returnList);
     }
 
@@ -491,6 +514,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             }
             list.add(returnMap);
         }
+
         map.put("topic", list);
     }
 
@@ -552,19 +576,19 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             //放入题目
             chooseMap.put("subject", choose.getSubject());
             //放入选择答案
-            List<Map<String,Object>> reList=new ArrayList<>();
+            List<Map<String, Object>> reList = new ArrayList<>();
             Map<String, Object> answerMap = new HashMap<>();
-            answerMap.put("answer",choose.getAnswer());
-            answerMap.put("falg",true);
+            answerMap.put("answer", choose.getAnswer());
+            answerMap.put("falg", true);
             reList.add(answerMap);
             //获取错误答案
             String[] wronganswers = choose.getWrongAnswer().split("&@&");
             List<String> wrongList = Arrays.asList(wronganswers);
             //放入错误答案
             for (String str : wrongList.subList(0, 3)) {
-                Map<String,Object> worngMap=new HashMap<>();
-                worngMap.put("answer",str);
-                worngMap.put("falg",false);
+                Map<String, Object> worngMap = new HashMap<>();
+                worngMap.put("answer", str);
+                worngMap.put("falg", false);
                 reList.add(worngMap);
             }
             chooseMap.put("analysis", choose.getAnalysis());
