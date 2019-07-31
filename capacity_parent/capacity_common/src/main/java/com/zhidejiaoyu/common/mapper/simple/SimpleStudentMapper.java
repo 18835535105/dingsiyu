@@ -87,8 +87,6 @@ public interface SimpleStudentMapper extends BaseMapper<Student> {
      */
     List<Student> selectAccountTimeLessThreeDays();
 
-    Student indexData(Long student_id);
-
     /**
      * 获取学生排名
      * <p>如果当前班级或者学校或者全国只有一名学生，返回字符串"null"</p>

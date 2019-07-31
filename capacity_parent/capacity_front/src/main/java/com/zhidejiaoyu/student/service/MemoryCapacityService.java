@@ -18,4 +18,6 @@ public interface MemoryCapacityService extends BaseService<MemoryCapacity> {
     ServerResponse<Object> getEnterMemoryCapacity(HttpSession session);
 
     ServerResponse<Object> saveMemoryCapacity(HttpSession session, Integer grade, Integer fraction);
+
+    ServerResponse<Object> saveTrain(HttpSession session, Integer point);
 }
