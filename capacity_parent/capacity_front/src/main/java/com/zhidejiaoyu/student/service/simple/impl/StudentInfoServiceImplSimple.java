@@ -305,8 +305,8 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
                     student.getId(), student.getStudentName());
             return ServerResponse.createByErrorMessage("服务器错误！请稍后重试");
         }
-        Long classId=student.getClassId();
-        Long teacherId=student.getTeacherId();
+        student.setPartUrl(student.getPartUrl() == null ? student.getPartUrl() : student.getPartUrl().replace(AliyunInfoConst.host, ""));
+        student.setHeadUrl(student.getHeadUrl() == null ? student.getHeadUrl() : student.getHeadUrl().replace(AliyunInfoConst.host, ""));
         simpleStudentMapper.updateByPrimaryKeySelective(student);
         student = simpleStudentMapper.selectById(currentStudent.getId());
         student.setDiamond(currentStudent.getDiamond());
