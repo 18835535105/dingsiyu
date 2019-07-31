@@ -30,6 +30,7 @@ public interface ReadWordService extends BaseService<ReadWord> {
      *
      *
      * @param session
+     * @param readWord
      * @return
      */
     ServerResponse<Object> addNewWordsBook(HttpSession session, ReadWord readWord);
@@ -66,6 +67,7 @@ public interface ReadWordService extends BaseService<ReadWord> {
     /**
      * 保存强化信息
      *
+     * @param session
      * @param dto
      * @return
      */
