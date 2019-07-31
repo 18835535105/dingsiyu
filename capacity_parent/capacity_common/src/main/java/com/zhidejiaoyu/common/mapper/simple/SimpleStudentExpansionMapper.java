@@ -32,7 +32,7 @@ public interface SimpleStudentExpansionMapper extends BaseMapper<StudentExpansio
     @Update("update student_expansion set pk_explain=2 where id=#{studentId}")
     Integer updatePkExplain(@Param("studentId") Long studnetId);
 
-    List<Map<String,Object>> getMaxStudyTwenty(@Param("classId") Long classId, @Param("teacherId") Long teacherId, @Param("teachers") List<Integer> teachers, @Param("schoolAdminId") Long schoolAdminId, @Param("type") Integer type);
+    List<Map<String,Object>> getMaxStudyTwenty(@Param("classId") Long classId, @Param("teacherId") Long teacherId, @Param("teachers") List<Integer> teachers, @Param("schoolAdminId") Integer schoolAdminId, @Param("type") Integer type);
 
     List<StudentExpansion> selectAll();
 }

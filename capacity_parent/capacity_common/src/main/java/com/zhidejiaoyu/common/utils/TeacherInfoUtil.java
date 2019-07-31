@@ -23,15 +23,9 @@ public class TeacherInfoUtil {
     @Autowired
     private TeacherMapper teacherMapperInit;
 
-    @Autowired
-    private SimpleTeacherMapper simpleTeacherInit;
-
-    private static SimpleTeacherMapper simpleTeacherMapper;
-
     @PostConstruct
     public void init() {
         teacherMapper = this.teacherMapperInit;
-        simpleTeacherMapper = this.simpleTeacherInit;
     }
 
     /**
@@ -48,26 +42,6 @@ public class TeacherInfoUtil {
         if (schoolAdminId == null) {
             return Integer.valueOf(student.getTeacherId().toString());
         }
-        return schoolAdminId;
-    }
-
-    /**
-     * 获取教师id
-     */
-    public static Long getSchoolAdminIdAndTeacherId(Student student, List<Integer> teachers) {
-        Long schoolAdminId = null;
-        if (student.getTeacherId() != null) {
-            Integer schoolAdminById = simpleTeacherMapper.getSchoolAdminById(student.getTeacherId().intValue());
-            if (schoolAdminById == null) {
-                Integer teacherCountByAdminId = simpleTeacherMapper.getTeacherCountByAdminId(student.getTeacherId());
-                if (teacherCountByAdminId != null && teacherCountByAdminId > 0) {
-                    schoolAdminId = student.getTeacherId();
-                }
-            } else {
-                schoolAdminId = schoolAdminById.longValue();
-            }
-        }
-        teachers = simpleTeacherMapper.getTeacherIdByAdminId(schoolAdminId.intValue());
         return schoolAdminId;
     }
 }

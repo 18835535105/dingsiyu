@@ -321,7 +321,7 @@ public interface SimpleStudentMapper extends BaseMapper<Student> {
 
     List<StudentGauntletVo> getClassOrSchoolStudents(@Param("classId") Long classId,
                                                      @Param("teacherId") Long teacherId, @Param("teacherIds") List<Integer> teachers,
-                                                     @Param("adminId") Long schoolAdminId, @Param("type") Integer type,
+                                                     @Param("adminId") Integer schoolAdminId, @Param("type") Integer type,
                                                      @Param("start") Integer start, @Param("end") Integer end, @Param("account") String account,
                                                      @Param("studentId") Long studentId);
 
