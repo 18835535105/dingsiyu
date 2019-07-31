@@ -164,7 +164,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                 throw new RuntimeException(e);
             }
         }
-        getReturn(point, student, gold, map, enger);
+        getReturn(point, student, gold, map,enger);
         return ServerResponse.createBySuccess(map);
     }
 
