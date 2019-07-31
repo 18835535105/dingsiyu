@@ -469,20 +469,6 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     }
 
     @Override
-    public ServerResponse<String> updateStudentInfo(HttpSession session, Student student) {
-        Student currentStudent = getStudent(session);
-        if (!Objects.equals(currentStudent.getId(), student.getId())) {
-            log.error("学生 {}->{} 试图修改 学生 {}->{} 的个人信息！", currentStudent.getId(), currentStudent.getStudentName(),
-                    student.getId(), student.getStudentName());
-            return ServerResponse.createByErrorMessage("服务器错误！请稍后重试");
-        }
-        studentMapper.updateByPrimaryKeySelective(student);
-        student = studentMapper.selectByPrimaryKey(currentStudent.getId());
-        session.setAttribute(UserConstant.CURRENT_STUDENT, student);
-        return ServerResponse.createBySuccess();
-    }
-
-    @Override
     public ServerResponse<LevelVo> getLevel(HttpSession session, Long stuId, Integer pageNum, Integer pageSize) {
         Student student;
         boolean showFist = true;

@@ -53,8 +53,6 @@ public interface StudentInfoService extends BaseService<Student>{
      */
     ServerResponse<String> judgeOldPassword(String nowPassword, String oldPassword);
 
-    ServerResponse<String> updateStudentInfo(HttpSession session, Student student);
-
     /**
      * 获取学生的等级信息
      *
