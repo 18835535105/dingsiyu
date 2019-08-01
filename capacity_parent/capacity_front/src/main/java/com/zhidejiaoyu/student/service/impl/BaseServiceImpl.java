@@ -12,6 +12,7 @@ import com.zhidejiaoyu.common.utils.TokenUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.student.common.RedisOpt;
+import com.zhidejiaoyu.student.common.SaveRunLog;
 import com.zhidejiaoyu.student.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -49,6 +50,9 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
 
     @Autowired
     private LevelMapper levelMapper;
+
+    @Autowired
+    private SaveRunLog saveRunLog;
 
     @Override
     public Student getStudent(HttpSession session) {
@@ -146,6 +150,16 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
             studentExpansion.setPkExplain(1);
             studentExpansionMapper.insert(studentExpansion);
         }
+    }
+
+    @Override
+    public void saveRunLog(Integer type, Long courseId, Long unitId, String msg) {
+        saveRunLog.saveRunLog(type, courseId, unitId, msg);
+    }
+
+    @Override
+    public void saveRunLog(Integer type, String msg) {
+        saveRunLog.saveRunLog(type, msg);
     }
 
     /**
