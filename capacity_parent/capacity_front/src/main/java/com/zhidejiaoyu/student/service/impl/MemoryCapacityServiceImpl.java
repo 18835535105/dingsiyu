@@ -253,7 +253,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         } else {
             url = petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED);
         }
-        map.put("enger", enger);
+        map.put("energy", enger);
         map.put("gold", gold);
         map.put("listen", url);
         map.put("petUrl", AliyunInfoConst.host + student.getPartUrl());

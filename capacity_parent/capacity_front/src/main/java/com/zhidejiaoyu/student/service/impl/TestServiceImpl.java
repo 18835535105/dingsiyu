@@ -389,7 +389,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         TestResultVo vo = new TestResultVo();
         vo.setGold(goldCount);
         vo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
-        int energy = getEnergy(student, testRecord.getPoint());
+        int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
+                testRecord.getStudyModel(), testRecord.getGenre());
+        int energy = getEnergy(student, testRecord.getPoint(), number);
         vo.setEnergy(energy);
         getMessage(student, vo, testRecord, point, 100);
         studentMapper.updateById(student);
@@ -476,7 +478,10 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
         TestResultVo vo = new TestResultVo();
         vo.setGold(goldCount);
-        int energy = getEnergy(student, testRecord.getPoint());
+        //获取测试有效次数
+        int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
+                testRecord.getStudyModel(), testRecord.getGenre());
+        int energy = getEnergy(student, testRecord.getPoint(), number);
         vo.setEnergy(energy);
         vo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
         getMessage(student, vo, testRecord, point, 100);
@@ -1110,7 +1115,10 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Integer point = wordUnitTestDTO.getPoint();
 
         Map<String, Object> resultMap = new HashMap<>(16);
-        resultMap.put("energy", getEnergy(student, wordUnitTestDTO.getPoint()));
+        //获取测试有效次数
+        int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
+                testRecord.getStudyModel(), testRecord.getGenre());
+        resultMap.put("energy", getEnergy(student, wordUnitTestDTO.getPoint(), number));
         resultMap.put("gold", testRecord.getAwardGold());
         if (point < PASS) {
             resultMap.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
@@ -1227,8 +1235,11 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
             testRecord = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, testRecord, goldCount);
 
+            //获取测试有效次数
+            int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
+                    testRecord.getStudyModel(), testRecord.getGenre());
             // 获取需要奖励的能量值
-            addEnergy = getEnergy(student, point);
+            addEnergy = getEnergy(student, point, number);
         }
 
         String msg;
@@ -1312,8 +1323,11 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         Integer point = wordUnitTestDTO.getPoint();
 
+        //获取测试有效次数
+        int number = testRecordMapper.selCount(student.getId(), courseId, unitId[0],
+                type, "句子测试");
         // 获取需要奖励的能量值
-        int addEnergy = getEnergy(student, point);
+        int addEnergy = getEnergy(student, point, number);
 
         // 保存测试记录
         // 查看是否已经有该单元当前模块的单元闯关测试记录
@@ -1562,7 +1576,10 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setMsg(message);
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, TestGenreConstant.UNIT_TEST.getGenre()));
         vo.setGold(getBonusGold(student, goldCount));
-        vo.setEnergy(super.getEnergy(student, point));
+        //获取测试有效次数
+        int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
+                testRecord.getStudyModel(), testRecord.getGenre());
+        vo.setEnergy(super.getEnergy(student, point, number));
 
         testRecordMapper.insert(testRecord);
         studentMapper.updateById(student);

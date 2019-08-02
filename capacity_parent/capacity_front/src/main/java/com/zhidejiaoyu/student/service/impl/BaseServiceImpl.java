@@ -101,15 +101,15 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         List<Map<String, Object>> levels = redisOpt.getAllLevel();
         int level = getLevel((int) gold, levels);
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
-        if(studentExpansion != null && studentExpansion.getLevel()<level){
-            Integer oldStudy =0;
-            if(studentExpansion.getLevel()!=0){
-                oldStudy=levelMapper.getStudyById(studentExpansion.getLevel());
+        if (studentExpansion != null && studentExpansion.getLevel() < level) {
+            Integer oldStudy = 0;
+            if (studentExpansion.getLevel() != 0) {
+                oldStudy = levelMapper.getStudyById(studentExpansion.getLevel());
             }
             Integer newStudy = levelMapper.getStudyById(level);
-            Integer addStudy=newStudy-oldStudy;
+            Integer addStudy = newStudy - oldStudy;
             studentExpansion.setLevel(level);
-            studentExpansion.setStudyPower(studentExpansion.getStudyPower()+addStudy);
+            studentExpansion.setStudyPower(studentExpansion.getStudyPower() + addStudy);
             studentExpansionMapper.updateById(studentExpansion);
         }
     }
@@ -131,7 +131,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
     }
 
     /**
-     *  判断扩展表信息是否已有  如果没有添加
+     * 判断扩展表信息是否已有  如果没有添加
      */
     @Override
     public void isStudentEx(Student student) {
@@ -184,23 +184,25 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
      * @param point
      * @return
      */
-    int getEnergy(Student student, Integer point) {
+    int getEnergy(Student student, Integer point, Integer number) {
         int addEnergy = 0;
-        if (student.getEnergy() == null) {
-            if (point >= 80) {
-                student.setEnergy(2);
-                addEnergy = 2;
-            } else if (point > 20) {
-                student.setEnergy(1);
-                addEnergy = 1;
-            }
-        } else {
-            if (point >= 80) {
-                student.setEnergy(student.getEnergy() + 2);
-                addEnergy = 2;
-            } else if (point > 20) {
-                student.setEnergy(student.getEnergy() + 1);
-                addEnergy = 1;
+        if (number == null || number == 0) {
+            if (student.getEnergy() == null) {
+                if (point >= 60 && point < 100) {
+                    student.setEnergy(4);
+                    addEnergy = 4;
+                } else if (point == 100) {
+                    student.setEnergy(5);
+                    addEnergy = 5;
+                }
+            } else {
+                if (point >= 60 && point < 100) {
+                    student.setEnergy(student.getEnergy() + 4);
+                    addEnergy = 4;
+                } else if (point == 100) {
+                    student.setEnergy(student.getEnergy() + 5);
+                    addEnergy = 5;
+                }
             }
         }
         return addEnergy;
@@ -231,12 +233,11 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
             }
             myrecord = 0;
             myauto = 0;
-        }else{
-            level=1;
+        } else {
+            level = 1;
         }
         return level;
     }
-
 
 
 }

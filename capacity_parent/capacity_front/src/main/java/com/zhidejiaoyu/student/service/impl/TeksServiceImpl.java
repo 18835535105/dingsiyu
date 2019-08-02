@@ -809,7 +809,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             }
         }
         // 封装响应数据
-        Map<String, Object> map = packageResultMap(student, wordUnitTestDTO, point, goldCount, testRecord);
+        Map<String, Object> map = packageResultMap(student, wordUnitTestDTO, point, goldCount, testRecord, model);
         student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldCount));
         studentMapper.updateByPrimaryKeySelective(student);
         Integer insert = testRecordMapper.insert(testRecord);
@@ -895,9 +895,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         runLogMapper.insert(runLog);
     }
 
-    private Map<String, Object> packageResultMap(Student student, WordUnitTestDTO wordUnitTestDTO, Integer point, Integer goldCount, TestRecord testRecord) {
+    private Map<String, Object> packageResultMap(Student student, WordUnitTestDTO wordUnitTestDTO, Integer point, Integer goldCount, TestRecord testRecord, String model) {
         Map<String, Object> map = new HashMap<>(16);
-        int energy = super.getEnergy(student, wordUnitTestDTO.getPoint());
+        int number = testRecordMapper.selCount(student.getId(), wordUnitTestDTO.getCourseId(), wordUnitTestDTO.getUnitId()[0],
+                commonMethod.getTestType(wordUnitTestDTO.getClassify()), model);
+        int energy = super.getEnergy(student, wordUnitTestDTO.getPoint(), number);
         map.put("energy", energy);
         map.put("gold", goldCount);
         if (point < PASS) {

@@ -561,8 +561,11 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
             lockMsg = this.unlockNextUnit(student, courseId, unitId[0], classify);
 
+            //获取单元闯关获取的能量数量
+            int number = testRecordMapper.selCount(student.getId(), courseId, unitId[0],
+                    simpleCommonMethod.getTestType(wordUnitTestDTO.getClassify()), "单元闯关测试");
             //判断得分成绩大于80给与2个能量 小于80 给与1个能量
-            addEnergy = getEnergy(student, point);
+            addEnergy = getEnergy(student, point, number);
 
             if (point >= 60) {
                 simpleCcieUtil.saveCcieTest(student, 1, 1, 10 + classify, point);
@@ -665,24 +668,27 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         return msg;
     }
 
-    private int getEnergy(Student student, Integer point) {
-        Integer energy = student.getEnergy();
+    private int getEnergy(Student student, Integer point, Integer number) {
         int addEnergy = 0;
-        if (student.getEnergy() == null) {
-            if (point >= 80) {
-                student.setEnergy(2);
-                addEnergy = 2;
-            } else if (point > 20) {
-                student.setEnergy(1);
-                addEnergy = 1;
-            }
-        } else {
-            if (point >= 80) {
-                student.setEnergy(energy + 2);
-                addEnergy = 2;
-            } else if (point > 20) {
-                student.setEnergy(energy + 1);
-                addEnergy = 1;
+        if (number == null || number == 0) {
+            Integer energy = student.getEnergy();
+
+            if (student.getEnergy() == null) {
+                if (point >= 60 && point < 100) {
+                    student.setEnergy(4);
+                    addEnergy = 4;
+                } else if (point == 100) {
+                    student.setEnergy(5);
+                    addEnergy = 5;
+                }
+            } else {
+                if (point >= 60 && point < 100) {
+                    student.setEnergy(energy + 4);
+                    addEnergy = 2;
+                } else if (point == 100) {
+                    student.setEnergy(energy + 5);
+                    addEnergy = 5;
+                }
             }
         }
         return addEnergy;
@@ -960,7 +966,10 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         }
         testRecord.setGenre(typeModel);
         int point = testRecord.getPoint();
-        int addEnergy = getEnergy(student, point);
+        //获取单元闯关获取的能量数量
+        int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
+                studyModel, typeModel);
+        int addEnergy = getEnergy(student, point, number);
 
         int gold = getPreSchoolTestGold(testRecord, modelType, student, typeModel, vo, point);
 
@@ -1005,7 +1014,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         String studyModel = matchStudyModel(model);
         Student student = getStudent(session);
         if (courseId == null || unitId == null || type == null || model == null) {
-            return ServerResponse.createByError(500,"数据异常+"+courseId+"   "+unitId+"  "+type+"   "+model);
+            return ServerResponse.createByError(500, "数据异常+" + courseId + "   " + unitId + "  " + type + "   " + model);
         }
         if (type == 2) {
             simpleTestRecordMapper.updateByStudentAndUnitId(student.getId(), unitId.longValue());
