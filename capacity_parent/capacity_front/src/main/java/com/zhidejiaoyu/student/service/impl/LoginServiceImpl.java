@@ -23,10 +23,12 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.LoginService;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.format.datetime.joda.JodaTimeFormatterRegistrar;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -854,8 +856,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     public static void main(String[] args) {
-        String str = "20180101";
-        System.out.println(str.substring(0, 4) + "-" + str.substring(4, 6) + "-" + str.substring(6, 8));
+        System.out.println(DateTimeFormat.forPattern(DateUtil.YYYYMMDDHHMMSS).print(System.currentTimeMillis()));
     }
 
     /**
@@ -964,7 +965,12 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                     duration.setLoginOutTime(loginOutTime);
                     duration.setValidTime(0L);
                     durationMapper.insert(duration);
+                } else {
+                    logger.warn("学生[{} -{} - {}]已保存过登录时间为[{}]的在线时长信息！count=[{}]", student.getId(), student.getAccount(),
+                            student.getStudentName(), DateTimeFormat.forPattern(DateUtil.YYYYMMDDHHMMSS).print(loginTime.getTime()), count);
                 }
+            } else {
+                logger.warn("学生[{} -{} - {}]的登录时间信息为空！", student.getId(), student.getAccount(), student.getStudentName());
             }
         }
     }
