@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.MacIpUtil;
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
@@ -299,9 +300,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 姓名
         result.put("studentName", student.getStudentName());
         // 头像
-        result.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
+        result.put("headUrl", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
         // 宠物
-        result.put("partUrl", AliyunInfoConst.host + student.getPartUrl());
+        result.put("partUrl", GetOssFile.getPublicObjectUrl(student.getPartUrl()));
         // 宠物名
         result.put("petName", student.getPetName());
         result.put("schoolName", student.getSchoolName());

@@ -924,11 +924,24 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
     private Map<String, Object> packageMyData(Student student, RankDto rankDto, String key) {
         Map<String, Object> studentMap = new HashMap<>(16);
         double totalGold = BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
+        // 我的排名
+        Object myRanking = getMyRanking(student, rankDto, key);
         studentMap.put("stuId", student.getId());
         studentMap.put("myGold", Math.round(totalGold));
         studentMap.put("myChildName", getLevel((int) Math.round(totalGold), redisOpt.getAllLevel()));
         studentMap.put("myMb", rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId()) == -1 ? 0 : rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId()));
-        studentMap.put("myRanking", getMyRanking(student, rankDto, key));
+        studentMap.put("myRanking", myRanking);
+
+        // 如果是学生点击排行按钮进入排行，其初始页为0，后台强制其跳转到当前学生所在页
+        if (rankDto.getPage() == 0) {
+            if (myRanking instanceof String) {
+                rankDto.setPage(1);
+            } else if (myRanking instanceof Long) {
+                long ranking = Long.parseLong(myRanking.toString());
+                rankDto.setPage((int) (ranking / rankDto.getRows() + (ranking % rankDto.getRows() == 0 ? 0 : 1)));
+            }
+        }
+
         return studentMap;
     }
 
