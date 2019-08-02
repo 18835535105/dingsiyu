@@ -184,6 +184,11 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         }
 
         List<Object> returnList = this.getMarkWordRedList(translateMap, allWords, newWordsMap);
+
+        if (returnList.size() == 0) {
+            return ServerResponse.createBySuccess(301, "未查询到生词信息！");
+        }
+
         return ServerResponse.createBySuccess(returnList);
     }
 

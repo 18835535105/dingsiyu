@@ -923,7 +923,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, TestRecord testRecord, int type,
                                                           int modelType, String testDetail) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = super.getStudent(session);
         // 学生需要更新的信息
         if (StringUtils.isEmpty(student.getPetName())) {
             student.setPetName("大明白");
@@ -1072,11 +1072,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
     private int getPreSchoolTestGold(TestRecord testRecord, int modelType, Student student, String typeModel, TestResultVo vo, int point) {
         int gold = 0;
-        Integer maxPoint = this.getMaxPoint(testRecord, student);
-        // 当前得分没有超过当前得分没有超过历史最高分不给金币
-        if (maxPoint != null && maxPoint >= point) {
-            return 0;
-        }
+
         if ("学后测试".equals(typeModel)) {
             if (point < 80) {
                 vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.COURSE_TEST_LESS_EIGHTY));
@@ -1139,6 +1135,13 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
                 packagePassTestRecordVo(testRecord, student, vo, point);
             }
         }
+
+        Integer maxPoint = this.getMaxPoint(testRecord, student);
+        // 当前得分没有超过当前得分没有超过历史最高分不给金币
+        if (maxPoint != null && maxPoint >= point) {
+            return 0;
+        }
+
         return testGoldUtil.addGold(student, gold);
     }
 
