@@ -433,10 +433,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // 记忆强度
         map.put("memoryStrength", vo.getMemory_strength());
         //if (classify != 6) {
-        if(nextInt==1){
-            testResultUtil.getOrderEnglishList(map,sentence.getCentreExample(),sentence.getExampleDisturb(),type);
-        }else{
-            testResultUtil.getOrderChineseList(map,sentence.getCentreTranslate(),sentence.getTranslateDisturb(),type);
+        if (nextInt == 1) {
+            testResultUtil.getOrderEnglishList(map, sentence.getCentreExample(), sentence.getExampleDisturb(), type);
+        } else {
+            testResultUtil.getOrderChineseList(map, sentence.getCentreTranslate(), sentence.getTranslateDisturb(), type);
         }
         return map;
     }
@@ -812,6 +812,12 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         int errorCount = errorWord == null ? 0 : errorWord.length;
         int rightCount = correctWord == null ? 0 : correctWord.length;
 
+        int number = testRecordMapper.selCount(student.getId(), courseId, unitId[0],
+                commonMethod.getTestType(classify), genre);
+        //获取单元闯关获取的能量数量
+        TestResultVo vo = new TestResultVo();
+        vo.setEnergy(getEnergy(student, point, number));
+
         // 把已学测试,生词测试,熟词测试保存慧追踪中
         if (!"单词五维测试".equals(genre) && !"例句五维测试".equals(genre)) {
             // 保存学习记录和慧追踪信息
@@ -825,10 +831,11 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
         TestRecord testRecord = this.saveTestRecord(quantity, errorCount, rightCount, classify, session, student, point, genre, courseId, unitId);
 
-        TestResultVo vo = new TestResultVo();
+
         // 封装提示语
         packagePetSay(testRecord, wordUnitTestDTO, student, vo, genre);
-        vo.setEnergy(getEnergy(student, point));
+
+
 
         testRecordMapper.insert(testRecord);
         if (testDetail != null) {
@@ -1356,7 +1363,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             Map<String, Object> map = new HashMap<>(16);
             map.put("unitId", learn.getUnitId());
             map.put("wordId", learn.getVocabularyId());
-            map.put("courseId",learn.getCourseId());
+            map.put("courseId", learn.getCourseId());
             maps.add(map);
         });
         return maps;
@@ -1387,20 +1394,20 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     }
 
     @Override
-    public ServerResponse getAllSentenceReview(HttpSession session, Integer classify){
+    public ServerResponse getAllSentenceReview(HttpSession session, Integer classify) {
         Student student = getStudent(session);
         CapacityReview reviews = capacityMapper.selectSentenceCapacitys(student.getId(), classify);
         //获取总复习数量
         Integer count = capacityMapper.selSentenceCountCapacitys(student.getId(), classify);
         if (reviews == null) {
             return ServerResponse.createByErrorMessage("暂无需要复习的内容！");
-        }else{
+        } else {
             // 转换类型
             String classifyString = commonMethod.getTestType(classify);
-            if("例句翻译".equals(classifyString)){
+            if ("例句翻译".equals(classifyString)) {
                 SentenceTranslate sentenceTranslate = sentenceTranslateMapper.selectByPrimaryKey(reviews.getId());
                 return sentenceService.returnGoldWord(sentenceTranslate, 1L, false, count.longValue(), null, null, 1);
-            }else if("例句听力".equals(classifyString)){
+            } else if ("例句听力".equals(classifyString)) {
                 SentenceListen sentenceListen = sentenceListenMapper.selectByPrimaryKey(reviews.getId());
                 return sentenceService.returnGoldWord(null, 1L, false, count.longValue(), sentenceListen, null, 1);
             }
@@ -1623,8 +1630,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         }
         int addGold = testGoldUtil.addGold(student, gold);
         if (student.getBonusExpires() != null && System.currentTimeMillis() < student.getBonusExpires().getTime()) {
-                Double doubleGold=gold*0.2;
-                addGold=doubleGold.intValue()+addGold;
+            Double doubleGold = gold * 0.2;
+            addGold = doubleGold.intValue() + addGold;
         }
         student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), addGold));
         testRecord.setAwardGold(addGold);
