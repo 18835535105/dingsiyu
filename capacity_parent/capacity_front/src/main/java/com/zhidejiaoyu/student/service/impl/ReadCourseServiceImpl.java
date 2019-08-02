@@ -417,6 +417,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         map.put("wiseCounsel", readWiseCounsel.getContent());
         ReadCourse readCourse = readCourseMapper.selectById(courseId);
         map.put("courseName", readCourse.getGrade() + "-" + readCourse.getMonth());
+        map.put("title",readArders.get(0).getTitle());
         getEnglishData(readArders, map);
         //获取考试类型
         Integer type = readArders.get(0).getType();
