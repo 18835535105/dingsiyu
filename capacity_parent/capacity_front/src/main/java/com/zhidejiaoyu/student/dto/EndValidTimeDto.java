@@ -24,4 +24,6 @@ public class EndValidTimeDto {
     String validTime;
 
     Long valid;
+
+    String num;
 }
