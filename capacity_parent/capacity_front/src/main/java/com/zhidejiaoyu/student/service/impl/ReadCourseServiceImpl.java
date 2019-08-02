@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.mysql.cj.x.protobuf.MysqlxExpr;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.constant.read.ReadContentConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -414,6 +415,9 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         //获取队长讲英语锦囊妙计
         ReadWiseCounsel readWiseCounsel = readWiseCounselMapper.getByCourseId(courseId);
         map.put("wiseCounsel", readWiseCounsel.getContent());
+        ReadCourse readCourse = readCourseMapper.selectById(courseId);
+        map.put("courseName", readCourse.getGrade() + "-" + readCourse.getMonth());
+        map.put("title",readArders.get(0).getTitle());
         getEnglishData(readArders, map);
         //获取考试类型
         Integer type = readArders.get(0).getType();
@@ -499,11 +503,12 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         String analysis = readChooseBlanks.getAnalysis();
         String content = readChooseBlanks.getContent();
         List<String> contentList = Arrays.asList(content.split("&@&"));
+        List<String> analysisList= Arrays.asList(analysis.split("&@&"));
         List<Map<String, Object>> list = new ArrayList<>();
         for (int i = 0; i < contentList.size(); i++) {
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("number", i);
-            returnMap.put("analysisList", null);
+            returnMap.put("analysisList", analysisList.get(i));
             returnMap.put("sentence", contentList.get(i));
             list.add(returnMap);
         }
