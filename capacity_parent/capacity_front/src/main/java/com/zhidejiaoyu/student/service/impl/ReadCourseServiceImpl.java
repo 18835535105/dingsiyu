@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
+import com.mysql.cj.x.protobuf.MysqlxExpr;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.constant.read.ReadContentConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -499,11 +500,12 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         String analysis = readChooseBlanks.getAnalysis();
         String content = readChooseBlanks.getContent();
         List<String> contentList = Arrays.asList(content.split("&@&"));
+        List<String> analysisList= Arrays.asList(analysis.split("&@&"));
         List<Map<String, Object>> list = new ArrayList<>();
         for (int i = 0; i < contentList.size(); i++) {
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("number", i);
-            returnMap.put("analysisList", null);
+            returnMap.put("analysisList", analysisList.get(i));
             returnMap.put("sentence", contentList.get(i));
             list.add(returnMap);
         }

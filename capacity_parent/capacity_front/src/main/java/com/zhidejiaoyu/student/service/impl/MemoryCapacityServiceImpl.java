@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.MemoryCapacity;
 import com.zhidejiaoyu.common.pojo.RunLog;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.service.MemoryCapacityService;
@@ -40,6 +41,8 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
     private StudentMapper studentMapper;
     @Autowired
     private VocabularyMapper vocabularyMapper;
+    @Autowired
+    private BaiduSpeak baiduSpeak;
 
     @Override
     public ServerResponse<Object> getEnterMemoryCapacity(HttpSession session, Integer type) {
@@ -192,6 +195,9 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                 frequency++;
             }
         }
+        Map<String,Object> answerMap=new HashMap<>();
+        answerMap.put("word",answer);
+        answerMap.put("readUrl",baiduSpeak.getLanguagePath(answer));
         //获取选项集合
         List<Integer> number = new ArrayList<>();
         number.add(frequency);
@@ -211,7 +217,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         }
         Map<String, Object> map = new HashMap<>();
         map.put("list", returnList);
-        map.put("answer", answer);
+        map.put("answer", answerMap);
         Collections.shuffle(list);
         map.put("options", list);
         return ServerResponse.createBySuccess(map);
@@ -224,7 +230,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
     }
 
     private void getNumber(List<Integer> numbers) {
-        Integer number = (int) (Math.random() * 10);
+        Integer number = (int) (Math.random() * 10)+1;
         boolean isFalg = true;
         for (Integer option : numbers) {
             if (option.equals(number)) {
