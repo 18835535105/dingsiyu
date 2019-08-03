@@ -64,6 +64,9 @@ public class BaiduSpeak {
             }
             return GetOssFile.getPublicObjectUrl(vocabulary.getReadUrl());
         }
+        if (text != null && text.contains("a/an")) {
+            text = text.replace("/", ",");
+        }
         return youdao + text;
     }
 
