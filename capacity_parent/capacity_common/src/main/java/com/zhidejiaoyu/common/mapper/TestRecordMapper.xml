@@ -892,4 +892,19 @@
         <include refid="study_model_sql"/>
         group by unit_id
     </select>
+
+    <select id="selCount" parameterType="map" resultType="int">
+        select count(id) from test_record
+        where
+        student_id = #{studentId}
+        and genre = #{genre}
+        <if test="courseId!=null and courseId!=''">
+            and course_id=#{courseId}
+        </if>
+        <if test=" unitId!=null and unitId!=''">
+            and unit_id=#{unitId}
+        </if>
+        and study_model=#{studyModel}
+        and point>=60
+    </select>
 </mapper>
