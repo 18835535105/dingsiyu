@@ -268,7 +268,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
             //返回集合
             Map<String, Object> map = new HashMap<>();
             //判断是否相同
-            if (wordString.equals(wordTwo)) {
+            if (wordOne.equals(wordTwo)) {
                 map.put("isTrue", "0");
             } else {
                 map.put("isTrue", "1");
