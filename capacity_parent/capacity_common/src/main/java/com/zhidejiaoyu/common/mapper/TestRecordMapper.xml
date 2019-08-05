@@ -140,13 +140,21 @@
         #{unitId} and genre = #{genre} and study_model = #{studyModel} order by better_count desc limit 1
     </select>
 
-    <select id="selectByStudentIdAndUnitIdAndGenre"
+    <select id="selectByStudentIdAndUnitIdAndGenreAndStudyModel"
             resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="Base_Column_List"/>
         from test_record where student_id = #{studentId} and unit_id =
         #{unitId} and genre = #{genre} and study_model = #{studyModel} order by id desc limit 1
     </select>
+    <select id="selectByStudentIdAndUnitIdAndGenre"
+            resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from test_record where student_id = #{studentId} and unit_id =
+        #{unitId} and genre = #{genre} order by id desc limit 1
+    </select>
+
 
 
     <select id="selectByUnitId" resultType="java.lang.Integer"

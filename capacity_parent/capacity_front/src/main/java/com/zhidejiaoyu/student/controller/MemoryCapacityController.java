@@ -59,6 +59,8 @@ public class MemoryCapacityController {
         return memoryCapacityService.saveTrain(session, point);
     }
 
+
+
     /**
      *获取眼脑训练题目
      */

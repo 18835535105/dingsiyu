@@ -71,7 +71,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      * @param studyModel
      * @return
      */
-    TestRecord  selectByStudentIdAndUnitIdAndGenre(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+    TestRecord  selectByStudentIdAndUnitIdAndGenreAndStudyModel(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                           @Param("genre") String genre, @Param("studyModel") String studyModel);
 
 

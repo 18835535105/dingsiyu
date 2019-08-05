@@ -211,7 +211,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             map.put("lookLearnTime", strB.toString());
             map.put("calculationLearnTime", second);
             map.put("questions", readType.getReadCount());
-            TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitIdAndGenre(student.getId(), readType.getId(), "阅读测试", "阅读测试");
+            TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitIdAndGenreAndStudyModel(student.getId(), readType.getId(), "阅读测试", "阅读测试");
             if (testRecord != null) {
                 map.put("rightCount", testRecord.getRightCount());
                 map.put("isClose", true);
