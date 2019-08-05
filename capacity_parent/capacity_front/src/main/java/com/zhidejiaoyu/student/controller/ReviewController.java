@@ -29,7 +29,7 @@ import java.util.Map;
 @Slf4j
 @Controller
 @RequestMapping("/review")
-public class ReviewController {
+public class ReviewController extends BaseController {
 
     @Autowired
     private ReviewService reviewService;
@@ -189,23 +189,21 @@ public class ReviewController {
      * url = /capacity
      * 2.1 点击智能复习 - 必要参数单元id (慧记忆,慧听写...)
      *
-     * @param unitId   单元id
+     * @param unitId    单元id
      * @param classify  类型  1=慧记忆 2=听写 3=默写 4=例句听写 5=例句翻译 6=例句默写
      *                  <p>
      *                  <p>
      *                  url = /taskCourse
-     *
-     * 2.2 任务课程-点击复习 - 必要参数单元id,课程id
-     *
+     *                  <p>
+     *                  2.2 任务课程-点击复习 - 必要参数单元id,课程id
      * @param course_id 课程id
      * @param classify  类型 0=单词图鉴 1=慧记忆 2=慧听写 3=慧默写 4=例句听写 5=例句翻译 6=例句默写
+     * @param type      只针对例句：1：普通模式；2：暴走模式
+     *                  justWord : 正确顺序例句
+     *                  wrongWord : 打乱顺序例句
+     *                  word_Chinese : 翻译
+     *                  readUrl : 读音
      * @return 4, 5, 6模块所需复习的例句
-     * @param type 只针对例句：1：普通模式；2：暴走模式
-     * justWord : 正确顺序例句
-     * wrongWord : 打乱顺序例句
-     * word_Chinese : 翻译
-     * readUrl : 读音
-     *
      * @throws Exception
      */
     @ResponseBody
@@ -215,7 +213,7 @@ public class ReviewController {
                                                               HttpSession session,
                                                               @RequestParam(required = false, defaultValue = "1") Integer type){
         // 获取学生id
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = super.getStudent(session);
 
         // 图片图鉴模块
         if(classify == 0){
