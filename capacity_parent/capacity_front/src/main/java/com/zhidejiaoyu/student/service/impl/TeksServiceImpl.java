@@ -80,11 +80,17 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         add("Mr");
         add("Miss");
     }};
-    // 以字母或数字结尾
+    /**
+     * 以字母或数字结尾
+     */
     final String END_MATCH = ".*[a-zA-Z0-9$# '@]$";
-    // 以字母或数据开头
+    /**
+     * 以字母或数据开头
+     */
     final String START_MATCH = "^[a-zA-Z0-9$# '@].*";
-    // 以字母或数字结尾
+    /**
+     * 以字母或数字结尾
+     */
     final String END_MATCH2 = ".*[a-zA-Z0-9$# '@-]$";
 
 
@@ -307,7 +313,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                                         sb.setLength(0);
                                     }
                                     // 如果符号前面是字母需要在符号列表中加 null
-                                    if(i!=0){
+                                    if (i != 0) {
                                         if (Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
                                             pointList.add(null);
                                         }
