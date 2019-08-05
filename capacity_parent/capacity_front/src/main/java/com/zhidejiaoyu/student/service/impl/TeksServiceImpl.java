@@ -307,8 +307,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                                         sb.setLength(0);
                                     }
                                     // 如果符号前面是字母需要在符号列表中加 null
-                                    if (i > 0 && Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
-                                        pointList.add(null);
+                                    if(i!=0){
+                                        if (Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
+                                            pointList.add(null);
+                                        }
                                     }
                                     rightList.add(s1);
                                     pointList.add(s1);
