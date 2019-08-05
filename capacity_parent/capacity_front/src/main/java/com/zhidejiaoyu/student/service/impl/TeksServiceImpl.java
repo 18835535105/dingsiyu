@@ -80,6 +80,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         add("Mr");
         add("Miss");
     }};
+    // 以字母或数字结尾
+    final String END_MATCH = ".*[a-zA-Z0-9$# '@]$";
+    // 以字母或数据开头
+    final String START_MATCH = "^[a-zA-Z0-9$# '@].*";
+    // 以字母或数字结尾
+    final String END_MATCH2 = ".*[a-zA-Z0-9$# '@-]$";
 
 
     @Autowired
@@ -257,12 +263,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         // 乱序
         List<String> orderList = new ArrayList<>();
 
-        // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$# ']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$# '].*";
-        // 以字母或数字结尾
-        final String END_MATCH2 = ".*[a-zA-Z0-9$# '-]$";
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
             s = s.replace("#", " ").replace("$", "");
@@ -663,12 +663,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private List<String> getLeterRegitList(String sentence) {
         // 正确顺序
         List<String> rightList = new ArrayList<>();
-        // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$#']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$#'].*";
-        // 以字母或数字结尾
-        final String END_MATCH2 = ".*[a-zA-Z0-9$#-']$";
+
         String[] split = sentence.trim().split(" ");
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
@@ -726,10 +721,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private List<String> getRegitList(String sentence) {
         // 正确顺序
         List<String> rightList = new ArrayList<>();
-        // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$#']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$#'].*";
         String[] split = sentence.trim().split(" ");
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
@@ -960,9 +951,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     public int[] wirterBlank(List<String> strList) {
         Random random = new Random();
         List<Integer> shuZhuString = new ArrayList<>();
-        final String END_MATCH = ".*[a-zA-Z0-9$#']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$#'].*";
         for (int i = 0; i < strList.size(); i++) {
             boolean flag = true;
             String str = strList.get(i);
@@ -1247,10 +1235,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     //获取挖空的位置
     private int changeInteger(List<String> sentenceList) {
         List<Integer> list = new ArrayList<>();
-        // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$'].*";
         for (int i = 0; i < sentenceList.size(); i++) {
             if (sentenceList.get(i).indexOf("#") == -1 && sentenceList.get(i).indexOf("$") == -1) {
                 if (Pattern.matches(END_MATCH, sentenceList.get(i)) && Pattern.matches(START_MATCH, sentenceList.get(i))) {
