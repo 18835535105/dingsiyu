@@ -148,13 +148,6 @@
         #{unitId} and genre = #{genre} and study_model = #{studyModel} order by id desc limit 1
     </select>
 
-    <select id="selectByStudentIdAndUnitIdAndGenre"
-            resultMap="BaseResultMap" parameterType="map">
-        select
-        <include refid="Base_Column_List"/>
-        from test_record where student_id = #{studentId} and unit_id =
-        #{unitId} and genre = #{genre} order by point desc limit 1
-    </select>
 
     <select id="selectByUnitId" resultType="java.lang.Integer"
             parameterType="map">
@@ -902,6 +895,21 @@
         and student_id = #{studentId}
         <include refid="study_model_sql"/>
         group by unit_id
+    </select>
+
+    <select id="selCount" parameterType="map" resultType="int">
+        select count(id) from test_record
+        where
+        student_id = #{studentId}
+        and genre = #{genre}
+        <if test="courseId!=null and courseId!=''">
+            and course_id=#{courseId}
+        </if>
+        <if test=" unitId!=null and unitId!=''">
+            and unit_id=#{unitId}
+        </if>
+        and study_model=#{studyModel}
+        and point>=60
     </select>
 
     <select id="selectReadCountByCourseId" resultType="Integer" parameterType="map">

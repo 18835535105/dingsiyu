@@ -54,7 +54,7 @@ public class GetOssFile {
             HttpServletRequest request = HttpUtil.getHttpServletRequest();
             String parameter = request.getParameter(DESKTOP);
             if (parameter != null && !"".equals(parameter)) {
-                return "static/" + objectName;
+                return (objectName != null && objectName.contains("static/")) ? objectName : "static/" + objectName;
             }
         } catch (Exception e) {
             log.error("桌面客户端获取文件出错！文件路径=[{}]", objectName, e);
