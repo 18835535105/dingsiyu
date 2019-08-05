@@ -464,5 +464,12 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      */
     List<String> selByStudentIdLimitTen(@Param("studentId") Long studentId,@Param("type") int type);
 
-    String selRandWord(@Param("type") Integer  type ,@Param("leng") Integer length);
+    /**
+     *获取火眼精金数据
+     * @param type
+     * @param length
+     * @param max
+     * @return
+     */
+    List<String> selRandWord(@Param("type") Integer  type ,@Param("leng") Integer length,@Param("max") Integer max);
 }

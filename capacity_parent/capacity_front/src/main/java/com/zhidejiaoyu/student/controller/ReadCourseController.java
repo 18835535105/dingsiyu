@@ -55,7 +55,12 @@ public class ReadCourseController extends BaseController {
         return readService.getStudyCourse(session, unitId, grade);
     }
 
-
+    /**
+     * 获取数据
+     * @param typeId        类型id
+     * @param courseId      课程id
+     * @return
+     */
     @RequestMapping("/getContent")
     public ServerResponse<Object> getContent(Long typeId, Long courseId) {
         return readService.getContent(typeId, courseId);
