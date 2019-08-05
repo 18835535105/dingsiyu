@@ -2,17 +2,16 @@ package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.mapper.MemoryCapacityMapper;
-import com.zhidejiaoyu.common.mapper.RunLogMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.MemoryCapacity;
-import com.zhidejiaoyu.common.pojo.RunLog;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.service.MemoryCapacityService;
 import com.zhidejiaoyu.student.utils.PetSayUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +27,7 @@ import java.util.*;
  * @author zdjy
  * @since 2019-07-29
  */
+@Slf4j
 @Service
 public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMapper, MemoryCapacity> implements MemoryCapacityService {
 
@@ -35,8 +35,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
     private MemoryCapacityMapper memoryCapacityMapper;
     @Autowired
     private PetSayUtil petSayUtil;
-    @Autowired
-    private RunLogMapper runLogMapper;
+
     @Autowired
     private StudentMapper studentMapper;
     @Autowired
@@ -106,9 +105,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                 memoryCapacity.setType(1);
                 memoryCapacityMapper.insert(memoryCapacity);
 
-                RunLog runLog = new RunLog(student.getId(), 4, "学生[" + student.getStudentName() + "]在记忆容量《"
-                        + grade + "》中奖励#" + gold + "#枚金币", date);
-                runLogMapper.insert(runLog);
+                super.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在记忆容量《" + grade + "》中奖励#" + gold + "#枚金币");
                 student.setSystemGold(student.getSystemGold() + gold);
                 student.setEnergy(student.getEnergy() + enger);
                 studentMapper.updateById(student);
@@ -167,12 +164,12 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         memoryCapacity.setStudentId(student.getId());
         memoryCapacity.setType(type);
         memoryCapacityMapper.insert(memoryCapacity);
-        RunLog runLog = new RunLog(student.getId(), 4, "学生[" + student.getStudentName() + "]在"+model
-                + "中奖励#" + gold + "#枚金币", date);
-        runLogMapper.insert(runLog);
+
         student.setSystemGold(student.getSystemGold() + gold);
         student.setEnergy(student.getEnergy() + energy);
         studentMapper.updateById(student);
+
+        super.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在" + model + "中奖励#" + gold + "#枚金币");
     }
 
     @Override
