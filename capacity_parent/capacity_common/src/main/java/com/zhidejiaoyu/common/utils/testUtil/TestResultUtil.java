@@ -660,10 +660,12 @@ public class TestResultUtil implements Serializable {
                                 String longStr = new String(new char[]{longChar});
                                 if (Pattern.matches(END_MATCH2, s1)) {
                                     sb.append(s1);
-                                }else{
-                                    rightList.add(sb.toString().replace("#", " ").replace("$", ""));
-                                    orderList.add(sb.toString().replace("#", " ").replace("$", ""));
-                                    sb.setLength(0);
+                                } else {
+                                    if (sb.length() > 0) {
+                                        rightList.add(sb.toString().replace("#", " ").replace("$", ""));
+                                        orderList.add(sb.toString().replace("#", " ").replace("$", ""));
+                                        sb.setLength(0);
+                                    }
                                     rightList.add(s1);
                                 }
                             } else {

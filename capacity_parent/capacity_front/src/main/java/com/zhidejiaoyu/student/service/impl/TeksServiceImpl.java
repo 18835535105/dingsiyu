@@ -896,8 +896,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     private Map<String, Object> packageResultMap(Student student, WordUnitTestDTO wordUnitTestDTO, Integer point, Integer goldCount, TestRecord testRecord, String model) {
         Map<String, Object> map = new HashMap<>(16);
-        int number = testRecordMapper.selCount(student.getId(), wordUnitTestDTO.getCourseId(), wordUnitTestDTO.getUnitId()[0],
-                commonMethod.getTestType(wordUnitTestDTO.getClassify()), model);
+        int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
+                testRecord.getStudyModel(), model);
         int energy = super.getEnergy(student, wordUnitTestDTO.getPoint(), number);
         map.put("energy", energy);
         map.put("gold", goldCount);

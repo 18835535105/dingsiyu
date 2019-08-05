@@ -811,11 +811,14 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         }
         int errorCount = errorWord == null ? 0 : errorWord.length;
         int rightCount = correctWord == null ? 0 : correctWord.length;
-
-        int number = testRecordMapper.selCount(student.getId(), courseId, unitId[0],
-                commonMethod.getTestType(classify), genre);
+        Long uID = (unitId == null || unitId.length == 0) ? null : unitId[0];
         //获取单元闯关获取的能量数量
         TestResultVo vo = new TestResultVo();
+        int number =0;
+        if(uID!=null){
+            number=testRecordMapper.selCount(student.getId(), courseId, unitId[0],
+                    commonMethod.getTestType(classify), genre);
+        }
         vo.setEnergy(getEnergy(student, point, number));
 
         // 把已学测试,生词测试,熟词测试保存慧追踪中

@@ -356,8 +356,8 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
                 // 最大可保存时间
                 long maxTime = timeDifference / 1000;
                 if (maxTime < dto.getValid()) {
-                    log.warn("学生 [{} -{} - {}] 保存有效时长过大！classify=[{}], courseId=[{}], unitId=[{}], validTime=[{}s], 实际最大可保存为[{}s]",
-                            student.getId(), student.getAccount(), student.getStudentName(), dto.getClassify(), dto.getCourseId(), dto.getUnitId(), dto.getValid(), maxTime);
+                    log.warn("学生 [{} -{} - {}] 保存有效时长过大！classify=[{}], courseId=[{}], unitId=[{}], validTime=[{}s], 实际最大可保存为[{}s], num=[{}]",
+                            student.getId(), student.getAccount(), student.getStudentName(), dto.getClassify(), dto.getCourseId(), dto.getUnitId(), dto.getValid(), maxTime, dto.getNum());
                     dto.setValid(maxTime);
                     return maxTime;
                 }
