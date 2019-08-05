@@ -190,6 +190,26 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @Scheduled(cron = "0 20 0 * * ?")
+    @Override
+    public void updatFrozen() {
+        int localPort = ServiceInfoUtil.getPort();
+        if (port != localPort) {
+            return;
+        }
+        log.info("定时任务 -> 给每个冻结用户增加一天...");
+        List<Student> studentList=studentMapper.getAllFrozenStudent();
+        for(Student student:studentList){
+            Calendar c = Calendar.getInstance();
+            c.add(Calendar.DAY_OF_MONTH, 1);
+            Date time = c.getTime();
+            student.setAccountTime(time);
+            studentMapper.updateById(student);
+        }
+        log.info("定时任务 -> 给每个冻结用户增加一天结束...");
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     @Scheduled(cron = "0 5 0 1 * ? ")
     @Override
     public void updateClassMonthRank() {

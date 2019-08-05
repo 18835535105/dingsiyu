@@ -609,6 +609,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         } else if (stu.getStatus() != null && stu.getStatus() == 3) {
             // 账号被删除
             return ServerResponse.createByErrorMessage("此账号已被删除");
+        } else if (stu.getStatus() != null && stu.getStatus() == 4) {
+            // 账号被冻结
+            return ServerResponse.createByErrorMessage("账号已被冻结，请联系教管教师");
             // 3.正确
         } else {
             // 封装返回数据
