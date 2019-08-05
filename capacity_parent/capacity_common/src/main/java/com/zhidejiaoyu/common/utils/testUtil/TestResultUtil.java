@@ -631,9 +631,9 @@ public class TestResultUtil implements Serializable {
         // 以字母或数据开头
         final String START_MATCH = "^[a-zA-Z0-9$# '].*";
         // 二次判断以字母或数字结尾
-        final String END_MATCH2 = ".*[a-zA-Z0-9$# '-]$";
+        final String END_MATCH2 = ".*[a-zA-Z0-9$# '@-]$";
         // 二次判断以字母或数据开头
-        final String START_MATCH2 = "^[a-zA-Z0-9$# '-].*";
+        final String START_MATCH2 = "^[a-zA-Z0-9$# '@-].*";
         StringBuilder sb = new StringBuilder();
         for (String s : words) {
             s = s.replace("#", " ").replace("$", "");
