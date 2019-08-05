@@ -1174,4 +1174,17 @@
         order by rand() limit 10
     </select>
 
+    <select id="selRandWord" resultType="string" parameterType="map">
+        select voca.word from vocabulary voca
+        where
+        <if test="type==1">
+             LENGTH(voca.word) &lt; 10
+        </if>
+        <if test="type==2">
+             LENGTH(voca.word) = #{leng}
+        </if>
+        order by rand() limit 1
+    </select>
+
+
 </mapper>

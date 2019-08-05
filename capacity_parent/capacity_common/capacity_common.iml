@@ -22,7 +22,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="aliyun-oss" />
-    <orderEntry type="module" module-name="aliyun-oss" />
     <orderEntry type="library" name="Maven: com.aliyun.oss:aliyun-sdk-oss:3.4.2" level="project" />
     <orderEntry type="library" name="Maven: org.jdom:jdom:1.1" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.jettison:jettison:1.1" level="project" />

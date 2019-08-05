@@ -136,7 +136,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
                     Integer typeCount = readTypeMapper.selCountByCourseId(courseId);
                     //获取课程下所有考试结果
                     Integer recprdCourseId = testRecordMapper.selectReadCountByCourseId(courseId);
-                    if (typeCount.equals(recprdCourseId)) {
+                    if (typeCount <= recprdCourseId) {
                         sMap.put("text", "已完成");
                     } else {
                         sMap.put("text", "未完成");
@@ -417,7 +417,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         map.put("wiseCounsel", readWiseCounsel.getContent());
         ReadCourse readCourse = readCourseMapper.selectById(courseId);
         map.put("courseName", readCourse.getGrade() + "-" + readCourse.getMonth());
-        map.put("title",readArders.get(0).getTitle());
+        map.put("title", readArders.get(0).getTitle());
         getEnglishData(readArders, map);
         //获取考试类型
         Integer type = readArders.get(0).getType();
@@ -503,7 +503,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         String analysis = readChooseBlanks.getAnalysis();
         String content = readChooseBlanks.getContent();
         List<String> contentList = Arrays.asList(content.split("&@&"));
-        List<String> analysisList= Arrays.asList(analysis.split("&@&"));
+        List<String> analysisList = Arrays.asList(analysis.split("&@&"));
         List<Map<String, Object>> list = new ArrayList<>();
         for (int i = 0; i < contentList.size(); i++) {
             Map<String, Object> returnMap = new HashMap<>();

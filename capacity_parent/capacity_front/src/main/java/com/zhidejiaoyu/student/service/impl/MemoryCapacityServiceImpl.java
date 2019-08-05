@@ -150,24 +150,49 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                 enger = 3;
             }
             try {
-                Date date = new Date();
-                MemoryCapacity memoryCapacity = new MemoryCapacity();
-                memoryCapacity.setCreateTime(date);
-                memoryCapacity.setGold(gold);
-                memoryCapacity.setStudentId(student.getId());
-                memoryCapacity.setType(2);
-                memoryCapacityMapper.insert(memoryCapacity);
-                RunLog runLog = new RunLog(student.getId(), 4, "学生[" + student.getStudentName() + "]在眼脑训练"
-                        + "中奖励#" + gold + "#枚金币", date);
-                runLogMapper.insert(runLog);
-                student.setSystemGold(student.getSystemGold() + gold);
-                student.setEnergy(student.getEnergy() + enger);
-                studentMapper.updateById(student);
+                this.saveMemory(student,gold,enger,2,"眼脑训练");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
-        getReturn(point, student, gold, map,enger);
+        getReturn(point, student, gold, map, enger);
+        return ServerResponse.createBySuccess(map);
+    }
+
+    private void saveMemory(Student student,Integer gold,Integer energy,Integer type,String model){
+        Date date = new Date();
+        MemoryCapacity memoryCapacity = new MemoryCapacity();
+        memoryCapacity.setCreateTime(date);
+        memoryCapacity.setGold(gold);
+        memoryCapacity.setStudentId(student.getId());
+        memoryCapacity.setType(type);
+        memoryCapacityMapper.insert(memoryCapacity);
+        RunLog runLog = new RunLog(student.getId(), 4, "学生[" + student.getStudentName() + "]在"+model
+                + "中奖励#" + gold + "#枚金币", date);
+        runLogMapper.insert(runLog);
+        student.setSystemGold(student.getSystemGold() + gold);
+        student.setEnergy(student.getEnergy() + energy);
+        studentMapper.updateById(student);
+    }
+
+    @Override
+    public ServerResponse<Object> savePinkeye(HttpSession session, Integer point) {
+        Student student = getStudent(session);
+        Integer count = memoryCapacityMapper.selTodayMemoryCapacity(student.getId(), 3);
+        Map<String, Object> map = new HashMap<>();
+        Integer gold = 0;
+        if (point == null) {
+            point = 0;
+        }
+        Integer enger = 0;
+        if (count == null || count.equals(0) || student.getRole().equals(4)) {
+            try {
+                this.saveMemory(student,gold,enger,2,"火眼金睛");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        getReturn(point, student, gold, map, enger);
         return ServerResponse.createBySuccess(map);
     }
 
@@ -195,9 +220,9 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                 frequency++;
             }
         }
-        Map<String,Object> answerMap=new HashMap<>();
-        answerMap.put("word",answer);
-        answerMap.put("readUrl",baiduSpeak.getLanguagePath(answer));
+        Map<String, Object> answerMap = new HashMap<>();
+        answerMap.put("word", answer);
+        answerMap.put("readUrl", baiduSpeak.getLanguagePath(answer));
         //获取选项集合
         List<Integer> number = new ArrayList<>();
         number.add(frequency);
@@ -223,6 +248,35 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         return ServerResponse.createBySuccess(map);
     }
 
+    @Override
+    public ServerResponse<Object> getPinkeye() {
+        //获取第一个单词
+        String wordString = vocabularyMapper.selRandWord(1, 0);
+        //第二个单词
+        String wordTwo = null;
+        //随机数判断  小于5一单词 赋值 二单词 大于5重新查找
+        Random random = new Random();
+        Integer rand = random.nextInt(10) + 1;
+        if (rand <= 5) {
+            wordTwo = wordString;
+        } else {
+            wordTwo = vocabularyMapper.selRandWord(2, wordString.length());
+        }
+        //返回集合
+        Map<String, Object> map = new HashMap<>();
+        //判断是否相同
+        if (wordString.equals(wordTwo)) {
+            map.put("isTrue", "0");
+        } else {
+            map.put("isTrue", "1");
+        }
+        map.put("wordOne", wordString);
+        map.put("wordTwo", wordTwo);
+        return ServerResponse.createBySuccess(map);
+    }
+
+
+
     private void wrongAnswer(List<Integer> numbers) {
         while (numbers.size() < 4) {
             getNumber(numbers);
@@ -230,7 +284,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
     }
 
     private void getNumber(List<Integer> numbers) {
-        Integer number = (int) (Math.random() * 10)+1;
+        Integer number = (int) (Math.random() * 10) + 1;
         boolean isFalg = true;
         for (Integer option : numbers) {
             if (option.equals(number)) {

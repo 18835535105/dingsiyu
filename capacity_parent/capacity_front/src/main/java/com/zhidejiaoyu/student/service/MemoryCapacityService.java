@@ -22,4 +22,8 @@ public interface MemoryCapacityService extends BaseService<MemoryCapacity> {
     ServerResponse<Object> saveTrain(HttpSession session, Integer point);
 
     ServerResponse<Object> getTrainTest(HttpSession session);
+
+    ServerResponse<Object> getPinkeye();
+
+    ServerResponse<Object> savePinkeye(HttpSession session, Integer point);
 }

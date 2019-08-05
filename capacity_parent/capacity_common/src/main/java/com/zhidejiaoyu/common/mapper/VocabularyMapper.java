@@ -463,4 +463,6 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @param type  1，查询已学的单词  2查询全部单词
      */
     List<String> selByStudentIdLimitTen(@Param("studentId") Long studentId,@Param("type") int type);
+
+    String selRandWord(@Param("type") Integer  type ,@Param("leng") Integer length);
 }

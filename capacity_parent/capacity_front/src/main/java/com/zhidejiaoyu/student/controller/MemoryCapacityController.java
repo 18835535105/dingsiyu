@@ -60,13 +60,26 @@ public class MemoryCapacityController {
     }
 
     /**
-     *
+     *获取眼脑训练题目
      */
     @RequestMapping("/getTrainTest")
     public ServerResponse<Object> getTrainTest(HttpSession session){
         return memoryCapacityService.getTrainTest(session);
     }
 
+    /**
+     * 火焰金晶获取单词
+     * @return
+     */
+    @RequestMapping("/getPinkeye")
+    public ServerResponse<Object> getPinkeye(){
+        return memoryCapacityService.getPinkeye();
+    }
+
+    @RequestMapping("/savePinkeye")
+    public ServerResponse<Object> savePinkeye(HttpSession session,Integer point){
+        return memoryCapacityService.savePinkeye(session,point);
+    }
 
 }
 
