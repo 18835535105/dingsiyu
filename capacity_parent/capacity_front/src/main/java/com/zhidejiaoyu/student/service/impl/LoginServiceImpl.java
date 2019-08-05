@@ -866,7 +866,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      */
     private void saveDailyAward(Student stu) {
         int count = runLogMapper.countStudentTodayLogin(stu);
-        if (count == 1) {
+        if (count <= 1) {
             executorService.execute(() -> {
                 // 每日首次登陆日奖励
                 dailyAwardAsync.firstLogin(stu);
@@ -915,9 +915,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             logger.error("获取学生登录IP地址出错，error=[{}]", e.getMessage());
         }
 
-        RunLog runLog = new RunLog(stu.getId(), 1, "学生[" + stu.getStudentName() + "]登录,ip=[" + ip + "]", new Date());
         try {
-            runLogMapper.insert(runLog);
+            super.saveRunLog(stu,1, "学生[" + stu.getStudentName() + "]登录,ip=[" + ip + "]");
         } catch (Exception e) {
             logger.error("学生 {} -> {} 登录信息记录失败！ExceptionMsg:{}", stu.getId(), stu.getStudentName(), e.getMessage(), e);
         }
