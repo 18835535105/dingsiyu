@@ -58,11 +58,11 @@ public class TestResultUtil implements Serializable {
     /**
      * 以字母或数字结尾
      */
-    final String END_MATCH_CHAINESE = ".*[a-zA-z0-9\\u4e00-\\u9fa5@]$";
+    final String END_MATCH_CHAINESE = ".*[a-zA-z0-9\\u4e00-\\u9fa5@-]$";
     /**
      * 以字母或数据开头
      */
-    final String START_MATCH_CHAINESE = "^[a-zA-z0-9\\u4e00-\\u9fa5@].*";
+    final String START_MATCH_CHAINESE = "^[a-zA-z0-9\\u4e00-\\u9fa5@-].*";
 
     /**
      *
