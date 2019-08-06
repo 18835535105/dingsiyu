@@ -754,9 +754,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         int count = testRecordMapper.insertSelective(testRecord);
         if (count == 0) {
             String errMsg = "id为 " + student.getId() + " 的学生 " + student.getStudentName() + " 游戏测试记录保存失败！";
+            super.saveRunLog(student, 2, errMsg);
             log.error(errMsg);
-            RunLog runLog = new RunLog(2, errMsg, new Date());
-            runLogMapper.insertSelective(runLog);
         }
     }
 
@@ -806,9 +805,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         int count = testRecordMapper.updateByPrimaryKeySelective(testRecord);
         if (count == 0) {
             String errMsg = "id为 " + student.getId() + " 的学生 " + student.getStudentName() + " 更新游戏测试记录失败！";
+            super.saveRunLog(student, 2, errMsg);
             log.error(errMsg);
-            RunLog runLog = new RunLog(2, errMsg, new Date());
-            runLogMapper.insert(runLog);
         }
     }
 
@@ -1199,7 +1197,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Student student = getStudent(session);
         if (StringUtils.isEmpty(student.getPetName())) {
             student.setPetName("大明白");
-            student.setPartUrl(PetImageConstant.DEFAULT_IMG);
+            student.setPartUrl(PetImageConstant.DEFAULT_IMG.replace(AliyunInfoConst.host, ""));
         }
 
         TestResultVo vo = new TestResultVo();
@@ -1305,7 +1303,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Student student = getStudent(session);
         if (StringUtils.isEmpty(student.getPetName())) {
             student.setPetName("大明白");
-            student.setPartUrl(PetImageConstant.DEFAULT_IMG);
+            student.setPartUrl(PetImageConstant.DEFAULT_IMG.replace(AliyunInfoConst.host, ""));
         }
 
         TestResultVo vo = new TestResultVo();
@@ -1523,10 +1521,13 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         } else {
             msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + goldCount + "#枚金币";
         }
-        RunLog runLog = new RunLog(student.getId(), 4, msg, new Date());
-        runLog.setCourseId(student.getCourseId());
-        runLog.setUnitId(student.getUnitId());
-        runLogMapper.insert(runLog);
+        try {
+            Long courseId = wordUnitTestDTO == null ? null : wordUnitTestDTO.getCourseId();
+            Long unitId = (wordUnitTestDTO == null || wordUnitTestDTO.getUnitId() == null || wordUnitTestDTO.getUnitId().length == 0) ? null : wordUnitTestDTO.getUnitId()[0];
+            super.saveRunLog(student, 4, courseId, unitId, msg);
+        } catch (Exception e) {
+            log.error("保存学生[{} - {} - {}]日志记录出错！", student.getId(), student.getAccount(), student.getStudentName(), e);
+        }
         log.info(msg);
     }
 
