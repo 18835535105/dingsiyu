@@ -327,6 +327,8 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             }
             map.put("partList", partList);
         }
+        ReadCourse readCourse = readCourseMapper.selectById(courseId);
+        map.put("courseName",readCourse.getGrade()+"-"+readCourse.getMonth());
         return ServerResponse.createBySuccess(map);
     }
 
@@ -431,6 +433,38 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
 
     }
 
+    private void getReturnEnglisthMap(List<ReadArder> readArders, Map<String, Object> map) {
+        StringBuilder englishBuilder=new StringBuilder();
+        StringBuilder chineseBuilder=new StringBuilder();
+        List<Map<String, Object>> list = new ArrayList<>();
+        int i = 0;
+        for (ReadArder readArder : readArders) {
+            if (i == 0) {
+                englishBuilder.append(readArder.getSentence().replace("#&#",""));
+                chineseBuilder.append(readArder.getTranslate().replace("#&#",""));
+                i++;
+            } else {
+                if (readArder.getSentence().indexOf("#&#") != -1) {
+                    Map<String,Object> sMap=new HashMap<>();
+                    sMap.put("sentence",englishBuilder.toString());
+                    sMap.put("translate",chineseBuilder.toString());
+                    list.add(sMap);
+                    englishBuilder=new StringBuilder();
+                    chineseBuilder=new StringBuilder();
+                }
+                englishBuilder.append(readArder.getSentence().replace("#&#",""));
+                chineseBuilder.append(readArder.getTranslate().replace("#&#",""));
+                i++;
+            }
+            if (i == readArders.size()) {
+                Map<String,Object> sMap=new HashMap<>();
+                sMap.put("sentence",englishBuilder.toString());
+                sMap.put("translate",chineseBuilder.toString());
+                list.add(sMap);
+            }
+        }
+        map.put("sentenceList",list);
+    }
 
     private void getEnglishData(List<ReadArder> readArders, Map<String, Object> map) {
         List<List<ReadArder>> returnList = new ArrayList<>();
