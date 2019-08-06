@@ -773,7 +773,7 @@
     <select id="getAllFrozenStudent"  resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from student where `status` = 4 and account_time is not null
+        from student where `status` = 5 and account_time is not null
     </select>
 
 </mapper>
