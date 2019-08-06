@@ -1563,7 +1563,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setStudyModel(StudyModelContant.PHONETIC_SYMBOL_TEST.getModel());
 
         WordUnitTestDTO wordUnitTestDTO = new WordUnitTestDTO();
-        wordUnitTestDTO.setClassify(10);
+        wordUnitTestDTO.setClassify(11);
         wordUnitTestDTO.setUnitId(new Long[]{dto.getUnitId()});
         wordUnitTestDTO.setPoint(point);
         Integer goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord);
