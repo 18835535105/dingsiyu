@@ -11,7 +11,7 @@ public class ReadContentConstant {
     /**
      * 区分段落标识符
      */
-    public static final String PARAGRAPH_SPLIT = "#@#";
+    public static final String PARAGRAPH_SPLIT = "#&#";
 
     /**
      * 区分句子中挖空的数据
