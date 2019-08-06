@@ -345,10 +345,13 @@ public class CommonMethod implements Serializable {
             } else if (6 == classify) {
                 return "例句默写";
             } else if (7 == classify) {
-                return "课文测试";
+                return "课文默写测试";
             }
             if (classify == 8) {
                 return "音译练习";
+            }
+            if (classify == 9) {
+                return "课文测试";
             }
             if (11 == classify) {
                 return "音标测试";
