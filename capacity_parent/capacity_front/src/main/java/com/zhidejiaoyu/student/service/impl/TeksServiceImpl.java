@@ -781,6 +781,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         wordUnitTestDTO.setClassify(7);
         Integer point = testRecord.getPoint();
         wordUnitTestDTO.setPoint(point);
+        wordUnitTestDTO.setCourseId(aLong);
+        wordUnitTestDTO.setUnitId(new Long[]{testRecord.getUnitId()});
 
         TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), testRecord.getUnitId(), model, model);
 
