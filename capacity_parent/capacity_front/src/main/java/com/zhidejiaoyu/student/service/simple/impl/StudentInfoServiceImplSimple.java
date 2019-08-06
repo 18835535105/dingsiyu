@@ -92,7 +92,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         try {
             if (StringUtils.isEmpty(studentInfo.getPetName())) {
                 studentInfo.setPetName("大明白");
-                studentInfo.setPartUrl(PetImageConstant.DEFAULT_IMG);
+                studentInfo.setPartUrl(PetImageConstant.DEFAULT_IMG.replace(AliyunInfoConst.host, ""));
             }
             int count = simpleStudentMapper.updateByPrimaryKeySelective(studentInfo);
             studentInfo = simpleStudentMapper.selectById(studentInfo.getId());

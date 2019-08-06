@@ -866,7 +866,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      */
     private void saveDailyAward(Student stu) {
         int count = runLogMapper.countStudentTodayLogin(stu);
-        if (count == 1) {
+        if (count <= 1) {
             executorService.execute(() -> {
                 // 每日首次登陆日奖励
                 dailyAwardAsync.firstLogin(stu);
@@ -915,9 +915,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             logger.error("获取学生登录IP地址出错，error=[{}]", e.getMessage());
         }
 
-        RunLog runLog = new RunLog(stu.getId(), 1, "学生[" + stu.getStudentName() + "]登录,ip=[" + ip + "]", new Date());
         try {
-            runLogMapper.insert(runLog);
+            super.saveRunLog(stu,1, "学生[" + stu.getStudentName() + "]登录,ip=[" + ip + "]");
         } catch (Exception e) {
             logger.error("学生 {} -> {} 登录信息记录失败！ExceptionMsg:{}", stu.getId(), stu.getStudentName(), e.getMessage(), e);
         }
@@ -951,12 +950,13 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             Date loginOutTime = DateUtil.parseYYYYMMDDHHMMSS(new Date());
             //存放登入退出时间
             redisTemplate.opsForHash().put(RedisKeysConst.STUDENT_LOGINOUT_TIME, student.getId(), DateUtil.DateTime(new Date()));
+            // 清除学生的登录信息
+            redisTemplate.opsForHash().delete(RedisKeysConst.LOGIN_SESSION, student.getId());
             if (loginTime != null && loginOutTime != null) {
                 // 判断当前登录时间是否已经记录有在线时长信息，如果没有插入记录，如果有无操作
                 int count = durationMapper.countOnlineTimeWithLoginTime(student, loginTime);
                 if (count == 0) {
-                    redisTemplate.opsForHash().delete(RedisKeysConst.LOGIN_SESSION, student.getId());
-
+                    
                     Long onlineTime = (loginOutTime.getTime() - loginTime.getTime()) / 1000;
                     Duration duration = new Duration();
                     duration.setStudentId(student.getId());

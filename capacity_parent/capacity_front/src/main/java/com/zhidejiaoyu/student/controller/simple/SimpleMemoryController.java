@@ -68,7 +68,7 @@ public class SimpleMemoryController {
                                                  Integer total, @NotNull Integer type) {
         if (learn.getVocabularyId() == null) {
             Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-            log.error("保存单词信息时单词id=null, studentId=[{}], learn=[{}], type=[{}]", student.getId(), learn, type);
+            log.error("保存单词信息时参数错误：单词id=null, studentId=[{}], learn=[{}], type=[{}]", student.getId(), learn, type);
             return ServerResponse.createBySuccess("ok");
         }
         return simpleMemoryService.saveMemoryWord(session, learn, isKnown, plan, total, type);

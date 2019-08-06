@@ -359,10 +359,8 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
         try {
             learnMapper.insertList(nextLearns);
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("再学一遍初始化下一遍学习记录时失败！");
-            RunLog runLog = new RunLog(2, "再学一遍初始化下一遍学习记录时失败！", new Date());
-            runLogMapper.insert(runLog);
+            log.error("再学一遍初始化下一遍学习记录时失败！", e);
+            super.saveRunLog(student, 2, "再学一遍初始化下一遍学习记录时失败！");
             return ServerResponse.createByErrorMessage("初始化学习记录失败！");
         }
 
@@ -377,8 +375,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
             studyCountMapper.insert(studyCount);
         } catch (Exception e) {
             log.error("新增再学一遍记录失败！", e);
-            RunLog runLog = new RunLog(2, "新增再学一遍记录失败！", new Date());
-            runLogMapper.insert(runLog);
+            super.saveRunLog(student, 2, "新增再学一遍记录失败！");
             return ServerResponse.createByErrorMessage("新增再学一遍记录失败！");
         }
         return ServerResponse.createBySuccess();

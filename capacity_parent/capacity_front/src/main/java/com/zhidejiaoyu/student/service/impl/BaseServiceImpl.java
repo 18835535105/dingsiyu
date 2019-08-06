@@ -153,13 +153,13 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
     }
 
     @Override
-    public void saveRunLog(Integer type, Long courseId, Long unitId, String msg) {
-        saveRunLog.saveRunLog(type, courseId, unitId, msg);
+    public void saveRunLog(Student student, Integer type, Long courseId, Long unitId, String msg) {
+        saveRunLog.saveRunLog(student, type, courseId, unitId, msg);
     }
 
     @Override
-    public void saveRunLog(Integer type, String msg) {
-        saveRunLog.saveRunLog(type, msg);
+    public void saveRunLog(Student student, Integer type, String msg) throws RuntimeException {
+        saveRunLog.saveRunLog(student, type, msg);
     }
 
     /**
