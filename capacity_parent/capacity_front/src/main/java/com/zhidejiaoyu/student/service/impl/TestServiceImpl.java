@@ -97,9 +97,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     private TestRecordMapper testRecordMapper;
 
     @Autowired
-    private RunLogMapper runLogMapper;
-
-    @Autowired
     private UnitMapper unitMapper;
 
     @Autowired
@@ -1521,12 +1518,14 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         } else {
             msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + goldCount + "#枚金币";
         }
-        try {
-            Long courseId = wordUnitTestDTO == null ? null : wordUnitTestDTO.getCourseId();
-            Long unitId = (wordUnitTestDTO == null || wordUnitTestDTO.getUnitId() == null || wordUnitTestDTO.getUnitId().length == 0) ? null : wordUnitTestDTO.getUnitId()[0];
-            super.saveRunLog(student, 4, courseId, unitId, msg);
-        } catch (Exception e) {
-            log.error("保存学生[{} - {} - {}]日志记录出错！", student.getId(), student.getAccount(), student.getStudentName(), e);
+        if (goldCount > 0) {
+            try {
+                Long courseId = wordUnitTestDTO == null ? null : wordUnitTestDTO.getCourseId();
+                Long unitId = (wordUnitTestDTO == null || wordUnitTestDTO.getUnitId() == null || wordUnitTestDTO.getUnitId().length == 0) ? null : wordUnitTestDTO.getUnitId()[0];
+                super.saveRunLog(student, 4, courseId, unitId, msg);
+            } catch (Exception e) {
+                log.error("保存学生[{} - {} - {}]日志记录出错！", student.getId(), student.getAccount(), student.getStudentName(), e);
+            }
         }
         log.info(msg);
     }
