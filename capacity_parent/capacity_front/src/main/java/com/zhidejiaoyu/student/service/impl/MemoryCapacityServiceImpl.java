@@ -191,8 +191,9 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         student.setSystemGold(student.getSystemGold() + gold);
         student.setEnergy(student.getEnergy() + energy);
         studentMapper.updateById(student);
-
-        super.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在" + model + "中奖励#" + gold + "#枚金币");
+        if (gold > 0) {
+            super.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在" + model + "中奖励#" + gold + "#枚金币");
+        }
     }
 
     @Override
