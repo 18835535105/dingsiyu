@@ -26,4 +26,6 @@ public interface MemoryCapacityService extends BaseService<MemoryCapacity> {
     ServerResponse<Object> getPinkeye();
 
     ServerResponse<Object> savePinkeye(HttpSession session, Integer point);
+
+    ServerResponse<Object> saveBrain(HttpSession session, Integer point);
 }

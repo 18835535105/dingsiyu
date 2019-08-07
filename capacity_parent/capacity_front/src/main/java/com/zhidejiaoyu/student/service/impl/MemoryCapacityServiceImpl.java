@@ -123,11 +123,25 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         Student student = getStudent(session);
         Integer count = memoryCapacityMapper.selTodayMemoryCapacity(student.getId(), 2);
         Map<String, Object> map = new HashMap<>();
-        Integer gold = 0;
+        getGoldeAndEnteger(count,student,point,2,"眼脑训练",map);
+        return ServerResponse.createBySuccess(map);
+    }
+
+    /**
+     * 获取返回数据
+     * @param count
+     * @param student
+     * @param point
+     * @param type
+     * @param model
+     * @param map
+     */
+    private void getGoldeAndEnteger(Integer count,Student student,Integer point,Integer type,String model,Map<String,Object> map) {
+        Integer gold=0;
+        Integer enger=0;
         if (point == null) {
             point = 0;
         }
-        Integer enger = 0;
         if (count == null || count.equals(0) || student.getRole().equals(4)) {
             //当前为第一次测试 添加金币
             //根据等级添加金币
@@ -148,16 +162,24 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                 enger = 3;
             }
             try {
-                this.saveMemory(student,gold,enger,2,"眼脑训练");
+                this.saveMemory(student, gold, enger, type, model);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
         getReturn(point, student, gold, map, enger);
+    }
+
+    @Override
+    public ServerResponse<Object> saveBrain(HttpSession session, Integer point) {
+        Student student = getStudent(session);
+        Integer count = memoryCapacityMapper.selTodayMemoryCapacity(student.getId(), 2);
+        Map<String, Object> map = new HashMap<>();
+        getGoldeAndEnteger(count,student,point,3,"最强大脑",map);
         return ServerResponse.createBySuccess(map);
     }
 
-    private void saveMemory(Student student,Integer gold,Integer energy,Integer type,String model){
+    private void saveMemory(Student student, Integer gold, Integer energy, Integer type, String model) {
         Date date = new Date();
         MemoryCapacity memoryCapacity = new MemoryCapacity();
         memoryCapacity.setCreateTime(date);
@@ -193,6 +215,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         getReturn(point, student, gold, map, enger);
         return ServerResponse.createBySuccess(map);
     }
+
 
     @Override
     public ServerResponse<Object> getTrainTest(HttpSession session) {
@@ -278,7 +301,6 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         }
         return ServerResponse.createBySuccess(arrayList);
     }
-
 
 
     private void wrongAnswer(List<Integer> numbers) {

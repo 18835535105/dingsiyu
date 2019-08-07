@@ -27,7 +27,7 @@ public class MemoryCapacityController {
     /**
      * 判断学生是否可以进入记忆容量
      * @param session
-     * @param type      1，记忆容量  2，眼脑训练   3，火眼精金
+     * @param type      1，记忆容量  2，眼脑训练   3，火眼精金  4，最强大脑
      * @return
      */
     @RequestMapping("/getEnterMemoryCapacity")
@@ -88,6 +88,17 @@ public class MemoryCapacityController {
     @RequestMapping("/savePinkeye")
     public ServerResponse<Object> savePinkeye(HttpSession session,Integer point){
         return memoryCapacityService.savePinkeye(session,point);
+    }
+
+    /**
+     * 保存最强大脑数据
+     * @param session
+     * @param point
+     * @return
+     */
+    @RequestMapping("/saveBrain")
+    public ServerResponse<Object> saveBrain(HttpSession session,Integer point){
+        return memoryCapacityService.saveBrain(session,point);
     }
 
 }
