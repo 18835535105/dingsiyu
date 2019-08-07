@@ -262,6 +262,8 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
             list.add(map);
         }
         Map<String, Object> map = new HashMap<>();
+        //打乱数据顺序
+        Collections.shuffle(returnList);
         map.put("list", returnList);
         map.put("answer", answerMap);
         Collections.shuffle(list);

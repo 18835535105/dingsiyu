@@ -1009,12 +1009,14 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         Student student = getStudent(session);
         Map<String, Object> map = new HashMap<>();
         boolean isHave = false;
+        //判断是否有智慧单词课程
         if (type.equals(1)) {
             CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selByStudentIdAndType(student.getId(), type);
             if (capacityStudentUnit != null) {
                 isHave = true;
             }
         }
+        //判断是否有句型，课文课程
         if (type.equals(2) || type.equals(3)) {
             List<Map<String, Object>> maps = null;
             if (type == 2) {
@@ -1026,6 +1028,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 isHave = true;
             }
         }
+        //判断是否有字母课程
         if (type.equals(4)) {
             StudentStudyPlan letterPlan = studentStudyPlanMapper.selSymbolByStudentId(student.getId());
             StudentStudyPlan symbolPlan = studentStudyPlanMapper.selLetterByStudentId(student.getId());
@@ -1033,9 +1036,11 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 isHave = true;
             }
         }
+        //判断是否有绝招好课课程
         if (type.equals(5)) {
             isHave = true;
         }
+        //判断是否有阅读课程
         if (type.equals(6)) {
             StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selReadByStudentId(student.getId());
             if(studentStudyPlan!=null){
