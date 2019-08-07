@@ -175,7 +175,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         Student student = getStudent(session);
         Integer count = memoryCapacityMapper.selTodayMemoryCapacity(student.getId(), 2);
         Map<String, Object> map = new HashMap<>();
-        getGoldeAndEnteger(count,student,point,3,"最强大脑",map);
+        getGoldeAndEnteger(count,student,point,4,"最强大脑",map);
         return ServerResponse.createBySuccess(map);
     }
 
@@ -207,7 +207,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         Integer enger = 0;
         if (count == null || count.equals(0) || student.getRole().equals(4)) {
             try {
-                this.saveMemory(student, gold, enger, 2, "火眼金睛");
+                this.saveMemory(student, gold, enger, 3, "火眼金睛");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
