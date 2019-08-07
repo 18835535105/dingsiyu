@@ -21,6 +21,7 @@ import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.TeksService;
 import com.zhidejiaoyu.student.utils.PetSayUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.regex.Pattern;
 
-
+@Slf4j
 @Service
 public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implements TeksService {
 
@@ -101,9 +102,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Autowired
     private StudentMapper studentMapper;
-
-    @Autowired
-    private RunLogMapper runLogMapper;
 
     @Autowired
     private VoiceMapper voiceMapper;
@@ -783,6 +781,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         wordUnitTestDTO.setClassify(7);
         Integer point = testRecord.getPoint();
         wordUnitTestDTO.setPoint(point);
+        wordUnitTestDTO.setCourseId(aLong);
+        wordUnitTestDTO.setUnitId(new Long[]{testRecord.getUnitId()});
 
         TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), testRecord.getUnitId(), model, model);
 
@@ -884,10 +884,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         } else {
             msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + goldCount + "#枚金币";
         }
-        RunLog runLog = new RunLog(student.getId(), 4, msg, new Date());
-        runLog.setCourseId(student.getCourseId());
-        runLog.setUnitId(student.getUnitId());
-        runLogMapper.insert(runLog);
+        try {
+            super.saveRunLog(student, 4, msg);
+        } catch (RuntimeException e) {
+            log.error("保存学生[{} - {} - {}]日志出错！msg=[{}]", student.getId(), student.getAccount(), student.getStudentName(), msg, e);
+        }
     }
 
     private Map<String, Object> packageResultMap(Student student, WordUnitTestDTO wordUnitTestDTO, Integer point, Integer goldCount, TestRecord testRecord, String model) {
