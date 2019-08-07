@@ -144,7 +144,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         }
         if (count == null || count.equals(0) || student.getRole().equals(4)) {
             //当前为第一次测试 添加金币
-            //根据等级添加金币
+            //根据分数添加金币
             if (point > 20 && point <= 36) {
                 gold = 1;
                 enger = 1;
@@ -169,6 +169,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         }
         getReturn(point, student, gold, map, enger);
     }
+
 
     @Override
     public ServerResponse<Object> saveBrain(HttpSession session, Integer point) {
@@ -201,19 +202,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         Student student = getStudent(session);
         Integer count = memoryCapacityMapper.selTodayMemoryCapacity(student.getId(), 3);
         Map<String, Object> map = new HashMap<>();
-        Integer gold = 0;
-        if (point == null) {
-            point = 0;
-        }
-        Integer enger = 0;
-        if (count == null || count.equals(0) || student.getRole().equals(4)) {
-            try {
-                this.saveMemory(student, gold, enger, 3, "火眼金睛");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        getReturn(point, student, gold, map, enger);
+        getGoldeAndEnteger(count,student,point,3,"火眼金睛",map);
         return ServerResponse.createBySuccess(map);
     }
 
