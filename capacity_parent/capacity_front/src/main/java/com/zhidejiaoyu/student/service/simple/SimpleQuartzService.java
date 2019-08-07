@@ -45,6 +45,11 @@ public interface SimpleQuartzService {
     void updateClassMonthRank();
 
     /**
+     * 每天0：30给每一个冻结用户增加一天
+     */
+    void updatFrozen();
+
+    /**
      * 每天早上2：0：0执行
      */
     void deleteSessionMap();

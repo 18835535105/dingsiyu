@@ -39,18 +39,30 @@ public class TestResultUtil implements Serializable {
     @Autowired
     private VocabularyMapper vocabularyMapper;
 
-    // 以字母或数字结尾
+    /**
+     * 以字母或数字结尾
+     */
     final String END_MATCH = ".*[a-zA-Z0-9$# ']$";
-    // 以字母或数据开头
+    /**
+     * 以字母或数据开头
+     */
     final String START_MATCH = "^[a-zA-Z0-9$# '].*";
-    // 二次判断以字母或数字结尾
+    /**
+     * 二次判断以字母或数字结尾
+     */
     final String END_MATCH2 = ".*[a-zA-Z0-9$# '@-]$";
-    // 二次判断以字母或数据开头
+    /**
+     * 二次判断以字母或数据开头
+     */
     final String START_MATCH2 = "^[a-zA-Z0-9$# '@-].*";
-    // 以字母或数字结尾
-    final String END_MATCH_CHAINESE = ".*[a-zA-z0-9\\u4e00-\\u9fa5@]$";
-    // 以字母或数据开头
-    final String START_MATCH_CHAINESE = "^[a-zA-z0-9\\u4e00-\\u9fa5@].*";
+    /**
+     * 以字母或数字结尾
+     */
+    final String END_MATCH_CHAINESE = ".*[a-zA-z0-9\\u4e00-\\u9fa5@-]$";
+    /**
+     * 以字母或数据开头
+     */
+    final String START_MATCH_CHAINESE = "^[a-zA-z0-9\\u4e00-\\u9fa5@-].*";
 
     /**
      *
