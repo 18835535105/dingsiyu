@@ -890,10 +890,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         } else {
             msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + goldCount + "#枚金币";
         }
-        try {
-            super.saveRunLog(student, 4, msg);
-        } catch (RuntimeException e) {
-            log.error("保存学生[{} - {} - {}]日志出错！msg=[{}]", student.getId(), student.getAccount(), student.getStudentName(), msg, e);
+        if (goldCount > 0) {
+            try {
+                super.saveRunLog(student, 4, msg);
+            } catch (RuntimeException e) {
+                log.error("保存学生[{} - {} - {}]日志出错！msg=[{}]", student.getId(), student.getAccount(), student.getStudentName(), msg, e);
+            }
         }
     }
 
