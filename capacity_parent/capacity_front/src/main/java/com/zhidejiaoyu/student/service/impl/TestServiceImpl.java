@@ -1513,10 +1513,10 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldCount));
         String msg;
         if (wordUnitTestDTO != null) {
-            msg = "id为：" + student.getId() + "的学生在" + commonMethod.getTestType(wordUnitTestDTO.getClassify())
-                    + " 模块下的单元闯关测试中闯关成功，获得#" + goldCount + "#枚金币";
+            msg = "id为：" + student.getId() + "的学生在[" + commonMethod.getTestType(wordUnitTestDTO.getClassify())
+                    + "]模块下的单元闯关测试中闯关成功，获得#" + goldCount + "#枚金币";
         } else {
-            msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + goldCount + "#枚金币";
+            msg = "id为：" + student.getId() + "的学生在[" + model + "]模块下，获得#" + goldCount + "#枚金币";
         }
         if (goldCount > 0) {
             try {

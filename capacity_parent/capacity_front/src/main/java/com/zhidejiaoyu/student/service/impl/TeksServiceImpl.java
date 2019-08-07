@@ -885,10 +885,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         studentMapper.updateByPrimaryKeySelective(student);
         String msg;
         if (classify != null) {
-            msg = "id为：" + student.getId() + "的学生在" + commonMethod.getTestType(classify)
-                    + " 模块下的单元闯关测试中首次闯关成功，获得#" + goldCount + "#枚金币";
+            msg = "id为：" + student.getId() + "的学生在[" + commonMethod.getTestType(classify)
+                    + "]模块下的单元闯关测试中首次闯关成功，获得#" + goldCount + "#枚金币";
         } else {
-            msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + goldCount + "#枚金币";
+            msg = "id为：" + student.getId() + "的学生在[" + model + "]模块下，获得#" + goldCount + "#枚金币";
         }
         if (goldCount > 0) {
             try {
