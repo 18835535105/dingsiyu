@@ -106,10 +106,13 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                 memoryCapacity.setType(1);
                 memoryCapacityMapper.insert(memoryCapacity);
 
-                super.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在记忆容量《" + grade + "》中奖励#" + gold + "#枚金币");
                 student.setSystemGold(student.getSystemGold() + gold);
                 student.setEnergy(student.getEnergy() + enger);
                 studentMapper.updateById(student);
+
+                if (gold > 0) {
+                    super.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在记忆容量《" + grade + "》中奖励#" + gold + "#枚金币");
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
