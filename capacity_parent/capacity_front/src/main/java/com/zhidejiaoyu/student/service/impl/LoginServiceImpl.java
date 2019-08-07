@@ -1036,6 +1036,12 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         if (type.equals(5)) {
             isHave = true;
         }
+        if (type.equals(6)) {
+            StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selReadByStudentId(student.getId());
+            if(studentStudyPlan!=null){
+                isHave = true;
+            }
+        }
         map.put("isHave", isHave);
         return ServerResponse.createBySuccess(map);
     }

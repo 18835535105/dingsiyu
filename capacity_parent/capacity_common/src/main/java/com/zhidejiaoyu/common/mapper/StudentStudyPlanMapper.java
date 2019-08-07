@@ -82,4 +82,5 @@ public interface StudentStudyPlanMapper extends BaseMapper<StudentStudyPlan> {
     StudentStudyPlan selByCourseIdAndUnitIdAndType(@Param("courseId") Integer courseId,
                                                    @Param("unitId") Long unitId,@Param("type") int type,
                                                    @Param("studentId")Long studentId);
+    StudentStudyPlan selReadByStudentId(@Param("studentId")Long studentId);
 }
