@@ -126,12 +126,13 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         Student student = getStudent(session);
         Integer count = memoryCapacityMapper.selTodayMemoryCapacity(student.getId(), 2);
         Map<String, Object> map = new HashMap<>();
-        getGoldeAndEnteger(count,student,point,2,"眼脑训练",map);
+        getGoldeAndEnteger(count, student, point, 2, "眼脑训练", map);
         return ServerResponse.createBySuccess(map);
     }
 
     /**
      * 获取返回数据
+     *
      * @param count
      * @param student
      * @param point
@@ -139,9 +140,9 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
      * @param model
      * @param map
      */
-    private void getGoldeAndEnteger(Integer count,Student student,Integer point,Integer type,String model,Map<String,Object> map) {
-        Integer gold=0;
-        Integer enger=0;
+    private void getGoldeAndEnteger(Integer count, Student student, Integer point, Integer type, String model, Map<String, Object> map) {
+        Integer gold = 0;
+        Integer enger = 0;
         if (point == null) {
             point = 0;
         }
@@ -179,7 +180,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         Student student = getStudent(session);
         Integer count = memoryCapacityMapper.selTodayMemoryCapacity(student.getId(), 2);
         Map<String, Object> map = new HashMap<>();
-        getGoldeAndEnteger(count,student,point,4,"最强大脑",map);
+        getGoldeAndEnteger(count, student, point, 4, "最强大脑", map);
         return ServerResponse.createBySuccess(map);
     }
 
@@ -205,7 +206,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         Student student = getStudent(session);
         Integer count = memoryCapacityMapper.selTodayMemoryCapacity(student.getId(), 3);
         Map<String, Object> map = new HashMap<>();
-        getGoldeAndEnteger(count,student,point,3,"火眼金睛",map);
+        getGoldeAndEnteger(count, student, point, 3, "火眼金睛", map);
         return ServerResponse.createBySuccess(map);
     }
 
@@ -213,11 +214,22 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
     @Override
     public ServerResponse<Object> getTrainTest(HttpSession session) {
         Student student = getStudent(session);
+        Integer count = vocabularyMapper.selCountByStudentIdLimitTen(student.getId(), 1);
+        Integer start=0;
+        if (count > 10) {
+            Random random=new Random();
+            start = random.nextInt(count-10);
+        }
         //获取熟词中的单词
-        List<String> strings = vocabularyMapper.selByStudentIdLimitTen(student.getId(), 1);
+        List<String> strings = vocabularyMapper.selByStudentIdLimitTen(student.getId(), 1,start);
         if (strings.size() < 3) {
             //如果不够三个单词查询全部单词
-            strings = vocabularyMapper.selByStudentIdLimitTen(student.getId(), 2);
+            count = vocabularyMapper.selCountByStudentIdLimitTen(student.getId(), 2);
+            if (count > 10) {
+                Random random=new Random();
+                start = random.nextInt(count-10);
+            }
+            strings = vocabularyMapper.selByStudentIdLimitTen(student.getId(), 2,start);
         }
         List<String> returnList = new ArrayList<>();
         //获取展示数据
