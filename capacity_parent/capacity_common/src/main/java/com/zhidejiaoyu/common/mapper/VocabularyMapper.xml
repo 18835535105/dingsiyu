@@ -1169,7 +1169,7 @@
             group by vocabulary_id
         </if>
         <if test="type!=1">
-            where and LENGTH(voca.word) &lt; 10
+            where LENGTH(voca.word) &lt; 10
         </if>
         order by rand() limit 10
     </select>
