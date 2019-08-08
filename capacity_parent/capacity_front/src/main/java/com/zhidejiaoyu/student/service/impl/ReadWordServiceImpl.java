@@ -377,7 +377,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         StringBuilder sb = new StringBuilder();
         for (String sentence : split) {
             String[] words = sentence.split(" ");
-            splitPoint(rightList, sb, words, END_MATCH, START_MATCH);
+            splitPoint(rightList, sb, words);
             rightList.add(ReadContentConstant.PARAGRAPH_SPLIT);
         }
         return rightList;
@@ -392,9 +392,9 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
      * @param endMatch   以指定字符结尾的正则表达式
      * @param startMatch 以指定字符开头的正则表达式
      */
-    static void splitPoint(List<String> rightList, StringBuilder sb, String[] words, String endMatch, String startMatch) {
+    static void splitPoint(List<String> rightList, StringBuilder sb, String[] words) {
         for (String s : words) {
-            if (Pattern.matches(endMatch, s) && Pattern.matches(startMatch, s)) {
+            if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
                 rightList.add(s);
             } else {
                 char[] chars = s.toCharArray();
@@ -405,7 +405,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
                     // 当前下标的数据
                     String s1 = new String(new char[]{aChar});
                     // 是字母或者数字，拼接字符串
-                    if (Pattern.matches(endMatch, s1)) {
+                    if (Pattern.matches(END_MATCH, s1)) {
                         sb.append(s1);
                     } else {
                         if (sb.length() > 0) {
