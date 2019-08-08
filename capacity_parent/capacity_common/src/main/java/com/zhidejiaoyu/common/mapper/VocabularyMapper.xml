@@ -1175,14 +1175,13 @@
     </select>
 
     <select id="selCountByStudentIdLimitTen" resultType="integer" parameterType="map">
-        select count(voca.word) from vocabulary voca
+        select count(distinct voca.id) from vocabulary voca
         <if test="type==1">
             join learn learn on learn.vocabulary_id=voca.id
             where learn.student_id=#{studentId}
             and study_model in ('慧记忆','慧听写','慧默写','单词图鉴','例句听力''例句翻译','例句默写')
             and learn.vocabulary_id is not null
             and LENGTH(voca.word) &lt; 10
-            group by vocabulary_id
         </if>
         <if test="type!=1">
             where LENGTH(voca.word) &lt; 10
