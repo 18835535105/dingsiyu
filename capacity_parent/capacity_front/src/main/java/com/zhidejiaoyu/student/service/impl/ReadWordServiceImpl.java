@@ -389,8 +389,6 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
      * @param rightList  最终返回的单词和符号拆开后的集合
      * @param sb         用于拼接单词
      * @param words      需要处理的单词数据（其中包含符号）
-     * @param endMatch   以指定字符结尾的正则表达式
-     * @param startMatch 以指定字符开头的正则表达式
      */
     static void splitPoint(List<String> rightList, StringBuilder sb, String[] words) {
         for (String s : words) {
