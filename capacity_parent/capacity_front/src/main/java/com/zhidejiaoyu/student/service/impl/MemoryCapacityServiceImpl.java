@@ -178,7 +178,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
     @Override
     public ServerResponse<Object> saveBrain(HttpSession session, Integer point) {
         Student student = getStudent(session);
-        Integer count = memoryCapacityMapper.selTodayMemoryCapacity(student.getId(), 2);
+        Integer count = memoryCapacityMapper.selTodayMemoryCapacity(student.getId(), 4);
         Map<String, Object> map = new HashMap<>();
         getGoldeAndEnteger(count, student, point, 4, "最强大脑", map);
         return ServerResponse.createBySuccess(map);
