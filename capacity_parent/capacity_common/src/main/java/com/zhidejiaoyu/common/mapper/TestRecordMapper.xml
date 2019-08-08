@@ -152,7 +152,7 @@
         select
         <include refid="Base_Column_List"/>
         from test_record where student_id = #{studentId} and unit_id =
-        #{unitId} and genre = #{genre} order by id desc limit 1
+        #{unitId} and genre = #{genre} order by point desc limit 1
     </select>
 
 
