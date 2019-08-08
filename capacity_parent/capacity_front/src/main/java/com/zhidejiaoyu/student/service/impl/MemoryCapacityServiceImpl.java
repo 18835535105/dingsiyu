@@ -217,6 +217,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         Integer count = vocabularyMapper.selCountByStudentIdLimitTen(student.getId(), 1);
         Integer start = 0;
         Random random = new Random();
+        //获取数据查询位置
         if (count > 10) {
             start = random.nextInt(count - 10);
         }
@@ -225,6 +226,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         if (strings.size() < 3) {
             //如果不够三个单词查询全部单词
             count = vocabularyMapper.selCountByStudentIdLimitTen(student.getId(), 2);
+            //获取数据查询位置
             if (count > 10) {
                 start = random.nextInt(count - 10);
             }
