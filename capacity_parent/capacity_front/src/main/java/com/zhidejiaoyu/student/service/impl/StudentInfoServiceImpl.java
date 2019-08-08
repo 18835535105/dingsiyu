@@ -337,6 +337,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
                 tip = getValidTimeTip.saveSimpleGoldAward(session, student, type, validTime, loginTime);
             }
         } else {
+            tip = "本次学习获得金币：0 个。";
             log.error("保存学生[{} -{} - {}]有效时长classify=[null], 请求参数=[{}]", student.getId(), student.getAccount(), student.getStudentName(), dto.toString());
         }
         session.removeAttribute(TimeConstant.BEGIN_VALID_TIME);
