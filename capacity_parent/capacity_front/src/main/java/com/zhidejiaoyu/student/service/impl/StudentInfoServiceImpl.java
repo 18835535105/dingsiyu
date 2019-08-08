@@ -329,11 +329,15 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
         String tip = null;
         Integer classify = dto.getClassify();
-        if (classify <= 6) {
-            tip = getValidTimeTip.saveGoldAward(session, student, classify, validTime, loginTime);
-        } else if (classify >= 14 && classify <= 22) {
-            int type = classify - 13;
-            tip = getValidTimeTip.saveSimpleGoldAward(session, student, type, validTime, loginTime);
+        if (classify != null) {
+            if (classify <= 6) {
+                tip = getValidTimeTip.saveGoldAward(session, student, classify, validTime, loginTime);
+            } else if (classify >= 14 && classify <= 22) {
+                int type = classify - 13;
+                tip = getValidTimeTip.saveSimpleGoldAward(session, student, type, validTime, loginTime);
+            }
+        } else {
+            log.error("保存学生[{} -{} - {}]有效时长classify=[null], 请求参数=[{}]", student.getId(), student.getAccount(), student.getStudentName(), dto.toString());
         }
         session.removeAttribute(TimeConstant.BEGIN_VALID_TIME);
 
