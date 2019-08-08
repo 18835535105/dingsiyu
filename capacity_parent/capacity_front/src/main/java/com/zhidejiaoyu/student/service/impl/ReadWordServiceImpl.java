@@ -291,10 +291,16 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         Map<String, Object> wordInfoMap;
         // 将单词和字符拼接成句子
         StringBuilder sentence = new StringBuilder();
+        int i = 0;
         for (String word : allWords) {
             wordInfoMap = new HashMap<>(16);
             if (ReadContentConstant.PARAGRAPH_SPLIT.equals(word)) {
-                // 整个段落结束
+                sentence.append(" ").append(word);
+                if (i == 0) {
+                    // 第一段开始还没有段落内容，不保存，接着获取当前段落的内容
+                    continue;
+                }
+                // 上一个段落结束，保存上一个段落的内容
                 returnList.add(sentenceInfoList);
                 sentenceInfoList = new ArrayList<>();
             } else if (!Pattern.matches(END_MATCH, word)) {
@@ -311,8 +317,15 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
             } else {
                 // 当前元素是单词，正常拼接
                 packageWordInfoList(wordInfoList, wordInfoMap, word, newWordsMap.containsKey(word));
-                sentence.append(" ").append(word);
+                if (ReadContentConstant.PARAGRAPH_SPLIT.equals(sentence.toString().trim())) {
+                    // 段落标识符后面不加空格
+                    sentence.append(word);
+                } else {
+                    // 正常内容但此后面都加上空格
+                    sentence.append(" ").append(word);
+                }
             }
+            i++;
         }
         return returnList;
     }
