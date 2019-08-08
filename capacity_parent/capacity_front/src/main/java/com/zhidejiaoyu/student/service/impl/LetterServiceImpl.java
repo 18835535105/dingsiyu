@@ -117,8 +117,9 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
 
     /**
      * 获取单元模块开启详情
-     * @param session
-     * @param unitId
+     *
+     * @param session   session
+     * @param unitId    单元id
      * @return
      */
     @Override
@@ -179,19 +180,19 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 //查看学后测试是否开启
                 boolean falg = true;
                 for (Integer letterUnitId : letterUnitIds) {
-                    Integer max=testRecordMapper.selectUnitTestMaxPointByStudyModels(studentId, letterUnitId, 10);
+                    Integer max = testRecordMapper.selectUnitTestMaxPointByStudyModels(studentId, letterUnitId, 10);
                     if (max != null) {
                         if (max < 100) {
                             falg = false;
                         }
-                    }else{
+                    } else {
                         falg = false;
                     }
                 }
-                if(falg){
-                    map.put("LetterPosttest",true);
-                }else{
-                    map.put("LetterPosttest",false);
+                if (falg) {
+                    map.put("LetterPosttest", true);
+                } else {
+                    map.put("LetterPosttest", false);
                 }
             }
 
@@ -203,9 +204,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
 
     @Override
     public Object getLetterListen(Long unitId, HttpSession session) {
-        /**
-         * 查看字母播放器全部数据
-         */
+         //查看字母播放器全部数据
         Long studentId = getStudentId(session);
         StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selLetterSudyByStudentAndUnitId(studentId, unitId);
         if (studentStudyPlan == null) {
@@ -315,26 +314,26 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         Collections.shuffle(options);
         List<Map<String, Object>> returnList = new ArrayList<>();
         if (ranId > 5) {
-            for (int i = 0; i < options.size(); i++) {
+            for (String option : options) {
                 Map<String, Object> returnMap = new HashMap<>();
-                if (studyLetter.getLowercaseLetters().equals(options.get(i))) {
-                    returnMap.put("letter", options.get(i));
+                if (studyLetter.getLowercaseLetters().equals(option)) {
+                    returnMap.put("letter", option);
                     returnMap.put("isTurn", true);
                 } else {
-                    returnMap.put("letter", options.get(i));
+                    returnMap.put("letter", option);
                     returnMap.put("isTurn", false);
                 }
                 returnList.add(returnMap);
             }
         } else {
-            for (int i = 0; i < options.size(); i++) {
+            for (String option : options) {
                 Map<String, Object> returnMap = new HashMap<>();
-                if (studyLetter.getBigLetter().equals(options.get(i))) {
-                    returnMap.put("letter", options.get(i));
+                if (studyLetter.getBigLetter().equals(option)) {
+                    returnMap.put("letter", option);
                     returnMap.put("isTurn", true);
                 } else {
 
-                    returnMap.put("letter", options.get(i));
+                    returnMap.put("letter", option);
                     returnMap.put("isTurn", false);
                 }
                 returnList.add(returnMap);
@@ -395,14 +394,14 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         try {
             LetterPair pair = letterPairMapper.selByLetterIdAndStudent(letterPair.getLetterId(), studentId);
             if (pair != null) {
-                if(pair.getPush()!=null){
+                if (pair.getPush() != null) {
                     // 重新计算记忆强度
                     Date push = GoldMemoryTime.getGoldMemoryTime(pair.getMemoryStrength(), new Date());
                     pair.setPush(push);
                     pair.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(pair.getMemoryStrength(), falg));
                     letterPairMapper.updateById(pair);
                     return ServerResponse.createBySuccess();
-                }else{
+                } else {
                     return ServerResponse.createBySuccess();
                 }
             }
@@ -416,15 +415,13 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             learn.setUnitId(letterPair.getUnitId().longValue());
             learn.setVocabularyId(letterPair.getLetterId().longValue());
             learnMapper.insert(learn);
-            if(pair == null){
-                if (!falg) {
-                    letterPair.setMemoryStrength(0.12);
-                    Date push = GoldMemoryTime.getGoldMemoryTime(letterPair.getMemoryStrength(), new Date());
-                    letterPair.setPush(push);
-                }
-                letterPair.setStudentId(studentId.intValue());
-                letterPairMapper.insert(letterPair);
+            if (!falg) {
+                letterPair.setMemoryStrength(0.12);
+                Date push = GoldMemoryTime.getGoldMemoryTime(letterPair.getMemoryStrength(), new Date());
+                letterPair.setPush(push);
             }
+            letterPair.setStudentId(studentId.intValue());
+            letterPairMapper.insert(letterPair);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -435,7 +432,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     @Override
     public Object getLetterTreasure(String major, String subordinate) {
         List<Object> returnList = new ArrayList<>();
-        if (major.equals("认字母")) {
+        if ("认字母".equals(major)) {
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterAllUnit();
             Map<String, Object> map = new HashMap<>();
             List<Object> list = new ArrayList<>();
@@ -476,11 +473,11 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             List<LetterUnit> letterUnits = letterUnitMapper.selLetterTreasure(major, subordinate);
             for (LetterUnit unit : letterUnits) {
                 List<LetterVocabulary> letterVocabulary = letterVocabularyMapper.selByUnitIds(major, subordinate, unit.getId());
-                if (major.equals("字母拼读")) {
+                if ("字母拼读".equals(major)) {
                     //获取当前单元显示的字母
                     List<String> letters = letterVocabularyMapper.selLetterByUnitId(major, subordinate, unit.getId());
                     Map<String, List<LetterVocabulary>> collect = letterVocabulary.stream().collect(Collectors.groupingBy(vo -> vo.getLetter()));
-                    Integer i = 0;
+                    int i = 0;
                     for (String letter : letters) {
                         Map<String, Object> letterMap = new HashMap<>();
                         if (i == 0) {

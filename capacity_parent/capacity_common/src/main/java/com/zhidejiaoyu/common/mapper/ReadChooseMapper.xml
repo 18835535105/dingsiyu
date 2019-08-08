@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.ReadChooseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.ReadChoose">
+        <id column="id" property="id"/>
+        <result column="course_id" property="courseId"/>
+        <result column="read_type_id" property="readTypeId"/>
+        <result column="subject" property="subject"/>
+        <result column="answer" property="answer"/>
+        <result column="analysis" property="analysis"/>
+        <result column="wrong_answer" property="wrongAnswer"/>
+    </resultMap>
+
+    <sql id="baseSql">
+        id,course_id,read_type_id,subject,answer,analysis,wrong_answer
+    </sql>
+
+    <select id="selectByTypeIdOrCourseId" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="baseSql"></include>
+        from
+        read_choose
+        <where>
+            <if test="courseId!=null">
+                and course_id=#{courseId}
+            </if>
+            <if test="typeId!=null">
+                and read_type_id=#{typeId}
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

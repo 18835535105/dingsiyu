@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.ReadPictureMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.ReadPicture">
+        <id column="id" property="id"/>
+        <result column="course_id" property="courseId"/>
+        <result column="part_url" property="partUrl"/>
+        <result column="type" property="type"/>
+    </resultMap>
+
+    <sql id="sql">
+        id,course_id,part_url,type
+    </sql>
+
+    <select id="selByCourseIdAndType" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="sql"></include>
+        from read_picture
+        where course_id =#{courseId}
+        and type =#{type}
+    </select>
+
+
+</mapper>

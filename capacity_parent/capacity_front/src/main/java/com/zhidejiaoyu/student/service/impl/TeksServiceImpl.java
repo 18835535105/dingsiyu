@@ -21,6 +21,7 @@ import com.zhidejiaoyu.student.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.TeksService;
 import com.zhidejiaoyu.student.utils.PetSayUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.regex.Pattern;
 
-
+@Slf4j
 @Service
 public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implements TeksService {
 
@@ -80,6 +81,18 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         add("Mr");
         add("Miss");
     }};
+    /**
+     * 以字母或数字结尾
+     */
+    final String END_MATCH = ".*[a-zA-Z0-9$# '@]$";
+    /**
+     * 以字母或数据开头
+     */
+    final String START_MATCH = "^[a-zA-Z0-9$# '@].*";
+    /**
+     * 以字母或数字结尾
+     */
+    final String END_MATCH2 = ".*[a-zA-Z0-9$# '@-]$";
 
 
     @Autowired
@@ -95,9 +108,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Autowired
     private StudentMapper studentMapper;
-
-    @Autowired
-    private RunLogMapper runLogMapper;
 
     @Autowired
     private VoiceMapper voiceMapper;
@@ -257,12 +267,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         // 乱序
         List<String> orderList = new ArrayList<>();
 
-        // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$# ']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$# '].*";
-        // 以字母或数字结尾
-        final String END_MATCH2 = ".*[a-zA-Z0-9$# '-]$";
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
             s = s.replace("#", " ").replace("$", "");
@@ -282,6 +286,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                     if (Pattern.matches(END_MATCH, s1)) {
                         sb.append(s1);
                     } else {
+                        //判断是否为第一位
                         if (i == 0) {
                             if (sb.length() > 0) {
                                 rightList.add(sb.toString().replace("#", " ").replace("$", ""));
@@ -289,12 +294,15 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                                 sb.setLength(0);
                             }
                             // 如果符号前面是字母需要在符号列表中加 null
-                            if (i > 0 && Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
-                                pointList.add(null);
+                            if(i!=0){
+                                if (Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
+                                    pointList.add(null);
+                                }
                             }
                             rightList.add(s1);
                             pointList.add(s1);
                         } else {
+                            //如果中间出现符号则掠过
                             if (i < (length - 1)) {
                                 char longChar = chars[i + 1];
                                 String s2 = new String(new char[]{longChar});
@@ -307,8 +315,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                                         sb.setLength(0);
                                     }
                                     // 如果符号前面是字母需要在符号列表中加 null
-                                    if (i > 0 && Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
-                                        pointList.add(null);
+                                    if (i != 0) {
+                                        if (Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
+                                            pointList.add(null);
+                                        }
                                     }
                                     rightList.add(s1);
                                     pointList.add(s1);
@@ -663,12 +673,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private List<String> getLeterRegitList(String sentence) {
         // 正确顺序
         List<String> rightList = new ArrayList<>();
-        // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$#']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$#'].*";
-        // 以字母或数字结尾
-        final String END_MATCH2 = ".*[a-zA-Z0-9$#-']$";
         String[] split = sentence.trim().split(" ");
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
@@ -726,10 +730,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private List<String> getRegitList(String sentence) {
         // 正确顺序
         List<String> rightList = new ArrayList<>();
-        // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$#']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$#'].*";
         String[] split = sentence.trim().split(" ");
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
@@ -787,6 +787,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         wordUnitTestDTO.setClassify(7);
         Integer point = testRecord.getPoint();
         wordUnitTestDTO.setPoint(point);
+        wordUnitTestDTO.setCourseId(aLong);
+        wordUnitTestDTO.setUnitId(new Long[]{testRecord.getUnitId()});
 
         TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(), testRecord.getUnitId(), model, model);
 
@@ -883,21 +885,24 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         studentMapper.updateByPrimaryKeySelective(student);
         String msg;
         if (classify != null) {
-            msg = "id为：" + student.getId() + "的学生在" + commonMethod.getTestType(classify)
-                    + " 模块下的单元闯关测试中首次闯关成功，获得#" + goldCount + "#枚金币";
+            msg = "id为：" + student.getId() + "的学生在[" + commonMethod.getTestType(classify)
+                    + "]模块下的单元闯关测试中首次闯关成功，获得#" + goldCount + "#枚金币";
         } else {
-            msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + goldCount + "#枚金币";
+            msg = "id为：" + student.getId() + "的学生在[" + model + "]模块下，获得#" + goldCount + "#枚金币";
         }
-        RunLog runLog = new RunLog(student.getId(), 4, msg, new Date());
-        runLog.setCourseId(student.getCourseId());
-        runLog.setUnitId(student.getUnitId());
-        runLogMapper.insert(runLog);
+        if (goldCount > 0) {
+            try {
+                super.saveRunLog(student, 4, msg);
+            } catch (RuntimeException e) {
+                log.error("保存学生[{} - {} - {}]日志出错！msg=[{}]", student.getId(), student.getAccount(), student.getStudentName(), msg, e);
+            }
+        }
     }
 
     private Map<String, Object> packageResultMap(Student student, WordUnitTestDTO wordUnitTestDTO, Integer point, Integer goldCount, TestRecord testRecord, String model) {
         Map<String, Object> map = new HashMap<>(16);
-        int number = testRecordMapper.selCount(student.getId(), wordUnitTestDTO.getCourseId(), wordUnitTestDTO.getUnitId()[0],
-                commonMethod.getTestType(wordUnitTestDTO.getClassify()), model);
+        int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
+                testRecord.getStudyModel(), model);
         int energy = super.getEnergy(student, wordUnitTestDTO.getPoint(), number);
         map.put("energy", energy);
         map.put("gold", goldCount);
@@ -960,9 +965,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     public int[] wirterBlank(List<String> strList) {
         Random random = new Random();
         List<Integer> shuZhuString = new ArrayList<>();
-        final String END_MATCH = ".*[a-zA-Z0-9$#']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$#'].*";
         for (int i = 0; i < strList.size(); i++) {
             boolean flag = true;
             String str = strList.get(i);
@@ -1247,10 +1249,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     //获取挖空的位置
     private int changeInteger(List<String> sentenceList) {
         List<Integer> list = new ArrayList<>();
-        // 以字母或数字结尾
-        final String END_MATCH = ".*[a-zA-Z0-9$']$";
-        // 以字母或数据开头
-        final String START_MATCH = "^[a-zA-Z0-9$'].*";
         for (int i = 0; i < sentenceList.size(); i++) {
             if (sentenceList.get(i).indexOf("#") == -1 && sentenceList.get(i).indexOf("$") == -1) {
                 if (Pattern.matches(END_MATCH, sentenceList.get(i)) && Pattern.matches(START_MATCH, sentenceList.get(i))) {

@@ -525,7 +525,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         Student student = super.getStudent(session);
         if (StringUtils.isEmpty(student.getPetName())) {
             student.setPetName("大明白");
-            student.setPartUrl(PetImageConstant.DEFAULT_IMG);
+            student.setPartUrl(PetImageConstant.DEFAULT_IMG.replace(AliyunInfoConst.host, ""));
         }
 
         // 是否是第一次进行当前模块下的单元闯关测试标识
@@ -933,7 +933,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         // 学生需要更新的信息
         if (StringUtils.isEmpty(student.getPetName())) {
             student.setPetName("大明白");
-            student.setPartUrl(PetImageConstant.DEFAULT_IMG);
+            student.setPartUrl(PetImageConstant.DEFAULT_IMG.replace(AliyunInfoConst.host, ""));
         }
 
         String typeModel = matchTypeModel(testRecord, type, modelType, student);

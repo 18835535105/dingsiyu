@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.ReadTypeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.ReadType">
+        <id column="id" property="id"/>
+        <result column="types_of_essays" property="typesOfEssays"/>
+        <result column="difficulty" property="difficulty"/>
+        <result column="course_id" property="courseId"/>
+        <result column="word_quantity" property="wordQuantity"/>
+        <result column="learn_time" property="learnTime"/>
+        <result column="read_name" property="readName"/>
+        <result column="test_type" property="testType"/>
+        <result column="read_count" property="readCount"/>
+
+    </resultMap>
+
+    <sql id="baseSql">
+        id,types_of_essays,difficulty,course_id,word_quantity,learn_time,read_name,test_type
+    </sql>
+
+    <select id="selByCourseId" resultMap="BaseResultMap" parameterType="map">
+        select <include refid="baseSql"></include> from read_type where course_id=#{courseId}
+    </select>
+
+    <select id="selCountByCourseId" parameterType="map" resultType="integer">
+        select count(id) from read_type where course_id=#{courseId}
+    </select>
+
+    <select id="selByCourseList" resultMap="BaseResultMap" parameterType="map">
+        select <include refid="baseSql"></include> from read_type where course_id in (
+        <foreach collection="courseIds" item="courseId" separator=",">
+            #{courseId}
+        </foreach>
+        )
+    </select>
+
+</mapper>

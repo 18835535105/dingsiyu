@@ -46,9 +46,12 @@ public enum ResponseCode {
     /**
      * 时间不足一周
      */
-    TIME_LESS_ONE_WEEK(901, "TIME_LESS_ONE_WEEK");
+    TIME_LESS_ONE_WEEK(901, "TIME_LESS_ONE_WEEK"),
 
-
+    /**
+     * 未查询到数据
+     */
+    NO_DATA(400, "未查询到数据！");
 
 
     private Integer code;

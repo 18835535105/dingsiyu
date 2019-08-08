@@ -257,4 +257,10 @@ public interface StudentMapper extends BaseMapper<Student> {
      * @return
      */
     List<Student> selectHasRank();
+
+    /**
+     * 查看所有冻结用户
+     * @return
+     */
+    List<Student> getAllFrozenStudent();
 }

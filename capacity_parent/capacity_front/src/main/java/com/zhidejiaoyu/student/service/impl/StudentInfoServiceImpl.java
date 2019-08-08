@@ -330,10 +330,10 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         String tip = null;
         Integer classify = dto.getClassify();
         if (classify <= 6) {
-            tip = getValidTimeTip.saveGoldAward(session, classify, validTime, loginTime);
+            tip = getValidTimeTip.saveGoldAward(session, student, classify, validTime, loginTime);
         } else if (classify >= 14 && classify <= 22) {
             int type = classify - 13;
-            tip = getValidTimeTip.saveSimpleGoldAward(session, type, validTime, loginTime);
+            tip = getValidTimeTip.saveSimpleGoldAward(session, student, type, validTime, loginTime);
         }
         session.removeAttribute(TimeConstant.BEGIN_VALID_TIME);
 

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
@@ -14,6 +15,7 @@ import java.util.Date;
  */
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class RunLog extends Model<RunLog> {
 	@TableId(type = IdType.AUTO)
 	private Long id;
@@ -45,6 +47,15 @@ public class RunLog extends Model<RunLog> {
 		this.type = type;
 		this.logContent = logContent;
 		this.createTime = createTime;
+	}
+
+	public RunLog(Long operateUserId, Integer type, String logContent, Date createTime,Long courseId,Long unitId) {
+		this.operateUserId = operateUserId;
+		this.type = type;
+		this.logContent = logContent;
+		this.createTime = createTime;
+		this.courseId=courseId;
+		this.unitId=unitId;
 	}
 
 	@Override

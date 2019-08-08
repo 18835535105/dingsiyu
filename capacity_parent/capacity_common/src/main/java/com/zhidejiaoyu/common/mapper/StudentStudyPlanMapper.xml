@@ -90,15 +90,33 @@
         where student_id = #{studentId}
           and type = #{type}
     </select>
-
+    <select id="selReadCourseByStudentId" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include>
+        from student_study_plan
+        where student_id=#{studentId}
+        <if test="gradeInteger!=null">
+            and course_id=#{gradeInteger}
+        </if>
+        and type = 6
+        order by course_id
+    </select>
     <select id="selSymbolByStudentId" resultMap="BaseResultMap" parameterType="long">
         select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type = 5 limit 1
     </select>
     <select id="selLetterByStudentId" resultMap="BaseResultMap" parameterType="long">
         select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type = 4 limit 1
     </select>
+    <select id="selReadByStudentId" resultMap="BaseResultMap" parameterType="long">
+        select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type = 6 limit 1
+    </select>
     <select id="selLetterSudyByStudentAndUnitId" parameterType="map" resultMap="BaseResultMap">
         select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type=4 and (start_unit_id &lt;=#{unitId} and end_unit_id>=#{unitId}) limit 1
+    </select>
+    <select id="selStudyReadPlanByStudentIdAndUnitId" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type=6 and (start_unit_id &lt;=#{unitId} and end_unit_id>=#{unitId}) limit 1
+    </select>
+    <select id="selByCourseIdAndUnitIdAndType" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and course_id=#{courseId} and type=#{type} and (start_unit_id &lt;=#{unitId} and end_unit_id>=#{unitId}) limit 1
     </select>
 
 

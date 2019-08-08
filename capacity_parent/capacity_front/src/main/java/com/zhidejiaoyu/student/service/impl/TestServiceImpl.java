@@ -97,9 +97,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     private TestRecordMapper testRecordMapper;
 
     @Autowired
-    private RunLogMapper runLogMapper;
-
-    @Autowired
     private UnitMapper unitMapper;
 
     @Autowired
@@ -492,6 +489,45 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         return ServerResponse.createBySuccess(vo);
     }
 
+    @Override
+    @GoldChangeAnnotation
+    @TestChangeAnnotation(isUnitTest = false)
+    public Object saveReadTest(HttpSession session, TestRecord testRecord) {
+        Student student = getStudent(session);
+        Integer point = testRecord.getPoint();
+        testRecord.setStudentId(student.getId());
+        testRecord.setGenre("单元闯关测试");
+        testRecord.setStudyModel("阅读测试");
+        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+        getUnitTestMsg(testRecord, testRecord.getPoint());
+        Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 13);
+        Integer gold=0;
+        Integer energy=0;
+        if (integer != null && integer < 60) {
+            if (point >= 60) {
+                gold=5;
+                energy=2;
+                this.saveLog(student, gold, null, "阅读测试");
+                studentMapper.updateById(student);
+            }
+        }
+        TestResultVo vo = new TestResultVo();
+        vo.setGold(gold);
+        vo.setEnergy(energy);
+        vo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
+        vo.setPoint(point);
+        testRecordMapper.insert(testRecord);
+        if (point < PASS) {
+            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
+        } else if (point < NINETY_POINT) {
+            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
+        } else {
+            vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+        }
+        return ServerResponse.createBySuccess(vo);
+    }
+
+
     private void getLetterWrite(Map<String, Object> map, Letter studyLetter) {
         map.put("type", 3);
         map.put("mp3url", baiduSpeak.getLetterPath(studyLetter.getBigLetter()));
@@ -715,9 +751,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         int count = testRecordMapper.insertSelective(testRecord);
         if (count == 0) {
             String errMsg = "id为 " + student.getId() + " 的学生 " + student.getStudentName() + " 游戏测试记录保存失败！";
+            super.saveRunLog(student, 2, errMsg);
             log.error(errMsg);
-            RunLog runLog = new RunLog(2, errMsg, new Date());
-            runLogMapper.insertSelective(runLog);
         }
     }
 
@@ -767,9 +802,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         int count = testRecordMapper.updateByPrimaryKeySelective(testRecord);
         if (count == 0) {
             String errMsg = "id为 " + student.getId() + " 的学生 " + student.getStudentName() + " 更新游戏测试记录失败！";
+            super.saveRunLog(student, 2, errMsg);
             log.error(errMsg);
-            RunLog runLog = new RunLog(2, errMsg, new Date());
-            runLogMapper.insert(runLog);
         }
     }
 
@@ -1160,7 +1194,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Student student = getStudent(session);
         if (StringUtils.isEmpty(student.getPetName())) {
             student.setPetName("大明白");
-            student.setPartUrl(PetImageConstant.DEFAULT_IMG);
+            student.setPartUrl(PetImageConstant.DEFAULT_IMG.replace(AliyunInfoConst.host, ""));
         }
 
         TestResultVo vo = new TestResultVo();
@@ -1245,6 +1279,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         studentMapper.updateByPrimaryKeySelective(student);
         getLevel(session);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
+        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
         return ServerResponse.createBySuccess(vo);
     }
 
@@ -1265,7 +1300,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Student student = getStudent(session);
         if (StringUtils.isEmpty(student.getPetName())) {
             student.setPetName("大明白");
-            student.setPartUrl(PetImageConstant.DEFAULT_IMG);
+            student.setPartUrl(PetImageConstant.DEFAULT_IMG.replace(AliyunInfoConst.host, ""));
         }
 
         TestResultVo vo = new TestResultVo();
@@ -1478,15 +1513,20 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldCount));
         String msg;
         if (wordUnitTestDTO != null) {
-            msg = "id为：" + student.getId() + "的学生在" + commonMethod.getTestType(wordUnitTestDTO.getClassify())
-                    + " 模块下的单元闯关测试中闯关成功，获得#" + goldCount + "#枚金币";
+            msg = "id为：" + student.getId() + "的学生在[" + commonMethod.getTestType(wordUnitTestDTO.getClassify())
+                    + "]模块下的单元闯关测试中闯关成功，获得#" + goldCount + "#枚金币";
         } else {
-            msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + goldCount + "#枚金币";
+            msg = "id为：" + student.getId() + "的学生在[" + model + "]模块下，获得#" + goldCount + "#枚金币";
         }
-        RunLog runLog = new RunLog(student.getId(), 4, msg, new Date());
-        runLog.setCourseId(student.getCourseId());
-        runLog.setUnitId(student.getUnitId());
-        runLogMapper.insert(runLog);
+        if (goldCount > 0) {
+            try {
+                Long courseId = wordUnitTestDTO == null ? null : wordUnitTestDTO.getCourseId();
+                Long unitId = (wordUnitTestDTO == null || wordUnitTestDTO.getUnitId() == null || wordUnitTestDTO.getUnitId().length == 0) ? null : wordUnitTestDTO.getUnitId()[0];
+                super.saveRunLog(student, 4, courseId, unitId, msg);
+            } catch (Exception e) {
+                log.error("保存学生[{} - {} - {}]日志记录出错！", student.getId(), student.getAccount(), student.getStudentName(), e);
+            }
+        }
         log.info(msg);
     }
 
@@ -1523,7 +1563,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setStudyModel(StudyModelContant.PHONETIC_SYMBOL_TEST.getModel());
 
         WordUnitTestDTO wordUnitTestDTO = new WordUnitTestDTO();
-        wordUnitTestDTO.setClassify(10);
+        wordUnitTestDTO.setClassify(11);
         wordUnitTestDTO.setUnitId(new Long[]{dto.getUnitId()});
         wordUnitTestDTO.setPoint(point);
         Integer goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord);

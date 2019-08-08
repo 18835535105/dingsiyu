@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.app;
 
-import com.zhidejiaoyu.common.MacIpUtil;
+import com.zhidejiaoyu.common.utils.MacIpUtil;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.pojo.Student;

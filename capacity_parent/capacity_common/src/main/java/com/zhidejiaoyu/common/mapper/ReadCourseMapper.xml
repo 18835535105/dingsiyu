@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.ReadCourseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.ReadCourse">
+        <id column="id" property="id"/>
+        <result column="course_name" property="courseName"/>
+        <result column="month" property="month"/>
+        <result column="week" property="week"/>
+        <result column="grade" property="grade"/>
+        <result column="create_time" property="createTime"/>
+        <result column="read_sort" property="readSort"/>
+    </resultMap>
+
+    <sql id="sql">
+        id,course_name,month,week,grade,create_time
+    </sql>
+
+    <select id="selCourseByStartUnitAndEndUnit" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="sql"></include> from read_course where unit>=#{startUnitId} and unit &lt;=#{endUnitId}
+    </select>
+
+    <select id="selReadSortByStartReadSortAndEndReadSort" parameterType="map" resultType="long">
+        select
+        read_sort
+        from read_course
+        where read_sort >= #{startUnitId}
+        and read_sort &lt;= #{endUnitId}
+        and grade=#{grade}
+        group by read_sort
+        order by read_sort
+    </select>
+
+    <select id="selSort" parameterType="map" resultType="map">
+        select read_sort unitId ,month month,id courseId
+        from read_course
+        where grade=#{grade}
+        and read_sort in (
+        <foreach collection="unitList" separator="," item="list">
+            #{list}
+        </foreach>
+        )
+        group by read_sort
+    </select>
+
+    <select id="selBySortAndGrade" resultType="long" parameterType="map">
+        select id
+        from read_course
+        where read_sort=#{sort}
+        and grade=#{grade}
+    </select>
+
+
+</mapper>

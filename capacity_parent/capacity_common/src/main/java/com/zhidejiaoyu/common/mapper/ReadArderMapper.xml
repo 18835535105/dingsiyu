@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.ReadArderMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.ReadArder">
+        <id column="id" property="id" />
+        <result column="type" property="type" />
+        <result column="sentence" property="sentence" />
+        <result column="translate" property="translate" />
+        <result column="course_id" property="courseId" />
+        <result column="text_types" property="textTypes" />
+        <result column="part_url" property="partUrl" />
+        <result column="title" property="title" />
+    </resultMap>
+
+    <sql id="base_sql">
+        id,type,sentence,translate,course_id,text_types,part_url,title
+    </sql>
+
+    <select id="selByCourseId" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include>
+        from read_arder
+        where course_id=#{courseId}
+        and text_types =#{textTypes}
+    </select>
+
+
+
+</mapper>

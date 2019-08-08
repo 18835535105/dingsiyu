@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.pojo.UnitVocabulary;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.pojo.VocabularyExample;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -446,4 +447,49 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     List<Vocabulary> selectByPhaseNotInWord(@Param("studyParagraph") String studyParagraph, @Param("ignoreList") List<Map<String, Object>> ignoreList);
+
+    /**
+     * 获取指定个数含有图片的单词信息
+     *
+     * @param offset 从第多少条开始获取
+     * @param limit  需要获取的个数
+     * @return
+     */
+    List<Vocabulary> selectPictureRandom(@Param("offset") int offset, @Param("limit") int limit);
+
+    /**
+     * 眼脑训练取10个单词
+     *
+     * @param studentId 学生id
+     * @param type      1，查询已学的单词  2查询全部单词
+     */
+    List<String> selByStudentIdLimitTen(@Param("studentId") Long studentId, @Param("type") int type, @Param("start") Integer start);
+
+    /**
+     * 获取单词数量
+     *
+     * @param studentId 学生id
+     * @param type      1，查询已学的单词  2查询全部单词
+     */
+    Integer selCountByStudentIdLimitTen(@Param("studentId") Long studentId, @Param("type") int type);
+
+    /**
+     * 获取火眼精金数据
+     *
+     * @param type
+     * @param length
+     * @param max
+     * @param start
+     * @return
+     */
+    List<String> selRandWord(@Param("type") Integer type, @Param("leng") Integer length, @Param("max") Integer max, @Param("start") Integer start);
+
+    /**
+     * 获取火眼精金数据數量
+     *
+     * @param type
+     * @param length
+     * @return
+     */
+    Integer selCountRandWord(@Param("type") Integer type, @Param("leng") Integer length);
 }

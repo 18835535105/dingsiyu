@@ -35,7 +35,7 @@ public interface BaseService<T> extends IService<T> {
      *
      * @param studentId
      * @param beginTime 起始时间字符串
-     * @param endTime 结束时间字符串
+     * @param endTime   结束时间字符串
      * @return 有效时长 （秒）
      */
     Integer getValidTime(Long studentId, String beginTime, String endTime);
@@ -45,7 +45,7 @@ public interface BaseService<T> extends IService<T> {
      *
      * @param session
      * @param beginTime 起始时间字符串
-     * @param endTime 结束时间字符串
+     * @param endTime   结束时间字符串
      * @return 有效时长 （秒）
      */
     Integer getOnLineTime(HttpSession session, String beginTime, String endTime);
@@ -61,4 +61,25 @@ public interface BaseService<T> extends IService<T> {
     StudyFlow getCurrentStudyFlow(Long studentId);
 
     void isStudentEx(Student student);
+
+    /**
+     * 保存运行日志
+     *
+     * @param student
+     * @param type     保存的日志类型
+     * @param courseId
+     * @param unitId
+     * @param msg      保存的日志内容
+     */
+    void saveRunLog(Student student, Integer type, Long courseId, Long unitId, String msg) throws RuntimeException;
+
+    /**
+     * 保存运行日志
+     *
+     * @param student
+     * @param type    保存的日志类型
+     * @param msg     保存的日志内容
+     */
+    void saveRunLog(Student student, Integer type, String msg) throws RuntimeException;
+
 }

@@ -1,15 +1,23 @@
 package com.zhidejiaoyu.common.utils.simple.language;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zhidejiaoyu.common.Vo.read.WordInfoVo;
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.utils.simple.http.SimpleHttpClientUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 有道翻译web api
@@ -51,19 +59,7 @@ public class SimpleYouDaoTranslate {
      * @throws Exception
      */
     public Map<String, String> getResultMap(String text) throws Exception {
-        String salt = String.valueOf(System.currentTimeMillis());
-        String sign = new Md5Hash(appKey + text + salt + md5Key).toString();
-
-        Map<String, String> params = new HashMap<>(16);
-        params.put("q", text);
-        params.put("from", from);
-        params.put("to", to);
-        params.put("sign", sign);
-        params.put("salt", salt);
-        params.put("appKey", appKey);
-        String result = simpleHttpClientUtil.post(youdaoUrl, params);
-
-        JSONObject jsonObject = JSONObject.parseObject(result);
+        JSONObject jsonObject = getJsonObject(text);
 
         // 释义
         String translation = "";
@@ -93,6 +89,81 @@ public class SimpleYouDaoTranslate {
         map.put("explains", explains);
         map.put("readUrl", readUrl);
         return map;
+    }
+
+    /**
+     * 获取指定单词的信息
+     *
+     * @param word
+     * @return
+     */
+    public WordInfoVo getWordInfoVo(String word) {
+        if (StringUtils.isEmpty(word)) {
+            return null;
+        }
+        word = word.trim();
+        JSONObject jsonObject = this.getJsonObject(word);
+
+        if (jsonObject == null) {
+            return null;
+        }
+        String errorCode = jsonObject.getString("errorCode");
+        String successCode = "0";
+        if (!Objects.equals(successCode, errorCode)) {
+            log.error("请求有道翻译接口出错！错误码=[{}]", errorCode);
+            throw new ServiceException("请求有道翻译接口出错！");
+        }
+
+        JSONObject basic = jsonObject.getJSONObject("basic");
+        JSONArray translations = basic.getJSONArray("explains");
+        // 释义
+        List<String> translates = translations.stream().map(object -> {
+            if (object == null) {
+                return "";
+            }
+            return object.toString();
+        }).collect(Collectors.toList());
+        String usPhonetic = basic.getString("us-phonetic");
+        String usReadUrl = basic.getString("us-speech");
+        String ukPhonetic = basic.getString("uk-phonetic");
+        String ukReadUrl = basic.getString("uk-speech");
+
+        WordInfoVo wordInfoVo = new WordInfoVo();
+        wordInfoVo.setWord(word);
+        wordInfoVo.setTranslates(translates);
+        wordInfoVo.setUkPhonetic("[" + ukPhonetic + "]");
+        wordInfoVo.setUsPhonetic("[" + usPhonetic + "]");
+        wordInfoVo.setUsReadUrl(usReadUrl);
+        wordInfoVo.setUkReadUrl(ukReadUrl);
+
+        return wordInfoVo;
+    }
+
+    /**
+     * 获取单词翻译响应数据
+     *
+     * @param text
+     * @return
+     * @throws IOException
+     */
+    private JSONObject getJsonObject(String text) {
+        String salt = String.valueOf(System.currentTimeMillis());
+        String sign = new Md5Hash(appKey + text + salt + md5Key).toString();
+
+        Map<String, String> params = new HashMap<>(16);
+        params.put("q", text);
+        params.put("from", from);
+        params.put("to", to);
+        params.put("sign", sign);
+        params.put("salt", salt);
+        params.put("appKey", appKey);
+        String result = null;
+        try {
+            result = simpleHttpClientUtil.post(youdaoUrl, params);
+        } catch (IOException e) {
+            log.error("调用有道翻译接口获取单词翻译信息出错！word=[{}]", text, e);
+        }
+        return JSONObject.parseObject(result);
     }
 
 }

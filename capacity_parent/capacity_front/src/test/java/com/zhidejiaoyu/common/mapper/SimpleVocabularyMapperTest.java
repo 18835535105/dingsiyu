@@ -44,4 +44,9 @@ public class SimpleVocabularyMapperTest extends BaseTest {
         List<Vocabulary> vocabularies = vocabularyMapper.selectByPhaseNotInWord("小学", list);
         log.info("words=[{}]", vocabularies);
     }
-}
+
+    @Test
+    public void testSelCountByStudentIdLimitTen() {
+        System.out.println(vocabularyMapper.selCountByStudentIdLimitTen(7846L, 1));
+    }
+ }

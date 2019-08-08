@@ -246,16 +246,18 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         GameStore gameStore = gameStoreMapper.selectById(gameScore.getGameId());
         saveGameScore(session, gameScore, student, gameStore);
 
-        RunLog runLog = new RunLog(student.getId(), 4, "学生[" + student.getStudentName() + "]在游戏《"
-                + gameStore.getGameName() + "》中奖励#" + gameScore.getAwardGold() + "#枚金币", new Date());
-        runLogMapper.insert(runLog);
-
         if (gameScore.getAwardGold() > 0) {
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gameScore.getAwardGold()));
             studentMapper.updateById(student);
             session.setAttribute(UserConstant.CURRENT_STUDENT, student);
+            try {
+                super.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在游戏《" + gameStore.getGameName()
+                        + "》中奖励#" + gameScore.getAwardGold() + "#枚金币");
+            } catch (Exception e) {
+                log.error("保存学生[{} - {} - {}]游戏[{}]结果出错！需要奖励[{}]枚金币！", student.getId(), student.getAccount(),
+                        student.getStudentName(), gameStore.getGameName(), gameScore.getAwardGold() , e);
+            }
         }
-
         return ServerResponse.createBySuccess();
     }
 

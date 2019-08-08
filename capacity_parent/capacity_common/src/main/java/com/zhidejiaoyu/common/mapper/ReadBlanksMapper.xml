@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.ReadBlanksMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.ReadBlanks">
+        <id column="id" property="id"/>
+        <result column="read_type_id" property="readTypeId"/>
+        <result column="answer" property="answer"/>
+        <result column="analysis" property="analysis"/>
+    </resultMap>
+
+    <sql id="sql">
+        id,read_type_id,answer,analysis
+    </sql>
+
+    <select id="selByTypeId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="sql"></include>
+        from read_blanks
+        where read_type_id=#{typeId}
+    </select>
+
+
+</mapper>

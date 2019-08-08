@@ -55,4 +55,9 @@ public class TestResultVo implements Serializable {
      * 测试id
      */
     private Long testId;
+
+    /**
+     * 分数
+     */
+    private Integer point;
 }

@@ -13,7 +13,7 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
-import com.zhidejiaoyu.student.config.ServiceInfoUtil;
+import com.zhidejiaoyu.student.utils.ServiceInfoUtil;
 import com.zhidejiaoyu.student.service.simple.SimpleQuartzService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,6 +187,26 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
         log.info("定时任务 -> 教师创建学生清零...");
         simpleTeacherMapper.updateCreateStudentNumber();
         log.info("定时任务 -> 教师创建学生清零 执行完成...");
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Scheduled(cron = "0 20 0 * * ?")
+    @Override
+    public void updatFrozen() {
+        int localPort = ServiceInfoUtil.getPort();
+        if (port != localPort) {
+            return;
+        }
+        log.info("定时任务 -> 给每个冻结用户增加一天...");
+        List<Student> studentList=studentMapper.getAllFrozenStudent();
+        for(Student student:studentList){
+            Calendar c = Calendar.getInstance();
+            c.add(Calendar.DAY_OF_MONTH, 1);
+            Date time = c.getTime();
+            student.setAccountTime(time);
+            studentMapper.updateById(student);
+        }
+        log.info("定时任务 -> 给每个冻结用户增加一天结束...");
     }
 
     @Transactional(rollbackFor = Exception.class)

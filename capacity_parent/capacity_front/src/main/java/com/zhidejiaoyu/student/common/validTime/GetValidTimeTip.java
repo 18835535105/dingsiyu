@@ -61,8 +61,7 @@ public class GetValidTimeTip {
      * @param loginTime
      * @return
      */
-    public String saveSimpleGoldAward(HttpSession session, Integer classify, Long second, Date loginTime) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+    public String saveSimpleGoldAward(HttpSession session, Student student, Integer classify, Long second, Date loginTime) {
         String learnType = simpleCommonMethod.getTestType(classify);
         // 金币数
         double gold = 0;
@@ -187,9 +186,7 @@ public class GetValidTimeTip {
      * @param loginTime
      * @return
      */
-    public String saveGoldAward(HttpSession session, Integer classify, Long second, Date loginTime) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        student = studentMapper.selectByPrimaryKey(student.getId());
+    public String saveGoldAward(HttpSession session, Student student, Integer classify, Long second, Date loginTime) {
         String learnType = commonMethod.getTestType(classify);
         // 金币数
         double gold = 0;

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.ReadContentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.ReadContent">
+        <id column="id" property="id" />
+        <result column="read_type_id" property="readTypeId" />
+        <result column="sentence" property="sentence" />
+        <result column="translate" property="translate" />
+    </resultMap>
+
+    <sql id="base_sql">
+        id, read_type_id, sentence, translate
+    </sql>
+
+    <select id="selectByReadTypeId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from read_content where read_type_id = #{readTypeId}
+    </select>
+
+    <sql id="basesql">
+        id,read_type_id,sentence,translate
+    </sql>
+
+    <select id="selectByTypeId" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="basesql"></include> from read_content where read_type_id=#{typeId}
+    </select>
+
+</mapper>

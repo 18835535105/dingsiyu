@@ -63,9 +63,20 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     TestRecord selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                           @Param("genre") String genre, @Param("studyModel") String studyModel);
 
+    /**
+     * 读取离线在最后一回的测试数据
+     * @param studentId
+     * @param unitId
+     * @param genre
+     * @param studyModel
+     * @return
+     */
+    TestRecord  selectByStudentIdAndUnitIdAndGenreAndStudyModel(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+                                          @Param("genre") String genre, @Param("studyModel") String studyModel);
+
+
     TestRecord selectByStudentIdAndUnitIdAndGenre(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                                   @Param("genre") String genre);
-
     /**
      * 查询指定类型的测试记录
      *
@@ -164,7 +175,6 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
 
     /**
      * 修改游戏测试记录次数为 2 次
-     *
      * @param student
      */
     void updateGameRecord(@Param("student") Student student);
@@ -179,19 +189,19 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      *
      * @param studentId
      * @param unitId
-     * @param classify  类型 0=单词图鉴 1=慧记忆 2=听写 3=默写 4=例句听力 5=例句翻译 6=例句默写
+     * @param classify 类型 0=单词图鉴 1=慧记忆 2=听写 3=默写 4=例句听力 5=例句翻译 6=例句默写
      * @return
      */
     Integer selectUnitTestMaxPointByStudyModel(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("model") Integer classify);
 
-    List<SeniorityVo> planSeniority(@Param("grade") String grade, @Param("study_paragraph") String study_paragraph, @Param("haveTest") Integer haveTest, @Param("version") String version, @Param("classId") Long classId);
+    List<SeniorityVo> planSeniority(@Param("grade") String grade, @Param("study_paragraph") String study_paragraph, @Param("haveTest") Integer haveTest, @Param("version") String version, @Param("classId")Long classId);
 
     @Select("SELECT COUNT(id) AS testCount FROM test_record WHERE student_id = #{stuId}  GROUP BY student_id")
     Integer onePlanSeniority(@Param("stuId") Long stuId);
 
-    List<SeniorityVo> planSenioritySchool(@Param("study_paragraph") String study_paragraph, @Param("haveUnit") Integer haveUnit, @Param("version") String version, @Param("teacherId") Long teacherId);
+    List<SeniorityVo> planSenioritySchool(@Param("study_paragraph") String study_paragraph, @Param("haveUnit") Integer haveUnit, @Param("version") String version, @Param("teacherId")Long teacherId);
 
-    List<SeniorityVo> planSeniorityNationwide(@Param("study_paragraph") String study_paragraph, @Param("haveTest") Integer haveTest, @Param("version") String version);
+    List<SeniorityVo> planSeniorityNationwide(@Param("study_paragraph") String study_paragraph,@Param("haveTest") Integer haveTest, @Param("version") String version);
 
     /**
      * 查询学生不同课程课程测试的最低分
@@ -215,7 +225,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      *
      * @param studentId
      * @param unitIds
-     * @return key 单元id
+     * @return  key 单元id
      */
     @MapKey("unitId")
     Map<Long, Map<Long, Long>> selectHasUnitTest(@Param("studentId") Long studentId, @Param("unitIds") List<Long> unitIds);
@@ -227,7 +237,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      *
      * @param stuId
      * @param testId
-     * @param type   1:单词；2：句型；3：课文
+     * @param type  1:单词；2：句型；3：课文
      * @return
      */
     TestDetailVo selectTestDetailVo(@Param("stuId") Long stuId, @Param("testId") Long testId, @Param("type") Integer type);
@@ -250,7 +260,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     int countGameCount(@Param("stu") Student stu);
 
 
-    TestRecord selectByStudentIdAndGenre(@Param("id") Long id, @Param("unitId") Long unitId);
+    TestRecord selectByStudentIdAndGenre(@Param("id") Long id,@Param("unitId") Long unitId);
 
     /**
      * 查询当前测试是否已存在
@@ -282,7 +292,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     Integer selectPrePoint(@Param("studentId") Long studentId);
 
 
-    Integer selectUnitTestMaxPointByStudyModels(@Param("studentId") Long studentId, @Param("letterUnitId") Integer letterUnitIds, @Param("model") Integer model);
+    Integer selectUnitTestMaxPointByStudyModels(@Param("studentId") Long studentId,@Param("letterUnitId") Integer letterUnitIds,@Param("model") Integer model);
 
     /**
      * 统计学生今天进行的单元闯关测试次数
@@ -293,14 +303,8 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     @Select("select count(id) from test_record where student_id = #{studentId} and genre = '单元闯关测试' and TO_DAYS(test_start_time) = TO_DAYS(now())")
     int countTodayTestUnitCount(@Param("studentId") Long studentId);
 
-    @Select("select count(id) from test_record " +
-            "where " +
-            "student_id = #{studentId} " +
-            "and genre = #{genre} " +
-            "and course_id=#{courseId} " +
-            "and unit_id=#{unitId} " +
-            "and study_model=#{studyModel} " +
-            "and point>=60 ")
+    Integer selectReadCountByCourseId(@Param("courseId") long courseId);
+
     int selCount(@Param("studentId") Long studenId, @Param("courseId") Long courseId, @Param("unitId") Long unitId, @Param("studyModel") String studyModel, @Param("genre") String genre);
 }
 
