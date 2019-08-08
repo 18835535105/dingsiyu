@@ -1197,12 +1197,22 @@
         <if test="type==2">
             LENGTH(voca.word) = #{leng}
         </if>
-        order by rand() limit
+         limit #{start} ,
         <if test="max==1">
             15
         </if>
         <if test="max==2">
             1
+        </if>
+    </select>
+    <select id="selCountRandWord" resultType="integer" parameterType="map">
+        select count(distinct  voca.word) from vocabulary voca
+        where
+        <if test="type==1">
+            LENGTH(voca.word) &lt; 10
+        </if>
+        <if test="type==2">
+            LENGTH(voca.word) = #{leng}
         </if>
     </select>
 

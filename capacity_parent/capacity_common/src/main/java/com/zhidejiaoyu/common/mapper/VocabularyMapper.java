@@ -481,5 +481,8 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @param max
      * @return
      */
-    List<String> selRandWord(@Param("type") Integer type, @Param("leng") Integer length, @Param("max") Integer max);
+    List<String> selRandWord(@Param("type") Integer type, @Param("leng") Integer length, @Param("max") Integer max, @Param("start") Integer start);
+
+
+    Integer selCountRandWord(@Param("type") Integer type, @Param("leng") Integer length);
 }

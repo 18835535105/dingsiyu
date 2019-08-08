@@ -279,20 +279,26 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
 
     @Override
     public ServerResponse<Object> getPinkeye() {
-        //获取第一个单词
-        List<String> wordString = vocabularyMapper.selRandWord(1, 0, 1);
+        //获取第一个数组出现位置
+        Integer integer = vocabularyMapper.selCountRandWord(1, 0);
+        Random random = new Random();
+        Integer count = random.nextInt(integer - 15);
+        //获取第一个单词数组
+        List<String> wordString = vocabularyMapper.selRandWord(1, 0, 1, count);
         //返回的数据list集合
         List<Map<String, Object>> arrayList = new ArrayList<>();
         for (String wordOne : wordString) {
             //第二个单词
             String wordTwo = null;
+            //获取第二个单词出现位置
+            integer = vocabularyMapper.selCountRandWord(2, wordOne.length());
+            count = random.nextInt(integer - 2);
             //随机数判断  小于5一单词 赋值 二单词 大于5重新查找
-            Random random = new Random();
             Integer rand = random.nextInt(10) + 1;
             if (rand <= 5) {
                 wordTwo = wordOne;
             } else {
-                wordTwo = vocabularyMapper.selRandWord(2, wordOne.length(), 2).get(0);
+                wordTwo = vocabularyMapper.selRandWord(2, wordOne.length(), 2, count).get(0);
             }
             //返回集合
             Map<String, Object> map = new HashMap<>();
