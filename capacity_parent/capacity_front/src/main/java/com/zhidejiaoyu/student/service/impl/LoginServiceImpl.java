@@ -2,7 +2,6 @@ package com.zhidejiaoyu.student.service.impl;
 
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.MacIpUtil;
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
@@ -12,10 +11,7 @@ import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
-import com.zhidejiaoyu.common.utils.TokenUtil;
-import com.zhidejiaoyu.common.utils.ValidateCode;
+import com.zhidejiaoyu.common.utils.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
 import com.zhidejiaoyu.common.utils.locationUtil.LocationUtil;
@@ -29,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.format.datetime.joda.JodaTimeFormatterRegistrar;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
