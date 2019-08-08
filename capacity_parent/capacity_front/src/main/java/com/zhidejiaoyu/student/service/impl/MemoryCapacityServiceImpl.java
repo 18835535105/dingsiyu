@@ -215,26 +215,25 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
     public ServerResponse<Object> getTrainTest(HttpSession session) {
         Student student = getStudent(session);
         Integer count = vocabularyMapper.selCountByStudentIdLimitTen(student.getId(), 1);
-        Integer start=0;
+        Integer start = 0;
+        Random random = new Random();
         if (count > 10) {
-            Random random=new Random();
-            start = random.nextInt(count-10);
+            start = random.nextInt(count - 10);
         }
         //获取熟词中的单词
-        List<String> strings = vocabularyMapper.selByStudentIdLimitTen(student.getId(), 1,start);
+        List<String> strings = vocabularyMapper.selByStudentIdLimitTen(student.getId(), 1, start);
         if (strings.size() < 3) {
             //如果不够三个单词查询全部单词
             count = vocabularyMapper.selCountByStudentIdLimitTen(student.getId(), 2);
             if (count > 10) {
-                Random random=new Random();
-                start = random.nextInt(count-10);
+                start = random.nextInt(count - 10);
             }
-            strings = vocabularyMapper.selByStudentIdLimitTen(student.getId(), 2,start);
+            strings = vocabularyMapper.selByStudentIdLimitTen(student.getId(), 2, start);
         }
         List<String> returnList = new ArrayList<>();
         //获取展示数据
         for (int i = 0; i < 10; i++) {
-            Integer number = (int) (Math.random() * strings.size());
+            Integer number = random.nextInt(strings.size());
             returnList.add(strings.get(number));
         }
         //获取正确答案

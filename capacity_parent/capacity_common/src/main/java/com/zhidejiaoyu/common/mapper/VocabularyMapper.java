@@ -458,25 +458,28 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
     List<Vocabulary> selectPictureRandom(@Param("offset") int offset, @Param("limit") int limit);
 
     /**
-     *  眼脑训练取10个单词
+     * 眼脑训练取10个单词
+     *
      * @param studentId 学生id
-     * @param type  1，查询已学的单词  2查询全部单词
+     * @param type      1，查询已学的单词  2查询全部单词
      */
-    List<String> selByStudentIdLimitTen(@Param("studentId") Long studentId,@Param("type") int type,@Param("start") Integer start);
+    List<String> selByStudentIdLimitTen(@Param("studentId") Long studentId, @Param("type") int type, @Param("start") Integer start);
 
     /**
-     *  获取单词数量
+     * 获取单词数量
+     *
      * @param studentId 学生id
-     * @param type  1，查询已学的单词  2查询全部单词
+     * @param type      1，查询已学的单词  2查询全部单词
      */
-    Integer selCountByStudentIdLimitTen(@Param("studentId") Long studentId,@Param("type") int type);
+    Integer selCountByStudentIdLimitTen(@Param("studentId") Long studentId, @Param("type") int type);
 
     /**
-     *获取火眼精金数据
+     * 获取火眼精金数据
+     *
      * @param type
      * @param length
      * @param max
      * @return
      */
-    List<String> selRandWord(@Param("type") Integer  type ,@Param("leng") Integer length,@Param("max") Integer max);
+    List<String> selRandWord(@Param("type") Integer type, @Param("leng") Integer length, @Param("max") Integer max);
 }

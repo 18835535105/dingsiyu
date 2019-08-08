@@ -1171,11 +1171,11 @@
         <if test="type!=1">
             where LENGTH(voca.word) &lt; 10
         </if>
-         limit #{start}, 10
+        limit #{start}, 10
     </select>
 
     <select id="selCountByStudentIdLimitTen" resultType="integer" parameterType="map">
-        select voca.word from vocabulary voca
+        select count(voca.word) from vocabulary voca
         <if test="type==1">
             join learn learn on learn.vocabulary_id=voca.id
             where learn.student_id=#{studentId}
@@ -1193,10 +1193,10 @@
         select voca.word from vocabulary voca
         where
         <if test="type==1">
-             LENGTH(voca.word) &lt; 10
+            LENGTH(voca.word) &lt; 10
         </if>
         <if test="type==2">
-             LENGTH(voca.word) = #{leng}
+            LENGTH(voca.word) = #{leng}
         </if>
         order by rand() limit
         <if test="max==1">
