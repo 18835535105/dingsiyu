@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.*;
@@ -925,7 +924,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         Map<String, Object> studentMap = new HashMap<>(16);
         double totalGold = BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
         // 我的排名
-        Object myRanking = getMyRanking(student, rankDto, key);
+        Object myRanking = getMyRanking(student, key);
         studentMap.put("stuId", student.getId());
         studentMap.put("myGold", Math.round(totalGold));
         studentMap.put("myChildName", getLevel((int) Math.round(totalGold), redisOpt.getAllLevel()));
@@ -939,6 +938,8 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
             } else if (myRanking instanceof Long) {
                 long ranking = Long.parseLong(myRanking.toString());
                 rankDto.setPage((int) (ranking / rankDto.getRows() + (ranking % rankDto.getRows() == 0 ? 0 : 1)));
+            } else {
+                rankDto.setPage(1);
             }
         }
 
@@ -949,14 +950,10 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
      * 金币排行中获取我的名次
      *
      * @param student
-     * @param rankDto
      */
-    private Object getMyRanking(Student student, RankDto rankDto, String key) {
-        if (rankDto.getModel() == 3) {
-            long rank = rankOpt.getRank(key, student.getId());
-            return rank > 99 || rank == -1 ? "未上榜" : rank;
-        }
-        return rankOpt.getRank(key, student.getId()) + 1;
+    private Object getMyRanking(Student student, String key) {
+        long rank = rankOpt.getRank(key, student.getId());
+        return rank > 99 || rank == -1 ? "未上榜" : rank + 1;
     }
 
     private long getTotalPages(Integer rows, long number) {
