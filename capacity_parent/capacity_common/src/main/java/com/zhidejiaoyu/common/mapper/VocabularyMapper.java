@@ -479,10 +479,17 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @param type
      * @param length
      * @param max
+     * @param start
      * @return
      */
     List<String> selRandWord(@Param("type") Integer type, @Param("leng") Integer length, @Param("max") Integer max, @Param("start") Integer start);
 
-
+    /**
+     * 获取火眼精金数据數量
+     *
+     * @param type
+     * @param length
+     * @return
+     */
     Integer selCountRandWord(@Param("type") Integer type, @Param("leng") Integer length);
 }
