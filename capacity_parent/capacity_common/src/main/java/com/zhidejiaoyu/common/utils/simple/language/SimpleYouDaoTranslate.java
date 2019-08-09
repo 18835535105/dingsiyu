@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.Vo.read.WordInfoVo;
 import com.zhidejiaoyu.common.exception.ServiceException;
-import com.zhidejiaoyu.common.utils.simple.http.SimpleHttpClientUtil;
+import com.zhidejiaoyu.common.utils.http.HttpClientUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
@@ -48,7 +48,7 @@ public class SimpleYouDaoTranslate {
     private SimpleBaiduSpeak simpleBaiduSpeak;
 
     @Autowired
-    private SimpleHttpClientUtil simpleHttpClientUtil;
+    private HttpClientUtil httpClientUtil;
 
     /**
      * 获取单词详细信息
@@ -159,7 +159,7 @@ public class SimpleYouDaoTranslate {
         params.put("appKey", appKey);
         String result = null;
         try {
-            result = simpleHttpClientUtil.post(youdaoUrl, params);
+            result = httpClientUtil.post(youdaoUrl, params);
         } catch (IOException e) {
             log.error("调用有道翻译接口获取单词翻译信息出错！word=[{}]", text, e);
         }

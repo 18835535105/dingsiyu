@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.common.utils.simple.http;
+package com.zhidejiaoyu.common.utils.http;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -36,7 +36,7 @@ import java.util.Map;
  *
  */
 @Component
-public class SimpleHttpClientUtil {
+public class HttpClientUtil {
 
 	@Value("${http.maxTotal}")
 	private Integer maxTotal;
