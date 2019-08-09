@@ -291,6 +291,8 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         Map<String, Object> wordInfoMap;
         // 将单词和字符拼接成句子
         StringBuilder sentence = new StringBuilder();
+        // 记录最后一个字符，如果是 “。”，在下个字符前要加上空格
+        String[] lastStr = new String[1];
         int i = 0;
         for (String word : allWords) {
             wordInfoMap = new HashMap<>(16);
@@ -307,10 +309,14 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
                 if ("。".equals(word)) {
                     // 说明该处是挖出的空格，让学生选择或者填写
                     packageWordInfoList(wordInfoList, wordInfoMap, null, false);
-                    sentence.append(" ").append(ReadContentConstant.BLANK).append(" ");
+                    sentence.append(" ").append(ReadContentConstant.BLANK);
                     wordInfoList = packageSentenceInfoList(translateMap, wordInfoList, sentenceInfoList, sentence);
                 } else {
                     packageWordInfoList(wordInfoList, wordInfoMap, word, false);
+                    if (Objects.equals(lastStr[0], "。")) {
+                        // 挖空分隔符与后面的字符中间加上一个空格
+                        sentence.append(" ");
+                    }
                     sentence.append(word);
                     wordInfoList = packageSentenceInfoList(translateMap, wordInfoList, sentenceInfoList, sentence);
                 }
@@ -325,6 +331,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
                     sentence.append(" ").append(word);
                 }
             }
+            lastStr[0] = word;
             i++;
         }
         return returnList;
