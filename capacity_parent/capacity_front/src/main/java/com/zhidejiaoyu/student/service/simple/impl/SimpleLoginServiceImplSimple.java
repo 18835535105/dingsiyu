@@ -11,8 +11,8 @@ import com.zhidejiaoyu.common.pojo.CapacityReview;
 import com.zhidejiaoyu.common.pojo.RunLog;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.ValidateCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.utils.simple.SimpleValidateCode;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleLearnTimeUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
@@ -456,7 +456,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Cache-Control", "no-cache");
         response.setDateHeader("Expires", 0);
-        SimpleValidateCode vCode = new SimpleValidateCode(150, 40, 4, 150);
+        ValidateCode vCode = new ValidateCode(150, 40, 4, 150);
         session.removeAttribute("validateCode");
         vCode.write(response.getOutputStream());
         session.setAttribute("validateCode", vCode.getCode());

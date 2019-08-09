@@ -6,27 +6,13 @@ package com.zhidejiaoyu.common.constant.study;
  * @author wuchenxi
  * @date 2019-05-21
  */
-@SuppressWarnings("all")
-public enum PointConstant {
+public class PointConstant {
 
-    FIFTY(50),
-    SIXTY(60),
-    SEVENTY(70),
-    EIGHTY(80),
-    NINETY(90),
-    HUNDRED(100);
+    public static final int FIFTY = 50;
+    public static final int SIXTY = 60;
+    public static final int SEVENTY = 70;
+    public static final int EIGHTY = 80;
+    public static final int NINETY = 90;
+    public static final int HUNDRED = 100;
 
-    PointConstant(Integer point) {
-        this.point = point;
-    }
-
-    private Integer point;
-
-    public Integer getPoint() {
-        return point;
-    }
-
-    public void setPoint(Integer point) {
-        this.point = point;
-    }
 }

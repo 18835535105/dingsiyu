@@ -7,11 +7,11 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.study.simple.SimpleWordPictureUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.server.GoldResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
 import com.zhidejiaoyu.common.utils.simple.language.SimpleYouDaoTranslate;
-import com.zhidejiaoyu.common.utils.simple.server.SimpleGoldResponseCode;
 import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResult;
 import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResultUtil;
 import com.zhidejiaoyu.student.service.simple.SimpleReviewService;
@@ -435,14 +435,14 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
                 int state = simpleStudentMapper.updateBySystem_gold((gold-1), student_id);
             }else{
                 // 金币不足
-                return ServerResponse.createBySuccess(SimpleGoldResponseCode.LESS_GOLD.getCode(), "金币不足");
+                return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
             }
             // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
         }else{
             Integer judgeTest = simpleTestRecordMapper.selectJudgeTestToModel(course_id, student_id, classify, select);
             if(judgeTest != null){
                 // 已经测试过, 提示扣除金币是否测试
-                return ServerResponse.createBySuccess(SimpleGoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
+                return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
             }
         }
 
@@ -634,14 +634,14 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
                 int state = simpleStudentMapper.updateBySystem_gold((gold-1), studentId);
             }else{
                 // 金币不足
-                return ServerResponse.createBySuccess(SimpleGoldResponseCode.LESS_GOLD.getCode(), "金币不足");
+                return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
             }
             // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
         }else{
             Integer judgeTest = simpleTestRecordMapper.selectJudgeTest(course_id, studentId, "单词五维测试");
             if(judgeTest != null){
                 // 已经测试过, 提示扣除金币是否测试
-                return ServerResponse.createBySuccess(SimpleGoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
+                return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
             }
         }
 
@@ -941,14 +941,14 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
                 int state = simpleStudentMapper.updateBySystem_gold((gold-1), student_id);
             }else{
                 // 金币不足
-                return ServerResponse.createBySuccess(SimpleGoldResponseCode.LESS_GOLD.getCode(), "金币不足");
+                return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
             }
             // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
         }else{
             Integer judgeTest = simpleTestRecordMapper.selectJudgeTestToModel(courseId, student_id, 0, select);
             if(judgeTest != null){
                 // 已经测试过, 提示扣除金币是否测试
-                return ServerResponse.createBySuccess(SimpleGoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
+                return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
             }
         }
 
