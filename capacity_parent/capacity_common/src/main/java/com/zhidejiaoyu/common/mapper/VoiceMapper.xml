@@ -1,78 +1,80 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.zhidejiaoyu.common.mapper.VoiceMapper" >
-  <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Voice" >
-    <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="student_id" property="studentId" jdbcType="BIGINT" />
-    <result column="course_id" property="courseId" jdbcType="BIGINT" />
-    <result column="unit_id" property="unitId" jdbcType="BIGINT" />
-    <result column="word_id" property="wordId" jdbcType="BIGINT" />
-      <result column="student_name" property="studentName" jdbcType="VARCHAR"/>
-    <result column="type" property="type" jdbcType="INTEGER" />
-    <result column="score" property="score" jdbcType="DOUBLE" />
-    <result column="voice_url" property="voiceUrl" jdbcType="VARCHAR" />
-    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-    <result column="count" property="count" jdbcType="INTEGER" />
-  </resultMap>
-  <sql id="Example_Where_Clause" >
-    <where >
-      <foreach collection="oredCriteria" item="criteria" separator="or" >
-        <if test="criteria.valid" >
-          <trim prefix="(" suffix=")" prefixOverrides="and" >
-            <foreach collection="criteria.criteria" item="criterion" >
-              <choose >
-                <when test="criterion.noValue" >
-                  and ${criterion.condition}
-                </when>
-                <when test="criterion.singleValue" >
-                  and ${criterion.condition} #{criterion.value}
-                </when>
-                <when test="criterion.betweenValue" >
-                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
-                </when>
-                <when test="criterion.listValue" >
-                  and ${criterion.condition}
-                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
-                    #{listItem}
-                  </foreach>
-                </when>
-              </choose>
+<mapper namespace="com.zhidejiaoyu.common.mapper.VoiceMapper">
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Voice">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="student_id" property="studentId" jdbcType="BIGINT"/>
+        <result column="course_id" property="courseId" jdbcType="BIGINT"/>
+        <result column="unit_id" property="unitId" jdbcType="BIGINT"/>
+        <result column="word_id" property="wordId" jdbcType="BIGINT"/>
+        <result column="student_name" property="studentName" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="score" property="score" jdbcType="DOUBLE"/>
+        <result column="voice_url" property="voiceUrl" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="count" property="count" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
             </foreach>
-          </trim>
-        </if>
-      </foreach>
-    </where>
-  </sql>
-  <sql id="Update_By_Example_Where_Clause" >
-    <where >
-      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
-        <if test="criteria.valid" >
-          <trim prefix="(" suffix=")" prefixOverrides="and" >
-            <foreach collection="criteria.criteria" item="criterion" >
-              <choose >
-                <when test="criterion.noValue" >
-                  and ${criterion.condition}
-                </when>
-                <when test="criterion.singleValue" >
-                  and ${criterion.condition} #{criterion.value}
-                </when>
-                <when test="criterion.betweenValue" >
-                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
-                </when>
-                <when test="criterion.listValue" >
-                  and ${criterion.condition}
-                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
-                    #{listItem}
-                  </foreach>
-                </when>
-              </choose>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
             </foreach>
-          </trim>
-        </if>
-      </foreach>
-    </where>
-  </sql>
-  <sql id="Base_Column_List" >
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
       id, student_id, course_id, unit_id, word_id, student_name, type, score,
       voice_url, create_time
   </sql>
@@ -81,126 +83,132 @@
         v.id, v.student_id, v.course_id, v.unit_id, v.word_id, v.student_name, v.type, v.score,
         v.voice_url, v.create_time
     </sql>
-  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.VoiceExample" >
-    select
-    <if test="distinct" >
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    from voice
-    <if test="_parameter != null" >
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null" >
-      order by ${orderByClause}
-    </if>
-  </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
-    select
-    <include refid="Base_Column_List" />
-    from voice
-    where id = #{id,jdbcType=BIGINT}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.VoiceExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from voice
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from voice
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from voice
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.VoiceExample" >
-    delete from voice
-    <if test="_parameter != null" >
-      <include refid="Example_Where_Clause" />
-    </if>
-  </delete>
-  <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Voice" >
-    insert into voice
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        id,
-      </if>
-      <if test="studentId != null" >
-        student_id,
-      </if>
-      <if test="courseId != null" >
-        course_id,
-      </if>
-      <if test="unitId != null" >
-        unit_id,
-      </if>
-      <if test="wordId != null" >
-        word_id,
-      </if>
-        <if test="studentName != null">
-            student_name,
+    <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.VoiceExample">
+        delete from voice
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
         </if>
-      <if test="type != null" >
-        type,
-      </if>
-      <if test="score != null" >
-        score,
-      </if>
-      <if test="voiceUrl != null" >
-        voice_url,
-      </if>
-      <if test="createTime != null" >
-        create_time,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=BIGINT},
-      </if>
-      <if test="studentId != null" >
-        #{studentId,jdbcType=BIGINT},
-      </if>
-      <if test="courseId != null" >
-        #{courseId,jdbcType=BIGINT},
-      </if>
-      <if test="unitId != null" >
-        #{unitId,jdbcType=BIGINT},
-      </if>
-      <if test="wordId != null" >
-        #{wordId,jdbcType=BIGINT},
-      </if>
-        <if test="studentName != null">
-            #{studentName,jdbcType=VARCHAR},
+    </delete>
+    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Voice">
+        insert into voice
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="studentId != null">
+                student_id,
+            </if>
+            <if test="courseId != null">
+                course_id,
+            </if>
+            <if test="unitId != null">
+                unit_id,
+            </if>
+            <if test="wordId != null">
+                word_id,
+            </if>
+            <if test="studentName != null">
+                student_name,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="score != null">
+                score,
+            </if>
+            <if test="voiceUrl != null">
+                voice_url,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="studentId != null">
+                #{studentId,jdbcType=BIGINT},
+            </if>
+            <if test="courseId != null">
+                #{courseId,jdbcType=BIGINT},
+            </if>
+            <if test="unitId != null">
+                #{unitId,jdbcType=BIGINT},
+            </if>
+            <if test="wordId != null">
+                #{wordId,jdbcType=BIGINT},
+            </if>
+            <if test="studentName != null">
+                #{studentName,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="score != null">
+                #{score,jdbcType=DOUBLE},
+            </if>
+            <if test="voiceUrl != null">
+                #{voiceUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.VoiceExample" resultType="java.lang.Integer">
+        select count(*) from voice
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
         </if>
-      <if test="type != null" >
-        #{type,jdbcType=INTEGER},
-      </if>
-      <if test="score != null" >
-        #{score,jdbcType=DOUBLE},
-      </if>
-      <if test="voiceUrl != null" >
-        #{voiceUrl,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null" >
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-    </trim>
-  </insert>
-  <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.VoiceExample" resultType="java.lang.Integer" >
-    select count(*) from voice
-    <if test="_parameter != null" >
-      <include refid="Example_Where_Clause" />
-    </if>
-  </select>
+    </select>
     <select id="selectCountryRank" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="Base_Column_List"/>
-        from voice where unit_id = #{unitId} and word_id = #{wordId} and type = #{type} order by score desc limit 10
+        from voice
+        where unit_id = #{unitId}
+        and word_id = #{wordId}
+        and type = #{type}
+        and create_time >= #{createTime}
+        order by score desc limit 10
     </select>
     <select id="selectClassRank" resultMap="BaseResultMap" parameterType="map">
-        select <include refid="more_table_list"/>
+        select
+        <include refid="more_table_list"/>
         from student s,
-             voice v
+        voice v
         where s.id = v.student_id
-          and s.class_id = #{student.classId}
-          and v.unit_id = #{unitId}
-          and v.type = #{type}
+        and s.class_id = #{student.classId}
+        and v.unit_id = #{unitId}
+        and v.type = #{type}
         order by v.score desc
         limit 10
     </select>
-  <select id="selectTextRankSchool" resultType="java.util.Map" parameterType="java.util.Map">
+    <select id="selectTextRankSchool" resultType="java.util.Map" parameterType="java.util.Map">
     select *
     from (select ROUND(AVG(DISTINCT vo.score)) avgscore
                , stu.student_name              studentName
@@ -218,7 +226,7 @@
     order by score.avgscore desc
     limit 6
   </select>
-  <select id="selectTextRank" resultType="java.util.Map" parameterType="java.util.Map">
+    <select id="selectTextRank" resultType="java.util.Map" parameterType="java.util.Map">
     select *
     from (select ROUND(AVG(DISTINCT vo.score)) avgscore
                , stu.student_name              studentName
@@ -236,93 +244,93 @@
     limit 6
   </select>
     <update id="updateByExampleSelective" parameterType="map">
-    update voice
-    <set >
-      <if test="record.id != null" >
-        id = #{record.id,jdbcType=BIGINT},
-      </if>
-      <if test="record.studentId != null" >
+        update voice
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=BIGINT},
+            </if>
+            <if test="record.studentId != null">
+                student_id = #{record.studentId,jdbcType=BIGINT},
+            </if>
+            <if test="record.courseId != null">
+                course_id = #{record.courseId,jdbcType=BIGINT},
+            </if>
+            <if test="record.unitId != null">
+                unit_id = #{record.unitId,jdbcType=BIGINT},
+            </if>
+            <if test="record.wordId != null">
+                word_id = #{record.wordId,jdbcType=BIGINT},
+            </if>
+            <if test="record.studentName != null">
+                student_name = #{record.studentName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.type != null">
+                type = #{record.type,jdbcType=INTEGER},
+            </if>
+            <if test="record.score != null">
+                score = #{record.score,jdbcType=DOUBLE},
+            </if>
+            <if test="record.voiceUrl != null">
+                voice_url = #{record.voiceUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="record.createTime != null">
+                create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update voice
+        set id = #{record.id,jdbcType=BIGINT},
         student_id = #{record.studentId,jdbcType=BIGINT},
-      </if>
-      <if test="record.courseId != null" >
         course_id = #{record.courseId,jdbcType=BIGINT},
-      </if>
-      <if test="record.unitId != null" >
         unit_id = #{record.unitId,jdbcType=BIGINT},
-      </if>
-      <if test="record.wordId != null" >
         word_id = #{record.wordId,jdbcType=BIGINT},
-      </if>
-        <if test="record.studentName != null">
-            student_name = #{record.studentName,jdbcType=VARCHAR},
-        </if>
-      <if test="record.type != null" >
+        student_name = #{record.studentName,jdbcType=VARCHAR},
         type = #{record.type,jdbcType=INTEGER},
-      </if>
-      <if test="record.score != null" >
         score = #{record.score,jdbcType=DOUBLE},
-      </if>
-      <if test="record.voiceUrl != null" >
         voice_url = #{record.voiceUrl,jdbcType=VARCHAR},
-      </if>
-      <if test="record.createTime != null" >
-        create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      </if>
-    </set>
-    <if test="_parameter != null" >
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
-  </update>
-  <update id="updateByExample" parameterType="map" >
-    update voice
-    set id = #{record.id,jdbcType=BIGINT},
-      student_id = #{record.studentId,jdbcType=BIGINT},
-      course_id = #{record.courseId,jdbcType=BIGINT},
-      unit_id = #{record.unitId,jdbcType=BIGINT},
-      word_id = #{record.wordId,jdbcType=BIGINT},
-      student_name = #{record.studentName,jdbcType=VARCHAR},
-      type = #{record.type,jdbcType=INTEGER},
-      score = #{record.score,jdbcType=DOUBLE},
-      voice_url = #{record.voiceUrl,jdbcType=VARCHAR},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP}
-    <if test="_parameter != null" >
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
-  </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.Voice" >
-    update voice
-    <set >
-      <if test="studentId != null" >
-        student_id = #{studentId,jdbcType=BIGINT},
-      </if>
-      <if test="courseId != null" >
-        course_id = #{courseId,jdbcType=BIGINT},
-      </if>
-      <if test="unitId != null" >
-        unit_id = #{unitId,jdbcType=BIGINT},
-      </if>
-      <if test="wordId != null" >
-        word_id = #{wordId,jdbcType=BIGINT},
-      </if>
-        <if test="studentName != null">
-            student_name = #{studentName,jdbcType=VARCHAR},
+        create_time = #{record.createTime,jdbcType=TIMESTAMP}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
         </if>
-      <if test="type != null" >
-        type = #{type,jdbcType=INTEGER},
-      </if>
-      <if test="score != null" >
-        score = #{score,jdbcType=DOUBLE},
-      </if>
-      <if test="voiceUrl != null" >
-        voice_url = #{voiceUrl,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null" >
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-    </set>
-    where id = #{id,jdbcType=BIGINT}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.Voice" >
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.Voice">
+        update voice
+        <set>
+            <if test="studentId != null">
+                student_id = #{studentId,jdbcType=BIGINT},
+            </if>
+            <if test="courseId != null">
+                course_id = #{courseId,jdbcType=BIGINT},
+            </if>
+            <if test="unitId != null">
+                unit_id = #{unitId,jdbcType=BIGINT},
+            </if>
+            <if test="wordId != null">
+                word_id = #{wordId,jdbcType=BIGINT},
+            </if>
+            <if test="studentName != null">
+                student_name = #{studentName,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="score != null">
+                score = #{score,jdbcType=DOUBLE},
+            </if>
+            <if test="voiceUrl != null">
+                voice_url = #{voiceUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.Voice">
       update voice
       set student_id   = #{studentId,jdbcType=BIGINT},
           course_id    = #{courseId,jdbcType=BIGINT},
@@ -335,36 +343,40 @@
           create_time  = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <select id="selMaxCountByUnitIdAndStudentId" parameterType="java.util.Map" resultType="java.lang.Integer">
+    <select id="selMaxCountByUnitIdAndStudentId" parameterType="java.util.Map" resultType="java.lang.Integer">
       select Max(count) from voice  where unit_id=#{unitId} and student_id=#{studentId}
   </select>
-  <select id="selectSchoolRank" resultMap="BaseResultMap" parameterType="map">
-    select <include refid="more_table_list"/> from voice v, student s where v.student_id = s.id and (s.teacher_id in (
-    <foreach collection="teachers" item="teacher" separator=",">
-      #{teacher.teacherId}
-    </foreach>
-    )
-    <if test="schoolAdminId != null">
-      or s.teacher_id = #{schoolAdminId})
-    </if>
-    and v.unit_id = #{unitId} and v.word_id = #{wordId} and v.type = #{type}
-    order by v.score desc limit 10
-  </select>
+    <select id="selectSchoolRank" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_list"/>
+        from voice v, student s where v.student_id = s.id and (s.teacher_id in (
+        <foreach collection="teachers" item="teacher" separator=",">
+            #{teacher.teacherId}
+        </foreach>
+        )
+        <if test="schoolAdminId != null">
+            or s.teacher_id = #{schoolAdminId})
+        </if>
+        and v.unit_id = #{unitId} and v.word_id = #{wordId} and v.type = #{type}
+        and create_time >= #{createTime}
+        order by v.score desc limit 10
+    </select>
 
-  <select id="selectTeacherIdIsNull" resultMap="BaseResultMap" parameterType="map">
-    select
-    <include refid="more_table_list"/>
-    from voice v,
-    student s
-    where v.student_id = s.id
-    and s.teacher_id is null
-    and v.unit_id = #{unitId}
-    and v.word_id = #{wordId}
-    and v.type = #{type}
-    order by v.score desc limit 10
-  </select>
+    <select id="selectTeacherIdIsNull" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_list"/>
+        from voice v,
+        student s
+        where v.student_id = s.id
+        and s.teacher_id is null
+        and v.unit_id = #{unitId}
+        and v.word_id = #{wordId}
+        and v.type = #{type}
+        and create_time >= #{createTime}
+        order by v.score desc limit 10
+    </select>
 
-  <select id="selVoiceTeksByStudentAndUnit" resultType="map" parameterType="map" >
+    <select id="selVoiceTeksByStudentAndUnit" resultType="map" parameterType="map">
     select DISTINCT voice.word_id , voice.id
     from voice voice
     where voice.unit_id =#{unitId}
