@@ -307,7 +307,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
                 if ("。".equals(word)) {
                     // 说明该处是挖出的空格，让学生选择或者填写
                     packageWordInfoList(wordInfoList, wordInfoMap, null, false);
-                    sentence.append(" ").append(ReadContentConstant.BLANK);
+                    sentence.append(" ").append(ReadContentConstant.BLANK).append(" ");
                     wordInfoList = packageSentenceInfoList(translateMap, wordInfoList, sentenceInfoList, sentence);
                 } else {
                     packageWordInfoList(wordInfoList, wordInfoMap, word, false);
