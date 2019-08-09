@@ -9,11 +9,11 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.excelUtil.SimpleExcelUtil;
 import com.zhidejiaoyu.common.utils.simple.excelUtil.SimpleExportUtil;
-import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
 import com.zhidejiaoyu.student.service.simple.SimpleCapacityServiceSimple;
 import com.zhidejiaoyu.student.service.simple.SimpleCourseService;
 import com.zhidejiaoyu.student.utils.CapacityFontUtil;
@@ -37,7 +37,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     private CommonMethod commonMethod;
 
     @Autowired
-    private SimpleBaiduSpeak simpleBaiduSpeak;
+    private BaiduSpeak baiduSpeak;
 
     @Autowired
     private SimpleVocabularyMapper vocabularyMapper;
@@ -99,7 +99,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         wordInfo.setFontWeight(capacityFontUtil.getFontWeight());
         wordInfo.setUnitId(simpleCapacity.getUnitId());
         wordInfo.setShowInfo(false);
-        wordInfo.setReadUrl(simpleBaiduSpeak.getLanguagePath(simpleCapacity.getWord()));
+        wordInfo.setReadUrl(baiduSpeak.getLanguagePath(simpleCapacity.getWord()));
         wordInfos.add(wordInfo);
     }
 
@@ -159,7 +159,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         PageHelper.startPage(page, size);
         List<CapacityListVo> vos = simpleSimpleCapacityMapper.selectByCourseId(student.getId(), courseId, type);
         for (CapacityListVo vo : vos) {
-            vo.setReadUrl(simpleBaiduSpeak.getLanguagePath(vo.getReadUrl()));
+            vo.setReadUrl(baiduSpeak.getLanguagePath(vo.getReadUrl()));
             vo.setPush(this.getPushTime(vo.getPushTime()));
         }
         PageInfo<CapacityMemory> info = new PageInfo(vos);

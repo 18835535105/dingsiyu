@@ -7,9 +7,9 @@ import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
-import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
 import com.zhidejiaoyu.common.utils.simple.language.SimpleYouDaoTranslate;
 import com.zhidejiaoyu.student.service.simple.SimpleDictationService;
 import org.apache.commons.lang.StringUtils;
@@ -49,7 +49,7 @@ public class SimpleDictationServiceImpl implements SimpleDictationService {
 	private SimpleYouDaoTranslate simpleYouDaoTranslate;
 
 	@Autowired
-	private SimpleBaiduSpeak simpleBaiduSpeak;
+	private BaiduSpeak baiduSpeak;
 
 	@Override
 	public ServerResponse<Object> dictationShow(String unit_id, HttpSession session) {
@@ -121,7 +121,7 @@ public class SimpleDictationServiceImpl implements SimpleDictationService {
 				map.put("soundmark", null);
 			}
 			// 读音url
-			map.put("readUrl", simpleBaiduSpeak.getLanguagePath(vocabulary.getWord()));
+			map.put("readUrl", baiduSpeak.getLanguagePath(vocabulary.getWord()));
 			// 词性
 			String explains = resultMap.get("explains");
 			String exp = explains.substring(2, explains.indexOf(".") + 1);

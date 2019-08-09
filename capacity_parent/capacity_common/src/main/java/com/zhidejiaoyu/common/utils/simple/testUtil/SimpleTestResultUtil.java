@@ -5,7 +5,7 @@ import com.zhidejiaoyu.common.mapper.simple.SimpleVocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
-import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ import java.util.*;
 public class SimpleTestResultUtil implements Serializable {
 
     @Autowired
-    private SimpleBaiduSpeak simpleBaiduSpeak;
+    private BaiduSpeak baiduSpeak;
 
     @Autowired
     private SimpleUnitVocabularyMapper simpleUnitVocabularyMapper;
@@ -85,7 +85,7 @@ public class SimpleTestResultUtil implements Serializable {
                     testResult.setId(vocabulary.getId());
                     map2.put(wordChinese, true);
                     if ("听力理解".equals(type[i])) {
-                        testResult.setReadUrl(simpleBaiduSpeak.getLanguagePath(vocabulary.getWord()));
+                        testResult.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
                     }
                     // 从其余题目中随机获取三道题目
                     for (int k = 0; k < (target.size() - 1 > 3 ? 3 : target.size() - 1); ) {
@@ -237,7 +237,7 @@ public class SimpleTestResultUtil implements Serializable {
                     testResult.setId(vocabulary.getId());
                     map2.put(wordChinese, true);
                     if ("听力理解".equals(type[i])) {
-                        testResult.setReadUrl(simpleBaiduSpeak.getLanguagePath(vocabulary.getWord()));
+                        testResult.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
                     }
                     // 从其余题目中随机获取三道题目
                     for (int k = 0; k < (target.size() - 1 > 3 ? 3 : target.size() - 1); ) {
@@ -375,7 +375,7 @@ public class SimpleTestResultUtil implements Serializable {
             result.setSentence(sentence.getCentreExample().replace("#", " "));
             result.setChaosSentence(simpleCommonMethod.getOrderEnglishList(sentence.getCentreExample(), sentence.getExampleDisturb()));
             result.setSentenctChinese(sentence.getCentreTranslate().replace("*", ""));
-            result.setReadUrl(simpleBaiduSpeak.getLanguagePath(sentence.getCentreExample().replace("#", " ")));
+            result.setReadUrl(baiduSpeak.getLanguagePath(sentence.getCentreExample().replace("#", " ")));
             simpleSentenceTestResults.add(result);
         }
         return simpleSentenceTestResults;

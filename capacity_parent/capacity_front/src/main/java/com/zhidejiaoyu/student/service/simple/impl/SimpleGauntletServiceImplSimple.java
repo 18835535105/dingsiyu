@@ -9,10 +9,10 @@ import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.SimpleLevelUtils;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
-import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.simple.SimpleIGauntletServiceSimple;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     private SimpleVocabularyMapper vocabularyMapper;
 
     @Autowired
-    private SimpleBaiduSpeak simpleBaiduSpeak;
+    private BaiduSpeak baiduSpeak;
 
     @Autowired
     private SimpleStudentStudyPlanMapper simpleStudentStudyPlanMapper;
@@ -830,7 +830,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             gameTwoVo = new GameTwoVo();
             gameTwoVo.setBigBossIndex(bigBossIndex);
             gameTwoVo.setMinBossIndex(minBossIndex);
-            gameTwoVo.setReadUrl(simpleBaiduSpeak.getLanguagePath(needReviewWord.getWord()));
+            gameTwoVo.setReadUrl(baiduSpeak.getLanguagePath(needReviewWord.getWord()));
             // 封装纸牌的试题集合并打乱顺序；
             list = new ArrayList<>(12);
             list.add(needReviewWord);

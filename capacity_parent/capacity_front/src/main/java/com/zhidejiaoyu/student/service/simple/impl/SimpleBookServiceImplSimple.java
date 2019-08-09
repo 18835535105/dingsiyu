@@ -10,9 +10,9 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
-import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
 import com.zhidejiaoyu.student.service.simple.SimpleBookServiceSimple;
 import com.zhidejiaoyu.common.Vo.bookVo.BookInfoVo;
 import com.zhidejiaoyu.common.Vo.bookVo.PlayerVo;
@@ -44,7 +44,7 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<SimpleVoc
     private SimpleRunLogMapper runLogMapper;
 
     @Autowired
-    private SimpleBaiduSpeak simpleBaiduSpeak;
+    private BaiduSpeak baiduSpeak;
 
     @Autowired
     private SimpleVocabularyMapper vocabularyMapper;
@@ -138,10 +138,10 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<SimpleVoc
         if (type == 4 || type == 9 || type == 2) {
             vos.parallelStream().forEach(vo -> {
                 vo.setSoundMark(null);
-                vo.setReadUrl(simpleBaiduSpeak.getLanguagePath(vo.getReadUrl()));
+                vo.setReadUrl(baiduSpeak.getLanguagePath(vo.getReadUrl()));
             });
         } else {
-            vos.parallelStream().forEach(vo -> vo.setReadUrl(simpleBaiduSpeak.getLanguagePath(vo.getReadUrl())));
+            vos.parallelStream().forEach(vo -> vo.setReadUrl(baiduSpeak.getLanguagePath(vo.getReadUrl())));
         }
 
         PageInfo<BookVo> pageInfo = new PageInfo<>(vos);
@@ -251,7 +251,7 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<SimpleVoc
         // 查询当前学生当前模块下所有单词
         PageHelper.startPage(1, 100);
         List<BookVo> bookVos = vocabularyMapper.selectBookVoByUnitId(unitId);
-        bookVos.forEach(bookVo -> bookVo.setReadUrl(simpleBaiduSpeak.getLanguagePath(bookVo.getReadUrl())));
+        bookVos.forEach(bookVo -> bookVo.setReadUrl(baiduSpeak.getLanguagePath(bookVo.getReadUrl())));
         switch (order) {
             case 2:
                 // 随机排列

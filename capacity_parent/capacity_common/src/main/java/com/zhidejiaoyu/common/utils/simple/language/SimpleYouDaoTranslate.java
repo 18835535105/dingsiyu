@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.Vo.read.WordInfoVo;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.utils.http.HttpClientUtil;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
@@ -45,7 +46,7 @@ public class SimpleYouDaoTranslate {
     private String md5Key;
 
     @Autowired
-    private SimpleBaiduSpeak simpleBaiduSpeak;
+    private BaiduSpeak baiduSpeak;
 
     @Autowired
     private HttpClientUtil httpClientUtil;
@@ -81,7 +82,7 @@ public class SimpleYouDaoTranslate {
         } catch (Exception ignored) {
         }
         // 读音地址
-        String readUrl = simpleBaiduSpeak.getLanguagePath(text);
+        String readUrl = baiduSpeak.getLanguagePath(text);
 
         Map<String, String> map = new HashMap<>(16);
         map.put("translation", translation);

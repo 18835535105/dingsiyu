@@ -7,10 +7,10 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.study.simple.SimpleWordPictureUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.GoldResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
-import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
 import com.zhidejiaoyu.common.utils.simple.language.SimpleYouDaoTranslate;
 import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResult;
 import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResultUtil;
@@ -63,7 +63,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
     private SimpleCommonMethod simpleCommonMethod;
 
     @Autowired
-    private SimpleBaiduSpeak simpleBaiduSpeak;
+    private BaiduSpeak baiduSpeak;
 
     @Autowired
     private SimpleCourseMapper simpleCourseMapper;
@@ -265,7 +265,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
             }else{
                 map.put("soundmark", null);
             }
-            map.put("readUrl", simpleBaiduSpeak.getLanguagePath(word)); // 读音
+            map.put("readUrl", baiduSpeak.getLanguagePath(word)); // 读音
         } catch (Exception e) {
         }
 
@@ -349,7 +349,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         // 例句id
         map.put("id", sentence.getId());
         // 例句读音
-        map.put("readUrl", simpleBaiduSpeak.getLanguagePath(english));
+        map.put("readUrl", baiduSpeak.getLanguagePath(english));
         // 例句翻译
         map.put("word_Chinese", chinese);
         // 例句英文原文
@@ -523,7 +523,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
                     if(classify == 2) {
                         try {
                             // 单词读音
-                            map.put("readUrl", simpleBaiduSpeak.getLanguagePath(vo.getWord()));
+                            map.put("readUrl", baiduSpeak.getLanguagePath(vo.getWord()));
                         } catch (Exception e) {
                             logger.error("获取单词" + vo.getWord() + "读音报错!");
                         }
@@ -576,7 +576,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
             vo = capacityMapper.ripeCentreReviewSentence_listen(student_id, unitId, classifyStr);
         }
         // 1.例句读音
-        map.put("readUrl", simpleBaiduSpeak.getLanguagePath(vo.getCentreExample()));
+        map.put("readUrl", baiduSpeak.getLanguagePath(vo.getCentreExample()));
         // 2.例句翻译
         map.put("word_Chinese", vo.getCentreTranslate());
         // 3.正确顺序例句
@@ -720,7 +720,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
                 m.put("word", vo.getWord());
                 try {
                     // 单词读音
-                    m.put("readUrl", simpleBaiduSpeak.getLanguagePath(vo.getWord()));
+                    m.put("readUrl", baiduSpeak.getLanguagePath(vo.getWord()));
                 }catch (Exception e){
                     logger.error("获取单词"+vo.getWord()+"读音报错!");
                 }
@@ -838,7 +838,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
                 correct.put("soundmark", null);
             }
             // 读音url
-            correct.put("readUrl", simpleBaiduSpeak.getLanguagePath(correct.get("word").toString()));
+            correct.put("readUrl", baiduSpeak.getLanguagePath(correct.get("word").toString()));
             // 词性
             // String explains = resultMap.get("explains");
             //String exp = explains.substring(2, explains.indexOf(".") + 1);

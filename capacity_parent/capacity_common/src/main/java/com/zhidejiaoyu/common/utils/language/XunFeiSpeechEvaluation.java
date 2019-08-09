@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.common.utils.simple.language;
+package com.zhidejiaoyu.common.utils.language;
 
 import com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.utils.http.HttpClientUtil;
@@ -28,9 +28,9 @@ import java.util.*;
  * @date 2018/6/20 17:01
  */
 @Component
-public class SimpleSpeechEvaluation {
+public class XunFeiSpeechEvaluation {
 
-    private Logger logger = LoggerFactory.getLogger(SimpleSpeechEvaluation.class);
+    private Logger logger = LoggerFactory.getLogger(XunFeiSpeechEvaluation.class);
 
     @Autowired
     private HttpClientUtil httpClientUtil;
