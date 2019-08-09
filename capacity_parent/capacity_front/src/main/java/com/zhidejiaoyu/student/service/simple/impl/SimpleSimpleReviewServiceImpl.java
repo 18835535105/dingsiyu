@@ -11,7 +11,7 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.GoldResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
-import com.zhidejiaoyu.common.utils.simple.language.SimpleYouDaoTranslate;
+import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
 import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResult;
 import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResultUtil;
 import com.zhidejiaoyu.student.service.simple.SimpleReviewService;
@@ -57,7 +57,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
     private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
-    private SimpleYouDaoTranslate simpleYouDaoTranslate;
+    private YouDaoTranslate youDaoTranslate;
 
     @Autowired
     private SimpleCommonMethod simpleCommonMethod;
@@ -256,7 +256,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
             map.put("wordyj", word); // 单词
         }
         try {
-            Map<String, String> resultMap = simpleYouDaoTranslate.getResultMap(word);
+            Map<String, String> resultMap = youDaoTranslate.getResultMap(word);
             // 音标
             String phonetic = resultMap.get("phonetic");
             // 判断音标是否为null
@@ -829,7 +829,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
 //        correct.put("memoryDifficulty", hard);
 
         try {
-            Map<String, String> resultMap = simpleYouDaoTranslate.getResultMap(correct.get("word").toString());
+            Map<String, String> resultMap = youDaoTranslate.getResultMap(correct.get("word").toString());
             // 音标
             String phonetic = resultMap.get("phonetic");
             if(StringUtils.isNotBlank(phonetic) && !"null".equals(phonetic)) {

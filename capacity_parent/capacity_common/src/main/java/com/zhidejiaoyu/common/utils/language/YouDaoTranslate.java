@@ -1,11 +1,10 @@
-package com.zhidejiaoyu.common.utils.simple.language;
+package com.zhidejiaoyu.common.utils.language;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.Vo.read.WordInfoVo;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.utils.http.HttpClientUtil;
-import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class SimpleYouDaoTranslate {
+public class YouDaoTranslate {
 
     @Value("${appKey}")
     private String appKey;
@@ -111,7 +110,7 @@ public class SimpleYouDaoTranslate {
         String errorCode = jsonObject.getString("errorCode");
         String successCode = "0";
         if (!Objects.equals(successCode, errorCode)) {
-            log.error("请求有道翻译接口出错！错误码=[{}]", errorCode);
+            log.error("请求有道翻译接口出错！错误码=[{}]，响应信息:[{}]", errorCode, jsonObject.toJSONString());
             throw new ServiceException("请求有道翻译接口出错！");
         }
 
