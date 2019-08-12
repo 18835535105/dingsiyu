@@ -308,6 +308,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
             } else {
                 map.put("isTrue", "1");
             }
+            map.put("isTrue", "1");
             map.put("wordOne", wordOne);
             map.put("wordTwo", wordTwo);
             arrayList.add(map);

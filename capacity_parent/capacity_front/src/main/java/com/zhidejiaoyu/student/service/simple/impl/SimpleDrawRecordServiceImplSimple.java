@@ -193,10 +193,10 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
                     RunLog runLog;
                     if (type == 2) {
                         consumeService.addConsume(1, 2, session);
-                        this.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在抽獎中奖励#" + 2 + "#枚金币");
+                        super.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在抽獎中奖励#" + 2 + "#枚金币");
                     } else {
                         consumeService.addConsume(1, 5, session);
-                        this.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在抽獎中奖励#" + 5 + "#枚金币");
+                        super.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在抽獎中奖励#" + 5 + "#枚金币");
                     }
                     resultInt[0] = 1;
                     return resultInt;
@@ -213,11 +213,6 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
             }
         }
         return resultInt;
-    }
-
-
-    private void saveRunLog(Student student, Integer type, String msg) throws RuntimeException {
-        saveRunLog.saveRunLog(student, type, msg);
     }
 
     /**
