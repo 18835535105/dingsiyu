@@ -292,7 +292,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
             String wordTwo = null;
             //获取第二个单词出现位置
             integer = vocabularyMapper.selCountRandWord(2, wordOne.length());
-            count = random.nextInt(integer - 2);
+            count = random.nextInt(integer);
             //随机数判断  小于5一单词 赋值 二单词 大于5重新查找
             Integer rand = random.nextInt(10) + 1;
             if (rand <= 5) {
