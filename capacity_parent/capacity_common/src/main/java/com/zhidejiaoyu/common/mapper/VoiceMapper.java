@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.pojo.Voice;
 import com.zhidejiaoyu.common.pojo.VoiceExample;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -37,20 +38,11 @@ public interface VoiceMapper extends BaseMapper<Voice> {
      * @param unitId
      * @param wordId
      * @param type
+     * @param createTime
      * @return
      */
-    List<Voice> selectCountryRank(@Param("unitId") Long unitId, @Param("wordId") Long wordId, @Param("type") Integer type);
-
-    /**
-     * 获取班级排名
-     *
-     * @param student
-     * @param unitId
-     * @param wordId
-     * @param type
-     * @return
-     */
-    List<Voice> selectClassRank(@Param("student") Student student, @Param("unitId") Long unitId, @Param("wordId") Long wordId, @Param("type") Integer type);
+    List<Voice> selectCountryRank(@Param("unitId") Long unitId, @Param("wordId") Long wordId, @Param("type") Integer type,
+                                  @Param("createTime") Date createTime);
 
     Integer selMaxCountByUnitIdAndStudentId(Map<String, Object> getMap);
 
@@ -77,9 +69,12 @@ public interface VoiceMapper extends BaseMapper<Voice> {
      * @param unitId
      * @param wordId
      * @param type
+     * @param createTime
      * @return
      */
-    List<Voice> selectSchoolRank(@Param("teachers") List<Teacher> teachers, @Param("schoolAdminId") Integer schoolAdminId, @Param("unitId") Long unitId, @Param("wordId") Long wordId, @Param("type") Integer type);
+    List<Voice> selectSchoolRank(@Param("teachers") List<Teacher> teachers, @Param("schoolAdminId") Integer schoolAdminId,
+                                 @Param("unitId") Long unitId, @Param("wordId") Long wordId, @Param("type") Integer type,
+                                 @Param("createTime") Date createTime);
 
     /**
      * 查询所有没有班级的学生的好声音排行
@@ -87,9 +82,11 @@ public interface VoiceMapper extends BaseMapper<Voice> {
      * @param unitId
      * @param wordId
      * @param type
+     * @param createTime
      * @return
      */
-    List<Voice> selectTeacherIdIsNull(@Param("unitId") Long unitId, @Param("wordId") Long wordId, @Param("type") Integer type);
+    List<Voice> selectTeacherIdIsNull(@Param("unitId") Long unitId, @Param("wordId") Long wordId, @Param("type") Integer type,
+                                      @Param("createTime") Date createTime);
 
     List<Map<String,Object>> selVoiceTeksByStudentAndUnit(@Param("unitId") Long unitId,@Param("studentId") Long studentId);
 }

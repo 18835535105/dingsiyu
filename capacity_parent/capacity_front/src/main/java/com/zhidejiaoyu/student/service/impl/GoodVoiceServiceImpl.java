@@ -14,6 +14,7 @@ import com.zhidejiaoyu.student.service.GoodVoiceService;
 import com.zhidejiaoyu.student.utils.GoodVoiceUtil;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -119,12 +120,15 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
         List<VoiceRankVo> classRankVos = new ArrayList<>();
         List<VoiceRankVo> countryRankVos = new ArrayList<>(10);
 
+        // 当前时间之前28天的时间，因为好声音音频文件在腾讯服务器只保留一个月
+        DateTime dateTime = DateTime.now().minusDays(28);
+
         // 全国排行
-        List<Voice> countryVoiceRank = voiceMapper.selectCountryRank(unitId, wordId, type);
+        List<Voice> countryVoiceRank = voiceMapper.selectCountryRank(unitId, wordId, type, dateTime.toDate());
         packageVoiceRankVo(countryRankVos, countryVoiceRank);
 
         // 全校排行
-        List<Voice> schoolVoiceRank = packageSchoolRank(unitId, wordId, type, student);
+        List<Voice> schoolVoiceRank = packageSchoolRank(unitId, wordId, type, student, dateTime.toDate());
 
         packageVoiceRankVo(classRankVos, schoolVoiceRank);
 
@@ -135,11 +139,11 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
         return ServerResponse.createBySuccess(map);
     }
 
-    private List<Voice> packageSchoolRank(Long unitId, Long wordId, Integer type, Student student) {
+    private List<Voice> packageSchoolRank(Long unitId, Long wordId, Integer type, Student student, Date createTime) {
         Long teacherId = student.getTeacherId();
         List<Voice> schoolVoiceRank = null;
         if (teacherId == null) {
-            schoolVoiceRank = voiceMapper.selectTeacherIdIsNull(unitId, wordId, type);
+            schoolVoiceRank = voiceMapper.selectTeacherIdIsNull(unitId, wordId, type, createTime);
         } else {
             // 判断教师角色，如果是教师，查找其校管，再查找其所管辖的所有教师；如果是校管查找其所管辖的所有教师
             List<Teacher> teachers;
@@ -148,14 +152,14 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 // 校管角色
                 teachers = teacherMapper.selectBySchoolAdminId(sysUser.getId());
                 if (teachers.size() > 0) {
-                    schoolVoiceRank = voiceMapper.selectSchoolRank(teachers, sysUser.getId(), unitId, wordId, type);
+                    schoolVoiceRank = voiceMapper.selectSchoolRank(teachers, sysUser.getId(), unitId, wordId, type, createTime);
                 }
             } else {
                 // 教师角色
                 Integer schoolAdminId = teacherMapper.selectSchoolAdminIdByTeacherId(teacherId);
                 teachers = teacherMapper.selectBySchoolAdminId(schoolAdminId);
                 if (teachers.size() > 0) {
-                    schoolVoiceRank = voiceMapper.selectSchoolRank(teachers, schoolAdminId, unitId, wordId, type);
+                    schoolVoiceRank = voiceMapper.selectSchoolRank(teachers, schoolAdminId, unitId, wordId, type, createTime);
                 }
             }
         }

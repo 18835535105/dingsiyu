@@ -291,6 +291,8 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         Map<String, Object> wordInfoMap;
         // 将单词和字符拼接成句子
         StringBuilder sentence = new StringBuilder();
+        // 记录最后一个字符，如果是 “。”，在下个字符前要加上空格
+        String[] lastStr = new String[1];
         int i = 0;
         for (String word : allWords) {
             wordInfoMap = new HashMap<>(16);
@@ -311,6 +313,10 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
                     wordInfoList = packageSentenceInfoList(translateMap, wordInfoList, sentenceInfoList, sentence);
                 } else {
                     packageWordInfoList(wordInfoList, wordInfoMap, word, false);
+                    if (Objects.equals(lastStr[0], "。")) {
+                        // 挖空分隔符与后面的字符中间加上一个空格
+                        sentence.append(" ");
+                    }
                     sentence.append(word);
                     wordInfoList = packageSentenceInfoList(translateMap, wordInfoList, sentenceInfoList, sentence);
                 }
@@ -325,6 +331,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
                     sentence.append(" ").append(word);
                 }
             }
+            lastStr[0] = word;
             i++;
         }
         return returnList;
@@ -390,7 +397,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
      * @param sb         用于拼接单词
      * @param words      需要处理的单词数据（其中包含符号）
      */
-    static void splitPoint(List<String> rightList, StringBuilder sb, String[] words) {
+    private static void splitPoint(List<String> rightList, StringBuilder sb, String[] words) {
         for (String s : words) {
             if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
                 rightList.add(s);
