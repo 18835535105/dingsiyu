@@ -217,7 +217,8 @@
           limit 6
   </select>
     <select id="selectTextRank" resultType="java.util.Map" parameterType="java.util.Map">
-        select ROUND(AVG(DISTINCT vo.score)) avgscore
+select * from
+        (select ROUND(AVG(DISTINCT vo.score)) avgscore
              , stu.student_name              studentName
              , stu.school_name               schoolName
              , concat(#{host}, stu.part_url) url
