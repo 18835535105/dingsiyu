@@ -71,28 +71,6 @@ public class SimpleBaseServiceImpl<M extends BaseMapper<T>, T> extends BaseServi
     }
 
     /**
-     * 计算今天的在线时长
-     *
-     * @param session
-     * @return
-     */
-    Integer getTodayOnlineTime(HttpSession session) {
-        String formatYYYYMMDD = SimpleDateUtil.formatYYYYMMDD(new Date());
-        return this.getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
-    }
-
-    /**
-     * 计算今天的有效时长
-     *
-     * @param studentId
-     * @return
-     */
-    Integer getTodayValidTime(Long studentId) {
-        String formatYYYYMMDD = SimpleDateUtil.formatYYYYMMDD(new Date());
-        return this.getValidTime(studentId, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
-    }
-
-    /**
      * 学生需要单元测试提示信息
      *
      * @return

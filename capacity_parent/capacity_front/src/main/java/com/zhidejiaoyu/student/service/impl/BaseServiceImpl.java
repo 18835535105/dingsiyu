@@ -89,7 +89,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
      * @param session
      * @return
      */
-    Integer getTodayOnlineTime(HttpSession session) {
+    @Override
+    public Integer getTodayOnlineTime(HttpSession session) {
         String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
         return this.getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
     }
@@ -120,7 +121,8 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
      * @param studentId
      * @return
      */
-    Integer getTodayValidTime(Long studentId) {
+    @Override
+    public Integer getTodayValidTime(Long studentId) {
         String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
         return this.getValidTime(studentId, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
     }
