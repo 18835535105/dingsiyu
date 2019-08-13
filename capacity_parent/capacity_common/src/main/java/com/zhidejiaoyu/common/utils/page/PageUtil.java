@@ -19,11 +19,13 @@ public class PageUtil {
      */
     public static int getPageNum() {
         HttpServletRequest request = HttpUtil.getHttpServletRequest();
-        if (StringUtils.isNotEmpty(request.getParameter("pageNum"))) {
-            return Integer.valueOf(request.getParameter("pageNum"));
-        } else {
+        if (request == null) {
             return 1;
         }
+        if (StringUtils.isNotEmpty(request.getParameter("pageNum"))) {
+            return Integer.parseInt(request.getParameter("pageNum"));
+        }
+        return 1;
     }
 
     /**
@@ -33,11 +35,13 @@ public class PageUtil {
      */
     public static int getPageSize() {
         HttpServletRequest request = HttpUtil.getHttpServletRequest();
-        if (StringUtils.isNotEmpty(request.getParameter("pageSize"))) {
-            return Integer.valueOf(request.getParameter("pageSize"));
-        } else {
+        if (request == null) {
             return 20;
         }
+        if (StringUtils.isNotEmpty(request.getParameter("pageSize"))) {
+            return Integer.parseInt(request.getParameter("pageSize"));
+        }
+        return 20;
     }
 
     /**

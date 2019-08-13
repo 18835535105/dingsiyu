@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.utils;
 
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -15,11 +16,19 @@ import java.util.Map;
 public class HttpUtil {
 
     public static HttpServletRequest getHttpServletRequest() {
-        return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes == null) {
+            return null;
+        }
+        return ((ServletRequestAttributes) requestAttributes).getRequest();
     }
 
     public static HttpSession getHttpSession() {
-        return HttpUtil.getHttpServletRequest().getSession();
+        HttpServletRequest httpServletRequest = HttpUtil.getHttpServletRequest();
+        if (httpServletRequest == null) {
+            return null;
+        }
+        return httpServletRequest.getSession();
     }
 
     /**
@@ -28,7 +37,11 @@ public class HttpUtil {
      * @return
      */
     public static String getParams() {
-        Map<String, String[]> parameterMap = getHttpServletRequest().getParameterMap();
+        HttpServletRequest httpServletRequest = getHttpServletRequest();
+        if (httpServletRequest == null) {
+            return "";
+        }
+        Map<String, String[]> parameterMap = httpServletRequest.getParameterMap();
         StringBuilder sb = new StringBuilder();
         if (parameterMap != null && parameterMap.size() > 0) {
             parameterMap.forEach((key, value) -> sb.append(key).append(":").append(Arrays.toString(value)).append(";"));
