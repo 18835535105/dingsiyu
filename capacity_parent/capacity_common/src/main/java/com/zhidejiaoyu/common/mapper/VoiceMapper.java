@@ -44,17 +44,6 @@ public interface VoiceMapper extends BaseMapper<Voice> {
     List<Voice> selectCountryRank(@Param("unitId") Long unitId, @Param("wordId") Long wordId, @Param("type") Integer type,
                                   @Param("createTime") Date createTime);
 
-    /**
-     * 获取班级排名
-     *
-     * @param student
-     * @param unitId
-     * @param wordId
-     * @param type
-     * @return
-     */
-    List<Voice> selectClassRank(@Param("student") Student student, @Param("unitId") Long unitId, @Param("wordId") Long wordId, @Param("type") Integer type);
-
     Integer selMaxCountByUnitIdAndStudentId(Map<String, Object> getMap);
 
     /**

@@ -194,19 +194,9 @@
         and word_id = #{wordId}
         and type = #{type}
         and create_time >= #{createTime}
+        and score > 0
+        group by student_id
         order by score desc limit 10
-    </select>
-    <select id="selectClassRank" resultMap="BaseResultMap" parameterType="map">
-        select
-        <include refid="more_table_list"/>
-        from student s,
-        voice v
-        where s.id = v.student_id
-        and s.class_id = #{student.classId}
-        and v.unit_id = #{unitId}
-        and v.type = #{type}
-        order by v.score desc
-        limit 10
     </select>
     <select id="selectTextRankSchool" resultType="java.util.Map" parameterType="java.util.Map">
     select *
@@ -220,28 +210,28 @@
             and vo.type = 2
             and vo.unit_id = #{map.unitId}
             and vo.create_time >= #{map.beforeTime}
-            and vo.create_time &lt;= #{map.nowTime}
+            and vo.score > 0
           GROUP BY vo.student_id
          ) score
     order by score.avgscore desc
-    limit 6
+          limit 6
   </select>
     <select id="selectTextRank" resultType="java.util.Map" parameterType="java.util.Map">
-    select *
-    from (select ROUND(AVG(DISTINCT vo.score)) avgscore
-               , stu.student_name              studentName
-               , stu.school_name               schoolName
-               , concat(#{host}, stu.part_url) url
-          from voice vo
+select * from
+        (select ROUND(AVG(DISTINCT vo.score)) avgscore
+             , stu.student_name              studentName
+             , stu.school_name               schoolName
+             , concat(#{host}, stu.part_url) url
+        from voice vo
                  right join student stu on vo.student_id = stu.id
-          where vo.type = 2
-            and vo.unit_id = #{map.unitId}
-            and vo.create_time >= #{map.beforeTime}
-            and vo.create_time &lt;= #{map.nowTime}
-          GROUP BY vo.student_id
+        where vo.type = 2
+          and vo.unit_id = #{map.unitId}
+          and vo.create_time >= #{map.beforeTime}
+          and vo.score > 0
+        GROUP BY vo.student_id
          ) score
     order by score.avgscore desc
-    limit 6
+        limit 6
   </select>
     <update id="updateByExampleSelective" parameterType="map">
         update voice
@@ -358,7 +348,9 @@
             or s.teacher_id = #{schoolAdminId})
         </if>
         and v.unit_id = #{unitId} and v.word_id = #{wordId} and v.type = #{type}
-        and create_time >= #{createTime}
+        and v.create_time >= #{createTime}
+        and v.score > 0
+        group by v.student_id
         order by v.score desc limit 10
     </select>
 
@@ -373,6 +365,8 @@
         and v.word_id = #{wordId}
         and v.type = #{type}
         and create_time >= #{createTime}
+        and v.score > 0
+        group by v.student_id
         order by v.score desc limit 10
     </select>
 

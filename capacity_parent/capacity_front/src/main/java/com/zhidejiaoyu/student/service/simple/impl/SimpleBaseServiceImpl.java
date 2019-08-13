@@ -1,15 +1,16 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
-import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.constant.UserConstant;
-import com.zhidejiaoyu.common.mapper.simple.*;
+import com.zhidejiaoyu.common.mapper.simple.SimpleLevelMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleStudentExpansionMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleTeacherMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
+import com.zhidejiaoyu.student.service.BaseService;
+import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.service.simple.SimpleBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,20 +25,13 @@ import java.util.Map;
  * @author wuchenxi
  * @date 2018/8/29
  */
-public class SimpleBaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, T> implements SimpleBaseService<T> {
-
-    @Autowired
-    private SimpleDurationMapper simpleDurationMapper;
+public class SimpleBaseServiceImpl<M extends BaseMapper<T>, T> extends BaseServiceImpl<M, T> implements BaseService<T> {
 
     @Autowired
     private SimpleTeacherMapper simpleTeacherMapper;
 
     @Autowired
     private HttpServletRequest request;
-
-    @Autowired
-    private SimpleStudentMapper simpleStudentMapper;
-
 
     @Autowired
     private RedisOpt redisOpt;
@@ -47,39 +41,6 @@ public class SimpleBaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceIm
 
     @Autowired
     private SimpleLevelMapper simpleLevelMapper;
-
-
-    @Override
-    public Student getStudent(HttpSession session) {
-        Student student = (Student)session.getAttribute(UserConstant.CURRENT_STUDENT);
-        if (student != null) {
-            return simpleStudentMapper.selectById(student.getId());
-        }
-        throw new RuntimeException("学生未登录");
-    }
-
-    @Override
-    public Long getStudentId(HttpSession session) {
-        return getStudent(session).getId();
-    }
-
-    @Override
-    public Integer getValidTime(Long studentId, String beginTime, String endTime) {
-        Integer time = simpleDurationMapper.selectValidTime(studentId, beginTime, endTime);
-        return time == null ? 0 : time;
-    }
-
-    @Override
-    public Integer getOnLineTime(HttpSession session, String beginTime, String endTime) {
-        Integer onlineTime = simpleDurationMapper.selectOnlineTime(getStudentId(session), beginTime, endTime);
-        int loginTime = (int) (System.currentTimeMillis() - ((Date) session.getAttribute(TimeConstant.LOGIN_TIME)).getTime()) / 1000;
-        if (onlineTime == null) {
-            onlineTime = loginTime;
-        } else {
-            onlineTime += loginTime;
-        }
-        return onlineTime;
-    }
 
     @Override
     public void getLevel(HttpSession session) {
@@ -107,28 +68,6 @@ public class SimpleBaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceIm
             studentExpansion.setStudyPower(studentExpansion.getStudyPower()+addStudy);
             simpleStudentExpansionMapper.updateById(studentExpansion);
         }
-    }
-
-    /**
-     * 计算今天的在线时长
-     *
-     * @param session
-     * @return
-     */
-    Integer getTodayOnlineTime(HttpSession session) {
-        String formatYYYYMMDD = SimpleDateUtil.formatYYYYMMDD(new Date());
-        return this.getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
-    }
-
-    /**
-     * 计算今天的有效时长
-     *
-     * @param studentId
-     * @return
-     */
-    Integer getTodayValidTime(Long studentId) {
-        String formatYYYYMMDD = SimpleDateUtil.formatYYYYMMDD(new Date());
-        return this.getValidTime(studentId, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
     }
 
     /**

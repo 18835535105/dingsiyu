@@ -7,6 +7,8 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.SimpleAwardUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
+import com.zhidejiaoyu.student.common.SaveRunLog;
+import com.zhidejiaoyu.student.service.BaseService;
 import com.zhidejiaoyu.student.service.simple.*;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +52,9 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
     private SimpleStudentMapper simpleStudentMapper;
     @Autowired
     private RedisOpt redisOpt;
+    @Autowired
+    private SaveRunLog saveRunLog;
+
 
     @Override
     @GoldChangeAnnotation
@@ -188,12 +193,12 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
                     RunLog runLog;
                     if (type == 2) {
                         consumeService.addConsume(1, 2, session);
-                        runLog = new RunLog(student.getId(), 4, "抽奖获取#2#个金币", date);
+                        super.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在抽獎中奖励#" + 2 + "#枚金币");
                     } else {
                         consumeService.addConsume(1, 5, session);
-                        runLog = new RunLog(student.getId(), 4, "惊喜抽奖获取#5#个金币", date);
+                        super.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在抽獎中奖励#" + 5 + "#枚金币");
                     }
-                    resultInt[0] = runLogMapper.insert(runLog);
+                    resultInt[0] = 1;
                     return resultInt;
                 } else if (type == 3 || type == 7) {
                     //添加钻石

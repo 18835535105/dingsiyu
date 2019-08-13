@@ -82,4 +82,20 @@ public interface BaseService<T> extends IService<T> {
      */
     void saveRunLog(Student student, Integer type, String msg) throws RuntimeException;
 
+    /**
+     * 计算今天的在线时长
+     *
+     * @param session
+     * @return
+     */
+    Integer getTodayOnlineTime(HttpSession session);
+
+    /**
+     * 计算今天的有效时长
+     *
+     * @param studentId
+     * @return
+     */
+    Integer getTodayValidTime(Long studentId);
+
 }

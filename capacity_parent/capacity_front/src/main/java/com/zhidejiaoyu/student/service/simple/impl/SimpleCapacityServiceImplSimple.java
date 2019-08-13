@@ -91,7 +91,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         CapacityDigestVo.WordInfo wordInfo = new CapacityDigestVo.WordInfo();
         int fontNum = commonMethod.getFontSize(simpleCapacity);
         CapacityFontUtil capacityFontUtil = new CapacityFontUtil(fontNum);
-        wordInfo.setContent(simpleCapacity.getWord());
+        wordInfo.setContent(simpleCapacity.getWord().replace("$","").replace("#"," "));
         wordInfo.setUnitId(simpleCapacity.getUnitId());
         wordInfo.setId(simpleCapacity.getVocabularyId());
         wordInfo.setFontSize(capacityFontUtil.getFontSize());

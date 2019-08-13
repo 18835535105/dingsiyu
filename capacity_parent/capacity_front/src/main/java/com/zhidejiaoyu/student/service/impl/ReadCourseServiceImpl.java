@@ -328,7 +328,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             map.put("partList", partList);
         }
         ReadCourse readCourse = readCourseMapper.selectById(courseId);
-        map.put("courseName",readCourse.getGrade()+"-"+readCourse.getMonth());
+        map.put("courseName", readCourse.getGrade() + "-" + readCourse.getMonth());
         return ServerResponse.createBySuccess(map);
     }
 
@@ -375,7 +375,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             this.getBlanks(typeId, map, returnList);
         }
         if (readType.getTestType() == 3) {
-            this.getChooseSentences(typeId, map);
+            this.getChooseSentences(typeId, map, readType.getReadCount());
         }
         /* if (readType.getTestType() != 5) {*/
         map.put("sentenceList", returnList);
@@ -434,36 +434,36 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
     }
 
     private void getReturnEnglisthMap(List<ReadArder> readArders, Map<String, Object> map) {
-        StringBuilder englishBuilder=new StringBuilder();
-        StringBuilder chineseBuilder=new StringBuilder();
+        StringBuilder englishBuilder = new StringBuilder();
+        StringBuilder chineseBuilder = new StringBuilder();
         List<Map<String, Object>> list = new ArrayList<>();
         int i = 0;
         for (ReadArder readArder : readArders) {
             if (i == 0) {
-                englishBuilder.append(readArder.getSentence().replace("#&#",""));
-                chineseBuilder.append(readArder.getTranslate().replace("#&#",""));
+                englishBuilder.append(readArder.getSentence().replace("#&#", ""));
+                chineseBuilder.append(readArder.getTranslate().replace("#&#", ""));
                 i++;
             } else {
                 if (readArder.getSentence().indexOf("#&#") != -1) {
-                    Map<String,Object> sMap=new HashMap<>();
-                    sMap.put("sentence",englishBuilder.toString());
-                    sMap.put("translate",chineseBuilder.toString());
+                    Map<String, Object> sMap = new HashMap<>();
+                    sMap.put("sentence", englishBuilder.toString());
+                    sMap.put("translate", chineseBuilder.toString());
                     list.add(sMap);
-                    englishBuilder=new StringBuilder();
-                    chineseBuilder=new StringBuilder();
+                    englishBuilder = new StringBuilder();
+                    chineseBuilder = new StringBuilder();
                 }
-                englishBuilder.append(readArder.getSentence().replace("#&#",""));
-                chineseBuilder.append(readArder.getTranslate().replace("#&#",""));
+                englishBuilder.append(readArder.getSentence().replace("#&#", ""));
+                chineseBuilder.append(readArder.getTranslate().replace("#&#", ""));
                 i++;
             }
             if (i == readArders.size()) {
-                Map<String,Object> sMap=new HashMap<>();
-                sMap.put("sentence",englishBuilder.toString());
-                sMap.put("translate",chineseBuilder.toString());
+                Map<String, Object> sMap = new HashMap<>();
+                sMap.put("sentence", englishBuilder.toString());
+                sMap.put("translate", chineseBuilder.toString());
                 list.add(sMap);
             }
         }
-        map.put("sentenceList",list);
+        map.put("sentenceList", list);
     }
 
     private void getEnglishData(List<ReadArder> readArders, Map<String, Object> map) {
@@ -536,7 +536,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
      * @param typeId
      * @param map
      */
-    private void getChooseSentences(Long typeId, Map<String, Object> map) {
+    private void getChooseSentences(Long typeId, Map<String, Object> map, Integer readCount) {
         ReadChooseBlanks readChooseBlanks = readChooseBlanksMapper.selByTypeId(typeId);
         String analysis = readChooseBlanks.getAnalysis();
         String content = readChooseBlanks.getContent();
@@ -546,6 +546,12 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         for (int i = 0; i < contentList.size(); i++) {
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("number", i);
+            if (i < readCount) {
+                returnMap.put("isTrue",true);
+            }else{
+                returnMap.put("isTrue",false);
+
+            }
             returnMap.put("analysisList", analysisList.get(i));
             returnMap.put("sentence", contentList.get(i));
             list.add(returnMap);
