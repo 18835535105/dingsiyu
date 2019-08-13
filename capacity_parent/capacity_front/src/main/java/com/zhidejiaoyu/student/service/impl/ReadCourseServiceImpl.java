@@ -187,9 +187,18 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         List<Long> courseIds = readCourseMapper.selBySortAndGrade(unitId, grade);
         //获取月份下的所有课程
         List<ReadType> readTypes = readTypeMapper.selByCourseList(courseIds);
+        //按类型分组
+        Map<Integer, List<ReadType>> collectMap = readTypes.parallelStream().collect(Collectors.groupingBy(ReadType::getTestType));
         //List<ReadType> readTypes = readTypeMapper.selByCourseId(courseId);
         List<Map<String, Object>> returnList = new ArrayList<>();
-        for (ReadType readType : readTypes) {
+        //获取所有Type
+        Set<Integer> integers = collectMap.keySet();
+        //根据type获取分组
+        for (Integer integer : integers) {
+            List<ReadType> readTypes1 = collectMap.get(integer);
+            Random random = new Random(readTypes1.size());
+            int index = random.nextInt();
+            ReadType readType = readTypes1.get(index);
             Map<String, Object> returnMap = new HashMap<>();
             Map<String, Object> map = new HashMap<>();
             map.put("typeId", readType.getId());
@@ -223,6 +232,40 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             returnMap.put("data", map);
             returnList.add(returnMap);
         }
+       /* for (ReadType readType : readTypes) {
+            Map<String, Object> returnMap = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
+            map.put("typeId", readType.getId());
+            map.put("typesOfEssays", readType.getTypesOfEssays());
+            map.put("difficulty", readType.getDifficulty());
+            map.put("wordQuantity", readType.getWordQuantity());
+            String learnTime = readType.getLearnTime().replace("s", "");
+            Integer second = Integer.parseInt(learnTime);
+            Integer minute = second / 60;
+            Integer residueSecond = second % 60;
+            StringBuilder strB = new StringBuilder();
+            if (minute != null && minute != 0) {
+                strB.append(minute + "分");
+            }
+            if (residueSecond != null && residueSecond != 0) {
+                strB.append(residueSecond + "秒");
+            }
+            map.put("readName", readType.getReadName());
+            map.put("lookLearnTime", strB.toString());
+            map.put("calculationLearnTime", second);
+            map.put("questions", readType.getReadCount());
+            TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitIdAndGenreAndStudyModel(student.getId(), readType.getId(), "阅读测试", "阅读测试");
+            if (testRecord != null) {
+                map.put("rightCount", testRecord.getRightCount());
+                map.put("isClose", true);
+            } else {
+                map.put("rightCount", 0);
+                map.put("isClose", false);
+            }
+            returnMap.put("title", readType.getReadName());
+            returnMap.put("data", map);
+            returnList.add(returnMap);
+        }*/
         return ServerResponse.createBySuccess(returnList);
     }
 
@@ -505,28 +548,6 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             returnMap.put("analysis", analysisList[i]);
             returnList.add(returnMap);
         }
-       /* int brank = 0;
-        List<List<Map<String, Object>>> reList = new ArrayList<>();
-        for (List<Map<String, Object>> rList : sList) {
-            List<Map<String, Object>> tList = new ArrayList<>();
-            for (Map<String, Object> rMap : rList) {
-                List<String> wordList = (List<String>) rMap.get("wordList");
-                List<Map<String,Object>> wordsList=new ArrayList<>();
-                for (String word : wordList) {
-                    Map<String,Object> wordMap=new HashMap<>();
-                    wordMap.put("word",word);
-                    if (word.contains("&@&")) {
-                        wordMap.put("answer", answerList[brank]);
-                        brank++;
-                    }
-                    wordsList.add(wordMap);
-                }
-                rMap.put("wordList",wordsList);
-                tList.add(rMap);
-            }
-            reList.add(tList);
-        }
-        map.put("sentenceList", reList);*/
         map.put("topic", returnList);
     }
 
@@ -547,9 +568,9 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("number", i);
             if (i < readCount) {
-                returnMap.put("isTrue",true);
-            }else{
-                returnMap.put("isTrue",false);
+                returnMap.put("isTrue", true);
+            } else {
+                returnMap.put("isTrue", false);
 
             }
             returnMap.put("analysisList", analysisList.get(i));
