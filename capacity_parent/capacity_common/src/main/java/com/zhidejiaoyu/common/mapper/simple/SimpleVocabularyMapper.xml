@@ -920,6 +920,7 @@
         FROM vocabulary v,learn l where v.id =
         l.vocabulary_id and
         v.delStatus = 1
+        and l.type = 1
         and l.student_id=#{studentId} and
         l.course_id=#{courseId}
         <if test="condition == 2">
@@ -948,6 +949,7 @@
           AND uv.vocabulary_id NOT IN (SELECT l.vocabulary_id
                                        FROM learn l
                                        WHERE l.student_id = #{studentId}
+                                         and l.type = 1
                                          AND l.vocabulary_id = v.id
                                          AND l.course_id = #{courseId})
     </select>
