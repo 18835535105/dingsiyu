@@ -270,8 +270,7 @@
         FROM
         unit_vocabulary uv,
         vocabulary v
-        WHERE
-        v.id = uv.vocabulary_id
+        WHERE v.id = uv.vocabulary_id
         AND v.delStatus = 1
         AND uv.unit_id = #{unitId}
         <if test="studyModel == '单词图鉴'">
@@ -285,9 +284,9 @@
         WHERE
         l.student_id = #{studentId}
         AND l.vocabulary_id = v.id
-        AND
-        unit_id = #{unitId}
+        AND unit_id = #{unitId}
         AND study_model = #{studyModel}
+        and l.type = 1
         )
     </select>
 
@@ -297,12 +296,13 @@
         SELECT
         distinct
         <include refid="unite_Column_List"/>
-        FROM vocabulary v,learn l where v.id =
-        l.vocabulary_id and
-        v.delStatus =
-        1 and l.study_model = #{studyModel}
-        and l.student_id=#{studentId} and
-        l.unit_id=#{unitId}
+        FROM vocabulary v,learn l
+        where v.id = l.vocabulary_id
+        and v.delStatus = 1
+        and l.study_model = #{studyModel}
+        and l.student_id=#{studentId}
+        and l.unit_id=#{unitId}
+        and l.type = 1
         <if test="studyModel == '单词图鉴'">
             and v.recordpicurl is not null
         </if>
