@@ -196,8 +196,11 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         //根据type获取分组
         for (Integer integer : integers) {
             List<ReadType> readTypes1 = collectMap.get(integer);
-            Random random = new Random(readTypes1.size());
-            int index = random.nextInt();
+            int index = 0;
+            if (readTypes1.size()> 1) {
+                Random random = new Random();
+                index = random.nextInt(readTypes1.size());
+            }
             ReadType readType = readTypes1.get(index);
             Map<String, Object> returnMap = new HashMap<>();
             Map<String, Object> map = new HashMap<>();
