@@ -934,7 +934,7 @@
     </select>
     <select id="selectUnlearnedBookVoByCourseId" resultType="com.zhidejiaoyu.common.Vo.bookVo.BookVo"
             parameterType="map">
-        SELECT distinct v.id,
+        SELECT v.id,
                         v.word_chinese                                                chinese,
                         if(v.syllable is null or v.syllable = '', v.word, v.syllable) content,
                         v.word                                                        readUrl,
@@ -955,7 +955,7 @@
     </select>
 
     <sql id="selectBookVoSql">
-        SELECT distinct v.id,
+        SELECT v.id,
                         v.word_chinese                                                chinese,
                         if(v.syllable is null or v.syllable = '', v.word, v.syllable) content,
                         v.word                                                        readUrl,
@@ -996,7 +996,7 @@
     <select id="selectUnknownWordBookVoByCourseIds" resultType="com.zhidejiaoyu.common.Vo.bookVo.BookVo"
             parameterType="map">
         SELECT
-        distinct v.id,
+        v.id,
         v.word_chinese chinese,
         if(v.syllable is null or v.syllable = '', v.word, v.syllable) content,
         v.word readUrl,
@@ -1025,8 +1025,7 @@
     <select id="selectUnlearnedBookVoByCourseIds" resultType="com.zhidejiaoyu.common.Vo.bookVo.BookVo"
             parameterType="map">
         SELECT
-        distinct v.id,
-
+        v.id,
         v.word_chinese chinese,
         if(v.syllable is null or v.syllable = '', v.word, v.syllable) content,
         v.word readUrl,
