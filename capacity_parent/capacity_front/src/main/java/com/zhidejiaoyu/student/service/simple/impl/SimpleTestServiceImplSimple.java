@@ -21,9 +21,9 @@ import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
-import com.zhidejiaoyu.common.utils.simple.server.SimpleTestResponseCode;
+import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleSentenceTestResult;
 import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResult;
 import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResultUtil;
@@ -116,7 +116,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     private SimpleSimpleCapacityMapper simpleSimpleCapacityMapper;
 
     @Autowired
-    private SimpleBaiduSpeak simpleBaiduSpeak;
+    private BaiduSpeak baiduSpeak;
 
     @Autowired
     private SimpleLearnMapper learnMapper;
@@ -221,8 +221,8 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             // 测试次数
             String time = explain.split("#")[1];
             if ("2".equals(time)) {
-                return ServerResponse.createByErrorCodeMessage(SimpleTestResponseCode.GAME_TESTED_SECOND.getCode(),
-                        SimpleTestResponseCode.GAME_TESTED_SECOND.getMsg());
+                return ServerResponse.createByErrorCodeMessage(TestResponseCode.GAME_TESTED_SECOND.getCode(),
+                        TestResponseCode.GAME_TESTED_SECOND.getMsg());
             }
         }
 
@@ -1426,7 +1426,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
         // 读音
         if (type == 1 || type == 2 || type == 3 || type == 4 || type == 8 || type == 9) {
-            vocabulary.put("readUrl", simpleBaiduSpeak.getLanguagePath(word));
+            vocabulary.put("readUrl", baiduSpeak.getLanguagePath(word));
         }
 
         // 该课程已学单词

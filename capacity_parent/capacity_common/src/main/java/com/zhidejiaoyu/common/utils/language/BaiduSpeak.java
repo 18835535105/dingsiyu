@@ -58,9 +58,11 @@ public class BaiduSpeak {
         Vocabulary vocabulary = vocabularyMapper.selectByWord(text);
         if (vocabulary != null && StringUtils.isNotEmpty(vocabulary.getReadUrl())) {
             HttpSession session = HttpUtil.getHttpSession();
-            Object attribute = session.getAttribute(GetOssFile.DESKTOP);
-            if (attribute != null && !"".equals(attribute)) {
-                return "static/" + vocabulary.getReadUrl();
+            if (session != null) {
+                Object attribute = session.getAttribute(GetOssFile.DESKTOP);
+                if (attribute != null && !"".equals(attribute)) {
+                    return "static/" + vocabulary.getReadUrl();
+                }
             }
             return GetOssFile.getPublicObjectUrl(vocabulary.getReadUrl());
         }

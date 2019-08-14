@@ -10,8 +10,8 @@ import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.utils.simple.language.SimpleBaiduSpeak;
 import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.common.SaveLearnAndCapacity;
@@ -49,7 +49,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
     private MemoryDifficultyUtil memoryDifficultyUtil;
 
     @Autowired
-    private SimpleBaiduSpeak simpleBaiduSpeak;
+    private BaiduSpeak baiduSpeak;
 
     @Autowired
     private SaveLearnAndCapacity saveLearnAndCapacity;
@@ -215,7 +215,7 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
 
         // 单词读音url
         if (type == 1 || type == 2 || type == 3 || type == 4 || type == 8 || type == 9) {
-            simpleCapacityVo.setReadUrl(simpleBaiduSpeak.getLanguagePath(simpleCapacityVo.getWord()));
+            simpleCapacityVo.setReadUrl(baiduSpeak.getLanguagePath(simpleCapacityVo.getWord()));
         }
 
         // 去掉音标

@@ -22,7 +22,7 @@ import com.zhidejiaoyu.common.utils.math.MathUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.utils.simple.language.SimpleYouDaoTranslate;
+import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
 import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.service.ReadWordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +55,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
     private ReadWordMapper readWordMapper;
 
     @Autowired
-    private SimpleYouDaoTranslate simpleYouDaoTranslate;
+    private YouDaoTranslate youDaoTranslate;
 
     @Autowired
     private VocabularyMapper vocabularyMapper;
@@ -78,7 +78,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
     @Override
     public ServerResponse<Object> getWordInfo(HttpSession session, Long courseId, String word) {
         Vocabulary vocabulary = vocabularyMapper.selectByWord(word);
-        WordInfoVo wordInfoVo = simpleYouDaoTranslate.getWordInfoVo(word);
+        WordInfoVo wordInfoVo = youDaoTranslate.getWordInfoVo(word);
         if (vocabulary == null) {
             wordInfoVo.setWordId(null);
             wordInfoVo.setCanAddNewWordsBook(false);

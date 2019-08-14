@@ -1,10 +1,10 @@
-package com.zhidejiaoyu.common.utils.simple.language;
+package com.zhidejiaoyu.common.utils.language;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.Vo.read.WordInfoVo;
 import com.zhidejiaoyu.common.exception.ServiceException;
-import com.zhidejiaoyu.common.utils.simple.http.SimpleHttpClientUtil;
+import com.zhidejiaoyu.common.utils.http.HttpClientUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class SimpleYouDaoTranslate {
+public class YouDaoTranslate {
 
     @Value("${appKey}")
     private String appKey;
@@ -45,10 +45,10 @@ public class SimpleYouDaoTranslate {
     private String md5Key;
 
     @Autowired
-    private SimpleBaiduSpeak simpleBaiduSpeak;
+    private BaiduSpeak baiduSpeak;
 
     @Autowired
-    private SimpleHttpClientUtil simpleHttpClientUtil;
+    private HttpClientUtil httpClientUtil;
 
     /**
      * 获取单词详细信息
@@ -81,7 +81,7 @@ public class SimpleYouDaoTranslate {
         } catch (Exception ignored) {
         }
         // 读音地址
-        String readUrl = simpleBaiduSpeak.getLanguagePath(text);
+        String readUrl = baiduSpeak.getLanguagePath(text);
 
         Map<String, String> map = new HashMap<>(16);
         map.put("translation", translation);
@@ -110,7 +110,7 @@ public class SimpleYouDaoTranslate {
         String errorCode = jsonObject.getString("errorCode");
         String successCode = "0";
         if (!Objects.equals(successCode, errorCode)) {
-            log.error("请求有道翻译接口出错！错误码=[{}]", errorCode);
+            log.error("请求有道翻译接口出错！错误码=[{}]，响应信息:[{}]", errorCode, jsonObject.toJSONString());
             throw new ServiceException("请求有道翻译接口出错！");
         }
 
@@ -159,7 +159,7 @@ public class SimpleYouDaoTranslate {
         params.put("appKey", appKey);
         String result = null;
         try {
-            result = simpleHttpClientUtil.post(youdaoUrl, params);
+            result = httpClientUtil.post(youdaoUrl, params);
         } catch (IOException e) {
             log.error("调用有道翻译接口获取单词翻译信息出错！word=[{}]", text, e);
         }

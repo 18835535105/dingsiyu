@@ -9,16 +9,15 @@ import com.zhidejiaoyu.common.Vo.simple.studentInfoVo.LevelVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
-import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleWeekUtil;
-import com.zhidejiaoyu.common.utils.simple.server.SimpleResponseCode;
 import com.zhidejiaoyu.student.constant.PetImageConstant;
 import com.zhidejiaoyu.student.service.simple.SimpleStudentInfoServiceSimple;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 
 @Slf4j
 @Service
@@ -207,12 +205,12 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
             Date lastWorshipTime = worships.get(0).getWorshipTime();
             if (Objects.equals(SimpleDateUtil.formatYYYYMMDD(lastWorshipTime), SimpleDateUtil.formatYYYYMMDD(new Date()))) {
                 // 今天已经膜拜过其他人
-                return ServerResponse.createByErrorCodeMessage(SimpleResponseCode.TIME_LESS_ONE_DAY.getCode(), SimpleResponseCode.TIME_LESS_ONE_DAY.getMsg());
+                return ServerResponse.createByErrorCodeMessage(ResponseCode.TIME_LESS_ONE_DAY.getCode(), ResponseCode.TIME_LESS_ONE_DAY.getMsg());
             }
             long count = worships.stream().filter(worship -> worship.getStudentIdByWorship().equals(userId)).count();
             if (count > 0) {
                 // 本周已膜拜过该同学，不能再次膜拜
-                return ServerResponse.createByErrorCodeMessage(SimpleResponseCode.TIME_LESS_ONE_WEEK.getCode(), SimpleResponseCode.TIME_LESS_ONE_WEEK.getMsg());
+                return ServerResponse.createByErrorCodeMessage(ResponseCode.TIME_LESS_ONE_WEEK.getCode(), ResponseCode.TIME_LESS_ONE_WEEK.getMsg());
             }
         }
 
@@ -292,7 +290,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     public ServerResponse<String> judgeOldPassword(String nowPassword, String oldPassword) {
 
         if (!Objects.equals(nowPassword, oldPassword)) {
-            return ServerResponse.createByErrorCodeMessage(SimpleResponseCode.PASSWORD_ERROR.getCode(), SimpleResponseCode.PASSWORD_ERROR.getMsg());
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.PASSWORD_ERROR.getCode(), ResponseCode.PASSWORD_ERROR.getMsg());
         }
         return ServerResponse.createBySuccess();
     }

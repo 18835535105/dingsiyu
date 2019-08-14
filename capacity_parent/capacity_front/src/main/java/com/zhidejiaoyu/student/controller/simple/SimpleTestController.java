@@ -3,9 +3,9 @@ package com.zhidejiaoyu.student.controller.simple;
 import com.zhidejiaoyu.common.Vo.simple.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.TestRecord;
+import com.zhidejiaoyu.common.utils.ValidateUtil;
+import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.utils.simple.SimpleValidateUtil;
-import com.zhidejiaoyu.common.utils.simple.server.SimpleResponseCode;
 import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResult;
 import com.zhidejiaoyu.student.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.service.simple.SimpleTestServiceSimple;
@@ -109,11 +109,11 @@ public class SimpleTestController {
     @PostMapping("/saveWordUnitTest")
     public ServerResponse<TestResultVo> saveWordUnitTest(HttpSession session, String testDetail, @Valid WordUnitTestDTO wordUnitTestDTO,
                                                          BindingResult bindingResult) {
-        String msg = SimpleValidateUtil.validate(bindingResult);
+        String msg = ValidateUtil.validate(bindingResult);
         if ("ok".equals(msg)) {
             return testService.saveWordUnitTest(session, wordUnitTestDTO, testDetail);
         }
-        return ServerResponse.createByErrorCodeMessage(SimpleResponseCode.ILLEGAL_ARGUMENT.getCode(), msg);
+        return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), msg);
     }
 
     /**
@@ -193,10 +193,10 @@ public class SimpleTestController {
     public ServerResponse<Map<String, Object>> getSentenceUnitTest(HttpSession session, Long unitId, String studyModel,
                                                                    @RequestParam(required = false, defaultValue = "false") Boolean isSure) {
         if (unitId == null) {
-            return ServerResponse.createByErrorCodeMessage(SimpleResponseCode.ILLEGAL_ARGUMENT.getCode(), "unitId 不能为 null");
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), "unitId 不能为 null");
         }
         if (StringUtils.isEmpty(studyModel)) {
-            return ServerResponse.createByErrorCodeMessage(SimpleResponseCode.ILLEGAL_ARGUMENT.getCode(), "unitId 不能为空");
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), "unitId 不能为空");
         }
         return testService.getSentenceUnitTest(session, unitId, studyModel, isSure);
     }
@@ -220,7 +220,7 @@ public class SimpleTestController {
     @GetMapping("/getTestDetail")
     public ServerResponse<TestDetailVo> getTestDetail(HttpSession session, Long testId) {
         if (testId == null) {
-            return ServerResponse.createByError(SimpleResponseCode.ILLEGAL_ARGUMENT.getCode(), SimpleResponseCode.ILLEGAL_ARGUMENT.getMsg());
+            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
         }
         return testService.getTestDetail(session, testId);
     }

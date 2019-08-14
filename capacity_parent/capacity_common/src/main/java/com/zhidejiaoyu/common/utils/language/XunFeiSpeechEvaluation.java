@@ -1,7 +1,7 @@
-package com.zhidejiaoyu.common.utils.simple.language;
+package com.zhidejiaoyu.common.utils.language;
 
 import com.alibaba.fastjson.JSONObject;
-import com.zhidejiaoyu.common.utils.simple.http.SimpleHttpClientUtil;
+import com.zhidejiaoyu.common.utils.http.HttpClientUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -28,12 +28,12 @@ import java.util.*;
  * @date 2018/6/20 17:01
  */
 @Component
-public class SimpleSpeechEvaluation {
+public class XunFeiSpeechEvaluation {
 
-    private Logger logger = LoggerFactory.getLogger(SimpleSpeechEvaluation.class);
+    private Logger logger = LoggerFactory.getLogger(XunFeiSpeechEvaluation.class);
 
     @Autowired
-    private SimpleHttpClientUtil simpleHttpClientUtil;
+    private HttpClientUtil httpClientUtil;
 
     @Value("${xfyun.ise.URL}")
     private String URL;
@@ -89,7 +89,7 @@ public class SimpleSpeechEvaluation {
         String X_param = Base64.getMimeEncoder().encodeToString(param.getBytes());
         String currentTime = String.valueOf(System.currentTimeMillis() / 1000);
 
-        CloseableHttpClient httpClient = simpleHttpClientUtil.getHttpClient();
+        CloseableHttpClient httpClient = httpClientUtil.getHttpClient();
         HttpPost post = new HttpPost(URL);
         post.addHeader("X-Appid", APP_ID);
         post.addHeader("X-CurTime", currentTime);

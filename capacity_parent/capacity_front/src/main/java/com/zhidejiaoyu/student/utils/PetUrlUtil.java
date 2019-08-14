@@ -57,10 +57,10 @@ public class PetUrlUtil {
      * @return
      */
     private static String getHeroImg(Integer point) {
-        if (point < PointConstant.EIGHTY.getPoint()) {
+        if (point < PointConstant.EIGHTY) {
             return PetImageConstant.HERO_NOT_PASS;
         }
-        if (point < PointConstant.HUNDRED.getPoint()) {
+        if (point < PointConstant.HUNDRED) {
             return PetImageConstant.HERO_PASS;
         }
         return PetImageConstant.HERO_ONE_HUNDRED;
@@ -73,10 +73,10 @@ public class PetUrlUtil {
      * @return
      */
     private static String getCatImg(Integer point) {
-        if (point < PointConstant.EIGHTY.getPoint()) {
+        if (point < PointConstant.EIGHTY) {
             return PetImageConstant.CAT_NOT_PASS;
         }
-        if (point < PointConstant.HUNDRED.getPoint()) {
+        if (point < PointConstant.HUNDRED) {
             return PetImageConstant.CAT_PASS;
         }
         return PetImageConstant.CAT_ONE_HUNDRED;
@@ -89,10 +89,10 @@ public class PetUrlUtil {
      * @return
      */
     private static String getHoneyImg(Integer point) {
-        if (point < PointConstant.EIGHTY.getPoint()) {
+        if (point < PointConstant.EIGHTY) {
             return PetImageConstant.HONEY_NOT_PASS;
         }
-        if (point < PointConstant.HUNDRED.getPoint()) {
+        if (point < PointConstant.HUNDRED) {
             return PetImageConstant.HONEY_PASS;
         }
         return PetImageConstant.HONEY_ONE_HUNDRED;
@@ -142,7 +142,7 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotWordTestIngUrl(Integer point) {
-        if (point < PointConstant.EIGHTY.getPoint()) {
+        if (point < PointConstant.EIGHTY) {
             return PetImageConstant.INSIST;
         }
         return PetImageConstant.FOREVER;
@@ -155,7 +155,7 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotCourseTestImgUrl(Integer point) {
-        if (point < PointConstant.EIGHTY.getPoint()) {
+        if (point < PointConstant.EIGHTY) {
             return PetImageConstant.HOWEVER;
         }
         return PetImageConstant.SUCCEED;
@@ -168,10 +168,10 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotBeforeUnitTestImgUrl(Integer point) {
-        if (point < PointConstant.EIGHTY.getPoint()) {
+        if (point < PointConstant.EIGHTY) {
             return PetImageConstant.WALK;
         }
-        if (point < PointConstant.NINETY.getPoint()) {
+        if (point < PointConstant.NINETY) {
             return PetImageConstant.WIN;
         }
         return PetImageConstant.GOOD;
@@ -185,7 +185,7 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotFiveTestImgUrl(Integer point) {
-        if (point < PointConstant.EIGHTY.getPoint()) {
+        if (point < PointConstant.EIGHTY) {
             return PetImageConstant.INSIST;
         }
         return PetImageConstant.FOREVER;
@@ -198,10 +198,10 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotCenterTestImgUrl(Integer point) {
-        if (point < PointConstant.EIGHTY.getPoint()) {
+        if (point < PointConstant.EIGHTY) {
             return PetImageConstant.WALK;
         }
-        if (point < PointConstant.NINETY.getPoint()) {
+        if (point < PointConstant.NINETY) {
             return PetImageConstant.DEFEAT;
         }
         return PetImageConstant.GOOD;
@@ -215,7 +215,7 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotReviewTestImgUrl(Integer point) {
-        if (point < PointConstant.EIGHTY.getPoint()) {
+        if (point < PointConstant.EIGHTY) {
             return PetImageConstant.HOWEVER;
         }
         return PetImageConstant.COOL;
@@ -229,7 +229,7 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotStageTestImgUrl(Integer point) {
-        if (point < PointConstant.EIGHTY.getPoint()) {
+        if (point < PointConstant.EIGHTY) {
             return PetImageConstant.CONTINUE;
         }
         return PetImageConstant.SUCCEED;
@@ -243,10 +243,10 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotUnitTestImgUrl(Integer point) {
-        if (point < PointConstant.EIGHTY.getPoint()) {
+        if (point < PointConstant.EIGHTY) {
             return PetImageConstant.LOSE;
         }
-        if (point < PointConstant.HUNDRED.getPoint()) {
+        if (point < PointConstant.HUNDRED) {
             return PetImageConstant.WIN;
         }
         return PetImageConstant.STAR;
@@ -260,10 +260,10 @@ public class PetUrlUtil {
      * @return
      */
     private static String robotLevelTestImgUrl(Integer point) {
-        if (point < PointConstant.EIGHTY.getPoint()) {
+        if (point < PointConstant.EIGHTY) {
             return PetImageConstant.JIONG;
         }
-        if (point < PointConstant.NINETY.getPoint()) {
+        if (point < PointConstant.NINETY) {
             return PetImageConstant.HAHA;
         }
         return PetImageConstant.BANG;
