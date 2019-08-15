@@ -47,14 +47,14 @@
             and rw.read_type_id = #{readTypeId}
         </if>
     </select>
-    <select id="selectNeedReview" resultType="com.zhidejiaoyu.common.Vo.study.MemoryStudyVo" parameterType="map">
-        select v.id               wordId,
+    <select id="selectNeedReview" resultType="com.zhidejiaoyu.common.Vo.read.StrengthenVo" parameterType="map">
+        select v.id               id,
                v.word             word,
                v.syllable         syllable,
                v.word_chinese     wordChinese,
-               v.sound_mark       soundMark,
+               v.sound_mark       wordyj,
                rw.memory_strength memoryStrength,
-               v.recordpicurl     imgUrl
+               v.recordpicurl     recordpicurl
         from read_word rw,
              vocabulary v
         where rw.word_id = v.id
