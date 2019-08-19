@@ -510,7 +510,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         Map<String, String> childMap = getLevelInfo(levelVo, student, parentMap);
 
         levelVo.setChildLevelIndex(childMap == null ? 1 : childMap.size());
-        levelVo.setParentLevelIndex(parentMap.size() == 0 ? 1 : parentMap.size());
+        levelVo.setParentLevelIndex(parentMap.size() == 0 ? 0 : parentMap.size() - 1);
 
         // 获取学生已获取的勋章图片url
         PageInfo<String> pageInfo = getHadMedalByPage(pageNum, pageSize, student);
