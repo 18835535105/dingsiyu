@@ -45,22 +45,6 @@ public class GetOssFile {
      * @return
      */
     public static String getPublicObjectUrl(String objectName) {
-        // 藏宝阁图片路径
-        String prizeImg = "prizeImg/";
-        if (objectName != null && objectName.contains(prizeImg)) {
-            return AliyunInfoConst.host + objectName;
-        }
-        try {
-            HttpServletRequest request = HttpUtil.getHttpServletRequest();
-            if (request != null) {
-                String parameter = request.getParameter(DESKTOP);
-                if (parameter != null && !"".equals(parameter)) {
-                    return (objectName != null && objectName.contains("static/")) ? objectName : "static/" + objectName;
-                }
-            }
-        } catch (Exception e) {
-            log.error("桌面客户端获取文件出错！文件路径=[{}]", objectName, e);
-        }
         return AliyunInfoConst.host + objectName;
     }
 
