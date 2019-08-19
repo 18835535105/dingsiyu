@@ -17,4 +17,9 @@ public class SimpleQuartzServiceTest extends BaseTest {
     public void initRankCache() {
         simpleQuartzService.initRankCaches();
     }
+
+    @Test
+    public void testUpdateClassMonthRank() {
+        simpleQuartzService.updateClassMonthRank();
+    }
 }
