@@ -3,10 +3,10 @@ package com.zhidejiaoyu.student.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.mapper.simple.SimpleMessageBoardMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.AwardUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
@@ -1677,7 +1677,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
 
         for (SyntheticRewardsList synthetic : gloveOrFlower) {
             Map<String, Object> map = new HashMap<>();
-            map.put("url", synthetic.getImgUrl());
+            map.put("url", GetOssFile.getPublicObjectUrl(synthetic.getImgUrl()));
             if (useGloveOrFlower != null) {
                 map.put("state", true);
                 map.put("time", 48 + "小时00分00秒");
@@ -1701,7 +1701,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         }
         if (useGloveOrFlower != null) {
             Map<String, Object> useNowMap = new HashMap<>();
-            useNowMap.put("url", useGloveOrFlower.getImgUrl());
+            useNowMap.put("url", GetOssFile.getPublicObjectUrl(useGloveOrFlower.getImgUrl()));
             useNowMap.put("endTime", useGloveOrFlower.getUseEndTime());
             useMap.put("gloveOrFlower", useNowMap);
         }
@@ -1710,10 +1710,10 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         List<StudentSkin> studentSkins = studentSkinMapper.selSkinByStudentIdIsHave(studentId.longValue());
         for (StudentSkin studentSkin : studentSkins) {
             if (studentSkin.getState() == 1) {
-                useMap.put("skin", studentSkin.getImgUrl());
+                useMap.put("skin", GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
             }
             Map<String, Object> map = new HashMap<>();
-            map.put("url", studentSkin.getImgUrl());
+            map.put("url",  GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
             if (studentSkin.getState() == 1) {
                 map.put("state", true);
             } else {
