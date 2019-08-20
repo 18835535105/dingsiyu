@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.student.level.ChildMedalVo;
 import com.zhidejiaoyu.common.Vo.student.level.LevelVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -510,7 +511,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         Map<String, String> childMap = getLevelInfo(levelVo, student, parentMap);
 
         levelVo.setChildLevelIndex(childMap == null ? 1 : childMap.size());
-        levelVo.setParentLevelIndex(parentMap.size() == 0 ? 1 : parentMap.size());
+        levelVo.setParentLevelIndex(parentMap.size() == 0 ? 0 : parentMap.size() - 1);
 
         // 获取学生已获取的勋章图片url
         PageInfo<String> pageInfo = getHadMedalByPage(pageNum, pageSize, student);
@@ -648,7 +649,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         List<String> medalImgUrl = new ArrayList<>(childInfo.size());
         StringBuilder sb = new StringBuilder();
         childInfo.forEach(info -> {
-            medalImgUrl.add(AliyunInfoConst.host + info.get("imgUrl"));
+            medalImgUrl.add(GetOssFile.getPublicObjectUrl(info.get("imgUrl")));
             sb.append(info.get("content"));
         });
 
@@ -681,13 +682,13 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
                 // 判断当前金币所处的等级
                 boolean flag = ((i == 0 && gold < level.getGold()) || gold >= level.getGold()) && gold < nextLevel.getGold();
                 if (flag) {
-                    levelVo.setLevelImgUrl(AliyunInfoConst.host + level.getImgUrlLevel());
-                    levelVo.setChildName(level.getImgUrlWord());
+                    levelVo.setLevelImgUrl(GetOssFile.getPublicObjectUrl(level.getImgUrlLevel()));
+                    levelVo.setChildName(GetOssFile.getPublicObjectUrl(level.getImgUrlWord()));
                     break;
                 }
             } else {
-                levelVo.setLevelImgUrl(AliyunInfoConst.host + level.getImgUrlLevel());
-                levelVo.setChildName(level.getImgUrlWord());
+                levelVo.setLevelImgUrl(GetOssFile.getPublicObjectUrl(level.getImgUrlLevel()));
+                levelVo.setChildName(GetOssFile.getPublicObjectUrl(level.getImgUrlWord()));
                 break;
             }
         }

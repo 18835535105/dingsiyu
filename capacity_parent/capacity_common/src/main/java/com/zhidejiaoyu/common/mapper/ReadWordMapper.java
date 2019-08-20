@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.Vo.read.StrengthenVo;
 import com.zhidejiaoyu.common.Vo.study.MemoryStudyVo;
 import com.zhidejiaoyu.common.pojo.ReadWord;
 import org.apache.ibatis.annotations.Param;
@@ -54,7 +55,7 @@ public interface ReadWordMapper extends BaseMapper<ReadWord> {
      * @param type      强化类型：1.慧记忆;2.单词图鉴3.慧听写4.慧默写
      * @return
      */
-    MemoryStudyVo selectNeedReview(@Param("studentId") Long studentId, @Param("courseId") Long courseId, @Param("type") Integer type);
+    StrengthenVo selectNeedReview(@Param("studentId") Long studentId, @Param("courseId") Long courseId, @Param("type") Integer type);
 
     /**
      * 需要复习的单词个数

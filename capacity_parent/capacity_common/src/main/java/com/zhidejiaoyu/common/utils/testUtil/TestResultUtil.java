@@ -622,7 +622,8 @@ public class TestResultUtil implements Serializable {
     public static void main(String[] args) {
         SentenceTranslateVo sentenceTranslateVo = new SentenceTranslateVo();
         TestResultUtil testResultUtil = new TestResultUtil();
-        testResultUtil.getOrderEnglishList(sentenceTranslateVo, "On these trips his driver was always the same - a man called Hans.", null, 1);
+        testResultUtil.getOrderEnglishList(sentenceTranslateVo,
+                "I felt lucky, as all my teachers gave me much encouragement and I enjoyed all my subjects:English, History, English#Literature, Computer#Science, Maths, Science, PE, Art, Cooking and French.", null, 1);
         System.out.println(sentenceTranslateVo);
     }
 

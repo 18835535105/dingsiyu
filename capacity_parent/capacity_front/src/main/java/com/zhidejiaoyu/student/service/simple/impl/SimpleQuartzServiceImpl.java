@@ -13,8 +13,8 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
-import com.zhidejiaoyu.student.utils.ServiceInfoUtil;
 import com.zhidejiaoyu.student.service.simple.SimpleQuartzService;
+import com.zhidejiaoyu.student.utils.ServiceInfoUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.Calendar;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author wuchenxi
@@ -403,6 +404,9 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
 
             rank[0] = 1;
             studentList.forEach(student -> {
+                if (student == null) {
+                    return;
+                }
                 Map<String, Long> map = new HashMap<>(16);
                 if (studentMedalCount.get(student.getId()) != null && studentMedalCount.get(student.getId()).get("count") != null) {
                     map.put("studentId", student.getId());
@@ -447,6 +451,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
         studentClassMap.forEach((classId, studentList) -> {
             rank[0] = 1;
             if (studentList != null && studentList.size() > 0) {
+                studentList = studentList.stream().filter(Objects::nonNull).collect(Collectors.toList());
                 studentList.sort(Comparator.comparing(Student::getSystemGold).reversed());
                 studentList.forEach(student -> {
                     StudentRank studentRank = new StudentRank();

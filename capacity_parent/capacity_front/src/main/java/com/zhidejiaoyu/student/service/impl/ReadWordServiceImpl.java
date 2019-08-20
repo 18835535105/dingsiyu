@@ -4,27 +4,26 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.read.NewWordsBookVo;
+import com.zhidejiaoyu.common.Vo.read.StrengthenVo;
 import com.zhidejiaoyu.common.Vo.read.WordInfoVo;
 import com.zhidejiaoyu.common.Vo.study.MemoryStudyVo;
 import com.zhidejiaoyu.common.constant.read.ReadContentConstant;
 import com.zhidejiaoyu.common.dto.read.SaveStrengthenDto;
 import com.zhidejiaoyu.common.exception.ServiceException;
-import com.zhidejiaoyu.common.mapper.LearnMapper;
-import com.zhidejiaoyu.common.mapper.ReadContentMapper;
-import com.zhidejiaoyu.common.mapper.ReadWordMapper;
-import com.zhidejiaoyu.common.mapper.VocabularyMapper;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
+import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
 import com.zhidejiaoyu.student.common.PerceiveEngine;
 import com.zhidejiaoyu.student.service.ReadWordService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,6 +74,12 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
     @Autowired
     private MemoryStrengthUtil memoryStrengthUtil;
 
+    @Autowired
+    private UnitVocabularyMapper unitVocabularyMapper;
+
+    @Autowired
+    private UnitMapper unitMapper;
+
     @Override
     public ServerResponse<Object> getWordInfo(HttpSession session, Long courseId, String word) {
         Vocabulary vocabulary = vocabularyMapper.selectByWord(word);
@@ -116,7 +121,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         }
 
         readWord.setStudentId(studentId);
-        this.saveReadWord(readWord);
+        this.saveReadWord(readWord, vocabulary);
 
         return ServerResponse.createBySuccess();
     }
@@ -174,7 +179,8 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         if (needMarkRedWords == null || needMarkRedWords.size() == 0) {
             return ServerResponse.createBySuccess(301, "未查询到生词信息！");
         }
-        if (needMarkRedWords.size() > 50) {
+        final int maxNewWords = 50;
+        if (needMarkRedWords.size() > maxNewWords) {
             return ServerResponse.createBySuccess(300, "生词大于50个单词!");
         }
 
@@ -196,39 +202,49 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
     public ServerResponse startStrengthen(HttpSession session, Long courseId, Integer type) {
         Student student = super.getStudent(session);
         Long studentId = student.getId();
-        MemoryStudyVo memoryStudyVo = readWordMapper.selectNeedReview(studentId, courseId, type);
-        if (memoryStudyVo == null) {
+        StrengthenVo strengthenVo = readWordMapper.selectNeedReview(studentId, courseId, type);
+        if (strengthenVo == null) {
             return ServerResponse.createByError(300, "当前模块没有需要强化的单词！");
         }
+
+        if (StringUtils.isNotEmpty(strengthenVo.getWordyj())) {
+            strengthenVo.setWordyj(strengthenVo.getWord());
+        }
+
         Long totalNeedReviewCount = readWordMapper.countNeedReview(studentId, courseId, type);
-        memoryStudyVo.setImgUrl(GetOssFile.getPublicObjectUrl(memoryStudyVo.getImgUrl()));
-        memoryStudyVo.setReadUrl(baiduSpeak.getLanguagePath(memoryStudyVo.getWord()));
-        memoryStudyVo.setWordCount(totalNeedReviewCount);
-        memoryStudyVo.setStudyNew(false);
+        strengthenVo.setRecordpicurl(GetOssFile.getPublicObjectUrl(strengthenVo.getRecordpicurl()));
+        strengthenVo.setReadUrl(baiduSpeak.getLanguagePath(strengthenVo.getWord()));
+        strengthenVo.setWordCount(totalNeedReviewCount);
+        strengthenVo.setStudyNew(false);
 
-        ReadWord readWord = readWordMapper.selectByStudentIdAndCourseIdAndWordId(studentId, courseId, memoryStudyVo.getWordId(), type);
-        memoryStudyVo.setMemoryDifficulty(memoryDifficultyUtil.getReadWordDifficulty(readWord));
-        memoryStudyVo.setEngine(PerceiveEngine.getPerceiveEngine(memoryStudyVo.getMemoryDifficulty(), memoryStudyVo.getMemoryStrength()));
+        // 单词 id
+        Long wordId = strengthenVo.getId();
+        ReadWord readWord = readWordMapper.selectByStudentIdAndCourseIdAndWordId(studentId, courseId, wordId, type);
+        strengthenVo.setMemoryDifficulty(memoryDifficultyUtil.getReadWordDifficulty(readWord));
+        strengthenVo.setEngine(PerceiveEngine.getPerceiveEngine(strengthenVo.getMemoryDifficulty(), strengthenVo.getMemoryStrength()));
 
-        if (type == 2) {
-            // 封装单词图鉴
+        // 慧记忆模块
+        final int memory = 1;
+        if (type == memory) {
+            Long unitId = unitVocabularyMapper.selectOneUnitIdByVocabularyId(wordId);
+            strengthenVo.setWordChineseList(ReviewServiceImpl.getInterferenceChinese(unitId, wordId, strengthenVo.getWordChinese(), unitVocabularyMapper, unitMapper));
+        }
+
+        // 封装单词图鉴
+        final int picture = 2;
+        if (type == picture) {
             int random = MathUtil.getRandom(1, 1000);
             List<Vocabulary> vocabularies = vocabularyMapper.selectPictureRandom(random, 3);
 
-            List<Map<String, Boolean>> mapList = new ArrayList<>(4);
             Map<String, Boolean> map = new HashMap<>(16);
-            map.put(memoryStudyVo.getWord(), true);
-            mapList.add(map);
+            map.put(strengthenVo.getWord(), true);
             for (Vocabulary vocabulary : vocabularies) {
-                map = new HashMap<>(16);
                 map.put(vocabulary.getWord(), false);
-                mapList.add(map);
             }
-            Collections.shuffle(mapList);
-            memoryStudyVo.setWordChineseList(mapList);
+            strengthenVo.setSubject(map);
         }
 
-        return ServerResponse.createBySuccess(memoryStudyVo);
+        return ServerResponse.createBySuccess(strengthenVo);
     }
 
     @Override
@@ -393,9 +409,9 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
     /**
      * 将标点符号和单词拆开放在集合中
      *
-     * @param rightList  最终返回的单词和符号拆开后的集合
-     * @param sb         用于拼接单词
-     * @param words      需要处理的单词数据（其中包含符号）
+     * @param rightList 最终返回的单词和符号拆开后的集合
+     * @param sb        用于拼接单词
+     * @param words     需要处理的单词数据（其中包含符号）
      */
     private static void splitPoint(List<String> rightList, StringBuilder sb, String[] words) {
         for (String s : words) {
@@ -429,7 +445,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         }
     }
 
-    private void saveReadWord(ReadWord readWord) {
+    private void saveReadWord(ReadWord readWord, Vocabulary vocabulary) {
         Date now = new Date();
         Date pushTime = GoldMemoryTime.getGoldMemoryTime(0.12, now);
 
@@ -441,8 +457,11 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         readWord.setErrorCount(1);
         this.insert(readWord);
 
-        readWord.setType(2);
-        this.insert(readWord);
+        if (StringUtils.isNotEmpty(vocabulary.getRecordpicurl())) {
+            // 单词有图片才保存
+            readWord.setType(2);
+            this.insert(readWord);
+        }
 
         readWord.setType(3);
         this.insert(readWord);

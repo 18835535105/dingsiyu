@@ -240,4 +240,12 @@ public interface UnitVocabularyMapper {
      * @return
      */
     List<String> selectWordChineseByCourseIdAndNotInUnitId(@Param("courseId") Long courseId, @Param("unitId") Long unitId, @Param("limitSize") int limitSize);
+
+    /**
+     * 根据单词 id 随机查询一个单元的 id
+     *
+     * @param wordId
+     * @return
+     */
+    Long selectOneUnitIdByVocabularyId(@Param("wordId") Long wordId);
 }
