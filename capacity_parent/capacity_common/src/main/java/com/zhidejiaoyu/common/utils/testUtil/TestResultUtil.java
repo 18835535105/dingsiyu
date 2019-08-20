@@ -50,7 +50,7 @@ public class TestResultUtil implements Serializable {
     /**
      * 二次判断以字母或数字结尾
      */
-    final String END_MATCH2 = ".*[a-zA-Z0-9$# '.@-]$";
+    final String END_MATCH2 = ".*[a-zA-Z0-9$# ':.@-]$";
     /**
      * 二次判断以字母或数据开头
      */
