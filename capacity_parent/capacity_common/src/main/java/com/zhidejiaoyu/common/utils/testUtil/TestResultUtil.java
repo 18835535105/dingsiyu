@@ -50,11 +50,11 @@ public class TestResultUtil implements Serializable {
     /**
      * 二次判断以字母或数字结尾
      */
-    final String END_MATCH2 = ".*[a-zA-Z0-9$# '@-]$";
+    final String END_MATCH2 = ".*[a-zA-Z0-9$# '.@-]$";
     /**
      * 二次判断以字母或数据开头
      */
-    final String START_MATCH2 = "^[a-zA-Z0-9$# '@-].*";
+    final String START_MATCH2 = "^[a-zA-Z0-9$# ':@-].*";
     /**
      * 以字母或数字结尾
      */
@@ -664,7 +664,6 @@ public class TestResultUtil implements Serializable {
                         } else {
                             if (i != (length - 1)) {
                                 char longChar = chars[i + 1];
-                                String longStr = new String(new char[]{longChar});
                                 if (Pattern.matches(END_MATCH2, s1)) {
                                     sb.append(s1);
                                 } else {
