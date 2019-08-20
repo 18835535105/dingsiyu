@@ -43,7 +43,11 @@ public class ReadChooseBlanks extends Model<ReadChooseBlanks> {
      */
     private String analysis;
 
-
+    /**
+     * 答案正确顺序
+     */
+    @TableField("reight_order")
+    private String reightOrder;
     @Override
     protected Serializable pkVal() {
         return this.id;

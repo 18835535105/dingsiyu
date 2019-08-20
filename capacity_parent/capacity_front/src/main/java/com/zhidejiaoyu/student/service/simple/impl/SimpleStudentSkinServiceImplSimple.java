@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.SimpleExhumationMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleStudentMapper;
@@ -240,7 +241,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
             if (studentSkin.getEndTime() == null) {
                 Map<String, Object> maps = new HashMap<>();
                 //皮肤地址
-                maps.put("imgUrl", studentSkin.getImgUrl());
+                maps.put("imgUrl", GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
                 //皮肤对应编号
                 maps.put("nameId", SimpleAwardUtil.getMaps(studentSkin.getSkinName()));
                 //皮肤使用状态

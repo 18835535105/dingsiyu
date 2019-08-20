@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
@@ -372,6 +373,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
         List<Map<String, Object>> resultList = new ArrayList<>();
         for (Map<String, Object> mapss : maps1) {
             mapss.put("isEnter", false);
+            mapss.put("img_url", GetOssFile.getPublicObjectUrl(mapss.get("img_url").toString()));
             resultList.add(mapss);
         }
         map.put("surprised", resultList);

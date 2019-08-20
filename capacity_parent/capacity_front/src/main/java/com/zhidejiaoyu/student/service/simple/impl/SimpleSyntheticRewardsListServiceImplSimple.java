@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.SimpleExhumationMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleStudentMapper;
@@ -193,6 +194,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                     map.put("nameId", SimpleAwardUtil.getMaps((String) map.get("name")));
                     map.put("time", (endTime.getTime() - System.currentTimeMillis()) / 1000);
                     map.put("type", 1);
+                    map.put("imgUrl", GetOssFile.getPublicObjectUrl(map.get("imgUrl").toString()));
                     list.add(map);
                 } else {
                     map.put("status", 1);
@@ -202,6 +204,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                     } else {
                         map.put("time", (48 * count) + "小时0分0秒");
                     }
+                    map.put("imgUrl", GetOssFile.getPublicObjectUrl(map.get("imgUrl").toString()));
                     map.put("beUseing", false);
                     if (((Long) map.get("useNumber")) .equals( (Long) map.get("count"))) {
                         map.put("nameId", SimpleAwardUtil.getMaps((String) map.get("name")));
@@ -212,6 +215,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
             } else {
                 map.put("status", 1);
                 Integer count = ((Long) map.get("count")).intValue();
+                map.put("imgUrl", GetOssFile.getPublicObjectUrl(map.get("imgUrl").toString()));
                 if (count == 1) {
                     map.put("time", 48 + "小时0分0秒");
                 } else {

@@ -8,10 +8,11 @@
         <result column="read_type_id" property="readTypeId"/>
         <result column="content" property="content"/>
         <result column="analysis" property="analysis"/>
+        <result column="reight_order" property="reightOrder"/>
     </resultMap>
 
     <sql id="sql">
-        id,read_type_id,content,analysis
+        id,read_type_id,content,analysis,reight_order
     </sql>
     <select id="selByTypeId" parameterType="map" resultMap="BaseResultMap">
         select <include refid="sql"></include>

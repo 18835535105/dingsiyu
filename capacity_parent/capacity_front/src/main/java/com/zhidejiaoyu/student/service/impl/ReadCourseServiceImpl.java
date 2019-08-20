@@ -197,7 +197,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         for (Integer integer : integers) {
             List<ReadType> readTypes1 = collectMap.get(integer);
             int index = 0;
-            if (readTypes1.size()> 1) {
+            if (readTypes1.size() > 1) {
                 Random random = new Random();
                 index = random.nextInt(readTypes1.size());
             }
@@ -547,7 +547,8 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         List<Map<String, Object>> returnList = new ArrayList<>();
         for (int i = 0; i < analysisList.length; i++) {
             Map<String, Object> returnMap = new HashMap<>();
-            returnMap.put("word", answerList[i]);
+            String[] answ = answerList[i].split("/");
+            returnMap.put("word", answ);
             returnMap.put("analysis", analysisList[i]);
             returnList.add(returnMap);
         }
@@ -564,26 +565,29 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         ReadChooseBlanks readChooseBlanks = readChooseBlanksMapper.selByTypeId(typeId);
         String analysis = readChooseBlanks.getAnalysis();
         String content = readChooseBlanks.getContent();
+        String reightOrder = readChooseBlanks.getReightOrder();
+        List<Map<String, Object>> list = new ArrayList<>();
         List<String> contentList = Arrays.asList(content.split("&@&"));
         List<String> analysisList = Arrays.asList(analysis.split("&@&"));
-        List<Map<String, Object>> list = new ArrayList<>();
+        List<String> reightOrderList = Arrays.asList(reightOrder.split("&@&"));
+        int num = 65;
         for (int i = 0; i < contentList.size(); i++) {
             Map<String, Object> returnMap = new HashMap<>();
-            returnMap.put("number", i);
-            if (i < readCount) {
-                returnMap.put("isTrue", true);
-            } else {
-                returnMap.put("isTrue", false);
-
-            }
-            returnMap.put("analysisList", analysisList.get(i));
+            returnMap.put("number", (char) num);
             returnMap.put("sentence", contentList.get(i));
             list.add(returnMap);
+            num++;
         }
-
+        List<Map<String,Object>> answerList=new ArrayList<>();
+        for (int i = 0; i < reightOrderList.size(); i++) {
+            Map<String,Object> answerMap=new HashMap<>();
+            answerMap.put("answer",reightOrderList.get(i));
+            answerMap.put("analysis",analysisList.get(i));
+            answerList.add(answerMap);
+        }
+        map.put("answer", answerList);
         map.put("topic", list);
     }
-
 
     /**
      * 获取回答问题题目
