@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.service.simple.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.simple.GameTwoVo;
 import com.zhidejiaoyu.common.Vo.simple.StrengthGameVo;
 import com.zhidejiaoyu.common.Vo.simple.StudentGauntletVo;
@@ -662,12 +663,12 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             }
             Student student = simpleStudentMapper.selectByPrimaryKey(gauntlet.getChallengerStudentId());
             returnMap.put("oneself", student.getNickname());
-            returnMap.put("oneselfUrl", AliyunInfoConst.host + student.getHeadUrl());
+            returnMap.put("oneselfUrl", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
             returnMap.put("oneselfPoint", gauntlet.getChallengerPoint());
             returnMap.put("challengePoint", gauntlet.getBeChallengerPoint());
             Student challengeStudent = simpleStudentMapper.selectByPrimaryKey(gauntlet.getBeChallengerStudentId());
             returnMap.put("challenge", challengeStudent.getNickname());
-            returnMap.put("challengeUrl", AliyunInfoConst.host + challengeStudent.getHeadUrl());
+            returnMap.put("challengeUrl", GetOssFile.getPublicObjectUrl(challengeStudent.getHeadUrl()));
             returnMap.put("gradeGold", gauntlet.getGrade());
             returnMap.put("awardGold", gauntlet.getAward());
         } else {

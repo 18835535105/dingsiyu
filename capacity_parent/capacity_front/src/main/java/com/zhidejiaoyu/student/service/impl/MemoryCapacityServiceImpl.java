@@ -1,12 +1,10 @@
 package com.zhidejiaoyu.student.service.impl;
 
-import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.MemoryCapacityMapper;
-import com.zhidejiaoyu.common.mapper.RunLogMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.MemoryCapacity;
-import com.zhidejiaoyu.common.pojo.RunLog;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -349,6 +347,6 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         map.put("energy", enger);
         map.put("gold", gold);
         map.put("listen", url);
-        map.put("petUrl", AliyunInfoConst.host + student.getPartUrl());
+        map.put("petUrl", GetOssFile.getPublicObjectUrl(student.getPartUrl()));
     }
 }

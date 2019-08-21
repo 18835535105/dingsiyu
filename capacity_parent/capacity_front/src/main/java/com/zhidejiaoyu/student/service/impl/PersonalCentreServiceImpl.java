@@ -127,7 +127,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         Student student = getStudent(session);
         Long id = student.getId();
         map.put("name", student.getStudentName());
-        map.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
+        map.put("headUrl", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
 
         // 判断有哪些模块有未处理的信息
         redPoint(map, id);

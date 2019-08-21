@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.student.service.impl;
 
 import com.github.pagehelper.PageHelper;
-import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.studentMessage.StudentMessageListVo;
 import com.zhidejiaoyu.common.mapper.StudentMessageMapper;
 import com.zhidejiaoyu.common.mapper.SysUserMapper;
@@ -41,7 +41,7 @@ public class StudentMessageServiceImpl extends BaseServiceImpl<StudentMessageMap
         PageHelper.startPage(pageNum, pageSize);
         List<StudentMessageListVo> studentMessageListVos = studentMessageMapper.selectMessageList(student.getId());
         if (studentMessageListVos.size() > 0) {
-            String headUrl = AliyunInfoConst.host + student.getHeadUrl();
+            String headUrl = GetOssFile.getPublicObjectUrl(student.getHeadUrl());
             studentMessageListVos.forEach(studentMessageListVo -> {
                 if (studentMessageListVo.getStudentId() != 0) {
                     studentMessageListVo.setHeadUrl(headUrl);

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.simple.studentInfoVo.ChildMedalVo;
 import com.zhidejiaoyu.common.Vo.simple.studentInfoVo.LevelVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -362,7 +363,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         mapPageInfo1.setPages(mapPageInfo.getPages());
 
         Map<String, Object> map = new HashMap<>(16);
-        map.put("petName", AliyunInfoConst.host + student.getPetName());
+        map.put("petName", GetOssFile.getPublicObjectUrl(student.getPetName()));
         map.put("list", mapPageInfo1);
 
         return ServerResponse.createBySuccess(map);
