@@ -41,12 +41,12 @@ import java.util.stream.Collectors;
 public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWord> implements ReadWordService {
 
     /**
-     * 是否以单词或者数字或者 ' 结尾
+     * 是否以单词或者数字结尾
      */
-    private static final String END_MATCH = ".*[a-zA-z0-9'\\u4e00-\\u9fa5]$";
+    private static final String END_MATCH = ".*[a-zA-z0-9\\u4e00-\\u9fa5]$";
 
     /**
-     * 是否以单词或者数字或者 ' 开头
+     * 是否以单词或者数字开头
      */
     private static final String START_MATCH = "^[a-zA-z0-9'\\u4e00-\\u9fa5].*";
 
@@ -308,7 +308,6 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         // 将单词和字符拼接成句子
         StringBuilder sentence = new StringBuilder();
         int i = 0;
-        String[] preStr = new String[1];
         for (String word : allWords) {
             wordInfoMap = new HashMap<>(16);
             if (ReadContentConstant.PARAGRAPH_SPLIT.equals(word)) {
@@ -327,27 +326,15 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
                     sentence.append(ReadContentConstant.BLANK);
                     wordInfoList = packageSentenceInfoList(translateMap, wordInfoList, sentenceInfoList, sentence);
                 } else {
-                     if (("\"".equals(word) && !" ".equals(preStr[0])) || !"\"".equals(word)) {
-                        // 如果当前字符为双引号并且前一个字符不是空格，正常拼接
-                        packageWordInfoList(wordInfoList, wordInfoMap, word, false);
-                        sentence.append(word);
-                        wordInfoList = packageSentenceInfoList(translateMap, wordInfoList, sentenceInfoList, sentence);
-                    }
-                }
-            } else {
-                if ("\"".equals(preStr[0])) {
-                    // 如果上个字符是双引号，前置双引号与其后面的单词拼接一块
-                    word = "\"" + word;
+                    // 正常拼接
                     packageWordInfoList(wordInfoList, wordInfoMap, word, false);
                     sentence.append(word);
                     wordInfoList = packageSentenceInfoList(translateMap, wordInfoList, sentenceInfoList, sentence);
-                } else {
-                    // 当前元素是单词，正常拼接
-                    packageWordInfoList(wordInfoList, wordInfoMap, word, newWordsMap.containsKey(word));
-                    sentence.append(word);
                 }
+            } else {
+                packageWordInfoList(wordInfoList, wordInfoMap, word, newWordsMap.containsKey(word));
+                sentence.append(word);
             }
-            preStr[0] = word;
             i++;
         }
         return returnList;
@@ -384,11 +371,9 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
      * @param red          是否标红
      */
     private void packageWordInfoList(List<Map<String, Object>> wordInfoList, Map<String, Object> wordInfoMap, String word, boolean red) {
-        if (!" ".equals(word)) {
-            wordInfoMap.put("word", word);
-            wordInfoMap.put("red", red);
-            wordInfoList.add(wordInfoMap);
-        }
+        wordInfoMap.put("word", word);
+        wordInfoMap.put("red", red);
+        wordInfoList.add(wordInfoMap);
     }
 
     static List<String> getAllWords(String text) {
