@@ -48,7 +48,8 @@ public class UnitTestChangeAop {
     private MedalAwardAsync medalAwardAsync;
 
     @Pointcut("@annotation(com.zhidejiaoyu.common.annotation.TestChangeAnnotation)")
-    public void testPoint() {}
+    public void testPoint() {
+    }
 
     @Around("testPoint()")
     public Object optTest(ProceedingJoinPoint pjp) throws Throwable {
@@ -70,11 +71,7 @@ public class UnitTestChangeAop {
             TestChangeAnnotation annotation = method.getAnnotation(TestChangeAnnotation.class);
             if (annotation != null) {
                 Student student = this.getStudent();
-                if (annotation.isUnitTest()) {
-                    this.afterUnitTest(student);
-                } else {
-                    this.afterTest(student);
-                }
+                this.afterUnitTest(student);
             }
         }
     }
@@ -102,18 +99,8 @@ public class UnitTestChangeAop {
             dailyAwardAsync.todayCompleteTenUnitTest(student);
             // 验证学生单元闯关成功个数
             goldAwardAsync.completeUnitTest(student);
-        }
-    }
 
-    /**
-     * 所有测试保存后操作
-     *
-     * @param student
-     */
-    private void afterTest(Student student) {
-        if (student != null) {
             String point = request.getParameter("point");
-           this.afterUnitTest(student);
             // 最有潜力勋章
             medalAwardAsync.potentialMan(student);
             if (Objects.equals(point, "100")) {

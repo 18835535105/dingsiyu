@@ -150,7 +150,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      * @param student
      * @return
      */
-    @Select("select count(history_bad_point) from test_record where history_bad_point < 80 and student_id = #{student.id}")
+    @Select("select count(history_bad_point) from test_record where point < 80 and student_id = #{student.id}")
     Integer countTestFailByStudent(@Param("student") Student student);
 
     /**
