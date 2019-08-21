@@ -12,10 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 异步保存勋章奖励信息
@@ -236,11 +234,11 @@ public class MedalAwardAsync extends BaseAwardAsync {
     /**
      * 学霸崛起
      * <ul>
-     * <li>所有测试首次满分，点亮LV1</li>
-     * <li>连续五次，点亮LV2。</li>
-     * <li>连续十次，点亮LV3。</li>
-     * <li>连续十五次，点亮LV4。</li>
-     * <li>连续二十次，点亮LV5。</li>
+     * 所有测试首次获得满分，点亮学霸崛起Lv1
+     * 所有课程的首次测试累计五次获得满分，点亮学霸崛起Lv2
+     * 所有课程的首次测试累计十次获得满分，点亮学霸崛起Lv3
+     * 所有课程的首次测试累计二十次获得满分，点亮学霸崛起Lv4
+     * 所有课程的首次测试累计五十次获得满分，点亮学霸崛起Lv5
      * </ul>
      *
      * @param student
@@ -250,33 +248,23 @@ public class MedalAwardAsync extends BaseAwardAsync {
         List<Medal> children = medalMapper.selectChildrenIdByParentId(23);
         // 如果最后一个奖励条件已达成，说明其之前奖励都已能领取，不再进行其他计算
         Award award = awardMapper.selectByStudentIdAndMedalType(studentId, children.get(children.size() - 1).getId());
+        if (!super.checkAward(award, MEDAL_TYPE)) {
+            return;
+        }
+
+        // 学生测试获得满分的次数（同一个单元不重复计算）
+        int size = 0;
+        List<TestRecord> testRecords = testRecordMapper.selectFullPoint(studentId);
+        if (testRecords.size() > 0) {
+            Map<String, Long> collect = testRecords.stream().collect(Collectors.groupingBy(testRecord -> testRecord.getCourseId() + "-" + testRecord.getUnitId(), Collectors.counting()));
+            size = collect.size();
+        }
+
         try {
-            if (super.checkAward(award, MEDAL_TYPE)) {
-                Long medalId;
-                // 上次测试得分
-                Integer prePoint = testRecordMapper.selectPrePoint(studentId);
-                // 如果上次测试是100分，进度+1
-                if (prePoint != null) {
-                    for (Medal child : children) {
-                        medalId = child.getId();
-                        award = awardMapper.selectByStudentIdAndMedalType(studentId, medalId);
-                        if (award == null) {
-                            if (prePoint == 100) {
-                                super.optAward(studentId, medalId, 1, null, MEDAL_TYPE);
-                            } else {
-                                super.optAward(studentId, medalId, 0, null, MEDAL_TYPE);
-                            }
-                        } else if (!Objects.equals(award.getCurrentPlan(), award.getTotalPlan())) {
-                            // 如果当前奖励还没有完成
-                            // 分数为100当前进度+1
-                            if (prePoint == 100) {
-                                super.optAward(studentId, medalId, award.getCurrentPlan() + 1, award, MEDAL_TYPE);
-                            } else {
-                                // 分数不等于100当前进度清零
-                                super.optAward(studentId, medalId, 1, award, MEDAL_TYPE);
-                            }
-                        }
-                    }
+            for (Medal child : children) {
+                award = awardMapper.selectByStudentIdAndMedalType(studentId, child.getId());
+                if (this.checkAward(award, MEDAL_TYPE)) {
+                    super.optAward(studentId, child.getId(), size, award, MEDAL_TYPE);
                 }
             }
         } catch (Exception e) {
@@ -507,12 +495,13 @@ public class MedalAwardAsync extends BaseAwardAsync {
 
     /**
      * 拔得头筹
-     *
+     * <p>
      * 本校金币总数第一名保持一分钟，点亮 拔得头筹 LV1
      * 本校金币总数第一名保持一小时，点亮 拔得头筹 LV2。
      * 本校金币总数第一名保持两小时，点亮 拔得头筹 LV3。
      * 本校金币总数第一名保持一天，点亮 拔得头筹 LV4。
      * 本校金币总数第一名保持一周，点亮 拔得头筹 LV5。
+     *
      * @param student
      */
     public void theFirst(Student student) {
@@ -568,7 +557,6 @@ public class MedalAwardAsync extends BaseAwardAsync {
     }
 
     /**
-     *
      * @param studentId
      * @param children
      * @param currentPlan

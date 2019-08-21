@@ -283,15 +283,6 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     @Delete("delete from test_record where student_id = #{studentId} and genre = '学前游戏测试'")
     void deleteGameRecord(@Param("studentId") Long studentId);
 
-    /**
-     * 查询学生上次测试成绩得分
-     *
-     * @param studentId
-     * @return
-     */
-    Integer selectPrePoint(@Param("studentId") Long studentId);
-
-
     Integer selectUnitTestMaxPointByStudyModels(@Param("studentId") Long studentId,@Param("letterUnitId") Integer letterUnitIds,@Param("model") Integer model);
 
     /**
@@ -306,5 +297,13 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     Integer selectReadCountByCourseId(@Param("courseId") long courseId);
 
     int selCount(@Param("studentId") Long studenId, @Param("courseId") Long courseId, @Param("unitId") Long unitId, @Param("studyModel") String studyModel, @Param("genre") String genre);
+
+    /**
+     * 查询学生获得 100 分的测试记录
+     *
+     * @param studentId
+     * @return
+     */
+    List<TestRecord> selectFullPoint(@Param("studentId") Long studentId);
 }
 

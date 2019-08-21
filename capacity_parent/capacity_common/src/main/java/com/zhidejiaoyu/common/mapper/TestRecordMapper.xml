@@ -156,7 +156,6 @@
     </select>
 
 
-
     <select id="selectByUnitId" resultType="java.lang.Integer"
             parameterType="map">
         select count(id)
@@ -195,8 +194,8 @@
         where id = #{id,jdbcType=BIGINT}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from
-            test_record
+        delete
+        from test_record
         where id = #{id,jdbcType=BIGINT}
     </delete>
     <delete id="deleteByExample"
@@ -476,11 +475,14 @@
             right_count        = #{rightCount,jdbcType=INTEGER},
             study_model        = #{studyModel,jdbcType=VARCHAR},
             award_gold         = #{awardGold,jdbcType=INTEGER},
-            better_count = #{betterCount,jdbcType=INTEGER}
+            better_count       = #{betterCount,jdbcType=INTEGER}
         where id = #{id,jdbcType=BIGINT}
     </update>
     <update id="updateGameRecord" parameterType="map">
-        update test_record set `explain` = '游戏测试次数#2#恭喜你旗开得胜，祝未来勇闯天涯！' where student_id = #{student.id} and  genre = '学前游戏测试'
+        update test_record
+        set `explain` = '游戏测试次数#2#恭喜你旗开得胜，祝未来勇闯天涯！'
+        where student_id = #{student.id}
+          and genre = '学前游戏测试'
     </update>
 
     <select id="showRecord" parameterType="map" resultType="com.zhidejiaoyu.common.Vo.testVo.TestRecordVo">
@@ -558,73 +560,59 @@
     </select>
     <select id="selectTodayCompleteTestCenter" resultType="java.lang.Integer" parameterType="map">
         SELECT count(genre)
-        FROM
-            test_record
-        WHERE
-            student_id = #{student.id}
-            AND genre IN (
-                '已学测试',
-                '生词测试',
-                '熟词测试',
-                '五维测试'
+        FROM test_record
+        WHERE student_id = #{student.id}
+          AND genre IN (
+                        '已学测试',
+                        '生词测试',
+                        '熟词测试',
+                        '五维测试'
             )
-            AND TO_DAYS(test_end_time) = TO_DAYS(now())
-            AND pass = 1
+          AND TO_DAYS(test_end_time) = TO_DAYS(now())
+          AND pass = 1
     </select>
     <select id="countCompleteByStudentId" resultType="java.util.Map" parameterType="map">
-        SELECT
-            #{student.id}       studentId,
-            memory.c            memory,
-            listen.c            listen,
-            writing.c           `write`,
-            sentenceListen.c    sentenceListen,
-            sentenceTranslate.c sentenceTranslate
-        FROM
-            (
-                SELECT count(id) c
-                FROM
-                    test_record
-                WHERE
-                    study_model = '慧记忆'
-                    AND history_best_point - history_bad_point >= 20
-                    AND student_id = #{student.id}
-            ) memory,
-            (
-                SELECT count(id) c
-                FROM
-                    test_record
-                WHERE
-                    study_model = '慧听写'
-                    AND history_best_point - history_bad_point >= 30
-                    AND student_id = #{student.id}
-            ) listen,
-            (
-                SELECT count(id) c
-                FROM
-                    test_record
-                WHERE
-                    study_model = '慧默写'
-                    AND history_best_point - history_bad_point >= 20
-                    AND student_id = #{student.id}
-            ) writing,
-            (
-                SELECT count(id) c
-                FROM
-                    test_record
-                WHERE
-                    study_model = '例句听力'
-                    AND history_best_point - history_bad_point >= 20
-                    AND student_id = #{student.id}
-            ) sentenceListen,
-            (
-                SELECT count(id) c
-                FROM
-                    test_record
-                WHERE
-                    study_model = '例句翻译'
-                    AND history_best_point - history_bad_point >= 20
-                    AND student_id = #{student.id}
-            ) sentenceTranslate;
+        SELECT #{student.id}       studentId,
+               memory.c            memory,
+               listen.c            listen,
+               writing.c           `write`,
+               sentenceListen.c    sentenceListen,
+               sentenceTranslate.c sentenceTranslate
+        FROM (
+                 SELECT count(id) c
+                 FROM test_record
+                 WHERE study_model = '慧记忆'
+                   AND history_best_point - history_bad_point >= 20
+                   AND student_id = #{student.id}
+             ) memory,
+             (
+                 SELECT count(id) c
+                 FROM test_record
+                 WHERE study_model = '慧听写'
+                   AND history_best_point - history_bad_point >= 30
+                   AND student_id = #{student.id}
+             ) listen,
+             (
+                 SELECT count(id) c
+                 FROM test_record
+                 WHERE study_model = '慧默写'
+                   AND history_best_point - history_bad_point >= 20
+                   AND student_id = #{student.id}
+             ) writing,
+             (
+                 SELECT count(id) c
+                 FROM test_record
+                 WHERE study_model = '例句听力'
+                   AND history_best_point - history_bad_point >= 20
+                   AND student_id = #{student.id}
+             ) sentenceListen,
+             (
+                 SELECT count(id) c
+                 FROM test_record
+                 WHERE study_model = '例句翻译'
+                   AND history_best_point - history_bad_point >= 20
+                   AND student_id = #{student.id}
+             ) sentenceTranslate;
     </select>
     <select id="selectMaxPointByStudyModel" resultMap="BaseResultMap" parameterType="map">
         SELECT
@@ -782,8 +770,10 @@
               where student_id = #{studentId}
                 and unit_id = #{unitId}
                 and point >= 80) v,
-             (select count(id) c from test_record where student_id = 3169
-                                                    and unit_id = 13702) a
+             (select count(id) c
+              from test_record
+              where student_id = 3169
+                and unit_id = 13702) a
     </select>
 
     <select id="selectHasUnitTest" resultType="java.util.Map" parameterType="map">
@@ -888,13 +878,6 @@
         and study_model='例句默写'
         order by id desc limit 1
     </select>
-    <select id="selectPrePoint" resultType="java.lang.Integer" parameterType="map">
-        select point
-        from test_record
-        where student_id = #{studentId}
-        order by id desc
-        limit 1,1
-    </select>
 
     <select id="selectUnitTestMaxPointByStudyModels" resultType="Integer" parameterType="map">
         select max(point)
@@ -921,10 +904,16 @@
     </select>
 
     <select id="selectReadCountByCourseId" resultType="Integer" parameterType="map">
-        select
-        count(distinct unit_id)
+        select count(distinct unit_id)
         from test_record
-        where course_id=#{courseId}
-        and study_model="阅读测试"
+        where course_id = #{courseId}
+          and study_model = '阅读测试'
+    </select>
+    <select id="selectFullPoint" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from test_record
+        where student_id = #{studentId}
+        and point = 100
     </select>
 </mapper>
