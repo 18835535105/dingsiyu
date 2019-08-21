@@ -307,13 +307,12 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         Map<String, Object> wordInfoMap;
         // 将单词和字符拼接成句子
         StringBuilder sentence = new StringBuilder();
-        // 记录最后一个字符，如果是 “。”，在下个字符前要加上空格
-        String[] lastStr = new String[1];
         int i = 0;
+        String[] preStr = new String[1];
         for (String word : allWords) {
             wordInfoMap = new HashMap<>(16);
             if (ReadContentConstant.PARAGRAPH_SPLIT.equals(word)) {
-                sentence.append(" ").append(word);
+                sentence.append(word);
                 if (i == 0) {
                     // 第一段开始还没有段落内容，不保存，接着获取当前段落的内容
                     continue;
@@ -325,29 +324,30 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
                 if ("。".equals(word)) {
                     // 说明该处是挖出的空格，让学生选择或者填写
                     packageWordInfoList(wordInfoList, wordInfoMap, null, false);
-                    sentence.append(" ").append(ReadContentConstant.BLANK);
+                    sentence.append(ReadContentConstant.BLANK);
                     wordInfoList = packageSentenceInfoList(translateMap, wordInfoList, sentenceInfoList, sentence);
                 } else {
-                    packageWordInfoList(wordInfoList, wordInfoMap, word, false);
-                    if (Objects.equals(lastStr[0], "。")) {
-                        // 挖空分隔符与后面的字符中间加上一个空格
-                        sentence.append(" ");
+                     if (("\"".equals(word) && !" ".equals(preStr[0])) || !"\"".equals(word)) {
+                        // 如果当前字符为双引号并且前一个字符不是空格，正常拼接
+                        packageWordInfoList(wordInfoList, wordInfoMap, word, false);
+                        sentence.append(word);
+                        wordInfoList = packageSentenceInfoList(translateMap, wordInfoList, sentenceInfoList, sentence);
                     }
-                    sentence.append(word);
-                    wordInfoList = packageSentenceInfoList(translateMap, wordInfoList, sentenceInfoList, sentence);
                 }
             } else {
-                // 当前元素是单词，正常拼接
-                packageWordInfoList(wordInfoList, wordInfoMap, word, newWordsMap.containsKey(word));
-                if (ReadContentConstant.PARAGRAPH_SPLIT.equals(sentence.toString().trim())) {
-                    // 段落标识符后面不加空格
+                if ("\"".equals(preStr[0])) {
+                    // 如果上个字符是双引号，前置双引号与其后面的单词拼接一块
+                    word = "\"" + word;
+                    packageWordInfoList(wordInfoList, wordInfoMap, word, false);
                     sentence.append(word);
+                    wordInfoList = packageSentenceInfoList(translateMap, wordInfoList, sentenceInfoList, sentence);
                 } else {
-                    // 正常内容但此后面都加上空格
-                    sentence.append(" ").append(word);
+                    // 当前元素是单词，正常拼接
+                    packageWordInfoList(wordInfoList, wordInfoMap, word, newWordsMap.containsKey(word));
+                    sentence.append(word);
                 }
             }
-            lastStr[0] = word;
+            preStr[0] = word;
             i++;
         }
         return returnList;
@@ -363,11 +363,10 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
      * @return
      */
     private List<Map<String, Object>> packageSentenceInfoList(Map<String, String> translateMap, List<Map<String, Object>> wordInfoList, List<Map<String, Object>> sentenceInfoList, StringBuilder sentence) {
-        String sentenceTrim = sentence.toString().trim();
-        if (translateMap.containsKey(sentenceTrim)) {
+        if (translateMap.containsKey(sentence.toString().trim())) {
             // 如果当前元素不是单词，有可能是整句话，查找该句话的翻译
             Map<String, Object> sentenceMap = new HashMap<>(16);
-            sentenceMap.put("translate", translateMap.get(sentenceTrim));
+            sentenceMap.put("translate", translateMap.get(sentence.toString()));
             sentenceMap.put("words", wordInfoList);
             sentenceInfoList.add(sentenceMap);
             wordInfoList = new ArrayList<>();
@@ -385,9 +384,11 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
      * @param red          是否标红
      */
     private void packageWordInfoList(List<Map<String, Object>> wordInfoList, Map<String, Object> wordInfoMap, String word, boolean red) {
-        wordInfoMap.put("word", word);
-        wordInfoMap.put("red", red);
-        wordInfoList.add(wordInfoMap);
+        if (!" ".equals(word)) {
+            wordInfoMap.put("word", word);
+            wordInfoMap.put("red", red);
+            wordInfoList.add(wordInfoMap);
+        }
     }
 
     static List<String> getAllWords(String text) {
@@ -415,6 +416,9 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
      */
     private static void splitPoint(List<String> rightList, StringBuilder sb, String[] words) {
         for (String s : words) {
+            if ("".equals(s)) {
+                continue;
+            }
             if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
                 rightList.add(s);
             } else {
@@ -442,6 +446,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
                     }
                 }
             }
+            rightList.add(" ");
         }
     }
 
