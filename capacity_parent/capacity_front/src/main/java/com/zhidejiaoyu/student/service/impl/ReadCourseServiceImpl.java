@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.ReadCourseService;
+import com.zhidejiaoyu.student.service.ReadWordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,6 +65,9 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
 
     @Autowired
     private ReadWiseCounselMapper readWiseCounselMapper;
+
+    @Autowired
+    private ReadWordService readWordService;
 
     /**
      * 获取全部单元信息
@@ -396,9 +400,20 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
     private void getInterestingReadingData(Long typeId, Map<String, Object> map) {
         ReadType readType = readTypeMapper.selectById(typeId);
         List<ReadContent> readContents = readContentMapper.selectByTypeId(typeId);
-        List<List<Map<String, Object>>> returnList = new ArrayList<>();
-        List<Map<String, Object>> readList = new ArrayList<>();
-        int i = 0;
+        /*  List<List<Map<String, Object>>> returnList = new ArrayList<>();*/
+        /*List<Map<String, Object>> readList = new ArrayList<>();*/
+        //修改开始 获取文章数据修改
+        StringBuilder sb = new StringBuilder();
+        Map<String, String> translateMap = new HashMap<>(16);
+        readContents.forEach(readContent -> {
+            sb.append(readContent.getSentence().replace(ReadContentConstant.BLANK, "。")).append(" ");
+            translateMap.put(readContent.getSentence().trim(), readContent.getTranslate());
+        });
+        // 整篇文章
+        List<String> allWords = getAllWords(sb.toString().trim());
+        List<Object> returnList = ReadWordServiceImpl.getMarkWordRedList(translateMap, allWords, new HashMap<>());
+        //修改结束
+        /*int i = 0;
         for (ReadContent readContent : readContents) {
 
             if (readList.size() == 0) {
@@ -416,16 +431,16 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             if (i == readContents.size()) {
                 returnList.add(readList);
             }
-        }
+        }*/
         if (readType.getTestType() == 5) {
-            this.getBlanks(typeId, map, returnList);
+            this.getBlanks(typeId, map);
         }
         if (readType.getTestType() == 3) {
             this.getChooseSentences(typeId, map, readType.getReadCount());
         }
-        /* if (readType.getTestType() != 5) {*/
+
         map.put("sentenceList", returnList);
-        /* }*/
+
 
         map.put("type", readType.getTestType());
         Integer learnTime = Integer.parseInt(readType.getLearnTime().replace("s", ""));
@@ -540,7 +555,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         map.put("sentenceList", returnList);
     }
 
-    private void getBlanks(Long typeId, Map<String, Object> map, List<List<Map<String, Object>>> sList) {
+    private void getBlanks(Long typeId, Map<String, Object> map) {
         ReadBlanks readBlanks = readBlanksMapper.selByTypeId(typeId);
         String[] answerList = readBlanks.getAnswer().split("&@&");
         String[] analysisList = readBlanks.getAnalysis().split("&@&");
@@ -578,11 +593,11 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             list.add(returnMap);
             num++;
         }
-        List<Map<String,Object>> answerList=new ArrayList<>();
+        List<Map<String, Object>> answerList = new ArrayList<>();
         for (int i = 0; i < reightOrderList.size(); i++) {
-            Map<String,Object> answerMap=new HashMap<>();
-            answerMap.put("answer",reightOrderList.get(i));
-            answerMap.put("analysis",analysisList.get(i));
+            Map<String, Object> answerMap = new HashMap<>();
+            answerMap.put("answer", reightOrderList.get(i));
+            answerMap.put("analysis", analysisList.get(i));
             answerList.add(answerMap);
         }
         map.put("answer", answerList);

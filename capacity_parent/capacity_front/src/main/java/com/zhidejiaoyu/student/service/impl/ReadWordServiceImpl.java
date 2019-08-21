@@ -167,7 +167,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         Map<String, String> translateMap = new HashMap<>(16);
         readContents.forEach(readContent -> {
             sb.append(readContent.getSentence().replace(ReadContentConstant.BLANK, "。")).append(" ");
-            translateMap.put(readContent.getSentence(), readContent.getTranslate());
+            translateMap.put(readContent.getSentence().trim(), readContent.getTranslate());
         });
         // 整篇文章
         List<String> allWords = getAllWords(sb.toString().trim());
@@ -189,7 +189,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
             newWordsMap.put(word.trim(), word.trim());
         }
 
-        List<Object> returnList = this.getMarkWordRedList(translateMap, allWords, newWordsMap);
+        List<Object> returnList = ReadWordServiceImpl.getMarkWordRedList(translateMap, allWords, newWordsMap);
 
         if (returnList.size() == 0) {
             return ServerResponse.createBySuccess(301, "未查询到生词信息！");
@@ -297,7 +297,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
      * @param newWordsMap  需要标红的单词
      * @return
      */
-    private List<Object> getMarkWordRedList(Map<String, String> translateMap, List<String> allWords, Map<String, String> newWordsMap) {
+    public static List<Object> getMarkWordRedList(Map<String, String> translateMap, List<String> allWords, Map<String, String> newWordsMap) {
         List<Object> returnList = new ArrayList<>();
         // 存放一句话中的各个单词及各个单词是不是生词信息
         List<Map<String, Object>> wordInfoList = new ArrayList<>();
@@ -349,11 +349,11 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
      * @param sentence         当前整句话
      * @return
      */
-    private List<Map<String, Object>> packageSentenceInfoList(Map<String, String> translateMap, List<Map<String, Object>> wordInfoList, List<Map<String, Object>> sentenceInfoList, StringBuilder sentence) {
+    private static List<Map<String, Object>> packageSentenceInfoList(Map<String, String> translateMap, List<Map<String, Object>> wordInfoList, List<Map<String, Object>> sentenceInfoList, StringBuilder sentence) {
         if (translateMap.containsKey(sentence.toString().trim())) {
             // 如果当前元素不是单词，有可能是整句话，查找该句话的翻译
             Map<String, Object> sentenceMap = new HashMap<>(16);
-            sentenceMap.put("translate", translateMap.get(sentence.toString()));
+            sentenceMap.put("translate", translateMap.get(sentence.toString().trim()));
             sentenceMap.put("words", wordInfoList);
             sentenceInfoList.add(sentenceMap);
             wordInfoList = new ArrayList<>();
@@ -370,7 +370,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
      * @param word         单词
      * @param red          是否标红
      */
-    private void packageWordInfoList(List<Map<String, Object>> wordInfoList, Map<String, Object> wordInfoMap, String word, boolean red) {
+    private static void packageWordInfoList(List<Map<String, Object>> wordInfoList, Map<String, Object> wordInfoMap, String word, boolean red) {
         wordInfoMap.put("word", word);
         wordInfoMap.put("red", red);
         wordInfoList.add(wordInfoMap);

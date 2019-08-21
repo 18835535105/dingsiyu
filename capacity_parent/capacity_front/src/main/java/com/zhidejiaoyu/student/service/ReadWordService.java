@@ -5,6 +5,8 @@ import com.zhidejiaoyu.common.pojo.ReadWord;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author wuchenxi
@@ -15,8 +17,6 @@ public interface ReadWordService extends BaseService<ReadWord> {
     /**
      * 获取选中的单词信息
      *
-     *
-     *
      * @param session
      * @param courseId
      * @param word
@@ -26,8 +26,6 @@ public interface ReadWordService extends BaseService<ReadWord> {
 
     /**
      * 添加单词到生词本
-     *
-     *
      *
      * @param session
      * @param readWord
@@ -58,8 +56,8 @@ public interface ReadWordService extends BaseService<ReadWord> {
      * 开始强化
      *
      * @param session
-     * @param courseId  课程 id
-     * @param type  强化类型：1.慧记忆;2.单词图鉴3.慧听写4.慧默写
+     * @param courseId 课程 id
+     * @param type     强化类型：1.慧记忆;2.单词图鉴3.慧听写4.慧默写
      * @return
      */
     ServerResponse startStrengthen(HttpSession session, Long courseId, Integer type);
