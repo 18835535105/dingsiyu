@@ -313,7 +313,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
     }
 
     /**
-     * 值得元老：
+     * 资深队员：
      * <ul>
      * <li>在线登录时长达一个月，点亮LV1。</li>
      * <li>达五个月，点亮LV2。</li>
@@ -333,8 +333,9 @@ public class MedalAwardAsync extends BaseAwardAsync {
             if (super.checkAward(award, MEDAL_TYPE)) {
                 // 在线总时长
                 Long totalOnlineTime = durationMapper.countTotalOnlineTime(student);
-                int totalMonth = totalOnlineTime == null ? 0 : (int) (totalOnlineTime / 2592000);
-                packagePlan(studentId, children, totalMonth);
+                // 总天数
+                int totalDays = totalOnlineTime == null ? 0 : (int) (totalOnlineTime / 86400);
+                packagePlan(studentId, children, totalDays);
             }
         } catch (Exception e) {
             log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
