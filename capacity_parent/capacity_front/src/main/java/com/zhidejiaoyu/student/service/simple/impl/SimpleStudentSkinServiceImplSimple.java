@@ -150,7 +150,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
             Date endTime = (Date) map2.get("endTime");
             //判断皮肤是使用的皮肤还是试用的皮肤
             if (endTime != null) {
-                if (new Date().getTime() >= endTime.getTime()) {
+                if (System.currentTimeMillis() >= endTime.getTime()) {
                     //当使用时间小于现在的时间时调用
                     map2.put("use", false);
                 } else {
