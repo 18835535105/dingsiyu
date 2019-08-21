@@ -2,13 +2,11 @@ package com.zhidejiaoyu.aliyunoss.getObject;
 
 import com.aliyun.oss.OSS;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
-import com.zhidejiaoyu.aliyunoss.util.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.net.URL;
 import java.util.Date;
 
@@ -45,6 +43,9 @@ public class GetOssFile {
      * @return
      */
     public static String getPublicObjectUrl(String objectName) {
+        if (objectName != null && objectName.contains(AliyunInfoConst.host)) {
+            objectName = objectName.replace(AliyunInfoConst.host, "");
+        }
         return AliyunInfoConst.host + objectName;
     }
 
