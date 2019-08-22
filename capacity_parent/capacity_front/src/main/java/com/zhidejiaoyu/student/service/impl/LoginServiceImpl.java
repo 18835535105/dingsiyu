@@ -432,7 +432,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 姓名
         result.put("studentName", student.getStudentName());
         // 头像
-        result.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
+        result.put("headUrl", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
         result.put("schoolName", student.getSchoolName());
 
         this.getIndexTime(session, student, result);
