@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.SimpleExhumationMapper;
@@ -57,7 +58,8 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
      */
     @Override
     public int addSynthetic(String name, String imgUrl, Integer type, Integer studentId, Integer model) {
-        return simpleSyntheticRewardsListMapper.insert(syntheticRewardsList(name, imgUrl, type, studentId, new Date(), model));
+        String replaceImgUrl = imgUrl.replace(AliyunInfoConst.host, "");
+        return simpleSyntheticRewardsListMapper.insert(syntheticRewardsList(name, replaceImgUrl, type, studentId, new Date(), model));
     }
 
     /**
