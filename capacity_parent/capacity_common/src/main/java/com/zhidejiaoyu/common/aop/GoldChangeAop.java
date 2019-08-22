@@ -8,10 +8,7 @@ import com.zhidejiaoyu.common.mapper.TeacherMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.rank.RankOpt;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -66,7 +63,7 @@ public class GoldChangeAop {
         }
     }
 
-    @After("goldPoint()")
+    @AfterReturning("goldPoint()")
     public void afterChange() {
         Student student = this.getStudent();
         try {
