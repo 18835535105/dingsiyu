@@ -509,7 +509,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         for (Gauntlet gauntlet : gauntlets) {
             Map<String, Object> map = new HashMap<>();
             map.put("name", student.getNickname());
-            map.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
+            map.put("headUrl", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
             if (gauntlet.getChallengerStudentId().equals(student.getId())) {
                 map.put("status", gauntlet.getChallengeStatus());
                 map.put("study", gauntlet.getChallengerStudyNow());
@@ -1063,7 +1063,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             studentGauntletVo.setWinner("0");
         }
 
-        studentGauntletVo.setHeadUrl(AliyunInfoConst.host + studentGauntletVo.getHeadUrl());
+        studentGauntletVo.setHeadUrl(GetOssFile.getPublicObjectUrl(studentGauntletVo.getHeadUrl()));
     }
 
 
