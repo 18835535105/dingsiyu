@@ -43,12 +43,17 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
     /**
      * 是否以单词或者数字结尾
      */
-    private static final String END_MATCH = ".*[a-zA-z0-9\\u4e00-\\u9fa5]$";
+    private static final String END_MATCH = ".*[a-zA-Z0-9\\u4e00-\\u9fa5]$";
+
+    /**
+     * 二次判断
+     */
+    private static final String END_MATCH2 = ".*[a-zA-Z0-9\\u4e00-\\u9fa5'’]$";
 
     /**
      * 是否以单词或者数字开头
      */
-    private static final String START_MATCH = "^[a-zA-z0-9'\\u4e00-\\u9fa5].*";
+    private static final String START_MATCH = "^[a-zA-Z0-9'\\u4e00-\\u9fa5].*";
 
     @Autowired
     private ReadWordMapper readWordMapper;
@@ -418,11 +423,23 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
                     if (Pattern.matches(END_MATCH, s1)) {
                         sb.append(s1);
                     } else {
-                        if (sb.length() > 0) {
-                            rightList.add(sb.toString());
-                            sb.setLength(0);
+                        if (i != length - 1) {
+                            if (Pattern.matches(END_MATCH2, s1)) {
+                                sb.append(s1);
+                            }else{
+                                if (sb.length() > 0) {
+                                    rightList.add(sb.toString());
+                                    sb.setLength(0);
+                                }
+                                rightList.add(s1);
+                            }
+                        } else {
+                            if (sb.length() > 0) {
+                                rightList.add(sb.toString());
+                                sb.setLength(0);
+                            }
+                            rightList.add(s1);
                         }
-                        rightList.add(s1);
                     }
                     // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
                     if (sb.length() > 0 && i == length - 1) {
