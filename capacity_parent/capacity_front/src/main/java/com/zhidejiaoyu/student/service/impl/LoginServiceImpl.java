@@ -992,7 +992,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     public Object getRiepCount(HttpSession session) {
         Student student = getStudent(session);
         Map<String, Object> map = new HashMap<>();
-        map.put("partUrl", AliyunInfoConst.host + student.getPartUrl());
+        map.put("partUrl", GetOssFile.getPublicObjectUrl(student.getPartUrl()));
         Integer count = studentMapper.getVocabularyCountByStudent(student.getId());
         map.put("vocabularyCount", count);
         Integer sentenceCount = studentMapper.getSentenceCountByStudent(student.getId());
