@@ -1,8 +1,6 @@
 package com.zhidejiaoyu.student.controller;
 
-import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
-import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.LoginService;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +43,7 @@ public class LoginController {
      *
      * @param account  账号
      * @param password 密码
-     * @param code 验证码
+     * @param code     验证码
      * @param session
      * @return
      */
@@ -95,31 +93,22 @@ public class LoginController {
     /**
      * 修改密码
      *
-     * @param oldPassword  旧密码
-     * @param password 新密码
+     * @param oldPassword 旧密码
+     * @param password    新密码
      */
     @RequestMapping("/updatePassword")
     public ServerResponse<String> updatePassword(String oldPassword, String password, HttpSession session, Long studentId) {
         if (StringUtils.isEmpty(oldPassword) || StringUtils.isEmpty(password)) {
             return ServerResponse.createByErrorMessage("密码不能为空！");
         }
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        if (!Objects.equals(student.getId(), studentId)) {
-            log.error("学生 {}->{} 试图修改学生 {} 的密码！", student.getId(), student.getStudentName(), studentId);
-            return ServerResponse.createByErrorMessage("无权限修改他人密码！");
-        }
-        if (!Objects.equals(student.getPassword(), oldPassword)) {
-            return ServerResponse.createByErrorMessage("原密码输入错误！");
-        }
-        return loginService.updatePassword(password, session);
+        return loginService.updatePassword(password, session, oldPassword, studentId);
     }
 
     /**
      * 首页点击头像
-     *
      */
     @RequestMapping("/portrait")
-    public ServerResponse<Object> clickPortrait(HttpSession session){
+    public ServerResponse<Object> clickPortrait(HttpSession session) {
         return loginService.clickPortrait(session);
     }
 
@@ -169,17 +158,17 @@ public class LoginController {
     }
 
     @GetMapping("/getRiepCount")
-    public Object getRiepCount(HttpSession session){
+    public Object getRiepCount(HttpSession session) {
         return loginService.getRiepCount(session);
     }
 
     @GetMapping("/getModelStatus")
-    public Object getModelStatus(HttpSession session,Integer type){
-        return loginService.getModelStatus(session,type);
+    public Object getModelStatus(HttpSession session, Integer type) {
+        return loginService.getModelStatus(session, type);
     }
 
     @GetMapping("/isLoginOut")
-    public Object isLoginOut(HttpSession session,String teacherAccount){
-        return loginService.isLoginOut(session,teacherAccount);
+    public Object isLoginOut(HttpSession session, String teacherAccount) {
+        return loginService.isLoginOut(session, teacherAccount);
     }
 }

@@ -19,6 +19,7 @@ import com.zhidejiaoyu.common.utils.locationUtil.LongitudeAndLatitude;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.LoginService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
@@ -45,6 +46,7 @@ import java.util.regex.Pattern;
  * @version 1.0
  */
 @Service
+@Slf4j
 @Transactional(rollbackFor = Exception.class)
 public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements LoginService {
 
@@ -126,9 +128,23 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         return studentMapper.loginJudge(st);
     }
 
+    /**
+     * @param password    新密码
+     * @param session
+     * @param oldPassword 旧密码
+     * @param studentId   对比 学生id
+     * @return
+     */
     @Override
-    public ServerResponse<String> updatePassword(String password, HttpSession session) {
+    public ServerResponse<String> updatePassword(String password, HttpSession session, String oldPassword, Long studentId) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        if (!Objects.equals(student.getId(), studentId)) {
+            log.error("学生 {}->{} 试图修改学生 {} 的密码！", student.getId(), student.getStudentName(), studentId);
+            return ServerResponse.createByErrorMessage("无权限修改他人密码！");
+        }
+        if (!Objects.equals(student.getPassword(), oldPassword)) {
+            return ServerResponse.createByErrorMessage("原密码输入错误！");
+        }
         student.setPassword(password);
         int state = studentMapper.updateByPrimaryKeySelective(student);
         if (state == 1) {
@@ -915,7 +931,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
 
         try {
-            super.saveRunLog(stu,1, "学生[" + stu.getStudentName() + "]登录,ip=[" + ip + "]");
+            super.saveRunLog(stu, 1, "学生[" + stu.getStudentName() + "]登录,ip=[" + ip + "]");
         } catch (Exception e) {
             logger.error("学生 {} -> {} 登录信息记录失败！ExceptionMsg:{}", stu.getId(), stu.getStudentName(), e.getMessage(), e);
         }
@@ -1039,7 +1055,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         //判断是否有阅读课程
         if (type.equals(6)) {
             StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selReadByStudentId(student.getId());
-            if(studentStudyPlan!=null){
+            if (studentStudyPlan != null) {
                 isHave = true;
             }
         }

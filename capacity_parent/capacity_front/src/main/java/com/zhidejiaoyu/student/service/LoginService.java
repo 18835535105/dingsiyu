@@ -15,7 +15,7 @@ import java.util.Map;
  * @author qizhentao
  * @version 1.0
  */
-public interface LoginService extends BaseService<Student>{
+public interface LoginService extends BaseService<Student> {
     /***
      * 修改密码
      *
@@ -23,7 +23,7 @@ public interface LoginService extends BaseService<Student>{
      * @param session
      * @return
      */
-    ServerResponse<String> updatePassword(String password, HttpSession session);
+    ServerResponse<String> updatePassword(String password, HttpSession session, String oldPassword, Long studentId);
 
     ServerResponse<Object> index(HttpSession session);
 
