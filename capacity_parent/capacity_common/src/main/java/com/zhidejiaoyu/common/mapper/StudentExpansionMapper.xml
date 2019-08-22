@@ -4,23 +4,39 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentExpansion">
-        <id column="id" property="id" />
-        <result column="student_id" property="studentId" />
-        <result column="study_power" property="studyPower" />
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="study_power" property="studyPower"/>
         <result column="level" property="level"/>
         <result column="is_look" property="isLook"/>
         <result column="audio_status" property="audioStatus"/>
         <result column="test_gold_add" property="testGoldAdd"/>
         <result column="pk_explain" property="pkExplain"/>
+        <result column="better_three_time" property="betterThreeTime"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, student_id, study_power , level ,is_look, audio_status, test_gold_add, pk_explain
+        id, student_id, study_power , level ,is_look, audio_status, test_gold_add, pk_explain, better_three_time
+    </sql>
+
+    <sql id="more_table_column">
+        se.id, se.student_id, se.study_power , se.level , se.is_look, se.audio_status, se.test_gold_add, se.pk_explain, se.better_three_time
     </sql>
 
     <select id="selectByStudentId" parameterType="long" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"/> from student_expansion where student_id=#{studentId} limit 1
+        select
+        <include refid="Base_Column_List"/>
+        from student_expansion where student_id=#{studentId} limit 1
+    </select>
+    <select id="selectBySchoolAdminId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_column"/>
+        from student s,
+        student_expansion se
+        where s.id = se.student_id
+        and (s.teacher_id = #{schoolAdminId} or
+        s.teacher_id in (select teacher_id from teacher where school_admin_id = #{schoolAdminId}))
     </select>
 
 </mapper>

@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -53,6 +54,11 @@ public class StudentExpansion extends Model<StudentExpansion> {
      * 闯关类当日金币增加量，每天首次登陆时清零
      */
     private Integer testGoldAdd;
+
+    /**
+     * 学生达到全校前 3 名时的时间，用于判断“拔得头筹”勋章
+     */
+    private Date betterThreeTime;
 
     @Override
     protected Serializable pkVal() {

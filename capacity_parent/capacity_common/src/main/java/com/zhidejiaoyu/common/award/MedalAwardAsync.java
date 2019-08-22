@@ -2,9 +2,12 @@ package com.zhidejiaoyu.common.award;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.zhidejiaoyu.common.constant.MedalConstant;
+import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.StudentUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -53,6 +56,12 @@ public class MedalAwardAsync extends BaseAwardAsync {
     @Autowired
     private WorshipMapper worshipMapper;
 
+    @Autowired
+    private RankOpt rankOpt;
+
+    @Autowired
+    private StudentExpansionMapper studentExpansionMapper;
+
     /**
      * 初出茅庐勋章
      * 任意课程单元下，首次完成‘慧记忆、慧听写、慧默写、例句听力、例句翻译’五个模块，依次点亮L1、L2、L3、L4、L5。
@@ -73,7 +82,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
                 for (int i = 0; i < length; i++) {
                     award = awardMapper.selectByStudentIdAndMedalType(studentId, (long) MedalConstant.INEXPERIENCED_TOTAL_PLAN[i]);
                     if (this.checkAward(award, MEDAL_TYPE)) {
-                        super.optAward(studentId, (long) MedalConstant.INEXPERIENCED_TOTAL_PLAN[i], modelSize, award, MEDAL_TYPE);
+                        super.optAward(studentId, MedalConstant.INEXPERIENCED_TOTAL_PLAN[i], modelSize, award, MEDAL_TYPE);
                     }
                 }
             }
@@ -496,62 +505,180 @@ public class MedalAwardAsync extends BaseAwardAsync {
     /**
      * 拔得头筹
      * <p>
-     * 本校金币总数第一名保持一分钟，点亮 拔得头筹 LV1
-     * 本校金币总数第一名保持一小时，点亮 拔得头筹 LV2。
-     * 本校金币总数第一名保持两小时，点亮 拔得头筹 LV3。
-     * 本校金币总数第一名保持一天，点亮 拔得头筹 LV4。
-     * 本校金币总数第一名保持一周，点亮 拔得头筹 LV5。
+     * 本校金币排行前三名保持1分钟，点亮 拔得头筹 LV1
+     * 本校金币排行前三名保持1小时，点亮 拔得头筹 LV2。
+     * 本校金币排行前三名保持1天，点亮 拔得头筹 LV3。
+     * 本校金币排行第一名保持1天，点亮 拔得头筹 LV4。
+     * 本校金币排行第一名保持1周，点亮 拔得头筹 LV5。
      *
      * @param student
      */
     public void theFirst(Student student) {
+
         Integer schoolAdminId = super.getSchoolAdminId(student);
-        // 查询本校最高的金币数的学生
-        Student maxGoldStudent = studentMapper.selectMaxGoldForSchool(schoolAdminId);
-        if (maxGoldStudent == null) {
-            // 还没有学生获取拔得头筹，给当前学生更新获取拔得头筹的时间
-            student.setSchoolGoldFirstTime(new Date());
-            studentMapper.updateById(student);
-        } else {
-            // 已经有学生获取了拔得头筹
-            double maxGold = maxGoldStudent.getSystemGold() + maxGoldStudent.getOfflineGold();
-            double myGold = student.getSystemGold() + student.getOfflineGold();
-            if (myGold == maxGold) {
-                student.setSchoolGoldFirstTime(new Date());
-                studentMapper.updateById(student);
-            } else if (myGold > maxGold) {
 
-                List<Medal> children = medalMapper.selectChildrenIdByParentId(11);
+        // 计算金币排行前三名的情况
+        this.saveBetterThree(student, schoolAdminId);
 
-                // 当前学生金币在本校第一名
-                student.setSchoolGoldFirstTime(new Date());
-                studentMapper.updateById(student);
+        // 计算金币排行全校第一名的情况
+        this.saveTheFirst(student, schoolAdminId);
+    }
 
-                // 查询本校所有金币总和为 maxGold 的学生信息
-                List<Student> students = studentMapper.selectMaxGoldForGold(schoolAdminId, maxGold);
-                // 计算保持时间，并保存相应的勋章奖励
-                students.parallelStream().forEach(maxStudent -> {
-                    if (maxStudent.getSchoolGoldFirstTime() != null) {
-                        // 如果最后一个奖励条件已达成，说明其之前奖励都已能领取，不再进行其他计算
-                        Award award = awardMapper.selectByStudentIdAndMedalType(student.getId(), children.get(children.size() - 1).getId());
-                        try {
-                            if (super.checkAward(award, MEDAL_TYPE)) {
-                                // 保持的分钟数
-                                int keepTime = (int) ((System.currentTimeMillis() - maxStudent.getSchoolGoldFirstTime().getTime()) / 60000);
-                                for (Medal child : children) {
-                                    award = awardMapper.selectByStudentIdAndMedalType(student.getId(), child.getId());
-                                    super.optAward(student.getId(), child.getId(), keepTime, award, MEDAL_TYPE);
-                                }
-                            }
-                        } catch (Exception e) {
-                            log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
-                        }
+    /**
+     * 计算金币排行全校第一名的情况
+     *
+     * @param student
+     * @param schoolAdminId
+     */
+    private void saveTheFirst(Student student, Integer schoolAdminId) {
+        List<Long> theFirstStudentIds = rankOpt.getReverseRangeMembersBetweenStartAndEnd(RankKeysConst.SCHOOL_GOLD_RANK + schoolAdminId, 0L, 1L);
+
+        // 查询有全校排名第一标识的学生，之前是全校第一名但当前不是第一名的学生信息
+        List<Student> students = StudentUtil.getStudentBySchoolAdmin(schoolAdminId)
+                .parallelStream()
+                .filter(student1 -> student.getSchoolGoldFirstTime() != null && !Objects.equals(student1.getId(), theFirstStudentIds.get(0)))
+                .collect(Collectors.toList());
+        if (students.size() > 0) {
+            students.forEach(student1 -> {
+                // 计算这些学生拔得头筹勋章
+                this.calculateTheFirst(student);
+                student1.setSchoolGoldFirstTime(null);
+                studentMapper.updateById(student1);
+            });
+        }
+
+        if (theFirstStudentIds.contains(student.getId())) {
+            // 当前学生是全校第一名
+            this.calculateTheFirst(student);
+        }
+    }
+
+    /**
+     * 计算学生全校第一名保持时间，并更新拔得头筹勋章
+     *
+     * @param student
+     */
+    private void calculateTheFirst(Student student) {
+        if (student.getSchoolGoldFirstTime() == null) {
+            return;
+        }
+        // 当前学生在全校第一名
+        long keepTime = (System.currentTimeMillis() - student.getSchoolGoldFirstTime().getTime()) / 60000;
+        if (keepTime >= 1) {
+            // 判断是否已经点亮： 本校金币排行第一名保持1周，点亮 拔得头筹 LV5。
+            Award award = awardMapper.selectByStudentIdAndMedalType(student.getId(), 15L);
+            try {
+                if (super.checkAward(award, MEDAL_TYPE)) {
+                    List<Long> children = new ArrayList<>(2);
+                    children.add(14L);
+                    children.add(15L);
+                    for (long childId : children) {
+                        award = awardMapper.selectByStudentIdAndMedalType(student.getId(), childId);
+                        super.optAward(student.getId(), childId, (int) keepTime, award, MEDAL_TYPE);
                     }
-                });
-                // 去掉金币排名不再是学校第一名学生的时间标识
-                if (students.size() > 0) {
-                    studentMapper.updateSchoolGoldFirstTimeToNull(students);
                 }
+            } catch (Exception e) {
+                log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
+            }
+        }
+    }
+
+    /**
+     * 计算全校金币排行前三名的情况
+     *
+     * @param student
+     * @param schoolAdminId
+     */
+    private void saveBetterThree(Student student, Integer schoolAdminId) {
+
+        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
+        if (studentExpansion == null) {
+            log.error("学生[{} - {} - {}] 的扩展信息 studentExpansion = null", student.getId(), student.getAccount(), student.getStudentName());
+            return;
+        }
+
+        // 查询本校前 3 名的学生
+        List<Long> betterThreeStudentIds = rankOpt.getReverseRangeMembersBetweenStartAndEnd(RankKeysConst.SCHOOL_GOLD_RANK + schoolAdminId, 0L, 3L);
+
+        // 计算跌出全校前三名的学生勋章
+        this.calculateOtherStudentTheFirstMedal(schoolAdminId, betterThreeStudentIds);
+
+        if (betterThreeStudentIds.contains(student.getId())) {
+            // 当前学生在本校的前三名中
+            // 如果学生之前就在前三名中，计算其保持的时间
+            // 如果学生之前不在前三名中，将其进入前三名的时间更新为当前时间
+            if (studentExpansion.getBetterThreeTime() == null) {
+                studentExpansion.setBetterThreeTime(new Date());
+                studentExpansionMapper.updateById(studentExpansion);
+            } else {
+                this.calculateTheFirstMedal(student, studentExpansion);
+            }
+        }
+    }
+
+    /**
+     * 统计跌出全校前三名的学生拔得头筹勋章
+     *
+     * @param schoolAdminId         校管 id
+     * @param betterThreeStudentIds 之前全校前三名的学生 id
+     */
+    private void calculateOtherStudentTheFirstMedal(Integer schoolAdminId, List<Long> betterThreeStudentIds) {
+        List<StudentExpansion> studentExpansions = studentExpansionMapper.selectBySchoolAdminId(schoolAdminId);
+        if (studentExpansions.size() > 0) {
+            Map<Long, List<StudentExpansion>> collect = studentExpansions
+                    .stream()
+                    .filter(studentExpansion -> studentExpansion.getBetterThreeTime() != null)
+                    .collect(Collectors.groupingBy(StudentExpansion::getStudentId));
+            if (collect.size() == 0) {
+                return;
+            }
+
+            betterThreeStudentIds.forEach(id -> {
+                if (!collect.containsKey(id)) {
+                    // 说明学生之前在全校前三名，现在已经不在前三名了，计算其勋章
+                    Student student = studentMapper.selectById(id);
+                    StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
+                    if (studentExpansion == null) {
+                        log.error("学生[{} - {} - {}] 的扩展信息 studentExpansion = null", student.getId(), student.getAccount(), student.getStudentName());
+                        return;
+                    }
+
+                    this.calculateTheFirstMedal(student, studentExpansion);
+
+                    studentExpansion.setBetterThreeTime(null);
+                    studentExpansionMapper.updateById(studentExpansion);
+                }
+            });
+        }
+    }
+
+    /**
+     * 计算拔得头筹前三名的勋章获取情况
+     *
+     * @param student          学生信息
+     * @param studentExpansion 学生扩展信息
+     */
+    private void calculateTheFirstMedal(Student student, StudentExpansion studentExpansion) {
+        if (studentExpansion.getBetterThreeTime() == null) {
+            return;
+        }
+        long keepTime = (System.currentTimeMillis() - studentExpansion.getBetterThreeTime().getTime()) / 60000;
+        if (keepTime >= 1) {
+            // 判断是否已经点亮： 本校金币排行前三名保持1天，点亮 拔得头筹 LV3。
+            Award award = awardMapper.selectByStudentIdAndMedalType(student.getId(), 13L);
+            try {
+                if (super.checkAward(award, MEDAL_TYPE)) {
+                    List<Long> children = new ArrayList<>(3);
+                    children.add(11L);
+                    children.add(12L);
+                    children.add(13L);
+                    for (long childId : children) {
+                        award = awardMapper.selectByStudentIdAndMedalType(student.getId(), childId);
+                        super.optAward(student.getId(), childId, (int) keepTime, award, MEDAL_TYPE);
+                    }
+                }
+            } catch (Exception e) {
+                log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
             }
         }
     }

@@ -3,8 +3,10 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
+
+import java.util.List;
 
 /**
  * <p>
@@ -21,4 +23,11 @@ public interface StudentExpansionMapper extends BaseMapper<StudentExpansion> {
 
     StudentExpansion selectByStudentId(Long challengerStudentId);
 
+    /**
+     * 查询学校下所有学生的扩展信息
+     *
+     * @param schoolAdminId
+     * @return
+     */
+    List<StudentExpansion> selectBySchoolAdminId(@Param("schoolAdminId") Integer schoolAdminId);
 }

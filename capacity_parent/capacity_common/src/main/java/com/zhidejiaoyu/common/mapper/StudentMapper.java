@@ -123,11 +123,10 @@ public interface StudentMapper extends BaseMapper<Student> {
      * @param model
      * @param teacherId
      * @param classId
-     *
      * @return
      */
     //List<StudentSeniority> selectSeniority();
-    List<Map<String, Object>> selectSeniority(@Param("model") String model, @Param("teacherId") Long teacherId,@Param("classId") Long classId);
+    List<Map<String, Object>> selectSeniority(@Param("model") String model, @Param("teacherId") Long teacherId, @Param("classId") Long classId);
 
     @MapKey("id")
     Map<Long, Map<Long, Object>> selectxz();
@@ -153,15 +152,15 @@ public interface StudentMapper extends BaseMapper<Student> {
     int updateBySystem_gold(@Param("i") int i, @Param("studentId") Long studentId);
 
     @Update("update student set unit_id = #{unitId} where id = #{studentId}")
-    void updateUnitId(@Param("studentId") long studentId,@Param("unitId") int unitId);
+    void updateUnitId(@Param("studentId") long studentId, @Param("unitId") int unitId);
 
     @Update("update student set sentence_unit_id = #{unitId} where id = #{studentId}")
-    void updatesentenceUnitId(@Param("studentId") long studentId,@Param("unitId") int unitId);
+    void updatesentenceUnitId(@Param("studentId") long studentId, @Param("unitId") int unitId);
 
     /**
      * 批量删除学生信息
      *
-     * @param ids   学生id集合
+     * @param ids 学生id集合
      */
     void deleteByPrimaryKeys(@Param("ids") Long[] ids);
 
@@ -176,7 +175,7 @@ public interface StudentMapper extends BaseMapper<Student> {
     /**
      * 批量更新学生删除状态为开启状态
      *
-     * @param stuIds    学生id集合
+     * @param stuIds 学生id集合
      */
     void updateDelStatus(@Param("stuIds") List<Long> stuIds);
 
@@ -190,7 +189,7 @@ public interface StudentMapper extends BaseMapper<Student> {
     int countByPhaseAndVersion(@Param("phase") String phase, @Param("student") Student student);
 
     @Select("select count(id) from student where teacher_id = #{teacherId} and version = #{version}")
-    Integer schoolHeadcount(@Param("teacherId")Long teacherId, @Param("version") String version);
+    Integer schoolHeadcount(@Param("teacherId") Long teacherId, @Param("version") String version);
 
     Integer schoolHeadcountNationwide(@Param("study_paragraph") String study_paragraph, @Param("version") String version);
 
@@ -260,7 +259,24 @@ public interface StudentMapper extends BaseMapper<Student> {
 
     /**
      * 查看所有冻结用户
+     *
      * @return
      */
     List<Student> getAllFrozenStudent();
+
+    /**
+     * 查询当前学校所有学生信息
+     *
+     * @param schoolAdminId 校管 id
+     * @return
+     */
+    List<Student> selectBySchoolAdminId(@Param("schoolAdminId") Integer schoolAdminId);
+
+    /**
+     * 查询教师下所有学生
+     *
+     * @param teacherId
+     * @return
+     */
+    List<Student> selectByTeacherId(@Param("teacherId") Integer teacherId);
 }
