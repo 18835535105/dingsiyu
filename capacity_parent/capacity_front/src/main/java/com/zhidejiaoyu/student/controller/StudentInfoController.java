@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.common.Vo.student.level.ChildMedalVo;
 import com.zhidejiaoyu.common.Vo.student.level.LevelVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
@@ -88,6 +89,8 @@ public class StudentInfoController extends BaseController {
         if (x != null) {
             return x;
         }
+        student.setHeadUrl(student.getHeadUrl().replace(AliyunInfoConst.host, ""));
+        student.setPartUrl(student.getPartUrl().replace(AliyunInfoConst.host, ""));
         return studentInfoService.saveStudentInfo(session, student, oldPassword, newPassword);
     }
 
@@ -133,7 +136,7 @@ public class StudentInfoController extends BaseController {
      * @return
      */
     private ServerResponse<String> validStudentInfo(HttpSession session, Student student, String oldPassword, String newPassword) {
-        Student studentInfo = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student studentInfo = super.getStudent(session);
 
         int minPasswordLength = 6;
         int maxPasswordLength = 10;

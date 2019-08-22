@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
-import com.mysql.cj.x.protobuf.MysqlxExpr;
-import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.read.ReadContentConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -373,7 +372,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             List<ReadPicture> readPictures = readPictureMapper.selByCourseIdAndType(courseId, type);
             List<String> partList = new ArrayList<>();
             for (ReadPicture readPicture : readPictures) {
-                partList.add(AliyunInfoConst.host + readPicture.getPartUrl());
+                partList.add(GetOssFile.getPublicObjectUrl(readPicture.getPartUrl()));
             }
             map.put("partList", partList);
         }

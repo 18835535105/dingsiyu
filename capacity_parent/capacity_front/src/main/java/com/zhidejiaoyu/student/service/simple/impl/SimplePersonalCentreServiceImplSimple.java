@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
 import com.zhidejiaoyu.common.Vo.simple.ccieVo.CcieVo;
 import com.zhidejiaoyu.common.Vo.simple.ccieVo.MyCcieVo;
@@ -138,7 +139,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         Student student = getStudent(session);
         Long id = student.getId();
         map.put("name", student.getStudentName());
-        map.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
+        map.put("headUrl", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
         map.put("nickname", student.getNickname());
         map.put("sex", student.getSex() == null || student.getSex() == 1 ? "男" : "女");
 

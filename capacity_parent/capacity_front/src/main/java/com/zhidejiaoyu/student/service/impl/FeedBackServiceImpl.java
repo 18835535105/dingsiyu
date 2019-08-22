@@ -49,7 +49,7 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
         // 获取当前学生所有的反馈及被回复信息
         List<MessageBoard> messageBoards = messageBoardMapper.selectByStudentId(student.getId());
         if (messageBoards.size() > 0) {
-            return ServerResponse.createBySuccess(packageFeedBackInfoVO(messageBoards, AliyunInfoConst.host + student.getHeadUrl()));
+            return ServerResponse.createBySuccess(packageFeedBackInfoVO(messageBoards, GetOssFile.getPublicObjectUrl(student.getHeadUrl())));
         }
         return ServerResponse.createBySuccess(new FeedBackInfoVO());
     }
