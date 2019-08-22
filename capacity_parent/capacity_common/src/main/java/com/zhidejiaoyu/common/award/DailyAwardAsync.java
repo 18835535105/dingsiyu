@@ -213,6 +213,9 @@ public class DailyAwardAsync extends BaseAwardAsync {
         parentIds.add(23L);
         parentIds.add(37L);
         parentIds.add(47L);
+        parentIds.add(52L);
+        parentIds.add(57L);
+        parentIds.add(62L);
         parentIds.add(67L);
         parentIds.add(72L);
         parentIds.add(87L);
