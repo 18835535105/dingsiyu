@@ -895,7 +895,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 // 将天道酬勤中未达到领取条件的勋章重置
                 medalAwardAsync.resetLevel(stu);
 
-                // 值得元老勋章
+                // 资深队员勋章
                 medalAwardAsync.oldMan(stu);
             });
         }
