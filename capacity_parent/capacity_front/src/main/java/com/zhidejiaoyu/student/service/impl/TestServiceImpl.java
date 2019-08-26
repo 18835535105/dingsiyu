@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.game.StrengthGameVo;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.Vo.testVo.TestDetailVo;
@@ -385,7 +386,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecordMapper.insert(testRecord);
         TestResultVo vo = new TestResultVo();
         vo.setGold(goldCount);
-        vo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
+        vo.setPetUrl(GetOssFile.getPublicObjectUrl(student.getPartUrl()));
         int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
                 testRecord.getStudyModel(), testRecord.getGenre());
         int energy = getEnergy(student, testRecord.getPoint(), number);
