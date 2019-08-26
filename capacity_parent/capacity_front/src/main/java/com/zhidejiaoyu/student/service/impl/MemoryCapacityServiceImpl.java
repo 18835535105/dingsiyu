@@ -139,8 +139,8 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
      * @param map
      */
     private void getGoldeAndEnteger(Integer count, Student student, Integer point, Integer type, String model, Map<String, Object> map) {
-        Integer gold = 0;
-        Integer enger = 0;
+        int gold = 0;
+        int enger = 0;
         if (point == null) {
             point = 0;
         }
