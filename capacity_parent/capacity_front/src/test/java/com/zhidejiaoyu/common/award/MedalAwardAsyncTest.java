@@ -69,6 +69,7 @@ public class MedalAwardAsyncTest extends BaseTest {
 
     @Test
     public void theFirst() {
+        medalAwardAsync.theFirst(student);
     }
 
     @Test

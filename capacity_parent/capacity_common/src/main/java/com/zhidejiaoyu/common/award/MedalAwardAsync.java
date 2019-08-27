@@ -538,18 +538,19 @@ public class MedalAwardAsync extends BaseAwardAsync {
                 .parallelStream()
                 .filter(student1 -> student.getSchoolGoldFirstTime() != null && !Objects.equals(student1.getId(), theFirstStudentIds.get(0)))
                 .collect(Collectors.toList());
-        if (students.size() > 0) {
-            students.forEach(student1 -> {
-                // 计算这些学生拔得头筹勋章
-                this.calculateTheFirst(student);
-                student1.setSchoolGoldFirstTime(null);
-                studentMapper.updateById(student1);
-            });
-        }
 
         if (theFirstStudentIds.contains(student.getId())) {
             // 当前学生是全校第一名
             this.calculateTheFirst(student);
+
+            if (students.size() > 0) {
+                students.forEach(student1 -> {
+                    // 计算这些学生拔得头筹勋章
+                    this.calculateTheFirst(student);
+                    student1.setSchoolGoldFirstTime(null);
+                    studentMapper.updateById(student1);
+                });
+            }
         }
     }
 
@@ -600,9 +601,6 @@ public class MedalAwardAsync extends BaseAwardAsync {
         // 查询本校前 3 名的学生
         List<Long> betterThreeStudentIds = rankOpt.getReverseRangeMembersBetweenStartAndEnd(RankKeysConst.SCHOOL_GOLD_RANK + schoolAdminId, 0L, 3L);
 
-        // 计算跌出全校前三名的学生勋章
-        this.calculateOtherStudentTheFirstMedal(schoolAdminId, betterThreeStudentIds);
-
         if (betterThreeStudentIds.contains(student.getId())) {
             // 当前学生在本校的前三名中
             // 如果学生之前就在前三名中，计算其保持的时间
@@ -613,6 +611,9 @@ public class MedalAwardAsync extends BaseAwardAsync {
             } else {
                 this.calculateTheFirstMedal(student, studentExpansion);
             }
+
+            // 计算跌出全校前三名的学生勋章
+            this.calculateOtherStudentTheFirstMedal(schoolAdminId, betterThreeStudentIds);
         }
     }
 
