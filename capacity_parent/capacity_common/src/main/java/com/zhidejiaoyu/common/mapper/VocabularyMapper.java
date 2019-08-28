@@ -4,118 +4,16 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.UnitVocabulary;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
-import com.zhidejiaoyu.common.pojo.VocabularyExample;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Map;
 
 public interface VocabularyMapper extends BaseMapper<Vocabulary> {
-    int countByExample(VocabularyExample example);
-
-    int deleteByExample(VocabularyExample example);
-
-    int deleteByPrimaryKey(Long id);
-
-    int insertSelective(Vocabulary record);
-
-    List<Vocabulary> selectByExample(VocabularyExample example);
 
     Vocabulary selectByPrimaryKey(Long id);
-
-    int updateByExampleSelective(@Param("record") Vocabulary record, @Param("example") VocabularyExample example);
-
-    int updateByExample(@Param("record") Vocabulary record, @Param("example") VocabularyExample example);
-
-    int updateByPrimaryKeySelective(Vocabulary record);
-
-    int updateByPrimaryKey(Vocabulary record);
-
-    int wordAdd(Vocabulary vocabulary);
-
-    @Insert("insert into unit_vocabulary(unit_id, vocabulary_id, classify, word_chinese) values(#{id},#{id2}, #{classify}, #{chinese})")
-    void vocabularyToUnit(@Param("id") String id, @Param("id2") Long id2, @Param("classify") String classify, @Param("chinese") String chinese);
-
-    /**
-     * 查询单词是否存在
-     */
-    @Select("select id from vocabulary where word = #{word} and delStatus = 1")
-    List<Integer> showVocabulary(@Param("word") String word);
-
-    List<Vocabulary> page(Vocabulary vo);
-
-    /**
-     * 删除单词
-     */
-    //@Update("update vocabulary set delStatus = 2 where id = #{id}")
-    @Delete("delete from vocabulary where id = #{id}")
-    Integer delWord(@Param("id") String id);
-
-    // @Delete("delete from vocabulary where id = #{id}")
-    // Integer delWord(@Param("id") String id);
-
-    // @Delete("delete from unit_vocabulary where vocabulary_id = #{id}")
-    // Integer delWordTo(@Param("id") String id);
-
-    /**
-     * 根据拼接的名查询单元id
-     */
-    @Select("select id from unit where joint_name = #{pjm} and delStatus = 1")
-    Integer selectJoint_name(@Param("pjm") String pjm);
-
-    /**
-     * 单元关联单词
-     */
-    @Insert("insert into unit_vocabulary(unit_id, vocabulary_id, classify) values(#{id}, #{id2}, #{classify})")
-    Integer addUnit_vocabulary(@Param("id") Integer id, @Param("id2") Long id2, @Param("classify") Integer classify);
-
-    @Select("select b.unit_id from unit a INNER JOIN unit_vocabulary b on a.id = b.unit_id where a.joint_name=#{pjm} and b.vocabulary_id=#{in} ")
-    Integer selectUnit_vo(@Param("pjm") String pjm, @Param("in") Integer in);
-
-    /**
-     * 新增/更改初中例句
-     */
-    @Update("update vocabulary set centreExample = #{valueOf}, centreTranslate = #{valueOf2} where id = #{in} ")
-    void updateCentreVocabulary(@Param("in") Integer in, @Param("valueOf") String valueOf,
-                                @Param("valueOf2") String valueOf2);
-
-    /**
-     * 新增/更改高中例句
-     */
-    @Update("update vocabulary set tallExample = #{valueOf}, tallTranslate = #{valueOf2} where id = #{in} ")
-    void updateTallVocabulary(@Param("in") Integer in, @Param("valueOf") String valueOf,
-                              @Param("valueOf2") String valueOf2);
-
-    Vocabulary mapSelectVocabulary(String id);
-
-    /**
-     * 修改词汇
-     */
-    Integer wordUpdate(Vocabulary vocabulary);
-
-    @Insert("insert into unit_vocabulary(unit_id, vocabulary_id, classify, word_chinese) values(#{unitid}, #{id}, #{classify}, #{chinese})")
-    void wordToUnit(@Param("id") Long id, @Param("unitid") String unitid, @Param("classify") String classify, @Param("chinese") String chinese);
-
-    @Select("select vocabulary_id from unit_vocabulary where unit_id = #{unitid} and vocabulary_id = #{id} ")
-    Integer wordToUnitRelevancy(@Param("id") Long id, @Param("unitid") String unitid);
-
-    /**
-     * 单词id, 单元id, 词汇分类
-     *
-     * @param chinese
-     */
-    @Update("update unit_vocabulary set classify = #{string}, word_chinese = #{chinese} where vocabulary_id = #{id} and unit_id = #{unitid}")
-    void updateClassfiy(@Param("id") Long id, @Param("unitid") String unitid, @Param("string") String string, @Param("chinese") String chinese);
-
-    /**
-     * 删除取消关联的单词的单元
-     */
-    // @Delete("delete from unit_vocabulary where vocabulary_id = #{id} ${unit_id}")
-    // void delUnit_vocabulary(@Param("id") Long id, @Param("unit_id")String
-    // unit_id);
-
-    void delUnit_vocabulary(UnitVocabulary nv);
 
     /**
      * 根据单词的 ids 获取单词集合
@@ -124,9 +22,6 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     List<Vocabulary> selectByWordIds(@Param("ids") List<Long> wordIds);
-
-    @Select("select id from vocabulary where id = #{id} and word = #{word}")
-    Integer showVocabularyId(@Param("id") Long id, @Param("word") String word);
 
     /**
      * 获取当前单元下的所有单词信息(不含删除的单词)
@@ -182,11 +77,11 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
     /**
      * 取单元下一个未学习过的单词
      *
-     * @param unit_id 单元id
+     * @param unitId 单元id
      * @param id      学生id
      * @return 单词数据
      */
-    Vocabulary showWord(@Param("unit_id") String unit_id, @Param("id") Long id);
+    Vocabulary showWord(@Param("unit_id") String unitId, @Param("id") Long id);
 
     /**
      * 获取当前课程下的单词总量
@@ -196,27 +91,6 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     int countByCourseId(@Param("courseId") Long courseId, @Param("flag") Integer flag);
-
-    @Select("select count(id) from vocabulary where word = #{word} and delStatus = 1 and id != #{id}")
-    Integer selectVocabuularyId(@Param("id") Long id, @Param("word") String word);
-
-    /**
-     * 查询单词-单元中间表是否已经关联
-     *
-     * @param unitId 单元id
-     * @param wordId 单词id
-     * @return
-     */
-    @Select("select unit_id from unit_vocabulary where unit_id = #{unitId} and vocabulary_id = #{wordId}")
-    Integer selectUnit_Word(@Param("unitId") Integer unitId, @Param("wordId") Integer wordId);
-
-    @Update("update vocabulary set word_chinese = #{wordChinese} where id = #{id}")
-    Integer excelUpdateWork(@Param("wordChinese") Object wordChinese, @Param("id") int id);
-
-    List<Vocabulary> pageWord(@Param("word") String word);
-
-    @Select("select word_chinese from vocabulary where word = #{word} and delStatus = 1")
-    String showVocabularyWordChinese(@Param("word") String word);
 
     /**
      * 根据学生学段获取单词信息
@@ -229,10 +103,14 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      */
     List<Vocabulary> selectByStudentPhase(@Param("student") Student student, @Param("flag") int flag);
 
+    /**
+     * 获取课程下的单词数
+     *
+     * @param courseId
+     * @return
+     */
     @Select("select COUNT(c.id) FROM unit a JOIN unit_vocabulary b ON a.id = b.unit_id JOIN vocabulary c ON b.vocabulary_id = c.id AND c.delStatus = 1 AND a.course_id = #{course_id}")
-    Integer courseCountVocabulary(@Param("course_id") Long course_id);
-
-    Integer countUnitWeek(@Param("studentId") Long studentId, @Param("course_id") Long course_id, @Param("model") int model);
+    Integer courseCountVocabulary(@Param("course_id") Long courseId);
 
     /**
      * 查找指定单词的音节
@@ -251,9 +129,6 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     Vocabulary selectOneWordNotInIds(@Param("wordIds") List<Long> wordIds, @Param("unitId") Long unitId);
-
-    @Select("select IFNULL(syllable,word) from vocabulary where id = #{vocabulary_id}")
-    String getSyllableByWordid(@Param("vocabulary_id") Long vocabulary_id);
 
     /**
      * 根据单词查询当前单词的id
@@ -296,16 +171,6 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
     @Select("select word from vocabulary limit #{i}, #{i1}")
     List<String> getThreeWord(@Param("i") int i, @Param("i1") int i1);
 
-    @Select("select id, recordpicurl from vocabulary where word = #{fileName}")
-    Vocabulary matchingImagesToWord(@Param("fileName") String fileName);
-
-    @Update("update vocabulary set recordpicurl = #{s} where id = #{wordId}")
-    void updateRecordpicurl(@Param("s") String s, @Param("wordId") Long wordId);
-
-    List<Vocabulary> pagePicNotNull(Vocabulary vo);
-
-    List<Vocabulary> pageWordPicNotNull(@Param("word") String word);
-
     List<Map<String, Object>> getWordIdByCourse(@Param("correctWordId") Long correctWordId, @Param("courseId") Long courseId, @Param("unidId") Long unidId);
 
     List<Vocabulary> getWordPicAll(@Param("unitId") Long unitId);
@@ -316,7 +181,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
 
     List<Map<String, Object>> getWordIdByUnit(@Param("id") Long id, @Param("unitId") String unitId);
 
-    List<Vocabulary> getMemoryWordPicAll(@Param("unit_id") long unit_id, @Param("studentId") Long studentId, @Param("data") String data);
+    List<Vocabulary> getMemoryWordPicAll(@Param("unit_id") long unitId, @Param("studentId") Long studentId, @Param("data") String data);
 
     /**
      * 查询当前单元指定模块的单词个数

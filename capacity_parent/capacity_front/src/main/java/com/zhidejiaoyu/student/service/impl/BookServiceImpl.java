@@ -1,21 +1,21 @@
 package com.zhidejiaoyu.student.service.impl;
 
-import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zhidejiaoyu.common.Vo.bookVo.BookInfoVo;
 import com.zhidejiaoyu.common.Vo.bookVo.BookVo;
+import com.zhidejiaoyu.common.Vo.bookVo.PlayerVo;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.PictureUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.BookService;
-import com.zhidejiaoyu.common.Vo.bookVo.BookInfoVo;
-import com.zhidejiaoyu.common.Vo.bookVo.PlayerVo;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -195,11 +195,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
             vo.setContent(StringUtils.isEmpty(vocabulary.getSyllable()) ? vocabulary.getWord() : vocabulary.getSyllable());
             vo.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
             vo.setSoundMark(StringUtils.isEmpty(vocabulary.getSoundMark()) ? "" : vocabulary.getSoundMark());
-            if (StringUtils.isNotEmpty(vocabulary.getRecordpicurl())) {
-                vo.setPictureUrl(GetOssFile.getPublicObjectUrl(vocabulary.getRecordpicurl()));
-            } else {
-                vo.setPictureUrl(null);
-            }
+            vo.setPictureUrl(PictureUtil.getPictureByUnitId(vocabulary, unitId));
             list.add(vo);
         }
         return list;

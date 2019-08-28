@@ -206,7 +206,7 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
         List<Vocabulary> listSelect = vocabularyMapper.getWordIdByAll(list.size() * 4);
 
         // 分题工具类
-        Map<String, Object> map = wordPictureUtil.allocationWord(list, listSelect, null);
+        Map<String, Object> map = wordPictureUtil.allocationWord(list, listSelect, null, unitId);
         return ServerResponse.createBySuccess(map);
     }
 }

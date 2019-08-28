@@ -28,6 +28,9 @@
                 jdbcType="VARCHAR"/>
         <result column="read_url" property="readUrl"
                 jdbcType="VARCHAR"/>
+        <result column="small_picture_url" property="smallPictureUrl"/>
+        <result column="middle_picture_url" property="middlePictureUrl"/>
+        <result column="high_picture_url" property="highPictureUrl"/>
     </resultMap>
     <sql id="insertWord_sql">
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -246,7 +249,8 @@
         id, word, word_chinese, example_english, example_chinese,
         explain_,
         create_time,
-        update_time, course_unit, syllable, delStatus, sound_mark, read_url
+        update_time, course_unit, syllable, delStatus, sound_mark, read_url,
+        small_picture_url, middle_picture_url, high_picture_url
     </sql>
 
     <!-- 多表查询返回结果 -->
@@ -257,7 +261,8 @@
         v.create_time,
         v.update_time,
         v.course_unit,
-        v.syllable, v.delStatus, v.recordpicurl, v.sound_mark, v.read_url
+        v.syllable, v.delStatus, v.recordpicurl, v.sound_mark, v.read_url,
+        v.small_picture_url, v.middle_picture_url, v.high_picture_url
     </sql>
 
     <!-- 根据学生id查询当前单元下指定模块的所有生词/熟词 -->

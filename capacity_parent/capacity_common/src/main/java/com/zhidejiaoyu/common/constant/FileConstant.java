@@ -9,16 +9,6 @@ package com.zhidejiaoyu.common.constant;
 public class FileConstant {
 
     /**
-     * 保存课程封面路径
-     */
-    public static final String COURSE_IMG = "imgs/courseImg/";
-
-    /**
-     * 保存单词助记图片
-     */
-    public static final String WORD_HELP_IMG = "imgs/wordHelpImg/";
-
-    /**
      * 宠物录音地址
      */
     public static final String PET_SAY_AUDIO = "audio/pet-tip/";
@@ -27,15 +17,5 @@ public class FileConstant {
      * 意见反馈图片地址
      */
     public static final String FEEDBACK_IMG = "imgs/feedBackImg/";
-
-    /**
-     * 好声音文件路径
-     */
-    public static final String GOOD_VOICE = "audio/voice/";
-
-    /**
-     * 单词读音地址
-     */
-    public static final String WORD_AUDIO = "audio/word/";
 
 }

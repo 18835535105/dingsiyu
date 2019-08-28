@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 /**
  * 词汇
- * 
+ *
  * @author Administrator
  */
 @Data
@@ -95,7 +95,7 @@ public class Vocabulary extends Model<Vocabulary> {
 
 	@TableField(exist = false)
 	private Double memory_strength;
-	
+
 	/** 音节 */
 	private String syllable;
 
@@ -110,6 +110,24 @@ public class Vocabulary extends Model<Vocabulary> {
 	private String soundMark;
 
 	private String readUrl;
+
+	/**
+	 * 小学单词图片地址
+	 */
+	@TableField("small_picture_url")
+	private String smallPictureUrl;
+
+	/**
+	 * 初中单词图片地址
+	 */
+	@TableField("middle_picture_url")
+	private String middlePictureUrl;
+
+	/**
+	 * 高中单词图片地址
+	 */
+	@TableField("high_picture_url")
+	private String highPictureUrl;
 
 	@Override
 	protected Serializable pkVal() {

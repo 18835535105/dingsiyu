@@ -4,6 +4,7 @@ import com.aliyun.oss.OSS;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -21,11 +22,6 @@ import java.util.Date;
 public class GetOssFile {
 
     private static OSS client;
-
-    /**
-     * 用于判断当前请求是不是客户端发起的请求（session 中含有该字段说明是桌面客户端发起的请求，否则说明是浏览器发起的请求）
-     */
-    public static final String DESKTOP = "desktop";
 
     @Resource
     private OSS ossClient;
@@ -45,6 +41,9 @@ public class GetOssFile {
     public static String getPublicObjectUrl(String objectName) {
         if (objectName != null && objectName.contains(AliyunInfoConst.host)) {
             objectName = objectName.replace(AliyunInfoConst.host, "");
+        }
+        if (StringUtils.isEmpty(objectName)) {
+            return "";
         }
         return AliyunInfoConst.host + objectName;
     }

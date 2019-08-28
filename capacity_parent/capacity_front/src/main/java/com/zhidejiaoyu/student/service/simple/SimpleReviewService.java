@@ -76,7 +76,4 @@ public interface SimpleReviewService {
 
     ServerResponse<Map<String, Object>> Reviewcapacity_picture(Long id, String unitId, int i, String course_id, String judge);
 
-    ServerResponse<Object> testReviewWordPic(String unit_id, int classify, HttpSession session);
-
-    ServerResponse<Object> testWordPic(String courseId, String unitId, int select, int classify, Boolean isTrue, HttpSession session);
 }
