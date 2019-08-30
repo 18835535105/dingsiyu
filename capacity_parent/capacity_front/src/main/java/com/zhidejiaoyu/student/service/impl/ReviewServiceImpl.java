@@ -1296,7 +1296,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         } else if (select == 2) {
             // 3.获取生词需要出的测试题
             vocabularies = capacityMapper.accrueWordStrOne(studentId, unitId, "单词图鉴");
-        } else if (select == 3) {
+        } else {
             // 4.获取熟词需要出的测试题
             vocabularies = capacityMapper.ripeWordStrOne(studentId, unitId, "单词图鉴");
         }

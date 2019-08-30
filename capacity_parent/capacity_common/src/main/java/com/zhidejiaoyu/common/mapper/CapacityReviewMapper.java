@@ -97,35 +97,32 @@ public interface CapacityReviewMapper {
 	/**
 	 * 模块1已学题
 	 *
-	 * @param student_id
-	 * @param unit_id
+	 * @param studentId
+	 * @param unitId
 	 * @param classifyStr
 	 * @return
 	 */
-	@Select("select a.id, a.word, a.word_chinese as wordChinese, a.recordpicurl from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id and b.type = 1 and b.unit_id = #{unit_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id  AND a.delStatus = 1")
-	List<Vocabulary> alreadyWordStrOne(@Param("student_id") Long student_id,@Param("unit_id") String unit_id,@Param("classifyStr") String classifyStr);
+	List<Vocabulary> alreadyWordStrOne(@Param("student_id") Long studentId,@Param("unit_id") String unitId,@Param("classifyStr") String classifyStr);
 
 	/**
 	 * 模块1生词题
 	 *
-	 * @param student_id
-	 * @param unit_id
+	 * @param studentId
+	 * @param unitId
 	 * @param classifyStr
 	 * @return
 	 */
-	@Select("select a.id, a.word, a.word_chinese as wordChinese, a.recordpicurl from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id and b.type = 1 and b.unit_id = #{unit_id} and b.student_id = #{student_id}	and b.study_model = #{classifyStr} and b.status = 0 INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id  AND a.delStatus = 1")
-	List<Vocabulary> accrueWordStrOne(@Param("student_id") Long student_id,@Param("unit_id") String unit_id,@Param("classifyStr")  String classifyStr);
+	List<Vocabulary> accrueWordStrOne(@Param("student_id") Long studentId,@Param("unit_id") String unitId,@Param("classifyStr")  String classifyStr);
 
 	/**
 	 * 模块1熟词题
 	 *
-	 * @param student_id
-	 * @param unit_id
+	 * @param studentId
+	 * @param unitId
 	 * @param classifyStr
 	 * @return
 	 */
-	@Select("select a.id, a.word, a.word_chinese as wordChinese, a.recordpicurl from vocabulary a INNER JOIN learn b on a.id = b.vocabulary_id and b.type = 1 and b.unit_id = #{unit_id} and b.student_id = #{student_id}	and b.study_model = #{classifyStr} and b.status = 1 INNER JOIN unit_vocabulary uv ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id  AND a.delStatus = 1")
-	List<Vocabulary> ripeWordStrOne(@Param("student_id") Long student_id, @Param("unit_id") String unit_id, @Param("classifyStr") String classifyStr);
+	List<Vocabulary> ripeWordStrOne(@Param("student_id") Long studentId, @Param("unit_id") String unitId, @Param("classifyStr") String classifyStr);
 
 	/**
 	 * 模块2,3已学题
