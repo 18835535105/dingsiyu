@@ -39,11 +39,11 @@ public class GetOssFile {
      * @return
      */
     public static String getPublicObjectUrl(String objectName) {
-        if (objectName != null && objectName.contains(AliyunInfoConst.host)) {
-            objectName = objectName.replace(AliyunInfoConst.host, "");
-        }
         if (StringUtils.isEmpty(objectName)) {
             return "";
+        }
+        if (objectName.contains(AliyunInfoConst.host)) {
+            objectName = objectName.replace(AliyunInfoConst.host, "");
         }
         return AliyunInfoConst.host + objectName;
     }
