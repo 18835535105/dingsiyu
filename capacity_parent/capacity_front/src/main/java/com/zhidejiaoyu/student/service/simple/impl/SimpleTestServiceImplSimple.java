@@ -255,7 +255,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             map.put("point", point);
         }
         // 宠物url,用于跳过游戏时显示
-        map.put("petUrl", AliyunInfoConst.host + student.getPartUrl());
+        map.put("petUrl", GetOssFile.getPublicObjectUrl(student.getPartUrl()));
 
         return ServerResponse.createBySuccess(map);
     }
@@ -1417,15 +1417,12 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             return ServerResponse.createBySuccess();
         }
 
-        if (vocabulary.get("recordpicurl") != null && vocabulary.get("recordpicurl") != "") {
-            Vocabulary wordPictureVocabulary = new Vocabulary();
-            wordPictureVocabulary.setSmallPictureUrl(String.valueOf(vocabulary.get("smallPictureUrl")));
-            wordPictureVocabulary.setMiddlePictureUrl(String.valueOf(vocabulary.get("middlePictureUrl")));
-            wordPictureVocabulary.setHighPictureUrl(String.valueOf(vocabulary.get("highPictureUrl")));
-            vocabulary.put("recordpicurl", PictureUtil.getPictureByCourseId(wordPictureVocabulary, courseId));
-        } else {
-            vocabulary.put("recordpicurl", "");
-        }
+        // 单词图片
+        Vocabulary wordPictureVocabulary = new Vocabulary();
+        wordPictureVocabulary.setSmallPictureUrl(vocabulary.get("smallPictureUrl") == null ? null : vocabulary.get("smallPictureUrl").toString());
+        wordPictureVocabulary.setMiddlePictureUrl(vocabulary.get("middlePictureUrl") == null ? null : vocabulary.get("middlePictureUrl").toString());
+        wordPictureVocabulary.setHighPictureUrl(vocabulary.get("highPictureUrl") == null ? null : vocabulary.get("highPictureUrl").toString());
+        vocabulary.put("recordpicurl", PictureUtil.getPictureByCourseId(wordPictureVocabulary, courseId));
 
         String word = vocabulary.get("word").toString();
 

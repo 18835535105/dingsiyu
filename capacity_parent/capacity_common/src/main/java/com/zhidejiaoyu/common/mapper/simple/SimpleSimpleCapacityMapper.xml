@@ -118,7 +118,6 @@
 		select a.id            capacityId,
 			   a.unit_id,
 			   b.id,
-		       b.recordpicurl,
 		       b.small_picture_url smallPictureUrl,
 		       b.middle_picture_url middlePictureUrl,
 		       b.high_picture_url highPicutreUrl,

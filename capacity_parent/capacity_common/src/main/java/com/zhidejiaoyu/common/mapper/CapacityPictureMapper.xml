@@ -114,7 +114,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from capacity_picture
     where id = #{id,jdbcType=BIGINT}
@@ -323,11 +323,21 @@
   </update>
 
   <select id="selectNeedReviewWord" resultType="java.util.Map" parameterType="map">
-    select a.id, a.word, b.word_chinese, b.memory_strength, a.recordpicurl, b.fault_time, b.unit_id, a.sound_mark
+    select a.id,
+           a.word,
+           b.word_chinese,
+           b.memory_strength,
+           a.recordpicurl,
+           b.fault_time,
+           b.unit_id,
+           a.sound_mark,
+           a.small_picture_url  smallPictureUrl,
+           a.middle_picture_url middlePictureUrl,
+           a.high_picture_url   highPicutreUrl
     from vocabulary a
            INNER JOIN capacity_picture b on a.id = b.vocabulary_id and b.unit_id = #{unidId}
       and b.student_id = #{studentId} and b.push &lt; #{s} and b.memory_strength &lt; 1 and a.delStatus = 1
-    ORDER BY b.push asc
+    ORDER BY b.push
     LIMIT 0,1
   </select>
 

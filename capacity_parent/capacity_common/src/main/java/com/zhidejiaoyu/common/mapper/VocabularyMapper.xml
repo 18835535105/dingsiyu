@@ -553,6 +553,9 @@
                v.word,
                uv.word_chinese,
                v.recordpicurl,
+               v.small_picture_url smallPictureUrl,
+               v.middle_picture_url middlePictureUrl,
+               v.high_picture_url highPicutreUrl,
                v.sound_mark
         FROM vocabulary v,
              unit_vocabulary uv
