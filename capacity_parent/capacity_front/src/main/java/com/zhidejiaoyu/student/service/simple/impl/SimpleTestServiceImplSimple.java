@@ -20,6 +20,7 @@ import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.PictureUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -1417,7 +1418,11 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         }
 
         if (vocabulary.get("recordpicurl") != null && vocabulary.get("recordpicurl") != "") {
-            vocabulary.put("recordpicurl", GetOssFile.getPublicObjectUrl(String.valueOf(vocabulary.get("recordpicurl"))));
+            Vocabulary wordPictureVocabulary = new Vocabulary();
+            wordPictureVocabulary.setSmallPictureUrl(String.valueOf(vocabulary.get("smallPictureUrl")));
+            wordPictureVocabulary.setMiddlePictureUrl(String.valueOf(vocabulary.get("middlePictureUrl")));
+            wordPictureVocabulary.setHighPictureUrl(String.valueOf(vocabulary.get("highPictureUrl")));
+            vocabulary.put("recordpicurl", PictureUtil.getPictureByCourseId(wordPictureVocabulary, courseId));
         } else {
             vocabulary.put("recordpicurl", "");
         }

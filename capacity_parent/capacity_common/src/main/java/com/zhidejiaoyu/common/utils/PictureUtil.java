@@ -55,7 +55,7 @@ public class PictureUtil {
     /**
      * 通过传入课程 id 获取单词图片
      *
-     * @param vocabulary
+     * @param vocabulary 只需要其中的 smallPictureUrl，middlePictureUrl，highPictureUrl 三个字段即可
      * @param courseId   课程 id
      * @return
      */
