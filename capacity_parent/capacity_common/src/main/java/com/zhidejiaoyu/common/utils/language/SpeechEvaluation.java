@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Base64;
 import java.util.UUID;
 
 /**
@@ -92,7 +93,7 @@ public class SpeechEvaluation {
         transReq.setVoiceFileType(WAV);
         try {
             byte[] buf = file.getBytes();
-            String base64Str = new sun.misc.BASE64Encoder().encode(buf);
+            String base64Str = Base64.getEncoder().encodeToString(buf);
             transReq.setUserVoiceData(base64Str);
             transReq.setSeqId(1);
             transReq.setIsEnd(1);
