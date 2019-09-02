@@ -383,7 +383,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
         testRecord.setTestEndTime(new Date());
         testRecord.setAwardGold(goldCount);
-        testRecordMapper.insert(testRecord);
+
         TestResultVo vo = new TestResultVo();
         vo.setGold(goldCount);
         vo.setPetUrl(GetOssFile.getPublicObjectUrl(student.getPartUrl()));
@@ -391,6 +391,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 testRecord.getStudyModel(), testRecord.getGenre());
         int energy = getEnergy(student, testRecord.getPoint(), number);
         vo.setEnergy(energy);
+        testRecordMapper.insert(testRecord);
         getMessage(student, vo, testRecord, point, 100);
         studentMapper.updateById(student);
         return ServerResponse.createBySuccess(vo);
