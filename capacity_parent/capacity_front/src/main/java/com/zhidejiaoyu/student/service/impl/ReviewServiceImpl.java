@@ -1121,17 +1121,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         return ServerResponse.createBySuccessMessage("学习记录保存成功！");
     }
 
-    /**
-     * 单词图鉴智能复习模块
-     *
-     * @param student   学生
-     * @param unitId    单元id
-     * @param model     1=单词图鉴模块
-     * @param course_id 课程id
-     * @return
-     */
     @Override
-    public ServerResponse<Map<String, Object>> reviewCapacityPicture(Student student, String unitId, int model, String course_id, String judge) {
+    public ServerResponse<Map<String, Object>> reviewCapacityPicture(Student student, String unitId, int model, String courseId, String judge) {
 
         Long studentId = student.getId();
         // 1. 根据随机数获取题型, 并查出一道正确的题
@@ -1142,7 +1133,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             correct = capacityPictureMapper.selectNeedReviewWord(Long.valueOf(unitId), studentId, DateUtil.DateTime());
         } else {
             // 根据课程查询 课程复习模块
-            correct = capacityPictureMapper.selectNeedReviewWordCourse(course_id, studentId, DateUtil.DateTime());
+            correct = capacityPictureMapper.selectNeedReviewWordCourse(courseId, studentId, DateUtil.DateTime());
             if (correct != null) {
                 unitId = correct.get("unit_id").toString();
             }
@@ -1152,7 +1143,9 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         if (correct == null) {
             return ServerResponse.createBySuccess();
         }
-        correct.put("recordpicurl", GetOssFile.getPublicObjectUrl(String.valueOf(correct.get("recordpicurl"))));
+
+        correct.put("recordpicurl", PictureUtil.getPictureByUnitId(packagePictureUrl(correct), unitId == null ? null : Long.parseLong(unitId)));
+
         // 记忆强度
         correct.put("memoryStrength", correct.get("memory_strength"));
 
@@ -1188,8 +1181,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
         List<Map<String, Object>> mapErrorVocabulary;
         // 2. 从课程下随机获取三个题, 三个作为错题, 并且id不等于正确题id
-        if (course_id != null) {
-            mapErrorVocabulary = vocabularyMapper.getWordIdByCourse(new Long(correct.get("id").toString()), Long.valueOf(course_id), Long.parseLong(unitId));
+        if (courseId != null) {
+            mapErrorVocabulary = vocabularyMapper.getWordIdByCourse(new Long(correct.get("id").toString()), Long.valueOf(courseId), Long.parseLong(unitId));
         } else {
             //  从单元下随机获取三个题, 三个作为错题, 并且id不等于正确题id
             mapErrorVocabulary = vocabularyMapper.getWordIdByUnit(new Long(correct.get("id").toString()), unitId);
@@ -1215,13 +1208,21 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         correct.put("subject", subject);
 
         // 需要复习的单词总数
-        Integer count = capacityMapper.countNeedReviewByCourseIdOrUnitId(student, Long.valueOf(course_id),
+        Integer count = capacityMapper.countNeedReviewByCourseIdOrUnitId(student, Long.valueOf(courseId),
                 Long.valueOf(unitId), commonMethod.getTestType(0));
         correct.put("wordCount", count);
         correct.put("studyNew", false);
 
         return ServerResponse.createBySuccess(correct);
 
+    }
+
+    static Vocabulary packagePictureUrl(Map<String, Object> correct) {
+        Vocabulary wordPictureVocabulary = new Vocabulary();
+        wordPictureVocabulary.setSmallPictureUrl(correct.get("smallPictureUrl") == null ? null : correct.get("smallPictureUrl").toString());
+        wordPictureVocabulary.setMiddlePictureUrl(correct.get("middlePictureUrl") == null ? null : correct.get("middlePictureUrl").toString());
+        wordPictureVocabulary.setHighPictureUrl(correct.get("highPictureUrl") == null ? null : correct.get("highPictureUrl").toString());
+        return wordPictureVocabulary;
     }
 
     /**

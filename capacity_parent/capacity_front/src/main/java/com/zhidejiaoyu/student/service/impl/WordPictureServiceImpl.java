@@ -133,11 +133,7 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
         correct.put("readUrl", baiduSpeak.getLanguagePath(correct.get("word").toString()));
 
         // 单词图片
-        Vocabulary wordPictureVocabulary = new Vocabulary();
-        wordPictureVocabulary.setSmallPictureUrl(correct.get("smallPictureUrl") == null ? null : correct.get("smallPictureUrl").toString());
-        wordPictureVocabulary.setMiddlePictureUrl(correct.get("middlePictureUrl") == null ? null : correct.get("middlePictureUrl").toString());
-        wordPictureVocabulary.setHighPictureUrl(correct.get("highPictureUrl") == null ? null : correct.get("highPictureUrl").toString());
-        correct.put("recordpicurl", PictureUtil.getPictureByUnitId(wordPictureVocabulary, unitId));
+        correct.put("recordpicurl", PictureUtil.getPictureByUnitId(ReviewServiceImpl.packagePictureUrl(correct), unitId));
 
         // 2. 从本课程非本单元下随机获取三个题, 三个作为错题, 并且id不等于正确题id
         List<Map<String, Object>> mapErrorVocabulary = vocabularyMapper.getWordIdByCourse(new Long(correct.get("id").toString()), courseId, unitId);

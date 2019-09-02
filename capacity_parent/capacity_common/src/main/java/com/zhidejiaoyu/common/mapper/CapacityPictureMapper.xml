@@ -347,21 +347,24 @@
     from capacity_picture where student_id = #{studentId} and unit_id =
     #{unitId} and vocabulary_id =#{correctWordId}
   </select>
-    <select id="selectNeedReviewWordCourse" resultType="java.util.Map" parameterType="map">
-      SELECT
-          a.id,
-          b.word,
-          b.word_chinese,
-          b.memory_strength,
-          a.recordpicurl,
-          b.fault_time,
-          b.unit_id
-      FROM
-          vocabulary a
-      INNER JOIN capacity_picture b ON a.id = b.vocabulary_id
+  <select id="selectNeedReviewWordCourse" resultType="java.util.Map" parameterType="map">
+    SELECT a.id,
+           b.word,
+           b.word_chinese,
+           b.memory_strength,
+           a.recordpicurl,
+           b.fault_time,
+           b.unit_id,
+           a.small_picture_url  smallPictureUrl,
+           a.middle_picture_url middlePictureUrl,
+           a.high_picture_url   highPicutreUrl
+    FROM vocabulary a
+           INNER JOIN capacity_picture b ON a.id = b.vocabulary_id
       AND b.course_id = #{course_id}
-      AND b.student_id = #{studentId} and b.push &lt; #{s} and b.memory_strength &lt; 1 and a.delStatus = 1 ORDER BY b.push asc LIMIT 0,1
-    </select>
+      AND b.student_id = #{studentId} and b.push &lt; #{s} and b.memory_strength &lt; 1 and a.delStatus = 1
+    ORDER BY b.push
+    LIMIT 0,1
+  </select>
     <select id="selectByUnitIdAndStudentId" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="Base_Column_List"/>
