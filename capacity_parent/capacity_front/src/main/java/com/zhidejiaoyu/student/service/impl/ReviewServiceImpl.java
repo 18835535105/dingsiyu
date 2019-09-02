@@ -1436,7 +1436,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
         // 单词图鉴相关内容
         if (classify == 0) {
-            map.put("recordpicurl", PictureUtil.getPictureByCourseId(vocabulary, Long.parseLong(map.get("course_id").toString())));
+            map.put("recordpicurl", PictureUtil.getPictureByCourseId(vocabulary, map.get("course_id") == null ? null : Long.parseLong(map.get("course_id").toString())));
             List<Map<String, Object>> mapErrorVocabulary = vocabularyMapper.getWordIdByUnit(new Long(map.get("id").toString()), map.get("unit_id").toString());
             if (mapErrorVocabulary.size() < 3) {
                 List<Map<String, Object>> otherErrorVocabulary = vocabularyMapper.selectPictureWordFromLearned(student.getId(), 3 - mapErrorVocabulary.size());
@@ -1461,7 +1461,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             map.put("subject", subject);
         } else if (classify == 1) {
             map.put("wordChineseList", this.getChinese(Long.parseLong(map.get("unit_id").toString()), vocabulary.getId(), map.get("wordChinese").toString()));
-            map.put("recordpicurl", PictureUtil.getPictureByCourseId(vocabulary, Long.parseLong(map.get("course_id").toString())));
+            map.put("recordpicurl", PictureUtil.getPictureByCourseId(vocabulary, map.get("course_id") == null ? null : Long.parseLong(map.get("course_id").toString())));
         }
         return ServerResponse.createBySuccess(map);
     }
