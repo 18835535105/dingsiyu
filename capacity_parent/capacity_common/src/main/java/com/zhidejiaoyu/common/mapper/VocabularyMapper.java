@@ -476,10 +476,10 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
     /**
      * 获取火眼精金数据
      *
-     * @param type
-     * @param length
-     * @param max
-     * @param start
+     * @param type  1 查找小于10个字母的单词  2 查询固定长度的单词
+     * @param length   最大单词长度
+     * @param max     查询单词数量 ：1 15个单词 ， 2 1个单词
+     * @param start   单词查询开始位置
      * @return
      */
     List<String> selRandWord(@Param("type") Integer type, @Param("leng") Integer length, @Param("max") Integer max, @Param("start") Integer start);
@@ -488,7 +488,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * 获取火眼精金数据數量
      *
      * @param type
-     * @param length
+     * @param length 单词长度
      * @return
      */
     Integer selCountRandWord(@Param("type") Integer type, @Param("leng") Integer length);

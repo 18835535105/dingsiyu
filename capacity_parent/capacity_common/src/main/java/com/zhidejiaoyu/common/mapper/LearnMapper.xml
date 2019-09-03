@@ -1262,13 +1262,12 @@
         limit 1
     </select>
     <select id="selectTeksLaterLearnTimeByStudentId" resultType="java.util.Map" parameterType="map">
-        select DISTINCT learn.update_time , unit.joint_name ,course.course_name
+        select DISTINCT DISTINCT Max(learn.update_time) update_time , unit.joint_name ,course.course_name
         from learn learn
         join teks_unit unit on unit.id=learn.unit_id
         join teks_course course on course.id=learn.course_id
         where student_id = #{studentId} and learn.vocabulary_id is null and learn.example_id is null
         group by course.course_name
-        order by learn.update_time desc
     </select>
     <select id="selLaterLearnTeks" parameterType="java.util.Map" resultType="java.lang.Long">
         select learn.unit_id from learn learn
