@@ -962,4 +962,20 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @return
      */
     Learn selectReadWord(@Param("readWord") ReadWord readWord, @Param("studyModel") String studyModel);
+
+    /**
+     * 统计学生今日学习的字母个数
+     *
+     * @param studentId
+     * @return
+     */
+    int countTodayLearnedLetter(@Param("studentId") Long studentId);
+
+    /**
+     * 统计学生今日学习的音标个数
+     *
+     * @param studentId
+     * @return
+     */
+    int countTodayLearnedPhoneticSymbol(@Param("studentId") Long studentId);
 }

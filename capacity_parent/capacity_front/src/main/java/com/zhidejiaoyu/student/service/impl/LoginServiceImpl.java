@@ -479,35 +479,34 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     @Override
-    public Integer judgePreschoolTest(Long id) {
-        return testRecordMapper.judgePreschoolTest(id);
-    }
-
-    /**
-     * 点击头像,需要展示的信息
-     * <p>
-     * 今日已学单词/例句   date_format(learn_time, '%Y-%m-%d')
-     * 总金币/今日金币
-     * 我的等级/下一个等级
-     * 距离下一级还差多少金币
-     */
-    @Override
-    public ServerResponse<Object> clickPortrait(HttpSession session) {
+    public ServerResponse<Object> clickPortrait(HttpSession session, Integer type) {
 
         Student student = getStudent(session);
         Long studentId = student.getId();
 
         Map<String, Object> map = new HashMap<>(16);
         map.put("sex", student.getSex());
-        // 获取今日已学单词
-        int learnWord = learnMapper.getTodayWord(DateUtil.formatYYYYMMDD(new Date()), studentId);
-        // 获取今日已学例句
-        int learnSentence = learnMapper.getTodaySentence(DateUtil.formatYYYYMMDD(new Date()), studentId);
-        //获取今日已学课文数
-        int learnTeks = learnMapper.getTodyTeks(DateUtil.formatYYYYMMDD(new Date()), studentId);
-        map.put("learnWord", learnWord);
-        map.put("learnSentence", learnSentence);
-        map.put("learnTeks", learnTeks);
+        if (type == 1) {
+            // 获取今日已学单词
+            int learnWord = learnMapper.getTodayWord(DateUtil.formatYYYYMMDD(new Date()), studentId);
+            map.put("learnWord", learnWord);
+        } else if (type == 2) {
+            // 获取今日已学例句
+            int learnSentence = learnMapper.getTodaySentence(DateUtil.formatYYYYMMDD(new Date()), studentId);
+            map.put("learnSentence", learnSentence);
+        } else if (type == 3) {
+            //获取今日已学课文数
+            int learnTeks = learnMapper.getTodyTeks(DateUtil.formatYYYYMMDD(new Date()), studentId);
+            map.put("learnTeks", learnTeks);
+        } else {
+            // 获取今日学习字母
+            int letterCount = learnMapper.countTodayLearnedLetter(studentId);
+            map.put("letter", letterCount);
+
+            // 今日已学音标个数
+            int phoneticSymbolCount = learnMapper.countTodayLearnedPhoneticSymbol(studentId);
+            map.put("phoneticSymbol", phoneticSymbolCount);
+        }
 
         // 获取我的总金币
         int myGold = (int) BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
