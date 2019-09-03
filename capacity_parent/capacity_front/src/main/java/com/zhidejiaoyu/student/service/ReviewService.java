@@ -120,7 +120,16 @@ public interface ReviewService extends BaseService<CapacityMemory> {
      */
     ServerResponse<String> saveCapacityReview(HttpSession session, Long[] unitId, Integer classify, String word, Long courseId, Long id, boolean isKnown);
 
-    ServerResponse<Map<String, Object>> reviewCapacityPicture(Student student, String unitId, int i, String course_id, String judge);
+    /**
+     * 单词图鉴智能复习模块
+     *
+     * @param student  学生
+     * @param unitId   单元id
+     * @param model    1=单词图鉴模块
+     * @param courseId 课程id
+     * @return
+     */
+    ServerResponse<Map<String, Object>> reviewCapacityPicture(Student student, String unitId, int model, String courseId, String judge);
 
     ServerResponse<Object> testReviewWordPic(String unit_id, int classify, HttpSession session, boolean pattern);
 

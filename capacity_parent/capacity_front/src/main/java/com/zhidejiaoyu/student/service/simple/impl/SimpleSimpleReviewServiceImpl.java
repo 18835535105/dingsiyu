@@ -5,13 +5,12 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
-import com.zhidejiaoyu.common.study.simple.SimpleWordPictureUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
+import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
 import com.zhidejiaoyu.common.utils.server.GoldResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
-import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
 import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResult;
 import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResultUtil;
 import com.zhidejiaoyu.student.service.simple.SimpleReviewService;
@@ -80,13 +79,10 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
     @Autowired
     private SimpleCapacityPictureMapper simpleCapacityPictureMapper;
 
-    @Autowired
-    private SimpleWordPictureUtil simpleWordPictureUtil;
-
     @Override
     public Map<String, Integer> testReview(String unit_id, String student_id) {
         // 封装返回的数据 - 智能记忆智能复习数量
-        Map<String, Integer> map = new HashMap<String, Integer>();
+        Map<String, Integer> map = new HashMap<>();
 
         // 当前时间
         SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -894,90 +890,4 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
 
     }
 
-    /**
-     * 单词图鉴测试复习
-     * @param unit_id
-     * @param classify
-     * @param session
-     * @return
-     */
-    @Override
-    public ServerResponse<Object> testReviewWordPic(String unit_id, int classify, HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        Long studentId = student.getId();
-
-        // 获取单元下需要复习的单词
-        List<Vocabulary> list = vocabularyMapper.getMemoryWordPicAll(Long.parseLong(unit_id), studentId, SimpleDateUtil.DateTime());
-        // 随机获取带图片的单词, 正确答案的三倍
-        List<Vocabulary> listSelect = vocabularyMapper.getWordIdByAll(list.size() * 4);
-
-        // 分题工具类
-        Map<String, Object> map = simpleWordPictureUtil.allocationWord(list, listSelect, null);
-        return ServerResponse.createBySuccess(map);
-    }
-
-    /**
-     * WordPicModel
-     *
-     * @param courseId
-     * @param unitId
-     * @param select 选择: 1=已学, 2=生词, 3=熟词
-     * @param classify 0=WordPicModel
-     * @param isTrue
-     * @param session
-     * @return
-     */
-    @Override
-    public ServerResponse<Object> testWordPic(String courseId, String unitId, int select, int classify, Boolean isTrue, HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        Long student_id = student.getId();
-
-        // true 扣除一金币
-        if(isTrue){
-            // 1.查询学生剩余金币
-            Integer gold = simpleStudentMapper.getSystem_gold(student_id);
-            if(gold != null && gold>0){
-                // 扣除1金币
-                int state = simpleStudentMapper.updateBySystem_gold((gold-1), student_id);
-            }else{
-                // 金币不足
-                return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
-            }
-            // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
-        }else{
-            Integer judgeTest = simpleTestRecordMapper.selectJudgeTestToModel(courseId, student_id, 0, select);
-            if(judgeTest != null){
-                // 已经测试过, 提示扣除金币是否测试
-                return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
-            }
-        }
-
-        List<Vocabulary> vocabularies = null;
-        // select: 1=已学, 2=生词, 3=熟词
-        if (select == 1) {
-            // 2.获取已学需要出的测试题
-            vocabularies = capacityMapper.alreadyWordStrOne(student_id, unitId, "单词图鉴");
-        } else if (select == 2) {
-            // 3.获取生词需要出的测试题
-            vocabularies = capacityMapper.accrueWordStrOne(student_id, unitId, "单词图鉴");
-        } else if (select == 3) {
-            // 4.获取熟词需要出的测试题
-            vocabularies = capacityMapper.ripeWordStrOne(student_id, unitId, "单词图鉴");
-        }
-
-        // 随机获取带图片的单词, 正确答案的三倍
-        List<Vocabulary> listSelect = vocabularyMapper.getWordIdByAll(vocabularies.size() * 4);
-
-        // 分配题型‘看词选图’、‘听音选图’、‘看图选词’ 3:3:4
-        //return ServerResponse.createBySuccess(allocationWord(list, listSelect));
-
-        // 获取课程下的单词id-单元id
-        List<Long> ids = learnMapper.selectVocabularyIdByStudentIdAndCourseId(student_id, Long.valueOf(courseId), 0);
-        Map<Long, Map<Long, Long>> longMapMap = unitMapper.selectIdMapByCourseIdAndWordIds(Long.valueOf(courseId), ids, student_id, classify);
-
-        // 分题工具类
-        Map<String, Object> map = simpleWordPictureUtil.allocationWord(vocabularies, listSelect, longMapMap);
-
-        return ServerResponse.createBySuccess(map);
-    }
 }

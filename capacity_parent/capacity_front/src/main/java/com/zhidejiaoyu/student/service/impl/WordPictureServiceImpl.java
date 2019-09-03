@@ -1,12 +1,15 @@
 package com.zhidejiaoyu.student.service.impl;
 
-import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.pojo.CapacityPicture;
+import com.zhidejiaoyu.common.pojo.Learn;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.WordPictureUtil;
+import com.zhidejiaoyu.common.utils.PictureUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -108,19 +111,19 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
         cp.setStudentId(studentId);
         cp.setUnitId(unitId);
         cp.setVocabularyId(Long.valueOf(correct.get("id").toString()));
-        Object fault_time = correct.get("fault_time");
-        Object memory_strength = correct.get("memory_strength");
-        if(fault_time==null){
+        Object faultTime = correct.get("fault_time");
+        Object memoryStrength = correct.get("memory_strength");
+        if (faultTime == null) {
             cp.setFaultTime(0);
-        }else {
-            cp.setFaultTime(Integer.parseInt(fault_time.toString()));
+        } else {
+            cp.setFaultTime(Integer.parseInt(faultTime.toString()));
         }
-        if(memory_strength==null){
+        if (memoryStrength == null) {
             cp.setMemoryStrength(0.0);
-        }else {
-            cp.setMemoryStrength(Double.parseDouble(memory_strength.toString()));
+        } else {
+            cp.setMemoryStrength(Double.parseDouble(memoryStrength.toString()));
         }
-        Integer hard = memoryDifficultyUtil.getMemoryDifficulty(cp, 1);
+        int hard = memoryDifficultyUtil.getMemoryDifficulty(cp, 1);
         correct.put("memoryDifficulty", hard);
 
         // 认知引擎
@@ -128,16 +131,20 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
 
         // 读音url
         correct.put("readUrl", baiduSpeak.getLanguagePath(correct.get("word").toString()));
-        correct.put("recordpicurl", GetOssFile.getPublicObjectUrl(String.valueOf(correct.get("recordpicurl"))));
+
+        // 单词图片
+        correct.put("recordpicurl", PictureUtil.getPictureByUnitId(ReviewServiceImpl.packagePictureUrl(correct), unitId));
 
         // 2. 从本课程非本单元下随机获取三个题, 三个作为错题, 并且id不等于正确题id
         List<Map<String, Object>> mapErrorVocabulary = vocabularyMapper.getWordIdByCourse(new Long(correct.get("id").toString()), courseId, unitId);
-        mapErrorVocabulary.add(correct); // 四道题
-        Collections.shuffle(mapErrorVocabulary); // 随机打乱顺序
+        // 四道题
+        mapErrorVocabulary.add(correct);
+        // 随机打乱顺序
+        Collections.shuffle(mapErrorVocabulary);
 
         // 封装选项正确答案
-        Map subject = new HashMap(16);
-        for (Map m : mapErrorVocabulary) {
+        Map<Object, Object> subject = new HashMap<>(16);
+        for (Map<String, Object> m : mapErrorVocabulary) {
 
             boolean b = false;
             if (m.get("word").equals(correct.get("word"))) {
@@ -155,14 +162,14 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
 
         // 5. 是否是第一次学习单词图鉴，true:第一次学习，进入学习引导页；false：不是第一次学习
         Integer the = learnMapper.theFirstTimeToWordPic(studentId);
-        if(the==null) {
+        if (the == null) {
             correct.put("firstStudy", true);
             // 初始化一条数据，引导页进行完之后进入学习页面
             Learn learn = new Learn();
             learn.setStudentId(studentId);
             learn.setStudyModel("单词图鉴");
             learnMapper.insert(learn);
-        }else {
+        } else {
             correct.put("firstStudy", false);
         }
 
@@ -206,7 +213,7 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
         List<Vocabulary> listSelect = vocabularyMapper.getWordIdByAll(list.size() * 4);
 
         // 分题工具类
-        Map<String, Object> map = wordPictureUtil.allocationWord(list, listSelect, null);
+        Map<String, Object> map = wordPictureUtil.allocationWord(list, listSelect, null, unitId);
         return ServerResponse.createBySuccess(map);
     }
 }

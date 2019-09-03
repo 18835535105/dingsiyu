@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.controller.simple;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -45,26 +44,6 @@ public class SimpleReviewController {
     }
 
     /**
-     * 1.2 点击测试复习(慧记忆,慧听写...)
-     *
-     * @param unit_id  单元id
-     * @param classify 类型  1=慧记忆 2=听写 3=默写 4=例句听写 5=例句翻译 6=例句默写
-     * @return 选择模块所需复习的单词(测试题)
-     * @throws JsonProcessingException
-     */
-    @ResponseBody
-    @RequestMapping(value = "/test")
-    public ServerResponse<Object> testCapacityReview(String unit_id, int classify, HttpSession session) throws JsonProcessingException {
-        if(classify == 0){
-            // 单词图鉴
-            return simpleReviewService.testReviewWordPic(unit_id, classify, session);
-        }else {
-            return simpleReviewService.testCapacityReview(unit_id, classify, session);
-        }
-
-    }
-
-    /**
      * 保存 智能复习/任务课程 学习记录
      *
      * @param session
@@ -85,15 +64,6 @@ public class SimpleReviewController {
         }
         return simpleReviewService.saveCapacityReview(session, unitId, classify, word, courseId, id, isKnown);
     }
-
-    /**
-     * 1.4 测试记录(测试结果保存测试记录中)
-     *
-     * @Param classifyName 测试类型名
-     * @Param testDateTime 测试日期时间
-     * @Param score 得分
-     * @Param quantity 题数量
-     */
 
 
     /**
@@ -169,10 +139,6 @@ public class SimpleReviewController {
     public ServerResponse<Object> testcentre(String courseId, String unitId, int select, int classify, Boolean isTrue, HttpSession session) {
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
-        if(classify == 0){
-            // WordPicModel
-            return simpleReviewService.testWordPic(courseId, unitId, select, classify, isTrue, session);
-        }
         if (classify == 1 || classify == 2 || classify == 3) {
             // 词汇题
             return simpleReviewService.testcentre(courseId, unitId, select, classify, isTrue, session);

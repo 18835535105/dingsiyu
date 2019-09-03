@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.service.impl;
 
-import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.study.MemoryStudyVo;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
@@ -9,6 +8,7 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
+import com.zhidejiaoyu.common.utils.PictureUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
@@ -158,7 +158,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
             memoryStudyVo.setWordCount(wordCount);
             memoryStudyVo.setEngine(1);
             memoryStudyVo.setWordChineseList(this.getChinese(unitId, currentStudyWord.getId(), wordChinese));
-            memoryStudyVo.setImgUrl(GetOssFile.getPublicObjectUrl(currentStudyWord.getRecordpicurl()));
+            memoryStudyVo.setImgUrl(PictureUtil.getPictureByUnitId(currentStudyWord, unitId));
             return ServerResponse.createBySuccess(memoryStudyVo);
         }
         return null;
@@ -334,7 +334,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         memoryStudyVo.setReadUrl(baiduSpeak.getLanguagePath(capacityMemory.getWord()));
         memoryStudyVo.setEngine(PerceiveEngine.getPerceiveEngine(memoryDifficulty, memoryStrength));
         memoryStudyVo.setWordChineseList(this.getChinese(unitId, vocabularyId, wordChinese));
-        memoryStudyVo.setImgUrl(GetOssFile.getPublicObjectUrl(vocabulary.getRecordpicurl()));
+        memoryStudyVo.setImgUrl(PictureUtil.getPictureByUnitId(vocabulary, unitId));
 
         return ServerResponse.createBySuccess(memoryStudyVo);
 

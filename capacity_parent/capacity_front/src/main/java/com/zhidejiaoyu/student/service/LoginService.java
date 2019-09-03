@@ -29,9 +29,12 @@ public interface LoginService extends BaseService<Student> {
 
     ServerResponse<Object> sentenceIndex(HttpSession session);
 
-    Integer judgePreschoolTest(Long id);
-
-    ServerResponse<Object> clickPortrait(HttpSession session);
+    /**
+     * 首页点击头像
+     *
+     * @param type 类型：1.单词；2.句型；3.课文；4.字母、音标
+     */
+    ServerResponse<Object> clickPortrait(HttpSession session, Integer type);
 
     /**
      * 登录

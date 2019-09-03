@@ -6,7 +6,6 @@ import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.read.NewWordsBookVo;
 import com.zhidejiaoyu.common.Vo.read.StrengthenVo;
 import com.zhidejiaoyu.common.Vo.read.WordInfoVo;
-import com.zhidejiaoyu.common.Vo.study.MemoryStudyVo;
 import com.zhidejiaoyu.common.constant.read.ReadContentConstant;
 import com.zhidejiaoyu.common.dto.read.SaveStrengthenDto;
 import com.zhidejiaoyu.common.exception.ServiceException;
@@ -15,6 +14,7 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
+import com.zhidejiaoyu.common.utils.PictureUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
@@ -464,7 +464,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         readWord.setErrorCount(1);
         this.insert(readWord);
 
-        if (StringUtils.isNotEmpty(vocabulary.getRecordpicurl())) {
+        if (StringUtils.isNotEmpty(PictureUtil.getPictureByUnitId(vocabulary, null))) {
             // 单词有图片才保存
             readWord.setType(2);
             this.insert(readWord);

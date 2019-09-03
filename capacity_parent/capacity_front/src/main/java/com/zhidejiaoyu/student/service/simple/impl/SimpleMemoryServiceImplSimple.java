@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
+import com.zhidejiaoyu.common.utils.PictureUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.PerceiveEngine;
@@ -194,7 +195,8 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
         }
         // 图片url
         if (StringUtils.isNotEmpty(simpleCapacityVo.getRecordpicurl())) {
-            simpleCapacityVo.setRecordpicurl(GetOssFile.getPublicObjectUrl(simpleCapacityVo.getRecordpicurl()));
+            Vocabulary vocabulary = vocabularyMapper.selectById(simpleCapacityVo.getId());
+            simpleCapacityVo.setRecordpicurl(PictureUtil.getPictureByCourseId(vocabulary, courseId));
         }
         // 已学单元单词
         simpleCapacityVo.setPlan(plan);

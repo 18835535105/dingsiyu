@@ -106,10 +106,16 @@ public class LoginController {
 
     /**
      * 首页点击头像
+     *
+     * @param type 类型：1.单词；2.句型；3.课文；4.字母、音标
      */
     @RequestMapping("/portrait")
-    public ServerResponse<Object> clickPortrait(HttpSession session) {
-        return loginService.clickPortrait(session);
+    public ServerResponse<Object> clickPortrait(HttpSession session, Integer type) {
+        if (type == null) {
+            log.warn("学生头像信息中：type=null");
+            type = 1;
+        }
+        return loginService.clickPortrait(session, type);
     }
 
     /**

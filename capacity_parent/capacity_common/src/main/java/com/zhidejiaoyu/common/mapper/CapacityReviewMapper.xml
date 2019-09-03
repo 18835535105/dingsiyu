@@ -6,7 +6,7 @@
     <!-- capacity_write 记忆追踪-智能默写 --> <!-- sentence_write 例句默写 -->
 
     <!--单词记忆追踪列名-->
-	<sql id="word_sql">
+    <sql id="word_sql">
         student_id,
 		course_id,
 		unit_id,
@@ -17,11 +17,11 @@
 		fault_time,
 		push,
         memory_strength
-	</sql>
+    </sql>
 
-	<!--例句记忆追踪列名-->
+    <!--例句记忆追踪列名-->
     <sql id="sentence_sql">
-		student_id,
+        student_id,
 		course_id,
         unit_id,
 		vocabulary_id,
@@ -40,7 +40,7 @@
         cr.vocabulary_id,
         cr.word,
         <if test="studyModel != '例句听力' and studyModel != '例句翻译' and studyModel != '例句默写'">
-        cr.syllable,
+            cr.syllable,
         </if>
         cr.word_chinese,
         cr.fault_time,
@@ -53,22 +53,22 @@
             capacity_picture
         </if>
         <if test="classify == 1">
-			capacity_memory
-		</if>
+            capacity_memory
+        </if>
         <if test="classify == 2 ">
             capacity_listen
-		</if>
-		<if test="classify == 3 ">
-			capacity_write
-		</if>
+        </if>
+        <if test="classify == 3 ">
+            capacity_write
+        </if>
         <if test="classify == 4 ">
-			sentence_listen
+            sentence_listen
         </if>
         <if test="classify == 5 ">
-			sentence_translate
-		</if>
-		<if test="classify == 6 ">
-			sentence_write
+            sentence_translate
+        </if>
+        <if test="classify == 6 ">
+            sentence_write
         </if>
     </sql>
 
@@ -77,7 +77,7 @@
             capacity_memory
         </if>
         <if test="studyModel == '慧听写' ">
-        capacity_listen
+            capacity_listen
         </if>
         <if test="studyModel == '慧默写' ">
             capacity_write
@@ -130,42 +130,43 @@
     </sql>
 
     <insert id="insertByBatch" parameterType="map">
-		INSERT INTO <include refid="classify_sql"/>
-		<if test="classify &lt;= 3">
-			(<include refid="word_sql"/>)
-			VALUES
-			<foreach collection="capacityReviews" separator="," item="capacityReview">
-				(#{capacityReview.student_id}, #{capacityReview.course_id},
-				#{capacityReview.unit_id},
-				#{capacityReview.vocabulary_id},
-				#{capacityReview.word},
-				#{capacityReview.syllable},
-				#{capacityReview.word_chinese},
-				#{capacityReview.fault_time},
-				#{capacityReview.push},
-				#{capacityReview.memory_strength})
-			</foreach>
-		</if>
-		<if test="classify	 >= 4">
-			(<include refid="sentence_sql"/>)
-			VALUES
-			<foreach collection="capacityReviews" separator="," item="capacityReview">
-				(#{capacityReview.student_id},
-				#{capacityReview.course_id},
-				#{capacityReview.unit_id},
-				#{capacityReview.vocabulary_id},
-				#{capacityReview.word},
-				#{capacityReview.word_chinese},
-				#{capacityReview.fault_time},
-				#{capacityReview.push},
-				#{capacityReview.memory_strength})
-			</foreach>
-		</if>
-	</insert>
+        INSERT INTO
+        <include refid="classify_sql"/>
+        <if test="classify &lt;= 3">
+            (<include refid="word_sql"/>)
+            VALUES
+            <foreach collection="capacityReviews" separator="," item="capacityReview">
+                (#{capacityReview.student_id}, #{capacityReview.course_id},
+                #{capacityReview.unit_id},
+                #{capacityReview.vocabulary_id},
+                #{capacityReview.word},
+                #{capacityReview.syllable},
+                #{capacityReview.word_chinese},
+                #{capacityReview.fault_time},
+                #{capacityReview.push},
+                #{capacityReview.memory_strength})
+            </foreach>
+        </if>
+        <if test="classify	 >= 4">
+            (<include refid="sentence_sql"/>)
+            VALUES
+            <foreach collection="capacityReviews" separator="," item="capacityReview">
+                (#{capacityReview.student_id},
+                #{capacityReview.course_id},
+                #{capacityReview.unit_id},
+                #{capacityReview.vocabulary_id},
+                #{capacityReview.word},
+                #{capacityReview.word_chinese},
+                #{capacityReview.fault_time},
+                #{capacityReview.push},
+                #{capacityReview.memory_strength})
+            </foreach>
+        </if>
+    </insert>
 
     <select id="countCapacity_memory" resultType="int" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview">
-		<!-- 学生id , 单元id , 1...分类表 -->
-		select count(a.id) from
+        <!-- 学生id , 单元id , 1...分类表 -->
+        select count(a.id) from
         <include refid="classify_sql"/>
         a
         <if test="classify &lt;= 3">
@@ -182,160 +183,166 @@
     </select>
 
     <resultMap id="Vocabulary_map" type="com.zhidejiaoyu.common.pojo.Vocabulary">
-    	<result column="vocabulary_id" property="id" jdbcType="BIGINT" />
-    	<result column="word" property="word" jdbcType="VARCHAR" />
-    	<result column="word_chinese" property="wordChinese" jdbcType="VARCHAR" />
-  	</resultMap>
-	<!-- 根据模块,学生id,单元: 查询记忆追踪 词汇 需要复习的单词 -->
+        <result column="vocabulary_id" property="id" jdbcType="BIGINT"/>
+        <result column="word" property="word" jdbcType="VARCHAR"/>
+        <result column="word_chinese" property="wordChinese" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!-- 根据模块,学生id,单元: 查询记忆追踪 词汇 需要复习的单词 -->
     <select id="selectCapacity" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview" resultMap="Vocabulary_map">
-		select vocabulary_id, word, word_chinese from
-		<include refid="classify_sql" />
-		where push &lt; #{push} and student_id = #{student_id} and unit_id = #{unit_id} order by push asc
-	</select>
+        select vocabulary_id, word, word_chinese from
+        <include refid="classify_sql"/>
+        where push &lt; #{push} and student_id = #{student_id} and unit_id = #{unit_id} order by push asc
+    </select>
 
     <select id="selectMemory_strength" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview" resultType="Double">
-		select memory_strength from
-		<include refid="classify_sql" />
-		where student_id = #{student_id} and word = #{word}
-			<if test="unit_id != null and unit_id!='' ">
-				and unit_id = #{unit_id}
-			</if>
-	</select>
+        select memory_strength from
+        <include refid="classify_sql"/>
+        where student_id = #{student_id} and word = #{word}
+        <if test="unit_id != null and unit_id!='' ">
+            and unit_id = #{unit_id}
+        </if>
+    </select>
 
     <update id="updateMemory_strength" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview">
-		update <include refid="classify_sql" />
-		 set memory_strength = #{memory_strength}
-		 where student_id = #{student_id} and word = #{word}
-			<if test="unit_id != null and unit_id !='' ">
-				and unit_id = #{unit_id}
-			</if>
-	</update>
+        update
+        <include refid="classify_sql"/>
+        set memory_strength = #{memory_strength}
+        where student_id = #{student_id} and word = #{word}
+        <if test="unit_id != null and unit_id !='' ">
+            and unit_id = #{unit_id}
+        </if>
+    </update>
 
-	<!-- 智能复习单词,翻译 -->
+    <!-- 智能复习单词,翻译 -->
     <select id="ReviewCapacity_memory" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview"
             resultType="com.zhidejiaoyu.common.pojo.CapacityReview">
-	select a.vocabulary_id, a.word, a.word_chinese , a.memory_strength , a.fault_time, a.syllable, a.unit_id
-	from
-	<include refid="classify_sql" /> a join vocabulary b on a.vocabulary_id = b.id
-	where a.push &lt; #{push}
-	and a.student_id = #{student_id}
-	<if test="unit_id != null and unit_id != '' ">
-		and a.unit_id = #{unit_id}
-	</if>
-	<if test="course_id != null and course_id != '' ">
-		and a.course_id = #{course_id}
-	</if>
-	and b.delStatus = 1
-	and a.memory_strength &lt; 1
-	order by a.push asc limit 0,1
-</select>
+        select a.vocabulary_id, a.word, a.word_chinese , a.memory_strength , a.fault_time, a.syllable, a.unit_id
+        from
+        <include refid="classify_sql"/>
+        a join vocabulary b on a.vocabulary_id = b.id
+        where a.push &lt; #{push}
+        and a.student_id = #{student_id}
+        <if test="unit_id != null and unit_id != '' ">
+            and a.unit_id = #{unit_id}
+        </if>
+        <if test="course_id != null and course_id != '' ">
+            and a.course_id = #{course_id}
+        </if>
+        and b.delStatus = 1
+        and a.memory_strength &lt; 1
+        order by a.push asc limit 0,1
+    </select>
 
-	<!-- 修改黄金记忆时间 -->
+    <!-- 修改黄金记忆时间 -->
     <update id="updatePush" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview">
-		update
-		<include refid="classify_sql" />
-		set
-			push = #{push}
-		where
-			student_id = #{student_id} and word = #{word}
-			<if test="unit_id != null and unit_id !='' ">
-				and unit_id = #{unit_id}
-			</if>
-	</update>
+        update
+        <include refid="classify_sql"/>
+        set
+        push = #{push}
+        where
+        student_id = #{student_id} and word = #{word}
+        <if test="unit_id != null and unit_id !='' ">
+            and unit_id = #{unit_id}
+        </if>
+    </update>
 
-	<!-- 修改学习信息表 -->
+    <!-- 修改学习信息表 -->
     <update id="updateLearn" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview">
-		update learn
-			set study_count = study_count + 1
-		where
-			student_id = #{student_id}
+        update learn
+        set study_count = study_count + 1
+        where
+        student_id = #{student_id}
 
-			<if test="unit_id != null and unit_id !='' ">
-				and unit_id = #{unit_id}
-			</if>
+        <if test="unit_id != null and unit_id !='' ">
+            and unit_id = #{unit_id}
+        </if>
 
-			<if test="classify == 1 or classify == 2 or classify == 3">
-				and vocabulary_id = #{vocabulary_id}
-			</if>
-			<if test="classify == 4 or classify == 5 or classify == 6">
-				and example_id = #{vocabulary_id}
-			</if>
+        <if test="classify == 1 or classify == 2 or classify == 3">
+            and vocabulary_id = #{vocabulary_id}
+        </if>
+        <if test="classify == 4 or classify == 5 or classify == 6">
+            and example_id = #{vocabulary_id}
+        </if>
 
-			<if test="classify == 1">
-				and study_model = '慧记忆'
-			</if>
-			<if test="classify == 2">
-				and study_model = '慧听写'
-			</if>
-			<if test="classify == 3">
-				and study_model = '慧默写'
-			</if>
-			<if test="classify == 4">
-				and study_model = '例句听力'
-			</if>
-			<if test="classify == 5">
-				and study_model = '例句翻译'
-			</if>
-			<if test="classify == 6">
-				and study_model = '例句默写'
-			</if>
-	</update>
+        <if test="classify == 1">
+            and study_model = '慧记忆'
+        </if>
+        <if test="classify == 2">
+            and study_model = '慧听写'
+        </if>
+        <if test="classify == 3">
+            and study_model = '慧默写'
+        </if>
+        <if test="classify == 4">
+            and study_model = '例句听力'
+        </if>
+        <if test="classify == 5">
+            and study_model = '例句翻译'
+        </if>
+        <if test="classify == 6">
+            and study_model = '例句默写'
+        </if>
+    </update>
 
-	<!-- 成为熟词 -->
+    <!-- 成为熟词 -->
     <update id="updateLearnStudy_count" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview">
-		update learn
-			set study_count = study_count + 1 , status = 1
-		where
-			student_id = #{student_id}
+        update learn
+        set study_count = study_count + 1 , status = 1
+        where
+        student_id = #{student_id}
 
-			<if test="unit_id != null and unit_id !='' ">
-				and unit_id = #{unit_id}
-			</if>
+        <if test="unit_id != null and unit_id !='' ">
+            and unit_id = #{unit_id}
+        </if>
 
-			<if test="classify == 1 or classify == 2 or classify == 3">
-				and vocabulary_id = #{vocabulary_id}
-			</if>
-			<if test="classify == 4 or classify == 5 or classify == 6">
-				and example_id = #{vocabulary_id}
-			</if>
+        <if test="classify == 1 or classify == 2 or classify == 3">
+            and vocabulary_id = #{vocabulary_id}
+        </if>
+        <if test="classify == 4 or classify == 5 or classify == 6">
+            and example_id = #{vocabulary_id}
+        </if>
 
-			<if test="classify == 1">
-				and study_model = '慧记忆'
-			</if>
-			<if test="classify == 2">
-				and study_model = '慧听写'
-			</if>
-			<if test="classify == 3">
-				and study_model = '慧默写'
-			</if>
-			<if test="classify == 4">
-				and study_model = '例句听力'
-			</if>
-			<if test="classify == 5">
-				and study_model = '例句翻译'
-			</if>
-			<if test="classify == 6">
-				and study_model = '例句默写'
-			</if>
-	</update>
-	<update id="updatePushAndMemoryStrengthByPrimaryKeys" parameterType="map">
-		UPDATE
-		<include refid="classify_sql"/>
-		SET push = #{push}, memory_strength = #{memoryStrength} WHERE id in (
-		<foreach collection="updateIds" separator="," item="id">
-			#{id}
-		</foreach>
-		)
-	</update>
+        <if test="classify == 1">
+            and study_model = '慧记忆'
+        </if>
+        <if test="classify == 2">
+            and study_model = '慧听写'
+        </if>
+        <if test="classify == 3">
+            and study_model = '慧默写'
+        </if>
+        <if test="classify == 4">
+            and study_model = '例句听力'
+        </if>
+        <if test="classify == 5">
+            and study_model = '例句翻译'
+        </if>
+        <if test="classify == 6">
+            and study_model = '例句默写'
+        </if>
+    </update>
+    <update id="updatePushAndMemoryStrengthByPrimaryKeys" parameterType="map">
+        UPDATE
+        <include refid="classify_sql"/>
+        SET push = #{push}, memory_strength = #{memoryStrength} WHERE id in (
+        <foreach collection="updateIds" separator="," item="id">
+            #{id}
+        </foreach>
+        )
+    </update>
 
     <resultMap id="fiveDimensionTest_Map" type="com.zhidejiaoyu.common.pojo.Vocabulary">
-		<id column="id" property="id"/>
-		<result column="word" property="word"/>
-		<result column="word_chinese" property="wordChinese"/>
-	</resultMap>
-	<select id="fiveDimensionTest" parameterType="string" resultMap="fiveDimensionTest_Map">
-		select c.id,c.word, c.word_chinese from unit a INNER JOIN unit_vocabulary b on a.id = b.unit_id INNER JOIN vocabulary c on b.vocabulary_id = c.id and a.course_id = #{course_id} and c.delStatus = 1 LIMIT 0, ${b}
-	</select>
+        <id column="id" property="id"/>
+        <result column="word" property="word"/>
+        <result column="word_chinese" property="wordChinese"/>
+    </resultMap>
+    <select id="fiveDimensionTest" parameterType="string" resultMap="fiveDimensionTest_Map">
+        select c.id, c.word, c.word_chinese
+        from unit a
+                 INNER JOIN unit_vocabulary b on a.id = b.unit_id
+                 INNER JOIN vocabulary c on b.vocabulary_id = c.id and a.course_id = #{course_id} and c.delStatus = 1
+        LIMIT 0, ${b}
+    </select>
     <select id="selectByWordIdsAndStudyModel" resultType="java.lang.Long" parameterType="map">
         SELECT
         id
@@ -352,16 +359,20 @@
         )
     </select>
     <select id="fiveDimensionTestTwo" parameterType="string" resultMap="fiveDimensionTest_Map">
-		select c.id,c.word, c.word_chinese from unit a INNER JOIN unit_vocabulary b on a.id = b.unit_id INNER JOIN vocabulary c on b.vocabulary_id = c.id and a.course_id = #{course_id} and c.delStatus = 1 LIMIT ${b},${c}
-	</select>
+        select c.id, c.word, c.word_chinese
+        from unit a
+                 INNER JOIN unit_vocabulary b on a.id = b.unit_id
+                 INNER JOIN vocabulary c on b.vocabulary_id = c.id and a.course_id = #{course_id} and c.delStatus = 1
+        LIMIT ${b},${c}
+    </select>
     <select id="selectByCourseIdOrUnitId" resultType="com.zhidejiaoyu.common.pojo.CapacityReview" parameterType="map">
         select
-		<if test="studyModel != '例句听力' and studyModel != '例句翻译' and studyModel != '例句默写'">
-			<include refid="word_sql"/>
-		</if>
-		<if test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
-			<include refid="sentence_sql"/>
-		</if>
+        <if test="studyModel != '例句听力' and studyModel != '例句翻译' and studyModel != '例句默写'">
+            <include refid="word_sql"/>
+        </if>
+        <if test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
+            <include refid="sentence_sql"/>
+        </if>
         from
         <include refid="studyModel_sql"/>
         where student_id = #{student.id}
@@ -378,7 +389,8 @@
         select
         <include refid="more_table_sql"/>
         from
-        <include refid="more_table_studyModel_sql"/>, <include refid="table_studyModel_sql_vocAndSen"/>
+        <include refid="more_table_studyModel_sql"/>,
+        <include refid="table_studyModel_sql_vocAndSen"/>
         where
         cr.vocabulary_id = v.id
         <if test="studyModel == '慧记忆' or studyModel == '慧听写' or  studyModel == '慧默写' or studyModel == '单词图鉴'">
@@ -396,7 +408,8 @@
         select
         count(distinct cr.vocabulary_id)
         from
-        <include refid="more_table_studyModel_sql"/>, <include refid="table_studyModel_sql_vocAndSen"/>
+        <include refid="more_table_studyModel_sql"/>,
+        <include refid="table_studyModel_sql_vocAndSen"/>
         where
         cr.vocabulary_id = v.id
         <if test="studyModel == '慧记忆' or studyModel == '慧听写' or  studyModel == '慧默写' or studyModel == '单词图鉴'">
@@ -421,7 +434,7 @@
     <select id="selectSentenceCapacitys" resultType="com.zhidejiaoyu.common.pojo.CapacityReview" parameterType="map">
         SELECT * from
         <include refid="classify_sql"/>
-        where student_id = #{studentId}  and push &lt;= now() limit 1
+        where student_id = #{studentId} and push &lt;= now() limit 1
     </select>
 
 
@@ -516,7 +529,8 @@
 
     <select id="selectLastLoginNeedReview" resultType="java.util.Map" parameterType="map">
         select
-        memory_strength memoryStrength, fault_time, vocabulary_id id, unit_id, word, word_chinese wordChinese, syllable wordyj ,course_id courseId
+        memory_strength memoryStrength, fault_time, vocabulary_id id, unit_id, word, word_chinese wordChinese, syllable
+        wordyj ,course_id courseId
         from
         <include refid="classify_sql"/>
         where student_id = #{studentId} and unit_id in (
@@ -561,10 +575,12 @@
         </if>
     </sql>
     <select id="countAlreadyStudyWord" resultType="java.lang.Integer" parameterType="map">
-        <include refid="testCenterSql"/> and type=1
+        <include refid="testCenterSql"/>
+        and type=1
     </select>
     <select id="countAccrueWord" resultType="java.lang.Integer" parameterType="map">
-        <include refid="testCenterSql"/> and type=1
+        <include refid="testCenterSql"/>
+        and type=1
         and status = 0
     </select>
     <select id="countRipeWord" resultType="java.lang.Integer" parameterType="map">
@@ -580,7 +596,49 @@
     <select id="selSentenceCountCapacitys" resultType="integer" parameterType="map">
         SELECT count(id) from
         <include refid="classify_sql"/>
-        where student_id = #{studentId}  and push &lt;= now()
+        where student_id = #{studentId} and push &lt;= now()
+    </select>
+    <select id="alreadyWordStrOne" resultType="com.zhidejiaoyu.common.pojo.Vocabulary" parameterType="map">
+        select a.id,
+               a.word,
+               a.word_chinese as    wordChinese,
+               a.recordpicurl,
+               a.small_picture_url  smallPictureUrl,
+               a.middle_picture_url middlePictureUrl,
+               a.high_picture_url   highPictureUrl
+        from vocabulary a
+                 INNER JOIN learn b on a.id = b.vocabulary_id and b.type = 1 and b.unit_id = #{unit_id} and
+                                       b.student_id = #{student_id} and b.study_model = #{classifyStr}
+                 INNER JOIN unit_vocabulary uv
+                            ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id AND a.delStatus = 1
+    </select>
+    <select id="accrueWordStrOne" resultType="com.zhidejiaoyu.common.pojo.Vocabulary" parameterType="map">
+        select a.id,
+               a.word,
+               a.word_chinese as    wordChinese,
+               a.recordpicurl,
+               a.small_picture_url  smallPictureUrl,
+               a.middle_picture_url middlePictureUrl,
+               a.high_picture_url   highPictureUrl
+        from vocabulary a
+                 INNER JOIN learn b on a.id = b.vocabulary_id and b.type = 1 and b.unit_id = #{unit_id} and
+                                       b.student_id = #{student_id} and b.study_model = #{classifyStr} and b.status = 0
+                 INNER JOIN unit_vocabulary uv
+                            ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id AND a.delStatus = 1
+    </select>
+    <select id="ripeWordStrOne" resultType="com.zhidejiaoyu.common.pojo.Vocabulary" parameterType="map">
+        select a.id,
+               a.word,
+               a.word_chinese as    wordChinese,
+               a.recordpicurl,
+               a.small_picture_url  smallPictureUrl,
+               a.middle_picture_url middlePictureUrl,
+               a.high_picture_url   highPictureUrl
+        from vocabulary a
+                 INNER JOIN learn b on a.id = b.vocabulary_id and b.type = 1 and b.unit_id = #{unit_id} and
+                                       b.student_id = #{student_id} and b.study_model = #{classifyStr} and b.status = 1
+                 INNER JOIN unit_vocabulary uv
+                            ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id AND a.delStatus = 1
     </select>
 
 </mapper>

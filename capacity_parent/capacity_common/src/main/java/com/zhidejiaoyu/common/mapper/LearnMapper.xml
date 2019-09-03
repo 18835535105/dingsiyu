@@ -272,8 +272,8 @@
             parameterType="map">
         select vocabulary_id
         from learn
-        where
-            student_id = #{studentId} and unit_id = #{unitId}
+        where student_id = #{studentId}
+          and unit_id = #{unitId}
         order by learn_time desc
         limit 0, #{wordCount}
     </select>
@@ -356,69 +356,68 @@
     <select id="selectLearnUnitsByStuId" resultType="java.lang.Long" parameterType="map">
         select distinct (unit_id)
         from learn
-        where student_id = #{studentId} and to_days(update_time) = to_days(now())
+        where student_id = #{studentId}
+          and to_days(update_time) = to_days(now())
     </select>
     <select id="countLearnModelByUnitId" resultType="java.lang.Integer" parameterType="map">
         select count(distinct study_model)
         from learn
-        where student_id = #{studentId} and unit_id = #{unitId}
+        where student_id = #{studentId}
+          and unit_id = #{unitId}
     </select>
     <select id="countTodayLearnedByStudyModel" resultType="java.lang.Integer" parameterType="map">
         select count(id)
         from learn
-        where student_id = #{studentId} and to_days(update_time) = to_days(now()) and unit_id = #{unitId} and
-              study_model = #{studyModel}
+        where student_id = #{studentId}
+          and to_days(update_time) = to_days(now())
+          and unit_id = #{unitId}
+          and study_model = #{studyModel}
     </select>
     <select id="countTodayLearnedKnownWord" resultType="java.lang.Integer">
         select count(id)
         from learn
-        where study_model in ('慧记忆', '慧听写', '慧默写') and to_days(update_time) = to_days(now()) and `status` = 1
+        where study_model in ('慧记忆', '慧听写', '慧默写')
+          and to_days(update_time) = to_days(now())
+          and `status` = 1
     </select>
     <select id="countTodayLearnedUnknownWord" resultType="java.lang.Integer">
         SELECT cl1 + cl2 + cl3
-        FROM
-            (
-                SELECT count(l.id) cl1
-                FROM
-                    learn l,
-                    capacity_listen cl
-                WHERE
-                    l.unit_id = cl.unit_id
-                    AND l.vocabulary_id = cl.vocabulary_id
-                    AND l.study_count > 1
-                    AND cl.fault_time > 1
-                    AND cl.memory_strength >= 0.5
-                    AND l.study_model = '慧听写'
-                    AND to_days(l.update_time) = to_days(now())
-            ) c1,
-            (
-                SELECT count(l.id) cl2
-                FROM
-                    learn l,
-                    capacity_memory cm
-                WHERE
-                    l.unit_id = cm.unit_id
-                    AND l.vocabulary_id = cm.vocabulary_id
-                    AND l.study_count > 1
-                    AND cm.fault_time > 1
-                    AND cm.memory_strength >= 0.5
-                    AND l.study_model = '慧记忆'
-                    AND to_days(l.update_time) = to_days(now())
-            ) c2,
-            (
-                SELECT count(l.id) cl3
-                FROM
-                    learn l,
-                    capacity_write cw
-                WHERE
-                    l.unit_id = cw.unit_id
-                    AND l.vocabulary_id = cw.vocabulary_id
-                    AND l.study_count > 1
-                    AND cw.fault_time > 1
-                    AND cw.memory_strength >= 0.5
-                    AND l.study_model = '慧默写'
-                    AND to_days(l.update_time) = to_days(now())
-            ) c3;
+        FROM (
+                 SELECT count(l.id) cl1
+                 FROM learn l,
+                      capacity_listen cl
+                 WHERE l.unit_id = cl.unit_id
+                   AND l.vocabulary_id = cl.vocabulary_id
+                   AND l.study_count > 1
+                   AND cl.fault_time > 1
+                   AND cl.memory_strength >= 0.5
+                   AND l.study_model = '慧听写'
+                   AND to_days(l.update_time) = to_days(now())
+             ) c1,
+             (
+                 SELECT count(l.id) cl2
+                 FROM learn l,
+                      capacity_memory cm
+                 WHERE l.unit_id = cm.unit_id
+                   AND l.vocabulary_id = cm.vocabulary_id
+                   AND l.study_count > 1
+                   AND cm.fault_time > 1
+                   AND cm.memory_strength >= 0.5
+                   AND l.study_model = '慧记忆'
+                   AND to_days(l.update_time) = to_days(now())
+             ) c2,
+             (
+                 SELECT count(l.id) cl3
+                 FROM learn l,
+                      capacity_write cw
+                 WHERE l.unit_id = cw.unit_id
+                   AND l.vocabulary_id = cw.vocabulary_id
+                   AND l.study_count > 1
+                   AND cw.fault_time > 1
+                   AND cw.memory_strength >= 0.5
+                   AND l.study_model = '慧默写'
+                   AND to_days(l.update_time) = to_days(now())
+             ) c3;
     </select>
     <select id="selectLastStudyTimeByStudentId" resultType="java.util.Date" parameterType="java.lang.Long">
         select max(learn_time)
@@ -532,7 +531,8 @@
     <update id="updateByCourseId" parameterType="map">
         update learn
         set `status` = 0
-        where student_id = #{studentId} and course_id = #{courseId}
+        where student_id = #{studentId}
+          and course_id = #{courseId}
     </update>
     <update id="updateUnknownWords" parameterType="map">
         update learn set `status` = 0 where student_id = #{student.id} and course_id = #{courseId}
@@ -617,43 +617,47 @@
     </select>
 
     <select id="mapWeekCountQuantity" parameterType="map" resultType="map">
-        SELECT
-            count(id)                    AS count,
-            (SELECT count(id)
-             FROM learn
-             where date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart} and
-                   date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd} AND student_id = #{studentId} AND
-                   study_model = '慧记忆')  AS a,
-            (SELECT count(id)
-             FROM learn
-             where date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart} and
-                   date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd} AND student_id = #{studentId} AND
-                   study_model = '慧听写')  AS b,
-            (SELECT count(id)
-             FROM learn
-             where date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart} and
-                   date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd} AND student_id = #{studentId} AND
-                   study_model = '慧默写')  AS c,
-            (SELECT count(id)
-             FROM learn
-             where date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart} and
-                   date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd} AND student_id = #{studentId} AND
-                   study_model = '例句听力') AS d,
-            (SELECT count(id)
-             FROM learn
-             where date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart} and
-                   date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd} AND student_id = #{studentId} AND
-                   study_model = '例句翻译') AS e,
-            (SELECT count(id)
-             FROM learn
-             where date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart} and
-                   date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd} AND student_id = #{studentId} AND
-                   study_model = '例句默写') AS f
-        FROM
-            learn
-        where
-            date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart} and
-            date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd} AND student_id = #{studentId}
+        SELECT count(id)                    AS count,
+               (SELECT count(id)
+                FROM learn
+                where date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+                  and date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+                  AND student_id = #{studentId}
+                  AND study_model = '慧记忆')  AS a,
+               (SELECT count(id)
+                FROM learn
+                where date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+                  and date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+                  AND student_id = #{studentId}
+                  AND study_model = '慧听写')  AS b,
+               (SELECT count(id)
+                FROM learn
+                where date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+                  and date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+                  AND student_id = #{studentId}
+                  AND study_model = '慧默写')  AS c,
+               (SELECT count(id)
+                FROM learn
+                where date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+                  and date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+                  AND student_id = #{studentId}
+                  AND study_model = '例句听力') AS d,
+               (SELECT count(id)
+                FROM learn
+                where date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+                  and date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+                  AND student_id = #{studentId}
+                  AND study_model = '例句翻译') AS e,
+               (SELECT count(id)
+                FROM learn
+                where date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+                  and date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+                  AND student_id = #{studentId}
+                  AND study_model = '例句默写') AS f
+        FROM learn
+        where date_format(learn_time, '%Y-%m-%d') &gt;= #{weekStart}
+          and date_format(learn_time, '%Y-%m-%d') &lt;= #{weekEnd}
+          AND student_id = #{studentId}
     </select>
 
 
@@ -828,7 +832,10 @@
     <select id="selectThirtyVocabularyIdByStudentIdAndCourseId" resultType="java.lang.Long" parameterType="map">
         select distinct vocabulary_id
         from learn
-        where study_model = '慧记忆' and student_id = #{stuId} and course_id = #{courseId} and type=1
+        where study_model = '慧记忆'
+          and student_id = #{stuId}
+          and course_id = #{courseId}
+          and type = 1
         order by id desc
         limit 30
     </select>
@@ -882,125 +889,94 @@
         and l.student_id = #{studentId}
     </select>
     <select id="countMasterWord" resultType="java.lang.Integer" parameterType="map">
-        SELECT
-            count(DISTINCT m.vocabulary_id)
-        FROM
-            (
-                SELECT
-                    unit_id,
-                    vocabulary_id
-                FROM
-                    learn
-                WHERE
-                    student_id = #{student.id}
-                    AND study_model = '慧记忆'
-                    AND `status` = 1
-            ) m,
-            (
-                SELECT
-                    unit_id,
-                    vocabulary_id
-                FROM
-                    learn
-                WHERE
-                    student_id = #{student.id}
-                    AND study_model = '慧听写'
-                    AND `status` = 1
-            ) l,
-            (
-                SELECT
-                    unit_id,
-                    vocabulary_id
-                FROM
-                    learn
-                WHERE
-                    student_id = #{student.id}
-                    AND study_model = '慧默写'
-                    AND `status` = 1
-            ) w,
-            unit u,
-            course c
-        WHERE
-            m.unit_id = l.unit_id
-            AND l.unit_id = w.unit_id
-            AND m.vocabulary_id = l.vocabulary_id
-            AND w.vocabulary_id = l.vocabulary_id
-            AND m.unit_id = u.id
-            AND u.course_id = c.id
-            AND c.study_paragraph = #{phase}
+        SELECT count(DISTINCT m.vocabulary_id)
+        FROM (
+                 SELECT unit_id,
+                        vocabulary_id
+                 FROM learn
+                 WHERE student_id = #{student.id}
+                   AND study_model = '慧记忆'
+                   AND `status` = 1
+             ) m,
+             (
+                 SELECT unit_id,
+                        vocabulary_id
+                 FROM learn
+                 WHERE student_id = #{student.id}
+                   AND study_model = '慧听写'
+                   AND `status` = 1
+             ) l,
+             (
+                 SELECT unit_id,
+                        vocabulary_id
+                 FROM learn
+                 WHERE student_id = #{student.id}
+                   AND study_model = '慧默写'
+                   AND `status` = 1
+             ) w,
+             unit u,
+             course c
+        WHERE m.unit_id = l.unit_id
+          AND l.unit_id = w.unit_id
+          AND m.vocabulary_id = l.vocabulary_id
+          AND w.vocabulary_id = l.vocabulary_id
+          AND m.unit_id = u.id
+          AND u.course_id = c.id
+          AND c.study_paragraph = #{phase}
     </select>
     <select id="countMasterSentence" resultType="java.lang.Integer" parameterType="map">
-        SELECT
-            count(DISTINCT m.example_id)
-        FROM
-            (
-                SELECT
-                    unit_id,
-                    example_id
-                FROM
-                    learn
-                WHERE
-                    student_id = #{student.id}
-                    AND study_model = '例句听力'
-                    AND `status` = 1
-            ) m,
-            (
-                SELECT
-                    unit_id,
-                    example_id
-                FROM
-                    learn
-                WHERE
-                    student_id = #{student.id}
-                    AND study_model = '例句翻译'
-                    AND `status` = 1
-            ) l,
-            (
-                SELECT
-                    unit_id,
-                    example_id
-                FROM
-                    learn
-                WHERE
-                    student_id = #{student.id}
-                    AND study_model = '例句默写'
-                    AND `status` = 1
-            ) w,
-            unit u,
-            course c
-        WHERE
-            m.unit_id = l.unit_id
-            AND l.unit_id = w.unit_id
-            AND m.example_id = l.example_id
-            AND w.example_id = l.example_id
-            AND m.unit_id = u.id
-            AND u.course_id = c.id
-            AND c.study_paragraph = #{phase}
+        SELECT count(DISTINCT m.example_id)
+        FROM (
+                 SELECT unit_id,
+                        example_id
+                 FROM learn
+                 WHERE student_id = #{student.id}
+                   AND study_model = '例句听力'
+                   AND `status` = 1
+             ) m,
+             (
+                 SELECT unit_id,
+                        example_id
+                 FROM learn
+                 WHERE student_id = #{student.id}
+                   AND study_model = '例句翻译'
+                   AND `status` = 1
+             ) l,
+             (
+                 SELECT unit_id,
+                        example_id
+                 FROM learn
+                 WHERE student_id = #{student.id}
+                   AND study_model = '例句默写'
+                   AND `status` = 1
+             ) w,
+             unit u,
+             course c
+        WHERE m.unit_id = l.unit_id
+          AND l.unit_id = w.unit_id
+          AND m.example_id = l.example_id
+          AND w.example_id = l.example_id
+          AND m.unit_id = u.id
+          AND u.course_id = c.id
+          AND c.study_paragraph = #{phase}
     </select>
     <select id="countGreaterLearnedCount" resultType="java.lang.Integer" parameterType="map">
         SELECT count(DISTINCT l.student_id)
-        FROM
-            learn l,
-            (
-                SELECT
-
-                    (
-                        count(DISTINCT l1.example_id) + count(DISTINCT l1.vocabulary_id)
-                    )             num,
-                    l1.student_id student_id
-                FROM
-                    learn l1,
-                    course cs
-                WHERE
-                    l1.course_id = cs.id
-                    AND cs.study_paragraph = #{phase}
-                    AND cs.version = #{student.version}
-                GROUP BY
-                    student_id
-            ) c
-        WHERE
-            l.student_id = c.student_id
-            AND c.num > #{learnedCount}
+        FROM learn l,
+             (
+                 SELECT (
+                            count(DISTINCT l1.example_id) + count(DISTINCT l1.vocabulary_id)
+                            )         num,
+                        l1.student_id student_id
+                 FROM learn l1,
+                      course cs
+                 WHERE l1.course_id = cs.id
+                   AND cs.study_paragraph = #{phase}
+                   AND cs.version = #{student.version}
+                 GROUP BY student_id
+             ) c
+        WHERE l.student_id = c.student_id
+          AND c.num > #{learnedCount}
     </select>
     <select id="countHaveToLearnByModelAll" resultType="java.lang.Integer">
         SELECT COUNT(*) FROM learn WHERE student_id = #{studentId} AND unit_id = #{unitId}
@@ -1022,41 +998,41 @@
         select v.id + s.id
         from (
 #        查询首次学习为掌握状态的单词个数
-             select count(l.id) id
-             from learn l,
-                  vocabulary v
-             where l.vocabulary_id = v.id
-               and v.delStatus = 1
-               and l.first_is_known = 1
-               and l.vocabulary_id is not null
-               and l.student_id = #{stuId}) v,
+                 select count(l.id) id
+                 from learn l,
+                      vocabulary v
+                 where l.vocabulary_id = v.id
+                   and v.delStatus = 1
+                   and l.first_is_known = 1
+                   and l.vocabulary_id is not null
+                   and l.student_id = #{stuId}) v,
              (
 #              查询首次学习为掌握状态的例句个数
-             select count(l.id) id
-             from learn l
-             where l.first_is_known = 1
-               and l.example_id is not null
-               and l.student_id = #{stuId}) s
+                 select count(l.id) id
+                 from learn l
+                 where l.first_is_known = 1
+                   and l.example_id is not null
+                   and l.student_id = #{stuId}) s
     </select>
     <select id="countFaultWordByStudentId" resultType="java.lang.Integer" parameterType="map">
         SELECT cm.rate + cl.rate + cw.rate + cp.rate + sl.rate + st.rate + sw.rate
         FROM (
 #         计算慧记忆模块下错误率超过20%的单词个数
-             SELECT count(rate.errorRate) rate
-             FROM (
+                 SELECT count(rate.errorRate) rate
+                 FROM (
 #                    计算慧记忆模块下首次学习为熟词的错误率
-                  SELECT cm.fault_time / l.study_count errorRate, cm.*
-                  FROM capacity_memory cm,
-                       learn l,
-                       vocabulary v
-                  WHERE cm.student_id = l.student_id
-                    AND l.student_id = #{stuId}
-                    AND l.first_is_known = 1
-                    AND cm.vocabulary_id = l.vocabulary_id
-                    AND l.vocabulary_id = v.id
-                    AND v.delStatus = 1
-                  GROUP BY cm.vocabulary_id) rate
-             WHERE rate.errorRate > 0.2) cm,
+                          SELECT cm.fault_time / l.study_count errorRate, cm.*
+                          FROM capacity_memory cm,
+                               learn l,
+                               vocabulary v
+                          WHERE cm.student_id = l.student_id
+                            AND l.student_id = #{stuId}
+                            AND l.first_is_known = 1
+                            AND cm.vocabulary_id = l.vocabulary_id
+                            AND l.vocabulary_id = v.id
+                            AND v.delStatus = 1
+                          GROUP BY cm.vocabulary_id) rate
+                 WHERE rate.errorRate > 0.2) cm,
              (SELECT count(rate.errorRate) rate
               FROM (SELECT cm.fault_time / l.study_count errorRate, cm.*
                     FROM capacity_listen cm,
@@ -1132,16 +1108,18 @@
         FROM (SELECT learned.c / total.c t
               FROM (
 #                    学生已完成单元数
-                   SELECT count(DISTINCT unit_id) c FROM test_record WHERE student_id = #{stuId}
-                                                                       AND study_model = '单元闯关测试') learned,
+                       SELECT count(DISTINCT unit_id) c
+                       FROM test_record
+                       WHERE student_id = #{stuId}
+                         AND study_model = '单元闯关测试') learned,
                    (
 #                    学生总单元数
-                   SELECT count(id) c FROM student_unit WHERE student_id = #{stuId} and type = 1) total) lt,
+                       SELECT count(id) c FROM student_unit WHERE student_id = #{stuId} and type = 1) total) lt,
              (
 #              有效学习总次数(有效学习总次数为产生有效时长的登录次数)
-             SELECT count(d.vt) t
-             FROM (SELECT sum(valid_time) vt FROM duration WHERE student_id = #{stuId} GROUP BY login_time) d
-             WHERE d.vt &gt; 0) vt
+                 SELECT count(d.vt) t
+                 FROM (SELECT sum(valid_time) vt FROM duration WHERE student_id = #{stuId} GROUP BY login_time) d
+                 WHERE d.vt &gt; 0) vt
     </select>
     <select id="selectTestErrorRate" resultType="java.lang.Double" parameterType="map">
         SELECT sum(error_count) / (sum(error_count) + SUM(right_count))
@@ -1223,11 +1201,17 @@
         where student_id = #{studentId}
           and l.vocabulary_id = v.id
           and l.unit_id = #{unitId}
-          group by v.id limit #{beginRow}
+        group by v.id
+        limit #{beginRow}
             , #{pageSize}
     </select>
     <update id="updLearnByUnitIdAndStudyModelAndStudentId" parameterType="map">
-         update learn set type=2 where student_id=#{studentId} and study_model=#{studyModel} and type=1 and unit_id=#{unitId};
+        update learn
+        set type=2
+        where student_id = #{studentId}
+          and study_model = #{studyModel}
+          and type = 1
+          and unit_id = #{unitId};
     </update>
     <update id="updateTypeToLearned" parameterType="map">
         update learn
@@ -1254,44 +1238,51 @@
           and study_model = #{studyModel}
     </update>
     <select id="selByStudentIdAndCourseIdDisVersion" parameterType="java.util.Map" resultType="java.lang.Long">
-        select DISTINCT learn.unit_id from learn learn
-        where learn.student_id= #{studentId}
-        and learn.course_id= #{courseId}
-        and learn.type=1
+        select DISTINCT learn.unit_id
+        from learn learn
+        where learn.student_id = #{studentId}
+          and learn.course_id = #{courseId}
+          and learn.type = 1
         order by id desc
         limit 1
     </select>
     <select id="selectTeksLaterLearnTimeByStudentId" resultType="java.util.Map" parameterType="map">
-        select DISTINCT DISTINCT Max(learn.update_time) update_time , unit.joint_name ,course.course_name
+        select DISTINCT Max(learn.update_time) update_time , unit.joint_name ,course.course_name
         from learn learn
-        join teks_unit unit on unit.id=learn.unit_id
-        join teks_course course on course.id=learn.course_id
-        where student_id = #{studentId} and learn.vocabulary_id is null and learn.example_id is null
+                 join teks_unit unit on unit.id = learn.unit_id
+                 join teks_course course on course.id = learn.course_id
+        where student_id = #{studentId}
+          and learn.vocabulary_id is null
+          and learn.example_id is null
         group by course.course_name
     </select>
     <select id="selLaterLearnTeks" parameterType="java.util.Map" resultType="java.lang.Long">
-        select learn.unit_id from learn learn
-        where learn.student_id=#{studentId}
-        and learn.course_id=#{courseId}
-        order by id desc limit 1
+        select learn.unit_id
+        from learn learn
+        where learn.student_id = #{studentId}
+          and learn.course_id = #{courseId}
+        order by id desc
+        limit 1
     </select>
     <select id="selTeksLaterCourse" parameterType="java.lang.Long" resultType="java.util.Map">
-        select learn.unit_id ,learn.course_id courseId, course.grade , course.version , course.label , learn.course_id
+        select learn.unit_id, learn.course_id courseId, course.grade, course.version, course.label, learn.course_id
         from learn learn
-        join teks_course course on course.id=learn.course_id
-        where learn.student_id=#{studentId}
-        and type=1
-        and vocabulary_id is null
-        and example_id is null
-        order by learn.update_time desc limit 1
+                 join teks_course course on course.id = learn.course_id
+        where learn.student_id = #{studentId}
+          and type = 1
+          and vocabulary_id is null
+          and example_id is null
+        order by learn.update_time desc
+        limit 1
     </select>
     <select id="selLearnTeks" parameterType="java.util.Map" resultType="java.lang.Integer">
-        select count(id) from learn
-        where student_id=#{studentId}
-        and study_model=#{studyModel}
-        and unit_id=#{unitId}
-        and vocabulary_id is null
-        and example_id is null
+        select count(id)
+        from learn
+        where student_id = #{studentId}
+          and study_model = #{studyModel}
+          and unit_id = #{unitId}
+          and vocabulary_id is null
+          and example_id is null
     </select>
     <select id="selAllTeksLearn" parameterType="java.util.Map" resultType="java.lang.Integer">
         select count(distinct unit_id) from learn
@@ -1333,16 +1324,19 @@
         desc limit 1;
     </select>
     <select id="countByStudentIdAndStudyModel" resultType="integer" parameterType="map">
-        select
-        count(id)
+        select count(id)
         from learn
         where unit_id = #{unitId}
-        and student_id = #{studentId}
-        and study_model = #{studyModel}
-        and type = 1
+          and student_id = #{studentId}
+          and study_model = #{studyModel}
+          and type = 1
     </select>
     <select id="selLetterLearn" parameterType="map" resultType="integer">
-        select count(id) from learn where  student_id=#{studentId} and unit_id=#{unitId} and study_model=#{studyModel};
+        select count(id)
+        from learn
+        where student_id = #{studentId}
+          and unit_id = #{unitId}
+          and study_model = #{studyModel};
     </select>
     <select id="selLetter" parameterType="map" resultMap="BaseResultMap">
         select <include refid="Base_Column_List"></include> from learn where student_id=#{studentId} and type=4 and
@@ -1356,7 +1350,8 @@
           and sc.unit_id = sr.unit_id
           and sr.type = 1
           and to_days(sr.update_time) = to_days(now())
-          and sc.student_id = #{student.id} and sc.memory_strength >= 0.5
+          and sc.student_id = #{student.id}
+          and sc.memory_strength >= 0.5
     </select>
     <select id="selectAllCapacityReview" parameterType="map" resultMap="BaseResultMap">
         select
@@ -1385,6 +1380,20 @@
         and vocabulary_id = #{readWord.wordId}
         and study_model = #{studyModel}
         limit 1
+    </select>
+    <select id="countTodayLearnedLetter" resultType="java.lang.Integer" parameterType="map">
+        select count(distinct vocabulary_id)
+        from learn
+        where student_id = #{studentId}
+          and study_model like '字母%'
+          and to_days(learn_time) = to_days(now())
+    </select>
+    <select id="countTodayLearnedPhoneticSymbol" resultType="java.lang.Integer" parameterType="map">
+        select count(distinct vocabulary_id)
+        from learn
+        where student_id = #{studentId}
+          and study_model like '音标%'
+          and to_days(learn_time) = to_days(now())
     </select>
 
 

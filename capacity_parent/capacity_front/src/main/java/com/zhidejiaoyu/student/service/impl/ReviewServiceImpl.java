@@ -17,6 +17,7 @@ import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.study.WordPictureUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.PictureUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
@@ -1120,17 +1121,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         return ServerResponse.createBySuccessMessage("学习记录保存成功！");
     }
 
-    /**
-     * 单词图鉴智能复习模块
-     *
-     * @param student   学生
-     * @param unitId    单元id
-     * @param model     1=单词图鉴模块
-     * @param course_id 课程id
-     * @return
-     */
     @Override
-    public ServerResponse<Map<String, Object>> reviewCapacityPicture(Student student, String unitId, int model, String course_id, String judge) {
+    public ServerResponse<Map<String, Object>> reviewCapacityPicture(Student student, String unitId, int model, String courseId, String judge) {
 
         Long studentId = student.getId();
         // 1. 根据随机数获取题型, 并查出一道正确的题
@@ -1141,7 +1133,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             correct = capacityPictureMapper.selectNeedReviewWord(Long.valueOf(unitId), studentId, DateUtil.DateTime());
         } else {
             // 根据课程查询 课程复习模块
-            correct = capacityPictureMapper.selectNeedReviewWordCourse(course_id, studentId, DateUtil.DateTime());
+            correct = capacityPictureMapper.selectNeedReviewWordCourse(courseId, studentId, DateUtil.DateTime());
             if (correct != null) {
                 unitId = correct.get("unit_id").toString();
             }
@@ -1151,7 +1143,9 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         if (correct == null) {
             return ServerResponse.createBySuccess();
         }
-        correct.put("recordpicurl", GetOssFile.getPublicObjectUrl(String.valueOf(correct.get("recordpicurl"))));
+
+        correct.put("recordpicurl", PictureUtil.getPictureByUnitId(packagePictureUrl(correct), unitId == null ? null : Long.parseLong(unitId)));
+
         // 记忆强度
         correct.put("memoryStrength", correct.get("memory_strength"));
 
@@ -1187,8 +1181,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
         List<Map<String, Object>> mapErrorVocabulary;
         // 2. 从课程下随机获取三个题, 三个作为错题, 并且id不等于正确题id
-        if (course_id != null) {
-            mapErrorVocabulary = vocabularyMapper.getWordIdByCourse(new Long(correct.get("id").toString()), Long.valueOf(course_id), Long.parseLong(unitId));
+        if (courseId != null) {
+            mapErrorVocabulary = vocabularyMapper.getWordIdByCourse(new Long(correct.get("id").toString()), Long.valueOf(courseId), Long.parseLong(unitId));
         } else {
             //  从单元下随机获取三个题, 三个作为错题, 并且id不等于正确题id
             mapErrorVocabulary = vocabularyMapper.getWordIdByUnit(new Long(correct.get("id").toString()), unitId);
@@ -1214,7 +1208,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         correct.put("subject", subject);
 
         // 需要复习的单词总数
-        Integer count = capacityMapper.countNeedReviewByCourseIdOrUnitId(student, Long.valueOf(course_id),
+        Integer count = capacityMapper.countNeedReviewByCourseIdOrUnitId(student, Long.valueOf(courseId),
                 Long.valueOf(unitId), commonMethod.getTestType(0));
         correct.put("wordCount", count);
         correct.put("studyNew", false);
@@ -1223,31 +1217,39 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
     }
 
+    static Vocabulary packagePictureUrl(Map<String, Object> correct) {
+        Vocabulary wordPictureVocabulary = new Vocabulary();
+        wordPictureVocabulary.setSmallPictureUrl(correct.get("smallPictureUrl") == null ? null : correct.get("smallPictureUrl").toString());
+        wordPictureVocabulary.setMiddlePictureUrl(correct.get("middlePictureUrl") == null ? null : correct.get("middlePictureUrl").toString());
+        wordPictureVocabulary.setHighPictureUrl(correct.get("highPictureUrl") == null ? null : correct.get("highPictureUrl").toString());
+        return wordPictureVocabulary;
+    }
+
     /**
      * 单词图鉴测试复习
      *
-     * @param unit_id
+     * @param unitId
      * @param classify
      * @param session
      * @return
      */
     @Override
-    public ServerResponse<Object> testReviewWordPic(String unit_id, int classify, HttpSession session, boolean pattern) {
+    public ServerResponse<Object> testReviewWordPic(String unitId, int classify, HttpSession session, boolean pattern) {
         Student student = getStudent(session);
         Long studentId = student.getId();
 
         // 复习测试上一单元
         if (pattern) {
-            unit_id = learnMapper.getEndUnitIdByStudentId(studentId);
+            unitId = learnMapper.getEndUnitIdByStudentId(studentId);
         }
 
         // 获取单元下需要复习的单词
-        List<Vocabulary> list = vocabularyMapper.getMemoryWordPicAll(Long.parseLong(unit_id), studentId, DateUtil.DateTime());
+        List<Vocabulary> list = vocabularyMapper.getMemoryWordPicAll(Long.parseLong(unitId), studentId, DateUtil.DateTime());
         // 随机获取带图片的单词, 正确答案的三倍
         List<Vocabulary> listSelect = vocabularyMapper.getWordIdByAll(list.size() * 4);
 
         // 分题工具类
-        Map<String, Object> map = wordPictureUtil.allocationWord(list, listSelect, null);
+        Map<String, Object> map = wordPictureUtil.allocationWord(list, listSelect, null, Long.valueOf(unitId));
         return ServerResponse.createBySuccess(map);
     }
 
@@ -1295,7 +1297,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         } else if (select == 2) {
             // 3.获取生词需要出的测试题
             vocabularies = capacityMapper.accrueWordStrOne(studentId, unitId, "单词图鉴");
-        } else if (select == 3) {
+        } else {
             // 4.获取熟词需要出的测试题
             vocabularies = capacityMapper.ripeWordStrOne(studentId, unitId, "单词图鉴");
         }
@@ -1311,7 +1313,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         Map<Long, Map<Long, Long>> longMapMap = unitMapper.selectIdMapByCourseIdAndWordIds(Long.valueOf(courseId), ids, studentId, classify);
 
         // 分题工具类
-        Map<String, Object> map = wordPictureUtil.allocationWord(vocabularies, listSelect, longMapMap);
+        Map<String, Object> map = wordPictureUtil.allocationWord(vocabularies, listSelect, longMapMap, Long.valueOf(unitId));
 
         return ServerResponse.createBySuccess(map);
     }
@@ -1434,7 +1436,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
         // 单词图鉴相关内容
         if (classify == 0) {
-            map.put("recordpicurl", GetOssFile.getPublicObjectUrl(vocabulary.getRecordpicurl()));
+            map.put("recordpicurl", PictureUtil.getPictureByCourseId(vocabulary, map.get("course_id") == null ? null : Long.parseLong(map.get("course_id").toString())));
             List<Map<String, Object>> mapErrorVocabulary = vocabularyMapper.getWordIdByUnit(new Long(map.get("id").toString()), map.get("unit_id").toString());
             if (mapErrorVocabulary.size() < 3) {
                 List<Map<String, Object>> otherErrorVocabulary = vocabularyMapper.selectPictureWordFromLearned(student.getId(), 3 - mapErrorVocabulary.size());
@@ -1459,7 +1461,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             map.put("subject", subject);
         } else if (classify == 1) {
             map.put("wordChineseList", this.getChinese(Long.parseLong(map.get("unit_id").toString()), vocabulary.getId(), map.get("wordChinese").toString()));
-            map.put("recordpicurl", GetOssFile.getPublicObjectUrl(vocabulary.getRecordpicurl()));
+            map.put("recordpicurl", PictureUtil.getPictureByCourseId(vocabulary, map.get("course_id") == null ? null : Long.parseLong(map.get("course_id").toString())));
         }
         return ServerResponse.createBySuccess(map);
     }
