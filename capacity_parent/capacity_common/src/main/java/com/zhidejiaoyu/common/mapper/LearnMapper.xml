@@ -1255,6 +1255,7 @@
           and learn.vocabulary_id is null
           and learn.example_id is null
         group by course.course_name
+        order by learn.update_time desc
     </select>
     <select id="selLaterLearnTeks" parameterType="java.util.Map" resultType="java.lang.Long">
         select learn.unit_id
