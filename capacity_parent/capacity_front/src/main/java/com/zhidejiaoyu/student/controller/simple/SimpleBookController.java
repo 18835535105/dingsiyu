@@ -119,4 +119,15 @@ public class SimpleBookController {
         Assert.notNull(classify, "classify 不能为空！");
         return bookService.restudy(session, courseId, unitId, wordIds, classify);
     }
+
+    /**
+     * 获取学生可选择的学习模块
+     *
+     * @param session
+     * @return
+     */
+    @GetMapping("/getModel")
+    public ServerResponse getModel(HttpSession session) {
+        return this.bookService.getModel(session);
+    }
 }

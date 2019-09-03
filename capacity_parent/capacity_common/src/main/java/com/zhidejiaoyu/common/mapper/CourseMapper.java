@@ -7,10 +7,12 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Unit;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 
+@Repository
 public interface CourseMapper extends BaseMapper<Course> {
     int countByExample(CourseExample example);
 
@@ -226,7 +228,7 @@ public interface CourseMapper extends BaseMapper<Course> {
 	Integer countUnitAnnotation(@Param("id")Long id);
 
 	Map<String, Object> postStudentByCourse(@Param("courseId")Integer courseId);
-	
+
 	/**
      * 去重获取所有教材版本
      *
@@ -360,4 +362,12 @@ public interface CourseMapper extends BaseMapper<Course> {
     List<Map<String, Object>> getAllCourse(@Param("student") Student student, @Param("type") Integer type);
 
     String getVersionByUnitId(Long unitId);
+
+    /**
+     * 获取学生清学版的所有版本信息
+     *
+     * @param studentId
+     * @return
+     */
+    List<String> selectSimpleVersionByStudentId(@Param("studentId") Long studentId);
 }

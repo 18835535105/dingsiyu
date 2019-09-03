@@ -201,7 +201,8 @@
         where id = #{id,jdbcType=BIGINT}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from course
+        delete
+        from course
         where id = #{id,jdbcType=BIGINT}
     </delete>
     <delete id="deleteByExample"
@@ -386,13 +387,12 @@
     </resultMap>
     <select id="selectListCourseName" parameterType="int"
             resultMap="selectListCourseNameMap">
-        select
-            unit_name,
-            unit_index,
-            id
+        select unit_name,
+               unit_index,
+               id
         from unit
         where course_id = #{id}
-        and delStatus = 1
+          and delStatus = 1
     </select>
 
     <resultMap type="com.zhidejiaoyu.common.pojo.Course" id="showcoursenameMap">
@@ -400,32 +400,33 @@
         <result column="course_name" property="courseName"/>
     </resultMap>
     <select id="showcoursename" resultMap="showcoursenameMap">
-        select
-            id,
-            course_name
+        select id,
+               course_name
         from course
-        where `status` = 1 and delStatus = 1;
+        where `status` = 1
+          and delStatus = 1;
     </select>
 
     <select id="showWordName" parameterType="int" resultType="map">
-        select
-            id,
-            unit_name
+        select id,
+               unit_name
         from unit
         where course_id = #{id}
-        and delStatus = 1
+          and delStatus = 1
     </select>
 
     <select id="chooseGradeToLabel" parameterType="com.zhidejiaoyu.common.pojo.Course"
             resultType="Map">
-        select 
-			b.id,
-			b.label,
-			b.course_name AS courseName,
-			c.id AS unitId,
-			c.unit_name AS unitName
-		from student a INNER JOIN course b on a.version = b.version join unit c ON b.id = c.course_id
- 			and a.id = #{id} and b.grade = #{grade} and b.delStatus = 1 and b.`status` = 1 GROUP BY b.id
+        select b.id,
+               b.label,
+               b.course_name AS courseName,
+               c.id          AS unitId,
+               c.unit_name   AS unitName
+        from student a
+                 INNER JOIN course b on a.version = b.version
+                 join unit c ON b.id = c.course_id
+            and a.id = #{id} and b.grade = #{grade} and b.delStatus = 1 and b.`status` = 1
+        GROUP BY b.id
     </select>
 
     <select id="selectWordCountByCourseId" resultType="java.util.Map" parameterType="java.util.List">
@@ -481,20 +482,31 @@
         )
     </select>
 
-	<select id="courseLearnInfo" parameterType="java.lang.Long" resultType="map">
-		select b.id, b.course_name, b.version, b.label, a.learn_count FROM learn a JOIN course b ON a.course_id = b.id AND a.student_id = #{studentId} GROUP BY b.id ORDER BY b.id DESC
-	</select>
-	
-	<select id="postStudentByCourse" parameterType="map" resultType="map">
-		select b.id, a.course_name, a.grade, a.version, a.label, b.unit_name from course a JOIN unit b ON a.id = b.course_id
- 		AND a.id = #{courseId} LIMIT 0,1
-	</select>
-	
-	<select id="selectCourseVersion" parameterType="map" resultType="map">
-		select grade, version, label, study_paragraph from course where id = #{id}
-	</select>
+    <select id="courseLearnInfo" parameterType="java.lang.Long" resultType="map">
+        select b.id, b.course_name, b.version, b.label, a.learn_count
+        FROM learn a
+                 JOIN course b ON a.course_id = b.id AND a.student_id = #{studentId}
+        GROUP BY b.id
+        ORDER BY b.id DESC
+    </select>
+
+    <select id="postStudentByCourse" parameterType="map" resultType="map">
+        select b.id, a.course_name, a.grade, a.version, a.label, b.unit_name
+        from course a
+                 JOIN unit b ON a.id = b.course_id
+            AND a.id = #{courseId}
+        LIMIT 0,1
+    </select>
+
+    <select id="selectCourseVersion" parameterType="map" resultType="map">
+        select grade, version, label, study_paragraph
+        from course
+        where id = #{id}
+    </select>
     <select id="getCourseByCreamVersionName" parameterType="string" resultType="map">
-        select id, version, course_name from course where version = #{creamVersion}
+        select id, version, course_name
+        from course
+        where version = #{creamVersion}
     </select>
     <select id="getAllCourseInfoWithWord" resultType="java.util.Map" parameterType="map">
         select c.id courseId, c.course_name courseName, count(v.id) `count`
@@ -534,7 +546,7 @@
         order by c.id asc
     </select>
     <select id="selectSentenceCourseIdAndCourseNameByStudentId" resultType="java.util.Map" parameterType="map">
-        select c.id, c.course_name courseName,su.unit_Id unitId,c.grade,c.label,c.version
+        select c.id, c.course_name courseName, su.unit_Id unitId, c.grade, c.label, c.version
         from course c,
              student_unit su,
              unit_sentence us
@@ -547,7 +559,7 @@
     </select>
 
     <select id="selectTextCourseIdAndCourseNameByStudentId" resultType="java.util.Map" parameterType="map">
-        select c.id, c.course_name courseName,c.grade grade,c.label label,c.version version
+        select c.id, c.course_name courseName, c.grade grade, c.label label, c.version version
         from course c,
              student_unit su,
              teks t
@@ -613,18 +625,21 @@
         order by u.id asc
     </select>
     <select id="getAllVersion" resultType="java.util.Map" parameterType="java.lang.Long">
-      select DISTINCT course.version from student_study_plan ssp
-			join course course on course.id=ssp.course_id
-			where ssp.student_id =#{studentId}
-      and ssp.type=2 group by ssp.course_id
+        select DISTINCT course.version
+        from student_study_plan ssp
+                 join course course on course.id = ssp.course_id
+        where ssp.student_id = #{studentId}
+          and ssp.type = 2
+        group by ssp.course_id
     </select>
     <select id="selectCourseByUnitId" resultType="java.util.Map" parameterType="java.lang.Long">
-        select course.id courseId , unit.id unitId , cou.version,cou.label,cou.grade  from student_course course
-          join student student on course.student_id=student.id
-          join unit unit on unit.course_id=course.course_id
-          join course cou on course.course_id=cou.id
-          where unit.id = #{unitId}
-		  limit 1
+        select course.id courseId, unit.id unitId, cou.version, cou.label, cou.grade
+        from student_course course
+                 join student student on course.student_id = student.id
+                 join unit unit on unit.course_id = course.course_id
+                 join course cou on course.course_id = cou.id
+        where unit.id = #{unitId}
+        limit 1
     </select>
     <select id="getAllCourse" resultType="java.util.Map" parameterType="map">
         select c.id courseId, c.course_name courseName, c.version
@@ -666,7 +681,18 @@
         order by c.id asc
     </select>
     <select id="getVersionByUnitId" parameterType="java.lang.Long" resultType="java.lang.String">
-        select cou.version from course cou join unit unit on cou.id=unit.course_id where unit.id=#{unitId}
+        select cou.version
+        from course cou
+                 join unit unit on cou.id = unit.course_id
+        where unit.id = #{unitId}
+    </select>
+    <select id="selectSimpleVersionByStudentId" resultType="java.lang.String" parameterType="map">
+        select c.version
+        from student_unit su,
+             course c
+        where su.course_id = c.id
+          and su.student_id = #{studentId}
+        group by c.id
     </select>
 
 </mapper>
