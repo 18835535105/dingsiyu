@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.bookVo.BookVo;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.mapper.CourseMapper;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
@@ -66,6 +67,9 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<SimpleVoc
 
     @Autowired
     private SimpleCourseMapper simpleCourseMapper;
+
+    @Autowired
+    private CourseMapper courseMapper;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -154,10 +158,10 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<SimpleVoc
 
     @Override
     public ServerResponse<BookInfoVo> getBookInfo(HttpSession session, Long courseId, Integer type) {
-    	// 该模块没有课程
-    	if(courseId == null) {
-    		return ServerResponse.createByError(300, "暂无数据");
-    	}
+        // 该模块没有课程
+        if (courseId == null) {
+            return ServerResponse.createByError(300, "暂无数据");
+        }
 
         Student student = getStudent(session);
         String typeStr = simpleCommonMethod.getTestType(type);
@@ -167,7 +171,7 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<SimpleVoc
         Long notKnow;
         if (courseId != 0) {
             // 当前课程学习总个数
-            List<Long> courseIds =  new ArrayList<>();
+            List<Long> courseIds = new ArrayList<>();
             courseIds.add(courseId);
             learnedCount = learnMapper.countLearnWordByCourse(studentId, courseIds, typeStr);
 
@@ -261,7 +265,7 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<SimpleVoc
                 // 倒序排列
                 Collections.reverse(bookVos);
                 break;
-                default:
+            default:
         }
         PlayerVo playerVo = new PlayerVo();
         playerVo.setPlayerList(bookVos);
@@ -376,6 +380,36 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<SimpleVoc
         }
         if (updateIds.size() > 0) {
             simpleCapacityReviewMapper.updatePushAndMemoryStrengthByPrimaryKeys(updateIds, push, memoryStrength, studyModel);
+        }
+        return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    public ServerResponse getModel(HttpSession session) {
+        Long studentId = super.getStudentId(session);
+
+        List<String> versions = this.courseMapper.selectSimpleVersionByStudentId(studentId);
+        if (versions.size() > 0) {
+            Map<String, String> map = new HashMap<>(16);
+            for (String version : versions) {
+                String[] s = version.split(" ");
+                if (s.length == 2) {
+                    map.put(s[1], s[1]);
+                }
+            }
+
+            Map<String, Boolean> returnMap = new HashMap<>(16);
+            String[] typeStr = {"单词辨音", "词组辨音", "快速单词", "快速词组", "词汇考点", "快速句型", "语法辨析", "单词默写", "词组默写"};
+            int length = typeStr.length;
+            int[] modelInteger = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+            for (int i = 0; i < length; i++) {
+                if (map.containsKey(typeStr[i])) {
+                    returnMap.put("model" + modelInteger[i], true);
+                } else {
+                    returnMap.put("model" + modelInteger[i], false);
+                }
+            }
+            return ServerResponse.createBySuccess(returnMap);
         }
         return ServerResponse.createBySuccess();
     }

@@ -72,4 +72,12 @@ public interface SimpleBookServiceSimple extends SimpleBaseService<Vocabulary> {
      * @return ServerResponse<String>
      */
     ServerResponse<String> restudy(HttpSession session, Long courseId, Long unitId, Long[] wordIds, Integer studyModel);
+
+    /**
+     * 获取学生可选择的学习模块
+     *
+     * @param session
+     * @return
+     */
+    ServerResponse getModel(HttpSession session);
 }
