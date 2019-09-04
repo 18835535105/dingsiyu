@@ -5,12 +5,14 @@ import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.AwardMapper;
 import com.zhidejiaoyu.common.mapper.CcieMapper;
+import com.zhidejiaoyu.common.mapper.LocationMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.simple.SimpleQuartzService;
@@ -83,6 +85,9 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
 
     @Autowired
     private CcieMapper ccieMapper;
+
+    @Autowired
+    private LocationMapper locationMapper;
 
     @Autowired
     private RankOpt rankOpt;
@@ -191,9 +196,9 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    @Scheduled(cron = "0 20 0 * * ?")
+    @Scheduled(cron = "0 30 0 * * ?")
     @Override
-    public void updatFrozen() {
+    public void updateFrozen() {
         int localPort = ServiceInfoUtil.getPort();
         if (port != localPort) {
             return;
@@ -357,6 +362,19 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
         List<Student> students = new ArrayList<>();
         students.add(student);
         initCache(students);
+    }
+
+    @Override
+    @Scheduled(cron = "0 5 0 * * 1")
+    public void deleteStudentLocation() {
+        int localPort = ServiceInfoUtil.getPort();
+        if (port != localPort) {
+            ServerResponse.createBySuccess();
+            return;
+        }
+        log.info("开始清除学生定位信息...");
+        locationMapper.delete(null);
+        log.info("清除学生定位信息完成...");
     }
 
     /**
@@ -757,7 +775,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
 
     @Override
     @Scheduled(cron = "0 0 0 * * ? ")
-    public void updateDailyAward() {
+    public void deleteDailyAward() {
         int localPort = ServiceInfoUtil.getPort();
         if (port != localPort) {
             return;
@@ -768,7 +786,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
     }
 
     @Override
-    @Scheduled(cron = "0 0 10 * * ? ")
+    @Scheduled(cron = "0 10 0 * * ? ")
     public void deleteDrawRedis() {
         int localPort = ServiceInfoUtil.getPort();
         if (port != localPort) {
