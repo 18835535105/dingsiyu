@@ -79,7 +79,7 @@ public class SimpleQuartzController {
     /**
      * 删除学生日奖励信息
      */
-    @PostMapping
+    @PostMapping("/deleteDailyAward")
     public void deleteDailyAward() {
         this.simpleQuartzService.deleteDailyAward();
     }
@@ -87,7 +87,7 @@ public class SimpleQuartzController {
     /**
      * 删除抽奖基数
      */
-    @PostMapping
+    @PostMapping("/deleteDrawRedis")
     public void deleteDrawRedis() {
         this.simpleQuartzService.deleteDrawRedis();
     }
