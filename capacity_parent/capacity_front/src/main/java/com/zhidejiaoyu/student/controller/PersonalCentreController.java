@@ -171,25 +171,6 @@ public class PersonalCentreController extends BaseController {
     }
 
     /**
-     * 我的排名
-     *
-     * @param model       本班排行模块  model = 1
-     *                    本校模块 model = 2
-     *                    全国模块 model = 3
-     * @param queryType   空代表全部查询，1=今日排行 2=本周排行 3=本月排行
-     * @param gold        金币 1=正序 2=倒叙  - 默认金币倒叙排行
-     * @param badge       勋章 1=正序 2=倒叙
-     * @param certificate 证书 1=正序 2=倒叙
-     * @param worship     膜拜 1=正序 2=倒叙
-     */
-    @RequestMapping(value = "/classSeniority", method = RequestMethod.POST)
-    public ServerResponse<Object> classSeniority(HttpSession session, Integer page, Integer rows,
-                                                 @RequestParam(required = false, defaultValue = "1") String model, String gold,
-                                                 String badge, String certificate, String worship, Integer queryType) {
-        return personalCentreService.classSeniority(session, page, rows, gold, badge, certificate, worship, model, queryType);
-    }
-
-    /**
      * 我的证书
      *
      * @param session

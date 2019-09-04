@@ -513,7 +513,8 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<SimpleC
         // 3.设置默认状态
         for (Map course : courseList) {
             if (course.get("id").equals(courseId)) {
-                course.put("state", true); // 正在学习的课程
+                // 正在学习的课程
+                course.put("state", true);
                 a = 1;
             } else {
                 course.put("state", false);

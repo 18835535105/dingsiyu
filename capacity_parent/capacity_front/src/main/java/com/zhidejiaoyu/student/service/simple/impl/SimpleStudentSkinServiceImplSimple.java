@@ -371,7 +371,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 //已获得皮肤储存皮肤对应编号
                 map.put("skinId", SimpleAwardUtil.getMaps(studentSkin.getSkinName()));
                 //未获得皮肤判断使用时间
-            } else if (studentSkin.getEndTime().getTime() > new Date().getTime()) {
+            } else if (studentSkin.getEndTime().getTime() > System.currentTimeMillis()) {
                 //使用时间大于当前时间储存皮肤编号
                 map.put("skinId", SimpleAwardUtil.getMaps(studentSkin.getSkinName()));
             } else {

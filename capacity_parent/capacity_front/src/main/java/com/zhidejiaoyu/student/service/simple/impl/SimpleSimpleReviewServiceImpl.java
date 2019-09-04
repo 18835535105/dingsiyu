@@ -416,26 +416,26 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
      * 测试中心题
      */
     @Override
-    public ServerResponse<Object> testcentre(String course_id, String unitId, int select, int classify, Boolean isTrue, HttpSession session) {
+    public ServerResponse<Object> testcentre(String courseId, String unitId, int select, int classify, Boolean isTrue, HttpSession session) {
         // 获取当前学生信息
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         // 学生id
-        Long student_id = student.getId();
+        Long studentId = student.getId();
 
         // true 扣除一金币
         if(isTrue){
             // 1.查询学生剩余金币
-            Integer gold = simpleStudentMapper.getSystem_gold(student_id);
+            Integer gold = simpleStudentMapper.getSystem_gold(studentId);
             if(gold != null && gold>0){
                 // 扣除1金币
-                int state = simpleStudentMapper.updateBySystem_gold((gold-1), student_id);
+                int state = simpleStudentMapper.updateBySystem_gold((gold-1), studentId);
             }else{
                 // 金币不足
                 return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
             }
             // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
         }else{
-            Integer judgeTest = simpleTestRecordMapper.selectJudgeTestToModel(course_id, student_id, classify, select);
+            Integer judgeTest = simpleTestRecordMapper.selectJudgeTestToModel(courseId, studentId, classify, select);
             if(judgeTest != null){
                 // 已经测试过, 提示扣除金币是否测试
                 return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
@@ -464,21 +464,21 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
             // select: 1=已学, 2=生词, 3=熟词
             if (select == 1) {
                 // 2.获取已学需要出的测试题
-                vocabularies = capacityMapper.alreadyWordStrOne(student_id, unitId, classifyStr);
+                vocabularies = capacityMapper.alreadyWordStrOne(studentId, unitId, classifyStr);
             } else if (select == 2) {
                 // 3.获取生词需要出的测试题
-                vocabularies = capacityMapper.accrueWordStrOne(student_id, unitId, classifyStr);
+                vocabularies = capacityMapper.accrueWordStrOne(studentId, unitId, classifyStr);
             } else if (select == 3) {
                 // 4.获取熟词需要出的测试题
-                vocabularies = capacityMapper.ripeWordStrOne(student_id, unitId, classifyStr);
+                vocabularies = capacityMapper.ripeWordStrOne(studentId, unitId, classifyStr);
             }
 
             // 处理结果
-            List<SimpleTestResult> testResults = simpleTestResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, Long.valueOf(course_id));
+            List<SimpleTestResult> testResults = simpleTestResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, Long.valueOf(courseId));
 
             // 获取课程下的单词id-单元id
-            List<Long> ids = learnMapper.selectVocabularyIdByStudentIdAndCourseId(student_id, Long.valueOf(course_id), 1);
-            Map<Long, Map<Long, Long>> longMapMap = unitMapper.selectIdMapByCourseIdAndWordIds(Long.valueOf(course_id), ids, student_id, classify);
+            List<Long> ids = learnMapper.selectVocabularyIdByStudentIdAndCourseId(studentId, Long.valueOf(courseId), 1);
+            Map<Long, Map<Long, Long>> longMapMap = unitMapper.selectIdMapByCourseIdAndWordIds(Long.valueOf(courseId), ids, studentId, classify);
 
             // 处理结果添加单元id
             for(SimpleTestResult reList: testResults){
@@ -496,13 +496,13 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
             // select: 1=已学, 2=生词, 3=熟词
             if (select == 1) {
                 // 2.获取已学需要出的测试题
-                vocabularies = capacityMapper.alreadyWordStr(student_id, unitId, classifyStr);
+                vocabularies = capacityMapper.alreadyWordStr(studentId, unitId, classifyStr);
             } else if (select == 2) {
                 // 3.获取生词需要出的测试题
-                vocabularies = capacityMapper.accrueWordStr(student_id, unitId, classifyStr);
+                vocabularies = capacityMapper.accrueWordStr(studentId, unitId, classifyStr);
             } else if (select == 3) {
                 // 4.获取熟词需要出的测试题
-                vocabularies = capacityMapper.ripeWordStr(student_id, unitId, classifyStr);
+                vocabularies = capacityMapper.ripeWordStr(studentId, unitId, classifyStr);
             }
 
             // 慧听写 封装读音
@@ -544,7 +544,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         // 获取当前学生信息
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         // 学生id
-        Long student_id = student.getId();
+        Long studentId = student.getId();
         // 学生年级
         String grade = student.getGrade();
 
@@ -563,13 +563,13 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         // 已学
         if (select == 1) {
             // 查询 例句,例句翻译
-            vo = capacityMapper.centreReviewSentence_listen(student_id, unitId, classifyStr);
+            vo = capacityMapper.centreReviewSentence_listen(studentId, unitId, classifyStr);
             // 生词
         } else if (select == 2) {
-            vo = capacityMapper.accrueCentreReviewSentence_listen(student_id, unitId, classifyStr);
+            vo = capacityMapper.accrueCentreReviewSentence_listen(studentId, unitId, classifyStr);
             // 熟词
         } else if (select == 3) {
-            vo = capacityMapper.ripeCentreReviewSentence_listen(student_id, unitId, classifyStr);
+            vo = capacityMapper.ripeCentreReviewSentence_listen(studentId, unitId, classifyStr);
         }
         // 1.例句读音
         map.put("readUrl", baiduSpeak.getLanguagePath(vo.getCentreExample()));
@@ -596,20 +596,20 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
      * 根据课程id和学习id查询learn表
      */
     @Override
-    public ServerResponse<Object> testeffect(String course_id, HttpSession session) {
+    public ServerResponse<Object> testeffect(String courseId, HttpSession session) {
         // 获取当前学生信息
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         // 学生id
-        Long student_id = student.getId();
+        Long studentId = student.getId();
 
         // 1.题类型
         String[] type = {"英译汉", "汉译英", "听力理解"};
 
         //
-        List<Vocabulary> vocabularies = capacityMapper.testeffect(course_id, student_id);
+        List<Vocabulary> vocabularies = capacityMapper.testeffect(courseId, studentId);
 
         // 处理结果
-        List<SimpleTestResult> testResults = simpleTestResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, Long.valueOf(course_id));
+        List<SimpleTestResult> testResults = simpleTestResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, Long.valueOf(courseId));
         return ServerResponse.createBySuccess(testResults);
     }
 
@@ -617,7 +617,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
      * 五维测试
      */
     @Override
-    public ServerResponse<Object> fiveDimensionTest(String course_id, boolean isTrue, HttpSession session) {
+    public ServerResponse<Object> fiveDimensionTest(String courseId, boolean isTrue, HttpSession session) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         Long studentId = student.getId();
 
@@ -634,7 +634,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
             }
             // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
         }else{
-            Integer judgeTest = simpleTestRecordMapper.selectJudgeTest(course_id, studentId, "单词五维测试");
+            Integer judgeTest = simpleTestRecordMapper.selectJudgeTest(courseId, studentId, "单词五维测试");
             if(judgeTest != null){
                 // 已经测试过, 提示扣除金币是否测试
                 return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
@@ -644,7 +644,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         Map<String, Object> result = new LinkedHashMap<String, Object>();
 
         // 查询课程下边一共有多少单词
-        Integer countWord = unitMapper.countWordByCourse(course_id);
+        Integer countWord = unitMapper.countWordByCourse(courseId);
         if(countWord==0){
             return ServerResponse.createByError(500,"该课程下没有单词!");
         }
@@ -677,7 +677,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         //List<Vocabulary> vocabulariesTwo = capacityMapper.fiveDimensionTestTwo(course_id, b, c);
 
         // 1. 获取课程下的所有打乱顺序的单词
-        List<Vocabulary> list = capacityMapper.fiveDimensionTestAll(course_id);
+        List<Vocabulary> list = capacityMapper.fiveDimensionTestAll(courseId);
 
     	// 2.1 从课程中查出*个单词 - 英译汉,汉译英,听力理解 limit 0,b
         List<Vocabulary> vocabularies = list.subList(0, b);
@@ -689,11 +689,11 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         String[] type_b = {"汉译英"};
         String[] type_c = {"听力理解"};
         List<SimpleTestResult> testResults_a = simpleTestResultUtil.getWordTestesForCourse(type_a, vocabularies.subList(0, vocabularies.size()/3).size(),
-                vocabularies.subList(0,vocabularies.size()/3), Long.valueOf(course_id));
+                vocabularies.subList(0,vocabularies.size()/3), Long.valueOf(courseId));
         List<SimpleTestResult> testResults_b = simpleTestResultUtil.getWordTestesForCourse(type_b, vocabularies.subList(vocabularies.size()/3, (int) BigDecimalUtil.div((double)vocabularies.size(),1.5,0)).size(),
-                vocabularies.subList(vocabularies.size()/3, (int) BigDecimalUtil.div((double)vocabularies.size(),1.5,0)), Long.valueOf(course_id));
+                vocabularies.subList(vocabularies.size()/3, (int) BigDecimalUtil.div((double)vocabularies.size(),1.5,0)), Long.valueOf(courseId));
         List<SimpleTestResult> testResults_c = simpleTestResultUtil.getWordTestesForCourse(type_c, vocabularies.subList((int) BigDecimalUtil.div((double)vocabularies.size(),1.5,0), vocabularies.size()).size(),
-                vocabularies.subList((int) BigDecimalUtil.div((double)vocabularies.size(),1.5,0), vocabularies.size()), Long.valueOf(course_id));
+                vocabularies.subList((int) BigDecimalUtil.div((double)vocabularies.size(),1.5,0), vocabularies.size()), Long.valueOf(courseId));
 
         result.put("testResults_a", testResults_a);
         result.put("testResults_b", testResults_b);
@@ -773,11 +773,11 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
      * @param studentId 学生id
      * @param unitId 单元id
      * @param model 1=单词图鉴模块
-     * @param course_id 课程id
+     * @param courseId 课程id
      * @return
      */
     @Override
-    public ServerResponse<Map<String, Object>> Reviewcapacity_picture(Long studentId, String unitId, int model, String course_id, String judge) {
+    public ServerResponse<Map<String, Object>> Reviewcapacity_picture(Long studentId, String unitId, int model, String courseId, String judge) {
 
         // 用于判断哪个题型
         Random random = new Random();
@@ -791,7 +791,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
             correct = simpleCapacityPictureMapper.selectNeedReviewWord(Long.valueOf(unitId), studentId, SimpleDateUtil.DateTime());
         }else{
             // 根据课程查询 课程复习模块
-            correct = simpleCapacityPictureMapper.selectNeedReviewWordCourse(course_id, studentId, SimpleDateUtil.DateTime());
+            correct = simpleCapacityPictureMapper.selectNeedReviewWordCourse(courseId, studentId, SimpleDateUtil.DateTime());
             unitId = correct.get("unit_id").toString();
         }
 
@@ -809,17 +809,17 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
         cp.setStudentId(studentId);
         cp.setUnitId(Long.valueOf(unitId));
         cp.setVocabularyId(Long.valueOf(correct.get("id").toString()));
-        Object fault_time = correct.get("fault_time");
-        Object memory_strength = correct.get("memory_strength");
-        if(fault_time==null){
+        Object faultTime = correct.get("fault_time");
+        Object memoryStrength = correct.get("memory_strength");
+        if(faultTime==null){
             cp.setFaultTime(0);
         }else {
-            cp.setFaultTime(Integer.parseInt(fault_time.toString()));
+            cp.setFaultTime(Integer.parseInt(faultTime.toString()));
         }
-        if(memory_strength==null){
+        if(memoryStrength==null){
             cp.setMemoryStrength(0.0);
         }else {
-            cp.setMemoryStrength(Double.parseDouble(memory_strength.toString()));
+            cp.setMemoryStrength(Double.parseDouble(memoryStrength.toString()));
         }
 //        Integer hard = memoryDifficultyUtil.getMemoryDifficulty(cp, 1);
 //        correct.put("memoryDifficulty", hard);
@@ -845,8 +845,8 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
 
         List<Map<String, Object>> mapErrorVocabulary = null;
         // 2. 从课程下随机获取三个题, 三个作为错题, 并且id不等于正确题id
-        if(course_id!=null){
-            mapErrorVocabulary = vocabularyMapper.getWordIdByCourse(new Long(correct.get("id").toString()),Long.valueOf(course_id), Long.parseLong(unitId));
+        if(courseId!=null){
+            mapErrorVocabulary = vocabularyMapper.getWordIdByCourse(new Long(correct.get("id").toString()),Long.valueOf(courseId), Long.parseLong(unitId));
         }else{
         //  从单元下随机获取三个题, 三个作为错题, 并且id不等于正确题id
             mapErrorVocabulary = vocabularyMapper.getWordIdByUnit(new Long(correct.get("id").toString()), unitId);

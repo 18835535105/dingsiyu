@@ -216,10 +216,10 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             Integer minute = second / 60;
             Integer residueSecond = second % 60;
             StringBuilder strB = new StringBuilder();
-            if (minute != null && minute != 0) {
+            if (minute != 0) {
                 strB.append(minute + "分");
             }
-            if (residueSecond != null && residueSecond != 0) {
+            if (residueSecond != 0) {
                 strB.append(residueSecond + "秒");
             }
             map.put("readName", readType.getReadName());
@@ -451,10 +451,10 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
         Integer minute = learnTime / 60;
         Integer residueSecond = learnTime % 60;
         StringBuilder strB = new StringBuilder();
-        if (minute != null && minute != 0) {
+        if (minute != 0) {
             strB.append(minute + "分");
         }
-        if (residueSecond != null && residueSecond != 0) {
+        if (residueSecond != 0) {
             strB.append(residueSecond + "秒");
         }
         map.put("lookTime", strB.toString());
@@ -504,7 +504,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
                 chineseBuilder.append(readArder.getTranslate().replace("#&#", ""));
                 i++;
             } else {
-                if (readArder.getSentence().indexOf("#&#") != -1) {
+                if (readArder.getSentence().contains("#&#")) {
                     Map<String, Object> sMap = new HashMap<>();
                     sMap.put("sentence", englishBuilder.toString());
                     sMap.put("translate", chineseBuilder.toString());
@@ -538,7 +538,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
                 readList.add(readArder);
                 i++;
             } else {
-                if (readArder.getSentence().indexOf("#&#") != -1) {
+                if (readArder.getSentence().contains("#&#")) {
                     returnList.add(readList);
                     readList = new ArrayList<>();
                 }
@@ -638,7 +638,7 @@ public class ReadCourseServiceImpl extends BaseServiceImpl<ReadCourseMapper, Rea
             Map<String, Object> judgeMap = new HashMap<>();
             judgeMap.put("subject", judge.getSubject());
             judgeMap.put("analysis", judge.getAnalysis());
-            boolean answer = judge.getAnswer().trim().equals("T") ? true : false;
+            boolean answer = "T".equals(judge.getAnswer().trim()) ? true : false;
             judgeMap.put("answer", answer);
             list.add(judgeMap);
         }

@@ -139,7 +139,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
 
     @Override
-    public Map<String, Integer> testReview(String unit_id, String studentId) {
+    public Map<String, Integer> testReview(String unitId, String studentId) {
         // 封装返回的数据 - 智能记忆智能复习数量
         Map<String, Integer> map = new HashMap<String, Integer>();
 
@@ -148,7 +148,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         String dateTime = s.format(new Date());
 
         CapacityReview cr = new CapacityReview();
-        cr.setUnit_id(Long.valueOf(unit_id));
+        cr.setUnit_id(Long.valueOf(unitId));
         cr.setStudent_id(Long.valueOf(studentId));
         cr.setPush(dateTime);
         // 慧记忆模块许复习量
@@ -181,7 +181,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     }
 
     @Override
-    public ServerResponse<Object> testCapacityReview(String unit_id, int classify, HttpSession session, boolean pattern) {
+    public ServerResponse<Object> testCapacityReview(String unitId, int classify, HttpSession session, boolean pattern) {
         // 封装测试单词
         List<Vocabulary> vocabularies;
 
@@ -192,7 +192,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
         // 复习测试上一单元
         if (pattern) {
-            unit_id = learnMapper.getEndUnitIdByStudentId(id);
+            unitId = learnMapper.getEndUnitIdByStudentId(id);
         }
 
         // 当前时间
@@ -221,13 +221,13 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             // 查询记忆追踪需要复习的单词
             CapacityReview ca = new CapacityReview();
             ca.setStudent_id(id);
-            ca.setUnit_id(Long.valueOf(unit_id));
+            ca.setUnit_id(Long.valueOf(unitId));
             ca.setClassify(classify + "");
             ca.setPush(dateTime);
             vocabularies = capacityMapper.selectCapacity(ca);
 
             // 处理结果
-            List<TestResult> testResults = testResultUtil.getWordTestesForUnit(type, vocabularies.size(), vocabularies, Long.valueOf(unit_id));
+            List<TestResult> testResults = testResultUtil.getWordTestesForUnit(type, vocabularies.size(), vocabularies, Long.valueOf(unitId));
             return ServerResponse.createBySuccess(testResults);
         } /*else if (classify >= 4) {
             List<CapacityReview> reviews = capacityMapper.selectSentenceCapacity(id, unit_id, classify);
@@ -256,7 +256,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     }
 
     @Override
-    public Map<String, Object> reviewCapacityMemory(Student student, String unitId, int classify, String course_id) {
+    public Map<String, Object> reviewCapacityMemory(Student student, String unitId, int classify, String courseId) {
 
         Long studentId = student.getId();
 
@@ -373,7 +373,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     }
 
     @Override
-    public Object reviewSentenceListen(Student student, String unit_id, int classify, String course_id, Integer type) {
+    public Object reviewSentenceListen(Student student, String unitId, int classify, String courseId, Integer type) {
 
         Long studentId = student.getId();
         Map<String, Object> map = new HashMap<>(16);
@@ -386,26 +386,26 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
         // 1.去记忆追踪中获取需要复习的例句
         // 智能复习 (根据单元查询)
-        if (StringUtils.isNotBlank(unit_id)) {
+        if (StringUtils.isNotBlank(unitId)) {
             if (classify == 4) {
                 // 例句听力
-                vo = capacityMapper.ReviewSentence_listen(studentId, unit_id, dateTime);
+                vo = capacityMapper.ReviewSentence_listen(studentId, unitId, dateTime);
             } else if (classify == 5) {
                 // 例句翻译 sentence_translate
-                vo = capacityMapper.ReviewSentence_translate(studentId, unit_id, dateTime);
+                vo = capacityMapper.ReviewSentence_translate(studentId, unitId, dateTime);
             } else if (classify == 6) {
                 // 例句默写 sentence_write
-                vo = capacityMapper.ReviewSentence_write(studentId, unit_id, dateTime);
+                vo = capacityMapper.ReviewSentence_write(studentId, unitId, dateTime);
             }
 
             // 需要复习的例句个数
             int sentenceCount = capacityMapper.countNeedReviewByCourseIdOrUnitId(student, null,
-                    Long.valueOf(unit_id), commonMethod.getTestType(classify));
+                    Long.valueOf(unitId), commonMethod.getTestType(classify));
             map.put("sentenceCount", sentenceCount);
         }
 
         if (vo == null) {
-            logger.info("courseid:{}->unitId:{} 下没有需要复习的句型", course_id, unit_id);
+            logger.info("courseid:{}->unitId:{} 下没有需要复习的句型", courseId, unitId);
             return null;
         }
         // 2.通过记忆追踪中的例句id-获取例句信息 (vo.getVocabulary_id()是例句id)
@@ -420,10 +420,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         map.put("id", sentence.getId());
         // 例句id
         // 任务课程复习
-        if (unit_id == null) {
+        if (unitId == null) {
             map.put("unitId", vo.getUnit_id());
         } else {// 智能复习
-            map.put("unitId", unit_id);
+            map.put("unitId", unitId);
         }
         // 例句读音
         map.put("readUrl", baiduSpeak.getSentencePath(sentence.getCentreExample()));
@@ -487,7 +487,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
      * 测试中心题
      */
     @Override
-    public ServerResponse<Object> testcentre(String course_id, String unitId, int select, int classify, Boolean isTrue, HttpSession session) {
+    public ServerResponse<Object> testcentre(String courseId, String unitId, int select, int classify, Boolean isTrue, HttpSession session) {
         // 获取当前学生信息
         Student student = getStudent(session);
         // 学生id
@@ -506,7 +506,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             }
             // false 第一次点击五维测试  1.查询是否做过该课程的五维测试 2.如果做过返回扣除1金币提示
         } else {
-            Integer judgeTest = testRecordMapper.selectJudgeTestToModel(course_id, studentId, classify, select);
+            Integer judgeTest = testRecordMapper.selectJudgeTestToModel(courseId, studentId, classify, select);
             if (judgeTest != null) {
                 // 已经测试过, 提示扣除金币是否测试
                 return ServerResponse.createBySuccess(GoldResponseCode.NEED_REDUCE_GOLD.getCode(), "您已参加过该五维测试，再次测试需扣除1金币。");
@@ -545,11 +545,11 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             }
 
             // 处理结果
-            List<TestResult> testResults = testResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, Long.valueOf(course_id));
+            List<TestResult> testResults = testResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, Long.valueOf(courseId));
 
             // 获取课程下的单词id-单元id
-            List<Long> ids = learnMapper.selectVocabularyIdByStudentIdAndCourseId(studentId, Long.valueOf(course_id), 1);
-            Map<Long, Map<Long, Long>> longMapMap = unitMapper.selectIdMapByCourseIdAndWordIds(Long.valueOf(course_id), ids, studentId, classify);
+            List<Long> ids = learnMapper.selectVocabularyIdByStudentIdAndCourseId(studentId, Long.valueOf(courseId), 1);
+            Map<Long, Map<Long, Long>> longMapMap = unitMapper.selectIdMapByCourseIdAndWordIds(Long.valueOf(courseId), ids, studentId, classify);
 
             // 处理结果添加单元id
             for (TestResult reList : testResults) {
@@ -652,7 +652,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
      * 根据课程id和学习id查询learn表
      */
     @Override
-    public ServerResponse<Object> testeffect(String course_id, HttpSession session) {
+    public ServerResponse<Object> testeffect(String courseId, HttpSession session) {
         // 获取当前学生信息
         Student student = getStudent(session);
         // 学生id
@@ -662,10 +662,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         String[] type = {"英译汉", "汉译英", "听力理解"};
 
         //
-        List<Vocabulary> vocabularies = capacityMapper.testeffect(course_id, studentId);
+        List<Vocabulary> vocabularies = capacityMapper.testeffect(courseId, studentId);
 
         // 处理结果
-        List<TestResult> testResults = testResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, Long.valueOf(course_id));
+        List<TestResult> testResults = testResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, Long.valueOf(courseId));
         return ServerResponse.createBySuccess(testResults);
     }
 

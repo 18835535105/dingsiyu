@@ -1737,7 +1737,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     @Override
     public ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId, Integer type, Integer pageNum) {
-        Student student = getStudent(session);
         if (session.getAttribute(TimeConstant.BEGIN_START_TIME) == null) {
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         }

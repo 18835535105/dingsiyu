@@ -1108,12 +1108,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     public Object isLoginOut(HttpSession session, String isTeacherAccount) {
         Map<String, Object> map = new HashMap<>();
         Student student = getStudent(session);
-        if (student.getTeacherId().equals(1)) {
-            if ("admin".equals(isTeacherAccount.trim())) {
-                map.put("isLoginOut", true);
-            } else {
-                map.put("isLoginOut", false);
-            }
+        if (student.getTeacherId().equals(1L)) {
+            map.put("isLoginOut", "admin".equals(isTeacherAccount.trim()));
             return ServerResponse.createBySuccess(map);
         }
         String adminAccount = null;
@@ -1144,11 +1140,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 falg = true;
             }
         }
-        if (falg) {
-            map.put("isLoginOut", true);
-        } else {
-            map.put("isLoginOut", false);
-        }
+        map.put("isLoginOut", falg);
         return ServerResponse.createBySuccess(map);
     }
 }

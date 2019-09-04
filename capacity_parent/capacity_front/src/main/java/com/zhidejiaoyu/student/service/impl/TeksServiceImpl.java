@@ -294,7 +294,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                                 sb.setLength(0);
                             }
                             // 如果符号前面是字母需要在符号列表中加 null
-                            if(i!=0){
+                            if (i != 0) {
                                 if (Pattern.matches(END_MATCH, new String(new char[]{chars[i - 1]}))) {
                                     pointList.add(null);
                                 }
@@ -727,44 +727,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         return rightList;
     }
 
-    private List<String> getRegitList(String sentence) {
-        // 正确顺序
-        List<String> rightList = new ArrayList<>();
-        String[] split = sentence.trim().split(" ");
-        StringBuilder sb = new StringBuilder();
-        for (String s : split) {
-            if (Pattern.matches(END_MATCH, s) && Pattern.matches(START_MATCH, s)) {
-                rightList.add(s);
-            } else {
-                char[] chars = s.toCharArray();
-                sb.setLength(0);
-                int length = chars.length;
-                for (int i = 0; i < length; i++) {
-                    char aChar = chars[i];
-                    // 当前下标的数据
-                    String s1 = new String(new char[]{aChar});
-                    // 是字母或者数字，拼接字符串
-                    if (Pattern.matches(END_MATCH, s1)) {
-                        sb.append(s1);
-                    } else {
-                        if (sb.length() > 0) {
-                            rightList.add(sb.toString().replace("$", "").replace("#", " "));
-                            sb.setLength(0);
-                        }
-                        rightList.add(s1);
-                    }
-
-                    // 防止最后一个单词后面没有符号导致最后一个单词不追加到列表中
-                    if (sb.length() > 0 && i == length - 1) {
-                        rightList.add(sb.toString().replace("$", "").replace("#", " "));
-                        sb.setLength(0);
-                    }
-                }
-            }
-        }
-        return rightList;
-    }
-
     @Override
     @TestChangeAnnotation(isUnitTest = false)
     @GoldChangeAnnotation
@@ -1006,7 +968,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             int index = 0;
             while (integers[choose - 1] == 0) {
                 int i = random.nextInt(shuZhuString.size());
-                if (choose == 2 && s == 1) {
+                if (s == 1) {
                     if (i != index) {
                         integers[s] = shuZhuString.get(i);
                     }
@@ -1023,7 +985,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
 
-    //添加数据
+    /**
+     * 添加数据
+     */
     public void addList(String str, List<String> blanceSentence, List<String> vocabulary) {
         vocabulary.add(str.replace("#", " ").replace("$", ""));
         blanceSentence.add(null);
@@ -1048,7 +1012,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             }
             List<Integer> list = new ArrayList<>();
             for (int i = 0; i < s.length; i++) {
-                if (s[i].indexOf("#") == -1 && s[i].indexOf("$") == -1) {
+                if (s[i].contains("#") && s[i].contains("$")) {
                     list.add(i);
                 }
             }
@@ -1250,7 +1214,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private int changeInteger(List<String> sentenceList) {
         List<Integer> list = new ArrayList<>();
         for (int i = 0; i < sentenceList.size(); i++) {
-            if (sentenceList.get(i).indexOf("#") == -1 && sentenceList.get(i).indexOf("$") == -1) {
+            if (sentenceList.get(i).contains("#") && sentenceList.get(i).contains("$")) {
                 if (Pattern.matches(END_MATCH, sentenceList.get(i)) && Pattern.matches(START_MATCH, sentenceList.get(i))) {
                     list.add(i);
                 }
@@ -1261,8 +1225,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
     //获取听力题
-    private void hearing
-    (List<Teks> hearingList, List<Map<String, Object>> returnList, List<Teks> optionList) {
+    private void hearing(List<Teks> hearingList, List<Map<String, Object>> returnList, List<Teks> optionList) {
         for (int i = 0; i < hearingList.size(); i++) {
             Collections.shuffle(optionList);
             List<Teks> list = new ArrayList<>();
@@ -1297,21 +1260,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         }
         returnMap.put("option", option);
 
-    }
-
-    private void BritishElectHan(Teks teks, List<Teks> optionList, Map<String, Object> returnMap) {
-        optionList.add(teks);
-        Collections.shuffle(optionList);
-        List<String> english = new ArrayList<>();
-        List<String> option = new ArrayList<>();
-        for (int i = 0; i < optionList.size(); i++) {
-            if (optionList.get(i).getSentence().equals(teks.getSentence())) {
-                returnMap.put("answer", i);
-            }
-            english.add(optionList.get(i).getSentence());
-            option.add(baiduSpeak.getSentencePath(optionList.get(i).getSentence()));
-        }
-        returnMap.put("option", option);
     }
 
     private void getStudyUnit(List<Long> courseIds, List<Map<String, Object>> returnCourse, Long studentId) {

@@ -43,8 +43,8 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
 
     @Override
     public ServerResponse<Object> getAllList(HttpSession session) {
-        Student student =getStudent(session);
-        if(student.getTeacherId()==null){
+        Student student = getStudent(session);
+        if (student.getTeacherId() == null) {
             return ServerResponse.createBySuccess();
         }
         Long teacherId = student.getTeacherId();
@@ -62,8 +62,8 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
             returnMap.put("sysGold", 0);
         }
         if (schoolAdminById == null || string == null || string == "") {
-            if(schoolAdminById==null){
-                schoolAdminById=teacherId.intValue();
+            if (schoolAdminById == null) {
+                schoolAdminById = teacherId.intValue();
                 Integer teacherCount = simpleTeacherMapper.getTeacherCountByAdminId(teacherId);
                 if (teacherCount == null && teacherCount == 0) {
                     addResultMapByAllList(oneMap, null, 1, false);
@@ -78,34 +78,34 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
             //一类放置
             List<PrizeExchangeList> oneType = simplePrizeExchangeListMapper.getAllByType(null, schoolAdminById, 1);
             Integer oneCount = simplePrizeExchangeListMapper.getCountByType(null, schoolAdminById, 1);
-            getResultMap(oneMap,oneType);
-            addResultMapByAll(oneMap,1,oneCount>5?true:false);
+            getResultMap(oneMap, oneType);
+            addResultMapByAll(oneMap, 1, oneCount > 5 ? true : false);
             //二类放置
             List<PrizeExchangeList> twoType = simplePrizeExchangeListMapper.getAllByType(null, schoolAdminById, 2);
             Integer twoCount = simplePrizeExchangeListMapper.getCountByType(null, schoolAdminById, 2);
-            getResultMap(twoMap,twoType);
-            addResultMapByAll(twoMap,2,twoCount>5?true:false);
+            getResultMap(twoMap, twoType);
+            addResultMapByAll(twoMap, 2, twoCount > 5 ? true : false);
             //三类放置
             List<PrizeExchangeList> threeType = simplePrizeExchangeListMapper.getAllByType(null, schoolAdminById, 3);
             Integer threeCount = simplePrizeExchangeListMapper.getCountByType(null, schoolAdminById, 3);
-            getResultMap(threeMap,threeType);
-            addResultMapByAll(twoMap,3,threeCount>5?true:false);
+            getResultMap(threeMap, threeType);
+            addResultMapByAll(twoMap, 3, threeCount > 5 ? true : false);
         } else {
             //一类放置
             List<PrizeExchangeList> oneType = simplePrizeExchangeListMapper.getAllByType(teacherId, null, 1);
             Integer oneCount = simplePrizeExchangeListMapper.getCountByType(teacherId, null, 1);
-            getResultMap(oneMap,oneType);
-            addResultMapByAll(oneMap,1,oneCount>5?true:false);
+            getResultMap(oneMap, oneType);
+            addResultMapByAll(oneMap, 1, oneCount > 5 ? true : false);
             //二类放置
             List<PrizeExchangeList> twoType = simplePrizeExchangeListMapper.getAllByType(teacherId, null, 2);
             Integer twoCount = simplePrizeExchangeListMapper.getCountByType(teacherId, null, 2);
-            getResultMap(twoMap,twoType);
-            addResultMapByAll(twoMap,2,twoCount>5?true:false);
+            getResultMap(twoMap, twoType);
+            addResultMapByAll(twoMap, 2, twoCount > 5 ? true : false);
             //三类放置
             List<PrizeExchangeList> threeType = simplePrizeExchangeListMapper.getAllByType(teacherId, null, 3);
             Integer threeCount = simplePrizeExchangeListMapper.getCountByType(teacherId, null, 3);
-            getResultMap(threeMap,threeType);
-            addResultMapByAll(threeMap,3,threeCount>5?true:false);
+            getResultMap(threeMap, threeType);
+            addResultMapByAll(threeMap, 3, threeCount > 5 ? true : false);
         }
         returnMap.put("oneMap", oneMap);
         returnMap.put("twoMap", twoMap);
@@ -130,9 +130,9 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         }
         map.put("page", page);
         map.put("row", row);
-        if (adminId == null || string == null || string == ""){
-            if(adminId==null){
-                adminId=teacherId.intValue();
+        if (adminId == null || string == null || string == "") {
+            if (adminId == null) {
+                adminId = teacherId.intValue();
                 Integer teacherCount = simpleTeacherMapper.getTeacherCountByAdminId(teacherId);
                 if (teacherCount == null && teacherCount == 0) {
                     map.put("total", 0);
@@ -142,21 +142,21 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
             }
             Integer count = simplePrizeExchangeListMapper.getCountByType(null, adminId, type);
             map.put("total", count);
-            List<PrizeExchangeList> prizeExchangeLists = simplePrizeExchangeListMapper.getAll((page - 1) * row, row, adminId.longValue(),null,type);
-            getResultMap(map,prizeExchangeLists);
-        }else{
+            List<PrizeExchangeList> prizeExchangeLists = simplePrizeExchangeListMapper.getAll((page - 1) * row, row, adminId.longValue(), null, type);
+            getResultMap(map, prizeExchangeLists);
+        } else {
             Integer count = simplePrizeExchangeListMapper.getCountByType(teacherId, null, type);
             map.put("total", count);
-            List<PrizeExchangeList> prizeExchangeLists = simplePrizeExchangeListMapper.getAll((page - 1) * row, row, null,teacherId,type);
-            getResultMap(map,prizeExchangeLists);
+            List<PrizeExchangeList> prizeExchangeLists = simplePrizeExchangeListMapper.getAll((page - 1) * row, row, null, teacherId, type);
+            getResultMap(map, prizeExchangeLists);
         }
 
         return ServerResponse.createBySuccess(map);
     }
 
-    private void getResultMap(Map<String,Object> map,List<PrizeExchangeList> list){
+    private void getResultMap(Map<String, Object> map, List<PrizeExchangeList> list) {
         List<Map<String, Object>> prizeMap = new ArrayList<>();
-        for(PrizeExchangeList prize : list){
+        for (PrizeExchangeList prize : list) {
             Map<String, Object> dataMap = new HashMap<>();
             dataMap.put("id", prize.getId());
             dataMap.put("partUrl", GetOssFile.getPublicObjectUrl(prize.getPrizeUrl()));
@@ -166,7 +166,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
             dataMap.put("describes", prize.getDescribes());
             prizeMap.add(dataMap);
         }
-        map.put("list",prizeMap);
+        map.put("list", prizeMap);
     }
 
     @Override
@@ -179,12 +179,12 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         resultMap.put("row", row);
         Integer total = simpleStudentExchangePrizeMapper.getAllNumber(studentId);
         resultMap.put("total", total);
-        Integer resultInteger=total-(page-1)*row;
+        Integer resultInteger = total - (page - 1) * row;
         List<Map<String, Object>> resultList = new ArrayList<>();
         for (Map<String, Object> map : all) {
             Integer state = (Integer) map.get("state");
-            map.put("id",resultInteger);
-            resultInteger-=1;
+            map.put("id", resultInteger);
+            resultInteger -= 1;
             if (state == 0) {
                 map.put("state", "成功");
                 map.put("msg", "已领取");
@@ -197,7 +197,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
             } else if (state == 1) {
                 map.put("state", "成功");
                 map.put("msg", "兑换成功快去找老师领取奖励吧");
-            }else if (state == 2) {
+            } else if (state == 2) {
                 map.put("state", "失败");
                 map.put("msg", "兑换失败");
             }
@@ -224,7 +224,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
                 if (index > 0) {
                     simplePrizeExchangeListMapper.updSulpersNumber(prizeId, prizeExchangeList.getSurplusNumber() - 1);
                     addOperationLog(prizeExchangeList.getPrize(), student.getId().intValue());
-                    addGoldLog(student.getId(), prizeExchangeList.getExchangePrize(), "兑换奖励");
+                    addGoldLog(student.getId(), prizeExchangeList.getExchangePrize());
                     student.setSystemGold(student.getSystemGold() - prizeExchangeList.getExchangePrize());
                     student.setOfflineGold(student.getOfflineGold() + prizeExchangeList.getExchangePrize());
                     simpleStudentMapper.updateByPrimaryKey(student);
@@ -262,19 +262,19 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
     private int addOperationLog(String prize, Integer studentId) {
         RunLog runLog = new RunLog();
         runLog.setCreateTime(new Date());
-        runLog.setLogContent(studentId+"：兑奖管理 ："+prize+" 兑换成功");
+        runLog.setLogContent(studentId + "：兑奖管理 ：" + prize + " 兑换成功");
         runLog.setType(8);
         runLog.setOperateUserId(studentId.longValue());
         return runLogMapper.insert(runLog);
     }
 
-    private int addGoldLog(Long studentId, Integer price, String msg) {
+    private int addGoldLog(Long studentId, Integer price) {
         GoldLog goldLog = new GoldLog();
         goldLog.setCreateTime(new Date());
         goldLog.setGoldReduce(price);
         goldLog.setOperatorId(studentId.intValue());
         goldLog.setStudentId(studentId);
-        goldLog.setReason(msg);
+        goldLog.setReason("兑换奖励");
         goldLog.setReadFlag(0);
         return simpleGoldLogMapper.insert(goldLog);
     }
@@ -284,7 +284,8 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         map.put("type", type);
         map.put("more", more);
     }
-    private void addResultMapByAll(Map<String, Object> map,  int type, boolean more) {
+
+    private void addResultMapByAll(Map<String, Object> map, int type, boolean more) {
         map.put("type", type);
         map.put("more", more);
     }

@@ -1320,7 +1320,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         // 区
         String area = student.getArea();
         // 学校
-        String school_name = student.getSchoolName();
+        String schoolName = student.getSchoolName();
         // 年级
         String grade = student.getGrade();
         // 班级
@@ -1329,11 +1329,11 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         String version = student.getVersion();
 
         // 学段
-        String study_paragraph;
+        String studyParagraph;
         if ("七年级".equals(grade) || "八年级".equals(grade) || "九年级".equals(grade)) {
-            study_paragraph = "初中";
+            studyParagraph = "初中";
         } else {
-            study_paragraph = "高中";
+            studyParagraph = "高中";
         }
 
         // 响应数据
@@ -1344,13 +1344,13 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         if (model == 1 || model == null) {
             // 已学单元
             if (haveUnit != null && haveUnit > 0) {
-                list = simpleStudentUnitMapper.planSeniority(area, school_name, grade, squad, study_paragraph, haveUnit, version);
+                list = simpleStudentUnitMapper.planSeniority(area, schoolName, grade, squad, studyParagraph, haveUnit, version);
                 // 已做测试
             } else if (haveTest != null && haveTest > 0) {
-                list = simpleTestRecordMapper.planSeniority(area, school_name, grade, squad, study_paragraph, haveTest, version);
+                list = simpleTestRecordMapper.planSeniority(area, schoolName, grade, squad, studyParagraph, haveTest, version);
                 // 学习时长
             } else if (haveTime != null && haveTime > 0) {
-                list = simpleDurationMapper.planSeniority(area, school_name, grade, squad, study_paragraph, haveTime, version);
+                list = simpleDurationMapper.planSeniority(area, schoolName, grade, squad, studyParagraph, haveTime, version);
             }
 
             // 班级总参与人数
@@ -1360,33 +1360,33 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         } else if (model == 2) {
             // 已学单元
             if (haveUnit != null && haveUnit > 0) {
-                list = simpleStudentUnitMapper.planSenioritySchool(area, school_name, study_paragraph, haveUnit, version);
+                list = simpleStudentUnitMapper.planSenioritySchool(area, schoolName, studyParagraph, haveUnit, version);
                 // 已做测试
             } else if (haveTest != null && haveTest > 0) {
-                list = simpleTestRecordMapper.planSenioritySchool(area, school_name, study_paragraph, haveTest, version);
+                list = simpleTestRecordMapper.planSenioritySchool(area, schoolName, studyParagraph, haveTest, version);
                 // 学习时长
             } else if (haveTime != null && haveTime > 0) {
-                list = simpleDurationMapper.planSenioritySchool(area, school_name, study_paragraph, haveTime, version);
+                list = simpleDurationMapper.planSenioritySchool(area, schoolName, studyParagraph, haveTime, version);
             }
 
             // 学校总参与人数
-            result.put("atNumber", simpleStudentMapper.schoolHeadcount(area, school_name, version));
+            result.put("atNumber", simpleStudentMapper.schoolHeadcount(area, schoolName, version));
 
             // 全国排行
         } else {
             // 已学单元
             if (haveUnit != null && haveUnit > 0) {
-                list = simpleStudentUnitMapper.planSeniorityNationwide(study_paragraph, haveUnit, version);
+                list = simpleStudentUnitMapper.planSeniorityNationwide(studyParagraph, haveUnit, version);
                 // 已做测试
             } else if (haveTest != null && haveTest > 0) {
-                list = simpleTestRecordMapper.planSeniorityNationwide(study_paragraph, haveTest, version);
+                list = simpleTestRecordMapper.planSeniorityNationwide(studyParagraph, haveTest, version);
                 // 学习时长
             } else if (haveTime != null && haveTime > 0) {
-                list = simpleDurationMapper.planSeniorityNationwide(study_paragraph, haveTime, version);
+                list = simpleDurationMapper.planSeniorityNationwide(studyParagraph, haveTime, version);
             }
 
             // 初中/高中总参与人数
-            result.put("atNumber", simpleStudentMapper.schoolHeadcountNationwide(study_paragraph, version));
+            result.put("atNumber", simpleStudentMapper.schoolHeadcountNationwide(studyParagraph, version));
 
         }
 

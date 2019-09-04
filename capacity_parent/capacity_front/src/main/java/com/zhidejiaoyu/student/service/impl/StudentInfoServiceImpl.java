@@ -796,7 +796,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
      * @param award
      * @param i
      */
-    static void setAwardState(int[] complete, int[] totalPlan, Award award, int i) {
+    private static void setAwardState(int[] complete, int[] totalPlan, Award award, int i) {
         if (complete[i] == totalPlan[i]) {
             // 当前任务完成
             award.setGetFlag(2);

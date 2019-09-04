@@ -200,7 +200,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         Long studentId = getStudentId(session);
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selSymbolByStudentId(studentId);
         if (capacityStudentUnit != null) {
-            if (!capacityStudentUnit.getUnitId().equals(unitId)) {
+            if (!capacityStudentUnit.getUnitId().equals(unitId.longValue())) {
                 capacityStudentUnit.setUnitId(unitId.longValue());
                 capacityStudentUnitMapper.updateById(capacityStudentUnit);
             }

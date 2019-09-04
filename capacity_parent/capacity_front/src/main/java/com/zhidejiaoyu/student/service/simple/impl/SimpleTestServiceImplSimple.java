@@ -846,7 +846,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     }
 
     @Override
-    public ServerResponse<Object> showRecord(String course_id, HttpSession session, Integer page, Integer rows) {
+    public ServerResponse<Object> showRecord(String courseId, HttpSession session, Integer page, Integer rows) {
         Student student = super.getStudent(session);
         Long studentId = student.getId();
 
