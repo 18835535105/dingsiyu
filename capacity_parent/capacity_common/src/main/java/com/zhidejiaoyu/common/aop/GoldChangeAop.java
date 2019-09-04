@@ -81,9 +81,7 @@ public class GoldChangeAop {
                 rankOpt.optGoldRank(student);
             }
         } catch (Exception e) {
-            if (student != null) {
-                log.error("学生[{} - {} - {}] 操作错误！", student.getId(), student.getAccount(), student.getStudentName(), e);
-            }
+            log.error("学生[{} - {} - {}] 操作错误！", student.getId(), student.getAccount(), student.getStudentName(), e);
         }
     }
 
