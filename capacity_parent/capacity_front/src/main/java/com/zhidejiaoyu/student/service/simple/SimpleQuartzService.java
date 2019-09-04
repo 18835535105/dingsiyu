@@ -47,7 +47,7 @@ public interface SimpleQuartzService {
     /**
      * 每天0：30给每一个冻结用户增加一天
      */
-    void updatFrozen();
+    void updateFrozen();
 
     /**
      * 每天早上2：0：0执行
@@ -75,4 +75,11 @@ public interface SimpleQuartzService {
      * @return
      */
     void initRankCache(Long studentId);
+
+    /**
+     * 每周一 00：05 删除所有学生定位信息
+     *
+     * @return
+     */
+    void deleteStudentLocation();
 }

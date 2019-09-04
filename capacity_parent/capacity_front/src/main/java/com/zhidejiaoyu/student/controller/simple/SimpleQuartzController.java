@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.simple.SimpleQuartzService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -72,4 +73,14 @@ public class SimpleQuartzController {
         return ServerResponse.createBySuccess();
     }
 
+    /**
+     * 每周一凌晨删除学生定位信息
+     *
+     * @return
+     */
+    @PostMapping("/deleteStudentLocation")
+    public ServerResponse deleteStudentLocation() {
+        this.simpleQuartzService.deleteStudentLocation();
+        return ServerResponse.createBySuccess();
+    }
 }
