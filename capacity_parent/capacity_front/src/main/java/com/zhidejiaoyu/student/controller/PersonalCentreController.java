@@ -31,9 +31,6 @@ public class PersonalCentreController extends BaseController {
     @Autowired
     private PersonalCentreService personalCentreService;
 
-    @Value("${domain}")
-    private String domain;
-
     @Autowired
     private SimpleDrawRecordServiceSimple drawRecordService;
 

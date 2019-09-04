@@ -62,16 +62,10 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     private VocabularyMapper vocabularyMapper;
 
     @Autowired
-    private UnitVocabularyMapper unitVocabularyMapper;
-
-    @Autowired
     private SentenceMapper sentenceMapper;
 
     @Autowired
     private UnitMapper unitMapper;
-
-    @Autowired
-    private UnitSentenceMapper unitSentenceMapper;
 
     @Autowired
     private StudentMapper studentMapper;
