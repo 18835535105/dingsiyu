@@ -775,7 +775,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
 
     @Override
     @Scheduled(cron = "0 0 0 * * ? ")
-    public void updateDailyAward() {
+    public void deleteDailyAward() {
         int localPort = ServiceInfoUtil.getPort();
         if (port != localPort) {
             return;
@@ -786,7 +786,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
     }
 
     @Override
-    @Scheduled(cron = "0 0 10 * * ? ")
+    @Scheduled(cron = "0 10 0 * * ? ")
     public void deleteDrawRedis() {
         int localPort = ServiceInfoUtil.getPort();
         if (port != localPort) {

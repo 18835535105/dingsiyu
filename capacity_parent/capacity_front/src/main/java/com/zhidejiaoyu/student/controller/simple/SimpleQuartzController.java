@@ -16,39 +16,80 @@ public class SimpleQuartzController {
     @Autowired
     private SimpleQuartzService simpleQuartzService;
 
-
-    @RequestMapping("/getQuartzTime")
-    public String getQuarzTime(){
-        simpleQuartzService.updateNews();
-        return "success";
-    }
-
     /**
-     * 定时更新班级月排行信息
-     *
+     * 更新题型消息中学生账号到期提醒
      *
      * @return
      */
-    @GetMapping("/updateClassMonthRank")
+    @PostMapping("/updateNews")
+    public ServerResponse updateNews() {
+        simpleQuartzService.updateNews();
+        return ServerResponse.createBySuccess();
+    }
+
+    /**
+     * 学生能量清零
+     *
+     * @return
+     */
+    @PostMapping("/updateEnergy")
+    public ServerResponse updateEnergy() {
+        this.simpleQuartzService.updateEnergy();
+        return ServerResponse.createBySuccess();
+    }
+
+    /**
+     * 冻结的学生每日增加有效期
+     *
+     * @return
+     */
+    @PostMapping("/updateFrozen")
+    public ServerResponse updateFrozen() {
+        this.simpleQuartzService.updateFrozen();
+        return ServerResponse.createBySuccess();
+    }
+
+    /**
+     * 记录学生当月的金币、勋章、膜拜次数排行信息
+     *
+     * @return
+     */
+    @PostMapping("/updateClassMonthRank")
     public ServerResponse<Object> updateClassMonthRank() {
         simpleQuartzService.updateClassMonthRank();
         return ServerResponse.createBySuccess();
     }
 
-    @GetMapping("/updateRank")
+    @PostMapping("/updateRank")
     public ServerResponse<Object> updateRank() {
         simpleQuartzService.updateRank();
         return ServerResponse.createBySuccess();
     }
 
     @GetMapping("/updateStudentExpansion")
-    public void updateStudentExpansion(){
-       simpleQuartzService.updateStudentExpansion();
+    public void updateStudentExpansion() {
+        simpleQuartzService.updateStudentExpansion();
     }
 
-    @GetMapping("/deleteSessionMap")
+    @PostMapping("/deleteSessionMap")
     public void deleteSessionMap() {
         simpleQuartzService.deleteSessionMap();
+    }
+
+    /**
+     * 删除学生日奖励信息
+     */
+    @PostMapping
+    public void deleteDailyAward() {
+        this.simpleQuartzService.deleteDailyAward();
+    }
+
+    /**
+     * 删除抽奖基数
+     */
+    @PostMapping
+    public void deleteDrawRedis() {
+        this.simpleQuartzService.deleteDrawRedis();
     }
 
     /**

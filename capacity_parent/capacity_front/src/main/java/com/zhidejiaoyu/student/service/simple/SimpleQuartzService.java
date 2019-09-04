@@ -40,12 +40,12 @@ public interface SimpleQuartzService {
     void updateEnergy();
 
     /**
-     * 每月最后一天23：00：00记录学生当月的金币排行信息
+     * 每月 1 号 00：05：00 记录学生当月的金币、勋章、膜拜次数排行信息
      */
     void updateClassMonthRank();
 
     /**
-     * 每天0：30给每一个冻结用户增加一天
+     * 每天0：30给每一个冻结用户有效期增加一天
      */
     void updateFrozen();
 
@@ -57,7 +57,7 @@ public interface SimpleQuartzService {
     /**
      * 每天早上00:00更新日奖励
      */
-    void updateDailyAward();
+    void deleteDailyAward();
 
 
      void deleteDrawRedis();
