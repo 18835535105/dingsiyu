@@ -82,9 +82,6 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     private StudentMapper studentMapper;
 
     @Autowired
-    private LevelMapper levelMapper;
-
-    @Autowired
     private CcieMapper ccieMapper;
 
     @Autowired
@@ -92,12 +89,6 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
 
     @Autowired
     private TestRecordMapper testRecordMapper;
-
-    @Autowired
-    private WorshipMapper worshipMapper;
-
-    @Autowired
-    private RunLogMapper runLogMapper;
 
     @Autowired
     private PayLogMapper payLogMapper;
@@ -116,86 +107,6 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
 
     @Autowired
     private RestTemplate restTemplate;
-
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
-
-    @Override
-    public ServerResponse<Object> personalIndex(HttpSession session) {
-        Map<String, Object> map = new HashMap<>(16);
-        // 获取当前学生信息
-        Student student = getStudent(session);
-        Long id = student.getId();
-        map.put("name", student.getStudentName());
-        map.put("headUrl", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
-
-        // 判断有哪些模块有未处理的信息
-        redPoint(map, id);
-
-        // 我的总金币
-        Double myGoldD = studentMapper.myGold(id);
-        BigDecimal mybd = new BigDecimal(myGoldD).setScale(0, BigDecimal.ROUND_HALF_UP);
-        int myGold = Integer.parseInt(mybd.toString());
-        // 根据金币获取等级名
-        String levelName = learnMapper.getLevelNameByGold(myGold);
-        map.put("levelName", levelName);
-
-        return ServerResponse.createBySuccess(map);
-    }
-
-    /**
-     * 判断有哪些模块有需要处理的消息
-     *
-     * @param map
-     * @param studentId
-     */
-    private void redPoint(Map<String, Object> map, Long studentId) {
-        // 消息中心是否有未读消息
-        unReadNews(map, studentId);
-
-        // 我的证书是否有未查阅的证书
-        myCcie(map, studentId);
-
-        // 查看留言反馈是否有未查看的回复
-        myFeedBack(map, studentId);
-    }
-
-    private void myFeedBack(Map<String, Object> map, Long studentId) {
-        MessageBoardExample messageBoardExample = new MessageBoardExample();
-        MessageBoardExample.Criteria criteria = messageBoardExample.createCriteria();
-        criteria.andReadFlagEqualTo(3).andStudentIdEqualTo(studentId);
-        int i = messageBoardMapper.countByExample(messageBoardExample);
-        if (i == 0) {
-            map.put("messageRead", false);
-        } else {
-            map.put("messageRead", true);
-        }
-    }
-
-    private void myCcie(Map<String, Object> map, Long studentId) {
-        CcieExample ccieExample = new CcieExample();
-        CcieExample.Criteria criteria = ccieExample.createCriteria();
-        criteria.andStudentIdEqualTo(studentId).andReadFlagEqualTo(0);
-        int i = ccieMapper.countByExample(ccieExample);
-        if (i == 0) {
-            map.put("ccieRead", false);
-        } else {
-            map.put("ccieRead", true);
-        }
-    }
-
-    private void unReadNews(Map<String, Object> map, Long studentId) {
-        NewsExample example = new NewsExample();
-        example.createCriteria().andStudentidEqualTo(studentId).andReadEqualTo(2);
-        int i = newsMapper.countByExample(example);
-        if (i == 0) {
-            // 不在未读消息
-            map.put("read", false);
-        } else {
-            // 存在未读消息
-            map.put("read", true);
-        }
-    }
 
     /**
      * 消息通知

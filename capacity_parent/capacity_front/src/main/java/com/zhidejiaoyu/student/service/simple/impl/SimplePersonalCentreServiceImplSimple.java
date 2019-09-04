@@ -76,13 +76,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
     private SimpleUnitMapper unitMapper;
 
     @Autowired
-    private SimpleUnitSentenceMapper simpleUnitSentenceMapper;
-
-    @Autowired
     private SimpleStudentMapper simpleStudentMapper;
-
-    @Autowired
-    private SimpleTeacherMapper simpleTeacherMapper;
 
     @Autowired
     private SimpleCcieMapper ccieMapper;
@@ -103,25 +97,13 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
     private SimpleWorshipMapper worshipMapper;
 
     @Autowired
-    private SimpleRunLogMapper runLogMapper;
-
-    @Autowired
     private SimpleMessageBoardMapper simpleMessageBoardMapper;
 
     @Autowired
     private SimpleAwardMapper simpleAwardMapper;
 
     @Autowired
-    private SimpleGradeMapper simpleGradeMapper;
-
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
-
-    @Autowired
     private RedisOpt redisOpt;
-
-    @Autowired
-    private SimpleRankingMapper simpleRankingMapper;
 
     @Autowired
     private ExecutorService executorService;
@@ -147,36 +129,32 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         redPoint(map, id);
 
         // 获取我的总金币
-        Double myGoldD = simpleStudentMapper.myGold(id);
-        BigDecimal mybd = new BigDecimal(myGoldD).setScale(0, BigDecimal.ROUND_HALF_UP);
-        int myGold = Integer.parseInt(mybd.toString());
+        int myGold = (int) BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
         map.put("myGold", myGold);
 
         // 获取等级规则
         List<Map<String, Object>> levels = redisOpt.getAllLevel();
 
         // 我的等级myChildName
-        int myrecord = 0;
-        int myauto = 1;
+        int myRecord = 0;
+        int myAuto = 1;
 
         for (int i = 0; i < levels.size(); i++) {
             // 循环的当前等级分数
             int levelGold = (int) levels.get(i).get("gold");
             // 下一等级分数
-            int xlevelGold = (int) levels.get((i + 1) < levels.size() ? (i + 1) : i).get("gold");
-            // 下一等级索引
-            int si = (i + 1) < levels.size() ? (i + 1) : i;
+            int nextLevelGold = (int) levels.get((i + 1) < levels.size() ? (i + 1) : i).get("gold");
 
-            if (myGold >= myrecord && myGold < xlevelGold) {
+            if (myGold >= myRecord && myGold < nextLevelGold) {
                 // 我的等级
                 map.put("levelName", levels.get(i).get("child_name"));
                 break;
                 // 等级循环完还没有确定等级 = 最高等级
-            } else if (myauto == levels.size()) {
+            } else if (myAuto == levels.size()) {
                 break;
             }
-            myrecord = levelGold;
-            myauto++;
+            myRecord = levelGold;
+            myAuto++;
         }
 
         return ServerResponse.createBySuccess(map);
@@ -189,9 +167,6 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
      * @param studentId
      */
     private void redPoint(Map<String, Object> map, Long studentId) {
-        // 消息中心是否有未读消息
-        unReadNews(map, studentId);
-
         // 我的证书是否有未查阅的证书
         myCcie(map, studentId);
 
@@ -230,13 +205,6 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         ccieEntityWrapper.eq("student_id", studentId).eq("read_flag", 0);
         int i = ccieMapper.selectCount(ccieEntityWrapper);
         map.put("ccieRead", i);
-    }
-
-    private void unReadNews(Map<String, Object> map, Long studentId) {
-        NewsExample example = new NewsExample();
-        example.createCriteria().andStudentidEqualTo(studentId).andReadEqualTo(2);
-        int i = simpleNewsMapper.countByExample(example);
-        map.put("read", i);
     }
 
     /**

@@ -1,17 +1,14 @@
 package com.zhidejiaoyu.student.service;
 
-import javax.servlet.http.HttpSession;
-
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
+import javax.servlet.http.HttpSession;
 import java.text.ParseException;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 消息中心
- * 
+ *
  * @author qizhentao
  * @version 1.0
  */
@@ -21,16 +18,14 @@ public interface PersonalCentreService extends BaseService<Student> {
 
 	ServerResponse<String> newsupdate(HttpSession session, Integer state, Integer[] id);
 
-	ServerResponse<Object> personalIndex(HttpSession session);
-
 	/**
-	 * 消息中心-每周时长页面信息 
+	 * 消息中心-每周时长页面信息
 	 *
 	 * @param session
 	 * @return
 	 */
 	ServerResponse<Object> weekDurationIndex(HttpSession session);
-	
+
 	/**
 	 * 我的报告
 	 *  2.每周学习量
@@ -51,7 +46,7 @@ public interface PersonalCentreService extends BaseService<Student> {
 	 * @param session
 	 * @param courseId 课程id
 	 * @param model 模块: 1=慧记忆，2=慧听写，3=慧默写，4=例句听力，5=例句翻译，6=例句默写
-	 * @param unitNumber 第几个单元 
+	 * @param unitNumber 第几个单元
 	 * @return
 	 */
 	ServerResponse<Object> courseStatisticsCount(HttpSession session, Integer courseId, Integer model,

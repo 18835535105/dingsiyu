@@ -50,7 +50,7 @@ public class PersonalCentreController extends BaseController {
      */
     @RequestMapping("/personal")
     public ServerResponse<Object> personalIndex(HttpSession session) {
-        return personalCentreService.personalIndex(session);
+        return simplePersonalCentreServiceSimple.personalIndex(session);
     }
 
     /**
