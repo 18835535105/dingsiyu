@@ -2,7 +2,6 @@ package com.zhidejiaoyu.student.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
@@ -19,20 +18,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 消息中心
@@ -500,54 +495,6 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         resultMapAll.put("dataList", result);
 
         return ServerResponse.createBySuccess(resultMapAll);
-    }
-
-    /**
-     * 我的报告
-     * 3.课程统计
-     * 点击某个课程某个模块下的某个单元 显示 已学/单词总量
-     *
-     * @param session
-     * @param courseId   课程id
-     * @param unitNumber 第几个单元
-     * @param model      模块: 1=慧记忆，2=慧听写，3=慧默写，4=例句听力，5=例句翻译，6=例句默写
-     * @return 所选单元已学单词数量 / 单元单词总量
-     */
-    @Override
-    public ServerResponse<Object> courseStatisticsCount(HttpSession session, Integer courseId, Integer model,
-                                                        Integer unitNumber) {
-        Map<String, Object> result = new HashMap<String, Object>();
-
-        // 获取当前学生id
-        Long studentId = StudentIdBySession(session);
-
-        // 获取单元id
-        Map<String, Object> mapDate = unitMapper.getUnitIdByCourseIdAndUnitNumber(courseId, unitNumber);
-        Long unitId = (Long) mapDate.get("id");
-
-        // 课程名方式1
-        result.put("courseNameOne", mapDate.get("course_name"));
-        // 课程名方式2
-        result.put("courseNameTwo", mapDate.get("version") + "-" + mapDate.get("label"));
-
-        // 查询单元下边有多少已学单词
-        Integer learnWord = learnMapper.countByWord(studentId, unitId, model);
-        // 已学单词/例句
-        result.put("yet", learnWord);
-
-        if (model < 4) {
-            // 查询单元下边有多少单词
-            Long countByWord = unitVocabularyMapper.selectWordCountByUnitId(unitId);
-            // 单元总单词/例句量
-            result.put("count", countByWord);
-        } else {
-            // 查询单元下边有多少例句
-            int countBySentence = unitSentenceMapper.countByUnitId(unitId);
-            // 单元总单词/例句量
-            result.put("count", countBySentence);
-        }
-
-        return ServerResponse.createBySuccess(result);
     }
 
     @Override
