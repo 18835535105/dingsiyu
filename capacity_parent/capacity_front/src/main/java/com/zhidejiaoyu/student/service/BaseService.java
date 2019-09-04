@@ -60,8 +60,6 @@ public interface BaseService<T> extends IService<T> {
      */
     StudyFlow getCurrentStudyFlow(Long studentId);
 
-    void isStudentEx(Student student);
-
     /**
      * 保存运行日志
      *

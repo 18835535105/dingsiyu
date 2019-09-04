@@ -9,7 +9,9 @@ import org.apache.ibatis.annotations.Select;
 
 import com.zhidejiaoyu.common.pojo.Level;
 import com.zhidejiaoyu.common.pojo.LevelExample;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface LevelMapper extends BaseMapper<Level> {
     int countByExample(LevelExample example);
 

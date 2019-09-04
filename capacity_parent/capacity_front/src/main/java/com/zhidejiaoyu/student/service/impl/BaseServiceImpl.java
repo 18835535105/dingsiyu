@@ -132,28 +132,6 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         return studyFlowMapper.selectCurrentFlowByStudentId(studentId);
     }
 
-    /**
-     * 判断扩展表信息是否已有  如果没有添加
-     */
-    @Override
-    public void isStudentEx(Student student) {
-        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
-        if (studentExpansion == null) {
-            List<Map<String, Object>> levels = redisOpt.getAllLevel();
-            Double gold = student.getSystemGold() + student.getOfflineGold();
-            int level = getLevel(gold.intValue(), levels);
-            Integer study = levelMapper.getStudyById(level);
-            studentExpansion = new StudentExpansion();
-            studentExpansion.setStudentId(student.getId());
-            studentExpansion.setAudioStatus(1);
-            studentExpansion.setStudyPower(study);
-            studentExpansion.setLevel(level);
-            studentExpansion.setIsLook(2);
-            studentExpansion.setPkExplain(1);
-            studentExpansionMapper.insert(studentExpansion);
-        }
-    }
-
     @Override
     public void saveRunLog(Student student, Integer type, Long courseId, Long unitId, String msg) {
         saveRunLog.saveRunLog(student, type, courseId, unitId, msg);
@@ -210,31 +188,28 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         return addEnergy;
     }
 
-
-    private int getLevel(Integer myGold, List<Map<String, Object>> levels) {
+    int getLevel(Integer myGold, List<Map<String, Object>> levels) {
         int level = 0;
         if (myGold >= 50) {
-            int myrecord = 0;
-            int myauto = 1;
+            int myRecord = 0;
+            int myAuto = 1;
             for (int i = 0; i < levels.size(); i++) {
                 // 循环的当前等级分数
                 int levelGold = (int) levels.get(i).get("gold");
                 // 下一等级分数
-                int xlevelGold = (int) levels.get((i + 1) < levels.size() ? (i + 1) : i).get("gold");
+                int nextLevelGold = (int) levels.get((i + 1) < levels.size() ? (i + 1) : i).get("gold");
 
-                if (myGold >= myrecord && myGold < xlevelGold) {
+                if (myGold >= myRecord && myGold < nextLevelGold) {
                     level = i + 1;
                     break;
                     // 等级循环完还没有确定等级 = 最高等级
-                } else if (myauto == levels.size()) {
+                } else if (myAuto == levels.size()) {
                     level = i + 1;
                     break;
                 }
-                myrecord = levelGold;
-                myauto++;
+                myRecord = levelGold;
+                myAuto++;
             }
-            myrecord = 0;
-            myauto = 0;
         } else {
             level = 1;
         }

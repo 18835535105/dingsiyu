@@ -113,6 +113,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private ExecutorService executorService;
 
     @Autowired
+    private LevelMapper levelMapper;
+
+    @Autowired
     private LocationUtil locationUtil;
 
     @Autowired
@@ -661,10 +664,8 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 记录登录信息
             String ip = saveLoginRunLog(stu, request);
 
-            isStudentEx(stu);
-
-            // 当日首次登陆奖励5金币（日奖励）
-            saveDailyAward(stu);
+            // 每日首次登陆需要初始化的内容
+            initFirstLogin(stu);
 
             // 一个账户只能登陆一台
             judgeMultipleLogin(session, stu);
@@ -830,16 +831,36 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             student.setAccountTime(new Date(System.currentTimeMillis() + student.getRank() * 24 * 60 * 60 * 1000L));
             studentMapper.updateById(student);
 
-
             executorService.execute(() -> {
                 // 初始化学生勋章信息
                 dailyAwardAsync.initAward(student);
 
                 // 初始化学生排行数据
                 initRankInfo(student);
+
+                initStudentExpansion(student);
             });
+        }
+    }
 
-
+    /**
+     * 判断扩展表信息是否已有  如果没有添加
+     */
+    private void initStudentExpansion(Student student) {
+        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
+        if (studentExpansion == null) {
+            List<Map<String, Object>> levels = redisOpt.getAllLevel();
+            double gold = student.getSystemGold() + student.getOfflineGold();
+            int level = super.getLevel((int) gold, levels);
+            Integer study = levelMapper.getStudyById(level);
+            studentExpansion = new StudentExpansion();
+            studentExpansion.setStudentId(student.getId());
+            studentExpansion.setAudioStatus(1);
+            studentExpansion.setStudyPower(study);
+            studentExpansion.setLevel(level);
+            studentExpansion.setIsLook(2);
+            studentExpansion.setPkExplain(1);
+            studentExpansionMapper.insert(studentExpansion);
         }
     }
 
@@ -870,18 +891,26 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     public static void main(String[] args) {
-        System.out.println(DateTimeFormat.forPattern(DateUtil.YYYYMMDDHHMMSS).print(System.currentTimeMillis()));
+        Long l1 = 1L;
+        Integer i1 = 1;
+        Long l2 = 1L;
+//        System.out.println(l1.equals(i1));
+//        System.out.println(l1.equals(l2));
     }
 
     /**
-     * 学生当天首次登陆奖励5金币，并计入日奖励信息
+     * 每日首次登陆需要初始化的内容
      *
      * @param stu
      */
-    private void saveDailyAward(Student stu) {
+    private void initFirstLogin(Student stu) {
         int count = runLogMapper.countStudentTodayLogin(stu);
         if (count <= 1) {
             executorService.execute(() -> {
+
+                // 招生账号每日首次登陆初始化 50 个能量供体验抽奖
+                this.addEnergy(stu);
+
                 // 每日首次登陆日奖励
                 dailyAwardAsync.firstLogin(stu);
 
@@ -897,6 +926,19 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 // 资深队员勋章
                 medalAwardAsync.oldMan(stu);
             });
+        }
+    }
+
+    /**
+     * 招生账号每日首次登陆初始化 50 个能量供体验抽奖
+     *
+     * @param stu
+     */
+    private void addEnergy(Student stu) {
+        // 是招生账号
+        if (Objects.equals(stu.getRole(), 4)) {
+            stu.setEnergy(50);
+            this.studentMapper.updateById(stu);
         }
     }
 
@@ -1029,7 +1071,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
         //判断是否有句型，课文课程
         if (type.equals(2) || type.equals(3)) {
-            List<Map<String, Object>> maps = null;
+            List<Map<String, Object>> maps;
             if (type == 2) {
                 maps = studentStudyPlanMapper.selBySentenceStudentId(student.getId(), type);
             } else {
@@ -1075,11 +1117,10 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             return ServerResponse.createBySuccess(map);
         }
         String adminAccount = null;
-        String teacherAccount = null;
         boolean falg = false;
         if (student.getTeacherId() != null) {
             SysUser sysUser = sysUserMapper.selectById(student.getTeacherId());
-            if (sysUser.getAccount().indexOf("xg") != -1) {
+            if (sysUser.getAccount().contains("xg")) {
                 adminAccount = sysUser.getAccount();
             } else {
                 if (sysUser.getAccount() != null) {

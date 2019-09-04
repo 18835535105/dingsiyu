@@ -26,7 +26,7 @@ public class Student extends Model<Student> {
 
     @TableId(type = IdType.AUTO)
     private Long id;
-    
+
     /**
      * 老师id
      */
@@ -212,7 +212,7 @@ public class Student extends Model<Student> {
     private Date updateTime;
 
     /**
-     * 角色，1：普通学生用户；2：业务用户
+     * 角色，1：清学版用户 ; 2：智能版学生用户；3：业务用户；4：福利账号（招生账号）
      */
     private Integer role;
 
