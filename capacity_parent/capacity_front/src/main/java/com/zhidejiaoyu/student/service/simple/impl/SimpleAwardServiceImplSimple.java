@@ -298,7 +298,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
 
         if (ranking != null) {
             // 膜拜班级排行变化名次
-            if (ranking.getWorshipClassRank() != null) {
+            if (ranking.getWorshipClassRank() != null && classRank != -1) {
                 long change = ranking.getWorshipClassRank() - classRank;
                 map.put("worshipClassRank", change);
                 map.put("isClass", change != 0);
@@ -308,7 +308,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
             }
 
             // 膜拜学校排行变化名次
-            if (ranking.getWorshipSchoolRank() != null) {
+            if (ranking.getWorshipSchoolRank() != null && schoolRank != -1) {
                 long change = ranking.getWorshipSchoolRank() - schoolRank;
                 map.put("worshipSchoolRank", change);
                 map.put("isSchool", change != 0);
@@ -318,7 +318,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
             }
 
             // 膜拜全校排行变化名次
-            if (ranking.getWorshipCountryRank() != null) {
+            if (ranking.getWorshipCountryRank() != null && countryRank != -1) {
                 long change = ranking.getWorshipCountryRank() - countryRank;
                 map.put("worshipCountryRank", change);
                 map.put("isCountry", change != 0);

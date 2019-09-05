@@ -922,7 +922,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
      */
     private Object getMyRanking(Student student, String key) {
         long rank = rankOpt.getRank(key, student.getId());
-        return rank > 99 || rank == -1 ? "未上榜" : rank + 1;
+        return rank > 99 || rank == -1 ? "未上榜" : rank;
     }
 
     private long getTotalPages(Integer rows, long number) {

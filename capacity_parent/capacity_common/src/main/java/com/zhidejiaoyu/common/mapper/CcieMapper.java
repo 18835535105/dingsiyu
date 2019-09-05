@@ -8,11 +8,13 @@ import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+@Repository
 public interface CcieMapper extends BaseMapper<Ccie> {
     int countByExample(CcieExample example);
 

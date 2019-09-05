@@ -5,10 +5,12 @@ import com.zhidejiaoyu.common.pojo.Medal;
 import com.zhidejiaoyu.common.pojo.Student;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 
+@Repository
 public interface SimpleMedalMapper extends BaseMapper<Medal> {
     /**
      * 查询每个勋章大类含有的子勋章个数

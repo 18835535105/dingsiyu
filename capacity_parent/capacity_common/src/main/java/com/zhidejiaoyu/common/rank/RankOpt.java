@@ -173,7 +173,7 @@ public class RankOpt {
      */
     public long getRank(String key, Long member) {
         Long rank = redisTemplate.opsForZSet().reverseRank(key, member);
-        return rank == null ? -1 : rank;
+        return rank == null ? -1 : rank + 1;
     }
 
     /**

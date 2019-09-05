@@ -5,10 +5,12 @@ import com.zhidejiaoyu.common.pojo.Worship;
 import com.zhidejiaoyu.common.pojo.WorshipExample;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 
+@Repository
 public interface SimpleWorshipMapper {
     int countByExample(WorshipExample example);
 

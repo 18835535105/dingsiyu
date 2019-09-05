@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.AwardContentType;
 import com.zhidejiaoyu.common.pojo.AwardContentTypeExample;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface SimpleAwardContentTypeMapper extends BaseMapper<AwardContentType> {
     int countByExample(AwardContentTypeExample example);
 
