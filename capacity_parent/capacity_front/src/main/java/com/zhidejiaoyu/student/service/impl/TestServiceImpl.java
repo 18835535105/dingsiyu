@@ -218,6 +218,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setTestStartTime(gameStartTime);
         testRecord.setTestEndTime(new Date());
         testRecord.setGenre("学前游戏测试");
+        testRecord.setStudyModel("学前游戏测试");
         testRecord.setQuantity(20);
 
         // 查看当前学生是否已经有游戏测试记录
