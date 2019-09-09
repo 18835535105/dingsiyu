@@ -1012,7 +1012,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             }
             List<Integer> list = new ArrayList<>();
             for (int i = 0; i < s.length; i++) {
-                if (s[i].contains("#") && s[i].contains("$")) {
+                if (!s[i].contains("#") && !s[i].contains("$")) {
                     list.add(i);
                 }
             }
@@ -1214,7 +1214,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private int changeInteger(List<String> sentenceList) {
         List<Integer> list = new ArrayList<>();
         for (int i = 0; i < sentenceList.size(); i++) {
-            if (sentenceList.get(i).contains("#") && sentenceList.get(i).contains("$")) {
+            if (!sentenceList.get(i).contains("#") && !sentenceList.get(i).contains("$")) {
                 if (Pattern.matches(END_MATCH, sentenceList.get(i)) && Pattern.matches(START_MATCH, sentenceList.get(i))) {
                     list.add(i);
                 }
