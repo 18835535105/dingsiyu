@@ -66,10 +66,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      */
     private static final int SIX = 60;
     /**
-     * 70分
-     */
-    private static final int SEVENTY = 70;
-    /**
      * 80分
      */
     private static final int PASS = 80;
