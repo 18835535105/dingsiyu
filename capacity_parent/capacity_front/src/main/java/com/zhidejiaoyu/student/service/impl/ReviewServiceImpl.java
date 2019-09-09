@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.service.impl;
 
-import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
@@ -1626,7 +1625,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         int gold = 0;
         if (point < 90 && point >= 80) {
             // 奖励2金币
-            gold = testRecord.getBetterCount() * TestAwardGoldConstant.TEST_CENTER_ENGHTY_TO_NINETY;
+            gold = testRecord.getBetterCount() * TestAwardGoldConstant.TEST_CENTER_EIGHTY_TO_NINETY;
         } else if (point >= 90 && point <= 100) {
             // 奖励5枚金币
             gold = testRecord.getBetterCount() * TestAwardGoldConstant.TEST_CENTER_NINETY_TO_FULL;

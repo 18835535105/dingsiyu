@@ -16,7 +16,7 @@ import com.zhidejiaoyu.common.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
-import com.zhidejiaoyu.common.constant.study.StudyModelContant;
+import com.zhidejiaoyu.common.constant.study.StudyModelConstant;
 import com.zhidejiaoyu.common.constant.study.TestGenreConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
@@ -1531,7 +1531,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         // 判断是否是首次测试
         boolean isFirst = false;
         TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
-                dto.getUnitId(), TestGenreConstant.UNIT_TEST.getGenre(), PhoneticSymbolServiceImpl.STUDY_MODEL);
+                dto.getUnitId(), TestGenreConstant.UNIT_TEST, PhoneticSymbolServiceImpl.STUDY_MODEL);
         if (testRecord != null) {
             isFirst = true;
         }
@@ -1541,7 +1541,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord = new TestRecord();
         testRecord.setStudentId(student.getId());
         testRecord.setUnitId(dto.getUnitId());
-        testRecord.setGenre(TestGenreConstant.UNIT_TEST.getGenre());
+        testRecord.setGenre(TestGenreConstant.UNIT_TEST);
         testRecord.setTestEndTime(new Date());
         testRecord.setTestStartTime(beginTime == null ? new Date() : (Date) beginTime);
         testRecord.setPoint(point);
@@ -1550,7 +1550,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setQuantity(dto.getRightCount() + dto.getErrorCount());
         testRecord.setErrorCount(dto.getErrorCount());
         testRecord.setRightCount(dto.getRightCount());
-        testRecord.setStudyModel(StudyModelContant.PHONETIC_SYMBOL_TEST.getModel());
+        testRecord.setStudyModel(StudyModelConstant.PHONETIC_SYMBOL_TEST);
 
         WordUnitTestDTO wordUnitTestDTO = new WordUnitTestDTO();
         wordUnitTestDTO.setClassify(11);
@@ -1564,7 +1564,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setExplain(message);
 
         vo.setMsg(message);
-        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, TestGenreConstant.UNIT_TEST.getGenre()));
+        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, TestGenreConstant.UNIT_TEST));
         vo.setGold(getBonusGold(student, goldCount));
         //获取测试有效次数
         int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),

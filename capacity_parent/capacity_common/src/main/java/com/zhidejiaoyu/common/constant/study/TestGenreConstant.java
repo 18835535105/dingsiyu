@@ -6,21 +6,7 @@ package com.zhidejiaoyu.common.constant.study;
  * @author wuchenxi
  * @date 2019-05-21
  */
-@SuppressWarnings("all")
-public enum  TestGenreConstant {
+public class TestGenreConstant {
 
-    UNIT_TEST("单元闯关测试");
-
-    private String genre;
-
-    TestGenreConstant(String genre) {
-        this.genre = genre;
-    }
-    public String getGenre() {
-        return genre;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
+    public static final String UNIT_TEST = "单元闯关测试";
 }

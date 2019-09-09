@@ -22,9 +22,10 @@ public class TestAwardGoldConstant {
 	public static final int FLOW_TEST_NINETY_TO_FULL = 10;
 
     /**
-     * 单元闯关测试分数 单元闯关测试分数  point >= 80 && point < 100
+     * 单元闯关测试分数  point >= 80 && point < 100
      */
-    public static final int UNIT_TEST_EIGHTY_TO_FULL = 2;
+    public static final int UNIT_TEST_EIGHTY_TO_FULL = 3;
+
 	/**
      * 单元闯关测试分数 point >= 60 && point < 70
      */
@@ -57,7 +58,7 @@ public class TestAwardGoldConstant {
     /**
      * 生词测试，熟词测试，已学测试 分数 point >= 80 && point < 90
      */
-    public static final int TEST_CENTER_ENGHTY_TO_NINETY = 2;
+    public static final int TEST_CENTER_EIGHTY_TO_NINETY = 2;
     /**
      * 生词测试，熟词测试，已学测试 分数 point >= 90 && point <= 100
      */
