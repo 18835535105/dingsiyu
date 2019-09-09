@@ -15,6 +15,7 @@ import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
 import com.zhidejiaoyu.common.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.constant.study.StudyModelContant;
 import com.zhidejiaoyu.common.constant.study.TestGenreConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
@@ -358,23 +359,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             integer = 0;
         }
         //获取历史最高分
-        Integer goldCount = 0;
+        int goldCount = 0;
         if (point > integer) {
-            if (integer <= point) {
-                if (point < SIX) {
-                    goldCount = 0;
-                } else if (point < SEVENTY) {
-                    goldCount = TestAwardGoldConstant.UNIT_TEST_SIXTY_TO_SEVENTY;
-                } else if (point < PASS) {
-                    goldCount = TestAwardGoldConstant.UNIT_TEST_SEVENTY_TO_EIGHTY;
-                } else if (point < NINETY_POINT) {
-                    goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_NINETY;
-                } else if (point < FULL_MARK) {
-                    goldCount = TestAwardGoldConstant.UNIT_TEST_NINETY_TO_FULL;
-                } else {
-                    goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
-                }
-            }
+            goldCount = this.getGold(point);
             this.saveLog(student, goldCount, null, "字母单元闯关测试");
             if (student.getBonusExpires() != null) {
                 if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
@@ -400,6 +387,24 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         return ServerResponse.createBySuccess(vo);
     }
 
+    private int getGold(Integer point) {
+        int goldCount;
+        if (point < PointConstant.SIXTY) {
+            goldCount = 0;
+        } else if (point < PointConstant.SEVENTY) {
+            goldCount = TestAwardGoldConstant.UNIT_TEST_SIXTY_TO_SEVENTY;
+        } else if (point < PointConstant.EIGHTY) {
+            goldCount = TestAwardGoldConstant.UNIT_TEST_SEVENTY_TO_EIGHTY;
+        } else if (point < PointConstant.NINETY) {
+            goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_NINETY;
+        } else if (point < PointConstant.HUNDRED) {
+            goldCount = TestAwardGoldConstant.UNIT_TEST_NINETY_TO_FULL;
+        } else {
+            goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
+        }
+        return goldCount;
+    }
+
     @Override
     public Object getLetterAfterLearning(HttpSession session, Long unitId) {
         // 设置游戏测试开始时间
@@ -408,7 +413,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         List<Letter> letters = letterMapper.getAllLetter();
         //打乱顺序
         Collections.shuffle(letters);
-        List<Map<String, Object>> returnList = new ArrayList<>();
         //获取字母配对试题
         List<Letter> letterPairList = letters.subList(0, 10);
         List<Map<String, Object>> pairList = new ArrayList<>();
@@ -417,7 +421,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             getLetterPair(letterPairMap, letter);
             pairList.add(letterPairMap);
         }
-        returnList.addAll(pairList);
+        List<Map<String, Object>> returnList = new ArrayList<>(pairList);
         //获取字母辨音试题
         List<Letter> letterDiscriminationList = letters.subList(10, 20);
         List<Map<String, Object>> discriminationList = new ArrayList<>();
@@ -451,24 +455,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
         getUnitTestMsg(testRecord, testRecord.getPoint());
         Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 12);
-        Integer goldCount = 0;
+        int goldCount = 0;
         if (integer == null || integer <= 0) {
             integer = 0;
         }
         if (integer < point) {
-            if (point < SIX) {
-                goldCount = 0;
-            } else if (point < SEVENTY) {
-                goldCount = TestAwardGoldConstant.UNIT_TEST_SIXTY_TO_SEVENTY;
-            } else if (point < PASS) {
-                goldCount = TestAwardGoldConstant.UNIT_TEST_SEVENTY_TO_EIGHTY;
-            } else if (point < NINETY_POINT) {
-                goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_NINETY;
-            } else if (point < FULL_MARK) {
-                goldCount = TestAwardGoldConstant.UNIT_TEST_NINETY_TO_FULL;
-            } else {
-                goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
-            }
+            goldCount = this.getGold(point);
         }
         this.saveLog(student, goldCount, null, "字母学后测试");
         if (student.getBonusExpires() != null) {
@@ -498,7 +490,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @GoldChangeAnnotation
     @TestChangeAnnotation(isUnitTest = false)
     public Object saveReadTest(HttpSession session, TestRecord testRecord) {
-        Student student = getStudent(session);
+        Student student = super.getStudent(session);
         Integer point = testRecord.getPoint();
         testRecord.setStudentId(student.getId());
         testRecord.setGenre("单元闯关测试");
@@ -506,12 +498,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
         getUnitTestMsg(testRecord, testRecord.getPoint());
         Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 13);
-        Integer gold=0;
-        Integer energy=0;
+        int gold = 0;
+        int energy = 0;
         if (integer != null && integer < 60) {
             if (point >= 60) {
-                gold=5;
-                energy=2;
+                gold = 5;
+                energy = 2;
                 this.saveLog(student, gold, null, "阅读测试");
                 studentMapper.updateById(student);
             }
@@ -895,19 +887,19 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             englishToChinese = vocabularies.subList(0, 10);
             results = testResultUtil.getWordTestes(type, englishToChinese.size(), englishToChinese, student.getVersion(), phase);
         } catch (Exception e) {
-            log.error("摸底测试单词不足10个！", e.getMessage());
+            log.error("摸底测试单词不足10个！", e);
         }
         try {
             chineseToEnglish = vocabularies.subList(10, 20);
             results1 = testResultUtil.getWordTestes(type1, chineseToEnglish.size(), chineseToEnglish, student.getVersion(), phase);
         } catch (Exception e) {
-            log.error("摸底测试单词不足20个！", e.getMessage());
+            log.error("摸底测试单词不足20个！", e);
         }
         try {
             listen = vocabularies.subList(20, 30);
             results2 = testResultUtil.getWordTestes(type2, listen.size(), listen, student.getVersion(), phase);
         } catch (Exception e) {
-            log.error("摸底测试单词不足30个！", e.getMessage());
+            log.error("摸底测试单词不足30个！", e);
         }
 
         results.forEach(testResult -> testResult.setType(type[0]));
@@ -939,12 +931,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
 
         // 需要封装的测试题个数
-        int subjectNum;
-        if (vocabularies.size() < 20) {
-            subjectNum = vocabularies.size();
-        } else {
-            subjectNum = 20;
-        }
+        int subjectNum = Math.min(vocabularies.size(), 20);
 
         List<TestResult> results = testResultUtil.getWordTestesForUnit(type, subjectNum, vocabularies, unitId);
         if (!"慧记忆".equals(studyModel)) {
@@ -1177,7 +1164,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      */
     private String getUseTime(String useTime) {
         if (!StringUtils.isEmpty(useTime)) {
-            int intUseTime = Integer.valueOf(useTime);
+            int intUseTime = Integer.parseInt(useTime);
             return "用时：" + (intUseTime / 60) + " 分 " + (intUseTime % 60) + "秒";
         }
         return "用时：0 分 0 秒";
@@ -1304,7 +1291,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<TestResultVo> saveSentenceUnitTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO, String testDetail) {
 
-        Student student = getStudent(session);
+        Student student = super.getStudent(session);
         if (StringUtils.isEmpty(student.getPetName())) {
             student.setPetName("大明白");
             student.setPartUrl(PetImageConstant.DEFAULT_IMG.replace(AliyunInfoConst.host, ""));
@@ -1441,7 +1428,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                         }
                         this.setOptions(finalTestRecordInfo, j[0], key);
                         if (finalObject.getJSONObject("userInput") != null) {
-                            selected[0] = this.matchSelected(finalObject.getJSONObject("userInput").getInteger("optionIndex"));
+                            selected[0] = matchSelected(finalObject.getJSONObject("userInput").getInteger("optionIndex"));
                         }
                         finalTestRecordInfo.setWord(word);
                         j[0]++;
@@ -1493,7 +1480,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      * @param integer
      * @return
      */
-    public static String matchSelected(Integer integer) {
+    static String matchSelected(Integer integer) {
         switch (integer) {
             case 0:
                 return "A";
@@ -1657,20 +1644,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     private int getGoldCount(WordUnitTestDTO wordUnitTestDTO, Student student, int point) {
-        int goldCount;
-        if (point < SIX) {
-            goldCount = 0;
-        } else if (point < SEVENTY) {
-            goldCount = TestAwardGoldConstant.UNIT_TEST_SIXTY_TO_SEVENTY;
-        } else if (point < PASS) {
-            goldCount = TestAwardGoldConstant.UNIT_TEST_SEVENTY_TO_EIGHTY;
-        } else if (point < NINETY_POINT) {
-            goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_NINETY;
-        } else if (point < FULL_MARK) {
-            goldCount = TestAwardGoldConstant.UNIT_TEST_NINETY_TO_FULL;
-        } else {
-            goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
-        }
+        int goldCount = this.getGold(point);
         this.saveLog(student, goldCount, wordUnitTestDTO, null);
         return goldCount;
     }
