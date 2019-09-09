@@ -340,6 +340,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 studentStudyPlan.setUpdateTime(new Date());
                 studentStudyPlanMapper.updateById(studentStudyPlan);
 
+                this.logInfo(student, studentStudyPlan);
+
                 StudentStudyPlan nextPlan = studentStudyPlanMapper.selectNextPlan(studentId, studentStudyPlan.getId(), 1);
                 if (nextPlan == null) {
                     // 教师分配的所有计划已完成
@@ -354,6 +356,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             } else {
                 updateCapacityStudentUnit(capacityStudentUnit, startUnit, null);
 
+                this.logInfo(student, studentStudyPlan);
+
                 studentStudyPlan.setUpdateTime(new Date());
                 studentStudyPlan.setCurrentStudyCount(studentStudyPlan.getCurrentStudyCount() + 1);
                 studentStudyPlanMapper.updateById(studentStudyPlan);
@@ -365,6 +369,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
             Long currentUnitId = capacityStudentUnit.getUnitId();
             long nextUnitId = currentUnitId + 1;
+
+            this.logInfo(student, studentStudyPlan);
 
             studentStudyPlan.setUpdateTime(new Date());
             studentStudyPlan.setCurrentStudyCount(studentStudyPlan.getCurrentStudyCount() + 1);
@@ -378,6 +384,13 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             dto.getSession().setAttribute(UserConstant.CURRENT_STUDENT, student1);
         }
         return null;
+    }
+
+    private void logInfo(Student student, StudentStudyPlan studentStudyPlan) {
+        log.info("学生[{} -{} -{}]当前学习计划courseId=[{}], unitId=[{}], type=[{}]需学习总遍数：[{}], 当前学习遍数：[{}]",
+                student.getId(), student.getAccount(), student.getStudentName(),
+                studentStudyPlan.getCourseId(), studentStudyPlan.getEndUnitId(), studentStudyPlan.getType(),
+                studentStudyPlan.getTotalStudyCount(), studentStudyPlan.getCurrentStudyCount());
     }
 
     private void updateCapacityStudentUnit(CapacityStudentUnit capacityStudentUnit, long nextUnitId, StudentStudyPlan nextPlan) {

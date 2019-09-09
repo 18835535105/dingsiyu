@@ -145,9 +145,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Autowired
     private BaiduSpeak baiduSpeak;
 
-    @Autowired
-    private CapacityReviewMapper capacityReviewMapper;
-
     /**
      * 游戏测试题目获取，获取20个单词供测试
      *
@@ -221,6 +218,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setTestStartTime(gameStartTime);
         testRecord.setTestEndTime(new Date());
         testRecord.setGenre("学前游戏测试");
+        testRecord.setStudyModel("学前游戏测试");
         testRecord.setQuantity(20);
 
         // 查看当前学生是否已经有游戏测试记录
@@ -259,7 +257,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Override
     public ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session) {
 
-        Student student = getStudent(session);
+        Student student = super.getStudent(session);
         Long studentId = student.getId();
 
         // 判断学生是否已经进行过游戏测试，如果进行过不允许再次进行；否则返回游戏题目
@@ -272,6 +270,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (capacityStudentUnit == null) {
             throw new ServiceException(500, "学生未分配智能版单词学习计划！");
         }
+
+        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
         // 随机选出20个正确单词信息
         PageHelper.startPage(1, 20);
@@ -308,9 +308,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
 
         // 封装各组信息
-        ServerResponse<Map<String, Object>> resultMap = packageStrengthVo(student, rightVocabularies, map, size,
-                errorSize, errorVocabularies);
-        return resultMap;
+        Map<String, Object> resultMap = packageStrengthVo(student, rightVocabularies, map, size, errorSize, errorVocabularies);
+        if (resultMap != null) {
+            resultMap.put("courseId", currentCourseId);
+            resultMap.put("unitId", capacityStudentUnit.getStartunit());
+        }
+        return ServerResponse.createBySuccess(resultMap);
     }
 
     @Override
@@ -624,7 +627,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         return map;
     }
 
-    private ServerResponse<Map<String, Object>> packageStrengthVo(Student student, List<Vocabulary> rightVocabularies, Map<String, String> map, int size, int errorSize, List<Vocabulary> errorVocabularies) {
+    private Map<String, Object> packageStrengthVo(Student student, List<Vocabulary> rightVocabularies,
+                                                                  Map<String, String> map, int size, int errorSize,
+                                                                  List<Vocabulary> errorVocabularies) {
         List<StrengthGameVo> strengthGameVos = new ArrayList<>();
         if (size > 0) {
             List<String> wordList;
@@ -683,7 +688,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             Map<String, Object> resultMap = new HashMap<>(16);
             resultMap.put("result", strengthGameVos);
             resultMap.put("sex", student.getSex());
-            return ServerResponse.createBySuccess(resultMap);
+            return resultMap;
         }
         return null;
     }
