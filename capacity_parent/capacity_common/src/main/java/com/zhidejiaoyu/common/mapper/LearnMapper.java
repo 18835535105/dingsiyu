@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+@Repository
 public interface LearnMapper extends BaseMapper<Learn> {
     int countByExample(LearnExample example);
 

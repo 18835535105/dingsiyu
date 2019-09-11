@@ -1195,12 +1195,15 @@
         group by v.id
     </select>
     <select id="selectLearnedByUnitId" resultType="java.util.Map" parameterType="map">
-        select v.word, v.word_chinese wordChinese, v.id
+        select v.word, uv.word_chinese wordChinese, v.id
         from learn l,
-             vocabulary v
-        where student_id = #{studentId}
+             vocabulary v,
+             unit_vocabulary uv
+        where l.unit_id = #{unitId}
+          and l.student_id = #{studentId}
           and l.vocabulary_id = v.id
-          and l.unit_id = #{unitId}
+          and uv.vocabulary_id = v.id
+          and uv.unit_id = #{unitId}
         group by v.id
         limit #{beginRow}
             , #{pageSize}
@@ -1247,7 +1250,7 @@
         limit 1
     </select>
     <select id="selectTeksLaterLearnTimeByStudentId" resultType="java.util.Map" parameterType="map">
-        select DISTINCT Max(learn.update_time) update_time , unit.joint_name ,course.course_name
+        select DISTINCT Max(learn.update_time) update_time, unit.joint_name, course.course_name
         from learn learn
                  join teks_unit unit on unit.id = learn.unit_id
                  join teks_course course on course.id = learn.course_id

@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author wuchenxi
@@ -36,9 +37,6 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
 
     @Autowired
     private GameScoreMapper gameScoreMapper;
-
-    @Autowired
-    private RunLogMapper runLogMapper;
 
     @Autowired
     private StudentMapper studentMapper;
@@ -120,33 +118,56 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
             return null;
         }
         List<Map<String, Object>> needReviewWords = this.getGameTwoSubject(student, capacityStudentUnit);
-
         List<Long> wordIds = new ArrayList<>(10);
-        needReviewWords.forEach(map -> wordIds.add(Long.valueOf(map.get("id").toString())));
+        List<Vocabulary> vocabularies = needReviewWords.stream().map(map -> {
+            wordIds.add(Long.valueOf(map.get("id").toString()));
+            return Vocabulary.builder()
+                    .id(Long.valueOf(map.get("id").toString()))
+                    .word(map.get("word").toString())
+                    .wordChinese(map.get("wordChinese").toString())
+                    .build();
+        }).collect(Collectors.toList());
 
         // 从学生当前正在学习的课程中随机获取110个单词
-        List<Map<String, String>> wordList = learnMapper.selectWordInCurrentCourse(capacityStudentUnit.getCourseId(), wordIds);
-        if (wordList.size() < 110) {
+        List<Map<String, String>> wordMapList = learnMapper.selectWordInCurrentCourse(capacityStudentUnit.getCourseId(), wordIds);
+        if (wordMapList.size() < 110) {
             // 如果当前课程下单词总数补足110个，从其他智能版课程随机再取剩余数量的单词
-            List<Map<String, String>> otherWordList = learnMapper.selectWordRandomInCourse(student.getId(), 110 - wordList.size(), wordIds);
-            wordList.addAll(otherWordList);
+            List<Map<String, String>> otherWordList = learnMapper.selectWordRandomInCourse(student.getId(), 110 - wordMapList.size(), wordIds);
+            wordMapList.addAll(otherWordList);
         }
-        if (wordList.size() < 110) {
+        if (wordMapList.size() < 110) {
             // 如果学生所有课程中单词总数补足110个，从《外研社版（一年级起）(一年级-上册)》取剩余单词
             List<Map<String, String>> otherWordList = vocabularyMapper.selectWordByCourseId(2863L, 0, 110 - wordIds.size(), wordIds);
-            wordList.addAll(otherWordList);
+            wordMapList.addAll(otherWordList);
         }
+        List<Vocabulary> wordList = wordMapList.stream().map(map -> Vocabulary.builder()
+                .word(map.get("word"))
+                .wordChinese(map.get("wordChinese"))
+                .build())
+                .collect(Collectors.toList());
+
+        return ServerResponse.createBySuccess(packageGameTwoVos(vocabularies, wordList, baiduSpeak));
+    }
+
+    /**
+     * 封装 《桌牌捕音》响应结果
+     *
+     * @param vocabularies 已学习单词
+     * @param wordList     其余随机单词
+     * @return
+     */
+    public static List<GameTwoVo> packageGameTwoVos(List<Vocabulary> vocabularies, List<Vocabulary> wordList, BaiduSpeak baiduSpeak) {
         Collections.shuffle(wordList);
 
         List<GameTwoVo> gameTwoVos = new ArrayList<>();
-        List<Object> list;
+        List<Vocabulary> list;
         // 中文集合
         List<String> chinese;
         // 试题英文集合
         List<String> subjects;
         GameTwoVo gameTwoVo;
         int i = 0;
-        for (Map<String, Object> needReviewWord : needReviewWords) {
+        for (Vocabulary vocabulary : vocabularies) {
             int bigBossIndex = -1;
             int minBossIndex = -1;
             if (i < 2) {
@@ -162,34 +183,32 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
             gameTwoVo = new GameTwoVo();
             gameTwoVo.setBigBossIndex(bigBossIndex);
             gameTwoVo.setMinBossIndex(minBossIndex);
-            gameTwoVo.setReadUrl(baiduSpeak.getLanguagePath(needReviewWord.get("word").toString()));
+            gameTwoVo.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
 
             // 封装纸牌的试题集合并打乱顺序；
             list = new ArrayList<>(12);
-            list.add(needReviewWord);
+            list.add(vocabulary);
             list.addAll(wordList.subList(i * 11, (i + 1) * 11));
             Collections.shuffle(list);
 
             subjects = new ArrayList<>(list.size());
             chinese = new ArrayList<>(list.size());
-            for (Object object : list) {
-                Map<String, Object> objectMap = (Map<String, Object>) object;
-
-                subjects.add(objectMap.get("word").toString());
-                chinese.add(objectMap.get("wordChinese").toString());
+            for (Vocabulary vocabulary1 : list) {
+                subjects.add(vocabulary1.getWord());
+                chinese.add(vocabulary1.getWordChinese());
             }
 
             gameTwoVo.setChinese(chinese);
             gameTwoVo.setSubjects(subjects);
             // 封装正确答案的索引
             for (int i1 = 0; i1 < subjects.size(); i1++) {
-                if (Objects.equals(subjects.get(i1), needReviewWord.get("word").toString())) {
+                if (Objects.equals(subjects.get(i1), vocabulary.getWord())) {
                     gameTwoVo.setRightIndex(i1);
                 }
             }
             gameTwoVos.add(gameTwoVo);
         }
-        return ServerResponse.createBySuccess(gameTwoVos);
+        return gameTwoVos;
     }
 
     /**
@@ -255,7 +274,7 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
                         + "》中奖励#" + gameScore.getAwardGold() + "#枚金币");
             } catch (Exception e) {
                 log.error("保存学生[{} - {} - {}]游戏[{}]结果出错！需要奖励[{}]枚金币！", student.getId(), student.getAccount(),
-                        student.getStudentName(), gameStore.getGameName(), gameScore.getAwardGold() , e);
+                        student.getStudentName(), gameStore.getGameName(), gameScore.getAwardGold(), e);
             }
         }
         return ServerResponse.createBySuccess();

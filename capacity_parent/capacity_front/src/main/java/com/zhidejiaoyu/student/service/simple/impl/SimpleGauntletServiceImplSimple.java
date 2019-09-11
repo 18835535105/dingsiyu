@@ -3,7 +3,6 @@ package com.zhidejiaoyu.student.service.simple.impl;
 import com.github.pagehelper.PageHelper;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.Vo.simple.GameTwoVo;
 import com.zhidejiaoyu.common.Vo.simple.StrengthGameVo;
 import com.zhidejiaoyu.common.Vo.simple.StudentGauntletVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -15,6 +14,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.SimpleLevelUtils;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
+import com.zhidejiaoyu.student.service.impl.GameServiceImpl;
 import com.zhidejiaoyu.student.service.simple.SimpleIGauntletServiceSimple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +24,7 @@ import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -227,8 +228,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             return ServerResponse.createBySuccess(map);
         }
         if ("桌牌捕音".equals(gameName)) {
-            ServerResponse<Object> gameTwo = getGameTwo(courseId);
-            return gameTwo;
+            return getGameTwo(courseId);
         }
         if ("冰火两重天".equals(gameName)) {
             Map<String, Object> map = new HashMap<>();
@@ -240,9 +240,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         if ("实力初显".equals(gameName)) {
             Map<String, Object> map = new HashMap<>();
             getGameFour(map, courseId, student);
-            if (map != null) {
-                return ServerResponse.createBySuccess(map);
-            }
+            return ServerResponse.createBySuccess(map);
         }
         return null;
     }
@@ -713,6 +711,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
 
     /**
      * 根据胜利人信息添加金币
+     *
      * @param winnerStudentId
      * @param failStudentId
      * @param study
@@ -761,6 +760,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
 
     /**
      * 添加挑战信息详情
+     *
      * @param returnList
      * @param gauntlets
      * @param type
@@ -803,58 +803,10 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     private ServerResponse<Object> getGameTwo(Long courseId) {
         // 从当前课程随机取10个已学的单词
         List<Vocabulary> gameTwoSubject = this.getGameTwoSubject(courseId);
-        List<Long> wordIds = new ArrayList<>(10);
-        gameTwoSubject.forEach(map -> wordIds.add(Long.valueOf(map.getId().toString())));
+        List<Long> wordIds = gameTwoSubject.stream().map(Vocabulary::getId).collect(Collectors.toList());
         // 从单词中随机取出11个单词
         List<Vocabulary> wordList = vocabularyMapper.getWord(0, 110, wordIds);
-        Collections.shuffle(wordList);
-        List<GameTwoVo> gameTwoVos = new ArrayList<>();
-        List<Object> list;
-        // 中文集合
-        List<String> chinese;
-        // 试题英文集合
-        List<String> subjects;
-        GameTwoVo gameTwoVo;
-        int i = 0;
-        for (Vocabulary needReviewWord : gameTwoSubject) {
-            int bigBossIndex = -1;
-            int minBossIndex = -1;
-            if (i < 2) {
-                int index = new Random().nextInt(2);
-                if (index % 2 == 0) {
-                    bigBossIndex = new Random().nextInt(12);
-                } else {
-                    minBossIndex = new Random().nextInt(12);
-                }
-                i++;
-            }
-            gameTwoVo = new GameTwoVo();
-            gameTwoVo.setBigBossIndex(bigBossIndex);
-            gameTwoVo.setMinBossIndex(minBossIndex);
-            gameTwoVo.setReadUrl(baiduSpeak.getLanguagePath(needReviewWord.getWord()));
-            // 封装纸牌的试题集合并打乱顺序；
-            list = new ArrayList<>(12);
-            list.add(needReviewWord);
-            list.addAll(wordList.subList(i * 11, (i + 1) * 11));
-            Collections.shuffle(list);
-            subjects = new ArrayList<>(list.size());
-            chinese = new ArrayList<>(list.size());
-            for (Object object : list) {
-                Vocabulary objectMap = (Vocabulary) object;
-                subjects.add(objectMap.getWord());
-                chinese.add(objectMap.getWordChinese());
-            }
-            gameTwoVo.setChinese(chinese);
-            gameTwoVo.setSubjects(subjects);
-            // 封装正确答案的索引
-            for (int i1 = 0; i1 < subjects.size(); i1++) {
-                if (Objects.equals(subjects.get(i1), needReviewWord.getWord())) {
-                    gameTwoVo.setRightIndex(i1);
-                }
-            }
-            gameTwoVos.add(gameTwoVo);
-        }
-        return ServerResponse.createBySuccess(gameTwoVos);
+        return ServerResponse.createBySuccess(GameServiceImpl.packageGameTwoVos(gameTwoSubject, wordList, baiduSpeak));
     }
 
     /**
@@ -863,16 +815,16 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
      * @return
      */
     private List<Vocabulary> getGameTwoSubject(Long courseId) {
-        List<Vocabulary> vocabularys = vocabularyMapper.getWordByCourseGetNumber(courseId, 0, 10);
-        Collections.shuffle(vocabularys);
-        return vocabularys;
+        List<Vocabulary> vocabularies = vocabularyMapper.getWordByCourseGetNumber(courseId, 0, 10);
+        Collections.shuffle(vocabularies);
+        return vocabularies;
     }
 
     private void getGameOne(Long courseId, List<Map<String, Object>> subjects) {
         List<Vocabulary> vocabularys = vocabularyMapper.getWordByCourseGetNumber(courseId, 0, 80);
-        Integer page = vocabularys.size() / 4;
+        int page = vocabularys.size() / 4;
         if (vocabularys.size() % 4 != 0) {
-            if (vocabularys.size() > 0 && vocabularys.size() > 4) {
+            if (vocabularys.size() > 4) {
                 vocabularys = vocabularys.subList(0, page * 4);
             } else {
                 vocabularys = null;
