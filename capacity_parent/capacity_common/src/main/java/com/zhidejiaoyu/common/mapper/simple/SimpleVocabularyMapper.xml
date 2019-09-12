@@ -269,7 +269,8 @@
     <select id="selectUnknownWordByUnitId" resultMap="BaseResultMap"
             parameterType="map">
         SELECT
-        distinct <include refid="unite_Column_List"/>
+        distinct
+        <include refid="unite_Column_List"/>
         FROM vocabulary v,learn l where v.id =
         l.vocabulary_id and
         v.delStatus =
@@ -293,13 +294,14 @@
     <select id="selectByUnitId" resultMap="BaseResultMap"
             parameterType="java.lang.Long">
         SELECT
-           distinct <include refid="unite_Column_List"/>
+        distinct
+        <include refid="unite_Column_List"/>
         FROM vocabulary
-             v, unit_vocabulary uv
+        v, unit_vocabulary uv
         where uv.unit_id = #{unitId}
-              AND v.id
-                  =
-                  uv.vocabulary_id AND v.delStatus = 1 limit 20
+        AND v.id
+        =
+        uv.vocabulary_id AND v.delStatus = 1 limit 20
     </select>
 
     <select id="selectByWordIds" parameterType="java.util.List"
@@ -374,11 +376,13 @@
 
     <select id="mapSelectVocabulary" parameterType="String"
             resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"/> from vocabulary where id = #{id}
+        select
+        <include refid="Base_Column_List"/>
+        from vocabulary where id = #{id}
     </select>
 
     <!-- 根据id更改词汇 -->
-    <update id="wordUpdate" parameterType="Vocabulary">
+    <update id="wordUpdate" parameterType="com.zhidejiaoyu.common.pojo.Vocabulary">
         update vocabulary
         set
         word = #{word},
@@ -404,40 +408,35 @@
     </update>
 
     <delete id="delUnit_vocabulary" parameterType="com.zhidejiaoyu.common.pojo.UnitVocabulary">
-        delete from
-            unit_vocabulary
+        delete
+        from unit_vocabulary
         where vocabulary_id = #{vocabularyId} ${str}
     </delete>
 
     <select id="showWord" parameterType="map" resultMap="BaseResultMap">
-        SELECT
-            uv.unit_id,
-            v.id,
-            v.word,
-            uv.word_chinese,
-            v.syllable
-        FROM
-            vocabulary v,
-            unit_vocabulary uv
-        WHERE
-            v.id = uv.vocabulary_id
-            AND uv.unit_id = #{unit_id}
-            AND v.delStatus = 1
-            AND v.id NOT IN (
-                SELECT l1.vocabulary_id
-                FROM
-                    learn l1
-                WHERE
-                    l1.student_id = #{id}
-                    AND l1.unit_id = #{unit_id}
-                    AND l1.study_model = '慧听写')
+        SELECT uv.unit_id,
+               v.id,
+               v.word,
+               uv.word_chinese,
+               v.syllable
+        FROM vocabulary v,
+             unit_vocabulary uv
+        WHERE v.id = uv.vocabulary_id
+          AND uv.unit_id = #{unit_id}
+          AND v.delStatus = 1
+          AND v.id NOT IN (
+            SELECT l1.vocabulary_id
+            FROM learn l1
+            WHERE l1.student_id = #{id}
+              AND l1.unit_id = #{unit_id}
+              AND l1.study_model = '慧听写')
         LIMIT 0, 1
     </select>
     <select id="countByCourseId" resultType="java.lang.Integer" parameterType="map">
         select count(uv.vocabulary_id)
         from vocabulary v, unit_vocabulary uv, unit u
         where v.id = uv.vocabulary_id and v.delStatus = 1
-              and uv.unit_id = u.id and u.course_id = #{courseId}
+        and uv.unit_id = u.id and u.course_id = #{courseId}
         <if test="flag == 1">
             and v.recordpicurl is not null
         </if>
@@ -562,14 +561,16 @@
     </select>
     <select id="selectByCourseId" resultMap="BaseResultMap" parameterType="map">
         SELECT
-        distinct <include refid="unite_Column_List"/>
+        distinct
+        <include refid="unite_Column_List"/>
         FROM vocabulary v, unit_vocabulary uv, unit u
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = #{courseId}
     </select>
     <select id="selectUnknownWordByCourseId" resultMap="BaseResultMap" parameterType="map">
         SELECT
-        distinct <include refid="unite_Column_List"/>
+        distinct
+        <include refid="unite_Column_List"/>
         FROM vocabulary v,learn l where v.id =
         l.vocabulary_id and
         v.delStatus = 1
@@ -651,8 +652,7 @@
     <select id="selectUnitIdsNotInIds" resultType="java.lang.Long" parameterType="map">
         select unit_id
         from unit_vocabulary
-        where
-            vocabulary_id = #{nv.vocabularyId} ${nv.str}
+        where vocabulary_id = #{nv.vocabularyId} ${nv.str}
     </select>
 
     <select id="pagePicNotNull" parameterType="com.zhidejiaoyu.common.pojo.Vocabulary" resultMap="pageMap">
@@ -688,92 +688,90 @@
         <where>
             recordpicurl is not null
             <if test="word != null and word != '' ">
-               and word like '%${word}%'
+                and word like '%${word}%'
             </if>
         </where>
         order by id desc
     </select>
     <select id="getWordIdByCourse" resultType="map" parameterType="map">
-        SELECT
-        a.id,
-        a.word,
-        a.word_chinese,
-        a.recordpicurl
-        FROM
-        vocabulary a
-        JOIN unit_vocabulary b ON a.id = b.vocabulary_id
-        JOIN unit c ON b.unit_id = c.id
-        AND recordpicurl IS NOT NULL
-        AND a.delStatus = 1
-        AND b.unit_id &lt;&gt; #{unidId}
-        AND a.id &lt;&gt; #{correctWordId}
-        AND course_id = #{courseId}
-        ORDER BY rand() LIMIT 3
+        SELECT a.id,
+               a.word,
+               a.word_chinese,
+               a.recordpicurl
+        FROM vocabulary a
+                 JOIN unit_vocabulary b ON a.id = b.vocabulary_id
+                 JOIN unit c ON b.unit_id = c.id
+            AND recordpicurl IS NOT NULL
+            AND a.delStatus = 1
+            AND b.unit_id &lt;&gt; #{unidId}
+            AND a.id &lt;&gt; #{correctWordId}
+            AND course_id = #{courseId}
+        ORDER BY rand()
+        LIMIT 3
     </select>
     <select id="getNotNeedReviewWord" resultType="java.util.Map" parameterType="map">
-        SELECT
-            v.id,
-            v.word,
-            uv.word_chinese,
-            v.recordpicurl
-        FROM
-            vocabulary v,
-            unit_vocabulary uv
-        WHERE
-            v.id = uv.vocabulary_id
-            AND uv.unit_id = #{unitId}
-            AND v.recordpicurl is not NULL
-            AND v.delStatus = 1
-            AND v.id NOT IN (
-                SELECT l1.vocabulary_id
-                FROM
-                    learn l1
-                WHERE
-                    l1.student_id = #{studentId}
-                    AND l1.unit_id = #{unitId}
-                    AND l1.study_model = '单词图鉴')
+        SELECT v.id,
+               v.word,
+               uv.word_chinese,
+               v.recordpicurl
+        FROM vocabulary v,
+             unit_vocabulary uv
+        WHERE v.id = uv.vocabulary_id
+          AND uv.unit_id = #{unitId}
+          AND v.recordpicurl is not NULL
+          AND v.delStatus = 1
+          AND v.id NOT IN (
+            SELECT l1.vocabulary_id
+            FROM learn l1
+            WHERE l1.student_id = #{studentId}
+              AND l1.unit_id = #{unitId}
+              AND l1.study_model = '单词图鉴')
         LIMIT 0, 1
     </select>
 
     <select id="getWordPicAll" resultMap="BaseResultMap" parameterType="map">
-        select b.id, b.word, a.word_chinese, b.recordpicurl from unit_vocabulary a join vocabulary b on a.vocabulary_id = b.id
-        and a.unit_id = #{unitId} and b.recordpicurl is not null and b.delStatus = 1;
+        select b.id, b.word, a.word_chinese, b.recordpicurl
+        from unit_vocabulary a
+                 join vocabulary b on a.vocabulary_id = b.id
+            and a.unit_id = #{unitId} and b.recordpicurl is not null and b.delStatus = 1;
     </select>
     <select id="getWordIdByCourseAll" resultMap="BaseResultMap" parameterType="map">
-        SELECT
-        a.id,
-        a.word,
-        a.word_chinese,
-        a.recordpicurl
-        FROM
-        vocabulary a
-        JOIN unit_vocabulary b ON a.id = b.vocabulary_id
-        JOIN unit c ON b.unit_id = c.id
-        AND recordpicurl IS NOT NULL
-        AND a.delStatus = 1
-        AND course_id = #{courseId}
+        SELECT a.id,
+               a.word,
+               a.word_chinese,
+               a.recordpicurl
+        FROM vocabulary a
+                 JOIN unit_vocabulary b ON a.id = b.vocabulary_id
+                 JOIN unit c ON b.unit_id = c.id
+            AND recordpicurl IS NOT NULL
+            AND a.delStatus = 1
+            AND course_id = #{courseId}
     </select>
     <select id="getWordIdByAll" resultMap="BaseResultMap" parameterType="map">
-      select id, word, word_chinese, recordpicurl from vocabulary where recordpicurl is not NULL ORDER BY RAND() LIMIT ${size}
+        select id, word, word_chinese, recordpicurl
+        from vocabulary
+        where recordpicurl is not NULL
+        ORDER BY RAND()
+        LIMIT ${size}
     </select>
     <select id="getWordIdByUnit" resultType="java.util.Map" parameterType="map">
-        SELECT
-        a.id,
-        a.word,
-        a.word_chinese,
-        a.recordpicurl
-        FROM
-        vocabulary a
-        JOIN unit_vocabulary b ON a.id = b.vocabulary_id
-        AND recordpicurl IS NOT NULL
-        AND a.delStatus = 1
-        AND a.id &lt;&gt; #{id}
-        AND b.unit_id = #{unitId}
-        ORDER BY rand() LIMIT 3
+        SELECT a.id,
+               a.word,
+               a.word_chinese,
+               a.recordpicurl
+        FROM vocabulary a
+                 JOIN unit_vocabulary b ON a.id = b.vocabulary_id
+            AND recordpicurl IS NOT NULL
+            AND a.delStatus = 1
+            AND a.id &lt;&gt; #{id}
+            AND b.unit_id = #{unitId}
+        ORDER BY rand()
+        LIMIT 3
     </select>
     <select id="selectByUnitIdAndStudyModel" resultMap="BaseResultMap" parameterType="map">
         SELECT
-        distinct <include refid="unite_Column_List"/>
+        distinct
+        <include refid="unite_Column_List"/>
         FROM vocabulary
         v, unit_vocabulary uv
         where uv.unit_id = #{unitId}
@@ -783,8 +781,11 @@
         </if>
     </select>
     <select id="getMemoryWordPicAll" resultMap="BaseResultMap" parameterType="map">
-        select b.id, b.word, b.word_chinese, b.recordpicurl from capacity_picture a JOIN vocabulary b ON a.vocabulary_id = b.id
-        AND a.student_id = #{studentId} AND a.unit_id=#{unit_id} AND a.push &lt; #{data} and a.memory_strength &lt; 1 AND b.delStatus = 1
+        select b.id, b.word, b.word_chinese, b.recordpicurl
+        from capacity_picture a
+                 JOIN vocabulary b ON a.vocabulary_id = b.id
+            AND a.student_id = #{studentId} AND a.unit_id = #{unit_id} AND a.push &lt; #{data} and
+                                      a.memory_strength &lt; 1 AND b.delStatus = 1
     </select>
     <select id="selectWordChineseByVersionAndWordId" resultType="java.lang.String" parameterType="map">
         SELECT DISTINCT
@@ -812,78 +813,79 @@
         LIMIT 1;
     </select>
 
-<!-- 精简版 -->
-<!-- '1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写;', -->
-	<sql id="simple_test_type">
-		<if test="type == 1">
-			"单词辨音"
-		</if>
-		<if test="type == 2">
-			"词组辨音"
-		</if>
-		<if test="type == 3">
-			"快速单词"
-		</if>
-		<if test="type == 4">
-			"快速词组"
-		</if>
-		<if test="type == 5">
-			"词汇考点"
-		</if>
-		<if test="type == 6">
-			"快速句型"
-		</if>
-		<if test="type == 7">
-			"语法辨析"
-		</if>
-		<if test="type == 8">
-			"单词默写"
-		</if>
-		<if test="type == 9">
-			"词组默写"
-		</if>
-	</sql>
-	<select id="showWordSimple" parameterType="map" resultType="com.zhidejiaoyu.common.Vo.simple.SimpleCapacityVo">
-		select
-		 	uv.unit_id,
-			v.id,
-			v.word,
-		    if (uv.word_chinese is null, v.word_chinese, uv.word_chinese) word_chinese,
-			v.example_english,
-			v.example_chinese,
-			v.recordpicurl,
-			v.sound_mark AS soundMark
-		from vocabulary v,unit_vocabulary uv
-		WHERE
-			v.id = uv.vocabulary_id
-			AND uv.unit_id = #{unitId}
-			AND v.delStatus = 1
-		AND v.id NOT IN (
-			SELECT
-				l1.vocabulary_id
-			FROM
-				learn l1
-			WHERE
-				l1.student_id = #{studentId}
-			AND l1.unit_id = #{unitId}
-			AND l1.study_model = <include refid="simple_test_type" />
-			    and l1.type = 1
-		)
-		LIMIT 1;
-	</select>
-	<select id="getTestPaperGenerationAll" parameterType="map" resultType="com.zhidejiaoyu.common.pojo.Vocabulary">
-		SELECT
-			c.id, c.word, if(locate('&lt;', if(locate('>', c.word_chinese) > 0, replace(c.word_chinese, '>', ')'),
+    <!-- 精简版 -->
+    <!-- '1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写;', -->
+    <sql id="simple_test_type">
+        <if test="type == 1">
+            "单词辨音"
+        </if>
+        <if test="type == 2">
+            "词组辨音"
+        </if>
+        <if test="type == 3">
+            "快速单词"
+        </if>
+        <if test="type == 4">
+            "快速词组"
+        </if>
+        <if test="type == 5">
+            "词汇考点"
+        </if>
+        <if test="type == 6">
+            "快速句型"
+        </if>
+        <if test="type == 7">
+            "语法辨析"
+        </if>
+        <if test="type == 8">
+            "单词默写"
+        </if>
+        <if test="type == 9">
+            "词组默写"
+        </if>
+    </sql>
+    <select id="showWordSimple" parameterType="map" resultType="com.zhidejiaoyu.common.Vo.simple.SimpleCapacityVo">
+        select
+        uv.unit_id,
+        v.id,
+        v.word,
+        if (uv.word_chinese is null, v.word_chinese, uv.word_chinese) word_chinese,
+        v.example_english,
+        v.example_chinese,
+        v.recordpicurl,
+        v.sound_mark AS soundMark
+        from vocabulary v,unit_vocabulary uv
+        WHERE
+        v.id = uv.vocabulary_id
+        AND uv.unit_id = #{unitId}
+        AND v.delStatus = 1
+        AND v.id NOT IN (
+        SELECT
+        l1.vocabulary_id
+        FROM
+        learn l1
+        WHERE
+        l1.student_id = #{studentId}
+        AND l1.unit_id = #{unitId}
+        AND l1.study_model =
+        <include refid="simple_test_type"/>
+        and l1.type = 1
+        )
+        LIMIT 1;
+    </select>
+    <select id="getTestPaperGenerationAll" parameterType="map" resultType="com.zhidejiaoyu.common.pojo.Vocabulary">
+        SELECT
+        c.id, c.word, if(locate('&lt;', if(locate('>', c.word_chinese) > 0, replace(c.word_chinese, '>', ')'),
         c.word_chinese)),
         replace(if(locate('>', c.word_chinese) > 0, replace(c.word_chinese, '>', ')'), c.word_chinese), '&lt;', '('),
         c.word_chinese) AS wordChinese
-		FROM unit a JOIN unit_vocabulary b ON a.id = b.unit_id JOIN vocabulary c ON b.vocabulary_id = c.id
-		AND a.course_id = #{courseId} AND c.delStatus = 1
-		<if test="unitId != null and unitId != ''">
-			AND a.id in ( <foreach collection="unitId" item="id" separator=","> #{id} </foreach> )
-		</if>
-		order by rand() LIMIT ${typeTwo}
-	</select>
+        FROM unit a JOIN unit_vocabulary b ON a.id = b.unit_id JOIN vocabulary c ON b.vocabulary_id = c.id
+        AND a.course_id = #{courseId} AND c.delStatus = 1
+        <if test="unitId != null and unitId != ''">
+            AND a.id in ( <foreach collection="unitId" item="id" separator=",">#{id}</foreach> )
+        </if>
+        order by rand() LIMIT ${typeTwo}
+    </select>
     <select id="selectByCourseIds" resultMap="BaseResultMap" parameterType="map">
         SELECT
         distinct
@@ -901,10 +903,10 @@
 
     <select id="selectBookVoByCourseId" resultType="com.zhidejiaoyu.common.Vo.bookVo.BookVo" parameterType="map">
         SELECT distinct v.id,
-                        if(uv.word_chinese is null or uv.word_chinese = '', v.word_chinese, uv.word_chinese)     chinese,
-                        if(v.syllable is null or v.syllable = '', v.word, v.syllable) content,
-                        v.word                                                        readUrl,
-                        v.sound_mark                                                  soundMark
+                        if(uv.word_chinese is null or uv.word_chinese = '', v.word_chinese, uv.word_chinese) chinese,
+                        if(v.syllable is null or v.syllable = '', v.word, v.syllable)                        content,
+                        v.word                                                                               readUrl,
+                        v.sound_mark                                                                         soundMark
         FROM vocabulary v,
              unit_vocabulary uv,
              unit u
@@ -940,10 +942,10 @@
     <select id="selectUnlearnedBookVoByCourseId" resultType="com.zhidejiaoyu.common.Vo.bookVo.BookVo"
             parameterType="map">
         SELECT v.id,
-                        v.word_chinese                                                chinese,
-                        if(v.syllable is null or v.syllable = '', v.word, v.syllable) content,
-                        v.word                                                        readUrl,
-                        v.sound_mark                                                  soundMark
+               v.word_chinese                                                chinese,
+               if(v.syllable is null or v.syllable = '', v.word, v.syllable) content,
+               v.word                                                        readUrl,
+               v.sound_mark                                                  soundMark
         FROM unit_vocabulary uv,
              vocabulary v,
              unit u
@@ -961,10 +963,10 @@
 
     <sql id="selectBookVoSql">
         SELECT v.id,
-                        v.word_chinese                                                chinese,
-                        if(v.syllable is null or v.syllable = '', v.word, v.syllable) content,
-                        v.word                                                        readUrl,
-                        v.sound_mark                                                  soundMark
+               v.word_chinese                                                chinese,
+               if(v.syllable is null or v.syllable = '', v.word, v.syllable) content,
+               v.word                                                        readUrl,
+               v.sound_mark                                                  soundMark
         FROM vocabulary v,
              unit_vocabulary uv,
              unit u
@@ -984,18 +986,18 @@
     </select>
 
     <select id="selectBookVoByUnitId" resultType="com.zhidejiaoyu.common.Vo.bookVo.BookVo" parameterType="map">
-         SELECT distinct v.id,
-                        v.word_chinese                                                chinese,
-                        v.word                                                        content,
-                        v.word                                                        readUrl,
-                        v.sound_mark                                                  soundMark
+        SELECT distinct v.id,
+                        v.word_chinese chinese,
+                        v.word         content,
+                        v.word         readUrl,
+                        v.sound_mark   soundMark
         FROM vocabulary v,
              unit_vocabulary uv,
              unit u
         WHERE v.delStatus = 1
           AND v.id = uv.vocabulary_id
           AND u.id = uv.unit_id
-        and u.id = #{unitId}
+          and u.id = #{unitId}
     </select>
 
     <select id="selectUnknownWordBookVoByCourseIds" resultType="com.zhidejiaoyu.common.Vo.bookVo.BookVo"
@@ -1069,7 +1071,9 @@
     </select>
 
     <select id="selectByWord" resultMap="BaseResultMap" parameterType="map">
-      select <include refid="Base_Column_List"/> from vocabulary where binary word = #{text} limit 1
+        select
+        <include refid="Base_Column_List"/>
+        from vocabulary where binary word = #{text} limit 1
     </select>
     <select id="countWordMapByCourseIds" resultType="java.util.Map" parameterType="map">
         select a.course_id id, count(c.id) count
@@ -1083,11 +1087,11 @@
         group by a.course_id
     </select>
     <select id="getWordByCourseGetNumber" resultMap="BaseResultMap" parameterType="map">
-        select <include refid="unite_Column_List"></include>
+        select v.id, v.word, uv.word_chinese
         from vocabulary v
-        join unit_vocabulary uv on v.id=uv.vocabulary_id
-        join unit unit on unit.id=uv.unit_id
-        where unit.course_id=#{courseId}
+                 join unit_vocabulary uv on v.id = uv.vocabulary_id
+                 join unit unit on unit.id = uv.unit_id
+        where unit.course_id = #{courseId}
         order by rand()
         limit #{start},#{row}
     </select>
@@ -1110,7 +1114,7 @@
 
     <select id="getWord" parameterType="map" resultMap="BaseResultMap">
         select
-        <include refid="unite_Column_List"/>
+        v.id, v.word, uv.word_chinese
         from vocabulary v, unit_vocabulary uv, unit u
         where v.id = uv.vocabulary_id and v.delStatus = 1
         and uv.unit_id = u.id and u.joint_name like '%单词%'

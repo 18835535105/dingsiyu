@@ -553,11 +553,13 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
             resultMap.put("modelName", modelName);
 
             // 课程名
-            if (versionName.contains("高中英语") || versionName.contains("初中英语") || versionName.contains("小学英语")) {
+            if (versionName.contains("高中同步") || versionName.contains("初中同步") || versionName.contains("小学同步")) {
                 resultMap.put("versionLabel", map.get("version"));
             } else {
                 // 版本 年级-上册/下册
-                resultMap.put("versionLabel", map.get("version") + " " + (map.get("grade") == null ? "" : map.get("grade")) + "-" + (map.get("label") == null ? "" : map.get("label")));
+                resultMap.put("versionLabel", map.get("version") + " " + (map.get("grade") == null
+                        ? "" : map.get("grade")) + "-" + (map.get("label") == null
+                        ? "" : map.get("label")));
             }
 
             // 课程学习的第几遍

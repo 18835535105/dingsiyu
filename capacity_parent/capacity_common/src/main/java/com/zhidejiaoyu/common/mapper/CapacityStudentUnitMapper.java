@@ -5,7 +5,7 @@ import com.zhidejiaoyu.common.pojo.CapacityStudentUnit;
 import com.zhidejiaoyu.common.pojo.Student;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 /**
  * <p>
@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author zdjy
  * @since 2018-12-12
  */
+@Repository
 public interface CapacityStudentUnitMapper extends BaseMapper<CapacityStudentUnit> {
 
     CapacityStudentUnit selGetSentenceByStudentIdAndType(Long studentId);

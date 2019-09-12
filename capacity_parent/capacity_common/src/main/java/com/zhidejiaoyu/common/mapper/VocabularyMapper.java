@@ -7,10 +7,12 @@ import com.zhidejiaoyu.common.pojo.Vocabulary;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 
+@Repository
 public interface VocabularyMapper extends BaseMapper<Vocabulary> {
 
     Vocabulary selectByPrimaryKey(Long id);
