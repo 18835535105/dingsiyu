@@ -40,7 +40,7 @@ public interface SimpleExhumationMapper extends BaseMapper<Exhumation> {
      * @param studnetId
      * @return
      */
-    @Select("select final_name finalName, count(id) count , name name from exhumation where student_id=#{studentId} and type!=3 and state = 1 group by final_name ")
+    @Select("select final_name finalName, count(id) count , name name from exhumation where student_id=#{studentId} and type!=3 and state = 1")
     List<Map<String,Object>> selExhumationByStudentId(Long studnetId);
 
     /**
@@ -48,7 +48,7 @@ public interface SimpleExhumationMapper extends BaseMapper<Exhumation> {
      * @param studnetId
      * @return
      */
-    @Select("select final_name finalName, count(id) count , name name from exhumation where student_id=#{studentId} and type=3 and state = 1 group by final_name ")
+    @Select("select final_name finalName, count(id) count , name name from exhumation where student_id=#{studentId} and type=3 and state = 1")
     List<Map<String,Object>> selExhumationSkinByStudentId(Long studnetId);
 
     /**
