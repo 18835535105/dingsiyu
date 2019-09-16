@@ -9,9 +9,11 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public interface CapacityListenMapper extends BaseMapper<CapacityListen> {
     int countByExample(CapacityListenExample example);
 
@@ -88,11 +90,7 @@ public interface CapacityListenMapper extends BaseMapper<CapacityListen> {
      */
     int countNeedReviewByStudentIdAndCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
 
-    @Select("select a.id, b.word, b.word_chinese AS wordChinese, a.syllable, b.memory_strength, a.sound_mark soundMark from vocabulary a INNER JOIN capacity_listen b on a.id = b.vocabulary_id and b.unit_id = #{unit_id} and b.student_id = #{id} and b.push < #{dateTime} and b.memory_strength < 1 and a.delStatus = 1 ORDER BY b.push asc LIMIT 0,1")
-    Vocabulary showCapacity_listen(@Param("unit_id") String unit_id, @Param("id") Long id, @Param("dateTime") String dateTime);
-
-    @Select("select count(a.id) from capacity_listen a where a.student_id = #{id} and a.unit_id = #{unit_id}")
-    Integer alreadyStudyWord(@Param("unit_id") String unit_id, @Param("id") Long id);
+    Vocabulary selectCapacityListen(@Param("unit_id") String unit_id, @Param("id") Long id);
 
     @Select("select count(id) from capacity_listen where student_id = #{student_id} and push < #{dateTime}")
     Integer countByPushByCourseid(@Param("student_id") Long student_id, @Param("dateTime") String dateTime);
@@ -139,9 +137,6 @@ public interface CapacityListenMapper extends BaseMapper<CapacityListen> {
      * @return
      */
     Long selectUnknownWordByUnitId(@Param("student") Student student, @Param("unitId") String unitId, @Param("ignoreWordId") Long[] ignoreWordId);
-
-    @Delete("delete from capacity_listen where student_id = #{studentId} and unit_id = #{unitId}")
-    void deleteByStudentIdAndStudyUnitId(@Param("studentId") Long studentId,@Param("unitId") Long aLong);
 
     @Delete("delete from capacity_listen where student_id = #{studentId} and unit_id = #{unitId} and vocabulary_id=#{vocabularyId}")
     void deleteByStudentIdAndUnitIdAndVocabulary(@Param("studentId") Long studentId,@Param("unitId") Long unitId,@Param("vocabularyId") Long vocabularyId);
