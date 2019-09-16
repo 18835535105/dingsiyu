@@ -21,6 +21,7 @@ import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.LoginService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -642,9 +643,19 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 当前时间
             Date current = new Date();
             // 2.此账号已失效
-            if (date == null || date.getTime() < current.getTime()) {
+            if (date == null) {
                 return ServerResponse.createByErrorMessage("此账号已失效");
             }
+            if (date.getTime() < current.getTime()) {
+                // 福利账号有效期为永久
+                if (stu.getRole() != null && stu.getRole() == 4) {
+                    stu.setAccountTime(DateTime.now().plusYears(1).toDate());
+                    studentMapper.updateById(stu);
+                } else {
+                    return ServerResponse.createByErrorMessage("此账号已失效");
+                }
+            }
+
             // 3.账号即将过期，请及时续期
             long difference = (date.getTime() - current.getTime()) / 86400000;
             long l = Math.abs(difference);
