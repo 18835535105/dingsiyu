@@ -400,4 +400,13 @@
         </if>
         limit 1
     </select>
+    <select id="selectCapacityListen" resultType="com.zhidejiaoyu.common.pojo.Vocabulary" parameterType="map">
+        select a.id, b.word, b.word_chinese AS wordChinese, a.syllable, b.memory_strength, a.sound_mark soundMark
+        from vocabulary a
+                 INNER JOIN capacity_listen b on a.id = b.vocabulary_id and b.unit_id = #{unit_id}
+            and b.student_id = #{id} and b.push &lt; now()
+            and b.memory_strength &lt; 1 and a.delStatus = 1
+        ORDER BY b.push
+        LIMIT 0,1
+    </select>
 </mapper>

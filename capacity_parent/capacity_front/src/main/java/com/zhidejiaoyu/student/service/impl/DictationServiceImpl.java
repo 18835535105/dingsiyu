@@ -7,7 +7,6 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
-import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.DictationService;
@@ -61,15 +60,11 @@ public class DictationServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 			session.setAttribute(UserConstant.CURRENT_STUDENT, student);
 		}
 
-
 		// 记录学生开始学习该单词/例句的时间
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
-		// 获取当前时间
-		String dateTime = DateUtil.DateTime();
-
 		// 1. 查询智能听写记忆追踪中是否有需要复习的单词
-        Vocabulary vocabulary = capacityListenMapper.showCapacity_listen(unitId, id, dateTime);
+		Vocabulary vocabulary = capacityListenMapper.selectCapacityListen(unitId, id);
 
 		// 2. 如果记忆追踪中没有需要复习的, 去单词表中取出一个单词,条件是(learn表中单词id不存在的)
         if (vocabulary == null) {
@@ -122,20 +117,18 @@ public class DictationServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 		map.put("wordCount", count);
 
 		// 4. 该单元已学单词  ./
-		//Integer count_ = capacityListenMapper.alreadyStudyWord(unit_id, id);
-		Long count_ = learnMapper.learnCountWord(id, Integer.parseInt(unitId), "慧听写");
-		map.put("plan", count_);
+		map.put("plan", learnMapper.learnCountWord(id, Integer.parseInt(unitId), "慧听写"));
 
 		// 5. 是否是第一次学习慧听写，true:第一次学习，进入学习引导页；false：不是第一次学习
 		Integer the = learnMapper.theFirstTime(id);
-		if(the==null) {
+		if (the == null) {
 			map.put("firstStudy", true);
 			// 初始化一条数据，引导页进行完之后进入学习页面
 			Learn learn = new Learn();
 			learn.setStudentId(student.getId());
 			learn.setStudyModel("慧听写");
 			learnMapper.insert(learn);
-		}else {
+		} else {
 			map.put("firstStudy", false);
 		}
 
