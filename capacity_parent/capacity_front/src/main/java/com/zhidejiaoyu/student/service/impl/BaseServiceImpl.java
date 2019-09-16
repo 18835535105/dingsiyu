@@ -72,30 +72,6 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
     }
 
     @Override
-    public Integer getOnLineTime(HttpSession session, String beginTime, String endTime) {
-        Integer onlineTime = durationMapper.selectOnlineTime(getStudentId(session), beginTime, endTime);
-        int loginTime = (int) (System.currentTimeMillis() - ((Date) session.getAttribute(TimeConstant.LOGIN_TIME)).getTime()) / 1000;
-        if (onlineTime == null) {
-            onlineTime = loginTime;
-        } else {
-            onlineTime += loginTime;
-        }
-        return onlineTime;
-    }
-
-    /**
-     * 计算今天的在线时长
-     *
-     * @param session
-     * @return
-     */
-    @Override
-    public Integer getTodayOnlineTime(HttpSession session) {
-        String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
-        return this.getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
-    }
-
-    @Override
     public void getLevel(HttpSession session) {
         Student student = getStudent(session);
         double gold = student.getSystemGold() + student.getOfflineGold();

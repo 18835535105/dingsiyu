@@ -478,7 +478,7 @@
     <select id="selectLastLoginDuration" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="Base_Column_List"/>
-        from duration where student_id = #{studentId} and online_time &lt;&gt; 0 order by id
+        from duration where student_id = #{studentId} and valid_time = 0 order by id
         desc limit 1
     </select>
 
@@ -487,7 +487,7 @@
         from duration
         where student_id = #{student.id}
           and login_time = #{loginTime}
-          and online_time &lt;> 0
+          and valid_time = 0
     </select>
     <select id="selectByStudentIdAndCourseId" resultMap="BaseResultMap" parameterType="map">
         select
@@ -507,5 +507,14 @@
         <include refid="Base_Column_List"/>
         from duration where student_id = #{studentId} and to_days(login_time) = to_days(now()) and online_time = 0
         order by id desc limit 1
+    </select>
+    <select id="countOnlineTimeWithLoginOutTine" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from duration
+        where student_id = #{studentId}
+          and online_time &lt;> 0
+        order by id desc
+        limit 1
     </select>
 </mapper>

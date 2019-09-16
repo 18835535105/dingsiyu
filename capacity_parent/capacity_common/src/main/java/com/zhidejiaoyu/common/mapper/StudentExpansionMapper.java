@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
  * @author stylefeng
  * @since 2019-03-15
  */
+@Repository
 public interface StudentExpansionMapper extends BaseMapper<StudentExpansion> {
 
     @Update("update student_expansion set is_look=1 where id=#{studentId}")

@@ -17,6 +17,7 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.DurationUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
@@ -172,8 +173,8 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
      * 学生完善信息保存奖励信息
      *
      * @param student
-     * @param scale 信息完成度
-     * @return  完善信息后提示语
+     * @param scale   信息完成度
+     * @return 完善信息后提示语
      */
     private String saveAwardInfo(Student student, double scale) {
         String tip;
@@ -321,7 +322,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
         Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
 
-        Duration duration = packageDuration(dto, student, loginTime);
+        Duration duration = packageDuration(dto, student, loginTime, session);
         try {
             durationMapper.insert(duration);
         } catch (Exception e) {
@@ -376,7 +377,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
     private void saveAward(HttpSession session, Integer classify, Student student) {
         // 辉煌荣耀勋章：今天学习效率>目标学习效率 currentPlan ++；否则不操作，每天第一次登录的时候查看昨天是否有更新辉煌荣耀勋章，如果没更新，将其 currentPlan 置为0
-        medalAwardAsync.honour(student, super.getTodayValidTime(student.getId()), super.getTodayOnlineTime(session));
+        medalAwardAsync.honour(student, super.getTodayValidTime(student.getId()), (int) DurationUtil.getTodayOnlineTime(session));
 
         // 学习总有效时长金币奖励
         goldAwardAsync.totalValidTime(student);
@@ -412,7 +413,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         Student student = super.getStudent(session);
         // 今日学习效率
         double validTime = super.getTodayValidTime(student.getId());
-        double onlineTime = super.getTodayOnlineTime(session);
+        double onlineTime = DurationUtil.getTodayOnlineTime(session);
         double efficiency = BigDecimalUtil.div(validTime, onlineTime, 2);
 
         // 辉煌荣耀子勋章id
@@ -452,7 +453,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         }
     }
 
-    private Duration packageDuration(EndValidTimeDto dto, Student student, Date loginTime) {
+    private Duration packageDuration(EndValidTimeDto dto, Student student, Date loginTime, HttpSession session) {
         Duration duration = new Duration();
         duration.setCourseId(dto.getCourseId());
         duration.setStudyModel(dto.getClassify());
@@ -460,7 +461,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         duration.setValidTime(dto.getValid());
         duration.setLoginTime(loginTime);
         duration.setStudentId(student.getId());
-        duration.setOnlineTime(0L);
+        duration.setOnlineTime(DurationUtil.getOnlineTimeBetweenThisAndLast(student, (Date) session.getAttribute(TimeConstant.LOGIN_TIME)));
         duration.setLoginOutTime(new Date());
         return duration;
     }
