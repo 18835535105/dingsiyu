@@ -259,9 +259,9 @@ public class StudentInfoController extends BaseController {
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
         }
 
-        long valid = 0L;
+        long valid = 1L;
         try {
-            valid = Long.valueOf(validTime);
+            valid = Long.parseLong(validTime);
         } catch (Exception e) {
             log.error("有效时长入参类型错误：学习模块[{}]，validTime[{}]，error=[{}]", dto.getClassify(), validTime, e.getMessage());
         }

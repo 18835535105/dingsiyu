@@ -12,6 +12,7 @@ import com.zhidejiaoyu.common.pojo.CapacityReview;
 import com.zhidejiaoyu.common.pojo.RunLog;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.DurationUtil;
 import com.zhidejiaoyu.common.utils.ValidateCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
@@ -160,9 +161,9 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         // 有效时长  !
         Integer valid = getValidTime(studentId, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
         // 在线时长 !
-        Integer online = getOnLineTime(session, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
+        Integer online = (int) DurationUtil.getTodayOnlineTime(session);
         // 今日学习效率 !
-        if (valid != null && online != null) {
+        if (valid != null) {
             if (valid >= online) {
                 logger.error("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, student);
                 valid = online - 1;
@@ -313,7 +314,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         // 有效时长  !
         Integer valid = super.getTodayValidTime(studentId);
         // 在线时长 !
-        Integer online = super.getTodayOnlineTime(session);
+        Integer online = (int) DurationUtil.getTodayOnlineTime(session);
         result.put("online", SimpleLearnTimeUtil.validOnlineTime(online));
         result.put("valid", SimpleLearnTimeUtil.validOnlineTime(valid));
         // 今日学习效率 !
