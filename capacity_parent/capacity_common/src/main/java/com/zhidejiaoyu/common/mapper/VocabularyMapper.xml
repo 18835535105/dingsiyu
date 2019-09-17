@@ -513,7 +513,7 @@
     <select id="selectByCourseIdNotInWord" resultMap="BaseResultMap" parameterType="map">
         SELECT
         distinct
-        <include refid="unite_Column_List"/>
+        v.id, v.word, uv.word_chinese
         FROM vocabulary v, unit_vocabulary uv, unit u
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = #{courseId}
@@ -652,7 +652,7 @@
     <select id="selectByPhaseNotInWord" resultMap="BaseResultMap" parameterType="map">
         SELECT
         distinct
-        <include refid="unite_Column_List"/>
+        v.id, v.word, uv.word_chinese
         FROM vocabulary v, unit_vocabulary uv, unit u, course c
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = c.id and c.study_paragraph = #{studyParagraph}
