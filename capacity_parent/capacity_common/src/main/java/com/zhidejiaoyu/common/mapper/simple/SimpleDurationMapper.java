@@ -47,15 +47,6 @@ public interface SimpleDurationMapper extends BaseMapper<Duration> {
     Integer deleteByStudentId(Long studentId);
 
     /**
-     * 查找学生的总有效时长
-     *
-     * @param stuId
-     * @return
-     */
-    @Select("select sum(valid_time) from duration where student_id = #{stuId}")
-    Long countTotalValidTime(@Param("stuId") Long stuId);
-
-    /**
      * 查询学生的总学习有效时长 （精确到秒）
      *
      * @param stuId
@@ -75,20 +66,6 @@ public interface SimpleDurationMapper extends BaseMapper<Duration> {
      */
     @Select("SELECT SUM(online_time) FROM duration where student_id = #{stuId}")
     Integer selectTotalOnlineByStudentId(@Param("stuId") Long stuId);
-
-    @Select("select SUM(valid_time) from duration where login_time > #{stateDate} AND login_out_time <= #{endDate} and student_id = #{student_id}")
-    Integer selectValid_time(@Param("student_id") Long student_id, @Param("stateDate") String stateDate, @Param("endDate") String endDate);
-
-    /**
-     * 今天在线数据
-     *
-     * @param student_id
-     * @param stateDate
-     * @param endDate
-     * @return
-     */
-    @Select("select SUM(online_time) from duration where login_time > #{stateDate} AND login_out_time <= #{endDate} and student_id = #{student_id}")
-    Integer selectOnline_time(@Param("student_id") Long student_id, @Param("stateDate") String stateDate, @Param("endDate") String endDate);
 
     /**
      * 查询当前课程总有效学习时间
@@ -111,15 +88,6 @@ public interface SimpleDurationMapper extends BaseMapper<Duration> {
     @MapKey("validTime")
     List<Map<String, Object>> selectValidTimeAndOnlineTime(@Param("student") Student student);
 
-    /**
-     * 获取学生总在线时长
-     *
-     * @param student
-     * @return
-     */
-    @Select("select sum(online_time) from duration where student_id = #{student.id}")
-    Long countTotalOnlineTime(@Param("student") Student student);
-
     List<SeniorityVo> planSeniority(@Param("area") String area, @Param("school_name") String school_name, @Param("grade") String grade, @Param("squad") String squad, @Param("study_paragraph") String study_paragraph, @Param("haveTime") Integer haveTime, @Param("version") String version);
 
     @Select("select SUM(valid_time) AS valid_time FROM duration  WHERE student_id = #{stuId}  GROUP BY student_id")
@@ -140,15 +108,4 @@ public interface SimpleDurationMapper extends BaseMapper<Duration> {
      * @return
      */
     Integer selectOnlineTime(@Param("studentId") Long studentId, @Param("beginTime") String beginTime, @Param("endTime") String endTime);
-
-    /**
-     * 统计今日学生当前模块下当前单元的总有效时长
-     *
-     * @param stuId
-     * @param model  学习模块
-     * @param unitId
-     * @return  有效时长，单位：秒
-     */
-    @Select("select sum(valid_time) from duration where to_days(now()) = to_days(login_time) and student_id = #{stuId} and study_model = #{model} and unit_id = #{unitId}")
-    Long sumTodayModelValidTime(@Param("stuId") Long stuId, @Param("model") int model, @Param("unitId") Long unitId);
 }
