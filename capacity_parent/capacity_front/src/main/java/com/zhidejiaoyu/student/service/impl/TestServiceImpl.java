@@ -1220,11 +1220,11 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
             testRecord = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, testRecord, goldCount);
 
-            //获取测试有效次数
+            /*//获取测试有效次数
             int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
-                    testRecord.getStudyModel(), testRecord.getGenre());
+                    testRecord.getStudyModel(), testRecord.getGenre());*/
             // 获取需要奖励的能量值
-            addEnergy = getEnergy(student, point, number);
+            addEnergy = getEnergy(student, point, 0);
         }
 
         String msg;
