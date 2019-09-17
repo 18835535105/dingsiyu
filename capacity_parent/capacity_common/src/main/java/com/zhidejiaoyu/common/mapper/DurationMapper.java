@@ -6,12 +6,14 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+@Repository
 public interface DurationMapper {
     int countByExample(DurationExample example);
 
@@ -198,4 +200,12 @@ public interface DurationMapper {
      * @return
      */
     Duration selectLastDuration(@Param("studentId") Long studentId);
+
+    /**
+     * 计算本次学习结束距离上次学习结束的在线时长信息
+     *
+     * @param studentId
+     * @return
+     */
+    Duration countOnlineTimeWithLoginOutTine(@Param("studentId") Long studentId);
 }

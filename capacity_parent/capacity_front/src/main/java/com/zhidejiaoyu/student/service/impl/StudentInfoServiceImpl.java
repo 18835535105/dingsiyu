@@ -17,6 +17,7 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.DurationUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
@@ -172,8 +173,8 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
      * 学生完善信息保存奖励信息
      *
      * @param student
-     * @param scale 信息完成度
-     * @return  完善信息后提示语
+     * @param scale   信息完成度
+     * @return 完善信息后提示语
      */
     private String saveAwardInfo(Student student, double scale) {
         String tip;
@@ -312,6 +313,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             return ServerResponse.createBySuccessMessage("本次学习获得金币：0 个");
         }
 
+        long onlineTimeBetweenThisAndLast = DurationUtil.getOnlineTimeBetweenThisAndLast(student, (Date) session.getAttribute(TimeConstant.LOGIN_TIME));
+        dto.setOnlineTime(onlineTimeBetweenThisAndLast);
+
         // 判断有效时长是否大于上个模块退出至当前模块退出时间差, 如果大于，置为最大时间差；否则正常保存
         long validTime = checkTimeDifference(student, dto);
         if (validTime == 0) {
@@ -356,17 +360,13 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
      */
     private Long checkTimeDifference(Student student, EndValidTimeDto dto) {
         try {
-            Duration lastDuration = durationMapper.selectLastDuration(student.getId());
-            if (lastDuration != null && lastDuration.getLoginOutTime() != null) {
-                long timeDifference = System.currentTimeMillis() - lastDuration.getLoginOutTime().getTime();
-                // 最大可保存时间
-                long maxTime = timeDifference / 1000;
-                if (maxTime < dto.getValid()) {
-                    log.warn("学生 [{} -{} - {}] 保存有效时长过大！classify=[{}], courseId=[{}], unitId=[{}], validTime=[{}s], 实际最大可保存为[{}s], num=[{}]",
-                            student.getId(), student.getAccount(), student.getStudentName(), dto.getClassify(), dto.getCourseId(), dto.getUnitId(), dto.getValid(), maxTime, dto.getNum());
-                    dto.setValid(maxTime);
-                    return maxTime;
-                }
+            // 最大可保存时间
+            long maxTime = dto.getOnlineTime();
+            if (maxTime < dto.getValid()) {
+                log.warn("学生 [{} -{} - {}] 保存有效时长过大！classify=[{}], courseId=[{}], unitId=[{}], validTime=[{}s], 实际最大可保存为[{}s], num=[{}]",
+                        student.getId(), student.getAccount(), student.getStudentName(), dto.getClassify(), dto.getCourseId(), dto.getUnitId(), dto.getValid(), maxTime, dto.getNum());
+                dto.setValid(maxTime);
+                return maxTime;
             }
         } catch (Exception e) {
             log.warn("获取有效时长出错！不影响正常使用！", e);
@@ -376,7 +376,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
     private void saveAward(HttpSession session, Integer classify, Student student) {
         // 辉煌荣耀勋章：今天学习效率>目标学习效率 currentPlan ++；否则不操作，每天第一次登录的时候查看昨天是否有更新辉煌荣耀勋章，如果没更新，将其 currentPlan 置为0
-        medalAwardAsync.honour(student, super.getTodayValidTime(student.getId()), super.getTodayOnlineTime(session));
+        medalAwardAsync.honour(student, super.getTodayValidTime(student.getId()), (int) DurationUtil.getTodayOnlineTime(session));
 
         // 学习总有效时长金币奖励
         goldAwardAsync.totalValidTime(student);
@@ -412,7 +412,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         Student student = super.getStudent(session);
         // 今日学习效率
         double validTime = super.getTodayValidTime(student.getId());
-        double onlineTime = super.getTodayOnlineTime(session);
+        double onlineTime = DurationUtil.getTodayOnlineTime(session);
         double efficiency = BigDecimalUtil.div(validTime, onlineTime, 2);
 
         // 辉煌荣耀子勋章id
@@ -460,7 +460,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         duration.setValidTime(dto.getValid());
         duration.setLoginTime(loginTime);
         duration.setStudentId(student.getId());
-        duration.setOnlineTime(0L);
+        duration.setOnlineTime(dto.getOnlineTime());
         duration.setLoginOutTime(new Date());
         return duration;
     }

@@ -40,16 +40,6 @@ public interface BaseService<T> extends IService<T> {
      */
     Integer getValidTime(Long studentId, String beginTime, String endTime);
 
-    /**
-     * 获取学生指定时间段的有效时长
-     *
-     * @param session
-     * @param beginTime 起始时间字符串
-     * @param endTime   结束时间字符串
-     * @return 有效时长 （秒）
-     */
-    Integer getOnLineTime(HttpSession session, String beginTime, String endTime);
-
     void getLevel(HttpSession session);
 
     /**
@@ -79,14 +69,6 @@ public interface BaseService<T> extends IService<T> {
      * @param msg     保存的日志内容
      */
     void saveRunLog(Student student, Integer type, String msg) throws RuntimeException;
-
-    /**
-     * 计算今天的在线时长
-     *
-     * @param session
-     * @return
-     */
-    Integer getTodayOnlineTime(HttpSession session);
 
     /**
      * 计算今天的有效时长

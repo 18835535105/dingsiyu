@@ -6,7 +6,9 @@ import com.zhidejiaoyu.common.pojo.StudyFlowExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface StudyFlowMapper extends BaseMapper<StudyFlow> {
     int countByExample(StudyFlowExample example);
 

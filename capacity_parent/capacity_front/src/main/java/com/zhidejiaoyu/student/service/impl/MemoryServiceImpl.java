@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
+import com.zhidejiaoyu.common.utils.DurationUtil;
 import com.zhidejiaoyu.common.utils.PictureUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
@@ -370,7 +371,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         // 有效时长  !
         Integer valid = super.getTodayValidTime(id);
         // 在线时长 !
-        Integer online = super.getTodayOnlineTime(session);
+        Integer online = (int) DurationUtil.getTodayOnlineTime(session);
         // 今日学习效率 !
         if (valid != null && online != null) {
             if (valid > online) {
