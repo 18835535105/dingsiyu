@@ -616,8 +616,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     private Map<String, Object> packageStrengthVo(Student student, List<Vocabulary> rightVocabularies,
-                                                                  Map<String, String> map, int size, int errorSize,
-                                                                  List<Vocabulary> errorVocabularies) {
+                                                  Map<String, String> map, int size, int errorSize,
+                                                  List<Vocabulary> errorVocabularies) {
         List<StrengthGameVo> strengthGameVos = new ArrayList<>();
         if (size > 0) {
             List<String> wordList;
@@ -987,7 +987,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             isFirst = true;
         }
 
-        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld);
+        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld,true);
         if (testRecordOld == null) {
             testRecord = new TestRecord();
             // 首次测试大于或等于80分，超过历史最高分次数 +1
@@ -1043,7 +1043,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             isFirst = true;
         }
 
-        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld);
+        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld,true);
         if (testRecordOld == null) {
             testRecord = new TestRecord();
             // 首次测试大于或等于80分，超过历史最高分次数 +1
@@ -1216,7 +1216,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (!redisOpt.isRepeatSubmit(student.getId(), (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME))) {
             saveTestLearnAndCapacity.saveTestAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, unitId, classify);
 
-            goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord);
+            goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord, false);
 
             testRecord = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, testRecord, goldCount);
 
@@ -1324,7 +1324,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         saveTestLearnAndCapacity.saveTestAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, unitId, classify);
 
         // 根据不同分数奖励学生金币
-        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord);
+        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord,true);
 
         testRecord = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, testRecord, goldCount);
 
@@ -1556,7 +1556,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         wordUnitTestDTO.setClassify(11);
         wordUnitTestDTO.setUnitId(new Long[]{dto.getUnitId()});
         wordUnitTestDTO.setPoint(point);
-        Integer goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord);
+        Integer goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord,true);
 
         testRecord.setAwardGold(goldCount);
         TestResultVo vo = new TestResultVo();
@@ -1609,32 +1609,41 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      * @param wordUnitTestDTO
      * @param student
      * @param testRecord
+     * @param type            true 计算最高分  false不计算最高分
      * @return 学生应奖励金币数
      */
-    private Integer saveGold(boolean isFirst, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord) {
+    private Integer saveGold(boolean isFirst, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord, boolean type) {
         int point = wordUnitTestDTO.getPoint();
         int goldCount = 0;
         // 查询当前单元测试历史最高分数
-        Integer betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), wordUnitTestDTO.getUnitId()[0],
-                wordUnitTestDTO.getClassify());
-        // 当前分数没有超过历史最高分，不获取金币
-        if (betterPoint != null && betterPoint >= point) {
-            return 0;
+        Integer betterPoint = null;
+        if (type) {
+            betterPoint = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), wordUnitTestDTO.getUnitId()[0],
+                    wordUnitTestDTO.getClassify());
+            // 当前分数没有超过历史最高分，不获取金币
+            if (betterPoint != null && betterPoint >= point) {
+                return 0;
+            }
         }
-
         if (isFirst) {
             goldCount = getGoldCount(wordUnitTestDTO, student, point);
         } else {
-            if (betterPoint == null) {
-                betterPoint = 0;
-            }
-
-            // 非首次测试成绩本次测试成绩大于历史最高分，超过历史最高分次数 +1并且金币奖励翻倍
-            if (betterPoint < point) {
+            if (type) {
+                if (betterPoint == null) {
+                    betterPoint = 0;
+                }
+                // 非首次测试成绩本次测试成绩大于历史最高分，超过历史最高分次数 +1并且金币奖励翻倍
+                if (betterPoint < point) {
+                    int betterCount = (testRecord.getBetterCount() == null ? 0 : testRecord.getBetterCount()) + 1;
+                    testRecord.setBetterCount(betterCount);
+                    goldCount = getGoldCount(wordUnitTestDTO, student, point);
+                }
+            } else {
                 int betterCount = (testRecord.getBetterCount() == null ? 0 : testRecord.getBetterCount()) + 1;
                 testRecord.setBetterCount(betterCount);
                 goldCount = getGoldCount(wordUnitTestDTO, student, point);
             }
+
         }
         return testGoldUtil.addGold(student, goldCount);
     }
