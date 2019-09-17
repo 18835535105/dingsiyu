@@ -402,23 +402,6 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
                 if (i == 0) {
                     // 计算单词模块百分比值
                     int planVocabulary = ((int) (BigDecimalUtil.div(count, picCount) * 100));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                     m.put("duration", planVocabulary);// 单词图鉴模块百分比值
                 } else if (i < 4) {
                     // 计算单词模块百分比值
