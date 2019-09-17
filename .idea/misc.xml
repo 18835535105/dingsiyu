@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$/capacity_parent/capacity_front" />
+  </component>
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/capacity_parent/pom.xml" />
+      </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/capacity_parent/aliyun-oss/pom.xml" />
+        <option value="$PROJECT_DIR$/capacity_parent/capacity_common/pom.xml" />
+        <option value="$PROJECT_DIR$/capacity_parent/capacity_front/pom.xml" />
+        <option value="$PROJECT_DIR$/capacity_parent/pom.xml" />
+        <option value="$PROJECT_DIR$/../guns-parent/guns/aliyun-oss/pom.xml" />
+        <option value="$PROJECT_DIR$/../guns-parent/guns/common/pom.xml" />
+        <option value="$PROJECT_DIR$/../guns-parent/guns/guns-admin/pom.xml" />
+        <option value="$PROJECT_DIR$/../guns-parent/guns/guns-core/pom.xml" />
+        <option value="$PROJECT_DIR$/../guns-parent/guns/guns-generator/pom.xml" />
+        <option value="$PROJECT_DIR$/../guns-parent/guns/pom.xml" />
+      </set>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>
