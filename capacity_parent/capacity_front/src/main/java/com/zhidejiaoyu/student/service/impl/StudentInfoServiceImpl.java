@@ -313,6 +313,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             return ServerResponse.createBySuccessMessage("本次学习获得金币：0 个");
         }
 
+        long onlineTimeBetweenThisAndLast = DurationUtil.getOnlineTimeBetweenThisAndLast(student, (Date) session.getAttribute(TimeConstant.LOGIN_TIME));
+        dto.setOnlineTime(onlineTimeBetweenThisAndLast);
+
         // 判断有效时长是否大于上个模块退出至当前模块退出时间差, 如果大于，置为最大时间差；否则正常保存
         long validTime = checkTimeDifference(student, dto);
         if (validTime == 0) {
@@ -322,7 +325,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
         Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
 
-        Duration duration = packageDuration(dto, student, loginTime, session);
+        Duration duration = packageDuration(dto, student, loginTime);
         try {
             durationMapper.insert(duration);
         } catch (Exception e) {
@@ -357,17 +360,13 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
      */
     private Long checkTimeDifference(Student student, EndValidTimeDto dto) {
         try {
-            Duration lastDuration = durationMapper.selectLastDuration(student.getId());
-            if (lastDuration != null && lastDuration.getLoginOutTime() != null) {
-                long timeDifference = System.currentTimeMillis() - lastDuration.getLoginOutTime().getTime();
-                // 最大可保存时间
-                long maxTime = timeDifference / 1000;
-                if (maxTime < dto.getValid()) {
-                    log.warn("学生 [{} -{} - {}] 保存有效时长过大！classify=[{}], courseId=[{}], unitId=[{}], validTime=[{}s], 实际最大可保存为[{}s], num=[{}]",
-                            student.getId(), student.getAccount(), student.getStudentName(), dto.getClassify(), dto.getCourseId(), dto.getUnitId(), dto.getValid(), maxTime, dto.getNum());
-                    dto.setValid(maxTime);
-                    return maxTime;
-                }
+            // 最大可保存时间
+            long maxTime = dto.getOnlineTime();
+            if (maxTime < dto.getValid()) {
+                log.warn("学生 [{} -{} - {}] 保存有效时长过大！classify=[{}], courseId=[{}], unitId=[{}], validTime=[{}s], 实际最大可保存为[{}s], num=[{}]",
+                        student.getId(), student.getAccount(), student.getStudentName(), dto.getClassify(), dto.getCourseId(), dto.getUnitId(), dto.getValid(), maxTime, dto.getNum());
+                dto.setValid(maxTime);
+                return maxTime;
             }
         } catch (Exception e) {
             log.warn("获取有效时长出错！不影响正常使用！", e);
@@ -453,7 +452,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         }
     }
 
-    private Duration packageDuration(EndValidTimeDto dto, Student student, Date loginTime, HttpSession session) {
+    private Duration packageDuration(EndValidTimeDto dto, Student student, Date loginTime) {
         Duration duration = new Duration();
         duration.setCourseId(dto.getCourseId());
         duration.setStudyModel(dto.getClassify());
@@ -461,7 +460,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         duration.setValidTime(dto.getValid());
         duration.setLoginTime(loginTime);
         duration.setStudentId(student.getId());
-        duration.setOnlineTime(DurationUtil.getOnlineTimeBetweenThisAndLast(student, (Date) session.getAttribute(TimeConstant.LOGIN_TIME)));
+        duration.setOnlineTime(dto.getOnlineTime());
         duration.setLoginOutTime(new Date());
         return duration;
     }

@@ -26,4 +26,9 @@ public class EndValidTimeDto {
     Long valid;
 
     String num;
+
+    /**
+     * 在线时长，不作为接口参数，在逻辑内封装的字段
+     */
+    Long onlineTime;
 }
