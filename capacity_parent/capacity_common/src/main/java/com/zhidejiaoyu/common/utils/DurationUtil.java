@@ -75,4 +75,18 @@ public class DurationUtil {
         }
         return thisLoginOnlineTime + preThisLoginOnlineTine;
     }
+
+    /**
+     * 获取学生今日的有效时长
+     *
+     * @param session
+     * @return
+     */
+    public static long getTodayValidTime(HttpSession session) {
+        Student student  = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        String todayTime = DateUtil.formatYYYYMMDD(new Date());
+        Integer validTime = durationMapper.selectValidTime(student.getId(), todayTime + " 00:00:00",
+                todayTime + " 23:59:59");
+        return validTime == null ? 0L : validTime;
+    }
 }

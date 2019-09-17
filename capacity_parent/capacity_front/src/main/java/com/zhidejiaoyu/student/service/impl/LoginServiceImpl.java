@@ -462,21 +462,17 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     private void getIndexTime(HttpSession session, Student student, Map<String, Object> result) {
         // 有效时长
-        Integer valid = getTodayValidTime(student.getId());
+        Integer valid = (int) DurationUtil.getTodayValidTime(session);
         // 在线时长
         Integer online = (int) DurationUtil.getTodayOnlineTime(session);
         // 今日学习效率
-        if (valid != null) {
-            if (valid >= online) {
-                logger.warn("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, student);
-                valid = online - 1;
-                result.put("efficiency", "99%");
-            } else {
-                String efficiency = LearnTimeUtil.efficiency(valid, online);
-                result.put("efficiency", efficiency);
-            }
+        if (valid >= online) {
+            logger.warn("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, student);
+            valid = online - 1;
+            result.put("efficiency", "99%");
         } else {
-            result.put("efficiency", "0%");
+            String efficiency = LearnTimeUtil.efficiency(valid, online);
+            result.put("efficiency", efficiency);
         }
         result.put("online", online);
         result.put("valid", valid);

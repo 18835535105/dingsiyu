@@ -376,7 +376,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
     private void saveAward(HttpSession session, Integer classify, Student student) {
         // 辉煌荣耀勋章：今天学习效率>目标学习效率 currentPlan ++；否则不操作，每天第一次登录的时候查看昨天是否有更新辉煌荣耀勋章，如果没更新，将其 currentPlan 置为0
-        medalAwardAsync.honour(student, super.getTodayValidTime(student.getId()), (int) DurationUtil.getTodayOnlineTime(session));
+        medalAwardAsync.honour(student, (int) DurationUtil.getTodayValidTime(session), (int) DurationUtil.getTodayOnlineTime(session));
 
         // 学习总有效时长金币奖励
         goldAwardAsync.totalValidTime(student);
@@ -401,55 +401,6 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             return 3;
         }
         return 0;
-    }
-
-    /**
-     * 更新辉煌荣耀勋章
-     *
-     * @param session
-     */
-    private void honour(HttpSession session) {
-        Student student = super.getStudent(session);
-        // 今日学习效率
-        double validTime = super.getTodayValidTime(student.getId());
-        double onlineTime = DurationUtil.getTodayOnlineTime(session);
-        double efficiency = BigDecimalUtil.div(validTime, onlineTime, 2);
-
-        // 辉煌荣耀子勋章id
-        List<Medal> children = medalMapper.selectChildrenIdByParentId(6);
-
-        // 获取勋章奖励信息
-        List<Award> awards = awardMapper.selectMedalByStudentIdAndMedalType(student, children);
-
-        if (awards.size() > 0) {
-            Date date = new Date();
-            int size = awards.size();
-            Award award;
-            try {
-                for (int i = 0; i < size; i++) {
-                    award = awards.get(i);
-                    // 总进度为空或者总进度不等于需要完成的总进度，重新设置奖励总进度
-                    if (award.getTotalPlan() == null || award.getTotalPlan() != MedalConstant.HONOUR_TOTAL_PLAN[i]) {
-                        award.setTotalPlan(MedalConstant.HONOUR_TOTAL_PLAN[i]);
-                    }
-                    // 如果总进度!=当前完成进度，更新当前完成进度
-                    if (!Objects.equals(award.getTotalPlan(), award.getCurrentPlan())) {
-                        // 学习效率 >= 需要完成的学习效率，并且当前记录不是今天更新的，进度++
-                        if (efficiency >= MedalConstant.HONOUR_TARGET_PLAN[i] && !Objects.equals(DateUtil.formatYYYYMMDD(award.getCreateTime()), DateUtil.formatYYYYMMDD(date))) {
-                            if (award.getCurrentPlan() == null) {
-                                award.setCurrentPlan(1);
-                            } else {
-                                award.setCurrentPlan(award.getCurrentPlan() + 1);
-                            }
-                            award.setCreateTime(date);
-                        }
-                        awardMapper.updateById(award);
-                    }
-                }
-            } catch (Exception e) {
-                log.error("实时计算辉煌荣耀勋章出错，studentId=[{}], studentName=[{}], error=[{}]", student.getId(), student.getStudentName(), e);
-            }
-        }
     }
 
     private Duration packageDuration(EndValidTimeDto dto, Student student, Date loginTime) {

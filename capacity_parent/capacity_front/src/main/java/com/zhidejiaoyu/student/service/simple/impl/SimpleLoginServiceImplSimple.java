@@ -7,10 +7,7 @@ import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
-import com.zhidejiaoyu.common.pojo.Award;
-import com.zhidejiaoyu.common.pojo.CapacityReview;
-import com.zhidejiaoyu.common.pojo.RunLog;
-import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.DurationUtil;
 import com.zhidejiaoyu.common.utils.ValidateCode;
@@ -157,23 +154,18 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         int count = simpleCapacityStudentUnitMapper.countByType(student, 1);
         result.put("hasCapacityWord", count > 0);
 
-        String formatYYYYMMDD = SimpleDateUtil.formatYYYYMMDD(new Date());
         // 有效时长  !
-        Integer valid = getValidTime(studentId, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
+        Integer valid = (int) DurationUtil.getTodayValidTime(session);
         // 在线时长 !
         Integer online = (int) DurationUtil.getTodayOnlineTime(session);
         // 今日学习效率 !
-        if (valid != null) {
-            if (valid >= online) {
-                logger.error("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, student);
-                valid = online - 1;
-                result.put("efficiency", "99%");
-            } else {
-                String efficiency = SimpleLearnTimeUtil.efficiency(valid, online);
-                result.put("efficiency", efficiency);
-            }
+        if (valid >= online) {
+            logger.error("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, student);
+            valid = online - 1;
+            result.put("efficiency", "99%");
         } else {
-            result.put("efficiency", "0%");
+            String efficiency = SimpleLearnTimeUtil.efficiency(valid, online);
+            result.put("efficiency", efficiency);
         }
         result.put("online", online);
         result.put("valid", valid);
@@ -312,18 +304,14 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         result.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
 
         // 有效时长  !
-        Integer valid = super.getTodayValidTime(studentId);
+        int valid = (int) DurationUtil.getTodayValidTime(session);
         // 在线时长 !
-        Integer online = (int) DurationUtil.getTodayOnlineTime(session);
+        int online = (int) DurationUtil.getTodayOnlineTime(session);
         result.put("online", SimpleLearnTimeUtil.validOnlineTime(online));
         result.put("valid", SimpleLearnTimeUtil.validOnlineTime(valid));
         // 今日学习效率 !
-        if (valid != null && online != null) {
-            String efficiency = SimpleLearnTimeUtil.efficiency(valid, online);
-            result.put("efficiency", efficiency);
-        } else {
-            result.put("efficiency", "0%");
-        }
+        String efficiency = SimpleLearnTimeUtil.efficiency(valid, online);
+        result.put("efficiency", efficiency);
 
         // i参数 1=慧记忆，2=慧听写，3=慧默写，4=例句听力，5=例句翻译，6=例句默写
         //-- 1.查询学生当前单词模块学的那个单元
@@ -336,10 +324,6 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
             Map<String, Object> a = new HashMap<String, Object>();
             //-- 如果 2 = NULL 就跳过4步执行5步   condition = 3(方框为空)
             //-- 如果 2 != NULL 执行4步跳过第5步 , 如果第2步>=80 condition = 1(方框为√), 如果第3步<80 condition = 2(方框为×)
-
-            if (unitId == null) {
-                return ServerResponse.createBySuccess(result);
-            }
 
             //-- 2.某学生某单元某模块得了多少分
             //select point from test_record where student_id = #{} and unit_id = #{} and genre = '单元闯关测试' and study_model = '慧记忆'
