@@ -4,11 +4,11 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentSkin">
-        <id column="id" property="id" />
-        <result column="student_id" property="studentId" />
-        <result column="skin_name" property="skinName" />
-        <result column="end_time" property="endTime" />
-        <result column="state" property="state" />
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="skin_name" property="skinName"/>
+        <result column="end_time" property="endTime"/>
+        <result column="state" property="state"/>
         <result column="create_time" property="createTime"></result>
         <result column="img_url" property="imgUrl"></result>
     </resultMap>
@@ -18,33 +18,45 @@
 	</sql>
 
     <select id="selSkinByStudentId" resultMap="BaseResultMap" parameterType="java.lang.Long">
-        select <include refid="Base_Column_List" /> from student_skin where student_id=#{studentId}
+        select
+        <include refid="Base_Column_List"/>
+        from student_skin where student_id=#{studentId}
     </select>
 
 
     <select id="selSkinByStudentIdIsHave" resultMap="BaseResultMap" parameterType="java.lang.Long">
-        select <include refid="Base_Column_List" /> from student_skin where student_id=#{studentId} and end_time is null
+        select
+        <include refid="Base_Column_List"/>
+        from student_skin where student_id=#{studentId} and end_time is null
     </select>
 
 
     <select id="selSkinByStudentIdAndEndTime" resultMap="BaseResultMap" parameterType="java.lang.Long">
-        select <include refid="Base_Column_List" /> from student_skin where student_id=#{studentId} and (end_time > now() or end_time is null)
+        select
+        <include refid="Base_Column_List"/>
+        from student_skin where student_id=#{studentId} and (end_time > now() or end_time is null) and state=1
     </select>
 
     <select id="selUseSkinByStudentId" resultMap="BaseResultMap" parameterType="java.lang.Long">
-         select <include refid="Base_Column_List" /> from student_skin where student_id=#{studentId} and state=1
+        select
+        <include refid="Base_Column_List"/>
+        from student_skin where student_id=#{studentId} and state=1
     </select>
 
     <select id="selSkinBystudentIdAndName" resultMap="BaseResultMap" parameterType="java.util.Map">
-        select <include refid="Base_Column_List" /> from student_skin where student_id=#{studentId} and skin_name=#{skinName}
+        select
+        <include refid="Base_Column_List"/>
+        from student_skin where student_id=#{studentId} and skin_name=#{skinName}
     </select>
 
-    <update id="updUseSkin"  parameterType="java.util.Map" >
+    <update id="updUseSkin" parameterType="java.util.Map">
         update student_skin set state=#{state} , end_time = #{endTime} , img_url=#{imgUrl} , create_time=#{createTime} where id=#{id};
     </update>
 
     <select id="selUseSkinByStudentIdAndName" resultMap="BaseResultMap" parameterType="java.lang.Long">
-        select <include refid="Base_Column_List" /> from student_skin where student_id=#{studentId} and state=1 and (end_time > now() or end_time is null)
+        select
+        <include refid="Base_Column_List"/>
+        from student_skin where student_id=#{studentId} and state=1 and (end_time > now() or end_time is null)
     </select>
 
     <select id="selTrySkinAndHaveSkin" resultType="java.util.Map" parameterType="java.lang.Long">
