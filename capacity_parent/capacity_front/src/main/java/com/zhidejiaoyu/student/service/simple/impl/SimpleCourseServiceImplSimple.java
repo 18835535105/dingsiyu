@@ -2,10 +2,7 @@ package com.zhidejiaoyu.student.service.simple.impl;
 
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
-import com.zhidejiaoyu.common.pojo.Course;
-import com.zhidejiaoyu.common.pojo.Learn;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.StudentCourse;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -695,7 +692,17 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<SimpleC
 
     @Override
     public ServerResponse<Object> postCourseIdAndUnitId(Long studentId, Long courseId, Long unitId, int model) {
-        simpleSimpleStudentUnitMapper.updateCourseIdAndUnitIdByCourseIdByModel(courseId, unitId, studentId, model);
+        Long courseIdByTypeToStudent = simpleSimpleStudentUnitMapper.getCourseIdByTypeToStudent(studentId, model);
+        if (courseIdByTypeToStudent == null) {
+            simpleSimpleStudentUnitMapper.insert(SimpleStudentUnit.builder()
+                    .courseId(courseId)
+                    .studentId(studentId)
+                    .type(model)
+                    .unitId(unitId)
+                    .build());
+        } else {
+            simpleSimpleStudentUnitMapper.updateCourseIdAndUnitIdByCourseIdByModel(courseId, unitId, studentId, model);
+        }
         return ServerResponse.createBySuccess();
     }
 

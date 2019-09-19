@@ -363,34 +363,25 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
     @Override
     public ServerResponse<Object> todayTime(HttpSession session) {
         Student student = super.getStudent(session);
-        Long id = student.getId();
 
         // 封装返回数据
         Map<String, Object> result = new HashMap<>(16);
 
         // 有效时长  !
-        Integer valid = super.getTodayValidTime(id);
+        Integer valid = (int) DurationUtil.getTodayValidTime(session);
         // 在线时长 !
         Integer online = (int) DurationUtil.getTodayOnlineTime(session);
         // 今日学习效率 !
-        if (valid != null && online != null) {
-            if (valid > online) {
-                log.error("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, student);
-                valid = online - 1;
-                result.put("efficiency", "99%");
-            } else {
-                String efficiency = LearnTimeUtil.efficiency(valid, online);
-                result.put("efficiency", efficiency);
-            }
+        if (valid > online) {
+            log.error("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, student);
+            valid = online - 1;
+            result.put("efficiency", "99%");
         } else {
-            result.put("efficiency", "0%");
+            String efficiency = LearnTimeUtil.efficiency(valid, online);
+            result.put("efficiency", efficiency);
         }
         result.put("online", online);
         result.put("valid", valid);
-        // todo:跟踪日志
-        if (valid == null) {
-            log.error("今日有效时长 valid = null;");
-        }
         return ServerResponse.createBySuccess(result);
     }
 

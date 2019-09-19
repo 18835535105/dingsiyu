@@ -2,14 +2,15 @@ package com.zhidejiaoyu.student.service.impl;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
-import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
-import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.LevelMapper;
+import com.zhidejiaoyu.common.mapper.StudentExpansionMapper;
+import com.zhidejiaoyu.common.mapper.StudentMapper;
+import com.zhidejiaoyu.common.mapper.StudyFlowMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.pojo.StudyFlow;
 import com.zhidejiaoyu.common.utils.TokenUtil;
-import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.common.SaveRunLog;
@@ -18,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,10 +28,6 @@ import java.util.Map;
  * @date 2018/8/29
  */
 public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, T> implements BaseService<T> {
-
-    @Autowired
-    private DurationMapper durationMapper;
-
 
     @Autowired
     private StudyFlowMapper studyFlowMapper;
@@ -66,12 +62,6 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
     }
 
     @Override
-    public Integer getValidTime(Long studentId, String beginTime, String endTime) {
-        Integer time = durationMapper.selectValidTime(studentId, beginTime, endTime);
-        return time == null ? 0 : time;
-    }
-
-    @Override
     public void getLevel(HttpSession session) {
         Student student = getStudent(session);
         double gold = student.getSystemGold() + student.getOfflineGold();
@@ -89,18 +79,6 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
             studentExpansion.setStudyPower(studentExpansion.getStudyPower() + addStudy);
             studentExpansionMapper.updateById(studentExpansion);
         }
-    }
-
-    /**
-     * 计算今天的有效时长
-     *
-     * @param studentId
-     * @return
-     */
-    @Override
-    public Integer getTodayValidTime(Long studentId) {
-        String formatYYYYMMDD = DateUtil.formatYYYYMMDD(new Date());
-        return this.getValidTime(studentId, formatYYYYMMDD + " 00:00:00", formatYYYYMMDD + " 23:59:59");
     }
 
     @Override

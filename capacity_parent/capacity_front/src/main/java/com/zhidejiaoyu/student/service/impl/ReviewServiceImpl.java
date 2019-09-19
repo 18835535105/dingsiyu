@@ -1459,7 +1459,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             // 把四个选项添加到correct正确答案数据中
             map.put("subject", subject);
         } else if (classify == 1) {
-            map.put("wordChineseList", this.getChinese(Long.parseLong(map.get("unit_id").toString()), vocabulary.getId(), map.get("wordChinese").toString()));
+            map.put("wordChineseList", this.getChinese(Long.parseLong(map.get("unit_id").toString()), vocabulary == null ? null : vocabulary.getId(), map.get("wordChinese").toString()));
             map.put("recordpicurl", PictureUtil.getPictureByCourseId(vocabulary, map.get("course_id") == null ? null : Long.parseLong(map.get("course_id").toString())));
         }
         return ServerResponse.createBySuccess(map);
@@ -1489,7 +1489,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         int hard = memoryDifficultyUtil.getMemoryDifficulty(cm, 1);
         map.put("memoryDifficulty", hard);
 
-        map.put("soundmark", vocabulary.getSoundMark());
+        map.put("soundmark", vocabulary == null ? null : vocabulary.getSoundMark());
         // 读音url
         map.put("readUrl", baiduSpeak.getLanguagePath(map.get("word").toString()));
 
