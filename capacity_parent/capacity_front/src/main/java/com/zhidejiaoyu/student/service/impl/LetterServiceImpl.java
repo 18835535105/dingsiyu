@@ -268,8 +268,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         Integer letterPairCount = letterPairMapper.selCountStudyLetter(unitId, studentId);
         Integer countByUnitId = letterMapper.selLetterCountById(unitId);
         if (countByUnitId.equals(letterPairCount)) {
-            letterPairMapper.deleteByUnitAndStudent(unitId, studentId);
-            learnMapper.updLetterPair(studentId, unitId, "字母配对");
+            return ServerResponse.createBySuccess(600, "无学习");
         }
         Map<String, Object> map = new HashMap<>();
         //查看黄金记忆点单词
@@ -572,6 +571,19 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             throw new RuntimeException(e);
         }
 
+        return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    public Object updLetterPair(HttpSession session,Long unitId){
+        Long studentId = getStudentId(session);
+        try {
+            //修改字母配对数据
+            letterPairMapper.deleteByUnitAndStudent(unitId, studentId);
+            learnMapper.updLetterPair(studentId, unitId, "字母配对");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return ServerResponse.createBySuccess();
     }
 

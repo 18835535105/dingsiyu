@@ -86,6 +86,18 @@ public class LetterController {
     }
 
     /**
+     * 去除字母配对内容
+     *
+     * @param unitId
+     * @param session
+     * @return
+     */
+    @RequestMapping("/updLetterPair")
+    public Object updLetterPair(Long unitId, HttpSession session) {
+        return letterService.updLetterPair(session, unitId);
+    }
+
+    /**
      * 保存字母配对
      *
      * @param letterPair

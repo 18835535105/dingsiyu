@@ -20,7 +20,7 @@
     </sql>
 
     <select id="selLetterCountById" resultType="integer" parameterType="long">
-        select count(id) from letter where unit_id =#{unitId}
+        select count(distinct letter.big_letter) from letter where unit_id =#{unitId}
     </select>
 
     <select id="getByUnitId" parameterType="long" resultMap="BaseResultMap">
