@@ -372,10 +372,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
             this.logInfo(student, studentStudyPlan);
 
-            studentStudyPlan.setUpdateTime(new Date());
-            studentStudyPlan.setCurrentStudyCount(studentStudyPlan.getCurrentStudyCount() + 1);
-            studentStudyPlanMapper.updateById(studentStudyPlan);
-
             updateCapacityStudentUnit(capacityStudentUnit, nextUnitId, null);
             saveOpenUnitLog(student, dto.getUnitId(), nextUnitId);
 
