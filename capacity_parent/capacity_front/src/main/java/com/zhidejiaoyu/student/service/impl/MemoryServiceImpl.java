@@ -25,10 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabulary> implements MemoryService {
@@ -307,6 +304,9 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
      */
     public static void packageAboutStudyPlan(Learn learn, Long studentId, CapacityStudentUnitMapper capacityStudentUnitMapper,
                                              StudentStudyPlanMapper studentStudyPlanMapper) {
+        if (StringUtils.isNotEmpty(learn.getCourseName())) {
+            return;
+        }
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
         if (capacityStudentUnit != null) {
             Long startUnitId = capacityStudentUnit.getStartunit();
