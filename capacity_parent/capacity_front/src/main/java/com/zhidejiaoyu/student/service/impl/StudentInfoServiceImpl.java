@@ -426,7 +426,8 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     private Duration packageDuration(EndValidTimeDto dto, Student student, Date loginTime) {
         Duration duration = new Duration();
         duration.setCourseId(dto.getCourseId());
-        duration.setStudyModel(dto.getClassify());
+        Integer classify = dto.getClassify();
+        duration.setStudyModel(classify);
         duration.setUnitId(dto.getUnitId());
         duration.setValidTime(dto.getValid());
         duration.setLoginTime(loginTime);
@@ -434,9 +435,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         duration.setOnlineTime(dto.getOnlineTime());
         duration.setLoginOutTime(new Date());
 
-        if (dto.getClassify() != null) {
+        if (classify != null) {
             // 判断是不是单词流程相关的模块
-            boolean flag = (dto.getClassify() >= 0 && dto.getClassify() <= 3) || dto.getClassify() == 27 || dto.getClassify() == 35;
+            boolean flag = (classify >= 0 && classify <= 3) || classify == 27 || classify == 35 || classify == 36;
             if (flag) {
                 // 单词学习计划
                 CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
