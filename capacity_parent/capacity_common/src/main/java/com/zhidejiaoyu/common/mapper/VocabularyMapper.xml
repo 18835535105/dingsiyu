@@ -732,5 +732,16 @@
         </if>
     </select>
 
+    <select id="selectByJointName" resultMap="BaseResultMap" parameterType="map">
+        select v.word, uv.word_chinese
+        from unit u,
+             unit_vocabulary uv,
+             vocabulary v
+        where u.id = uv.unit_id
+          and v.id = uv.vocabulary_id
+          and u.joint_name = #{jointName}
+        group by v.id
+    </select>
+
 
 </mapper>

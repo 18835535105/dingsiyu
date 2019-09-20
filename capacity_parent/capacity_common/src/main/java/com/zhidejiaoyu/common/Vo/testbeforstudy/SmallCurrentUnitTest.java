@@ -14,8 +14,8 @@ import java.util.List;
  * @Date: 2019-09-16 16:11
  */
 @Data
-@Builder
-@NoArgsConstructor
+/*@Builder
+@NoArgsConstructor*/
 public class SmallCurrentUnitTest implements Serializable {
 
     /**
@@ -23,7 +23,7 @@ public class SmallCurrentUnitTest implements Serializable {
      */
     private Integer topic;
 
-    /**
+   /* *
      *
      */
     private List<QuestionAndAnswer> questionAndAnswerList;

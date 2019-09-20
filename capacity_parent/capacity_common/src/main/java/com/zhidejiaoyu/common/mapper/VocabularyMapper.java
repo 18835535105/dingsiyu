@@ -359,4 +359,12 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     Integer selCountRandWord(@Param("type") Integer type, @Param("leng") Integer length);
+
+    /**
+     * 通过单元名查询当前单元下的所有单词信息
+     *
+     * @param jointName
+     * @return
+     */
+    List<Vocabulary> selectByJointName(@Param("jointName") String jointName);
 }
