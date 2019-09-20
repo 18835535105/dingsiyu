@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.ExerciseSheetBeforeClassMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.ExerciseSheetBeforeClass">
+        <id column="id" property="id"/>
+        <result column="subject" property="subject"/>
+        <result column="answer" property="answer"/>
+        <result column="option" property="option"/>
+        <result column="type" property="type"/>
+        <result column="joint_name" property="jointName"/>
+        <result column="points" property="points"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="analysis" property="analysis"/>
+    </resultMap>
+
+    <sql id="base_sql">
+        id, `subject`, answer,`option`, type, joint_name, points,  create_time, update_time, analysis
+    </sql>
+
+    <select id="selectByJointName" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from exercise_sheet_before_class
+        where joint_name = #{jointName}
+        order by type
+    </select>
+
+</mapper>

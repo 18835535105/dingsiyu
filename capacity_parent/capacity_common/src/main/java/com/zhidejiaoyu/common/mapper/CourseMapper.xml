@@ -695,4 +695,8 @@
         group by c.id
     </select>
 
+    <select id="getAllCourseByStudyParagraph" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from course where study_paragraph =#{paragraph}
+    </select>
+
 </mapper>
