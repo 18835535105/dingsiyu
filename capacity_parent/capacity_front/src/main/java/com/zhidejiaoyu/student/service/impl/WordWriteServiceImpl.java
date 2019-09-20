@@ -45,9 +45,6 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
     private StudentMapper studentMapper;
 
     @Autowired
-    private CommonMethod commonMethod;
-
-    @Autowired
     private BaiduSpeak baiduSpeak;
 
     @Autowired
@@ -64,6 +61,12 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 
     @Autowired
     private CapacityPictureMapper capacityPictureMapper;
+
+    @Autowired
+    private CapacityStudentUnitMapper capacityStudentUnitMapper;
+
+    @Autowired
+    private StudentStudyPlanMapper studentStudyPlanMapper;
 
 
     @Override
@@ -84,9 +87,8 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
         // 记录学生开始学习该单词的时间
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
-        Integer maxCount = 1;
         // 查询学生当前单元当前模块下已学习单词的个数，即学习进度
-        Long plan = learnMapper.countLearnWord(student.getId(), unitId, "慧默写", maxCount);
+        Long plan = learnMapper.countLearnWord(student.getId(), unitId, "慧默写");
         // 获取当前单元下的所有单词的总个数
         Long wordCount = unitVocabularyMapper.countByUnitId(unitId);
         if (wordCount == 0) {
@@ -111,7 +113,7 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
         // 获取当前学习进度的下一个单词
         if (wordCount - 1 >= plan) {
             // 查询学习记录本模块学习过的所有单词id
-            List<Long> wordIds = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "慧默写", maxCount);
+            List<Long> wordIds = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "慧默写");
 
             WordWriteStudyVo wordWriteStudyVo = new WordWriteStudyVo();
             Vocabulary currentStudyWord = vocabularyMapper.selectOneWordNotInIds(wordIds, unitId);
@@ -196,7 +198,6 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
         Student student = getStudent(session);
         Date now = DateUtil.parseYYYYMMDDHHMMSS(new Date());
         Long studentId = student.getId();
-        int count;
 
         if (student.getFirstStudyTime() == null) {
             // 说明学生是第一次在本系统学习，记录首次学习时间
@@ -220,16 +221,12 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
             studyModel = "单词图鉴";
         }
 
-        // 当前课程最大学习遍数
-        Integer maxCount = 1;
-        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, studyModel, 1, 1);
+        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, studyModel, 1);
         if (learnIds.size() > 1) {
             List<Long> longs = learnIds.subList(1, learnIds.size());
             learnMapper.deleteBatchIds(longs);
         }
-        Learn currentLearn = learnMapper.selectLearn(studentId, learn, studyModel, maxCount, 1);
-        // 不是第一次学习
-
+        Learn currentLearn = learnMapper.selectLearn(studentId, learn, studyModel, 1);
         /**
          * 查看慧默写  会听写  单词图鉴是否为上次学习 如果是 删除
          * 开始
@@ -237,37 +234,34 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
         CapacityWrite capacityWrite = null;
         CapacityListen capacityListen = null;
         CapacityPicture capacityPicture = null;
-        boolean falg = false;
+        boolean flag = false;
         if (classify == 3) {
             // 慧默写
             List<CapacityWrite> capacityWrites = capacityWriteMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
                     learn.getVocabularyId());
-            falg = capacityWrites.size() > 0 && capacityWrites.get(0).getPush().getTime() < System.currentTimeMillis();
+            flag = capacityWrites.size() > 0 && capacityWrites.get(0).getPush().getTime() < System.currentTimeMillis();
         } else if (classify == 2) {
             List<CapacityListen> capacityListens = capacityListenMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
                     learn.getVocabularyId());
-            falg = capacityListens.size() > 0 && capacityListens.get(0).getPush().getTime() < System.currentTimeMillis();
+            flag = capacityListens.size() > 0 && capacityListens.get(0).getPush().getTime() < System.currentTimeMillis();
         } else if (classify == 0) {
             List<CapacityPicture> capacityPictures = capacityPictureMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
                     learn.getVocabularyId());
-            falg = capacityPictures.size() > 0 && capacityPictures.get(0).getPush().getTime() < System.currentTimeMillis();
+            flag = capacityPictures.size() > 0 && capacityPictures.get(0).getPush().getTime() < System.currentTimeMillis();
         }
-        if (currentLearn == null && falg) {
+        if (currentLearn == null && flag) {
             if (classify == 3) {
                 capacityWriteMapper.deleteByStudentIdAndUnitIdAndVocabulary(student.getId(), learn.getUnitId(),
                         learn.getVocabularyId());
             } else if (classify == 2) {
                 capacityListenMapper.deleteByStudentIdAndUnitIdAndVocabulary(student.getId(), learn.getUnitId(),
                         learn.getVocabularyId());
-            } else if (classify == 0) {
+            } else {
                 capacityPictureMapper.deleteByStudentIdAndUnitIdAndVocabulary(student.getId(), learn.getUnitId(),
                         learn.getVocabularyId());
             }
             return ServerResponse.createBySuccess();
         }
-        /**
-         * 结束
-         */
         // 保存学习记录
         // 第一次学习，如果答对记为熟词，答错记为生词
         if (currentLearn == null) {
@@ -302,7 +296,10 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
                 }
 
             }
-            count = learnMapper.insert(learn);
+
+            MemoryServiceImpl.packageAboutStudyPlan(learn, studentId, capacityStudentUnitMapper, studentStudyPlanMapper);
+
+            int count = learnMapper.insert(learn);
 
             // 统计初出茅庐勋章
             executorService.execute(() -> medalAwardAsync.inexperienced(student));
@@ -334,17 +331,20 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
                 }
             }
             // 计算记忆难度
-            Integer memoryDifficult = memoryDifficultyUtil.getMemoryDifficulty(capacityWrite != null ? capacityWrite : (capacityListen != null ? capacityListen : capacityPicture), 1);
+            int memoryDifficult = memoryDifficultyUtil.getMemoryDifficulty(capacityWrite != null ? capacityWrite : (capacityListen != null ? capacityListen : capacityPicture), 1);
             // 更新学习记录
             currentLearn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
             session.removeAttribute(TimeConstant.BEGIN_START_TIME);
 
             currentLearn.setStudyCount(currentLearn.getStudyCount() + 1);
             // 熟词
-            currentLearn.setStatus((memoryDifficult == null || memoryDifficult == 0) ? 1 : 0);
-            currentLearn.setLearnCount(maxCount);
+            currentLearn.setStatus(memoryDifficult == 0 ? 1 : 0);
+
             currentLearn.setUpdateTime(now);
-            int i = learnMapper.updateByPrimaryKeySelective(currentLearn);
+
+            MemoryServiceImpl.packageAboutStudyPlan(currentLearn, studentId, capacityStudentUnitMapper, studentStudyPlanMapper);
+
+            int i = learnMapper.updateById(currentLearn);
 
             // 慧默写、慧听写模块错过三次在记忆时间上再加长三小时
             int pushRise = 3;

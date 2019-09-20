@@ -6,10 +6,12 @@ import com.zhidejiaoyu.common.pojo.CapacityMemoryExample;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 
+@Repository
 public interface CapacityMemoryMapper extends BaseMapper<CapacityMemory> {
 	int countByExample(CapacityMemoryExample example);
 
@@ -34,7 +36,7 @@ public interface CapacityMemoryMapper extends BaseMapper<CapacityMemory> {
 
 	/**
 	 * 通过学生id，单元id和单词id获取当前单词的记忆追踪信息
-	 * 
+	 *
 	 * @param studentId
 	 * @param unitId
 	 * @param wordId
@@ -45,7 +47,7 @@ public interface CapacityMemoryMapper extends BaseMapper<CapacityMemory> {
 
 	/**
 	 * 根据学生id删除
-	 * 
+	 *
 	 * @param studentId
 	 * @return
 	 */
@@ -54,7 +56,7 @@ public interface CapacityMemoryMapper extends BaseMapper<CapacityMemory> {
 
 	/**
 	 * 根据单元id和单词id查找对应的慧记忆记忆追踪信息
-	 * 
+	 *
 	 * @param studentId
 	 * @param unitId
 	 * @param id
@@ -76,7 +78,7 @@ public interface CapacityMemoryMapper extends BaseMapper<CapacityMemory> {
 
 	/**
 	 * 根据学生id和课程id获取生词信息
-	 * 
+	 *
 	 * @param courseId
 	 * @param studentId
 	 * @return
@@ -96,7 +98,7 @@ public interface CapacityMemoryMapper extends BaseMapper<CapacityMemory> {
 
 	/**
 	 * 根据课程id和学生id获取需要需要达到黄金记忆点的单词数(除去删除状态的单词)
-	 * 
+	 *
 	 * @param studentId
 	 * @param courseId
 	 * @return
@@ -105,7 +107,7 @@ public interface CapacityMemoryMapper extends BaseMapper<CapacityMemory> {
 
 
 	List<Integer> selectStatusBig(@Param("studentId")Long studentId, @Param("classify")int classify);
-	
+
 	List<Map<String,Object>> selectStatusBigTenNine(@Param("studentId")Long studentId, @Param("courseId") Integer courseId, @Param("classify")int classify, @Param("push")String push);
 
 	@Select("select count(id) from capacity_memory where student_id = #{student_id} and push < #{dateTime}")

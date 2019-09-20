@@ -8,9 +8,11 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface CapacityWriteMapper extends BaseMapper<CapacityWrite> {
 	int countByExample(CapacityWriteExample example);
 
@@ -34,7 +36,7 @@ public interface CapacityWriteMapper extends BaseMapper<CapacityWrite> {
 
 	/**
 	 * 根据学生id删除
-	 * 
+	 *
 	 * @param studentId
 	 */
 	@Delete("delete from capacity_write where student_id = #{studentId}")
@@ -42,7 +44,7 @@ public interface CapacityWriteMapper extends BaseMapper<CapacityWrite> {
 
 	/**
 	 * 根据单元id和单词id数组查找对应的慧默写记忆追踪信息
-	 * 
+	 *
 	 * @param studentId
 	 * @param unitId
 	 * @param correctWordId
@@ -64,7 +66,7 @@ public interface CapacityWriteMapper extends BaseMapper<CapacityWrite> {
 
 	/**
 	 * 根据学生id和课程id获取生词信息
-	 * 
+	 *
 	 * @param courseId
 	 * @param studentId
 	 * @return

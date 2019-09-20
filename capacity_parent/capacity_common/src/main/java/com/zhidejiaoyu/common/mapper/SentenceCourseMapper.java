@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.SentenceCourse;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.Map;
  * @author stylefeng
  * @since 2019-03-29
  */
+@Repository
 public interface SentenceCourseMapper extends BaseMapper<SentenceCourse> {
 
     String getVersionByUnitId(Long unitId);

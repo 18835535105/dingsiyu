@@ -79,6 +79,12 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     @Autowired
     private GetValidTimeTip getValidTimeTip;
 
+    @Autowired
+    private StudentStudyPlanMapper studentStudyPlanMapper;
+
+    @Autowired
+    private CapacityStudentUnitMapper capacityStudentUnitMapper;
+
     @Override
     @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
@@ -300,7 +306,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<String> calculateValidTime(HttpSession session, EndValidTimeDto dto) {
 
-        Student student = getStudent(session);
+        Student student = super.getStudent(session);
 
         // 学生超过30分钟无操作后，session过期会导致student为空，点击退出按钮会出现NPE，在此进行处理
         if (student == null) {
@@ -413,6 +419,24 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         duration.setStudentId(student.getId());
         duration.setOnlineTime(dto.getOnlineTime());
         duration.setLoginOutTime(new Date());
+
+        if (dto.getClassify() != null) {
+            // 判断是不是单词流程相关的模块
+            boolean flag = (dto.getClassify() >= 0 && dto.getClassify() <= 3) || dto.getClassify() == 27 || dto.getClassify() == 35;
+            if (flag) {
+                // 单词学习计划
+                CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+                if (capacityStudentUnit != null) {
+                    StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selectCurrentPlan(student.getId(),
+                            capacityStudentUnit.getStartunit(), capacityStudentUnit.getEndunit(), 1);
+                    if (studentStudyPlan != null) {
+                        duration.setStudyCount(studentStudyPlan.getCurrentStudyCount());
+                        duration.setStudyPlanId(studentStudyPlan.getId());
+                    }
+                }
+            }
+        }
+
         return duration;
     }
 

@@ -11,6 +11,8 @@
         <result column="login_time" property="loginTime" jdbcType="TIMESTAMP"/>
         <result column="login_out_time" property="loginOutTime" jdbcType="TIMESTAMP"/>
         <result column="study_model" property="studyModel" jdbcType="INTEGER"/>
+        <result column="study_count" property="studyCount"/>
+        <result column="study_plan_id" property="studyPlanId"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -74,28 +76,8 @@
     </sql>
     <sql id="Base_Column_List">
         id, student_id, course_id, unit_id, valid_time, online_time, login_time, login_out_time,
-        study_model
+        study_model, study_count, study_plan_id
     </sql>
-    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.DurationExample">
-        select
-        <if test="distinct">
-            distinct
-        </if>
-        <include refid="Base_Column_List"/>
-        from duration
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-        <if test="orderByClause != null">
-            order by ${orderByClause}
-        </if>
-    </select>
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
-        select
-        <include refid="Base_Column_List"/>
-        from duration
-        where id = #{id,jdbcType=BIGINT}
-    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from duration
         where id = #{id,jdbcType=BIGINT}
@@ -106,16 +88,6 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.Duration" useGeneratedKeys="true" keyProperty="id">
-        insert into duration (id, student_id, course_id,
-                              unit_id, valid_time, online_time,
-                              login_time, login_out_time, study_model
-        )
-        values (#{id,jdbcType=BIGINT}, #{studentId,jdbcType=BIGINT}, #{courseId,jdbcType=BIGINT},
-                #{unitId,jdbcType=BIGINT}, #{validTime,jdbcType=BIGINT}, #{onlineTime,jdbcType=BIGINT},
-                #{loginTime,jdbcType=TIMESTAMP}, #{loginOutTime,jdbcType=TIMESTAMP}, #{studyModel,jdbcType=INTEGER}
-        )
-    </insert>
     <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Duration" useGeneratedKeys="true" keyProperty="id">
         insert into duration
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -177,13 +149,6 @@
             </if>
         </trim>
     </insert>
-    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.DurationExample"
-            resultType="java.lang.Integer">
-        select count(*) from duration
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-    </select>
     <select id="countTotalValidTimeMapByCourseId" resultType="java.util.Map" parameterType="map">
         SELECT
         course_id id,
@@ -198,41 +163,6 @@
         </foreach>
         )
     </select>
-    <update id="updateByExampleSelective" parameterType="map">
-        update duration
-        <set>
-            <if test="record.id != null">
-                id = #{record.id,jdbcType=BIGINT},
-            </if>
-            <if test="record.studentId != null">
-                student_id = #{record.studentId,jdbcType=BIGINT},
-            </if>
-            <if test="record.courseId != null">
-                course_id = #{record.courseId,jdbcType=BIGINT},
-            </if>
-            <if test="record.unitId != null">
-                unit_id = #{record.unitId,jdbcType=BIGINT},
-            </if>
-            <if test="record.validTime != null">
-                valid_time = #{record.validTime,jdbcType=BIGINT},
-            </if>
-            <if test="record.onlineTime != null">
-                online_time = #{record.onlineTime,jdbcType=BIGINT},
-            </if>
-            <if test="record.loginTime != null">
-                login_time = #{record.loginTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="record.loginOutTime != null">
-                login_out_time = #{record.loginOutTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="record.studyModel != null">
-                study_model = #{record.studyModel,jdbcType=INTEGER},
-            </if>
-        </set>
-        <if test="_parameter != null">
-            <include refid="Update_By_Example_Where_Clause"/>
-        </if>
-    </update>
     <update id="updateByExample" parameterType="map">
         update duration
         set id = #{record.id,jdbcType=BIGINT},

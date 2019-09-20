@@ -120,7 +120,7 @@
 			   b.id,
 		       b.small_picture_url smallPictureUrl,
 		       b.middle_picture_url middlePictureUrl,
-		       b.high_picture_url highPicutreUrl,
+		       b.high_picture_url highPictureUrl,
 			   b.word,
 			   b.word_chinese,
 			   b.example_english,

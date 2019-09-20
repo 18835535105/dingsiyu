@@ -5,10 +5,12 @@ import com.zhidejiaoyu.common.pojo.CapacityPicture;
 import com.zhidejiaoyu.common.pojo.CapacityPictureExample;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 
+@Repository
 public interface CapacityPictureMapper extends BaseMapper<CapacityPicture> {
     int countByExample(CapacityPictureExample example);
 

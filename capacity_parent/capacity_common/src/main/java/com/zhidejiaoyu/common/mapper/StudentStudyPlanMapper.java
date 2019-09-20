@@ -1,9 +1,9 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.zhidejiaoyu.common.pojo.CapacityStudentUnit;
 import com.zhidejiaoyu.common.pojo.StudentStudyPlan;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
@@ -17,6 +17,7 @@ import java.util.Map;
  * @author zdjy
  * @since 2019-01-15
  */
+@Repository
 public interface StudentStudyPlanMapper extends BaseMapper<StudentStudyPlan> {
 
     List<Map<String,Object>> selByStudentId(@Param("studentId") Long studentId,@Param("type") int type);
