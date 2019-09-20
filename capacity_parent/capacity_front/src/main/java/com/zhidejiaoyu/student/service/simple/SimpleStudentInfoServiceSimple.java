@@ -18,16 +18,6 @@ import java.util.Map;
 public interface SimpleStudentInfoServiceSimple extends SimpleBaseService<Student> {
 
     /**
-     * 学生完善个人信息，保存学生信息
-     *
-     * @param student
-     * @param newPassword
-     * @param oldPassword
-     * @return
-     */
-    ServerResponse<String> saveStudentInfo(HttpSession session, Student student, String oldPassword, String newPassword);
-
-    /**
      * 膜拜
      *
      * @param session

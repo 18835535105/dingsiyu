@@ -6,23 +6,16 @@ import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.simple.studentInfoVo.ChildMedalVo;
-import com.zhidejiaoyu.common.Vo.simple.studentInfoVo.LevelVo;
-import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
-import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleWeekUtil;
-import com.zhidejiaoyu.student.constant.PetImageConstant;
 import com.zhidejiaoyu.student.service.simple.SimpleStudentInfoServiceSimple;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,8 +26,6 @@ import java.util.*;
 @Slf4j
 @Service
 public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleStudentMapper, Student> implements SimpleStudentInfoServiceSimple {
-
-    private RunLog runLog;
 
     @Autowired
     private SimpleStudentMapper simpleStudentMapper;
@@ -53,146 +44,10 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     private SimpleMedalMapper simpleMedalMapper;
 
     @Autowired
-    private SimpleLearnMapper learnMapper;
-
-    @Autowired
-    private SimpleLevelMapper simpleLevelMapper;
-
-    @Autowired
-    private SimpleCommonMethod simpleCommonMethod;
-
-    @Autowired
     private SimpleStudentExpansionMapper simpleStudentExpansionMapper;
 
     @Autowired
-    private GoldAwardAsync goldAwardAsync;
-
-    @Autowired
     private MedalAwardAsync medalAwardAsync;
-
-    @Override
-    @GoldChangeAnnotation
-    @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<String> saveStudentInfo(HttpSession session, Student student, String oldPassword,
-                                                  String newPassword) {
-
-        Student studentInfo = getStudent(session);
-        packageStudentInfo(student, studentInfo);
-
-        // 根据完善程度奖励金币
-        double scale = completeInfo(studentInfo, oldPassword, newPassword);
-
-        // 完善信息后保存奖励信息，获取奖励金币页提示语
-        String tip = saveAwardInfo(studentInfo, scale);
-
-        // 首次修改密码奖励
-        firstUpdatePasswordAward(studentInfo, oldPassword, newPassword);
-
-        try {
-            if (StringUtils.isEmpty(studentInfo.getPetName())) {
-                studentInfo.setPetName("大明白");
-                studentInfo.setPartUrl(PetImageConstant.DEFAULT_IMG.replace(AliyunInfoConst.host, ""));
-            }
-            int count = simpleStudentMapper.updateByPrimaryKeySelective(studentInfo);
-            studentInfo = simpleStudentMapper.selectById(studentInfo.getId());
-            session.setAttribute(UserConstant.CURRENT_STUDENT, studentInfo);
-            return count > 0 ? ServerResponse.createBySuccessMessage(tip)
-                    : ServerResponse.createByErrorMessage("信息完善失败！");
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("id为{}的学生{}完善个人信息失败！", studentInfo.getId(), studentInfo.getStudentName());
-            runLog = new RunLog(3, "id为" + studentInfo.getId() + "的学生" + studentInfo.getStudentName()
-                    + "完善个人信息失败！",
-                    new Date());
-            runLogMapper.insert(runLog);
-        }
-        return ServerResponse.createByErrorMessage("信息完善失败！");
-    }
-
-    private void packageStudentInfo(Student student, Student studentInfo) {
-        String headUrl = student.getHeadUrl();
-        String headName = headUrl.substring(headUrl.lastIndexOf("."));
-        studentInfo.setHeadUrl(headUrl);
-        studentInfo.setHeadName(headName);
-        studentInfo.setUpdateTime(new Date());
-        studentInfo.setGrade(student.getGrade());
-        studentInfo.setBirthDate(student.getBirthDate());
-        studentInfo.setArea(student.getArea());
-        studentInfo.setCity(student.getCity());
-        if (student.getSex() == null) {
-            studentInfo.setSex(1);
-        } else {
-            studentInfo.setSex(student.getSex());
-        }
-        studentInfo.setAddress(student.getAddress());
-        studentInfo.setStudentName(student.getStudentName());
-        studentInfo.setMail(student.getMail());
-        studentInfo.setSquad(student.getSquad());
-        studentInfo.setNickname(student.getNickname());
-        studentInfo.setPartUrl(student.getPartUrl());
-        studentInfo.setProvince(student.getProvince());
-        studentInfo.setVersion(student.getVersion());
-        studentInfo.setPatriarchPhone(student.getPatriarchPhone());
-        studentInfo.setPetName(student.getPetName());
-        studentInfo.setPracticalSchool(student.getPracticalSchool());
-        studentInfo.setQq(student.getQq());
-        studentInfo.setReferrer(student.getReferrer());
-        studentInfo.setWish(student.getWish());
-        if (studentInfo.getRegisterDate() == null) {
-            studentInfo.setRegisterDate(new Date());
-        }
-    }
-
-    /**
-     * 首次修改密码计入任务奖励
-     *
-     * @param student
-     * @param oldPassword
-     * @param newPassword
-     */
-    private void firstUpdatePasswordAward(Student student, String oldPassword, String newPassword) {
-        if (StringUtils.isNotBlank(newPassword) && !oldPassword.equals(newPassword)) {
-            student.setPassword(newPassword);
-
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), 10));
-            RunLog runLog = new RunLog(student.getId(), 4, "学生首次修改密码，奖励#10#金币", new Date());
-            runLogMapper.insert(runLog);
-
-            // 首次修改密码奖励
-            goldAwardAsync.dailyAward(student, 12);
-        }
-    }
-
-    /**
-     * 学生完善信息保存奖励信息
-     *
-     * @param student
-     * @param scale 信息完成度
-     * @return  完善信息后提示语
-     */
-    private String saveAwardInfo(Student student, double scale) {
-        String tip;
-        if (scale == 1) {
-            // 完善完必填信息和选填信息（算修改密码），奖励金币30个
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), 30));
-            tip = "恭喜获得30枚金币，已收入囊中。";
-            log.info("id为 " + student.getId() + " 的学生在 " + SimpleDateUtil.DateTime(new Date()) + " 首次完善资料达 " + scale * 100 + "%，奖励金币#30#枚！");
-            runLog = new RunLog(student.getId(), 4, "id为 " + student.getId() + " 的学生首次完善资料达 " + scale * 100 + "%，奖励金币#30#枚！", new Date());
-            runLogMapper.insert(runLog);
-            int awardContentType = 11;
-            goldAwardAsync.dailyAward(student, awardContentType);
-        } else {
-            // 完善完必填信息，奖励金币20个
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), 20));
-            tip = "恭喜获得20枚金币，已收入囊中。";
-            log.info("id为 " + student.getId() + " 的学生在 " + SimpleDateUtil.DateTime(new Date()) + " 首次完善资料达 " + scale * 100 + "%，奖励金币#20#枚！");
-            runLog = new RunLog(student.getId(), 4, "id为 " + student.getId() + " 的学生首次完善资料达 " + scale * 100 + "%，奖励金币#20#枚！", new Date());
-            runLogMapper.insert(runLog);
-            int awardContentType = 10;
-            goldAwardAsync.dailyAward(student, awardContentType);
-        }
-        return tip;
-    }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -448,42 +303,6 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         return childMedalVo;
     }
 
-    private Map<String, String> getLevelInfo(LevelVo levelVo, Student student, Map<String, String> parentMap) {
-        List<Level> levels = simpleLevelMapper.selectList(new EntityWrapper<Level>().orderBy("id", true));
-        double gold = BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
-        // 获取当前勋章子勋章索引
-        Map<String, String> childMap = null;
-        int size = levels.size();
-        int preSize = size - 1;
-        Level level;
-        Level nextLevel;
-        for (int i = 0; i < size; i++) {
-            level = levels.get(i);
-            if (!parentMap.containsKey(level.getLevelName())) {
-                childMap = new HashMap<>(16);
-                parentMap.put(level.getLevelName(), level.getLevelName());
-            }
-            if (childMap != null) {
-                childMap.put(level.getChildName(), level.getChildName());
-            }
-            if (i < preSize) {
-                nextLevel = levels.get(i + 1);
-                // 判断当前金币所处的等级
-                boolean flag = ((i == 0 && gold < level.getGold()) || gold >= level.getGold()) && gold < nextLevel.getGold();
-                if (flag) {
-                    levelVo.setLevelImgUrl(level.getImgUrlLevel());
-                    levelVo.setChildName(level.getImgUrlWord());
-                    break;
-                }
-            } else {
-                levelVo.setLevelImgUrl(level.getImgUrlLevel());
-                levelVo.setChildName(level.getImgUrlWord());
-                break;
-            }
-        }
-        return childMap;
-    }
-
     private void toAward(List<Medal> children, Student byWorship, List<Student> list, int[] complete, int[] totalPlan) {
         if (list.size() > 0) {
             Date worshipFirstTime = list.get(0).getWorshipFirstTime();
@@ -580,75 +399,5 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         long now = System.currentTimeMillis();
         return (int) ((now - date) / 86400000);
     }
-
-    /**
-     * 验证完善信息程度，并奖励金币
-     *
-     * @param student
-     * @param oldPassword
-     * @param newPassword
-     */
-    private double completeInfo(Student student, String oldPassword, String newPassword) {
-        int total = 18;
-        int complete = 0;
-        if (StringUtils.isNotBlank(student.getStudentName())) {
-            complete++;
-        }
-        if (student.getSex() != null) {
-            complete++;
-        }
-        if (StringUtils.isNotBlank(student.getBirthDate())) {
-            complete++;
-        }
-        if (StringUtils.isNotBlank(student.getGrade())) {
-            complete++;
-        }
-        if (StringUtils.isNotBlank(student.getVersion())) {
-            complete++;
-        }
-
-        // 地址
-        if (!StringUtils.isEmpty(student.getArea())) {
-            complete++;
-        }
-        if (!StringUtils.isEmpty(student.getProvince())) {
-            complete++;
-        }
-        if (!StringUtils.isEmpty(student.getCity())) {
-            complete++;
-        }
-        // 宠物名
-        if (!StringUtils.isEmpty(student.getPetName())) {
-            complete++;
-        }
-
-        if (StringUtils.isNotBlank(oldPassword)) {
-            complete += 2;
-        }
-        if (StringUtils.isNotBlank(newPassword)) {
-            complete++;
-        }
-        if (StringUtils.isNotBlank(student.getHeadUrl())) {
-            complete++;
-        }
-        if (StringUtils.isNotBlank(student.getNickname())) {
-            complete++;
-        }
-        if (StringUtils.isNotBlank(student.getWish())) {
-            complete++;
-        }
-        if (StringUtils.isNotBlank(student.getPatriarchPhone())) {
-            complete++;
-        }
-        if (StringUtils.isNotBlank(student.getQq())) {
-            complete++;
-        }
-        if (StringUtils.isNotBlank(student.getMail())) {
-            complete++;
-        }
-
-        return complete * 1.0 / total;
-    }
-
 
 }
