@@ -317,8 +317,12 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
 
             StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selectCurrentPlan(studentId, startUnitId, endUnitId, 1);
             if (studentStudyPlan != null) {
-                learn.setLearnCount(studentStudyPlan.getCurrentStudyCount() > studentStudyPlan.getTotalStudyCount()
-                        ? studentStudyPlan.getTotalStudyCount() : studentStudyPlan.getCurrentStudyCount());
+                if (studentStudyPlan.getCurrentStudyCount() == null) {
+                    learn.setLearnCount(1);
+                } else {
+                    learn.setLearnCount(studentStudyPlan.getCurrentStudyCount() > studentStudyPlan.getTotalStudyCount()
+                            ? studentStudyPlan.getTotalStudyCount() : studentStudyPlan.getCurrentStudyCount());
+                }
                 learn.setStudyPlanId(studentStudyPlan.getId());
             }
         }
