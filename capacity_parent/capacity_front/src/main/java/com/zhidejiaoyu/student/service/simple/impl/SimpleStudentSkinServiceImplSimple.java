@@ -229,7 +229,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         //获取学生信息
         Student student =getStudent(session);
         //查询学生下皮肤信息
-        List<StudentSkin> studentSkins = simpleStudentSkinMapper.selSkinByStudentIdAndEndTime(student.getId());
+        List<StudentSkin> studentSkins = simpleStudentSkinMapper.selSkinByStudentIdIsHave(student.getId());
         //返回值格式确定
         Map<String, Object> map = new HashMap<>();
         //获取钻石数量

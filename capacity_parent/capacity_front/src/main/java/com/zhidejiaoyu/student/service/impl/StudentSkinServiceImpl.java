@@ -227,7 +227,7 @@ public class StudentSkinServiceImpl extends BaseServiceImpl<StudentSkinMapper, S
         //获取学生信息
         Student student = getStudent(session);
         //查询学生下皮肤信息
-        List<StudentSkin> studentSkins = studentSkinMapper.selSkinByStudentIdAndEndTime(student.getId());
+        List<StudentSkin> studentSkins = studentSkinMapper.selSkinByStudentIdIsHave(student.getId());
         //返回值格式确定
         Map<String, Object> map = new HashMap<>();
         //获取钻石数量
