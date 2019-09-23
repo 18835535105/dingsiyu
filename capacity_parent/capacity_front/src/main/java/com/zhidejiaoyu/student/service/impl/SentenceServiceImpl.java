@@ -126,9 +126,6 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
         // 获取当前单元下的所有例句的总个数
         Long sentenceCount = sentenceMapper.countByUnitId(unitId);
 
-        // 查询当前课程的学习遍数
-        Integer learnCount = 1;
-
         // 转换类型
         String classify = commonMethod.getTestType(classifyInt);
 
@@ -139,7 +136,7 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
         // 查询学生当前单元下已学习例句的个数，即学习进度
-        Long plan = learnMapper.isCountLearnWord(student.getId(), unitId, classify, learnCount);
+        Long plan = learnMapper.isCountLearnWord(student.getId(), unitId, classify);
 
         if (sentenceCount == 0) {
             log.error("单元 {} 下没有例句信息！", unitId);
@@ -167,7 +164,7 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
 
             // 获取当前学习进度的下一个例句
             // 获取当前单元已学习的当前模块的例句id
-            List<Long> ids = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "例句翻译", learnCount);
+            List<Long> ids = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "例句翻译");
             Sentence sentence = sentenceMapper.selectOneSentenceNotInIds(ids, unitId);
             SentenceTranslateVo sentenceTranslateVo = getSentenceTranslateVo(plan, firstStudy, sentenceCount, type, sentence);
             sentenceTranslateVo.setStudyNew(true);
@@ -191,7 +188,7 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
             // 如果没有到达黄金记忆点的例句
             // 获取当前学习进度的下一个例句
             // 获取当前单元已学习的当前模块的例句id
-            List<Long> ids = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "例句听力", learnCount);
+            List<Long> ids = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "例句听力");
             Sentence sentence = sentenceMapper.selectOneSentenceNotInIds(ids, unitId);
             return getSentenceTranslateVoServerResponse(firstStudy, plan, sentenceCount, sentence, type);
         }
@@ -213,7 +210,7 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
             // 如果没有到达黄金记忆点的例句
             // 获取当前学习进度的下一个例句
             // 获取当前单元已学习的当前模块的例句id
-            List<Long> ids = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "例句默写", learnCount);
+            List<Long> ids = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "例句默写");
             Sentence sentence = sentenceMapper.selectOneSentenceNotInIds(ids, unitId);
             return getSentenceTranslateVoServerResponse(firstStudy, plan, sentenceCount, sentence, type);
         }
@@ -302,18 +299,16 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
         learnExample.createCriteria().andStudentIdEqualTo(studentId).andCourseIdEqualTo(learn.getCourseId()).andTypeEqualTo(1);
         int courseLearnCount = learnMapper.countByExample(learnExample);
 
-        // 当前课程最大学习遍数
-        Integer maxCount = 1;
         Date learnTime = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
 
-        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, classify, maxCount, 1);
+        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, classify, 1);
         if (learnIds.size() > 1) {
             List<Long> longs = learnIds.subList(1, learnIds.size());
             learnMapper.deleteBatchIds(longs);
         }
 
         // 查询当前例句的学习记录数据
-        Learn currentLearn = learnMapper.selectLearn(studentId, learn, classify, maxCount, 1);
+        Learn currentLearn = learnMapper.selectLearn(studentId, learn, classify, 1);
         // 保存学习记录
         // 当前课程学习的第一遍，当前例句是第一次学习，如果答对记为熟句，答错记为生句
         if (currentLearn == null) {
@@ -369,7 +364,7 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
             } else {
                 currentLearn.setStatus(0);
             }
-            currentLearn.setLearnCount(maxCount);
+            currentLearn.setLearnCount(1);
             currentLearn.setUpdateTime(now);
             int i = learnMapper.updateByPrimaryKeySelective(currentLearn);
 
@@ -527,14 +522,13 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
     }
 
     public void addResultCourse(Student student, Long unitId, Map<String, Object> unitInfoMap) {
-        Integer learnCount = 1;
-        Long id = learnMapper.countLearnWord(student.getId(), unitId, commonMethod.getTestType(5), learnCount);
+        Long id = learnMapper.countLearnWord(student.getId(), unitId, commonMethod.getTestType(5));
         //获取当前单元有多少例句
         Long senCount = unitSentenceMapper.selectSentenceCountByUnitId(unitId);
         if (id < senCount && id > 0) {
             unitInfoMap.put("sentenceTranslation", "正在学习");
         } else if (id >= senCount) {
-            Long id1 = learnMapper.countLearnWordAndType(student.getId(), unitId, commonMethod.getTestType(5), learnCount);
+            Long id1 = learnMapper.countLearnWordAndType(student.getId(), unitId, commonMethod.getTestType(5));
             if (id1 == null) {
                 id1 = 0L;
             }
@@ -548,14 +542,14 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
         } else {
             unitInfoMap.put("sentenceTranslation", "未学习");
         }
-        Long id1 = learnMapper.countLearnWord(student.getId(), unitId, commonMethod.getTestType(4), learnCount);
+        Long id1 = learnMapper.countLearnWord(student.getId(), unitId, commonMethod.getTestType(4));
         if (id1 == null) {
             id1 = 0L;
         }
         if (id1 < senCount && id1 > 0) {
             unitInfoMap.put("sentenceListening", "正在学习");
         } else if (id1 >= senCount) {
-            Long id2 = learnMapper.countLearnWordAndType(student.getId(), unitId, commonMethod.getTestType(4),   learnCount);
+            Long id2 = learnMapper.countLearnWordAndType(student.getId(), unitId, commonMethod.getTestType(4));
             if (id2 == null) {
                 id2 = 0L;
             }
@@ -570,14 +564,14 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
             unitInfoMap.put("sentenceListening", "未学习");
         }
 
-        Long id2 = learnMapper.countLearnWord(student.getId(), unitId, commonMethod.getTestType(6), learnCount);
+        Long id2 = learnMapper.countLearnWord(student.getId(), unitId, commonMethod.getTestType(6));
         if (id2 == null) {
             id2 = 0L;
         }
         if (id2 < senCount && id2 > 0) {
             unitInfoMap.put("sentenceWriting", "正在学习");
         } else if (id2 >= senCount) {
-            Long id3 = learnMapper.countLearnWordAndType(student.getId(), unitId, commonMethod.getTestType(6), learnCount);
+            Long id3 = learnMapper.countLearnWordAndType(student.getId(), unitId, commonMethod.getTestType(6));
             if (id3 == null) {
                 id3 = 0L;
             }

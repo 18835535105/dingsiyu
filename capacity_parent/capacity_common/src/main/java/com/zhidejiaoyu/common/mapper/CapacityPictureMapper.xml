@@ -333,7 +333,7 @@
            a.sound_mark,
            a.small_picture_url  smallPictureUrl,
            a.middle_picture_url middlePictureUrl,
-           a.high_picture_url   highPicutreUrl
+           a.high_picture_url   highPictureUrl
     from vocabulary a
            INNER JOIN capacity_picture b on a.id = b.vocabulary_id and b.unit_id = #{unidId}
       and b.student_id = #{studentId} and b.push &lt; #{s} and b.memory_strength &lt; 1 and a.delStatus = 1
@@ -357,7 +357,7 @@
            b.unit_id,
            a.small_picture_url  smallPictureUrl,
            a.middle_picture_url middlePictureUrl,
-           a.high_picture_url   highPicutreUrl
+           a.high_picture_url   highPictureUrl
     FROM vocabulary a
            INNER JOIN capacity_picture b ON a.id = b.vocabulary_id
       AND b.course_id = #{course_id}

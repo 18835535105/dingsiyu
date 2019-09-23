@@ -11,7 +11,7 @@ import java.util.Date;
 
 /**
  * 学习信息表
- * 
+ *
  * @author wuchenxi
  * @date 2018年5月10日
  */
@@ -65,6 +65,23 @@ public class Learn extends Model<Learn> {
 	 * 流程名称
 	 */
 	private String flowName;
+
+	private String courseName;
+
+	/**
+	 * 计划中起始单元 id
+	 */
+	private Long startUnitId;
+
+	/**
+	 * 计划中结束单元 id
+	 */
+	private Long endUnitId;
+
+	/**
+	 * 学习计划 id，用于区分当前学习是哪个学习计划
+	 */
+	private Integer studyPlanId;
 
 
     @Override

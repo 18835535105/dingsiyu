@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.student.common;
 
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
-import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -10,7 +9,7 @@ import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
-import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.service.impl.MemoryServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +35,6 @@ public class SaveTestLearnAndCapacity {
 
     @Autowired
     private LearnMapper learnMapper;
-
-    @Autowired
-    private UnitMapper unitMapper;
-
-    @Autowired
-    private StudyCountMapper studyCountMapper;
 
     @Autowired
     private SentenceListenMapper sentenceListenMapper;
@@ -78,6 +71,12 @@ public class SaveTestLearnAndCapacity {
 
     @Autowired
     private DailyAwardAsync dailyAwardAsync;
+
+    @Autowired
+    private CapacityStudentUnitMapper capacityStudentUnitMapper;
+
+    @Autowired
+    private StudentStudyPlanMapper studentStudyPlanMapper;
 
     /**
      * 分别保存例句或单词学习信息和记忆追踪信息
@@ -180,17 +179,16 @@ public class SaveTestLearnAndCapacity {
      */
     private int saveLearnAndCapacity(HttpSession session, Student student, Long unitId, Long id, Integer classify,
                                      boolean isTrue) {
-        Integer maxCount = 1;
         // 查询学习记录
         List<Learn> learns;
         if (classify <= 3) {
             // 查询单词的学习记录
             learns = learnMapper.selectLearnByIdAmdModel(student.getId(), unitId, Long.valueOf(id.toString()), null,
-                    commonMethod.getTestType(classify), maxCount);
+                    commonMethod.getTestType(classify));
         } else {
             // 查询句子的学习记录
             learns = learnMapper.selectLearnByIdAmdModel(student.getId(), unitId, null, Long.valueOf(id.toString()),
-                    commonMethod.getTestType(classify), maxCount);
+                    commonMethod.getTestType(classify));
         }
 
         Learn learn;
@@ -208,6 +206,10 @@ public class SaveTestLearnAndCapacity {
         Object capacity = null;
         try {
             capacity = this.saveCapacityMemory(learn, student, isTrue, classify);
+
+            if (classify <= 3) {
+                MemoryServiceImpl.packageAboutStudyPlan(learn, student.getId(), capacityStudentUnitMapper, studentStudyPlanMapper);
+            }
 
             // 判断学生今日复习30个生词且记忆强度达到50%
             dailyAwardAsync.todayReview(student);
@@ -233,7 +235,7 @@ public class SaveTestLearnAndCapacity {
             learn.setStatus(0);
         }
         learn.setUpdateTime(new Date());
-        return learnMapper.updateByPrimaryKeySelective(learn);
+        return learnMapper.updateById(learn);
     }
 
     /**

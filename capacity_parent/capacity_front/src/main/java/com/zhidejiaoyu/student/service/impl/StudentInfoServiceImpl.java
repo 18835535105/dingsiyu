@@ -10,7 +10,6 @@ import com.zhidejiaoyu.common.Vo.student.level.LevelVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
-import com.zhidejiaoyu.common.constant.MedalConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -48,7 +47,6 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     @Autowired
     private RunLogMapper runLogMapper;
 
-
     @Autowired
     private AwardMapper awardMapper;
 
@@ -79,23 +77,29 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     @Autowired
     private GetValidTimeTip getValidTimeTip;
 
+    @Autowired
+    private StudentStudyPlanMapper studentStudyPlanMapper;
+
+    @Autowired
+    private CapacityStudentUnitMapper capacityStudentUnitMapper;
+
     @Override
     @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<String> saveStudentInfo(HttpSession session, Student student, String oldPassword,
                                                   String newPassword) {
 
-        Student studentInfo = getStudent(session);
-        packageStudentInfo(student, studentInfo);
+        Student studentInfo = super.getStudent(session);
+        this.packageStudentInfo(student, studentInfo);
 
         // 根据完善程度奖励金币
-        double scale = completeInfo(studentInfo, oldPassword, newPassword);
+        double scale = this.completeInfo(studentInfo, oldPassword, newPassword);
 
         // 完善信息后保存奖励信息，获取奖励金币页提示语
-        String tip = saveAwardInfo(studentInfo, scale);
+        String tip = this.saveAwardInfo(studentInfo, scale);
 
         // 首次修改密码奖励
-        firstUpdatePasswordAward(studentInfo, oldPassword, newPassword);
+        this.firstUpdatePasswordAward(studentInfo, oldPassword, newPassword);
 
         try {
             int count = studentMapper.updateByPrimaryKeySelective(studentInfo);
@@ -103,8 +107,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             return count > 0 ? ServerResponse.createBySuccessMessage(tip)
                     : ServerResponse.createByErrorMessage("信息完善失败！");
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("id为{}的学生{}完善个人信息失败！", studentInfo.getId(), studentInfo.getStudentName());
+            log.error("id为{}的学生{}完善个人信息失败！", studentInfo.getId(), studentInfo.getStudentName(), e);
             runLog = new RunLog(3, "id为" + studentInfo.getId() + "的学生" + studentInfo.getStudentName()
                     + "完善个人信息失败！",
                     new Date());
@@ -113,17 +116,34 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         return ServerResponse.createByErrorMessage("信息完善失败！");
     }
 
+    /**
+     * 封装学生完善的信息
+     *
+     * @param student     学生填写信息
+     * @param studentInfo 原学生信息
+     */
     private void packageStudentInfo(Student student, Student studentInfo) {
         String headUrl = student.getHeadUrl();
         String headName = headUrl.substring(headUrl.lastIndexOf("."));
         studentInfo.setHeadUrl(headUrl);
         studentInfo.setHeadName(headName);
         studentInfo.setUpdateTime(new Date());
-        studentInfo.setGrade(student.getGrade());
+
+        // 招生账号不修改年级信息
+        if (Objects.equals(4, studentInfo.getRole())) {
+            studentInfo.setGrade(studentInfo.getGrade());
+        } else {
+            studentInfo.setGrade(student.getGrade());
+        }
+
         studentInfo.setBirthDate(student.getBirthDate());
         studentInfo.setArea(student.getArea());
         studentInfo.setCity(student.getCity());
-        studentInfo.setSex(student.getSex());
+        if (student.getSex() == null) {
+            studentInfo.setSex(1);
+        } else {
+            studentInfo.setSex(student.getSex());
+        }
         studentInfo.setAddress(student.getAddress());
         studentInfo.setStudentName(student.getStudentName());
         studentInfo.setMail(student.getMail());
@@ -300,7 +320,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<String> calculateValidTime(HttpSession session, EndValidTimeDto dto) {
 
-        Student student = getStudent(session);
+        Student student = super.getStudent(session);
 
         // 学生超过30分钟无操作后，session过期会导致student为空，点击退出按钮会出现NPE，在此进行处理
         if (student == null) {
@@ -406,13 +426,32 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     private Duration packageDuration(EndValidTimeDto dto, Student student, Date loginTime) {
         Duration duration = new Duration();
         duration.setCourseId(dto.getCourseId());
-        duration.setStudyModel(dto.getClassify());
+        Integer classify = dto.getClassify();
+        duration.setStudyModel(classify);
         duration.setUnitId(dto.getUnitId());
         duration.setValidTime(dto.getValid());
         duration.setLoginTime(loginTime);
         duration.setStudentId(student.getId());
         duration.setOnlineTime(dto.getOnlineTime());
         duration.setLoginOutTime(new Date());
+
+        if (classify != null) {
+            // 判断是不是单词流程相关的模块
+            boolean flag = (classify >= 0 && classify <= 3) || classify == 27 || classify == 35 || classify == 36;
+            if (flag) {
+                // 单词学习计划
+                CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+                if (capacityStudentUnit != null) {
+                    StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selectCurrentPlan(student.getId(),
+                            capacityStudentUnit.getStartunit(), capacityStudentUnit.getEndunit(), 1);
+                    if (studentStudyPlan != null) {
+                        duration.setStudyCount(studentStudyPlan.getCurrentStudyCount());
+                        duration.setStudyPlanId(studentStudyPlan.getId());
+                    }
+                }
+            }
+        }
+
         return duration;
     }
 

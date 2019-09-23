@@ -816,7 +816,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                         map.put("ljtl", ljtl + "分");
                     } else {
                         // 查询例句听力模块单词是否学完
-                        Long countWord = learnMapper.countLearnWord(studentId, unitId, "例句听力", 1);
+                        Long countWord = learnMapper.countLearnWord(studentId, unitId, "例句听力");
                         if (countWord >= count && count != 0) {
                             map.put("ljtl", "闯关");
                         } else {
@@ -829,7 +829,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                         map.put("ljfy", ljtl + "分");
                     } else {
                         // 查询慧听写模块单词是否学完
-                        Long countWord = learnMapper.countLearnWord(studentId, unitId, "例句翻译", 1);
+                        Long countWord = learnMapper.countLearnWord(studentId, unitId, "例句翻译");
                         if (countWord >= count && count != 0) {
                             map.put("ljfy", "闯关");
                         } else {
@@ -842,7 +842,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
                         map.put("ljmx", ljtl + "分");
                     } else {
                         // 查询慧默写模块单词是否学完
-                        Long countWord = learnMapper.countLearnWord(studentId, unitId, "例句默写", 1);
+                        Long countWord = learnMapper.countLearnWord(studentId, unitId, "例句默写");
                         if (countWord >= count && count != 0) {
                             map.put("ljmx", "闯关");
                         } else {

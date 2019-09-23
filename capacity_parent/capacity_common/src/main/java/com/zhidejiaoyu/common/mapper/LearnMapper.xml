@@ -17,6 +17,10 @@
         <result column="first_study_time" property="firstStudyTime" jdbcType="TIMESTAMP"/>
         <result column="first_is_known" property="firstIsKnown" jdbcType="INTEGER"/>
         <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="start_unit_id" property="startUnitId" />
+        <result column="end_unit_id" property="endUnitId" />
+        <result column="course_name" property="courseName" />
+        <result column="study_plan_id" property="studyPlanId" />
     </resultMap>
 
     <!-- 查询learn中的单词还是例句 -->
@@ -91,7 +95,8 @@
     </sql>
     <sql id="Base_Column_List">
         id, student_id, course_id, unit_id, vocabulary_id, example_id, status, learn_time,
-        study_model, study_count, learn_count, update_time, first_study_time, first_is_known ,type
+        study_model, study_count, learn_count, update_time, first_study_time, first_is_known ,type,
+        start_unit_id, end_unit_id, course_name, study_plan_id
     </sql>
 
     <!--区分单词例句-->
@@ -144,7 +149,6 @@
         <if test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
             and example_id is not null
         </if>
-        and learn_count = #{count}
     </select>
 
     <!-- 查询学生当前单元当前模块下已学习单词/例句的个数，即学习进度 -->
@@ -178,7 +182,7 @@
                 test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
             and example_id is not null
         </if>
-        and learn_count = #{count} and type=1
+        and type=1
 
     </select>
 
@@ -197,7 +201,6 @@
                 test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
             and example_id is not null
         </if>
-        and learn_count = #{count}
         and type=1
 
     </select>
@@ -210,14 +213,12 @@
         l.unit_id = #{unitId}
         <if
                 test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写' or studyModel == '单词图鉴'">
-            and vocabulary_id is not null and (select v.delStatus from
-            vocabulary v where v.id = l.vocabulary_id) = 1
+            and vocabulary_id is not null
             <if
                     test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
                 and l.example_id is not null
             </if>
         </if>
-        and l.learn_count = #{count}
         and l.study_model = #{studyModel} and l.status = 0 and l.type = 1
     </select>
 
@@ -231,7 +232,6 @@
         <if test="unitId != 0">
             and unit_id = #{unitId}
         </if>
-        and learn_count = #{count}
         and study_model = #{studyModel}
         and type = 1
         and
@@ -262,9 +262,7 @@
         <if test="sentenceId != null">
             and example_id = #{sentenceId}
         </if>
-        and learn_count = #{count}
-        and
-        study_model=#{studyModel}
+        and study_model=#{studyModel}
         and type = 1
     </select>
 
@@ -290,7 +288,6 @@
         <if test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel =='例句默写'">
             and example_id=#{learn.exampleId}
         </if>
-        and learn_count = #{count}
         and study_model=#{studyModel}
         and type=#{type}
     </select>
@@ -822,7 +819,6 @@
                 test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">
             and example_id is not null
         </if>
-        and l.learn_count = #{maxCount}
     </select>
     <select id="selectByStudentIdAndWorldId" resultMap="BaseResultMap" parameterType="map">
         select
@@ -1309,7 +1305,6 @@
         <if test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel =='例句默写'">
             and example_id=#{learn.exampleId}
         </if>
-        and learn_count = #{count}
         and study_model=#{studyModel}
         and type=#{type}
     </select>

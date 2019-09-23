@@ -212,9 +212,8 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
         boolean flag = WORD_MEMORY.equals(studyModel) || WORD_LISTEN.equals(studyModel) || WORD_WRITE.equals(studyModel);
         if (unitId != 0) {
             // 查看指定单元的单词/例句信息
-            Integer learnCount = 1;
-            learnedCount = learnMapper.countLearnWord(studentId, unitId, studyModel, learnCount);
-            notKnow = learnMapper.countNotKnownWord(studentId, unitId, studyModel, learnCount);
+            learnedCount = learnMapper.countLearnWord(studentId, unitId, studyModel);
+            notKnow = learnMapper.countNotKnownWord(studentId, unitId, studyModel);
             if (flag) {
                 // 查看单词本摘要信息
                 total = unitVocabularyMapper.countByUnitId(unitId);

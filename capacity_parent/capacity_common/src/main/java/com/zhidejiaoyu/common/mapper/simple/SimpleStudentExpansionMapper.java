@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import java.util.Map;
  * @author stylefeng
  * @since 2019-03-15
  */
+@Repository
 public interface SimpleStudentExpansionMapper extends BaseMapper<StudentExpansion> {
 
     StudentExpansion isHave(@Param("studentId") Long studentId);

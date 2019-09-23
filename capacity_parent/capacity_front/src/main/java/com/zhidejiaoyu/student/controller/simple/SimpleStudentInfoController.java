@@ -59,25 +59,6 @@ public class SimpleStudentInfoController extends BaseController {
     }
 
     /**
-     * 完善学生信息时保存学生信息
-     *
-     * @param session
-     * @param student
-     * @param oldPassword 原密码
-     * @param newPassword 新密码
-     * @return
-     */
-    @PostMapping("/saveStudentInfo")
-    public ServerResponse<String> saveStudentInfo(HttpSession session, Student student, String oldPassword,
-                                                  String newPassword) {
-        ServerResponse<String> x = validStudentInfo(session, student, oldPassword, newPassword);
-        if (x != null) {
-            return x;
-        }
-        return simpleStudentInfoServiceSimple.saveStudentInfo(session, student, oldPassword, newPassword);
-    }
-
-    /**
      * 学生在个人中心修改个人信息
      *
      * @param session
@@ -114,43 +95,6 @@ public class SimpleStudentInfoController extends BaseController {
             return stringServerResponse;
         }
         return simpleStudentInfoServiceSimple.judgeOldPassword(password, oldPassword);
-    }
-
-    /**
-     * 校验学生信息
-     *
-     * @param session
-     * @param student
-     * @param oldPassword
-     * @param newPassword
-     * @return
-     */
-    private ServerResponse<String> validStudentInfo(HttpSession session, Student student, String oldPassword, String newPassword) {
-        Student studentInfo = super.getStudent(session);
-
-        int minPasswordLength = 6;
-        int maxPasswordLength = 10;
-
-        if (StringUtils.isNotEmpty(studentInfo.getPetName())) {
-            return ServerResponse.createByErrorMessage("您已经完善过个人信息，不可再次执行该操作！");
-        }
-
-        ServerResponse<String> x = validOldPassword(oldPassword, studentInfo.getPassword(), minPasswordLength, maxPasswordLength);
-        if (x != null) {
-            return x;
-        }
-
-        boolean validNewPassword = StringUtils.isNotEmpty(newPassword)
-                && (newPassword.length() < minPasswordLength || newPassword.length() > maxPasswordLength);
-        if (validNewPassword) {
-            return ServerResponse.createByErrorMessage("新密码长度必须是6~10个字符！");
-        }
-
-        ServerResponse<String> x1 = checkStudentCommon(student);
-        if (x1 != null) {
-            return x1;
-        }
-        return null;
     }
 
     /**

@@ -24,11 +24,10 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @param studentId  学生id
      * @param unitId     单元id
      * @param studyModel
-     * @param count      当前课程的学习遍数
      * @return
      */
     Long countLearnWord(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
-                        @Param("studyModel") String studyModel, @Param("count") Integer count);
+                        @Param("studyModel") String studyModel);
 
     /**
      * 查询学生当前单元当前模块下已学习单词/例句的个数，即学习进度
@@ -43,7 +42,7 @@ public interface LearnMapper extends BaseMapper<Learn> {
                         @Param("studyModel") String studyModel, @Param("count") Integer count);
 
     Long isCountLearnWord(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
-                          @Param("studyModel") String studyModel, @Param("count") Integer count);
+                          @Param("studyModel") String studyModel);
     /**
      * 查询学生当前单元当前模块下已学习单词/例句的个数，即学习进度 By Type
      *
@@ -53,8 +52,7 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @param count      当前课程的学习遍数
      * @return
      */
-    Long countLearnWordAndType(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
-                        @Param("studyModel") String studyModel, @Param("count") Integer count);
+    Long countLearnWordAndType(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("studyModel") String studyModel);
 
     /**
      * 查询学生当前课程当前模块下已学习单词/例句的个数，即学习进度
@@ -73,11 +71,10 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @param studentId
      * @param learn
      * @param studyModel 学习模块 （慧记忆，慧听写，慧默写，例句听力，例句翻译，例句默写）
-     * @param count      当前课程的学习遍数
      * @return
      */
     Learn selectLearn(@Param("studentId") Long studentId, @Param("learn") Learn learn,
-                      @Param("studyModel") String studyModel, @Param("count") Integer count ,@Param("type") Integer type);
+                      @Param("studyModel") String studyModel, @Param("type") Integer type);
 
     /**
      * 根据学生id删除
@@ -106,11 +103,10 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @param wordId     单词id
      * @param sentenceId 例句id
      * @param studyModel
-     * @param count      当前课程的学习遍数
      * @return
      */
     List<Learn> selectLearnByIdAmdModel(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
-                                  @Param("wordId") Long wordId, @Param("sentenceId") Long sentenceId, @Param("studyModel") String studyModel, @Param("count") Integer count);
+                                  @Param("wordId") Long wordId, @Param("sentenceId") Long sentenceId, @Param("studyModel") String studyModel);
 
     /**
      * 查询当前学生已学单词 的个数
@@ -134,7 +130,7 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @return 学习次数
      */
     Integer selectStudyCountByCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId, @Param("unitId") Long unitId,
-                                       @Param("id") Long id, @Param("studyModel") String studyModel, @Param("count") Integer count);
+                                       @Param("id") Long id, @Param("studyModel") String studyModel);
 
     /**
      * 查询当前单元下生词/生句的个数
@@ -145,7 +141,7 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @return
      */
     Long countNotKnownWord(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
-                           @Param("studyModel") String studyModel, @Param("count") Integer count);
+                           @Param("studyModel") String studyModel);
 
     /**
      * 查询当前课程下生词/生句的个数
@@ -478,10 +474,9 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @param student
      * @param unitId
      * @param studyModel
-     * @param maxCount
      * @return
      */
-    List<Long> selectLearnedWordIdByUnitId(@Param("student") Student student, @Param("unitId") Long unitId, @Param("studyModel") String studyModel, @Param("maxCount") Integer maxCount);
+    List<Long> selectLearnedWordIdByUnitId(@Param("student") Student student, @Param("unitId") Long unitId, @Param("studyModel") String studyModel);
 
     @Select("select id from learn where student_id = #{id} and course_id = #{courseId} and vocabulary_id is null limit 0,1")
     Integer selectByidToStudent(@Param("id") long id, @Param("courseId") Integer courseId);
@@ -871,12 +866,11 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @param studentId
      * @param learn
      * @param studyModel
-     * @param count
      * @param type
      * @return
      */
     List<Long> selectLearnIds(@Param("studentId") Long studentId, @Param("learn") Learn learn,
-                              @Param("studyModel") String studyModel, @Param("count") int count, @Param("type") int type);
+                              @Param("studyModel") String studyModel, @Param("type") int type);
 
     /**
      * 查询学生当前单元当前流程的学习次数

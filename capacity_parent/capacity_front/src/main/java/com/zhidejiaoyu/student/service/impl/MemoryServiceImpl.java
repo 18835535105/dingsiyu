@@ -25,10 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabulary> implements MemoryService {
@@ -71,6 +68,12 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
     @Autowired
     private MedalAwardAsync medalAwardAsync;
 
+    @Autowired
+    private CapacityStudentUnitMapper capacityStudentUnitMapper;
+
+    @Autowired
+    private StudentStudyPlanMapper studentStudyPlanMapper;
+
     @Override
     public Object getMemoryWord(HttpSession session, Long unitId) {
         Student student = getStudent(session);
@@ -84,11 +87,8 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
             learnMapper.insert(learn);
         }
 
-        // 查询当前课程的学习遍数
-        Integer maxCount = 1;
-
         // 查询学生当前单元下已学习单词的个数，即学习进度
-        Long plan = learnMapper.countLearnWord(student.getId(), unitId, "慧记忆", maxCount);
+        Long plan = learnMapper.countLearnWord(student.getId(), unitId, "慧记忆");
         // 获取当前单元下的所有单词的总个数
         Long wordCount = unitVocabularyMapper.countByUnitId(unitId);
         if (wordCount == 0) {
@@ -115,7 +115,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         }
 
         // 如果没有到达黄金记忆点的单词，获取当前学习进度的下一个单词
-        return getNextMemoryWord(session, unitId, student, firstStudy, maxCount, plan, wordCount);
+        return getNextMemoryWord(session, unitId, student, firstStudy, plan, wordCount);
     }
 
     /**
@@ -125,19 +125,18 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
      * @param unitId
      * @param student
      * @param firstStudy
-     * @param maxCount
      * @param plan       当前学习进度
      * @param wordCount  当前单元单词总数
      * @return 如果当前单词是本单元最后一个单词，返回 null
      */
     private ServerResponse<MemoryStudyVo> getNextMemoryWord(HttpSession session, Long unitId, Student student, boolean firstStudy,
-                                                            Integer maxCount, Long plan, Long wordCount) {
+                                                            Long plan, Long wordCount) {
         if (wordCount - 1 >= plan) {
             // 记录学生开始学习该单词的时间
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
             // 查询学习记录本模块学习过的所有单词id
-            List<Long> wordIds = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "慧记忆", maxCount);
+            List<Long> wordIds = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "慧记忆");
 
             Vocabulary currentStudyWord = vocabularyMapper.selectOneWordNotInIds(wordIds, unitId);
 
@@ -174,14 +173,13 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         Long studentId = student.getId();
 
         // 当前课程的最大学习遍数
-        Integer maxCount = 1;
-        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, "慧记忆", maxCount, 1);
+        List<Long> learnIds = learnMapper.selectLearnIds(studentId, learn, "慧记忆", 1);
         if (learnIds.size() > 1) {
             List<Long> longs = learnIds.subList(1, learnIds.size());
             learnMapper.deleteBatchIds(longs);
         }
         // 查询当前单词的学习记录数据
-        Learn currentLearn = learnMapper.selectLearn(studentId, learn, "慧记忆", maxCount, 1);
+        Learn currentLearn = learnMapper.selectLearn(studentId, learn, "慧记忆", 1);
 
         // 统计初出茅庐勋章
         medalAwardAsync.inexperienced(student);
@@ -196,10 +194,10 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         // 保存学习记录
         // 第一次学习，如果答对记为熟词，答错记为生词
         if (currentLearn == null) {
-            return saveMemoryFirstLearnRecord(session, learn, known, total, plan, student, studentId);
+            return saveMemoryFirstLearnRecord(session, learn, known, student, studentId);
         } else {
             // 不是第一次学习
-            return saveMemoryNotFirstLearnRecord(session, learn, known, student, maxCount, currentLearn);
+            return saveMemoryNotFirstLearnRecord(session, learn, known, student, currentLearn);
         }
     }
 
@@ -210,12 +208,11 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
      * @param learn        当前单词之前的学习信息
      * @param known        是否熟悉当前单词
      * @param student
-     * @param maxCount     当前课程的学习遍数
      * @param currentLearn 当前单词的学习信息
      * @return
      */
     private ServerResponse<String> saveMemoryNotFirstLearnRecord(HttpSession session, Learn learn, Boolean known,
-                                                                 Student student, Integer maxCount, Learn currentLearn) {
+                                                                 Student student, Learn currentLearn) {
         learn.setStudyCount(currentLearn.getStudyCount() + 1);
         CapacityMemory capacityMemory;
         if (known) {
@@ -229,7 +226,8 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         // 更新学习记录
         currentLearn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
         currentLearn.setStudyCount(currentLearn.getStudyCount() + 1);
-        currentLearn.setLearnCount(maxCount);
+
+        packageAboutStudyPlan(currentLearn, student.getId(), capacityStudentUnitMapper, studentStudyPlanMapper);
 
         if (memoryDifficult == 0) {
             // 熟词
@@ -238,7 +236,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
             currentLearn.setStatus(0);
         }
         currentLearn.setUpdateTime(new Date());
-        int i = learnMapper.updateByPrimaryKeySelective(currentLearn);
+        int i = learnMapper.updateById(currentLearn);
         return i > 0 ? ServerResponse.createBySuccessMessage("学习信息保存成功") : ServerResponse.createByErrorMessage("学习信息保存失败");
     }
 
@@ -248,14 +246,11 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
      * @param session
      * @param learn     当前学习信息
      * @param known     是否熟悉当前单词
-     * @param total
-     * @param plan
      * @param student
      * @param studentId
      * @return
      */
-    private ServerResponse<String> saveMemoryFirstLearnRecord(HttpSession session, Learn learn, Boolean known, Integer total,
-                                                              Integer plan, Student student, Long studentId) {
+    private ServerResponse<String> saveMemoryFirstLearnRecord(HttpSession session, Learn learn, Boolean known, Student student, Long studentId) {
         Date now = DateUtil.parseYYYYMMDDHHMMSS(new Date());
 
         if (student.getFirstStudyTime() == null) {
@@ -265,15 +260,18 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
             session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         }
 
-        // 该课程是否是第一次学习，是第一次学习要保存课程首次学习时间
-        LearnExample learnExample = new LearnExample();
-        learnExample.createCriteria().andStudentIdEqualTo(studentId).andCourseIdEqualTo(learn.getCourseId());
-        int courseLearnCount = learnMapper.countByExample(learnExample);
+        // 封装有关学习计划的信息
+        packageAboutStudyPlan(learn, studentId, capacityStudentUnitMapper, studentStudyPlanMapper);
 
         learn.setStudentId(studentId);
         learn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
         learn.setStudyModel("慧记忆");
         learn.setStudyCount(1);
+
+        // 该课程是否是第一次学习，是第一次学习要保存课程首次学习时间
+        LearnExample learnExample = new LearnExample();
+        learnExample.createCriteria().andStudentIdEqualTo(studentId).andCourseIdEqualTo(learn.getCourseId());
+        int courseLearnCount = learnMapper.countByExample(learnExample);
         if (courseLearnCount == 0) {
             // 第一次学习该课程，保存首次学习时间
             learn.setFirstStudyTime(now);
@@ -282,13 +280,12 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
             // 如果认识该单词，记为熟词
             learn.setStatus(1);
             learn.setFirstIsKnown(1);
-            saveWordLearnAndCapacity.saveCapacityMemory(learn, student, known, 1);
         } else {
             learn.setStatus(0);
             learn.setFirstIsKnown(0);
             // 单词不认识将该单词记入记忆追踪中
-            saveWordLearnAndCapacity.saveCapacityMemory(learn, student, known, 1);
         }
+        saveWordLearnAndCapacity.saveCapacityMemory(learn, student, known, 1);
         learn.setLearnCount(1);
         learn.setUpdateTime(now);
         learn.setType(1);
@@ -297,6 +294,38 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         }
         learnMapper.insert(learn);
         return ServerResponse.createBySuccess();
+    }
+
+    /**
+     * 封装有关学习计划的数据
+     *
+     * @param learn
+     * @param studentId
+     */
+    public static void packageAboutStudyPlan(Learn learn, Long studentId, CapacityStudentUnitMapper capacityStudentUnitMapper,
+                                             StudentStudyPlanMapper studentStudyPlanMapper) {
+        if (StringUtils.isNotEmpty(learn.getCourseName())) {
+            return;
+        }
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
+        if (capacityStudentUnit != null) {
+            Long startUnitId = capacityStudentUnit.getStartunit();
+            Long endUnitId = capacityStudentUnit.getEndunit();
+            learn.setCourseName(capacityStudentUnit.getCourseName());
+            learn.setStartUnitId(startUnitId);
+            learn.setEndUnitId(endUnitId);
+
+            StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selectCurrentPlan(studentId, startUnitId, endUnitId, 1);
+            if (studentStudyPlan != null) {
+                if (studentStudyPlan.getCurrentStudyCount() == null) {
+                    learn.setLearnCount(1);
+                } else {
+                    learn.setLearnCount(studentStudyPlan.getCurrentStudyCount() > studentStudyPlan.getTotalStudyCount()
+                            ? studentStudyPlan.getTotalStudyCount() : studentStudyPlan.getCurrentStudyCount());
+                }
+                learn.setStudyPlanId(studentStudyPlan.getId());
+            }
+        }
     }
 
 

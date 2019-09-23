@@ -58,6 +58,16 @@ public class Duration extends Model<Duration> {
      */
     private Integer studyModel;
 
+    /**
+     * 学习计划的学习遍数
+     */
+    private Integer studyCount;
+
+    /**
+     * 学习计划 id，用于区分当前时长信息是属于哪个学习计划的
+     */
+    private Integer studyPlanId;
+
     @Override
     protected Serializable pkVal() {
         return this.id;
