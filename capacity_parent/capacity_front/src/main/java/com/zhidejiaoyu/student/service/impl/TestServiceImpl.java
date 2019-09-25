@@ -1009,13 +1009,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setGenre("音译测试");
         testRecord.setStudentId(student.getId());
         Date date = new Date();
-        testRecord.setTestEndTime(date);
-        Date startDate = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
-        if (startDate != null) {
-            testRecord.setTestStartTime(startDate);
-        } else {
-            testRecord.setTestStartTime(date);
-        }
+        saveTestRecordTime(testRecord, session, date);
         if (wordUnitTestDTO.getErrorCount() != null && wordUnitTestDTO.getRightCount() != null) {
             testRecord.setQuantity(wordUnitTestDTO.getErrorCount() + wordUnitTestDTO.getRightCount());
         }
@@ -1069,8 +1063,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setRightCount(wordUnitTestDTO.getRightCount());
         testRecord.setGenre("课文测试");
         testRecord.setStudentId(student.getId());
-        testRecord.setTestEndTime(new Date());
-        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+        Date date = new Date();
+        saveTestRecordTime(testRecord, session, date);
         if (wordUnitTestDTO.getErrorCount() != null && wordUnitTestDTO.getRightCount() != null) {
             testRecord.setQuantity(wordUnitTestDTO.getErrorCount() + wordUnitTestDTO.getRightCount());
         }
@@ -1099,6 +1093,27 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             learnMapper.insert(learn);
         }
         return getObjectServerResponse(session, wordUnitTestDTO, student, testRecord);
+    }
+
+    /**
+     * 保存测试时间 保证测试时间不为空
+     *
+     * @param testRecord
+     * @param session
+     * @param date
+     */
+    private void saveTestRecordTime(TestRecord testRecord, HttpSession session, Date date) {
+        if (date == null) {
+            new Date();
+        }
+        testRecord.setTestEndTime(date);
+        Date startTime = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
+        if (startTime != null) {
+            testRecord.setTestStartTime(startTime);
+        } else {
+            testRecord.setTestStartTime(date);
+        }
+
     }
 
     private ServerResponse<Object> getObjectServerResponse(HttpSession session, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord) {

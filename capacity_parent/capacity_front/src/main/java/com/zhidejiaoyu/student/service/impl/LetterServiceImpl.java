@@ -118,8 +118,8 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     /**
      * 获取单元模块开启详情
      *
-     * @param session   session
-     * @param unitId    单元id
+     * @param session session
+     * @param unitId  单元id
      * @return
      */
     @Override
@@ -204,7 +204,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
 
     @Override
     public Object getLetterListen(Long unitId, HttpSession session) {
-         //查看字母播放器全部数据
+        //查看字母播放器全部数据
         Long studentId = getStudentId(session);
         StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selLetterSudyByStudentAndUnitId(studentId, unitId);
         if (studentStudyPlan == null) {
@@ -264,12 +264,13 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     @Override
     public Object getLetterPair(Long unitId, HttpSession session) {
         Long studentId = getStudentId(session);
-        //查看是否已经学习完当前的模块
+        /*//查看是否已经学习完当前的模块
         Integer letterPairCount = letterPairMapper.selCountStudyLetter(unitId, studentId);
-        Integer countByUnitId = letterMapper.selLetterCountById(unitId);
-        if (countByUnitId.equals(letterPairCount)) {
+
+        if (countByUnitId <= letterPairCount) {
             return ServerResponse.createBySuccess(600, "无学习");
-        }
+        }*/
+
         Map<String, Object> map = new HashMap<>();
         //查看黄金记忆点单词
         LetterPair letterPair = letterPairMapper.selPushLetter(unitId, studentId);
@@ -281,6 +282,10 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         } else {
             studyLetter = letterMapper.selectById(letterPair.getLetterId());
         }
+        if (studyLetter == null) {
+            return ServerResponse.createBySuccess(600, "无学习");
+        }
+        Integer countByUnitId = letterMapper.selLetterCountById(unitId);
         //随机获取字母
         List<Letter> threeLetter = letterMapper.getThreeLetter(studyLetter.getId());
         Integer integer = letterPairMapper.selCountStudyLetter(unitId, studentId);
@@ -575,7 +580,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     }
 
     @Override
-    public Object updLetterPair(HttpSession session,Long unitId){
+    public Object updLetterPair(HttpSession session, Long unitId) {
         Long studentId = getStudentId(session);
         try {
             //修改字母配对数据
