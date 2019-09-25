@@ -987,7 +987,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             isFirst = true;
         }
 
-        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld,true);
+        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld, true);
         if (testRecordOld == null) {
             testRecord = new TestRecord();
             // 首次测试大于或等于80分，超过历史最高分次数 +1
@@ -1008,8 +1008,14 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setAwardGold(goldCount);
         testRecord.setGenre("音译测试");
         testRecord.setStudentId(student.getId());
-        testRecord.setTestEndTime(new Date());
-        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+        Date date = new Date();
+        testRecord.setTestEndTime(date);
+        Date startDate = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
+        if (startDate != null) {
+            testRecord.setTestStartTime(startDate);
+        } else {
+            testRecord.setTestStartTime(date);
+        }
         if (wordUnitTestDTO.getErrorCount() != null && wordUnitTestDTO.getRightCount() != null) {
             testRecord.setQuantity(wordUnitTestDTO.getErrorCount() + wordUnitTestDTO.getRightCount());
         }
@@ -1043,7 +1049,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             isFirst = true;
         }
 
-        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld,true);
+        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld, true);
         if (testRecordOld == null) {
             testRecord = new TestRecord();
             // 首次测试大于或等于80分，超过历史最高分次数 +1
@@ -1324,7 +1330,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         saveTestLearnAndCapacity.saveTestAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, unitId, classify);
 
         // 根据不同分数奖励学生金币
-        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord,true);
+        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord, true);
 
         testRecord = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, testRecord, goldCount);
 
@@ -1556,7 +1562,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         wordUnitTestDTO.setClassify(11);
         wordUnitTestDTO.setUnitId(new Long[]{dto.getUnitId()});
         wordUnitTestDTO.setPoint(point);
-        Integer goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord,true);
+        Integer goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord, true);
 
         testRecord.setAwardGold(goldCount);
         TestResultVo vo = new TestResultVo();
