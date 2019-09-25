@@ -208,12 +208,11 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Map<String, Object> map = new HashMap<>(16);
 
         // 游戏测试开始时间
-        Date gameStartTime = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
+        Date date=new Date();
+        saveTestRecordTime(testRecord,session,date);
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
 
         testRecord.setStudentId(student.getId());
-        testRecord.setTestStartTime(gameStartTime);
-        testRecord.setTestEndTime(new Date());
         testRecord.setGenre("学前游戏测试");
         testRecord.setStudyModel("学前游戏测试");
         testRecord.setQuantity(20);
@@ -348,7 +347,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setStudentId(student.getId());
         testRecord.setGenre("单元闯关测试");
         testRecord.setStudyModel("字母单元闯关");
-        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+        Date date = new Date();
+        saveTestRecordTime(testRecord, session, date);
         getUnitTestMsg(testRecord, testRecord.getPoint());
         Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 10);
         if (integer == null || integer <= 0) {
@@ -367,7 +367,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 }
             }
         }
-        testRecord.setTestEndTime(new Date());
+
         testRecord.setAwardGold(goldCount);
 
         TestResultVo vo = new TestResultVo();
@@ -448,7 +448,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setStudentId(student.getId());
         testRecord.setGenre("学后测试");
         testRecord.setStudyModel("字母学后测试");
-        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+        Date date = new Date();
+        saveTestRecordTime(testRecord, session, date);
         getUnitTestMsg(testRecord, testRecord.getPoint());
         Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 12);
         int goldCount = 0;
@@ -475,7 +476,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setEnergy(energy);
         vo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
         getMessage(student, vo, testRecord, point, 100);
-        testRecord.setTestEndTime(new Date());
+
         testRecord.setAwardGold(goldCount);
         testRecordMapper.insert(testRecord);
         studentMapper.updateById(student);
@@ -491,7 +492,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setStudentId(student.getId());
         testRecord.setGenre("单元闯关测试");
         testRecord.setStudyModel("阅读测试");
-        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+        Date date=new Date();
+        saveTestRecordTime(testRecord,session,date);
         getUnitTestMsg(testRecord, testRecord.getPoint());
         Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 13);
         int gold = 0;
@@ -1095,26 +1097,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         return getObjectServerResponse(session, wordUnitTestDTO, student, testRecord);
     }
 
-    /**
-     * 保存测试时间 保证测试时间不为空
-     *
-     * @param testRecord
-     * @param session
-     * @param date
-     */
-    private void saveTestRecordTime(TestRecord testRecord, HttpSession session, Date date) {
-        if (date == null) {
-            new Date();
-        }
-        testRecord.setTestEndTime(date);
-        Date startTime = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
-        if (startTime != null) {
-            testRecord.setTestStartTime(startTime);
-        } else {
-            testRecord.setTestStartTime(date);
-        }
 
-    }
 
     private ServerResponse<Object> getObjectServerResponse(HttpSession session, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord) {
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
@@ -1547,8 +1530,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse savePhoneticSymbolUnitTest(HttpSession session, UnitTestDto dto) {
         Student student = super.getStudent(session);
-        Object beginTime = session.getAttribute(TimeConstant.BEGIN_START_TIME);
-
         // 判断是否是首次测试
         boolean isFirst = false;
         TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
@@ -1563,8 +1544,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setStudentId(student.getId());
         testRecord.setUnitId(dto.getUnitId());
         testRecord.setGenre(TestGenreConstant.UNIT_TEST);
-        testRecord.setTestEndTime(new Date());
-        testRecord.setTestStartTime(beginTime == null ? new Date() : (Date) beginTime);
+        Date date = new Date();
+        saveTestRecordTime(testRecord, session, date);
         testRecord.setPoint(point);
         testRecord.setHistoryBadPoint(point);
         testRecord.setHistoryBestPoint(point);
@@ -1721,8 +1702,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setRightCount(correctWord == null ? 0 : correctWord.length);
         testRecord.setStudentId(student.getId());
         testRecord.setStudyModel(commonMethod.getTestType(wordUnitTestDTO.getClassify()));
-        testRecord.setTestEndTime(new Date());
-        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+        Date date = new Date();
+        saveTestRecordTime(testRecord, session, date);
         testRecord.setUnitId(wordUnitTestDTO.getUnitId()[0]);
         testRecord.setAwardGold(goldCount);
 

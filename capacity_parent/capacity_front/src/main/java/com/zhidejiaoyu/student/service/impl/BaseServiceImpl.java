@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.service.impl;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.LevelMapper;
 import com.zhidejiaoyu.common.mapper.StudentExpansionMapper;
@@ -10,6 +11,7 @@ import com.zhidejiaoyu.common.mapper.StudyFlowMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.pojo.StudyFlow;
+import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.utils.TokenUtil;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.student.common.RedisOpt;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +97,27 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
     @Override
     public void saveRunLog(Student student, Integer type, String msg) throws RuntimeException {
         saveRunLog.saveRunLog(student, type, msg);
+    }
+
+    /**
+     * 保存测试时间 保证测试时间不为空
+     *
+     * @param testRecord
+     * @param session
+     * @param date
+     */
+    public void saveTestRecordTime(TestRecord testRecord, HttpSession session, Date date) {
+        if (date == null) {
+            new Date();
+        }
+        testRecord.setTestEndTime(date);
+        Object startTime = session.getAttribute(TimeConstant.BEGIN_START_TIME);
+        if (startTime != null) {
+            testRecord.setTestStartTime((Date) startTime);
+        } else {
+            testRecord.setTestStartTime(date);
+        }
+
     }
 
     /**

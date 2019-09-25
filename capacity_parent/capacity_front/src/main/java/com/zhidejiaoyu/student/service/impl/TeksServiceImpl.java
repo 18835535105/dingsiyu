@@ -736,10 +736,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         Student student = super.getStudent(session);
         final String model = "课文默写测试";
         //测试开始时间
-        Date startTime = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
-        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
         //测试结束时间
         Date endTime = new Date();
+        saveTestRecordTime(testRecord,session,endTime);
+        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
         //添加学习模块
         testRecord.setStudyModel(model);
         //获取课程id
@@ -759,8 +759,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         testRecord.setAwardGold(goldCount);
         testRecord.setStudentId(student.getId());
         testRecord.setCourseId(aLong);
-        testRecord.setTestStartTime(startTime);
-        testRecord.setTestEndTime(endTime);
+
         getLevel(session);
         if (student.getBonusExpires() != null) {
             if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
