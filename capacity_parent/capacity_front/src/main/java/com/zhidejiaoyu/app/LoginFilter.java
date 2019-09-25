@@ -151,6 +151,13 @@ public class LoginFilter implements Filter {
             return;
         }
 
+        // 当 loginSession 的值为-2 时，说明是该学生信息被清除，需要重新登录
+        flag = "-2";
+        if (Objects.equals(flag, sessionObject.toString())) {
+            currentSession.setAttribute("multipleLoginMsg", "该账号信息已被清除，已被强制下线！");
+            return;
+        }
+
         if (!Objects.equals(sessionId, currentSessionId)) {
             try {
                 String ip = MacIpUtil.getIpAddr(request);
