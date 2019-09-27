@@ -282,6 +282,16 @@ public class Student extends Model<Student> {
         this.petName = petName;
     }
 
+    public void setPhone(String phone) {
+        this.phone = phone;
+        this.patriarchPhone = phone;
+    }
+
+    public void setPatriarchPhone(String patriarchPhone) {
+        this.phone = patriarchPhone;
+        this.patriarchPhone = patriarchPhone;
+    }
+
     @Override
     protected Serializable pkVal() {
         return this.id;
