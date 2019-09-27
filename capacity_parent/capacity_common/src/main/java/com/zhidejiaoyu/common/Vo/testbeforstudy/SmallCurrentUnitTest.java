@@ -1,8 +1,6 @@
 package com.zhidejiaoyu.common.Vo.testbeforstudy;
 
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
@@ -24,7 +22,7 @@ public class SmallCurrentUnitTest implements Serializable {
     private Integer topic;
 
    /* *
-     *
+     *音译测试
      */
     private List<QuestionAndAnswer> questionAndAnswerList;
 }

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author wuchenxi
+ * 生成数据库文件
  * @date 2018/9/5
  */
 @Slf4j
@@ -23,7 +24,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"memory_capacity"};
+        String[] tableName = {"school_hours","student_hours"};
 
         /**
          * 配置：
@@ -38,7 +39,7 @@ public class MpGeneratorUtil {
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig
                 //设置代码生成路径
-                .setOutputDir("F://pojo")
+                .setOutputDir("D://pojo")
                 //设置作者
                 .setAuthor("zdjy")
                 //设置二级缓存的开闭
