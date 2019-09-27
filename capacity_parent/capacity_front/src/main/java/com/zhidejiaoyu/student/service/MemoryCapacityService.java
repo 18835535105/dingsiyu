@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.service;
 
+import com.zhidejiaoyu.common.pojo.EegRecording;
 import com.zhidejiaoyu.common.pojo.MemoryCapacity;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
@@ -17,7 +18,7 @@ public interface MemoryCapacityService extends BaseService<MemoryCapacity> {
 
     ServerResponse<Object> getEnterMemoryCapacity(HttpSession session, Integer type);
 
-    ServerResponse<Object> saveMemoryCapacity(HttpSession session, Integer grade, Integer fraction);
+    /*ServerResponse<Object> saveMemoryCapacity(HttpSession session, Integer grade, Integer fraction);*/
 
     ServerResponse<Object> saveTrain(HttpSession session, Integer point);
 
@@ -28,4 +29,6 @@ public interface MemoryCapacityService extends BaseService<MemoryCapacity> {
     ServerResponse<Object> savePinkeye(HttpSession session, Integer point);
 
     ServerResponse<Object> saveBrain(HttpSession session, Integer point);
+
+    ServerResponse<Object> saveMemoryCapacity(HttpSession session, EegRecording eegRecording);
 }

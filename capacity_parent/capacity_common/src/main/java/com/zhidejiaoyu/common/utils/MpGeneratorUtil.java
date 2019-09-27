@@ -24,7 +24,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"school_hours","student_hours"};
+        String[] tableName = {"EEG_recording"};
 
         /**
          * 配置：

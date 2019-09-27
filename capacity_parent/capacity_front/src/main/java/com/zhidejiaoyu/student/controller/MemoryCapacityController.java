@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.controller;
 
 
+import com.zhidejiaoyu.common.pojo.EegRecording;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.MemoryCapacityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,18 @@ public class MemoryCapacityController {
     }
 
     /**
+     * 保存脑电波数据
+     * @param session
+     * @param eegRecording
+     * @return
+     */
+    @RequestMapping("saveMemoryCapacity")
+    public ServerResponse<Object> saveMemoryCapacity(HttpSession session, EegRecording eegRecording) {
+        return memoryCapacityService.saveMemoryCapacity(session, eegRecording);
+    }
+
+
+    /**
      * 保存当日记忆容量获取金币
      *
      * @param session
@@ -43,10 +56,10 @@ public class MemoryCapacityController {
      * @param fraction  分数
      * @return
      */
-    @RequestMapping("/saveMemoryCapacity")
+    /*@RequestMapping("/saveMemoryCapacity")
     public ServerResponse<Object> saveMemoryCapacity(HttpSession session, Integer grade, Integer fraction) {
         return memoryCapacityService.saveMemoryCapacity(session, grade, fraction);
-    }
+    }*/
 
     /**
      * 保存眼脑训练
