@@ -15,4 +15,6 @@ import org.apache.ibatis.annotations.Param;
 public interface EegRecordingMapper extends BaseMapper<EegRecording> {
 
     EegRecording selNowByStudent(@Param("studentId") Long studentId);
+
+    EegRecording selRoleStudent(@Param("type") Integer type,@Param("studentId") Long id);
 }

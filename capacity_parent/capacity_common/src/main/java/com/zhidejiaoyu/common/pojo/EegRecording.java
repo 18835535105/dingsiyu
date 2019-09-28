@@ -67,6 +67,11 @@ public class EegRecording extends Model<EegRecording> {
     private Integer state;
 
     /**
+     * 连续答对次数集合用string保存
+     */
+    private String frequency;
+
+    /**
      * 创建时间
      */
     @TableField("create_time")

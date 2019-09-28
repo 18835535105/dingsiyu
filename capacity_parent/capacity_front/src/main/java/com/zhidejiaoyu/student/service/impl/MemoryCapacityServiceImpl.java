@@ -50,24 +50,43 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
     @Override
     public ServerResponse<Object> getEnterMemoryCapacity(HttpSession session, Integer type) {
         Student student = getStudent(session);
-        EegRecording eegRecording = eegRecordingMapper.selNowByStudent(student.getId());
         Map<String, Object> map = new HashMap();
-        if (eegRecording == null) {
-            map.put("isStudy", true);
+        if (student.getRole().equals(4)) {
+            EegRecording eegRecording = eegRecordingMapper.selRoleStudent(type, student.getId());
             map.put("type", 0);
-        } else {
-            if (eegRecording.getState().equals(1)) {
-                map.put("isStudy", false);
+            if (eegRecording == null) {
+                map.put("isStudy", true);
+                map.put("level", 1);
             } else {
                 map.put("isStudy", true);
-                map.put("answerNumber", eegRecording.getAnswerNumber());
-                map.put("pairNumber", eegRecording.getPairNumber());
-                map.put("bigLevel", eegRecording.getBigLevel());
-                map.put("smallLevel", eegRecording.getSmallLevel());
+                setReturnMap(eegRecording, map);
             }
-            map.put("type", eegRecording.getType());
+        } else {
+            EegRecording eegRecording = eegRecordingMapper.selNowByStudent(student.getId());
+            if (eegRecording == null) {
+                map.put("isStudy", true);
+                map.put("type", 0);
+                map.put("level", 1);
+            } else {
+                if (eegRecording.getState().equals(1)) {
+                    map.put("isStudy", false);
+                } else {
+                    map.put("isStudy", true);
+                    setReturnMap(eegRecording, map);
+                }
+                map.put("type", eegRecording.getType());
+            }
         }
         return ServerResponse.createBySuccess(map);
+    }
+
+    private void setReturnMap(EegRecording eegRecording, Map<String, Object> map) {
+        map.put("answerNumber", eegRecording.getAnswerNumber());
+        map.put("pairNumber", eegRecording.getPairNumber());
+        map.put("bigLevel", eegRecording.getBigLevel());
+        map.put("smallLevel", eegRecording.getSmallLevel());
+        map.put("level", eegRecording.getLevel());
+        map.put("frequency", eegRecording.getFrequency());
     }
 
     /*@Override
@@ -200,11 +219,17 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
     @Override
     public ServerResponse<Object> saveMemoryCapacity(HttpSession session, EegRecording eegRecording) {
         Student student = getStudent(session);
-        EegRecording eegRecordings = eegRecordingMapper.selNowByStudent(student.getId());
+        EegRecording eegRecordings = null;
+        if (student.getRole().equals(4)) {
+            eegRecordings = eegRecordingMapper.selRoleStudent(eegRecording.getType(), student.getId());
+        } else {
+            eegRecordings = eegRecordingMapper.selNowByStudent(student.getId());
+        }
+
         Integer gold = 0;
-        if (eegRecording.getType().equals(eegRecordings.getType())) {
-            //判断是否拥有eegRecording
-            if (eegRecordings != null) {
+        if (eegRecordings != null) {
+            if (eegRecording.getType().equals(eegRecordings.getType())) {
+                //判断是否拥有eegRecording
                 if (eegRecordings.getType().equals(eegRecording.getType())) {
                     eegRecording.setStudentId(student.getId().intValue());
                     eegRecording.setId(eegRecordings.getId());
@@ -214,60 +239,64 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                         Integer laterLevel = eegRecordings.getLevel();
                         Integer noeLevel = eegRecording.getBigLevel();
                         eegRecording.setLevel(eegRecording.getBigLevel());
-                        gold = calculationGold(eegRecording.getType(), laterLevel, noeLevel);
+                        gold = calculationGold(eegRecording.getType(), eegRecording.getLevel(), laterLevel, noeLevel);
                     } else {
                         eegRecording.setLevel(eegRecordings.getLevel());
                     }
                     eegRecordingMapper.updateById(eegRecording);
                 }
             } else {
-                gold = calculationGold(eegRecording.getType(), null, eegRecording.getBigLevel());
-                eegRecording.setLevel(eegRecording.getBigLevel());
-                eegRecording.setCreateTime(new Date());
-                eegRecordingMapper.insert(eegRecording);
+                return ServerResponse.createBySuccess();
+            }
+        } else {
+            gold = calculationGold(eegRecording.getType(), eegRecording.getLevel(), null, eegRecording.getBigLevel());
+            eegRecording.setLevel(eegRecording.getBigLevel());
+            eegRecording.setCreateTime(new Date());
+            eegRecording.setStudentId(student.getId().intValue());
+            eegRecordingMapper.insert(eegRecording);
 
+        }
+        //保存金币
+        if (gold > 0) {
+            student.setSystemGold(student.getSystemGold() + gold);
+            studentMapper.updateById(student);
+            String model = null;
+            if (eegRecording.getType() == 1) {
+                model = "记忆大挑战";
             }
-            //保存金币
-            if (gold > 0) {
-                student.setSystemGold(student.getSystemGold() + gold);
-                studentMapper.updateById(student);
-                String model = null;
-                if (eegRecording.getType() == 1) {
-                    model = "记忆大挑战";
-                }
-                if (eegRecording.getType() == 2) {
-                    model = "乾坤挪移";
-                }
-                if (eegRecording.getType() == 3) {
-                    model = "火眼金睛";
-                }
-                if (eegRecording.getType() == 4) {
-                    model = "最强大脑";
-                }
-                super.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在脑电波：" + model + "中奖励#" + gold + "#枚金币");
+            if (eegRecording.getType() == 2) {
+                model = "乾坤挪移";
             }
-            Map<String, Object> map = new HashMap<>();
-            String url = null;
-            if (eegRecording.getType() != 1) {
-                if (eegRecording.getBigLevel().equals(1)) {
-                    url = petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY);
-                } else if (eegRecording.getBigLevel().equals(2)) {
-                    url = petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED);
-                } else {
-                    url = petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED);
-                }
+            if (eegRecording.getType() == 3) {
+                model = "火眼金睛";
+            }
+            if (eegRecording.getType() == 4) {
+                model = "最强大脑";
+            }
+            super.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在脑电波：" + model + "中奖励#" + gold + "#枚金币");
+        }
+        Map<String, Object> map = new HashMap<>();
+        String url = null;
+        if (eegRecording.getType() != 1) {
+            if (eegRecording.getBigLevel().equals(1)) {
+                url = petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY);
+            } else if (eegRecording.getBigLevel().equals(2)) {
+                url = petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED);
             } else {
                 url = petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED);
             }
-            map.put("gold", gold);
-            map.put("listen", url);
-            map.put("petUrl", GetOssFile.getPublicObjectUrl(student.getPartUrl()));
-            return ServerResponse.createBySuccess(map);
+        } else {
+            url = petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED);
         }
-        return ServerResponse.createBySuccess();
+        map.put("gold", gold);
+        map.put("listen", url);
+        map.put("petUrl", GetOssFile.getPublicObjectUrl(student.getPartUrl()));
+        return ServerResponse.createBySuccess(map);
+
+
     }
 
-    private Integer calculationGold(Integer type, Integer laterLevel, Integer nowLevel) {
+    private Integer calculationGold(Integer type, Integer level, Integer laterLevel, Integer nowLevel) {
         Integer gold = 0;
         if (laterLevel != null) {
             if (nowLevel.equals(2)) {
@@ -286,7 +315,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
                 }
             }
         } else {
-            if (type == 1) {
+            if (type.equals(1) && level.equals(1)) {
                 gold = 5;
             } else {
                 if (nowLevel.equals(2)) {

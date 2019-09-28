@@ -4,28 +4,39 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.EegRecording">
-        <id column="id" property="id" />
-        <result column="student_id" property="studentId" />
-        <result column="type" property="type" />
-        <result column="big_level" property="bigLevel" />
-        <result column="small_level" property="smallLevel" />
-        <result column="answer_number" property="answerNumber" />
-        <result column="pair_number" property="pairNumber" />
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="type" property="type"/>
+        <result column="big_level" property="bigLevel"/>
+        <result column="small_level" property="smallLevel"/>
+        <result column="answer_number" property="answerNumber"/>
+        <result column="pair_number" property="pairNumber"/>
         <result column="create_time" property="createTime"/>
-        <result column="state" property="state" />
-        <result column="level" property="level" />
+        <result column="state" property="state"/>
+        <result column="level" property="level"/>
+        <result column="frequency" property="frequency"/>
     </resultMap>
 
     <sql id="base_sql">
-        id,student_id,type,big_level,small_level,answer_number,pair_number,state,create_time,level
+        id,student_id,type,big_level,small_level,answer_number,pair_number,state,create_time,level,frequency
     </sql>
 
     <select id="selNowByStudent" parameterType="map" resultMap="BaseResultMap">
         select
-         <include refid="base_sql"></include>
+        <include refid="base_sql"></include>
         from EEG_recording
         where student_id=#{studentId}
         and to_days(create_time) = to_days(now())
+    </select>
+
+    <select id="selRoleStudent" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"></include>
+        from EEG_recording
+        where
+        student_id=#{studentId}
+        and to_days(create_time) = to_days(now())
+        and state=0
     </select>
 
 </mapper>
