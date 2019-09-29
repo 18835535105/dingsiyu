@@ -27,8 +27,9 @@ public class MemoryCapacityController {
 
     /**
      * 判断学生是否可以进入记忆容量
+     *
      * @param session
-     * @param type      1，记忆容量  2，眼脑训练   3，火眼精金  4，最强大脑
+     * @param type    1，记忆容量  2，眼脑训练   3，火眼精金  4，最强大脑
      * @return
      */
     @RequestMapping("/getEnterMemoryCapacity")
@@ -37,7 +38,20 @@ public class MemoryCapacityController {
     }
 
     /**
+     * 判断学生是否可以进入记忆容量
+     *
+     * @param session
+     * @return
+     */
+    @RequestMapping("/getReStartMemoryCapacity")
+    public ServerResponse<Object> getReStartMemoryCapacity(HttpSession session,Integer type) {
+        return memoryCapacityService.getReStartMemoryCapacity(session,type);
+    }
+
+
+    /**
      * 保存脑电波数据
+     *
      * @param session
      * @param eegRecording
      * @return
@@ -65,7 +79,7 @@ public class MemoryCapacityController {
      * 保存眼脑训练
      *
      * @param session
-     * @param point    分数
+     * @param point   分数
      * @return
      */
     @RequestMapping("/saveTrain")
@@ -74,44 +88,46 @@ public class MemoryCapacityController {
     }
 
 
-
     /**
-     *获取眼脑训练题目
+     * 获取眼脑训练题目
      */
     @RequestMapping("/getTrainTest")
-    public ServerResponse<Object> getTrainTest(HttpSession session){
+    public ServerResponse<Object> getTrainTest(HttpSession session) {
         return memoryCapacityService.getTrainTest(session);
     }
 
     /**
      * 火焰金晶获取单词
+     *
      * @return
      */
     @RequestMapping("/getPinkeye")
-    public ServerResponse<Object> getPinkeye(){
+    public ServerResponse<Object> getPinkeye() {
         return memoryCapacityService.getPinkeye();
     }
 
     /**
      * 保存火眼金睛测试记录
+     *
      * @param session
-     * @param point 分数
+     * @param point   分数
      * @return
      */
     @RequestMapping("/savePinkeye")
-    public ServerResponse<Object> savePinkeye(HttpSession session,Integer point){
-        return memoryCapacityService.savePinkeye(session,point);
+    public ServerResponse<Object> savePinkeye(HttpSession session, Integer point) {
+        return memoryCapacityService.savePinkeye(session, point);
     }
 
     /**
      * 保存最强大脑数据
+     *
      * @param session
      * @param point
      * @return
      */
     @RequestMapping("/saveBrain")
-    public ServerResponse<Object> saveBrain(HttpSession session,Integer point){
-        return memoryCapacityService.saveBrain(session,point);
+    public ServerResponse<Object> saveBrain(HttpSession session, Integer point) {
+        return memoryCapacityService.saveBrain(session, point);
     }
 
 }

@@ -31,4 +31,6 @@ public interface MemoryCapacityService extends BaseService<MemoryCapacity> {
     ServerResponse<Object> saveBrain(HttpSession session, Integer point);
 
     ServerResponse<Object> saveMemoryCapacity(HttpSession session, EegRecording eegRecording);
+
+    ServerResponse<Object> getReStartMemoryCapacity(HttpSession session, Integer type);
 }

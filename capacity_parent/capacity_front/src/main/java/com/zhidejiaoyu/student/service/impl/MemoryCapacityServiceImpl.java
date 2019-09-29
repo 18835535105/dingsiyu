@@ -32,7 +32,8 @@ import java.util.*;
  */
 @Slf4j
 @Service
-public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMapper, MemoryCapacity> implements MemoryCapacityService {
+public class MemoryCapacityServiceImpl
+        extends BaseServiceImpl<MemoryCapacityMapper, MemoryCapacity> implements MemoryCapacityService {
 
     @Autowired
     private MemoryCapacityMapper memoryCapacityMapper;
@@ -54,6 +55,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         if (student.getRole().equals(4)) {
             EegRecording eegRecording = eegRecordingMapper.selRoleStudent(type, student.getId());
             map.put("type", 0);
+            map.put("role", true);
             if (eegRecording == null) {
                 map.put("isStudy", true);
                 map.put("level", 1);
@@ -63,6 +65,7 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
             }
         } else {
             EegRecording eegRecording = eegRecordingMapper.selNowByStudent(student.getId());
+            map.put("role", false);
             if (eegRecording == null) {
                 map.put("isStudy", true);
                 map.put("type", 0);
@@ -294,6 +297,21 @@ public class MemoryCapacityServiceImpl extends BaseServiceImpl<MemoryCapacityMap
         return ServerResponse.createBySuccess(map);
 
 
+    }
+
+    /**
+     * 福利账号重新玩脑电波
+     *
+     * @param session
+     * @return
+     */
+    @Override
+    public ServerResponse<Object> getReStartMemoryCapacity(HttpSession session, Integer type) {
+        Student student = getStudent(session);
+        if (student.getRole().equals(4)) {
+            eegRecordingMapper.delByStudentId(student.getId(),type);
+        }
+        return ServerResponse.createBySuccess();
     }
 
     private Integer calculationGold(Integer type, Integer level, Integer laterLevel, Integer nowLevel) {
