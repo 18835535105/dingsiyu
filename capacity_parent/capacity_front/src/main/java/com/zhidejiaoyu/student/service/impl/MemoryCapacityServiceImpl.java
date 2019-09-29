@@ -53,7 +53,23 @@ public class MemoryCapacityServiceImpl
         Student student = getStudent(session);
         Map<String, Object> map = new HashMap();
         if (student.getRole().equals(4)) {
-            EegRecording eegRecording = eegRecordingMapper.selRoleStudent(type, student.getId());
+            EegRecording eegRecording = null;
+            if (type != null) {
+                eegRecording = eegRecordingMapper.selRoleStudent(type, student.getId());
+            } else {
+                List<Boolean> list = new ArrayList<>();
+                Map<Integer, Map<String, Object>> integerMapMap = eegRecordingMapper.selRoleStudyByStudent(student.getId());
+                for (int i = 1; i <= 4; i++) {
+                    Map<String, Object> stringObjectMap = integerMapMap.get(i);
+                    if (stringObjectMap != null) {
+                        list.add(true);
+                    } else {
+                        list.add(false);
+                    }
+                }
+                map.put("studyList", list);
+            }
+
             map.put("type", 0);
             map.put("role", true);
             if (eegRecording == null) {
@@ -228,7 +244,9 @@ public class MemoryCapacityServiceImpl
         } else {
             eegRecordings = eegRecordingMapper.selNowByStudent(student.getId());
         }
-
+        if (eegRecording.getAnswerNumber() < 0) {
+            return ServerResponse.createBySuccess();
+        }
         Integer gold = 0;
         if (eegRecordings != null) {
             if (eegRecording.getType().equals(eegRecordings.getType())) {
@@ -309,7 +327,7 @@ public class MemoryCapacityServiceImpl
     public ServerResponse<Object> getReStartMemoryCapacity(HttpSession session, Integer type) {
         Student student = getStudent(session);
         if (student.getRole().equals(4)) {
-            eegRecordingMapper.delByStudentId(student.getId(),type);
+            eegRecordingMapper.delByStudentId(student.getId(), type);
         }
         return ServerResponse.createBySuccess();
     }

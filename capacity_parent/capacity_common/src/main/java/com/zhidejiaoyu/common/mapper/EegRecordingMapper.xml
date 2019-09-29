@@ -36,6 +36,16 @@
         where
         student_id=#{studentId}
         and to_days(create_time) = to_days(now())
+        <if test="type != null">
+            and type =#{type}
+        </if>
+        and state=0
+    </select>
+
+    <select id="selRoleStudyByStudent" parameterType="map" resultType="map">
+        select type
+        from EEG_recording
+        where student_id=#{studentId}
         and state=0
     </select>
 

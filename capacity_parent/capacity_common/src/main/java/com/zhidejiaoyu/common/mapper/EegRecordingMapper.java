@@ -3,7 +3,11 @@ package com.zhidejiaoyu.common.mapper;
 import com.zhidejiaoyu.common.pojo.EegRecording;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -21,4 +25,7 @@ public interface EegRecordingMapper extends BaseMapper<EegRecording> {
 
     @Delete("delete from EEG_record where student_id =#{studentId} and type=#{type}")
     void delByStudentId(@Param("studentId") Long studentId, @Param("type") Integer type);
+
+    @MapKey("type")
+    Map<Integer, Map<String, Object>> selRoleStudyByStudent(@Param("studentId") Long studentId);
 }
