@@ -142,7 +142,7 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
             log.error("单元 {} 下没有例句信息！", unitId);
             return ServerResponse.createByErrorMessage("当前单元下没有例句！");
         }
-        if (sentenceCount.equals(plan)) {
+        if (sentenceCount <= plan) {
             return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
         }
 
@@ -190,10 +190,6 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
             // 获取当前单元已学习的当前模块的例句id
             List<Long> ids = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "例句听力");
             Sentence sentence = sentenceMapper.selectOneSentenceNotInIds(ids, unitId);
-            if (sentence == null) {
-                log.error("单元 {} 下没有例句信息！", unitId);
-                return ServerResponse.createByErrorMessage("当前单元下没有例句！");
-            }
             return getSentenceTranslateVoServerResponse(firstStudy, plan, sentenceCount, sentence, type);
         }
 
@@ -216,10 +212,6 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
             // 获取当前单元已学习的当前模块的例句id
             List<Long> ids = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "例句默写");
             Sentence sentence = sentenceMapper.selectOneSentenceNotInIds(ids, unitId);
-            if (sentence == null) {
-                log.error("单元 {} 下没有例句信息！", unitId);
-                return ServerResponse.createByErrorMessage("当前单元下没有例句！");
-            }
             return getSentenceTranslateVoServerResponse(firstStudy, plan, sentenceCount, sentence, type);
         }
         return null;
