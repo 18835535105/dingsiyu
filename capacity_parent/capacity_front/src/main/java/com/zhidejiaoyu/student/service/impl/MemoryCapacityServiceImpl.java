@@ -244,7 +244,7 @@ public class MemoryCapacityServiceImpl
         } else {
             eegRecordings = eegRecordingMapper.selNowByStudent(student.getId());
         }
-        if (eegRecording.getAnswerNumber() < 0) {
+        if (eegRecording.getType() != 1 && eegRecording.getAnswerNumber() < 0) {
             return ServerResponse.createBySuccess();
         }
         Integer gold = 0;
