@@ -69,7 +69,7 @@ public class MemoryCapacityServiceImpl
                 }
                 map.put("studyList", list);
             }
-
+            map.put("petUrl", GetOssFile.getPublicObjectUrl(student.getPartUrl()));
             map.put("type", 0);
             map.put("role", true);
             if (eegRecording == null) {
@@ -95,6 +95,7 @@ public class MemoryCapacityServiceImpl
                 }
                 map.put("type", eegRecording.getType());
             }
+            map.put("petUrl", GetOssFile.getPublicObjectUrl(student.getPartUrl()));
         }
         return ServerResponse.createBySuccess(map);
     }
