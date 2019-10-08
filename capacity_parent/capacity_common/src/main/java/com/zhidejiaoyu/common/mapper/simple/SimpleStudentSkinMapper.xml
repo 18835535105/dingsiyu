@@ -24,8 +24,11 @@
         from student_skin where student_id=#{studentId}
         and type = 1
         and
-        (date(end_time) > date(now())
-        or end_time is null)
+        (
+        date(end_time) >= date(now())
+        or
+        end_time is null
+        )
         group by finalName
     </select>
 
@@ -33,7 +36,15 @@
     <select id="selSkinByStudentIdIsHave" resultMap="BaseResultMap" parameterType="java.lang.Long">
         select
         <include refid="Base_Column_List"/>
-        from student_skin where student_id=#{studentId} and end_time is null
+        from student_skin
+        where
+        student_id=#{studentId}
+        and type=1
+        and
+        (end_time is null
+        or
+        date(end_time) >= date(now())
+        )
     </select>
 
 

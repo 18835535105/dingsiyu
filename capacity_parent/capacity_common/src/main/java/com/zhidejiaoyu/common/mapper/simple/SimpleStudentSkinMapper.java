@@ -69,4 +69,6 @@ public interface SimpleStudentSkinMapper extends BaseMapper<StudentSkin> {
      */
     @MapKey("finalName")
     Map<String,Object> selTrySkinAndHaveSkin(Long id);
+
+    Integer updIsUseSkin(StudentSkin studentSkin);
 }
