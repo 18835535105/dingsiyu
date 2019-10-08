@@ -498,7 +498,8 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<SimpleC
      * @return
      */
     @Override
-    public ServerResponse<Object> getSimpleCourseAll(long studentId, String typeStr, int type) {
+    public ServerResponse<Object> getSimpleCourseAll(HttpSession session, String typeStr, int type) {
+        Long studentId = super.getStudentId(session);
         // 1.获取当前学生当前模块关联的所有课程, 返回id,version
         List<Map> courseList = redisOpt.getCourseListInType(studentId, typeStr);
 
