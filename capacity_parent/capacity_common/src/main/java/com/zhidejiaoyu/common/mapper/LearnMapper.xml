@@ -812,8 +812,7 @@
         and l.unit_id=#{unitId} and l.study_model =
         #{studyModel} and l.type = 1
         <if test="studyModel == '慧记忆' or studyModel == '慧听写' or studyModel == '慧默写'">
-            and l.vocabulary_id is not null and (select v.delStatus from
-            vocabulary v where v.id = l.vocabulary_id) = 1
+            and l.vocabulary_id is not null
         </if>
         <if
                 test="studyModel == '例句听力' or studyModel == '例句翻译' or studyModel == '例句默写'">

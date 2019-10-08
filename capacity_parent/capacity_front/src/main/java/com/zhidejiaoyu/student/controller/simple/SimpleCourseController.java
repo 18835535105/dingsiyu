@@ -49,8 +49,7 @@ public class SimpleCourseController {
     @ResponseBody
     @RequestMapping(value = "/getSimpleCourse")
     public ServerResponse<Object> getSimpleCourseAll(HttpSession session, String typeStr, int type){
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-    	return courseService.getSimpleCourseAll(student.getId(), typeStr, type);
+    	return courseService.getSimpleCourseAll(session, typeStr, type);
     }
 
     /**

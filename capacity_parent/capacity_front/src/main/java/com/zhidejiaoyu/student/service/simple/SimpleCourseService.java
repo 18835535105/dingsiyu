@@ -68,7 +68,7 @@ public interface SimpleCourseService extends SimpleBaseService<Course> {
 
     ServerResponse<Object> postUnit(HttpSession session, int unitId, int model);
 
-	ServerResponse<Object> getSimpleCourseAll(long studentId, String typeStr, int type);
+	ServerResponse<Object> getSimpleCourseAll(HttpSession session, String typeStr, int type);
 
 	ServerResponse<Object> getSimpleUnitAll(HttpSession session, long courseId, int type, String typeStr);
 
