@@ -227,8 +227,12 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
             Map<String, Object> maps = new HashMap<>();
             if (studentSkin.getEndTime() == null) {
                 maps.put("endTime", "30天");
+                maps.put("time", "30天");
+                maps.put("isUse", false);
             } else {
                 maps.put("endTime", studentSkin.getEndTime());
+                maps.put("time", (studentSkin.getEndTime().getTime() - System.currentTimeMillis()) / 1000);
+                maps.put("isUse", true);
             }
             //皮肤地址
             maps.put("imgUrl", GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
@@ -321,7 +325,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 studentSkin1.setState(1);
                 //為使用皮膚添加時間
                 if (studentSkin1.getEndTime() == null) {
-                    calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 1);
+                    calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 30);
                     studentSkin1.setEndTime(calendar.getTime());
                 }
                 Integer integer = simpleStudentSkinMapper.updUseSkin(studentSkin1);

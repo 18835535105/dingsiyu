@@ -1145,7 +1145,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
                 useMap.put("skin", GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
             }
             Map<String, Object> map = new HashMap<>();
-            map.put("url",  GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
+            map.put("url", GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
             if (studentSkin.getState() == 1) {
                 map.put("state", true);
             } else {
@@ -1154,6 +1154,13 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
             map.put("type", "skin");
             map.put("skinIngter", AwardUtil.getMaps(studentSkin.getSkinName()));
             map.put("id", studentSkin.getId());
+            if (studentSkin.getEndTime() == null) {
+                map.put("endTime", "30天");
+                map.put("time", "30天");
+            } else {
+                map.put("endTime", studentSkin.getEndTime());
+                map.put("time", (studentSkin.getEndTime().getTime() - System.currentTimeMillis()) / 1000);
+            }
             map.put("name", studentSkin.getSkinName());
             map.put("message", "个性装扮");
             map.put("createTime", studentSkin.getCreateTime());
@@ -1175,7 +1182,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
 
         Map<String, Integer> map = new HashMap<>(16);
 
-        map.put("count",  feedBackCount + lotteryCount);
+        map.put("count", feedBackCount + lotteryCount);
         return ServerResponse.createBySuccess(map);
     }
 

@@ -244,10 +244,10 @@ public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRe
         if (studentId == null) {
             Student student = getStudent(session);
             studentId = student.getId().intValue();
-            useMap.put("sex",student.getSex()==1?"男":"女");
-        }else{
+            useMap.put("sex", student.getSex() == 1 ? "男" : "女");
+        } else {
             Student student = studentMapper.selectById(studentId);
-            useMap.put("sex",student.getSex()==1?"男":"女");
+            useMap.put("sex", student.getSex() == 1 ? "男" : "女");
         }
         Map<String, Object> resultMap = new HashMap<>();
         //查询手套印记
@@ -258,32 +258,32 @@ public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRe
         for (SyntheticRewardsList synthetic : gloveOrFlower) {
             Map<String, Object> map = new HashMap<>();
             map.put("url", synthetic.getImgUrl());
-            if(useGloveOrFlower!=null){
+            if (useGloveOrFlower != null) {
                 map.put("state", true);
-                map.put("time",48);
-            }else{
+                map.put("time", 48);
+            } else {
                 SyntheticRewardsList isUse = syntheticRewardsListMapper.getIsUse(studentId, synthetic.getName());
-                if(isUse!=null){
+                if (isUse != null) {
                     Integer count = syntheticRewardsListMapper.selCountByStudentIdAndName(synthetic);
                     map.put("state", false);
-                    map.put("time",48*count);
-                }else{
+                    map.put("time", 48 * count);
+                } else {
                     map.put("state", true);
-                    map.put("time",48);
+                    map.put("time", 48);
                 }
             }
             map.put("syntheticInteger", AwardUtil.getMaps(synthetic.getName()));
-            map.put("time",48);
+            map.put("time", 48);
             map.put("type", "gloveOrFlower");
-            map.put("name",synthetic.getName());
+            map.put("name", synthetic.getName());
             map.put("message", "得到的金币加成" + AwardUtil.getNumber(Integer.parseInt(AwardUtil.getMaps(synthetic.getName()).toString())) + "%");
             map.put("createTime", synthetic.getCreateTime());
             gloveOrFlowerList.add(map);
         }
-        if (useGloveOrFlower!=null) {
+        if (useGloveOrFlower != null) {
             Map<String, Object> useNowMap = new HashMap<>();
             useNowMap.put("url", useGloveOrFlower.getImgUrl());
-            useNowMap.put("endTime",useGloveOrFlower.getUseEndTime());
+            useNowMap.put("endTime", useGloveOrFlower.getUseEndTime());
             useMap.put("gloveOrFlower", useNowMap);
         }
         resultMap.put("gloveOrFlower", gloveOrFlowerList);
@@ -295,21 +295,31 @@ public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRe
             }
             Map<String, Object> map = new HashMap<>();
             map.put("url", studentSkin.getImgUrl());
-            if(studentSkin.getState() == 1){
+            if (studentSkin.getState() == 1) {
                 map.put("state", true);
-            }else{
+            } else {
                 map.put("state", false);
             }
+            if (studentSkin.getEndTime() == null) {
+                map.put("endTime", "30天");
+                map.put("isUse", false);
+            } else {
+                map.put("endTime", studentSkin.getEndTime());
+                map.put("time", (studentSkin.getEndTime().getTime() - System.currentTimeMillis()) / 1000);
+                map.put("isUse", true);
+            }
+
             map.put("type", "skin");
             map.put("skinIngter", AwardUtil.getMaps(studentSkin.getSkinName()));
-            map.put("id",studentSkin.getId());
-            map.put("name",studentSkin.getSkinName());
+            map.put("time",(studentSkin.getEndTime().getTime() - System.currentTimeMillis()) / 1000);
+            map.put("id", studentSkin.getId());
+            map.put("name", studentSkin.getSkinName());
             map.put("message", "个性装扮");
             map.put("createTime", studentSkin.getCreateTime());
             skinList.add(map);
         }
         resultMap.put("skin", skinList);
-        resultMap.put("use",useMap);
+        resultMap.put("use", useMap);
         return ServerResponse.createBySuccess(resultMap);
     }
 

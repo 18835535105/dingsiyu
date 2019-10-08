@@ -408,6 +408,14 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
             }
             map.put("type", "skin");
             map.put("skinIngter", SimpleAwardUtil.getMaps(studentSkin.getSkinName()));
+            if (studentSkin.getEndTime() == null) {
+                map.put("endTime", "30天");
+                map.put("isUse", false);
+            } else {
+                map.put("endTime", studentSkin.getEndTime());
+                map.put("time", (studentSkin.getEndTime().getTime() - System.currentTimeMillis()) / 1000);
+                map.put("isUse", true);
+            }
             map.put("id",studentSkin.getId());
             map.put("name",studentSkin.getSkinName());
             map.put("message", "个性装扮");
