@@ -20,7 +20,7 @@
         select count(id) from exhumation where state=0 and student_id=#{studentId} and type=3
     </select>
     <select id="selExhumationByStudentIdTOSkinState" parameterType="java.util.Map" resultType="java.util.Map">
-        select final_name finalName,count(id) count  from exhumation where state=1 and student_id=#{studentId} and type=3 group by final_name
+        select final_name finalName,count(id)  count  from exhumation where state=1 and student_id=#{studentId} and type=3 group by final_name
     </select>
 
     <select id="selExhumationCountByNameAndFinalName" parameterType="java.util.Map" resultType="java.lang.Integer">

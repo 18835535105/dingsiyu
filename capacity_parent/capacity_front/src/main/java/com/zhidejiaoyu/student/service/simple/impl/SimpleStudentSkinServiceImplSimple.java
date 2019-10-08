@@ -142,37 +142,43 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
             Object o = studentSkins.get(finalName);
             setMap.put("finalName", finalName);
             setMap.put("isEnter", false);
+            //名称id
+            setMap.put("finalNameInteger", i);
             if (o != null) {
                 //是否拥有
                 setMap.put("isHave", true);
                 //是否可试用
-                setMap.put("have", true);
+                setMap.put("have", false);
                 Map<String, Object> haveSkinMap = (Map<String, Object>) o;
                 Object state = haveSkinMap.get("state");
                 //是否正在使用
                 setMap.put("use", state);
                 //合成碎片数量
                 setMap.put("count", 3);
-                //名称id
-                setMap.put("finalNameInteger", i);
             } else {
                 //未拥有皮肤
                 setMap.put("isHave", false);
                 //是否可试用
                 Object o1 = trySkin.get(finalName);
-
                 if (o1 != null) {
                     Map<String, Object> trySkinMap = (Map<String, Object>) o1;
-                    setMap.put("have", false);
+                    setMap.put("have", true);
                     //是否正在使用
                     setMap.put("use", trySkinMap.get("state"));
                 } else {
-                    setMap.put("have", true);
+                    setMap.put("have", false);
                     //是否正在使用
                     setMap.put("use", false);
                 }
-
-
+                //獲取皮膚碎片使用數量
+                Object o2 = maps.get(finalName);
+                if (o2 != null) {
+                    Map<String, Object> countMap = (Map<String, Object>) o2;
+                    int count = Integer.parseInt(countMap.get("count").toString());
+                    setMap.put("count", count % 3);
+                } else {
+                    setMap.put("count", 0);
+                }
             }
             retrun.put(i, setMap);
         }
