@@ -52,20 +52,32 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         skin.setSkinName(name);
         skin.setStudentId(studentId);
         //查找是否已经有试用皮肤
-        StudentSkin studentSkin = simpleStudentSkinMapper.selSkinBystudentIdAndName(skin);
+        StudentSkin studentSkin = simpleStudentSkinMapper.selSkinByStudentIdAndNameAndType(skin);
         Date now = new Date();
         if (studentSkin == null) {
             //没有添加
             return simpleStudentSkinMapper.insert(getStudentSkin(name, studentId, date, now, imgUrl));
         } else {
-            //有 修改到期时间
-            studentSkin.setEndTime(null);
-            studentSkin.setImgUrl(imgUrl);
-            studentSkin.setCreateTime(new Date());
-            Integer integer = simpleStudentSkinMapper.updUseSkin(studentSkin);
-            return integer;
+            //判斷擁有皮膚是否已經到期
+            if (studentSkin.getEndTime() != null) {
+                Integer integer = 0;
+                if (System.currentTimeMillis() > studentSkin.getEndTime().getTime()) {
+                    studentSkin.setEndTime(null);
+                    studentSkin.setImgUrl(imgUrl);
+                    studentSkin.setCreateTime(new Date());
+                    integer = simpleStudentSkinMapper.updUseSkin(studentSkin);
+                } else {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(studentSkin.getEndTime());
+                    //当为使用皮肤時間+30天
+                    calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 30);
+                    integer = simpleStudentSkinMapper.updUseSkin(studentSkin);
+                }
+                return integer;
+            } else {
+                return 1;
+            }
         }
-
     }
 
 
@@ -159,10 +171,16 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 //未拥有皮肤
                 setMap.put("isHave", false);
                 //是否可试用
+                //have字段为false未使用 true为已使用
                 Object o1 = trySkin.get(finalName);
                 if (o1 != null) {
                     Map<String, Object> trySkinMap = (Map<String, Object>) o1;
-                    setMap.put("have", true);
+                    Date date = (Date) trySkin.get("endTime");
+                    if (System.currentTimeMillis() < date.getTime()) {
+                        setMap.put("have", false);
+                    } else {
+                        setMap.put("have", true);
+                    }
                     //是否正在使用
                     setMap.put("use", trySkinMap.get("state"));
                 } else {
@@ -206,24 +224,28 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         List<Map<String, Object>> studentSkinss = new ArrayList<>();
         for (StudentSkin studentSkin : studentSkins) {
             //判断皮肤endtime是否为空  为空进行下一步
+            Map<String, Object> maps = new HashMap<>();
             if (studentSkin.getEndTime() == null) {
-                Map<String, Object> maps = new HashMap<>();
-                //皮肤地址
-                maps.put("imgUrl", GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
-                //皮肤对应编号
-                maps.put("nameId", SimpleAwardUtil.getMaps(studentSkin.getSkinName()));
-                //皮肤使用状态
-                if (studentSkin.getState() == 1) {
-                    //正在使用的皮肤状态
-                    maps.put("status", 2);
-                } else {
-                    //未使用的皮肤状态
-                    maps.put("status", 1);
-                }
-                //type区分是皮肤还是手套印记
-                maps.put("type", 2);
-                studentSkinss.add(maps);
+                maps.put("endTime", "30天");
+            } else {
+                maps.put("endTime", studentSkin.getEndTime());
             }
+            //皮肤地址
+            maps.put("imgUrl", GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
+            //皮肤对应编号
+            maps.put("nameId", SimpleAwardUtil.getMaps(studentSkin.getSkinName()));
+            //皮肤使用状态
+            if (studentSkin.getState() == 1) {
+                //正在使用的皮肤状态
+                maps.put("status", 2);
+            } else {
+                //未使用的皮肤状态
+                maps.put("status", 1);
+            }
+            //type区分是皮肤还是手套印记
+            maps.put("type", 2);
+            studentSkinss.add(maps);
+
         }
         //存入皮肤信息
         map.put("studentSkin", studentSkinss);
@@ -279,7 +301,8 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 1);
                 StudentSkin studentSkin = getStudentSkin(name, student.getId().intValue(), calendar.getTime(), new Date(), imgUrl);
                 studentSkin.setType(2);
-                StudentSkin studentSkin1 = simpleStudentSkinMapper.selSkinBystudentIdAndName(studentSkin);
+                //搜索试用皮肤
+                StudentSkin studentSkin1 = simpleStudentSkinMapper.selTrySkinBystudentIdAndName(studentSkin);
                 if (studentSkin1 == null) {
                     studentSkin.setState(1);
                     simpleStudentSkinMapper.insert(studentSkin);

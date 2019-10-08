@@ -15,7 +15,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-		id, student_id, skin_name, end_time, state, create_time, img_url
+		id, student_id, skin_name, end_time, state, create_time, img_url , type
 	</sql>
 
     <select id="selSkinByStudentId" resultType="map" parameterType="java.lang.Long">
@@ -64,6 +64,18 @@
         select
         <include refid="Base_Column_List"/>
         from student_skin where student_id=#{studentId} and skin_name=#{skinName}
+    </select>
+
+    <select id="selTrySkinBystudentIdAndName" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select
+        <include refid="Base_Column_List"/>
+        from student_skin where student_id=#{studentId} and skin_name=#{skinName} and type = 2
+    </select>
+
+    <select id="selSkinByStudentIdAndNameAndType" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select
+        <include refid="Base_Column_List"/>
+        from student_skin where student_id=#{studentId} and skin_name=#{skinName} and type =1;
     </select>
 
     <update id="updUseSkin" parameterType="java.util.Map">
