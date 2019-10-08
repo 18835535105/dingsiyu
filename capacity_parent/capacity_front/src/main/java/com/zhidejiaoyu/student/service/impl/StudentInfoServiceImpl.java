@@ -148,7 +148,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         studentInfo.setStudentName(student.getStudentName());
         studentInfo.setMail(student.getMail());
         studentInfo.setSquad(student.getSquad());
-        studentInfo.setNickname(student.getNickname());
+        studentInfo.setNickname(StringUtils.isEmpty(student.getNickname()) ? "默认昵称" : student.getNickname());
         studentInfo.setPartUrl(student.getPartUrl());
         studentInfo.setProvince(student.getProvince());
         studentInfo.setVersion(student.getVersion());

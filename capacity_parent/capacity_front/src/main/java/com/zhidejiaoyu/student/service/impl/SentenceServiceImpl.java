@@ -142,7 +142,7 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
             log.error("单元 {} 下没有例句信息！", unitId);
             return ServerResponse.createByErrorMessage("当前单元下没有例句！");
         }
-        if (sentenceCount.equals(plan)) {
+        if (sentenceCount <= plan) {
             return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
         }
 
@@ -232,8 +232,8 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
     /**
      * 判断是否可以学习当前模块的句型（流程：句型翻译-句型听力-音译练习）
      *
-     * @param student   学生
-     * @param unitId    单元id
+     * @param student       学生
+     * @param unitId        单元id
      * @param classifyInt   类型
      * @param sentenceCount 当前单元下例句总个数
      * @param learnCount    数据
@@ -268,7 +268,7 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
         sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("$", ""));
         sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", "").replace("$", ""));
         sentenceTranslateVo.setReadUrl(baiduSpeak.getSentencePath(sentence.getCentreExample()));
-        testResultUtil.getOrderEnglishList(sentenceTranslateVo,sentence.getCentreExample(),sentence.getExampleDisturb(),type);
+        testResultUtil.getOrderEnglishList(sentenceTranslateVo, sentence.getCentreExample(), sentence.getExampleDisturb(), type);
         sentenceTranslateVo.setPlan(plan);
         sentenceTranslateVo.setStudyNew(true);
         sentenceTranslateVo.setFirstStudy(firstStudy);
@@ -579,7 +579,7 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
                 unitInfoMap.put("sentenceWriting", "正在学习");
             } else if (id3 >= senCount) {
                 TestRecord testRecord = testRecordMapper.selectByStudentIdAndGenre(student.getId(), unitId);
-                if ( id2 != 0) {
+                if (id2 != 0) {
                     //获取最后一个句子的学习时间
                     Learn learnSentence = learnMapper.selLaterSentence(student.getId(), unitId);
                     if (testRecord != null) {
@@ -1011,7 +1011,7 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
         sentenceTranslateVo.setSentenceCount(sentenceCount);
         sentenceTranslateVo.setSentence(sentence.getCentreExample().replace("#", " ").replace("*", " ").replace("$", ""));
         sentenceTranslateVo.setStudyNew(false);
-        testResultUtil.getOrderEnglishList(sentenceTranslateVo,sentence.getCentreExample(),sentence.getTranslateDisturb(),type);
+        testResultUtil.getOrderEnglishList(sentenceTranslateVo, sentence.getCentreExample(), sentence.getTranslateDisturb(), type);
         return sentenceTranslateVo;
     }
 

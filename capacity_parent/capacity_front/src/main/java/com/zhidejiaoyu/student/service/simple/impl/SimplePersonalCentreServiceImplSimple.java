@@ -25,6 +25,7 @@ import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.simple.SimplePersonalCentreServiceSimple;
 import com.zhidejiaoyu.student.utils.simple.SimpleCcieUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -881,7 +882,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                 dataMap.put("city", student1.getCity());
                 dataMap.put("province", student1.getProvince());
                 dataMap.put("headUrl", AliyunInfoConst.host + student1.getHeadUrl());
-                dataMap.put("studentName", student1.getNickname());
+                dataMap.put("studentName", StringUtils.isEmpty(student1.getNickname()) ? "默认昵称" : student1.getNickname());
                 dataMap.put("id", id);
                 dataMap.put("gold", Math.round(BigDecimalUtil.add(student1.getOfflineGold(), student1.getSystemGold())));
                 dataMap.put("childName", getLevel((int) BigDecimalUtil.add(student1.getOfflineGold(), student1.getSystemGold()), redisOpt.getAllLevel()));
