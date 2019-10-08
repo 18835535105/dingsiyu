@@ -286,7 +286,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
         flowOrglove.put("isEnter", false);
         map.put("flowOrGlove", flowOrglove);
         //获取学生未使用的皮肤碎片
-        List<Exhumation> exhumations1 = simpleExhumationMapper.selExhumationByStudentIdTOSkin(student.getId());
+        int exhumations1 = simpleExhumationMapper.selExhumationByStudentIdTOSkin(student.getId());
         //获取学生使用的皮肤碎片
         List<Map<String, Object>> maps = simpleExhumationMapper.selExhumationSkinByStudentId(student.getId());
         Map<String, Object> skin = new HashMap<>();
@@ -295,12 +295,12 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
             for (Map<String, Object> mapsss : maps) {
                 have += (Long) (mapsss.get("count"));
             }
-            skin.put("total", exhumations1.size() + have);
-            skin.put("have", exhumations1.size());
+            skin.put("total", exhumations1 + have);
+            skin.put("have", exhumations1);
             skin.put("use", have);
         } else {
-            skin.put("total", exhumations1.size());
-            skin.put("have", exhumations1.size());
+            skin.put("total", exhumations1);
+            skin.put("have", exhumations1);
             skin.put("use", 0);
         }
         skin.put("isEnter", false);
@@ -323,7 +323,7 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
         gold.put("use", student.getOfflineGold().intValue());
         if (allGold != null) {
             gold.put("luckDrawAll", allGold);
-        }else{
+        } else {
             gold.put("luckDrawAll", 0);
         }
 

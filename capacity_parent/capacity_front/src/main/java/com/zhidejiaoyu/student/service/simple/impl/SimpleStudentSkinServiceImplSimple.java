@@ -123,12 +123,13 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         Map<String, Object> map = new HashMap<>();
         //获取学生信息
         Student student = getStudent(session);
-        //获取未使用的皮肤碎片信息
-        List<Exhumation> exhumations = simpleExhumationMapper.selExhumationByStudentIdTOSkin(student.getId());
+        //获取未使用的皮肤碎片数量
+        int exhumations = simpleExhumationMapper.selExhumationByStudentIdTOSkin(student.getId());
         //储存皮肤碎片数量
-        map.put("exhumations", exhumations.size());
+        map.put("exhumations", exhumations);
         //每个皮肤合成使用的碎片数量
         List<Map<String, Object>> maps = simpleExhumationMapper.selExhumationByStudentIdTOSkinState(student.getId());
+        //所有已拥有皮肤集合
         Map<Integer, Object> mapss = new HashMap<>();
         for (Map<String, Object> ma : maps) {
             Integer finalName = (Integer) SimpleAwardUtil.getMaps((String) ma.get("finalName"));
@@ -143,42 +144,8 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         }
 
         //查看已使用的皮肤和试用过得皮肤
-        List<Map<String, Object>> maps1 = simpleStudentSkinMapper.selTrySkinAndHaveSkin(student.getId());
+        Map<String, Object> maps1 = simpleStudentSkinMapper.selTrySkinAndHaveSkin(student.getId());
         Map<Object, Map> mapsss = new HashMap<>();
-        for (Map<String, Object> map2 : maps1) {
-            Object finalName = SimpleAwardUtil.getMaps((String) map2.get("finalName"));
-            Date endTime = (Date) map2.get("endTime");
-            //判断皮肤是使用的皮肤还是试用的皮肤
-            if (endTime != null) {
-                if (System.currentTimeMillis() >= endTime.getTime()) {
-                    //当使用时间小于现在的时间时调用
-                    map2.put("use", false);
-                } else {
-                    //当使用时间大于现在的时间时调用
-                    if ((Integer) map2.get("state") == 1) {
-                        //判断当前试用皮肤是否在使用
-                        map2.put("use", true);
-                    } else {
-                        //判断当前试用皮肤是否在使用
-                        map2.put("use", false);
-                    }
-                }
-                //试用皮肤现在为未拥有状态
-                map2.put("isHave", false);
-            } else {
-
-                if ((Integer) map2.get("state") == 1) {
-                    //判断当前皮肤是否在使用
-                    map2.put("use", true);
-                } else {
-                    //判断当前皮肤是否在使用
-                    map2.put("use", false);
-                }
-                map2.put("isHave", true);
-            }
-            //皮肤现在为未拥有状态
-            mapsss.put(finalName, map2);
-        }
         //现实的信息
         Map<Integer, Object> retrun = new HashMap<>();
         for (int i = 28; i <= 37; i++) {
@@ -188,13 +155,19 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 setMap.put("finalName", SimpleAwardUtil.getAward(i));
                 setMap.put("count", 0);
                 setMap.put("finalNameInteger", i);
-                setMap.put("isEnter",false);
+                setMap.put("isEnter", false);
             } else {
                 setMap.put("finalName", SimpleAwardUtil.getAward(i));
                 HashMap o1 = (HashMap) mapss.get(i);
-                setMap.put("count", o1.get("count"));
+                Object mapCount = o1.get("count");
+                if (mapCount != null) {
+                    Integer count = Integer.parseInt(mapCount.toString());
+                    setMap.put("count", count % 3);
+                } else {
+                    setMap.put("count", 0);
+                }
                 setMap.put("finalNameInteger", i);
-                setMap.put("isEnter",false);
+                setMap.put("isEnter", false);
             }
             //判断是否可以试用
             if (map1.get(i) != null) {
@@ -227,7 +200,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
     @Override
     public ServerResponse<Object> selSkin(HttpSession session) {
         //获取学生信息
-        Student student =getStudent(session);
+        Student student = getStudent(session);
         //查询学生下皮肤信息
         List<StudentSkin> studentSkins = simpleStudentSkinMapper.selSkinByStudentIdIsHave(student.getId());
         //返回值格式确定

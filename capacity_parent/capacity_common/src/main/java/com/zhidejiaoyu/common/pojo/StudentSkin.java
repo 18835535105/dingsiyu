@@ -36,7 +36,7 @@ public class StudentSkin extends Model<StudentSkin> {
      */
     private String skinName;
     /**
-     * 到期时间  为null代表为永久
+     * 到期时间  试用皮肤与正式皮肤使用到期时间
      */
     private Date endTime;
     /**
@@ -52,6 +52,11 @@ public class StudentSkin extends Model<StudentSkin> {
      * 皮肤地址
      */
     private String imgUrl;
+
+    /**
+     * 1，正式拥有  2，试用皮肤
+     */
+    private Integer type;
 
     @Override
     protected Serializable pkVal() {

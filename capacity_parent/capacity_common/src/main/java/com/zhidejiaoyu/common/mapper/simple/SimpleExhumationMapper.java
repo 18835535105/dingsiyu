@@ -27,7 +27,7 @@ public interface SimpleExhumationMapper extends BaseMapper<Exhumation> {
     /**
      * 获取皮肤碎片
      */
-    List<Exhumation> selExhumationByStudentIdTOSkin(Long studentId);
+    int selExhumationByStudentIdTOSkin(Long studentId);
 
     /**
      * 获取每个皮肤使用的碎片数量

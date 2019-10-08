@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper.simple;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.StudentSkin;
+import org.apache.ibatis.annotations.MapKey;
 
 import java.util.List;
 import java.util.Map;
@@ -60,5 +61,11 @@ public interface SimpleStudentSkinMapper extends BaseMapper<StudentSkin> {
     StudentSkin selUseSkinByStudentIdAndName(Long studentId);
 
 
-    List<Map<String,Object>> selTrySkinAndHaveSkin(Long id);
+    /**
+     * 查看已经试用的皮肤
+     * @param id
+     * @return
+     */
+    @MapKey("finalName")
+    Map<String,Object> selTrySkinAndHaveSkin(Long id);
 }
