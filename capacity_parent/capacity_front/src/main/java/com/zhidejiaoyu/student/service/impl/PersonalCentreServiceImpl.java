@@ -1142,7 +1142,13 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         List<StudentSkin> studentSkins = studentSkinMapper.selSkinByStudentIdIsHave(studentId.longValue());
         for (StudentSkin studentSkin : studentSkins) {
             if (studentSkin.getState() == 1) {
-                useMap.put("skin", GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
+                Map<String, Object> skinMap = new HashMap<>();
+                if (studentSkin.getEndTime() != null) {
+                    skinMap.put("endTime", studentSkin.getEndTime());
+                    skinMap.put("time", (studentSkin.getEndTime().getTime() - System.currentTimeMillis()) / 1000);
+                }
+                skinMap.put("url", GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
+                useMap.put("skin", skinMap);
             }
             Map<String, Object> map = new HashMap<>();
             map.put("url", GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
