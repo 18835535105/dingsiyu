@@ -23,7 +23,7 @@ public interface EegRecordingMapper extends BaseMapper<EegRecording> {
 
     EegRecording selRoleStudent(@Param("type") Integer type, @Param("studentId") Long id);
 
-    @Delete("delete from EEG_record where student_id =#{studentId} and type=#{type}")
+    @Delete("delete from EEG_recording where student_id =#{studentId} and type=#{type}")
     void delByStudentId(@Param("studentId") Long studentId, @Param("type") Integer type);
 
     @MapKey("type")
