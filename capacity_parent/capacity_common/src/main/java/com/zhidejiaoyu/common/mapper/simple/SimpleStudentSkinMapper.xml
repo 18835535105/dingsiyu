@@ -18,11 +18,15 @@
 		id, student_id, skin_name, end_time, state, create_time, img_url
 	</sql>
 
-    <select id="selSkinByStudentId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    <select id="selSkinByStudentId" resultType="map" parameterType="java.lang.Long">
         select
-        <include refid="Base_Column_List"/>
+        skin_name finalName,state,end_time endTime
         from student_skin where student_id=#{studentId}
-        and type =1
+        and type = 1
+        and
+        (date(end_time) > date(now())
+        or end_time is null)
+        group by finalName
     </select>
 
 

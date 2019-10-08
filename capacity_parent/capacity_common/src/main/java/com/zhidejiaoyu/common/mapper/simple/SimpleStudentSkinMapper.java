@@ -22,7 +22,8 @@ public interface SimpleStudentSkinMapper extends BaseMapper<StudentSkin> {
      * @param studentId
      * @return
      */
-    List<StudentSkin> selSkinByStudentId(Long studentId);
+    @MapKey("finalName")
+    Map<String,Object> selSkinByStudentId(Long studentId);
 
     /**
      * 获取学生已拥有皮肤

@@ -128,63 +128,52 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         //储存皮肤碎片数量
         map.put("exhumations", exhumations);
         //每个皮肤合成使用的碎片数量
-        List<Map<String, Object>> maps = simpleExhumationMapper.selExhumationByStudentIdTOSkinState(student.getId());
-        //所有已拥有皮肤集合
-        Map<Integer, Object> mapss = new HashMap<>();
-        for (Map<String, Object> ma : maps) {
-            Integer finalName = (Integer) SimpleAwardUtil.getMaps((String) ma.get("finalName"));
-            mapss.put(finalName, ma);
-        }
-        //获取皮肤
-        List<StudentSkin> studentSkins = simpleStudentSkinMapper.selSkinByStudentId(student.getId());
-        Map<Integer, Object> map1 = new HashMap<>();
-        for (StudentSkin studentSkin : studentSkins) {
-            Integer finalName = (Integer) SimpleAwardUtil.getMaps(studentSkin.getSkinName());
-            map1.put(finalName, true);
-        }
-
-        //查看已使用的皮肤和试用过得皮肤
-        Map<String, Object> maps1 = simpleStudentSkinMapper.selTrySkinAndHaveSkin(student.getId());
-        Map<Object, Map> mapsss = new HashMap<>();
-        //现实的信息
+        Map<String, Object> maps = simpleExhumationMapper.selExhumationByStudentIdTOSkinState(student.getId());
+        //获取未使用和未到期皮肤
+        Map<String, Object> studentSkins = simpleStudentSkinMapper.selSkinByStudentId(student.getId());
+        //查看试用过得皮肤
+        Map<String, Object> trySkin = simpleStudentSkinMapper.selTrySkinAndHaveSkin(student.getId());
+        //显示的信息
         Map<Integer, Object> retrun = new HashMap<>();
         for (int i = 28; i <= 37; i++) {
-            Object o = mapss.get(i);
+            String finalName = SimpleAwardUtil.getAward(i);
             Map<String, Object> setMap = new HashMap<>();
-            if (o == null) {
-                setMap.put("finalName", SimpleAwardUtil.getAward(i));
-                setMap.put("count", 0);
+            //查看是否为已拥有皮肤
+            Object o = studentSkins.get(finalName);
+            setMap.put("finalName", finalName);
+            setMap.put("isEnter", false);
+            if (o != null) {
+                //是否拥有
+                setMap.put("isHave", true);
+                //是否可试用
+                setMap.put("have", true);
+                Map<String, Object> haveSkinMap = (Map<String, Object>) o;
+                Object state = haveSkinMap.get("state");
+                //是否正在使用
+                setMap.put("use", state);
+                //合成碎片数量
+                setMap.put("count", 3);
+                //名称id
                 setMap.put("finalNameInteger", i);
-                setMap.put("isEnter", false);
             } else {
-                setMap.put("finalName", SimpleAwardUtil.getAward(i));
-                HashMap o1 = (HashMap) mapss.get(i);
-                Object mapCount = o1.get("count");
-                if (mapCount != null) {
-                    Integer count = Integer.parseInt(mapCount.toString());
-                    setMap.put("count", count % 3);
-                } else {
-                    setMap.put("count", 0);
-                }
-                setMap.put("finalNameInteger", i);
-                setMap.put("isEnter", false);
-            }
-            //判断是否可以试用
-            if (map1.get(i) != null) {
-                setMap.put("have", map1.get(i));
-            } else {
-                setMap.put("have", false);
-            }
-            if (mapsss.get(i) != null) {
-                //判断当前皮肤是否在使用
-                setMap.put("isHave", mapsss.get(i).get("isHave"));
-                setMap.put("use", mapsss.get(i).get("use"));
-            } else {
-                //判断当前皮肤是否在使用
+                //未拥有皮肤
                 setMap.put("isHave", false);
-                setMap.put("use", false);
-            }
+                //是否可试用
+                Object o1 = trySkin.get(finalName);
 
+                if (o1 != null) {
+                    Map<String, Object> trySkinMap = (Map<String, Object>) o1;
+                    setMap.put("have", false);
+                    //是否正在使用
+                    setMap.put("use", trySkinMap.get("state"));
+                } else {
+                    setMap.put("have", true);
+                    //是否正在使用
+                    setMap.put("use", false);
+                }
+
+
+            }
             retrun.put(i, setMap);
         }
         map.put("skin", retrun);
