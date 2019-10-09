@@ -183,7 +183,13 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                         setMap.put("have", true);
                     }
                     //是否正在使用
-                    setMap.put("use", trySkinMap.get("state"));
+                    int state = Integer.parseInt(trySkinMap.get("state").toString());
+                    if(state!=1){
+                        setMap.put("use", false);
+                    }else{
+                        setMap.put("use", 1);
+                    }
+
                 } else {
                     setMap.put("have", false);
                     //是否正在使用
