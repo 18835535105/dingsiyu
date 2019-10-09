@@ -359,10 +359,8 @@ public class StudentSkinServiceImpl extends BaseServiceImpl<StudentSkinMapper, S
      */
     @Override
     public ServerResponse<Object> selUseSkinById(HttpSession session) {
-        //获取学生信息
-        Student student = getStudent(session);
         //根据学生id获取使用的皮肤信息
-        StudentSkin studentSkin = studentSkinMapper.selUseSkinByStudentId(student.getId());
+        StudentSkin studentSkin = studentSkinMapper.selUseSkinByStudentId(super.getStudentId(session));
         //返回数据放入map集合中
         Map<String, Object> map = new HashMap<>();
         if (studentSkin != null) {
