@@ -12,6 +12,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.SimpleAwardUtil;
 import com.zhidejiaoyu.student.service.simple.SimpleConsumeServiceSimple;
 import com.zhidejiaoyu.student.service.simple.SimpleStudentSkinServiceSimple;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -175,7 +176,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 Object o1 = trySkin.get(finalName);
                 if (o1 != null) {
                     Map<String, Object> trySkinMap = (Map<String, Object>) o1;
-                    Date date = (Date) trySkin.get("endTime");
+                    Date date = (Date)trySkinMap.get("endTime");
                     if (System.currentTimeMillis() < date.getTime()) {
                         setMap.put("have", false);
                     } else {
@@ -230,8 +231,12 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 maps.put("time", "30天");
                 maps.put("isUse", false);
             } else {
-                maps.put("endTime", studentSkin.getEndTime());
-                maps.put("time", (studentSkin.getEndTime().getTime() - System.currentTimeMillis()) / 1000);
+                Calendar ca = Calendar.getInstance();//得到一个Calendar的实例
+                ca.setTime(studentSkin.getEndTime()); //设置时间为当前时间
+                ca.add(Calendar.DAY_OF_MONTH, 1); //日期加1
+                Date lastMonth = ca.getTime(); //结果
+                maps.put("endTime", lastMonth);
+                maps.put("time", (lastMonth.getTime() - System.currentTimeMillis()) / 1000);
                 maps.put("isUse", true);
             }
             //皮肤地址
