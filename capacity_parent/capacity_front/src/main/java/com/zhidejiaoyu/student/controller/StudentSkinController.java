@@ -39,7 +39,7 @@ public class StudentSkinController {
     @PostMapping("/selSkinAndExhumationByStudent")
     @ResponseBody
     public ServerResponse<Object> selSkinAndExhumationByStudent(HttpSession session) {
-        return studentSkinService.selSkinAndExhumation(session);
+        return simpleStudentSkinServiceSimple.selSkinAndExhumation(session);
     }
 
 
@@ -52,7 +52,7 @@ public class StudentSkinController {
     @PostMapping("/selSkinByStudent")
     @ResponseBody
     public ServerResponse<Object> selSkinByStudent(HttpSession session) {
-        return studentSkinService.selSkin(session);
+        return simpleStudentSkinServiceSimple.selSkin(session);
     }
 
 
@@ -79,7 +79,7 @@ public class StudentSkinController {
     @PostMapping("/selUseSkin")
     @ResponseBody
     public ServerResponse<Object> selUseSkin(HttpSession session) {
-        return studentSkinService.selUseSkinById(session);
+        return simpleStudentSkinServiceSimple.selUseSkinById(session);
     }
 
 
@@ -95,7 +95,7 @@ public class StudentSkinController {
     @PostMapping("/addStudentSkinByDiamond")
     @ResponseBody
     public ServerResponse<Object> addStudentSkinByDiamond(HttpSession session, int number, int skinInteger, String imgUrl) {
-        return studentSkinService.addStudentSkinByDiamond(session, number, skinInteger, imgUrl);
+        return simpleStudentSkinServiceSimple.addStudentSkinByDiamond(session, number, skinInteger, imgUrl);
     }
 }
 
