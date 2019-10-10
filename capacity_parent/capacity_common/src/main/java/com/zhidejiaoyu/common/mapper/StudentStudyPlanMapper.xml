@@ -5,15 +5,15 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentStudyPlan">
         <id column="id" property="id"/>
-        <result column="student_id" property="studentId" />
-        <result column="course_id" property="courseId" />
-        <result column="start_unit_id" property="startUnitId" />
-        <result column="end_unit_id" property="endUnitId" />
+        <result column="student_id" property="studentId"/>
+        <result column="course_id" property="courseId"/>
+        <result column="start_unit_id" property="startUnitId"/>
+        <result column="end_unit_id" property="endUnitId"/>
         <result column="type" property="type"/>
         <result column="complete" property="complete"/>
         <result column="current_study_count" property="currentStudyCount"/>
         <result column="total_study_count" property="totalStudyCount"/>
-        <result column="update_time" property="updateTime" />
+        <result column="update_time" property="updateTime"/>
     </resultMap>
     <sql id="base_sql">
         id,
@@ -49,36 +49,62 @@
     </select>
 
     <select id="selByStudentId" parameterType="java.util.Map" resultType="java.util.Map">
-     select
-        course.id id,course.course_name courseName, ssp.start_unit_id unitId,ssp.end_unit_id endUnitId,
-        course.grade grade , course.label label,course.version version
-        from student_study_plan ssp join teks_course course on ssp.course_id=course.id
-        where student_id=#{studentId} and type =#{type} group by course.id;
+        select course.id          id,
+               course.course_name courseName,
+               ssp.start_unit_id  unitId,
+               ssp.end_unit_id    endUnitId,
+               course.grade       grade,
+               course.label       label,
+               course.version     version
+        from student_study_plan ssp
+                 join teks_course course on ssp.course_id = course.id
+        where ssp.student_id = #{studentId}
+          and ssp.type = #{type}
+        group by ssp.course_id
     </select>
 
     <select id="selByStudentIdAndCourseIdAndType" parameterType="map" resultType="map">
-        select
-        course.id id,course.course_name courseName, ssp.start_unit_id unitId,ssp.end_unit_id endUnitId,
-        course.grade grade , course.label label,course.version version
-        from student_study_plan ssp join teks_course course on ssp.course_id=course.id
-        where student_id=#{studentId} and type =#{type} and course.id=#{courseId} group by course.id;
+        select course.id          id,
+               course.course_name courseName,
+               ssp.start_unit_id  unitId,
+               ssp.end_unit_id    endUnitId,
+               course.grade       grade,
+               course.label       label,
+               course.version     version
+        from student_study_plan ssp
+                 join teks_course course on ssp.course_id = course.id
+        where student_id = #{studentId}
+          and type = #{type}
+          and course.id = #{courseId}
+        group by course.id;
     </select>
 
     <select id="selBySentenceStudentId" parameterType="java.util.Map" resultType="java.util.Map">
-     select
-        course.id id,course.course_name courseName, ssp.start_unit_id unitId,ssp.end_unit_id endUnitId,
-        course.grade grade , course.label label,course.version version
-        from student_study_plan ssp join sentence_course course on ssp.course_id=course.id
-        where student_id=#{studentId} and type =#{type} group by course.id;
+        select course.id          id,
+               course.course_name courseName,
+               ssp.start_unit_id  unitId,
+               ssp.end_unit_id    endUnitId,
+               course.grade       grade,
+               course.label       label,
+               course.version     version
+        from student_study_plan ssp
+                 join sentence_course course on ssp.course_id = course.id
+        where ssp.student_id = #{studentId}
+          and ssp.type = #{type}
+        group by ssp.course_id
     </select>
     <select id="selByStudentIdAndCourseId" parameterType="java.util.Map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include> from student_study_plan
+        select
+        <include refid="base_sql"/>
+        from student_study_plan
         where student_id=#{studentId}
         and course_id=#{courseId}
         and type=#{type}
     </select>
     <select id="selByStudentIdAndCourseIdAndUnitId" parameterType="java.util.Map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include> from student_study_plan
+        select
+        <include refid="base_sql"/>
+        from student_study_plan
         where student_id=#{studentId}
         and course_id=#{courseId}
         and type=#{type}
@@ -91,7 +117,8 @@
           and type = #{type}
     </select>
     <select id="selReadCourseByStudentId" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include>
+        select
+        <include refid="base_sql"/>
         from student_study_plan
         where student_id=#{studentId}
         <if test="gradeInteger!=null">
@@ -101,22 +128,40 @@
         order by course_id
     </select>
     <select id="selSymbolByStudentId" resultMap="BaseResultMap" parameterType="long">
-        select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type = 5 limit 1
+        select
+        <include refid="base_sql"/>
+        from student_study_plan where student_id=#{studentId} and type = 5
+        limit 1
     </select>
     <select id="selLetterByStudentId" resultMap="BaseResultMap" parameterType="long">
-        select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type = 4 limit 1
+        select
+        <include refid="base_sql"/>
+        from student_study_plan where student_id=#{studentId} and type = 4
+        limit 1
     </select>
     <select id="selReadByStudentId" resultMap="BaseResultMap" parameterType="long">
-        select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type = 6 limit 1
+        select
+        <include refid="base_sql"/>
+        from student_study_plan where student_id=#{studentId} and type = 6
+        limit 1
     </select>
-    <select id="selLetterSudyByStudentAndUnitId" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type=4 and (start_unit_id &lt;=#{unitId} and end_unit_id>=#{unitId}) limit 1
+    <select id="selLetterStudyByStudentAndUnitId" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"/>
+        from student_study_plan where student_id=#{studentId} and type=4 and
+        (start_unit_id &lt;=#{unitId} and end_unit_id>=#{unitId}) limit 1
     </select>
     <select id="selStudyReadPlanByStudentIdAndUnitId" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and type=6 and (start_unit_id &lt;=#{unitId} and end_unit_id>=#{unitId}) limit 1
+        select
+        <include refid="base_sql"/>
+        from student_study_plan where student_id=#{studentId} and type=6 and
+        (start_unit_id &lt;=#{unitId} and end_unit_id>=#{unitId}) limit 1
     </select>
     <select id="selByCourseIdAndUnitIdAndType" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include> from student_study_plan where student_id=#{studentId} and course_id=#{courseId} and type=#{type} and (start_unit_id &lt;=#{unitId} and end_unit_id>=#{unitId}) limit 1
+        select
+        <include refid="base_sql"/>
+        from student_study_plan where student_id=#{studentId} and
+        course_id=#{courseId} and type=#{type} and (start_unit_id &lt;=#{unitId} and end_unit_id>=#{unitId}) limit 1
     </select>
 
 

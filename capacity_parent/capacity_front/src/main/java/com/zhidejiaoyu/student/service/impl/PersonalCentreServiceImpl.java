@@ -1142,10 +1142,16 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         List<StudentSkin> studentSkins = studentSkinMapper.selSkinByStudentIdIsHave(studentId.longValue());
         for (StudentSkin studentSkin : studentSkins) {
             if (studentSkin.getState() == 1) {
-                useMap.put("skin", GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
+                Map<String, Object> skinMap = new HashMap<>();
+                if (studentSkin.getEndTime() != null) {
+                    skinMap.put("endTime", studentSkin.getEndTime());
+                    skinMap.put("time", (studentSkin.getEndTime().getTime() - System.currentTimeMillis()) / 1000);
+                }
+                skinMap.put("url", GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
+                useMap.put("skin", skinMap);
             }
             Map<String, Object> map = new HashMap<>();
-            map.put("url",  GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
+            map.put("url", GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
             if (studentSkin.getState() == 1) {
                 map.put("state", true);
             } else {
@@ -1154,6 +1160,17 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
             map.put("type", "skin");
             map.put("skinIngter", AwardUtil.getMaps(studentSkin.getSkinName()));
             map.put("id", studentSkin.getId());
+            if (studentSkin.getEndTime() == null) {
+                map.put("endTime", "30天");
+                map.put("time", "30天");
+            } else {
+                Calendar ca = Calendar.getInstance();//得到一个Calendar的实例
+                ca.setTime(studentSkin.getEndTime()); //设置时间为当前时间
+                ca.add(Calendar.DAY_OF_MONTH, 1); //日期加1
+                Date date=ca.getTime();
+                map.put("endTime", date);
+                map.put("time", (date.getTime() - System.currentTimeMillis()) / 1000);
+            }
             map.put("name", studentSkin.getSkinName());
             map.put("message", "个性装扮");
             map.put("createTime", studentSkin.getCreateTime());
@@ -1175,7 +1192,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
 
         Map<String, Integer> map = new HashMap<>(16);
 
-        map.put("count",  feedBackCount + lotteryCount);
+        map.put("count", feedBackCount + lotteryCount);
         return ServerResponse.createBySuccess(map);
     }
 

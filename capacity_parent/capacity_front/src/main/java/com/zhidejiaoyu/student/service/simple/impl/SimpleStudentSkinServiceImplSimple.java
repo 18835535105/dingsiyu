@@ -12,6 +12,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.SimpleAwardUtil;
 import com.zhidejiaoyu.student.service.simple.SimpleConsumeServiceSimple;
 import com.zhidejiaoyu.student.service.simple.SimpleStudentSkinServiceSimple;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,20 +53,32 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         skin.setSkinName(name);
         skin.setStudentId(studentId);
         //查找是否已经有试用皮肤
-        StudentSkin studentSkin = simpleStudentSkinMapper.selSkinBystudentIdAndName(skin);
+        StudentSkin studentSkin = simpleStudentSkinMapper.selSkinByStudentIdAndNameAndType(skin);
         Date now = new Date();
         if (studentSkin == null) {
             //没有添加
             return simpleStudentSkinMapper.insert(getStudentSkin(name, studentId, date, now, imgUrl));
         } else {
-            //有 修改到期时间
-            studentSkin.setEndTime(null);
-            studentSkin.setImgUrl(imgUrl);
-            studentSkin.setCreateTime(new Date());
-            Integer integer = simpleStudentSkinMapper.updUseSkin(studentSkin);
-            return integer;
+            //判斷擁有皮膚是否已經到期
+            if (studentSkin.getEndTime() != null) {
+                Integer integer = 0;
+                if (System.currentTimeMillis() > studentSkin.getEndTime().getTime()) {
+                    studentSkin.setEndTime(null);
+                    studentSkin.setImgUrl(imgUrl);
+                    studentSkin.setCreateTime(new Date());
+                    integer = simpleStudentSkinMapper.updUseSkin(studentSkin);
+                } else {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(studentSkin.getEndTime());
+                    //当为使用皮肤時間+30天
+                    calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 30);
+                    integer = simpleStudentSkinMapper.updUseSkin(studentSkin);
+                }
+                return integer;
+            } else {
+                return 1;
+            }
         }
-
     }
 
 
@@ -123,95 +136,75 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         Map<String, Object> map = new HashMap<>();
         //获取学生信息
         Student student = getStudent(session);
-        //获取未使用的皮肤碎片信息
-        List<Exhumation> exhumations = simpleExhumationMapper.selExhumationByStudentIdTOSkin(student.getId());
+        //获取未使用的皮肤碎片数量
+        int exhumations = simpleExhumationMapper.selExhumationByStudentIdTOSkin(student.getId());
         //储存皮肤碎片数量
-        map.put("exhumations", exhumations.size());
+        map.put("exhumations", exhumations);
         //每个皮肤合成使用的碎片数量
-        List<Map<String, Object>> maps = simpleExhumationMapper.selExhumationByStudentIdTOSkinState(student.getId());
-        Map<Integer, Object> mapss = new HashMap<>();
-        for (Map<String, Object> ma : maps) {
-            Integer finalName = (Integer) SimpleAwardUtil.getMaps((String) ma.get("finalName"));
-            mapss.put(finalName, ma);
-        }
-        //获取皮肤
-        List<StudentSkin> studentSkins = simpleStudentSkinMapper.selSkinByStudentId(student.getId());
-        Map<Integer, Object> map1 = new HashMap<>();
-        for (StudentSkin studentSkin : studentSkins) {
-            Integer finalName = (Integer) SimpleAwardUtil.getMaps(studentSkin.getSkinName());
-            map1.put(finalName, true);
-        }
-
-        //查看已使用的皮肤和试用过得皮肤
-        List<Map<String, Object>> maps1 = simpleStudentSkinMapper.selTrySkinAndHaveSkin(student.getId());
-        Map<Object, Map> mapsss = new HashMap<>();
-        for (Map<String, Object> map2 : maps1) {
-            Object finalName = SimpleAwardUtil.getMaps((String) map2.get("finalName"));
-            Date endTime = (Date) map2.get("endTime");
-            //判断皮肤是使用的皮肤还是试用的皮肤
-            if (endTime != null) {
-                if (System.currentTimeMillis() >= endTime.getTime()) {
-                    //当使用时间小于现在的时间时调用
-                    map2.put("use", false);
-                } else {
-                    //当使用时间大于现在的时间时调用
-                    if ((Integer) map2.get("state") == 1) {
-                        //判断当前试用皮肤是否在使用
-                        map2.put("use", true);
-                    } else {
-                        //判断当前试用皮肤是否在使用
-                        map2.put("use", false);
-                    }
-                }
-                //试用皮肤现在为未拥有状态
-                map2.put("isHave", false);
-            } else {
-
-                if ((Integer) map2.get("state") == 1) {
-                    //判断当前皮肤是否在使用
-                    map2.put("use", true);
-                } else {
-                    //判断当前皮肤是否在使用
-                    map2.put("use", false);
-                }
-                map2.put("isHave", true);
-            }
-            //皮肤现在为未拥有状态
-            mapsss.put(finalName, map2);
-        }
-        //现实的信息
+        Map<String, Object> maps = simpleExhumationMapper.selExhumationByStudentIdTOSkinState(student.getId());
+        //获取未使用和未到期皮肤
+        Map<String, Object> studentSkins = simpleStudentSkinMapper.selSkinByStudentId(student.getId());
+        //查看试用过得皮肤
+        Map<String, Object> trySkin = simpleStudentSkinMapper.selTrySkinAndHaveSkin(student.getId());
+        //显示的信息
         Map<Integer, Object> retrun = new HashMap<>();
         for (int i = 28; i <= 37; i++) {
-            Object o = mapss.get(i);
+            String finalName = SimpleAwardUtil.getAward(i);
             Map<String, Object> setMap = new HashMap<>();
-            if (o == null) {
-                setMap.put("finalName", SimpleAwardUtil.getAward(i));
-                setMap.put("count", 0);
-                setMap.put("finalNameInteger", i);
-                setMap.put("isEnter",false);
-            } else {
-                setMap.put("finalName", SimpleAwardUtil.getAward(i));
-                HashMap o1 = (HashMap) mapss.get(i);
-                setMap.put("count", o1.get("count"));
-                setMap.put("finalNameInteger", i);
-                setMap.put("isEnter",false);
-            }
-            //判断是否可以试用
-            if (map1.get(i) != null) {
-                setMap.put("have", map1.get(i));
-            } else {
+            //查看是否为已拥有皮肤
+            Object o = studentSkins.get(finalName);
+            setMap.put("finalName", finalName);
+            setMap.put("isEnter", false);
+            //名称id
+            setMap.put("finalNameInteger", i);
+            if (o != null) {
+                //是否拥有
+                setMap.put("isHave", true);
+                //是否可试用
                 setMap.put("have", false);
-            }
-            if (mapsss.get(i) != null) {
-                //判断当前皮肤是否在使用
-                setMap.put("isHave", mapsss.get(i).get("isHave"));
-                setMap.put("use", mapsss.get(i).get("use"));
+                Map<String, Object> haveSkinMap = (Map<String, Object>) o;
+                Object state = haveSkinMap.get("state");
+                //是否正在使用
+                setMap.put("use", state);
+                //合成碎片数量
+                setMap.put("count", 3);
             } else {
-                //判断当前皮肤是否在使用
+                //未拥有皮肤
                 setMap.put("isHave", false);
-                setMap.put("use", false);
-            }
+                //是否可试用
+                //have字段为false未使用 true为已使用
+                Object o1 = trySkin.get(finalName);
+                if (o1 != null) {
+                    Map<String, Object> trySkinMap = (Map<String, Object>) o1;
+                    Date date = (Date)trySkinMap.get("endTime");
+                    if (System.currentTimeMillis() < date.getTime()) {
+                        setMap.put("have", false);
+                    } else {
+                        setMap.put("have", true);
+                    }
+                    //是否正在使用
+                    int state = Integer.parseInt(trySkinMap.get("state").toString());
+                    if(state!=1){
+                        setMap.put("use", false);
+                    }else{
+                        setMap.put("use", 1);
+                    }
 
+                } else {
+                    setMap.put("have", false);
+                    //是否正在使用
+                    setMap.put("use", false);
+                }
+                //獲取皮膚碎片使用數量
+                Object o2 = maps.get(finalName);
+                if (o2 != null) {
+                    Map<String, Object> countMap = (Map<String, Object>) o2;
+                    int count = Integer.parseInt(countMap.get("count").toString());
+                    setMap.put("count", count % 3);
+                } else {
+                    setMap.put("count", 0);
+                }
+            }
             retrun.put(i, setMap);
         }
         map.put("skin", retrun);
@@ -227,7 +220,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
     @Override
     public ServerResponse<Object> selSkin(HttpSession session) {
         //获取学生信息
-        Student student =getStudent(session);
+        Student student = getStudent(session);
         //查询学生下皮肤信息
         List<StudentSkin> studentSkins = simpleStudentSkinMapper.selSkinByStudentIdIsHave(student.getId());
         //返回值格式确定
@@ -238,24 +231,36 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         List<Map<String, Object>> studentSkinss = new ArrayList<>();
         for (StudentSkin studentSkin : studentSkins) {
             //判断皮肤endtime是否为空  为空进行下一步
+            Map<String, Object> maps = new HashMap<>();
             if (studentSkin.getEndTime() == null) {
-                Map<String, Object> maps = new HashMap<>();
-                //皮肤地址
-                maps.put("imgUrl", GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
-                //皮肤对应编号
-                maps.put("nameId", SimpleAwardUtil.getMaps(studentSkin.getSkinName()));
-                //皮肤使用状态
-                if (studentSkin.getState() == 1) {
-                    //正在使用的皮肤状态
-                    maps.put("status", 2);
-                } else {
-                    //未使用的皮肤状态
-                    maps.put("status", 1);
-                }
-                //type区分是皮肤还是手套印记
-                maps.put("type", 2);
-                studentSkinss.add(maps);
+                maps.put("endTime", "30天");
+                maps.put("time", "30天");
+                maps.put("isUse", false);
+            } else {
+                Calendar ca = Calendar.getInstance();//得到一个Calendar的实例
+                ca.setTime(studentSkin.getEndTime()); //设置时间为当前时间
+                ca.add(Calendar.DAY_OF_MONTH, 1); //日期加1
+                Date lastMonth = ca.getTime(); //结果
+                maps.put("endTime", lastMonth);
+                maps.put("time", (lastMonth.getTime() - System.currentTimeMillis()) / 1000);
+                maps.put("isUse", true);
             }
+            //皮肤地址
+            maps.put("imgUrl", GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
+            //皮肤对应编号
+            maps.put("nameId", SimpleAwardUtil.getMaps(studentSkin.getSkinName()));
+            //皮肤使用状态
+            if (studentSkin.getState() == 1) {
+                //正在使用的皮肤状态
+                maps.put("status", 2);
+            } else {
+                //未使用的皮肤状态
+                maps.put("status", 1);
+            }
+            //type区分是皮肤还是手套印记
+            maps.put("type", 2);
+            studentSkinss.add(maps);
+
         }
         //存入皮肤信息
         map.put("studentSkin", studentSkinss);
@@ -303,14 +308,16 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 skin.setCreateTime(aLong.getCreateTime());
                 simpleStudentSkinMapper.updUseSkin(skin);
             }
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
             //判断是否为试用皮肤
             if (dateInteger == 0) {
-                //当为试用皮肤时添加皮肤
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(new Date());
+                //当为试用皮肤時間
                 calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 1);
                 StudentSkin studentSkin = getStudentSkin(name, student.getId().intValue(), calendar.getTime(), new Date(), imgUrl);
-                StudentSkin studentSkin1 = simpleStudentSkinMapper.selSkinBystudentIdAndName(studentSkin);
+                studentSkin.setType(2);
+                //搜索试用皮肤
+                StudentSkin studentSkin1 = simpleStudentSkinMapper.selTrySkinBystudentIdAndName(studentSkin);
                 if (studentSkin1 == null) {
                     studentSkin.setState(1);
                     simpleStudentSkinMapper.insert(studentSkin);
@@ -327,6 +334,11 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 studentSkin.setImgUrl(imgUrl);
                 StudentSkin studentSkin1 = simpleStudentSkinMapper.selSkinBystudentIdAndName(studentSkin);
                 studentSkin1.setState(1);
+                //為使用皮膚添加時間
+                if (studentSkin1.getEndTime() == null) {
+                    calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 30);
+                    studentSkin1.setEndTime(calendar.getTime());
+                }
                 Integer integer = simpleStudentSkinMapper.updUseSkin(studentSkin1);
                 if (integer > 0) {
                     student.setDiamond(student.getDiamond() - 50);
@@ -345,7 +357,6 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 studentSkin1.setState(0);
                 simpleStudentSkinMapper.updUseSkin(studentSkin1);
             }
-
         }
 
         return ServerResponse.createBySuccess();
@@ -366,12 +377,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         //返回数据放入map集合中
         Map<String, Object> map = new HashMap<>();
         if (studentSkin != null) {
-            //判断skin的使用时间为空是已获得皮肤,不为空为未获得皮肤
-            if (studentSkin.getEndTime() == null) {
-                //已获得皮肤储存皮肤对应编号
-                map.put("skinId", SimpleAwardUtil.getMaps(studentSkin.getSkinName()));
-                //未获得皮肤判断使用时间
-            } else if (studentSkin.getEndTime().getTime() > System.currentTimeMillis()) {
+            if (studentSkin.getEndTime().getTime() > System.currentTimeMillis()) {
                 //使用时间大于当前时间储存皮肤编号
                 map.put("skinId", SimpleAwardUtil.getMaps(studentSkin.getSkinName()));
             } else {
@@ -399,6 +405,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         studentSkin.setEndTime(date);
         studentSkin.setCreateTime(now);
         studentSkin.setState(0);
+        studentSkin.setType(1);
         studentSkin.setSkinName(name);
         studentSkin.setStudentId(studentId);
         studentSkin.setImgUrl(imgUrl);

@@ -11,23 +11,40 @@
         <result column="state" property="state"/>
         <result column="create_time" property="createTime"></result>
         <result column="img_url" property="imgUrl"></result>
+        <result column="type" property="type"></result>
     </resultMap>
 
     <sql id="Base_Column_List">
-		id, student_id, skin_name, end_time, state, create_time, img_url
+		id, student_id, skin_name, end_time, state, create_time, img_url , type
 	</sql>
 
-    <select id="selSkinByStudentId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    <select id="selSkinByStudentId" resultType="map" parameterType="java.lang.Long">
         select
-        <include refid="Base_Column_List"/>
+        skin_name finalName,state,end_time endTime
         from student_skin where student_id=#{studentId}
+        and type = 1
+        and
+        (
+        date(end_time) >= date(now())
+        or
+        end_time is null
+        )
+        group by finalName
     </select>
 
 
     <select id="selSkinByStudentIdIsHave" resultMap="BaseResultMap" parameterType="java.lang.Long">
         select
         <include refid="Base_Column_List"/>
-        from student_skin where student_id=#{studentId} and end_time is null
+        from student_skin
+        where
+        student_id=#{studentId}
+        and type=1
+        and
+        (end_time is null
+        or
+        date(end_time) >= date(now())
+        )
     </select>
 
 
@@ -49,6 +66,18 @@
         from student_skin where student_id=#{studentId} and skin_name=#{skinName}
     </select>
 
+    <select id="selTrySkinBystudentIdAndName" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select
+        <include refid="Base_Column_List"/>
+        from student_skin where student_id=#{studentId} and skin_name=#{skinName} and type = 2
+    </select>
+
+    <select id="selSkinByStudentIdAndNameAndType" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select
+        <include refid="Base_Column_List"/>
+        from student_skin where student_id=#{studentId} and skin_name=#{skinName} and type =1;
+    </select>
+
     <update id="updUseSkin" parameterType="java.util.Map">
         update student_skin set state=#{state} , end_time = #{endTime} , img_url=#{imgUrl} , create_time=#{createTime} where id=#{id};
     </update>
@@ -60,7 +89,7 @@
     </select>
 
     <select id="selTrySkinAndHaveSkin" resultType="java.util.Map" parameterType="java.lang.Long">
-        select skin_name finalName, state ,end_time endTime from student_skin where student_id=#{id};
+        select skin_name finalName, state ,end_time endTime from student_skin where student_id=#{id} and type = 2 group by skin_name;
     </select>
 
 </mapper>

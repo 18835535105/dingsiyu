@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper.simple;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Exhumation;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
@@ -27,14 +28,15 @@ public interface SimpleExhumationMapper extends BaseMapper<Exhumation> {
     /**
      * 获取皮肤碎片
      */
-    List<Exhumation> selExhumationByStudentIdTOSkin(Long studentId);
+    int selExhumationByStudentIdTOSkin(Long studentId);
 
     /**
      * 获取每个皮肤使用的碎片数量
      * @param studentId
      * @return
      */
-    List<Map<String,Object>> selExhumationByStudentIdTOSkinState(Long studentId);
+    @MapKey("finalName")
+    Map<String,Object> selExhumationByStudentIdTOSkinState(Long studentId);
     /**
      * 查询使用的手套花朵碎片数量
      * @param studnetId

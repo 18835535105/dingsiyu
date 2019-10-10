@@ -8,7 +8,6 @@ import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.LetterService;
-import com.zhidejiaoyu.student.service.StudentInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -206,7 +205,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     public Object getLetterListen(Long unitId, HttpSession session) {
         //查看字母播放器全部数据
         Long studentId = getStudentId(session);
-        StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selLetterSudyByStudentAndUnitId(studentId, unitId);
+        StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selLetterStudyByStudentAndUnitId(studentId, unitId);
         if (studentStudyPlan == null) {
             return ServerResponse.createByError(400, "您没有当前课程请按正确路径进入");
         }
