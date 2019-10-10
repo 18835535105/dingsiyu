@@ -264,6 +264,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
         if (capacityStudentUnit == null) {
+            log.warn("学生[{} - {} - {}]没有分配智慧单词学习计划！", student.getId(), student.getAccount(), student.getStudentName());
             return ServerResponse.createByError(301, "学生未分配智能版单词学习计划！");
         }
 
