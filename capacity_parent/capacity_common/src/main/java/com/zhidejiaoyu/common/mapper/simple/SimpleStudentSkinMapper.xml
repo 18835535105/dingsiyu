@@ -63,7 +63,7 @@
     <select id="selSkinBystudentIdAndName" resultMap="BaseResultMap" parameterType="java.util.Map">
         select
         <include refid="Base_Column_List"/>
-        from student_skin where student_id=#{studentId} and skin_name=#{skinName}
+        from student_skin where student_id=#{studentId} and skin_name=#{skinName} and type =1
     </select>
 
     <select id="selTrySkinBystudentIdAndName" resultMap="BaseResultMap" parameterType="java.util.Map">
