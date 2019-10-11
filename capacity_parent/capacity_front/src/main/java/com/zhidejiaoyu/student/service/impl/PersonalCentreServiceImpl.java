@@ -1164,12 +1164,8 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
                 map.put("endTime", "30天");
                 map.put("time", "30天");
             } else {
-                Calendar ca = Calendar.getInstance();//得到一个Calendar的实例
-                ca.setTime(studentSkin.getEndTime()); //设置时间为当前时间
-                ca.add(Calendar.DAY_OF_MONTH, 1); //日期加1
-                Date date=ca.getTime();
-                map.put("endTime", date);
-                map.put("time", (date.getTime() - System.currentTimeMillis()) / 1000);
+                map.put("endTime", studentSkin.getEndTime());
+                map.put("time", (studentSkin.getEndTime().getTime() - System.currentTimeMillis()) / 1000);
             }
             map.put("name", studentSkin.getSkinName());
             map.put("message", "个性装扮");
