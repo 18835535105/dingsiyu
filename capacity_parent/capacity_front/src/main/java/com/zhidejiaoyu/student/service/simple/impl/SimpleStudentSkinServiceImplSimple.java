@@ -237,12 +237,8 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 maps.put("time", "30天");
                 maps.put("isUse", false);
             } else {
-                Calendar ca = Calendar.getInstance();//得到一个Calendar的实例
-                ca.setTime(studentSkin.getEndTime()); //设置时间为当前时间
-                ca.add(Calendar.DAY_OF_MONTH, 1); //日期加1
-                Date lastMonth = ca.getTime(); //结果
-                maps.put("endTime", lastMonth);
-                maps.put("time", (lastMonth.getTime() - System.currentTimeMillis()) / 1000);
+                maps.put("endTime", studentSkin.getEndTime());
+                maps.put("time", (studentSkin.getEndTime().getTime() - System.currentTimeMillis()) / 1000);
                 maps.put("isUse", true);
             }
             //皮肤地址
