@@ -3,18 +3,19 @@ package com.zhidejiaoyu.student.common;
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
-import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
+import com.zhidejiaoyu.common.study.StudentRestudyUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
@@ -55,6 +56,9 @@ public class SaveLearnAndCapacity {
 
     @Autowired
     private DailyAwardAsync awardAsync;
+
+    @Resource
+    private StudentRestudyUtil studentRestudyUtil;
 
     /**
      * 学习模块保存指定模块的学习记录和慧追踪信息
@@ -243,32 +247,14 @@ public class SaveLearnAndCapacity {
             simpleSimpleCapacityMapper.updateById(simpleCapacity);
 
             // 保存学生复习记录
-            saveStudentRestudy(learn, student, vocabulary, type);
+            if (type == 6 || type == 7) {
+                studentRestudyUtil.saveSentenceRestudy(learn, student, vocabulary == null ? null : vocabulary.getWord(), 1);
+            } else {
+                studentRestudyUtil.saveWordRestudy(learn, student, vocabulary == null ? null : vocabulary.getWord(), 1);
+            }
 
             return simpleCapacity;
         }
         return null;
-    }
-
-    private void saveStudentRestudy(Learn learn, Student student, Vocabulary vocabulary, Integer type) {
-        StudentRestudy studentRestudy = new StudentRestudy();
-        studentRestudy.setCourseId(learn.getCourseId());
-        studentRestudy.setStudentId(student.getId());
-        if (type == 6 || type == 7) {
-            studentRestudy.setType(2);
-        } else {
-            studentRestudy.setType(1);
-        }
-        studentRestudy.setUnitId(learn.getUnitId());
-        studentRestudy.setUpdateTime(new Date());
-        studentRestudy.setVersion(1);
-        studentRestudy.setVocabularyId(learn.getVocabularyId());
-        studentRestudy.setWord(vocabulary.getWord());
-        try {
-            simpleStudentRestudyMapper.insert(studentRestudy);
-        } catch (Exception e) {
-            log.error("保存学生复习记录失败，学生信息：[{}]-[{}]=[{}], learn=[{}], vocabulary=[{}]",
-                    student.getAccount(), student.getId(), student.getStudentName(), learn.toString(), vocabulary.toString());
-        }
     }
 }

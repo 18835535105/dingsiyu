@@ -120,7 +120,7 @@ public class SaveWordLearnAndCapacity {
 
         } else {
             // 保存学生复习记录
-            studentRestudyUtil.saveWordRestudy(learn, student, vocabulary.getWord(), 1);
+            studentRestudyUtil.saveWordRestudy(learn, student, vocabulary.getWord(), 2);
 
             // 认识该单词
             if (isKnown) {

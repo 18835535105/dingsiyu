@@ -56,7 +56,7 @@ public class StudentRestudyUtil {
                 .type(2)
                 .version(version)
                 .word(sentence)
-                .vocabularyId(learn.getExampleId())
+                .vocabularyId(learn.getExampleId() == null ? learn.getVocabularyId() : learn.getExampleId())
                 .updateTime(new Date())
                 .build());
     }
