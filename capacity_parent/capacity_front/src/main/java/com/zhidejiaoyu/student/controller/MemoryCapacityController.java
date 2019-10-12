@@ -56,7 +56,7 @@ public class MemoryCapacityController {
      * @param eegRecording
      * @return
      */
-    @RequestMapping("saveMemoryCapacity")
+    @RequestMapping("/saveMemoryCapacity")
     public ServerResponse<Object> saveMemoryCapacity(HttpSession session, EegRecording eegRecording) {
         return memoryCapacityService.saveMemoryCapacity(session, eegRecording);
     }
