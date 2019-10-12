@@ -38,7 +38,6 @@ public class TestController {
     private TestService testService;
 
 
-
     /**
      * 保存学生游戏测试记录
      *
@@ -47,7 +46,7 @@ public class TestController {
      * @return
      */
     @PostMapping("/saveGameTestRecord")
-    public ServerResponse<Map<String, Object>> saveGameTestRecord(HttpSession session,  TestRecord testRecord) {
+    public ServerResponse<Map<String, Object>> saveGameTestRecord(HttpSession session, TestRecord testRecord) {
         return testService.saveGameTestRecord(session, testRecord);
     }
 
@@ -91,7 +90,7 @@ public class TestController {
      *
      * @param session
      * @param unitId
-     * @param type 1:普通模式；2：暴走模式
+     * @param type    1:普通模式；2：暴走模式
      * @return
      */
     @GetMapping("/getSentenceUnitTest")
@@ -107,6 +106,7 @@ public class TestController {
 
     /**
      * 获取例句相关单元闯关的测试题
+     *
      * @param unitId
      * @return
      */
@@ -154,8 +154,6 @@ public class TestController {
     }
 
 
-
-
     /**
      * 测试记录首页展示
      *
@@ -172,7 +170,7 @@ public class TestController {
      * 获取学生测试详情信息
      *
      * @param testId 测试记录id
-     * @param type 1:单词；2：句型；3：课文
+     * @param type   1:单词；2：句型；3：课文
      * @return
      */
     @GetMapping("/getTestDetail")
@@ -190,7 +188,7 @@ public class TestController {
      * @return
      */
     @PostMapping("getPreSchoolTest")
-    public ServerResponse<Object> getPreSchoolTest(HttpSession session){
+    public ServerResponse<Object> getPreSchoolTest(HttpSession session) {
         return testService.getPreSchoolTest(session);
     }
 
@@ -211,12 +209,13 @@ public class TestController {
 
     /**
      * genre 课文测试  闯关测试
+     *
      * @param session
      * @param wordUnitTestDTO
      * @return
      */
     @PostMapping("/saveCapTeksTest")
-    public ServerResponse<Object> saveCapTeksTest(HttpSession session,WordUnitTestDTO wordUnitTestDTO){
+    public ServerResponse<Object> saveCapTeksTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
         if (wordUnitTestDTO.getUnitId() == null) {
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
         }
@@ -233,6 +232,7 @@ public class TestController {
     public ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session) {
         return testService.getStrengthGame(session);
     }
+
     /**
      * 获取游戏 找同学
      *
@@ -255,56 +255,61 @@ public class TestController {
     public ServerResponse saveUnitTest(HttpSession session, @Valid UnitTestDto dto) {
         return testService.savePhoneticSymbolUnitTest(session, dto);
     }
+
     /**
      * 获取字母单元闯关内容
      */
     @RequestMapping("/getLetterUnitEntry")
-    public Object getLetterUnitEntry(HttpSession session,Long unitId){
-        return testService.getLetterUnitEntry(session,unitId);
+    public Object getLetterUnitEntry(HttpSession session, Long unitId) {
+        return testService.getLetterUnitEntry(session, unitId);
     }
 
     /**
      * 保存字母闯关内容
+     *
      * @param session
      * @param testRecord
      * @return
      */
     @RequestMapping("/saveLetterUnitEntry")
-    public Object saveLetterUnitEntry(HttpSession session,TestRecord testRecord){
-        return testService.saveLetterUnitEntry(session,testRecord);
+    public Object saveLetterUnitEntry(HttpSession session, TestRecord testRecord) {
+        return testService.saveLetterUnitEntry(session, testRecord);
     }
 
     /**
      * 获取学后测试内容
+     *
      * @param session
      * @param unitId
      * @return
      */
     @RequestMapping("/getLetterAfterLearning")
-    public Object getLetterAfterLearning(HttpSession session,Long unitId){
-        return testService.getLetterAfterLearning(session,unitId);
+    public Object getLetterAfterLearning(HttpSession session, Long unitId) {
+        return testService.getLetterAfterLearning(session, unitId);
     }
 
     /**
      * 保存学后测试内容
+     *
      * @param session
      * @param testRecord
      * @return
      */
     @RequestMapping("/saveLetterAfterLearning")
-    public Object saveLetterAfterLearning(HttpSession session,TestRecord testRecord){
-        return testService.saveLetterAfterLearning(session,testRecord);
+    public Object saveLetterAfterLearning(HttpSession session, TestRecord testRecord) {
+        return testService.saveLetterAfterLearning(session, testRecord);
     }
 
     /**
      * 保存阅读测试结果
+     *
      * @param session
      * @param testRecord
      * @return
      */
     @RequestMapping("/saveReadTest")
-    public Object saveReadTest(HttpSession session ,TestRecord testRecord){
-        return testService.saveReadTest(session,testRecord);
+    public Object saveReadTest(HttpSession session, TestRecord testRecord) {
+        return testService.saveReadTest(session, testRecord);
     }
 
 }

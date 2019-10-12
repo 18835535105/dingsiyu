@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExample;
 import org.apache.ibatis.annotations.MapKey;
@@ -9,27 +10,44 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 @Repository
 public interface StudentMapper extends BaseMapper<Student> {
+    /**
+     * @param example
+     * @return
+     * @see com.baomidou.mybatisplus.mapper.BaseMapper#selectList(Wrapper)
+     */
+    @Deprecated
     List<Student> selectByExample(StudentExample example);
 
+    /**
+     * @param id
+     * @return
+     * @see com.baomidou.mybatisplus.mapper.BaseMapper#selectById(Serializable)
+     */
+    @Deprecated
     Student selectByPrimaryKey(Long id);
 
+    /**
+     * @param record
+     * @return
+     * @see com.baomidou.mybatisplus.mapper.BaseMapper#updateById(Object)
+     */
+    @Deprecated
     int updateByPrimaryKeySelective(Student record);
 
-    int updateByPrimaryKey(Student record);
-
     /**
-     * 查询最大id对应的记录
-     *
+     * @param record
      * @return
+     * @see com.baomidou.mybatisplus.mapper.BaseMapper#updateAllColumnById(Object)
      */
-    @Select("select * from student where id = (select max(id) from student)")
-    Student selectStudentByMaxId();
+    @Deprecated
+    int updateByPrimaryKey(Student record);
 
     /**
      * 去重获取所有学校名称
@@ -74,9 +92,6 @@ public interface StudentMapper extends BaseMapper<Student> {
      */
     int updateByPrimarykeys(@Param("students") List<Student> students);
 
-    @Update("update student set password = #{password} where id = #{id} and account = #{account}")
-    Integer updatePassword(@Param("account") String account, @Param("password") String password, @Param("id") Long id);
-
     /**
      * 查询有效期等于3天的学生
      *
@@ -98,18 +113,6 @@ public interface StudentMapper extends BaseMapper<Student> {
     @MapKey("id")
     Map<Long, Map<String, Object>> selectLevelByStuId(@Param("student") Student student, @Param("flag") int flag, @Param("schoolAdminId") Integer schoolAdminId);
 
-    @Select("SELECT unit_id from student where id = #{student_id}")
-    Integer selectUnit_id(@Param("student_id") Long student_id);
-
-    /**
-     * 例句unit
-     *
-     * @param student_id
-     * @return
-     */
-    @Select("SELECT sentence_unit_id from student where id = #{student_id}")
-    Integer selectSentenceUnit_id(Long student_id);
-
     /**
      * 查询当前这些学生的排名
      *
@@ -127,23 +130,10 @@ public interface StudentMapper extends BaseMapper<Student> {
      * @param classId
      * @return
      */
-    //List<StudentSeniority> selectSeniority();
     List<Map<String, Object>> selectSeniority(@Param("model") String model, @Param("teacherId") Long teacherId, @Param("classId") Long classId);
 
     @MapKey("id")
     Map<Long, Map<Long, Object>> selectxz();
-
-    @Select("select (offline_gold+system_gold)AS jb from student where id = #{id} ")
-    Double myGold(@Param("id") Long id);
-
-    @Select("select count(*) AS mb from worship where student_id_by_worship = #{id} ")
-    int myMb(@Param("id") Long id);
-
-    @Update("update student set unit_name = #{amendName} where unit_id = #{unitId}")
-    Integer updateByUnitNameAndWord(@Param("unitId") Integer unitId, @Param("amendName") String amendName);
-
-    @Update("update student set sentence_unit_name = #{amendName} where sentence_unit_id = #{unitId}")
-    void updateByUnitNameAndSentence(Integer unitId, String amendName);
 
     Map<String, Object> getCourseIdAndUnitId(@Param("studentId") long studentId);
 
@@ -216,9 +206,6 @@ public interface StudentMapper extends BaseMapper<Student> {
     int getYear(@Param("studentId") long studentId);
 
     Map getStudentAccountTime(@Param("studentId") long studentId);
-
-    @Select("select account_time from student where id = #{studentId}")
-    String getStudentAccountTimeByStudentId(long studentId);
 
     @Update("update student set account_time = #{format} where id = #{studentId}")
     int updateAccountTimeByStudentId(@Param("studentId") long studentId, @Param("format") String format);
