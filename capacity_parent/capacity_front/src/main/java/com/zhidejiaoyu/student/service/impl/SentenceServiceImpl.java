@@ -7,10 +7,7 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.study.CommonMethod;
-import com.zhidejiaoyu.common.study.GoldMemoryTime;
-import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
-import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
+import com.zhidejiaoyu.common.study.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.CalculateTimeUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
@@ -19,13 +16,13 @@ import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
 import com.zhidejiaoyu.student.service.SentenceService;
 import com.zhidejiaoyu.student.vo.SentenceWordInfoVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -35,15 +32,9 @@ import java.util.stream.Collectors;
  * @author wuchenxi
  * @date 2018/5/21 15:15
  */
+@Slf4j
 @Service
-public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, Sentence> implements SentenceService {
-
-    private Logger log = LoggerFactory.getLogger(SentenceService.class);
-
-    /**
-     * 三小时
-     */
-    private final int pushRise = 3;
+public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentence> implements SentenceService {
 
     @Autowired
     private TestResultUtil testResultUtil;
@@ -118,6 +109,8 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
     @Autowired
     private SentenceCourseMapper sentenceCourseMapper;
 
+    @Resource
+    private StudentRestudyUtil studentRestudyUtil;
 
     @Override
     public ServerResponse<SentenceTranslateVo> getSentenceTranslate(HttpSession session, Long unitId, int classifyInt, Integer type) {
@@ -374,6 +367,7 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
                 Integer faultTime = sentenceWriteMapper.getFaultTime(studentId, learn.getExampleId(), unitId);
                 if (faultTime != null && faultTime >= 3) {
                     // 如果错误次数>=3, 黄金记忆时间推迟3小时
+                    int pushRise = 3;
                     sentenceWriteMapper.updatePush(studentId, learn.getExampleId(), pushRise, unitId);
                 }
             }
@@ -814,6 +808,7 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
                 }
 
             } else {
+                studentRestudyUtil.saveSentenceRestudy(learn, student, sentenceTranslate.getWord(), 2);
                 // 认识该例句
                 if (isKnown) {
                     // 重新计算黄金记忆点时间
@@ -859,6 +854,7 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
                 }
 
             } else {
+                studentRestudyUtil.saveSentenceRestudy(learn, student, sentenceListen.getWord(), 2);
                 // 认识该例句
                 if (isKnown) {
                     // 重新计算黄金记忆点时间
@@ -905,6 +901,7 @@ public class SentenceServiceImpl<main> extends BaseServiceImpl<SentenceMapper, S
                 }
 
             } else {
+                studentRestudyUtil.saveSentenceRestudy(learn, student, sentenceWrite.getWord(), 2);
                 // 认识该例句
                 if (isKnown) {
                     // 重新计算黄金记忆点时间

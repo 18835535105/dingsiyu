@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
+import com.zhidejiaoyu.common.study.StudentRestudyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class SaveWordLearnAndCapacity {
     private CapacityPictureMapper capacityPictureMapper;
 
     @Resource
-    private StudentRestudyMapper studentRestudyMapper;
+    private StudentRestudyUtil studentRestudyUtil;
 
     /**
      * 保存指定模块的单词学习记录和慧追踪信息
@@ -119,7 +120,7 @@ public class SaveWordLearnAndCapacity {
 
         } else {
             // 保存学生复习记录
-            this.saveStudentRestudy(learn, student, vocabulary);
+            studentRestudyUtil.saveWordRestudy(learn, student, vocabulary.getWord(), 1);
 
             // 认识该单词
             if (isKnown) {
@@ -160,31 +161,6 @@ public class SaveWordLearnAndCapacity {
             }
         }
         return capacity;
-    }
-
-    /**
-     * 保存复习记录
-     *
-     * @param learn
-     * @param student
-     * @param vocabulary
-     */
-    private void saveStudentRestudy(Learn learn, Student student, Vocabulary vocabulary) {
-        StudentRestudy studentRestudy = new StudentRestudy();
-        studentRestudy.setCourseId(learn.getCourseId());
-        studentRestudy.setStudentId(student.getId());
-        studentRestudy.setType(1);
-        studentRestudy.setUnitId(learn.getUnitId());
-        studentRestudy.setUpdateTime(new Date());
-        studentRestudy.setVersion(2);
-        studentRestudy.setVocabularyId(learn.getVocabularyId());
-        studentRestudy.setWord(vocabulary.getWord());
-        try {
-            studentRestudyMapper.insert(studentRestudy);
-        } catch (Exception e) {
-            log.error("保存学生复习记录失败，学生信息：[{}]-[{}]=[{}], learn=[{}], vocabulary=[{}]",
-                    student.getAccount(), student.getId(), student.getStudentName(), learn.toString(), vocabulary.toString());
-        }
     }
 
     private CapacityMemory getCapacityInfo(Learn learn, Student student, Integer studyModel, Vocabulary vocabulary) {

@@ -5,16 +5,14 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.study.CommonMethod;
-import com.zhidejiaoyu.common.study.GoldMemoryTime;
-import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
-import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
+import com.zhidejiaoyu.common.study.*;
 import com.zhidejiaoyu.student.service.impl.MemoryServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
 import java.util.Date;
@@ -80,6 +78,9 @@ public class SaveTestLearnAndCapacity {
 
     @Autowired
     private StudentRestudyMapper studentRestudyMapper;
+
+    @Resource
+    private StudentRestudyUtil studentRestudyUtil;
 
     /**
      * 分别保存例句或单词学习信息和记忆追踪信息
@@ -222,11 +223,11 @@ public class SaveTestLearnAndCapacity {
             if (classify <= 3) {
                 // 保存学生复习记录
                 Vocabulary vocabulary = vocabularyMapper.selectById(id);
-                this.saveStudentRestudy(learn, student, vocabulary == null ? null : vocabulary.getWord(), 1);
+                studentRestudyUtil.saveWordRestudy(learn, student, vocabulary == null ? null : vocabulary.getWord(), 2);
                 memoryDifficult = memoryDifficultyUtil.getMemoryDifficulty(capacity, 1);
             } else {
                 Sentence sentence = sentenceMapper.selectById(id);
-                this.saveStudentRestudy(learn, student, sentence == null ? null : sentence.getCentreExample(), 2);
+                studentRestudyUtil.saveSentenceRestudy(learn, student, sentence == null ? null : sentence.getCentreExample(), 2);
                 memoryDifficult = memoryDifficultyUtil.getMemoryDifficulty(capacity, 2);
             }
         }
