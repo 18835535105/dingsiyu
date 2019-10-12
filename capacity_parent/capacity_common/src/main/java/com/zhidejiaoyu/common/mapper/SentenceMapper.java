@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Sentence;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
 
+@Repository
 public interface SentenceMapper extends BaseMapper<Sentence> {
 
     /**
@@ -40,46 +42,6 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
      * @param id
      */
     Sentence editshow(Integer id);
-
-    /**
-     * 删除
-     *
-     * @param id
-     * @return
-     */
-    @Delete("delete from sentence where id = #{id}")
-    Integer del(@Param("id") Integer id);
-
-    /**
-     * 根据单词查询单词例句是否已经存在 (去重)
-     *
-     * @param word 单词
-     * @return id
-     */
-    @Select("select id from sentence where word = #{word}")
-    String selectToSentence(@Param("word") String word);
-
-    /**
-     * 根据单词查询单词例句是否已经存在 (去重)
-     *
-     * @param word 单词
-     * @return 例句对象
-     */
-    @Select("select * from sentence where word = #{word}")
-    Sentence selectToSentenceToWord(@Param("word") String string);
-
-    // 3.1.1修改保存高中例句
-    @Update("update sentence set tallExample = #{tallExample}, tallTranslate = #{tallTranslate}, tallExampleDisturb = #{tallExampleDisturb}, tallTranslateDisturb = #{tallTranslateDisturb} where id = #{id}")
-    void updateTallExample(@Param("id") Long id, @Param("tallExample") String tallExample,
-                           @Param("tallTranslate") String tallTranslate, @Param("tallExampleDisturb") String tallExampleDisturb,
-                           @Param("tallTranslateDisturb") String tallTranslateDisturb);
-
-    // 3.2.1修改保存初中例句
-    @Update("update sentence set centreExample = #{centreExample}, centreTranslate = #{centreTranslate}, centreExampleDisturb = #{centreExampleDisturb}, centreTranslateDisturb = #{centreTranslateDisturb} where id = #{id}")
-    void updateCentreExample(@Param("id") Long id, @Param("centreExample") String centreExample,
-                             @Param("centreTranslate") String centreTranslate,
-                             @Param("centreExampleDisturb") String centreExampleDisturb,
-                             @Param("centreTranslateDisturb") String centreTranslateDisturb);
 
     /**
      * 获取当前课程下的所有例句
@@ -156,39 +118,16 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
      */
     List<Sentence> selectByWords(@Param("words") List<String> words);
 
-    @Select("select id from sentence where centreExample = #{str} ")
-	Integer selectCentreExample(@Param("str") String str);
-
-    // 新增主建返回
+    /**
+     * 新增主建返回
+     *
+     * @param se
+     * @return
+     */
 	Integer insertSentence(Sentence se);
-
-	@Insert("insert into unit_sentence(unit_id, sentence_id) values(#{unit_id}, #{sentence_id})")
-	Integer SentenceToUnit(@Param("sentence_id") Long sentence_id,@Param("unit_id") Integer unit_id);
-
-	@Select("select sentence_id from unit_sentence where unit_id = #{unit_id} and sentence_id = #{sentence_id}")
-	Integer selectSentenceToUnit(@Param("sentence_id") Integer sentence_id,@Param("unit_id") Integer unit_id);
 
 	@Select("select count(a.id) from sentence a, unit_sentence b where a.id = b.sentence_id and b.unit_id = #{unitId}")
 	Long countByUnitId(@Param("unitId") Long unitId);
-	
-	/**
-     * 查询单元-单词是否已经关
-     *
-     * @param id 例句id
-     * @param unitId 单元id
-     * @return
-     */
-    @Select("select sentence_id from unit_sentence where unit_id = #{unitId} and sentence_id = #{id}")
-	Integer wordToUnitRelevancy(@Param("id")Long id, @Param("unitId")String unitId);
-
-	/**
-	 * 新增例句单元中间表
-	 *
-	 * @param id 例句id
-	 * @param unitId 单元id
-	 */
-    @Insert("insert into unit_sentence(unit_id, sentence_id) values(#{unitId}, #{id})")
-	void wordToUnit(@Param("id")Long id, @Param("unitId")String unitId);
 
 	/**
 	 * 删除取消关联的单元
@@ -264,12 +203,4 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
 
     List<Map<String, Object>> selectSentenceLaterLearnTimeByStudentId(Long id);
 
-    /**
-     * 查询句型的读音地址
-     *
-     * @param centreExample
-     * @return
-     */
-    @Select("select read_url from sentence where centreExample = #{centreExample} limit 1")
-    String selectReadUrlByCentreExample(String centreExample);
 }

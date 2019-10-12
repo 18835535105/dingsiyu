@@ -1,14 +1,15 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.SentenceTranslate;
 import com.zhidejiaoyu.common.pojo.SentenceTranslateExample;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface SentenceTranslateMapper {
     int countByExample(SentenceTranslateExample example);
 

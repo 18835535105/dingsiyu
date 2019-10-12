@@ -6,9 +6,11 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface SentenceWriteMapper {
 	int countByExample(SentenceWriteExample example);
 
@@ -34,7 +36,7 @@ public interface SentenceWriteMapper {
 
 	/**
 	 * 根据学生id删除
-	 * 
+	 *
 	 * @param studentId
 	 * @return
 	 */
@@ -43,7 +45,7 @@ public interface SentenceWriteMapper {
 
 	/**
 	 * 根据学生id和课程id获取生句信息
-	 * 
+	 *
 	 * @param courseId
 	 * @param studentId
 	 * @return
@@ -63,7 +65,7 @@ public interface SentenceWriteMapper {
 
 	/**
 	 * 根据课程id和学生id获取需要需要达到黄金记忆点的例句数
-	 * 
+	 *
 	 * @param studentId
 	 * @param courseId
 	 * @return
@@ -72,7 +74,7 @@ public interface SentenceWriteMapper {
 
 	/**
 	 * 通过学生id，单元id和单词id获取当前例句的记忆追踪信息
-	 * 
+	 *
 	 * @param studentId
 	 * @param unitId
 	 * @param wordId

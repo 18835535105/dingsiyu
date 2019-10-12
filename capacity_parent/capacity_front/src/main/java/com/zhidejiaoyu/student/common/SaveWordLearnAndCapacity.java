@@ -4,10 +4,12 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
@@ -17,6 +19,7 @@ import java.util.List;
  * @author wuchenxi
  * @date 2018/7/5
  */
+@Slf4j
 @Component
 public class SaveWordLearnAndCapacity {
 
@@ -40,6 +43,9 @@ public class SaveWordLearnAndCapacity {
 
     @Autowired
     private CapacityPictureMapper capacityPictureMapper;
+
+    @Resource
+    private StudentRestudyMapper studentRestudyMapper;
 
     /**
      * 保存指定模块的单词学习记录和慧追踪信息
@@ -104,7 +110,7 @@ public class SaveWordLearnAndCapacity {
                 } else if (studyModel == 3) {
                     // 慧默写
                     capacityWriteMapper.insert((CapacityWrite) capacity);
-                }else {
+                } else {
                     // 单词图鉴
                     capacityPictureMapper.insert((CapacityPicture) capacity);
                 }
@@ -112,6 +118,9 @@ public class SaveWordLearnAndCapacity {
             }
 
         } else {
+            // 保存学生复习记录
+            this.saveStudentRestudy(learn, student, vocabulary);
+
             // 认识该单词
             if (isKnown) {
                 // 重新计算黄金记忆点时间
@@ -124,7 +133,7 @@ public class SaveWordLearnAndCapacity {
             } else {
                 // 错误次数在原基础上 +1
                 int afterFaultTime = capacity.getFaultTime() + 1;
-                if (learn != null && learn.getStudyCount() != null && afterFaultTime > learn.getStudyCount()) {
+                if (learn.getStudyCount() != null && afterFaultTime > learn.getStudyCount()) {
                     afterFaultTime = learn.getStudyCount();
                 }
                 capacity.setFaultTime(afterFaultTime);
@@ -153,18 +162,43 @@ public class SaveWordLearnAndCapacity {
         return capacity;
     }
 
+    /**
+     * 保存复习记录
+     *
+     * @param learn
+     * @param student
+     * @param vocabulary
+     */
+    private void saveStudentRestudy(Learn learn, Student student, Vocabulary vocabulary) {
+        StudentRestudy studentRestudy = new StudentRestudy();
+        studentRestudy.setCourseId(learn.getCourseId());
+        studentRestudy.setStudentId(student.getId());
+        studentRestudy.setType(1);
+        studentRestudy.setUnitId(learn.getUnitId());
+        studentRestudy.setUpdateTime(new Date());
+        studentRestudy.setVersion(2);
+        studentRestudy.setVocabularyId(learn.getVocabularyId());
+        studentRestudy.setWord(vocabulary.getWord());
+        try {
+            studentRestudyMapper.insert(studentRestudy);
+        } catch (Exception e) {
+            log.error("保存学生复习记录失败，学生信息：[{}]-[{}]=[{}], learn=[{}], vocabulary=[{}]",
+                    student.getAccount(), student.getId(), student.getStudentName(), learn.toString(), vocabulary.toString());
+        }
+    }
+
     private CapacityMemory getCapacityInfo(Learn learn, Student student, Integer studyModel, Vocabulary vocabulary) {
         CapacityMemory capacity = null;
         if (studyModel == 1) {
             // 慧记忆
-             List<CapacityMemory> capacityMemoryList = capacityMemoryMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
+            List<CapacityMemory> capacityMemoryList = capacityMemoryMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),
                     vocabulary.getId());
-             if (capacityMemoryList.size() > 1) {
-                 capacityMemoryMapper.deleteById(capacityMemoryList.get(1).getId());
-                 capacity = capacityMemoryList.get(0);
-             } else if (capacityMemoryList.size() > 0) {
-                 capacity = capacityMemoryList.get(0);
-             }
+            if (capacityMemoryList.size() > 1) {
+                capacityMemoryMapper.deleteById(capacityMemoryList.get(1).getId());
+                capacity = capacityMemoryList.get(0);
+            } else if (capacityMemoryList.size() > 0) {
+                capacity = capacityMemoryList.get(0);
+            }
         } else if (studyModel == 2) {
             // 慧听写
             List<CapacityListen> capacityListens = capacityListenMapper.selectByUnitIdAndId(student.getId(), learn.getUnitId(),

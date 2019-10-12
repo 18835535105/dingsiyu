@@ -78,6 +78,9 @@ public class SaveTestLearnAndCapacity {
     @Autowired
     private StudentStudyPlanMapper studentStudyPlanMapper;
 
+    @Autowired
+    private StudentRestudyMapper studentRestudyMapper;
+
     /**
      * 分别保存例句或单词学习信息和记忆追踪信息
      *
@@ -93,7 +96,7 @@ public class SaveTestLearnAndCapacity {
      */
     public void saveLearnAndCapacity(String[] correctWord, String[] errorWord, Long[] correctWordId,
                                      Long[] errorWordId, HttpSession session, Student student,
-                                                       Long[] unitId, Integer classify) {
+                                     Long[] unitId, Integer classify) {
         // 保存正确单词/例句的学习记录和记忆追踪信息
         if (correctWord != null && correctWordId != null && correctWord.length > 0
                 && correctWord.length == correctWordId.length) {
@@ -124,31 +127,29 @@ public class SaveTestLearnAndCapacity {
     /**
      * 测试模块 保存学习记录和记忆追踪信息
      *
-     * @param correctWord  答对的单词/例句
+     * @param correctWord   答对的单词/例句
      * @param errorWord     答错的单词/例句
      * @param correctWordId 答对的单词/例句 id
      * @param errorWordId   答错的单词/例句 id
      * @param session       session信息
      * @param unitId        如果单元id长度为1，说明当前测试是以单元为单位的测试；如果长度大于1，说明当前测试是以课程为单位的测试
-     * @param type   1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写;
-     * @return 响应信息
+     * @param type          1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写;
      */
-    public int saveTestAndCapacity(String[] correctWord, String[] errorWord, Long[] correctWordId,
+    public void saveTestAndCapacity(String[] correctWord, String[] errorWord, Long[] correctWordId,
                                     Long[] errorWordId, HttpSession session,
                                     Long[] unitId, Integer type) {
 
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
 
         // 保存正确单词/例句的学习记录和记忆追踪信息
-        int count = 0;
         if (correctWord != null && correctWordId != null && correctWord.length > 0
                 && correctWord.length == correctWordId.length) {
             int correctWordLength = correctWord.length;
             for (int i = 0; i < correctWordLength; i++) {
                 if (unitId.length == 1) {
-                    count = this.saveLearnAndCapacity(session, student, unitId[0], correctWordId[i], type, true);
+                    this.saveLearnAndCapacity(session, student, unitId[0], correctWordId[i], type, true);
                 } else {
-                    count = this.saveLearnAndCapacity(session, student, unitId[i], correctWordId[i], type, true);
+                    this.saveLearnAndCapacity(session, student, unitId[i], correctWordId[i], type, true);
                 }
             }
         }
@@ -159,13 +160,12 @@ public class SaveTestLearnAndCapacity {
             int errorWordLength = errorWord.length;
             for (int i = 0; i < errorWordLength; i++) {
                 if (unitId.length == 1) {
-                    count = this.saveLearnAndCapacity(session, student, unitId[0], errorWordId[i], type, false);
+                    this.saveLearnAndCapacity(session, student, unitId[0], errorWordId[i], type, false);
                 } else {
-                    count = this.saveLearnAndCapacity(session, student, unitId[i], errorWordId[i], type, false);
+                    this.saveLearnAndCapacity(session, student, unitId[i], errorWordId[i], type, false);
                 }
             }
         }
-        return count;
     }
 
     /**
@@ -177,8 +177,8 @@ public class SaveTestLearnAndCapacity {
      * @param id      单词或句子的id
      * @param isTrue  题目是否答对
      */
-    private int saveLearnAndCapacity(HttpSession session, Student student, Long unitId, Long id, Integer classify,
-                                     boolean isTrue) {
+    private void saveLearnAndCapacity(HttpSession session, Student student, Long unitId, Long id, Integer classify,
+                                      boolean isTrue) {
         // 查询学习记录
         List<Learn> learns;
         if (classify <= 3) {
@@ -200,7 +200,7 @@ public class SaveTestLearnAndCapacity {
         } else {
             // 无学习记录
             log.warn("学生[{} - {} - {}]没有当前模块学习记录：单元id[{}],单词id[{}],模块type[{}]", student.getId(), student.getAccount(), student.getStudentName(), unitId, id, classify);
-            return 0;
+            return;
         }
         // 保存记忆追踪信息
         Object capacity = null;
@@ -220,8 +220,13 @@ public class SaveTestLearnAndCapacity {
         int memoryDifficult = 0;
         if (capacity != null) {
             if (classify <= 3) {
+                // 保存学生复习记录
+                Vocabulary vocabulary = vocabularyMapper.selectById(id);
+                this.saveStudentRestudy(learn, student, vocabulary == null ? null : vocabulary.getWord(), 1);
                 memoryDifficult = memoryDifficultyUtil.getMemoryDifficulty(capacity, 1);
             } else {
+                Sentence sentence = sentenceMapper.selectById(id);
+                this.saveStudentRestudy(learn, student, sentence == null ? null : sentence.getCentreExample(), 2);
                 memoryDifficult = memoryDifficultyUtil.getMemoryDifficulty(capacity, 2);
             }
         }
@@ -235,8 +240,35 @@ public class SaveTestLearnAndCapacity {
             learn.setStatus(0);
         }
         learn.setUpdateTime(new Date());
-        return learnMapper.updateById(learn);
+        learnMapper.updateById(learn);
     }
+
+    /**
+     * 保存复习记录
+     *
+     * @param learn
+     * @param student
+     * @param word    单词或者句型
+     * @param type    1：单词；2：句型
+     */
+    private void saveStudentRestudy(Learn learn, Student student, String word, Integer type) {
+        StudentRestudy studentRestudy = new StudentRestudy();
+        studentRestudy.setCourseId(learn.getCourseId());
+        studentRestudy.setStudentId(student.getId());
+        studentRestudy.setType(type);
+        studentRestudy.setUnitId(learn.getUnitId());
+        studentRestudy.setUpdateTime(new Date());
+        studentRestudy.setVersion(2);
+        studentRestudy.setVocabularyId(type == 1 ? learn.getVocabularyId() : learn.getExampleId());
+        studentRestudy.setWord(word);
+        try {
+            studentRestudyMapper.insert(studentRestudy);
+        } catch (Exception e) {
+            log.error("保存学生复习记录失败，学生信息：[{}]-[{}]=[{}], learn=[{}], word=[{}]",
+                    student.getAccount(), student.getId(), student.getStudentName(), learn.toString(), word);
+        }
+    }
+
 
     /**
      * 保存记忆追踪数据
@@ -307,7 +339,7 @@ public class SaveTestLearnAndCapacity {
             }
         } else {
             // 之前学习当前单词或例句时，有答错记录
-            if(classify == 0){
+            if (classify == 0) {
                 CapacityPicture capacityPicture = (CapacityPicture) object;
                 if (!isKnown) {
                     capacityPicture.setFaultTime(capacityPicture.getFaultTime() + 1);
@@ -321,7 +353,7 @@ public class SaveTestLearnAndCapacity {
                 capacityPicture.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(memoryStrength, true));
                 capacityPictureMapper.updateByPrimaryKeySelective(capacityPicture);
                 return capacityPicture;
-            }else if (classify == 1) {
+            } else if (classify == 1) {
                 CapacityMemory capacityMemory = (CapacityMemory) object;
                 if (!isKnown) {
                     capacityMemory.setFaultTime(capacityMemory.getFaultTime() + 1);

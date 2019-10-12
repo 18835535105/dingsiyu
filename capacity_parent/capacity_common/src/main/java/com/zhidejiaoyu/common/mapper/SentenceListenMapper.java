@@ -5,9 +5,11 @@ import com.zhidejiaoyu.common.pojo.SentenceListenExample;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface SentenceListenMapper  {
     int countByExample(SentenceListenExample example);
 
