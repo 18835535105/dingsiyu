@@ -430,8 +430,6 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                     runLog.setCourseId(student.getCourseId());
                     try {
                         runLogMapper.insert(runLog);
-                        student = simpleStudentMapper.selectById(student.getId());
-                        session.setAttribute(UserConstant.CURRENT_STUDENT, student);
                         getLevel(session);
                     } catch (Exception e) {
                         log.error("id为[{}]的学生在领取[{}]中[{}]奖励时保存日志出错！", student.getId(), awardType, awardContent, e);
