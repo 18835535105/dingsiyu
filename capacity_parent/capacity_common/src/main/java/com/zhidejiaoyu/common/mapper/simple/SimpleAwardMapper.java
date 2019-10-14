@@ -16,8 +16,12 @@ import java.util.Map;
 
 @Repository
 public interface SimpleAwardMapper extends BaseMapper<Award> {
-    int countByExample(AwardExample example);
-
+    /**
+     * @param record
+     * @return
+     * @see com.baomidou.mybatisplus.mapper.BaseMapper#updateById(Object)
+     */
+    @Deprecated
     int updateByPrimaryKeySelective(Award record);
 
     /**
@@ -165,10 +169,11 @@ public interface SimpleAwardMapper extends BaseMapper<Award> {
 
     /**
      * 获取学生勋章数量
+     *
      * @param studentId
      * @return
      */
-    List<Map<String,Object>> selAwardCountByStudentId(@Param("studentId") Long studentId);
+    List<Map<String, Object>> selAwardCountByStudentId(@Param("studentId") Long studentId);
 
     /**
      * 删除学生日奖励信息

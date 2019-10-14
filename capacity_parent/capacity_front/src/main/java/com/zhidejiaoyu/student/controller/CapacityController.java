@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.student.controller;
 
 import com.github.pagehelper.PageInfo;
-import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.CapacityService;
 import com.zhidejiaoyu.student.vo.CapacityContentVo;
@@ -9,16 +8,12 @@ import com.zhidejiaoyu.student.vo.CapacityDigestVo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * 记忆追踪（慧追踪）模块
@@ -28,16 +23,13 @@ import java.util.Objects;
  */
 @Controller
 @RequestMapping("/capacity")
-public class CapacityController extends BaseController{
+public class CapacityController extends BaseController {
 
     @Value("${domain}")
     private String domain;
 
     @Autowired
     private CapacityService capacityService;
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     /**
      * 获取记忆追踪中摘要内容 只有单词或例句显示的页面，通过字体大小来确定复习紧迫程度的页面
@@ -108,7 +100,7 @@ public class CapacityController extends BaseController{
      * @param session
      * @param studyModel 学习模块（慧记忆，慧听写，慧默写，例句听力，例句翻译，例句默写）
      * @param courseId   课程id
-     * @param unitId 单元id，当单元id=0 的时候根据课程id查询，否则根据单元id查询
+     * @param unitId     单元id，当单元id=0 的时候根据课程id查询，否则根据单元id查询
      * @param pageNum    当前页码
      * @param pageSize   每页数据量
      * @return
