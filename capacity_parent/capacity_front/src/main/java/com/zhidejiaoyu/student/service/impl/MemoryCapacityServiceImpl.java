@@ -354,7 +354,8 @@ public class MemoryCapacityServiceImpl
         } else {
             if (type.equals(1) && level != null && level.equals(1)) {
                 gold = 5;
-            } else {
+            }
+            if (!type.equals(1)) {
                 if (nowLevel.equals(2)) {
                     gold = 2;
                 }
@@ -362,7 +363,6 @@ public class MemoryCapacityServiceImpl
                     gold = 7;
                 }
             }
-
         }
         return gold;
     }
