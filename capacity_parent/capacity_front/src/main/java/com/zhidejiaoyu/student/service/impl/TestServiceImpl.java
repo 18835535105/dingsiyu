@@ -208,8 +208,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Map<String, Object> map = new HashMap<>(16);
 
         // 游戏测试开始时间
-        Date date=new Date();
-        saveTestRecordTime(testRecord,session,date);
+        Date date = new Date();
+        saveTestRecordTime(testRecord, session, date);
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
 
         testRecord.setStudentId(student.getId());
@@ -348,6 +348,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setStudentId(student.getId());
         testRecord.setGenre("单元闯关测试");
         testRecord.setStudyModel("字母单元闯关");
+        testRecord.setQuantity(testRecord.getErrorCount() + testRecord.getRightCount());
         Date date = new Date();
         saveTestRecordTime(testRecord, session, date);
         getUnitTestMsg(testRecord, testRecord.getPoint());
@@ -449,6 +450,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setStudentId(student.getId());
         testRecord.setGenre("学后测试");
         testRecord.setStudyModel("字母学后测试");
+        testRecord.setQuantity(testRecord.getErrorCount() + testRecord.getRightCount());
         Date date = new Date();
         saveTestRecordTime(testRecord, session, date);
         getUnitTestMsg(testRecord, testRecord.getPoint());
@@ -493,8 +495,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setStudentId(student.getId());
         testRecord.setGenre("单元闯关测试");
         testRecord.setStudyModel("阅读测试");
-        Date date=new Date();
-        saveTestRecordTime(testRecord,session,date);
+        Date date = new Date();
+        saveTestRecordTime(testRecord, session, date);
         getUnitTestMsg(testRecord, testRecord.getPoint());
         Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 13);
         int gold = 0;
@@ -1006,8 +1008,17 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setCourseId(wordUnitTestDTO.getCourseId());
         testRecord.setUnitId(wordUnitTestDTO.getUnitId()[0]);
         testRecord.setPoint(wordUnitTestDTO.getPoint());
-        testRecord.setErrorCount(wordUnitTestDTO.getErrorCount());
-        testRecord.setRightCount(wordUnitTestDTO.getRightCount());
+        int rightCount = 0;
+        int errorCount = 0;
+        if (wordUnitTestDTO.getErrorCount() != null) {
+            errorCount = wordUnitTestDTO.getErrorCount();
+        }
+        if (wordUnitTestDTO.getRightCount() != null) {
+            rightCount = wordUnitTestDTO.getRightCount();
+        }
+        testRecord.setErrorCount(errorCount);
+        testRecord.setRightCount(rightCount);
+        testRecord.setQuantity(errorCount + rightCount);
         testRecord.setAwardGold(goldCount);
         testRecord.setGenre("音译测试");
         testRecord.setStudentId(student.getId());
@@ -1062,8 +1073,17 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setCourseId(wordUnitTestDTO.getCourseId());
         testRecord.setUnitId(wordUnitTestDTO.getUnitId()[0]);
         testRecord.setPoint(wordUnitTestDTO.getPoint());
-        testRecord.setErrorCount(wordUnitTestDTO.getErrorCount());
-        testRecord.setRightCount(wordUnitTestDTO.getRightCount());
+        int rightCount = 0;
+        int errorCount = 0;
+        if (wordUnitTestDTO.getErrorCount() != null) {
+            errorCount = wordUnitTestDTO.getErrorCount();
+        }
+        if (wordUnitTestDTO.getRightCount() != null) {
+            rightCount = wordUnitTestDTO.getRightCount();
+        }
+        testRecord.setErrorCount(errorCount);
+        testRecord.setRightCount(rightCount);
+        testRecord.setQuantity(errorCount + rightCount);
         testRecord.setGenre("课文测试");
         testRecord.setStudentId(student.getId());
         Date date = new Date();
@@ -1097,7 +1117,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
         return getObjectServerResponse(session, wordUnitTestDTO, student, testRecord);
     }
-
 
 
     private ServerResponse<Object> getObjectServerResponse(HttpSession session, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord) {
