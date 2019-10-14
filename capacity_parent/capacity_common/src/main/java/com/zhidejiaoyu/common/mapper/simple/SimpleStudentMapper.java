@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -18,19 +19,29 @@ import java.util.Map;
 public interface SimpleStudentMapper extends BaseMapper<Student> {
     List<Student> selectByExample(StudentExample example);
 
+    /**
+     * @param id
+     * @return
+     * @see com.baomidou.mybatisplus.mapper.BaseMapper#selectById(Serializable)
+     */
+    @Deprecated
     Student selectByPrimaryKey(Long id);
 
+    /**
+     * @param record
+     * @return
+     * @see com.baomidou.mybatisplus.mapper.BaseMapper#updateById(Object)
+     */
+    @Deprecated
     int updateByPrimaryKeySelective(Student record);
 
-    int updateByPrimaryKey(Student record);
-
     /**
-     * 查询最大id对应的记录
-     *
+     * @param record
      * @return
+     * @see com.baomidou.mybatisplus.mapper.BaseMapper#updateAllColumnById(Object)
      */
-    @Select("select * from student where id = (select max(id) from student)")
-    Student selectStudentByMaxId();
+    @Deprecated
+    int updateByPrimaryKey(Student record);
 
     /**
      * 批量增加学生信息
@@ -50,9 +61,6 @@ public interface SimpleStudentMapper extends BaseMapper<Student> {
     List<String> getSchools(@Param("isNewStudentSchool") Boolean isNewStudentSchool);
 
     Student LoginJudge(Student st);
-
-    @Select("select role from student where id = #{id}")
-    Integer judgeUser(@Param("id") Long id);
 
     /**
      * 根据学生id数据批量修改有效期和到期时间
@@ -101,18 +109,6 @@ public interface SimpleStudentMapper extends BaseMapper<Student> {
     @MapKey("id")
     Map<Long, Map<String, Object>> selectLevelByStuId(@Param("student") Student student, @Param("flag") int flag, @Param("schoolAdminId") Integer schoolAdminId);
 
-    @Select("SELECT unit_id from student where id = #{student_id}")
-    Integer selectUnit_id(@Param("student_id") Long student_id);
-
-    /**
-     * 例句unit
-     *
-     * @param student_id
-     * @return
-     */
-    @Select("SELECT sentence_unit_id from student where id = #{student_id}")
-    Integer selectSentenceUnit_id(Long student_id);
-
     /**
      * 查询当前这些学生的排名
      *
@@ -133,18 +129,6 @@ public interface SimpleStudentMapper extends BaseMapper<Student> {
 
     @MapKey("id")
     Map<Long, Map<Long, Object>> selectxz();
-
-    @Select("select (offline_gold+system_gold)AS jb from student where id = #{id} ")
-    Double myGold(@Param("id") Long id);
-
-    @Select("select count(*) AS mb from worship where student_id_by_worship = #{id} ")
-    int myMb(@Param("id") Long id);
-
-    @Update("update student set unit_name = #{amendName} where unit_id = #{unitId}")
-    Integer updateByUnitNameAndWord(@Param("unitId") Integer unitId, @Param("amendName") String amendName);
-
-    @Update("update student set sentence_unit_name = #{amendName} where sentence_unit_id = #{unitId}")
-    void updateByUnitNameAndSentence(Integer unitId, String amendName);
 
     Map<String, Object> getCourseIdAndUnitId(@Param("studentId") long studentId);
 
@@ -241,14 +225,7 @@ public interface SimpleStudentMapper extends BaseMapper<Student> {
     @MapKey("id")
     Map<Long, Map<Long, Object>> learnUnitsWordSum(@Param("studentId") long studentId, @Param("courseId") long courseId);
 
-    @Select("select system_gold + offline_gold from student where id = #{studentId}")
-    double selectTotalGold(@Param("studentId") Long studentId);
-
-
     Integer updEnergyByAll();
-
-    @Select("select teacher.school_admin_id from student student join teacher teacher on student.teacher_id = teacher.teacher_id where student.id=#{studentId}")
-    Long getSysAdminId(Long studentId);
 
     List<Student> selCountry();
 

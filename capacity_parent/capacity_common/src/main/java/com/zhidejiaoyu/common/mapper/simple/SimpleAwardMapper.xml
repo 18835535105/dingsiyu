@@ -96,12 +96,6 @@
         from award
         where type = 1
     </delete>
-    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.AwardExample" resultType="java.lang.Integer">
-        select count(*) from award
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-    </select>
     <select id="selectByAwardContentTypeAndType" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="Base_Column_List"/>
