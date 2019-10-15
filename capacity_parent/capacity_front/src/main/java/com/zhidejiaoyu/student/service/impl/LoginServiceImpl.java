@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.simple.SimpleStudentUnitMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.*;
@@ -55,6 +56,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Autowired
     private StudentMapper studentMapper;
+
+    @Autowired
+    private SimpleStudentUnitMapper simpleStudentUnitMapper;
 
     @Autowired
     private RunLogMapper runLogMapper;
@@ -1096,7 +1100,13 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
         //判断是否有绝招好课课程
         if (type.equals(5)) {
-            isHave = true;
+            int count = simpleStudentUnitMapper.countAllUnlockByStudentId(student.getId());
+            if (count > 0) {
+                isHave = true;
+            } else {
+                isHave = false;
+            }
+
         }
         //判断是否有阅读课程
         if (type.equals(6)) {
