@@ -26,7 +26,9 @@
     <select id="selListMap" parameterType="java.util.HashMap" resultType="java.util.HashMap">
         select count(list.id) count,count(list.use_time) useNumber,list.name name,max(list.use_end_time) endTime ,img_url imgUrl
         from synthetic_rewards_list list
-        where list.student_id=#{studentId} and type=#{type}  group by name order by id desc
+        where list.student_id=#{studentId} and type=#{type}
+          and (list.use_end_time > now() or list.use_end_time is null)
+          group by name order by id desc
     </select>
 
     <select id="selCountByStudentIdAndName" resultType="java.lang.Integer" parameterType="java.util.Map">
