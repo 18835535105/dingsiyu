@@ -1,6 +1,8 @@
 package com.zhidejiaoyu.student.controller;
 
+import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.LoginService;
 import lombok.extern.slf4j.Slf4j;
@@ -112,7 +114,8 @@ public class LoginController {
     @RequestMapping("/portrait")
     public ServerResponse<Object> clickPortrait(HttpSession session, Integer type) {
         if (type == null) {
-            log.warn("学生头像信息中：type=null");
+            Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+            log.warn("学生[{} -{} -{}]头像信息中：type=null", student.getId(), student.getAccount(), student.getStudentName());
             type = 1;
         }
         return loginService.clickPortrait(session, type);
