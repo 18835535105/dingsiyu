@@ -161,11 +161,11 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 //是否拥有
                 setMap.put("isHave", true);
                 //是否可试用
-                setMap.put("have", false);
+                setMap.put("have", true);
                 Map<String, Object> haveSkinMap = (Map<String, Object>) o;
-                Object state = haveSkinMap.get("state");
+                int state = Integer.parseInt(haveSkinMap.get("state").toString());
                 //是否正在使用
-                setMap.put("use", state);
+                setMap.put("use", state == 1 ? true : false);
                 //合成碎片数量
                 setMap.put("count", 3);
             } else {
@@ -176,24 +176,24 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 Object o1 = trySkin.get(finalName);
                 if (o1 != null) {
                     Map<String, Object> trySkinMap = (Map<String, Object>) o1;
-                    Date date = (Date)trySkinMap.get("endTime");
+                    Date date = (Date) trySkinMap.get("endTime");
                     if (System.currentTimeMillis() < date.getTime()) {
-                        setMap.put("have", false);
-                    } else {
                         setMap.put("have", true);
+                    } else {
+                        setMap.put("have", false);
                     }
                     //是否正在使用
                     int state = Integer.parseInt(trySkinMap.get("state").toString());
-                    if(state!=1){
+                    if (state != 1) {
                         setMap.put("use", false);
-                    }else{
-                        setMap.put("use", 1);
+                    } else {
+                        setMap.put("use", false);
                     }
 
                 } else {
-                    setMap.put("have", false);
+                    setMap.put("have", true);
                     //是否正在使用
-                    setMap.put("use", false);
+                    setMap.put("use", true);
                 }
                 //獲取皮膚碎片使用數量
                 Object o2 = maps.get(finalName);
