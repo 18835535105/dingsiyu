@@ -577,14 +577,14 @@
     <select id="selectNumberByStudentId" parameterType="map" resultType="int">
         <!-- 单词 -->
         <if test="model &lt; 4">
-            select COUNT(distinct vocabulary_id) from learn a where a.student_id =
+            select COUNT(vocabulary_id) from learn a where a.student_id =
             #{student_id} and a.unit_id = #{unit_id}
             and a.example_id is null
             <include refid="study_model_sql"/>
         </if>
         <!-- 例句 -->
         <if test="model &gt; 3">
-            select COUNT(distinct example_id) from learn a where a.student_id = #{student_id} and a.unit_id = #{unit_id}
+            select COUNT(example_id) from learn a where a.student_id = #{student_id} and a.unit_id = #{unit_id}
             and a.example_id is NOT null
             <include refid="study_model_sql"/>
         </if>
