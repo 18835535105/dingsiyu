@@ -291,7 +291,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 map.put("countWord", "");
             } else { // 未做单元闯关
 
-                map.put("sum", sum);
+                map.put("sum", Math.min(sum, countWord));
                 map.put("countWord", countWord);
                 // 方框状态
                 map.put("condition", 3);
