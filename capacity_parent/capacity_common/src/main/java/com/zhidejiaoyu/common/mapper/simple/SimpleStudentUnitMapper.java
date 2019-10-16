@@ -57,7 +57,7 @@ public interface SimpleStudentUnitMapper {
      * @param courseId
      * @return
      */
-    @Select("select count(id) from student_unit where unit_id = #{studentId} and student_id = #{courseId} and `status` = 0")
+    @Select("select count(id) from student_unit where unit_id = #{studentId} and student_id = #{courseId}")
     int countUnlockUnitByStudentIdAndCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
 
     /**
@@ -66,7 +66,7 @@ public interface SimpleStudentUnitMapper {
      * @param studentId
      * @return
      */
-    @Select("select COUNT(id) from student_unit where student_id = #{studentId} and `status` = 0")
+    @Select("select COUNT(id) from student_unit where student_id = #{studentId} ")
     int countAllUnlockByStudentId(Long studentId);
 
     /**

@@ -41,7 +41,6 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
     private String adminDomin;
 
 
-
     @Override
     public ServerResponse<FeedBackInfoVO> getFeedBacks(HttpSession session) {
         Student student = getStudent(session);
@@ -93,12 +92,12 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
             return ServerResponse.createByErrorMessage("提交失败！");
         }
 
-        try{
+        try {
             Map<String, Object> paramMap = new HashMap<>(16);
             paramMap.put("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)));
-            String url = adminDomin + "/socket/getMessage";
+            String url = adminDomin + "/socket/getMessage?studentId=" + student.getId();
             restTemplate.getForEntity(url, Map.class, paramMap);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("[{} - {} -{}]提交反馈信息请求后台 socket 失败！", student.getId(), student.getAccount(), student.getStudentName(), e);
         }
 
@@ -167,7 +166,7 @@ public class FeedBackServiceImpl extends BaseServiceImpl<MessageBoardMapper, Mes
 
             // 如果最后一条记录奖励金币数为0，说明当前学生不需要显示奖励金币提示
             if (i == size - 1) {
-                if (messageBoard.getHintFlag() != null && messageBoard.getHintFlag() == 1){
+                if (messageBoard.getHintFlag() != null && messageBoard.getHintFlag() == 1) {
                     feedBackInfoVO.setHint(true);
                     feedBackInfoVO.setAwardGold(messageBoard.getAwardGold());
                 } else {
