@@ -3,10 +3,10 @@ package com.zhidejiaoyu.student.controller;
 import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.Vo.student.testCenter.TestCenterVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.ReviewService;
+import com.zhidejiaoyu.student.service.UnitService;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -15,10 +15,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 智能复习/测试复习, 测试中心, 效果测试
@@ -33,6 +35,9 @@ public class ReviewController extends BaseController {
 
     @Autowired
     private ReviewService reviewService;
+
+    @Resource
+    private UnitService unitService;
 
     /**
      * 1. 点击智能复习/测试复习 显示个个模块需要复习的数量
@@ -58,10 +63,10 @@ public class ReviewController extends BaseController {
     @ResponseBody
     @RequestMapping(value = "/test")
     public ServerResponse<Object> testCapacityReview(String unit_id, int classify, HttpSession session, boolean pattern) {
-        if(classify == 0){
+        if (classify == 0) {
             // 单词图鉴
             return reviewService.testReviewWordPic(unit_id, classify, session, pattern);
-        }else {
+        } else {
             return reviewService.testCapacityReview(unit_id, classify, session, pattern);
         }
 
@@ -79,7 +84,7 @@ public class ReviewController extends BaseController {
     @ResponseBody
     @GetMapping("/getSentenceReviewTest")
     public ServerResponse<List<SentenceTranslateVo>> getSentenceReviewTest(HttpSession session, Long unitId, Integer classify,
-                                                                           @RequestParam(required = false, defaultValue = "1") Integer type , boolean pattern) {
+                                                                           @RequestParam(required = false, defaultValue = "1") Integer type, boolean pattern) {
         if (unitId == null || classify == null || classify > 6 || classify < 4) {
             return ServerResponse.createByErrorMessage("参数不正确！");
         }
@@ -104,7 +109,7 @@ public class ReviewController extends BaseController {
     @ResponseBody
     @PostMapping("/saveTestCenter")
     public ServerResponse<TestResultVo> saveTestCenter(String[] correctWord, String[] errorWord, Long[] correctWordId, Long[] errorWordId, Long[] unitId,
-                                                 Integer classify, Long courseId, HttpSession session, Integer point, String genre, String testDetail) {
+                                                       Integer classify, Long courseId, HttpSession session, Integer point, String genre, String testDetail) {
         final String wordFiveTest = "单词五维测试";
         final String sentenceFiveTest = "例句五维测试";
 
@@ -118,6 +123,10 @@ public class ReviewController extends BaseController {
         }
         if (!wordFiveTest.equals(genre) && !sentenceFiveTest.equals(genre)) {
             Assert.notEmpty(unitId, "unitId cant't be null!");
+        }
+        // courseId=null，为了系统正常执行，通过 unitId 获取 courseId 并赋值
+        if (unitId != null && unitId.length > 0 && courseId == null) {
+            courseId = unitService.selectCourseIdById(unitId[0]);
         }
         Assert.notNull(courseId, "courseId can't be null!");
         Assert.notNull(point, "point cant't be null!");
@@ -133,7 +142,7 @@ public class ReviewController extends BaseController {
         if (correctWord == null && errorWord == null) {
             return ServerResponse.createByErrorMessage("参数错误！");
         }
-        return reviewService.saveTestCenter(correctWord, errorWord, correctWordId, errorWordId, unitId, classify, courseId, session, point, genre,testDetail);
+        return reviewService.saveTestCenter(correctWord, errorWord, correctWordId, errorWordId, unitId, classify, courseId, session, point, genre, testDetail);
     }
 
     /**
@@ -160,7 +169,7 @@ public class ReviewController extends BaseController {
         Assert.notNull(courseId, "courseId cant't be null!");
         Assert.notNull(point, "point cant't be null!");
         return reviewService.saveTestReview(correctWord, errorWord, correctWordId, errorWordId, unitId, classify, courseId,
-                session, point, "复习测试",null);
+                session, point, "复习测试", null);
     }
 
     /**
@@ -208,15 +217,15 @@ public class ReviewController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = {"/capacity", "/taskCourse"})
-    public Object capacityReview(@RequestParam(value = "unitId",required = false) String unitId,
+    public Object capacityReview(@RequestParam(value = "unitId", required = false) String unitId,
                                  String course_id, int classify, String judge,
-                                                              HttpSession session,
-                                                              @RequestParam(required = false, defaultValue = "1") Integer type){
+                                 HttpSession session,
+                                 @RequestParam(required = false, defaultValue = "1") Integer type) {
         // 获取学生id
         Student student = super.getStudent(session);
 
         // 图片图鉴模块
-        if(classify == 0){
+        if (classify == 0) {
             return reviewService.reviewCapacityPicture(student, unitId, 0, course_id, judge);
         }
         // 慧记忆模块 / 听写 / 默写
@@ -237,7 +246,7 @@ public class ReviewController extends BaseController {
     /**
      * 获取智能复习题目，上次登录期间需要复习的单词
      *
-     * @param classify   0=单词图鉴 1=慧记忆 2=慧听写 3=慧默写
+     * @param classify 0=单词图鉴 1=慧记忆 2=慧听写 3=慧默写
      * @param session
      * @return
      */
@@ -253,13 +262,13 @@ public class ReviewController extends BaseController {
     /**
      * 获取智能复习题目，上次登录期间需要复习的单词
      *
-     * @param classify   0=单词图鉴 1=慧记忆 2=慧听写 3=慧默写
+     * @param classify 0=单词图鉴 1=慧记忆 2=慧听写 3=慧默写
      * @param session
      * @return
      */
     @ResponseBody
     @GetMapping("/getAllCapacityReview")
-    public ServerResponse<Map<String,Object>> getAllCapacityReview(Integer classify,HttpSession session){
+    public ServerResponse<Map<String, Object>> getAllCapacityReview(Integer classify, HttpSession session) {
         if (classify == 0 || classify == 1 || classify == 2 || classify == 3) {
             return reviewService.getAllCapacityReview(session, classify);
         }
@@ -268,8 +277,8 @@ public class ReviewController extends BaseController {
 
     @ResponseBody
     @GetMapping("/getAllSentenceReview")
-    public ServerResponse getAllSentenceReview(Integer classify,HttpSession session){
-        if(classify == 4 || classify == 5 || classify == 6){
+    public ServerResponse getAllSentenceReview(Integer classify, HttpSession session) {
+        if (classify == 4 || classify == 5 || classify == 6) {
             return reviewService.getAllSentenceReview(session, classify);
         }
         return ServerResponse.createBySuccess();
@@ -280,7 +289,7 @@ public class ReviewController extends BaseController {
      * 测试中心首页需要的数据
      *
      * @param unitId
-     * @param type 1：单词；2：句型
+     * @param type   1：单词；2：句型
      * @return
      */
     @ResponseBody
@@ -294,10 +303,10 @@ public class ReviewController extends BaseController {
      * 测试中心题
      *
      * @param courseId 课程id
-     * @param unitId 单元id
-     * @param classify  模块: 0=单词图鉴 1=慧记忆, 2=听写, 3=默写, 4=例句听写, 5=例句翻译, 6=例句默写
-     * @param select    选择: 1=已学, 2=生词, 3=熟词
-     * @param type 例句相关 1：普通模式；2：暴走模式
+     * @param unitId   单元id
+     * @param classify 模块: 0=单词图鉴 1=慧记忆, 2=听写, 3=默写, 4=例句听写, 5=例句翻译, 6=例句默写
+     * @param select   选择: 1=已学, 2=生词, 3=熟词
+     * @param type     例句相关 1：普通模式；2：暴走模式
      * @return 对应模块选择的题
      */
     @ResponseBody
@@ -306,7 +315,7 @@ public class ReviewController extends BaseController {
                                              HttpSession session, @RequestParam(required = false, defaultValue = "1") Integer type) {
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
-        if(classify == 0){
+        if (classify == 0) {
             // WordPicModel
             return reviewService.testWordPic(courseId, unitId, select, classify, isTrue, session);
         }
@@ -323,8 +332,7 @@ public class ReviewController extends BaseController {
      * 五维测试 - 单词模块
      *
      * @param course_id 课程id
-     * @param isTrue 默认false第一次点击五维测试 (true扣除1金币)
-     *
+     * @param isTrue    默认false第一次点击五维测试 (true扣除1金币)
      * @return 50道题
      */
     @ResponseBody
