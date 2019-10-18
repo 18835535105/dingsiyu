@@ -869,7 +869,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                 String word = object.getString("title");
                 final String[] selected = {null};
                 if (modelType == 1 || modelType == 0) {
-                    // 试卷题目
+                    // 试卷题目，选择题
                     JSONObject subject = object.getJSONObject("subject");
                     final int[] j = {0};
                     TestRecordInfo finalTestRecordInfo = testRecordInfo;
@@ -885,11 +885,16 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                         finalTestRecordInfo.setWord(word);
                         j[0]++;
                     });
-                } else {
+                } else if (modelType == 2) {
+                    // 慧听写
                     selected[0] = object.getString("userInput");
-                    String chinese = object.getString("chinese");
-                    testRecordInfo.setWord(chinese);
-                    testRecordInfo.setAnswer(word);
+                    testRecordInfo.setWord(object.getString("readUrl"));
+                    testRecordInfo.setAnswer(object.getString("word"));
+                } else if (modelType == 3) {
+                    // 慧默写
+                    selected[0] = object.getString("userInput");
+                    testRecordInfo.setWord(object.getString("chinese"));
+                    testRecordInfo.setAnswer(object.getString("word"));
                 }
 
                 testRecordInfo.setTestId(testRecordId);
