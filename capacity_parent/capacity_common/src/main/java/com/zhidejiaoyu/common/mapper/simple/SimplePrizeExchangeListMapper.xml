@@ -46,7 +46,7 @@
             and teacher_id =#{teacherId}
         </if>
         <if test="adminId != null">
-            and school_id =#{adminId} and teacher_id is null
+            and school_id =#{adminId}
         </if>
         order by create_time desc
         limit 5
@@ -59,7 +59,7 @@
             and teacher_id =#{teacherId}
         </if>
         <if test="adminId != null">
-            and school_id =#{adminId} and teacher_id is null
+            and school_id =#{adminId}
         </if>
     </select>
 
