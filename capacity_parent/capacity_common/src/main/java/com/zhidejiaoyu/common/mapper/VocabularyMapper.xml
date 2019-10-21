@@ -562,9 +562,9 @@
                v.word,
                uv.word_chinese,
                v.recordpicurl,
-               v.small_picture_url smallPictureUrl,
+               v.small_picture_url  smallPictureUrl,
                v.middle_picture_url middlePictureUrl,
-               v.high_picture_url highPictureUrl,
+               v.high_picture_url   highPictureUrl,
                v.sound_mark
         FROM vocabulary v,
              unit_vocabulary uv
@@ -677,7 +677,7 @@
     <select id="selByStudentIdLimitTen" resultType="string" parameterType="map">
         select voca.word from vocabulary voca
         <if test="type==1">
-            join learn learn on learn.vocabulary_id=voca.id
+            join learn on learn.vocabulary_id=voca.id
             where learn.student_id=#{studentId}
             and study_model in ('慧记忆','慧听写','慧默写','单词图鉴','例句听力''例句翻译','例句默写')
             and learn.vocabulary_id is not null
@@ -693,7 +693,7 @@
     <select id="selCountByStudentIdLimitTen" resultType="integer" parameterType="map">
         select count(distinct voca.id) from vocabulary voca
         <if test="type==1">
-            join learn learn on learn.vocabulary_id=voca.id
+            join learn on learn.vocabulary_id=voca.id
             where learn.student_id=#{studentId}
             and study_model in ('慧记忆','慧听写','慧默写','单词图鉴','例句听力''例句翻译','例句默写')
             and learn.vocabulary_id is not null
@@ -741,6 +741,16 @@
           and v.id = uv.vocabulary_id
           and u.joint_name = #{jointName}
         group by v.id
+    </select>
+    <select id="countPicture" resultType="java.lang.Integer">
+        select count(v.id)
+        from vocabulary v,
+             unit_vocabulary uv
+        where uv.unit_id = #{unitId}
+          and uv.vocabulary_id = v.id
+          and (v.small_picture_url is not null
+            or v.middle_picture_url is not null
+            or v.high_picture_url is not null)
     </select>
 
 

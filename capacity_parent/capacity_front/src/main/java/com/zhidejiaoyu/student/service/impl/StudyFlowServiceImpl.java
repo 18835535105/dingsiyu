@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.service.impl;
 
-import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.exception.Enum.ServiceExceptionEnum;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
@@ -58,9 +58,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     private UnitMapper unitMapper;
 
     @Resource
-    private StudentMapper studentMapper;
-
-    @Resource
     private CourseMapper courseMapper;
 
     @Resource
@@ -93,11 +90,14 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     @Autowired
     private CcieUtil ccieUtil;
 
+    @Resource
+    private VocabularyMapper vocabularyMapper;
+
     /**
      * 节点学完, 把下一节初始化到student_flow表, 并把下一节点返回
      *
-     * @return  id 节点id
-     *          model_name 节点模块名
+     * @return id 节点id
+     * model_name 节点模块名
      */
 
     @Override
@@ -177,12 +177,15 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         if (studyFlow.getType() != null) {
             StudyFlow falseFlow = studyFlowMapper.selectById(studyFlow.getNextFalseFlow());
             StudyFlow trueFlow = studyFlowMapper.selectById(studyFlow.getNextTrueFlow());
-            if (Objects.equals(3, falseFlow.getType())) {
+
+            // 游戏前测节点 id
+            int gameTestFlowId = 3;
+            if (Objects.equals(gameTestFlowId, falseFlow.getType())) {
                 ServerResponse<Object> x = toNextNode(dto, falseFlow);
                 if (x != null) {
                     return x;
                 }
-            } else if (Objects.equals(3, trueFlow.getType())) {
+            } else if (Objects.equals(gameTestFlowId, trueFlow.getType())) {
                 ServerResponse<Object> x = toNextNode(dto, trueFlow);
                 if (x != null) {
                     return x;
@@ -212,9 +215,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         Long grade = dto.getGrade();
         if (grade != null) {
             // 50 <= 分数 < 90分走 nextTrue 流程，分数 < 50 走 nextFalse 流程
-            if (grade >= 50 && grade < 90) {
+            if (grade >= PointConstant.FIFTY && grade < PointConstant.NINETY) {
                 return toAnotherFlow(dto, flow.getNextTrueFlow());
-            } else if (grade < 90) {
+            } else if (grade < PointConstant.NINETY) {
                 return toAnotherFlow(dto, flow.getNextFalseFlow());
             }
         }
@@ -230,8 +233,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         Student student = dto.getStudent();
 
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
-        studentFlowMapper.updateFlowByStudentId(student.getId(), flowId);
-        StudyFlow byPrimaryKey = studyFlowMapper.selectById(flowId);
+
+        // 判断当前单元单词是否有图片，如果都没有图片不进入单词图鉴
+        StudyFlow byPrimaryKey = this.getStudyFlow(dto, flowId);
+        studentFlowMapper.updateFlowByStudentId(student.getId(), byPrimaryKey.getId());
 
         if (Objects.equals(TO_FLOW_ONE, byPrimaryKey.getNextTrueFlow())) {
             log.info("[{} -{} -{}] 前往流程 1.", student.getId(), student.getAccount(), student.getStudentName());
@@ -250,6 +255,72 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             log.error("教师已经删除[{} -> {} -> {}]正在学习的学习计划。", student.getId(), student.getAccount(), student.getStudentName());
         }
         return ServerResponse.createBySuccess("true", byPrimaryKey);
+    }
+
+    /**
+     * @param dto
+     * @param flowId 下个流程节点的 id
+     * @return
+     */
+    private StudyFlow getStudyFlow(NodeDto dto, int flowId) {
+        StudyFlow byPrimaryKey = studyFlowMapper.selectById(flowId);
+
+        // 如果下个节点不是单词图鉴模块，执行正常流程
+        String studyModel = "单词图鉴";
+        if (!byPrimaryKey.getModelName().contains(studyModel)) {
+            return byPrimaryKey;
+        }
+
+        Long unitId = dto.getUnitId();
+        if (unitId == null) {
+            return byPrimaryKey;
+        }
+
+        // 当前单元含有图片的单词个数，如果大于零，执行正常流程，否则跳过单词图鉴模块
+        int pictureCount = vocabularyMapper.countPicture(unitId);
+        if (pictureCount > 0) {
+            return byPrimaryKey;
+        }
+
+        // 流程 1 单词图鉴流程 id
+        int flowOnePicture = 15;
+        // 流程 1 的单词图鉴
+        if (flowId == flowOnePicture) {
+            if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlow().getType()) {
+                // 去流程 2 的慧听写
+                return studyFlowMapper.selectById(18);
+            }
+            // 如果是从单词播放机直接进入单词图鉴，将流程跳转到慧记忆
+            if (Objects.equals(dto.getNodeId(), 22L)) {
+                return studyFlowMapper.selectById(48);
+            }
+            // 返回流程 1
+            return studyFlowMapper.selectById(9);
+        }
+
+        // 流程 2 慧听写的单词图鉴
+        int flowTwoListenPicture = 35;
+        if (flowId == flowTwoListenPicture) {
+            if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlow().getType()) {
+                // 去流程 2 的慧默写
+                return studyFlowMapper.selectById(28);
+            }
+            // 返回流程 1
+            return studyFlowMapper.selectById(9);
+        }
+
+        // 流程 2 慧默写的单词图鉴
+        int flowTwoWritePicture = 33;
+        if (flowId == flowTwoWritePicture) {
+            if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlow().getType()) {
+                // 去游戏
+                return studyFlowMapper.selectById(31);
+            }
+            // 返回流程 1
+            return studyFlowMapper.selectById(9);
+        }
+
+        return byPrimaryKey;
     }
 
     /**
@@ -324,7 +395,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 int learnedUnitCount = learnMapper.countLearnedUnitByCourseId(studentStudyPlan.getCourseId(), studentId);
                 if (learnedUnitCount >= unitCount) {
                     // 课程学习完毕，奖励学生课程证书
-                    ccieUtil.saveCourseCcie(student, capacityStudentUnit.getCourseId(), capacityStudentUnit.getUnitId(), grade == null ? 0 : Integer.valueOf(grade.toString()));
+                    ccieUtil.saveCourseCcie(student, capacityStudentUnit.getCourseId(), capacityStudentUnit.getUnitId(), grade == null ? 0 : Integer.parseInt(grade.toString()));
                 }
             }
 
@@ -374,10 +445,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
             updateCapacityStudentUnit(capacityStudentUnit, nextUnitId, null);
             saveOpenUnitLog(student, dto.getUnitId(), nextUnitId);
-
-            // 更新学生session
-            Student student1 = studentMapper.selectByPrimaryKey(student.getId());
-            dto.getSession().setAttribute(UserConstant.CURRENT_STUDENT, student1);
         }
         return null;
     }
@@ -404,18 +471,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         capacityStudentUnitMapper.updateById(capacityStudentUnit);
     }
 
-    private CapacityStudentUnit packageCapacityStudentUnit(Student student, Long courseId, Long nextUnitId, Unit unit) {
-        CapacityStudentUnit capacityStudentUnit = new CapacityStudentUnit();
-        Course course = courseMapper.selectById(courseId);
-        capacityStudentUnit.setCourseId(courseId);
-        capacityStudentUnit.setStudentId(student.getId());
-        capacityStudentUnit.setType(1);
-        capacityStudentUnit.setUnitId(nextUnitId);
-        capacityStudentUnit.setUnitName(unit.getUnitName());
-        capacityStudentUnit.setCourseName(course.getCourseName());
-        return capacityStudentUnit;
-    }
-
     private void saveOpenUnitLog(Student student, Long unitId, Long nextUnitId) {
         // 保存开启单元日志记录
         OpenUnitLog openUnitLog = new OpenUnitLog();
@@ -423,7 +478,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         openUnitLog.setCurrentUnitId(unitId);
         openUnitLog.setNextUnitId(nextUnitId);
         openUnitLog.setStudentId(student.getId());
-        try{
+        try {
             openUnitLogMapper.insert(openUnitLog);
         } catch (Exception e) {
             log.error("学生 {}-{} 保存开启单元日志出错；当前单元 {}，下一单元 {}", student.getId(), student.getStudentName(), unitId, nextUnitId, e);

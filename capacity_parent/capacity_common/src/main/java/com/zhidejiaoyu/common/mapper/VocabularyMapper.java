@@ -367,4 +367,12 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     List<Vocabulary> selectByJointName(@Param("jointName") String jointName);
+
+    /**
+     * 统计当前单元含有图片的单词个数
+     *
+     * @param unitId
+     * @return
+     */
+    int countPicture(@Param("unitId") Long unitId);
 }

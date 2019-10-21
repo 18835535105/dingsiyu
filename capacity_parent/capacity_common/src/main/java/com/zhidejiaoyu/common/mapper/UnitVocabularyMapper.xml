@@ -156,13 +156,10 @@
         </if>
     </select>
     <select id="selectWordChineseMapByUnitId" resultType="java.util.Map" parameterType="java.lang.Long">
-        SELECT
-            vocabulary_id id,
-            word_chinese  wordChinese
-        FROM
-            unit_vocabulary
-        WHERE
-            unit_id = #{unitId}
+        SELECT vocabulary_id id,
+               word_chinese  wordChinese
+        FROM unit_vocabulary
+        WHERE unit_id = #{unitId}
     </select>
     <select id="selectWordChineseMapByUnitIdAndWordIds" resultType="java.util.Map" parameterType="map">
         SELECT
@@ -192,11 +189,14 @@
         WHERE
         course_id = #{courseId}
         )
-        AND vocabulary_id IN (
-        <foreach collection="idSet" item="id" separator=",">
-            #{id}
-        </foreach>
-        )
+        <if test="idSet != null and idSet.size > 0">
+            AND vocabulary_id IN (
+            <foreach collection="idSet" item="id" separator=",">
+                #{id}
+            </foreach>
+            )
+        </if>
+
     </select>
     <select id="selectByCourseIdAndWordId" resultMap="BaseResultMap" parameterType="map">
         select
@@ -206,23 +206,20 @@
         and v.id = #{wordId} and course_id = #{courseId}
     </select>
     <select id="selectWordChineseMapByCourseId" resultType="java.util.Map" parameterType="map">
-        SELECT
-            uv.vocabulary_id id,
-            uv.word_chinese  wordChinese
-        FROM
-            unit_vocabulary uv,
-            unit u
-        WHERE
-            u.id = uv.unit_id
-            AND u.course_id = #{courseId}
+        SELECT uv.vocabulary_id id,
+               uv.word_chinese  wordChinese
+        FROM unit_vocabulary uv,
+             unit u
+        WHERE u.id = uv.unit_id
+          AND u.course_id = #{courseId}
     </select>
     <select id="countWordByUnitIds" resultType="java.lang.Integer" parameterType="map">
         select count(distinct uv.vocabulary_id) from unit_vocabulary uv, vocabulary v where uv.vocabulary_id = v.id and
         v.delStatus = 1 and uv.unit_id in (
-            <foreach collection="unitIds" item="unitId" separator=",">
-                #{unitId}
+        <foreach collection="unitIds" item="unitId" separator=",">
+            #{unitId}
 
-            </foreach>
+        </foreach>
         )
     </select>
     <select id="countByUnitIdAndStudyModel" resultType="java.lang.Long" parameterType="map">
@@ -284,15 +281,17 @@
 
     <insert id="insertWordToUnit" parameterType="map">
         insert into unit_vocabulary
-        (unit_id, vocabulary_id, classify, word_chinese)
+            (unit_id, vocabulary_id, classify, word_chinese)
         VALUES (#{unitId}, #{wordId}, #{classify}, #{word_chinese})
     </insert>
-    <select id="selUnitIdAndNameByCourseIdsAndStartUnitIdAndEndUnitId" parameterType="java.util.Map" resultType="java.util.Map">
-        select course.id courseId , unit.id id,unit.unit_name unitName
-        from course course join unit unit on course.id=unit.course_id
-        where course.id=#{courseId}
-        and unit.id >= #{startUnitId}
-        and unit.id &lt;=#{endUnitId}
+    <select id="selUnitIdAndNameByCourseIdsAndStartUnitIdAndEndUnitId" parameterType="java.util.Map"
+            resultType="java.util.Map">
+        select course.id courseId, unit.id id, unit.unit_name unitName
+        from course
+                 join unit on course.id = unit.course_id
+        where course.id = #{courseId}
+          and unit.id >= #{startUnitId}
+          and unit.id &lt;= #{endUnitId}
     </select>
     <select id="selectWordChineseByUnitIdAndCurrentWordId" resultType="java.lang.String" parameterType="map">
         select word_chinese
