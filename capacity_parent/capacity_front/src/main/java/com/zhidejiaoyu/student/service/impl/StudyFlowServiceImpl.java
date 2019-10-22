@@ -439,8 +439,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         } else {
 
             Long currentUnitId = capacityStudentUnit.getUnitId();
-            int count = learnMapper.countByStudentIdAndFlow(dto.getStudent().getId(), currentUnitId, dto.getStudyFlow().getFlowName());
+
             // 防止需要进入下一单元的时候，学生重复刷新测试记录，导致capacityStudentUnit中单元持续累加的问题
+            // 只有当前单元已经学习了，才会初始化下一个单元
+            int count = learnMapper.countByStudentIdAndFlow(dto.getStudent().getId(), currentUnitId, dto.getStudyFlow().getFlowName());
             if (count > 0) {
                 long nextUnitId = currentUnitId + 1;
 
