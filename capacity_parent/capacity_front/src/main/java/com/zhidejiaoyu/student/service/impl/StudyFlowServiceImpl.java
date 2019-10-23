@@ -282,20 +282,31 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             return byPrimaryKey;
         }
 
+        Unit unit = unitMapper.selectById(unitId);
+        Student student = dto.getStudent() == null ? new Student() : dto.getStudent();
+
+        // 需要跳转到的流程 id
+        int flowId1;
         // 流程 1 单词图鉴流程 id
         int flowOnePicture = 15;
         // 流程 1 的单词图鉴
         if (flowId == flowOnePicture) {
             if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlow().getType()) {
                 // 去流程 2 的慧听写
-                return studyFlowMapper.selectById(18);
+                flowId1 = 18;
+                this.changeFlowNodeLog(student, "慧听写", unit, flowId1);
+                return studyFlowMapper.selectById(flowId1);
             }
             // 如果是从单词播放机直接进入单词图鉴，将流程跳转到慧记忆
             if (Objects.equals(dto.getNodeId(), 22L)) {
-                return studyFlowMapper.selectById(48);
+                flowId1 = 48;
+                this.changeFlowNodeLog(student, "慧记忆", unit, flowId1);
+                return studyFlowMapper.selectById(flowId1);
             }
             // 返回流程 1
-            return studyFlowMapper.selectById(9);
+            flowId1 = 9;
+            this.changeFlowNodeLog(student, "单词播放机", unit, flowId1);
+            return studyFlowMapper.selectById(flowId1);
         }
 
         // 流程 2 慧听写的单词图鉴
@@ -303,9 +314,13 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         if (flowId == flowTwoListenPicture) {
             if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlow().getType()) {
                 // 去流程 2 的慧默写
-                return studyFlowMapper.selectById(28);
+                flowId1 = 28;
+                this.changeFlowNodeLog(student, "慧默写", unit, flowId1);
+                return studyFlowMapper.selectById(flowId1);
             }
             // 返回流程 1
+            flowId1 = 9;
+            this.changeFlowNodeLog(student, "单词播放机", unit, flowId1);
             return studyFlowMapper.selectById(9);
         }
 
@@ -314,13 +329,28 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         if (flowId == flowTwoWritePicture) {
             if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlow().getType()) {
                 // 去游戏
-                return studyFlowMapper.selectById(31);
+                flowId1 = 31;
+                this.changeFlowNodeLog(student, "游戏", unit, flowId1);
+                return studyFlowMapper.selectById(flowId1);
             }
             // 返回流程 1
+            flowId1 = 9;
+            this.changeFlowNodeLog(student, "单词播放机", unit, flowId1);
             return studyFlowMapper.selectById(9);
         }
 
         return byPrimaryKey;
+    }
+
+    /**
+     * 当需要调过单词图鉴节点的时候记录日志
+     *
+     * @param student
+     * @param model   学习模块
+     */
+    private void changeFlowNodeLog(Student student, String model, Unit unit, int flowId) {
+        log.info("单元[{}]没有单词图片，学生[{} - {} - {}]进入{}流程，流程 id=[{}]",
+                unit.getJointName(), student.getId(), student.getAccount(), student.getStudentName(), model, flowId);
     }
 
     /**
