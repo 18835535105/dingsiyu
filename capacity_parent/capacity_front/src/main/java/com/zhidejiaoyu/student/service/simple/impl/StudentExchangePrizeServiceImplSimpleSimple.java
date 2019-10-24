@@ -89,7 +89,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
             List<PrizeExchangeList> threeType = simplePrizeExchangeListMapper.getAllByType(null, schoolAdminById, 3);
             Integer threeCount = simplePrizeExchangeListMapper.getCountByType(null, schoolAdminById, 3);
             getResultMap(threeMap, threeType);
-            addResultMapByAll(twoMap, 3, threeCount > 5 ? true : false);
+            addResultMapByAll(threeMap, 3, threeCount > 5 ? true : false);
         } else {
             //一类放置
             List<PrizeExchangeList> oneType = simplePrizeExchangeListMapper.getAllByType(teacherId, null, 1);

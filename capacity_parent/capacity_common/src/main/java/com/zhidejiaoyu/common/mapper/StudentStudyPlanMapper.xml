@@ -93,6 +93,15 @@
           and ssp.type = #{type}
         group by ssp.course_id
     </select>
+
+    <select id="countByStudentId" parameterType="map" resultType="int">
+        select
+        count(id)
+        from
+        student_study_plan
+        where student_id = #{studentId}
+        and type = #{type}
+    </select>
     <select id="selByStudentIdAndCourseId" parameterType="java.util.Map" resultMap="BaseResultMap">
         select
         <include refid="base_sql"/>
