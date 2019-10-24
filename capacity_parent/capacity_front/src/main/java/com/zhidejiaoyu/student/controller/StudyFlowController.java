@@ -18,7 +18,7 @@ import javax.servlet.http.HttpSession;
 public class StudyFlowController {
 
     @Resource
-    private StudyFlowService StudyFlowServic;
+    private StudyFlowService studyFlowService;
 
 
     /**
@@ -31,6 +31,6 @@ public class StudyFlowController {
     @RequestMapping("/getNode")
     public ServerResponse<Object> getNode(NodeDto dto, @RequestParam(required = false) String isTrueFlow, HttpSession session) {
         dto.setTrueFlow(isTrueFlow);
-        return StudyFlowServic.getNode(dto, isTrueFlow, session);
+        return studyFlowService.getNode(dto, isTrueFlow, session);
     }
 }

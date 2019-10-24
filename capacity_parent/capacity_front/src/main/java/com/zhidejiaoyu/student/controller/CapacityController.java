@@ -42,7 +42,7 @@ public class CapacityController extends BaseController {
      */
     @ResponseBody
     @GetMapping("/getCapacityDigestVo")
-    public ServerResponse<CapacityDigestVo> getCapacityDigestVo(HttpSession session, Long courseId, Long unitId, String studyModel) {
+    public ServerResponse<CapacityDigestVo> getCapacityDigestVo(HttpSession session, Long courseId, String unitId, String studyModel) {
         if (courseId == null || StringUtils.isBlank(studyModel) || unitId == null) {
             return ServerResponse.createByErrorMessage("参数非法");
         }

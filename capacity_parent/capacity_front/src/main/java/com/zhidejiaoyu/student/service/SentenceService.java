@@ -1,13 +1,11 @@
 package com.zhidejiaoyu.student.service;
 
-import com.zhidejiaoyu.common.Vo.student.sentence.CourseUnitVo;
+import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.student.vo.SentenceWordInfoVo;
 
 import javax.servlet.http.HttpSession;
-import java.util.List;
 
 /**
  * @author wuchenxi
