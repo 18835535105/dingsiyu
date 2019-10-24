@@ -21,6 +21,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.*;
@@ -57,9 +58,12 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
     @Autowired
     private StudentMapper studentMapper;
 
+    @Resource
+    private CapacityStudentUnitMapper capacityStudentUnitMapper;
+
     @Override
-    public ServerResponse<CapacityDigestVo> getCapacityDigestVo(HttpSession session, Long courseId, Long unitId, String studyModel) {
-        Student student = getStudent(session);
+    public ServerResponse<CapacityDigestVo> getCapacityDigestVo(HttpSession session, Long courseId, String unitIdStr, String studyModel) {
+        Student student = this.getStudent(session);
         CapacityDigestVo vo = new CapacityDigestVo();
         if (student.getShowCapacity() == null || student.getShowCapacity() == 1) {
             vo.setShowCapacity(true);
@@ -67,7 +71,60 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
             vo.setShowCapacity(false);
         }
 
+        Long unitId;
+        // 如果传入的unitId 错误，获取当前学生正在学习的单元
+        if ("NaN".equalsIgnoreCase(unitIdStr) || StringUtils.isEmpty(unitIdStr)) {
+            log.warn("获取追词记/追句记是，unitId=NaN.");
+            Map<String, String> wordModelMap = new HashMap(16);
+            Map<String, String> sentenceModelMap = new HashMap(16);
+
+            wordModelMap.put("慧记忆", "慧记忆");
+            wordModelMap.put("慧听写", "慧听写");
+            wordModelMap.put("慧默写", "慧默写");
+            wordModelMap.put("单词图鉴", "单词图鉴");
+
+            sentenceModelMap.put("例句翻译", "例句翻译");
+            wordModelMap.put("例句听力", "例句听力");
+            wordModelMap.put("例句默写", "例句默写");
+
+            if (wordModelMap.containsKey(studyModel)) {
+                // 查询学生当前学习的单元
+                CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+                if (capacityStudentUnit == null) {
+                    log.error("学生[{} - {} - {}]还没有初始化智慧单词课程！", student.getId(), student.getAccount(), student.getStudentName());
+                    return ServerResponse.createBySuccess(this.getDefaultCapacityDigestVo(vo));
+                }
+                courseId = capacityStudentUnit.getCourseId();
+                unitId = capacityStudentUnit.getUnitId();
+            } else if (sentenceModelMap.containsKey(studyModel)) {
+                // 查询学生当前学习的句型单元
+                CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 2);
+                if (capacityStudentUnit == null) {
+                    log.error("学生[{} - {} - {}]还没有初始化抢分句型课程！", student.getId(), student.getAccount(), student.getStudentName());
+                    return ServerResponse.createBySuccess(this.getDefaultCapacityDigestVo(vo));
+                }
+                courseId = capacityStudentUnit.getCourseId();
+                unitId = capacityStudentUnit.getUnitId();
+            } else {
+                return ServerResponse.createBySuccess();
+            }
+        } else {
+            unitId = Long.parseLong(unitIdStr);
+        }
         return getCapacityDigestVo(student, courseId, unitId, vo, studyModel);
+    }
+
+    /**
+     * 追词纪、追句记返回空的默认数据
+     *
+     * @param vo
+     * @return
+     */
+    private CapacityDigestVo getDefaultCapacityDigestVo(CapacityDigestVo vo) {
+        vo.setStrangenessCount(0);
+        vo.setNeedReview(0);
+        vo.setWordInfos(new ArrayList<>(0));
+        return vo;
     }
 
     private ServerResponse<CapacityDigestVo> getCapacityDigestVo(Student student, Long courseId, Long unitId,

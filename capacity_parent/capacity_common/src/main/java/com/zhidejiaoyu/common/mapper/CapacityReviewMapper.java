@@ -4,9 +4,9 @@ import com.zhidejiaoyu.common.pojo.CapacityReview;
 import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
-import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
@@ -19,6 +19,7 @@ import java.util.Set;
  * @author qizhentao
  * @version 1.0
  */
+@Repository
 public interface CapacityReviewMapper {
 
 	/** 个个模块许复习量, 可有多个条件查询 */
@@ -27,9 +28,6 @@ public interface CapacityReviewMapper {
 	/**
 	 * 根据模块查询需要复习的单词
 	 *
-	 * @param id 学生id
-	 * @param unit_id 单元id
-	 * @param classify 类型
 	 * @return
 	 */
 	List<Vocabulary> selectCapacity(CapacityReview ca);
@@ -43,8 +41,6 @@ public interface CapacityReviewMapper {
 
 	@Select("select vocabulary_id, word, word_chinese, memory_strength from sentence_listen where student_id = #{student_id} and unit_id = #{unit_id} and push < #{dateTime} order by push asc limit 0,1")
 	CapacityReview ReviewSentence_listen(@Param("student_id") Long student_id,@Param("unit_id") String unit_id,@Param("dateTime") String dateTime);
-	@Select("select vocabulary_id, word, word_chinese, memory_strength, unit_id from sentence_listen where student_id = #{student_id} and course_id = #{course_id} and push < #{dateTime} order by push asc limit 0,1")
-	CapacityReview ReviewSentence_listenCourseId(@Param("student_id") Long student_id,@Param("course_id") String course_id,@Param("dateTime") String dateTime);
 
 	void updatePush(CapacityReview cr);
 
@@ -52,17 +48,10 @@ public interface CapacityReviewMapper {
 
 	void updateLearnStudy_count(CapacityReview cr);
 
-	@Select("select id from vocabulary where word = #{word}")
-	Integer selectWordId(@Param("word") String word);
-
-	@Select("select id from sentence where centreExample = #{word} or tallExample = #{word}")
-	Integer selectSentenceId(@Param("word") String word);
-
 	/**
 	 * 学生当前课程下已学单词数
 	 *
 	 * @param studentId
-	 * @param courseIds
 	 * @param classify
 	 * @param flag
 	 * @return
@@ -165,63 +154,18 @@ public interface CapacityReviewMapper {
 	@Select("select a.id, a.centreExample, a.centreTranslate from learn b INNER JOIN sentence a on a.id = b.example_id and b.unit_id = #{unit_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} and type=1 and b.status = 1  limit 0,20")
 	List<Sentence> ripeCentreReviewSentence_listen(@Param("student_id") Long student_id, @Param("unit_id") String unit_id, @Param("classifyStr") String classifyStr);
 
-	// 4,5,6模块高中已学题
-	@Select("select a.id, a.tallExample, a.tallTranslate from learn b INNER JOIN sentence a on a.id = b.example_id and b.course_id = #{course_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} limit 0,20")
-	Sentence tallReviewSentence_listen(@Param("student_id") Long student_id,@Param("course_id") String course_id,@Param("classifyStr") String classifyStr);
-	@Select("select a.id, a.tallExample, a.tallTranslate from learn b INNER JOIN sentence a on a.id = b.example_id and b.course_id = #{course_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} and b.status = 0  limit 0,20")
-	Sentence accrueTallReviewSentence_listen(Long student_id, String course_id, String classifyStr);
-	@Select("select a.id, a.tallExample, a.tallTranslate from learn b INNER JOIN sentence a on a.id = b.example_id and b.course_id = #{course_id} and b.student_id = #{student_id} and b.study_model = #{classifyStr} and b.status = 1  limit 0,20")
-	Sentence ripeTallReviewSentence_listen(Long student_id, String course_id, String classifyStr);
-
-	//-- 根据单词,课程查询单元id
-	@Select("SELECT a.id FROM unit a INNER JOIN unit_vocabulary b on a.id = b.unit_id INNER JOIN vocabulary c on b.vocabulary_id = c.id and c.word = #{word} and a.course_id = #{course_id} LIMIT 0,1")
-	Long selectWordUnit_id(@Param("word") String word,@Param("course_id") Integer course_id);
-
-	/**
-	 * 根据课程id和学生id查询 learn表得到单词id,名,翻译
-	 *
-	 * @param course_id
-	 * @param student_id
-	 * @return
-	 */
-
-	//@Select("select c.id, c.word, b.word_chinese from unit a JOIN unit_vocabulary b ON a.id = b.unit_id JOIN vocabulary c ON b.vocabulary_id = c.id AND a.course_id = #{course_id} AND c.delStatus = 1 limit 0,30")
 	@Select("select a.id, a.word, a.word_chinese as wordChinese from vocabulary a INNER join learn b on a.id = b.vocabulary_id and b.course_id = #{course_id} and b.student_id = #{student_id} AND a.delStatus = 1 limit 0,30")
 	List<Vocabulary> testeffect(@Param("course_id") String course_id,@Param("student_id") Long student_id);
-
-	@Delete("delete from capacity_listen where student_id = #{student_id} and course_id = #{course_id}")
-	void delClearCourseDataOne(@Param("course_id") Integer course_id,@Param("student_id")  Long student_id);
-	@Delete("delete from capacity_memory where student_id = #{student_id} and course_id = #{course_id}")
-	void delClearCourseDataTwo(@Param("course_id") Integer course_id,@Param("student_id")  Long student_id);
-	@Delete("delete from capacity_write where student_id = #{student_id} and course_id = #{course_id}")
-	void delClearCourseDataThree(@Param("course_id") Integer course_id,@Param("student_id")  Long student_id);
-	@Delete("delete from sentence_listen where student_id = #{student_id} and course_id = #{course_id}")
-	void delClearCourseDataFour(@Param("course_id") Integer course_id,@Param("student_id")  Long student_id);
-	@Delete("delete from sentence_translate where student_id = #{student_id} and course_id = #{course_id}")
-	void delClearCourseDataFive(@Param("course_id") Integer course_id,@Param("student_id")  Long student_id);
-	@Delete("delete from sentence_write where student_id = #{student_id} and course_id = #{course_id}")
-	void delClearCourseDataSix(@Param("course_id") Integer course_id,@Param("student_id") Long student_id);
-	@Delete("delete from learn where student_id = #{student_id} and course_id = #{course_id}")
-	void delClearCourseDataSeven(Integer course_id, Long student_id);
 
 	List<Vocabulary> fiveDimensionTest(@Param("course_id")String course_id, @Param("b")int b);
 
 	List<Vocabulary> fiveDimensionTestTwo(@Param("course_id")String course_id, @Param("b")int b, @Param("c")int c);
-
-	@Select("select * from unit_sentence a INNER JOIN sentence b on a.sentence_id = b.id INNER JOIN unit c ON a.unit_id = c.id AND b.centreExample=#{word} AND c.course_id=#{course_id} GROUP BY b.id")
-	Long selectSentenceToUnitId(@Param("word") String word,@Param("course_id") Integer course_id);
 
 	@Select("select vocabulary_id, word, word_chinese, memory_strength from sentence_translate where student_id = #{student_id} and unit_id = #{unit_id} and push < #{dateTime} order by push asc limit 0,1")
 	CapacityReview ReviewSentence_translate(@Param("student_id") Long student_id,@Param("unit_id") String unit_id,@Param("dateTime") String dateTime);
 
 	@Select("select vocabulary_id, word, word_chinese, memory_strength from sentence_write where student_id = #{student_id} and unit_id = #{unit_id} and push < #{dateTime} order by push asc limit 0,1")
 	CapacityReview ReviewSentence_write(@Param("student_id") Long student_id,@Param("unit_id") String unit_id,@Param("dateTime") String dateTime);
-
-	@Select("select vocabulary_id, word, word_chinese, memory_strength, unit_id from sentence_translate where student_id = #{student_id} and course_id = #{course_id} and push < #{dateTime} order by push asc limit 0,1")
-	CapacityReview Reviewsentence_translateCourseId(@Param("student_id") Long stuId, @Param("course_id") String course_id, @Param("dateTime") String dateTime);
-
-	@Select("select vocabulary_id, word, word_chinese, memory_strength, unit_id from sentence_write where student_id = #{student_id} and course_id = #{course_id} and push < #{dateTime} order by push asc limit 0,1")
-	CapacityReview ReviewSentence_writeCourseId(@Param("student_id") Long stuId, @Param("course_id") String course_id, @Param("dateTime") String dateTime);
 
 	/**
 	 * 查找指定单词/例句的记忆追踪信息

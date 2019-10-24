@@ -27,7 +27,7 @@ public interface CapacityService extends BaseService<CapacityWrite> {
      * @param studyModel 学习模块（慧记忆，慧听写，慧默写，例句听力，例句翻译，例句默写）
      * @return
      */
-    ServerResponse<CapacityDigestVo> getCapacityDigestVo(HttpSession session, Long courseId, Long unitId, String studyModel);
+    ServerResponse<CapacityDigestVo> getCapacityDigestVo(HttpSession session, Long courseId, String unitId, String studyModel);
 
     /**
      * 记忆追踪中鼠标悬浮到指定单词或例句上时，页面展示的该单词或者例句的详细学习状况
