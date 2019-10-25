@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.UserConstant;
@@ -7,6 +9,7 @@ import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.simple.SimpleIStudentExchangePrizeServiceSimple;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,35 +124,37 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         Integer adminId = simpleTeacherMapper.getSchoolAdminById(teacherId.intValue());
         String string = simpleCampusMapper.selSchoolName(teacherId);
         Map<String, Object> map = new HashMap<>();
-        Double systemGold = student.getSystemGold();
-        if (systemGold > 1) {
-            Long round = Math.round(systemGold);
-            map.put("sysGold", round.intValue());
-        } else {
-            map.put("sysGold", 0);
-        }
-        map.put("page", page);
-        map.put("row", row);
-        if (adminId == null || string == null || string == "") {
+
+        List<PrizeExchangeList> prizeExchangeLists;
+        if (adminId == null || StringUtils.isEmpty(string)) {
             if (adminId == null) {
                 adminId = teacherId.intValue();
-                Integer teacherCount = simpleTeacherMapper.getTeacherCountByAdminId(teacherId);
-                if (teacherCount == null && teacherCount == 0) {
+                int teacherCount = simpleTeacherMapper.getTeacherCountByAdminId(teacherId);
+                if (teacherCount == 0) {
                     map.put("total", 0);
                     map.put("list", new ArrayList<>());
                     return ServerResponse.createBySuccess(map);
                 }
             }
-            Integer count = simplePrizeExchangeListMapper.getCountByType(null, adminId, type);
-            map.put("total", count);
-            List<PrizeExchangeList> prizeExchangeLists = simplePrizeExchangeListMapper.getAll((page - 1) * row, row, adminId.longValue(), null, type);
-            getResultMap(map, prizeExchangeLists);
+            PageHelper.startPage(page, row);
+            prizeExchangeLists = simplePrizeExchangeListMapper.getAll(adminId.longValue(), null, type);
         } else {
-            Integer count = simplePrizeExchangeListMapper.getCountByType(teacherId, null, type);
-            map.put("total", count);
-            List<PrizeExchangeList> prizeExchangeLists = simplePrizeExchangeListMapper.getAll((page - 1) * row, row, null, teacherId, type);
-            getResultMap(map, prizeExchangeLists);
+            PageHelper.startPage(page, row);
+            prizeExchangeLists = simplePrizeExchangeListMapper.getAll(null, teacherId, type);
         }
+        Double systemGold = student.getSystemGold();
+        if (systemGold > 1) {
+            long round = Math.round(systemGold);
+            map.put("sysGold", (int) round);
+        } else {
+            map.put("sysGold", 0);
+        }
+        PageInfo<PrizeExchangeList> pageInfo = new PageInfo<>(prizeExchangeLists);
+
+        getResultMap(map, prizeExchangeLists);
+        map.put("total", pageInfo.getTotal());
+        map.put("page", page);
+        map.put("row", row);
 
         return ServerResponse.createBySuccess(map);
     }

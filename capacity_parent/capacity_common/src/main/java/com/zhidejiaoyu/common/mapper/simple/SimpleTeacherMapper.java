@@ -99,7 +99,7 @@ public interface SimpleTeacherMapper extends BaseMapper<Teacher> {
     List<Integer> getTeacherIdByAdminId(Integer adminId);
 
     @Select("select count(id) from teacher where school_admin_id=#{teacherId}")
-    Integer getTeacherCountByAdminId(Long teacherId);
+    int getTeacherCountByAdminId(Long teacherId);
 
     @Update("update teacher set create_student_number=0")
     void updateCreateStudentNumber();
