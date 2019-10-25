@@ -32,7 +32,6 @@
             and teacher_id = #{teacherId}
         </if>
         order by create_time desc
-        limit #{start},#{number}
     </select>
 
     <select id="selById" parameterType="map" resultMap="BaseResultMap">
