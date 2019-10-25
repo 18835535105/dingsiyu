@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.simple.SimpleIStudentExchangePrizeServiceSimple;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,7 +62,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         } else {
             returnMap.put("sysGold", 0);
         }
-        if (schoolAdminById == null || string == null || string == "") {
+        if (schoolAdminById == null || StringUtils.isNotBlank(string)) {
             if (schoolAdminById == null) {
                 schoolAdminById = teacherId.intValue();
                 Integer teacherCount = simpleTeacherMapper.getTeacherCountByAdminId(teacherId);
