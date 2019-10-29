@@ -24,7 +24,8 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"EEG_recording"};
+        String[] tableName = {"knowledge_point", "course_knowledge_point", "syntax_course", "syntax_unit", "syntax_topic",
+        "syntax_unit_topic", "study_capacity"};
 
         /**
          * 配置：
@@ -40,6 +41,7 @@ public class MpGeneratorUtil {
         globalConfig
                 //设置代码生成路径
                 .setOutputDir("D://pojo")
+//                .setOutputDir("/Users/wuchenxi/Desktop/zdjy")
                 //设置作者
                 .setAuthor("zdjy")
                 //设置二级缓存的开闭
