@@ -29,15 +29,22 @@ public class SyntaxController extends BaseController {
 
     /**
      * 获取学生学习课程
+     *
      * @param session
      * @return
      */
     @RequestMapping("/getStudyCourse")
-    public Object getStudyCourse(HttpSession session){
+    public Object getStudyCourse(HttpSession session) {
         return syntaxService.getStudyCourse(session);
     }
 
 
+    /**
+     * 获取学生当前单元需要学习的模块名称
+     *
+     * @param unitId
+     * @return
+     */
     @GetMapping("/getSyntaxNode")
     public ServerResponse getSyntaxNode(Long unitId) {
         if (unitId == null) {
@@ -47,5 +54,6 @@ public class SyntaxController extends BaseController {
         }
         return syntaxService.getSyntaxNode(unitId);
     }
+
 
 }
