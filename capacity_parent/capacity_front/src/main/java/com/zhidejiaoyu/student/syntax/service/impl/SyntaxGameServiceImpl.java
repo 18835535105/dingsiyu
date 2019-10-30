@@ -163,13 +163,13 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
      * @param student
      */
     private void saveStudentStudySyntax(TestRecord testRecord, Student student) {
-        StudentStudySyntax studentStudySyntax;
-        studentStudySyntax = new StudentStudySyntax();
-        studentStudySyntax.setCourseId(testRecord.getCourseId());
-        studentStudySyntax.setStudentId(student.getId());
-        studentStudySyntax.setUnitId(testRecord.getUnitId());
-        studentStudySyntax.setModel(this.getNextModelFirstLearn(testRecord));
-        studentStudySyntaxMapper.insert(studentStudySyntax);
+        studentStudySyntaxMapper.insert(StudentStudySyntax.builder()
+                .courseId(testRecord.getCourseId())
+                .studentId(student.getId())
+                .unitId(testRecord.getUnitId())
+                .model(this.getNextModelFirstLearn(testRecord))
+                .updateTime(new Date())
+                .build());
     }
 
     /**
