@@ -48,7 +48,7 @@
           and complete = 1
     </select>
 
-    <select id="selByStudentId" parameterType="java.util.Map" resultType="java.util.Map">
+    <select id="selTeksByStudentId" parameterType="java.util.Map" resultType="java.util.Map">
         select course.id          id,
                course.course_name courseName,
                ssp.start_unit_id  unitId,
@@ -171,6 +171,9 @@
         <include refid="base_sql"/>
         from student_study_plan where student_id=#{studentId} and
         course_id=#{courseId} and type=#{type} and (start_unit_id &lt;=#{unitId} and end_unit_id>=#{unitId}) limit 1
+    </select>
+    <select id="selectSyntaxByStudentAndType" parameterType="map" resultType="map">
+
     </select>
 
 

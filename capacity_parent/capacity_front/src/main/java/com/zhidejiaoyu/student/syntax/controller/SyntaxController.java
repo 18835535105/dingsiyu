@@ -21,7 +21,15 @@ public class SyntaxController extends BaseController {
     @Resource
     private SyntaxService syntaxService;
 
-
+    /**
+     * 获取学生学习课程
+     * @param session
+     * @return
+     */
+    @RequestMapping("/getStudyCourse")
+    public Object getStudyCourse(HttpSession session){
+        return syntaxService.getStudyCourse(session);
+    }
 
 
 
