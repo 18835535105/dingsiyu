@@ -14,7 +14,9 @@
     <sql id="base_sql">
         id, course_id, student_id, unit_id, model
     </sql>
-
+    <sql id="sql_base_sql">
+        id, courseId, studentId, unitId, model
+    </sql>
     <select id="selectByStudentId" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="base_sql"/>
@@ -22,6 +24,13 @@
         where student_id = #{studentId}
         and unit_id = #{unitId}
         limit 1
+    </select>
+    <select id="selectStudyAllByStudentId" resultType="map" parameterType="map">
+        select
+        <include refid="sql_base_sql"/>
+        from student_study_syntax
+        where student_id = #{studentId}
+        group by course_id
     </select>
 
 </mapper>
