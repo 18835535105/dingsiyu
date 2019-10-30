@@ -16,7 +16,7 @@
         id, course_id, student_id, unit_id, model, update_time
     </sql>
 
-    <select id="selectByStudentId" resultMap="BaseResultMap" parameterType="map">
+    <select id="selectByStudentIdAndUnitId" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="base_sql"/>
         from student_study_syntax

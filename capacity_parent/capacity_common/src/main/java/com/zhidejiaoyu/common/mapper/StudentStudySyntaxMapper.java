@@ -22,5 +22,5 @@ public interface StudentStudySyntaxMapper extends BaseMapper<StudentStudySyntax>
      * @param unitId
      * @return
      */
-    StudentStudySyntax selectByStudentId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+    StudentStudySyntax selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 }

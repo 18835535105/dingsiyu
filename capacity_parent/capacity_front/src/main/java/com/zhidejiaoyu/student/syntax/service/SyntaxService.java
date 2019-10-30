@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.syntax.service;
 
 import com.zhidejiaoyu.common.pojo.SyntaxTopic;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.BaseService;
 
 import javax.servlet.http.HttpSession;
@@ -14,8 +15,17 @@ import javax.servlet.http.HttpSession;
 public interface SyntaxService extends BaseService<SyntaxTopic> {
     /**
      * 获取学生学习课程
+     *
      * @param session
      * @return
      */
     Object getStudyCourse(HttpSession session);
+
+    /**
+     * 获取学生当前语法应该学习的模块
+     *
+     * @return
+     * @param unitId
+     */
+    ServerResponse getSyntaxNode(Long unitId);
 }

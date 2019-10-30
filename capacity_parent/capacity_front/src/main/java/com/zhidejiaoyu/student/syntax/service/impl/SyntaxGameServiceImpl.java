@@ -84,7 +84,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     public ServerResponse saveSyntaxGame(TestRecord testRecord) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
 
-        StudentStudySyntax studentStudySyntax = studentStudySyntaxMapper.selectByStudentId(student.getId(), testRecord.getUnitId());
+        StudentStudySyntax studentStudySyntax = studentStudySyntaxMapper.selectByStudentIdAndUnitId(student.getId(), testRecord.getUnitId());
 
         // 是否是第一次学习当前单元
         boolean isFirst = false;
