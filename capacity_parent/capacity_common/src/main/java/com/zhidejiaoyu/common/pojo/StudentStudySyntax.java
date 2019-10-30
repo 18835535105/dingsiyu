@@ -35,6 +35,10 @@ public class StudentStudySyntax extends Model<StudentStudySyntax> {
      */
     private Long courseId;
     /**
+     * 学生id
+     */
+    private Long studentId;
+    /**
      * 单元id
      */
     private Long unitId;
