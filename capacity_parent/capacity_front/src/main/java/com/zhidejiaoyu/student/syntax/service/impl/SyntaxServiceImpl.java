@@ -27,7 +27,7 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
     @Override
     public Object getStudyCourse(HttpSession session) {
         Student student = getStudent(session);
-        studentStudyPlanMapper.selectByStudentAndType(student.getId(), 7);
+        studentStudyPlanMapper.selectSyntaxByStudentAndType(student.getId(), 7);
         return null;
     }
 }
