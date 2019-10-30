@@ -1,8 +1,12 @@
 package com.zhidejiaoyu.student.syntax.controller;
 
 import com.zhidejiaoyu.student.controller.BaseController;
+import com.zhidejiaoyu.student.syntax.service.SyntaxService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 /**
  * 超级语法
@@ -13,4 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/syntax")
 public class SyntaxController extends BaseController {
+
+    @Resource
+    private SyntaxService syntaxService;
+
+
+
+
+
+
 }
