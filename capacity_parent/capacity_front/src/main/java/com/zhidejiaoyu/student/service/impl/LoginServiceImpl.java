@@ -1110,6 +1110,13 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 isHave = true;
             }
         }
+        //判断是否有语法课程
+        if (type.equals(7)) {
+            int i = studentStudyPlanMapper.countByStudentId(student.getId(), type);
+            if (i > 0) {
+                isHave = true;
+            }
+        }
         map.put("isHave", isHave);
         return ServerResponse.createBySuccess(map);
     }
