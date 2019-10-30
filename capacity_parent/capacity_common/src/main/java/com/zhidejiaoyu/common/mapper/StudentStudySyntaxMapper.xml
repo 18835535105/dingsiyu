@@ -4,11 +4,24 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentStudySyntax">
-        <id column="id" property="id" />
-        <result column="course_id" property="courseId" />
-        <result column="student_id" property="studentId" />
-        <result column="unit_id" property="unitId" />
-        <result column="model" property="model" />
+        <id column="id" property="id"/>
+        <result column="course_id" property="courseId"/>
+        <result column="student_id" property="studentId"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="model" property="model"/>
     </resultMap>
+
+    <sql id="base_sql">
+        id, course_id, student_id, unit_id, model
+    </sql>
+
+    <select id="selectByStudentId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from student_study_syntax
+        where student_id = #{studentId}
+        and unit_id = #{unitId}
+        limit 1
+    </select>
 
 </mapper>

@@ -6,13 +6,14 @@ package com.zhidejiaoyu.common.constant.study;
  * @author wuchenxi
  * @date 2019-05-21
  */
-public class PointConstant {
+public interface PointConstant {
 
-    public static final int FIFTY = 50;
-    public static final int SIXTY = 60;
-    public static final int SEVENTY = 70;
-    public static final int EIGHTY = 80;
-    public static final int NINETY = 90;
-    public static final int HUNDRED = 100;
+    int THIRTY = 30;
+    int FIFTY = 50;
+    int SIXTY = 60;
+    int SEVENTY = 70;
+    int EIGHTY = 80;
+    int NINETY = 90;
+    int HUNDRED = 100;
 
 }

@@ -26,7 +26,7 @@ public class HttpUtil {
     public static HttpSession getHttpSession() {
         HttpServletRequest httpServletRequest = HttpUtil.getHttpServletRequest();
         if (httpServletRequest == null) {
-            return null;
+            throw new RuntimeException("HttpServletRequest=null");
         }
         return httpServletRequest.getSession();
     }

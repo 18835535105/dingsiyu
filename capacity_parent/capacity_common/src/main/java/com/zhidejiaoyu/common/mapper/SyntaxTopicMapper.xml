@@ -4,12 +4,27 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.SyntaxTopic">
-        <id column="id" property="id" />
-        <result column="knowledge_point_id" property="knowledgePointId" />
-        <result column="topic" property="topic" />
-        <result column="answer" property="answer" />
-        <result column="type" property="type" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="knowledge_point_id" property="knowledgePointId"/>
+        <result column="topic" property="topic"/>
+        <result column="answer" property="answer"/>
+        <result column="type" property="type"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
+
+    <sql id="base_sql">
+        id, knowledge_point_id, topic, answer, type, update_time
+    </sql>
+    <sql id="more_table_sql">
+        st.id, st.knowledge_point_id, st.topic, st.answer, st.type, st.update_time
+    </sql>
+
+    <select id="selectByUnitId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from syntax_topic st, syntax_unit_topic sut
+        where st.id = sut.topic_id
+        and sut.unit_id = #{unitId}
+    </select>
 
 </mapper>
