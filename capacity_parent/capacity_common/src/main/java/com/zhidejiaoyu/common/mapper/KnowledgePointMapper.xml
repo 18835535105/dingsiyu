@@ -4,9 +4,45 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.KnowledgePoint">
-        <id column="id" property="id" />
-        <result column="name" property="name" />
-        <result column="content" property="content" />
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="content" property="content"/>
     </resultMap>
+
+    <sql id="base_sql">
+        id, `name`, content
+    </sql>
+    <sql id="more_table_sql">
+        kp.id, kp.`name`, kp.content
+    </sql>
+
+    <select id="countByUnitId" resultType="java.lang.Integer" parameterType="map">
+        select count(distinct st.knowledge_point_id)
+        from syntax_topic st,
+             syntax_unit_topic sut
+        where st.id = sut.topic_id
+          and sut.unit_id = #{unitId}
+    </select>
+    <select id="selectNextByUnitId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from syntax_topic st,
+        syntax_unit_topic sut,
+        knowledge_point kp
+        where
+        kp.id = st.knowledge_point_id
+        and st.id = sut.topic_id
+        and sut.unit_id = #{unitId}
+        and kp.id not in (
+        select vocabulary_id from learn l
+        where l.student_id = #{studentId}
+        and l.unit_id = #{unitId}
+        and l.study_model = '学语法'
+        and l.type = 1
+        )
+        group by kp.id
+        order by kp.id
+        limit 1
+    </select>
 
 </mapper>

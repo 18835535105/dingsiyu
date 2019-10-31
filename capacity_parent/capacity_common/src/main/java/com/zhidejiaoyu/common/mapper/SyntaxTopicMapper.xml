@@ -26,5 +26,32 @@
         where st.id = sut.topic_id
         and sut.unit_id = #{unitId}
     </select>
+    <select id="countByUnitIdAndType" resultType="java.lang.Integer" parameterType="map">
+        select count(st.id)
+        from syntax_topic st,
+             syntax_unit_topic sut
+        where st.id = sut.topic_id
+          and sut.unit_id = #{unitId}
+          and st.type = #{type}
+    </select>
+    <select id="selectNextByUnitIdAndType" resultMap="BaseResultMap" parameterType="map">
+        select count(st.id)
+        from syntax_topic st,
+        syntax_unit_topic sut
+        where st.id = sut.topic_id
+        and sut.unit_id = #{unitId}
+        <if test="studyModel == '选语法'">
+            and st.type = 1
+        </if>
+        <if test="studyModel == '写语法'">
+            and st.type = 2
+        </if>
+        and st.id not in (
+        select vocabulary_id from learn l
+        where l.student_id = #{studentId}
+        and l.study_model = #{studyModel}
+        and l.type = 1
+        ) order by st.id limit 1
+    </select>
 
 </mapper>

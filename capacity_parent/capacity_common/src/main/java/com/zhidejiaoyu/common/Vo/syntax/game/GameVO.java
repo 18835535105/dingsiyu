@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.common.Vo.syntax;
+package com.zhidejiaoyu.common.Vo.syntax.game;
 
 import com.zhidejiaoyu.common.Vo.syntax.game.GameSelect;
 import lombok.Data;

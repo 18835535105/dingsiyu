@@ -24,8 +24,16 @@ public interface SyntaxService extends BaseService<SyntaxTopic> {
     /**
      * 获取学生当前语法应该学习的模块
      *
-     * @return
      * @param unitId
+     * @return
      */
     ServerResponse getSyntaxNode(Long unitId);
+
+    /**
+     * 获取当前单元的学语法数据
+     *
+     * @param unitId
+     * @return
+     */
+    ServerResponse getLearnSyntax(Long unitId);
 }

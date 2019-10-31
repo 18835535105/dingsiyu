@@ -21,7 +21,7 @@ import javax.servlet.http.HttpSession;
  */
 @Slf4j
 @RestController
-    @RequestMapping("/syntax")
+@RequestMapping("/syntax")
 public class SyntaxController extends BaseController {
 
     @Resource
@@ -55,5 +55,20 @@ public class SyntaxController extends BaseController {
         return syntaxService.getSyntaxNode(unitId);
     }
 
+    /**
+     * 获取当前单元的学语法数据
+     *
+     * @param unitId
+     * @return
+     */
+    @GetMapping("/getLearnSyntax")
+    public ServerResponse getLearnSyntax(Long unitId) {
+        if (unitId == null) {
+            Student student = super.getStudent(HttpUtil.getHttpSession());
+            log.error("学生[{} - {} - {}]在获取学语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
+            throw new RuntimeException("参数错误");
+        }
+        return syntaxService.getLearnSyntax(unitId);
+    }
 
 }

@@ -70,7 +70,7 @@ public class StudyCapacity extends Model<StudyCapacity> {
     /**
      * 记忆强度
      */
-    private Double memorStrength;
+    private Double memoryStrength;
     /**
      * 类型：20，读语法 21，选语法 22，写语法
      */

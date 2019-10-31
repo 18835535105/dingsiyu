@@ -17,10 +17,10 @@
         <result column="first_study_time" property="firstStudyTime" jdbcType="TIMESTAMP"/>
         <result column="first_is_known" property="firstIsKnown" jdbcType="INTEGER"/>
         <result column="type" property="type" jdbcType="INTEGER"/>
-        <result column="start_unit_id" property="startUnitId" />
-        <result column="end_unit_id" property="endUnitId" />
-        <result column="course_name" property="courseName" />
-        <result column="study_plan_id" property="studyPlanId" />
+        <result column="start_unit_id" property="startUnitId"/>
+        <result column="end_unit_id" property="endUnitId"/>
+        <result column="course_name" property="courseName"/>
+        <result column="study_plan_id" property="studyPlanId"/>
     </resultMap>
 
     <!-- 查询learn中的单词还是例句 -->
@@ -1390,6 +1390,14 @@
         where student_id = #{studentId}
           and study_model like '音标%'
           and to_days(learn_time) = to_days(now())
+    </select>
+    <select id="countLearnedSyntax" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from learn l
+        where student_id = #{studentId}
+          and unit_id = #{unitId}
+          and study_model = #{studyModel}
+          and type = 1
     </select>
 
 

@@ -1,7 +1,8 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.zhidejiaoyu.common.pojo.StudyCapacity;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.StudyCapacity;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +14,23 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
  */
 public interface StudyCapacityMapper extends BaseMapper<StudyCapacity> {
 
+    /**
+     * 查询达到黄金记忆点的语法
+     *
+     * @param studentId
+     * @param unitId
+     * @param type
+     * @return
+     */
+    StudyCapacity selectLargerThanGoldTimeWithStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("type") int type);
+
+    /**
+     * 获取没有掌握的知识点
+     *
+     * @param studentId
+     * @param unitId
+     * @param type
+     * @return
+     */
+    StudyCapacity selectUnKnownByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("type") int type);
 }

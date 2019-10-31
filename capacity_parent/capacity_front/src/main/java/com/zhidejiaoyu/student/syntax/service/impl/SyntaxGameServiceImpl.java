@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.syntax.service.impl;
 
-import com.zhidejiaoyu.common.Vo.syntax.GameVO;
+import com.zhidejiaoyu.common.Vo.syntax.game.GameVO;
 import com.zhidejiaoyu.common.Vo.syntax.game.GameSelect;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.TimeConstant;
