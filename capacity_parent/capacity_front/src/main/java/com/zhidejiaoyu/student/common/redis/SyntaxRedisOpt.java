@@ -103,13 +103,7 @@ public class SyntaxRedisOpt {
      * @return
      */
     private int getTotalSyntaxContentWithUnitId(Long unitId, String studyModel, String key) {
-        Integer count;
-        if (Objects.equals(studyModel, SyntaxModelNameConstant.LEARN_SYNTAX)) {
-            count = syntaxUnitTopicMapper.selectCount(new EntityWrapper<SyntaxUnitTopic>().eq("unit_id", unitId));
-        } else {
-            // 如果是选语法模块，type=1;是写语法模块，type=2
-            count = syntaxTopicMapper.countByUnitIdAndType(unitId, Objects.equals(studyModel, SyntaxModelNameConstant.SELECT_SYNTAX) ? 1 : 2);
-        }
+        Integer count = syntaxTopicMapper.countByUnitIdAndType(unitId, Objects.equals(studyModel, SyntaxModelNameConstant.SELECT_SYNTAX) ? 1 : 2);
         int returnCount = Objects.isNull(count) ? 0 : count;
         redisTemplate.opsForValue().set(key, returnCount);
         redisTemplate.expire(key, 5, TimeUnit.MINUTES);

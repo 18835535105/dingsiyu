@@ -30,4 +30,12 @@ public interface KnowledgePointMapper extends BaseMapper<KnowledgePoint> {
      * @return
      */
     KnowledgePoint selectNextByUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+
+    /**
+     * 根据语法内容id获取知识点信息
+     *
+     * @param topicId
+     * @return
+     */
+    KnowledgePoint selectByTopicId(@Param("topicId") Long topicId);
 }

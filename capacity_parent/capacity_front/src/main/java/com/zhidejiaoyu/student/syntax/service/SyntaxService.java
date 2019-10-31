@@ -46,4 +46,12 @@ public interface SyntaxService extends BaseService<SyntaxTopic> {
      * @return
      */
     ServerResponse saveLearnSyntax(Learn learn, Boolean known);
+
+    /**
+     * 获取选语法数据
+     *
+     * @param unitId
+     * @return
+     */
+    ServerResponse getSelectSyntax(Long unitId);
 }

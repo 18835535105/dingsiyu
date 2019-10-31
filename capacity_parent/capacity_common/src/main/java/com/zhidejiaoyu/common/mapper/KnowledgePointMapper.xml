@@ -44,5 +44,15 @@
         order by kp.id
         limit 1
     </select>
+    <select id="selectByTopicId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from knowledge_point kp,
+        syntax_topic st
+        where kp.id = st.knowledge_point_id
+        and st.id = #{topicId}
+        order by id
+        limit 1
+    </select>
 
 </mapper>
