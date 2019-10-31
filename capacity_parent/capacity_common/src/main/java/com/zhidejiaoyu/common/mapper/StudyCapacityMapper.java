@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.StudyCapacity;
 import org.apache.ibatis.annotations.Param;
 
@@ -33,4 +34,13 @@ public interface StudyCapacityMapper extends BaseMapper<StudyCapacity> {
      * @return
      */
     StudyCapacity selectUnKnownByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("type") int type);
+
+    /**
+     * 跟句学生id，单元id，type获取学生语法的记忆追踪信息
+     *
+     * @param learn
+     * @param type
+     * @return
+     */
+    StudyCapacity selectByLearn(@Param("learn") Learn learn, @Param("type") int type);
 }

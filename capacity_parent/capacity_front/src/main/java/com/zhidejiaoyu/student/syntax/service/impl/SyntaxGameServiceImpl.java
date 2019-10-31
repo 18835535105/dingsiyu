@@ -14,7 +14,7 @@ import com.zhidejiaoyu.common.utils.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.service.impl.TestServiceImpl;
-import com.zhidejiaoyu.student.syntax.constant.SyntaxModelNameConstant;
+import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.student.syntax.service.SyntaxGameService;
 import com.zhidejiaoyu.student.utils.PetSayUtil;
 import com.zhidejiaoyu.student.utils.PetUrlUtil;

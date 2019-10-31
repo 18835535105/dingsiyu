@@ -1,15 +1,19 @@
 package com.zhidejiaoyu.student.syntax.service.impl;
 
 import com.zhidejiaoyu.common.Vo.syntax.LearnSyntaxVO;
+import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.study.GoldMemoryTime;
+import com.zhidejiaoyu.common.study.memorydifficulty.SyntaxMemoryDifficulty;
+import com.zhidejiaoyu.common.study.memorystrength.SyntaxMemoryStrength;
 import com.zhidejiaoyu.common.utils.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.redis.SyntaxRedisOpt;
 import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.syntax.constant.GradeNameConstant;
-import com.zhidejiaoyu.student.syntax.constant.SyntaxModelNameConstant;
+import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.student.syntax.service.SyntaxService;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +50,12 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
 
     @Resource
     private KnowledgePointMapper knowledgePointMapper;
+
+    @Resource
+    private SyntaxMemoryDifficulty syntaxMemoryDifficulty;
+
+    @Resource
+    private SyntaxMemoryStrength syntaxMemoryStrength;
 
     /**
      * 获取学生学习课程
@@ -205,20 +215,20 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
 
     @Override
     public ServerResponse getLearnSyntax(Long unitId) {
-
+        HttpUtil.getHttpSession().setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         Student student = super.getStudent(HttpUtil.getHttpSession());
 
         int plan = learnMapper.countLearnedSyntax(student.getId(), unitId, SyntaxModelNameConstant.LEARN_SYNTAX);
         int total = syntaxRedisOpt.getTotalKnowledgePointWithUnitId(unitId);
 
         // 如果有需要复习的，返回需要复习的数据
-        ServerResponse studyCapacity = getNeedView(unitId, student, plan, total);
+        ServerResponse studyCapacity = this.getNeedView(unitId, student, plan, total);
         if (!Objects.isNull(studyCapacity)) {
             return studyCapacity;
         }
 
         // 如果有可以学习的新知识点，返回新知识点数据
-        ServerResponse knowledgePoint = getNewKnowledgePoint(unitId, student, plan, total);
+        ServerResponse knowledgePoint = this.getNewKnowledgePoint(unitId, student, plan, total);
         if (!Objects.isNull(knowledgePoint)) {
             return knowledgePoint;
         }
@@ -234,6 +244,90 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
         this.packageStudentStudySyntax(unitId, student);
 
         return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    public ServerResponse saveLearnSyntax(Learn learn, Boolean known) {
+        Student student = super.getStudent(HttpUtil.getHttpSession());
+
+        learn.setStudentId(student.getId());
+        learn.setStudyModel(SyntaxModelNameConstant.LEARN_SYNTAX);
+        Learn learned = learnMapper.selectLearnedSyntaxByUnitIdAndStudyModelAndWordId(learn);
+        if (Objects.isNull(learned)) {
+            this.saveFirstLearn(learn, known);
+        } else {
+            this.updateNotFirstLearn(known, learned);
+        }
+
+        return ServerResponse.createBySuccess();
+    }
+
+    /**
+     * 非第一次学习，更新学习记录及记忆追踪信息
+     *
+     * @param known
+     * @param learned
+     */
+    private void updateNotFirstLearn(Boolean known, Learn learned) {
+        // 非首次学习
+        StudyCapacity studyCapacity = studyCapacityMapper.selectByLearn(learned, StudyCapacityTypeConstant.LEARN_SYNTAX);
+        if (Objects.isNull(studyCapacity)) {
+            // 保存记忆追踪
+            this.initStudyCapacity(learned);
+        } else {
+            studyCapacity.setMemoryStrength(syntaxMemoryStrength.getMemoryStrength(studyCapacity.getMemoryStrength(), known));
+            studyCapacity.setPush(GoldMemoryTime.getGoldMemoryTime(studyCapacity.getMemoryStrength(), new Date()));
+            studyCapacity.setUpdateTime(new Date());
+            if (!known) {
+                studyCapacity.setFaultTime(studyCapacity.getFaultTime() + 1);
+            }
+            studyCapacityMapper.updateById(studyCapacity);
+        }
+
+        learned.setStudyCount(learned.getStudyCount() + 1);
+        learned.setUpdateTime(new Date());
+        learnMapper.updateById(learned);
+    }
+
+    /**
+     * 第一次学习，新增学习记录、记忆追踪信息
+     *
+     * @param learn
+     * @param known
+     */
+    private void saveFirstLearn(Learn learn, Boolean known) {
+        // 首次学习
+        learn.setLearnTime((Date) HttpUtil.getHttpSession().getAttribute(TimeConstant.BEGIN_START_TIME));
+        learn.setStudyCount(1);
+        learn.setUpdateTime(new Date());
+        if (known) {
+            learn.setStatus(1);
+            learn.setFirstIsKnown(1);
+        } else {
+            // 保存记忆追踪
+            this.initStudyCapacity(learn);
+
+            learn.setStatus(0);
+            learn.setFirstIsKnown(0);
+        }
+        learnMapper.insert(learn);
+    }
+
+    private void initStudyCapacity(Learn learn) {
+        KnowledgePoint knowledgePoint = knowledgePointMapper.selectById(learn.getVocabularyId());
+        studyCapacityMapper.insert(StudyCapacity.builder()
+                .courseId(learn.getCourseId())
+                .unitId(learn.getUnitId())
+                .studentId(learn.getStudentId())
+                .faultTime(1)
+                .memoryStrength(0.38)
+                .push(GoldMemoryTime.getGoldMemoryTime(0.38, new Date()))
+                .updateTime(new Date())
+                .type(StudyCapacityTypeConstant.LEARN_SYNTAX)
+                .word(Objects.isNull(knowledgePoint) ? null : knowledgePoint.getName())
+                .wordChinese(Objects.isNull(knowledgePoint) ? null : knowledgePoint.getContent())
+                .wordId(learn.getVocabularyId())
+                .build());
     }
 
     private void packageStudentStudySyntax(Long unitId, Student student) {
@@ -272,6 +366,8 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
                     .total(total)
                     .plan(Math.min(plan, total))
                     .studyNew(true)
+                    .memoryDifficult(0)
+                    .memoryStrength(0)
                     .build());
         }
         return null;
@@ -299,6 +395,8 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
                     .total(total)
                     .plan(Math.min(plan, total))
                     .studyNew(false)
+                    .memoryStrength((int) Math.round(studyCapacity.getMemoryStrength()))
+                    .memoryDifficult(syntaxMemoryDifficulty.getMemoryDifficulty(studyCapacity))
                     .build());
         }
         return null;

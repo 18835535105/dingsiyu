@@ -43,4 +43,14 @@ public class LearnSyntaxVO implements Serializable {
      * 是否是新学习的
      */
     private Boolean studyNew;
+
+    /**
+     * 记忆难度
+     */
+    private Integer memoryDifficult;
+
+    /**
+     * 记忆强度
+     */
+    private Integer memoryStrength;
 }

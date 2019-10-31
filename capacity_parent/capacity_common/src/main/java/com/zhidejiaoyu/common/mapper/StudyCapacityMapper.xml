@@ -45,5 +45,16 @@
         and memory_strength &lt; 1
         order by push limit 1
     </select>
+    <select id="selectByLearn" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from study_capacity
+        where student_id = #{learn.studentId}
+        and unit_id = #{learn.unitId}
+        and word_id = #{learn.vocabularyId}
+        and type = #{type}
+        order by id
+        limit 1
+    </select>
 
 </mapper>

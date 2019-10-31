@@ -468,25 +468,6 @@ public interface LearnMapper extends BaseMapper<Learn> {
      */
     List<Long> selectLearnedWordIdByUnitId(@Param("student") Student student, @Param("unitId") Long unitId, @Param("studyModel") String studyModel);
 
-    @Select("select id from learn where student_id = #{id} and course_id = #{courseId} and vocabulary_id is null limit 0,1")
-    Integer selectByidToStudent(@Param("id") long id, @Param("courseId") Integer courseId);
-
-    @Select("select id from learn where student_id = #{id} and course_id = #{courseId} and example_id is null limit 0,1")
-    Integer selectByidToStudentWord(@Param("id") long id, @Param("courseId") Integer courseId);
-
-    @Select("select count(a.id) from learn a JOIN vocabulary b ON a.vocabulary_id = b.id where a.student_id = #{id} and a.course_id = #{course_id} and a.study_model = #{model} and b.delStatus = 1")
-    Long learnCourseCountWord(@Param("id") Long id, @Param("course_id") String course_id, @Param("model") String model);
-
-    /**
-     * 查看学生学习当前单词的个数
-     *
-     * @param student
-     * @param wordId
-     * @return
-     */
-    @Select("select count(id) from learn where student_id = #{student.id} and vocabulary_id = #{wordId}")
-    int countByStudentIdAndWordId(@Param("student") Student student, @Param("wordId") Long wordId);
-
     /**
      * 查询指定学生指定单词的学习信息
      *
@@ -581,15 +562,6 @@ public interface LearnMapper extends BaseMapper<Learn> {
     Integer countUnitAllStudyModel(@Param("studentId") Long studentId, @Param("unitId") Integer unitId, @Param("model") Integer model);
 
     /**
-     * 根据金币获取对应的等级名
-     *
-     * @param myGold 金币
-     * @return 子等级名
-     */
-    @Select("select child_name from level where gold >= #{myGold} limit 0,1")
-    String getLevelNameByGold(@Param("myGold") int myGold);
-
-    /**
      * 计算学生首次学习为掌握的单词和例句总个数
      *
      * @param stuId
@@ -666,15 +638,6 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @return
      */
     List<Learn> selectLastLoginStudy(@Param("studentId") Long studentId, @Param("loginTime") Date loginTime, @Param("loginOutTime") Date loginOutTime, @Param("classify") Integer classify);
-
-    /**
-     * 删除学生当前单元的学习记录
-     *
-     * @param studentId
-     * @param unitId
-     */
-    @Delete("delete from learn where student_id = #{studentId} and unit_id = #{unitId}")
-    void deleteByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 
     /**
      * 查找学生还没有学习的单元
@@ -937,4 +900,12 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @return
      */
     int countLearnedSyntax(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("studyModel") String studyModel);
+
+    /**
+     * 根据学生id，单元id、语法id、语法学习模块
+     *
+     * @param learn
+     * @return
+     */
+    Learn selectLearnedSyntaxByUnitIdAndStudyModelAndWordId(@Param("learn") Learn learn);
 }

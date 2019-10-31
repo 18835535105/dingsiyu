@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.syntax.controller;
 
+import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -69,6 +70,22 @@ public class SyntaxController extends BaseController {
             throw new RuntimeException("参数错误");
         }
         return syntaxService.getLearnSyntax(unitId);
+    }
+
+    /**
+     * 保存学语法数据
+     *
+     * @param known 是否知道 true：知道；false：不知道
+     * @return
+     */
+    @GetMapping("/saveLearnSyntax")
+    public ServerResponse saveLearnSyntax(Learn learn, Boolean known) {
+        if (learn.getUnitId() == null) {
+            Student student = super.getStudent(HttpUtil.getHttpSession());
+            log.error("学生[{} - {} - {}]在保存学语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
+            throw new RuntimeException("参数错误");
+        }
+        return syntaxService.saveLearnSyntax(learn, known);
     }
 
 }

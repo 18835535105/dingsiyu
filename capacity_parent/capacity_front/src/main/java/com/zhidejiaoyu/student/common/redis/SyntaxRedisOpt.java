@@ -6,7 +6,7 @@ import com.zhidejiaoyu.common.mapper.KnowledgePointMapper;
 import com.zhidejiaoyu.common.mapper.SyntaxTopicMapper;
 import com.zhidejiaoyu.common.mapper.SyntaxUnitTopicMapper;
 import com.zhidejiaoyu.common.pojo.SyntaxUnitTopic;
-import com.zhidejiaoyu.student.syntax.constant.SyntaxModelNameConstant;
+import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
