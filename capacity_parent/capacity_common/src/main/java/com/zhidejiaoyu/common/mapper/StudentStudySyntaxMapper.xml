@@ -9,15 +9,16 @@
         <result column="student_id" property="studentId"/>
         <result column="unit_id" property="unitId"/>
         <result column="model" property="model"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <sql id="base_sql">
-        id, course_id, student_id, unit_id, model
+        id, course_id, student_id, unit_id, model, update_time
     </sql>
     <sql id="sql_base_sql">
-        id, courseId, studentId, unitId, model
+        id, course_id courseId, student_id studentId, unit_id unitId, model
     </sql>
-    <select id="selectByStudentId" resultMap="BaseResultMap" parameterType="map">
+    <select id="selectByStudentIdAndUnitId" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="base_sql"/>
         from student_study_syntax

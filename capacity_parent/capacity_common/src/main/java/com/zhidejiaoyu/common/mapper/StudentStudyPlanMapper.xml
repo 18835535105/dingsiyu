@@ -184,6 +184,7 @@
             plan.student_id=#{studentId}
             and
             type =7
+            order by course.id desc
     </select>
 
 

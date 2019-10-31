@@ -84,7 +84,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     public ServerResponse saveSyntaxGame(TestRecord testRecord) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
 
-        StudentStudySyntax studentStudySyntax = studentStudySyntaxMapper.selectByStudentId(student.getId(), testRecord.getUnitId());
+        StudentStudySyntax studentStudySyntax = studentStudySyntaxMapper.selectByStudentIdAndUnitId(student.getId(), testRecord.getUnitId());
 
         // 是否是第一次学习当前单元
         boolean isFirst = false;
@@ -163,13 +163,13 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
      * @param student
      */
     private void saveStudentStudySyntax(TestRecord testRecord, Student student) {
-        StudentStudySyntax studentStudySyntax;
-        studentStudySyntax = new StudentStudySyntax();
-        studentStudySyntax.setCourseId(testRecord.getCourseId());
-        studentStudySyntax.setStudentId(student.getId());
-        studentStudySyntax.setUnitId(testRecord.getUnitId());
-        studentStudySyntax.setModel(this.getNextModelFirstLearn(testRecord));
-        studentStudySyntaxMapper.insert(studentStudySyntax);
+        studentStudySyntaxMapper.insert(StudentStudySyntax.builder()
+                .courseId(testRecord.getCourseId())
+                .studentId(student.getId())
+                .unitId(testRecord.getUnitId())
+                .model(this.getNextModelFirstLearn(testRecord))
+                .updateTime(new Date())
+                .build());
     }
 
     /**

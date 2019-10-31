@@ -8,16 +8,16 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentStudySyntax;
 import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.pojo.SyntaxUnit;
+import com.zhidejiaoyu.common.utils.HttpUtil;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.syntax.constant.SyntaxModelNameConstant;
 import com.zhidejiaoyu.student.syntax.service.SyntaxService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, SyntaxTopic> implements SyntaxService {
@@ -53,7 +53,7 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
             String gradeEnglish = getGradeAndLabelEnglishName(grade);
             String label = map.get("label").toString();
             String labelEnglish = getGradeAndLabelEnglishName(label);
-            useMap.put("grade", gradeEnglish + "(" + label + ")");
+            useMap.put("grade", grade + "(" + label + ")");
             useMap.put("engilshGrade", gradeEnglish + "-" + labelEnglish);
             //添加课程id以及单元id名称
             Long courseId = Long.parseLong(map.get("courseId").toString());
@@ -170,5 +170,18 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
             return "down";
         }
         return null;
+    }
+
+    @Override
+    public ServerResponse getSyntaxNode(Long unitId) {
+
+        Student student = super.getStudent(HttpUtil.getHttpSession());
+
+        StudentStudySyntax studentStudySyntax = studentStudySyntaxMapper.selectByStudentIdAndUnitId(student.getId(), unitId);
+        if (Objects.isNull(studentStudySyntaxMapper)) {
+            return ServerResponse.createBySuccessMessage(SyntaxModelNameConstant.GAME);
+        }
+
+        return ServerResponse.createBySuccessMessage(studentStudySyntax.getModel());
     }
 }
