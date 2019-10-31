@@ -104,18 +104,18 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
         //获取所有单元id
         List<Long> unitIds = syntaxUnitMapper.selectUnitIdByCourseId(courseId);
         //获取总模块数量
-        Integer modelSize = unitIds.size() * 3;
+        int modelSize = unitIds.size() * 3;
         //获取已完成模块在所有模块的位置
-        Integer size = 0;
+        int size = 0;
         for (int i = 0; i < unitIds.size(); i++) {
             if (unitIds.get(i).equals(unitId)) {
                 size = i + 1;
             }
         }
         int learningSize = (size - 1) * 3;
-        if (model.equals("选语法")) {
+        if ("选语法".equals(model)) {
             learningSize += 1;
-        } else if (model.equals("写语法")) {
+        } else if ("写语法".equals(model)) {
             learningSize += 2;
         }
         return learningSize / modelSize;
@@ -126,47 +126,47 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
         if (grade == null) {
             return "one";
         }
-        if (grade.equals("一年级")) {
+        if ("一年级".equals(grade)) {
             return "one";
         }
-        if (grade.equals("二年级")) {
+        if ("二年级".equals(grade)) {
             return "two";
         }
-        if (grade.equals("三年级")) {
+        if ("三年级".equals(grade)) {
             return "three";
         }
-        if (grade.equals("四年级")) {
+        if ("四年级".equals(grade)) {
             return "four";
         }
-        if (grade.equals("五年级")) {
+        if ("五年级".equals(grade)) {
             return "five";
         }
-        if (grade.equals("六年级")) {
+        if ("六年级".equals(grade)) {
             return "six";
         }
-        if (grade.equals("七年级")) {
+        if ("七年级".equals(grade)) {
             return "serven";
         }
-        if (grade.equals("八年级")) {
+        if ("八年级".equals(grade)) {
             return "eight";
         }
-        if (grade.equals("九年级")) {
+        if ("九年级".equals(grade)) {
             return "nine";
         }
 
-        if (grade.equals("高一")) {
+        if ("高一".equals(grade)) {
             return "ten";
         }
-        if (grade.equals("高二")) {
+        if ("高二".equals(grade)) {
             return "eleven";
         }
-        if (grade.equals("高三")) {
+        if ("高三".equals(grade)) {
             return "twelve";
         }
-        if (grade.equals("上册")) {
+        if ("上册".equals(grade)) {
             return "up";
         }
-        if (grade.equals("下册")) {
+        if ("下册".equals(grade)) {
             return "down";
         }
         return null;
