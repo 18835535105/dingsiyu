@@ -61,7 +61,7 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
             String label = map.get("label").toString();
             String labelEnglish = getGradeAndLabelEnglishName(label);
             useMap.put("grade", grade + "(" + label + ")");
-            useMap.put("engilshGrade", gradeEnglish + "-" + labelEnglish);
+            useMap.put("englishGrade", gradeEnglish + "-" + labelEnglish);
             //添加课程id以及单元id名称
             Long courseId = Long.parseLong(map.get("courseId").toString());
             Map<String, Object> studyUnit = longStudentStudySyntaxMap.get(courseId);
