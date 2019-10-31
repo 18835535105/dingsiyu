@@ -5,6 +5,8 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.controller.BaseController;
+import com.zhidejiaoyu.student.syntax.service.LearnSyntaxService;
+import com.zhidejiaoyu.student.syntax.service.SelectSyntaxService;
 import com.zhidejiaoyu.student.syntax.service.SyntaxService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +30,12 @@ public class SyntaxController extends BaseController {
 
     @Resource
     private SyntaxService syntaxService;
+
+    @Resource
+    private LearnSyntaxService learnSyntaxService;
+
+    @Resource
+    private SelectSyntaxService selectSyntaxService;
 
     /**
      * 获取学生学习课程
@@ -70,7 +78,7 @@ public class SyntaxController extends BaseController {
             log.error("学生[{} - {} - {}]在获取学语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
             throw new RuntimeException("参数错误");
         }
-        return syntaxService.getLearnSyntax(unitId);
+        return learnSyntaxService.getLearnSyntax(unitId);
     }
 
     /**
@@ -86,7 +94,7 @@ public class SyntaxController extends BaseController {
             log.error("学生[{} - {} - {}]在保存学语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
             throw new RuntimeException("参数错误");
         }
-        return syntaxService.saveLearnSyntax(learn, known);
+        return learnSyntaxService.saveLearnSyntax(learn, known);
     }
 
     /**
@@ -102,6 +110,6 @@ public class SyntaxController extends BaseController {
             log.error("学生[{} - {} - {}]在获取选语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
             throw new RuntimeException("参数错误");
         }
-        return syntaxService.getSelectSyntax(unitId);
+        return selectSyntaxService.getSelectSyntax(unitId);
     }
 }
