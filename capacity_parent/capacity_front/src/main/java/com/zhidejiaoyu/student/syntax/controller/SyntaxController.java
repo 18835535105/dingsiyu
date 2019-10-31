@@ -8,6 +8,7 @@ import com.zhidejiaoyu.student.controller.BaseController;
 import com.zhidejiaoyu.student.syntax.service.SyntaxService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -78,7 +79,7 @@ public class SyntaxController extends BaseController {
      * @param known 是否知道 true：知道；false：不知道
      * @return
      */
-    @GetMapping("/saveLearnSyntax")
+    @PostMapping("/saveLearnSyntax")
     public ServerResponse saveLearnSyntax(Learn learn, Boolean known) {
         if (learn.getUnitId() == null) {
             Student student = super.getStudent(HttpUtil.getHttpSession());
@@ -87,5 +88,4 @@ public class SyntaxController extends BaseController {
         }
         return syntaxService.saveLearnSyntax(learn, known);
     }
-
 }
