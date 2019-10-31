@@ -11,6 +11,7 @@ import com.zhidejiaoyu.common.pojo.SyntaxUnit;
 import com.zhidejiaoyu.common.utils.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.syntax.constant.GradeNameConstant;
 import com.zhidejiaoyu.student.syntax.constant.SyntaxModelNameConstant;
 import com.zhidejiaoyu.student.syntax.service.SyntaxService;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,12 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
+/**
+ * 语法实现类
+ *
+ * @author liumaoyu
+ * @date 2019-10-30
+ */
 @Service
 public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, SyntaxTopic> implements SyntaxService {
 
@@ -43,11 +50,11 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
         List<Map<String, Object>> studyList = studentStudyPlanMapper.selectSyntaxByStudentAndType(student.getId());
         //获取学生所有语法课程学习记录
         Map<Long, Map<String, Object>> longStudentStudySyntaxMap = studentStudySyntaxMapper.selectStudyAllByStudentId(student.getId());
-        Map<String, Object> returnMap = new HashMap<>();
+        Map<String, Object> returnMap = new HashMap<>(3);
         List<Map<String, Object>> currentGradeList = new ArrayList<>();
         List<Map<String, Object>> previousGradeList = new ArrayList<>();
         for (Map<String, Object> map : studyList) {
-            Map<String, Object> useMap = new HashMap<>();
+            Map<String, Object> useMap = new HashMap<>(1);
             //添加返回年级及英文年级选项
             String grade = map.get("grade").toString();
             String gradeEnglish = getGradeAndLabelEnglishName(grade);
@@ -60,7 +67,7 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
             Map<String, Object> studyUnit = longStudentStudySyntaxMap.get(courseId);
             useMap.put("courseId", courseId);
             //判断该单元是否正在学习
-            Long unitId = null;
+            Long unitId;
             if (studyUnit != null) {
                 unitId = Long.parseLong(studyUnit.get("unitId").toString());
                 useMap.put("model", studyUnit.get("model"));
@@ -69,7 +76,7 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
                 useMap.put("combatProgress", getCalculateBattleProgress(courseId, unitId, studyUnit.get("model").toString()));
             } else {
                 unitId = Long.parseLong(map.get("startId").toString());
-                useMap.put("model", null);
+                useMap.put("model", SyntaxModelNameConstant.GAME);
                 useMap.put("battle", 1);
                 useMap.put("combatProgress", 0);
             }
@@ -90,6 +97,7 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
         }
         returnMap.put("currentGrade", currentGradeList);
         returnMap.put("previousGrade", previousGradeList);
+        returnMap.put("InGrade", student.getGrade());
         return returnMap;
     }
 
@@ -113,9 +121,9 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
             }
         }
         int learningSize = (size - 1) * 3;
-        if ("选语法".equals(model)) {
+        if (SyntaxModelNameConstant.SELECT_SYNTAX.equals(model)) {
             learningSize += 1;
-        } else if ("写语法".equals(model)) {
+        } else if (SyntaxModelNameConstant.WRITE_SYNTAX.equals(model)) {
             learningSize += 2;
         }
         return learningSize / modelSize;
@@ -126,47 +134,47 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
         if (grade == null) {
             return "one";
         }
-        if ("一年级".equals(grade)) {
+        if (GradeNameConstant.FIRST_GRADE.equals(grade)) {
             return "one";
         }
-        if ("二年级".equals(grade)) {
+        if (GradeNameConstant.SECOND_GRADE.equals(grade)) {
             return "two";
         }
-        if ("三年级".equals(grade)) {
+        if (GradeNameConstant.WRITE_GRADE.equals(grade)) {
             return "three";
         }
-        if ("四年级".equals(grade)) {
+        if (GradeNameConstant.FOURTH_GRADE.equals(grade)) {
             return "four";
         }
-        if ("五年级".equals(grade)) {
+        if (GradeNameConstant.FIFTH_GRADE.equals(grade)) {
             return "five";
         }
-        if ("六年级".equals(grade)) {
+        if (GradeNameConstant.SIXTH_GRADE.equals(grade)) {
             return "six";
         }
-        if ("七年级".equals(grade)) {
+        if (GradeNameConstant.SEVENTH_GRADE.equals(grade)) {
             return "serven";
         }
-        if ("八年级".equals(grade)) {
+        if (GradeNameConstant.EIGHTH_GRADE.equals(grade)) {
             return "eight";
         }
-        if ("九年级".equals(grade)) {
+        if (GradeNameConstant.NINTH_GRADE.equals(grade)) {
             return "nine";
         }
 
-        if ("高一".equals(grade)) {
+        if (GradeNameConstant.SENIOR_ONE.equals(grade)) {
             return "ten";
         }
-        if ("高二".equals(grade)) {
+        if (GradeNameConstant.SENIOR_TWO.equals(grade)) {
             return "eleven";
         }
-        if ("高三".equals(grade)) {
+        if (GradeNameConstant.SENIOR_THREE.equals(grade)) {
             return "twelve";
         }
-        if ("上册".equals(grade)) {
+        if (GradeNameConstant.VOLUME_1.equals(grade)) {
             return "up";
         }
-        if ("下册".equals(grade)) {
+        if (GradeNameConstant.VOLUME_2.equals(grade)) {
             return "down";
         }
         return null;
