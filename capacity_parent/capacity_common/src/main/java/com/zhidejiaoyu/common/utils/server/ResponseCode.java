@@ -30,6 +30,11 @@ public enum ResponseCode {
     PASSWORD_ERROR(300, "PASSWORD_ERROR"),
 
     /**
+     * 本单元已学完
+     */
+    UNIT_FINISH(600, "UNIT_FINISH"),
+
+    /**
      * 文本中含有敏感词
      */
     SENSITIVE_WORD(700, "SENSITIVE_WORD"),

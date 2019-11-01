@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.syntax.constant;
+package com.zhidejiaoyu.common.constant.syntax;
 
 /**
  * 语法模块名常量

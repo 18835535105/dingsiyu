@@ -1,15 +1,18 @@
 package com.zhidejiaoyu.student.syntax.service.impl;
 
-import com.zhidejiaoyu.common.Vo.syntax.LearnSyntaxVO;
-import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
-import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
+import com.zhidejiaoyu.common.mapper.StudentStudyPlanMapper;
+import com.zhidejiaoyu.common.mapper.StudentStudySyntaxMapper;
+import com.zhidejiaoyu.common.mapper.SyntaxTopicMapper;
+import com.zhidejiaoyu.common.mapper.SyntaxUnitMapper;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.StudentStudySyntax;
+import com.zhidejiaoyu.common.pojo.SyntaxTopic;
+import com.zhidejiaoyu.common.pojo.SyntaxUnit;
 import com.zhidejiaoyu.common.utils.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.common.redis.SyntaxRedisOpt;
 import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.syntax.constant.GradeNameConstant;
-import com.zhidejiaoyu.student.syntax.constant.SyntaxModelNameConstant;
 import com.zhidejiaoyu.student.syntax.service.SyntaxService;
 import org.springframework.stereotype.Service;
 
@@ -34,18 +37,6 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
 
     @Resource
     private SyntaxUnitMapper syntaxUnitMapper;
-
-    @Resource
-    private StudyCapacityMapper studyCapacityMapper;
-
-    @Resource
-    private LearnMapper learnMapper;
-
-    @Resource
-    private SyntaxRedisOpt syntaxRedisOpt;
-
-    @Resource
-    private KnowledgePointMapper knowledgePointMapper;
 
     /**
      * 获取学生学习课程
@@ -203,104 +194,4 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
         return ServerResponse.createBySuccessMessage(studentStudySyntax.getModel());
     }
 
-    @Override
-    public ServerResponse getLearnSyntax(Long unitId) {
-
-        Student student = super.getStudent(HttpUtil.getHttpSession());
-
-        int plan = learnMapper.countLearnedSyntax(student.getId(), unitId, SyntaxModelNameConstant.LEARN_SYNTAX);
-        int total = syntaxRedisOpt.getTotalKnowledgePointWithUnitId(unitId);
-
-        // 如果有需要复习的，返回需要复习的数据
-        ServerResponse studyCapacity = getNeedView(unitId, student, plan, total);
-        if (!Objects.isNull(studyCapacity)) {
-            return studyCapacity;
-        }
-
-        // 如果有可以学习的新知识点，返回新知识点数据
-        ServerResponse knowledgePoint = getNewKnowledgePoint(unitId, student, plan, total);
-        if (!Objects.isNull(knowledgePoint)) {
-            return knowledgePoint;
-        }
-
-        // 获取没有达到黄金记忆点的生知识点
-        StudyCapacity nextStudyCapacity = studyCapacityMapper.selectUnKnownByStudentIdAndUnitId(student.getId(), unitId, StudyCapacityTypeConstant.LEARN_SYNTAX);
-        ServerResponse serverResponse = this.packageNeedViewLearnSyntax(nextStudyCapacity, plan, total);
-        if (!Objects.isNull(serverResponse)) {
-            return serverResponse;
-        }
-
-        // 说明当前单元学语法模块内容都已掌握，进入选语法模块
-        this.packageStudentStudySyntax(unitId, student);
-
-        return ServerResponse.createBySuccess();
-    }
-
-    private void packageStudentStudySyntax(Long unitId, Student student) {
-        StudentStudySyntax studentStudySyntax = studentStudySyntaxMapper.selectByStudentIdAndUnitId(student.getId(), unitId);
-        if (!Objects.isNull(studentStudySyntax)) {
-            studentStudySyntax.setModel(SyntaxModelNameConstant.SELECT_SYNTAX);
-            studentStudySyntax.setUpdateTime(new Date());
-            studentStudySyntaxMapper.updateById(studentStudySyntax);
-        } else {
-            SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
-            studentStudySyntaxMapper.insert(StudentStudySyntax.builder()
-                    .updateTime(new Date())
-                    .model(SyntaxModelNameConstant.SELECT_SYNTAX)
-                    .unitId(unitId)
-                    .studentId(student.getId())
-                    .courseId(!Objects.isNull(syntaxUnit) ? syntaxUnit.getCourseId() : null)
-                    .build());
-        }
-    }
-
-    /**
-     * 获取下一个知识点内容
-     *
-     * @param unitId
-     * @param student
-     * @param plan
-     * @param total
-     * @return
-     */
-    private ServerResponse getNewKnowledgePoint(Long unitId, Student student, int plan, int total) {
-        KnowledgePoint knowledgePoint = knowledgePointMapper.selectNextByUnitId(student.getId(), unitId);
-        if (!Objects.isNull(knowledgePoint)) {
-            return ServerResponse.createBySuccess(LearnSyntaxVO.builder()
-                    .content(knowledgePoint.getContent())
-                    .syntaxName(knowledgePoint.getName())
-                    .total(total)
-                    .plan(Math.min(plan, total))
-                    .studyNew(true)
-                    .build());
-        }
-        return null;
-    }
-
-    /**
-     * 获取需要复习的知识点内容
-     *
-     * @param unitId
-     * @param student
-     * @param plan
-     * @param total
-     * @return
-     */
-    private ServerResponse getNeedView(Long unitId, Student student, int plan, int total) {
-        StudyCapacity studyCapacity = studyCapacityMapper.selectLargerThanGoldTimeWithStudentIdAndUnitId(student.getId(), unitId, StudyCapacityTypeConstant.LEARN_SYNTAX);
-        return this.packageNeedViewLearnSyntax(studyCapacity, plan, total);
-    }
-
-    private ServerResponse packageNeedViewLearnSyntax(StudyCapacity studyCapacity, int plan, int total) {
-        if (!Objects.isNull(studyCapacity)) {
-            return ServerResponse.createBySuccess(LearnSyntaxVO.builder()
-                    .content(studyCapacity.getWordChinese())
-                    .syntaxName(studyCapacity.getWord())
-                    .total(total)
-                    .plan(Math.min(plan, total))
-                    .studyNew(false)
-                    .build());
-        }
-        return null;
-    }
 }

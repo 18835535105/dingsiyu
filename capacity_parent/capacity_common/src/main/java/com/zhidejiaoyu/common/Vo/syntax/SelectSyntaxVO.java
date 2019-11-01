@@ -1,40 +1,34 @@
 package com.zhidejiaoyu.common.Vo.syntax;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.zhidejiaoyu.common.Vo.syntax.game.GameVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 /**
- * 学语法响应数据
+ * 选语法响应数据
  *
  * @author: wuchenxi
- * @Date: 2019/10/31 09:52
+ * @Date: 2019/10/31 15:30
  */
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class LearnSyntaxVO implements Serializable {
+public class SelectSyntaxVO {
 
     /**
      * 语法id
      */
     private Long id;
 
-    /**
-     * 语法名
-     */
-    private String syntaxName;
+    private LearnSyntaxVO knowledgePoint;
 
-    /**
-     * 语法内容
-     */
-    private String content;
+    private GameVO selects;
+
 
     /**
      * 当前单元语法总数

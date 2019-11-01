@@ -1399,6 +1399,18 @@
           and study_model = #{studyModel}
           and type = 1
     </select>
+    <select id="selectLearnedSyntaxByUnitIdAndStudyModelAndWordId"
+            resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from learn
+        where student_id = #{learn.studentId}
+        and unit_id = #{learn.unitId}
+        and vocabulary_id = #{learn.vocabularyId}
+        and study_model = #{learn.studyModel}
+        and type = 1
+        limit 1
+    </select>
 
 
 </mapper>

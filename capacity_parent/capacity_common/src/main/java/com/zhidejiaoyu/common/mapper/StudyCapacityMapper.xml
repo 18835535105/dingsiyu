@@ -28,9 +28,9 @@
         select
         <include refid="base_sql"/>
         from study_capacity
-        where student_id = #{studentId}
-        and unit_id = #{unitId}
-        and type = #{type}
+        where student_id = #{dto.studentId}
+        and unit_id = #{dto.unitId}
+        and type = #{dto.type}
         and memory_strength &lt; 1
         and push &lt;= now()
         order by push limit 1
@@ -39,11 +39,22 @@
         select
         <include refid="base_sql"/>
         from study_capacity
-        where student_id = #{studentId}
-        and unit_id = #{unitId}
-        and type = #{type}
+        where student_id = #{dto.studentId}
+        and unit_id = #{dto.unitId}
+        and type = #{dto.type}
         and memory_strength &lt; 1
         order by push limit 1
+    </select>
+    <select id="selectByLearn" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from study_capacity
+        where student_id = #{learn.studentId}
+        and unit_id = #{learn.unitId}
+        and word_id = #{learn.vocabularyId}
+        and type = #{type}
+        order by id
+        limit 1
     </select>
 
 </mapper>

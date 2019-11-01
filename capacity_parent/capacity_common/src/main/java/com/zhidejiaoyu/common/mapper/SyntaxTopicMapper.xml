@@ -35,7 +35,8 @@
           and st.type = #{type}
     </select>
     <select id="selectNextByUnitIdAndType" resultMap="BaseResultMap" parameterType="map">
-        select count(st.id)
+        select
+        <include refid="more_table_sql"/>
         from syntax_topic st,
         syntax_unit_topic sut
         where st.id = sut.topic_id
