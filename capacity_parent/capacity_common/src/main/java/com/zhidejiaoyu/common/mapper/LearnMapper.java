@@ -908,4 +908,12 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @return
      */
     Learn selectLearnedSyntaxByUnitIdAndStudyModelAndWordId(@Param("learn") Learn learn);
+
+    /**
+     * 将当前课程的语法学习记录置为已学习状态
+     *
+     * @param studentId
+     * @param courseId
+     */
+    void updateSyntaxToLearnedByCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
 }

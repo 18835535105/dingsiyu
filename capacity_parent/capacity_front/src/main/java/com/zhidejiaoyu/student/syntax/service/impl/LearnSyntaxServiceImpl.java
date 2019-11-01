@@ -25,7 +25,7 @@ import java.util.Objects;
  * @author: wuchenxi
  * @Date: 2019/10/31 17:43
  */
-@Service
+@Service("learnSyntaxService")
 public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, SyntaxTopic> implements LearnSyntaxService {
 
     @Resource
@@ -206,7 +206,7 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                     .total(dto.getTotal())
                     .plan(Math.min(dto.getPlan(), dto.getTotal()))
                     .studyNew(false)
-                    .memoryStrength((int) Math.round(studyCapacity.getMemoryStrength()))
+                    .memoryStrength((int) Math.round(studyCapacity.getMemoryStrength() * 100))
                     .memoryDifficult(syntaxMemoryDifficulty.getMemoryDifficulty(studyCapacity))
                     .build());
         }
