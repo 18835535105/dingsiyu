@@ -1,4 +1,4 @@
- package com.zhidejiaoyu.student.syntax.service.impl;
+package com.zhidejiaoyu.student.syntax.service.impl;
 
 import com.zhidejiaoyu.common.Vo.syntax.LearnSyntaxVO;
 import com.zhidejiaoyu.common.constant.TimeConstant;
@@ -102,26 +102,23 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         learn.setStudyModel(SyntaxModelNameConstant.LEARN_SYNTAX);
         Learn learned = learnMapper.selectLearnedSyntaxByUnitIdAndStudyModelAndWordId(learn);
         if (Objects.isNull(learned)) {
-            this.saveFirstLearn(learn, known);
+            saveFirstLearn(learn, known, knowledgePointMapper, studyCapacityMapper, learnMapper);
         } else {
-            this.updateNotFirstLearn(known, learned);
+            updateNotFirstLearn(known, learned, StudyCapacityTypeConstant.LEARN_SYNTAX, studyCapacityMapper, syntaxMemoryStrength, learnMapper, knowledgePointMapper);
         }
 
         return ServerResponse.createBySuccess();
     }
 
-    /**
-     * 非第一次学习，更新学习记录及记忆追踪信息
-     *
-     * @param known
-     * @param learned
-     */
-    private void updateNotFirstLearn(Boolean known, Learn learned) {
+
+    static void updateNotFirstLearn(Boolean known, Learn learned, int type, StudyCapacityMapper studyCapacityMapper,
+                                    SyntaxMemoryStrength syntaxMemoryStrength, LearnMapper learnMapper,
+                                    KnowledgePointMapper knowledgePointMapper) {
         // 非首次学习
-        StudyCapacity studyCapacity = studyCapacityMapper.selectByLearn(learned, StudyCapacityTypeConstant.LEARN_SYNTAX);
+        StudyCapacity studyCapacity = studyCapacityMapper.selectByLearn(learned, type);
         if (Objects.isNull(studyCapacity)) {
             // 保存记忆追踪
-            this.initStudyCapacity(learned);
+            initStudyCapacity(learned, type, knowledgePointMapper, studyCapacityMapper);
         } else {
             studyCapacity.setMemoryStrength(syntaxMemoryStrength.getMemoryStrength(studyCapacity.getMemoryStrength(), known));
             studyCapacity.setPush(GoldMemoryTime.getGoldMemoryTime(studyCapacity.getMemoryStrength(), new Date()));
@@ -142,8 +139,12 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
      *
      * @param learn
      * @param known
+     * @param knowledgePointMapper
+     * @param studyCapacityMapper
+     * @param learnMapper
      */
-    private void saveFirstLearn(Learn learn, Boolean known) {
+    static void saveFirstLearn(Learn learn, Boolean known, KnowledgePointMapper knowledgePointMapper,
+                               StudyCapacityMapper studyCapacityMapper, LearnMapper learnMapper) {
         // 首次学习
         learn.setLearnTime((Date) HttpUtil.getHttpSession().getAttribute(TimeConstant.BEGIN_START_TIME));
         learn.setStudyCount(1);
@@ -153,7 +154,7 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
             learn.setFirstIsKnown(1);
         } else {
             // 保存记忆追踪
-            this.initStudyCapacity(learn);
+            initStudyCapacity(learn, StudyCapacityTypeConstant.LEARN_SYNTAX, knowledgePointMapper, studyCapacityMapper);
 
             learn.setStatus(0);
             learn.setFirstIsKnown(0);
@@ -161,7 +162,7 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         learnMapper.insert(learn);
     }
 
-    private void initStudyCapacity(Learn learn) {
+    private static void initStudyCapacity(Learn learn, int type, KnowledgePointMapper knowledgePointMapper, StudyCapacityMapper studyCapacityMapper) {
         KnowledgePoint knowledgePoint = knowledgePointMapper.selectById(learn.getVocabularyId());
         studyCapacityMapper.insert(StudyCapacity.builder()
                 .courseId(learn.getCourseId())
@@ -171,7 +172,7 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                 .memoryStrength(0.38)
                 .push(GoldMemoryTime.getGoldMemoryTime(0.38, new Date()))
                 .updateTime(new Date())
-                .type(StudyCapacityTypeConstant.LEARN_SYNTAX)
+                .type(type)
                 .word(Objects.isNull(knowledgePoint) ? null : knowledgePoint.getName())
                 .wordChinese(Objects.isNull(knowledgePoint) ? null : knowledgePoint.getContent())
                 .wordId(learn.getVocabularyId())

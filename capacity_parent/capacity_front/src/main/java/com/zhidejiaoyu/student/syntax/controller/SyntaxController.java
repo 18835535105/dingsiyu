@@ -112,4 +112,21 @@ public class SyntaxController extends BaseController {
         }
         return selectSyntaxService.getSelectSyntax(unitId);
     }
+
+    /**
+     * 保存写语法数据
+     *
+     * @param learn
+     * @param known
+     * @return
+     */
+    @PostMapping("/saveSelectSyntax")
+    public ServerResponse saveSelectSyntax(Learn learn, Boolean known) {
+        if (learn.getUnitId() == null) {
+            Student student = super.getStudent(HttpUtil.getHttpSession());
+            log.error("学生[{} - {} - {}]在获取选语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
+            throw new RuntimeException("参数错误");
+        }
+        return selectSyntaxService.saveSelectSyntax(learn, known);
+    }
 }

@@ -1409,6 +1409,7 @@
         and vocabulary_id = #{learn.vocabularyId}
         and study_model = #{learn.studyModel}
         and type = 1
+        limit 1
     </select>
 
 

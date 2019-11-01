@@ -4,15 +4,14 @@ import com.zhidejiaoyu.common.Vo.syntax.LearnSyntaxVO;
 import com.zhidejiaoyu.common.Vo.syntax.SelectSyntaxVO;
 import com.zhidejiaoyu.common.Vo.syntax.game.GameSelect;
 import com.zhidejiaoyu.common.Vo.syntax.game.GameVO;
+import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
 import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.KnowledgePoint;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.StudyCapacity;
-import com.zhidejiaoyu.common.pojo.SyntaxTopic;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.memorydifficulty.SyntaxMemoryDifficulty;
+import com.zhidejiaoyu.common.study.memorystrength.SyntaxMemoryStrength;
 import com.zhidejiaoyu.common.utils.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -23,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -58,8 +58,12 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
     @Resource
     private SyntaxTopicMapper syntaxTopicMapper;
 
+    @Resource
+    private SyntaxMemoryStrength syntaxMemoryStrength;
+
     @Override
     public ServerResponse getSelectSyntax(Long unitId) {
+        HttpUtil.getHttpSession().setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         Student student = super.getStudent(HttpUtil.getHttpSession());
 
         int plan = learnMapper.countLearnedSyntax(student.getId(), unitId, SyntaxModelNameConstant.SELECT_SYNTAX);
@@ -97,6 +101,22 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
 
         return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
 
+    }
+
+    @Override
+    public ServerResponse saveSelectSyntax(Learn learn, Boolean known) {
+        Student student = super.getStudent(HttpUtil.getHttpSession());
+
+        learn.setStudentId(student.getId());
+        learn.setStudyModel(SyntaxModelNameConstant.SELECT_SYNTAX);
+        Learn learned = learnMapper.selectLearnedSyntaxByUnitIdAndStudyModelAndWordId(learn);
+        if (Objects.isNull(learned)) {
+            LearnSyntaxServiceImpl.saveFirstLearn(learn, known, knowledgePointMapper, studyCapacityMapper, learnMapper);
+        } else {
+            LearnSyntaxServiceImpl.updateNotFirstLearn(known, learned, StudyCapacityTypeConstant.SELECT_SYNTAX, studyCapacityMapper, syntaxMemoryStrength, learnMapper, knowledgePointMapper);
+        }
+
+        return ServerResponse.createBySuccess();
     }
 
     private ServerResponse getNewSyntaxTopic(NeedViewDTO dto) {
@@ -186,7 +206,7 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
      * @return
      */
     private Object packageSelectSyntaxVO(LearnSyntaxVO knowledgePoint, GameVO selects) {
-        SelectSyntaxVO.SelectSyntaxVOBuilder selectSyntaxVOBuilder = SelectSyntaxVO.builder()
+        SelectSyntaxVO.SelectSyntaxVOBuilder builder = SelectSyntaxVO.builder()
                 .id(knowledgePoint.getId())
                 .total(knowledgePoint.getTotal())
                 .plan(knowledgePoint.getPlan())
@@ -202,7 +222,7 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
         knowledgePoint.setMemoryDifficult(null);
         knowledgePoint.setMemoryStrength(null);
 
-        return selectSyntaxVOBuilder.knowledgePoint(knowledgePoint).build();
+        return builder.knowledgePoint(knowledgePoint).build();
     }
 
     /**
