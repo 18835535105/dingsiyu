@@ -11,12 +11,12 @@ import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.memorydifficulty.SyntaxMemoryDifficulty;
-import com.zhidejiaoyu.common.study.memorystrength.SyntaxMemoryStrength;
 import com.zhidejiaoyu.common.utils.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.redis.SyntaxRedisOpt;
 import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.syntax.savelearn.SaveLearnInfo;
 import com.zhidejiaoyu.student.syntax.service.SelectSyntaxService;
 import org.springframework.stereotype.Service;
 
@@ -59,7 +59,7 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
     private SyntaxTopicMapper syntaxTopicMapper;
 
     @Resource
-    private SyntaxMemoryStrength syntaxMemoryStrength;
+    private SaveLearnInfo saveLearnInfo;
 
     @Override
     public ServerResponse getSelectSyntax(Long unitId) {
@@ -111,9 +111,9 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
         learn.setStudyModel(SyntaxModelNameConstant.SELECT_SYNTAX);
         Learn learned = learnMapper.selectLearnedSyntaxByUnitIdAndStudyModelAndWordId(learn);
         if (Objects.isNull(learned)) {
-            LearnSyntaxServiceImpl.saveFirstLearn(learn, known, knowledgePointMapper, studyCapacityMapper, learnMapper);
+            saveLearnInfo.saveFirstLearn(learn, known);
         } else {
-            LearnSyntaxServiceImpl.updateNotFirstLearn(known, learned, StudyCapacityTypeConstant.SELECT_SYNTAX, studyCapacityMapper, syntaxMemoryStrength, learnMapper, knowledgePointMapper);
+            saveLearnInfo.updateNotFirstLearn(known, learned, StudyCapacityTypeConstant.SELECT_SYNTAX);
         }
 
         return ServerResponse.createBySuccess();
