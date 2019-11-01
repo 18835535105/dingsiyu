@@ -40,4 +40,12 @@ public interface StudyCapacityMapper extends BaseMapper<StudyCapacity> {
      * @return
      */
     StudyCapacity selectByLearn(@Param("learn") Learn learn, @Param("type") int type);
+
+    /**
+     * 删除学生指定课程语法的记忆追踪信息
+     *
+     * @param studentId
+     * @param courseId
+     */
+    void deleteSyntaxByStudentIdAndCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
 }

@@ -1233,6 +1233,13 @@
           and student_id = #{studentId}
           and study_model = #{studyModel}
     </update>
+    <update id="updateSyntaxToLearnedByCourseId" parameterType="map">
+        update learn
+        set type = 2
+        where student_id = #{studentId}
+          and course_id = #{courseId}
+          and study_model like '%语法'
+    </update>
     <select id="selByStudentIdAndCourseIdDisVersion" parameterType="java.util.Map" resultType="java.lang.Long">
         select DISTINCT learn.unit_id
         from learn learn

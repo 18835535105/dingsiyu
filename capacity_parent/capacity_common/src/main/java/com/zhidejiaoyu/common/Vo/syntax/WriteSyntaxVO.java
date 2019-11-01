@@ -1,39 +1,47 @@
 package com.zhidejiaoyu.common.Vo.syntax;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.zhidejiaoyu.common.Vo.syntax.game.GameVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
- * 选语法响应数据
+ * 写语法响应数据
  *
  * @author: wuchenxi
- * @Date: 2019/10/31 15:30
+ * @Date: 2019/11/1 10:20
  */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class SelectSyntaxVO {
-
+public class WriteSyntaxVO implements Serializable {
     /**
      * 语法id
      */
     private Long id;
 
     /**
-     * 知识点信息
-     * key
-     * syntaxName：知识点名称
-     * content：知识点内容
+     * 题目
      */
-    private KnowledgePointVO knowledgePoint;
+    private String title;
 
-    private GameVO selects;
+    /**
+     * 答案
+     */
+    private String answer;
+
+    /**
+     * 语法名
+     */
+    private String syntaxName;
+
+    /**
+     * 语法内容
+     */
+    private String content;
 
     /**
      * 当前单元语法总数

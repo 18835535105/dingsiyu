@@ -18,7 +18,7 @@ public enum ResponseCode {
     /**
      * 参数非法
      */
-    ILLEGAL_ARGUMENT(400,"ILLEGAL_ARGUMENT"),
+    ILLEGAL_ARGUMENT(400, "ILLEGAL_ARGUMENT"),
 
     /**
      * 无权限访问
@@ -33,6 +33,11 @@ public enum ResponseCode {
      * 本单元已学完
      */
     UNIT_FINISH(600, "UNIT_FINISH"),
+
+    /**
+     * 本课程学习完毕
+     */
+    COURSE_FINISH(601, "COURSE_FINISH"),
 
     /**
      * 文本中含有敏感词

@@ -6,7 +6,6 @@ import com.zhidejiaoyu.common.utils.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.controller.BaseController;
 import com.zhidejiaoyu.student.syntax.service.LearnSyntaxService;
-import com.zhidejiaoyu.student.syntax.service.SelectSyntaxService;
 import com.zhidejiaoyu.student.syntax.service.SyntaxService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,11 +30,14 @@ public class SyntaxController extends BaseController {
     @Resource
     private SyntaxService syntaxService;
 
-    @Resource
+    @Resource(name = "learnSyntaxService")
     private LearnSyntaxService learnSyntaxService;
 
-    @Resource
-    private SelectSyntaxService selectSyntaxService;
+    @Resource(name = "selectSyntaxService")
+    private LearnSyntaxService selectSyntaxService;
+
+    @Resource(name = "writeSyntaxService")
+    private LearnSyntaxService writeSyntaxService;
 
     /**
      * 获取学生学习课程
@@ -110,11 +112,11 @@ public class SyntaxController extends BaseController {
             log.error("学生[{} - {} - {}]在获取选语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
             throw new RuntimeException("参数错误");
         }
-        return selectSyntaxService.getSelectSyntax(unitId);
+        return selectSyntaxService.getLearnSyntax(unitId);
     }
 
     /**
-     * 保存写语法数据
+     * 保存选语法数据
      *
      * @param learn
      * @param known
@@ -124,9 +126,42 @@ public class SyntaxController extends BaseController {
     public ServerResponse saveSelectSyntax(Learn learn, Boolean known) {
         if (learn.getUnitId() == null) {
             Student student = super.getStudent(HttpUtil.getHttpSession());
-            log.error("学生[{} - {} - {}]在获取选语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
+            log.error("学生[{} - {} - {}]在保存选语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
             throw new RuntimeException("参数错误");
         }
-        return selectSyntaxService.saveSelectSyntax(learn, known);
+        return selectSyntaxService.saveLearnSyntax(learn, known);
+    }
+
+    /**
+     * 获取选语法数据
+     *
+     * @param unitId
+     * @return
+     */
+    @GetMapping("/getWriteSyntax")
+    public ServerResponse getWriteSyntax(Long unitId) {
+        if (unitId == null) {
+            Student student = super.getStudent(HttpUtil.getHttpSession());
+            log.error("学生[{} - {} - {}]在获取写语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
+            throw new RuntimeException("参数错误");
+        }
+        return writeSyntaxService.getLearnSyntax(unitId);
+    }
+
+    /**
+     * 保存写语法数据
+     *
+     * @param learn
+     * @param known
+     * @return
+     */
+    @PostMapping("/saveWriteSyntax")
+    public ServerResponse saveWriteSyntax(Learn learn, Boolean known) {
+        if (learn.getUnitId() == null) {
+            Student student = super.getStudent(HttpUtil.getHttpSession());
+            log.error("学生[{} - {} - {}]在保存写语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
+            throw new RuntimeException("参数错误");
+        }
+        return writeSyntaxService.saveLearnSyntax(learn, known);
     }
 }
