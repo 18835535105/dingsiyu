@@ -48,6 +48,10 @@ public class SyntaxTopic extends Model<SyntaxTopic> {
      */
     private Integer type;
     private Date updateTime;
+    /**
+     * 选择题
+     */
+    private String option;
 
 
     @Override

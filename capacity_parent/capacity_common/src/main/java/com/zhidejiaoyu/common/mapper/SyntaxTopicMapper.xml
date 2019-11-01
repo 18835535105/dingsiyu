@@ -10,10 +10,11 @@
         <result column="answer" property="answer"/>
         <result column="type" property="type"/>
         <result column="update_time" property="updateTime"/>
+        <result column="option" property="option"/>
     </resultMap>
 
     <sql id="base_sql">
-        id, knowledge_point_id, topic, answer, type, update_time
+        id, knowledge_point_id, topic, answer, type, update_time,option
     </sql>
     <sql id="more_table_sql">
         st.id, st.knowledge_point_id, st.topic, st.answer, st.type, st.update_time
