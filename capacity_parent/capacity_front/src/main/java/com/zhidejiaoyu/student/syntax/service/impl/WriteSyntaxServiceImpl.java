@@ -23,6 +23,8 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
+ * 写语法
+ *
  * @author: wuchenxi
  * @Date: 2019/10/31 17:52
  */
@@ -52,6 +54,9 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
 
     @Resource
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
+
+    @Resource
+    private StudentStudySyntaxMapper studentStudySyntaxMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -105,6 +110,8 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                 learnMapper.updateSyntaxToLearnedByCourseId(capacityStudentUnit.getStudentId(), capacityStudentUnit.getCourseId());
                 // 清除学生语法记忆追踪信息
                 studyCapacityMapper.deleteSyntaxByStudentIdAndCourseId(capacityStudentUnit.getStudentId(), capacityStudentUnit.getCourseId());
+                // 删除当前课程的语法节点信息
+                studentStudySyntaxMapper.deleteByCourseId(student.getId(), capacityStudentUnit.getCourseId());
                 return true;
             }
             capacityStudentUnit.setUnitId(capacityStudentUnit.getUnitId() + 1);
@@ -142,7 +149,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                     .studyNew(true)
                     .id(syntaxTopic.getId())
                     .syntaxName(knowledgePoint.getName())
-                    .title(syntaxTopic.getTopic().replace("$&$", "___"))
+                    .title(syntaxTopic.getTopic())
                     .total(dto.getTotal())
                     .build());
         }

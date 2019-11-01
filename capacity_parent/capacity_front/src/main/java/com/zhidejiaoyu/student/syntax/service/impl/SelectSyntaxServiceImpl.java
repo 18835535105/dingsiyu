@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
+ * 选语法
+ *
  * @author: wuchenxi
  * @Date: 2019/10/31 17:52
  */
@@ -113,7 +115,7 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
             KnowledgePoint knowledgePoint = knowledgePointMapper.selectByTopicId(syntaxTopic.getId());
             LearnSyntaxVO knowledgePoint1 = this.packageNewKnowledgePoint(dto, knowledgePoint);
             GameVO selects = selectNeedView.getGameVO(dto.getUnitId(), syntaxTopic);
-            return ServerResponse.createBySuccess(selectNeedView.packageSelectSyntaxVO(knowledgePoint1, selects));
+            return ServerResponse.createBySuccess(selectNeedView.packageSelectSyntaxVO(knowledgePoint1, selects, syntaxTopic));
         }
         return null;
     }

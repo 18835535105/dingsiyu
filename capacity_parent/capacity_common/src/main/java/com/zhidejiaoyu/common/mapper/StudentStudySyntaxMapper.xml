@@ -18,6 +18,12 @@
     <sql id="sql_base_sql">
         id, course_id courseId, student_id studentId, unit_id unitId, model
     </sql>
+    <delete id="deleteByCourseId" parameterType="map">
+        delete
+        from student_study_syntax
+        where student_id = #{studentId}
+          and course_id = #{courseId}
+    </delete>
     <select id="selectByStudentIdAndUnitId" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="base_sql"/>

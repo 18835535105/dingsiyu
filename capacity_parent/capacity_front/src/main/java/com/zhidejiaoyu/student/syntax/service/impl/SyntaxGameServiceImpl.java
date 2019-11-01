@@ -217,7 +217,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
         // 添加错误答案
         List<GameSelect> collect = syntaxTopics.parallelStream()
                 // 错误答案排除正确答案的内容
-                .filter(syntaxTopic1 -> !Objects.equals(syntaxTopic.getId(), syntaxTopic1.getId()))
+                .filter(syntaxTopic1 -> !Objects.equals(syntaxTopic.getTopic(), syntaxTopic1.getTopic()))
                 .limit(3)
                 .map(syntaxTopic1 -> new GameSelect(syntaxTopic1.getAnswer(), false))
                 .collect(Collectors.toList());

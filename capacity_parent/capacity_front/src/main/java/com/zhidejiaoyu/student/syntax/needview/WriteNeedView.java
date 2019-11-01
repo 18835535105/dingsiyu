@@ -71,7 +71,7 @@ public class WriteNeedView implements INeedView {
                     .studyNew(false)
                     .id(syntaxTopic.getId())
                     .syntaxName(knowledgePoint.getName())
-                    .title(getTopic(syntaxTopic))
+                    .title(syntaxTopic.getTopic())
                     .total(dto.getTotal())
                     .build());
         }
