@@ -136,7 +136,7 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
         } else if (SyntaxModelNameConstant.WRITE_SYNTAX.equals(model)) {
             learningSize += 2;
         }
-        return learningSize / modelSize;
+        return (int) (learningSize * 1.0 / modelSize * 100);
     }
 
 
