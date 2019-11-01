@@ -7,8 +7,10 @@ import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
 import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.study.memorydifficulty.SyntaxMemoryDifficulty;
+import com.zhidejiaoyu.common.pojo.KnowledgePoint;
+import com.zhidejiaoyu.common.pojo.Learn;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.utils.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -18,6 +20,7 @@ import com.zhidejiaoyu.student.syntax.needview.SelectNeedView;
 import com.zhidejiaoyu.student.syntax.savelearn.SaveLearnInfo;
 import com.zhidejiaoyu.student.syntax.service.LearnSyntaxService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -37,9 +40,6 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
     private SyntaxUnitMapper syntaxUnitMapper;
 
     @Resource
-    private StudyCapacityMapper studyCapacityMapper;
-
-    @Resource
     private LearnMapper learnMapper;
 
     @Resource
@@ -47,9 +47,6 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
 
     @Resource
     private KnowledgePointMapper knowledgePointMapper;
-
-    @Resource
-    private SyntaxMemoryDifficulty syntaxMemoryDifficulty;
 
     @Resource
     private SyntaxTopicMapper syntaxTopicMapper;
@@ -77,7 +74,7 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
                 .type(StudyCapacityTypeConstant.SELECT_SYNTAX)
                 .build();
 
-        ServerResponse studyCapacity = this.getNeedView(dto);
+        ServerResponse studyCapacity = selectNeedView.getNeedView(dto);
         if (!Objects.isNull(studyCapacity)) {
             return studyCapacity;
         }
@@ -102,6 +99,7 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse saveLearnSyntax(Learn learn, Boolean known) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
         learn.setStudentId(student.getId());
@@ -138,20 +136,6 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
                 .memoryDifficult(0)
                 .memoryStrength(0)
                 .build();
-    }
-
-    /**
-     * 获取需要复习的知识点内容
-     *
-     * @param dto
-     * @return
-     */
-    private ServerResponse getNeedView(NeedViewDTO dto) {
-        StudyCapacity studyCapacity = studyCapacityMapper.selectLargerThanGoldTimeWithStudentIdAndUnitId(dto);
-        if (Objects.equals(dto.getType(), StudyCapacityTypeConstant.LEARN_SYNTAX)) {
-            return LearnSyntaxServiceImpl.packageNeedViewLearnSyntax(studyCapacity, dto, syntaxMemoryDifficulty);
-        }
-        return null;
     }
 
 }

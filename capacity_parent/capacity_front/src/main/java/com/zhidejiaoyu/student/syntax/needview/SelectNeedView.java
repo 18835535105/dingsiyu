@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.syntax.needview;
 
+import com.zhidejiaoyu.common.Vo.syntax.KnowledgePointVO;
 import com.zhidejiaoyu.common.Vo.syntax.LearnSyntaxVO;
 import com.zhidejiaoyu.common.Vo.syntax.SelectSyntaxVO;
 import com.zhidejiaoyu.common.Vo.syntax.game.GameSelect;
@@ -16,9 +17,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -61,7 +60,7 @@ public class SelectNeedView implements INeedView {
      * @param studyCapacity
      * @return
      */
-    public ServerResponse packageSelectSyntaxNeedView(NeedViewDTO dto, StudyCapacity studyCapacity) {
+    private ServerResponse packageSelectSyntaxNeedView(NeedViewDTO dto, StudyCapacity studyCapacity) {
         if (!Objects.isNull(studyCapacity)) {
             KnowledgePoint knowledgePoint = knowledgePointMapper.selectByTopicId(studyCapacity.getWordId());
 
@@ -114,23 +113,19 @@ public class SelectNeedView implements INeedView {
      * @return
      */
     public Object packageSelectSyntaxVO(LearnSyntaxVO knowledgePoint, GameVO selects) {
-        SelectSyntaxVO.SelectSyntaxVOBuilder builder = SelectSyntaxVO.builder()
+        return SelectSyntaxVO.builder()
                 .id(knowledgePoint.getId())
                 .total(knowledgePoint.getTotal())
                 .plan(knowledgePoint.getPlan())
                 .studyNew(knowledgePoint.getStudyNew())
                 .memoryDifficult(knowledgePoint.getMemoryDifficult())
                 .memoryStrength(knowledgePoint.getMemoryStrength())
-                .selects(selects);
-
-        knowledgePoint.setId(null);
-        knowledgePoint.setTotal(null);
-        knowledgePoint.setPlan(null);
-        knowledgePoint.setStudyNew(null);
-        knowledgePoint.setMemoryDifficult(null);
-        knowledgePoint.setMemoryStrength(null);
-
-        return builder.knowledgePoint(knowledgePoint).build();
+                .selects(selects)
+                .knowledgePoint(KnowledgePointVO.builder()
+                        .content(knowledgePoint.getContent())
+                        .syntaxName(knowledgePoint.getSyntaxName())
+                        .build())
+                .build();
     }
 
     /**

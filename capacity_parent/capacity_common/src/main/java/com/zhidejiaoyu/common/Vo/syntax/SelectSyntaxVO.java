@@ -25,10 +25,15 @@ public class SelectSyntaxVO {
      */
     private Long id;
 
-    private LearnSyntaxVO knowledgePoint;
+    /**
+     * 知识点信息
+     * key
+     * syntaxName：知识点名称
+     * content：知识点内容
+     */
+    private KnowledgePointVO knowledgePoint;
 
     private GameVO selects;
-
 
     /**
      * 当前单元语法总数

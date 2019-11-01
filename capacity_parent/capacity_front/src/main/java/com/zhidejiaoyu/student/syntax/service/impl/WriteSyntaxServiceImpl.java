@@ -90,6 +90,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
 
         // 说明当前单元写语法模块内容都已掌握，进入下一个单元或者完成当前课程
         if (initNextUnitOrCourse(student)) {
+            // todo:课程学习完奖励勋章逻辑
             return ServerResponse.createBySuccess(ResponseCode.COURSE_FINISH);
         }
         return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
@@ -113,6 +114,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ServerResponse saveLearnSyntax(Learn learn, Boolean known) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
         learn.setStudentId(student.getId());
