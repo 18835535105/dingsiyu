@@ -7,7 +7,6 @@ import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.study.memorydifficulty.SyntaxMemoryDifficulty;
 import com.zhidejiaoyu.common.utils.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -31,12 +30,6 @@ import java.util.Objects;
 public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, SyntaxTopic> implements LearnSyntaxService {
 
     @Resource
-    private StudentStudySyntaxMapper studentStudySyntaxMapper;
-
-    @Resource
-    private SyntaxUnitMapper syntaxUnitMapper;
-
-    @Resource
     private StudyCapacityMapper studyCapacityMapper;
 
     @Resource
@@ -47,9 +40,6 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
 
     @Resource
     private KnowledgePointMapper knowledgePointMapper;
-
-    @Resource
-    private SyntaxMemoryDifficulty syntaxMemoryDifficulty;
 
     @Resource
     private SyntaxTopicMapper syntaxTopicMapper;
@@ -124,7 +114,10 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
 
     @Override
     public ServerResponse saveLearnSyntax(Learn learn, Boolean known) {
-        return null;
+        Student student = super.getStudent(HttpUtil.getHttpSession());
+        learn.setStudentId(student.getId());
+        learn.setStudyModel(SyntaxModelNameConstant.WRITE_SYNTAX);
+        return saveLearnInfo.saveSyntax(learn, known, StudyCapacityTypeConstant.WRITE_SYNTAX);
     }
 
 

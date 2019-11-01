@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.student.syntax.savelearn;
 
 import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
 import com.zhidejiaoyu.common.mapper.KnowledgePointMapper;
 import com.zhidejiaoyu.common.mapper.LearnMapper;
 import com.zhidejiaoyu.common.mapper.StudyCapacityMapper;
@@ -11,6 +10,7 @@ import com.zhidejiaoyu.common.pojo.StudyCapacity;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.memorystrength.SyntaxMemoryStrength;
 import com.zhidejiaoyu.common.utils.HttpUtil;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -38,12 +38,30 @@ public class SaveLearnInfo {
     @Resource
     private SyntaxMemoryStrength syntaxMemoryStrength;
 
-    public void updateNotFirstLearn(Boolean known, Learn learned, int type) {
+    /**
+     * 保存语法学习记录
+     *
+     * @param learn
+     * @param known
+     * @param type
+     * @return
+     */
+    public ServerResponse saveSyntax(Learn learn, Boolean known, int type) {
+        Learn learned = learnMapper.selectLearnedSyntaxByUnitIdAndStudyModelAndWordId(learn);
+        if (Objects.isNull(learned)) {
+            this.saveFirstLearn(learn, known, type);
+        } else {
+            this.updateNotFirstLearn(known, learned, type);
+        }
+        return ServerResponse.createBySuccess();
+    }
+
+    private void updateNotFirstLearn(Boolean known, Learn learned, int type) {
         // 非首次学习
         StudyCapacity studyCapacity = studyCapacityMapper.selectByLearn(learned, type);
         if (Objects.isNull(studyCapacity)) {
             // 保存记忆追踪
-            this.initStudyCapacity(learned, type, knowledgePointMapper, studyCapacityMapper);
+            this.initStudyCapacity(learned, type);
         } else {
             studyCapacity.setMemoryStrength(syntaxMemoryStrength.getMemoryStrength(studyCapacity.getMemoryStrength(), known));
             studyCapacity.setPush(GoldMemoryTime.getGoldMemoryTime(studyCapacity.getMemoryStrength(), new Date()));
@@ -61,11 +79,11 @@ public class SaveLearnInfo {
 
     /**
      * 第一次学习，新增学习记录、记忆追踪信息
-     *
-     * @param learn
+     *  @param learn
      * @param known
+     * @param type
      */
-    public void saveFirstLearn(Learn learn, Boolean known) {
+    private void saveFirstLearn(Learn learn, Boolean known, int type) {
         // 首次学习
         learn.setLearnTime((Date) HttpUtil.getHttpSession().getAttribute(TimeConstant.BEGIN_START_TIME));
         learn.setStudyCount(1);
@@ -75,7 +93,7 @@ public class SaveLearnInfo {
             learn.setFirstIsKnown(1);
         } else {
             // 保存记忆追踪
-            this.initStudyCapacity(learn, StudyCapacityTypeConstant.LEARN_SYNTAX, knowledgePointMapper, studyCapacityMapper);
+            this.initStudyCapacity(learn, type);
 
             learn.setStatus(0);
             learn.setFirstIsKnown(0);
@@ -83,7 +101,7 @@ public class SaveLearnInfo {
         learnMapper.insert(learn);
     }
 
-    private void initStudyCapacity(Learn learn, int type, KnowledgePointMapper knowledgePointMapper, StudyCapacityMapper studyCapacityMapper) {
+    private void initStudyCapacity(Learn learn, int type) {
         KnowledgePoint knowledgePoint = knowledgePointMapper.selectById(learn.getVocabularyId());
         studyCapacityMapper.insert(StudyCapacity.builder()
                 .courseId(learn.getCourseId())

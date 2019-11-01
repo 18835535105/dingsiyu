@@ -96,20 +96,10 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
     @Override
     public ServerResponse saveLearnSyntax(Learn learn, Boolean known) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
-
         learn.setStudentId(student.getId());
         learn.setStudyModel(SyntaxModelNameConstant.LEARN_SYNTAX);
-        Learn learned = learnMapper.selectLearnedSyntaxByUnitIdAndStudyModelAndWordId(learn);
-        if (Objects.isNull(learned)) {
-            saveLearnInfo.saveFirstLearn(learn, known);
-        } else {
-            saveLearnInfo.updateNotFirstLearn(known, learned, StudyCapacityTypeConstant.LEARN_SYNTAX);
-        }
-
-        return ServerResponse.createBySuccess();
+        return saveLearnInfo.saveSyntax(learn, known, StudyCapacityTypeConstant.LEARN_SYNTAX);
     }
-
-
 
 
     /**
