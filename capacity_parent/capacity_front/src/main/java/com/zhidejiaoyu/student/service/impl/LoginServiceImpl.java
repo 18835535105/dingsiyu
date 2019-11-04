@@ -1072,8 +1072,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Override
     public Object getModelStatus(HttpSession session, Integer type) {
-        log.info("thread=[{}]", Thread.currentThread().getName());
-
         Student student = getStudent(session);
         Map<String, Object> map = new HashMap<>();
         boolean isHave = false;

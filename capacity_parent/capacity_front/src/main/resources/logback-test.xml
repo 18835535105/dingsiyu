@@ -17,16 +17,16 @@
         <File>/usr/local/log/student-capacity-info.log</File>
         <!-- rollingPolicy:当发生滚动时，决定 RollingFileAppender 的行为，涉及文件移动和重命名。 -->
         <!-- TimeBasedRollingPolicy： 最常用的滚动策略，它根据时间来制定滚动策略，既负责滚动也负责出发滚动 -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 活动文件的名字会根据fileNamePattern的值，每隔一段时间改变一次 -->
             <!-- 文件名：log/demo.2017-12-05.0.log -->
             <fileNamePattern>log/student-capacity-info.%d.%i.log</fileNamePattern>
             <!-- 每产生一个日志文件，该日志文件的保存期限为30天 -->
             <maxHistory>30</maxHistory>
-<!--            <timeBasedFileNamingAndTriggeringPolicy  class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
+            <timeBasedFileNamingAndTriggeringPolicy  class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <!-- maxFileSize:这是活动文件的大小，默认值是10MB，测试时可改成1KB看效果 -->
                 <maxFileSize>10MB</maxFileSize>
-<!--            </timeBasedFileNamingAndTriggeringPolicy>-->
+            </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
         <encoder>
             <!-- pattern节点，用来设置日志的输入格式 -->
