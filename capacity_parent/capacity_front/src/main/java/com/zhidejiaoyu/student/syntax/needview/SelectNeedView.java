@@ -17,7 +17,10 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -67,7 +70,7 @@ public class SelectNeedView implements INeedView {
             SyntaxTopic syntaxTopic = syntaxTopicMapper.selectById(studyCapacity.getWordId());
 
             LearnSyntaxVO knowledgePoint1 = this.getSelectSyntaxKnowledgePoint(dto, studyCapacity, knowledgePoint);
-            GameVO selects = getGameVO(dto.getUnitId(), syntaxTopic);
+            GameVO selects = getSelections(syntaxTopic);
             return ServerResponse.createBySuccess(this.packageSelectSyntaxVO(knowledgePoint1, selects, syntaxTopic));
         }
         return null;
@@ -97,12 +100,11 @@ public class SelectNeedView implements INeedView {
     /**
      * 封装试题选项
      *
-     * @param unitId
      * @param syntaxTopic 当前语法题
      * @return
      */
-    public GameVO getGameVO(Long unitId, SyntaxTopic syntaxTopic) {
-        return new GameVO(getTopic(syntaxTopic), this.packageSelectAnswer(syntaxTopic, unitId));
+    public GameVO getSelections(SyntaxTopic syntaxTopic) {
+        return new GameVO(getTopic(syntaxTopic), this.packageSelectAnswer(syntaxTopic));
     }
 
     /**
@@ -133,20 +135,18 @@ public class SelectNeedView implements INeedView {
      * 封装选语法选项
      *
      * @param syntaxTopic
-     * @param unitId
      * @return
      */
-    private List<GameSelect> packageSelectAnswer(SyntaxTopic syntaxTopic, Long unitId) {
-        List<SyntaxTopic> syntaxTopics = syntaxTopicMapper.selectByUnitId(unitId);
-        Collections.shuffle(syntaxTopics);
-        // 三个错误选项
-        List<GameSelect> select = syntaxTopics.stream()
-                .filter(syntaxTopic1 -> !Objects.equals(syntaxTopic1.getAnswer(), syntaxTopic.getAnswer()))
-                .limit(3)
-                .map(syntaxTopic1 -> new GameSelect(syntaxTopic1.getAnswer(), false))
-                .collect(Collectors.toList());
-        // 一个正确选项
-        select.add(new GameSelect(syntaxTopic.getAnswer(), true));
+    private List<GameSelect> packageSelectAnswer(SyntaxTopic syntaxTopic) {
+
+        String[] options = syntaxTopic.getOption().split("\\$&\\$");
+        List<GameSelect> select = Arrays.stream(options).map(option -> {
+            if (!Objects.equals(syntaxTopic.getAnswer().trim(), option.trim())) {
+                return new GameSelect(option.trim(), false);
+            }
+            return new GameSelect(option.trim(), true);
+        }).collect(Collectors.toList());
+
         Collections.shuffle(select);
         return select;
     }

@@ -114,7 +114,7 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
         if (!Objects.isNull(syntaxTopic)) {
             KnowledgePoint knowledgePoint = knowledgePointMapper.selectByTopicId(syntaxTopic.getId());
             LearnSyntaxVO knowledgePoint1 = this.packageNewKnowledgePoint(dto, knowledgePoint);
-            GameVO selects = selectNeedView.getGameVO(dto.getUnitId(), syntaxTopic);
+            GameVO selects = selectNeedView.getSelections(syntaxTopic);
             return ServerResponse.createBySuccess(selectNeedView.packageSelectSyntaxVO(knowledgePoint1, selects, syntaxTopic));
         }
         return null;
