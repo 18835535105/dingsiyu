@@ -510,7 +510,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 今日已学音标个数
             int phoneticSymbolCount = learnMapper.countTodayLearnedPhoneticSymbol(studentId);
             map.put("phoneticSymbol", phoneticSymbolCount);
-        } else {
+        } else if (type == 7) {
             //获取今日学习语法数
             int syntaxCount = learnMapper.countSyntax(studentId);
             map.put("syntaxCount", syntaxCount);
