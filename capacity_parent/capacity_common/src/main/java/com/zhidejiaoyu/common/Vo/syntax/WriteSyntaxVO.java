@@ -26,22 +26,12 @@ public class WriteSyntaxVO implements Serializable {
     /**
      * 题目
      */
-    private String title;
+    private TopicVO topic;
 
     /**
-     * 答案
+     * 知识点内容
      */
-    private String answer;
-
-    /**
-     * 语法名
-     */
-    private String syntaxName;
-
-    /**
-     * 语法内容
-     */
-    private String content;
+    private KnowledgePointVO knowledgePoint;
 
     /**
      * 当前单元语法总数

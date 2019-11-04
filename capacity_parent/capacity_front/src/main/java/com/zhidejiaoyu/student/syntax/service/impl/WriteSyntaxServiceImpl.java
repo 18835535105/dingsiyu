@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.student.syntax.service.impl;
 
+import com.zhidejiaoyu.common.Vo.syntax.KnowledgePointVO;
+import com.zhidejiaoyu.common.Vo.syntax.TopicVO;
 import com.zhidejiaoyu.common.Vo.syntax.WriteSyntaxVO;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
@@ -141,15 +143,19 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         if (!Objects.isNull(syntaxTopic)) {
             KnowledgePoint knowledgePoint = knowledgePointMapper.selectByTopicId(syntaxTopic.getId());
             return ServerResponse.createBySuccess(WriteSyntaxVO.builder()
-                    .answer(syntaxTopic.getAnswer())
-                    .content(knowledgePoint.getContent())
+                    .knowledgePoint(KnowledgePointVO.builder()
+                            .content(knowledgePoint.getContent())
+                            .syntaxName(knowledgePoint.getName())
+                            .build())
+                    .topic(TopicVO.builder()
+                            .answer(syntaxTopic.getAnswer())
+                            .title(syntaxTopic.getTopic())
+                            .build())
                     .memoryDifficult(0)
                     .memoryStrength(0)
                     .plan(dto.getPlan())
                     .studyNew(true)
                     .id(syntaxTopic.getId())
-                    .syntaxName(knowledgePoint.getName())
-                    .title(syntaxTopic.getTopic())
                     .total(dto.getTotal())
                     .build());
         }
