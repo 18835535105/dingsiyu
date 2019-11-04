@@ -1398,6 +1398,17 @@
           and study_model like '音标%'
           and to_days(learn_time) = to_days(now())
     </select>
+    <select id="countSyntax" resultType="java.lang.Integer" parameterType="map">
+       select
+       count(DISTINCT topic.knowledge_point_id)
+       from learn lea
+       join syntax_topic topic
+       on topic.id=lea.vocabulary_id
+       where student_id = #{studentId}
+       and study_model like '%语法'
+        and to_days(learn_time) = to_days(now())
+
+    </select>
     <select id="countLearnedSyntax" resultType="java.lang.Integer" parameterType="map">
         select count(id)
         from learn l

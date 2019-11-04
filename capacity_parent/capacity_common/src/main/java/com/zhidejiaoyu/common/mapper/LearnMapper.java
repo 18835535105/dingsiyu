@@ -916,4 +916,6 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @param courseId
      */
     void updateSyntaxToLearnedByCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
+
+    int countSyntax(@Param("studentId") Long studentId);
 }

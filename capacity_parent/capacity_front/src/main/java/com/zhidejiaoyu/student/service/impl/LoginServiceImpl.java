@@ -502,7 +502,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             //获取今日已学课文数
             int learnTeks = learnMapper.getTodyTeks(DateUtil.formatYYYYMMDD(new Date()), studentId);
             map.put("learnTeks", learnTeks);
-        } else {
+        } else if (type == 4) {
             // 获取今日学习字母
             int letterCount = learnMapper.countTodayLearnedLetter(studentId);
             map.put("letter", letterCount);
@@ -510,6 +510,10 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 今日已学音标个数
             int phoneticSymbolCount = learnMapper.countTodayLearnedPhoneticSymbol(studentId);
             map.put("phoneticSymbol", phoneticSymbolCount);
+        } else {
+            //获取今日学习语法数
+            int syntaxCount = learnMapper.countSyntax(studentId);
+            map.put("syntaxCount", syntaxCount);
         }
 
         // 获取我的总金币
