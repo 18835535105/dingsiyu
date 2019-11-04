@@ -25,10 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -40,6 +37,11 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, SyntaxTopic> implements SyntaxGameService {
+
+    /**
+     * 游戏题目数量
+     */
+    private final int GAME_COUNT = 10;
 
     @Resource
     private SyntaxTopicMapper syntaxTopicMapper;
@@ -63,19 +65,39 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     public ServerResponse getSyntaxGame(Long unitId) {
         HttpUtil.getHttpSession().setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
-        List<SyntaxTopic> syntaxTopics = syntaxTopicMapper.selectByUnitId(unitId);
+        List<SyntaxTopic> syntaxTopics = this.getSyntaxTopics(unitId);
         if (CollectionUtils.isEmpty(syntaxTopics)) {
             this.printGetSyntaxGameNoDataLog(unitId);
             return ServerResponse.createByError(500, "未查询到数据！");
         }
-        // todo: 有没有可能单元下的语法题不足10个题
-        Collections.shuffle(syntaxTopics);
 
-        List<GameVO> returnList = syntaxTopics.parallelStream().limit(10)
+        List<GameVO> returnList = syntaxTopics.parallelStream().limit(GAME_COUNT)
                 .map(syntaxTopic -> new GameVO(syntaxTopic.getTopic().replace("$&$", "___"), this.getSelect(syntaxTopic, syntaxTopics)))
                 .collect(Collectors.toList());
 
         return ServerResponse.createBySuccess(returnList);
+    }
+
+    /**
+     * 获取单元下的语法题，不足10个重复学习
+     *
+     * @param unitId
+     * @return
+     */
+    private List<SyntaxTopic> getSyntaxTopics(Long unitId) {
+        List<SyntaxTopic> syntaxTopics = syntaxTopicMapper.selectByUnitId(unitId);
+        List<SyntaxTopic> result = new ArrayList<>(syntaxTopics);
+        return this.syntaxTopicsResult(syntaxTopics, result);
+
+    }
+
+    private List<SyntaxTopic> syntaxTopicsResult(List<SyntaxTopic> syntaxTopics, List<SyntaxTopic> result) {
+        Collections.shuffle(result);
+        if (result.size() < GAME_COUNT) {
+            result.addAll(syntaxTopics);
+            this.syntaxTopicsResult(syntaxTopics, result);
+        }
+        return result;
     }
 
     @Override
@@ -217,7 +239,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
         // 添加错误答案
         List<GameSelect> collect = syntaxTopics.parallelStream()
                 // 错误答案排除正确答案的内容
-                .filter(syntaxTopic1 -> !Objects.equals(syntaxTopic.getId(), syntaxTopic1.getId()))
+                .filter(syntaxTopic1 -> !Objects.equals(syntaxTopic.getTopic(), syntaxTopic1.getTopic()))
                 .limit(3)
                 .map(syntaxTopic1 -> new GameSelect(syntaxTopic1.getAnswer(), false))
                 .collect(Collectors.toList());

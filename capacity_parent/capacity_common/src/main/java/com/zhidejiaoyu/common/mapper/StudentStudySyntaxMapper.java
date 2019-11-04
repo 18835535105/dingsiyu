@@ -30,7 +30,16 @@ public interface StudentStudySyntaxMapper extends BaseMapper<StudentStudySyntax>
      * 查询学生语法所有单元学习模块并进行分组
      *
      * @param studentId
+     * @return
      */
     @MapKey("courseId")
     Map<Long, Map<String, Object>> selectStudyAllByStudentId(@Param("studentId") Long studentId);
+
+    /**
+     * 删除学生指定课程的语法节点
+     *
+     * @param studentId
+     * @param courseId
+     */
+    void deleteByCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
 }

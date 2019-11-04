@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.student.syntax.service.impl;
 
+import com.zhidejiaoyu.common.Vo.syntax.KnowledgePointVO;
+import com.zhidejiaoyu.common.Vo.syntax.TopicVO;
 import com.zhidejiaoyu.common.Vo.syntax.WriteSyntaxVO;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
@@ -23,6 +25,8 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
+ * 写语法
+ *
  * @author: wuchenxi
  * @Date: 2019/10/31 17:52
  */
@@ -52,6 +56,9 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
 
     @Resource
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
+
+    @Resource
+    private StudentStudySyntaxMapper studentStudySyntaxMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -105,6 +112,8 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                 learnMapper.updateSyntaxToLearnedByCourseId(capacityStudentUnit.getStudentId(), capacityStudentUnit.getCourseId());
                 // 清除学生语法记忆追踪信息
                 studyCapacityMapper.deleteSyntaxByStudentIdAndCourseId(capacityStudentUnit.getStudentId(), capacityStudentUnit.getCourseId());
+                // 删除当前课程的语法节点信息
+                studentStudySyntaxMapper.deleteByCourseId(student.getId(), capacityStudentUnit.getCourseId());
                 return true;
             }
             capacityStudentUnit.setUnitId(capacityStudentUnit.getUnitId() + 1);
@@ -134,15 +143,19 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         if (!Objects.isNull(syntaxTopic)) {
             KnowledgePoint knowledgePoint = knowledgePointMapper.selectByTopicId(syntaxTopic.getId());
             return ServerResponse.createBySuccess(WriteSyntaxVO.builder()
-                    .answer(syntaxTopic.getAnswer())
-                    .content(knowledgePoint.getContent())
+                    .knowledgePoint(KnowledgePointVO.builder()
+                            .content(knowledgePoint.getContent())
+                            .syntaxName(knowledgePoint.getName())
+                            .build())
+                    .topic(TopicVO.builder()
+                            .answer(syntaxTopic.getAnswer())
+                            .title(syntaxTopic.getTopic())
+                            .build())
                     .memoryDifficult(0)
                     .memoryStrength(0)
                     .plan(dto.getPlan())
                     .studyNew(true)
                     .id(syntaxTopic.getId())
-                    .syntaxName(knowledgePoint.getName())
-                    .title(syntaxTopic.getTopic().replace("$&$", "___"))
                     .total(dto.getTotal())
                     .build());
         }

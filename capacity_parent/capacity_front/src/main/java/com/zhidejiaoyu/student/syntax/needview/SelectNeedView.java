@@ -68,7 +68,7 @@ public class SelectNeedView implements INeedView {
 
             LearnSyntaxVO knowledgePoint1 = this.getSelectSyntaxKnowledgePoint(dto, studyCapacity, knowledgePoint);
             GameVO selects = getGameVO(dto.getUnitId(), syntaxTopic);
-            return ServerResponse.createBySuccess(this.packageSelectSyntaxVO(knowledgePoint1, selects));
+            return ServerResponse.createBySuccess(this.packageSelectSyntaxVO(knowledgePoint1, selects, syntaxTopic));
         }
         return null;
     }
@@ -110,11 +110,12 @@ public class SelectNeedView implements INeedView {
      *
      * @param knowledgePoint
      * @param selects
+     * @param syntaxTopic
      * @return
      */
-    public Object packageSelectSyntaxVO(LearnSyntaxVO knowledgePoint, GameVO selects) {
+    public Object packageSelectSyntaxVO(LearnSyntaxVO knowledgePoint, GameVO selects, SyntaxTopic syntaxTopic) {
         return SelectSyntaxVO.builder()
-                .id(knowledgePoint.getId())
+                .id(syntaxTopic.getId())
                 .total(knowledgePoint.getTotal())
                 .plan(knowledgePoint.getPlan())
                 .studyNew(knowledgePoint.getStudyNew())
@@ -140,7 +141,7 @@ public class SelectNeedView implements INeedView {
         Collections.shuffle(syntaxTopics);
         // 三个错误选项
         List<GameSelect> select = syntaxTopics.stream()
-                .filter(syntaxTopic1 -> !Objects.equals(syntaxTopic1.getId(), syntaxTopic.getId()))
+                .filter(syntaxTopic1 -> !Objects.equals(syntaxTopic1.getAnswer(), syntaxTopic.getAnswer()))
                 .limit(3)
                 .map(syntaxTopic1 -> new GameSelect(syntaxTopic1.getAnswer(), false))
                 .collect(Collectors.toList());

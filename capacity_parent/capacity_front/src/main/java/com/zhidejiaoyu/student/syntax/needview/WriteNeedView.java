@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.student.syntax.needview;
 
+import com.zhidejiaoyu.common.Vo.syntax.KnowledgePointVO;
+import com.zhidejiaoyu.common.Vo.syntax.TopicVO;
 import com.zhidejiaoyu.common.Vo.syntax.WriteSyntaxVO;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
 import com.zhidejiaoyu.common.mapper.KnowledgePointMapper;
@@ -63,15 +65,19 @@ public class WriteNeedView implements INeedView {
             SyntaxTopic syntaxTopic = syntaxTopicMapper.selectById(studyCapacity.getWordId());
 
             return ServerResponse.createBySuccess(WriteSyntaxVO.builder()
-                    .answer(syntaxTopic.getAnswer())
-                    .content(knowledgePoint.getContent())
+                    .knowledgePoint(KnowledgePointVO.builder()
+                            .content(knowledgePoint.getContent())
+                            .syntaxName(knowledgePoint.getName())
+                            .build())
+                    .topic(TopicVO.builder()
+                            .answer(syntaxTopic.getAnswer())
+                            .title(syntaxTopic.getTopic())
+                            .build())
                     .memoryDifficult(syntaxMemoryDifficulty.getMemoryDifficulty(studyCapacity))
                     .memoryStrength(getMemoryStrength(studyCapacity))
                     .plan(dto.getPlan())
                     .studyNew(false)
                     .id(syntaxTopic.getId())
-                    .syntaxName(knowledgePoint.getName())
-                    .title(getTopic(syntaxTopic))
                     .total(dto.getTotal())
                     .build());
         }
