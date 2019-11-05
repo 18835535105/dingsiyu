@@ -27,9 +27,6 @@ public class DailyAwardAsync extends BaseAwardAsync {
     private AwardMapper awardMapper;
 
     @Autowired
-    private OpenUnitLogMapper openUnitLogMapper;
-
-    @Autowired
     private AwardContentTypeMapper awardContentTypeMapper;
 
     @Autowired
@@ -205,21 +202,7 @@ public class DailyAwardAsync extends BaseAwardAsync {
     private void initMedalAward(Student student) {
         Long studentId = student.getId();
         Date date = new Date();
-        List<Long> parentIds = new ArrayList<>();
-        parentIds.add(1L);
-        parentIds.add(6L);
-        parentIds.add(11L);
-        parentIds.add(17L);
-        parentIds.add(23L);
-        parentIds.add(37L);
-        parentIds.add(47L);
-        parentIds.add(52L);
-        parentIds.add(57L);
-        parentIds.add(62L);
-        parentIds.add(67L);
-        parentIds.add(72L);
-        parentIds.add(87L);
-        parentIds.add(97L);
+        List<Long> parentIds = this.getMedalIds();
         List<Medal> medals = medalMapper.selectByParentIds(parentIds);
         List<Award> awards = new ArrayList<>(medals.size());
         medals.forEach(medal -> {
@@ -240,6 +223,43 @@ public class DailyAwardAsync extends BaseAwardAsync {
         } catch (Exception e) {
             log.error(super.logErrorMsg(student, "初始化学生勋章信息失败"), e);
         }
+    }
+
+    /**
+     * 获取需要初始化的勋章id
+     * @return
+     */
+    private List<Long> getMedalIds() {
+        List<Long> parentIds = new ArrayList<>();
+        parentIds.add(1L);
+        parentIds.add(6L);
+        parentIds.add(11L);
+        parentIds.add(17L);
+        parentIds.add(23L);
+        parentIds.add(37L);
+        parentIds.add(47L);
+        parentIds.add(52L);
+        parentIds.add(57L);
+        parentIds.add(62L);
+        parentIds.add(67L);
+        parentIds.add(72L);
+        parentIds.add(87L);
+        parentIds.add(97L);
+        parentIds.add(110L);
+        parentIds.add(111L);
+        parentIds.add(112L);
+        parentIds.add(113L);
+        parentIds.add(114L);
+        parentIds.add(115L);
+        parentIds.add(116L);
+        parentIds.add(117L);
+        parentIds.add(118L);
+        parentIds.add(119L);
+        parentIds.add(120L);
+        parentIds.add(121L);
+        parentIds.add(122L);
+        parentIds.add(123L);
+        return parentIds;
     }
 
     /**
