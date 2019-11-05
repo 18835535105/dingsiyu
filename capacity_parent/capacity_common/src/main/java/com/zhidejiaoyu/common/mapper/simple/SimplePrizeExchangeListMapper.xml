@@ -26,7 +26,7 @@
         where
         type = #{type}
         <if test="schoolId !=null ">
-            and school_id = #{schoolId} and teacher_id is null
+            and school_id = #{schoolId}
         </if>
         <if test="teacherId !=null ">
             and teacher_id = #{teacherId}

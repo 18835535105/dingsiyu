@@ -64,7 +64,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         } else {
             returnMap.put("sysGold", 0);
         }
-        if (schoolAdminById == null || string == null || string == "") {
+        if (schoolAdminById == null || StringUtils.isEmpty(string)) {
             if (schoolAdminById == null) {
                 schoolAdminById = teacherId.intValue();
                 Integer teacherCount = simpleTeacherMapper.getTeacherCountByAdminId(teacherId);
