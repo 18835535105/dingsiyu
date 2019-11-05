@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.syntax.service.impl;
 import com.zhidejiaoyu.common.Vo.syntax.KnowledgePointVO;
 import com.zhidejiaoyu.common.Vo.syntax.TopicVO;
 import com.zhidejiaoyu.common.Vo.syntax.WriteSyntaxVO;
+import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
 import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
 
 /**
  * 写语法
@@ -59,6 +61,12 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
 
     @Resource
     private StudentStudySyntaxMapper studentStudySyntaxMapper;
+
+    @Resource
+    private ExecutorService executorService;
+
+    @Resource
+    private MedalAwardAsync medalAwardAsync;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -97,7 +105,6 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
 
         // 说明当前单元写语法模块内容都已掌握，进入下一个单元或者完成当前课程
         if (initNextUnitOrCourse(student)) {
-            // todo:课程学习完奖励勋章逻辑
             return ServerResponse.createBySuccess(ResponseCode.COURSE_FINISH);
         }
         return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
@@ -114,12 +121,24 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                 studyCapacityMapper.deleteSyntaxByStudentIdAndCourseId(capacityStudentUnit.getStudentId(), capacityStudentUnit.getCourseId());
                 // 删除当前课程的语法节点信息
                 studentStudySyntaxMapper.deleteByCourseId(student.getId(), capacityStudentUnit.getCourseId());
+                // 课程学习完奖励勋章
+                this.saveMonsterMedal(student, capacityStudentUnit.getCourseId());
                 return true;
             }
             capacityStudentUnit.setUnitId(capacityStudentUnit.getUnitId() + 1);
             capacityStudentUnitMapper.updateById(capacityStudentUnit);
         }
         return false;
+    }
+
+    /**
+     * 奖励怪物征服奖章
+     *
+     * @param student
+     * @param courseId
+     */
+    private void saveMonsterMedal(Student student, Long courseId) {
+        executorService.execute(() -> medalAwardAsync.monsterMedal(student, courseId));
     }
 
     @Override
