@@ -60,7 +60,7 @@
         and unit_id = #{learn.unitId}
         and word_id = #{learn.vocabularyId}
         and type = #{type}
-        order by id
+        order by push
         limit 1
     </select>
 
