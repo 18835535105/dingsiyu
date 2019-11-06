@@ -91,14 +91,14 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
         }
         log.info("定时任务 -> 统计各校区学生充课信息开始。。。");
         // excel文件名
-        String fileName = "充课卡详情表" + System.currentTimeMillis() + ExcelTypeEnum.XLSX;
+        String fileName = "充课卡详情表" + System.currentTimeMillis() + ExcelTypeEnum.XLSX.getValue();
 
         Long adminId = 1L;
         Date time = DateTime.now().minusDays(1).toDate();
         //根据校管id获取学校下的充课学生
         List<StudentHours> studentHours = studentHoursMapper.selectDeatilsByAdminId(adminId, time);
         //导出充课数据
-        ExcelWriterFactory excelWriterFactory = getSizePayCardModel(time, adminId);
+        ExcelWriterFactory excelWriterFactory = getSizePayCardModel(time, adminId, fileName);
         if (studentHours.size() > 0) {
             //导出充课详细数据
             getRechargePayCardModel(excelWriterFactory, studentHours, time);
@@ -106,10 +106,10 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
 
         this.uploadToOss(fileName);
 
-        log.info("定时任务 -> 统计各校区学生充课信息完成。。。");
+        log.info("定时任务 -> 统计各校区学生充课信息完成。");
     }
 
-    private ExcelWriterFactory getSizePayCardModel(Date time, Long adminId) {
+    private ExcelWriterFactory getSizePayCardModel(Date time, Long adminId, String fileName) {
         Date startDay = DateTime.now().minusDays(31).toDate();
         String startTime = DateUtil.formatYYYYMMDD(startDay);
         Date endTime = DateTime.now().minusDays(1).toDate();
@@ -129,7 +129,6 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
             list.add(model);
         }
         // excel文件名
-        String fileName = "充课卡详情表" + System.currentTimeMillis() + ExcelTypeEnum.XLSX;
         return ExcelUtil.writeExcelWithSheetsAndDownload(list, fileName, "学校充课详情", ExportRechargePayCardCountModel.class);
     }
 
@@ -224,10 +223,10 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
                 StringBuilder builder = new StringBuilder();
                 Set<Integer> cardIds = cardMap.keySet();
                 for (Integer cardId : cardIds) {
-                    Map<String, Object> cardmap = cardMap.get(cardId);
+                    Map<String, Object> cardMap1 = cardMap.get(cardId);
                     if (studentCardMap.get(cardId) != null) {
                         if (studentCardMap.get(cardId) > 0) {
-                            builder.append(cardmap.get("name")).append(":").
+                            builder.append(cardMap1.get("name")).append(":").
                                     append(studentCardMap.get(cardId)).append(" ");
                         }
                     }
@@ -256,6 +255,6 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
      */
     private boolean checkPort() {
         int localPort = ServiceInfoUtil.getPort();
-        return port != localPort;
+        return localPort != 0 && port != localPort;
     }
 }

@@ -15,4 +15,9 @@ public class QuartzStudentReportServiceImplTest extends BaseTest {
     public void statisticsStudentWithSchoolInfo() {
         quartzStudentReportService.exportStudentWithSchool();
     }
+
+    @Test
+    public void exportStudentPay() {
+        quartzStudentReportService.exportStudentPay();
+    }
 }
