@@ -1,12 +1,13 @@
 package com.zhidejiaoyu.common.utils.excelUtil;
 
 import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 
 public class ExcelUtil {
 
 	/**
 	 * 导出Excel
-	 * 
+	 *
 	 * @param sheetName
 	 *            sheet名称
 	 * @param title
@@ -32,7 +33,7 @@ public class ExcelUtil {
 
 		// 第四步，创建单元格，并设置值表头 设置表头居中
 		HSSFCellStyle style = wb.createCellStyle();
-		style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+		style.setAlignment(HorizontalAlignment.CENTER); // 创建一个居中格式
 
 		// 声明列对象
 		HSSFCell cell;
