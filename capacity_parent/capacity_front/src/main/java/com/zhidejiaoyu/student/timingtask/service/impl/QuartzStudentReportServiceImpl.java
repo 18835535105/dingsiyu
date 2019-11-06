@@ -18,6 +18,7 @@ import com.zhidejiaoyu.common.utils.excelUtil.easyexcel.ExcelWriterFactory;
 import com.zhidejiaoyu.student.timingtask.service.QuartzStudentReportService;
 import com.zhidejiaoyu.student.utils.ServiceInfoUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -203,7 +204,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
                 Date loginTime = durationMapper.selectLoginTimeByDate(studentId, date);
                 model.setStudentAccount(student.getAccount());
                 model.setSchool(student.getSchoolName());
-                model.setStudentName(student.getStudentName()!=null&&student.getStudentName()!=""?student.getStudentName():"默认姓名");
+                model.setStudentName(StringUtils.isEmpty(student.getStudentName()) ? student.getStudentName() : "默认姓名");
                 model.setCreateTime(DateUtil.formatYYYYMMDD(studentHours1.get(0).getCreateTime()));
                 if (loginTime == null) {
                     model.setLoginTime("未登入");
