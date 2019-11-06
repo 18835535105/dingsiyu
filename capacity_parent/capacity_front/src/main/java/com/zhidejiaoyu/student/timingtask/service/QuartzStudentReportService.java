@@ -21,8 +21,8 @@ public interface QuartzStudentReportService {
 
     /**
      * 每日一点15统计昨天各校区新增课时人源
-     * @param response
+     *
      * @return
      */
-    void exportStudentPay(HttpServletResponse response);
+    void exportStudentPay();
 }

@@ -10,12 +10,6 @@ import com.zhidejiaoyu.common.excelmodel.student.ExportRechargePayCardModel;
 import com.zhidejiaoyu.common.excelmodel.student.ExportStudentOnlineTimeWithSchoolDetail;
 import com.zhidejiaoyu.common.excelmodel.student.ExportStudentOnlineTimeWithSchoolSummary;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.excelmodel.student.ExportRechargePayCardCountModel;
-import com.zhidejiaoyu.common.excelmodel.student.ExportRechargePayCardModel;
-import com.zhidejiaoyu.common.mapper.DurationMapper;
-import com.zhidejiaoyu.common.mapper.RechargeableCardMapper;
-import com.zhidejiaoyu.common.mapper.StudentHoursMapper;
-import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentHours;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -28,12 +22,10 @@ import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -68,7 +60,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
     @Scheduled(cron = "0 0 1 * * ?")
     @Override
     public void exportStudentWithSchool() {
-        if (!checkPort()) {
+        if (checkPort()) {
             return;
         }
         log.info("定时任务 -> 统计各校区学生登录及在线时长信息开始。。。");
@@ -93,19 +85,19 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
     /**
      * 检查当前端口是否可以执行定时任务
      *
-     * @return true：可以指定；false：不可执行
+     * @return true：不可以执行；false：可执行
      */
     private boolean checkPort() {
         int localPort = ServiceInfoUtil.getPort();
-        return port == localPort;
+        return port != localPort;
     }
 
 
+    @Override
     @Transactional(rollbackFor = Exception.class)
     @Scheduled(cron = "1 15 0 * * ?")
-    @Override
-    public void exportStudentPay(HttpServletResponse response) {
-        if (!checkPort()) {
+    public void exportStudentPay() {
+        if (checkPort()) {
             return;
         }
         log.info("定时任务 -> 统计各校区学生充课信息开始。。。");
@@ -189,7 +181,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
     private void getRechargePayCardModel(ExcelWriterFactory excelWriterFactory, List<StudentHours> studentHours, Date time) {
         //获取充课卡信息
         Map<Integer, Map<String, Object>> cardMap = rechargeableCardMapper.selAllRechargeableCardMap();
-        Map<Long, List<StudentHours>> map = new HashMap<>();
+        Map<Long, List<StudentHours>> map = new HashMap<>(16);
         if (studentHours.size() > 0) {
             //进行每一个学生的分组
             for (StudentHours hours : studentHours) {
@@ -208,7 +200,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
                 ExportRechargePayCardModel model = new ExportRechargePayCardModel();
                 Student student = studentMapper.selectById(studentId);
                 List<StudentHours> studentHours1 = map.get(studentId);
-                Map<Integer, Integer> studentCardMap = new HashMap<>();
+                Map<Integer, Integer> studentCardMap = new HashMap<>(16);
                 //将一个学生可能出现的多个数据添加到一起
                 for (StudentHours hours : studentHours1) {
                     String type = hours.getType();
@@ -243,7 +235,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
                 StringBuilder builder = new StringBuilder();
                 Set<Integer> cardIds = cardMap.keySet();
                 for (Integer cardId : cardIds) {
-                    Map<String, Object> cardmap = (Map<String, Object>) cardMap.get(cardId);
+                    Map<String, Object> cardmap = cardMap.get(cardId);
                     if (studentCardMap.get(cardId) != null) {
                         if (studentCardMap.get(cardId) > 0) {
                             builder.append(cardmap.get("name")).append(":").
@@ -261,7 +253,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
 
     private void uploadToOss(String fileName) {
         try {
-            FileInputStream fileInputStream = new FileInputStream(fileName);
+            FileInputStream fileInputStream = new FileInputStream(FileConstant.TMP_EXCEL + fileName);
             OssUpload.uploadWithInputStream(fileInputStream, FileConstant.STUDENT_REPORT_EXCEL, fileName);
         } catch (FileNotFoundException e) {
             log.error("定时任务上传学生报表失败！", e);

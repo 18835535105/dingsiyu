@@ -33,8 +33,8 @@ public class QuartzStudentReportController {
     }
 
     @RequestMapping("exportStudentPay")
-    public void exportStudentPay(HttpServletResponse response) {
-        quartzStudentReportService.exportStudentPay(response);
+    public void exportStudentPay() {
+        quartzStudentReportService.exportStudentPay();
     }
 
 }
