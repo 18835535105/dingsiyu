@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.common.constant;
 
+import java.io.FileInputStream;
+
 /**
  * 文件上传目录常量类
  *
@@ -18,4 +20,13 @@ public class FileConstant {
      */
     public static final String FEEDBACK_IMG = "imgs/feedBackImg/";
 
+    /**
+     * 学生报表excel
+     */
+    public static final String STUDENT_REPORT_EXCEL = "excel/student_report/";
+
+    /**
+     * 生成的临时excel文件存储位置
+     */
+    public static final String TMP_EXCEL = "/var/tmp/";
 }

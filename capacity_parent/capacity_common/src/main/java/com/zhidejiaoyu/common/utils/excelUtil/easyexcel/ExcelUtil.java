@@ -1,18 +1,20 @@
 package com.zhidejiaoyu.common.utils.excelUtil.easyexcel;
 
+import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelReader;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.metadata.BaseRowModel;
 import com.alibaba.excel.metadata.Sheet;
 import com.alibaba.excel.support.ExcelTypeEnum;
+import com.alibaba.excel.write.metadata.WriteSheet;
+import com.alibaba.excel.write.metadata.WriteWorkbook;
+import com.zhidejiaoyu.common.constant.FileConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import javax.xml.ws.Service;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -87,16 +89,16 @@ public class ExcelUtil {
      * @param list     数据 list，每个元素为一个 BaseRowModel
      * @param fileName 导出的文件名
      */
-    public static <T extends BaseRowModel> void writeExcel(HttpServletResponse response, List<T> list, String fileName, Class<T> classType) {
-        WriterHandler handler = new WriterHandler<>(classType);
-        OutputStream outputStream = getOutputStream(fileName, response, ExcelTypeEnum.XLSX);
-        ExcelWriter writer = new ExcelWriter(null, outputStream, ExcelTypeEnum.XLSX, true, handler);
+    public static <T> void writeExcel(HttpServletResponse response, List<T> list, String fileName, Class<?> clazz) {
+        WriteWorkbook writeWorkbook = new WriteWorkbook();
+        writeWorkbook.setOutputStream(getOutputStream(fileName, response, ExcelTypeEnum.XLSX));
+        writeWorkbook.setExcelType(ExcelTypeEnum.XLSX);
+        ExcelWriter writer = new ExcelWriter(writeWorkbook);
 
-        Sheet sheet = new Sheet(1, 0, classType);
-        sheet.setAutoWidth(true);
-        sheet.setSheetName(fileName);
+        WriteSheet writeSheet = getWriteSheet(1, fileName, clazz);
+
         try {
-            writer.write(list, sheet);
+            writer.write(list, writeSheet);
         } finally {
             writer.finish();
         }
@@ -107,18 +109,61 @@ public class ExcelUtil {
      * 导出 Excel ：多个 sheet，带表头
      *
      * @param response  HttpServletResponse
-     * @param list      数据 list，每个元素为一个 BaseRowModel
+     * @param list      数据 list，每个元素为一个
      * @param fileName  导出的文件名
      * @param sheetName 导入文件的 sheet 名
-     * @param object    映射实体类，Excel 模型
      */
-    public static ExcelWriterFactory writeExcelWithSheets(HttpServletResponse response, List<? extends BaseRowModel> list,
-                                                          String fileName, String sheetName, BaseRowModel object) {
-        ExcelWriterFactory writer = new ExcelWriterFactory(getOutputStream(fileName, response, ExcelTypeEnum.XLSX), ExcelTypeEnum.XLSX);
-        Sheet sheet = new Sheet(1, 0, object.getClass());
-        sheet.setSheetName(sheetName);
-        writer.write(list, sheet);
+    public static ExcelWriterFactory writeExcelWithSheets(HttpServletResponse response, List<?> list,
+                                                          String fileName, String sheetName, Class<?> clazz) {
+
+        WriteWorkbook writeWorkbook = getWriteWorkbook(response, fileName);
+        ExcelWriterFactory writer = new ExcelWriterFactory(writeWorkbook);
+
+        WriteSheet writeSheet = getWriteSheet(1, sheetName, clazz);
+        writer.write(list, writeSheet);
         return writer;
+    }
+
+    /**
+     * 生成excel文件并下载到本地
+     *
+     * @param list
+     * @param fileName  excel文件名
+     * @param sheetName
+     * @param clazz
+     * @return
+     */
+    public static ExcelWriterFactory writeExcelWithSheetsAndDownload(List<?> list, String fileName, String sheetName, Class<?> clazz) {
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(FileConstant.TMP_EXCEL + fileName);
+            WriteWorkbook writeWorkbook = getWriteWorkbook(fileOutputStream);
+
+            ExcelWriterFactory writer = new ExcelWriterFactory(writeWorkbook);
+
+            WriteSheet writeSheet = getWriteSheet(1, sheetName, clazz);
+            writer.write(list, writeSheet);
+            return writer;
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static WriteWorkbook getWriteWorkbook(HttpServletResponse response, String fileName) {
+        return getWriteWorkbook(getOutputStream(fileName, response, ExcelTypeEnum.XLSX));
+    }
+
+    private static WriteWorkbook getWriteWorkbook(OutputStream outputStream) {
+        WriteWorkbook writeWorkbook = new WriteWorkbook();
+        writeWorkbook.setOutputStream(outputStream);
+        writeWorkbook.setExcelType(ExcelTypeEnum.XLSX);
+        writeWorkbook.setAutoCloseStream(true);
+        writeWorkbook.setAutoTrim(true);
+        writeWorkbook.setNeedHead(true);
+        return writeWorkbook;
+    }
+
+    public static WriteSheet getWriteSheet(int sheetNo, String sheetName, Class<?> clazz) {
+        return EasyExcel.writerSheet(sheetNo, sheetName).needHead(true).head(clazz).build();
     }
 
     /**

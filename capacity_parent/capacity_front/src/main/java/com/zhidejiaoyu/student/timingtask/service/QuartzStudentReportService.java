@@ -17,7 +17,7 @@ public interface QuartzStudentReportService {
      *
      * @return
      */
-    ServerResponse statisticsStudentWithSchoolInfo();
+    void exportStudentWithSchool();
 
     /**
      * 每日一点15统计昨天各校区新增课时人源

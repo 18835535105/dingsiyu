@@ -286,6 +286,25 @@
         <include refid="Base_Column_List"/>
         from run_log where operate_user_id = #{operateUserId} and type = 1 order by id desc limit 1
     </select>
+
+    <select id="selectStudentInfoSchoolSummary"
+            resultType="com.zhidejiaoyu.common.Vo.student.studentinfowithschool.StudentInfoSchoolSummary" parameterType="map">
+        SELECT t.school                                schoolName,
+               count(DISTINCT s.id)                    studentCount,
+               date_format(rl.create_time, '%Y-%m-%d') time
+        FROM run_log rl,
+             student s,
+             teacher t
+        WHERE s.id = rl.operate_user_id
+          AND (
+                s.teacher_id = t.teacher_id
+                OR s.teacher_id = t.school_admin_id
+            )
+          AND rl.type = 1
+          AND TO_DAYS(rl.create_time) = TO_DAYS(#{date})
+        GROUP BY t.school
+    </select>
+
     <update id="updateByExampleSelective" parameterType="map" >
         update run_log
         <set >

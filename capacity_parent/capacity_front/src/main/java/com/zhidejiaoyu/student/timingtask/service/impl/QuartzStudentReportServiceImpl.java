@@ -1,6 +1,15 @@
 package com.zhidejiaoyu.student.timingtask.service.impl;
 
 import com.alibaba.excel.support.ExcelTypeEnum;
+import com.zhidejiaoyu.aliyunoss.putObject.OssUpload;
+import com.zhidejiaoyu.common.Vo.student.studentinfowithschool.StudentInfoSchoolDetail;
+import com.zhidejiaoyu.common.Vo.student.studentinfowithschool.StudentInfoSchoolSummary;
+import com.zhidejiaoyu.common.constant.FileConstant;
+import com.zhidejiaoyu.common.excelmodel.student.ExportRechargePayCardCountModel;
+import com.zhidejiaoyu.common.excelmodel.student.ExportRechargePayCardModel;
+import com.zhidejiaoyu.common.excelmodel.student.ExportStudentOnlineTimeWithSchoolDetail;
+import com.zhidejiaoyu.common.excelmodel.student.ExportStudentOnlineTimeWithSchoolSummary;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.excelmodel.student.ExportRechargePayCardCountModel;
 import com.zhidejiaoyu.common.excelmodel.student.ExportRechargePayCardModel;
 import com.zhidejiaoyu.common.mapper.DurationMapper;
@@ -11,74 +20,121 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentHours;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.excelUtil.easyexcel.ExcelUtil;
-import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.excelUtil.easyexcel.ExcelWriterFactory;
 import com.zhidejiaoyu.student.timingtask.service.QuartzStudentReportService;
+import com.zhidejiaoyu.student.utils.ServiceInfoUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author: wuchenxi
  * @Date: 2019/11/5 10:54
  */
+@Slf4j
 @Service
 public class QuartzStudentReportServiceImpl implements QuartzStudentReportService {
 
+    @Value("${quartz.port}")
+    private int port;
+
     @Resource
-    private StudentHoursMapper studentHoursMapper;
-    @Resource
-    private StudentMapper studentMapper;
+    private RunLogMapper runLogMapper;
+
     @Resource
     private DurationMapper durationMapper;
+
+    @Resource
+    private StudentHoursMapper studentHoursMapper;
+
+    @Resource
+    private StudentMapper studentMapper;
+
     @Resource
     private RechargeableCardMapper rechargeableCardMapper;
 
-
+    @Scheduled(cron = "0 0 1 * * ?")
     @Override
-    public ServerResponse statisticsStudentWithSchoolInfo() {
+    public void exportStudentWithSchool() {
+        if (!checkPort()) {
+            return;
+        }
+        log.info("定时任务 -> 统计各校区学生登录及在线时长信息开始。。。");
         // 昨天的日期
         String yesterday = DateUtil.formatYYYYMMDD(DateTime.now().minusDays(1).toDate());
-        String fileName = "校区学生每日信息" + System.currentTimeMillis();
-
+        String fileName = "校区学生每日信息" + System.currentTimeMillis() + ExcelTypeEnum.XLSX.getValue();
 
         // 汇总sheet页
-//        ExcelWriterFactory excelWriterFactory = exportStudentOnlineTimeWithSchoolSummary(yesterday, fileName);
-//
-//        // 详情sheet页
-//        if (exportStudentWithSchoolDetail(yesterday, excelWriterFactory)) {
-//            return new ErrorTip(BizExceptionEnum.NO_DATA);
-//        }
-        return null;
+        ExcelWriterFactory excelWriterFactory = this.exportStudentOnlineTimeWithSchoolSummary(yesterday, fileName);
+
+        // 明细页数据
+        this.exportStudentWithSchoolDetail(yesterday, excelWriterFactory);
+
+        // 将文件上传到oss
+        this.uploadToOss(fileName);
+
+        // 发送邮件
+
+        log.info("定时任务 -> 统计各校区学生登录及在线时长信息完成。");
     }
+
+    /**
+     * 检查当前端口是否可以执行定时任务
+     *
+     * @return true：可以指定；false：不可执行
+     */
+    private boolean checkPort() {
+        int localPort = ServiceInfoUtil.getPort();
+        return port == localPort;
+    }
+
 
     @Transactional(rollbackFor = Exception.class)
     @Scheduled(cron = "1 15 0 * * ?")
     @Override
     public void exportStudentPay(HttpServletResponse response) {
+        if (!checkPort()) {
+            return;
+        }
+        log.info("定时任务 -> 统计各校区学生充课信息开始。。。");
+        // excel文件名
+        String fileName = "充课卡详情表" + System.currentTimeMillis() + ExcelTypeEnum.XLSX;
+
         Long adminId = 1L;
         Date time = DateTime.now().minusDays(1).toDate();
         //根据校管id获取学校下的充课学生
         List<StudentHours> studentHours = studentHoursMapper.selectDeatilsByAdminId(adminId, time);
         //导出充课数据
-        getSizePayCardModel(response, time, adminId);
+        ExcelWriterFactory excelWriterFactory = getSizePayCardModel(time, adminId);
         if (studentHours.size() > 0) {
             //导出充课详细数据
-            getRechargePayCardModel(studentHours, time, response);
+            getRechargePayCardModel(excelWriterFactory, studentHours, time);
         }
+
+        this.uploadToOss(fileName);
+
+        log.info("定时任务 -> 统计各校区学生充课信息完成。。。");
     }
 
-    private void getSizePayCardModel(HttpServletResponse response, Date time, Long adminId) {
+    private ExcelWriterFactory getSizePayCardModel(Date time, Long adminId) {
         Date startDay = DateTime.now().minusDays(31).toDate();
         String startTime = DateUtil.formatYYYYMMDD(startDay);
         Date endTime = DateTime.now().minusDays(1).toDate();
         String endTimeStr = DateUtil.formatYYYYMMDD(time);
         List<Map<String, Object>> maps = studentHoursMapper.selectCountByDayTime(startDay, endTime, adminId);
-        List<ExportRechargePayCardCountModel> list = new ArrayList();
+        List<ExportRechargePayCardCountModel> list = new ArrayList<>();
         for (Map<String, Object> map : maps) {
             ExportRechargePayCardCountModel model = new ExportRechargePayCardCountModel();
             model.setSchool(map.get("schoolName").toString());
@@ -93,10 +149,44 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
         }
         // excel文件名
         String fileName = "充课卡详情表" + System.currentTimeMillis() + ExcelTypeEnum.XLSX;
-        ExcelUtil.writeExcelWithSheets(response, list, fileName, "学校充课详情", new ExportRechargePayCardCountModel());
+        return ExcelUtil.writeExcelWithSheetsAndDownload(list, fileName, "学校充课详情", ExportRechargePayCardCountModel.class);
     }
 
-    private void getRechargePayCardModel(List<StudentHours> studentHours, Date time, HttpServletResponse response) {
+    private ExcelWriterFactory exportStudentOnlineTimeWithSchoolSummary(String yesterday, String fileName) {
+        List<StudentInfoSchoolSummary> studentInfoSchoolSummaries = runLogMapper.selectStudentInfoSchoolSummary(yesterday);
+        studentInfoSchoolSummaries.sort(Comparator.comparing(StudentInfoSchoolSummary::getSchoolName));
+
+        List<ExportStudentOnlineTimeWithSchoolSummary> models = studentInfoSchoolSummaries.stream().map(studentInfoSchoolSummary -> {
+            ExportStudentOnlineTimeWithSchoolSummary exportStudentOnlineTimeWithSchoolSummary = new ExportStudentOnlineTimeWithSchoolSummary();
+            BeanUtils.copyProperties(studentInfoSchoolSummary, exportStudentOnlineTimeWithSchoolSummary);
+            return exportStudentOnlineTimeWithSchoolSummary;
+        }).collect(Collectors.toList());
+
+        return ExcelUtil.writeExcelWithSheetsAndDownload(models, fileName, "汇总", ExportStudentOnlineTimeWithSchoolSummary.class);
+    }
+
+    /**
+     * 导出校区每日学生登录情况及有效时长明细
+     *
+     * @param yesterday
+     * @param excelWriterFactory
+     * @return
+     */
+    private void exportStudentWithSchoolDetail(String yesterday, ExcelWriterFactory excelWriterFactory) {
+        List<StudentInfoSchoolDetail> studentInfoSchoolDetails = durationMapper.selectExportStudentOnlineTimeWithSchoolDetail(yesterday);
+        studentInfoSchoolDetails.sort(Comparator.comparing(StudentInfoSchoolDetail::getSchoolName));
+
+        List<ExportStudentOnlineTimeWithSchoolDetail> models = studentInfoSchoolDetails.stream().map(studentInfoSchoolDetail -> {
+            ExportStudentOnlineTimeWithSchoolDetail exportStudentOnlineTimeWithSchoolDetail = new ExportStudentOnlineTimeWithSchoolDetail();
+            BeanUtils.copyProperties(studentInfoSchoolDetail, exportStudentOnlineTimeWithSchoolDetail);
+            return exportStudentOnlineTimeWithSchoolDetail;
+        }).collect(Collectors.toList());
+
+        excelWriterFactory.write(models, ExcelUtil.getWriteSheet(2, "明细", ExportStudentOnlineTimeWithSchoolDetail.class));
+        excelWriterFactory.finish();
+    }
+
+    private void getRechargePayCardModel(ExcelWriterFactory excelWriterFactory, List<StudentHours> studentHours, Date time) {
         //获取充课卡信息
         Map<Integer, Map<String, Object>> cardMap = rechargeableCardMapper.selAllRechargeableCardMap();
         Map<Long, List<StudentHours>> map = new HashMap<>();
@@ -118,7 +208,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
                 ExportRechargePayCardModel model = new ExportRechargePayCardModel();
                 Student student = studentMapper.selectById(studentId);
                 List<StudentHours> studentHours1 = map.get(studentId);
-                Map<Integer, Integer> sutdentCardMap = new HashMap<>();
+                Map<Integer, Integer> studentCardMap = new HashMap<>();
                 //将一个学生可能出现的多个数据添加到一起
                 for (StudentHours hours : studentHours1) {
                     String type = hours.getType();
@@ -128,13 +218,13 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
                             String[] split1 = str.split(":");
                             Integer cardId = Integer.parseInt(split1[0]);
                             Integer number = Integer.parseInt(split1[1]);
-                            Integer carNumber = sutdentCardMap.get(cardId);
+                            Integer carNumber = studentCardMap.get(cardId);
                             if (carNumber != null) {
                                 carNumber += number;
                             } else {
                                 carNumber = number;
                             }
-                            sutdentCardMap.put(cardId, carNumber);
+                            studentCardMap.put(cardId, carNumber);
                         }
                     }
                 }
@@ -153,20 +243,28 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
                 StringBuilder builder = new StringBuilder();
                 Set<Integer> cardIds = cardMap.keySet();
                 for (Integer cardId : cardIds) {
-                    Map<String, Object> cardmap = cardMap.get(cardId);
-                    if (sutdentCardMap.get(cardId) != null) {
-                        if (sutdentCardMap.get(cardId) > 0) {
+                    Map<String, Object> cardmap = (Map<String, Object>) cardMap.get(cardId);
+                    if (studentCardMap.get(cardId) != null) {
+                        if (studentCardMap.get(cardId) > 0) {
                             builder.append(cardmap.get("name")).append(":").
-                                    append(sutdentCardMap.get(cardId)).append(" ");
+                                    append(studentCardMap.get(cardId)).append(" ");
                         }
                     }
                 }
                 model.setLessonDetails(builder.toString());
                 list.add(model);
             }
-            // excel文件名
-            String fileName = "充课卡详情表" + System.currentTimeMillis() + ExcelTypeEnum.XLSX;
-            ExcelUtil.writeExcelWithSheets(response, list, fileName, "学生信息", new ExportRechargePayCardModel());
+            excelWriterFactory.write(list, ExcelUtil.getWriteSheet(2, "学生信息", ExportRechargePayCardModel.class));
+            excelWriterFactory.finish();
+        }
+    }
+
+    private void uploadToOss(String fileName) {
+        try {
+            FileInputStream fileInputStream = new FileInputStream(fileName);
+            OssUpload.uploadWithInputStream(fileInputStream, FileConstant.STUDENT_REPORT_EXCEL, fileName);
+        } catch (FileNotFoundException e) {
+            log.error("定时任务上传学生报表失败！", e);
         }
     }
 }

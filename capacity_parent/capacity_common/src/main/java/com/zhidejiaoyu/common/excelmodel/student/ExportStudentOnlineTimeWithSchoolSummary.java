@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.common.excelmodel.student;
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.alibaba.excel.metadata.BaseRowModel;
 import com.zhidejiaoyu.common.annotation.excel.CellStyleFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +13,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ExportStudentOnlineTimeWithSchoolSummary extends BaseRowModel {
+public class ExportStudentOnlineTimeWithSchoolSummary {
 
     @CellStyleFormat()
     @ExcelProperty(value = "学校名称", index = 0)

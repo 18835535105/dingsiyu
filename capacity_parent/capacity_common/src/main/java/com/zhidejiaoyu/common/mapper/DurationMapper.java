@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
+import com.zhidejiaoyu.common.Vo.student.studentinfowithschool.StudentInfoSchoolDetail;
 import com.zhidejiaoyu.common.pojo.*;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.MapKey;
@@ -189,5 +190,13 @@ public interface DurationMapper extends BaseMapper<Duration> {
      */
     Duration countOnlineTimeWithLoginOutTine(@Param("studentId") Long studentId);
 
-    Date selectLoginTimeByDate(@Param("studentId") Long studentId,@Param("date") Date date);
+    /**
+     * 查询校区下指定日期学生登录信息及在线时长
+     *
+     * @param date
+     * @return
+     */
+    List<StudentInfoSchoolDetail> selectExportStudentOnlineTimeWithSchoolDetail(String date);
+
+    Date selectLoginTimeByDate(@Param("studentId") Long studentId, @Param("date") Date date);
 }
