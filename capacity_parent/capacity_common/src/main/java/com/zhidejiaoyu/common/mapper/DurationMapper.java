@@ -188,4 +188,6 @@ public interface DurationMapper extends BaseMapper<Duration> {
      * @return
      */
     Duration countOnlineTimeWithLoginOutTine(@Param("studentId") Long studentId);
+
+    Date selectLoginTimeByDate(@Param("studentId") Long studentId,@Param("date") Date date);
 }

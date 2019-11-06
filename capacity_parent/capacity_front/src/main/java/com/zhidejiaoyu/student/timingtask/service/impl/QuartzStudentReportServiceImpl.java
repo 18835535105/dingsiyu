@@ -1,14 +1,24 @@
 package com.zhidejiaoyu.student.timingtask.service.impl;
 
 import com.alibaba.excel.support.ExcelTypeEnum;
+import com.zhidejiaoyu.common.mapper.DurationMapper;
+import com.zhidejiaoyu.common.mapper.RechargeableCardMapper;
+import com.zhidejiaoyu.common.mapper.StudentHoursMapper;
+import com.zhidejiaoyu.common.mapper.StudentMapper;
+import com.zhidejiaoyu.common.pojo.RechargeableCard;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.StudentHours;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.excelUtil.easyexcel.ExcelUtil;
 import com.zhidejiaoyu.common.utils.excelUtil.easyexcel.ExcelWriterFactory;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.timingtask.service.QuartzStudentReportService;
+import com.zhidejiaoyu.student.timingtask.service.impl.exportModel.ExportRechargePayCardCountModel;
+import com.zhidejiaoyu.student.timingtask.service.impl.exportModel.ExportRechargePayCardModel;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
@@ -18,6 +28,16 @@ import java.util.*;
  */
 @Service
 public class QuartzStudentReportServiceImpl implements QuartzStudentReportService {
+
+    @Resource
+    private StudentHoursMapper studentHoursMapper;
+    @Resource
+    private StudentMapper studentMapper;
+    @Resource
+    private DurationMapper durationMapper;
+    @Resource
+    private RechargeableCardMapper rechargeableCardMapper;
+
 
     @Override
     public ServerResponse statisticsStudentWithSchoolInfo() {
@@ -48,15 +68,15 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
             //导出充课详细数据
             getRechargePayCardModel(studentHours, time, response);
         }
-        return new SuccessTip();
+
         return null;
     }
 
     private void getSizePayCardModel(HttpServletResponse response, Date time, Long adminId) {
         Date startDay = DateTime.now().minusDays(31).toDate();
-        String startTime = DateUtil.getDay(startDay);
+        String startTime = DateUtil.formatYYYYMMDD(startDay);
         Date endTime = DateTime.now().minusDays(1).toDate();
-        String endTimeStr = DateUtil.getDay(time);
+        String endTimeStr = DateUtil.formatYYYYMMDD(time);
         List<Map<String, Object>> maps = studentHoursMapper.selectCountByDayTime(startDay, endTime, adminId);
         List<ExportRechargePayCardCountModel> list = new ArrayList();
         for (Map<String, Object> map : maps) {
@@ -123,18 +143,18 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
                 Date loginTime = durationMapper.selectLoginTimeByDate(studentId, date);
                 model.setStudentAccount(student.getAccount());
                 model.setSchool(student.getSchoolName());
-                model.setCreateTime(DateUtil.getTime(studentHours1.get(0).getCreateTime()));
+                model.setCreateTime(DateUtil.formatYYYYMMDD(studentHours1.get(0).getCreateTime()));
                 if (loginTime == null) {
                     model.setLoginTime("未登入");
                 } else {
-                    String loginTimeStr = DateUtil.getTime(loginTime);
+                    String loginTimeStr = DateUtil.formatYYYYMMDD(loginTime);
                     model.setLoginTime(loginTimeStr);
                 }
                 StringBuilder builder = new StringBuilder();
                 Set<Integer> cardIds = cardMap.keySet();
                 for (Integer cardId : cardIds) {
                     Map<String, Object> cardmap = (Map<String, Object>) cardMap.get(cardId);
-                    if(sutdentCardMap.get(cardId)!=null){
+                    if (sutdentCardMap.get(cardId) != null) {
                         if (sutdentCardMap.get(cardId) > 0) {
                             builder.append(cardmap.get("name")).append(":").
                                     append(sutdentCardMap.get(cardId)).append(" ");
@@ -149,5 +169,4 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
             ExcelUtil.writeExcelWithSheets(response, list, fileName, "学生信息", new ExportRechargePayCardModel());
         }
     }
-
 }

@@ -447,4 +447,12 @@
         order by id desc
         limit 1
     </select>
+
+    <select id="selectLoginTimeByDate" parameterType="map" resultType="date">
+        select
+        max(login_time)
+        from duration
+        where student_id =#{studentId}
+        and date(login_time)&lt;=date(#{date})
+    </select>
 </mapper>
