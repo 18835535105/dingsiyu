@@ -82,17 +82,6 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
         log.info("定时任务 -> 统计各校区学生登录及在线时长信息完成。");
     }
 
-    /**
-     * 检查当前端口是否可以执行定时任务
-     *
-     * @return true：不可以执行；false：可执行
-     */
-    private boolean checkPort() {
-        int localPort = ServiceInfoUtil.getPort();
-        return port != localPort;
-    }
-
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Scheduled(cron = "1 15 0 * * ?")
@@ -258,5 +247,15 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
         } catch (FileNotFoundException e) {
             log.error("定时任务上传学生报表失败！", e);
         }
+    }
+
+    /**
+     * 检查当前端口是否可以执行定时任务
+     *
+     * @return true：不可以执行；false：可执行
+     */
+    private boolean checkPort() {
+        int localPort = ServiceInfoUtil.getPort();
+        return port != localPort;
     }
 }
