@@ -98,7 +98,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
 
     private void getRechargePayCardModel(List<StudentHours> studentHours, Date time, HttpServletResponse response) {
         //获取充课卡信息
-        Map<Integer, Object> cardMap = rechargeableCardMapper.selAllRechargeableCardMap();
+        Map<Integer, Map<String, Object>> cardMap = rechargeableCardMapper.selAllRechargeableCardMap();
         Map<Long, List<StudentHours>> map = new HashMap<>();
         if (studentHours.size() > 0) {
             //进行每一个学生的分组
@@ -153,7 +153,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
                 StringBuilder builder = new StringBuilder();
                 Set<Integer> cardIds = cardMap.keySet();
                 for (Integer cardId : cardIds) {
-                    Map<String, Object> cardmap = (Map<String, Object>) cardMap.get(cardId);
+                    Map<String, Object> cardmap = cardMap.get(cardId);
                     if (sutdentCardMap.get(cardId) != null) {
                         if (sutdentCardMap.get(cardId) > 0) {
                             builder.append(cardmap.get("name")).append(":").

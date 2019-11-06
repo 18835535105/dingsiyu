@@ -18,7 +18,7 @@ public interface RechargeableCardMapper extends BaseMapper<RechargeableCard> {
 
 
     @MapKey("id")
-    Map<Integer,Object> selAllRechargeableCardMap();
+    Map<Integer,Map<String,Object>> selAllRechargeableCardMap();
 
 
 
