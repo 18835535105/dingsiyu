@@ -24,5 +24,5 @@ public interface QuartzStudentReportService {
      * @param response
      * @return
      */
-    Object exportStudentPay(HttpServletResponse response);
+    void exportStudentPay(HttpServletResponse response);
 }

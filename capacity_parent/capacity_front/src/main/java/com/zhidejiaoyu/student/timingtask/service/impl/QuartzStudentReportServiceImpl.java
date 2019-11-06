@@ -1,6 +1,8 @@
 package com.zhidejiaoyu.student.timingtask.service.impl;
 
 import com.alibaba.excel.support.ExcelTypeEnum;
+import com.zhidejiaoyu.common.excelmodel.student.ExportRechargePayCardCountModel;
+import com.zhidejiaoyu.common.excelmodel.student.ExportRechargePayCardModel;
 import com.zhidejiaoyu.common.mapper.DurationMapper;
 import com.zhidejiaoyu.common.mapper.RechargeableCardMapper;
 import com.zhidejiaoyu.common.mapper.StudentHoursMapper;
@@ -11,10 +13,10 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.excelUtil.easyexcel.ExcelUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.timingtask.service.QuartzStudentReportService;
-import com.zhidejiaoyu.common.excelmodel.student.ExportRechargePayCardCountModel;
-import com.zhidejiaoyu.common.excelmodel.student.ExportRechargePayCardModel;
 import org.joda.time.DateTime;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -54,8 +56,10 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
         return null;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Scheduled(cron = "1 15 0 * * ?")
     @Override
-    public Object exportStudentPay(HttpServletResponse response) {
+    public void exportStudentPay(HttpServletResponse response) {
         Long adminId = 1L;
         Date time = DateTime.now().minusDays(1).toDate();
         //根据校管id获取学校下的充课学生
@@ -66,8 +70,6 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
             //导出充课详细数据
             getRechargePayCardModel(studentHours, time, response);
         }
-
-        return null;
     }
 
     private void getSizePayCardModel(HttpServletResponse response, Date time, Long adminId) {
@@ -101,7 +103,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
         if (studentHours.size() > 0) {
             //进行每一个学生的分组
             for (StudentHours hours : studentHours) {
-                List<StudentHours> students = map.get(hours.getStudentId());
+                List<StudentHours> students = map.get(hours.getStudentId().longValue());
                 if (students == null) {
                     students = new ArrayList<>();
                     students.add(hours);
@@ -124,8 +126,8 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
                     for (String str : split) {
                         if (str.contains(":")) {
                             String[] split1 = str.split(":");
-                            Integer cardId = Integer.parseInt(split1[0].toString());
-                            Integer number = Integer.parseInt(split1[1].toString());
+                            Integer cardId = Integer.parseInt(split1[0]);
+                            Integer number = Integer.parseInt(split1[1]);
                             Integer carNumber = sutdentCardMap.get(cardId);
                             if (carNumber != null) {
                                 carNumber += number;

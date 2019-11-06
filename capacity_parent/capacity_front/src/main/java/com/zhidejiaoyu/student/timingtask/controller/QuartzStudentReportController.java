@@ -18,12 +18,4 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping("/quartz/student/report")
 public class QuartzStudentReportController {
 
-    @Resource
-    private QuartzStudentReportService quartzStudentReportService;
-
-    @RequestMapping("exportStudentPay")
-    public Object exportStudentPay(HttpServletResponse response){
-        return quartzStudentReportService.exportStudentPay(response);
-    }
-
 }
