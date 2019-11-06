@@ -1,8 +1,8 @@
-package com.zhidejiaoyu.student.controller.simple;
+package com.zhidejiaoyu.student.timingtask.controller;
 
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.service.simple.SimpleQuartzService;
+import com.zhidejiaoyu.student.timingtask.service.QuartzService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/quartz")
-public class SimpleQuartzController {
+public class QuartzController {
 
     @Autowired
-    private SimpleQuartzService simpleQuartzService;
+    private QuartzService quartzService;
 
     /**
      * 更新题型消息中学生账号到期提醒
@@ -23,7 +23,7 @@ public class SimpleQuartzController {
      */
     @PostMapping("/updateNews")
     public ServerResponse updateNews() {
-        simpleQuartzService.updateNews();
+        quartzService.updateNews();
         return ServerResponse.createBySuccess();
     }
 
@@ -34,7 +34,7 @@ public class SimpleQuartzController {
      */
     @PostMapping("/updateEnergy")
     public ServerResponse updateEnergy() {
-        this.simpleQuartzService.updateEnergy();
+        this.quartzService.updateEnergy();
         return ServerResponse.createBySuccess();
     }
 
@@ -45,7 +45,7 @@ public class SimpleQuartzController {
      */
     @PostMapping("/updateFrozen")
     public ServerResponse updateFrozen() {
-        this.simpleQuartzService.updateFrozen();
+        this.quartzService.updateFrozen();
         return ServerResponse.createBySuccess();
     }
 
@@ -56,24 +56,24 @@ public class SimpleQuartzController {
      */
     @PostMapping("/updateClassMonthRank")
     public ServerResponse<Object> updateClassMonthRank() {
-        simpleQuartzService.updateClassMonthRank();
+        quartzService.updateClassMonthRank();
         return ServerResponse.createBySuccess();
     }
 
     @PostMapping("/updateRank")
     public ServerResponse<Object> updateRank() {
-        simpleQuartzService.updateRank();
+        quartzService.updateRank();
         return ServerResponse.createBySuccess();
     }
 
     @GetMapping("/updateStudentExpansion")
     public void updateStudentExpansion() {
-        simpleQuartzService.updateStudentExpansion();
+        quartzService.updateStudentExpansion();
     }
 
     @PostMapping("/deleteSessionMap")
     public void deleteSessionMap() {
-        simpleQuartzService.deleteSessionMap();
+        quartzService.deleteSessionMap();
     }
 
     /**
@@ -81,7 +81,7 @@ public class SimpleQuartzController {
      */
     @PostMapping("/deleteDailyAward")
     public void deleteDailyAward() {
-        this.simpleQuartzService.deleteDailyAward();
+        this.quartzService.deleteDailyAward();
     }
 
     /**
@@ -89,7 +89,7 @@ public class SimpleQuartzController {
      */
     @PostMapping("/deleteDrawRedis")
     public void deleteDrawRedis() {
-        this.simpleQuartzService.deleteDrawRedis();
+        this.quartzService.deleteDrawRedis();
     }
 
     /**
@@ -99,7 +99,7 @@ public class SimpleQuartzController {
      */
     @GetMapping("/initRankCaches")
     public ServerResponse initRankCaches() {
-        simpleQuartzService.initRankCaches();
+        quartzService.initRankCaches();
         return ServerResponse.createBySuccess();
     }
 
@@ -110,7 +110,7 @@ public class SimpleQuartzController {
      */
     @GetMapping("/initRankCache")
     public ServerResponse initRankCache(Long studentId) {
-        simpleQuartzService.initRankCache(studentId);
+        quartzService.initRankCache(studentId);
         return ServerResponse.createBySuccess();
     }
 
@@ -121,7 +121,7 @@ public class SimpleQuartzController {
      */
     @PostMapping("/deleteStudentLocation")
     public ServerResponse deleteStudentLocation() {
-        this.simpleQuartzService.deleteStudentLocation();
+        this.quartzService.deleteStudentLocation();
         return ServerResponse.createBySuccess();
     }
 }

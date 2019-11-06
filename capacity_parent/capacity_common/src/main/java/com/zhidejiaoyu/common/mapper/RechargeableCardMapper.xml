@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.RechargeableCardMapper">
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.RechargeableCard">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="time" column="time"/>
+        <result property="state" column="state"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="Base_Sql">
+        id, name, time, create_time,state,update_time
+    </sql>
+
+    <select id="selAllRechargeableCardMap" resultType="map">
+        select id, time, name
+        from rechargeable_card card
+        where card.state =1
+    </select>
+
+
+</mapper>

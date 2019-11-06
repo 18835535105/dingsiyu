@@ -447,4 +447,33 @@
         order by id desc
         limit 1
     </select>
+
+    <select id="selectExportStudentOnlineTimeWithSchoolDetail"
+            resultType="com.zhidejiaoyu.common.Vo.student.studentinfowithschool.StudentInfoSchoolDetail" parameterType="map">
+        select t.school                                schoolName,
+               s.account,
+               s.student_name                          studentName,
+               (select sum(online_time)
+                from duration
+                where student_id = s.id
+                  and TO_DAYS(login_out_time) = TO_DAYS(#{date})
+                GROUP BY student_id)                   onlineTime,
+               date_format(rl.create_time, '%Y-%m-%d') time
+        from run_log rl,
+             student s,
+             teacher t
+        where s.id = rl.operate_user_id
+          and (s.teacher_id = t.teacher_id or s.teacher_id = t.school_admin_id)
+          and rl.type = 1
+          and to_days(rl.create_time) = to_days(#{date})
+        group by rl.operate_user_id
+    </select>
+
+    <select id="selectLoginTimeByDate" parameterType="map" resultType="date">
+        select
+        max(login_time)
+        from duration
+        where student_id =#{studentId}
+        and date(login_time)&lt;=date(#{date})
+    </select>
 </mapper>
