@@ -15,9 +15,12 @@ import com.zhidejiaoyu.common.pojo.StudentHours;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.excelUtil.easyexcel.ExcelUtil;
 import com.zhidejiaoyu.common.utils.excelUtil.easyexcel.ExcelWriterFactory;
+import com.zhidejiaoyu.student.mail.Mail;
+import com.zhidejiaoyu.student.mail.service.MailService;
 import com.zhidejiaoyu.student.timingtask.service.QuartzStudentReportService;
 import com.zhidejiaoyu.student.utils.ServiceInfoUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,6 +60,9 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
     @Resource
     private RechargeableCardMapper rechargeableCardMapper;
 
+    @Resource
+    private MailService mailService;
+
     @Scheduled(cron = "0 0 1 * * ?")
     @Override
     public void exportStudentWithSchool() {
@@ -78,8 +84,18 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
         this.uploadToOss(fileName);
 
         // 发送邮件
+        this.sendEmail(fileName);
 
         log.info("定时任务 -> 统计各校区学生登录及在线时长信息完成。");
+    }
+
+    private void sendEmail(String fileName) {
+        mailService.sendAttachmentsMail(Mail.builder()
+                .to(new String[]{"763396567@qq.com"})
+                .filePath(FileConstant.TMP_EXCEL + fileName)
+                .subject(fileName)
+                .content(fileName)
+                .build());
     }
 
     @Override
@@ -105,6 +121,9 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
         }
 
         this.uploadToOss(fileName);
+
+        // 发送邮件
+        this.sendEmail(fileName);
 
         log.info("定时任务 -> 统计各校区学生充课信息完成。");
     }
@@ -203,7 +222,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
                 Date loginTime = durationMapper.selectLoginTimeByDate(studentId, date);
                 model.setStudentAccount(student.getAccount());
                 model.setSchool(student.getSchoolName());
-                model.setStudentName(student.getStudentName()!=null&&student.getStudentName()!=""?student.getStudentName():"默认姓名");
+                model.setStudentName(StringUtils.isEmpty(student.getStudentName()) ? student.getStudentName() : "默认姓名");
                 model.setCreateTime(DateUtil.formatYYYYMMDD(studentHours1.get(0).getCreateTime()));
                 if (loginTime == null) {
                     model.setLoginTime("未登入");
