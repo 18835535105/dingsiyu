@@ -2,6 +2,8 @@ package com.zhidejiaoyu.student.timingtask.service;
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * 学生报表相关定时任务
  *
@@ -16,4 +18,11 @@ public interface QuartzStudentReportService {
      * @return
      */
     ServerResponse statisticsStudentWithSchoolInfo();
+
+    /**
+     * 每日一点15统计昨天各校区新增课时人源
+     * @param response
+     * @return
+     */
+    Object exportStudentPay(HttpServletResponse response);
 }
