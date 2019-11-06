@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.syntax.service.impl;
 
+import com.zhidejiaoyu.common.Vo.syntax.SyntaxCourseVo;
 import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.mapper.StudentStudyPlanMapper;
 import com.zhidejiaoyu.common.mapper.StudentStudySyntaxMapper;
@@ -52,44 +53,44 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
         //获取学生所有语法课程学习记录
         Map<Long, Map<String, Object>> longStudentStudySyntaxMap = studentStudySyntaxMapper.selectStudyAllByStudentId(student.getId());
         Map<String, Object> returnMap = new HashMap<>(3);
-        List<Map<String, Object>> currentGradeList = new ArrayList<>();
-        List<Map<String, Object>> previousGradeList = new ArrayList<>();
+        List<SyntaxCourseVo> currentGradeList = new ArrayList<>();
+        List<SyntaxCourseVo> previousGradeList = new ArrayList<>();
         for (Map<String, Object> map : studyList) {
-            Map<String, Object> useMap = new HashMap<>(1);
+            SyntaxCourseVo useMap = new SyntaxCourseVo();
             //添加返回年级及英文年级选项
             String grade = map.get("grade").toString();
             String gradeEnglish = getGradeAndLabelEnglishName(grade);
             String label = map.get("label").toString();
             String labelEnglish = getGradeAndLabelEnglishName(label);
-            useMap.put("grade", grade + "(" + label + ")");
-            useMap.put("englishGrade", gradeEnglish + "-" + labelEnglish);
+            useMap.setGrade(grade + "(" + label + ")");
+            useMap.setEnglishGrade(gradeEnglish + "-" + labelEnglish);
             //添加课程id以及单元id名称
             Long courseId = Long.parseLong(map.get("courseId").toString());
             Map<String, Object> studyUnit = longStudentStudySyntaxMap.get(courseId);
-            useMap.put("courseId", courseId);
+            useMap.setCourseId(courseId.intValue());
             //判断该单元是否正在学习
             Long unitId;
             if (studyUnit != null) {
                 unitId = Long.parseLong(studyUnit.get("unitId").toString());
-                useMap.put("model", studyUnit.get("model"));
-                useMap.put("battle", 2);
+                useMap.setModel(studyUnit.get("model").toString());
+                useMap.setBattle(2);
                 //计算战斗进度
-                useMap.put("combatProgress", getCalculateBattleProgress(courseId, unitId, studyUnit.get("model").toString()));
+                useMap.setCombatProgress(getCalculateBattleProgress(courseId, unitId, studyUnit.get("model").toString()));
             } else {
                 unitId = Long.parseLong(map.get("startId").toString());
-                useMap.put("model", SyntaxModelNameConstant.GAME);
-                useMap.put("battle", 1);
-                useMap.put("combatProgress", 0);
+                useMap.setModel(SyntaxModelNameConstant.GAME);
+                useMap.setBattle(1);
+                useMap.setCombatProgress(0);
             }
             SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
-            useMap.put("unitId", unitId);
-            useMap.put("unitName", syntaxUnit.getUnitName());
-            useMap.put("unitIndex",syntaxUnit.getUnitIndex());
+            useMap.setUnitId(unitId.intValue());
+            useMap.setUnitName(syntaxUnit.getUnitName().toString());
+            useMap.setUnitIndex(syntaxUnit.getUnitIndex());
             //战斗状态
             int complete = Integer.parseInt(map.get("complete").toString());
             if (complete == 2) {
-                useMap.put("battle", 3);
-                useMap.put("combatProgress", 100);
+                useMap.setBattle(3);
+                useMap.setCombatProgress(100);
             }
             if (grade.equals(student.getGrade())) {
                 previousGradeList.add(useMap);
