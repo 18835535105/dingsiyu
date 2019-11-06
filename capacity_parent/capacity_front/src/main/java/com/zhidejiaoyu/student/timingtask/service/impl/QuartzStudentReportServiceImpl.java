@@ -100,7 +100,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @Scheduled(cron = "1 15 0 * * ?")
+    @Scheduled(cron = "0 15 1 * * ?")
     public void exportStudentPay() {
         if (checkPort()) {
             return;
