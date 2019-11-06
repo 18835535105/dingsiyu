@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.timingtask.service.impl.exportModel;
+package com.zhidejiaoyu.common.excelmodel.student;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.metadata.BaseRowModel;

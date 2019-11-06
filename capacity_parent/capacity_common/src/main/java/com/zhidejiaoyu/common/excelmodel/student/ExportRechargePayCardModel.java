@@ -1,9 +1,9 @@
-package com.zhidejiaoyu.student.timingtask.service.impl.exportModel;
+package com.zhidejiaoyu.common.excelmodel.student;
 
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.metadata.BaseRowModel;
-import com.stylefeng.guns.core.annotation.excel.CellStyleFormat;
+import com.zhidejiaoyu.common.annotation.excel.CellStyleFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -14,29 +14,11 @@
         id, name, time, create_time,state,update_time
     </sql>
 
-    <select id="selList" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="Base_Sql"/> from rechargeable_card order by create_time desc
-    </select>
-
-    <select id="getAddRechargeableCard" resultMap="BaseResultMap">
-        select <include refid="Base_Sql"></include> from rechargeable_card where state=1 order by id desc limit 5
-    </select>
-
-    <select id="selAllRechargeableCard" resultMap="BaseResultMap">
-        select <include refid="Base_Sql"></include>
-        from rechargeable_card card
-        where card.state =1
-    </select>
     <select id="selAllRechargeableCardMap" resultType="map">
         select id, time, name
         from rechargeable_card card
         where card.state =1
     </select>
 
-    <select id="selSchoolRechargeableCard" resultType="map" parameterType="map">
-        select card.id id, card.name name ,sum(paycard.card_num) num
-         from rechargeable_card card
-         join pay_card paycard on card.id = paycard.type
-          where goods_user_id=#{userId} group by card.id
-    </select>
+
 </mapper>
