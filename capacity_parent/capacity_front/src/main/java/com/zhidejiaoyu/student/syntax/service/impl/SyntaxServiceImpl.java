@@ -83,8 +83,8 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
                 useMap.setCombatProgress(0);
             }
             SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
-            useMap.setUnitId(unitId.intValue());
-            useMap.setUnitName(syntaxUnit.getUnitName().toString());
+            useMap.setUnitId(unitId);
+            useMap.setUnitName(syntaxUnit.getUnitName());
             useMap.setUnitIndex(syntaxUnit.getUnitIndex());
             //战斗状态
             int complete = Integer.parseInt(map.get("complete").toString());

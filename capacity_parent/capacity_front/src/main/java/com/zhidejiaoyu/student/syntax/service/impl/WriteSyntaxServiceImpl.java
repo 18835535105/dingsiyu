@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.syntax.service.impl;
 
 import com.zhidejiaoyu.common.Vo.syntax.KnowledgePointVO;
+import com.zhidejiaoyu.common.Vo.syntax.SyntaxCourseVo;
 import com.zhidejiaoyu.common.Vo.syntax.TopicVO;
 import com.zhidejiaoyu.common.Vo.syntax.WriteSyntaxVO;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
@@ -68,6 +69,9 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
     @Resource
     private MedalAwardAsync medalAwardAsync;
 
+    @Resource
+    private SyntaxUnitMapper syntaxUnitMapper;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse getLearnSyntax(Long unitId) {
@@ -106,6 +110,15 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         // 说明当前单元写语法模块内容都已掌握，进入下一个单元或者完成当前课程
         if (initNextUnitOrCourse(student)) {
             return ServerResponse.createBySuccess(ResponseCode.COURSE_FINISH);
+        }
+        SyntaxUnit syntaxUnit = syntaxUnitMapper.selectCurrentUnit(student.getId());
+        if (syntaxUnit != null) {
+            // 返回下一个单元的信息
+            return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH.getCode(), SyntaxCourseVo.builder()
+                    .unitId(syntaxUnit.getId())
+                    .unitName(syntaxUnit.getUnitName())
+                    .unitIndex(syntaxUnit.getUnitIndex())
+                    .build());
         }
         return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
     }

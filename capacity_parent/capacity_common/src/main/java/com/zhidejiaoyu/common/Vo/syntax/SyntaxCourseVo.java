@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.Vo.syntax;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class SyntaxCourseVo {
     /**
      * 中文年级
@@ -40,7 +42,7 @@ public class SyntaxCourseVo {
     /**
      * 单元id
      */
-    private Integer unitId;
+    private Long unitId;
     /**
      * 单元名
      */
