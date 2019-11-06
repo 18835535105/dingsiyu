@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.service.simple.impl;
+package com.zhidejiaoyu.student.timingtask.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
@@ -15,7 +15,7 @@ import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
-import com.zhidejiaoyu.student.service.simple.SimpleQuartzService;
+import com.zhidejiaoyu.student.timingtask.service.QuartzService;
 import com.zhidejiaoyu.student.utils.ServiceInfoUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class SimpleQuartzServiceImpl implements SimpleQuartzService {
+public class QuartzServiceImpl implements QuartzService {
 
     @Value("${quartz.port}")
     private int port;
@@ -175,7 +175,7 @@ public class SimpleQuartzServiceImpl implements SimpleQuartzService {
 
     public static void main(String[] args) {
         System.out.println(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
-        SimpleQuartzServiceImpl quart = new SimpleQuartzServiceImpl();
+        QuartzServiceImpl quart = new QuartzServiceImpl();
         quart.updateEnergy();
     }
 

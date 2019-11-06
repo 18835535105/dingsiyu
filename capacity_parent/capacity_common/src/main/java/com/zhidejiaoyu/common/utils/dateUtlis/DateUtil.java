@@ -5,6 +5,10 @@ import org.apache.commons.lang.StringUtils;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -408,5 +412,22 @@ public class DateUtil implements Serializable {
         Date date = new Date(System.currentTimeMillis());
         String currdate = new SimpleDateFormat(format).format(date);
         return currdate;
+    }
+
+    /**
+     * 获取当前日期测最大时间
+     *
+     * @param date
+     * @return
+     */
+    public static Date maxTime(Date date) {
+        // 获取本地标准时间（本地默认的时区时间）
+        Instant instant = date.toInstant();
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
+        ;
+        LocalDateTime endOfDay = localDateTime.with(LocalTime.MAX);
+        return Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant());
+
     }
 }

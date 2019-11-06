@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Data;
@@ -12,53 +13,40 @@ import java.util.Date;
 
 /**
  * <p>
- *
+ * 
  * </p>
  *
- * @author liumaoyu
- * @since 2019-11-05
+ * @author zdjy
+ * @since 2019-09-27
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class StudentClassHourDetails extends Model<StudentClassHourDetails> {
+public class StudentHours extends Model<StudentHours> {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
-    /**
-     * 学校
-     */
-    private String school;
+    private Integer id;
     /**
      * 校管id
      */
-    private Long schoolAdminId;
-    /**
-     * 校管名称
-     */
-    private String adminName;
+    @TableField("admin_id")
+    private Integer adminId;
     /**
      * 学生id
      */
-    private Long studentId;
+    @TableField("student_id")
+    private Integer studentId;
     /**
-     * 学生姓名
+     * 充课类型   类型:数量,
      */
-    private String studentName;
+    private String type;
     /**
      * 充课时间
      */
+    @TableField("create_time")
     private Date createTime;
-    /**
-     * 充课详情
-     */
-    private String details;
-    /**
-     * 最后登入时间
-     */
-    private Date maxLoginTime;
 
 
     @Override

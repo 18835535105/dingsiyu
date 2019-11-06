@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.StudentHoursMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentHours">
+        <id column="id" property="id"/>
+        <result column="admin_id" property="adminId"/>
+        <result column="student_id" property="studentId"/>
+        <result column="type" property="type"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="base_sql">
+        id,admin_id,student_id,type,create_time
+    </sql>
+
+    <select id="selByAdminId" parameterType="map" resultType="map">
+        select hours.type,hours.create_time time,stu.account,stu.student_name name from student_hours hours
+        left join student stu on stu.id=hours.student_id
+        <if test="adminId!=1">
+            where hours.admin_id=#{adminId}
+        </if>
+        order by hours.create_time desc
+    </select>
+
+    <select id="selectDeatilsByAdminId" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"></include>
+        from student_hours
+        where
+        to_days(create_time)=to_days(#{time})
+        <if test="adminId!=1">
+            and admin_id=#{adminId}
+        </if>
+    </select>
+
+    <select id="selectCountByDayTime" parameterType="map" resultType="map">
+        select
+        stu.school_name schoolName,count(distinct hours.student_id) count
+        from student_hours hours
+        join
+        student stu
+        on
+        hours.student_id=stu.id
+        where
+        to_days(create_time) >= to_days(#{startDay})
+        and
+        to_days(create_time) &lt;= to_days(#{endTime})
+        group by stu.school_name
+    </select>
+
+
+</mapper>
