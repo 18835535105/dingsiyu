@@ -124,8 +124,8 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
             } else {
                 model.setCount(map.get("count").toString());
             }
-            model.setSchool(startTime);
-            model.setSchool(endTimeStr);
+            model.setStartTime(startTime);
+            model.setEndTime(endTimeStr);
             list.add(model);
         }
         // excel文件名
@@ -169,19 +169,9 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
     private void getRechargePayCardModel(ExcelWriterFactory excelWriterFactory, List<StudentHours> studentHours, Date time) {
         //获取充课卡信息
         Map<Integer, Map<String, Object>> cardMap = rechargeableCardMapper.selAllRechargeableCardMap();
-        Map<Long, List<StudentHours>> map = new HashMap<>(16);
         if (studentHours.size() > 0) {
             //进行每一个学生的分组
-            for (StudentHours hours : studentHours) {
-                List<StudentHours> students = map.get(hours.getStudentId().longValue());
-                if (students == null) {
-                    students = new ArrayList<>();
-                    students.add(hours);
-                } else {
-                    students.add(hours);
-                }
-                map.put(hours.getStudentId().longValue(), students);
-            }
+            Map<Long, List<StudentHours>> map = studentHours.stream().collect(Collectors.groupingBy(hours -> hours.getStudentId().longValue()));
             Set<Long> longs = map.keySet();
             List<ExportRechargePayCardModel> list = new ArrayList<>();
             for (Long studentId : longs) {
@@ -213,6 +203,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
                 Date loginTime = durationMapper.selectLoginTimeByDate(studentId, date);
                 model.setStudentAccount(student.getAccount());
                 model.setSchool(student.getSchoolName());
+                model.setStudentName(student.getStudentName()!=null&&student.getStudentName()!=""?student.getStudentName():"默认姓名");
                 model.setCreateTime(DateUtil.formatYYYYMMDD(studentHours1.get(0).getCreateTime()));
                 if (loginTime == null) {
                     model.setLoginTime("未登入");

@@ -37,7 +37,7 @@
 
     <select id="selectCountByDayTime" parameterType="map" resultType="map">
         select
-        stu.school_name schoolName,count(distinct hours.student_id)
+        stu.school_name schoolName,count(distinct hours.student_id) count
         from student_hours hours
         join
         student stu
