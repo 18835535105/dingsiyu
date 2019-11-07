@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
@@ -90,6 +91,11 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
      */
     private List<SyntaxTopic> getSyntaxTopics(Long unitId) {
         List<SyntaxTopic> syntaxTopics = syntaxTopicMapper.selectSelectSyntaxByUnitId(unitId);
+        if (CollectionUtils.isEmpty(syntaxTopics)) {
+            SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
+            log.error("语法单元[{} - {}]没有没有选语法题目！", syntaxUnit.getId(), syntaxUnit.getJointName());
+            throw new ServiceException(500, "未查询到游戏题目！");
+        }
         List<SyntaxTopic> result = new ArrayList<>(syntaxTopics);
         return this.syntaxTopicsResult(syntaxTopics, result);
 
