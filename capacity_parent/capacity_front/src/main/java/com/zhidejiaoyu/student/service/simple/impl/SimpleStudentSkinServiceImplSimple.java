@@ -193,7 +193,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 } else {
                     setMap.put("have", true);
                     //是否正在使用
-                    setMap.put("use", true);
+                    setMap.put("use", false);
                 }
                 //獲取皮膚碎片使用數量
                 Object o2 = maps.get(finalName);
