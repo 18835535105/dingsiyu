@@ -94,7 +94,7 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
         }
 
         // 说明当前单元学语法模块内容都已掌握，进入语法游戏模块
-        LearnSyntaxServiceImpl.packageStudentStudySyntax(unitId, student, SyntaxModelNameConstant.GAME, studentStudySyntaxMapper, syntaxUnitMapper);
+        LearnSyntaxServiceImpl.packageStudentStudySyntax(unitId, student, SyntaxModelNameConstant.GAME, studentStudySyntaxMapper, syntaxUnitMapper, learnMapper);
 
         return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
 

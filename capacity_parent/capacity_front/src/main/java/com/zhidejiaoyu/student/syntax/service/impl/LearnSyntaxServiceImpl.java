@@ -17,9 +17,11 @@ import com.zhidejiaoyu.student.syntax.savelearn.SaveLearnInfo;
 import com.zhidejiaoyu.student.syntax.service.LearnSyntaxService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -87,7 +89,7 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         }
 
         // 说明当前单元学语法模块内容都已掌握，进入选语法模块
-        packageStudentStudySyntax(unitId, student, SyntaxModelNameConstant.SELECT_SYNTAX, studentStudySyntaxMapper, syntaxUnitMapper);
+        packageStudentStudySyntax(unitId, student, SyntaxModelNameConstant.SELECT_SYNTAX, studentStudySyntaxMapper, syntaxUnitMapper, learnMapper);
 
         return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
     }
@@ -107,9 +109,10 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
      * @param nextModelName            下一个模块名称
      * @param studentStudySyntaxMapper
      * @param syntaxUnitMapper
+     * @param learnMapper
      */
     static void packageStudentStudySyntax(Long unitId, Student student, String nextModelName,
-                                          StudentStudySyntaxMapper studentStudySyntaxMapper, SyntaxUnitMapper syntaxUnitMapper) {
+                                          StudentStudySyntaxMapper studentStudySyntaxMapper, SyntaxUnitMapper syntaxUnitMapper, LearnMapper learnMapper) {
         StudentStudySyntax studentStudySyntax = studentStudySyntaxMapper.selectByStudentIdAndUnitId(student.getId(), unitId);
         if (!Objects.isNull(studentStudySyntax)) {
             studentStudySyntax.setModel(nextModelName);
@@ -124,6 +127,25 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                     .studentId(student.getId())
                     .courseId(!Objects.isNull(syntaxUnit) ? syntaxUnit.getCourseId() : null)
                     .build());
+        }
+
+        // 将下一模块的学习记录置为已学习状态，避免找不到题目问题
+        updateLearnType(studentStudySyntax, learnMapper);
+    }
+
+    /**
+     * 将指定模块的学习记录置为已学习状态
+     *
+     * @param studentStudySyntax
+     * @param learnMapper
+     */
+    private static void updateLearnType(StudentStudySyntax studentStudySyntax, LearnMapper learnMapper) {
+        List<Learn> learns = learnMapper.selectSyntaxByUnitIdAndStudyModel(studentStudySyntax);
+        if (!CollectionUtils.isEmpty(learns)) {
+            learns.parallelStream().forEach(learn -> {
+                learn.setType(2);
+                learnMapper.updateById(learn);
+            });
         }
     }
 
