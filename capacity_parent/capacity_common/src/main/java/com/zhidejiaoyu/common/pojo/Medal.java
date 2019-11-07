@@ -51,6 +51,11 @@ public class Medal extends Model<Medal> {
      */
     private Integer totalPlan;
 
+    /**
+     * 领取勋章时gif图路径
+     */
+    private String getGifImgUrl;
+
     @Override
     protected Serializable pkVal() {
         return this.id;

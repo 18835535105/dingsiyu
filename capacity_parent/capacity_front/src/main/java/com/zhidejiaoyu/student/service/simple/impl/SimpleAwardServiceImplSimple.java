@@ -419,7 +419,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                     // 更新学生金币信息
                     student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
                     try {
-                        simpleStudentMapper.updateByPrimaryKeySelective(student);
+                        simpleStudentMapper.updateById(student);
                     } catch (Exception e) {
                         log.error("id为[{}]的学生在领取[{}]中[{}]奖励时更新学生金币信息出错", student.getId(), awardType, awardContent, e);
                         return ServerResponse.createByErrorMessage("更新学生金币信息出错!");
@@ -468,7 +468,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
             }
 
             if (getType == 2) {
-                return ServerResponse.createBySuccess(medal.getParentName());
+                return ServerResponse.createBySuccess(medal.getGetGifImgUrl());
             }
             return ServerResponse.createBySuccessMessage("领取成功！");
 
