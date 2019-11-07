@@ -17,11 +17,10 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+
+import static com.zhidejiaoyu.student.syntax.service.impl.SyntaxGameServiceImpl.getGameSelects;
 
 /**
  * 获取选语法需要复习的内容
@@ -138,16 +137,6 @@ public class SelectNeedView implements INeedView {
      * @return
      */
     private List<GameSelect> packageSelectAnswer(SyntaxTopic syntaxTopic) {
-
-        String[] options = syntaxTopic.getOption().split("\\$&\\$");
-        List<GameSelect> select = Arrays.stream(options).map(option -> {
-            if (!Objects.equals(syntaxTopic.getAnswer().trim(), option.trim())) {
-                return new GameSelect(option.trim(), false);
-            }
-            return new GameSelect(option.trim(), true);
-        }).collect(Collectors.toList());
-
-        Collections.shuffle(select);
-        return select;
+        return getGameSelects(syntaxTopic);
     }
 }

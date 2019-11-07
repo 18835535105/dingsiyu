@@ -72,7 +72,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
         }
 
         List<GameVO> returnList = syntaxTopics.parallelStream().limit(GAME_COUNT)
-                .map(syntaxTopic -> new GameVO(syntaxTopic.getTopic().replace("$&$", "___"), this.getSelect(syntaxTopic, syntaxTopics)))
+                .map(syntaxTopic -> new GameVO(syntaxTopic.getTopic().replace("$&$", "___"), this.getSelect(syntaxTopic)))
                 .collect(Collectors.toList());
 
         return ServerResponse.createBySuccess(returnList);
@@ -231,22 +231,23 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
      * 封装游戏选项
      *
      * @param syntaxTopic  当前正确的语法题信息
-     * @param syntaxTopics 当前单元所有的语法题信息
      * @return
      */
-    private List<GameSelect> getSelect(SyntaxTopic syntaxTopic, List<SyntaxTopic> syntaxTopics) {
-        Collections.shuffle(syntaxTopics);
-        // 添加错误答案
-        List<GameSelect> collect = syntaxTopics.parallelStream()
-                // 错误答案排除正确答案的内容
-                .filter(syntaxTopic1 -> !Objects.equals(syntaxTopic.getTopic(), syntaxTopic1.getTopic()))
-                .limit(3)
-                .map(syntaxTopic1 -> new GameSelect(syntaxTopic1.getAnswer(), false))
-                .collect(Collectors.toList());
-        // 添加正确答案
-        collect.add(new GameSelect(syntaxTopic.getAnswer(), true));
-        Collections.shuffle(collect);
-        return collect;
+    private List<GameSelect> getSelect(SyntaxTopic syntaxTopic) {
+        return getGameSelects(syntaxTopic);
+    }
+
+    public static List<GameSelect> getGameSelects(SyntaxTopic syntaxTopic) {
+        String[] options = syntaxTopic.getOption().split("\\$&\\$");
+        List<GameSelect> select = Arrays.stream(options).map(option -> {
+            if (!Objects.equals(syntaxTopic.getAnswer().trim(), option.trim())) {
+                return new GameSelect(option.trim(), false);
+            }
+            return new GameSelect(option.trim(), true);
+        }).collect(Collectors.toList());
+
+        Collections.shuffle(select);
+        return select;
     }
 
     /**

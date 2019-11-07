@@ -51,7 +51,7 @@
         syntax_topic st
         where kp.id = st.knowledge_point_id
         and st.id = #{topicId}
-        order by id
+        order by kp.id
         limit 1
     </select>
 
