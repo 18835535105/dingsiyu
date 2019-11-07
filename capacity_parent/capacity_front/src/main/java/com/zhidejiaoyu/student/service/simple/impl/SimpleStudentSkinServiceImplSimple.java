@@ -177,21 +177,21 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 if (o1 != null) {
                     Map<String, Object> trySkinMap = (Map<String, Object>) o1;
                     Date date = (Date) trySkinMap.get("endTime");
-                    if (System.currentTimeMillis() < date.getTime()) {
-                        setMap.put("have", true);
-                    } else {
-                        setMap.put("have", false);
-                    }
                     //是否正在使用
                     int state = Integer.parseInt(trySkinMap.get("state").toString());
                     if (state != 1) {
                         setMap.put("use", false);
-                    } else {
-                        setMap.put("use", false);
                     }
-
+                    if (System.currentTimeMillis() < date.getTime()) {
+                        setMap.put("have", true);
+                        if (state == 1) {
+                            setMap.put("use", true);
+                        }
+                    } else {
+                        setMap.put("have", true);
+                    }
                 } else {
-                    setMap.put("have", true);
+                    setMap.put("have", false);
                     //是否正在使用
                     setMap.put("use", false);
                 }
