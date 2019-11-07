@@ -7,8 +7,8 @@ import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
-import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
 import com.zhidejiaoyu.common.study.StudentRestudyUtil;
+import com.zhidejiaoyu.common.study.memorystrength.TestMemoryStrength;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -40,7 +40,7 @@ public class SaveLearnAndCapacity {
     private SimpleLearnMapper learnMapper;
 
     @Autowired
-    private MemoryStrengthUtil memoryStrengthUtil;
+    private TestMemoryStrength testMemoryStrength;
 
     @Autowired
     private SimpleVocabularyMapper vocabularyMapper;
@@ -50,9 +50,6 @@ public class SaveLearnAndCapacity {
 
     @Autowired
     private SimpleUnitVocabularyMapper simpleUnitVocabularyMapper;
-
-    @Autowired
-    private SimpleStudentRestudyMapper simpleStudentRestudyMapper;
 
     @Autowired
     private DailyAwardAsync awardAsync;
@@ -243,7 +240,7 @@ public class SaveLearnAndCapacity {
             simpleCapacity.setPush(push);
 
             // 重新计算记忆强度
-            simpleCapacity.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(memoryStrength, isKnown));
+            simpleCapacity.setMemoryStrength(testMemoryStrength.getMemoryStrength(memoryStrength, isKnown));
             simpleSimpleCapacityMapper.updateById(simpleCapacity);
 
             // 保存学生复习记录
