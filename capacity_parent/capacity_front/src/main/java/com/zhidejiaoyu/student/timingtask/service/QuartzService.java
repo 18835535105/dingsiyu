@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.service.simple;
+package com.zhidejiaoyu.student.timingtask.service;
 
 /**
  * <b>定时任务相关业务</b><br>
@@ -17,7 +17,7 @@ package com.zhidejiaoyu.student.service.simple;
  * @author wuchenxi
  * @date 2018/5/22 16:25
  */
-public interface SimpleQuartzService {
+public interface QuartzService {
 
     /**
      * 每日 00:10:00 更新提醒消息中学生账号到期提醒

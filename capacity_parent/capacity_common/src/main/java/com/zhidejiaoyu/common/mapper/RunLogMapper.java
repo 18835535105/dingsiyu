@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.Vo.student.studentinfowithschool.StudentInfoSchoolSummary;
 import com.zhidejiaoyu.common.pojo.RunLog;
 import com.zhidejiaoyu.common.pojo.RunLogExample;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -112,4 +113,11 @@ public interface RunLogMapper extends BaseMapper<RunLog> {
      * @return
      */
     RunLog selectLastRunLogByOperateUserId(@Param("operateUserId") Long operateUserId);
-}
+
+    /**
+     * 统计各个校区学生登录人数
+     *
+     * @param date
+     * @return
+     */
+    List<StudentInfoSchoolSummary> selectStudentInfoSchoolSummary(@Param("date") String date);}

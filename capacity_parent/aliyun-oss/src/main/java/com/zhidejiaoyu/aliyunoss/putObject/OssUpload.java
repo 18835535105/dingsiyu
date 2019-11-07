@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.aliyunoss.putObject;
 
+import com.aliyun.oss.ClientException;
+import com.aliyun.oss.OSSException;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.aliyun.oss.OSS;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -73,6 +76,24 @@ public class OssUpload {
             return null;
         }
         return fileNameList;
+    }
+
+    /**
+     * 通过输入流上传文件
+     *
+     * @param stream
+     * @param dir
+     * @param fileName
+     * @return
+     */
+    public static boolean uploadWithInputStream(InputStream stream, String dir, String fileName) {
+        try {
+            client.putObject(AliyunInfoConst.bucketName, dir + fileName, stream);
+            return true;
+        } catch (OSSException | ClientException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**

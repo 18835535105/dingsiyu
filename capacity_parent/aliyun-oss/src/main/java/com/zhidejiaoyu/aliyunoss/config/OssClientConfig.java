@@ -28,6 +28,9 @@ public class OssClientConfig {
         clientBuilderConfiguration.setSupportCname(true);
 //        clientBuilderConfiguration.setProtocol(Protocol.HTTPS);
         clientBuilderConfiguration.setMaxConnections(200);
+        // 最大超时时间是5s，超时重试3次
+        clientBuilderConfiguration.setConnectionTimeout(5000);
+        clientBuilderConfiguration.setMaxErrorRetry(3);
         log.info("Init OssClient");
         return new OSSClientBuilder().build(AliyunInfoConst.endpoint, AliyunInfoConst.accessKeyId, AliyunInfoConst.accessKeySecret, clientBuilderConfiguration);
     }
