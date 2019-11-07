@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.study.memorystrength;
 
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import org.springframework.stereotype.Component;
 
 /**
  * 测试逻辑获取记忆强度
@@ -8,6 +9,7 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
  * @author: wuchenxi
  * @Date: 2019/10/30 17:26
  */
+@Component
 public class TestMemoryStrength implements IMemoryStrength {
     @Override
     public Double getMemoryStrength(Double currentMemoryStrength, Boolean isRight) {
