@@ -89,7 +89,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
      * @return
      */
     private List<SyntaxTopic> getSyntaxTopics(Long unitId) {
-        List<SyntaxTopic> syntaxTopics = syntaxTopicMapper.selectByUnitId(unitId);
+        List<SyntaxTopic> syntaxTopics = syntaxTopicMapper.selectSelectSyntaxByUnitId(unitId);
         List<SyntaxTopic> result = new ArrayList<>(syntaxTopics);
         return this.syntaxTopicsResult(syntaxTopics, result);
 
