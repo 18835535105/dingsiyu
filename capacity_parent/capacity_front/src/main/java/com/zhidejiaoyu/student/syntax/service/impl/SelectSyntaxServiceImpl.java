@@ -6,16 +6,16 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
 import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
-import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.KnowledgePoint;
-import com.zhidejiaoyu.common.pojo.Learn;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.SyntaxTopic;
+import com.zhidejiaoyu.common.mapper.KnowledgePointMapper;
+import com.zhidejiaoyu.common.mapper.LearnMapper;
+import com.zhidejiaoyu.common.mapper.SyntaxTopicMapper;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.redis.SyntaxRedisOpt;
 import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.syntax.learnmodel.LearnModelInfo;
 import com.zhidejiaoyu.student.syntax.needview.SelectNeedView;
 import com.zhidejiaoyu.student.syntax.savelearn.SaveLearnInfo;
 import com.zhidejiaoyu.student.syntax.service.LearnSyntaxService;
@@ -36,12 +36,6 @@ import java.util.Objects;
 public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, SyntaxTopic> implements LearnSyntaxService {
 
     @Resource
-    private StudentStudySyntaxMapper studentStudySyntaxMapper;
-
-    @Resource
-    private SyntaxUnitMapper syntaxUnitMapper;
-
-    @Resource
     private LearnMapper learnMapper;
 
     @Resource
@@ -58,6 +52,9 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
 
     @Resource
     private SelectNeedView selectNeedView;
+
+    @Resource
+    private LearnModelInfo learnModelInfo;
 
     @Override
     public ServerResponse getLearnSyntax(Long unitId) {
@@ -94,7 +91,8 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
         }
 
         // 说明当前单元学语法模块内容都已掌握，进入语法游戏模块
-        LearnSyntaxServiceImpl.packageStudentStudySyntax(unitId, student, SyntaxModelNameConstant.GAME, studentStudySyntaxMapper, syntaxUnitMapper, learnMapper);
+        StudentStudySyntax studentStudySyntax = learnModelInfo.packageStudentStudySyntax(unitId, student, SyntaxModelNameConstant.GAME);
+        learnModelInfo.updateLearnType(studentStudySyntax);
 
         return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
 

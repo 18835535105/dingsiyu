@@ -1,10 +1,11 @@
 package com.zhidejiaoyu.student.syntax.service.impl;
 
-import com.zhidejiaoyu.common.Vo.syntax.game.GameVO;
 import com.zhidejiaoyu.common.Vo.syntax.game.GameSelect;
+import com.zhidejiaoyu.common.Vo.syntax.game.GameVO;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
+import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -14,7 +15,7 @@ import com.zhidejiaoyu.common.utils.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.service.impl.TestServiceImpl;
-import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
+import com.zhidejiaoyu.student.syntax.learnmodel.LearnModelInfo;
 import com.zhidejiaoyu.student.syntax.service.SyntaxGameService;
 import com.zhidejiaoyu.student.utils.PetSayUtil;
 import com.zhidejiaoyu.student.utils.PetUrlUtil;
@@ -60,6 +61,9 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
 
     @Resource
     private PetSayUtil petSayUtil;
+
+    @Resource
+    private LearnModelInfo learnModelInfo;
 
     @Override
     public ServerResponse getSyntaxGame(Long unitId) {
@@ -117,6 +121,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
         } else {
             studentStudySyntax.setModel(this.getNextModelNotFirstLearn(testRecord));
             studentStudySyntaxMapper.updateById(studentStudySyntax);
+            learnModelInfo.updateLearnType(studentStudySyntax);
         }
 
         TestResultVo vo = this.getTestResultVo(testRecord, student, isFirst);
@@ -230,7 +235,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     /**
      * 封装游戏选项
      *
-     * @param syntaxTopic  当前正确的语法题信息
+     * @param syntaxTopic 当前正确的语法题信息
      * @return
      */
     private List<GameSelect> getSelect(SyntaxTopic syntaxTopic) {
