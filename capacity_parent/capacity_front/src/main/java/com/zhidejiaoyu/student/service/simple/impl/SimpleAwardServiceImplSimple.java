@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.simple.AwardVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
@@ -468,7 +469,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
             }
 
             if (getType == 2) {
-                return ServerResponse.createBySuccess(medal.getGetGifImgUrl());
+                return ServerResponse.createBySuccess(GetOssFile.getPublicObjectUrl(medal.getGetGifImgUrl()));
             }
             return ServerResponse.createBySuccessMessage("领取成功！");
 
