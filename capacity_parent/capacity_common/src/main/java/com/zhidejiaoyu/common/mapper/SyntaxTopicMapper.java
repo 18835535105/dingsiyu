@@ -17,12 +17,12 @@ import java.util.List;
 public interface SyntaxTopicMapper extends BaseMapper<SyntaxTopic> {
 
     /**
-     * 查询当前单元下的所有语法内容
+     * 查询当前单元下的所有选语法内容
      *
      * @param unitId
      * @return
      */
-    List<SyntaxTopic> selectByUnitId(Long unitId);
+    List<SyntaxTopic> selectSelectSyntaxByUnitId(Long unitId);
 
     /**
      * 统计当前单元指定类型的语法内容个数

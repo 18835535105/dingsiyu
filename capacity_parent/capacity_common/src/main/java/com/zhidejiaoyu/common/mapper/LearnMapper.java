@@ -918,4 +918,13 @@ public interface LearnMapper extends BaseMapper<Learn> {
     void updateSyntaxToLearnedByCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
 
     int countSyntax(@Param("studentId") Long studentId);
+
+    /**
+     * 查询学习过的指定模块的语法
+     *
+     * @param studentStudySyntax
+     * @return
+     */
+    List<Learn> selectSyntaxByUnitIdAndStudyModel(@Param("studentStudySyntax") StudentStudySyntax studentStudySyntax);
+
 }

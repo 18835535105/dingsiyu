@@ -82,7 +82,7 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
                 getBattleAndCombatProgress(studyUnit, complete, useMap, unitId, courseId);
             }
             SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
-            useMap.setUnitId(unitId.intValue());
+            useMap.setUnitId(unitId);
             useMap.setUnitName(syntaxUnit.getUnitName());
             useMap.setUnitIndex(syntaxUnit.getUnitIndex());
             if (grade.equals(student.getGrade())) {

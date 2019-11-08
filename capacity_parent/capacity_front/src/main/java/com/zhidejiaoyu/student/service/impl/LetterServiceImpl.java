@@ -4,7 +4,7 @@ import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
-import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
+import com.zhidejiaoyu.common.study.memorystrength.TestMemoryStrength;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.LetterService;
@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -50,8 +51,8 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     private LetterVocabularyMapper letterVocabularyMapper;
     @Autowired
     private BaiduSpeak baiduSpeak;
-    @Autowired
-    private MemoryStrengthUtil memoryStrengthUtil;
+    @Resource
+    private TestMemoryStrength testMemoryStrength;
 
     /**
      * 获取字母单元
@@ -356,7 +357,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 // 重新计算记忆强度
                 Date push = GoldMemoryTime.getGoldMemoryTime(letterWrite.getMemoryStrength(), new Date());
                 letterWrite.setPush(push);
-                letterWrite.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(letterWrite.getMemoryStrength(), falg));
+                letterWrite.setMemoryStrength(testMemoryStrength.getMemoryStrength(letterWrite.getMemoryStrength(), falg));
                 letterWriteMapper.updateById(letterWrite);
             } else {
                 letterWrite = new LetterWrite();
@@ -401,7 +402,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                     // 重新计算记忆强度
                     Date push = GoldMemoryTime.getGoldMemoryTime(pair.getMemoryStrength(), new Date());
                     pair.setPush(push);
-                    pair.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(pair.getMemoryStrength(), falg));
+                    pair.setMemoryStrength(testMemoryStrength.getMemoryStrength(pair.getMemoryStrength(), falg));
                     letterPairMapper.updateById(pair);
                     return ServerResponse.createBySuccess();
                 } else {

@@ -2,6 +2,8 @@ package com.zhidejiaoyu.common.study.memorydifficulty;
 
 import com.zhidejiaoyu.common.pojo.StudyCapacity;
 
+import java.util.Objects;
+
 /**
  * 记忆难度计算基类
  *
@@ -17,6 +19,14 @@ public interface IMemoryDifficulty {
      */
     Integer getMemoryDifficulty(StudyCapacity studyCapacity);
 
+    /**
+     * 获取记忆难度
+     *
+     * @param memoryStrength 记忆强度
+     * @param errCount       错误次数
+     * @param studyCount     学习次数
+     * @return
+     */
     default int getMemoryDifficulty(Double memoryStrength, Integer errCount, Integer studyCount) {
         // 错误率
         double errorRate = (errCount * 1.0) / (studyCount * 1.0);

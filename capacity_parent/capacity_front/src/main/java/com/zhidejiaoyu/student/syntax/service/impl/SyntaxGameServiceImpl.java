@@ -1,12 +1,14 @@
 package com.zhidejiaoyu.student.syntax.service.impl;
 
-import com.zhidejiaoyu.common.Vo.syntax.game.GameVO;
 import com.zhidejiaoyu.common.Vo.syntax.game.GameSelect;
+import com.zhidejiaoyu.common.Vo.syntax.game.GameVO;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
+import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
@@ -14,7 +16,7 @@ import com.zhidejiaoyu.common.utils.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.service.impl.TestServiceImpl;
-import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
+import com.zhidejiaoyu.student.syntax.learnmodel.LearnModelInfo;
 import com.zhidejiaoyu.student.syntax.service.SyntaxGameService;
 import com.zhidejiaoyu.student.utils.PetSayUtil;
 import com.zhidejiaoyu.student.utils.PetUrlUtil;
@@ -61,6 +63,9 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     @Resource
     private PetSayUtil petSayUtil;
 
+    @Resource
+    private LearnModelInfo learnModelInfo;
+
     @Override
     public ServerResponse getSyntaxGame(Long unitId) {
         HttpUtil.getHttpSession().setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
@@ -72,7 +77,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
         }
 
         List<GameVO> returnList = syntaxTopics.parallelStream().limit(GAME_COUNT)
-                .map(syntaxTopic -> new GameVO(syntaxTopic.getTopic().replace("$&$", "___"), this.getSelect(syntaxTopic, syntaxTopics)))
+                .map(syntaxTopic -> new GameVO(syntaxTopic.getTopic().replace("$&$", "___"), this.getSelect(syntaxTopic)))
                 .collect(Collectors.toList());
 
         return ServerResponse.createBySuccess(returnList);
@@ -85,7 +90,12 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
      * @return
      */
     private List<SyntaxTopic> getSyntaxTopics(Long unitId) {
-        List<SyntaxTopic> syntaxTopics = syntaxTopicMapper.selectByUnitId(unitId);
+        List<SyntaxTopic> syntaxTopics = syntaxTopicMapper.selectSelectSyntaxByUnitId(unitId);
+        if (CollectionUtils.isEmpty(syntaxTopics)) {
+            SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
+            log.error("语法单元[{} - {}]没有没有选语法题目！", syntaxUnit.getId(), syntaxUnit.getJointName());
+            throw new ServiceException(500, "未查询到游戏题目！");
+        }
         List<SyntaxTopic> result = new ArrayList<>(syntaxTopics);
         return this.syntaxTopicsResult(syntaxTopics, result);
 
@@ -117,6 +127,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
         } else {
             studentStudySyntax.setModel(this.getNextModelNotFirstLearn(testRecord));
             studentStudySyntaxMapper.updateById(studentStudySyntax);
+            learnModelInfo.updateLearnType(studentStudySyntax);
         }
 
         TestResultVo vo = this.getTestResultVo(testRecord, student, isFirst);
@@ -230,23 +241,24 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     /**
      * 封装游戏选项
      *
-     * @param syntaxTopic  当前正确的语法题信息
-     * @param syntaxTopics 当前单元所有的语法题信息
+     * @param syntaxTopic 当前正确的语法题信息
      * @return
      */
-    private List<GameSelect> getSelect(SyntaxTopic syntaxTopic, List<SyntaxTopic> syntaxTopics) {
-        Collections.shuffle(syntaxTopics);
-        // 添加错误答案
-        List<GameSelect> collect = syntaxTopics.parallelStream()
-                // 错误答案排除正确答案的内容
-                .filter(syntaxTopic1 -> !Objects.equals(syntaxTopic.getTopic(), syntaxTopic1.getTopic()))
-                .limit(3)
-                .map(syntaxTopic1 -> new GameSelect(syntaxTopic1.getAnswer(), false))
-                .collect(Collectors.toList());
-        // 添加正确答案
-        collect.add(new GameSelect(syntaxTopic.getAnswer(), true));
-        Collections.shuffle(collect);
-        return collect;
+    private List<GameSelect> getSelect(SyntaxTopic syntaxTopic) {
+        return getGameSelects(syntaxTopic);
+    }
+
+    public static List<GameSelect> getGameSelects(SyntaxTopic syntaxTopic) {
+        String[] options = syntaxTopic.getOption().split("\\$&\\$");
+        List<GameSelect> select = Arrays.stream(options).map(option -> {
+            if (!Objects.equals(syntaxTopic.getAnswer().trim(), option.trim())) {
+                return new GameSelect(option.trim(), false);
+            }
+            return new GameSelect(option.trim(), true);
+        }).collect(Collectors.toList());
+
+        Collections.shuffle(select);
+        return select;
     }
 
     /**

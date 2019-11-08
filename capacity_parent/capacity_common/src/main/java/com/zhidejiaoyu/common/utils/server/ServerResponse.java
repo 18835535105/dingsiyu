@@ -98,7 +98,11 @@ public class ServerResponse<T> implements Serializable {
 	}
 
 	public static <T> ServerResponse<T> createBySuccess(String msg, T data) {
-		return new ServerResponse<T>(ResponseCode.SUCCESS.getCode(), msg, data);
+		return new ServerResponse<>(ResponseCode.SUCCESS.getCode(), msg, data);
+	}
+
+	public static <T> ServerResponse<T> createBySuccess(int code, T data) {
+		return new ServerResponse<>(code, data);
 	}
 
 	// 请求失败的接口

@@ -5,13 +5,16 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
 import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
-import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.KnowledgePointMapper;
+import com.zhidejiaoyu.common.mapper.LearnMapper;
+import com.zhidejiaoyu.common.mapper.SyntaxTopicMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.redis.SyntaxRedisOpt;
 import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.syntax.learnmodel.LearnModelInfo;
 import com.zhidejiaoyu.student.syntax.needview.LearnNeedView;
 import com.zhidejiaoyu.student.syntax.savelearn.SaveLearnInfo;
 import com.zhidejiaoyu.student.syntax.service.LearnSyntaxService;
@@ -32,12 +35,6 @@ import java.util.Objects;
 public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, SyntaxTopic> implements LearnSyntaxService {
 
     @Resource
-    private StudentStudySyntaxMapper studentStudySyntaxMapper;
-
-    @Resource
-    private SyntaxUnitMapper syntaxUnitMapper;
-
-    @Resource
     private LearnMapper learnMapper;
 
     @Resource
@@ -51,6 +48,9 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
 
     @Resource
     private LearnNeedView learnNeedView;
+
+    @Resource
+    private LearnModelInfo learnModelInfo;
 
     @Override
     public ServerResponse getLearnSyntax(Long unitId) {
@@ -87,7 +87,8 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         }
 
         // 说明当前单元学语法模块内容都已掌握，进入选语法模块
-        packageStudentStudySyntax(unitId, student, SyntaxModelNameConstant.SELECT_SYNTAX, studentStudySyntaxMapper, syntaxUnitMapper);
+        StudentStudySyntax studentStudySyntax = learnModelInfo.packageStudentStudySyntax(unitId, student, SyntaxModelNameConstant.SELECT_SYNTAX);
+        learnModelInfo.updateLearnType(studentStudySyntax);
 
         return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
     }
@@ -99,32 +100,6 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         learn.setStudentId(student.getId());
         learn.setStudyModel(SyntaxModelNameConstant.LEARN_SYNTAX);
         return saveLearnInfo.saveSyntax(learn, known, StudyCapacityTypeConstant.LEARN_SYNTAX);
-    }
-
-    /**
-     * @param unitId
-     * @param student
-     * @param nextModelName            下一个模块名称
-     * @param studentStudySyntaxMapper
-     * @param syntaxUnitMapper
-     */
-    static void packageStudentStudySyntax(Long unitId, Student student, String nextModelName,
-                                          StudentStudySyntaxMapper studentStudySyntaxMapper, SyntaxUnitMapper syntaxUnitMapper) {
-        StudentStudySyntax studentStudySyntax = studentStudySyntaxMapper.selectByStudentIdAndUnitId(student.getId(), unitId);
-        if (!Objects.isNull(studentStudySyntax)) {
-            studentStudySyntax.setModel(nextModelName);
-            studentStudySyntax.setUpdateTime(new Date());
-            studentStudySyntaxMapper.updateById(studentStudySyntax);
-        } else {
-            SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
-            studentStudySyntaxMapper.insert(StudentStudySyntax.builder()
-                    .updateTime(new Date())
-                    .model(nextModelName)
-                    .unitId(unitId)
-                    .studentId(student.getId())
-                    .courseId(!Objects.isNull(syntaxUnit) ? syntaxUnit.getCourseId() : null)
-                    .build());
-        }
     }
 
     /**

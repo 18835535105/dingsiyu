@@ -12,13 +12,24 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
+    <sql id="more_table_sql">
+        su.id, su.course_id, su.unit_name, su.joint_name, su.unit_index, su.update_time
+    </sql>
+
     <select id="selectUnitIdByCourseId" resultType="long" parameterType="long">
+        select id
+        from syntax_unit
+        where course_id = #{courseId}
+    </select>
+    <select id="selectCurrentUnit" resultMap="BaseResultMap" parameterType="map">
         select
-        id
-        from
-        syntax_unit
-        where
-        course_id =#{courseId}
+        <include refid="more_table_sql"/>
+        from syntax_unit su,
+        capacity_student_unit csu
+        where su.id = csu.unit_id
+        and csu.student_id = #{studentId}
+        and csu.type = 6
+        limit 1
     </select>
 
 </mapper>
