@@ -101,6 +101,10 @@ public class ServerResponse<T> implements Serializable {
 		return new ServerResponse<>(ResponseCode.SUCCESS.getCode(), msg, data);
 	}
 
+	public static <T> ServerResponse<T> createBySuccess(ResponseCode code) {
+		return new ServerResponse<>(code.getCode(), code.getMsg());
+	}
+
 	public static <T> ServerResponse<T> createBySuccess(int code, T data) {
 		return new ServerResponse<>(code, data);
 	}
