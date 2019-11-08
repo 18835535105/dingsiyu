@@ -70,28 +70,21 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
             useMap.setCourseId(courseId.intValue());
             //判断该单元是否正在学习
             Long unitId;
+            //战斗状态 为2单元已完成
+            int complete = Integer.parseInt(map.get("complete").toString());
             if (studyUnit != null) {
                 unitId = Long.parseLong(studyUnit.get("unitId").toString());
                 useMap.setModel(studyUnit.get("model").toString());
-                useMap.setBattle(2);
-                //计算战斗进度
-                useMap.setCombatProgress(getCalculateBattleProgress(courseId, unitId, studyUnit.get("model").toString()));
+                getBattleAndCombatProgress(studyUnit, complete, useMap, unitId, courseId);
             } else {
                 unitId = Long.parseLong(map.get("startId").toString());
                 useMap.setModel(SyntaxModelNameConstant.GAME);
-                useMap.setBattle(1);
-                useMap.setCombatProgress(0);
+                getBattleAndCombatProgress(studyUnit, complete, useMap, unitId, courseId);
             }
             SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
             useMap.setUnitId(unitId);
             useMap.setUnitName(syntaxUnit.getUnitName());
             useMap.setUnitIndex(syntaxUnit.getUnitIndex());
-            //战斗状态
-            int complete = Integer.parseInt(map.get("complete").toString());
-            if (complete == 2) {
-                useMap.setBattle(3);
-                useMap.setCombatProgress(100);
-            }
             if (grade.equals(student.getGrade())) {
                 previousGradeList.add(useMap);
             } else {
@@ -102,6 +95,23 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
         returnMap.put("previousGrade", previousGradeList);
         returnMap.put("InGrade", student.getGrade());
         return returnMap;
+    }
+
+    /**
+     * 获取战斗进度和战斗状态
+     *
+     * @param studyUnit 单元
+     * @param complete  1，未完成 2，已完成
+     * @param useMap    SyntaxCourseVo返回对象
+     * @param unitId    单元id
+     * @param courseId  课程id
+     */
+    private void getBattleAndCombatProgress(Map<String, Object> studyUnit, int complete,
+                                            SyntaxCourseVo useMap, Long unitId, Long courseId) {
+        useMap.setBattle(complete == 2 ? 3 : (studyUnit == null ? 1 : 2));
+        //计算战斗进度
+        useMap.setCombatProgress(complete == 2 ? 100 :
+                (studyUnit == null ? 0 : getCalculateBattleProgress(courseId, unitId, studyUnit.get("model").toString())));
     }
 
     /**
