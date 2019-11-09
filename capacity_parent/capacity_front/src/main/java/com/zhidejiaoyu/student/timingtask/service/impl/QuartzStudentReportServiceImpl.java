@@ -91,7 +91,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
 
     private void sendEmail(String fileName) {
         mailService.sendAttachmentsMail(Mail.builder()
-                .to(new String[]{"763396567@qq.com"})
+                .to(new String[]{"763396567@qq.com", "18515530997@163.com"})
                 .filePath(FileConstant.TMP_EXCEL + fileName)
                 .subject(fileName)
                 .content(fileName)
