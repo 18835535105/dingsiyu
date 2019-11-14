@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.syntax.service.impl;
 
-import com.zhidejiaoyu.common.Vo.syntax.KnowledgePointVO;
 import com.zhidejiaoyu.common.Vo.syntax.SyntaxCourseVo;
 import com.zhidejiaoyu.common.Vo.syntax.TopicVO;
 import com.zhidejiaoyu.common.Vo.syntax.WriteSyntaxVO;
@@ -175,10 +174,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         if (!Objects.isNull(syntaxTopic)) {
             KnowledgePoint knowledgePoint = knowledgePointMapper.selectByTopicId(syntaxTopic.getId());
             return ServerResponse.createBySuccess(WriteSyntaxVO.builder()
-                    .knowledgePoint(KnowledgePointVO.builder()
-                            .content(knowledgePoint.getContent())
-                            .syntaxName(knowledgePoint.getName())
-                            .build())
+                    .knowledgePoint(LearnSyntaxServiceImpl.getContent(knowledgePoint))
                     .topic(TopicVO.builder()
                             .answer(syntaxTopic.getAnswer())
                             .title(syntaxTopic.getTopic())

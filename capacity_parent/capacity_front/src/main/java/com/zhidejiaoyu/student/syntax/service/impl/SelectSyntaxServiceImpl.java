@@ -128,8 +128,7 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
     private LearnSyntaxVO packageNewKnowledgePoint(NeedViewDTO dto, KnowledgePoint knowledgePoint) {
         return LearnSyntaxVO.builder()
                 .id(knowledgePoint.getId())
-                .content(knowledgePoint.getContent())
-                .syntaxName(knowledgePoint.getName())
+                .content(LearnSyntaxServiceImpl.getContent(knowledgePoint))
                 .total(dto.getTotal())
                 .plan(Math.min(dto.getPlan(), dto.getTotal()))
                 .studyNew(true)
