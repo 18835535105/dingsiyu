@@ -232,7 +232,6 @@ public class SaveTestLearnAndCapacity {
             }
         }
         // 更新学习记录
-        learn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
         learn.setStudyCount(learn.getStudyCount() + 1);
         if (memoryDifficult == 0) {
             // 熟词
