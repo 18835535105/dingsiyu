@@ -1,13 +1,11 @@
 package com.zhidejiaoyu.common.utils;
 
 import com.zhidejiaoyu.common.mapper.TeacherMapper;
-import com.zhidejiaoyu.common.mapper.simple.SimpleTeacherMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
 
 /**
  * 获取教师及校长信息工具类

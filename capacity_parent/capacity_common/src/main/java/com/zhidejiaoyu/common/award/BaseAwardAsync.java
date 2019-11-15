@@ -3,15 +3,15 @@ package com.zhidejiaoyu.common.award;
 import com.zhidejiaoyu.common.mapper.AwardContentTypeMapper;
 import com.zhidejiaoyu.common.mapper.AwardMapper;
 import com.zhidejiaoyu.common.mapper.MedalMapper;
-import com.zhidejiaoyu.common.mapper.TeacherMapper;
 import com.zhidejiaoyu.common.pojo.Award;
 import com.zhidejiaoyu.common.pojo.AwardContentType;
 import com.zhidejiaoyu.common.pojo.Medal;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -39,17 +39,14 @@ class BaseAwardAsync {
      */
     static final int MEDAL_TYPE = 3;
 
-    @Autowired
+    @Resource
     private AwardMapper awardMapper;
 
-    @Autowired
+    @Resource
     private AwardContentTypeMapper awardContentTypeMapper;
 
-    @Autowired
+    @Resource
     private MedalMapper medalMapper;
-
-    @Autowired
-    private TeacherMapper teacherMapper;
 
     /**
      * 检验是否需要保存或更新 award
@@ -64,7 +61,7 @@ class BaseAwardAsync {
             return true;
         }
         // 如果从数据库中直接修改了需要完成奖励的总个数，也需要修改 award 表中相应的总个数
-        if (type == 1 || type == 2) {
+        if (type == DAILY_TYPE || type == GOLD_TYPE) {
             AwardContentType awardContentType = awardContentTypeMapper.selectById(award.getAwardContentType());
             return awardContentType != null && !Objects.equals(awardContentType.getTotalPlan(), award.getTotalPlan());
         } else {
@@ -144,7 +141,7 @@ class BaseAwardAsync {
         award.setStudentId(studentId);
         award.setCreateTime(new Date());
         award.setType(type);
-        award.setCurrentPlan(currentPlan >= totalPlan ? totalPlan : currentPlan);
+        award.setCurrentPlan(Math.min(currentPlan, totalPlan));
         award.setTotalPlan(totalPlan);
         if (type == MEDAL_TYPE) {
             award.setMedalType(awardContentType);
@@ -170,14 +167,7 @@ class BaseAwardAsync {
     }
 
     Integer getSchoolAdminId(Student student) {
-        if (student.getTeacherId() == null) {
-            return null;
-        }
-        Integer schoolAdminId = teacherMapper.getSchoolAdminById(Integer.valueOf(student.getTeacherId().toString()));
-        if (schoolAdminId == null) {
-            return Integer.valueOf(student.getTeacherId().toString());
-        }
-        return schoolAdminId;
+        return TeacherInfoUtil.getSchoolAdminId(student);
     }
 
     Award getByAwardContentTypeAndType(Long studentId, int type, int awardContentType) {
