@@ -65,6 +65,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 if (System.currentTimeMillis() > studentSkin.getEndTime().getTime()) {
                     studentSkin.setEndTime(null);
                     studentSkin.setImgUrl(imgUrl);
+                    studentSkin.setState(0);
                     studentSkin.setCreateTime(new Date());
                     integer = simpleStudentSkinMapper.updUseSkin(studentSkin);
                 } else {
