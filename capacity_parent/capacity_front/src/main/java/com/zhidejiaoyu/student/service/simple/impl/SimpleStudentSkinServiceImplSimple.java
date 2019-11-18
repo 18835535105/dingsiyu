@@ -61,10 +61,11 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         } else {
             //判斷擁有皮膚是否已經到期
             if (studentSkin.getEndTime() != null) {
-                Integer integer = 0;
+                Integer integer;
                 if (System.currentTimeMillis() > studentSkin.getEndTime().getTime()) {
                     studentSkin.setEndTime(null);
                     studentSkin.setImgUrl(imgUrl);
+                    studentSkin.setState(0);
                     studentSkin.setCreateTime(new Date());
                     integer = simpleStudentSkinMapper.updUseSkin(studentSkin);
                 } else {
