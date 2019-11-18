@@ -250,13 +250,8 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
 
     public static List<GameSelect> getGameSelects(SyntaxTopic syntaxTopic) {
         String[] options = syntaxTopic.getOption().split("\\$&\\$");
-        List<GameSelect> select = Arrays.stream(options).map(option -> {
-            if (!Objects.equals(syntaxTopic.getAnswer().trim(), option.trim())) {
-                return new GameSelect(option.trim(), false);
-            }
-            return new GameSelect(option.trim(), true);
-        }).collect(Collectors.toList());
-
+        List<GameSelect> select = Arrays.stream(options).map(option -> new GameSelect(option.trim(), false)).collect(Collectors.toList());
+        select.add(new GameSelect(syntaxTopic.getAnswer().trim(), true));
         Collections.shuffle(select);
         return select;
     }
