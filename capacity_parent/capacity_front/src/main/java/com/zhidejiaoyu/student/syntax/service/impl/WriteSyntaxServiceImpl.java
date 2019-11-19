@@ -15,6 +15,7 @@ import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.redis.SyntaxRedisOpt;
 import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.syntax.learnmodel.LearnModelInfo;
 import com.zhidejiaoyu.student.syntax.needview.WriteNeedView;
 import com.zhidejiaoyu.student.syntax.savelearn.SaveLearnInfo;
 import com.zhidejiaoyu.student.syntax.service.LearnSyntaxService;
@@ -71,6 +72,9 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
     @Resource
     private SyntaxUnitMapper syntaxUnitMapper;
 
+    @Resource
+    private LearnModelInfo learnModelInfo;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse getLearnSyntax(Long unitId) {
@@ -119,11 +123,16 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                     .unitIndex(syntaxUnit.getUnitIndex())
                     .build());
         }
+
+        // 说明当前单元写语法模块内容都已掌握，进入学语法模块
+        StudentStudySyntax studentStudySyntax = learnModelInfo.packageStudentStudySyntax(unitId, student, SyntaxModelNameConstant.LEARN_SYNTAX);
+        learnModelInfo.updateLearnType(studentStudySyntax);
+
         return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
     }
 
     private boolean initNextUnitOrCourse(Student student) {
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 6);
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 7);
         if (capacityStudentUnit != null) {
             if (Objects.equals(capacityStudentUnit.getUnitId(), capacityStudentUnit.getEndunit())) {
                 // 当前课程学习完毕

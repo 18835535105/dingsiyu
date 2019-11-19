@@ -75,12 +75,39 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
             this.printGetSyntaxGameNoDataLog(unitId);
             return ServerResponse.createByError(500, "未查询到数据！");
         }
-
-        List<GameVO> returnList = syntaxTopics.parallelStream().limit(GAME_COUNT)
+        List<GameVO> returnList = this.packageSyntaxTopics(syntaxTopics).parallelStream().limit(GAME_COUNT)
                 .map(syntaxTopic -> new GameVO(syntaxTopic.getTopic().replace("$&$", "___"), this.getSelect(syntaxTopic)))
                 .collect(Collectors.toList());
 
         return ServerResponse.createBySuccess(returnList);
+    }
+
+    /**
+     * 防止选项不够4个
+     *
+     * @param syntaxTopics
+     * @return
+     */
+    private List<SyntaxTopic> packageSyntaxTopics(List<SyntaxTopic> syntaxTopics) {
+        StringBuilder sb = new StringBuilder();
+        List<SyntaxTopic> syntaxTopicsTmp = new ArrayList<>(syntaxTopics);
+        return syntaxTopics.stream().map(syntaxTopic -> {
+            int length = syntaxTopic.getOption().split("\\$&\\$").length;
+            // 选项个数
+            int optionCount = 3;
+            if (length < optionCount) {
+                sb.setLength(0);
+                sb.append(syntaxTopic.getOption());
+                Collections.shuffle(syntaxTopicsTmp);
+                syntaxTopicsTmp.stream()
+                        .filter(syntaxTopic1 -> !syntaxTopic1.getAnswer().equalsIgnoreCase(syntaxTopic.getAnswer())
+                                && !sb.toString().contains(syntaxTopic1.getAnswer()))
+                        .limit(optionCount - length)
+                        .forEach(syntaxTopic1 -> sb.append("$&$").append(syntaxTopic1.getAnswer()));
+                return syntaxTopic.setOption(sb.toString());
+            }
+            return syntaxTopic;
+        }).collect(Collectors.toList());
     }
 
     /**
