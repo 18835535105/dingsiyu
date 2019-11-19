@@ -27,14 +27,9 @@ public class LearnSyntaxVO implements Serializable {
     private Long id;
 
     /**
-     * 语法名
-     */
-    private String syntaxName;
-
-    /**
      * 语法内容
      */
-    private String content;
+    private KnowledgePointVO content;
 
     /**
      * 当前单元语法总数

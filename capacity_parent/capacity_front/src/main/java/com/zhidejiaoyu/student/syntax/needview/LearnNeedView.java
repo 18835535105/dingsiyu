@@ -3,9 +3,11 @@ package com.zhidejiaoyu.student.syntax.needview;
 import com.zhidejiaoyu.common.Vo.syntax.LearnSyntaxVO;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
 import com.zhidejiaoyu.common.mapper.StudyCapacityMapper;
+import com.zhidejiaoyu.common.pojo.KnowledgePoint;
 import com.zhidejiaoyu.common.pojo.StudyCapacity;
 import com.zhidejiaoyu.common.study.memorydifficulty.SyntaxMemoryDifficulty;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.syntax.service.impl.LearnSyntaxServiceImpl;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -49,8 +51,10 @@ public class LearnNeedView implements INeedView {
         if (!Objects.isNull(studyCapacity)) {
             return ServerResponse.createBySuccess(LearnSyntaxVO.builder()
                     .id(studyCapacity.getWordId())
-                    .content(studyCapacity.getWordChinese())
-                    .syntaxName(studyCapacity.getWord())
+                    .content(LearnSyntaxServiceImpl.getContent(KnowledgePoint.builder()
+                            .content(studyCapacity.getWordChinese())
+                            .name(studyCapacity.getWord())
+                            .build()))
                     .total(dto.getTotal())
                     .plan(Math.min(dto.getPlan(), dto.getTotal()))
                     .studyNew(false)

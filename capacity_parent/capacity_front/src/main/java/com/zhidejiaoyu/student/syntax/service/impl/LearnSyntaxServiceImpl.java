@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.syntax.service.impl;
 
+import com.zhidejiaoyu.common.Vo.syntax.KnowledgePointVO;
 import com.zhidejiaoyu.common.Vo.syntax.LearnSyntaxVO;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
@@ -22,8 +23,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 学语法
@@ -126,13 +130,32 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
     private LearnSyntaxVO packageNewKnowledgePoint(NeedViewDTO dto, KnowledgePoint knowledgePoint) {
         return LearnSyntaxVO.builder()
                 .id(knowledgePoint.getId())
-                .content(knowledgePoint.getContent())
-                .syntaxName(knowledgePoint.getName())
+                .content(getContent(knowledgePoint))
                 .total(dto.getTotal())
                 .plan(Math.min(dto.getPlan(), dto.getTotal()))
                 .studyNew(true)
                 .memoryDifficult(0)
                 .memoryStrength(0)
                 .build();
+    }
+
+    public static KnowledgePointVO getContent(KnowledgePoint knowledgePoint) {
+        return KnowledgePointVO.builder()
+                .syntaxContent(getContent(knowledgePoint.getContent()))
+                .syntaxName(knowledgePoint.getName())
+                .build();
+    }
+
+    public static List<KnowledgePointVO.SyntaxContent> getContent(String content) {
+        // 包含【】##内容
+        String[] split = content.split("\\$\\$");
+        return Arrays.stream(split).map(str -> {
+            // 分割成【】   内容
+            String[] split1 = str.split("##");
+            return KnowledgePointVO.SyntaxContent.builder()
+                    .content(split1.length > 1 ? split1[1] : split1[0])
+                    .title(split1.length > 1 ? split1[0] : "")
+                    .build();
+        }).collect(Collectors.toList());
     }
 }

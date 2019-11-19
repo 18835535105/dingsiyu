@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.syntax.needview;
 
-import com.zhidejiaoyu.common.Vo.syntax.KnowledgePointVO;
 import com.zhidejiaoyu.common.Vo.syntax.LearnSyntaxVO;
 import com.zhidejiaoyu.common.Vo.syntax.SelectSyntaxVO;
 import com.zhidejiaoyu.common.Vo.syntax.game.GameSelect;
@@ -14,6 +13,7 @@ import com.zhidejiaoyu.common.pojo.StudyCapacity;
 import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.study.memorydifficulty.SyntaxMemoryDifficulty;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.syntax.service.impl.LearnSyntaxServiceImpl;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -86,8 +86,7 @@ public class SelectNeedView implements INeedView {
     private LearnSyntaxVO getSelectSyntaxKnowledgePoint(NeedViewDTO dto, StudyCapacity studyCapacity, KnowledgePoint knowledgePoint) {
         return LearnSyntaxVO.builder()
                 .id(studyCapacity.getWordId())
-                .content(Objects.isNull(knowledgePoint) ? null : knowledgePoint.getContent())
-                .syntaxName(Objects.isNull(knowledgePoint) ? null : knowledgePoint.getName())
+                .content(Objects.isNull(knowledgePoint) ? null : LearnSyntaxServiceImpl.getContent(knowledgePoint))
                 .total(dto.getTotal())
                 .plan(Math.min(dto.getPlan(), dto.getTotal()))
                 .studyNew(false)
@@ -123,10 +122,7 @@ public class SelectNeedView implements INeedView {
                 .memoryDifficult(knowledgePoint.getMemoryDifficult())
                 .memoryStrength(knowledgePoint.getMemoryStrength())
                 .selects(selects)
-                .knowledgePoint(KnowledgePointVO.builder()
-                        .content(knowledgePoint.getContent())
-                        .syntaxName(knowledgePoint.getSyntaxName())
-                        .build())
+                .knowledgePoint(knowledgePoint.getContent())
                 .build();
     }
 

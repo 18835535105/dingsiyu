@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.syntax.needview;
 
-import com.zhidejiaoyu.common.Vo.syntax.KnowledgePointVO;
 import com.zhidejiaoyu.common.Vo.syntax.TopicVO;
 import com.zhidejiaoyu.common.Vo.syntax.WriteSyntaxVO;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
@@ -12,6 +11,7 @@ import com.zhidejiaoyu.common.pojo.StudyCapacity;
 import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.study.memorydifficulty.SyntaxMemoryDifficulty;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.syntax.service.impl.LearnSyntaxServiceImpl;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -65,10 +65,7 @@ public class WriteNeedView implements INeedView {
             SyntaxTopic syntaxTopic = syntaxTopicMapper.selectById(studyCapacity.getWordId());
 
             return ServerResponse.createBySuccess(WriteSyntaxVO.builder()
-                    .knowledgePoint(KnowledgePointVO.builder()
-                            .content(knowledgePoint.getContent())
-                            .syntaxName(knowledgePoint.getName())
-                            .build())
+                    .knowledgePoint(LearnSyntaxServiceImpl.getContent(knowledgePoint))
                     .topic(TopicVO.builder()
                             .answer(syntaxTopic.getAnswer())
                             .title(syntaxTopic.getTopic())
