@@ -136,6 +136,8 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
         int learningSize = (size - 1) * 3;
         if (SyntaxModelNameConstant.SELECT_SYNTAX.equals(model)) {
             learningSize += 1;
+        }else if (SyntaxModelNameConstant.GAME.equals(model)){
+            learningSize += 2;
         } else if (SyntaxModelNameConstant.WRITE_SYNTAX.equals(model)) {
             learningSize += 2;
         }
