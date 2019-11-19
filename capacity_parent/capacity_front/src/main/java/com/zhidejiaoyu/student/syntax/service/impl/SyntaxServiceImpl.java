@@ -78,8 +78,8 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
                 getBattleAndCombatProgress(studyUnit, complete, useMap, unitId, courseId);
             } else {
                 unitId = Long.parseLong(map.get("startId").toString());
-                useMap.setModel(SyntaxModelNameConstant.GAME);
-                getBattleAndCombatProgress(studyUnit, complete, useMap, unitId, courseId);
+                useMap.setModel(null);
+                getBattleAndCombatProgress(null, complete, useMap, unitId, courseId);
             }
             SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
             useMap.setUnitId(unitId);
