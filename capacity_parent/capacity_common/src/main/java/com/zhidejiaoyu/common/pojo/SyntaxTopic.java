@@ -52,7 +52,11 @@ public class SyntaxTopic extends Model<SyntaxTopic> {
      * 选择题
      */
     private String option;
-
+    /**
+     * 解析
+     * @return
+     */
+    private String analysis;
 
     @Override
     protected Serializable pkVal() {
