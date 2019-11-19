@@ -111,7 +111,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         }
 
         // 说明当前单元写语法模块内容都已掌握，进入下一个单元或者完成当前课程
-        if (initNextUnitOrCourse(student)) {
+        if (initNextUnitOrCourse(student, dto)) {
             return ServerResponse.createBySuccess(ResponseCode.COURSE_FINISH);
         }
         SyntaxUnit syntaxUnit = syntaxUnitMapper.selectCurrentUnit(student.getId());
@@ -131,23 +131,20 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
     }
 
-    private boolean initNextUnitOrCourse(Student student) {
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 7);
-        if (capacityStudentUnit != null) {
-            if (Objects.equals(capacityStudentUnit.getUnitId(), capacityStudentUnit.getEndunit())) {
-                // 当前课程学习完毕
-                // 将当前课程的学习记录置为已学习
-                learnMapper.updateSyntaxToLearnedByCourseId(capacityStudentUnit.getStudentId(), capacityStudentUnit.getCourseId());
-                // 清除学生语法记忆追踪信息
-                studyCapacityMapper.deleteSyntaxByStudentIdAndCourseId(capacityStudentUnit.getStudentId(), capacityStudentUnit.getCourseId());
-                // 删除当前课程的语法节点信息
-                studentStudySyntaxMapper.deleteByCourseId(student.getId(), capacityStudentUnit.getCourseId());
-                // 课程学习完奖励勋章
-                this.saveMonsterMedal(student, capacityStudentUnit.getCourseId());
-                return true;
-            }
-            capacityStudentUnit.setUnitId(capacityStudentUnit.getUnitId() + 1);
-            capacityStudentUnitMapper.updateById(capacityStudentUnit);
+    private boolean initNextUnitOrCourse(Student student, NeedViewDTO dto) {
+        Long unitId = syntaxUnitMapper.selectMaxUnitIdByUnitId(dto.getUnitId());
+        if (Objects.equals(unitId, dto.getUnitId())) {
+            Long courseId = syntaxUnitMapper.selectCourseIdByUnitId(dto.getUnitId());
+            // 当前课程学习完毕
+            // 将当前课程的学习记录置为已学习
+            learnMapper.updateSyntaxToLearnedByCourseId(student.getId(), courseId);
+            // 清除学生语法记忆追踪信息
+            studyCapacityMapper.deleteSyntaxByStudentIdAndCourseId(student.getId(), courseId);
+            // 删除当前课程的语法节点信息
+            studentStudySyntaxMapper.deleteByCourseId(student.getId(), courseId);
+            // 课程学习完奖励勋章
+            this.saveMonsterMedal(student, courseId);
+            return true;
         }
         return false;
     }
