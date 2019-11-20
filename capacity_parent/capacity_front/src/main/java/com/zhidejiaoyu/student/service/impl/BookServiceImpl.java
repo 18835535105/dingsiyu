@@ -195,7 +195,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
         Student student = getStudent(session);
         Long studentId = student.getId();
 
-        Map<String, Long> map = this.checkNaN(courseIdStr, unitIdStr, student);
+        Map<String, Long> map = this.checkInvalidParam(courseIdStr, unitIdStr, student);
         Long unitId = map.get("unitId");
         Long courseId = map.get("courseId");
         Long total;
@@ -265,8 +265,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
      * @param student
      * @return
      */
-    @SuppressWarnings("warning")
-    private Map<String, Long> checkNaN(String courseIdStr, String unitIdStr, Student student) {
+    private Map<String, Long> checkInvalidParam(String courseIdStr, String unitIdStr, Student student) {
         Map<String, Long> map = new HashMap<>(16);
         String str = "NaN";
         if (Objects.equals(courseIdStr, str) || Objects.equals(unitIdStr, str)) {
