@@ -89,7 +89,7 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
 
             if (wordModelMap.containsKey(studyModel)) {
                 // 查询学生当前学习的单元
-                CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+                CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(student.getId(), 1);
                 if (capacityStudentUnit == null) {
                     log.error("学生[{} - {} - {}]还没有初始化智慧单词课程！", student.getId(), student.getAccount(), student.getStudentName());
                     return ServerResponse.createBySuccess(this.getDefaultCapacityDigestVo(vo));
@@ -98,7 +98,7 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
                 unitId = capacityStudentUnit.getUnitId();
             } else if (sentenceModelMap.containsKey(studyModel)) {
                 // 查询学生当前学习的句型单元
-                CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 2);
+                CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(student.getId(), 2);
                 if (capacityStudentUnit == null) {
                     log.error("学生[{} - {} - {}]还没有初始化抢分句型课程！", student.getId(), student.getAccount(), student.getStudentName());
                     return ServerResponse.createBySuccess(this.getDefaultCapacityDigestVo(vo));

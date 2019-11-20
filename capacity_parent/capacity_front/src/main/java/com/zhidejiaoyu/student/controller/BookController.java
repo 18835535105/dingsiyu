@@ -39,11 +39,7 @@ public class BookController {
      * @return
      */
     @GetMapping("/getBookInfo")
-    public ServerResponse<BookInfoVo> getBookInfo(HttpSession session, @RequestParam(required = false) Long courseId, Long unitId, String studyModel) {
-        boolean isTrue = (unitId == null || StringUtils.isBlank(studyModel) || (unitId == 0 && courseId == null));
-        if (isTrue) {
-            return ServerResponse.createByErrorMessage("参数非法");
-        }
+    public ServerResponse<BookInfoVo> getBookInfo(HttpSession session, @RequestParam(required = false) String courseId, String unitId, String studyModel) {
         return bookService.getBookInfo(session, courseId, unitId, studyModel);
     }
 
