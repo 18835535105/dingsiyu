@@ -21,14 +21,15 @@
         from syntax_unit
         where course_id = #{courseId}
     </select>
-    <select id="selectCurrentUnit" resultMap="BaseResultMap" parameterType="map">
-        select
-        <include refid="more_table_sql"/>
-        from syntax_unit su,
-        capacity_student_unit csu
-        where su.id = csu.unit_id
-        and csu.student_id = #{studentId}
-        and csu.type = 6
+    <select id="selectMaxUnitIdByUnitId" resultType="java.lang.Long" parameterType="map">
+        select Max(id)
+        from syntax_unit
+        where course_id = (select course_id from syntax_unit where id = #{unitId} limit 1)
+    </select>
+    <select id="selectCourseIdByUnitId" resultType="java.lang.Long" parameterType="map">
+        select course_id
+        from syntax_unit
+        where id = #{unitId}
         limit 1
     </select>
 

@@ -114,7 +114,9 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         if (initNextUnitOrCourse(student, dto)) {
             return ServerResponse.createBySuccess(ResponseCode.COURSE_FINISH);
         }
-        SyntaxUnit syntaxUnit = syntaxUnitMapper.selectCurrentUnit(student.getId());
+        SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId + 1);
+        // 说明当前单元写语法模块内容都已掌握，进入下一单元语法游戏模块
+        learnModelInfo.packageStudentStudySyntax(unitId, student, SyntaxModelNameConstant.GAME);
         if (syntaxUnit != null) {
             // 返回下一个单元的信息
             return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH.getCode(), SyntaxCourseVo.builder()
@@ -123,12 +125,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                     .unitIndex(syntaxUnit.getUnitIndex())
                     .build());
         }
-
-        // 说明当前单元写语法模块内容都已掌握，进入学语法模块
-        StudentStudySyntax studentStudySyntax = learnModelInfo.packageStudentStudySyntax(unitId, student, SyntaxModelNameConstant.LEARN_SYNTAX);
-        learnModelInfo.updateLearnType(studentStudySyntax);
-
-        return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
+        return ServerResponse.createBySuccess(ResponseCode.COURSE_FINISH);
     }
 
     private boolean initNextUnitOrCourse(Student student, NeedViewDTO dto) {

@@ -25,10 +25,18 @@ public interface SyntaxUnitMapper extends BaseMapper<SyntaxUnit> {
     List<Long> selectUnitIdByCourseId(@Param("courseId") Long courseId);
 
     /**
-     * 查询学生当前正在学习的单元
+     * 查询当前课程最大单元id
      *
-     * @param studentId
+     * @param unitId
      * @return
      */
-    SyntaxUnit selectCurrentUnit(@Param("studentId") Long studentId);
+    Long selectMaxUnitIdByUnitId(@Param("unitId") Long unitId);
+
+    /**
+     * 查询当前单元的课程id
+     *
+     * @param unitId
+     * @return
+     */
+    Long selectCourseIdByUnitId(@Param("unitId") Long unitId);
 }
