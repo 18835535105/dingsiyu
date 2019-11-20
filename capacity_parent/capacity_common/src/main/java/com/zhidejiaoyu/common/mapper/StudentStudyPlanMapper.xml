@@ -95,12 +95,10 @@
     </select>
 
     <select id="countByStudentId" parameterType="map" resultType="int">
-        select
-        count(id)
-        from
-        student_study_plan
+        select count(id)
+        from student_study_plan
         where student_id = #{studentId}
-        and type = #{type}
+          and type = #{type}
     </select>
     <select id="selByStudentIdAndCourseId" parameterType="java.util.Map" resultMap="BaseResultMap">
         select
@@ -173,18 +171,26 @@
         course_id=#{courseId} and type=#{type} and (start_unit_id &lt;=#{unitId} and end_unit_id>=#{unitId}) limit 1
     </select>
     <select id="selectSyntaxByStudentAndType" parameterType="map" resultType="map">
-            select
-            course.grade grade ,course.version version,
-            course.label label,plan.start_unit_id startId ,
-            plan.end_unit_id endId,plan.complete complete,course.id courseId
-            from
-            student_study_plan plan
-            join syntax_course course on plan.course_id=course.id
-            where
-            plan.student_id=#{studentId}
-            and
-            type =7
-            order by course.id asc
+        select course.grade       grade,
+               course.version     version,
+               course.label       label,
+               plan.start_unit_id startId,
+               plan.end_unit_id   endId,
+               plan.complete      complete,
+               course.id          courseId
+        from student_study_plan plan
+                 join syntax_course course on plan.course_id = course.id
+        where plan.student_id = #{studentId}
+          and type = 7
+        order by course.id asc
+    </select>
+    <select id="selectByStudentIdAndCourseId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from student_study_plan
+        where student_id = #{studentId}
+        and course_id = #{courseId}
+        and type = #{type}
     </select>
 
 

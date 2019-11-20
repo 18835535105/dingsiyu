@@ -88,4 +88,14 @@ public interface StudentStudyPlanMapper extends BaseMapper<StudentStudyPlan> {
     int countByStudentId(@Param("studentId") Long studentId, @Param("type") Integer type);
 
     List<Map<String, Object>> selectSyntaxByStudentAndType(@Param("studentId") Long studentId);
+
+    /**
+     * 获取学生学习计划
+     *
+     * @param studentId
+     * @param courseId
+     * @param type
+     * @return
+     */
+    List<StudentStudyPlan> selectByStudentIdAndCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId, @Param("type") int type);
 }

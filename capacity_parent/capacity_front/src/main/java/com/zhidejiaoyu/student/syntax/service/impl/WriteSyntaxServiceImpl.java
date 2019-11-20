@@ -21,9 +21,11 @@ import com.zhidejiaoyu.student.syntax.savelearn.SaveLearnInfo;
 import com.zhidejiaoyu.student.syntax.service.LearnSyntaxService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 
@@ -58,7 +60,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
     private WriteNeedView writeNeedView;
 
     @Resource
-    private CapacityStudentUnitMapper capacityStudentUnitMapper;
+    private StudentStudyPlanMapper studentStudyPlanMapper;
 
     @Resource
     private StudentStudySyntaxMapper studentStudySyntaxMapper;
@@ -141,9 +143,20 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
             studentStudySyntaxMapper.deleteByCourseId(student.getId(), courseId);
             // 课程学习完奖励勋章
             this.saveMonsterMedal(student, courseId);
+            // 将当前课程学习计划置为已完成状态
+            this.updateStudentStudyPlanToComplete(student, courseId);
             return true;
         }
         return false;
+    }
+
+    private void updateStudentStudyPlanToComplete(Student student, Long courseId) {
+        List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selectByStudentIdAndCourseId(student.getId(), courseId, 7);
+        if (!CollectionUtils.isEmpty(studentStudyPlans)) {
+            StudentStudyPlan studentStudyPlan = studentStudyPlans.get(0);
+            studentStudyPlan.setComplete(2);
+            studentStudyPlanMapper.updateById(studentStudyPlan);
+        }
     }
 
     /**
