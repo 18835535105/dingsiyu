@@ -18,7 +18,6 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.constant.study.StudyModelConstant;
 import com.zhidejiaoyu.common.constant.study.TestGenreConstant;
-import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
@@ -171,7 +170,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         // 设置游戏测试开始时间
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(student.getId(), 1);
         List<Vocabulary> vocabularies;
         Long courseId;
         PageHelper.startPage(1, 100);
@@ -262,7 +261,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             return ServerResponse.createBySuccess(ResponseCode.FORBIDDEN.getCode(), ResponseCode.FORBIDDEN.getMsg());
         }
 
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(studentId, 1);
         if (capacityStudentUnit == null) {
             log.warn("学生[{} - {} - {}]没有分配智慧单词学习计划！", student.getId(), student.getAccount(), student.getStudentName());
             return ServerResponse.createByError(301, "学生未分配智能版单词学习计划！");

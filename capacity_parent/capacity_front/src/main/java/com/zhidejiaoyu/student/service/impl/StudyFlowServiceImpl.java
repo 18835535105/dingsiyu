@@ -232,7 +232,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     private ServerResponse<Object> toAnotherFlow(NodeDto dto, int flowId) {
         Student student = dto.getStudent();
 
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(student.getId(), 1);
 
         // 判断当前单元单词是否有图片，如果都没有图片不进入单词图鉴
         StudyFlow byPrimaryKey = this.getStudyFlow(dto, flowId);
@@ -392,7 +392,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         Long grade = dto.getGrade();
 
 
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(studentId, 1);
         if (capacityStudentUnit == null) {
             log.error("学生[{} - {} - {}]还没有初始化同步版课程！", studentId, student.getAccount(), student.getStudentName());
             throw new ServiceException(ServiceExceptionEnum.NO_CAPACITY_COURSE);

@@ -35,7 +35,7 @@
           and type = #{type}
     </delete>
 
-    <select id="selectCurrentUnitIdByStudentIdAndType"
+    <select id="selectByStudentIdAndType"
             resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="base_sql"/>
@@ -43,24 +43,24 @@
     </select>
 
     <select id="selGetSentenceByStudentIdAndType" resultMap="BaseResultMap" parameterType="java.lang.Long">
-        select <include refid="base_sql"></include>
+        select <include refid="base_sql"/>
         from  capacity_student_unit where student_id=#{studentId} and type=2
     </select>
 
     <select id="selSymbolByStudentId" parameterType="long" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include>
+        select <include refid="base_sql"/>
         from capacity_student_unit
         where student_id=#{studentId} and type=5 limit 1
     </select>
 
     <select id="selLetterByStudentId" parameterType="long" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include>
+        select <include refid="base_sql"/>
         from capacity_student_unit
         where student_id=#{studentId} and type=4
     </select>
 
     <select id="selByStudentIdAndType" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include>
+        select <include refid="base_sql"/>
         from capacity_student_unit where student_id=#{studentId} and type=#{type}
     </select>
 

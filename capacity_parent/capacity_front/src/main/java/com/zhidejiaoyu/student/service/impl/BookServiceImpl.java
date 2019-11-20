@@ -5,9 +5,9 @@ import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.bookVo.BookInfoVo;
 import com.zhidejiaoyu.common.Vo.bookVo.BookVo;
 import com.zhidejiaoyu.common.Vo.bookVo.PlayerVo;
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.PictureUtil;
@@ -16,9 +16,8 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.service.BookService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,19 +25,12 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
+@Slf4j
 @Service
 public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabulary> implements BookService {
 
-    private Logger log = LoggerFactory.getLogger(this.getClass());
-
-    @Autowired
-    private CommonMethod commonMethod;
-
     @Autowired
     private LearnMapper learnMapper;
-
-    @Autowired
-    private RunLogMapper runLogMapper;
 
     @Autowired
     private BaiduSpeak baiduSpeak;
@@ -56,7 +48,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
     private UnitSentenceMapper unitSentenceMapper;
 
     @Autowired
-    private UnitMapper unitMapper;
+    private CapacityStudentUnitMapper capacityStudentUnitMapper;
 
     @Autowired
     private CapacityReviewMapper capacityReviewMapper;
@@ -66,9 +58,6 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
 
     @Autowired
     private PlayerMapper playerMapper;
-
-    @Autowired
-    private SentenceUnitMapper sentenceUnitMapper;
 
     @Autowired
     private RedisOpt redisOpt;
@@ -202,9 +191,13 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
     }
 
     @Override
-    public ServerResponse<BookInfoVo> getBookInfo(HttpSession session, Long courseId, Long unitId, String studyModel) {
+    public ServerResponse<BookInfoVo> getBookInfo(HttpSession session, String courseIdStr, String unitIdStr, String studyModel) {
         Student student = getStudent(session);
         Long studentId = student.getId();
+
+        Map<String, Long> map = this.checkNaN(courseIdStr, unitIdStr, student);
+        Long unitId = map.get("unitId");
+        Long courseId = map.get("courseId");
         Long total;
         Long learnedCount;
         Long notKnow;
@@ -256,12 +249,41 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
         vo.setKnow(know);
         vo.setNotKnow(notKnow);
         double plan = BigDecimalUtil.div(learnedCount * 1.0, total, 2);
-        vo.setPlan(plan > 1.0 ? 1.0 : plan);
+        vo.setPlan(Math.min(plan, 1.0));
         vo.setResidue(total - learnedCount);
         vo.setTotal(total);
         double scale = BigDecimalUtil.div(notKnow * 1.0, total, 2);
-        vo.setScale(scale > 1.0 ? 1.0 : scale);
+        vo.setScale(Math.min(scale, 1.0));
         return ServerResponse.createBySuccess(vo);
+    }
+
+    /**
+     * 防止NaN
+     *
+     * @param courseIdStr
+     * @param unitIdStr
+     * @param student
+     * @return
+     */
+    @SuppressWarnings("warning")
+    private Map<String, Long> checkNaN(String courseIdStr, String unitIdStr, Student student) {
+        Map<String, Long> map = new HashMap<>(16);
+        String str = "NaN";
+        if (Objects.equals(courseIdStr, str) || Objects.equals(unitIdStr, str)) {
+            log.warn("学生[{} - {} - {}]访问接口[/book/getBookInfo]参数courseId=[{}], unitId=[{}]", student.getId(),
+                    student.getAccount(), student.getStudentName(), courseIdStr, unitIdStr);
+            CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(student.getId(), 1);
+            if (!Objects.isNull(capacityStudentUnit)) {
+                map.put("courseId", capacityStudentUnit.getCourseId());
+                map.put("unitId", capacityStudentUnit.getUnitId());
+            } else {
+                throw new ServiceException("未查询到学习计划！");
+            }
+        } else {
+            map.put("courseId", Long.parseLong(courseIdStr));
+            map.put("unitId", Long.parseLong(unitIdStr));
+        }
+        return map;
     }
 
     @Override

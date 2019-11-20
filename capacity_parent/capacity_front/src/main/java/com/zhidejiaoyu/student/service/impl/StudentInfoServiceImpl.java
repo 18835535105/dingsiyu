@@ -440,7 +440,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             boolean flag = (classify >= 0 && classify <= 3) || classify == 27 || classify == 35 || classify == 36;
             if (flag) {
                 // 单词学习计划
-                CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+                CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(student.getId(), 1);
                 if (capacityStudentUnit != null) {
                     StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selectCurrentPlan(student.getId(),
                             capacityStudentUnit.getStartunit(), capacityStudentUnit.getEndunit(), 1);
