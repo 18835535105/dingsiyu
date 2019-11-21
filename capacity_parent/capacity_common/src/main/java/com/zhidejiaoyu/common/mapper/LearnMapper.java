@@ -251,46 +251,8 @@ public interface LearnMapper extends BaseMapper<Learn> {
      */
     Integer insertList(@Param("list") List<Learn> learns);
 
-    /**
-     * 根据学生id分组查询课程id,课程名
-     *
-     * @param student_id 学生id
-     * @param model
-     * @param model
-     * @return
-     */
-    @Select("select b.id, b.course_name as courseName from learn a join course b on a.course_id = b.id and a.student_id = #{student_id} AND a.example_id IS NULL GROUP BY b.id")
-    List<Course> selectByCourseId(@Param("student_id") Long student_id);
-
     @Select("select MAX(learn_time) from learn WHERE student_id = #{student_id} AND course_id = #{id} AND example_id IS NULL")
     String selectBylLearn_time(@Param("id") Long id, @Param("student_id") Long student_id);
-
-    /**
-     * 查询当前学生所有课程中生词的个数
-     *
-     * @param stuId
-     * @return
-     */
-    @Select("select count(distinct l.vocabulary_id) from learn l,vocabulary v where l.student_id = #{stuId} and l.`status` = 0 and l.vocabulary_id is not null and l.vocabulary_id <> '' and l.vocabulary_id = v.id and v.delStatus = 1")
-    int countUnknownWordByStudentId(Long stuId);
-
-    /**
-     * 查询当前学生所有课程中生句的个数
-     *
-     * @param stuId
-     * @return
-     */
-    @Select("select count(distinct example_id) from learn where student_id = #{stuId} and `status` = 0 and example_id is not null and example_id <> ''")
-    int countKnownSentenceByStudentId(Long stuId);
-
-    /**
-     * 查询当前学生所有课程中熟句的个数
-     *
-     * @param stuId
-     * @return
-     */
-    @Select("select count(distinct example_id) from learn where student_id = #{stuId} and `status` = 1 and example_id is not null and example_id <> ''")
-    int countUnknownSentenceByStudentId(Long stuId);
 
     /**
      * 查询当前学生已学单词/例句数（单词/例句的三个学习模块学习的单词/例句数之和）
@@ -303,67 +265,21 @@ public interface LearnMapper extends BaseMapper<Learn> {
     @MapKey("id")
     Map<Long, Map<String, Long>> countWordsByCourseId(@Param("stuId") Long stuId, @Param("list") List<Course> courses, @Param("flag") int flag);
 
-    /**
-     * 查询当前学生已学例句数（单词的三个学习模块学习的单例句之和）
-     *
-     * @param stuId
-     * @param courses
-     * @return map key：课程id，value：当前课程的例句的三个学习模块学习的例句数之和
-     */
-    @MapKey("id")
-    Map<Long, Integer> countSentencesByCourseId(@Param("stuId") Long stuId, @Param("list") List<Course> courses);
-
     @Select("select date_format(learn_time, '%Y') from learn where student_id = #{studentId} and learn_time IS NOT NULL GROUP BY  date_format(learn_time, '%Y') ORDER BY learn_time DESC")
     List<Integer> selectLearn_times(@Param("studentId") Long stuentId);
 
-    /**
-     * 课程首次学习时间
-     *
-     * @param stuId
-     * @param courses
-     * @return map key:课程id，value：当前课程首次学习日期
-     */
-    @MapKey("id")
-    Map<Long, Map<String, Date>> selectFirstStudyTimeMapByCourseId(@Param("stuId") Long stuId, @Param("courses") List<Course> courses);
-
-    /**
-     * 查询当前课程上次学习时间
-     *
-     * @param stuId
-     * @param courses
-     * @return
-     */
-    @MapKey("id")
-    Map<Long, Map<String, Date>> selectLastStudyTimeMapByCourseId(@Param("stuId") Long stuId, @Param("courses") List<Course> courses);
-
     Integer selectNumberByStudentId(@Param("student_id") Long student_id, @Param("unit_id") Integer unit_id, @Param("model") int model);
-
-    /**
-     * 查询当前课程下指定模块的熟词/熟句数
-     *
-     * @param stuId
-     * @param courseId
-     * @param model      学习类型 1：慧记忆；2：慧听写；3：慧默写；4：例句听力；5：例句翻译；6：例句默写
-     * @param flag       1：熟词/熟句；2：生词/生句
-     * @param learnCount 第几遍学习当前课程
-     * @return
-     */
-    Integer countKnownCountByStudentIdAndCourseId(@Param("stuId") Long stuId, @Param("courseId") Long courseId, @Param("model") int model, @Param("flag") int flag, @Param("learnCount") Integer learnCount);
 
     /**
      * 查询当前单元下指定模块的熟词/熟句数
      *
      * @param stuId
-     * @param courseId
      * @param model      学习类型 1：慧记忆；2：慧听写；3：慧默写；4：例句听力；5：例句翻译；6：例句默写
      * @param flag       1：熟词/熟句；2：生词/生句
      * @param learnCount 第几遍学习当前课程
      * @return
      */
     Integer countKnownCountByStudentIdAndUnitId(@Param("stuId") Long stuId, @Param("unitId") Long unitId, @Param("model") int model, @Param("flag") int flag, @Param("learnCount") Integer learnCount);
-
-    @Select("SELECT count(id) FROM learn where  date_format(learn_time, '%Y-%m-%d') >= #{weekStart} and date_format(learn_time, '%Y-%m-%d') <= #{weekEnd} AND student_id = #{studentId} ")
-    Integer weekCountQuantity(@Param("weekStart") String weekStart, @Param("weekEnd") String weekEnd, @Param("studentId") Long studentId);
 
     Map<String, Object> mapWeekCountQuantity(@Param("weekStart") String weekStart, @Param("weekEnd") String weekEnd, @Param("studentId") Long studentId);
 
@@ -377,12 +293,6 @@ public interface LearnMapper extends BaseMapper<Learn> {
     List<String> selectLearnedModelByStudent(@Param("student") Student student);
 
     String countCourseStudyModel(@Param("studentId") Long studentId, @Param("course_id") Long course_id, @Param("model") int model);
-
-    Map<String, Object> countUnitStudyModel(@Param("studentId") Long studentId, @Param("course_id") Long course_id, @Param("model") int model);
-
-    Integer countByWord(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("model") Integer model);
-
-    Integer countBySentence(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("model") Integer model);
 
     /**
      * 查看当前学生所有课程指定模块的熟词个数，相同单词算一个，所有课程下该单词都是熟词才能算作一个熟词个数
@@ -560,32 +470,6 @@ public interface LearnMapper extends BaseMapper<Learn> {
     Integer countHaveToLearnByModelAll(@Param("studentId") Long studentId, @Param("unitId") Integer id, @Param("model") int i);
 
     Integer countUnitAllStudyModel(@Param("studentId") Long studentId, @Param("unitId") Integer unitId, @Param("model") Integer model);
-
-    /**
-     * 计算学生首次学习为掌握的单词和例句总个数
-     *
-     * @param stuId
-     * @return
-     */
-    int countTotalLearnCountWithFirstIsKnown(@Param("stuId") Long stuId);
-
-    /**
-     * 获取当前学生错误率超过 20% 的单词和例句总个数
-     *
-     * @param stuId
-     * @return
-     */
-    int countFaultWordByStudentId(@Param("stuId") Long stuId);
-
-    /**
-     * 计算学生完成单元效率(完成单元效率=（已完成单元数÷总单元数[学生能学习的总单元数，不区分课程]）/有效学习总次数)
-     *
-     * @param stuId
-     * @return
-     */
-    Double selectCompleteUnitRate(@Param("stuId") Long stuId);
-
-    double selectTestErrorRate(@Param("stuId") Long stuId);
 
     /**
      * 已掌握单词
