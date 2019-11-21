@@ -24,7 +24,8 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"student_study_syntax"};
+        String[] tableName = {"course_new", "syntax_unit_topic_new", "unit_new", "unit_sentence_new", "unit_teks_new", "unit_vocabulary_new", "vocabulary_new"};
+
 
         /**
          * 配置：
@@ -39,7 +40,8 @@ public class MpGeneratorUtil {
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig
                 //设置代码生成路径
-                .setOutputDir("D://pojo")
+//                .setOutputDir("D://pojo")
+                .setOutputDir("/Users/wuchenxi/Desktop/zdjy")
                 //设置作者
                 .setAuthor("zdjy")
                 //设置二级缓存的开闭
