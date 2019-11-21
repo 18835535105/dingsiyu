@@ -129,14 +129,14 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
         //获取已完成模块在所有模块的位置
         int size = 0;
         for (int i = 0; i < unitIds.size(); i++) {
-            if (unitIds.get(i).equals(unitId)) {
+            if (unitIds.get(i) <= unitId) {
                 size = i + 1;
             }
         }
         int learningSize = (size - 1) * 3;
         if (SyntaxModelNameConstant.SELECT_SYNTAX.equals(model)) {
             learningSize += 1;
-        }else if (SyntaxModelNameConstant.GAME.equals(model)){
+        } else if (SyntaxModelNameConstant.GAME.equals(model)) {
             learningSize += 2;
         } else if (SyntaxModelNameConstant.WRITE_SYNTAX.equals(model)) {
             learningSize += 2;
