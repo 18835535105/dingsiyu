@@ -191,7 +191,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
 
         // 获取学生当前正在学习的单元信息
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(studentId, 1);
         if (capacityStudentUnit != null) {
             // 封装学生当前学习的课程信息
             this.packageUnitInfo(result, capacityStudentUnit);

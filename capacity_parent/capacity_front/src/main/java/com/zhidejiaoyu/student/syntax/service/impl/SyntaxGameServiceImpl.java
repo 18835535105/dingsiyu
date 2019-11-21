@@ -22,9 +22,9 @@ import com.zhidejiaoyu.student.utils.PetSayUtil;
 import com.zhidejiaoyu.student.utils.PetUrlUtil;
 import com.zhidejiaoyu.student.vo.TestResultVo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -66,21 +66,66 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     @Resource
     private LearnModelInfo learnModelInfo;
 
+    @Resource
+    private StudentStudyPlanMapper studentStudyPlanMapper;
+
     @Override
     public ServerResponse getSyntaxGame(Long unitId) {
+        Student student = super.getStudent(HttpUtil.getHttpSession());
         HttpUtil.getHttpSession().setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
+
+        // 判断当前学生学习计划是否为已完成状态，如果是已完成状态，置为未完成状态
+        this.updateStudentStudyPlanToUnComplete(unitId, student);
 
         List<SyntaxTopic> syntaxTopics = this.getSyntaxTopics(unitId);
         if (CollectionUtils.isEmpty(syntaxTopics)) {
             this.printGetSyntaxGameNoDataLog(unitId);
             return ServerResponse.createByError(500, "未查询到数据！");
         }
-
-        List<GameVO> returnList = syntaxTopics.parallelStream().limit(GAME_COUNT)
+        List<GameVO> returnList = this.packageSyntaxTopics(syntaxTopics).parallelStream().limit(GAME_COUNT)
                 .map(syntaxTopic -> new GameVO(syntaxTopic.getTopic().replace("$&$", "___"), this.getSelect(syntaxTopic)))
                 .collect(Collectors.toList());
 
         return ServerResponse.createBySuccess(returnList);
+    }
+
+    private void updateStudentStudyPlanToUnComplete(Long unitId, Student student) {
+        SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
+        List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selectByStudentIdAndCourseId(student.getId(), syntaxUnit.getCourseId(), 7);
+        int competeState = 2;
+        if (CollectionUtils.isNotEmpty(studentStudyPlans) && Objects.equals(studentStudyPlans.get(0).getComplete(), competeState)) {
+            StudentStudyPlan studentStudyPlan = studentStudyPlans.get(0);
+            studentStudyPlan.setComplete(1);
+            studentStudyPlanMapper.updateById(studentStudyPlan);
+        }
+    }
+
+    /**
+     * 防止选项不够4个
+     *
+     * @param syntaxTopics
+     * @return
+     */
+    private List<SyntaxTopic> packageSyntaxTopics(List<SyntaxTopic> syntaxTopics) {
+        StringBuilder sb = new StringBuilder();
+        List<SyntaxTopic> syntaxTopicsTmp = new ArrayList<>(syntaxTopics);
+        return syntaxTopics.stream().map(syntaxTopic -> {
+            int length = syntaxTopic.getOption().split("\\$&\\$").length;
+            // 选项个数
+            int optionCount = 3;
+            if (length < optionCount) {
+                sb.setLength(0);
+                sb.append(syntaxTopic.getOption());
+                Collections.shuffle(syntaxTopicsTmp);
+                syntaxTopicsTmp.stream()
+                        .filter(syntaxTopic1 -> !syntaxTopic1.getAnswer().equalsIgnoreCase(syntaxTopic.getAnswer())
+                                && !sb.toString().contains(syntaxTopic1.getAnswer()))
+                        .limit(optionCount - length)
+                        .forEach(syntaxTopic1 -> sb.append("$&$").append(syntaxTopic1.getAnswer()));
+                return syntaxTopic.setOption(sb.toString());
+            }
+            return syntaxTopic;
+        }).collect(Collectors.toList());
     }
 
     /**

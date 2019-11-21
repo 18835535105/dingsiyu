@@ -85,7 +85,7 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
     }
 
     private List<Map<String, Object>> getGameOneSubject(Student student, Integer pageNum, List<String> wordList) {
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(student.getId(), 1);
         int startRow = (pageNum - 1) * 10;
         // 从当前单元单词中随机获取10题
         List<Map<String, Object>> unitLearns = learnMapper.selectLearnedByUnitId(student.getId(), capacityStudentUnit.getUnitId(), startRow, 10);
@@ -112,7 +112,7 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         Student student = getStudent(session);
 
         // 从当前课程随机取10个已学的单词
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 1);
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(student.getId(), 1);
         if (capacityStudentUnit == null) {
             log.warn("学生 [{} - {} - {}] 没有智能版课程，获取“桌牌捕音”游戏数据失败！", student.getId(), student.getAccount(), student.getStudentName());
             return null;

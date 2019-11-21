@@ -62,7 +62,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
             return ServerResponse.createBySuccess(map);
         }
         //获取当前学习的课程
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 5);
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(student.getId(), 5);
         if (capacityStudentUnit != null) {
             Long unitId = capacityStudentUnit.getUnitId();
             if (unitId != null) {

@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.syntax.learnmodel;
 
+import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.mapper.LearnMapper;
 import com.zhidejiaoyu.common.mapper.StudentStudySyntaxMapper;
 import com.zhidejiaoyu.common.mapper.SyntaxUnitMapper;
@@ -44,6 +45,10 @@ public class LearnModelInfo {
     public StudentStudySyntax packageStudentStudySyntax(Long unitId, Student student, String nextModelName) {
         StudentStudySyntax studentStudySyntax = studentStudySyntaxMapper.selectByStudentIdAndUnitId(student.getId(), unitId);
         if (!Objects.isNull(studentStudySyntax)) {
+            // 如果当前模块是写语法，进入下一单元
+            if (Objects.equals(studentStudySyntax.getModel(), SyntaxModelNameConstant.WRITE_SYNTAX)) {
+                studentStudySyntax.setUnitId(unitId + 1);
+            }
             studentStudySyntax.setModel(nextModelName);
             studentStudySyntax.setUpdateTime(new Date());
             studentStudySyntaxMapper.updateById(studentStudySyntax);

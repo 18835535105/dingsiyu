@@ -15,14 +15,17 @@ import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.redis.SyntaxRedisOpt;
 import com.zhidejiaoyu.student.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.syntax.learnmodel.LearnModelInfo;
 import com.zhidejiaoyu.student.syntax.needview.WriteNeedView;
 import com.zhidejiaoyu.student.syntax.savelearn.SaveLearnInfo;
 import com.zhidejiaoyu.student.syntax.service.LearnSyntaxService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 
@@ -57,7 +60,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
     private WriteNeedView writeNeedView;
 
     @Resource
-    private CapacityStudentUnitMapper capacityStudentUnitMapper;
+    private StudentStudyPlanMapper studentStudyPlanMapper;
 
     @Resource
     private StudentStudySyntaxMapper studentStudySyntaxMapper;
@@ -70,6 +73,9 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
 
     @Resource
     private SyntaxUnitMapper syntaxUnitMapper;
+
+    @Resource
+    private LearnModelInfo learnModelInfo;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -107,10 +113,12 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         }
 
         // 说明当前单元写语法模块内容都已掌握，进入下一个单元或者完成当前课程
-        if (initNextUnitOrCourse(student)) {
+        if (initNextUnitOrCourse(student, dto)) {
             return ServerResponse.createBySuccess(ResponseCode.COURSE_FINISH);
         }
-        SyntaxUnit syntaxUnit = syntaxUnitMapper.selectCurrentUnit(student.getId());
+        SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId + 1);
+        // 说明当前单元写语法模块内容都已掌握，进入下一单元语法游戏模块
+        learnModelInfo.packageStudentStudySyntax(unitId, student, SyntaxModelNameConstant.GAME);
         if (syntaxUnit != null) {
             // 返回下一个单元的信息
             return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH.getCode(), SyntaxCourseVo.builder()
@@ -119,28 +127,36 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                     .unitIndex(syntaxUnit.getUnitIndex())
                     .build());
         }
-        return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
+        return ServerResponse.createBySuccess(ResponseCode.COURSE_FINISH);
     }
 
-    private boolean initNextUnitOrCourse(Student student) {
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(student.getId(), 6);
-        if (capacityStudentUnit != null) {
-            if (Objects.equals(capacityStudentUnit.getUnitId(), capacityStudentUnit.getEndunit())) {
-                // 当前课程学习完毕
-                // 将当前课程的学习记录置为已学习
-                learnMapper.updateSyntaxToLearnedByCourseId(capacityStudentUnit.getStudentId(), capacityStudentUnit.getCourseId());
-                // 清除学生语法记忆追踪信息
-                studyCapacityMapper.deleteSyntaxByStudentIdAndCourseId(capacityStudentUnit.getStudentId(), capacityStudentUnit.getCourseId());
-                // 删除当前课程的语法节点信息
-                studentStudySyntaxMapper.deleteByCourseId(student.getId(), capacityStudentUnit.getCourseId());
-                // 课程学习完奖励勋章
-                this.saveMonsterMedal(student, capacityStudentUnit.getCourseId());
-                return true;
-            }
-            capacityStudentUnit.setUnitId(capacityStudentUnit.getUnitId() + 1);
-            capacityStudentUnitMapper.updateById(capacityStudentUnit);
+    private boolean initNextUnitOrCourse(Student student, NeedViewDTO dto) {
+        Long unitId = syntaxUnitMapper.selectMaxUnitIdByUnitId(dto.getUnitId());
+        if (Objects.equals(unitId, dto.getUnitId())) {
+            Long courseId = syntaxUnitMapper.selectCourseIdByUnitId(dto.getUnitId());
+            // 当前课程学习完毕
+            // 将当前课程的学习记录置为已学习
+            learnMapper.updateSyntaxToLearnedByCourseId(student.getId(), courseId);
+            // 清除学生语法记忆追踪信息
+            studyCapacityMapper.deleteSyntaxByStudentIdAndCourseId(student.getId(), courseId);
+            // 删除当前课程的语法节点信息
+            studentStudySyntaxMapper.deleteByCourseId(student.getId(), courseId);
+            // 课程学习完奖励勋章
+            this.saveMonsterMedal(student, courseId);
+            // 将当前课程学习计划置为已完成状态
+            this.updateStudentStudyPlanToComplete(student, courseId);
+            return true;
         }
         return false;
+    }
+
+    private void updateStudentStudyPlanToComplete(Student student, Long courseId) {
+        List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selectByStudentIdAndCourseId(student.getId(), courseId, 7);
+        if (!CollectionUtils.isEmpty(studentStudyPlans)) {
+            StudentStudyPlan studentStudyPlan = studentStudyPlans.get(0);
+            studentStudyPlan.setComplete(2);
+            studentStudyPlanMapper.updateById(studentStudyPlan);
+        }
     }
 
     /**

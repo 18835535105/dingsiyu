@@ -19,6 +19,7 @@ import com.zhidejiaoyu.student.syntax.learnmodel.LearnModelInfo;
 import com.zhidejiaoyu.student.syntax.needview.LearnNeedView;
 import com.zhidejiaoyu.student.syntax.savelearn.SaveLearnInfo;
 import com.zhidejiaoyu.student.syntax.service.LearnSyntaxService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -149,7 +150,7 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
     public static List<KnowledgePointVO.SyntaxContent> getContent(String content) {
         // 包含【】##内容
         String[] split = content.split("\\$\\$");
-        return Arrays.stream(split).map(str -> {
+        return Arrays.stream(split).filter(StringUtils::isNotEmpty).map(str -> {
             // 分割成【】   内容
             String[] split1 = str.split("##");
             return KnowledgePointVO.SyntaxContent.builder()

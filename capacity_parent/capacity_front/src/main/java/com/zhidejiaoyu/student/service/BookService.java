@@ -38,7 +38,7 @@ public interface BookService extends BaseService<Vocabulary> {
      * @param studyModel
      * @return
      */
-    ServerResponse<BookInfoVo> getBookInfo(HttpSession session, Long courseId, Long unitId, String studyModel);
+    ServerResponse<BookInfoVo> getBookInfo(HttpSession session, String courseId, String unitId, String studyModel);
 
     /**
      * 获取单词播放机、句子播放机播放内容和答案列表
