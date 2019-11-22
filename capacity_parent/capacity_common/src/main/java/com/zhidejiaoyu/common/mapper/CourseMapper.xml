@@ -373,7 +373,7 @@
     </insert>
 
     <!-- 根据id查询课程名 -->
-    <select id="selectCourseName" parameterType="int"
+    <select id="selectCourseNameById" parameterType="map"
             resultType="java.lang.String">
         select course_name
         from course
