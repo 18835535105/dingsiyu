@@ -22,12 +22,12 @@ public interface BookService extends BaseService<Vocabulary> {
      * 获取单词本/句子本列表信息
      *
      * @param session
-     * @param courseId
-     * @param unitId    单元id
-     * @param condition 查询条件 1：总单词（默认）；2：生词；3：熟词；4：剩余   @return
+     * @param unitId     单元id
+     * @param studyModel
+     * @param condition  查询条件 1：总单词（默认）；2：生词；3：熟词；4：剩余   @return
      */
-    ServerResponse<PageInfo<BookVo>> getWordBookList(HttpSession session, Long courseId, Long unitId, String studyModel,
-                                                     Integer condition, Integer pageNum, Integer pageSize);
+    ServerResponse<PageInfo<BookVo>> getWordBookList(HttpSession session, String unitId, String studyModel,
+                                                     Integer condition);
 
     /**
      * 获取句子本、单词本顶部信息摘要
@@ -38,7 +38,7 @@ public interface BookService extends BaseService<Vocabulary> {
      * @param studyModel
      * @return
      */
-    ServerResponse<BookInfoVo> getBookInfo(HttpSession session, Long courseId, Long unitId, String studyModel);
+    ServerResponse<BookInfoVo> getBookInfo(HttpSession session, String courseId, String unitId, String studyModel);
 
     /**
      * 获取单词播放机、句子播放机播放内容和答案列表

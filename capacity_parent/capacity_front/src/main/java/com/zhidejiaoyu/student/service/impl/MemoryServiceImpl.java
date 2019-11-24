@@ -307,7 +307,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         if (StringUtils.isNotEmpty(learn.getCourseName())) {
             return;
         }
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectCurrentUnitIdByStudentIdAndType(studentId, 1);
+        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(studentId, 1);
         if (capacityStudentUnit != null) {
             Long startUnitId = capacityStudentUnit.getStartunit();
             Long endUnitId = capacityStudentUnit.getEndunit();

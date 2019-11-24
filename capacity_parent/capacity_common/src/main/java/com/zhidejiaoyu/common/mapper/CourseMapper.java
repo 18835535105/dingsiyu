@@ -40,7 +40,7 @@ public interface CourseMapper extends BaseMapper<Course> {
 
     int addCourse(Course course);
 
-    String selectCourseName(int id);
+    String selectCourseNameById(Long id);
 
     /**
      * 新增单元

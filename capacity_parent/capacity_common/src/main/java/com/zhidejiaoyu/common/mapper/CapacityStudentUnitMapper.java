@@ -27,17 +27,7 @@ public interface CapacityStudentUnitMapper extends BaseMapper<CapacityStudentUni
      * @param type  学习模块：1：单词模块；2：例句听力；3：例句默写；4：例句翻译
      * @return
      */
-    CapacityStudentUnit selectCurrentUnitIdByStudentIdAndType(@Param("studentId") Long studentId, @Param("type") Integer type);
-
-    /**
-     * 查看指定类型是否有同步版课程
-     *
-     * @param student
-     * @param type
-     * @return
-     */
-    @Select("select count(id) from student_study_plan where student_id = #{student.id} and type = #{type}")
-    int countByType(@Param("student") Student student, @Param("type") int type);
+    CapacityStudentUnit selectByStudentIdAndType(@Param("studentId") Long studentId, @Param("type") Integer type);
 
     /**
      * 清除学生指定类型的正在学习课程信息
