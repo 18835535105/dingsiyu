@@ -76,6 +76,7 @@ public class WriteNeedView implements INeedView {
                     .studyNew(false)
                     .id(syntaxTopic.getId())
                     .total(dto.getTotal())
+                    .model(syntaxTopic.getModel())
                     .build());
         }
         return null;

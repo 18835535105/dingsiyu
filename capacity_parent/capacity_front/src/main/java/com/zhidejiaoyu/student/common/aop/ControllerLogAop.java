@@ -31,7 +31,6 @@ public class ControllerLogAop {
 
     @Around("cut()")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
-        log.info("测试请求日志是否打印！！！！！thread=[{}]", Thread.currentThread().getName());
         long startTime = System.currentTimeMillis();
         Object proceed = pjp.proceed();
         printLog(startTime);

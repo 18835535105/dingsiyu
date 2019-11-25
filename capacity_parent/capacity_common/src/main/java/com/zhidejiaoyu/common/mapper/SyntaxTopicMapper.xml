@@ -12,13 +12,14 @@
         <result column="update_time" property="updateTime"/>
         <result column="option" property="option"/>
         <result column="analysis" property="analysis"/>
+        <result column="model" property="model"/>
     </resultMap>
 
     <sql id="base_sql">
-        id, knowledge_point_id, topic, answer, type, update_time, `option`,analysis
+        id, knowledge_point_id, topic, answer, type, update_time, `option`,analysis, model
     </sql>
     <sql id="more_table_sql">
-        st.id, st.knowledge_point_id, st.topic, st.answer, st.type, st.update_time, st.option, st.analysis
+        st.id, st.knowledge_point_id, st.topic, st.answer, st.type, st.update_time, st.option, st.analysis, model
     </sql>
 
     <select id="selectSelectSyntaxByUnitId" resultMap="BaseResultMap" parameterType="map">

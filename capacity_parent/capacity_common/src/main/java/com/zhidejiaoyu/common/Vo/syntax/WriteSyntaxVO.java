@@ -57,4 +57,11 @@ public class WriteSyntaxVO implements Serializable {
      * 记忆强度
      */
     private Integer memoryStrength;
+
+    /**
+     * 是否需要显示首字母
+     * 1：需要显示首字母
+     * 2：不需要显示首字母
+     */
+    private Integer model;
 }
