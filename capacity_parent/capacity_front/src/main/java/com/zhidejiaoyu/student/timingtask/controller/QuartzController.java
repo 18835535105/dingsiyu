@@ -76,13 +76,6 @@ public class QuartzController {
         quartzService.deleteSessionMap();
     }
 
-    /**
-     * 删除学生日奖励信息
-     */
-    @PostMapping("/deleteDailyAward")
-    public void deleteDailyAward() {
-        this.quartzService.deleteDailyAward();
-    }
 
     /**
      * 删除抽奖基数
@@ -90,28 +83,6 @@ public class QuartzController {
     @PostMapping("/deleteDrawRedis")
     public void deleteDrawRedis() {
         this.quartzService.deleteDrawRedis();
-    }
-
-    /**
-     * 初始化所有学生排行缓存信息
-     *
-     * @return
-     */
-    @GetMapping("/initRankCaches")
-    public ServerResponse initRankCaches() {
-        quartzService.initRankCaches();
-        return ServerResponse.createBySuccess();
-    }
-
-    /**
-     * 初始化所有指定学生排行缓存信息
-     *
-     * @return
-     */
-    @GetMapping("/initRankCache")
-    public ServerResponse initRankCache(Long studentId) {
-        quartzService.initRankCache(studentId);
-        return ServerResponse.createBySuccess();
     }
 
     /**

@@ -54,27 +54,9 @@ public interface QuartzService {
      */
     void deleteSessionMap();
 
-    /**
-     * 每天早上00:00更新日奖励
-     */
-    void deleteDailyAward();
-
-
      void deleteDrawRedis();
 
     void updateStudentExpansion();
-
-    /**
-     * 初始化排行缓存信息
-     */
-    void initRankCaches();
-
-    /**
-     * 初始化所有指定学生排行缓存信息
-     *
-     * @return
-     */
-    void initRankCache(Long studentId);
 
     /**
      * 每周一 00：05 删除所有学生定位信息
