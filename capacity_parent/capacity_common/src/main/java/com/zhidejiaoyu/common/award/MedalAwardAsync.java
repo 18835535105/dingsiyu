@@ -230,12 +230,12 @@ public class MedalAwardAsync extends BaseAwardAsync {
                     if (i < 3) {
                         if (super.checkAward(award, MEDAL_TYPE)) {
                             change = (int) (schoolDayRank - schoolRank);
-                            super.optAward(studentId, medalId, change >= 0 ? change : award.getCurrentPlan(), award, MEDAL_TYPE);
+                            super.optAward(studentId, medalId, this.getChange(award, change), award, MEDAL_TYPE);
                         }
                     } else {
                         if (super.checkAward(award, MEDAL_TYPE)) {
                             change = (int) (countryDayRank - countryRank);
-                            super.optAward(studentId, medalId, change >= 0 ? change : award.getCurrentPlan(), award, MEDAL_TYPE);
+                            super.optAward(studentId, medalId, this.getChange(award, change), award, MEDAL_TYPE);
                         }
                     }
                 }
@@ -243,6 +243,13 @@ public class MedalAwardAsync extends BaseAwardAsync {
                 log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
             }
         }
+    }
+
+    private int getChange(Award award, int change) {
+        if (change < 0) {
+            return award == null ? 0 : award.getCurrentPlan();
+        }
+        return change;
     }
 
     /**

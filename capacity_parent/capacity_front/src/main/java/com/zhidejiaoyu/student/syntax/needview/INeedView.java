@@ -2,7 +2,6 @@ package com.zhidejiaoyu.student.syntax.needview;
 
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
 import com.zhidejiaoyu.common.pojo.StudyCapacity;
-import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
 /**
@@ -37,15 +36,5 @@ public interface INeedView {
      */
     default int getMemoryStrength(StudyCapacity studyCapacity) {
         return (int) Math.round(studyCapacity.getMemoryStrength() * 100);
-    }
-
-    /**
-     * 替换符号
-     *
-     * @param syntaxTopic
-     * @return
-     */
-    default String getTopic(SyntaxTopic syntaxTopic) {
-        return syntaxTopic.getTopic().replace("$&$", "___");
     }
 }

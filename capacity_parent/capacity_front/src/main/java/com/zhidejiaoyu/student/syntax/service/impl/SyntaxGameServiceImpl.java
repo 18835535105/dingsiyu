@@ -83,10 +83,22 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
             return ServerResponse.createByError(500, "未查询到数据！");
         }
         List<GameVO> returnList = this.packageSyntaxTopics(syntaxTopics).parallelStream().limit(GAME_COUNT)
-                .map(syntaxTopic -> new GameVO(syntaxTopic.getTopic().replace("$&$", "___"), this.getSelect(syntaxTopic)))
+                .map(syntaxTopic -> new GameVO(replace(syntaxTopic), this.getSelect(syntaxTopic)))
                 .collect(Collectors.toList());
 
         return ServerResponse.createBySuccess(returnList);
+    }
+
+    /**
+     * 替换选择题中的$&$占位符
+     *
+     * @param syntaxTopic
+     * @return
+     */
+    public static String replace(SyntaxTopic syntaxTopic) {
+        return syntaxTopic.getTopic().startsWith("$")
+                ? syntaxTopic.getTopic().replace("$&$", "___ ")
+                : syntaxTopic.getTopic().replace("$&$", " ___ ");
     }
 
     private void updateStudentStudyPlanToUnComplete(Long unitId, Student student) {
@@ -196,6 +208,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
             student.setEnergy(awardEnergy);
             studentMapper.updateById(student);
+            super.saveRunLog(student, 4, "在语法游戏中奖励#" + awardGold + "#枚金币");
         }
 
         TestResultVo vo = new TestResultVo();

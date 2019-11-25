@@ -14,6 +14,7 @@ import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.study.memorydifficulty.SyntaxMemoryDifficulty;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.syntax.service.impl.LearnSyntaxServiceImpl;
+import com.zhidejiaoyu.student.syntax.service.impl.SyntaxGameServiceImpl;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -69,7 +70,7 @@ public class SelectNeedView implements INeedView {
             SyntaxTopic syntaxTopic = syntaxTopicMapper.selectById(studyCapacity.getWordId());
 
             LearnSyntaxVO knowledgePoint1 = this.getSelectSyntaxKnowledgePoint(dto, studyCapacity, knowledgePoint);
-            GameVO selects = getSelections(syntaxTopic);
+            GameVO selects = this.getSelections(syntaxTopic);
             return ServerResponse.createBySuccess(this.packageSelectSyntaxVO(knowledgePoint1, selects, syntaxTopic));
         }
         return null;
@@ -102,7 +103,7 @@ public class SelectNeedView implements INeedView {
      * @return
      */
     public GameVO getSelections(SyntaxTopic syntaxTopic) {
-        return new GameVO(getTopic(syntaxTopic), this.packageSelectAnswer(syntaxTopic));
+        return new GameVO(SyntaxGameServiceImpl.replace(syntaxTopic), this.packageSelectAnswer(syntaxTopic));
     }
 
     /**
