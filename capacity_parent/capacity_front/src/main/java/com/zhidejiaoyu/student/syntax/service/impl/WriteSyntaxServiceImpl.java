@@ -201,6 +201,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                     .studyNew(true)
                     .id(syntaxTopic.getId())
                     .total(dto.getTotal())
+                    .model(syntaxTopic.getModel())
                     .build());
         }
         return null;
