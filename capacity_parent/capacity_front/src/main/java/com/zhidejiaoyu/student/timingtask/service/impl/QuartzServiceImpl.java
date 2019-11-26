@@ -436,7 +436,6 @@ public class QuartzServiceImpl implements QuartzService {
      * 每天清楚体验账号到期60天的账号
      */
     @Override
-    @Scheduled(cron = "0 15 0 * * ?")
     public void deleteExperienceAccount() {
         //获取删除日期之前的学生
         Date date = DateTime.now().minusDays(60).toDate();
