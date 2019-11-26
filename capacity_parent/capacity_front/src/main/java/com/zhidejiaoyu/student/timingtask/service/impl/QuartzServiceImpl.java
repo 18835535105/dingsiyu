@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.timingtask.service.BaseQuartzService;
@@ -137,6 +138,12 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
     @Resource
     private SimpleSimpleStudentUnitMapper simpleSimpleStudentUnitMapper;
+
+    @Resource
+    private AwardMapper awardMapper;
+
+    @Resource
+    private CcieMapper ccieMapper;
 
     /**
      * 每日 00:10:00 更新提醒消息中学生账号到期提醒
