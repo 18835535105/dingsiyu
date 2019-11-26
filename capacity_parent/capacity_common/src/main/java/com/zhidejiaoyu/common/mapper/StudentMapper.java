@@ -271,9 +271,25 @@ public interface StudentMapper extends BaseMapper<Student> {
 
     /**
      * 查看到期体验账号id
-     * @param date
+     *
+     * @param studentIds
      */
-    List<Student> selectExpireExperienceAccount(@Param("date") Date date);
+    List<Student> selectDeleteAccount(@Param("studentIds") List<Long> studentIds);
 
     void deleteByIds(@Param("studentIds") List<Long> studentIds);
+
+    /**
+     * 查询到期的体验账号
+     *
+     * @return
+     */
+    List<Long> selectExperienceAccount();
+
+    /**
+     * 修改学生状态至已删除
+     *
+     * @param studentIds
+     */
+    void updateStatus(@Param("studentIds") List<Long> studentIds);
+
 }

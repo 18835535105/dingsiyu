@@ -481,6 +481,13 @@
         </foreach>
         )
     </update>
+    <update id="updateStatus" parameterType="map">
+        update student set `status` = 3 where id in (
+        <foreach collection="studentIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </update>
 
     <update id="updateSchoolGoldFirstTimeToNull" parameterType="map">
         update student set school_gold_first_time = null where id in (
@@ -839,21 +846,33 @@
         <include refid="Base_Column_List"/>
         from student where teacher_id = #{teacherId}
     </select>
-    <select id="selectExpireExperienceAccount" resultMap="BaseResultMap" parameterType="map">
+    <select id="selectDeleteAccount" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="Base_Column_List"></include>
         from student
         where
-        account_time is not null
-        and account_time &lt; #{date}
-        and `rank` &lt; 7
+        id in (
+        <foreach collection="studentIds" item="studentId" separator=",">
+            #{studentId}
+        </foreach>
+        )
     </select>
     <select id="deleteByIds" parameterType="map">
         delete from student where id in (
-            <foreach collection="studentIds" item="studentId" separator=",">
-                #{studentId}
-            </foreach>
+        <foreach collection="studentIds" item="studentId" separator=",">
+            #{studentId}
+        </foreach>
         )
+    </select>
+    <select id="selectExperienceAccount" resultType="long">
+        select
+        id
+        from student
+        where
+        account_time is not null
+        and account_time &lt; now()
+        and `status` = 1
+        and `rank` &lt; 7
     </select>
 
 </mapper>
