@@ -916,4 +916,11 @@
         where student_id = #{studentId}
         and point = 100
     </select>
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from test_record where student_id in (
+        <foreach collection="studentIds" separator="," item="studentId">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 </mapper>

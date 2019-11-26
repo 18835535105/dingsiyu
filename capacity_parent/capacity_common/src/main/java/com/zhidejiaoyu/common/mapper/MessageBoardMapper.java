@@ -102,4 +102,6 @@ public interface MessageBoardMapper extends BaseMapper<MessageBoard> {
      * @return
      */
     List<MessageBoard> selectByStudentId(Long studentId);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

@@ -3,10 +3,7 @@ package com.zhidejiaoyu.student.timingtask.service.impl;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
-import com.zhidejiaoyu.common.mapper.AwardMapper;
-import com.zhidejiaoyu.common.mapper.CcieMapper;
-import com.zhidejiaoyu.common.mapper.LocationMapper;
-import com.zhidejiaoyu.common.mapper.StudentMapper;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
@@ -18,6 +15,7 @@ import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.timingtask.service.QuartzService;
 import com.zhidejiaoyu.student.utils.ServiceInfoUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -91,6 +89,63 @@ public class QuartzServiceImpl implements QuartzService {
 
     @Autowired
     private RankOpt rankOpt;
+
+    @Resource
+    private TestRecordMapper testRecordMapper;
+    @Resource
+    private TestRecordInfoMapper testRecordInfoMapper;
+    @Resource
+    private LearnMapper learnMapper;
+    @Resource
+    private SimpleSimpleCapacityMapper simpleCapacityMapper;
+    @Resource
+    private SimpleGauntletMapper gauntletMapper;
+    @Resource
+    private CapacityListenMapper capacityListenMapper;
+    @Resource
+    private CapacityMemoryMapper capacityMemoryMapper;
+    @Resource
+    private CapacityPictureMapper capacityPictureMapper;
+    @Resource
+    private CapacityWriteMapper capacityWriteMapper;
+    @Resource
+    private SentenceWriteMapper sentenceWriteMapper;
+    @Resource
+    private SentenceListenMapper sentenceListenMapper;
+    @Resource
+    private SentenceTranslateMapper sentenceTranslateMapper;
+    @Resource
+    private RunLogMapper runLogMapper;
+    @Resource
+    private SimpleGoldLogMapper goldLogMapper;
+    @Resource
+    private SimpleStudentExchangePrizeMapper studentExchangePrizeMapper;
+    @Resource
+    private StudentRestudyMapper studentRestudyMapper;
+    @Resource
+    private DurationMapper durationMapper;
+    @Resource
+    private MessageBoardMapper messageBoardMapper;
+    @Resource
+    private SimpleDrawRecordMapper drawRecordMapper;
+    @Resource
+    private GameScoreMapper gameScoreMapper;
+    @Resource
+    private LetterListenMapper letterListenMapper;
+    @Resource
+    private LetterPairMapper letterPairMapper;
+    @Resource
+    private LetterWriteMapper letterWriteMapper;
+    @Resource
+    private OpenUnitLogMapper openUnitLogMapper;
+    @Resource
+    private SimpleStudentUnitMapper simpleStudentUnitMapper;
+    @Resource
+    private StudentStudyPlanMapper studentStudyPlanMapper;
+    @Resource
+    private CapacityStudentUnitMapper capacityStudentUnitMapper;
+    @Resource
+    private SimpleSimpleStudentUnitMapper simpleSimpleStudentUnitMapper;
 
     /**
      * 每日 00:10:00 更新提醒消息中学生账号到期提醒
@@ -204,8 +259,8 @@ public class QuartzServiceImpl implements QuartzService {
             return;
         }
         log.info("定时任务 -> 给每个冻结用户增加一天...");
-        List<Student> studentList=studentMapper.getAllFrozenStudent();
-        for(Student student:studentList){
+        List<Student> studentList = studentMapper.getAllFrozenStudent();
+        for (Student student : studentList) {
             Calendar c = Calendar.getInstance();
             c.add(Calendar.DAY_OF_MONTH, 1);
             Date time = c.getTime();
@@ -264,38 +319,38 @@ public class QuartzServiceImpl implements QuartzService {
             Integer study = simpleLevelMapper.getStudyById(studentExpansion.getLevel());
             //查询发起挑战的胜利场次获取的学习力
             List<Gauntlet> gauntlets = simpleGauntletMapper.selectStudy(1, studentExpansion.getStudentId());
-            for(Gauntlet gauntlet:gauntlets){
-                if(gauntlet.getChallengeStudy()!=null){
-                    study=study+gauntlet.getChallengeStudy();
+            for (Gauntlet gauntlet : gauntlets) {
+                if (gauntlet.getChallengeStudy() != null) {
+                    study = study + gauntlet.getChallengeStudy();
                 }
             }
             //获取发起挑战失败
             List<Gauntlet> gauntlets1 = simpleGauntletMapper.selectStudy(2, studentExpansion.getStudentId());
-            for(Gauntlet gauntlet:gauntlets1){
-                if(gauntlet.getChallengeStudy()!=null){
-                    if(study-gauntlet.getChallengeStudy()>0){
-                        study=study-gauntlet.getChallengeStudy();
-                    }else{
-                        study=0;
+            for (Gauntlet gauntlet : gauntlets1) {
+                if (gauntlet.getChallengeStudy() != null) {
+                    if (study - gauntlet.getChallengeStudy() > 0) {
+                        study = study - gauntlet.getChallengeStudy();
+                    } else {
+                        study = 0;
                     }
                 }
             }
             //查询被发起挑战的胜利场次获取的学习力
             List<Gauntlet> gauntlets2 = simpleGauntletMapper.selectStudy(3, studentExpansion.getStudentId());
-            for(Gauntlet gauntlet:gauntlets2){
-                if(gauntlet.getBeChallengeStudy()!=null){
-                    study=study+gauntlet.getBeChallengeStudy();
+            for (Gauntlet gauntlet : gauntlets2) {
+                if (gauntlet.getBeChallengeStudy() != null) {
+                    study = study + gauntlet.getBeChallengeStudy();
                 }
             }
             //获取发起挑战失败
             List<Gauntlet> gauntlets3 = simpleGauntletMapper.selectStudy(4, studentExpansion.getStudentId());
-            for(Gauntlet gauntlet:gauntlets3){
-                if(gauntlet.getBeChallengeStudy()!=null){
-                    if(study-gauntlet.getBeChallengeStudy()>0){
-                        study=study-gauntlet.getBeChallengeStudy();
+            for (Gauntlet gauntlet : gauntlets3) {
+                if (gauntlet.getBeChallengeStudy() != null) {
+                    if (study - gauntlet.getBeChallengeStudy() > 0) {
+                        study = study - gauntlet.getBeChallengeStudy();
                     }
-                }else{
-                    study=0;
+                } else {
+                    study = 0;
                 }
             }
             studentExpansion.setStudyPower(study);
@@ -326,7 +381,7 @@ public class QuartzServiceImpl implements QuartzService {
             rankOpt.addOrUpdate(RankKeysConst.COUNTRY_GOLD_RANK, student.getId(), goldCount);
             log.info("学生[{} - {} - {}] 金币数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), goldCount);
 
-            Long count =  0L;
+            Long count = 0L;
             if (ccieCount.get(student.getId()) != null && ccieCount.get(student.getId()).get("count") != null) {
                 count = ccieCount.get(student.getId()).get("count");
             }
@@ -350,7 +405,7 @@ public class QuartzServiceImpl implements QuartzService {
             }
             rankOpt.addOrUpdate(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
             rankOpt.addOrUpdate(RankKeysConst.SCHOOL_WORSHIP_RANK + schoolAdminId, student.getId(), count * 1.0);
-            rankOpt.addOrUpdate(RankKeysConst.COUNTRY_WORSHIP_RANK , student.getId(), count * 1.0);
+            rankOpt.addOrUpdate(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId(), count * 1.0);
             log.info("学生[{} - {} - {}] 被膜拜次数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
 
         });
@@ -376,6 +431,108 @@ public class QuartzServiceImpl implements QuartzService {
         locationMapper.delete(null);
         log.info("清除学生定位信息完成...");
     }
+
+    /**
+     * 每天清楚体验账号到期60天的账号
+     */
+    @Override
+    @Scheduled(cron = "0 15 0 * * ?")
+    public void deleteExperienceAccount() {
+        //获取删除日期之前的学生
+        Date date = DateTime.now().minusDays(60).toDate();
+        //查看到期学生的id
+        List<Student> students = studentMapper.selectExpireExperienceAccount(date);
+        if (students.size() > 0) {
+            //根据学生id清楚学习信息
+            for (Student stu : students) {
+                rankOpt.optGoldRank(stu);
+            }
+            //获取所有的学生id
+            List<Long> studentIds = new ArrayList<>();
+            students.forEach(stu -> studentIds.add(stu.getId()));
+            if (studentIds.size() > 0) {
+                simpleStudentUnitMapper.deleteByStudentIds(students);
+                // 删除跟学生相关的挑战
+                gauntletMapper.deleteByChallengerStudentIdsOrBeChallengerStudentIds(studentIds);
+                // 重置学习历程数据
+                redisTemplate.opsForHash().delete(RedisKeysConst.STUDENT_LOGINOUT_TIME, studentIds);
+                // 删除学生勋章、奖励
+                awardMapper.deleteByStudentIds(studentIds);
+
+                this.resetRecord(studentIds);
+                studentMapper.deleteByIds(studentIds);
+            }
+        }
+
+    }
+
+    /**
+     * 删除学生相关记录
+     *
+     * @param studentIdList
+     */
+    private void resetRecord(List<Long> studentIdList) {
+
+        // 删除测试记录详情
+        testRecordInfoMapper.deleteByStudentIds(studentIdList);
+
+        // 删除测试记录
+        testRecordMapper.deleteByStudentIds(studentIdList);
+
+        // 删除学习记录
+        learnMapper.deleteByStudentIds(studentIdList);
+
+        // 删除青学版学习记录
+        simpleCapacityMapper.deleteByStudentIds(studentIdList);
+
+        // 删除智能版单词学习记录
+        capacityListenMapper.deleteByStudentIds(studentIdList);
+        capacityMemoryMapper.deleteByStudentIds(studentIdList);
+        capacityPictureMapper.deleteByStudentIds(studentIdList);
+        capacityWriteMapper.deleteByStudentIds(studentIdList);
+
+        // 删除同步版句型慧追踪内容
+        sentenceWriteMapper.deleteByStudentIds(studentIdList);
+        sentenceListenMapper.deleteByStudentIds(studentIdList);
+        sentenceTranslateMapper.deleteByStudentIds(studentIdList);
+
+        //去除登入日志内容
+        runLogMapper.deleteByStudentIds(studentIdList);
+        goldLogMapper.deleteByStudentIds(studentIdList);
+
+        // 清除学生兑奖记录
+        studentExchangePrizeMapper.deleteByStudentIds(studentIdList);
+
+        // 清除学生复习记录
+        studentRestudyMapper.deleteByStudentIds(studentIdList);
+
+        // 清除学生时长信息
+        durationMapper.deleteByStudentIds(studentIdList);
+
+        // 删除学生证书信息
+        ccieMapper.deleteByStudentIds(studentIdList);
+
+        // 清除学生留言反馈信息
+        messageBoardMapper.deleteByStudentIds(studentIdList);
+
+        // 清除学生抽奖记录
+        drawRecordMapper.deleteByStudentIds(studentIdList);
+        simpleSimpleStudentUnitMapper.deleteByStudentIds(studentIdList);
+
+        // 删除学生游戏记录
+        gameScoreMapper.deleteByStudentIds(studentIdList);
+
+        // 删除字母学习相关记录
+        letterListenMapper.delete(new EntityWrapper<LetterListen>().in("student_id", studentIdList));
+        letterPairMapper.delete(new EntityWrapper<LetterPair>().in("student_id", studentIdList));
+        letterWriteMapper.delete(new EntityWrapper<LetterWrite>().in("student_id", studentIdList));
+        //清楚学习计划
+        studentStudyPlanMapper.deleteByStudentIds(studentIdList);
+        capacityStudentUnitMapper.deleteByStudentIds(studentIdList);
+        // 删除开启单元的记录
+        openUnitLogMapper.delete(new EntityWrapper<OpenUnitLog>().in("student_id", studentIdList));
+    }
+
 
     /**
      * 更新学生被膜拜总数排行榜
@@ -765,7 +922,7 @@ public class QuartzServiceImpl implements QuartzService {
         log.info("定时清除 sessionMap 完成");
 
         log.info("定时清理在线人数开始");
-        Set<Object> members = redisTemplate.opsForZSet().range(RedisKeysConst.ZSET_ONLINE_USER, 0 , -1);
+        Set<Object> members = redisTemplate.opsForZSet().range(RedisKeysConst.ZSET_ONLINE_USER, 0, -1);
         if (members != null) {
             members.forEach(o -> redisTemplate.opsForZSet().remove(RedisKeysConst.ZSET_ONLINE_USER, o));
         }

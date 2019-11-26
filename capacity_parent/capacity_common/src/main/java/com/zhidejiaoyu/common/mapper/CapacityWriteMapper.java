@@ -150,4 +150,6 @@ public interface CapacityWriteMapper extends BaseMapper<CapacityWrite> {
 
 	@Delete("delete from capacity_write where student_id = #{studentId} and unit_id = #{unitId} and vocabulary_id=#{vocabularyId} ")
     void deleteByStudentIdAndUnitIdAndVocabulary(@Param("studentId") Long studentId,@Param("unitId") Long unitId,@Param("vocabularyId") Long vocabularyId);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

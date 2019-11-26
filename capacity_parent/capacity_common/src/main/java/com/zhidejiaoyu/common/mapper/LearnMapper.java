@@ -974,4 +974,6 @@ public interface LearnMapper extends BaseMapper<Learn> {
      * @return
      */
     int countTodayLearnedPhoneticSymbol(@Param("studentId") Long studentId);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

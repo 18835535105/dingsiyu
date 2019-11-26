@@ -101,4 +101,6 @@ public interface CcieMapper extends BaseMapper<Ccie> {
      */
     @MapKey("studentId")
     Map<Long, Map<Long, Long>> countCcieByStudents(@Param("students") List<Student> students);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

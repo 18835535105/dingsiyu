@@ -1391,6 +1391,13 @@
           and study_model like '音标%'
           and to_days(learn_time) = to_days(now())
     </select>
-
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from learn where student_id in
+        (
+        <foreach collection="studentIds" item="studentId" separator=",">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 
 </mapper>

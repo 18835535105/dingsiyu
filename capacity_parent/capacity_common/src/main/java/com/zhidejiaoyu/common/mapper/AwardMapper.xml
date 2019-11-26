@@ -295,4 +295,13 @@
         <include refid="Base_Column_List"/>
         from award where student_id = #{student.id} and type = 1 and to_days(create_time) = to_days(now())
     </select>
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete
+        from award
+        where student_id in (
+        <foreach collection="studentIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </delete>
 </mapper>

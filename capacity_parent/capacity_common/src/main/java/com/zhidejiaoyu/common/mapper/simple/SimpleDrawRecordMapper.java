@@ -58,4 +58,6 @@ public interface SimpleDrawRecordMapper extends BaseMapper<DrawRecord> {
      * @return
      */
     Integer selDrawSizes(@Param("names") List<String> names, @Param("time") Date date);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

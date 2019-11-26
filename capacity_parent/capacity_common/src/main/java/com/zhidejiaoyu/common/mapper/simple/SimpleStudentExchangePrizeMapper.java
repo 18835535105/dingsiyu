@@ -23,4 +23,6 @@ public interface SimpleStudentExchangePrizeMapper extends BaseMapper<StudentExch
 
     @Select("select count(id) from student_exchange_prize where student_id=#{studentId}")
     Integer getAllNumber(Long studentId);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

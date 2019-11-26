@@ -402,4 +402,13 @@
             create_time = #{createTime,jdbcType=TIMESTAMP}
         where id = #{id,jdbcType=BIGINT}
     </update>
+
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from run_log
+        where operate_user_id in (
+        <foreach collection="studentIds" separator="," item="studentId">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 </mapper>

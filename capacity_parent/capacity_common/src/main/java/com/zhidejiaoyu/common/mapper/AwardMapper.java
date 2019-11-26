@@ -135,4 +135,6 @@ public interface AwardMapper extends BaseMapper<Award> {
      * @return
      */
     List<Award> selectDailyAward(@Param("student") Student student);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIds);
 }

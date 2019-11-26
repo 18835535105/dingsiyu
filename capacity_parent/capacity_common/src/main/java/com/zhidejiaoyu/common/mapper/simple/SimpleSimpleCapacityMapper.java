@@ -103,4 +103,6 @@ public interface SimpleSimpleCapacityMapper extends BaseMapper<SimpleCapacity> {
      * @return
      */
     List<SimpleCapacity> selectSimpleCapacityRecord(@Param("studentId") Long studentId, @Param("vocabularyId") Long vocabularyId, @Param("unitId") Long unitId, @Param("type") Integer type);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

@@ -115,6 +115,17 @@ public class QuartzController {
     }
 
     /**
+     * 删除所有到期60天的体验账号
+     *
+     * @return
+     */
+    @GetMapping("/deleteExperienceAccount")
+    public ServerResponse deleteExperienceAccount() {
+        quartzService.deleteExperienceAccount();
+        return ServerResponse.createBySuccess();
+    }
+
+    /**
      * 每周一凌晨删除学生定位信息
      *
      * @return

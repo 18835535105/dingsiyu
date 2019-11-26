@@ -106,7 +106,7 @@
     <delete id="deleteByStudentIds" parameterType="map">
         delete from student_unit where student_id in
         <foreach collection="students" separator="," open="(" close=")" item="student">
-            student.id
+            #{student.id}
         </foreach>
     </delete>
     <insert id="insert" parameterType="com.zhidejiaoyu.common.pojo.StudentUnit">

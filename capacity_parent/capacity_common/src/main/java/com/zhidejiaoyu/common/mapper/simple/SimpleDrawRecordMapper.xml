@@ -33,5 +33,12 @@
             #{name}
         </foreach>
     </select>
-
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from draw_record
+        where student_id in (
+        <foreach collection="studentIds" separator="," item="studentId">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 </mapper>

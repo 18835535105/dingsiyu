@@ -82,4 +82,6 @@ public interface QuartzService {
      * @return
      */
     void deleteStudentLocation();
+
+    void deleteExperienceAccount();
 }
