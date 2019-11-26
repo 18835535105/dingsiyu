@@ -437,4 +437,12 @@
         <include refid="Base_Column_List"/>
         from message_board where student_id = #{studentId} order by id asc
     </select>
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from message_board
+        where student_id in (
+        <foreach collection="studentIds" separator="," item="studentId">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 </mapper>

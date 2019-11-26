@@ -811,4 +811,6 @@ public interface LearnMapper extends BaseMapper<Learn> {
      */
     List<Learn> selectSyntaxByUnitIdAndStudyModel(@Param("studentStudySyntax") StudentStudySyntax studentStudySyntax);
 
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

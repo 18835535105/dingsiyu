@@ -120,4 +120,7 @@ public interface RunLogMapper extends BaseMapper<RunLog> {
      * @param date
      * @return
      */
-    List<StudentInfoSchoolSummary> selectStudentInfoSchoolSummary(@Param("date") String date);}
+    List<StudentInfoSchoolSummary> selectStudentInfoSchoolSummary(@Param("date") String date);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
+}

@@ -141,4 +141,6 @@ public interface SimpleGauntletMapper extends BaseMapper<Gauntlet> {
      * @return
      */
     List<Gauntlet> selectStudy(@Param("type") int type, @Param("studentId") Long studentId);
+
+    void deleteByChallengerStudentIdsOrBeChallengerStudentIds(@Param("studentIds") List<Long> studentIds);
 }

@@ -1237,5 +1237,13 @@
         and type = 1
     </select>
 
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from learn where student_id in
+        (
+        <foreach collection="studentIds" item="studentId" separator=",">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 
 </mapper>

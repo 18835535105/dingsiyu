@@ -199,4 +199,6 @@ public interface DurationMapper extends BaseMapper<Duration> {
     List<StudentInfoSchoolDetail> selectExportStudentOnlineTimeWithSchoolDetail(String date);
 
     Date selectLoginTimeByDate(@Param("studentId") Long studentId, @Param("date") Date date);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

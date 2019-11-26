@@ -381,4 +381,12 @@
         where id =
               #{id,jdbcType=BIGINT}
     </update>
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from sentence_translate
+        where student_id in (
+        <foreach collection="studentIds" separator="," item="studentId">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 </mapper>

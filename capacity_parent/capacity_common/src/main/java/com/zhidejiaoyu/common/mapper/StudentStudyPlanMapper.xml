@@ -193,5 +193,13 @@
         and type = #{type}
     </select>
 
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from student_study_plan
+        where student_id in (
+        <foreach collection="studentIds" separator="," item="studentId">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 
 </mapper>

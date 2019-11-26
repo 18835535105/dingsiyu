@@ -140,4 +140,6 @@ public interface CapacityListenMapper extends BaseMapper<CapacityListen> {
 
     @Delete("delete from capacity_listen where student_id = #{studentId} and unit_id = #{unitId} and vocabulary_id=#{vocabularyId}")
     void deleteByStudentIdAndUnitIdAndVocabulary(@Param("studentId") Long studentId,@Param("unitId") Long unitId,@Param("vocabularyId") Long vocabularyId);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

@@ -98,4 +98,6 @@ public interface StudentStudyPlanMapper extends BaseMapper<StudentStudyPlan> {
      * @return
      */
     List<StudentStudyPlan> selectByStudentIdAndCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId, @Param("type") int type);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

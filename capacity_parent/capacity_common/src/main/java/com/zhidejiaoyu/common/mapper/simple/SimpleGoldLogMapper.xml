@@ -13,4 +13,13 @@
         <result column="create_time" property="createTime"/>
         <result column="read_flag" property="readFlag"/>
     </resultMap>
+
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from gold_log
+        where student_id in (
+        <foreach collection="studentIds" separator="," item="studentId">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 </mapper>

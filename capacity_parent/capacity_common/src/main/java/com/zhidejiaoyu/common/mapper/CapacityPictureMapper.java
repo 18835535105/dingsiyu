@@ -96,4 +96,6 @@ public interface CapacityPictureMapper extends BaseMapper<CapacityPicture> {
     void deleteByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("startUnit") Long startUnit, @Param("endUnit") Long endUnit);
     @Delete("delete from capacity_picture where student_id = #{studentId} and unit_id = #{unitId} and vocabulary_id=#{vocabularyId}")
     void deleteByStudentIdAndUnitIdAndVocabulary(@Param("studentId") Long studentId,@Param("unitId") Long unitId,@Param("vocabularyId") Long vocabularyId);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

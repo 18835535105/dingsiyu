@@ -44,4 +44,6 @@ public interface TestRecordInfoMapper extends BaseMapper<TestRecordInfo> {
      */
     @MapKey("testId")
     Map<Long, Map<Long, Long>> countByRecordIds(@Param("records") List<TestRecordVo> records);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

@@ -367,4 +367,11 @@
             memory_strength = #{memoryStrength,jdbcType=DOUBLE}
         where id = #{id,jdbcType=BIGINT}
     </update>
+    <delete id="deleteByStudentIds" parameterType="java.util.Map">
+        delete from capacity_write where student_id in (
+        <foreach collection="studentIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </delete>
 </mapper>

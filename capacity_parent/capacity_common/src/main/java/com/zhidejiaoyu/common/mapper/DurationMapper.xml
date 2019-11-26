@@ -88,7 +88,8 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Duration" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Duration" useGeneratedKeys="true"
+            keyProperty="id">
         insert into duration
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -328,7 +329,7 @@
         JOIN student b ON a.student_id = b.id
         JOIN course c ON a.course_id = c.id
         AND c.study_paragraph = #{study_paragraph} AND c.version = #{version}
-		AND b.teacher_id = #{teacherId}
+        AND b.teacher_id = #{teacherId}
         GROUP BY
         a.student_id
         ORDER BY
@@ -443,13 +444,14 @@
         <include refid="Base_Column_List"/>
         from duration
         where student_id = #{studentId}
-          and online_time &lt;> 0
+        and online_time &lt;> 0
         order by id desc
         limit 1
     </select>
 
     <select id="selectExportStudentOnlineTimeWithSchoolDetail"
-            resultType="com.zhidejiaoyu.common.Vo.student.studentinfowithschool.StudentInfoSchoolDetail" parameterType="map">
+            resultType="com.zhidejiaoyu.common.Vo.student.studentinfowithschool.StudentInfoSchoolDetail"
+            parameterType="map">
         select t.school                                schoolName,
                s.account,
                s.student_name                          studentName,
@@ -476,4 +478,13 @@
         where student_id =#{studentId}
         and date(login_time)&lt;=date(#{date})
     </select>
+
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from duration
+        where student_id in (
+        <foreach collection="studentIds" separator="," item="studentId">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 </mapper>

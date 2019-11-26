@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * <p>
  * 智能版学生当前学习课程和单元记录表 Mapper 接口
@@ -43,4 +45,6 @@ public interface CapacityStudentUnitMapper extends BaseMapper<CapacityStudentUni
     CapacityStudentUnit selLetterByStudentId(Long studentId);
 
     CapacityStudentUnit selByStudentIdAndType(@Param("studentId") Long id,@Param("type") Integer type);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }
