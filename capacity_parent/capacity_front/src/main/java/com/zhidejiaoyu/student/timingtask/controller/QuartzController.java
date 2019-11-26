@@ -108,7 +108,7 @@ public class QuartzController {
      *
      * @return
      */
-    @GetMapping("/initRankCache")
+    @PostMapping("/initRankCache")
     public ServerResponse initRankCache(Long studentId) {
         quartzService.initRankCache(studentId);
         return ServerResponse.createBySuccess();
@@ -119,7 +119,7 @@ public class QuartzController {
      *
      * @return
      */
-    @GetMapping("/deleteExperienceAccount")
+    @PostMapping("/deleteExperienceAccount")
     public ServerResponse deleteExperienceAccount() {
         quartzService.deleteExperienceAccount();
         return ServerResponse.createBySuccess();
