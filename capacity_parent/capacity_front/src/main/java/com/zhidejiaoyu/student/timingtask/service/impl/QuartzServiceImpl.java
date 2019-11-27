@@ -369,6 +369,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
      * 每天清楚体验账号到期60天的账号
      */
     @Override
+    @Scheduled(cron = "0 15 2 * * ?")
     public void deleteExperienceAccount() {
         if (checkPort(port)) {
             return;
