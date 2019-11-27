@@ -28,4 +28,9 @@ public interface QuartzAwardService {
      * 初始化怪物勋章
      */
     void initMonsterMedal();
+
+    /**
+     * 定时删除多余的学生排行
+     */
+    void deleteRank();
 }

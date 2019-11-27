@@ -52,7 +52,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     private SimpleAwardMapper simpleAwardMapper;
 
     @Resource
-    private SimpleWorshipMapper worshipMapper;
+    private SimpleWorshipMapper simpleWorshipMapper;
 
     @Resource
     private RedisOpt redisOpt;
@@ -472,7 +472,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
      */
     private void updateClassWorshipMonthRank(Map<Long, List<Student>> studentClassMap, int size) {
         log.info("定时增加学生班级被膜拜次数排行信息开始。。。");
-        Map<Long, Map<Long, Long>> studentWorshipCount = worshipMapper.countWorshipWithStudent();
+        Map<Long, Map<Long, Long>> studentWorshipCount = simpleWorshipMapper.countWorshipWithStudent();
         if (!sortStudentMedalRankAndWorshipRank(studentClassMap, size, studentWorshipCount, 3)) {
             log.error("定时增加学生班级被膜拜次数排行信息失败！");
             return;

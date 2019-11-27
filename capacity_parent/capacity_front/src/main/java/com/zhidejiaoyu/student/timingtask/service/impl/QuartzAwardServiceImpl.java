@@ -17,16 +17,17 @@ import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.student.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.timingtask.service.QuartzAwardService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -61,6 +62,9 @@ public class QuartzAwardServiceImpl implements QuartzAwardService, BaseQuartzSer
     @Resource
     private MedalMapper medalMapper;
 
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
+
     @Override
     public void initRankCaches() {
         List<Student> students = studentMapper.selectHasRank();
@@ -83,7 +87,7 @@ public class QuartzAwardServiceImpl implements QuartzAwardService, BaseQuartzSer
             rankOpt.addOrUpdate(RankKeysConst.COUNTRY_GOLD_RANK, student.getId(), goldCount);
             log.info("学生[{} - {} - {}] 金币数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), goldCount);
 
-            Long count =  0L;
+            Long count = 0L;
             String countStr = "count";
             if (ccieCount.get(student.getId()) != null && ccieCount.get(student.getId()).get(countStr) != null) {
                 count = ccieCount.get(student.getId()).get(countStr);
@@ -108,7 +112,7 @@ public class QuartzAwardServiceImpl implements QuartzAwardService, BaseQuartzSer
             }
             rankOpt.addOrUpdate(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
             rankOpt.addOrUpdate(RankKeysConst.SCHOOL_WORSHIP_RANK + schoolAdminId, student.getId(), count * 1.0);
-            rankOpt.addOrUpdate(RankKeysConst.COUNTRY_WORSHIP_RANK , student.getId(), count * 1.0);
+            rankOpt.addOrUpdate(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId(), count * 1.0);
             log.info("学生[{} - {} - {}] 被膜拜次数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
 
         });
@@ -145,8 +149,57 @@ public class QuartzAwardServiceImpl implements QuartzAwardService, BaseQuartzSer
         });
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @Scheduled(cron = "0 40 0 1 * ?")
+    public void deleteRank() {
+
+        if (checkPort(port)) {
+            return;
+        }
+
+        log.info("定时清理缓存中冗余的排行信息开始...");
+        this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.CLASS_WORSHIP_RANK + "*"));
+        this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.CLASS_CCIE_RANK + "*"));
+        this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.CLASS_GOLD_RANK + "*"));
+        this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.CLASS_MEDAL_RANK + "*"));
+
+        this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.SCHOOL_WORSHIP_RANK + "*"));
+        this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.SCHOOL_CCIE_RANK + "*"));
+        this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.SCHOOL_GOLD_RANK + "*"));
+        this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.SCHOOL_MEDAL_RANK + "*"));
+
+        this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.COUNTRY_WORSHIP_RANK + "*"));
+        this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.COUNTRY_CCIE_RANK + "*"));
+        this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.COUNTRY_GOLD_RANK + "*"));
+        this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.COUNTRY_MEDAL_RANK + "*"));
+        log.info("定时清理缓存中冗余的排行信息结束...");
+
+    }
+
+    private void removeDeletedStudent(Set<String> keys) {
+        if (CollectionUtils.isEmpty(keys)) {
+            return;
+        }
+        keys.parallelStream().forEach(key -> {
+            Set<Object> members = redisTemplate.opsForZSet().range(key, 0, -1);
+            if (CollectionUtils.isEmpty(members)) {
+                return;
+            }
+
+            members.parallelStream().forEach(member -> {
+                Student student = studentMapper.selectById((Serializable) member);
+                if (Objects.isNull(student) || Objects.equals(student.getStatus(), 3)) {
+                    log.info("id=[{}]的学生排行缓存被清除！key=[{}]", member, key);
+                    redisTemplate.opsForZSet().remove(key, member);
+                }
+            });
+        });
+    }
+
     /**
      * 获取需要初始化的勋章id
+     *
      * @return
      */
     private List<Long> getMedalIds() {

@@ -33,7 +33,7 @@ public class QuartzAwardController {
      *
      * @return
      */
-    @GetMapping("/initRankCaches")
+    @PostMapping("/initRankCaches")
     public ServerResponse initRankCaches() {
         quartzAwardService.initRankCaches();
         return ServerResponse.createBySuccess();
@@ -58,6 +58,17 @@ public class QuartzAwardController {
     @PostMapping("/initMonsterMedal")
     public ServerResponse initMonsterMedal() {
         quartzAwardService.initMonsterMedal();
+        return ServerResponse.createBySuccess();
+    }
+
+    /**
+     * 清除删除状态学生的排行缓存
+     *
+     * @return
+     */
+    @PostMapping("/deleteRank")
+    public ServerResponse deleteRank() {
+        quartzAwardService.deleteRank();
         return ServerResponse.createBySuccess();
     }
 

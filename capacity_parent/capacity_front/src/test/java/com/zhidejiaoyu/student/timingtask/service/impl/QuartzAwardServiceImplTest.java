@@ -19,4 +19,9 @@ public class QuartzAwardServiceImplTest extends BaseTest {
     public void initMonsterMedal() {
         quartzAwardService.initMonsterMedal();
     }
+
+    @Test
+    public void deleteRank() {
+        quartzAwardService.deleteRank();
+    }
 }
