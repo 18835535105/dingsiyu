@@ -81,18 +81,19 @@ public class RankOpt {
      */
     public void deleteGoldRank(Student student) {
         try {
+            //删除学生金币信息
             redisTemplate.opsForZSet().remove(RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
             redisTemplate.opsForZSet().remove(RankKeysConst.SCHOOL_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
             redisTemplate.opsForZSet().remove(RankKeysConst.COUNTRY_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
-
+            //删除学生膜拜信息
             redisTemplate.opsForZSet().remove(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
             redisTemplate.opsForZSet().remove(RankKeysConst.SCHOOL_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
             redisTemplate.opsForZSet().remove(RankKeysConst.COUNTRY_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
-
+            //删除学生勋章信息
             redisTemplate.opsForZSet().remove(RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
             redisTemplate.opsForZSet().remove(RankKeysConst.SCHOOL_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
             redisTemplate.opsForZSet().remove(RankKeysConst.COUNTRY_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
-
+            //删除学生证书信息
             redisTemplate.opsForZSet().remove(RankKeysConst.CLASS_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
             redisTemplate.opsForZSet().remove(RankKeysConst.SCHOOL_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
             redisTemplate.opsForZSet().remove(RankKeysConst.COUNTRY_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
