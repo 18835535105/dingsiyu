@@ -144,12 +144,6 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     @Resource
     private SimpleSimpleStudentUnitMapper simpleSimpleStudentUnitMapper;
 
-    @Resource
-    private AwardMapper awardMapper;
-
-    @Resource
-    private CcieMapper ccieMapper;
-
     /**
      * 每日 00:10:00 更新提醒消息中学生账号到期提醒
      */
