@@ -143,6 +143,8 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
     @Resource
     private SimpleSimpleStudentUnitMapper simpleSimpleStudentUnitMapper;
+    @Resource
+    private RecycleBinMapper recycleBinMapper;
 
     /**
      * 每日 00:10:00 更新提醒消息中学生账号到期提醒
@@ -368,18 +370,29 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
      */
     @Override
     public void deleteExperienceAccount() {
+        int localPort = ServiceInfoUtil.getPort();
+        if (port != localPort) {
+            ServerResponse.createBySuccess();
+            return;
+        }
+        log.info("定时任务 -> 删除回收站中到期60天的学生信息开始.");
         //获取删除日期之前的学生
         Date date = DateTime.now().minusDays(60).toDate();
-        //查看到期学生的id
-        List<Student> students = studentMapper.selectExpireExperienceAccount(date);
-        if (students.size() > 0) {
-            //根据学生id清楚学习信息
-            for (Student stu : students) {
-                rankOpt.optGoldRank(stu);
-            }
+        //回收站超过60天的学生数据
+        List<Long> ids = recycleBinMapper.selectDeleteStudentIdByDate(date);
+        if (ids.size() > 0) {
+            //查询要删除的学生数据
+            List<Student> students = studentMapper.selectDeleteAccount(ids);
             //获取所有的学生id
             List<Long> studentIds = new ArrayList<>();
-            students.forEach(stu -> studentIds.add(stu.getId()));
+            List<String> accountList = new ArrayList<>();
+            students.forEach(stu -> {
+                        //根据学生id清楚学习信息
+                        rankOpt.deleteGoldRank(stu);
+                        studentIds.add(stu.getId());
+                        accountList.add(stu.getAccount());
+                    }
+            );
             if (studentIds.size() > 0) {
                 simpleStudentUnitMapper.deleteByStudentIds(students);
                 // 删除跟学生相关的挑战
@@ -388,12 +401,47 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 redisTemplate.opsForHash().delete(RedisKeysConst.STUDENT_LOGINOUT_TIME, studentIds);
                 // 删除学生勋章、奖励
                 awardMapper.deleteByStudentIds(studentIds);
-
+                recycleBinMapper.deleteByStudentIds(studentIds);
                 this.resetRecord(studentIds);
                 studentMapper.deleteByIds(studentIds);
+                RunLog runLog = new RunLog();
+                runLog.setType(3);
+                runLog.setOperateUserId(1L);
+                runLog.setLogContent("时间:" + date + "删除回收站超过60天的学生:" + accountList.toString());
+                runLogMapper.insert(runLog);
             }
         }
+        log.info("定时任务 -> 删除回收站中到期60天的学生信息完成.");
+    }
 
+
+    @Override
+    @Scheduled(cron = "0 15 1 * * ?")
+    public void saveRecycleBin() {
+        int localPort = ServiceInfoUtil.getPort();
+        if (port != localPort) {
+            ServerResponse.createBySuccess();
+            return;
+        }
+        log.info("定时任务 -> 将到期的体验账号放入回收站中开始.");
+        //查询到期的体验账号
+        List<Long> studentIds = studentMapper.selectExperienceAccount();
+        Date date = new Date();
+        if (studentIds.size() > 0) {
+            List<RecycleBin> saveList = new ArrayList<>();
+            studentIds.forEach(studentId -> {
+                RecycleBin bin = new RecycleBin();
+                bin.setCreateTime(date);
+                bin.setDelStatus(1);
+                bin.setOperateUserId(1L);
+                bin.setOperateUserName("管理员");
+                bin.setStudentId(studentId);
+                saveList.add(bin);
+            });
+            recycleBinMapper.insertByList(saveList);
+            studentMapper.updateStatus(studentIds);
+        }
+        log.info("定时任务 -> 将到期的体验账号放入回收站中完成.");
     }
 
     /**

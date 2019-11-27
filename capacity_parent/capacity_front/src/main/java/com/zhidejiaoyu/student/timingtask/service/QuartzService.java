@@ -66,4 +66,6 @@ public interface QuartzService {
     void deleteStudentLocation();
 
     void deleteExperienceAccount();
+
+    void saveRecycleBin();
 }

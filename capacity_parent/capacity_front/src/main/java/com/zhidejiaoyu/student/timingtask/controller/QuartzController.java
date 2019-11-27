@@ -106,4 +106,15 @@ public class QuartzController {
         this.quartzService.deleteStudentLocation();
         return ServerResponse.createBySuccess();
     }
+    /**
+     * 每天将过期的体验站好放入回收站中
+     *
+     * @return
+     */
+    @PostMapping("/saveRecycleBin")
+    public ServerResponse saveRecycleBin() {
+        this.quartzService.saveRecycleBin();
+        return ServerResponse.createBySuccess();
+    }
+
 }
