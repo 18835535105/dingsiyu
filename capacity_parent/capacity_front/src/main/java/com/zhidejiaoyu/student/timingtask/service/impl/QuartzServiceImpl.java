@@ -435,6 +435,9 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
 
                 // 清除学生排行缓存
                 rankOpt.deleteGoldRank(student);
+                rankOpt.deleteCcieRank(student);
+                rankOpt.deleteMedalRank(student);
+                rankOpt.deleteWorshipRank(student);
             });
             recycleBinMapper.insertByList(saveList);
             studentMapper.updateStatus(students);
