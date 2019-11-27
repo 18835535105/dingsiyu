@@ -370,9 +370,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
      */
     @Override
     public void deleteExperienceAccount() {
-        int localPort = ServiceInfoUtil.getPort();
-        if (port != localPort) {
-            ServerResponse.createBySuccess();
+        if (checkPort(port)) {
             return;
         }
         log.info("定时任务 -> 删除回收站中到期60天的学生信息开始.");
@@ -387,8 +385,6 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
             List<Long> studentIds = new ArrayList<>();
             List<String> accountList = new ArrayList<>();
             students.forEach(stu -> {
-                        //根据学生id清楚学习信息
-                        rankOpt.deleteGoldRank(stu);
                         studentIds.add(stu.getId());
                         accountList.add(stu.getAccount());
                     }
@@ -418,28 +414,30 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     @Override
     @Scheduled(cron = "0 15 1 * * ?")
     public void saveRecycleBin() {
-        int localPort = ServiceInfoUtil.getPort();
-        if (port != localPort) {
-            ServerResponse.createBySuccess();
+        if (checkPort(port)) {
             return;
         }
         log.info("定时任务 -> 将到期的体验账号放入回收站中开始.");
         //查询到期的体验账号
-        List<Long> studentIds = studentMapper.selectExperienceAccount();
+        List<Student> students = studentMapper.selectExperienceAccount();
         Date date = new Date();
-        if (studentIds.size() > 0) {
+        if (students.size() > 0) {
             List<RecycleBin> saveList = new ArrayList<>();
-            studentIds.forEach(studentId -> {
+            students.forEach(student -> {
                 RecycleBin bin = new RecycleBin();
                 bin.setCreateTime(date);
                 bin.setDelStatus(1);
                 bin.setOperateUserId(1L);
                 bin.setOperateUserName("管理员");
-                bin.setStudentId(studentId);
+                bin.setStudentId(student.getId());
                 saveList.add(bin);
+
+                // 清除学生排行缓存
+                rankOpt.deleteGoldRank(student);
             });
             recycleBinMapper.insertByList(saveList);
-            studentMapper.updateStatus(studentIds);
+            studentMapper.updateStatus(students);
+
         }
         log.info("定时任务 -> 将到期的体验账号放入回收站中完成.");
     }

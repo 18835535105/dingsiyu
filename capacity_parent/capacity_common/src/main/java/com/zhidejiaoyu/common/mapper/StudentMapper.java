@@ -283,13 +283,13 @@ public interface StudentMapper extends BaseMapper<Student> {
      *
      * @return
      */
-    List<Long> selectExperienceAccount();
+    List<Student> selectExperienceAccount();
 
     /**
      * 修改学生状态至已删除
      *
-     * @param studentIds
+     * @param students
      */
-    void updateStatus(@Param("studentIds") List<Long> studentIds);
+    void updateStatus(@Param("students") List<Student> students);
 
 }
