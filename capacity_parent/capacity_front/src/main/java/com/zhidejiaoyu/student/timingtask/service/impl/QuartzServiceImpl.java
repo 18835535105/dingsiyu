@@ -16,7 +16,6 @@ import com.zhidejiaoyu.student.timingtask.service.QuartzService;
 import com.zhidejiaoyu.student.utils.ServiceInfoUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -39,55 +38,55 @@ public class QuartzServiceImpl implements QuartzService {
     @Value("${quartz.port}")
     private int port;
 
-    @Autowired
+    @Resource
     private SimpleStudentMapper simpleStudentMapper;
 
-    @Autowired
+    @Resource
     private SimpleRankListMapper simpleRankListMapper;
 
-    @Autowired
+    @Resource
     private SimpleNewsMapper simpleNewsMapper;
 
-    @Autowired
+    @Resource
     private SimpleStudentRankMapper simpleStudentRankMapper;
 
-    @Autowired
+    @Resource
     private SimpleAwardMapper simpleAwardMapper;
 
-    @Autowired
+    @Resource
     private SimpleWorshipMapper worshipMapper;
 
-    @Autowired
+    @Resource
     private RedisOpt redisOpt;
 
-    @Autowired
+    @Resource
     private SimpleTeacherMapper simpleTeacherMapper;
 
-    @Autowired
+    @Resource
     private SimpleStudentExpansionMapper simpleStudentExpansionMapper;
 
-    @Autowired
+    @Resource
     private SimpleGauntletMapper simpleGauntletMapper;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
-    @Autowired
+    @Resource
     private SimpleLevelMapper simpleLevelMapper;
 
-    @Autowired
+    @Resource
     private StudentMapper studentMapper;
 
-    @Autowired
+    @Resource
     private AwardMapper awardMapper;
 
-    @Autowired
+    @Resource
     private CcieMapper ccieMapper;
 
-    @Autowired
+    @Resource
     private LocationMapper locationMapper;
 
-    @Autowired
+    @Resource
     private RankOpt rankOpt;
 
     @Resource
@@ -366,6 +365,7 @@ public class QuartzServiceImpl implements QuartzService {
     }
 
     private void initCache(List<Student> students) {
+        String strCount = "count";
         // 各个学生被膜拜的次数
         Map<Long, Map<Long, Long>> byWorshipCount = worshipMapper.countWorshipWithStudents(students);
         // 各个学生获取的勋章个数
@@ -382,8 +382,8 @@ public class QuartzServiceImpl implements QuartzService {
             log.info("学生[{} - {} - {}] 金币数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), goldCount);
 
             Long count = 0L;
-            if (ccieCount.get(student.getId()) != null && ccieCount.get(student.getId()).get("count") != null) {
-                count = ccieCount.get(student.getId()).get("count");
+            if (ccieCount.get(student.getId()) != null && ccieCount.get(student.getId()).get(strCount) != null) {
+                count = ccieCount.get(student.getId()).get(strCount);
             }
             rankOpt.addOrUpdate(RankKeysConst.CLASS_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
             rankOpt.addOrUpdate(RankKeysConst.SCHOOL_CCIE_RANK + schoolAdminId, student.getId(), count * 1.0);
@@ -391,8 +391,8 @@ public class QuartzServiceImpl implements QuartzService {
             log.info("学生[{} - {} - {}] 证书个数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
 
             count = 0L;
-            if (medalCount.get(student.getId()) != null && medalCount.get(student.getId()).get("count") != null) {
-                count = medalCount.get(student.getId()).get("count");
+            if (medalCount.get(student.getId()) != null && medalCount.get(student.getId()).get(strCount) != null) {
+                count = medalCount.get(student.getId()).get(strCount);
             }
             rankOpt.addOrUpdate(RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
             rankOpt.addOrUpdate(RankKeysConst.SCHOOL_MEDAL_RANK + schoolAdminId, student.getId(), count * 1.0);
@@ -400,8 +400,8 @@ public class QuartzServiceImpl implements QuartzService {
             log.info("学生[{} - {} - {}] 勋章个数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
 
             count = 0L;
-            if (byWorshipCount.get(student.getId()) != null && byWorshipCount.get(student.getId()).get("count") != null) {
-                count = byWorshipCount.get(student.getId()).get("count");
+            if (byWorshipCount.get(student.getId()) != null && byWorshipCount.get(student.getId()).get(strCount) != null) {
+                count = byWorshipCount.get(student.getId()).get(strCount);
             }
             rankOpt.addOrUpdate(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
             rankOpt.addOrUpdate(RankKeysConst.SCHOOL_WORSHIP_RANK + schoolAdminId, student.getId(), count * 1.0);
