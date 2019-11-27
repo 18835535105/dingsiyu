@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * <br>
+ * <a href="https://www.showdoc.cc/65694455382333?page_id=2858504713316437">定时任务说明文档</a>
+ */
 @RestController
 @RequestMapping("/api/quartz")
 public class QuartzController {
@@ -106,6 +110,7 @@ public class QuartzController {
         this.quartzService.deleteStudentLocation();
         return ServerResponse.createBySuccess();
     }
+
     /**
      * 每天将过期的体验站好放入回收站中
      *
