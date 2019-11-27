@@ -2,6 +2,8 @@ package com.zhidejiaoyu.student.timingtask.service;
 
 /**
  * @author wuchenxi
+ * <br>
+ * <a href="https://www.showdoc.cc/65694455382333?page_id=2858504713316437">定时任务说明文档</a>
  * @date 2018/5/22 16:25
  */
 public interface QuartzAwardService {

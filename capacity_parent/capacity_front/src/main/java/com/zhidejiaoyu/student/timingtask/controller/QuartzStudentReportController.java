@@ -2,15 +2,15 @@ package com.zhidejiaoyu.student.timingtask.controller;
 
 import com.zhidejiaoyu.student.timingtask.service.QuartzStudentReportService;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * 学生报表相关定时任务
+ * <br>
+ * <a href="https://www.showdoc.cc/65694455382333?page_id=2858504713316437">定时任务说明文档</a>
  *
  * @author: wuchenxi
  * @Date: 2019/11/5 10:51
