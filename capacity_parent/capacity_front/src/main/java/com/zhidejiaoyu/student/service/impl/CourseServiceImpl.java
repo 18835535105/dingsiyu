@@ -99,6 +99,8 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
     @Autowired
     private TeksUnitMapper teksUnitMapper;
 
+    @Autowired
+    private CapacityPictureMapper capacityPictureMapper;
     @Override
     public List chooseGrade(HttpSession session) {
 
@@ -185,7 +187,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
 
             studyModel = "单词图鉴";
             learnedCount = learnMapper.countByCourseId(studentId, unitIds, studyModel);
-            pushCount = capacityListenMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
+            pushCount = capacityPictureMapper.countNeedReviewByStudentIdAndCourseId(courseId, studentId);
             int pictureWordCount = vocabularyMapper.countByCourseId(courseId, 1);
             this.packageMemoryVo(learnedCount, pushCount, pictureWordCount, studyModel, vos);
 
