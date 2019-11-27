@@ -14,7 +14,6 @@ import com.zhidejiaoyu.student.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.timingtask.service.QuartzService;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -37,49 +36,55 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     @Value("${quartz.port}")
     private int port;
 
-    @Autowired
+    @Resource
     private SimpleStudentMapper simpleStudentMapper;
 
-    @Autowired
+    @Resource
     private SimpleRankListMapper simpleRankListMapper;
 
-    @Autowired
+    @Resource
     private SimpleNewsMapper simpleNewsMapper;
 
-    @Autowired
+    @Resource
     private SimpleStudentRankMapper simpleStudentRankMapper;
 
-    @Autowired
+    @Resource
     private SimpleAwardMapper simpleAwardMapper;
 
-    @Autowired
+    @Resource
     private SimpleWorshipMapper worshipMapper;
 
-    @Autowired
+    @Resource
     private RedisOpt redisOpt;
 
-    @Autowired
+    @Resource
     private SimpleTeacherMapper simpleTeacherMapper;
 
-    @Autowired
+    @Resource
     private SimpleStudentExpansionMapper simpleStudentExpansionMapper;
 
-    @Autowired
+    @Resource
     private SimpleGauntletMapper simpleGauntletMapper;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
-    @Autowired
+    @Resource
     private SimpleLevelMapper simpleLevelMapper;
 
-    @Autowired
+    @Resource
     private StudentMapper studentMapper;
 
-    @Autowired
+    @Resource
+    private AwardMapper awardMapper;
+
+    @Resource
+    private CcieMapper ccieMapper;
+
+    @Resource
     private LocationMapper locationMapper;
 
-    @Autowired
+    @Resource
     private RankOpt rankOpt;
 
     @Resource
@@ -368,7 +373,6 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
      * 每天清楚体验账号到期60天的账号
      */
     @Override
-    @Scheduled(cron = "0 15 0 * * ?")
     public void deleteExperienceAccount() {
         //获取删除日期之前的学生
         Date date = DateTime.now().minusDays(60).toDate();
