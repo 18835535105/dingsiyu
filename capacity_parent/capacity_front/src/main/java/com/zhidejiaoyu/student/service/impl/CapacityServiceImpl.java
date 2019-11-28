@@ -20,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -244,15 +245,13 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
     public ServerResponse<PageInfo> getCapacityList(HttpSession session, String studyModel, Long courseId, Long unitId,
                                                     Integer page, Integer size) {
         Student student = getStudent(session);
-        return packageCapacityList(student, courseId, unitId, studyModel, page, size);
-    }
 
-    private ServerResponse<PageInfo> packageCapacityList(Student student, Long courseId, Long unitId, String studyModel,
-                                                         Integer page, Integer size) {
+        courseId = this.getCourseId(courseId, unitId, studyModel);
+
         PageHelper.startPage(page, size);
         List<CapacityReview> capacityReviews = capacityReviewMapper.selectNewWordsByCourseIdOrUnitId(student, courseId,
                 unitId, studyModel);
-        PageInfo<CapacityMemory> info = new PageInfo(capacityReviews);
+        PageInfo<CapacityReview> info = new PageInfo<>(capacityReviews);
         List<CapacityMemory> capacityMemories = getCapacityMemories(capacityReviews);
 
         List<CapacityListVo> capacityListVos = new ArrayList<>();
@@ -263,6 +262,29 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
         pageInfo.setPages(info.getPages());
         pageInfo.setTotal(info.getTotal());
         return ServerResponse.createBySuccess(pageInfo);
+
+    }
+
+    /**
+     * 防止courseId为null时出现错误
+     *
+     * @param courseId
+     * @param unitId
+     * @param studyModel
+     * @return
+     */
+    private Long getCourseId(Long courseId, Long unitId, String studyModel) {
+        if (!Objects.isNull(courseId)) {
+            return courseId;
+        }
+        Long returnCourseId;
+        if (studyModel.contains("例句")) {
+            returnCourseId = sentenceUnitMapper.selectCourseIdByUnitId(unitId);
+        } else {
+            returnCourseId = unitMapper.selectCourseIdByUnitId(unitId);
+        }
+        Assert.notNull(returnCourseId, "未查询到单元id为 " + unitId + " 的课程！");
+        return returnCourseId;
     }
 
     @Override

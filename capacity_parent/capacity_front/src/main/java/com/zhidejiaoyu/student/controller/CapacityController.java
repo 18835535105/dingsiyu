@@ -112,7 +112,6 @@ public class CapacityController extends BaseController {
                                                     @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
                                                     @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize) {
         Assert.notNull(unitId, "unitId can't be null!");
-        Assert.notNull(courseId, "courseId can't be null!");
         if (StringUtils.isBlank(studyModel)) {
             return ServerResponse.createByErrorMessage("非法参数！");
         }
