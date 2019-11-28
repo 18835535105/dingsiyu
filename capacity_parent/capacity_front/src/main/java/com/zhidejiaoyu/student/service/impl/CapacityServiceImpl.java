@@ -92,8 +92,8 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
             wordModelMap.put("单词图鉴", "单词图鉴");
 
             sentenceModelMap.put("例句翻译", "例句翻译");
-            wordModelMap.put("例句听力", "例句听力");
-            wordModelMap.put("例句默写", "例句默写");
+            sentenceModelMap.put("例句听力", "例句听力");
+            sentenceModelMap.put("例句默写", "例句默写");
 
             if (wordModelMap.containsKey(studyModel)) {
                 // 查询学生当前学习的单元
