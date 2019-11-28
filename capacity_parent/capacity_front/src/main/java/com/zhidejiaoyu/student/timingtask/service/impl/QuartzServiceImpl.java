@@ -54,7 +54,7 @@ public class QuartzServiceImpl implements QuartzService {
     private SimpleAwardMapper simpleAwardMapper;
 
     @Resource
-    private SimpleWorshipMapper worshipMapper;
+    private SimpleWorshipMapper simpleWorshipMapper;
 
     @Resource
     private RedisOpt redisOpt;
@@ -367,7 +367,7 @@ public class QuartzServiceImpl implements QuartzService {
     private void initCache(List<Student> students) {
         String strCount = "count";
         // 各个学生被膜拜的次数
-        Map<Long, Map<Long, Long>> byWorshipCount = worshipMapper.countWorshipWithStudents(students);
+        Map<Long, Map<Long, Long>> byWorshipCount = simpleWorshipMapper.countWorshipWithStudents(students);
         // 各个学生获取的勋章个数
         Map<Long, Map<Long, Long>> medalCount = awardMapper.countGetModelByStudents(students);
         // 各个学生获取的证书个数
@@ -541,7 +541,7 @@ public class QuartzServiceImpl implements QuartzService {
      */
     private void updateClassWorshipMonthRank(Map<Long, List<Student>> studentClassMap, int size) {
         log.info("定时增加学生班级被膜拜次数排行信息开始。。。");
-        Map<Long, Map<Long, Long>> studentWorshipCount = worshipMapper.countWorshipWithStudent();
+        Map<Long, Map<Long, Long>> studentWorshipCount = simpleWorshipMapper.countWorshipWithStudent();
         if (!sortStudentMedalRankAndWorshipRank(studentClassMap, size, studentWorshipCount, 3)) {
             log.error("定时增加学生班级被膜拜次数排行信息失败！");
             return;
