@@ -737,18 +737,18 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     @Override
     public ServerResponse<Object> getModuleRelearning(HttpSession session, String studyModel, Integer unitId) {
         Student student = getStudent(session);
-        Integer update = learnMapper.updLearnByUnitIdAndStudyModelAndStudentId(student.getId(), studyModel, unitId);
-        if (update > 0) {
-            if ("例句翻译".equals(studyModel)) {
-                sentenceTranslateMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
-            }
-            if ("例句听力".equals(studyModel)) {
-                sentenceListenMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
-            }
-            if ("例句默写".equals(studyModel)) {
-                sentenceWriteMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
-            }
+        learnMapper.updLearnByUnitIdAndStudyModelAndStudentId(student.getId(), studyModel, unitId);
+
+        if ("例句翻译".equals(studyModel)) {
+            sentenceTranslateMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
         }
+        if ("例句听力".equals(studyModel)) {
+            sentenceListenMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
+        }
+        if ("例句默写".equals(studyModel)) {
+            sentenceWriteMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
+        }
+
 
         return ServerResponse.createBySuccess();
     }
