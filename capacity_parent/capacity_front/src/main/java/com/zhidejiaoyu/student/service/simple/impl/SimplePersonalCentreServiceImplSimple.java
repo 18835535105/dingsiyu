@@ -3,7 +3,6 @@ package com.zhidejiaoyu.student.service.simple.impl;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.Vo.SeniorityVo;
 import com.zhidejiaoyu.common.Vo.simple.ccieVo.CcieVo;
@@ -28,13 +27,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.*;
@@ -881,11 +877,11 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
                 dataMap.put("area", student1.getArea());
                 dataMap.put("city", student1.getCity());
                 dataMap.put("province", student1.getProvince());
-                dataMap.put("headUrl", AliyunInfoConst.host + student1.getHeadUrl());
+                dataMap.put("headUrl", GetOssFile.getPublicObjectUrl(student1.getHeadUrl()));
                 dataMap.put("studentName", StringUtils.isEmpty(student1.getNickname()) ? "默认昵称" : student1.getNickname());
                 dataMap.put("id", id);
                 dataMap.put("gold", Math.round(BigDecimalUtil.add(student1.getOfflineGold(), student1.getSystemGold())));
-                dataMap.put("childName", getLevel((int) BigDecimalUtil.add(student1.getOfflineGold(), student1.getSystemGold()), redisOpt.getAllLevel()));
+                dataMap.put("childName", getLevelStr((int) BigDecimalUtil.add(student1.getOfflineGold(), student1.getSystemGold()), redisOpt.getAllLevel()));
                 phData.add(dataMap);
             });
         }
@@ -899,7 +895,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         Object myRanking = getMyRanking(student, key);
         studentMap.put("stuId", student.getId());
         studentMap.put("myGold", Math.round(totalGold));
-        studentMap.put("myChildName", getLevel((int) Math.round(totalGold), redisOpt.getAllLevel()));
+        studentMap.put("myChildName", getLevelStr((int) Math.round(totalGold), redisOpt.getAllLevel()));
         studentMap.put("myMb", rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId()) == -1 ? 0 : rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId()));
         studentMap.put("myRanking", myRanking);
 
@@ -938,8 +934,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         return totalPages;
     }
 
-
-    private String getLevel(Integer myGold, List<Map<String, Object>> levels) {
+    private String getLevelStr(Integer myGold, List<Map<String, Object>> levels) {
         String level = "";
         if (myGold >= 50) {
             int myrecord = 0;
