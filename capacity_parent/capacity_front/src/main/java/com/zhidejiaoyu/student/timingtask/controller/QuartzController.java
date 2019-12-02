@@ -122,4 +122,15 @@ public class QuartzController {
         return ServerResponse.createBySuccess();
     }
 
+    /**
+     * 将招生账号置为过期状态，一次性任务
+     *
+     * @return
+     */
+    @PostMapping("/updateWelfareAccountToOutOfDate")
+    public ServerResponse updateWelfareAccountToOutOfDate() {
+        this.quartzService.updateWelfareAccountToOutOfDate();
+        return ServerResponse.createBySuccess();
+    }
+
 }

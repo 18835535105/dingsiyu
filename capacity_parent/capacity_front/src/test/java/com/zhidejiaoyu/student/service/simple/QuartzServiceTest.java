@@ -18,4 +18,9 @@ public class QuartzServiceTest extends BaseTest {
     public void testUpdateClassMonthRank() {
         quartzService.updateClassMonthRank();
     }
+
+    @Test
+    public void updateWelfareAccountToOutOfDate() {
+        quartzService.updateWelfareAccountToOutOfDate();
+    }
 }
