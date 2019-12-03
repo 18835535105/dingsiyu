@@ -319,7 +319,7 @@
     </select>
 
 
-    <insert id="wordAdd" parameterType="vocabulary"
+    <insert id="wordAdd" parameterType="com.zhidejiaoyu.common.pojo.Vocabulary"
             useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         insert into vocabulary
         <include refid="insertWord_sql"/>
