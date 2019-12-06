@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author wuchenxi
@@ -64,6 +65,9 @@ public class SessionListener implements HttpSessionListener {
         if (currentPort == Integer.valueOf(port)) {
             HttpSession session = se.getSession();
             if (checkMultipleLoginSession(session)) {
+                String key = RedisKeysConst.MULTIPLE_LOGIN_SESSION_ID + session.getId();
+                redisTemplate.opsForValue().set(key, null);
+                redisTemplate.expire(key, 40, TimeUnit.MINUTES);
                 return;
             }
 
