@@ -82,28 +82,26 @@ baidu: https://fanyi.baidu.com/gettts?lan=en&spd=3&source=web&text=
 
 # ip location，IP定位，距离计算
 # 腾讯地图，接口地址：https://lbs.qq.com/webservice_v1/guide-gcoder.html
-map:
-  tencent:
+tencent:
+  map:
     key: UGPBZ-SVC6X-O3W43-TYLAQ-CVERH-OFF65
     url: https://apis.map.qq.com/ws/geocoder/v1/
-# 腾讯距离计算，接口地址：https://lbs.qq.com/webservice_v1/guide-distance.html
-distance:
-  tencent:
+  # 腾讯距离计算，接口地址：https://lbs.qq.com/webservice_v1/guide-distance.html
+  distance:
     url: https://apis.map.qq.com/ws/distance/v1/
-# 腾讯 ip 定位
-location:
-  tencent:
+  # 腾讯 ip 定位
+  location:
     url: https://apis.map.qq.com/ws/location/v1/ip
 
-# 有道翻译
-appKey: 22e4622be137dac9
-youdaoUrl: https://openapi.youdao.com/api
-md5Key: OsGxRcsnty1MGvnGEOPPRGM8DK2dAAka
-from: EN
-to: zh-CHS
-
-# youdao voice create
-youdao: https://dict.youdao.com/dictvoice?type=2&audio=
+youdao:
+  # youdao voice create
+  create: https://dict.youdao.com/dictvoice?type=2&audio=
+  # 有道翻译
+  appKey: 22e4622be137dac9
+  youdaoUrl: https://openapi.youdao.com/api
+  md5Key: OsGxRcsnty1MGvnGEOPPRGM8DK2dAAka
+  from: EN
+  to: zh-CHS
 
 http:
   maxTotal: 200

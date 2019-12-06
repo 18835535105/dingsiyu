@@ -29,19 +29,19 @@ import java.util.stream.Collectors;
 @Component
 public class YouDaoTranslate {
 
-    @Value("${appKey}")
+    @Value("${youdao.appKey}")
     private String appKey;
 
-    @Value("${from}")
+    @Value("${youdao.from}")
     private String from;
 
-    @Value("${to}")
+    @Value("${youdao.to}")
     private String to;
 
-    @Value("${youdaoUrl}")
+    @Value("${youdao.youdaoUrl}")
     private String youdaoUrl;
 
-    @Value("${md5Key}")
+    @Value("${youdao.md5Key}")
     private String md5Key;
 
     @Autowired
