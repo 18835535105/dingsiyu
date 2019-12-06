@@ -453,8 +453,6 @@ public class QuartzServiceImpl implements QuartzService {
                 simpleStudentUnitMapper.deleteByStudentIds(students);
                 // 删除跟学生相关的挑战
                 gauntletMapper.deleteByChallengerStudentIdsOrBeChallengerStudentIds(studentIds);
-                // 重置学习历程数据
-                redisTemplate.opsForHash().delete(RedisKeysConst.STUDENT_LOGINOUT_TIME, studentIds);
                 // 删除学生勋章、奖励
                 awardMapper.deleteByStudentIds(studentIds);
 
