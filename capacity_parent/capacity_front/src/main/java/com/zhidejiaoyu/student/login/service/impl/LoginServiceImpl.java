@@ -200,8 +200,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             Student student = (Student) sessionMap.get(UserConstant.CURRENT_STUDENT);
             Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) sessionMap.get(TimeConstant.LOGIN_TIME));
             Date loginOutTime = DateUtil.parseYYYYMMDDHHMMSS(new Date());
-            //存放登入退出时间
-            redisTemplate.opsForHash().put(RedisKeysConst.STUDENT_LOGINOUT_TIME, student.getId(), DateUtil.DateTime(new Date()));
             // 清除学生的登录信息
             redisTemplate.opsForHash().delete(RedisKeysConst.LOGIN_SESSION, student.getId());
             if (loginTime != null && loginOutTime != null) {
