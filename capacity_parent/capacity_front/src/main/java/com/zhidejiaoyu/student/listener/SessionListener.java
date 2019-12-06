@@ -64,7 +64,6 @@ public class SessionListener implements HttpSessionListener {
         if (currentPort == Integer.valueOf(port)) {
             HttpSession session = se.getSession();
             if (checkMultipleLoginSession(session)) {
-                redisTemplate.opsForValue().set(RedisKeysConst.MULTIPLE_LOGIN_SESSION_ID + session.getId(), null);
                 return;
             }
 
