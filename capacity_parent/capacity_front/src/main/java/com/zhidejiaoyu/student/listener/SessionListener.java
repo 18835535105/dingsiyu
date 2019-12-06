@@ -67,7 +67,7 @@ public class SessionListener implements HttpSessionListener {
             if (checkMultipleLoginSession(session)) {
                 String key = RedisKeysConst.MULTIPLE_LOGIN_SESSION_ID + session.getId();
                 redisTemplate.opsForValue().set(key, null);
-                redisTemplate.expire(key, 10, TimeUnit.HOURS);
+                redisTemplate.expire(key, 40, TimeUnit.MINUTES);
                 return;
             }
 
