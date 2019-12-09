@@ -54,6 +54,7 @@
         and st.id not in (
         select vocabulary_id from learn l
         where l.student_id = #{studentId}
+        and l.unit_id = ${unitId}
         and l.study_model = #{studyModel}
         and l.type = 1
         ) order by st.id limit 1
