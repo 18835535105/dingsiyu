@@ -58,4 +58,11 @@ public interface QuartzService {
     void deleteExperienceAccount();
 
     void saveRecycleBin();
+
+    /**
+     * 将招生账号置为过期状态，一次性任务
+     *
+     * @return
+     */
+    void updateWelfareAccountToOutOfDate();
 }

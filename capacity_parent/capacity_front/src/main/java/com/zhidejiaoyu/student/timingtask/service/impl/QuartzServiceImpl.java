@@ -8,11 +8,13 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
 import com.zhidejiaoyu.student.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.timingtask.service.QuartzService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -394,8 +396,6 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 simpleStudentUnitMapper.deleteByStudentIds(students);
                 // 删除跟学生相关的挑战
                 gauntletMapper.deleteByChallengerStudentIdsOrBeChallengerStudentIds(studentIds);
-                // 重置学习历程数据
-                redisTemplate.opsForHash().delete(RedisKeysConst.STUDENT_LOGINOUT_TIME, studentIds);
                 // 删除学生勋章、奖励
                 awardMapper.deleteByStudentIds(studentIds);
                 recycleBinMapper.deleteByStudentIds(studentIds);
@@ -444,6 +444,27 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
 
         }
         log.info("定时任务 -> 将到期的体验账号放入回收站中完成.");
+    }
+
+    @Override
+    @Scheduled(cron = "0 25 0 2 1 ?")
+    public void updateWelfareAccountToOutOfDate() {
+        if (checkPort(port)) {
+            return;
+        }
+
+        log.info("定时将招生账号置为过期状态开始...");
+        List<Student> students = studentMapper.selectList(new EntityWrapper<Student>().eq("role", 4));
+
+        if (CollectionUtils.isNotEmpty(students)) {
+            String accountTime = DateUtil.DateTime();
+            students.forEach(student -> {
+                student.setAccount(accountTime);
+                log.info("学生[{} - {} - {}]有效期置为过期状态！", student.getId(), student.getAccount(), student.getStudentName());
+                studentMapper.updateById(student);
+            });
+        }
+        log.info("定时将招生账号置为过期状态完成...");
     }
 
     /**

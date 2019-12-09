@@ -24,16 +24,16 @@ public class LocationUtil {
     /**
      * 根据经纬度精确定位
      */
-    @Value("${map.tencent.url}")
+    @Value("${tencent.map.url}")
     private String mapUrl;
 
-    @Value("${map.tencent.key}")
+    @Value("${tencent.map.key}")
     private String mapKey;
 
-    @Value("${distance.tencent.url}")
+    @Value("${tencent.distance.url}")
     private String distanceUrl;
 
-    @Value("${location.tencent.url}")
+    @Value("${tencent.location.url}")
     private String locationUrl;
 
     /**
