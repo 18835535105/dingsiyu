@@ -26,7 +26,7 @@ public class QuartzController {
      * @return
      */
     @PostMapping("/updateNews")
-    public ServerResponse updateNews() {
+    public ServerResponse<Object> updateNews() {
         quartzService.updateNews();
         return ServerResponse.createBySuccess();
     }
@@ -37,7 +37,7 @@ public class QuartzController {
      * @return
      */
     @PostMapping("/updateEnergy")
-    public ServerResponse updateEnergy() {
+    public ServerResponse<Object> updateEnergy() {
         this.quartzService.updateEnergy();
         return ServerResponse.createBySuccess();
     }
@@ -48,7 +48,7 @@ public class QuartzController {
      * @return
      */
     @PostMapping("/updateFrozen")
-    public ServerResponse updateFrozen() {
+    public ServerResponse<Object> updateFrozen() {
         this.quartzService.updateFrozen();
         return ServerResponse.createBySuccess();
     }
@@ -95,7 +95,7 @@ public class QuartzController {
      * @return
      */
     @PostMapping("/deleteExperienceAccount")
-    public ServerResponse deleteExperienceAccount() {
+    public ServerResponse<Object> deleteExperienceAccount() {
         quartzService.deleteExperienceAccount();
         return ServerResponse.createBySuccess();
     }
@@ -106,7 +106,7 @@ public class QuartzController {
      * @return
      */
     @PostMapping("/deleteStudentLocation")
-    public ServerResponse deleteStudentLocation() {
+    public ServerResponse<Object> deleteStudentLocation() {
         this.quartzService.deleteStudentLocation();
         return ServerResponse.createBySuccess();
     }
@@ -117,7 +117,7 @@ public class QuartzController {
      * @return
      */
     @PostMapping("/saveRecycleBin")
-    public ServerResponse saveRecycleBin() {
+    public ServerResponse<Object> saveRecycleBin() {
         this.quartzService.saveRecycleBin();
         return ServerResponse.createBySuccess();
     }
@@ -128,7 +128,7 @@ public class QuartzController {
      * @return
      */
     @PostMapping("/updateWelfareAccountToOutOfDate")
-    public ServerResponse updateWelfareAccountToOutOfDate() {
+    public ServerResponse<Object> updateWelfareAccountToOutOfDate() {
         this.quartzService.updateWelfareAccountToOutOfDate();
         return ServerResponse.createBySuccess();
     }
