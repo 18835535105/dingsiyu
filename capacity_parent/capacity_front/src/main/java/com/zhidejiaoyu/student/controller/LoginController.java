@@ -12,12 +12,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -41,7 +38,7 @@ public class LoginController {
     private RedisTemplate<String, Objects> redisTemplate;
 
     @GetMapping("/getOnlineUserCount")
-    public ServerResponse getOnlineUserCount() {
+    public ServerResponse<Object> getOnlineUserCount() {
         Long size = redisTemplate.opsForZSet().size(RedisKeysConst.ZSET_ONLINE_USER);
         return ServerResponse.createBySuccess(size);
     }
