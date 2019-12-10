@@ -130,7 +130,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         studentInfo.setUpdateTime(new Date());
 
         // 招生账号不修改年级信息
-        if (Objects.equals(4, studentInfo.getRole())) {
+        if (Objects.equals(4, studentInfo.getRole()) || StringUtils.isEmpty(studentInfo.getGrade())) {
             studentInfo.setGrade(studentInfo.getGrade());
         } else {
             studentInfo.setGrade(student.getGrade());
