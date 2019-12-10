@@ -447,7 +447,6 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     }
 
     @Override
-    @Scheduled(cron = "0 25 0 2 1 ?")
     public void updateWelfareAccountToOutOfDate() {
         if (checkPort(port)) {
             return;
