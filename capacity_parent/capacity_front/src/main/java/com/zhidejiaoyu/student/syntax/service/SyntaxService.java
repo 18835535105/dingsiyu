@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.syntax.service;
 
-import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.service.BaseService;
@@ -28,5 +27,5 @@ public interface SyntaxService extends BaseService<SyntaxTopic> {
      * @param unitId
      * @return
      */
-    ServerResponse getSyntaxNode(Long unitId);
+    ServerResponse<Object> getSyntaxNode(Long unitId);
 }

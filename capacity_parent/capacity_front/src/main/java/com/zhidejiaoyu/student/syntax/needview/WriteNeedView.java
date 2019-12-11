@@ -39,7 +39,7 @@ public class WriteNeedView implements INeedView {
     private SyntaxMemoryDifficulty syntaxMemoryDifficulty;
 
     @Override
-    public ServerResponse getNeedView(NeedViewDTO dto) {
+    public ServerResponse<Object> getNeedView(NeedViewDTO dto) {
         StudyCapacity studyCapacity = studyCapacityMapper.selectLargerThanGoldTimeWithStudentIdAndUnitId(dto);
         return this.packageWriteSyntaxNeedView(dto, studyCapacity);
     }
@@ -51,13 +51,13 @@ public class WriteNeedView implements INeedView {
      * @return
      */
     @Override
-    public ServerResponse getNextNotGoldTime(NeedViewDTO dto) {
+    public ServerResponse<Object> getNextNotGoldTime(NeedViewDTO dto) {
         // 获取没有达到黄金记忆点的语法内容
         StudyCapacity studyCapacity = studyCapacityMapper.selectUnKnownByStudentIdAndUnitId(dto);
         return this.packageWriteSyntaxNeedView(dto, studyCapacity);
     }
 
-    private ServerResponse packageWriteSyntaxNeedView(NeedViewDTO dto, StudyCapacity studyCapacity) {
+    private ServerResponse<Object> packageWriteSyntaxNeedView(NeedViewDTO dto, StudyCapacity studyCapacity) {
 
         if (!Objects.isNull(studyCapacity)) {
             KnowledgePoint knowledgePoint = knowledgePointMapper.selectByTopicId(studyCapacity.getWordId());

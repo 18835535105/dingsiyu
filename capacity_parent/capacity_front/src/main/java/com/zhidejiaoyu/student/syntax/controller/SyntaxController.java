@@ -58,7 +58,7 @@ public class SyntaxController extends BaseController {
      * @return
      */
     @GetMapping("/getSyntaxNode")
-    public ServerResponse getSyntaxNode(Long unitId) {
+    public ServerResponse<Object> getSyntaxNode(Long unitId) {
         if (unitId == null) {
             Student student = super.getStudent(HttpUtil.getHttpSession());
             log.error("学生[{} - {} - {}]在请求获取语法学习模块的接口时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
@@ -74,7 +74,7 @@ public class SyntaxController extends BaseController {
      * @return
      */
     @GetMapping("/getLearnSyntax")
-    public ServerResponse getLearnSyntax(Long unitId) {
+    public ServerResponse<Object> getLearnSyntax(Long unitId) {
         if (unitId == null) {
             Student student = super.getStudent(HttpUtil.getHttpSession());
             log.error("学生[{} - {} - {}]在获取学语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
@@ -90,7 +90,7 @@ public class SyntaxController extends BaseController {
      * @return
      */
     @PostMapping("/saveLearnSyntax")
-    public ServerResponse saveLearnSyntax(Learn learn, Boolean known) {
+    public ServerResponse<Object> saveLearnSyntax(Learn learn, Boolean known) {
         if (learn.getUnitId() == null) {
             Student student = super.getStudent(HttpUtil.getHttpSession());
             log.error("学生[{} - {} - {}]在保存学语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
@@ -106,7 +106,7 @@ public class SyntaxController extends BaseController {
      * @return
      */
     @GetMapping("/getSelectSyntax")
-    public ServerResponse getSelectSyntax(Long unitId) {
+    public ServerResponse<Object> getSelectSyntax(Long unitId) {
         if (unitId == null) {
             Student student = super.getStudent(HttpUtil.getHttpSession());
             log.error("学生[{} - {} - {}]在获取选语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
@@ -123,7 +123,7 @@ public class SyntaxController extends BaseController {
      * @return
      */
     @PostMapping("/saveSelectSyntax")
-    public ServerResponse saveSelectSyntax(Learn learn, Boolean known) {
+    public ServerResponse<Object> saveSelectSyntax(Learn learn, Boolean known) {
         if (learn.getUnitId() == null) {
             Student student = super.getStudent(HttpUtil.getHttpSession());
             log.error("学生[{} - {} - {}]在保存选语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
@@ -139,7 +139,7 @@ public class SyntaxController extends BaseController {
      * @return
      */
     @GetMapping("/getWriteSyntax")
-    public ServerResponse getWriteSyntax(Long unitId) {
+    public ServerResponse<Object> getWriteSyntax(Long unitId) {
         if (unitId == null) {
             Student student = super.getStudent(HttpUtil.getHttpSession());
             log.error("学生[{} - {} - {}]在获取写语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
@@ -156,7 +156,7 @@ public class SyntaxController extends BaseController {
      * @return
      */
     @PostMapping("/saveWriteSyntax")
-    public ServerResponse saveWriteSyntax(Learn learn, Boolean known) {
+    public ServerResponse<Object> saveWriteSyntax(Learn learn, Boolean known) {
         if (learn.getUnitId() == null) {
             Student student = super.getStudent(HttpUtil.getHttpSession());
             log.error("学生[{} - {} - {}]在保存写语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());

@@ -70,7 +70,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     private StudentStudyPlanMapper studentStudyPlanMapper;
 
     @Override
-    public ServerResponse getSyntaxGame(Long unitId) {
+    public ServerResponse<Object> getSyntaxGame(Long unitId) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
         HttpUtil.getHttpSession().setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
@@ -170,7 +170,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     @Override
     @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse saveSyntaxGame(TestRecord testRecord) {
+    public ServerResponse<Object> saveSyntaxGame(TestRecord testRecord) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
 
         StudentStudySyntax studentStudySyntax = studentStudySyntaxMapper.selectByStudentIdAndUnitId(student.getId(), testRecord.getUnitId());

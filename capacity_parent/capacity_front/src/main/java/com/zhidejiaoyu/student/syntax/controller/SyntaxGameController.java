@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.syntax.controller;
 
-import com.fasterxml.jackson.databind.ser.std.ObjectArraySerializer;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.utils.HttpUtil;
@@ -37,7 +36,7 @@ public class SyntaxGameController extends BaseController {
      * @return
      */
     @GetMapping("/getSyntaxGame")
-    public ServerResponse getSyntaxGame(Long unitId) {
+    public ServerResponse<Object> getSyntaxGame(Long unitId) {
         if (Objects.isNull(unitId)) {
             Student student = super.getStudent(HttpUtil.getHttpSession());
             log.error("学生[{} - {} - {}]获取超级语法小游戏参数错误，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
@@ -53,7 +52,7 @@ public class SyntaxGameController extends BaseController {
      * @return
      */
     @PostMapping("/saveSyntaxGame")
-    public ServerResponse saveSyntaxGame(TestRecord testRecord) {
+    public ServerResponse<Object> saveSyntaxGame(TestRecord testRecord) {
         if (this.checkSaveSyntaxGameParam(testRecord)) {
             return ServerResponse.createByError(400, "参数错误");
         }

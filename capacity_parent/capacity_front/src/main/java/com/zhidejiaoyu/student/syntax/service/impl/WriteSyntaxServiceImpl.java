@@ -79,7 +79,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse getLearnSyntax(Long unitId) {
+    public ServerResponse<Object> getLearnSyntax(Long unitId) {
 
         HttpUtil.getHttpSession().setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         Student student = super.getStudent(HttpUtil.getHttpSession());
@@ -96,18 +96,18 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                 .type(StudyCapacityTypeConstant.WRITE_SYNTAX)
                 .build();
 
-        ServerResponse studyCapacity = writeNeedView.getNeedView(dto);
+        ServerResponse<Object> studyCapacity = writeNeedView.getNeedView(dto);
         if (!Objects.isNull(studyCapacity)) {
             return studyCapacity;
         }
 
         // 如果有可以学习的新知识点，返回新知识点数据
-        ServerResponse newSyntaxTopic = this.getNewSyntaxTopic(dto);
+        ServerResponse<Object> newSyntaxTopic = this.getNewSyntaxTopic(dto);
         if (!Objects.isNull(newSyntaxTopic)) {
             return newSyntaxTopic;
         }
 
-        ServerResponse serverResponse = writeNeedView.getNextNotGoldTime(dto);
+        ServerResponse<Object> serverResponse = writeNeedView.getNextNotGoldTime(dto);
         if (!Objects.isNull(serverResponse)) {
             return serverResponse;
         }
@@ -171,7 +171,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse saveLearnSyntax(Learn learn, Boolean known) {
+    public ServerResponse<Object> saveLearnSyntax(Learn learn, Boolean known) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
         learn.setStudentId(student.getId());
         learn.setStudyModel(SyntaxModelNameConstant.WRITE_SYNTAX);
@@ -185,7 +185,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
      * @param dto
      * @return
      */
-    private ServerResponse getNewSyntaxTopic(NeedViewDTO dto) {
+    private ServerResponse<Object> getNewSyntaxTopic(NeedViewDTO dto) {
         SyntaxTopic syntaxTopic = syntaxTopicMapper.selectNextByUnitIdAndType(dto.getStudentId(), dto.getUnitId(), SyntaxModelNameConstant.WRITE_SYNTAX);
         if (!Objects.isNull(syntaxTopic)) {
             KnowledgePoint knowledgePoint = knowledgePointMapper.selectByTopicId(syntaxTopic.getId());

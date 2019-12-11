@@ -46,7 +46,7 @@ public class SaveLearnInfo {
      * @param type
      * @return
      */
-    public ServerResponse saveSyntax(Learn learn, Boolean known, int type) {
+    public ServerResponse<Object> saveSyntax(Learn learn, Boolean known, int type) {
         Learn learned = learnMapper.selectLearnedSyntaxByUnitIdAndStudyModelAndWordId(learn);
         if (Objects.isNull(learned)) {
             this.saveFirstLearn(learn, known, type);

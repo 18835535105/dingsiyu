@@ -19,7 +19,7 @@ public interface SyntaxGameService extends BaseService<SyntaxTopic> {
      * @param unitId    超级语法单元id
      * @return
      */
-    ServerResponse getSyntaxGame(Long unitId);
+    ServerResponse<Object> getSyntaxGame(Long unitId);
 
     /**
      * 保存超级语法小游戏数据
@@ -27,5 +27,5 @@ public interface SyntaxGameService extends BaseService<SyntaxTopic> {
      * @param testRecord
      * @return
      */
-    ServerResponse saveSyntaxGame(TestRecord testRecord);
+    ServerResponse<Object> saveSyntaxGame(TestRecord testRecord);
 }
