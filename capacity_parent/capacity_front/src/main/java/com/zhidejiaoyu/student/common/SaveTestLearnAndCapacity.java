@@ -99,27 +99,21 @@ public class SaveTestLearnAndCapacity {
                                      Long[] errorWordId, HttpSession session, Student student,
                                      Long[] unitId, Integer classify) {
         // 保存正确单词/例句的学习记录和记忆追踪信息
-        if (correctWord != null && correctWordId != null && correctWord.length > 0
-                && correctWord.length == correctWordId.length) {
-            int correctWordLength = correctWord.length;
-            for (int i = 0; i < correctWordLength; i++) {
-                if (unitId.length == 1) {
-                    this.saveLearnAndCapacity(session, student, unitId[0], correctWordId[i], classify, true);
-                } else {
-                    this.saveLearnAndCapacity(session, student, unitId[i], correctWordId[i], classify, true);
-                }
-            }
-        }
+        saveWord(correctWord, correctWordId, session, student, unitId, classify, true);
 
         // 保存错误单词/例句的学习记录和记忆追踪信息
-        if (errorWord != null && errorWordId != null && errorWord.length > 0
-                && errorWord.length == errorWordId.length) {
-            int errorWordLength = errorWord.length;
-            for (int i = 0; i < errorWordLength; i++) {
+        saveWord(errorWord, errorWordId, session, student, unitId, classify, false);
+    }
+
+    private void saveWord(String[] words, Long[] wordIds, HttpSession session, Student student, Long[] unitId, Integer classify, boolean falg) {
+        if (words != null && wordIds != null && words.length > 0
+                && words.length == wordIds.length) {
+            int correctWordLength = words.length;
+            for (int i = 0; i < correctWordLength; i++) {
                 if (unitId.length == 1) {
-                    this.saveLearnAndCapacity(session, student, unitId[0], errorWordId[i], classify, false);
+                    this.saveLearnAndCapacity(session, student, unitId[0], wordIds[i], classify, falg);
                 } else {
-                    this.saveLearnAndCapacity(session, student, unitId[i], errorWordId[i], classify, false);
+                    this.saveLearnAndCapacity(session, student, unitId[i], wordIds[i], classify, falg);
                 }
             }
         }
@@ -143,30 +137,10 @@ public class SaveTestLearnAndCapacity {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
 
         // 保存正确单词/例句的学习记录和记忆追踪信息
-        if (correctWord != null && correctWordId != null && correctWord.length > 0
-                && correctWord.length == correctWordId.length) {
-            int correctWordLength = correctWord.length;
-            for (int i = 0; i < correctWordLength; i++) {
-                if (unitId.length == 1) {
-                    this.saveLearnAndCapacity(session, student, unitId[0], correctWordId[i], type, true);
-                } else {
-                    this.saveLearnAndCapacity(session, student, unitId[i], correctWordId[i], type, true);
-                }
-            }
-        }
+        saveWord(correctWord, correctWordId, session, student, unitId, type, true);
 
         // 保存错误单词/例句的学习记录和记忆追踪信息
-        if (errorWord != null && errorWordId != null && errorWord.length > 0
-                && errorWord.length == errorWordId.length) {
-            int errorWordLength = errorWord.length;
-            for (int i = 0; i < errorWordLength; i++) {
-                if (unitId.length == 1) {
-                    this.saveLearnAndCapacity(session, student, unitId[0], errorWordId[i], type, false);
-                } else {
-                    this.saveLearnAndCapacity(session, student, unitId[i], errorWordId[i], type, false);
-                }
-            }
-        }
+        saveWord(errorWord, errorWordId, session, student, unitId, type, false);
     }
 
     /**
