@@ -12,10 +12,10 @@ import java.util.Date;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
- * @author zdjy
+ * @author liumaoyu
  * @since 2019-11-05
  */
 @Data
@@ -36,9 +36,17 @@ public class StudentClassHourDetails extends Model<StudentClassHourDetails> {
      */
     private Long schoolAdminId;
     /**
+     * 校管名称
+     */
+    private String adminName;
+    /**
      * 学生id
      */
     private Long studentId;
+    /**
+     * 学生姓名
+     */
+    private String studentName;
     /**
      * 充课时间
      */

@@ -15,16 +15,22 @@ import com.zhidejiaoyu.student.utils.CapacityFontUtil;
 import com.zhidejiaoyu.student.vo.CapacityContentVo;
 import com.zhidejiaoyu.student.vo.CapacityDigestVo;
 import com.zhidejiaoyu.student.vo.CapacityListVo;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -61,22 +67,32 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
     @Resource
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
 
+    @Resource
+    private SentenceCourseMapper sentenceCourseMapper;
+
+    @Resource
+    private SentenceUnitMapper sentenceUnitMapper;
+
     @Override
     public ServerResponse<CapacityDigestVo> getCapacityDigestVo(HttpSession session, Long courseId, String unitIdStr, String studyModel) {
         Student student = this.getStudent(session);
         CapacityDigestVo vo = new CapacityDigestVo();
-        if (student.getShowCapacity() == null || student.getShowCapacity() == 1) {
-            vo.setShowCapacity(true);
-        } else {
-            vo.setShowCapacity(false);
+        vo.setShowCapacity(student.getShowCapacity() == null || student.getShowCapacity() == 1);
+
+        // 如果传入的unitId 错误，获取当前学生正在学习的单元
+        CourseAndUnit courseAndUnit = this.checkUnitId(courseId, unitIdStr, studyModel, student);
+        if (Objects.isNull(courseAndUnit.getUnitId())) {
+            return ServerResponse.createBySuccess(this.getDefaultCapacityDigestVo(vo));
         }
 
-        Long unitId;
-        // 如果传入的unitId 错误，获取当前学生正在学习的单元
+        return getCapacityDigestVo(student, courseAndUnit, vo, studyModel);
+    }
+
+    private CourseAndUnit checkUnitId(Long courseId, String unitIdStr, String studyModel, Student student) {
         if ("NaN".equalsIgnoreCase(unitIdStr) || StringUtils.isEmpty(unitIdStr)) {
             log.warn("获取追词记/追句记是，unitId=NaN.");
-            Map<String, String> wordModelMap = new HashMap(16);
-            Map<String, String> sentenceModelMap = new HashMap(16);
+            Map<String, String> wordModelMap = new HashMap<>(16);
+            Map<String, String> sentenceModelMap = new HashMap<>(16);
 
             wordModelMap.put("慧记忆", "慧记忆");
             wordModelMap.put("慧听写", "慧听写");
@@ -84,34 +100,31 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
             wordModelMap.put("单词图鉴", "单词图鉴");
 
             sentenceModelMap.put("例句翻译", "例句翻译");
-            wordModelMap.put("例句听力", "例句听力");
-            wordModelMap.put("例句默写", "例句默写");
+            sentenceModelMap.put("例句听力", "例句听力");
+            sentenceModelMap.put("例句默写", "例句默写");
 
             if (wordModelMap.containsKey(studyModel)) {
                 // 查询学生当前学习的单元
                 CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(student.getId(), 1);
                 if (capacityStudentUnit == null) {
                     log.error("学生[{} - {} - {}]还没有初始化智慧单词课程！", student.getId(), student.getAccount(), student.getStudentName());
-                    return ServerResponse.createBySuccess(this.getDefaultCapacityDigestVo(vo));
+                    return new CourseAndUnit();
                 }
-                courseId = capacityStudentUnit.getCourseId();
-                unitId = capacityStudentUnit.getUnitId();
+                return CourseAndUnit.builder().courseId(capacityStudentUnit.getCourseId()).unitId(capacityStudentUnit.getUnitId()).build();
             } else if (sentenceModelMap.containsKey(studyModel)) {
                 // 查询学生当前学习的句型单元
                 CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(student.getId(), 2);
                 if (capacityStudentUnit == null) {
                     log.error("学生[{} - {} - {}]还没有初始化抢分句型课程！", student.getId(), student.getAccount(), student.getStudentName());
-                    return ServerResponse.createBySuccess(this.getDefaultCapacityDigestVo(vo));
+                    return new CourseAndUnit();
                 }
-                courseId = capacityStudentUnit.getCourseId();
-                unitId = capacityStudentUnit.getUnitId();
-            } else {
-                return ServerResponse.createBySuccess();
+                return CourseAndUnit.builder().courseId(capacityStudentUnit.getCourseId()).unitId(capacityStudentUnit.getUnitId()).build();
             }
-        } else {
-            unitId = Long.parseLong(unitIdStr);
+            return new CourseAndUnit();
+
         }
-        return getCapacityDigestVo(student, courseId, unitId, vo, studyModel);
+        return CourseAndUnit.builder().courseId(courseId).unitId(Long.parseLong(unitIdStr)).build();
+
     }
 
     /**
@@ -127,8 +140,11 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
         return vo;
     }
 
-    private ServerResponse<CapacityDigestVo> getCapacityDigestVo(Student student, Long courseId, Long unitId,
+    private ServerResponse<CapacityDigestVo> getCapacityDigestVo(Student student, CourseAndUnit courseAndUnit,
                                                                  CapacityDigestVo vo, String studyModel) {
+        Long courseId = courseAndUnit.getCourseId();
+        Long unitId = courseAndUnit.getUnitId();
+
         List<CapacityReview> capacityReviews = capacityReviewMapper.selectNewWordsByCourseIdOrUnitId(student, courseId, unitId, studyModel);
         int needReview = capacityReviewMapper.countNeedReviewByCourseIdOrUnitId(student, courseId, unitId, studyModel);
         vo.setNeedReview(needReview);
@@ -224,7 +240,7 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
         capacityContentVo.setFaultCount(faultTime);
         capacityContentVo.setMemoryStrength(capacityReview.getMemory_strength());
         capacityContentVo.setPush(this.getPushTime(DateUtil.parseYYYYMMDDHHMMSS(capacityReview.getPush())));
-        if(studyModel.equals("例句听力")||studyModel.equals("例句翻译")||studyModel.equals("例句默写")){
+        if (studyModel.equals("例句听力") || studyModel.equals("例句翻译") || studyModel.equals("例句默写")) {
             capacityContentVo.setReadUrl(baiduSpeak.getLanguagePath(sentenceMapper.selectByPrimaryKey(capacityReview.getVocabulary_id()).getCentreExample()));
         }
         capacityContentVo.setChinese(chinese);
@@ -237,15 +253,13 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
     public ServerResponse<PageInfo> getCapacityList(HttpSession session, String studyModel, Long courseId, Long unitId,
                                                     Integer page, Integer size) {
         Student student = getStudent(session);
-        return packageCapacityList(student, courseId, unitId, studyModel, page, size);
-    }
 
-    private ServerResponse<PageInfo> packageCapacityList(Student student, Long courseId, Long unitId, String studyModel,
-                                                         Integer page, Integer size) {
+        courseId = this.getCourseId(courseId, unitId, studyModel);
+
         PageHelper.startPage(page, size);
         List<CapacityReview> capacityReviews = capacityReviewMapper.selectNewWordsByCourseIdOrUnitId(student, courseId,
                 unitId, studyModel);
-        PageInfo<CapacityMemory> info = new PageInfo(capacityReviews);
+        PageInfo<CapacityReview> info = new PageInfo<>(capacityReviews);
         List<CapacityMemory> capacityMemories = getCapacityMemories(capacityReviews);
 
         List<CapacityListVo> capacityListVos = new ArrayList<>();
@@ -256,6 +270,29 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
         pageInfo.setPages(info.getPages());
         pageInfo.setTotal(info.getTotal());
         return ServerResponse.createBySuccess(pageInfo);
+
+    }
+
+    /**
+     * 防止courseId为null时出现错误
+     *
+     * @param courseId
+     * @param unitId
+     * @param studyModel
+     * @return
+     */
+    private Long getCourseId(Long courseId, Long unitId, String studyModel) {
+        if (!Objects.isNull(courseId)) {
+            return courseId;
+        }
+        Long returnCourseId;
+        if (studyModel.contains("例句")) {
+            returnCourseId = sentenceUnitMapper.selectCourseIdByUnitId(unitId);
+        } else {
+            returnCourseId = unitMapper.selectCourseIdByUnitId(unitId);
+        }
+        Assert.notNull(returnCourseId, "未查询到单元id为 " + unitId + " 的课程！");
+        return returnCourseId;
     }
 
     @Override
@@ -265,13 +302,6 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
         final String[] modelArr = {"慧记忆", "慧听写", "慧默写", "单词图鉴", "例句听力", "例句翻译", "例句默写"};
         Long studentId = student.getId();
 
-        String fileName = courseMapper.selectCourseName(Integer.parseInt(courseId.toString()));
-        String unitName = null;
-        if (unitId != 0) {
-            unitName = unitMapper.getUnitNameByUnitId(unitId);
-        }
-
-        List<Long> ids = new ArrayList<>();
         // excel标题
         String[] title = {"序号", "英文", "中文解释", "记忆强度", "距离复习"};
         PageHelper.startPage(pageNum, pageSize);
@@ -279,7 +309,9 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
                 unitId, studyModel);
 
         // excel文件名
+        String fileName = this.getFileName(studyModel, courseId);
         StringBuilder fileNameSb = new StringBuilder(fileName);
+        String unitName = this.getUnitName(studyModel, unitId);
         if (unitName != null) {
             fileNameSb.append("-").append(unitName);
         }
@@ -291,7 +323,7 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
                 fileNameSb.append(studyModel);
                 if (i <= 3) {
                     fileNameSb.append("生词汇总");
-                    downloadWordCapacity(ids, content, capacityReviews);
+                    downloadWordCapacity(content, capacityReviews);
                 } else {
                     fileNameSb.append("生句汇总");
                     downloadSentenceCapacity(content, capacityReviews);
@@ -312,6 +344,32 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
         } catch (Exception e) {
             log.error("学生 {} 导出 {} 模块下记忆追踪信息失败！", studentId, studyModel, e);
         }
+    }
+
+    private String getFileName(String studyModel, Long courseId) {
+        String fileName;
+        String str = "例句";
+        if (StringUtils.isNotEmpty(studyModel) && studyModel.contains(str)) {
+            SentenceCourse sentenceCourse = sentenceCourseMapper.selectById(courseId);
+            fileName = sentenceCourse.getCourseName();
+        } else {
+            fileName = courseMapper.selectCourseNameById(courseId);
+        }
+        return fileName;
+    }
+
+    private String getUnitName(String studyModel, Long unitId) {
+        String str = "例句";
+        String unitName = null;
+        if (unitId != 0) {
+            if (StringUtils.isNotEmpty(studyModel) && studyModel.contains(str)) {
+                SentenceUnit sentenceUnit = sentenceUnitMapper.selectById(unitId);
+                unitName = sentenceUnit.getUnitName();
+            } else {
+                unitName = unitMapper.getUnitNameByUnitId(unitId);
+            }
+        }
+        return unitName;
     }
 
     @Override
@@ -360,14 +418,14 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
     }
 
     @SuppressWarnings("all")
-    private void downloadWordCapacity(List<Long> ids, String[][] content, List<CapacityReview> capacityReviews) {
+    private void downloadWordCapacity(String[][] content, List<CapacityReview> capacityReviews) {
         List<CapacityMemory> capacityMemories = getCapacityMemories(capacityReviews);
         Map<Long, Map<Long, String>> map;
         CapacityMemory capacityMemory;
         String syllable;
         String pushTime;
         if (capacityMemories.size() > 0) {
-            capacityMemories.forEach(capacityMemory1 -> ids.add(capacityMemory1.getVocabularyId()));
+            List<Long> ids = capacityMemories.stream().map(CapacityMemory::getVocabularyId).collect(Collectors.toList());
             // 查询单词的音节
             map = vocabularyMapper.selectSyllableByWordId(ids);
             for (int i = 0; i < capacityMemories.size(); i++) {
@@ -445,6 +503,17 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
         }
 
         return time;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private static
+    class CourseAndUnit {
+        private Long courseId;
+
+        private Long unitId;
     }
 
 }

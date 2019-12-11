@@ -41,4 +41,6 @@ public interface GameScoreMapper {
      */
     @Select("select game_id from game_score where student_id = #{student.id} order by id desc limit 1")
     Long selectGameNameList(@Param("student") Student student);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

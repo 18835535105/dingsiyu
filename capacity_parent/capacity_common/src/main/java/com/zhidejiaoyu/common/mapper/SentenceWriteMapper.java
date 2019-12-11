@@ -126,4 +126,6 @@ public interface SentenceWriteMapper {
 
     @Delete("delete from sentence_write where student_id=#{studentId} and unit_id=#{unitId}")
     Integer deleteByUnitIdAndStudentId(@Param("studentId") Long id, @Param("unitId") Integer unitId);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

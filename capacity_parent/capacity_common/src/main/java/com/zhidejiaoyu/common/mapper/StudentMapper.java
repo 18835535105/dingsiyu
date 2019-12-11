@@ -268,4 +268,28 @@ public interface StudentMapper extends BaseMapper<Student> {
      * @return
      */
     List<Student> selectByTeacherId(@Param("teacherId") Integer teacherId);
+
+    /**
+     * 查看到期体验账号id
+     *
+     * @param studentIds
+     */
+    List<Student> selectDeleteAccount(@Param("studentIds") List<Long> studentIds);
+
+    void deleteByIds(@Param("studentIds") List<Long> studentIds);
+
+    /**
+     * 查询到期的体验账号
+     *
+     * @return
+     */
+    List<Student> selectExperienceAccount();
+
+    /**
+     * 修改学生状态至已删除
+     *
+     * @param students
+     */
+    void updateStatus(@Param("students") List<Student> students);
+
 }

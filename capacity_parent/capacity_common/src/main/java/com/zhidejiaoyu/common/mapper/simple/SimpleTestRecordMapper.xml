@@ -328,6 +328,7 @@
                  left join unit u on u.id = a.unit_id
                  left join student_unit su on su.unit_id = a.unit_id
         where su.type = 2
+          and a.point >= 0
           and su.student_id = a.student_id
           and a.student_id = #{student_id}
           and a.study_model &lt;&gt; '词汇考点'

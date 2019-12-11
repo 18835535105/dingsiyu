@@ -1,0 +1,236 @@
+spring:
+  profiles:
+    active: dev
+  http:
+    encoding:
+      force: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Chongqing
+
+  datasource:
+    druid:
+      # 初始化时建立物理连接的个
+      initial-size: 5
+      # 最大连接池数量
+      max-active: 1000
+      # 最小连接池数量
+      min-idle: 100
+      # 获取连接时最大等待时间，单位毫秒
+      max-wait: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      time-between-eviction-runs-millis: 60000
+      # 连接保持空闲而不被驱逐的最小时间
+      min-evictable-idle-time-millis: 300000
+      # 用来检测连接是否有效的sql，要求是一个查询语句
+      validation-query: SELECT 1 FROM DUAL
+      # 建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。
+      test-while-idle: true
+      # 申请连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能。
+      test-on-borrow: false
+      # 归还连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能。
+      test-on-return: false
+      # 是否缓存preparedStatement，也就是PSCache。PSCache对支持游标的数据库性能提升巨大，比如说oracle。在mysql下建议关闭。
+      pool-prepared-statements: false
+      # 要启用PSCache，必须配置大于0，当大于0时，poolPreparedStatements自动触发修改为true。
+      max-pool-prepared-statement-per-connection-size: 50
+      # 配置监控统计拦截的filters，去掉后监控界面sql无法统计
+      filters: stat,wall
+      # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=1000
+      # 合并多个DruidDataSource的监控数据
+      use-global-data-source-stat: true
+
+  # 邮箱服务器地址
+  mail:
+    host: smtp.qq.com
+    port: 465
+    # 用户名
+    username: 763396567@qq.com
+    # 密码
+    password: shyvggshlwcebefi
+    # 编码
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          socketFactory:
+            class:javax.net.ssl.SSLSocketFactory
+# 发送者邮箱
+mail:
+  fromMail:
+    addr: 763396567@qq.com
+
+server:
+  tomcat:
+    uri-encoding: utf-8
+  servlet:
+    session:
+      timeout: 30m
+  connection-timeout: 30m
+
+mybatis:
+  type-aliases-package: com.zhidejiaoyu.common.pojo
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+
+baidu: https://fanyi.baidu.com/gettts?lan=en&spd=3&source=web&text=
+
+# ip location，IP定位，距离计算
+# 腾讯地图，接口地址：https://lbs.qq.com/webservice_v1/guide-gcoder.html
+tencent:
+  map:
+    key: UGPBZ-SVC6X-O3W43-TYLAQ-CVERH-OFF65
+    url: https://apis.map.qq.com/ws/geocoder/v1/
+  # 腾讯距离计算，接口地址：https://lbs.qq.com/webservice_v1/guide-distance.html
+  distance:
+    url: https://apis.map.qq.com/ws/distance/v1/
+  # 腾讯 ip 定位
+  location:
+    url: https://apis.map.qq.com/ws/location/v1/ip
+
+youdao:
+  # youdao voice create
+  create: https://dict.youdao.com/dictvoice?type=2&audio=
+  # 有道翻译
+  appKey: 22e4622be137dac9
+  youdaoUrl: https://openapi.youdao.com/api
+  md5Key: OsGxRcsnty1MGvnGEOPPRGM8DK2dAAka
+  from: EN
+  to: zh-CHS
+
+http:
+  maxTotal: 200
+  timeOut: 10000
+  defaultMaxPerRout: 200
+
+# 讯飞语音评测
+xfyun:
+  ise:
+    URL: http://api.xfyun.cn/v1/service/v1/ise
+    APP_ID: 5ad993bd
+    API_KEY: 60583ec028e09315c880a3b0cd3026b0
+
+---
+# 开发环境
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:mysql://192.168.0.2:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: zdjy
+    password: zdjy
+  redis:
+    host: ${ip}
+    port: 6379
+
+server:
+  port: 8083
+
+ip: 192.168.0.2
+domain: http://localhost:8083
+adminDomin: http://localhost:9999
+
+mybatis-plus:
+  global-config:
+    # 驼峰下划线转换
+    db-column-underline: true
+    # 刷新mapper 调试神器
+    refresh-mapper: true
+
+logging:
+  level:
+    com:
+      zhidejiaoyu:
+        student: debug
+        common:
+          mapper: debug
+  config: classpath:logback-dev.xml
+
+cross:
+  url: http://192.168.0.*:5000
+
+# 定时任务执行端口
+quartz:
+  port: 8083
+
+# sentinel配置
+#ahas:
+#  namespace: dev
+#  license: 05a8f00991ce4f36b8b7596c469ff105
+#project:
+#  name: yydz-dev
+---
+# 测试环境
+spring:
+  profiles: test
+  datasource:
+    url: jdbc:mysql://192.168.0.2:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: zdjy
+    password: zdjy
+  redis:
+    host: ${ip}
+    port: 6379
+
+logging:
+  config: classpath:logback-test.xml
+
+ip: 192.168.0.2
+domain: http://localhost:8082
+url: https://capacity.test
+adminDomin: http://192.168.0.2:9999/dept
+
+cross:
+  url: http://192.168.0.*:5000
+
+quartz:
+  port: 8083
+
+---
+
+spring:
+  profiles: prd
+  servlet:
+    multipart:
+      file-size-threshold: 15MB
+  datasource:
+    url: jdbc:mysql://${ip}:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai
+    username: root
+    password: zhide8800
+  redis:
+    host: ${ip}
+    port: 6379
+    password: zhide2018
+server:
+  port: 9082
+  tomcat:
+    max-threads: 512
+    min-spare-threads: 20
+    max-connections: 512
+#logging:
+#  config: classpath:logback-prd.xml
+
+ip: 39.106.181.151
+domain: https://www.yydz100.cn
+adminDomin: https://admin.duizhang100.cn/dept
+
+# 跨域地址
+cross:
+  url: '*'
+
+# 需要执行定时任务的服务器ip和端口
+quartz:
+  ip: ${ip}
+  port: 9082
+
+# sentinel配置
+ahas:
+  namespace: prd
+  license: 05a8f00991ce4f36b8b7596c469ff105
+project:
+  name: yydz-prd
+
+---

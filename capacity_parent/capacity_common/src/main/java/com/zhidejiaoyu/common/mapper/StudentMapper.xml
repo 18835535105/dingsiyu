@@ -481,6 +481,13 @@
         </foreach>
         )
     </update>
+    <update id="updateStatus" parameterType="map">
+        update student set `status` = 3 where id in (
+        <foreach collection="students" item="student" separator=",">
+            #{student.id}
+        </foreach>
+        )
+    </update>
 
     <update id="updateSchoolGoldFirstTimeToNull" parameterType="map">
         update student set school_gold_first_time = null where id in (
@@ -646,13 +653,11 @@
         GROUP BY s.id
     </select>
     <select id="selectxz" resultType="map">
-        select
-            t.sid           id,
-            count(t.sid) AS xz
-        from (select
-                  s.id                 sid,
-                  count(m.parent_name) tc,
-                  m.parent_name        p
+        select t.sid           id,
+               count(t.sid) AS xz
+        from (select s.id                 sid,
+                     count(m.parent_name) tc,
+                     m.parent_name        p
               from student s,
                    award a,
                    medal m
@@ -748,10 +753,10 @@
     </select>
     <select id="selectHeadUrlMapByStudentId" resultType="java.util.Map" parameterType="map">
         select id, head_url headUrl from student where id in (
-          <foreach collection="studentIds" separator="," item="id">
-              #{id}
-          </foreach>
-            )
+        <foreach collection="studentIds" separator="," item="id">
+            #{id}
+        </foreach>
+        )
     </select>
     <select id="getVocabularyCountByStudent" parameterType="map" resultType="integer">
         select ((select count(listen.id)
@@ -804,18 +809,30 @@
     </select>
 
     <select id="getSentenceCountByStudent" parameterType="map" resultType="integer">
-        select
-        ((select count(translate.id) from sentence_translate translate where translate.student_id=stu.id and translate.memory_strength &lt; 1 and push &lt; now())  +
-        (select count(cwrite.id) from sentence_write cwrite where cwrite.student_id=stu.id and cwrite.memory_strength   &lt; 1 and push &lt; now()) +
-        (select count(memory.id) from sentence_listen memory where memory.student_id=stu.id and memory.memory_strength  &lt; 1 and push &lt; now())
-        ) count
-        from student stu where stu.id =#{studentId}
+        select ((select count(translate.id)
+                 from sentence_translate translate
+                 where translate.student_id = stu.id
+                   and translate.memory_strength &lt; 1
+                   and push &lt; now()) +
+                (select count(cwrite.id)
+                 from sentence_write cwrite
+                 where cwrite.student_id = stu.id
+                   and cwrite.memory_strength &lt; 1
+                   and push &lt; now()) +
+                (select count(memory.id)
+                 from sentence_listen memory
+                 where memory.student_id = stu.id
+                   and memory.memory_strength &lt; 1
+                   and push &lt; now())
+                   ) count
+        from student stu
+        where stu.id = #{studentId}
     </select>
     <select id="countHasLoginLogStudentsBySchoolAdminId" resultType="java.lang.Integer">
         select count(s.id)
         from student s
         where s.account_time is not null
-          and s.role in (1 , 2)
+          and s.role in (1, 2)
           and s.status &lt;> 3
           and s.teacher_id in (select teacher_id from teacher where school_admin_id = #{schoolAdminId})
     </select>
@@ -838,6 +855,34 @@
         select
         <include refid="Base_Column_List"/>
         from student where teacher_id = #{teacherId}
+    </select>
+    <select id="selectDeleteAccount" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"></include>
+        from student
+        where
+        id in (
+        <foreach collection="studentIds" item="studentId" separator=",">
+            #{studentId}
+        </foreach>
+        )
+    </select>
+    <select id="deleteByIds" parameterType="map">
+        delete from student where id in (
+        <foreach collection="studentIds" item="studentId" separator=",">
+            #{studentId}
+        </foreach>
+        )
+    </select>
+    <select id="selectExperienceAccount" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from student
+        where
+        account_time is not null
+        and account_time &lt; now()
+        and `status` = 1
+        and `rank` &lt; 7
     </select>
 
 </mapper>

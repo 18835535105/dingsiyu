@@ -12,12 +12,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -40,28 +37,8 @@ public class LoginController {
     @Resource
     private RedisTemplate<String, Objects> redisTemplate;
 
-    /**
-     * 登陆
-     *
-     * @param account  账号
-     * @param password 密码
-     * @param code     验证码
-     * @param session
-     * @return
-     */
-    @RequestMapping(value = "/judge", method = RequestMethod.POST)
-    public ServerResponse loginJudge(String account, String password, HttpSession session, HttpServletRequest request, String code) {
-        if (StringUtils.isEmpty(account) || StringUtils.isEmpty(password)) {
-            return ServerResponse.createByErrorMessage("用户名和密码不能为空！");
-        }
-        account = account.trim();
-        password = password.trim();
-        return loginService.loginJudge(account, password, session, request, code);
-
-    }
-
     @GetMapping("/getOnlineUserCount")
-    public ServerResponse getOnlineUserCount() {
+    public ServerResponse<Object> getOnlineUserCount() {
         Long size = redisTemplate.opsForZSet().size(RedisKeysConst.ZSET_ONLINE_USER);
         return ServerResponse.createBySuccess(size);
     }
@@ -122,43 +99,6 @@ public class LoginController {
     }
 
     /**
-     * 登录拦截，若未登录返回false，前端控制跳转到登录页面
-     *
-     * @param flag
-     * @return
-     */
-    @RequestMapping("/toLogin/{boolean}")
-    public Map<String, Boolean> isLogin(@PathVariable("boolean") Boolean flag) {
-        Map<String, Boolean> isLogin = new HashMap<>(16);
-        isLogin.put("isLogin", flag);
-        return isLogin;
-    }
-
-    /**
-     * 多地点同时登录提示语
-     * <p>当用户通过不同session登录时，新登录的sessionId会覆盖旧sessionId，此时旧session用户会收到一条提示信息</p>
-     *
-     * @param msg 账号在另一地点登录提示信息
-     * @return
-     */
-    @RequestMapping("/multipleLogin/{msg}")
-    public Map<String, String> multipleLogin(@PathVariable("msg") Object msg) {
-        Map<String, String> map = new HashMap<>(16);
-        map.put("multipleLogin", msg.toString());
-        return map;
-    }
-
-    /**
-     * 学生退出
-     *
-     * @param session
-     */
-    @PostMapping("/loginOut")
-    public void loginOut(HttpSession session, HttpServletRequest request) {
-        loginService.loginOut(session, request);
-    }
-
-    /**
      * 生成验证码
      */
     @PostMapping("/validateCode")
@@ -176,8 +116,5 @@ public class LoginController {
         return loginService.getModelStatus(session, type);
     }
 
-    @GetMapping("/isLoginOut")
-    public Object isLoginOut(HttpSession session, String teacherAccount) {
-        return loginService.isLoginOut(session, teacherAccount);
-    }
+
 }

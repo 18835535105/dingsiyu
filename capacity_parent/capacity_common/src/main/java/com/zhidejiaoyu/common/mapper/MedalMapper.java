@@ -17,6 +17,7 @@ public interface MedalMapper extends BaseMapper<Medal> {
 
     /**
      * 查询每个勋章大类含有的子勋章个数
+     *
      * @param ids
      * @return map key:父勋章名， value map key:父勋章名，value：子勋章个数
      */
@@ -25,6 +26,7 @@ public interface MedalMapper extends BaseMapper<Medal> {
 
     /**
      * 查询学生获取的所有勋章个数
+     *
      * @param studentId
      * @return map key:父勋章名， value map key:父勋章名，value：获取的子勋章个数
      */
@@ -33,6 +35,7 @@ public interface MedalMapper extends BaseMapper<Medal> {
 
     /**
      * 根据父勋章id查询其子勋章id的集合
+     *
      * @param parentId 父勋章id
      * @return
      */
@@ -92,4 +95,11 @@ public interface MedalMapper extends BaseMapper<Medal> {
      */
     List<Map<String, Object>> selectMedalImgUrl(@Param("student") Student student);
 
-    List<Medal> selectByParentIds(@Param("parentIds") List<Long> parentIds);}
+    /**
+     * 通过父节点id查询父节点下所有勋章内容
+     *
+     * @param parentIds
+     * @return
+     */
+    List<Medal> selectByParentIds(@Param("parentIds") List<Long> parentIds);
+}

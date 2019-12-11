@@ -465,4 +465,11 @@
         <if test="status==3">capacity_write</if>
         where vocabulary_id = #{id}
     </delete>
+    <delete id="deleteByStudentIds" parameterType="java.util.Map">
+        delete from capacity_memory where student_id in (
+        <foreach collection="studentIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </delete>
 </mapper>

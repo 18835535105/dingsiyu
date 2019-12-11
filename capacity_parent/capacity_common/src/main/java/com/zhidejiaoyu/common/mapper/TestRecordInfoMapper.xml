@@ -30,5 +30,12 @@
         )
         group by test_id
     </select>
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete tri from test_record tr, test_record_info tri where tr.id = tri.test_id and tr.student_id in (
+        <foreach collection="studentIds" separator="," item="studentId">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 
 </mapper>

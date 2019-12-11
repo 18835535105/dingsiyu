@@ -25,7 +25,7 @@ import javax.servlet.http.HttpSession;
 @Component
 public class ControllerLogAop {
 
-    @Pointcut(value = "execution(* com.zhidejiaoyu.student.controller..*(..))")
+    @Pointcut(value = "execution(* com.zhidejiaoyu.student..*Controller.*(..))")
     public void cut() {
     }
 

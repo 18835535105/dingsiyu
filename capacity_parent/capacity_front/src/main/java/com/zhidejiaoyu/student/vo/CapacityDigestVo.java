@@ -31,6 +31,11 @@ public class CapacityDigestVo implements Serializable {
      */
     private boolean showCapacity;
 
+    /**
+     * 总页数
+     */
+    private Integer totalPages;
+
     private List<WordInfo> wordInfos = new ArrayList<>();
 
     @Data

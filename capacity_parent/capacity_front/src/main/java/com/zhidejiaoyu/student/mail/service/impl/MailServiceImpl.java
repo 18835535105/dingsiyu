@@ -29,10 +29,10 @@ public class MailServiceImpl implements MailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    //后加的防止题目过长并且进行全局定义
+    // 后加的防止题目过长并且进行全局定义
     static {
-        System.setProperty("mail.mime.splitlongparameters","false");
-        System.setProperty("mail.mime.charset","UTF-8");
+        System.setProperty("mail.mime.splitlongparameters", "false");
+        System.setProperty("mail.mime.charset", "UTF-8");
     }
 
     @Override

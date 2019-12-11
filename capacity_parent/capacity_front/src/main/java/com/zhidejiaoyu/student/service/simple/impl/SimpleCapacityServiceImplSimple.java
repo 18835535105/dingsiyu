@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.student.service.simple.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.Vo.simple.capacityVo.CapacityListVo;
@@ -10,6 +9,7 @@ import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
+import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.common.utils.simple.excelUtil.SimpleExcelUtil;
@@ -72,9 +72,15 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     }
 
     private ServerResponse<CapacityDigestVo> getCapacityDigestVo(Student student, Long courseId, CapacityDigestVo vo, Integer type) {
-        Wrapper<SimpleCapacity> wrapper = new EntityWrapper<SimpleCapacity>().eq("student_id", student.getId()).
-                eq("course_id", courseId).eq("type", type).lt("memory_strength", 1);
-        List<SimpleCapacity> simpleCapacities = simpleSimpleCapacityMapper.selectList(wrapper.orderBy("push", true));
+
+        PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
+
+        List<SimpleCapacity> simpleCapacities = simpleSimpleCapacityMapper.selectList(new EntityWrapper<SimpleCapacity>().eq("student_id", student.getId()).
+                eq("course_id", courseId).eq("type", type).lt("memory_strength", 1).orderBy("push", true));
+
+        PageInfo<SimpleCapacity> pageInfo = new PageInfo<>(simpleCapacities);
+        vo.setTotalPages(pageInfo.getPages());
+
         Integer needReview = simpleSimpleCapacityMapper.countNeedReview(student, courseId, type);
 
         vo.setNeedReview(needReview);

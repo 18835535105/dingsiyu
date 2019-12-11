@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.StudyCapacityMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudyCapacity">
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="course_id" property="courseId"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="word_id" property="wordId"/>
+        <result column="word" property="word"/>
+        <result column="syllable" property="syllable"/>
+        <result column="word_chinese" property="wordChinese"/>
+        <result column="fault_time" property="faultTime"/>
+        <result column="push" property="push"/>
+        <result column="memory_strength" property="memoryStrength"/>
+        <result column="type" property="type"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="base_sql">
+        id, student_id, course_id, unit_id, word_id, word, syllable, word_chinese, fault_time, push, memory_strength, type, update_time
+    </sql>
+    <delete id="deleteSyntaxByStudentIdAndCourseId" parameterType="map">
+        delete
+        from study_capacity
+        where student_id = #{studentId}
+          and course_id = #{courseId}
+          and type in (20, 21, 22)
+    </delete>
+
+    <select id="selectLargerThanGoldTimeWithStudentIdAndUnitId"
+            resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from study_capacity
+        where student_id = #{dto.studentId}
+        and unit_id = #{dto.unitId}
+        and type = #{dto.type}
+        and memory_strength &lt; 1
+        and push &lt;= now()
+        order by push limit 1
+    </select>
+    <select id="selectUnKnownByStudentIdAndUnitId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from study_capacity
+        where student_id = #{dto.studentId}
+        and unit_id = #{dto.unitId}
+        and type = #{dto.type}
+        and memory_strength &lt; 1
+        order by push limit 1
+    </select>
+    <select id="selectByLearn" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from study_capacity
+        where student_id = #{learn.studentId}
+        and unit_id = #{learn.unitId}
+        and word_id = #{learn.vocabularyId}
+        and type = #{type}
+        order by push
+        limit 1
+    </select>
+
+</mapper>

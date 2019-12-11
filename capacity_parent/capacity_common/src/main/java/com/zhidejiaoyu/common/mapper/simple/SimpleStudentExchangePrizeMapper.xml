@@ -20,4 +20,12 @@
         order by stuprize.create_time desc
         limit #{start} ,#{number}
     </select>
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from student_exchange_prize
+        where student_id in (
+        <foreach collection="studentIds" separator="," item="studentId">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 </mapper>

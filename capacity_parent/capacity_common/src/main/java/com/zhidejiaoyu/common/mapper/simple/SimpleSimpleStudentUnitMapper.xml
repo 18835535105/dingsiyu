@@ -4,19 +4,29 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.SimpleStudentUnit">
-        <id column="id" property="id" />
-        <result column="student_id" property="studentId" />
-        <result column="course_id" property="courseId" />
-        <result column="unit_id" property="unitId" />
-        <result column="type" property="type" />
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="course_id" property="courseId"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="type" property="type"/>
     </resultMap>
 
-	<select id="getAllUnit" parameterType="Long" resultType="map">
+    <select id="getAllUnit" parameterType="Long" resultType="map">
 		select type, course_id from simple_student_unit where student_id = #{studentId}
 	</select>
 
     <select id="getAllCourseIdByTypeToStudent" parameterType="map" resultType="long">
         select course_id from simple_student_unit where student_id=#{studentId} and type=#{type}
     </select>
+    <delete id="deleteByStudentIds">
+        delete
+        from simple_student_unit
+        where
+        student_id in (
+        <foreach collection="studentIds" separator="," item="studentId">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 
 </mapper>

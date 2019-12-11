@@ -63,5 +63,13 @@
         select <include refid="base_sql"/>
         from capacity_student_unit where student_id=#{studentId} and type=#{type}
     </select>
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from capacity_student_unit
+        where student_id in (
+        <foreach collection="studentIds" separator="," item="studentId">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 
 </mapper>

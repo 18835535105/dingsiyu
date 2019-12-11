@@ -15,12 +15,12 @@ public class QuartzServiceTest extends BaseTest {
     private QuartzService quartzService;
 
     @Test
-    public void initRankCache() {
-        quartzService.initRankCaches();
+    public void testUpdateClassMonthRank() {
+        quartzService.updateClassMonthRank();
     }
 
     @Test
-    public void testUpdateClassMonthRank() {
-        quartzService.updateClassMonthRank();
+    public void updateWelfareAccountToOutOfDate() {
+        quartzService.updateWelfareAccountToOutOfDate();
     }
 }

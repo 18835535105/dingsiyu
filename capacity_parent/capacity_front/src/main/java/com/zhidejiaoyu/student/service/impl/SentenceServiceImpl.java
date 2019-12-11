@@ -7,7 +7,11 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.study.*;
+import com.zhidejiaoyu.common.study.CommonMethod;
+import com.zhidejiaoyu.common.study.GoldMemoryTime;
+import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
+import com.zhidejiaoyu.common.study.StudentRestudyUtil;
+import com.zhidejiaoyu.common.study.memorystrength.StudyMemoryStrength;
 import com.zhidejiaoyu.common.utils.dateUtlis.CalculateTimeUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
@@ -41,9 +45,6 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
 
     @Autowired
     private MemoryDifficultyUtil memoryDifficultyUtil;
-
-    @Autowired
-    private MemoryStrengthUtil memoryStrengthUtil;
 
     @Autowired
     private BaiduSpeak baiduSpeak;
@@ -111,6 +112,9 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
 
     @Resource
     private StudentRestudyUtil studentRestudyUtil;
+
+    @Resource
+    private StudyMemoryStrength studyMemoryStrength;
 
     @Override
     public ServerResponse<SentenceTranslateVo> getSentenceTranslate(HttpSession session, Long unitId, int classifyInt, Integer type) {
@@ -737,18 +741,18 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     @Override
     public ServerResponse<Object> getModuleRelearning(HttpSession session, String studyModel, Integer unitId) {
         Student student = getStudent(session);
-        Integer update = learnMapper.updLearnByUnitIdAndStudyModelAndStudentId(student.getId(), studyModel, unitId);
-        if (update > 0) {
-            if ("例句翻译".equals(studyModel)) {
-                sentenceTranslateMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
-            }
-            if ("例句听力".equals(studyModel)) {
-                sentenceListenMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
-            }
-            if ("例句默写".equals(studyModel)) {
-                sentenceWriteMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
-            }
+        learnMapper.updLearnByUnitIdAndStudyModelAndStudentId(student.getId(), studyModel, unitId);
+
+        if ("例句翻译".equals(studyModel)) {
+            sentenceTranslateMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
         }
+        if ("例句听力".equals(studyModel)) {
+            sentenceListenMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
+        }
+        if ("例句默写".equals(studyModel)) {
+            sentenceWriteMapper.deleteByUnitIdAndStudentId(student.getId(), unitId);
+        }
+
 
         return ServerResponse.createBySuccess();
     }
@@ -817,7 +821,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                     sentenceTranslate.setPush(push);
 
                     // 重新计算记忆强度
-                    sentenceTranslate.setMemoryStrength(memoryStrengthUtil.getStudyMemoryStrength(memoryStrength, true));
+                    sentenceTranslate.setMemoryStrength(studyMemoryStrength.getMemoryStrength(memoryStrength, true));
                 } else {
                     // 错误次数在原基础上 +1
                     sentenceTranslate.setFaultTime(sentenceTranslate.getFaultTime() + 1);
@@ -827,7 +831,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                     sentenceTranslate.setPush(push);
 
                     // 重新计算记忆强度
-                    sentenceTranslate.setMemoryStrength(memoryStrengthUtil.getStudyMemoryStrength(memoryStrength, false));
+                    sentenceTranslate.setMemoryStrength(studyMemoryStrength.getMemoryStrength(memoryStrength, false));
                 }
                 sentenceTranslateMapper.updateByPrimaryKeySelective(sentenceTranslate);
                 return sentenceTranslate;
@@ -863,7 +867,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                     sentenceListen.setPush(push);
 
                     // 重新计算记忆强度
-                    sentenceListen.setMemoryStrength(memoryStrengthUtil.getStudyMemoryStrength(memoryStrength, true));
+                    sentenceListen.setMemoryStrength(studyMemoryStrength.getMemoryStrength(memoryStrength, true));
                 } else {
                     // 错误次数在原基础上 +1
                     sentenceListen.setFaultTime(sentenceListen.getFaultTime() + 1);
@@ -873,7 +877,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                     sentenceListen.setPush(push);
 
                     // 重新计算记忆强度
-                    sentenceListen.setMemoryStrength(memoryStrengthUtil.getStudyMemoryStrength(memoryStrength, false));
+                    sentenceListen.setMemoryStrength(studyMemoryStrength.getMemoryStrength(memoryStrength, false));
                 }
                 sentenceListenMapper.updateByPrimaryKeySelective(sentenceListen);
 
@@ -910,7 +914,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                     sentenceWrite.setPush(push);
 
                     // 重新计算记忆强度
-                    sentenceWrite.setMemoryStrength(memoryStrengthUtil.getStudyMemoryStrength(memoryStrength, true));
+                    sentenceWrite.setMemoryStrength(studyMemoryStrength.getMemoryStrength(memoryStrength, true));
                 } else {
                     // 错误次数在原基础上 +1
                     sentenceWrite.setFaultTime(sentenceWrite.getFaultTime() + 1);
@@ -920,7 +924,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
                     sentenceWrite.setPush(push);
 
                     // 重新计算记忆强度
-                    sentenceWrite.setMemoryStrength(memoryStrengthUtil.getStudyMemoryStrength(memoryStrength, false));
+                    sentenceWrite.setMemoryStrength(studyMemoryStrength.getMemoryStrength(memoryStrength, false));
                 }
                 sentenceWriteMapper.updateByPrimaryKeySelective(sentenceWrite);
                 return sentenceWrite;

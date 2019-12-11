@@ -27,7 +27,7 @@ public class BaiduSpeak {
     @Value("${baidu}")
     private String baidu;
 
-    @Value("${youdao}")
+    @Value("${youdao.create}")
     private String youdao;
 
     @Autowired

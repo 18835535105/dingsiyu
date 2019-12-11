@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.SyntaxTopicMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.SyntaxTopic">
+        <id column="id" property="id"/>
+        <result column="knowledge_point_id" property="knowledgePointId"/>
+        <result column="topic" property="topic"/>
+        <result column="answer" property="answer"/>
+        <result column="type" property="type"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="option" property="option"/>
+        <result column="analysis" property="analysis"/>
+        <result column="model" property="model"/>
+    </resultMap>
+
+    <sql id="base_sql">
+        id, knowledge_point_id, topic, answer, type, update_time, `option`,analysis, model
+    </sql>
+    <sql id="more_table_sql">
+        st.id, st.knowledge_point_id, st.topic, st.answer, st.type, st.update_time, st.option, st.analysis, model
+    </sql>
+
+    <select id="selectSelectSyntaxByUnitId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from syntax_topic st, syntax_unit_topic sut
+        where st.id = sut.topic_id
+        and sut.unit_id = #{unitId}
+        and st.type = 1
+    </select>
+    <select id="countByUnitIdAndType" resultType="java.lang.Integer" parameterType="map">
+        select count(st.id)
+        from syntax_topic st,
+             syntax_unit_topic sut
+        where st.id = sut.topic_id
+          and sut.unit_id = #{unitId}
+          and st.type = #{type}
+    </select>
+    <select id="selectNextByUnitIdAndType" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from syntax_topic st,
+        syntax_unit_topic sut
+        where st.id = sut.topic_id
+        and sut.unit_id = #{unitId}
+        <if test="studyModel == '选语法'">
+            and st.type = 1
+        </if>
+        <if test="studyModel == '写语法'">
+            and st.type = 2
+        </if>
+        and st.id not in (
+        select vocabulary_id from learn l
+        where l.student_id = #{studentId}
+        and l.unit_id = ${unitId}
+        and l.study_model = #{studyModel}
+        and l.type = 1
+        ) order by st.id limit 1
+    </select>
+
+</mapper>

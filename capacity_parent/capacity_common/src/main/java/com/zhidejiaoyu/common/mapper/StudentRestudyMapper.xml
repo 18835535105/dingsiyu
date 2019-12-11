@@ -4,15 +4,22 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentRestudy">
-        <id column="id" property="id" />
-        <result column="student_id" property="studentId" />
-        <result column="course_id" property="courseId" />
-        <result column="unit_id" property="unitId" />
-        <result column="vocabulary_id" property="vocabularyId" />
-        <result column="word" property="word" />
-        <result column="update_time" property="updateTime" />
-        <result column="type" property="type" />
-        <result column="version" property="version" />
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="course_id" property="courseId"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="vocabulary_id" property="vocabularyId"/>
+        <result column="word" property="word"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="type" property="type"/>
+        <result column="version" property="version"/>
     </resultMap>
-
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from student_restudy
+        where student_id in (
+        <foreach collection="studentIds" separator="," item="studentId">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 </mapper>

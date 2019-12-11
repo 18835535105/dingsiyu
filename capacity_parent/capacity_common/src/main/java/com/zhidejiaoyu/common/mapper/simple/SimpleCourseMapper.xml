@@ -358,7 +358,7 @@
     </select>
 
     <!-- 新增课程 -->
-    <insert id="addCourse" parameterType="course"
+    <insert id="addCourse" parameterType="com.zhidejiaoyu.common.pojo.Course"
             useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         insert into course
         <include refid="insertcourse"/>
@@ -372,7 +372,7 @@
         where id = #{id}
     </select>
 
-    <resultMap type="unit" id="selectListCourseNameMap">
+    <resultMap type="com.zhidejiaoyu.common.pojo.Unit" id="selectListCourseNameMap">
         <result column="id" property="id"/>
         <result column="unit_name" property="unitName"/>
         <result column="unit_index" property="unitIndex"/>
@@ -388,7 +388,7 @@
         and delStatus = 1
     </select>
 
-    <resultMap type="course" id="showcoursenameMap">
+    <resultMap type="com.zhidejiaoyu.common.pojo.Course" id="showcoursenameMap">
         <id column="id" property="id"/>
         <result column="course_name" property="courseName"/>
     </resultMap>
@@ -409,7 +409,7 @@
         and delStatus = 1
     </select>
 
-    <select id="chooseGradeToLabel" parameterType="Course"
+    <select id="chooseGradeToLabel" parameterType="com.zhidejiaoyu.common.pojo.Course"
             resultType="Map">
         select
 			b.id,

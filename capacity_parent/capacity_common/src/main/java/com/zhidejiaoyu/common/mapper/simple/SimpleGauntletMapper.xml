@@ -217,7 +217,18 @@
             and be_challenger_status=2 and be_challenger_student_id=#{studentId}
         </if>
     </select>
-
+    <delete id="deleteByChallengerStudentIdsOrBeChallengerStudentIds" parameterType="map">
+        delete from gauntlet where challenger_student_id in (
+        <foreach collection="studentIds" separator="," item="id">
+            #{id}
+        </foreach>
+        )
+        or be_challenger_student_id in (
+        <foreach collection="studentIds" separator="," item="id">
+            #{id}
+        </foreach>
+        )
+    </delete>
 
 
 

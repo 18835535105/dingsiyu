@@ -2,7 +2,10 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.StudentRestudy;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * <p>
@@ -15,4 +18,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StudentRestudyMapper extends BaseMapper<StudentRestudy> {
 
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

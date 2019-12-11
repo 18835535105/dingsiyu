@@ -409,4 +409,11 @@
         ORDER BY b.push
         LIMIT 0,1
     </select>
+    <delete id="deleteByStudentIds" parameterType="java.util.Map">
+        delete from capacity_listen where student_id in (
+        <foreach collection="studentIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </delete>
 </mapper>

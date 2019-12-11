@@ -17,10 +17,10 @@
         <result column="first_study_time" property="firstStudyTime" jdbcType="TIMESTAMP"/>
         <result column="first_is_known" property="firstIsKnown" jdbcType="INTEGER"/>
         <result column="type" property="type" jdbcType="INTEGER"/>
-        <result column="start_unit_id" property="startUnitId" />
-        <result column="end_unit_id" property="endUnitId" />
-        <result column="course_name" property="courseName" />
-        <result column="study_plan_id" property="studyPlanId" />
+        <result column="start_unit_id" property="startUnitId"/>
+        <result column="end_unit_id" property="endUnitId"/>
+        <result column="course_name" property="courseName"/>
+        <result column="study_plan_id" property="studyPlanId"/>
     </resultMap>
 
     <!-- 查询learn中的单词还是例句 -->
@@ -453,35 +453,6 @@
         </foreach>
         )
     </select>
-    <select id="selectFirstStudyTimeMapByCourseId" resultType="java.util.Map" parameterType="map">
-        SELECT
-        course_id id,
-        first_study_time value
-        FROM
-        learn
-        WHERE
-        first_study_time IS NOT NULL
-        AND student_id = #{stuId}
-        AND course_id in (
-        <foreach collection="courses" item="course" separator=",">
-            #{course.id}
-        </foreach>
-        )
-    </select>
-    <select id="selectLastStudyTimeMapByCourseId" resultType="java.util.Map" parameterType="map">
-        SELECT
-        course_id id,
-        max(learn_time) value
-        FROM
-        learn
-        WHERE
-        student_id = #{stuId}
-        AND course_id in (
-        <foreach collection="courses" item="course" separator=",">
-            #{course.id}
-        </foreach>
-        )
-    </select>
     <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.Learn">
         update learn
         <set>
@@ -552,28 +523,6 @@
     </update>
 
 
-    <select id="countKnownCountByStudentIdAndCourseId" resultType="java.lang.Integer" parameterType="map">
-        SELECT
-        <if test="model == 1 or model == 2 or model == 3">
-            count(DISTINCT vocabulary_id)
-        </if>
-        <if test="model == 4 or model == 5 or model == 6">
-            count(DISTINCT example_id)
-        </if>
-        FROM
-        learn
-        WHERE
-        student_id = #{stuId}
-        AND learn_count = #{learnCount}
-        AND course_id = #{courseId}
-        <if test="flag == 1">
-            AND `status` = 1
-        </if>
-        <if test="flag == 2">
-            AND `status` = 0
-        </if>
-        <include refid="study_model_sql"/>
-    </select>
     <select id="selectNumberByStudentId" parameterType="map" resultType="int">
         <!-- 单词 -->
         <if test="model &lt; 4">
@@ -669,16 +618,6 @@
         <!-- GROUP BY id -->
     </select>
 
-    <select id="countUnitStudyModel" parameterType="map" resultType="map">
-        select COUNT(id) AS count, sum(id) AS sum from learn where student_id = #{studentId} AND course_id =
-        #{course_id}
-        <include refid="study_model_sql"/>
-        <include refid="countCourseStudyModel_sql"/>
-        AND unit_id =
-        (select MAX(unit_id) from learn where student_id = #{studentId} AND course_id = #{course_id}
-        <include refid="study_model_sql"/>
-        <include refid="countCourseStudyModel_sql"/>) GROUP BY id
-    </select>
 
     <sql id="countByWordOrderBy_sql">
         <if test="model == 1 or model == 2 or model == 3">
@@ -714,13 +653,6 @@
             and study_model = '例句默写'
         </if>
         AND `status` = 1
-    </select>
-    <select id="countByWord" parameterType="map" resultType="Integer">
-        SELECT * FROM learn a where unit_id = #{unitId} AND student_id = #{studentId} AND study_model =
-        <include refid="study_model_sql"/>
-        <include refid="countCourseStudyModel_sql"/>
-        GROUP BY
-        <include refid="countByWordOrderBy_sql"/>
     </select>
     <select id="selectLearnedByStudentId" resultMap="BaseResultMap" parameterType="map">
         SELECT
@@ -986,139 +918,6 @@
         <include refid="countCourseStudyModel_sql"/>
         <include refid="study_model_sql"/>
     </select>
-    <select id="countTotalLearnCountWithFirstIsKnown" resultType="java.lang.Integer" parameterType="map">
-        #         首次学习为掌握状态的单词和例句总和
-        select v.id + s.id
-        from (
-#        查询首次学习为掌握状态的单词个数
-                 select count(l.id) id
-                 from learn l,
-                      vocabulary v
-                 where l.vocabulary_id = v.id
-                   and v.delStatus = 1
-                   and l.first_is_known = 1
-                   and l.vocabulary_id is not null
-                   and l.student_id = #{stuId}) v,
-             (
-#              查询首次学习为掌握状态的例句个数
-                 select count(l.id) id
-                 from learn l
-                 where l.first_is_known = 1
-                   and l.example_id is not null
-                   and l.student_id = #{stuId}) s
-    </select>
-    <select id="countFaultWordByStudentId" resultType="java.lang.Integer" parameterType="map">
-        SELECT cm.rate + cl.rate + cw.rate + cp.rate + sl.rate + st.rate + sw.rate
-        FROM (
-#         计算慧记忆模块下错误率超过20%的单词个数
-                 SELECT count(rate.errorRate) rate
-                 FROM (
-#                    计算慧记忆模块下首次学习为熟词的错误率
-                          SELECT cm.fault_time / l.study_count errorRate, cm.*
-                          FROM capacity_memory cm,
-                               learn l,
-                               vocabulary v
-                          WHERE cm.student_id = l.student_id
-                            AND l.student_id = #{stuId}
-                            AND l.first_is_known = 1
-                            AND cm.vocabulary_id = l.vocabulary_id
-                            AND l.vocabulary_id = v.id
-                            AND v.delStatus = 1
-                          GROUP BY cm.vocabulary_id) rate
-                 WHERE rate.errorRate > 0.2) cm,
-             (SELECT count(rate.errorRate) rate
-              FROM (SELECT cm.fault_time / l.study_count errorRate, cm.*
-                    FROM capacity_listen cm,
-                         learn l,
-                         vocabulary v
-                    WHERE cm.student_id = l.student_id
-                      AND l.student_id = #{stuId}
-                      AND l.first_is_known = 1
-                      AND cm.vocabulary_id = l.vocabulary_id
-                      AND l.vocabulary_id = v.id
-                      AND v.delStatus = 1
-                    GROUP BY cm.vocabulary_id) rate
-              WHERE rate.errorRate > 0.2) cl,
-             (SELECT count(rate.errorRate) rate
-              FROM (SELECT cm.fault_time / l.study_count errorRate, cm.*
-                    FROM capacity_write cm,
-                         learn l,
-                         vocabulary v
-                    WHERE cm.student_id = l.student_id
-                      AND l.student_id = #{stuId}
-                      AND l.first_is_known = 1
-                      AND cm.vocabulary_id = l.vocabulary_id
-                      AND l.vocabulary_id = v.id
-                      AND v.delStatus = 1
-                    GROUP BY cm.vocabulary_id) rate
-              WHERE rate.errorRate > 0.2) cw,
-             (SELECT count(rate.errorRate) rate
-              FROM (SELECT cm.fault_time / l.study_count errorRate, cm.*
-                    FROM capacity_picture cm,
-                         learn l,
-                         vocabulary v
-                    WHERE cm.student_id = l.student_id
-                      AND l.student_id = #{stuId}
-                      AND l.first_is_known = 1
-                      AND cm.vocabulary_id = l.vocabulary_id
-                      AND l.vocabulary_id = v.id
-                      AND v.delStatus = 1
-                    GROUP BY cm.vocabulary_id) rate
-              WHERE rate.errorRate > 0.2) cp,
-             (SELECT count(rate.errorRate) rate
-              FROM (SELECT cm.fault_time / l.study_count errorRate, cm.*
-                    FROM sentence_listen cm,
-                         learn l
-                    WHERE cm.student_id = l.student_id
-                      AND l.student_id = #{stuId}
-                      AND l.first_is_known = 1
-                      AND cm.vocabulary_id = l.example_id
-                    GROUP BY cm.vocabulary_id) rate
-              WHERE rate.errorRate > 0.2) sl,
-             (SELECT count(rate.errorRate) rate
-              FROM (SELECT cm.fault_time / l.study_count errorRate, cm.*
-                    FROM sentence_translate cm,
-                         learn l
-                    WHERE cm.student_id = l.student_id
-                      AND l.student_id = #{stuId}
-                      AND l.first_is_known = 1
-                      AND cm.vocabulary_id = l.example_id
-                    GROUP BY cm.vocabulary_id) rate
-              WHERE rate.errorRate > 0.2) st,
-             (SELECT count(rate.errorRate) rate
-              FROM (SELECT cm.fault_time / l.study_count errorRate, cm.*
-                    FROM sentence_write cm,
-                         learn l
-                    WHERE cm.student_id = l.student_id
-                      AND l.student_id = #{stuId}
-                      AND l.first_is_known = 1
-                      AND cm.vocabulary_id = l.example_id
-                    GROUP BY cm.vocabulary_id) rate
-              WHERE rate.errorRate > 0.2) sw
-    </select>
-    <select id="selectCompleteUnitRate" resultType="java.lang.Double" parameterType="map">
-        SELECT lt.t / vt.t
-        FROM (SELECT learned.c / total.c t
-              FROM (
-#                    学生已完成单元数
-                       SELECT count(DISTINCT unit_id) c
-                       FROM test_record
-                       WHERE student_id = #{stuId}
-                         AND study_model = '单元闯关测试') learned,
-                   (
-#                    学生总单元数
-                       SELECT count(id) c FROM student_unit WHERE student_id = #{stuId} and type = 1) total) lt,
-             (
-#              有效学习总次数(有效学习总次数为产生有效时长的登录次数)
-                 SELECT count(d.vt) t
-                 FROM (SELECT sum(valid_time) vt FROM duration WHERE student_id = #{stuId} GROUP BY login_time) d
-                 WHERE d.vt &gt; 0) vt
-    </select>
-    <select id="selectTestErrorRate" resultType="java.lang.Double" parameterType="map">
-        SELECT sum(error_count) / (sum(error_count) + SUM(right_count))
-        FROM test_record
-        WHERE student_id = #{stuId}
-    </select>
     <select id="learnCourseCountSentence" parameterType="map" resultType="java.lang.Integer">
         SELECT count(id) from learn where course_id = #{courseId} AND student_id = #{studentId}
         <include refid="study_model_sql"/>
@@ -1232,6 +1031,13 @@
         where unit_id = #{unitId}
           and student_id = #{studentId}
           and study_model = #{studyModel}
+    </update>
+    <update id="updateSyntaxToLearnedByCourseId" parameterType="map">
+        update learn
+        set type = 2
+        where student_id = #{studentId}
+          and course_id = #{courseId}
+          and study_model like '%语法'
     </update>
     <select id="selByStudentIdAndCourseIdDisVersion" parameterType="java.util.Map" resultType="java.lang.Long">
         select DISTINCT learn.unit_id
@@ -1391,6 +1197,53 @@
           and study_model like '音标%'
           and to_days(learn_time) = to_days(now())
     </select>
+    <select id="countSyntax" resultType="java.lang.Integer" parameterType="map">
+        select count(DISTINCT topic.knowledge_point_id)
+        from learn lea
+                 join syntax_topic topic
+                      on topic.id = lea.vocabulary_id
+        where student_id = #{studentId}
+          and study_model like '%语法'
+          and to_days(learn_time) = to_days(now())
 
+    </select>
+    <select id="countLearnedSyntax" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from learn l
+        where student_id = #{studentId}
+          and unit_id = #{unitId}
+          and study_model = #{studyModel}
+          and type = 1
+    </select>
+    <select id="selectLearnedSyntaxByUnitIdAndStudyModelAndWordId"
+            resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from learn
+        where student_id = #{learn.studentId}
+        and unit_id = #{learn.unitId}
+        and vocabulary_id = #{learn.vocabularyId}
+        and study_model = #{learn.studyModel}
+        and type = 1
+        limit 1
+    </select>
+    <select id="selectSyntaxByUnitIdAndStudyModel" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from learn
+        where student_id = #{studentStudySyntax.studentId}
+        and unit_id = #{studentStudySyntax.unitId}
+        and study_model = #{studentStudySyntax.model}
+        and type = 1
+    </select>
+
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from learn where student_id in
+        (
+        <foreach collection="studentIds" item="studentId" separator=",">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 
 </mapper>

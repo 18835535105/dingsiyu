@@ -1,18 +1,8 @@
 package com.zhidejiaoyu.student.timingtask.service;
 
 /**
- * <b>定时任务相关业务</b><br>
- * <p>学生升级，每年8月25日 23:59:59 分学生由低年级升至高年级</p>
- * <p>每日 23:59:59 对距离有效期还剩3天的学生进行消息提醒</p>
- * <p>每日 00:10:00 更新提醒消息中学生账号到期提醒</p>
- * <p>每天早上 01:00:00 更新日奖励</p>
- *
- * <br><b>排行榜相关定时任务</b>
- * <ul>
- * <li>全校日排行，每日 00:30:00 更新学生全校日排行记录</li>
- * <li>全国、全校周排行，每周一 00:30:00 更新学生全国周排行记录、全校周排行记录，周日 23:50:00 统计学生本周排行名次变化</li>
- * <li>全校月排行，每月1号 00:30:00 更新学生全校月排行记录，每月最后一天 23:45:00 统计学生本月排行名次变化</li>
- * </ul>
+ * <br>
+ * <a href="https://www.showdoc.cc/65694455382333?page_id=2858504713316437">定时任务说明文档</a>
  *
  * @author wuchenxi
  * @date 2018/5/22 16:25
@@ -54,27 +44,9 @@ public interface QuartzService {
      */
     void deleteSessionMap();
 
-    /**
-     * 每天早上00:00更新日奖励
-     */
-    void deleteDailyAward();
-
-
-     void deleteDrawRedis();
+    void deleteDrawRedis();
 
     void updateStudentExpansion();
-
-    /**
-     * 初始化排行缓存信息
-     */
-    void initRankCaches();
-
-    /**
-     * 初始化所有指定学生排行缓存信息
-     *
-     * @return
-     */
-    void initRankCache(Long studentId);
 
     /**
      * 每周一 00：05 删除所有学生定位信息
@@ -82,4 +54,15 @@ public interface QuartzService {
      * @return
      */
     void deleteStudentLocation();
+
+    void deleteExperienceAccount();
+
+    void saveRecycleBin();
+
+    /**
+     * 将招生账号置为过期状态，一次性任务
+     *
+     * @return
+     */
+    void updateWelfareAccountToOutOfDate();
 }

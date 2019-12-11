@@ -75,6 +75,71 @@ public class RankOpt {
     }
 
     /**
+     * 删除金币排行信息
+     *
+     * @param student
+     */
+    public void deleteGoldRank(Student student) {
+        try {
+            //删除学生金币信息
+            redisTemplate.opsForZSet().remove(RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
+            redisTemplate.opsForZSet().remove(RankKeysConst.SCHOOL_GOLD_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId());
+            redisTemplate.opsForZSet().remove(RankKeysConst.COUNTRY_GOLD_RANK, student.getId());
+        } catch (Exception e) {
+            log.error("修改 redis 排行中的金币排行信息失败！[{} - {} - {}]", student.getId(), student.getAccount(), student.getStudentName(), e);
+        }
+    }
+
+    /**
+     * 删除膜拜排行信息
+     *
+     * @param student
+     */
+    public void deleteWorshipRank(Student student) {
+        try {
+            //删除学生膜拜信息
+            redisTemplate.opsForZSet().remove(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
+            redisTemplate.opsForZSet().remove(RankKeysConst.SCHOOL_WORSHIP_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId());
+            redisTemplate.opsForZSet().remove(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId());
+        } catch (Exception e) {
+            log.error("修改 redis 排行中的金币排行信息失败！[{} - {} - {}]", student.getId(), student.getAccount(), student.getStudentName(), e);
+        }
+    }
+
+    /**
+     * 删除勋章排行信息
+     *
+     * @param student
+     */
+    public void deleteMedalRank(Student student) {
+        try {
+            //删除学生勋章信息
+            redisTemplate.opsForZSet().remove(RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
+            redisTemplate.opsForZSet().remove(RankKeysConst.SCHOOL_MEDAL_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId());
+            redisTemplate.opsForZSet().remove(RankKeysConst.COUNTRY_MEDAL_RANK, student.getId());
+        } catch (Exception e) {
+            log.error("修改 redis 排行中的金币排行信息失败！[{} - {} - {}]", student.getId(), student.getAccount(), student.getStudentName(), e);
+        }
+    }
+
+    /**
+     * 删除勋章证书信息
+     *
+     * @param student
+     */
+    public void deleteCcieRank(Student student) {
+        try {
+            //删除学生证书信息
+            redisTemplate.opsForZSet().remove(RankKeysConst.CLASS_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
+            redisTemplate.opsForZSet().remove(RankKeysConst.SCHOOL_CCIE_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId());
+            redisTemplate.opsForZSet().remove(RankKeysConst.COUNTRY_CCIE_RANK, student.getId());
+        } catch (Exception e) {
+            log.error("修改 redis 排行中的金币排行信息失败！[{} - {} - {}]", student.getId(), student.getAccount(), student.getStudentName(), e);
+        }
+    }
+
+
+    /**
      * 修改证书排行信息
      *
      * @param student
@@ -169,7 +234,7 @@ public class RankOpt {
      *
      * @param key
      * @param member
-     * @return  获取的排名从 1 开始
+     * @return 获取的排名从 1 开始
      */
     public long getRank(String key, Long member) {
         Long rank = redisTemplate.opsForZSet().reverseRank(key, member);

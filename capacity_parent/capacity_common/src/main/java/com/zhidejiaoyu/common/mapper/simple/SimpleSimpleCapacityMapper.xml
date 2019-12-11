@@ -170,4 +170,11 @@
 		  and vocabulary_id = #{vocabularyId}
 		  and type = #{type}
 	</select>
+	<delete id="deleteByStudentIds" parameterType="map">
+		delete from simple_capacity where student_id in (
+		<foreach collection="studentIds" separator="," item="studentId">
+			#{studentId}
+		</foreach>
+		)
+	</delete>
 </mapper>
