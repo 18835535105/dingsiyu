@@ -72,14 +72,6 @@ public interface PersonalCentreService extends BaseService<Student> {
 	 */
 	ServerResponse updateCcie(HttpSession session);
 
-	/**
-	 * 获取当前学生所在班级最新获取勋章的学生信息
-	 *
-	 * @param session
-	 * @return
-	 */
-	ServerResponse<Object> getMedalInClass(HttpSession session);
-
     Object getLucky(Integer studentId,HttpSession session);
 
     ServerResponse<Object> needViewCount(HttpSession session);

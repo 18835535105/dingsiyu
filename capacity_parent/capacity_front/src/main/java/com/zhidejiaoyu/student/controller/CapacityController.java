@@ -25,9 +25,6 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/capacity")
 public class CapacityController extends BaseController {
 
-    @Value("${domain}")
-    private String domain;
-
     @Autowired
     private CapacityService capacityService;
 

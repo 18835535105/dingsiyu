@@ -131,7 +131,6 @@ server:
   port: 8083
 
 ip: 192.168.0.2
-domain: http://localhost:8083
 adminDomin: http://localhost:9999
 
 mybatis-plus:
@@ -168,7 +167,7 @@ quartz:
 spring:
   profiles: test
   datasource:
-    url: jdbc:mysql://192.168.0.2:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://${ip}:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: zdjy
     password: zdjy
   redis:
@@ -179,8 +178,6 @@ logging:
   config: classpath:logback-test.xml
 
 ip: 192.168.0.2
-domain: http://localhost:8082
-url: https://capacity.test
 adminDomin: http://192.168.0.2:9999/dept
 
 cross:
@@ -214,7 +211,6 @@ server:
 #  config: classpath:logback-prd.xml
 
 ip: 39.106.181.151
-domain: https://www.yydz100.cn
 adminDomin: https://admin.duizhang100.cn/dept
 
 # 跨域地址

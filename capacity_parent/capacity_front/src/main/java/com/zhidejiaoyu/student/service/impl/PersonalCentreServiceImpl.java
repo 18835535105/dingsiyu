@@ -40,9 +40,6 @@ import java.util.*;
 @Transactional
 public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements PersonalCentreService {
 
-    @Value("${domain}")
-    private String domain;
-
     /**
      * 消息中心mapper接口
      */
@@ -1074,20 +1071,6 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         Long studentId = getStudentId(session);
         ccieMapper.updateReadFlag(studentId, 1);
         return ServerResponse.createBySuccess();
-    }
-
-    @Override
-    public ServerResponse<Object> getMedalInClass(HttpSession session) {
-        Student student = getStudent(session);
-
-        Map<String, Object> paramMap = new HashMap<>(16);
-        paramMap.put("studentId", student.getId());
-        paramMap.put("session", session);
-        paramMap.put("loginTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(session.getAttribute(TimeConstant.LOGIN_TIME)));
-
-        String url = domain + "/api/personal/getLatestMedalInClass?session={session}&studentId={studentId}&loginTime={loginTime}";
-        ResponseEntity<Map> entity = restTemplate.getForEntity(url, Map.class, paramMap);
-        return ServerResponse.createBySuccess(entity.getBody() == null ? null : entity.getBody().get("data"));
     }
 
     @Override
