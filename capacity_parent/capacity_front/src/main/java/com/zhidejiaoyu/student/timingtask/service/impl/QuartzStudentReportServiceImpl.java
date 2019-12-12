@@ -17,8 +17,8 @@ import com.zhidejiaoyu.common.utils.excelUtil.easyexcel.ExcelUtil;
 import com.zhidejiaoyu.common.utils.excelUtil.easyexcel.ExcelWriterFactory;
 import com.zhidejiaoyu.student.mail.Mail;
 import com.zhidejiaoyu.student.mail.service.MailService;
+import com.zhidejiaoyu.student.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.timingtask.service.QuartzStudentReportService;
-import com.zhidejiaoyu.student.utils.ServiceInfoUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class QuartzStudentReportServiceImpl implements QuartzStudentReportService {
+public class QuartzStudentReportServiceImpl implements QuartzStudentReportService, BaseQuartzService {
 
     @Value("${quartz.port}")
     private int port;
@@ -66,7 +66,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
     @Scheduled(cron = "0 0 1 * * ?")
     @Override
     public void exportStudentWithSchool() {
-        if (checkPort()) {
+        if (checkPort(port)) {
             return;
         }
         log.info("定时任务 -> 统计各校区学生登录及在线时长信息开始。。。");
@@ -102,7 +102,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
     @Transactional(rollbackFor = Exception.class)
     @Scheduled(cron = "0 15 1 * * ?")
     public void exportStudentPay() {
-        if (checkPort()) {
+        if (checkPort(port)) {
             return;
         }
         log.info("定时任务 -> 统计各校区学生充课信息开始。。。");
@@ -258,13 +258,4 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
         }
     }
 
-    /**
-     * 检查当前端口是否可以执行定时任务
-     *
-     * @return true：不可以执行；false：可执行
-     */
-    private boolean checkPort() {
-        int localPort = ServiceInfoUtil.getPort();
-        return localPort != 0 && port != localPort;
-    }
 }

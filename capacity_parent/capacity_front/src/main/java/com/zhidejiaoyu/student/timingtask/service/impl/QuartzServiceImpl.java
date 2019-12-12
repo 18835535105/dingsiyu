@@ -1,20 +1,20 @@
 package com.zhidejiaoyu.student.timingtask.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
+import com.zhidejiaoyu.common.mapper.LocationMapper;
+import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
-import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import com.zhidejiaoyu.student.common.RedisOpt;
+import com.zhidejiaoyu.student.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.timingtask.service.QuartzService;
-import com.zhidejiaoyu.student.utils.ServiceInfoUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class QuartzServiceImpl implements QuartzService {
+public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
 
     @Value("${quartz.port}")
     private int port;
@@ -145,6 +145,8 @@ public class QuartzServiceImpl implements QuartzService {
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
     @Resource
     private SimpleSimpleStudentUnitMapper simpleSimpleStudentUnitMapper;
+    @Resource
+    private RecycleBinMapper recycleBinMapper;
 
     /**
      * 每日 00:10:00 更新提醒消息中学生账号到期提醒
@@ -153,8 +155,7 @@ public class QuartzServiceImpl implements QuartzService {
 //    @Scheduled(cron = "0 10 0 * * ?")
     @Override
     public void updateNews() {
-        int localPort = ServiceInfoUtil.getPort();
-        if (port != localPort) {
+        if (checkPort(port)) {
             return;
         }
 
@@ -237,8 +238,7 @@ public class QuartzServiceImpl implements QuartzService {
     @Scheduled(cron = "0 20 0 * * ?")
     @Override
     public void updateEnergy() {
-        int localPort = ServiceInfoUtil.getPort();
-        if (port != localPort) {
+        if (checkPort(port)) {
             return;
         }
         log.info("定时任务 -> 能量清零...");
@@ -253,8 +253,7 @@ public class QuartzServiceImpl implements QuartzService {
     @Scheduled(cron = "0 30 0 * * ?")
     @Override
     public void updateFrozen() {
-        int localPort = ServiceInfoUtil.getPort();
-        if (port != localPort) {
+        if (checkPort(port)) {
             return;
         }
         log.info("定时任务 -> 给每个冻结用户增加一天...");
@@ -273,8 +272,7 @@ public class QuartzServiceImpl implements QuartzService {
     @Scheduled(cron = "0 5 0 1 * ? ")
     @Override
     public void updateClassMonthRank() {
-        int localPort = ServiceInfoUtil.getPort();
-        if (port != localPort) {
+        if (checkPort(port)) {
             return;
         }
         // 班级与学生对应关系
@@ -359,72 +357,9 @@ public class QuartzServiceImpl implements QuartzService {
     }
 
     @Override
-    public void initRankCaches() {
-        List<Student> students = studentMapper.selectHasRank();
-        initCache(students);
-    }
-
-    private void initCache(List<Student> students) {
-        String strCount = "count";
-        // 各个学生被膜拜的次数
-        Map<Long, Map<Long, Long>> byWorshipCount = simpleWorshipMapper.countWorshipWithStudents(students);
-        // 各个学生获取的勋章个数
-        Map<Long, Map<Long, Long>> medalCount = awardMapper.countGetModelByStudents(students);
-        // 各个学生获取的证书个数
-        Map<Long, Map<Long, Long>> ccieCount = ccieMapper.countCcieByStudents(students);
-        students.forEach(student -> {
-            Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
-
-            double goldCount = BigDecimalUtil.add(student.getOfflineGold(), student.getSystemGold());
-            rankOpt.addOrUpdate(RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), goldCount);
-            rankOpt.addOrUpdate(RankKeysConst.SCHOOL_GOLD_RANK + schoolAdminId, student.getId(), goldCount);
-            rankOpt.addOrUpdate(RankKeysConst.COUNTRY_GOLD_RANK, student.getId(), goldCount);
-            log.info("学生[{} - {} - {}] 金币数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), goldCount);
-
-            Long count = 0L;
-            if (ccieCount.get(student.getId()) != null && ccieCount.get(student.getId()).get(strCount) != null) {
-                count = ccieCount.get(student.getId()).get(strCount);
-            }
-            rankOpt.addOrUpdate(RankKeysConst.CLASS_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
-            rankOpt.addOrUpdate(RankKeysConst.SCHOOL_CCIE_RANK + schoolAdminId, student.getId(), count * 1.0);
-            rankOpt.addOrUpdate(RankKeysConst.COUNTRY_CCIE_RANK, student.getId(), count * 1.0);
-            log.info("学生[{} - {} - {}] 证书个数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
-
-            count = 0L;
-            if (medalCount.get(student.getId()) != null && medalCount.get(student.getId()).get(strCount) != null) {
-                count = medalCount.get(student.getId()).get(strCount);
-            }
-            rankOpt.addOrUpdate(RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
-            rankOpt.addOrUpdate(RankKeysConst.SCHOOL_MEDAL_RANK + schoolAdminId, student.getId(), count * 1.0);
-            rankOpt.addOrUpdate(RankKeysConst.COUNTRY_MEDAL_RANK, student.getId(), count * 1.0);
-            log.info("学生[{} - {} - {}] 勋章个数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
-
-            count = 0L;
-            if (byWorshipCount.get(student.getId()) != null && byWorshipCount.get(student.getId()).get(strCount) != null) {
-                count = byWorshipCount.get(student.getId()).get(strCount);
-            }
-            rankOpt.addOrUpdate(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
-            rankOpt.addOrUpdate(RankKeysConst.SCHOOL_WORSHIP_RANK + schoolAdminId, student.getId(), count * 1.0);
-            rankOpt.addOrUpdate(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId(), count * 1.0);
-            log.info("学生[{} - {} - {}] 被膜拜次数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
-
-        });
-    }
-
-    @Override
-    public void initRankCache(Long studentId) {
-        Student student = studentMapper.selectById(studentId);
-        List<Student> students = new ArrayList<>();
-        students.add(student);
-        initCache(students);
-    }
-
-    @Override
     @Scheduled(cron = "0 5 0 * * 1")
     public void deleteStudentLocation() {
-        int localPort = ServiceInfoUtil.getPort();
-        if (port != localPort) {
-            ServerResponse.createBySuccess();
+        if (checkPort(port)) {
             return;
         }
         log.info("开始清除学生定位信息...");
@@ -436,33 +371,99 @@ public class QuartzServiceImpl implements QuartzService {
      * 每天清楚体验账号到期60天的账号
      */
     @Override
+    @Scheduled(cron = "0 15 2 * * ?")
     public void deleteExperienceAccount() {
+        if (checkPort(port)) {
+            return;
+        }
+        log.info("定时任务 -> 删除回收站中到期60天的学生信息开始.");
         //获取删除日期之前的学生
         Date date = DateTime.now().minusDays(60).toDate();
-        //查看到期学生的id
-        List<Student> students = studentMapper.selectExpireExperienceAccount(date);
-        if (students.size() > 0) {
-            //根据学生id清楚学习信息
-            for (Student stu : students) {
-                rankOpt.optGoldRank(stu);
-            }
+        //回收站超过60天的学生数据
+        List<Long> ids = recycleBinMapper.selectDeleteStudentIdByDate(date);
+        if (ids.size() > 0) {
+            //查询要删除的学生数据
+            List<Student> students = studentMapper.selectDeleteAccount(ids);
             //获取所有的学生id
             List<Long> studentIds = new ArrayList<>();
-            students.forEach(stu -> studentIds.add(stu.getId()));
+            List<String> accountList = new ArrayList<>();
+            students.forEach(stu -> {
+                        studentIds.add(stu.getId());
+                        accountList.add(stu.getAccount());
+                    }
+            );
             if (studentIds.size() > 0) {
                 simpleStudentUnitMapper.deleteByStudentIds(students);
                 // 删除跟学生相关的挑战
                 gauntletMapper.deleteByChallengerStudentIdsOrBeChallengerStudentIds(studentIds);
-                // 重置学习历程数据
-                redisTemplate.opsForHash().delete(RedisKeysConst.STUDENT_LOGINOUT_TIME, studentIds);
                 // 删除学生勋章、奖励
                 awardMapper.deleteByStudentIds(studentIds);
-
+                recycleBinMapper.deleteByStudentIds(studentIds);
                 this.resetRecord(studentIds);
                 studentMapper.deleteByIds(studentIds);
+                RunLog runLog = new RunLog();
+                runLog.setType(3);
+                runLog.setOperateUserId(1L);
+                runLog.setLogContent("时间:" + date + "删除回收站超过60天的学生:" + accountList.toString());
+                runLogMapper.insert(runLog);
             }
         }
+        log.info("定时任务 -> 删除回收站中到期60天的学生信息完成.");
+    }
 
+
+    @Override
+    @Scheduled(cron = "0 15 1 * * ?")
+    public void saveRecycleBin() {
+        if (checkPort(port)) {
+            return;
+        }
+        log.info("定时任务 -> 将到期的体验账号放入回收站中开始.");
+        //查询到期的体验账号
+        List<Student> students = studentMapper.selectExperienceAccount();
+        Date date = new Date();
+        if (students.size() > 0) {
+            List<RecycleBin> saveList = new ArrayList<>();
+            students.forEach(student -> {
+                RecycleBin bin = new RecycleBin();
+                bin.setCreateTime(date);
+                bin.setDelStatus(1);
+                bin.setOperateUserId(1L);
+                bin.setOperateUserName("管理员");
+                bin.setStudentId(student.getId());
+                saveList.add(bin);
+
+                // 清除学生排行缓存
+                rankOpt.deleteGoldRank(student);
+                rankOpt.deleteCcieRank(student);
+                rankOpt.deleteMedalRank(student);
+                rankOpt.deleteWorshipRank(student);
+            });
+            recycleBinMapper.insertByList(saveList);
+            studentMapper.updateStatus(students);
+
+        }
+        log.info("定时任务 -> 将到期的体验账号放入回收站中完成.");
+    }
+
+    @Override
+    public void updateWelfareAccountToOutOfDate() {
+        if (checkPort(port)) {
+            return;
+        }
+
+        log.info("定时将招生账号置为过期状态开始...");
+        List<Student> students = studentMapper.selectList(new EntityWrapper<Student>().eq("role", 4));
+
+        if (CollectionUtils.isNotEmpty(students)) {
+            String accountTime = DateUtil.DateTime();
+            students.forEach(student -> {
+                student.setAccount(accountTime);
+                log.info("学生[{} - {} - {}]有效期置为过期状态！", student.getId(), student.getAccount(), student.getStudentName());
+                studentMapper.updateById(student);
+            });
+        }
+        log.info("定时将招生账号置为过期状态完成...");
     }
 
     /**
@@ -656,8 +657,7 @@ public class QuartzServiceImpl implements QuartzService {
     @Scheduled(cron = "0 30 0 * * ?")
     @Override
     public void updateRank() {
-        int localPort = ServiceInfoUtil.getPort();
-        if (port != localPort) {
+        if (checkPort(port)) {
             return;
         }
         log.info("定时任务 -> 更新学生全校日排行记录 开始执行...");
@@ -905,8 +905,7 @@ public class QuartzServiceImpl implements QuartzService {
     @Override
     @Scheduled(cron = "0 0 2 * * ? ")
     public void deleteSessionMap() {
-        int localPort = ServiceInfoUtil.getPort();
-        if (port != localPort) {
+        if (checkPort(port)) {
             return;
         }
         log.info("定时清除 sessionMap 开始");
@@ -930,22 +929,9 @@ public class QuartzServiceImpl implements QuartzService {
 
 
     @Override
-    @Scheduled(cron = "0 0 0 * * ? ")
-    public void deleteDailyAward() {
-        int localPort = ServiceInfoUtil.getPort();
-        if (port != localPort) {
-            return;
-        }
-        log.info("定时删除日奖励信息开始");
-        simpleAwardMapper.deleteDailyAward();
-        log.info("定时删除日奖励信息结束");
-    }
-
-    @Override
     @Scheduled(cron = "0 10 0 * * ? ")
     public void deleteDrawRedis() {
-        int localPort = ServiceInfoUtil.getPort();
-        if (port != localPort) {
+        if (checkPort(port)) {
             return;
         }
         redisOpt.delDrawRecord();

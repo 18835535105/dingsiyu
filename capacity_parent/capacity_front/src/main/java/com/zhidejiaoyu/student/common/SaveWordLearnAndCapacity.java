@@ -3,8 +3,8 @@ package com.zhidejiaoyu.student.common;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
-import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
 import com.zhidejiaoyu.common.study.StudentRestudyUtil;
+import com.zhidejiaoyu.common.study.memorystrength.StudyMemoryStrength;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,13 +40,13 @@ public class SaveWordLearnAndCapacity {
     private UnitVocabularyMapper unitVocabularyMapper;
 
     @Autowired
-    private MemoryStrengthUtil memoryStrengthUtil;
-
-    @Autowired
     private CapacityPictureMapper capacityPictureMapper;
 
     @Resource
     private StudentRestudyUtil studentRestudyUtil;
+
+    @Resource
+    private StudyMemoryStrength studyMemoryStrength;
 
     /**
      * 保存指定模块的单词学习记录和慧追踪信息
@@ -130,7 +130,7 @@ public class SaveWordLearnAndCapacity {
                 capacity.setPush(push);
 
                 // 重新计算记忆强度
-                capacity.setMemoryStrength(memoryStrengthUtil.getStudyMemoryStrength(memoryStrength, true));
+                capacity.setMemoryStrength(studyMemoryStrength.getMemoryStrength(memoryStrength, true));
             } else {
                 // 错误次数在原基础上 +1
                 int afterFaultTime = capacity.getFaultTime() + 1;
@@ -144,7 +144,7 @@ public class SaveWordLearnAndCapacity {
                 capacity.setPush(push);
 
                 // 重新计算记忆强度
-                capacity.setMemoryStrength(memoryStrengthUtil.getStudyMemoryStrength(memoryStrength, false));
+                capacity.setMemoryStrength(studyMemoryStrength.getMemoryStrength(memoryStrength, false));
             }
             if (studyModel == 1) {
                 // 慧记忆

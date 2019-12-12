@@ -166,7 +166,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         return addEnergy;
     }
 
-    int getLevel(Integer myGold, List<Map<String, Object>> levels) {
+    public int getLevel(Integer myGold, List<Map<String, Object>> levels) {
         int level = 0;
         if (myGold >= 50) {
             int myRecord = 0;

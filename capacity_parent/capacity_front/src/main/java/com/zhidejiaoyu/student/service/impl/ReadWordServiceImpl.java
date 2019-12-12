@@ -13,7 +13,7 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
-import com.zhidejiaoyu.common.study.MemoryStrengthUtil;
+import com.zhidejiaoyu.common.study.memorystrength.StudyMemoryStrength;
 import com.zhidejiaoyu.common.utils.PictureUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.language.YouDaoTranslate;
@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -76,8 +77,8 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
     @Autowired
     private LearnMapper learnMapper;
 
-    @Autowired
-    private MemoryStrengthUtil memoryStrengthUtil;
+    @Resource
+    private StudyMemoryStrength studyMemoryStrength;
 
     @Autowired
     private UnitVocabularyMapper unitVocabularyMapper;
@@ -259,7 +260,7 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         Student student = super.getStudent(session);
 
         ReadWord readWord = readWordMapper.selectByStudentIdAndCourseIdAndWordId(student.getId(), dto.getCourseId(), dto.getWordId(), dto.getType());
-        Double memoryStrength = memoryStrengthUtil.getStudyMemoryStrength(readWord.getMemoryStrength(), dto.getIsKnown());
+        Double memoryStrength = studyMemoryStrength.getMemoryStrength(readWord.getMemoryStrength(), dto.getIsKnown());
         Learn learn = this.getLearnInfo(dto, student);
         if (memoryStrength == 1) {
             readWordMapper.deleteById(readWord.getId());

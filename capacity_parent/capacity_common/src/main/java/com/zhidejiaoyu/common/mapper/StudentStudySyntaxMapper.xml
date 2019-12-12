@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.StudentStudySyntaxMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentStudySyntax">
+        <id column="id" property="id"/>
+        <result column="course_id" property="courseId"/>
+        <result column="student_id" property="studentId"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="model" property="model"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="base_sql">
+        id, course_id, student_id, unit_id, model, update_time
+    </sql>
+    <sql id="sql_base_sql">
+        id, course_id courseId, student_id studentId, unit_id unitId, model
+    </sql>
+    <delete id="deleteByCourseId" parameterType="map">
+        delete
+        from student_study_syntax
+        where student_id = #{studentId}
+          and course_id = #{courseId}
+    </delete>
+    <select id="selectByStudentIdAndUnitId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from student_study_syntax
+        where student_id = #{studentId}
+        and unit_id = #{unitId}
+        limit 1
+    </select>
+    <select id="selectStudyAllByStudentId" resultType="map" parameterType="map">
+        select
+        <include refid="sql_base_sql"/>
+        from student_study_syntax
+        where student_id = #{studentId}
+        group by course_id
+    </select>
+
+</mapper>

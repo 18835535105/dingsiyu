@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.mapper;
 import com.zhidejiaoyu.common.pojo.RecycleBin;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -42,4 +43,8 @@ public interface RecycleBinMapper {
      * @return
      */
     List<RecycleBin> selectByIds(@Param("ids") Long[] ids);
+
+    List<Long> selectDeleteStudentIdByDate(@Param("date") Date date);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIds);
 }

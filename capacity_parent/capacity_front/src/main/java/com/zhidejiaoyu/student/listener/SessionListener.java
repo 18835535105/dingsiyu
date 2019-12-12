@@ -4,9 +4,9 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.RunLogMapper;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.student.login.service.LoginService;
+import com.zhidejiaoyu.student.login.service.impl.LoginServiceImpl;
 import com.zhidejiaoyu.student.utils.ServiceInfoUtil;
-import com.zhidejiaoyu.student.service.LoginService;
-import com.zhidejiaoyu.student.service.impl.LoginServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author wuchenxi
@@ -64,7 +65,9 @@ public class SessionListener implements HttpSessionListener {
         if (currentPort == Integer.valueOf(port)) {
             HttpSession session = se.getSession();
             if (checkMultipleLoginSession(session)) {
-                redisTemplate.opsForValue().set(RedisKeysConst.MULTIPLE_LOGIN_SESSION_ID + session.getId(), null);
+                String key = RedisKeysConst.MULTIPLE_LOGIN_SESSION_ID + session.getId();
+                redisTemplate.opsForValue().set(key, null);
+                redisTemplate.expire(key, 40, TimeUnit.MINUTES);
                 return;
             }
 

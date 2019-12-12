@@ -72,4 +72,20 @@
         </foreach>
         )
     </select>
+    <select id="selectDeleteStudentIdByDate" resultType="long" parameterType="map">
+        select
+        student_id
+        from recycle_bin
+        where
+        create_time &lt; #{date}
+        and del_status = 1
+    </select>
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from recycle_bin
+        where student_id in (
+        <foreach collection="studentIds" separator="," item="studentId">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 </mapper>

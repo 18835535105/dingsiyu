@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.*;
+import com.zhidejiaoyu.common.study.memorystrength.TestMemoryStrength;
 import com.zhidejiaoyu.student.service.impl.MemoryServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -40,8 +41,8 @@ public class SaveTestLearnAndCapacity {
     @Autowired
     private SentenceTranslateMapper sentenceTranslateMapper;
 
-    @Autowired
-    private MemoryStrengthUtil memoryStrengthUtil;
+    @Resource
+    private TestMemoryStrength testMemoryStrength;
 
     @Autowired
     private SentenceWriteMapper sentenceWriteMapper;
@@ -75,9 +76,6 @@ public class SaveTestLearnAndCapacity {
 
     @Autowired
     private StudentStudyPlanMapper studentStudyPlanMapper;
-
-    @Autowired
-    private StudentRestudyMapper studentRestudyMapper;
 
     @Resource
     private StudentRestudyUtil studentRestudyUtil;
@@ -218,33 +216,6 @@ public class SaveTestLearnAndCapacity {
     }
 
     /**
-     * 保存复习记录
-     *
-     * @param learn
-     * @param student
-     * @param word    单词或者句型
-     * @param type    1：单词；2：句型
-     */
-    private void saveStudentRestudy(Learn learn, Student student, String word, Integer type) {
-        StudentRestudy studentRestudy = new StudentRestudy();
-        studentRestudy.setCourseId(learn.getCourseId());
-        studentRestudy.setStudentId(student.getId());
-        studentRestudy.setType(type);
-        studentRestudy.setUnitId(learn.getUnitId());
-        studentRestudy.setUpdateTime(new Date());
-        studentRestudy.setVersion(2);
-        studentRestudy.setVocabularyId(type == 1 ? learn.getVocabularyId() : learn.getExampleId());
-        studentRestudy.setWord(word);
-        try {
-            studentRestudyMapper.insert(studentRestudy);
-        } catch (Exception e) {
-            log.error("保存学生复习记录失败，学生信息：[{}]-[{}]=[{}], learn=[{}], word=[{}]",
-                    student.getAccount(), student.getId(), student.getStudentName(), learn.toString(), word);
-        }
-    }
-
-
-    /**
      * 保存记忆追踪数据
      *
      * @param learn    学习信息
@@ -324,7 +295,7 @@ public class SaveTestLearnAndCapacity {
                 capacityPicture.setPush(push);
 
                 // 重新计算记忆强度
-                capacityPicture.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(memoryStrength, true));
+                capacityPicture.setMemoryStrength(testMemoryStrength.getMemoryStrength(memoryStrength, true));
                 capacityPictureMapper.updateByPrimaryKeySelective(capacityPicture);
                 return capacityPicture;
             } else if (classify == 1) {
@@ -338,7 +309,7 @@ public class SaveTestLearnAndCapacity {
                 capacityMemory.setPush(push);
 
                 // 重新计算记忆强度
-                capacityMemory.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(memoryStrength, true));
+                capacityMemory.setMemoryStrength(testMemoryStrength.getMemoryStrength(memoryStrength, true));
                 capacityMemoryMapper.updateByPrimaryKeySelective(capacityMemory);
                 return capacityMemory;
             } else if (classify == 2) {
@@ -352,7 +323,7 @@ public class SaveTestLearnAndCapacity {
                 capacityListen.setPush(push);
 
                 // 重新计算记忆强度
-                capacityListen.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(memoryStrength, true));
+                capacityListen.setMemoryStrength(testMemoryStrength.getMemoryStrength(memoryStrength, true));
                 capacityListenMapper.updateByPrimaryKeySelective(capacityListen);
                 return capacityListen;
             } else if (classify == 3) {
@@ -366,7 +337,7 @@ public class SaveTestLearnAndCapacity {
                 capacityWrite.setPush(push);
 
                 // 重新计算记忆强度
-                capacityWrite.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(memoryStrength, true));
+                capacityWrite.setMemoryStrength(testMemoryStrength.getMemoryStrength(memoryStrength, true));
                 capacityWriteMapper.updateByPrimaryKeySelective(capacityWrite);
                 return capacityWrite;
             } else if (classify == 4) {
@@ -380,7 +351,7 @@ public class SaveTestLearnAndCapacity {
                 sentenceListen.setPush(push);
 
                 // 重新计算记忆强度
-                sentenceListen.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(memoryStrength, true));
+                sentenceListen.setMemoryStrength(testMemoryStrength.getMemoryStrength(memoryStrength, true));
                 sentenceListenMapper.updateByPrimaryKeySelective(sentenceListen);
                 return sentenceListen;
             } else if (classify == 5) {
@@ -394,7 +365,7 @@ public class SaveTestLearnAndCapacity {
                 sentenceTranslate.setPush(push);
 
                 // 重新计算记忆强度
-                sentenceTranslate.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(memoryStrength, true));
+                sentenceTranslate.setMemoryStrength(testMemoryStrength.getMemoryStrength(memoryStrength, true));
                 sentenceTranslateMapper.updateByPrimaryKeySelective(sentenceTranslate);
                 return sentenceTranslate;
             } else if (classify == 6) {
@@ -408,7 +379,7 @@ public class SaveTestLearnAndCapacity {
                 sentenceWrite.setPush(push);
 
                 // 重新计算记忆强度
-                sentenceWrite.setMemoryStrength(memoryStrengthUtil.getTestMemoryStrength(memoryStrength, true));
+                sentenceWrite.setMemoryStrength(testMemoryStrength.getMemoryStrength(memoryStrength, true));
                 sentenceWriteMapper.updateByPrimaryKeySelective(sentenceWrite);
                 return sentenceWrite;
             }

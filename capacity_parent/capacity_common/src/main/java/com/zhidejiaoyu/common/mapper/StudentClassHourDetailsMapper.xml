@@ -7,7 +7,9 @@
         <id column="id" property="id" />
         <result column="school" property="school" />
         <result column="school_admin_id" property="schoolAdminId" />
+        <result column="admin_name" property="adminName" />
         <result column="student_id" property="studentId" />
+        <result column="student_name" property="studentName" />
         <result column="create_time" property="createTime" />
         <result column="details" property="details" />
         <result column="max_login_time" property="maxLoginTime" />

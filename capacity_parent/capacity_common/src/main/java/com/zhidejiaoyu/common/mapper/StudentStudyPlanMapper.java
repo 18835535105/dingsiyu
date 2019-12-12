@@ -20,17 +20,17 @@ import java.util.Map;
 @Repository
 public interface StudentStudyPlanMapper extends BaseMapper<StudentStudyPlan> {
 
-    List<Map<String,Object>> selByStudentId(@Param("studentId") Long studentId,@Param("type") int type);
+    List<Map<String, Object>> selTeksByStudentId(@Param("studentId") Long studentId, @Param("type") int type);
 
-    List<StudentStudyPlan> selReadCourseByStudentId(@Param("studentId")Long studentId,@Param("gradeInteger") Integer gradeInteger);
+    List<StudentStudyPlan> selReadCourseByStudentId(@Param("studentId") Long studentId, @Param("gradeInteger") Integer gradeInteger);
 
-    List<Map<String,Object>> selByStudentIdAndCourseIdAndType(@Param("studentId") Long studentId,@Param("type") int type,@Param("courseId")Long courseId);
+    List<Map<String, Object>> selByStudentIdAndCourseIdAndType(@Param("studentId") Long studentId, @Param("type") int type, @Param("courseId") Long courseId);
 
-    List<Map<String,Object>> selBySentenceStudentId(@Param("studentId") Long studentId,@Param("type") int type);
+    List<Map<String, Object>> selBySentenceStudentId(@Param("studentId") Long studentId, @Param("type") int type);
 
-    List<StudentStudyPlan> selByStudentIdAndCourseId(@Param("studentId") Long studentId,@Param("courseId") Long courseId,@Param("type") Integer type);
+    List<StudentStudyPlan> selByStudentIdAndCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId, @Param("type") Integer type);
 
-    List<StudentStudyPlan> selByStudentIdAndCourseIdAndUnitId(@Param("studentId") Long studentId,@Param("courseId") Long courseId,@Param("type") Integer type,@Param("unitId") Long unitId);
+    List<StudentStudyPlan> selByStudentIdAndCourseIdAndUnitId(@Param("studentId") Long studentId, @Param("courseId") Long courseId, @Param("type") Integer type, @Param("unitId") Long unitId);
 
     /**
      * 查询学生当前的学习计划
@@ -45,7 +45,6 @@ public interface StudentStudyPlanMapper extends BaseMapper<StudentStudyPlan> {
 
     /**
      * 查找下一个学习计划
-     *
      *
      * @param studentId
      * @param planId
@@ -78,14 +77,27 @@ public interface StudentStudyPlanMapper extends BaseMapper<StudentStudyPlan> {
 
     StudentStudyPlan selLetterStudyByStudentAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 
-    StudentStudyPlan selStudyReadPlanByStudentIdAndUnitId(@Param("studentId") Long studentId,@Param("unitId") Long unitId);
+    StudentStudyPlan selStudyReadPlanByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 
     StudentStudyPlan selByCourseIdAndUnitIdAndType(@Param("courseId") Integer courseId,
-                                                   @Param("unitId") Long unitId,@Param("type") int type,
-                                                   @Param("studentId")Long studentId);
-    StudentStudyPlan selReadByStudentId(@Param("studentId")Long studentId);
+                                                   @Param("unitId") Long unitId, @Param("type") int type,
+                                                   @Param("studentId") Long studentId);
 
-    int countByStudentId(@Param("studentId") Long studentId,@Param("type") Integer type);
+    StudentStudyPlan selReadByStudentId(@Param("studentId") Long studentId);
+
+    int countByStudentId(@Param("studentId") Long studentId, @Param("type") Integer type);
+
+    List<Map<String, Object>> selectSyntaxByStudentAndType(@Param("studentId") Long studentId);
+
+    /**
+     * 获取学生学习计划
+     *
+     * @param studentId
+     * @param courseId
+     * @param type
+     * @return
+     */
+    List<StudentStudyPlan> selectByStudentIdAndCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId, @Param("type") int type);
 
     void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

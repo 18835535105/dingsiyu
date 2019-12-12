@@ -860,7 +860,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
             int count = 0;
             Map<String, Object> map = new HashMap<>(16);
             for (Map<String, Object> stringObjectMap : courseInfo) {
-                count += Integer.valueOf(stringObjectMap.get("count").toString());
+                count += Integer.parseInt(stringObjectMap.get("count").toString());
             }
             if (flag) {
                 map.put("courseName", "全部课程");

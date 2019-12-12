@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * <br>
+ * <a href="https://www.showdoc.cc/65694455382333?page_id=2858504713316437">定时任务说明文档</a>
+ */
 @RestController
 @RequestMapping("/api/quartz")
 public class QuartzController {
@@ -22,7 +26,7 @@ public class QuartzController {
      * @return
      */
     @PostMapping("/updateNews")
-    public ServerResponse updateNews() {
+    public ServerResponse<Object> updateNews() {
         quartzService.updateNews();
         return ServerResponse.createBySuccess();
     }
@@ -33,7 +37,7 @@ public class QuartzController {
      * @return
      */
     @PostMapping("/updateEnergy")
-    public ServerResponse updateEnergy() {
+    public ServerResponse<Object> updateEnergy() {
         this.quartzService.updateEnergy();
         return ServerResponse.createBySuccess();
     }
@@ -44,7 +48,7 @@ public class QuartzController {
      * @return
      */
     @PostMapping("/updateFrozen")
-    public ServerResponse updateFrozen() {
+    public ServerResponse<Object> updateFrozen() {
         this.quartzService.updateFrozen();
         return ServerResponse.createBySuccess();
     }
@@ -76,13 +80,6 @@ public class QuartzController {
         quartzService.deleteSessionMap();
     }
 
-    /**
-     * 删除学生日奖励信息
-     */
-    @PostMapping("/deleteDailyAward")
-    public void deleteDailyAward() {
-        this.quartzService.deleteDailyAward();
-    }
 
     /**
      * 删除抽奖基数
@@ -93,34 +90,12 @@ public class QuartzController {
     }
 
     /**
-     * 初始化所有学生排行缓存信息
-     *
-     * @return
-     */
-    @GetMapping("/initRankCaches")
-    public ServerResponse initRankCaches() {
-        quartzService.initRankCaches();
-        return ServerResponse.createBySuccess();
-    }
-
-    /**
-     * 初始化所有指定学生排行缓存信息
-     *
-     * @return
-     */
-    @PostMapping("/initRankCache")
-    public ServerResponse initRankCache(Long studentId) {
-        quartzService.initRankCache(studentId);
-        return ServerResponse.createBySuccess();
-    }
-
-    /**
      * 删除所有到期60天的体验账号
      *
      * @return
      */
     @PostMapping("/deleteExperienceAccount")
-    public ServerResponse deleteExperienceAccount() {
+    public ServerResponse<Object> deleteExperienceAccount() {
         quartzService.deleteExperienceAccount();
         return ServerResponse.createBySuccess();
     }
@@ -131,8 +106,31 @@ public class QuartzController {
      * @return
      */
     @PostMapping("/deleteStudentLocation")
-    public ServerResponse deleteStudentLocation() {
+    public ServerResponse<Object> deleteStudentLocation() {
         this.quartzService.deleteStudentLocation();
         return ServerResponse.createBySuccess();
     }
+
+    /**
+     * 每天将过期的体验站好放入回收站中
+     *
+     * @return
+     */
+    @PostMapping("/saveRecycleBin")
+    public ServerResponse<Object> saveRecycleBin() {
+        this.quartzService.saveRecycleBin();
+        return ServerResponse.createBySuccess();
+    }
+
+    /**
+     * 将招生账号置为过期状态，一次性任务
+     *
+     * @return
+     */
+    @PostMapping("/updateWelfareAccountToOutOfDate")
+    public ServerResponse<Object> updateWelfareAccountToOutOfDate() {
+        this.quartzService.updateWelfareAccountToOutOfDate();
+        return ServerResponse.createBySuccess();
+    }
+
 }

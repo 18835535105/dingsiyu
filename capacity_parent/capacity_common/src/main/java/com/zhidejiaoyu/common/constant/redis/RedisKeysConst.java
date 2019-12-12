@@ -14,17 +14,6 @@ public class RedisKeysConst {
     public static final String PREFIX = "simple_student";
 
     /**
-     * 当前单元下所有单词信息
-     */
-    public static final String WORD_INFO__IN_UNIT = "word_info_in_unit:";
-
-    /**
-     * 当前学生 当前课程下 所有单元信息
-     * 数据结构hash  key - WORD_INFO_IN_STUDENT_COURSE:学生id:课程id
-     */
-    public static final String WORD_INFO_IN_STUDENT_COURSE = "unit_in_student_course:";
-
-    /**
      * 当前课程下每个单元的单词总数量
      * 数据结构hash key - WORD_COUNT_WITH_UNIT_IN_COURSE:课程id
      */
@@ -75,11 +64,6 @@ public class RedisKeysConst {
     public static final String LOGIN_SESSION = "LOGIN_SESSION";
 
     /**
-     * 奖励排行上升或者下降名次
-     */
-    public static final String SIMPLE_STUDENT_RANKING = "simple_student_ranking";
-
-    /**
      * 当前单元下所有单词信息
      */
     public static final String WORD_INFO_IN_UNIT = "WORD_INFO_IN_UNIT:";
@@ -93,12 +77,6 @@ public class RedisKeysConst {
     public static final String TEST_SUBMIT = "TEST_SUBMIT";
 
     /**
-     * 用于存储已经保存过时长信息的登录时间，防止在线时长重复保存导致在线时长比实际大问题
-     * key: SAVE_LOGIN_TIME:studentId value:保存的在线时长中的登录时间
-     */
-    public static final String SAVE_LOGIN_TIME = "SAVE_LOGIN_TIME";
-
-    /**
      * 存储音节信息
      */
     public static final String PHONETIC_SYMBOL = "PHONETIC_SYMBOL";
@@ -107,11 +85,6 @@ public class RedisKeysConst {
      * 存储学生是否是第一次登录信息
      */
     public static final String FIRST_LOGIN = "FIRST_LOGIN";
-
-    /**
-     * 记录学生登出时间
-     */
-    public static final String STUDENT_LOGINOUT_TIME = "STUDENT_LOGINOUT_TIME";
 
     /**
      * 被标记为异地登录被挤掉的 sessionId

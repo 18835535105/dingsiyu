@@ -14,6 +14,7 @@
         <result column="gold_img_url" property="goldImgUrl" jdbcType="VARCHAR"/>
         <result column="gray_img_url" property="grayImgUrl" jdbcType="VARCHAR"/>
         <result column="total_plan" property="totalPlan"/>
+        <result column="get_gif_img_url" property="getGifImgUrl"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -77,11 +78,11 @@
     </sql>
     <sql id="Base_Column_List">
         id, parent_name, next_parent, child_name, next_child,`explain`, marked_words, child_img_url,
-        parent_img_url, gold_img_url, gray_img_url, total_plan
+        parent_img_url, gold_img_url, gray_img_url, total_plan, get_gif_img_url
     </sql>
     <sql id="more_Column_List">
         m.id, m.parent_name, m.next_parent, m.child_name, m.next_child,m.`explain`, m.marked_words, m.child_img_url,
-        m.parent_img_url, m.gold_img_url, m.gray_img_url, m.total_plan
+        m.parent_img_url, m.gold_img_url, m.gray_img_url, m.total_plan, m.get_gif_img_url
     </sql>
 
 
@@ -109,17 +110,13 @@
         ORDER BY id ASC
     </select>
     <select id="countGetCountByStudentId" resultType="java.util.Map" parameterType="map">
-        SELECT
-            m.parent_name       parentName,
-            count(m.child_name) getCount
-        FROM
-            award a,
-            medal m
-        WHERE
-            a.medal_type = m.id
-            AND student_id = #{studentId}
-        GROUP BY
-            m.parent_name;
+        SELECT m.parent_name       parentName,
+               count(m.child_name) getCount
+        FROM award a,
+             medal m
+        WHERE a.medal_type = m.id
+          AND student_id = #{studentId}
+        GROUP BY m.parent_name;
     </select>
     <select id="selectChildrenIdByParentId" resultMap="BaseResultMap" parameterType="map">
         select
@@ -173,7 +170,8 @@
     </select>
     <select id="selectMedalImgUrl" resultType="java.util.Map" parameterType="map">
         select if(sum(a.get_flag) > 2, if(sum(a.get_flag) = 5, m.gold_img_url, m.gray_img_url),
-                  if(sum(a.get_flag) = 1, m.gold_img_url, m.gray_img_url)) imgUrl, m.id
+                  if(sum(a.get_flag) = 1, m.gold_img_url, m.gray_img_url)) imgUrl,
+               m.id
         from medal m,
              award a
         where a.medal_type = m.id
@@ -192,4 +190,5 @@
         )
         )
         order by id asc
-    </select></mapper>
+    </select>
+</mapper>

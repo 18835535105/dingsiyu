@@ -75,4 +75,9 @@ public class MedalAwardAsyncTest extends BaseTest {
     @Test
     public void resetLevel() {
     }
+
+    @Test
+    public void testMonsterMedal() {
+        medalAwardAsync.monsterMedal(student, 5319L);
+    }
 }

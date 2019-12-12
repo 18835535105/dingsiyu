@@ -14,7 +14,9 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -61,6 +63,9 @@ public class MedalAwardAsync extends BaseAwardAsync {
 
     @Autowired
     private StudentExpansionMapper studentExpansionMapper;
+
+    @Resource
+    private SyntaxCourseMapper syntaxCourseMapper;
 
     /**
      * 初出茅庐勋章
@@ -225,12 +230,12 @@ public class MedalAwardAsync extends BaseAwardAsync {
                     if (i < 3) {
                         if (super.checkAward(award, MEDAL_TYPE)) {
                             change = (int) (schoolDayRank - schoolRank);
-                            super.optAward(studentId, medalId, change >= 0 ? change : award.getCurrentPlan(), award, MEDAL_TYPE);
+                            super.optAward(studentId, medalId, this.getChange(award, change), award, MEDAL_TYPE);
                         }
                     } else {
                         if (super.checkAward(award, MEDAL_TYPE)) {
                             change = (int) (countryDayRank - countryRank);
-                            super.optAward(studentId, medalId, change >= 0 ? change : award.getCurrentPlan(), award, MEDAL_TYPE);
+                            super.optAward(studentId, medalId, this.getChange(award, change), award, MEDAL_TYPE);
                         }
                     }
                 }
@@ -238,6 +243,13 @@ public class MedalAwardAsync extends BaseAwardAsync {
                 log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
             }
         }
+    }
+
+    private int getChange(Award award, int change) {
+        if (change < 0) {
+            return award == null ? 0 : award.getCurrentPlan();
+        }
+        return change;
     }
 
     /**
@@ -719,5 +731,30 @@ public class MedalAwardAsync extends BaseAwardAsync {
         } catch (Exception e) {
             log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
         }
+    }
+
+    /**
+     * 保存怪物勋章
+     *
+     * @param student
+     * @param courseId
+     */
+    public void monsterMedal(Student student, Long courseId) {
+        Long studentId = student.getId();
+        SyntaxCourse syntaxCourse = syntaxCourseMapper.selectById(courseId);
+        if (syntaxCourse != null) {
+            List<Medal> medals = medalMapper.selectList(new EntityWrapper<Medal>().like("parent_name", syntaxCourse.getGrade() + syntaxCourse.getLabel()));
+            try {
+                if (!CollectionUtils.isEmpty(medals)) {
+                    Award award = awardMapper.selectByStudentIdAndMedalType(studentId, medals.get(0).getId());
+                    if (this.checkAward(award, MEDAL_TYPE)) {
+                        super.optAward(studentId, medals.get(0).getId(), 1, award, MEDAL_TYPE);
+                    }
+                }
+            } catch (Exception e) {
+                log.error(super.logErrorMsg(student, "操作勋章信息失败"), e);
+            }
+        }
+
     }
 }

@@ -154,26 +154,26 @@
 		</if>
 	</insert>
 
-	<select id="countCapacity_memory" resultType="int" parameterType="CapacityReview">
+	<select id="countCapacity_memory" resultType="int" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview">
 		<!-- 学生id , 单元id , 1...分类表 -->
 		select count(a.id) from
 		<include refid="classify_sql" /> a join vocabulary b on a.vocabulary_id = b.id
 		and a.student_id = #{student_id} and a.unit_id = #{unit_id} and a.push &lt; #{push} and a.memory_strength &lt; 1 and b.delStatus = 1
 	</select>
 
-	<resultMap id="Vocabulary_map" type="Vocabulary" >
+	<resultMap id="Vocabulary_map" type="com.zhidejiaoyu.common.pojo.Vocabulary" >
     	<result column="vocabulary_id" property="id" jdbcType="BIGINT" />
     	<result column="word" property="word" jdbcType="VARCHAR" />
     	<result column="word_chinese" property="wordChinese" jdbcType="VARCHAR" />
   	</resultMap>
 	<!-- 根据模块,学生id,单元: 查询记忆追踪 词汇 需要复习的单词 -->
-	<select id="selectCapacity" parameterType="CapacityReview" resultMap="Vocabulary_map">
+	<select id="selectCapacity" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview" resultMap="Vocabulary_map">
 		select vocabulary_id, word, word_chinese from
 		<include refid="classify_sql" />
 		where push &lt; #{push} and student_id = #{student_id} and unit_id = #{unit_id} order by push asc
 	</select>
 
-	<select id="selectMemory_strength" parameterType="CapacityReview" resultType="Double">
+	<select id="selectMemory_strength" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview" resultType="Double">
 		select memory_strength from
 		<include refid="classify_sql" />
 		where student_id = #{student_id} and word = #{word}
@@ -182,7 +182,7 @@
 			</if>
 	</select>
 
-	<update id="updateMemory_strength" parameterType="CapacityReview">
+	<update id="updateMemory_strength" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview">
 		update <include refid="classify_sql" />
 		 set memory_strength = #{memory_strength}
 		 where student_id = #{student_id} and word = #{word}
@@ -192,7 +192,7 @@
 	</update>
 
 	<!-- 智能复习单词,翻译 -->
-	<select id="ReviewCapacity_memory" parameterType="CapacityReview" resultType="CapacityReview">
+	<select id="ReviewCapacity_memory" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview" resultType="com.zhidejiaoyu.common.pojo.CapacityReview">
 	select a.vocabulary_id, a.word, a.word_chinese , a.memory_strength , a.fault_time, a.syllable, a.unit_id
 	from
 	<include refid="classify_sql" /> a join vocabulary b on a.vocabulary_id = b.id
@@ -210,7 +210,7 @@
 </select>
 
 	<!-- 修改黄金记忆时间 -->
-	<update id="updatePush" parameterType="CapacityReview">
+	<update id="updatePush" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview">
 		update
 		<include refid="classify_sql" />
 		set
@@ -223,7 +223,7 @@
 	</update>
 
 	<!-- 修改学习信息表 -->
-	<update id="updateLearn" parameterType="CapacityReview">
+	<update id="updateLearn" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview">
 		update learn
 			set study_count = study_count + 1
 		where
@@ -261,7 +261,7 @@
 	</update>
 
 	<!-- 成为熟词 -->
-	<update id="updateLearnStudy_count" parameterType="CapacityReview">
+	<update id="updateLearnStudy_count" parameterType="com.zhidejiaoyu.common.pojo.CapacityReview">
 		update learn
 			set study_count = study_count + 1 , status = 1
 		where
@@ -307,7 +307,7 @@
 		)
 	</update>
 
-	<resultMap id="fiveDimensionTest_Map" type="Vocabulary">
+	<resultMap id="fiveDimensionTest_Map" type="com.zhidejiaoyu.common.pojo.Vocabulary">
 		<id column="id" property="id"/>
 		<result column="word" property="word"/>
 		<result column="word_chinese" property="wordChinese"/>

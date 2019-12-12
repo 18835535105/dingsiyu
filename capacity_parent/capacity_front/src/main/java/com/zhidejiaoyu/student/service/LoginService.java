@@ -36,31 +36,6 @@ public interface LoginService extends BaseService<Student> {
      */
     ServerResponse<Object> clickPortrait(HttpSession session, Integer type);
 
-    /**
-     * 登录
-     *
-     * @param account
-     * @param password
-     * @param session
-     * @param request
-     * @return
-     */
-    ServerResponse loginJudge(String account, String password, HttpSession session, HttpServletRequest request, String code);
-
-    /**
-     * 退出登录
-     *
-     * @param session
-     * @param request
-     */
-    void loginOut(HttpSession session, HttpServletRequest request);
-
-    /**
-     * session过期和系统重启时保存学生时长相关信息
-     *
-     * @param sessionMap
-     */
-    void saveDurationInfo(Map<String, Object> sessionMap);
 
     void getValidateCode(HttpSession session, HttpServletResponse response) throws IOException;
 
@@ -68,5 +43,4 @@ public interface LoginService extends BaseService<Student> {
 
     Object getModelStatus(HttpSession session, Integer type);
 
-    Object isLoginOut(HttpSession session, String teacherAccount);
 }
