@@ -131,7 +131,9 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
                 Collections.shuffle(syntaxTopicsTmp);
                 syntaxTopicsTmp.stream()
                         .filter(syntaxTopic1 -> !syntaxTopic1.getAnswer().equalsIgnoreCase(syntaxTopic.getAnswer())
-                                && !sb.toString().contains(syntaxTopic1.getAnswer()))
+                                && !sb.toString().contains(syntaxTopic1.getAnswer())
+                                // 防止取出题目相同但答案不同的选项
+                                && !syntaxTopic1.getTopic().equalsIgnoreCase(syntaxTopic.getTopic()))
                         .limit(optionCount - length)
                         .forEach(syntaxTopic1 -> sb.append("$&$").append(syntaxTopic1.getAnswer()));
                 return syntaxTopic.setOption(sb.toString());
