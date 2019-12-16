@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.mapper.simple;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.zhidejiaoyu.common.Vo.simple.AwardVo;
+import com.zhidejiaoyu.common.vo.simple.AwardVo;
 import com.zhidejiaoyu.common.pojo.Award;
 import com.zhidejiaoyu.common.pojo.AwardExample;
 import com.zhidejiaoyu.common.pojo.Medal;

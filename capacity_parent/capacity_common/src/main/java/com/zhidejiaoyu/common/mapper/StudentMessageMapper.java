@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.zhidejiaoyu.common.Vo.studentMessage.StudentMessageListVo;
+import com.zhidejiaoyu.common.vo.studentMessage.StudentMessageListVo;
 import com.zhidejiaoyu.common.pojo.StudentMessage;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;

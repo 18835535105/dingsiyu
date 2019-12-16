@@ -21,7 +21,7 @@
 		id, student_id, course_id, unit_id, vocabulary_id, word, word_chinese, fault_time, push, memory_strength, type
 	</sql>
 
-    <select id="getSimpleWhetherFeview" parameterType="map" resultType="com.zhidejiaoyu.common.Vo.simple.SimpleCapacityVo">
+    <select id="getSimpleWhetherFeview" parameterType="map" resultType="com.zhidejiaoyu.common.vo.simple.SimpleCapacityVo">
     	SELECT
 			a.student_id,
 			a.unit_id,
@@ -144,7 +144,7 @@
 		  and sc.push &lt;= now()
 		  and sc.memory_strength &lt; 1
 	</select>
-    <select id="selectByCourseId" resultType="com.zhidejiaoyu.common.Vo.simple.capacityVo.CapacityListVo" parameterType="map">
+    <select id="selectByCourseId" resultType="com.zhidejiaoyu.common.vo.simple.capacityVo.CapacityListVo" parameterType="map">
         select v.sound_mark            soundMark,
                sc.word readUrl,
                sc.word                 content,

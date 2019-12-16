@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.utils.dateUtlis;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -42,7 +43,7 @@ public class DateUtil implements Serializable {
     }
 
     public static String formatDate(Date date, String format) {
-         return new SimpleDateFormat(format).format(date);
+        return new SimpleDateFormat(format).format(date);
     }
 
     public static Date parse(String dateStr, String format) {
@@ -55,9 +56,7 @@ public class DateUtil implements Serializable {
     }
 
     /**
-     *
      * @param date
-     *
      * @return yyyy
      */
     public static String strDateYYYY(Date date) {
@@ -102,6 +101,7 @@ public class DateUtil implements Serializable {
 
     /**
      * 将时间戳转化为没有毫秒值得时间
+     *
      * @param date
      * @return
      */
@@ -119,8 +119,9 @@ public class DateUtil implements Serializable {
 
     /**
      * 将日期字符串格式化为 YYYYMMDDHHMMSS 格式
+     *
      * @param dateStr
-     * @return  dateStr is empty -> return null
+     * @return dateStr is empty -> return null
      */
     public static Date parseYYYYMMDDHHMMSS(String dateStr) {
         if (!StringUtils.isEmpty(dateStr)) {
@@ -430,4 +431,29 @@ public class DateUtil implements Serializable {
         return Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant());
 
     }
+
+    /**
+     * hours 小时前的时间
+     *
+     * @param hours
+     * @return
+     */
+    public static String beforeHoursTime(Integer hours) {
+        return formatYYYYMMDDHHMMSS(new DateTime().minusHours(hours).toDate());
+    }
+
+    /**
+     * 获取几周之前的日期
+     *
+     * @return
+     */
+    public static Date getBeforeWeekDate(Date date, int week) {
+        return new DateTime(date).minusWeeks(week).toDate();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(beforeHoursTime(1));
+    }
+
+
 }

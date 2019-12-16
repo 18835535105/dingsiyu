@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.utils.page;
 
 import com.github.pagehelper.PageInfo;
-import com.zhidejiaoyu.common.utils.HttpUtil;
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;

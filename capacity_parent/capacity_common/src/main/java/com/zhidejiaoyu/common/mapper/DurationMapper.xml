@@ -261,7 +261,7 @@
             login_time;
 
     </select>
-    <select id="planSeniority" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+    <select id="planSeniority" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
         <!--
         select a.student_id, SUM(a.valid_time) AS learnDate from (select student_id, course_id, SUM(valid_time) AS valid_time FROM duration GROUP BY student_id, course_id) a JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
         AND b.area = #{area} AND b.school_name = #{school_name} AND b.grade = #{grade} AND b.squad = #{squad}  &#45;&#45; AND b.id = 3169
@@ -298,7 +298,7 @@
         ORDER BY
         learnDate DESC
     </select>
-    <select id="planSenioritySchool" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+    <select id="planSenioritySchool" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
         <!--
         select a.student_id, SUM(a.valid_time) AS learnDate from (select student_id, course_id, SUM(valid_time) AS valid_time FROM duration GROUP BY student_id, course_id) a JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
         AND b.area = #{area} AND b.school_name = #{school_name}  &#45;&#45; AND b.id = 3169
@@ -336,7 +336,7 @@
         learnDate DESC
         LIMIT 50;
     </select>
-    <select id="planSeniorityNationwide" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+    <select id="planSeniorityNationwide" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
         <!--
         select a.student_id, SUM(a.valid_time) AS learnDate from (select student_id, course_id, SUM(valid_time) AS valid_time FROM duration GROUP BY student_id, course_id) a JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
         AND c.study_paragraph = #{study_paragraph} AND c.version = #{version} GROUP BY a.student_id ORDER BY learnDate <if test="haveTime == 1">ASC</if> <if test="haveTime == 2">DESC</if> LIMIT 50;
@@ -450,7 +450,7 @@
     </select>
 
     <select id="selectExportStudentOnlineTimeWithSchoolDetail"
-            resultType="com.zhidejiaoyu.common.Vo.student.studentinfowithschool.StudentInfoSchoolDetail"
+            resultType="com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolDetail"
             parameterType="map">
         select t.school                                schoolName,
                s.account,

@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.common.mapper.simple;
 
-import com.zhidejiaoyu.common.Vo.SeniorityVo;
+import com.zhidejiaoyu.common.vo.SeniorityVo;
 import com.zhidejiaoyu.common.pojo.Course;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentUnit;

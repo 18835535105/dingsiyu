@@ -1,13 +1,12 @@
 package com.zhidejiaoyu.student.common;
 
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
-import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.*;
 import com.zhidejiaoyu.common.study.memorystrength.TestMemoryStrength;
-import com.zhidejiaoyu.student.service.impl.MemoryServiceImpl;
+import com.zhidejiaoyu.student.business.service.impl.MemoryServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

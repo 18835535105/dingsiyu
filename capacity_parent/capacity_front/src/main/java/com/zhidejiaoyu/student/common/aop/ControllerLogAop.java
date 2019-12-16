@@ -2,7 +2,7 @@ package com.zhidejiaoyu.student.common.aop;
 
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.utils.HttpUtil;
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;

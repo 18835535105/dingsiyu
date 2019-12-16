@@ -844,7 +844,7 @@
             "词组默写"
         </if>
     </sql>
-    <select id="showWordSimple" parameterType="map" resultType="com.zhidejiaoyu.common.Vo.simple.SimpleCapacityVo">
+    <select id="showWordSimple" parameterType="map" resultType="com.zhidejiaoyu.common.vo.simple.SimpleCapacityVo">
         select
         uv.unit_id,
         v.id,
@@ -901,7 +901,7 @@
         </if>
     </select>
 
-    <select id="selectBookVoByCourseId" resultType="com.zhidejiaoyu.common.Vo.bookVo.BookVo" parameterType="map">
+    <select id="selectBookVoByCourseId" resultType="com.zhidejiaoyu.common.vo.bookVo.BookVo" parameterType="map">
         SELECT distinct v.id,
                         if(uv.word_chinese is null or uv.word_chinese = '', v.word_chinese, uv.word_chinese) chinese,
                         if(v.syllable is null or v.syllable = '', v.word, v.syllable)                        content,
@@ -916,7 +916,7 @@
           AND u.course_id = #{courseId}
     </select>
 
-    <select id="selectUnknownWordBookVoByCourseId" resultType="com.zhidejiaoyu.common.Vo.bookVo.BookVo"
+    <select id="selectUnknownWordBookVoByCourseId" resultType="com.zhidejiaoyu.common.vo.bookVo.BookVo"
             parameterType="map">
         SELECT
         distinct v.id,
@@ -939,7 +939,7 @@
             and l.`status` = 1
         </if>
     </select>
-    <select id="selectUnlearnedBookVoByCourseId" resultType="com.zhidejiaoyu.common.Vo.bookVo.BookVo"
+    <select id="selectUnlearnedBookVoByCourseId" resultType="com.zhidejiaoyu.common.vo.bookVo.BookVo"
             parameterType="map">
         SELECT v.id,
                v.word_chinese                                                chinese,
@@ -974,7 +974,7 @@
           AND v.id = uv.vocabulary_id
           AND u.id = uv.unit_id
     </sql>
-    <select id="selectBookVoByCourseIds" resultType="com.zhidejiaoyu.common.Vo.bookVo.BookVo" parameterType="map">
+    <select id="selectBookVoByCourseIds" resultType="com.zhidejiaoyu.common.vo.bookVo.BookVo" parameterType="map">
         <include refid="selectBookVoSql"/>
         <if test="courseIds.size > 0">
             AND u.course_id in (
@@ -985,7 +985,7 @@
         </if>
     </select>
 
-    <select id="selectBookVoByUnitId" resultType="com.zhidejiaoyu.common.Vo.bookVo.BookVo" parameterType="map">
+    <select id="selectBookVoByUnitId" resultType="com.zhidejiaoyu.common.vo.bookVo.BookVo" parameterType="map">
         SELECT distinct v.id,
                         v.word_chinese chinese,
                         v.word         content,
@@ -1000,7 +1000,7 @@
           and u.id = #{unitId}
     </select>
 
-    <select id="selectUnknownWordBookVoByCourseIds" resultType="com.zhidejiaoyu.common.Vo.bookVo.BookVo"
+    <select id="selectUnknownWordBookVoByCourseIds" resultType="com.zhidejiaoyu.common.vo.bookVo.BookVo"
             parameterType="map">
         SELECT
         v.id,
@@ -1029,7 +1029,7 @@
             and l.`status` = 1
         </if>
     </select>
-    <select id="selectUnlearnedBookVoByCourseIds" resultType="com.zhidejiaoyu.common.Vo.bookVo.BookVo"
+    <select id="selectUnlearnedBookVoByCourseIds" resultType="com.zhidejiaoyu.common.vo.bookVo.BookVo"
             parameterType="map">
         SELECT
         v.id,

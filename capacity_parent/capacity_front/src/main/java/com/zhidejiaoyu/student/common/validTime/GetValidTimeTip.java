@@ -13,7 +13,6 @@ import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
-import com.zhidejiaoyu.common.utils.simple.dateUtlis.SimpleDateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -100,7 +99,7 @@ public class GetValidTimeTip {
         int condition = classify == 1 ? 20 : 10;
         long stuId = student.getId();
         StringBuilder sb = new StringBuilder();
-        int awardCount = simpleRunLogMapper.countAwardCount(stuId, SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime), simpleCommonMethod.getTestType(classify), "熟词");
+        int awardCount = simpleRunLogMapper.countAwardCount(stuId, DateUtil.formatYYYYMMDDHHMMSS(loginTime), simpleCommonMethod.getTestType(classify), "熟词");
         LearnExample learnExample = new LearnExample();
         learnExample.createCriteria().andStudentIdEqualTo(stuId).andLearnTimeGreaterThanOrEqualTo(loginTime)
                 .andStudyModelEqualTo(learnType)
@@ -108,7 +107,7 @@ public class GetValidTimeTip {
         learnCount = simpleLearnMapper.countByExample(learnExample);
         if (learnCount >= condition * (awardCount + 1)) {
             sb.append("学生").append(student.getStudentName()).append("在").append(learnType)
-                    .append("模块本次新学熟词大于等于").append(condition).append("个单词，获得#1#个金币，登录时间：").append(SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime));
+                    .append("模块本次新学熟词大于等于").append(condition).append("个单词，获得#1#个金币，登录时间：").append(DateUtil.formatYYYYMMDDHHMMSS(loginTime));
             RunLog runLog = new RunLog(stuId, 4, sb.toString(), new Date());
             simpleRunLogMapper.insert(runLog);
             log.info(sb.toString());
@@ -133,10 +132,10 @@ public class GetValidTimeTip {
         long stuId = student.getId();
         StringBuilder sb = new StringBuilder();
         // 查询本次登录期间当前奖励次数
-        int count = simpleRunLogMapper.countAwardCount(stuId, SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime), simpleCommonMethod.getTestType(classify), "有效时长大于等于30分钟");
+        int count = simpleRunLogMapper.countAwardCount(stuId, DateUtil.formatYYYYMMDDHHMMSS(loginTime), simpleCommonMethod.getTestType(classify), "有效时长大于等于30分钟");
         if (count == 0 && minute >= condition) {
             sb.append("学生").append(student.getStudentName()).append("在").append(learnType).
-                    append("模块学习过程中有效时长大于等于30分钟，获得#5#个金币，登录时间：").append(SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime));
+                    append("模块学习过程中有效时长大于等于30分钟，获得#5#个金币，登录时间：").append(DateUtil.formatYYYYMMDDHHMMSS(loginTime));
             RunLog runLog = new RunLog(stuId, 4, sb.toString(), new Date());
             simpleRunLogMapper.insert(runLog);
             log.info(sb.toString());
@@ -160,7 +159,7 @@ public class GetValidTimeTip {
         int condition = classify == 1 ? 40 : 20;
         long stuId = student.getId();
         StringBuilder sb = new StringBuilder();
-        awardCount = simpleRunLogMapper.countAwardCount(stuId, SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime), simpleCommonMethod.getTestType(classify), "新学");
+        awardCount = simpleRunLogMapper.countAwardCount(stuId, DateUtil.formatYYYYMMDDHHMMSS(loginTime), simpleCommonMethod.getTestType(classify), "新学");
         LearnExample learnExample = new LearnExample();
         learnExample.createCriteria().andStudentIdEqualTo(stuId).andLearnTimeGreaterThanOrEqualTo(loginTime)
                 .andStudyModelEqualTo(learnType)
@@ -168,7 +167,7 @@ public class GetValidTimeTip {
         learnCount = simpleLearnMapper.countByExample(learnExample);
         if (learnCount >= condition * (awardCount + 1)) {
             sb.append("学生").append(student.getStudentName()).append("在").append(learnType).append("模块本次登录新学大于等于")
-                    .append(condition).append("个单词，获得#1#个金币，登录时间：").append(SimpleDateUtil.formatYYYYMMDDHHMMSS(loginTime));
+                    .append(condition).append("个单词，获得#1#个金币，登录时间：").append(DateUtil.formatYYYYMMDDHHMMSS(loginTime));
             RunLog runLog = new RunLog(stuId, 4, sb.toString(), new Date());
             simpleRunLogMapper.insert(runLog);
             log.info(sb.toString());

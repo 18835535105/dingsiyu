@@ -1016,7 +1016,7 @@
     <select id="selSchoolAdminId" parameterType="map" resultType="integer">
         select tea.school_admin_id from teacher tea join student stu on tea.teacher_id=stu.teacher_id where stu.id=#{studentId} and stu.status &lt;>3
     </select>
-    <select id="getClassOrSchoolStudents" parameterType="map" resultType="com.zhidejiaoyu.common.Vo.simple.StudentGauntletVo">
+    <select id="getClassOrSchoolStudents" parameterType="map" resultType="com.zhidejiaoyu.common.vo.simple.StudentGauntletVo">
         select stu.id id,stu.nickname name ,stu.head_url headUrl, expan.study_power study,stu.account account
         from student stu
         left join student_expansion expan on stu.id=expan.student_id

@@ -1,8 +1,8 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.zhidejiaoyu.common.Vo.read.StrengthenVo;
-import com.zhidejiaoyu.common.Vo.study.MemoryStudyVo;
+import com.zhidejiaoyu.common.vo.read.StrengthenVo;
+import com.zhidejiaoyu.common.vo.study.MemoryStudyVo;
 import com.zhidejiaoyu.common.pojo.ReadWord;
 import org.apache.ibatis.annotations.Param;
 

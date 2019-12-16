@@ -1,9 +1,9 @@
 package com.zhidejiaoyu.common.mapper.simple;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.zhidejiaoyu.common.Vo.SeniorityVo;
-import com.zhidejiaoyu.common.Vo.simple.testVo.TestRecordVo;
-import com.zhidejiaoyu.common.Vo.simple.testVo.TestDetailVo;
+import com.zhidejiaoyu.common.vo.SeniorityVo;
+import com.zhidejiaoyu.common.vo.simple.testVo.TestRecordVo;
+import com.zhidejiaoyu.common.vo.simple.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.pojo.TestRecordExample;

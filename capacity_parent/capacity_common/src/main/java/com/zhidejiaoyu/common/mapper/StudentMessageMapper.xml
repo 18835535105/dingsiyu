@@ -31,7 +31,7 @@
         update_time
     </sql>
 
-    <select id="selectMessageList" resultType="com.zhidejiaoyu.common.Vo.studentMessage.StudentMessageListVo"
+    <select id="selectMessageList" resultType="com.zhidejiaoyu.common.vo.studentMessage.StudentMessageListVo"
             parameterType="map">
         select
             id,

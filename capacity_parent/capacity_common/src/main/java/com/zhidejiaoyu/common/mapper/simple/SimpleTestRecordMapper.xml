@@ -311,7 +311,7 @@
         update test_record set `explain` = '游戏测试次数#2#恭喜你旗开得胜，祝未来勇闯天涯！' where student_id = #{student.id} and  genre = '学前游戏测试'
     </update>
 
-    <select id="showRecord" parameterType="map" resultType="com.zhidejiaoyu.common.Vo.simple.testVo.TestRecordVo">
+    <select id="showRecord" parameterType="map" resultType="com.zhidejiaoyu.common.vo.simple.testVo.TestRecordVo">
         select a.id,
                a.genre,
                a.test_start_time testStartTime,
@@ -482,17 +482,17 @@
         </if>
         limit 0,1
     </select>
-    <select id="planSeniority" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+    <select id="planSeniority" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
         select a.student_id, SUM(a.testCount) AS countTest from (SELECT student_id, course_id, COUNT(id) AS testCount FROM test_record GROUP BY student_id, course_id) a JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
         AND b.area = #{area} AND b.school_name = #{school_name} AND b.grade = #{grade} AND b.squad = #{squad}  -- AND b.id = 3169
         AND c.study_paragraph = #{study_paragraph} AND c.version = #{version} GROUP BY a.student_id ORDER BY countTest <if test="haveTest == 1">ASC</if> <if test="haveTest == 2">DESC</if>
     </select>
-    <select id="planSenioritySchool" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+    <select id="planSenioritySchool" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
         select a.student_id, SUM(a.testCount) AS countTest from (SELECT student_id, course_id, COUNT(id) AS testCount FROM test_record GROUP BY student_id, course_id) a JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
         AND b.area = #{area} AND b.school_name = #{school_name}  -- AND b.id = 3169
         AND c.study_paragraph = #{study_paragraph} AND c.version = #{version} GROUP BY a.student_id ORDER BY countTest <if test="haveTest == 1">ASC</if> <if test="haveTest == 2">DESC</if> LIMIT 50;
     </select>
-    <select id="planSeniorityNationwide" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+    <select id="planSeniorityNationwide" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
         select a.student_id, SUM(a.testCount) AS countTest from (SELECT student_id, course_id, COUNT(id) AS testCount FROM test_record GROUP BY student_id, course_id) a JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
         AND c.study_paragraph = #{study_paragraph} AND c.version = #{version} GROUP BY a.student_id ORDER BY countTest <if test="haveTest == 1">ASC</if> <if test="haveTest == 2">DESC</if> LIMIT 50;
     </select>
@@ -559,7 +559,7 @@
           and type = 1
     </select>
 
-    <select id="selectTestDetailVo" resultType="com.zhidejiaoyu.common.Vo.simple.testVo.TestDetailVo" parameterType="map">
+    <select id="selectTestDetailVo" resultType="com.zhidejiaoyu.common.vo.simple.testVo.TestDetailVo" parameterType="map">
         select concat(concat(concat('清学智能', c.version), '-'), t.genre)              title,
                s.student_name                                                       name,
                concat('测试时间：', date_format(if(t.test_start_time is null, now(), t.test_start_time), '%Y-%m-%d %H:%i:%s')) testTime,

@@ -225,7 +225,7 @@
             and su.course_id = c.id and c.study_paragraph = #{grade}
         </if>
     </select>
-    <select id="planSeniority" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+    <select id="planSeniority" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
     /* 本班排行, 单元排行@Param("area") String area, @Param("school_name") String school_name, @Param("grade") String grade,
     @Param("squad") String squad, @Param("study_paragraph") String study_paragraph, @Param("haveUnit") Integer haveUnit*/
      select a.student_id, SUM(a.sumUnit) AS countUnit from (select student_id,course_id, SUM(word_status) AS sumUnit FROM student_unit GROUP BY course_id,student_id) a
@@ -233,13 +233,13 @@
       AND b.area = #{area}	AND b.school_name = #{school_name} AND b.grade = #{grade} AND b.squad = #{squad}  -- AND b.id = 3169
 	  AND c.study_paragraph = #{study_paragraph} AND c.version = #{version} GROUP BY a.student_id ORDER BY countUnit <if test="haveUnit == 1">ASC</if> <if test="haveUnit == 2">DESC</if>
     </select>
-    <select id="planSenioritySchool" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+    <select id="planSenioritySchool" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
         select a.student_id, SUM(a.sumUnit) AS countUnit from (select student_id,course_id, SUM(word_status) AS sumUnit FROM student_unit GROUP BY course_id,student_id) a
         JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
         AND b.area = #{area} AND b.school_name = #{school_name}-- AND b.id = 3169
         AND c.study_paragraph = #{study_paragraph} AND c.version = #{version} GROUP BY a.student_id ORDER BY countUnit <if test="haveUnit == 1">ASC</if> <if test="haveUnit == 2">DESC</if> LIMIT 50;
     </select>
-    <select id="planSeniorityNationwide" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+    <select id="planSeniorityNationwide" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
         select a.student_id, SUM(a.sumUnit) AS countUnit from (select student_id,course_id, SUM(word_status) AS sumUnit FROM student_unit GROUP BY course_id,student_id) a
         JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
         AND c.study_paragraph = #{study_paragraph} AND c.version = #{version} GROUP BY a.student_id ORDER BY countUnit <if test="haveUnit == 1">ASC</if> <if test="haveUnit == 2">DESC</if> LIMIT 50;

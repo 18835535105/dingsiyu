@@ -2,7 +2,7 @@ package com.zhidejiaoyu.common.utils.language;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.zhidejiaoyu.common.Vo.read.WordInfoVo;
+import com.zhidejiaoyu.common.vo.read.WordInfoVo;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.utils.http.HttpClientUtil;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,5 @@
 package com.zhidejiaoyu;
 
-import com.zhidejiaoyu.app.ZdjyFrontApplication;
 import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;

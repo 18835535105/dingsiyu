@@ -485,7 +485,7 @@
           and genre = '学前游戏测试'
     </update>
 
-    <select id="showRecord" parameterType="map" resultType="com.zhidejiaoyu.common.Vo.testVo.TestRecordVo">
+    <select id="showRecord" parameterType="map" resultType="com.zhidejiaoyu.common.vo.testVo.TestRecordVo">
         select a.id,
         a.genre,
         a.test_end_time testEndTime,
@@ -651,7 +651,7 @@
         and student_id = #{studentId}
         <include refid="study_model_sql"/>
     </select>
-    <select id="planSeniority" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+    <select id="planSeniority" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
         <!--
         select a.student_id, SUM(a.testCount) AS countTest from (SELECT student_id, course_id, COUNT(id) AS testCount FROM test_record GROUP BY student_id, course_id) a JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
         AND b.area = #{area} AND b.school_name = #{school_name} AND b.grade = #{grade} AND b.squad = #{squad}  &#45;&#45; AND b.id = 3169
@@ -688,7 +688,7 @@
         ORDER BY
         countTest DESC
     </select>
-    <select id="planSenioritySchool" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+    <select id="planSenioritySchool" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
         <!--
         select a.student_id, SUM(a.testCount) AS countTest from (SELECT student_id, course_id, COUNT(id) AS testCount FROM test_record GROUP BY student_id, course_id) a JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
         AND b.area = #{area} AND b.school_name = #{school_name}  &#45;&#45; AND b.id = 3169
@@ -726,7 +726,7 @@
         countTest DESC
         LIMIT 50;
     </select>
-    <select id="planSeniorityNationwide" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+    <select id="planSeniorityNationwide" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
         <!--
         select a.student_id, SUM(a.testCount) AS countTest from (SELECT student_id, course_id, COUNT(id) AS testCount FROM test_record GROUP BY student_id, course_id) a JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
         AND c.study_paragraph = #{study_paragraph} AND c.version = #{version} GROUP BY a.student_id ORDER BY countTest <if test="haveTest == 1">ASC</if> <if test="haveTest == 2">DESC</if> LIMIT 50;
@@ -791,7 +791,7 @@
             and genre = #{genre}
         </if>
     </select>
-    <select id="selectTestDetailVo" resultType="com.zhidejiaoyu.common.Vo.testVo.TestDetailVo" parameterType="map">
+    <select id="selectTestDetailVo" resultType="com.zhidejiaoyu.common.vo.testVo.TestDetailVo" parameterType="map">
         select concat(c.course_name, concat('-', concat(u.unit_name,
         concat('-', concat(t.study_model, concat('-', t.genre)))))) title,
         s.student_name name,

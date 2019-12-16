@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.zhidejiaoyu.common.Vo.student.studentinfowithschool.StudentInfoSchoolSummary;
+import com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolSummary;
 import com.zhidejiaoyu.common.pojo.RunLog;
 import com.zhidejiaoyu.common.pojo.RunLogExample;
 import com.zhidejiaoyu.common.pojo.Student;

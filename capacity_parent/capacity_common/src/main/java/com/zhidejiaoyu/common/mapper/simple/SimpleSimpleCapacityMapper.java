@@ -1,8 +1,8 @@
 package com.zhidejiaoyu.common.mapper.simple;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.zhidejiaoyu.common.Vo.simple.SimpleCapacityVo;
-import com.zhidejiaoyu.common.Vo.simple.capacityVo.CapacityListVo;
+import com.zhidejiaoyu.common.vo.simple.SimpleCapacityVo;
+import com.zhidejiaoyu.common.vo.simple.capacityVo.CapacityListVo;
 import com.zhidejiaoyu.common.pojo.SimpleCapacity;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Vocabulary;

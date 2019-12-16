@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.zhidejiaoyu.common.Vo.SeniorityVo;
+import com.zhidejiaoyu.common.vo.SeniorityVo;
 import com.zhidejiaoyu.common.pojo.Course;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentUnit;
@@ -127,7 +127,7 @@ public interface StudentUnitMapper extends BaseMapper<StudentUnit> {
     int getCountUnitSentenceStatus(@Param("courseIdw")Long courseIdw,@Param("studentId") Long studentId);
 
     List<SeniorityVo> planSeniority(@Param("grade") String grade,  @Param("study_paragraph") String study_paragraph, @Param("haveUnit") Integer haveUnit, @Param("version") String version, @Param("classId")Long classId);
-    
+
     @Select("select SUM(word_status) AS sumUnit FROM student_unit WHERE student_id = #{stuId} GROUP BY student_id")
     Integer onePlanSeniority(@Param("stuId") Long stuId);
 

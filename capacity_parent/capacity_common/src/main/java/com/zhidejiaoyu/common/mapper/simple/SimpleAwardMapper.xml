@@ -230,7 +230,7 @@
           and can_get = 1
           and to_days(create_time) = to_days(now())
     </select>
-    <select id="selectAwardVos" resultType="com.zhidejiaoyu.common.Vo.simple.AwardVo" parameterType="map">
+    <select id="selectAwardVos" resultType="com.zhidejiaoyu.common.vo.simple.AwardVo" parameterType="map">
         select a.id,
                act.img_url                     imgUrl,
                act.award_content               content,
@@ -256,7 +256,7 @@
           and medal_type = #{medalId}
         limit 1
     </select>
-    <select id="selectMedalAwardVos" resultType="com.zhidejiaoyu.common.Vo.simple.AwardVo" parameterType="map">
+    <select id="selectMedalAwardVos" resultType="com.zhidejiaoyu.common.vo.simple.AwardVo" parameterType="map">
         select a.id,
                m.child_img_url                 imgUrl,
                m.marked_words                  content,

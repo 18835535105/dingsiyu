@@ -1,12 +1,13 @@
 package com.zhidejiaoyu.common.utils.testUtil;
 
-import com.zhidejiaoyu.common.Vo.student.SentenceTranslateVo;
+import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.mapper.UnitVocabularyMapper;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Sentence;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
+import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +82,7 @@ public class TestResultUtil implements Serializable {
      * @param phase      学段
      * @return
      */
-    public List<TestResult> getWordTestes(String[] type, Integer subjectNum, List<Vocabulary> target, String version, String phase) {
+    public List<TestResultVO> getWordTestes(String[] type, Integer subjectNum, List<Vocabulary> target, String version, String phase) {
         if (type == null) {
             throw new RuntimeException("测试题类型不能为空！");
         }
@@ -91,7 +92,7 @@ public class TestResultUtil implements Serializable {
         if (subjectNum > target.size()) {
             throw new RuntimeException("需要封装的测试题数量不能大于当前单词数量!");
         }
-        List<TestResult> results = new ArrayList<>();
+        List<TestResultVO> results = new ArrayList<>();
         // 随机找出指定数量单词
         Map<Long, Vocabulary> map = this.getTestVocabulary(subjectNum, target);
         Set<Long> idSet = map.keySet();
@@ -104,7 +105,7 @@ public class TestResultUtil implements Serializable {
                 j++;
                 Map<Object, Boolean> map2 = new HashMap<>(16);
                 Vocabulary vocabulary = map.get(iterator.next());
-                TestResult testResult = new TestResult();
+                TestResultVO testResult = new TestResultVO();
                 // 从当前课程下随机取一个当前单词对应的版本的单词释义
                 String wordChinese = getWordChinese(version, phase, vocabulary);
                 testResult.setType(type[i]);
@@ -116,7 +117,7 @@ public class TestResultUtil implements Serializable {
                         testResult.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
                     }
                     // 从其余题目中随机获取三道题目
-                    for (int k = 0; k < (target.size() - 1 > 3 ? 3 : target.size() - 1); ) {
+                    for (int k = 0; k < (Math.min(target.size() - 1, 3)); ) {
                         int random = (int) (Math.random() * target.size());
                         if (map2.containsKey(target.get(random).getWordChinese())) {
                             continue;
@@ -130,7 +131,7 @@ public class TestResultUtil implements Serializable {
                     testResult.setId(vocabulary.getId());
                     map2.put(vocabulary.getWord(), true);
                     // 从其余题目中随机获取三道题目数
-                    for (int k = 0; k < (target.size() - 1 > 3 ? 3 : target.size() - 1); ) {
+                    for (int k = 0; k < (Math.min(target.size() - 1, 3)); ) {
                         int random = (int) (Math.random() * target.size());
                         if (map2.containsKey(target.get(random).getWord())) {
                             continue;
@@ -175,7 +176,7 @@ public class TestResultUtil implements Serializable {
      * @param unitId     当前单元id
      * @return
      */
-    public List<TestResult> getWordTestesForUnit(String[] type, Integer subjectNum, List<Vocabulary> target, Long unitId) {
+    public List<TestResultVO> getWordTestesForUnit(String[] type, Integer subjectNum, List<Vocabulary> target, Long unitId) {
         if (type == null || type.length == 0) {
             throw new RuntimeException("测试题类型不能为空！");
         }
@@ -188,7 +189,7 @@ public class TestResultUtil implements Serializable {
         if (unitId == null) {
             throw new RuntimeException("单元id不能为空");
         }
-        List<TestResult> results = new ArrayList<>();
+        List<TestResultVO> results = new ArrayList<>();
         // 随机找出指定数量单词
         Map<Long, Vocabulary> map = this.getTestVocabulary(subjectNum, target);
         Set<Long> idSet = map.keySet();
@@ -212,7 +213,7 @@ public class TestResultUtil implements Serializable {
      * @param courseId   当前课程id
      * @return
      */
-    public List<TestResult> getWordTestesForCourse(String[] type, Integer subjectNum, List<Vocabulary> target, Long courseId) {
+    public List<TestResultVO> getWordTestesForCourse(String[] type, Integer subjectNum, List<Vocabulary> target, Long courseId) {
         if (type == null) {
             throw new RuntimeException("测试题类型不能为空！");
         }
@@ -228,7 +229,7 @@ public class TestResultUtil implements Serializable {
         if (target.size() == 0) {
             log.error("封装测试题时，target.size=0");
         }
-        List<TestResult> results = new ArrayList<>();
+        List<TestResultVO> results = new ArrayList<>();
         // 随机找出指定数量单词
         Map<Long, Vocabulary> map = this.getTestVocabulary(subjectNum, target);
         Set<Long> idSet = map.keySet();
@@ -252,7 +253,7 @@ public class TestResultUtil implements Serializable {
      * @param chineseMap 单词释义map key：单词id；value：map key：单词id；value：单词释义
      * @param iterator   单词id迭代器
      */
-    private void toGetSubject(String[] type, Integer subjectNum, List<Vocabulary> target, List<TestResult> results,
+    private void toGetSubject(String[] type, Integer subjectNum, List<Vocabulary> target, List<TestResultVO> results,
                               Map<Long, Vocabulary> map, Map<Long, Map<Long, String>> chineseMap, Iterator<Long> iterator) {
         String wordChinese;
         String chinese;
@@ -264,7 +265,7 @@ public class TestResultUtil implements Serializable {
                 Map<Object, Boolean> map2 = new HashMap<>(16);
                 Vocabulary vocabulary = map.get(iterator.next());
                 wordChinese = chineseMap.get(vocabulary.getId()).get("wordChinese");
-                TestResult testResult = new TestResult();
+                TestResultVO testResult = new TestResultVO();
                 testResult.setType(type[i]);
                 if ("英译汉".equals(type[i]) || "听力理解".equals(type[i])) {
                     testResult.setTitle(vocabulary.getWord());
@@ -274,7 +275,7 @@ public class TestResultUtil implements Serializable {
                         testResult.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
                     }
                     // 从其余题目中随机获取三道题目
-                    for (int k = 0; k < (target.size() - 1 > 3 ? 3 : target.size() - 1); ) {
+                    for (int k = 0; k < (Math.min(target.size() - 1, 3)); ) {
                         int random = (int) (Math.random() * target.size());
                         if (chineseMap.get(target.get(random).getId()) == null) {
                             continue;
@@ -326,7 +327,7 @@ public class TestResultUtil implements Serializable {
                     testResult.setId(vocabulary.getId());
                     map2.put(vocabulary.getWord(), true);
                     // 从其余题目中随机获取三道题目数
-                    for (int k = 0; k < (target.size() - 1 > 3 ? 3 : target.size() - 1); ) {
+                    for (int k = 0; k < (Math.min(target.size() - 1, 3)); ) {
                         int random = (int) (Math.random() * target.size());
                         if (map2.containsKey(target.get(random).getWord())) {
                             continue;

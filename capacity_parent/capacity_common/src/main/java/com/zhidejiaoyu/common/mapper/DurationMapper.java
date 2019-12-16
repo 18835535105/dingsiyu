@@ -1,8 +1,8 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.zhidejiaoyu.common.Vo.SeniorityVo;
-import com.zhidejiaoyu.common.Vo.student.studentinfowithschool.StudentInfoSchoolDetail;
+import com.zhidejiaoyu.common.vo.SeniorityVo;
+import com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolDetail;
 import com.zhidejiaoyu.common.pojo.*;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.MapKey;

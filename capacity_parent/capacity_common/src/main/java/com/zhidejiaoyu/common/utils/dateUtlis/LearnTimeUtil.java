@@ -6,7 +6,7 @@ import java.text.NumberFormat;
  * 计算今日学习效率, 在线时长, 有效时长工具类
  */
 public class LearnTimeUtil {
-	 /**
+    /**
      * 学习效率
      *
      * @param num1 ./
@@ -14,21 +14,21 @@ public class LearnTimeUtil {
      * @return
      */
     public static String efficiency(int num1, int num2) {
-        // 创建一个数值格式化对象  
+        // 创建一个数值格式化对象
         NumberFormat numberFormat = NumberFormat.getInstance();
-        // 设置精确到小数点后2位  
+        // 设置精确到小数点后2位
         numberFormat.setMaximumFractionDigits(0);
         String result = numberFormat.format((float) num1 / (float) num2 * 100);
         return result + "%";
     }
-    
+
     /**
      * 根据秒转换00:00:00格式
      *
      * @param s 秒
      * @return
      */
-    public static String valid_onlineTime(Integer s) {
+    public static String validOnlineTime(Integer s) {
         if (s == null) {
             return "00:00:00";
         }

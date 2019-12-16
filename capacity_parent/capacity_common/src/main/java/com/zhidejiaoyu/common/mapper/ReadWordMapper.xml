@@ -47,7 +47,7 @@
             and rw.read_type_id = #{readTypeId}
         </if>
     </select>
-    <select id="selectNeedReview" resultType="com.zhidejiaoyu.common.Vo.read.StrengthenVo" parameterType="map">
+    <select id="selectNeedReview" resultType="com.zhidejiaoyu.common.vo.read.StrengthenVo" parameterType="map">
         select v.id               id,
                v.word             word,
                v.syllable         syllable,

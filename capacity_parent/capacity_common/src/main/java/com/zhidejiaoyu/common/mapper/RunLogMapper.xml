@@ -288,7 +288,7 @@
     </select>
 
     <select id="selectStudentInfoSchoolSummary"
-            resultType="com.zhidejiaoyu.common.Vo.student.studentinfowithschool.StudentInfoSchoolSummary" parameterType="map">
+            resultType="com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolSummary" parameterType="map">
         SELECT t.school                                schoolName,
                count(DISTINCT s.id)                    studentCount,
                date_format(rl.create_time, '%Y-%m-%d') time

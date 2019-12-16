@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.zhidejiaoyu.app.ZdjyFrontApplication;
-import com.zhidejiaoyu.common.Vo.testVo.TestDetailVo;
+import com.zhidejiaoyu.ZdjyFrontApplication;
+import com.zhidejiaoyu.common.vo.testVo.TestDetailVo;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;

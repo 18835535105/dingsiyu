@@ -67,6 +67,8 @@
 
         <alinyun-skd-oss.version>3.4.2</alinyun-skd-oss.version>
 
+        <spring-boot-starter-ahas-sentinel-client.version>1.4.0</spring-boot-starter-ahas-sentinel-client.version>
+
     </properties>
 
     <dependencyManagement>
@@ -200,6 +202,12 @@
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-core</artifactId>
                 <version>${shiro-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.csp</groupId>
+                <artifactId>spring-boot-starter-ahas-sentinel-client</artifactId>
+                <version>${spring-boot-starter-ahas-sentinel-client.version}</version>
             </dependency>
 
         </dependencies>

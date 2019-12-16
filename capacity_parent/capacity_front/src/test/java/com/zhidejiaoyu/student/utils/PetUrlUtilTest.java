@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.utils;
 
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
 import org.junit.Test;
 
 /**

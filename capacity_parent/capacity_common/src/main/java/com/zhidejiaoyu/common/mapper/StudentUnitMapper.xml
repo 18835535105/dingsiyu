@@ -147,7 +147,7 @@
             and su.course_id = c.id and c.study_paragraph = #{grade}
         </if>
     </select>
-    <select id="planSeniority" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+    <select id="planSeniority" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
     <!--
      select a.student_id, SUM(a.sumUnit) AS countUnit from (select student_id,course_id, SUM(word_status) AS sumUnit FROM student_unit GROUP BY course_id,student_id) a
      JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
@@ -157,7 +157,7 @@
 
         SELECT
         a.student_id,
-        a.head_url AS headUrl, 
+        a.head_url AS headUrl,
         SUM(a.sumUnit) AS countUnit,
         a.student_name,
         a.squad,
@@ -187,7 +187,7 @@
         ORDER BY
         countUnit DESC
     </select>
-    <select id="planSenioritySchool" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+    <select id="planSenioritySchool" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
         <!--
         select a.student_id, SUM(a.sumUnit) AS countUnit from (select student_id,course_id, SUM(word_status) AS sumUnit FROM student_unit GROUP BY course_id,student_id) a
         JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
@@ -226,7 +226,7 @@
         countUnit DESC
         LIMIT 50;
     </select>
-    <select id="planSeniorityNationwide" resultType="com.zhidejiaoyu.common.Vo.SeniorityVo">
+    <select id="planSeniorityNationwide" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
        <!--
         select a.student_id, SUM(a.sumUnit) AS countUnit from (select student_id,course_id, SUM(word_status) AS sumUnit FROM student_unit GROUP BY course_id,student_id) a
         JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
