@@ -1,7 +1,5 @@
 package com.zhidejiaoyu.student.business.syntax.service.impl;
 
-import com.zhidejiaoyu.common.vo.syntax.game.GameSelect;
-import com.zhidejiaoyu.common.vo.syntax.game.GameVO;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
@@ -13,14 +11,16 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
+import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
+import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.TestResultVo;
+import com.zhidejiaoyu.common.vo.syntax.game.GameSelect;
+import com.zhidejiaoyu.common.vo.syntax.game.GameVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.TestServiceImpl;
 import com.zhidejiaoyu.student.business.syntax.learnmodel.LearnModelInfo;
 import com.zhidejiaoyu.student.business.syntax.service.SyntaxGameService;
-import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
-import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
-import com.zhidejiaoyu.common.vo.TestResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -119,25 +119,18 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
      * @return
      */
     private List<SyntaxTopic> packageSyntaxTopics(List<SyntaxTopic> syntaxTopics) {
-        StringBuilder sb = new StringBuilder();
-        List<SyntaxTopic> syntaxTopicsTmp = new ArrayList<>(syntaxTopics);
-        return syntaxTopics.stream().map(syntaxTopic -> {
-            int length = syntaxTopic.getOption().split("\\$&\\$").length;
-            // 选项个数
-            int optionCount = 3;
-            if (length < optionCount) {
-                sb.setLength(0);
-                sb.append(syntaxTopic.getOption());
-                Collections.shuffle(syntaxTopicsTmp);
-                syntaxTopicsTmp.stream()
-                        .filter(syntaxTopic1 -> !syntaxTopic1.getAnswer().equalsIgnoreCase(syntaxTopic.getAnswer())
-                                && !sb.toString().contains(syntaxTopic1.getAnswer()))
-                        .limit(optionCount - length)
-                        .forEach(syntaxTopic1 -> sb.append("$&$").append(syntaxTopic1.getAnswer()));
-                return syntaxTopic.setOption(sb.toString());
-            }
-            return syntaxTopic;
-        }).collect(Collectors.toList());
+        return syntaxTopics.stream().map(this::getSyntaxTopic).collect(Collectors.toList());
+    }
+
+    private SyntaxTopic getSyntaxTopic(SyntaxTopic syntaxTopic) {
+        int length = syntaxTopic.getOption().split("\\$&\\$").length;
+        // 选项个数
+        int optionCount = 3;
+        if (length < optionCount) {
+            syntaxTopic.setOption(syntaxTopic.getOption() + " $&$");
+            this.getSyntaxTopic(syntaxTopic);
+        }
+        return syntaxTopic;
     }
 
     /**
