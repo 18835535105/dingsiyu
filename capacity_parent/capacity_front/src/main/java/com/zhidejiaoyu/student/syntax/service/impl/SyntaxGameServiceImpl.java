@@ -119,27 +119,18 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
      * @return
      */
     private List<SyntaxTopic> packageSyntaxTopics(List<SyntaxTopic> syntaxTopics) {
-        StringBuilder sb = new StringBuilder();
-        List<SyntaxTopic> syntaxTopicsTmp = new ArrayList<>(syntaxTopics);
-        return syntaxTopics.stream().map(syntaxTopic -> {
-            int length = syntaxTopic.getOption().split("\\$&\\$").length;
-            // 选项个数
-            int optionCount = 3;
-            if (length < optionCount) {
-                sb.setLength(0);
-                sb.append(syntaxTopic.getOption());
-                Collections.shuffle(syntaxTopicsTmp);
-                syntaxTopicsTmp.stream()
-                        .filter(syntaxTopic1 -> !syntaxTopic1.getAnswer().equalsIgnoreCase(syntaxTopic.getAnswer())
-                                && !sb.toString().contains(syntaxTopic1.getAnswer())
-                                // 防止取出题目相同但答案不同的选项
-                                && !syntaxTopic1.getTopic().equalsIgnoreCase(syntaxTopic.getTopic()))
-                        .limit(optionCount - length)
-                        .forEach(syntaxTopic1 -> sb.append("$&$").append(syntaxTopic1.getAnswer()));
-                return syntaxTopic.setOption(sb.toString());
-            }
-            return syntaxTopic;
-        }).collect(Collectors.toList());
+        return syntaxTopics.stream().map(this::getSyntaxTopic).collect(Collectors.toList());
+    }
+
+    private SyntaxTopic getSyntaxTopic(SyntaxTopic syntaxTopic) {
+        int length = syntaxTopic.getOption().split("\\$&\\$").length;
+        // 选项个数
+        int optionCount = 3;
+        if (length < optionCount) {
+            syntaxTopic.setOption(syntaxTopic.getOption() + " $&$");
+            this.getSyntaxTopic(syntaxTopic);
+        }
+        return syntaxTopic;
     }
 
     /**
@@ -160,6 +151,13 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
 
     }
 
+    /**
+     * 防止题目不足10个
+     *
+     * @param syntaxTopics
+     * @param result
+     * @return
+     */
     private List<SyntaxTopic> syntaxTopicsResult(List<SyntaxTopic> syntaxTopics, List<SyntaxTopic> result) {
         Collections.shuffle(result);
         if (result.size() < GAME_COUNT) {
