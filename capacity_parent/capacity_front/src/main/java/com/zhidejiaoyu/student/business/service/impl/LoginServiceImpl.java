@@ -640,16 +640,10 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
         //判断是否有语法课程
         if (type.equals(7)) {
-            if (student.getSchoolName().contains("英语队长涿鹿鼓楼小学体验中心") ||
-                    student.getAccount().contains("2035") ||
-                    student.getAccount().contains("3557") ||
-                    student.getAccount().contains("3586")) {
-                int i = studentStudyPlanMapper.countByStudentId(student.getId(), type);
-                if (i > 0) {
-                    isHave = true;
-                }
+            int i = studentStudyPlanMapper.countByStudentId(student.getId(), type);
+            if (i > 0) {
+                isHave = true;
             }
-
         }
         map.put("isHave", isHave);
         return ServerResponse.createBySuccess(map);

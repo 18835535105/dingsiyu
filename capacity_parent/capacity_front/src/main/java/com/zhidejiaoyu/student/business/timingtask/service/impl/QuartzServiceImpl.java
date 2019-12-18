@@ -388,7 +388,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
             List<String> accountList = new ArrayList<>();
             students.forEach(stu -> {
                         studentIds.add(stu.getId());
-                        accountList.add(stu.getAccount());
+                        accountList.add("账号：" + stu.getAccount() + " 姓名：" + stu.getStudentName() + " 学校：" + stu.getSchoolName());
                     }
             );
             if (studentIds.size() > 0) {
@@ -403,6 +403,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 RunLog runLog = new RunLog();
                 runLog.setType(3);
                 runLog.setOperateUserId(1L);
+                runLog.setCreateTime(new Date());
                 runLog.setLogContent("时间:" + date + "删除回收站超过60天的学生:" + accountList.toString());
                 runLogMapper.insert(runLog);
             }
@@ -421,6 +422,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
         //查询到期的体验账号
         List<Student> students = studentMapper.selectExperienceAccount();
         Date date = new Date();
+        StringBuilder builder = new StringBuilder();
         if (students.size() > 0) {
             List<RecycleBin> saveList = new ArrayList<>();
             students.forEach(student -> {
@@ -431,13 +433,21 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 bin.setOperateUserName("管理员");
                 bin.setStudentId(student.getId());
                 saveList.add(bin);
-
                 // 清除学生排行缓存
                 rankOpt.deleteGoldRank(student);
                 rankOpt.deleteCcieRank(student);
                 rankOpt.deleteMedalRank(student);
                 rankOpt.deleteWorshipRank(student);
+                builder.append("账号：").append(student.getAccount()).append(" 姓名：")
+                        .append(student.getStudentName())
+                        .append(" 学校：").append(student.getSchoolName() + ",");
             });
+            RunLog runLog = new RunLog();
+            runLog.setType(3);
+            runLog.setOperateUserId(1L);
+            runLog.setCreateTime(new Date());
+            runLog.setLogContent("时间:" + date + "将到期的体验账号放入回收站:" + builder.toString());
+            runLogMapper.insert(runLog);
             recycleBinMapper.insertByList(saveList);
             studentMapper.updateStatus(students);
 

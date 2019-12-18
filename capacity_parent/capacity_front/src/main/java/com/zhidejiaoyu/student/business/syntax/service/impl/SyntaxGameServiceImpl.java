@@ -151,6 +151,13 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
 
     }
 
+    /**
+     * 防止题目不足10个
+     *
+     * @param syntaxTopics
+     * @param result
+     * @return
+     */
     private List<SyntaxTopic> syntaxTopicsResult(List<SyntaxTopic> syntaxTopics, List<SyntaxTopic> result) {
         Collections.shuffle(result);
         if (result.size() < GAME_COUNT) {
