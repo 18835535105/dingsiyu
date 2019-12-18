@@ -55,7 +55,9 @@ spring:
       mail:
         smtp:
           socketFactory:
-            class:javax.net.ssl.SSLSocketFactory
+            class: javax.net.ssl.SSLSocketFactory
+          starttls:
+            enable: true
 # 发送者邮箱
 mail:
   fromMail:
