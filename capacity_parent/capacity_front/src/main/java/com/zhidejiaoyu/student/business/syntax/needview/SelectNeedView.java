@@ -45,13 +45,13 @@ public class SelectNeedView implements INeedView {
     private SyntaxMemoryDifficulty syntaxMemoryDifficulty;
 
     @Override
-    public ServerResponse getNeedView(NeedViewDTO dto) {
+    public ServerResponse<Object> getNeedView(NeedViewDTO dto) {
         StudyCapacity studyCapacity = studyCapacityMapper.selectLargerThanGoldTimeWithStudentIdAndUnitId(dto);
         return this.packageSelectSyntaxNeedView(dto, studyCapacity);
     }
 
     @Override
-    public ServerResponse getNextNotGoldTime(NeedViewDTO dto) {
+    public ServerResponse<Object> getNextNotGoldTime(NeedViewDTO dto) {
         StudyCapacity studyCapacity = studyCapacityMapper.selectUnKnownByStudentIdAndUnitId(dto);
         return this.packageSelectSyntaxNeedView(dto, studyCapacity);
     }
@@ -63,7 +63,7 @@ public class SelectNeedView implements INeedView {
      * @param studyCapacity
      * @return
      */
-    private ServerResponse packageSelectSyntaxNeedView(NeedViewDTO dto, StudyCapacity studyCapacity) {
+    private ServerResponse<Object> packageSelectSyntaxNeedView(NeedViewDTO dto, StudyCapacity studyCapacity) {
         if (!Objects.isNull(studyCapacity)) {
             KnowledgePoint knowledgePoint = knowledgePointMapper.selectByTopicId(studyCapacity.getWordId());
 

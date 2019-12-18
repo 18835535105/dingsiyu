@@ -26,16 +26,6 @@ import java.util.concurrent.*;
 @Configuration
 public class BeanConfig {
 
-	/**
-	 * 获取百度语音合成api链接地址
-	 *
-	 * @return
-	 */
-	@Bean
-	public BaiduSpeak baiduSpeak() {
-		return new BaiduSpeak();
-	}
-
 	@Bean
 	public RestTemplate restTemplate() {
 		return new RestTemplate();

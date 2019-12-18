@@ -66,10 +66,10 @@ mail:
 server:
   tomcat:
     uri-encoding: utf-8
+    connection-timeout: 30m
   servlet:
     session:
       timeout: 30m
-  connection-timeout: 30m
 
 mybatis:
   type-aliases-package: com.zhidejiaoyu.common.pojo
