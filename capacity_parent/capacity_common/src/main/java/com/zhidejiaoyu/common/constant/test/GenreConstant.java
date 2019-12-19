@@ -9,4 +9,6 @@ public interface GenreConstant {
     String SYNTAX_GAME = "超级语法游戏测试";
 
     String UNIT_TEST = "单元闯关测试";
+
+    String TEST_BEFORE_STUDY = "摸底测试";
 }

@@ -6,43 +6,39 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.vo.game.StrengthGameVo;
-import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
-import com.zhidejiaoyu.common.vo.testVo.TestDetailVo;
-import com.zhidejiaoyu.common.vo.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
-import com.zhidejiaoyu.common.constant.TestAwardGoldConstant;
-import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.*;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.constant.study.StudyModelConstant;
 import com.zhidejiaoyu.common.constant.study.TestGenreConstant;
+import com.zhidejiaoyu.common.dto.WordUnitTestDTO;
+import com.zhidejiaoyu.common.dto.phonetic.UnitTestDto;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.CcieUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
+import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
+import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
-import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
 import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
 import com.zhidejiaoyu.common.utils.testUtil.TestSentenceUtil;
-import com.zhidejiaoyu.student.common.redis.RedisOpt;
-import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
-import com.zhidejiaoyu.common.constant.PetImageConstant;
-import com.zhidejiaoyu.common.constant.PetMP3Constant;
-import com.zhidejiaoyu.common.dto.WordUnitTestDTO;
-import com.zhidejiaoyu.common.dto.phonetic.UnitTestDto;
-import com.zhidejiaoyu.student.business.service.TestService;
-import com.zhidejiaoyu.common.utils.CcieUtil;
-import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
-import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
 import com.zhidejiaoyu.common.vo.TestResultVo;
+import com.zhidejiaoyu.common.vo.game.StrengthGameVo;
+import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
+import com.zhidejiaoyu.common.vo.testVo.TestDetailVo;
+import com.zhidejiaoyu.common.vo.testVo.TestRecordVo;
+import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
+import com.zhidejiaoyu.student.business.service.TestService;
+import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
+import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -350,7 +346,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setQuantity(testRecord.getErrorCount() + testRecord.getRightCount());
         Date date = new Date();
         saveTestRecordTime(testRecord, session, date);
-        getUnitTestMsg(testRecord, testRecord.getPoint());
+        testRecord.setExplain(getUnitTestMsg(testRecord.getPoint()));
         Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 10);
         if (integer == null || integer <= 0) {
             integer = 0;
@@ -452,7 +448,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setQuantity(testRecord.getErrorCount() + testRecord.getRightCount());
         Date date = new Date();
         saveTestRecordTime(testRecord, session, date);
-        getUnitTestMsg(testRecord, testRecord.getPoint());
+        testRecord.setExplain(getUnitTestMsg(testRecord.getPoint()));
         Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 12);
         int goldCount = 0;
         if (integer == null || integer <= 0) {
@@ -496,7 +492,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setStudyModel("阅读测试");
         Date date = new Date();
         saveTestRecordTime(testRecord, session, date);
-        getUnitTestMsg(testRecord, testRecord.getPoint());
+        testRecord.setExplain(getUnitTestMsg(testRecord.getPoint()));
         Integer integer = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), testRecord.getUnitId(), 13);
         int gold = 0;
         int energy = 0;
@@ -1727,18 +1723,21 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setUnitId(wordUnitTestDTO.getUnitId()[0]);
         testRecord.setAwardGold(goldCount);
 
-        getUnitTestMsg(testRecord, point);
+        testRecord.setExplain(getUnitTestMsg(point));
         return testRecord;
     }
 
-    private void getUnitTestMsg(TestRecord testRecord, int point) {
+    public static String getUnitTestMsg(int point) {
         if (point >= 0 && point < PASS) {
-            testRecord.setExplain("很遗憾，闯关失败，再接再厉。");
-        } else if (point >= PASS && point < FULL_MARK) {
-            testRecord.setExplain("闯关成功，独孤求败！");
-        } else if (point == FULL_MARK) {
-            testRecord.setExplain("恭喜你刷新了纪录！");
+            return "很遗憾，闯关失败，再接再厉。";
         }
+        if (point >= PASS && point < FULL_MARK) {
+            return "闯关成功，独孤求败！";
+        }
+        if (point == FULL_MARK) {
+            return "恭喜你刷新了纪录！";
+        }
+        return "";
     }
 
     @Override

@@ -463,6 +463,8 @@ public class DateUtil implements Serializable {
         return calendar.get(Calendar.WEEK_OF_MONTH);
     }
 
+    private DateUtil(){}
+
     public static void main(String[] args) {
         System.out.println(beforeHoursTime(1));
     }

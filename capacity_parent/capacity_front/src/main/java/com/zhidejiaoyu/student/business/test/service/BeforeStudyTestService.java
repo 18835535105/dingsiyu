@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.test.service;
 
-import com.zhidejiaoyu.common.pojo.SchoolTime;
+import com.zhidejiaoyu.common.dto.testbeforestudy.SaveSubjectsDTO;
+import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import com.zhidejiaoyu.student.business.service.BaseService;
@@ -8,12 +9,12 @@ import com.zhidejiaoyu.student.business.service.BaseService;
 import java.util.List;
 
 /**
- * 学前测试
+ * 摸底测试
  *
  * @author wuchenxi
  * @date 2019-12-19
  */
-public interface BeforeStudyTestService extends BaseService<SchoolTime> {
+public interface BeforeStudyTestService extends BaseService<StudentStudyPlanNew> {
 
     /**
      * 获取学前测试测试题目
@@ -21,4 +22,12 @@ public interface BeforeStudyTestService extends BaseService<SchoolTime> {
      * @return
      */
     ServerResponse<List<SubjectsVO>> getSubjects();
+
+    /**
+     * 保存摸底测试记录
+     *
+     * @param dto
+     * @return
+     */
+    ServerResponse<Object> saveSubjects(SaveSubjectsDTO dto);
 }

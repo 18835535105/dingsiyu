@@ -394,4 +394,5 @@ public class RedisOpt {
             log.error("标记 oldSessionId 出错！oldSessionId=[{}]", oldSessionId, e);
         }
     }
+
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.mapper.LevelMapper;
 import com.zhidejiaoyu.common.mapper.StudentExpansionMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
@@ -13,6 +14,7 @@ import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.pojo.StudyFlow;
 import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.utils.TokenUtil;
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import com.zhidejiaoyu.student.common.SaveRunLog;
@@ -62,6 +64,15 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
     public Long getStudentId(HttpSession session) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         return student.getId();
+    }
+
+    /**
+     * 获取测试或者学习开始时间
+     *
+     * @return
+     */
+    public Date getStartTime() {
+        return (Date) HttpUtil.getHttpSession().getAttribute(TimeConstant.BEGIN_START_TIME);
     }
 
     @Override
@@ -142,22 +153,22 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
      * @param point
      * @return
      */
-    int getEnergy(Student student, Integer point, Integer number) {
+    public int getEnergy(Student student, Integer point, Integer number) {
         int addEnergy = 0;
         if (number == null || number == 0) {
             if (student.getEnergy() == null) {
-                if (point >= 60 && point < 100) {
+                if (point >= PointConstant.SIXTY && point < PointConstant.HUNDRED) {
                     student.setEnergy(4);
                     addEnergy = 4;
-                } else if (point == 100) {
+                } else if (point == PointConstant.HUNDRED) {
                     student.setEnergy(5);
                     addEnergy = 5;
                 }
             } else {
-                if (point >= 60 && point < 100) {
+                if (point >= PointConstant.SIXTY && point < PointConstant.HUNDRED) {
                     student.setEnergy(student.getEnergy() + 4);
                     addEnergy = 4;
-                } else if (point == 100) {
+                } else if (point == PointConstant.HUNDRED) {
                     student.setEnergy(student.getEnergy() + 5);
                     addEnergy = 5;
                 }
