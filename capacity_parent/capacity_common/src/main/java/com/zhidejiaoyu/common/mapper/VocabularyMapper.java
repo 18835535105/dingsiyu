@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.UnitVocabulary;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
+import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -80,7 +81,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * 取单元下一个未学习过的单词
      *
      * @param unitId 单元id
-     * @param id      学生id
+     * @param id     学生id
      * @return 单词数据
      */
     Vocabulary showWord(@Param("unit_id") String unitId, @Param("id") Long id);
@@ -343,10 +344,10 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
     /**
      * 获取火眼精金数据
      *
-     * @param type  1 查找小于10个字母的单词  2 查询固定长度的单词
-     * @param length   最大单词长度
-     * @param max     查询单词数量 ：1 15个单词 ， 2 1个单词
-     * @param start   单词查询开始位置
+     * @param type   1 查找小于10个字母的单词  2 查询固定长度的单词
+     * @param length 最大单词长度
+     * @param max    查询单词数量 ：1 15个单词 ， 2 1个单词
+     * @param start  单词查询开始位置
      * @return
      */
     List<String> selRandWord(@Param("type") Integer type, @Param("leng") Integer length, @Param("max") Integer max, @Param("start") Integer start);
@@ -375,4 +376,12 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     int countPicture(@Param("unitId") Long unitId);
+
+    /**
+     * 获取单元下所有单词数据
+     *
+     * @param unitIds
+     * @return
+     */
+    List<SubjectsVO> selectSubjectsVOByUnitIds(@Param("unitIds") List<Long> unitIds);
 }

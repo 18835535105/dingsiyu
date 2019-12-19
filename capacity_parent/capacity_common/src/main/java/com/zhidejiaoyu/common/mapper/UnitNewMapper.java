@@ -1,7 +1,10 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.zhidejiaoyu.common.pojo.UnitNew;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.UnitNew;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,21 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
  */
 public interface UnitNewMapper extends BaseMapper<UnitNew> {
 
+    /**
+     * 获取当前版本、年级的所有单元id
+     *
+     * @param version
+     * @param gradeList
+     * @return
+     */
+    List<Long> selectByGradeListAndVersionAndGrade(String version, List<String> gradeList);
+
+    /**
+     * 获取当前课程中小于或等于当前单元的所有单元id
+     *
+     * @param courseId
+     * @param unitId
+     * @return
+     */
+    List<Long> selectLessOrEqualsCurrentIdByCourseIdAndUnitId(@Param("courseId") Long courseId, @Param("unitId") Long unitId);
 }

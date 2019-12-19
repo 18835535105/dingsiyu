@@ -4,15 +4,32 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.SchoolTime">
-        <id column="id" property="id" />
-        <result column="user_id" property="userId" />
-        <result column="grade" property="grade" />
-        <result column="unit_id" property="unitId" />
-        <result column="course_id" property="courseId" />
-        <result column="month" property="month" />
-        <result column="week" property="week" />
-        <result column="update_time" property="updateTime" />
-        <result column="type" property="type" />
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="grade" property="grade"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="course_id" property="courseId"/>
+        <result column="month" property="month"/>
+        <result column="week" property="week"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="type" property="type"/>
     </resultMap>
+    <sql id="base_sql">
+        id, user_id, grade, unit_id, course_id, `month`, week, `type`, update_time
+    </sql>
+    <select id="selectByUserIdAndTypeAndMonthAndWeek" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from school_time
+        where user_id = #{userId}
+        <if test="month != null">
+            and month = #{month}
+        </if>
+        <if test="week != null">
+            and week = #{week}
+        </if>
+        and type = #{type}
+        limit 1
+    </select>
 
 </mapper>

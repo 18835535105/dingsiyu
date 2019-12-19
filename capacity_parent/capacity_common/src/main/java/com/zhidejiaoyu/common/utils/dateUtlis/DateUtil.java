@@ -451,6 +451,18 @@ public class DateUtil implements Serializable {
         return new DateTime(date).minusWeeks(week).toDate();
     }
 
+    /**
+     * 获取指定日期在日期所在月位于第几周
+     *
+     * @param date
+     * @return
+     */
+    public static int getWeekOfMonth(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar.get(Calendar.WEEK_OF_MONTH);
+    }
+
     public static void main(String[] args) {
         System.out.println(beforeHoursTime(1));
     }

@@ -752,6 +752,22 @@
             or v.middle_picture_url is not null
             or v.high_picture_url is not null)
     </select>
+    <select id="selectSubjectsVOByUnitIds"
+            resultType="com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO" parameterType="map">
+        select
+        uvn.unit_id unitId,
+        v.read_url readUrl,
+        v.word_chinese wordChinese,
+        v.word
+        from vocabulary v, unit_vocabulary_new uvn
+        where
+        uvn.unit_id in (
+        <foreach collection="unitIds" separator="," item="unitId">
+            #{unitId}
+        </foreach>
+        )
+        and v.id = uvn.vocabulary_id
+    </select>
 
 
 </mapper>

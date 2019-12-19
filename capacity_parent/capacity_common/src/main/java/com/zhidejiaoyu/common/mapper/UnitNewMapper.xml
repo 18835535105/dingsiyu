@@ -4,12 +4,28 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.UnitNew">
-        <id column="id" property="id" />
-        <result column="course_id" property="courseId" />
-        <result column="unit_name" property="unitName" />
-        <result column="joint_name" property="jointName" />
-        <result column="delStatus" property="delStatus" />
-        <result column="unit_index" property="unitIndex" />
+        <id column="id" property="id"/>
+        <result column="course_id" property="courseId"/>
+        <result column="unit_name" property="unitName"/>
+        <result column="joint_name" property="jointName"/>
+        <result column="delStatus" property="delStatus"/>
+        <result column="unit_index" property="unitIndex"/>
     </resultMap>
+    <select id="selectByGradeListAndVersionAndGrade" resultType="java.lang.Long">
+        select distinct(u.id)
+        from course_new c, unit_new u
+        where c.id = u.course_id
+        and c.version = #{version}
+        and c.grade in (
+        <foreach collection="gradeList" item="grade" separator=",">
+            #{grade}
+        </foreach>)
+    </select>
+    <select id="selectLessOrEqualsCurrentIdByCourseIdAndUnitId" resultType="java.lang.Long" parameterType="map">
+        select distinct(id)
+        from unit_new
+        where course_id = #{courseId}
+          and id &lt;= #{unitId}
+    </select>
 
 </mapper>
