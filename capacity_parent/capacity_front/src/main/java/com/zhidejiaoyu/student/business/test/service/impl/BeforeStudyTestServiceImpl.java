@@ -79,24 +79,74 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         // 当前月的第几周
         int weekOfMonth = DateUtil.getWeekOfMonth(dateTime.toDate());
 
-        // 查询学生在当前周是否有计划
-        SchoolTime schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(student.getId(), 2, monthOfYear, weekOfMonth);
+        ServerResponse<List<SubjectsVO>> response = this.getResult(student, monthOfYear, weekOfMonth);
+        if (response != null) {
+            return response;
+        }
+
+        throw new ServiceException(500, "未查询到校区时间表！");
+    }
+
+    /**
+     * 获取试题
+     *
+     * @param student
+     * @param monthOfYear 一年中的第几月
+     * @param weekOfMonth 一月中的第几周
+     * @return
+     */
+    public ServerResponse<List<SubjectsVO>> getResult(Student student, int monthOfYear, int weekOfMonth) {
+        ServerResponse<List<SubjectsVO>> response = this.getStudentPlanResult(student, monthOfYear, weekOfMonth);
+        if (response != null) {
+            return response;
+        }
+
+        response = this.getSchoolPlanResult(student, monthOfYear, weekOfMonth);
+        if (response != null) {
+            return response;
+        }
+
+        return this.getBasePlanResult(monthOfYear, weekOfMonth);
+    }
+
+    /**
+     * 获取总部的测试题
+     *
+     * @param monthOfYear
+     * @return
+     */
+    public ServerResponse<List<SubjectsVO>> getBasePlanResult(int monthOfYear, int weekOfMonth) {
+        SchoolTime schoolTime;
+        // 查看总部当前周的计划
+        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(1L, 1, monthOfYear, weekOfMonth);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
         }
 
-        // 查看学生在当前月是否有计划
-        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(student.getId(), 2, monthOfYear, null);
+        // 查看总部当前月是否有计划
+        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(1L, 1, monthOfYear, null);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
         }
 
-        // 查看学生是否有计划
-        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(student.getId(), 2, null, null);
+        // 查看总部是否有计划
+        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(1L, 1, null, null);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
         }
+        return null;
+    }
 
+    /**
+     * 获取学校的测试题
+     *
+     * @param student
+     * @param monthOfYear
+     * @param weekOfMonth
+     * @return
+     */
+    public ServerResponse<List<SubjectsVO>> getSchoolPlanResult(Student student, int monthOfYear, int weekOfMonth) {
+        SchoolTime schoolTime;
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
 
         if (schoolAdminId != null) {
@@ -118,26 +168,36 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
                 return this.getSubjectsResult(schoolTime);
             }
         }
+        return null;
+    }
 
-        // 查看总部当前周的计划
-        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(1L, 1, monthOfYear, monthOfYear);
+    /**
+     * 获取学生的测试题
+     *
+     * @param student
+     * @param monthOfYear
+     * @param weekOfMonth
+     * @return
+     */
+    public ServerResponse<List<SubjectsVO>> getStudentPlanResult(Student student, int monthOfYear, int weekOfMonth) {
+        // 查询学生在当前周是否有计划
+        SchoolTime schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(student.getId(), 2, monthOfYear, weekOfMonth);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
         }
 
-        // 查看总部当前月是否有计划
-        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(1L, 1, monthOfYear, null);
+        // 查看学生在当前月是否有计划
+        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(student.getId(), 2, monthOfYear, null);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
         }
 
-        // 查看总部是否有计划
-        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(1L, 1, null, null);
+        // 查看学生是否有计划
+        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(student.getId(), 2, null, null);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
         }
-
-        throw new ServiceException(500, "未查询到校区时间表！");
+        return null;
     }
 
     @Override
