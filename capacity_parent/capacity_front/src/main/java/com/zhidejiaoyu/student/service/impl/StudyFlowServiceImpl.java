@@ -429,11 +429,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 }
             }
 
-            learnMapper.updateTypeToLearned(studentId, 1, startUnit, endUnit);
-            capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
-            capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
-            capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
-            capacityListenMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+            this.clearLearnRecord(studentId, startUnit, endUnit);
 
             if (studentStudyPlan.getCurrentStudyCount() >= studentStudyPlan.getTotalStudyCount()) {
                 // 当前学习计划完成需要学习的遍数
@@ -443,7 +439,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
                 this.logInfo(student, studentStudyPlan);
 
-                StudentStudyPlan nextPlan = studentStudyPlanMapper.selectNextPlan(studentId, studentStudyPlan.getId(), 1);
+                StudentStudyPlan nextPlan = studentStudyPlanMapper.selectNextPlan(studentId, 1);
                 if (nextPlan == null) {
                     // 教师分配的所有计划已完成
                     return "恭喜你，完成了本次学习任务，快去向教师申请开始新的征程吧！";
@@ -485,6 +481,21 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         return null;
     }
 
+    /**
+     * 清除学生指定单元的学习记录
+     *
+     * @param studentId
+     * @param startUnit
+     * @param endUnit
+     */
+    private void clearLearnRecord(Long studentId, Long startUnit, Long endUnit) {
+        learnMapper.updateTypeToLearned(studentId, 1, startUnit, endUnit);
+        capacityPictureMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+        capacityMemoryMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+        capacityWriteMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+        capacityListenMapper.deleteByStudentIdAndUnitId(studentId, startUnit, endUnit);
+    }
+
     private void logInfo(Student student, StudentStudyPlan studentStudyPlan) {
         log.info("学生[{} -{} -{}]当前学习计划courseId=[{}], unitId=[{}], type=[{}]需学习总遍数：[{}], 当前学习遍数：[{}]",
                 student.getId(), student.getAccount(), student.getStudentName(),
@@ -503,6 +514,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         if (nextPlan != null) {
             capacityStudentUnit.setStartunit(nextPlan.getStartUnitId());
             capacityStudentUnit.setEndunit(nextPlan.getEndUnitId());
+            this.clearLearnRecord(capacityStudentUnit.getStudentId(), nextPlan.getStartUnitId(), nextPlan.getEndUnitId());
         }
         capacityStudentUnitMapper.updateById(capacityStudentUnit);
     }
