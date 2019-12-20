@@ -271,8 +271,9 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
             learn.setStudyCount(1);
             learn.setLearnCount(1);
             learn.setUpdateTime(now);
-            if (super.getCurrentStudyFlow(studentId) != null) {
-                learn.setFlowName(super.getCurrentStudyFlow(studentId).getFlowName());
+            StudyFlow currentStudyFlow = super.getCurrentStudyFlow(studentId);
+            if (currentStudyFlow != null) {
+                learn.setFlowName(currentStudyFlow.getFlowName());
             }
             if (courseLearnCount == 0) {
                 // 首次学习当前课程，记录课程首次学习时间
