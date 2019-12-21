@@ -27,5 +27,15 @@
         where course_id = #{courseId}
           and id &lt;= #{unitId}
     </select>
+    <select id="selectIdsByCourseNames" resultType="java.lang.Long" parameterType="map">
+        select distinct (u.id)
+        from unit_new u, course_new c
+        where u.course_id = c.id
+        and c.course_name in (
+        <foreach collection="courseNames" item="courseName" separator=",">
+            #{courseName}
+        </foreach>
+        )
+    </select>
 
 </mapper>
