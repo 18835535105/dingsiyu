@@ -12,7 +12,7 @@ import java.util.Date;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author zdjy
@@ -38,7 +38,7 @@ public class CourseConfig extends Model<CourseConfig> {
     /**
      * 可学习模块，1单词2，句型，3课文，4语法
      */
-    private Integer studyModel;
+    private String studyModel;
     /**
      * 是否是一键学习：1：一键学习2：非一键学习
      */
