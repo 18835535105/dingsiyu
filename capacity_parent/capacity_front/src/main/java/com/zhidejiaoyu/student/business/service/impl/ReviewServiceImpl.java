@@ -1366,7 +1366,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         return cm;
     }
 
-    static List<Map<String, Object>> packageLastLoginLearnWordIds(List<Learn> learns) {
+    public static List<Map<String, Object>> packageLastLoginLearnWordIds(List<Learn> learns) {
         List<Map<String, Object>> maps = new ArrayList<>(learns.size());
         learns.forEach(learn -> {
             Map<String, Object> map = new HashMap<>(16);

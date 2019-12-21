@@ -261,6 +261,33 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     /**
+     * @param password    新密码
+     * @param session
+     * @param oldPassword 旧密码
+     * @param studentId   对比 学生id
+     * @return
+     */
+    @Override
+    public ServerResponse<String> updatePassword(String password, HttpSession session, String oldPassword, Long studentId) {
+        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        if (!Objects.equals(student.getId(), studentId)) {
+            log.error("学生 {}->{} 试图修改学生 {} 的密码！", student.getId(), student.getStudentName(), studentId);
+            return ServerResponse.createByErrorMessage("无权限修改他人密码！");
+        }
+        if (!Objects.equals(student.getPassword(), oldPassword)) {
+            return ServerResponse.createByErrorMessage("原密码输入错误！");
+        }
+        student.setPassword(password);
+        int state = studentMapper.updateByPrimaryKeySelective(student);
+        if (state == 1) {
+            session.setAttribute(UserConstant.CURRENT_STUDENT, student);
+            return ServerResponse.createBySuccessMessage("修改成功");
+        } else {
+            return ServerResponse.createByErrorMessage("修改失败");
+        }
+    }
+
+    /**
      * 判断学生是否是在加盟校半径 1 公里外登录
      *
      * @param stu

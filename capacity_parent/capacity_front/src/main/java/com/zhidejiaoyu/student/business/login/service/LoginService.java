@@ -36,4 +36,13 @@ public interface LoginService extends BaseService<Student> {
      * @return
      */
     Object isLoginOut(HttpSession session, String teacherAccount);
+
+    /***
+     * 修改密码
+     *
+     * @param password 新密码
+     * @param session
+     * @return
+     */
+    ServerResponse<String> updatePassword(String password, HttpSession session, String oldPassword, Long studentId);
 }
