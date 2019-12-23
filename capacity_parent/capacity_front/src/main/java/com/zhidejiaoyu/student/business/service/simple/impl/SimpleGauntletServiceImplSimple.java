@@ -14,7 +14,7 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.LevelUtil;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
-import com.zhidejiaoyu.student.business.service.impl.GameServiceImpl;
+import com.zhidejiaoyu.student.business.game.service.impl.GameServiceImpl;
 import com.zhidejiaoyu.student.business.service.simple.SimpleIGauntletServiceSimple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

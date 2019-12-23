@@ -1,11 +1,12 @@
-package com.zhidejiaoyu.student.business.controller;
+package com.zhidejiaoyu.student.business.game.controller;
 
 import com.zhidejiaoyu.common.vo.game.GameOneVo;
 import com.zhidejiaoyu.common.vo.game.GameTwoVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.pojo.GameScore;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.business.service.GameService;
+import com.zhidejiaoyu.student.business.controller.BaseController;
+import com.zhidejiaoyu.student.business.game.service.GameService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
