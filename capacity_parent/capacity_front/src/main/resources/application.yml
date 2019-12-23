@@ -55,7 +55,9 @@ spring:
       mail:
         smtp:
           socketFactory:
-            class:javax.net.ssl.SSLSocketFactory
+            class: javax.net.ssl.SSLSocketFactory
+          starttls:
+            enable: true
 # 发送者邮箱
 mail:
   fromMail:
@@ -148,7 +150,7 @@ logging:
         student: debug
         common:
           mapper: debug
-  config: classpath:logback-dev.xml
+#  config: classpath:logback-dev.xml
 
 cross:
   url: http://192.168.0.*:5000
