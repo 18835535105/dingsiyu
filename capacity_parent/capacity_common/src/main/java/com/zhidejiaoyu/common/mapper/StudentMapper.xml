@@ -882,7 +882,7 @@
         account_time is not null
         and account_time &lt; now()
         and `status` = 1
-        and `rank` &lt; 7
+        and `rank` &lt;= 7
     </select>
 
 </mapper>
