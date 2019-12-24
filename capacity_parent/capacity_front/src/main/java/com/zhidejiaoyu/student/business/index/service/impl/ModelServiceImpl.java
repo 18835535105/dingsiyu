@@ -65,6 +65,7 @@ public class ModelServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 // 语法
                 return this.judgeSyntax(studentId);
             case 8:
+                //智能流程
                 return this.judgeTestBeforeStudy(studentId);
             default:
                 Map<String, Boolean> map = new HashMap<>(16);
@@ -73,6 +74,11 @@ public class ModelServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
     }
 
+    /**
+     * 查看智能流程
+     * @param studentId
+     * @return
+     */
     private ServerResponse<Map<String, Boolean>> judgeTestBeforeStudy(Long studentId) {
         //1判断数据是否放入缓存中
         StudentExpansion expansion = studentExpansionMapper.selectByStudentId(studentId);
