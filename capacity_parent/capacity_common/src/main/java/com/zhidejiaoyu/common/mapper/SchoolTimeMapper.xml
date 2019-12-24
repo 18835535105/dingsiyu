@@ -22,13 +22,26 @@
         <include refid="base_sql"/>
         from school_time
         where user_id = #{userId}
-        <if test="month != null">
-            and month = #{month}
-        </if>
+
+        <!-- 当前月中小于或等于当前周的最大周数据 -->
         <if test="week != null">
-            and week = #{week}
+            and month = #{month}
+            and week &lt;= #{week}
+            and type = #{type}
+            order by week desc
         </if>
-        and type = #{type}
+
+        <!-- 小于或等于当前月的最大月、最大周数据 -->
+        <if test="week == null and month != null">
+            and month &lt;= #{month}
+            and type = #{type}
+            order by month desc, week desc
+        </if>
+
+        <if test="week == null and month == null">
+            and type = #{type}
+            order by month desc, week desc
+        </if>
         limit 1
     </select>
 

@@ -14,7 +14,7 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.LevelUtil;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
-import com.zhidejiaoyu.student.business.service.impl.GameServiceImpl;
+import com.zhidejiaoyu.student.business.game.service.impl.GameServiceImpl;
 import com.zhidejiaoyu.student.business.service.simple.SimpleIGauntletServiceSimple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -253,9 +253,9 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
      */
     @Override
     public ServerResponse<Object> getCourse(HttpSession session) {
-        Student student = getStudent(session);
-        List<Long> courseIds = simpleStudentStudyPlanMapper.getCourseId(student.getId());
-        courseIds.addAll(simpleStudentUnitMapper.getAllCourseIdByTypeToStudent(student.getId(), 2));
+        Long studentId = super.getStudentId(session);
+        List<Long> courseIds = simpleStudentStudyPlanMapper.getCourseId(studentId);
+        courseIds.addAll(simpleStudentUnitMapper.getAllCourseIdByTypeToStudent(studentId, 2));
         List<Map<String, Object>> courses = simpleCourseMapper.getCourseByIds(courseIds);
         return ServerResponse.createBySuccess(courses);
     }

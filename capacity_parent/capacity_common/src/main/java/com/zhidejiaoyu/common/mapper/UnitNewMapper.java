@@ -33,4 +33,12 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
      * @return
      */
     List<Long> selectLessOrEqualsCurrentIdByCourseIdAndUnitId(@Param("courseId") Long courseId, @Param("unitId") Long unitId);
+
+    /**
+     * 查询指定课程名的所有单元id
+     *
+     * @param courseNames
+     * @return
+     */
+    List<Long> selectIdsByCourseNames(@Param("courseNames") List<String> courseNames);
 }

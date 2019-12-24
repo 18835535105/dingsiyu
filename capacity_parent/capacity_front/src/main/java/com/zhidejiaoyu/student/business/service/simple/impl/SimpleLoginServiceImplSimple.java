@@ -14,9 +14,9 @@ import com.zhidejiaoyu.common.utils.ValidateCode;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.index.service.impl.IndexServiceImpl;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import com.zhidejiaoyu.common.constant.PetImageConstant;
-import com.zhidejiaoyu.student.business.service.impl.LoginServiceImpl;
 import com.zhidejiaoyu.student.business.service.simple.SimpleLoginServiceSimple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -421,11 +421,11 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         int myGold = (int) BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
         map.put("myGold", myGold);
 
-        LoginServiceImpl.getMyLevelInfo(map, myGold, redisOpt);
+        IndexServiceImpl.getMyLevelInfo(map, myGold, redisOpt);
 
         // 获取今日获得金币
         List<String> list = runLogMapper.getStudentGold(DateUtil.formatYYYYMMDD(new Date()), studentId);
-        LoginServiceImpl.getTodayGold(map, list);
+        IndexServiceImpl.getTodayGold(map, list);
 
         return ServerResponse.createBySuccess(map);
     }

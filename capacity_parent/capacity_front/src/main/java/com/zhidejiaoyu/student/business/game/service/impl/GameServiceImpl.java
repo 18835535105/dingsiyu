@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.service.impl;
+package com.zhidejiaoyu.student.business.game.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.zhidejiaoyu.common.vo.game.GameOneVo;
@@ -11,7 +11,8 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.business.service.GameService;
+import com.zhidejiaoyu.student.business.game.service.GameService;
+import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

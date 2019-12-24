@@ -88,4 +88,18 @@ public class LoginController extends BaseController {
     public Object isLoginOut(HttpSession session, String teacherAccount) {
         return newLoginService.isLoginOut(session, teacherAccount);
     }
+
+    /**
+     * 修改密码
+     *
+     * @param oldPassword 旧密码
+     * @param password    新密码
+     */
+    @RequestMapping("/updatePassword")
+    public ServerResponse<String> updatePassword(String oldPassword, String password, HttpSession session, Long studentId) {
+        if (StringUtils.isEmpty(oldPassword) || StringUtils.isEmpty(password)) {
+            return ServerResponse.createByErrorMessage("密码不能为空！");
+        }
+        return newLoginService.updatePassword(password, session, oldPassword, studentId);
+    }
 }

@@ -14,6 +14,7 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.grade.GradeUtil;
+import com.zhidejiaoyu.common.utils.grade.LabelUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
@@ -22,6 +23,7 @@ import com.zhidejiaoyu.common.vo.TestResultVo;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.TestServiceImpl;
+import com.zhidejiaoyu.student.business.test.constant.TestConstant;
 import com.zhidejiaoyu.student.business.test.service.BeforeStudyTestService;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
@@ -79,23 +81,6 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         // 当前月的第几周
         int weekOfMonth = DateUtil.getWeekOfMonth(dateTime.toDate());
 
-        ServerResponse<List<SubjectsVO>> response = this.getResult(student, monthOfYear, weekOfMonth);
-        if (response != null) {
-            return response;
-        }
-
-        throw new ServiceException(500, "未查询到校区时间表！");
-    }
-
-    /**
-     * 获取试题
-     *
-     * @param student
-     * @param monthOfYear 一年中的第几月
-     * @param weekOfMonth 一月中的第几周
-     * @return
-     */
-    public ServerResponse<List<SubjectsVO>> getResult(Student student, int monthOfYear, int weekOfMonth) {
         ServerResponse<List<SubjectsVO>> response = this.getStudentPlanResult(student, monthOfYear, weekOfMonth);
         if (response != null) {
             return response;
@@ -105,8 +90,12 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         if (response != null) {
             return response;
         }
+        response = this.getBasePlanResult(monthOfYear, weekOfMonth);
+        if (response != null) {
+            return response;
+        }
 
-        return this.getBasePlanResult(monthOfYear, weekOfMonth);
+        throw new ServiceException(500, "未查询到校区时间表！");
     }
 
     /**
@@ -117,19 +106,19 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
      */
     public ServerResponse<List<SubjectsVO>> getBasePlanResult(int monthOfYear, int weekOfMonth) {
         SchoolTime schoolTime;
-        // 查看总部当前周的计划
+        // 当前月中小于或等于当前周的最大周数据
         schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(1L, 1, monthOfYear, weekOfMonth);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
         }
 
-        // 查看总部当前月是否有计划
+        // 小于或等于当前月的最大月、最大周数据
         schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(1L, 1, monthOfYear, null);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
         }
 
-        // 查看总部是否有计划
+        // 查看学生最大月、最大周数据
         schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(1L, 1, null, null);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
@@ -150,19 +139,19 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
 
         if (schoolAdminId != null) {
-            // 查看校区当前周是否有计划
+            // 当前月中小于或等于当前周的最大周数据
             schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek((long) schoolAdminId, 1, monthOfYear, weekOfMonth);
             if (schoolTime != null) {
                 return this.getSubjectsResult(schoolTime);
             }
 
-            // 查看校区当前月是否有计划
+            // 小于或等于当前月的最大月、最大周数据
             schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek((long) schoolAdminId, 1, monthOfYear, null);
             if (schoolTime != null) {
                 return this.getSubjectsResult(schoolTime);
             }
 
-            // 查看校区是否有计划
+            // 查看学生最大月、最大周数据
             schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek((long) schoolAdminId, 1, null, null);
             if (schoolTime != null) {
                 return this.getSubjectsResult(schoolTime);
@@ -180,19 +169,19 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
      * @return
      */
     public ServerResponse<List<SubjectsVO>> getStudentPlanResult(Student student, int monthOfYear, int weekOfMonth) {
-        // 查询学生在当前周是否有计划
+        // 当前月中小于或等于当前周的最大周数据
         SchoolTime schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(student.getId(), 2, monthOfYear, weekOfMonth);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
         }
 
-        // 查看学生在当前月是否有计划
+        // 小于或等于当前月的最大月、最大周数据
         schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(student.getId(), 2, monthOfYear, null);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
         }
 
-        // 查看学生是否有计划
+        // 查看学生最大月、最大周数据
         schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(student.getId(), 2, null, null);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
@@ -263,7 +252,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
                 .collect(Collectors.groupingBy(SaveSubjectsDTO.Result::getUnitId));
 
         // 学生可学习的所有单元id
-        List<Long> unitIds = (List<Long>) HttpUtil.getHttpSession().getAttribute("TEST_BEFORE_STUDY_UNIT_IDS");
+        List<Long> unitIds = (List<Long>) HttpUtil.getHttpSession().getAttribute(TestConstant.TEST_BEFORE_STUDY_UNIT_IDS);
         List<StudentStudyPlanNew> studentStudyPlanNews = new ArrayList<>(resultList.size());
 
         for (Long unitId : unitIds) {
@@ -294,7 +283,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
 
         // 查询小于当前年级的所有单元，等于当前年级小于或等于当前单元的所有单元
         List<Long> unitIds = this.getUnitIds(schoolTime, courseNew, gradeList);
-        HttpUtil.getHttpSession().setAttribute("TEST_BEFORE_STUDY_UNIT_IDS", unitIds);
+        HttpUtil.getHttpSession().setAttribute(TestConstant.TEST_BEFORE_STUDY_UNIT_IDS, unitIds);
 
         // 取题
         List<SubjectsVO> subjectsVos = vocabularyMapper.selectSubjectsVOByUnitIds(unitIds);
@@ -325,11 +314,43 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         int size = gradeList.size();
         if (size > 1) {
             List<String> smallGradeList = gradeList.subList(0, size - 1);
+            // 当前版本中小于当前年级的所有单元id
             unitIds.addAll(unitNewMapper.selectByGradeListAndVersionAndGrade(courseNew.getVersion(), smallGradeList));
         }
-        unitIds.addAll(unitNewMapper.selectLessOrEqualsCurrentIdByCourseIdAndUnitId(schoolTime.getCourseId(), schoolTime.getUnitId()));
+        // 当前版本中等于当前年级小于或者等于当前单元的所有单元id
+        unitIds.addAll(this.getUnitIdsLessThanCurrentUnitId(schoolTime.getCourseId(), schoolTime.getUnitId()));
+
         return unitIds;
     }
+
+    /**
+     * 获取当前课程中小于或者等于当前单元的所有单元id
+     *
+     * @param courseId
+     * @param unitId
+     * @return
+     */
+    private List<Long> getUnitIdsLessThanCurrentUnitId(Long courseId, Long unitId) {
+        CourseNew courseNew = courseNewMapper.selectById(courseId);
+        String label = courseNew.getLabel();
+        List<String> lessLabels = LabelUtil.getLessThanCurrentLabel(label);
+
+        // 说明这个课程只有一个标签
+        if (lessLabels.size() == 1 && lessLabels.get(0).equals(label)) {
+            return unitNewMapper.selectLessOrEqualsCurrentIdByCourseIdAndUnitId(courseId, unitId);
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        List<String> courseNames = lessLabels.stream().map(lessLabel -> {
+            stringBuilder.setLength(0);
+            return stringBuilder.append(courseNew.getVersion()).append("(").append(courseNew.getGrade()).append("-").append(lessLabel).append(")").toString();
+        }).collect(Collectors.toList());
+
+        List<Long> resultList = unitNewMapper.selectIdsByCourseNames(courseNames);
+        resultList.addAll(unitNewMapper.selectLessOrEqualsCurrentIdByCourseIdAndUnitId(courseId, unitId));
+        return resultList;
+    }
+
 
     public static void main(String[] args) {
         // 当前月份
