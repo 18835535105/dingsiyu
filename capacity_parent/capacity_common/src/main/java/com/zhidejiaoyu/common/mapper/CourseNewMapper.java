@@ -1,8 +1,11 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.dto.testbeforestudy.GradeAndUnitIdDTO;
 import com.zhidejiaoyu.common.pojo.CourseNew;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -29,4 +32,12 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
      * @return
      */
     String selectPhaseById(@Param("courseId") Long courseId);
+
+    /**
+     * 根据单元id查询单元与年级的关系
+     *
+     * @param unitIds
+     * @return
+     */
+    List<GradeAndUnitIdDTO> selectGradeByUnitIds(@Param("unitIds") List<Long> unitIds);
 }

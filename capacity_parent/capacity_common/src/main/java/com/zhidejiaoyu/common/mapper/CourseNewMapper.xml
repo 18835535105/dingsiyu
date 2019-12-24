@@ -9,7 +9,7 @@
         <result column="grade" property="grade"/>
         <result column="version" property="version"/>
         <result column="label" property="label"/>
-        <result column="picture_name" property="pictureName"/>
+        <result column="gradeExt" property="gradeExt"/>
         <result column="picture_url" property="pictureUrl"/>
         <result column="course_name" property="courseName"/>
         <result column="status" property="status"/>
@@ -27,7 +27,19 @@
     </select>
 
     <select id="selectPhaseById" parameterType="map" resultType="string">
-        select study_paragraph from course_new where id =#{courseId}
+        select study_paragraph
+        from course_new
+        where id = #{courseId}
+    </select>
+    <select id="selectGradeByUnitIds"
+            resultType="com.zhidejiaoyu.common.dto.testbeforestudy.GradeAndUnitIdDTO" parameterType="map">
+        select c.grade, u.id unitId, c.grade_ext gradeExt
+        from course_new c
+        left join unit_new u on c.id = u.course_id and u.id in (
+        <foreach collection="unitIds" item="unitId" separator=",">
+            #{unitId}
+        </foreach>
+        )
     </select>
 
 </mapper>

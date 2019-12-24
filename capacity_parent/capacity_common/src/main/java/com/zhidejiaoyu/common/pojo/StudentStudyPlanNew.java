@@ -3,8 +3,7 @@ package com.zhidejiaoyu.common.pojo;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -19,6 +18,9 @@ import java.util.Date;
  * @since 2019-12-19
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class StudentStudyPlanNew extends Model<StudentStudyPlanNew> {
@@ -55,13 +57,10 @@ public class StudentStudyPlanNew extends Model<StudentStudyPlanNew> {
     private Integer flowId;
     /**
      * 难易类型：1：简单类型；2：难类型
-
      */
     private Integer easyOrHard;
     /**
      * 时间优先级，默认“1”
-
-
      */
     private Integer timeLevel;
     /**

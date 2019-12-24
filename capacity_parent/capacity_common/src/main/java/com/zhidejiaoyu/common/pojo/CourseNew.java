@@ -52,9 +52,9 @@ public class CourseNew extends Model<CourseNew> {
      */
     private String label;
     /**
-     * 课本封面图名
+     * 年级不是普通形式时，在该列将年级转化为普通形式
      */
-    private String pictureName;
+    private String gradeExt;
     /**
      * 课本封面图url地址
      */

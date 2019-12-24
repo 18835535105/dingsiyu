@@ -12,6 +12,12 @@ import java.util.List;
 public class SaveSubjectsDTO {
 
     /**
+     * 测试结果字符串
+     * 单元:错题数;单元:错题数;
+     */
+    private String result;
+
+    /**
      * 测试结果
      */
     private List<Result> resultList;
@@ -30,8 +36,8 @@ public class SaveSubjectsDTO {
         private Long unitId;
 
         /**
-         * 是否答对
+         * 答错个数
          */
-        private Boolean right;
+        private Integer errorCount;
     }
 }

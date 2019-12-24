@@ -1,11 +1,13 @@
 package com.zhidejiaoyu.student.business.test.service.impl;
 
+import com.github.pagehelper.util.StringUtil;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.award.GoldChange;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
+import com.zhidejiaoyu.common.dto.testbeforestudy.GradeAndUnitIdDTO;
 import com.zhidejiaoyu.common.dto.testbeforestudy.SaveSubjectsDTO;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
@@ -19,6 +21,7 @@ import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.common.vo.TestResultVo;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -207,7 +210,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         List<SaveSubjectsDTO.Result> resultList = dto.getResultList();
 
         // 推送课程
-        this.pushCourse(resultList);
+        this.pushCourse(resultList, student);
 
         // 奖励的金币数
         Integer point = dto.getPoint();
@@ -234,6 +237,14 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         return ServerResponse.createBySuccess(vo);
     }
 
+    /**
+     * 保存测试记录
+     *
+     * @param student
+     * @param dto
+     * @param awardGold
+     * @return
+     */
     public TestRecord saveTestRecord(Student student, SaveSubjectsDTO dto, int awardGold) {
         TestRecord testRecord = new TestRecord();
         testRecord.setAwardGold(awardGold);
@@ -241,16 +252,17 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         testRecord.setStudyModel(GenreConstant.TEST_BEFORE_STUDY);
 
         List<SaveSubjectsDTO.Result> resultList = dto.getResultList();
-        testRecord.setQuantity(resultList.size());
+        testRecord.setQuantity(resultList.size() * 3);
         testRecord.setStudentId(student.getId());
-        int rightCount = (int) resultList.stream().filter(SaveSubjectsDTO.Result::getRight).count();
-        testRecord.setRightCount(rightCount);
-        testRecord.setErrorCount(testRecord.getQuantity() - rightCount);
+        int errorCount = resultList.stream().mapToInt(SaveSubjectsDTO.Result::getErrorCount).sum();
+        testRecord.setRightCount(testRecord.getQuantity() - errorCount);
+        testRecord.setErrorCount(errorCount);
         testRecord.setTestStartTime(super.getStartTime());
         testRecord.setTestEndTime(new Date());
         testRecord.setPoint(dto.getPoint());
         Long unitId = resultList.get(0).getUnitId();
         testRecord.setUnitId(unitId);
+        testRecord.setCourseId(unitNewMapper.selectById(unitId).getCourseId());
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
         if (studentExpansion == null) {
             String phase = courseNewMapper.selectPhaseByUnitId(unitId);
@@ -262,24 +274,121 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         return testRecord;
     }
 
-    public void pushCourse(List<SaveSubjectsDTO.Result> resultList) {
+    /**
+     * 推送课程
+     *
+     * @param resultList
+     * @param student
+     */
+    public void pushCourse(List<SaveSubjectsDTO.Result> resultList, Student student) {
         Map<Long, List<SaveSubjectsDTO.Result>> unitIdMap = resultList.stream()
                 .collect(Collectors.groupingBy(SaveSubjectsDTO.Result::getUnitId));
 
         // 学生可学习的所有单元id
         List<Long> unitIds = (List<Long>) HttpUtil.getHttpSession().getAttribute(TestConstant.TEST_BEFORE_STUDY_UNIT_IDS);
+        if (unitIds == null) {
+            throw new ServiceException(500, "学生没有可学习的单元！");
+        }
+
+        // 匹配单元对应的年级
+        Map<Long, String> unitIdAndGrade = this.getUnitIdAndGrade(unitIds);
+
+        // 匹配单元对应的课程id
+        Map<Long, Long> unitIdAndCourseId = this.getUnitIdAndCourseId(unitIds);
+
         List<StudentStudyPlanNew> studentStudyPlanNews = new ArrayList<>(resultList.size());
 
+        String grade = student.getGrade();
+        Date updateTime = new Date();
+        int timePriority = PriorityUtil.BASE_TIME_PRIORITY;
+        Set<String> phaseSet = new HashSet<>();
         for (Long unitId : unitIds) {
-            if (unitIdMap.containsKey(unitId)) {
-                // todo: 没有单词的单元推送课程
-            } else {
-                long count = unitIdMap.get(unitId).stream().filter(SaveSubjectsDTO.Result::getRight).count();
-                // todo: 根据答对个数推送课程
-            }
+
+            String unitGrade = unitIdAndGrade.get(unitId);
+            timePriority = this.getTimePriority(timePriority, phaseSet, unitGrade);
+
+            int basePriority = this.getBasePriority(unitIdMap, unitGrade, grade, unitId);
+            StudentStudyPlanNew.StudentStudyPlanNewBuilder studentStudyPlanNewBuilder = StudentStudyPlanNew.builder()
+                    .studentId(student.getId())
+                    .complete(1)
+                    .courseId(unitIdAndCourseId.get(unitId))
+                    .currentStudyCount(1)
+                    .errorLevel(1)
+                    .group(0)
+                    .timeLevel(timePriority)
+                    .totalStudyCount(1)
+                    .updateTime(updateTime)
+                    .unitId(unitId)
+                    .finalLevel(basePriority + 1 + timePriority);
+
+            studentStudyPlanNews.add(studentStudyPlanNewBuilder
+                    .easyOrHard(1)
+                    .baseLevel(basePriority)
+                    .flowId(11)
+                    .build());
+
+            studentStudyPlanNews.add(studentStudyPlanNewBuilder
+                    .easyOrHard(2)
+                    .baseLevel(basePriority - PriorityUtil.HARD_NUM)
+                    .flowId(24)
+                    .build());
         }
 
         this.insertBatch(studentStudyPlanNews);
+    }
+
+    /**
+     * 获取时间优先级
+     *
+     * @param timePriority
+     * @param phaseSet
+     * @param unitGrade
+     * @return
+     */
+    public int getTimePriority(int timePriority, Set<String> phaseSet, String unitGrade) {
+        if (!phaseSet.contains(unitGrade)) {
+            phaseSet.add(unitGrade);
+            return PriorityUtil.BASE_TIME_PRIORITY;
+        } else {
+           return timePriority + PriorityUtil.BASE_TIME_PRIORITY;
+        }
+    }
+
+    public int getBasePriority(Map<Long, List<SaveSubjectsDTO.Result>> unitIdMap, String unitGrade,
+                               String grade, Long unitId) {
+        if (!unitIdMap.containsKey(unitId)) {
+            return PriorityUtil.getBasePriority(grade, unitGrade, 0);
+        }
+        // 答错个数
+        long errorCount = unitIdMap.get(unitId).get(0).getErrorCount();
+        return PriorityUtil.getBasePriority(grade, unitGrade, (int) errorCount);
+    }
+
+    /**
+     * 匹配单元对应的课程id
+     *
+     * @param unitIds
+     * @return
+     */
+    public Map<Long, Long> getUnitIdAndCourseId(List<Long> unitIds) {
+        List<UnitNew> unitNews = unitNewMapper.selectBatchIds(unitIds);
+        Map<Long, Long> unitIdAndCourseId = new HashMap<>(16);
+        unitNews.forEach(unitNew -> unitIdAndCourseId.put(unitNew.getId(), unitNew.getCourseId()));
+        return unitIdAndCourseId;
+    }
+
+    /**
+     * 匹配单元对应的年级
+     *
+     * @param unitIds
+     * @return
+     */
+    public Map<Long, String> getUnitIdAndGrade(List<Long> unitIds) {
+        List<GradeAndUnitIdDTO> gradeAndUnitIdDTOList = courseNewMapper.selectGradeByUnitIds(unitIds);
+        Map<Long, String> unitIdAndGrade = new HashMap<>(16);
+        gradeAndUnitIdDTOList.forEach(gradeAndUnitIdDTO -> unitIdAndGrade.put(gradeAndUnitIdDTO.getUnitId(),
+                StringUtil.isNotEmpty(gradeAndUnitIdDTO.getGradeExt()) ? gradeAndUnitIdDTO.getGradeExt() : gradeAndUnitIdDTO.getGrade()));
+        return unitIdAndGrade;
     }
 
     /**
