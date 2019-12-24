@@ -61,20 +61,20 @@ public class RedisOpt {
         staticRedisTemplate = redisTemplate;
     }
 
-    //添加摸底测试记录
+    /**
+     * 添加摸底测试记录
+     */
     public void addTestBeforeStudy(Long stuId, String phase) {
         redisTemplate.opsForHash().put(RedisKeysConst.TEST_BEFORE_STUDY + stuId + phase, null, true);
         redisTemplate.expire(RedisKeysConst.TEST_BEFORE_STUDY + stuId + phase, 30, TimeUnit.DAYS);
     }
 
-    //获取摸底测试测试记录
+    /**
+     * 获取摸底测试测试记录
+     */
     public boolean getTestBeforeStudy(Long stuId, String phase) {
         Object o = redisTemplate.opsForHash().get(RedisKeysConst.TEST_BEFORE_STUDY + stuId + phase, null);
-        if (o == null) {
-            return false;
-        } else {
-            return true;
-        }
+        return o != null ? true : false;
     }
 
 
