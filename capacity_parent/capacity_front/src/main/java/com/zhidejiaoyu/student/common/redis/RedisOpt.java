@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.common.redis;
 
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
+import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.simple.SimpleCourseMapper;
 import com.zhidejiaoyu.common.pojo.PhoneticSymbol;
@@ -60,21 +61,39 @@ public class RedisOpt {
         staticRedisTemplate = redisTemplate;
     }
 
+    //添加摸底测试记录
+    public void addTestBeforeStudy(Long stuId, String phase) {
+        redisTemplate.opsForHash().put(RedisKeysConst.TEST_BEFORE_STUDY + stuId + phase, null, true);
+        redisTemplate.expire(RedisKeysConst.TEST_BEFORE_STUDY + stuId + phase, 30, TimeUnit.DAYS);
+    }
 
-    public void addDrawRecordIndex(String name,Integer count){
+    //获取摸底测试测试记录
+    public boolean getTestBeforeStudy(Long stuId, String phase) {
+        Object o = redisTemplate.opsForHash().get(RedisKeysConst.TEST_BEFORE_STUDY + stuId + phase, null);
+        if (o == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+
+    public void addDrawRecordIndex(String name, Integer count) {
         String hKey = RedisKeysConst.DRAW_COUNT_WITH_NAME;
         redisTemplate.opsForHash().put(hKey, name, count);
     }
-    public int selDrawRecordIndex(String name){
+
+    public int selDrawRecordIndex(String name) {
         String hKey = RedisKeysConst.DRAW_COUNT_WITH_NAME;
         Object object = getRedisDraw(name);
-        if(object!=null){
-            return Integer.parseInt(object+"");
-        }else{
+        if (object != null) {
+            return Integer.parseInt(object + "");
+        } else {
             return 0;
         }
     }
-    public void delDrawRecord(){
+
+    public void delDrawRecord() {
         Set<Object> keys = redisTemplate.opsForHash().keys(RedisKeysConst.DRAW_COUNT_WITH_NAME);
         redisTemplate.opsForHash().delete(RedisKeysConst.DRAW_COUNT_WITH_NAME, keys);
     }
@@ -163,7 +182,7 @@ public class RedisOpt {
             wordCount = unitVocabularyMapper.countByUnitId(unitId);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, wordCountKey, wordCount);
         } else {
-            try{
+            try {
                 wordCount = (int) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], unitId=[{}], error=[{}]", object, unitId, e.getMessage());
@@ -275,7 +294,7 @@ public class RedisOpt {
             allLevel = levelMapper.selectAll();
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, RedisKeysConst.ALL_LEVEL, allLevel);
         } else {
-            try{
+            try {
                 allLevel = (List<Map<String, Object>>) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}]", object, e);
@@ -366,7 +385,7 @@ public class RedisOpt {
      * 判断学生是否是第一次登录系统
      *
      * @param studentId
-     * @return  true：是第一次登录系统；false：不是第一次登录系统
+     * @return true：是第一次登录系统；false：不是第一次登录系统
      */
     public boolean firstLogin(Long studentId) {
         Object object = redisTemplate.opsForHash().get(RedisKeysConst.FIRST_LOGIN, studentId);
@@ -377,7 +396,7 @@ public class RedisOpt {
         boolean flag = count == 0;
         redisTemplate.opsForHash().put(RedisKeysConst.FIRST_LOGIN, studentId, flag);
         redisTemplate.expire(RedisKeysConst.FIRST_LOGIN, 7, TimeUnit.DAYS);
-        return flag ;
+        return flag;
     }
 
     /**

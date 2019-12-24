@@ -18,4 +18,8 @@
         <result column="delStatus" property="delStatus"/>
     </resultMap>
 
+    <select id="selectPhseById" parameterType="map" resultType="string">
+        select study_paragraph from course_new where id =#{courseId}
+    </select>
+
 </mapper>

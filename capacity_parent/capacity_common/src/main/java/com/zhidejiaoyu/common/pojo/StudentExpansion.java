@@ -45,6 +45,8 @@ public class StudentExpansion extends Model<StudentExpansion> {
     @TableField("pk_explain")
     private Integer pkExplain;
 
+    private String phase;
+
     /**
      * 背景音乐开关；1：开启；2：关闭
      */

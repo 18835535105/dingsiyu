@@ -105,6 +105,13 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     TestRecord selectByGenre(@Param("stuId") Long stuId, @Param("genre") String genre);
 
     /**
+     * 根据测试类型查询测试记录数据
+     * @param stuId
+     * @param genre
+     * @return
+     */
+    List<TestRecord> selectListByGenre(@Param("stuId") Long stuId, @Param("genre") String genre);
+    /**
      * 查询学生所有课程单元闯关成功的个数
      *
      * @param studentId

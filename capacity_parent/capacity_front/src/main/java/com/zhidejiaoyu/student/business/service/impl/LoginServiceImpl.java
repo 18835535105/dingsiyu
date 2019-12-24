@@ -3,9 +3,11 @@ package com.zhidejiaoyu.student.business.service.impl;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.simple.SimpleStudentUnitMapper;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
@@ -42,6 +44,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Autowired
     private StudentMapper studentMapper;
+
+    @Autowired
+    private CourseNewMapper courseNewMapper;
 
     @Autowired
     private SimpleStudentUnitMapper simpleStudentUnitMapper;
@@ -84,6 +89,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Autowired
     private RedisOpt redisOpt;
+
+    @Autowired
+    private StudentExpansionMapper studentExpansionMapper;
 
     /**
      * @param password    新密码
@@ -644,6 +652,32 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             if (i > 0) {
                 isHave = true;
             }
+        }
+        //判断是否有摸底测试
+        if (type.equals(8)) {
+            //1判断数据是否放入缓存中
+            StudentExpansion expansion = studentExpansionMapper.selectByStudentId(student.getId());
+            boolean falg = redisOpt.getTestBeforeStudy(student.getId(), expansion.getPhase());
+            if (falg) {
+                isHave = true;
+            } else {
+                List<TestRecord> testRecords =
+                        testRecordMapper.selectListByGenre(student.getId(), GenreConstant.TEST_BEFORE_STUDY);
+                boolean isStudy = false;
+                for (TestRecord testRecord : testRecords) {
+                    String explain = testRecord.getExplain();
+                    if (explain.equals(expansion.getPhase())) {
+                        isStudy = true;
+                    }
+                }
+                if (isStudy) {
+                    redisOpt.addTestBeforeStudy(student.getId(), expansion.getPhase());
+                    isHave = true;
+                } else {
+                    isHave = false;
+                }
+            }
+
         }
         map.put("isHave", isHave);
         return ServerResponse.createBySuccess(map);

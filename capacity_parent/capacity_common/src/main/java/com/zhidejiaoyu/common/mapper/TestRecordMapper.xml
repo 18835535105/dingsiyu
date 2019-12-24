@@ -532,6 +532,11 @@
         <include refid="Base_Column_List"/>
         from test_record where student_id = #{stuId} and genre = #{genre}
     </select>
+    <select id="selectListByGenre" resultType="com.zhidejiaoyu.common.pojo.TestRecord" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from test_record where student_id = #{stuId} and genre = #{genre}
+    </select>
 
     <select id="selectPoint" parameterType="map" resultType="integer">
         select max(point) from test_record where student_id = #{student_id} and unit_id = #{unit_id} and genre =
