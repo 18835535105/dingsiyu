@@ -18,7 +18,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, student_id, study_power , level ,is_look, audio_status, test_gold_add, pk_explain, better_three_time,phase
+        id, student_id, study_power , level ,is_look, audio_status, test_gold_add, pk_explain, better_three_time, `phase`
     </sql>
 
     <sql id="more_table_column">

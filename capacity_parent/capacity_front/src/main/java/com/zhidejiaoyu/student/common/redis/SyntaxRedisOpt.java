@@ -1,12 +1,9 @@
 package com.zhidejiaoyu.student.common.redis;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.zhidejiaoyu.common.constant.redis.SyntaxKeysConst;
+import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.mapper.KnowledgePointMapper;
 import com.zhidejiaoyu.common.mapper.SyntaxTopicMapper;
-import com.zhidejiaoyu.common.mapper.SyntaxUnitTopicMapper;
-import com.zhidejiaoyu.common.pojo.SyntaxUnitTopic;
-import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -27,9 +24,6 @@ public class SyntaxRedisOpt {
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
-
-    @Resource
-    private SyntaxUnitTopicMapper syntaxUnitTopicMapper;
 
     @Resource
     private SyntaxTopicMapper syntaxTopicMapper;

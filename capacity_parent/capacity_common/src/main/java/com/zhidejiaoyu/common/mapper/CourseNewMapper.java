@@ -13,10 +13,20 @@ import org.apache.ibatis.annotations.Param;
  * @since 2019-11-21
  */
 public interface CourseNewMapper extends BaseMapper<CourseNew> {
+
+    /**
+     * 通过单元id查询当前课程所属学段
+     *
+     * @param unitId
+     * @return
+     */
+    String selectPhaseByUnitId(Long unitId);
+
     /**
      * 根据课程id查询学段
+     *
      * @param courseId
      * @return
      */
-    String selectPhseById(@Param("courseId") Long courseId);
+    String selectPhaseById(@Param("courseId") Long courseId);
 }

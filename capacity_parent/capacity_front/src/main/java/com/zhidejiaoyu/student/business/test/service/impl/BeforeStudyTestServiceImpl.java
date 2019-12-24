@@ -68,6 +68,9 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
     @Resource
     private RedisOpt redisOpt;
 
+    @Resource
+    private StudentExpansionMapper studentExpansionMapper;
+
     @Override
     public ServerResponse<List<SubjectsVO>> getSubjects() {
 
@@ -217,27 +220,11 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
 
         TestResultVo vo = new TestResultVo();
 
-        TestRecord testRecord = new TestRecord();
-        testRecord.setAwardGold(awardGold);
-        testRecord.setGenre(GenreConstant.TEST_BEFORE_STUDY);
-        testRecord.setStudyModel(GenreConstant.TEST_BEFORE_STUDY);
-        testRecord.setQuantity(resultList.size());
-        testRecord.setStudentId(student.getId());
-        int rightCount = (int) resultList.stream().filter(SaveSubjectsDTO.Result::getRight).count();
-        testRecord.setRightCount(rightCount);
-        testRecord.setErrorCount(testRecord.getQuantity() - rightCount);
-        testRecord.setTestStartTime(super.getStartTime());
-        testRecord.setTestEndTime(new Date());
-        testRecord.setPoint(point);
-        testRecord.setUnitId(resultList.get(0).getUnitId());
-        testRecord.setExplain(TestServiceImpl.getUnitTestMsg(point));
-
+        TestRecord testRecord = this.saveTestRecord(student, dto, awardGold);
         String msg = TestServiceImpl.getTestMessage(student, vo, testRecord, PointConstant.FIFTY, petSayUtil);
 
-        testRecordMapper.insert(testRecord);
-
         vo.setMsg(msg);
-        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
+        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, GenreConstant.UNIT_TEST));
         vo.setGold(awardGold);
         vo.setEnergy(energy);
 
@@ -245,6 +232,34 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
 
         httpSession.removeAttribute(TimeConstant.BEGIN_START_TIME);
         return ServerResponse.createBySuccess(vo);
+    }
+
+    public TestRecord saveTestRecord(Student student, SaveSubjectsDTO dto, int awardGold) {
+        TestRecord testRecord = new TestRecord();
+        testRecord.setAwardGold(awardGold);
+        testRecord.setGenre(GenreConstant.TEST_BEFORE_STUDY);
+        testRecord.setStudyModel(GenreConstant.TEST_BEFORE_STUDY);
+
+        List<SaveSubjectsDTO.Result> resultList = dto.getResultList();
+        testRecord.setQuantity(resultList.size());
+        testRecord.setStudentId(student.getId());
+        int rightCount = (int) resultList.stream().filter(SaveSubjectsDTO.Result::getRight).count();
+        testRecord.setRightCount(rightCount);
+        testRecord.setErrorCount(testRecord.getQuantity() - rightCount);
+        testRecord.setTestStartTime(super.getStartTime());
+        testRecord.setTestEndTime(new Date());
+        testRecord.setPoint(dto.getPoint());
+        Long unitId = resultList.get(0).getUnitId();
+        testRecord.setUnitId(unitId);
+        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
+        if (studentExpansion == null) {
+            String phase = courseNewMapper.selectPhaseByUnitId(unitId);
+            testRecord.setExplain(phase);
+        } else {
+            testRecord.setExplain(studentExpansion.getPhase());
+        }
+        testRecordMapper.insert(testRecord);
+        return testRecord;
     }
 
     public void pushCourse(List<SaveSubjectsDTO.Result> resultList) {

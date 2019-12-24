@@ -43,7 +43,7 @@ public class GameController extends BaseController {
     /**
      * 获取游戏《冰火两重天》试题
      *
-     * @param pageNum 第几次获取游戏题
+     * @param pageNum  第几次获取游戏题
      * @param session
      * @param wordList 当前游戏题目中的单词集合，避免下次取的游戏题目与上次题目有重复的
      * @return

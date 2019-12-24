@@ -1,9 +1,12 @@
 package com.zhidejiaoyu.student.business.index.service.impl;
 
-import com.zhidejiaoyu.common.constant.test.GenreConstant;
-import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.CapacityStudentUnitMapper;
+import com.zhidejiaoyu.common.mapper.StudentMapper;
+import com.zhidejiaoyu.common.mapper.StudentStudyPlanMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleStudentUnitMapper;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.pojo.CapacityStudentUnit;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.StudentStudyPlan;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.index.service.ModelService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -13,7 +16,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,12 +33,6 @@ public class ModelServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Resource
     private SimpleStudentUnitMapper simpleStudentUnitMapper;
-
-    @Resource
-    private StudentExpansionMapper studentExpansionMapper;
-
-    @Resource
-    private TestRecordMapper testRecordMapper;
 
     @Resource
     private RedisOpt redisOpt;
@@ -76,33 +72,13 @@ public class ModelServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     /**
      * 查看智能流程
+     *
      * @param studentId
      * @return
      */
     private ServerResponse<Map<String, Boolean>> judgeTestBeforeStudy(Long studentId) {
-        //1判断数据是否放入缓存中
-        StudentExpansion expansion = studentExpansionMapper.selectByStudentId(studentId);
-        boolean falg = redisOpt.getTestBeforeStudy(studentId, expansion.getPhase());
-        boolean isHave=false;
-        if (falg) {
-            isHave = true;
-        } else {
-            List<TestRecord> testRecords =
-                    testRecordMapper.selectListByGenre(studentId, GenreConstant.TEST_BEFORE_STUDY);
-            boolean isStudy = false;
-            for (TestRecord testRecord : testRecords) {
-                String explain = testRecord.getExplain();
-                if (explain.equals(expansion.getPhase())) {
-                    isStudy = true;
-                }
-            }
-            if (isStudy) {
-                redisOpt.addTestBeforeStudy(studentId, expansion.getPhase());
-                isHave = true;
-            }
-        }
         Map<String, Boolean> map = new HashMap<>(16);
-        map.put("isHave", isHave);
+        map.put("isHave", redisOpt.getTestBeforeStudy(studentId));
         return ServerResponse.createBySuccess(map);
     }
 

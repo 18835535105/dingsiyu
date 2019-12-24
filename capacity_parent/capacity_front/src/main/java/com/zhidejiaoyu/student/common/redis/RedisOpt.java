@@ -4,9 +4,7 @@ import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.simple.SimpleCourseMapper;
-import com.zhidejiaoyu.common.pojo.PhoneticSymbol;
-import com.zhidejiaoyu.common.pojo.Sentence;
-import com.zhidejiaoyu.common.pojo.Vocabulary;
+import com.zhidejiaoyu.common.pojo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -45,8 +43,11 @@ public class RedisOpt {
     @Autowired
     private SimpleCourseMapper simpleCourseMapper;
 
-    @Autowired
+    @Resource
+    private StudentExpansionMapper studentExpansionMapper;
 
+    @Resource
+    private TestRecordMapper testRecordMapper;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -62,19 +63,29 @@ public class RedisOpt {
     }
 
     /**
-     * 添加摸底测试记录
-     */
-    public void addTestBeforeStudy(Long stuId, String phase) {
-        redisTemplate.opsForHash().put(RedisKeysConst.TEST_BEFORE_STUDY + stuId + phase, null, true);
-        redisTemplate.expire(RedisKeysConst.TEST_BEFORE_STUDY + stuId + phase, 30, TimeUnit.DAYS);
-    }
-
-    /**
      * 获取摸底测试测试记录
      */
-    public boolean getTestBeforeStudy(Long stuId, String phase) {
-        Object o = redisTemplate.opsForHash().get(RedisKeysConst.TEST_BEFORE_STUDY + stuId + phase, null);
-        return o != null ? true : false;
+    public boolean getTestBeforeStudy(Long studentId) {
+        StudentExpansion expansion = studentExpansionMapper.selectByStudentId(studentId);
+        String phase = expansion.getPhase();
+        Object o = redisTemplate.opsForHash().get(RedisKeysConst.TEST_BEFORE_STUDY + studentId + phase, null);
+
+        if (o != null) {
+            return true;
+        }
+
+        List<TestRecord> testRecords =
+                testRecordMapper.selectListByGenre(studentId, GenreConstant.TEST_BEFORE_STUDY);
+        for (TestRecord testRecord : testRecords) {
+            String explain = testRecord.getExplain();
+            if (explain.equals(phase)) {
+                redisTemplate.opsForHash().put(RedisKeysConst.TEST_BEFORE_STUDY + studentId + phase, null, true);
+                redisTemplate.expire(RedisKeysConst.TEST_BEFORE_STUDY + studentId + phase, 30, TimeUnit.DAYS);
+                return true;
+            }
+        }
+        return false;
+
     }
 
 

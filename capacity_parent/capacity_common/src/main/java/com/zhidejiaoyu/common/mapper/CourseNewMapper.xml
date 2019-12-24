@@ -17,8 +17,16 @@
         <result column="update_time" property="updateTime"/>
         <result column="delStatus" property="delStatus"/>
     </resultMap>
+    <select id="selectPhaseByUnitId" resultType="java.lang.String" parameterType="map">
+        select c.study_paragraph
+        from course_new c
+                 left join unit_new u
+                           on u.course_id = c.id
+                               and u.id = #{unitId}
+        limit 1
+    </select>
 
-    <select id="selectPhseById" parameterType="map" resultType="string">
+    <select id="selectPhaseById" parameterType="map" resultType="string">
         select study_paragraph from course_new where id =#{courseId}
     </select>
 
