@@ -463,6 +463,11 @@ public class DateUtil implements Serializable {
         return calendar.get(Calendar.WEEK_OF_MONTH);
     }
 
+    public static int getMonth(){
+        Calendar cal = Calendar.getInstance();
+        return cal.get(Calendar.MONTH) + 1;
+    }
+
     private DateUtil(){}
 
     public static void main(String[] args) {

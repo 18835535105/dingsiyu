@@ -102,8 +102,8 @@ public class PriorityUtil {
     /**
      * 每天定时任务 计算学生变化率
      */
-    private static int CalculateRateOfChange(int studentGrade, int studyGrade) {
-        return 3 * (studentGrade + 1 - studyGrade);
+    public static int CalculateRateOfChange(String studentGrade, String studyGrade) {
+        return 3 * (GRADE_TO_NUM.get(studentGrade) + 1 - GRADE_TO_NUM.get(studyGrade));
     }
 
 

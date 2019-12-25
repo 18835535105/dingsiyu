@@ -23,50 +23,8 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class ErrorLearnLogHistory extends Model<ErrorLearnLogHistory> {
+public class ErrorLearnLogHistory extends ErrorLearnLog {
 
     private static final long serialVersionUID = 1L;
-
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
-    /**
-     * 学生id
-     */
-    private Long studentId;
-    private Long unitId;
-    /**
-     * 学习类型：1单词；2句型；3语法；4课文
-     */
-    private Integer type;
-    /**
-     * 学习模块
-     */
-    private String studyModel;
-    /**
-     * 难易类型：1：简单类型；2：难类型
-     */
-    private Integer easyOrHard;
-    /**
-     * 分组序号
-     */
-    private Integer group;
-    /**
-     * 原题
-     */
-    private String topic;
-    /**
-     * 错误答案
-     */
-    private String errorAnswer;
-    /**
-     * 学习记录更新时间
-     */
-    private Date updateTime;
-
-
-    @Override
-    protected Serializable pkVal() {
-        return this.id;
-    }
 
 }

@@ -16,4 +16,24 @@
         <result column="state" property="state" />
     </resultMap>
 
+    <select id="selectStudyFiveStudent" parameterType="map" resultType="map">
+        select student_id studentId,
+        (
+        (select count(unit_id) from learn_history learn1
+        where learn1.student_id = learn.student_id and learn1.state=2 and learn1.easy_or_hard=1) +
+        (select count(unit_id) from learn_history learn2
+        where learn2.student_id = learn.student_id and learn2.state=2 and learn2.easy_or_hard=2
+        )
+        ) count
+        from learn_history learn
+        where student_id in (
+        <foreach collection="studentIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+        group by student_id;
+    </select>
+    <select id="selectStudyUnitByStudentId" parameterType="map" resultType="map">
+        select distinct(unit_id) unitId,easy_or_hard easyOrHard from learn_history where student_id =#{studentId} group by unit_id,easy_or_hard
+    </select>
 </mapper>

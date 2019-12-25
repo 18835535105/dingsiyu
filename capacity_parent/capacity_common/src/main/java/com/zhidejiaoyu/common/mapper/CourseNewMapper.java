@@ -40,4 +40,6 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
      * @return
      */
     List<GradeAndUnitIdDTO> selectGradeByUnitIds(@Param("unitIds") List<Long> unitIds);
+
+    String selectGradeByCourseId(@Param("courseId") Long courseId);
 }

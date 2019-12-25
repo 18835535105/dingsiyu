@@ -2,9 +2,11 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.UnitNew;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -41,4 +43,7 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
      * @return
      */
     List<Long> selectIdsByCourseNames(@Param("courseNames") List<String> courseNames);
+
+    @MapKey("unitId")
+    Map<Long,Map<String,Object>> selectCountByUnitIds(@Param("unitIds") List<Long> unitIds);
 }

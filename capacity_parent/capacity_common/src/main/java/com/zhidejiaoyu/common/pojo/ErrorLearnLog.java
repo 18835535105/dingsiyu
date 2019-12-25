@@ -62,6 +62,10 @@ public class ErrorLearnLog extends Model<ErrorLearnLog> {
      * 学习记录更新时间
      */
     private Date updateTime;
+    /**
+     * 学习id
+     */
+    private Long wordId;
 
 
     @Override

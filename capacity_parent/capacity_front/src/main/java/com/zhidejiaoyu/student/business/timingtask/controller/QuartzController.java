@@ -138,5 +138,10 @@ public class QuartzController {
         this.quartzService.CalculateRateOfChange();
         return ServerResponse.createBySuccess();
     }
+    @PostMapping("/addStudyByWeek")
+    public ServerResponse<Object> addStudyByWeek() {
+        this.quartzService.addStudyByWeek();
+        return ServerResponse.createBySuccess();
+    }
 
 }

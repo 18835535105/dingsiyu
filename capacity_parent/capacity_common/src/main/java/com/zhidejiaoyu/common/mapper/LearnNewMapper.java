@@ -17,5 +17,5 @@ import java.util.Map;
  */
 public interface LearnNewMapper extends BaseMapper<LearnNew> {
 
-    List<Map<String,Object>> selectStudyFiveStudent(@Param("studentIds") List<Long> studentIds);
+
 }

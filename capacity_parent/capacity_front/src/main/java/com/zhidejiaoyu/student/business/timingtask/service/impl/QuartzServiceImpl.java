@@ -2,16 +2,15 @@ package com.zhidejiaoyu.student.business.timingtask.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
-import com.zhidejiaoyu.common.mapper.LocationMapper;
-import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
-import com.zhidejiaoyu.student.common.redis.RedisOpt;
+import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.student.business.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzService;
+import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
@@ -148,6 +147,18 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     private RecycleBinMapper recycleBinMapper;
     @Resource
     private LearnNewMapper learnNewMapper;
+    @Resource
+    private LearnHistoryMapper learnHistoryMapper;
+    @Resource
+    private ErrorLearnLogMapper errorLearnLogMapper;
+    @Resource
+    private ErrorLearnLogHistoryMapper errorLearnLogHistoryMapper;
+    @Resource
+    private UnitNewMapper unitNewMapper;
+    @Resource
+    private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
+    @Resource
+    private CourseNewMapper courseNewMapper;
 
     /**
      * 每日 00:10:00 更新提醒消息中学生账号到期提醒
@@ -477,16 +488,109 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
         log.info("定时将招生账号置为过期状态完成...");
     }
 
+    /**
+     * 获取单元学习进度
+     */
     @Override
+    @Scheduled(cron = "0 0 3 * * ?")
     public void CalculateRateOfChange() {
         if (checkPort(port)) {
             return;
         }
         //获取所有充课学生和所有未到期学生
         List<Long> studentIds = studentMapper.selectAllStudentId();
+        //获取学生学习数量 可能修改
+        List<Map<String, Object>> studyList = learnHistoryMapper.selectStudyFiveStudent(studentIds);
         //获取当前学生中学习了五个单元以上的学生id
-        learnNewMapper.selectStudyFiveStudent(studentIds);
+        List<Map<String, Object>> collect = studyList.stream().filter(study ->
+                study.get("count") != null && Integer.parseInt(study.get("count").toString()) > 5).collect(Collectors.toList());
+        List<Long> studyStudentIds = new ArrayList<>();
+        //获取可修改学生数据
+        for (Map<String, Object> map : collect) {
+            studyStudentIds.add(Long.parseLong(map.get("studentId").toString()));
+        }
+        studyStudentIds.forEach(studentId -> {
+            //获取学生错误次数最大的单元
+            //1获取已完成的单元id
+            //错误率最大的单元
+            Map<String, Object> isMap = new HashMap<>();
+            List<Map<String, Object>> maps = learnHistoryMapper.selectStudyUnitByStudentId(studentId);
+            if (maps.size() > 0) {
+                //2,查询单元下数据的总数量
+                List<Long> unitIds = new ArrayList<>();
+                maps.forEach(map -> {
+                    unitIds.add(Long.parseLong(map.get("unitId").toString()));
+                });
+                Map<Long, Map<String, Object>> allUnitStudyCount =
+                        unitNewMapper.selectCountByUnitIds(unitIds);
+                //获取最大多错误率
+                maps.forEach(map -> {
+                    long studyUnit = Long.parseLong(map.get("unitId").toString());
+                    long easyOrHard = Long.parseLong(map.get("easyOrHard").toString());
+                    int count = errorLearnLogMapper.selectCountByStudentIdAndUnitIdAndEasyOrHard
+                            (studentId, studyUnit, easyOrHard);
+                    Map<String, Object> studyMap = allUnitStudyCount.get(studyUnit);
+                    Integer studyCount = Integer.parseInt(studyMap.get("count").toString());
+                    double studyDouble = 1.0 * count / studyCount;
+                    if (isMap.size() == 0) {
+                        isMap.put("unitId", studyUnit);
+                        isMap.put("easyOrHard", easyOrHard);
+                        isMap.put("studyDouble", studyDouble);
+                    } else {
+                        Double paseStudyDouble = Double.parseDouble(isMap.get("studyDouble").toString());
+                        if (studyDouble > paseStudyDouble) {
+                            isMap.put("unitId", studyUnit);
+                            isMap.put("easyOrHard", easyOrHard);
+                            isMap.put("studyDouble", studyDouble);
+                        }
+                    }
+                });
+                //更新错误率删除errorLog数据
+                if (isMap.size() > 0) {
+                    double studyDouble = Double.parseDouble(isMap.get("studyDouble").toString());
+                    Long unitId = Long.parseLong(isMap.get("unitId").toString());
+                    int easyOrHard = Integer.parseInt(isMap.get("easyOrHard").toString());
+                    if (studyDouble > 0.0) {
+                        //获取错误率最大的优先级
+                        StudentStudyPlanNew studentStudyPlanNew =
+                                studentStudyPlanNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
+                        //获取学生年级数值
+                        Student student = studentMapper.selectById(studentId);
+                        //获取课程年级数值
+                        String strGrade = courseNewMapper.selectGradeByCourseId(studentStudyPlanNew.getCourseId());
+                        int number = PriorityUtil.CalculateRateOfChange(student.getGrade(), strGrade);
+                        studentStudyPlanNew.setErrorLevel(studentStudyPlanNew.getErrorLevel() + number);
+                        studentStudyPlanNew.setFinalLevel(studentStudyPlanNew.getFinalLevel() + number);
+                        studentStudyPlanNewMapper.updateById(studentStudyPlanNew);
+                        //获取删除的error信息
+                        List<ErrorLearnLog> errorLearnLogs =
+                                errorLearnLogMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
+                        if (errorLearnLogs.size() > 0) {
+                            List<Long> deleteErrorIds = new ArrayList<>();
+                            errorLearnLogs.forEach(logs -> deleteErrorIds.add(logs.getId()));
+                            errorLearnLogMapper.deleteBatchIds(deleteErrorIds);
+                            //将errorLearnLog表中删除的信息放入errorLearnLogHistory表中
+                            errorLearnLogHistoryMapper.insertListByErrorLearnLogs(errorLearnLogs);
+                        }
+                    }
+                }
+            }
+        });
     }
+
+    @Override
+    @Scheduled(cron = "0 30 3 * * ?")
+    public void addStudyByWeek() {
+        if (checkPort(port)) {
+            return;
+        }
+        //获取当前日期月的第几周
+        int weekOfMonth = DateUtil.getWeekOfMonth(new Date());
+        int month = DateUtil.getMonth();
+        //获取当前月份当前周学校学习信息
+
+    }
+
 
     /**
      * 删除学生相关记录

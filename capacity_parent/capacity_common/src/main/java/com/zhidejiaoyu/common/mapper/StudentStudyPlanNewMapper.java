@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +14,13 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
  */
 public interface StudentStudyPlanNewMapper extends BaseMapper<StudentStudyPlanNew> {
 
+    /**
+     * 查看数据
+     * @param studentId
+     * @param unitId
+     * @param easyOrHard
+     * @return
+     */
+    StudentStudyPlanNew selectByStudentIdAndUnitIdAndEasyOrHard
+            (@Param("studentId") Long studentId,@Param("unitId") Long unitId,@Param("easyOrHard") int easyOrHard);
 }

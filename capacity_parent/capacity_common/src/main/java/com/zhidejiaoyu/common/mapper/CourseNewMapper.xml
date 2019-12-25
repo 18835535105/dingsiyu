@@ -17,6 +17,11 @@
         <result column="update_time" property="updateTime"/>
         <result column="delStatus" property="delStatus"/>
     </resultMap>
+    <select id="selectGradeByCourseId" resultType="string" parameterType="map">
+        select
+            if(grade_ext=null or grade_ext='',grade_ext,grade )
+            from course_new where id =#{courseId}
+    </select>
     <select id="selectPhaseByUnitId" resultType="java.lang.String" parameterType="map">
         select c.study_paragraph
         from course_new c
@@ -41,5 +46,6 @@
         </foreach>
         )
     </select>
+
 
 </mapper>

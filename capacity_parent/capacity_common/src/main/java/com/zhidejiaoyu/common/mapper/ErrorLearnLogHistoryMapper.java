@@ -1,7 +1,11 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.zhidejiaoyu.common.pojo.ErrorLearnLog;
 import com.zhidejiaoyu.common.pojo.ErrorLearnLogHistory;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +17,5 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
  */
 public interface ErrorLearnLogHistoryMapper extends BaseMapper<ErrorLearnLogHistory> {
 
+    void insertListByErrorLearnLogs(@Param("logs") List<ErrorLearnLog> errorLearnLogs);
 }

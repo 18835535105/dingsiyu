@@ -4,21 +4,36 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentStudyPlanNew">
-        <id column="id" property="id" />
-        <result column="student_id" property="studentId" />
-        <result column="course_id" property="courseId" />
-        <result column="unit_id" property="unitId" />
-        <result column="group" property="group" />
-        <result column="complete" property="complete" />
-        <result column="current_study_count" property="currentStudyCount" />
-        <result column="total_study_count" property="totalStudyCount" />
-        <result column="flow_id" property="flowId" />
-        <result column="easy_or_hard" property="easyOrHard" />
-        <result column="time_level" property="timeLevel" />
-        <result column="base_level" property="baseLevel" />
-        <result column="error_level" property="errorLevel" />
-        <result column="final_level" property="finalLevel" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="course_id" property="courseId"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="group" property="group"/>
+        <result column="complete" property="complete"/>
+        <result column="current_study_count" property="currentStudyCount"/>
+        <result column="total_study_count" property="totalStudyCount"/>
+        <result column="flow_id" property="flowId"/>
+        <result column="easy_or_hard" property="easyOrHard"/>
+        <result column="time_level" property="timeLevel"/>
+        <result column="base_level" property="baseLevel"/>
+        <result column="error_level" property="errorLevel"/>
+        <result column="final_level" property="finalLevel"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
+
+    <sql id="base_sql">
+        id,student_id,course_id,unit_id,`group`,complete,current_study_count,
+        total_study_count,flow_id,easy_or_hard,time_level,base_level,error_level,final_level,update_time
+    </sql>
+
+    <select id="selectByStudentIdAndUnitIdAndEasyOrHard" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"></include>
+        from student_study_plan_new
+        where
+        student_id=#{studentId}
+        and unit_id =#{unitId}
+        and easy_or_hard=#{easyOrHard}
+    </select>
 
 </mapper>

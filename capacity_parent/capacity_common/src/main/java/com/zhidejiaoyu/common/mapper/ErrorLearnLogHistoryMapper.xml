@@ -8,6 +8,7 @@
         <result column="student_id" property="studentId" />
         <result column="unit_id" property="unitId" />
         <result column="type" property="type" />
+        <result column="word_id" property="wordId"/>
         <result column="study_model" property="studyModel" />
         <result column="easy_or_hard" property="easyOrHard" />
         <result column="group" property="group" />
@@ -15,5 +16,13 @@
         <result column="error_answer" property="errorAnswer" />
         <result column="update_time" property="updateTime" />
     </resultMap>
+
+    <insert id="insertListByErrorLearnLogs" parameterType="map">
+        insert into error_learn_log_history(student_id,unit_id,type,word_id,study_model,easy_or_hard,`group`,topic,error_answer,update_time)
+        values
+        <foreach collection="logs" item="log" separator=",">
+            (#{log.studentId},#{log.unitId},#{log.type},#{log.wordId},#{log.studyModel},#{log.easyOrHard},#{log.group},#{log.topic},#{log.errorAnswer},now())
+        </foreach>
+    </insert>
 
 </mapper>
