@@ -146,8 +146,6 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     @Resource
     private RecycleBinMapper recycleBinMapper;
     @Resource
-    private LearnNewMapper learnNewMapper;
-    @Resource
     private LearnHistoryMapper learnHistoryMapper;
     @Resource
     private ErrorLearnLogMapper errorLearnLogMapper;
@@ -159,6 +157,8 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
     @Resource
     private CourseNewMapper courseNewMapper;
+    @Resource
+    private SchoolTimeMapper schoolTimeMapper;
 
     /**
      * 每日 00:10:00 更新提醒消息中学生账号到期提醒
@@ -585,9 +585,49 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
             return;
         }
         //获取当前日期月的第几周
-        int weekOfMonth = DateUtil.getWeekOfMonth(new Date());
+        int week = DateUtil.getWeekOfMonth(new Date());
         int month = DateUtil.getMonth();
         //获取当前月份当前周学校学习信息
+        List<Map<String, Object>> maps = schoolTimeMapper.selectByMonthAndWeek(month, week);
+        Map<Long, List<Map<String, Object>>> collect =
+                maps.stream().collect(Collectors.groupingBy(map -> Long.parseLong(map.get("userId").toString())));
+        //获取所有学生
+        List<Map<String, Object>> allStudentIdTeacherId = studentMapper.getAllStudentIdTeacherId();
+        allStudentIdTeacherId.forEach(student -> {
+            Long adminId = Long.parseLong(student.get("adminId").toString());
+            String grade = student.get("grade").toString();
+            Long studentId = Long.parseLong(student.get("studentId").toString());
+            //获取学生是否有个人的计划
+            Integer count = schoolTimeMapper.selectCountByStudentId(studentId);
+            //需要添加的计划
+            Map<String, Object> studentMap = new HashMap<>();
+            if (count > 0) {
+                //获取学生添加的计划
+                studentMap = schoolTimeMapper.selectByMonthAndWeekAndStudentId(month, week, studentId);
+            } else {
+                //如果没有获取学生可能添加的计划
+                List<Map<String, Object>> studyModelList = collect.get(adminId);
+                //获取学习单元
+                if (studyModelList == null || studyModelList.size() == 0) {
+                    studyModelList = collect.get(1L);
+                }
+                for (Map<String, Object> returnMap : studyModelList) {
+                    String garde = returnMap.get("garde").toString();
+                    if (garde.equals(grade)) {
+                        studentMap = returnMap;
+                    }
+                }
+            }
+            if (studentMap != null && studentMap.size() > 0) {
+                //判断当前学生是否拥有当前单元
+                Long unitId = Long.parseLong(studentMap.get("unitId").toString());
+                int i = studentStudyPlanNewMapper.selectByStudentIdAndUnitId(studentId, unitId);
+                if (i <= 0) {
+                    
+                }
+            }
+        });
+
 
     }
 

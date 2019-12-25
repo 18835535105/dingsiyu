@@ -56,6 +56,10 @@ public class CourseNew extends Model<CourseNew> {
      */
     private String gradeExt;
     /**
+     * 只有上册下册全册
+     */
+    private String labelExt;
+    /**
      * 课本封面图url地址
      */
     private String pictureUrl;
@@ -80,6 +84,8 @@ public class CourseNew extends Model<CourseNew> {
      */
     @TableField("delStatus")
     private Integer delStatus;
+
+
 
 
     @Override

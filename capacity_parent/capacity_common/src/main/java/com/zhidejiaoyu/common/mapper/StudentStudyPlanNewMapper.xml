@@ -35,5 +35,13 @@
         and unit_id =#{unitId}
         and easy_or_hard=#{easyOrHard}
     </select>
+    <select id="selectByStudentIdAndUnitId" parameterType="map" resultType="int">
+        select
+        count(id)
+        from student_study_plan_new
+        where
+        student_id=#{studentId}
+        and unit_id =#{unitId}
+    </select>
 
 </mapper>

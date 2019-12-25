@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.SchoolTime;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * <p>
  * Mapper 接口
@@ -25,4 +28,24 @@ public interface SchoolTimeMapper extends BaseMapper<SchoolTime> {
      */
     SchoolTime selectByUserIdAndTypeAndMonthAndWeek(@Param("userId") Long userId, @Param("type") int type,
                                                     @Param("month") Integer month, @Param("week") Integer week);
+
+    /**
+     * 获取当前周的数据
+     *
+     * @param month
+     * @param week
+     * @return
+     */
+    List<Map<String, Object>> selectByMonthAndWeek(@Param("month") int month, @Param("week") int week);
+
+    /**
+     * 获取当前周的学生数据
+     *
+     * @param month
+     * @param week
+     * @return
+     */
+    Map<String, Object> selectByMonthAndWeekAndStudentId(@Param("month") int month, @Param("week") int week, @Param("studentId") Long studentId);
+
+    Integer selectCountByStudentId(@Param("studentId") Long studentId);
 }
