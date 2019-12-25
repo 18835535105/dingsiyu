@@ -59,6 +59,9 @@ public class PriorityUtil {
         return BASE_PRIORITY.get(grade);
     }
 
+    /**
+     * 年级转换为对应的数字
+     */
     private static void initGradeToNum() {
         GRADE_TO_NUM.put("一年级", 1);
         GRADE_TO_NUM.put("二年级", 2);
@@ -76,6 +79,9 @@ public class PriorityUtil {
         GRADE_TO_NUM.put("高三", 12);
     }
 
+    /**
+     * 获取各个年级的基础优先级值
+     */
     private static void intiBasePriority() {
         BASE_PRIORITY.put("一年级", 1000);
         BASE_PRIORITY.put("二年级", 1200);
