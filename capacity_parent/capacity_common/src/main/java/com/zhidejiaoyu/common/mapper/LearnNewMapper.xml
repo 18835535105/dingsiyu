@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.LearnNew">
         <id column="id" property="id" />
         <result column="student_id" property="studentId" />
+        <result column="course_id" property="courseId" />
         <result column="unit_id" property="unitId" />
         <result column="group" property="group" />
         <result column="easy_or_hard" property="easyOrHard" />

@@ -35,6 +35,7 @@ public class LearnHistory extends Model<LearnHistory> {
      * 学生id
      */
     private Long studentId;
+    private Long courseId;
     /**
      * 单元id
      */
