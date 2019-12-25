@@ -48,5 +48,8 @@
                 </foreach>
             )
     </select>
+    <select id="selectByUnitIdAndCourseId" resultType="int" parameterType="map">
+        select count(id) from unit_new where course_id=#{courseId} and id &lt; #{unitId}
+    </select>
 
 </mapper>

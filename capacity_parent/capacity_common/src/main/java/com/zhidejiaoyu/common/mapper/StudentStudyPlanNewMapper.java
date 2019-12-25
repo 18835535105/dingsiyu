@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
+import com.sun.tracing.dtrace.ProviderAttributes;
 import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -16,13 +17,14 @@ public interface StudentStudyPlanNewMapper extends BaseMapper<StudentStudyPlanNe
 
     /**
      * 查看数据
+     *
      * @param studentId
      * @param unitId
      * @param easyOrHard
      * @return
      */
     StudentStudyPlanNew selectByStudentIdAndUnitIdAndEasyOrHard
-            (@Param("studentId") Long studentId,@Param("unitId") Long unitId,@Param("easyOrHard") int easyOrHard);
+    (@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("easyOrHard") int easyOrHard);
 
-    int selectByStudentIdAndUnitId(@Param("studentId") Long studentId,@Param("unitId") Long unitId);
+    int selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 }

@@ -48,4 +48,6 @@ public interface SchoolTimeMapper extends BaseMapper<SchoolTime> {
     Map<String, Object> selectByMonthAndWeekAndStudentId(@Param("month") int month, @Param("week") int week, @Param("studentId") Long studentId);
 
     Integer selectCountByStudentId(@Param("studentId") Long studentId);
+
+    int selectByGradeAndLabel(@Param("grade") String grade,@Param("label") String label,@Param("type") int type,@Param("userId") Long userId);
 }

@@ -113,5 +113,20 @@ public class PriorityUtil {
         return 5 * number;
     }
 
+    /**
+     * 获取难易基础值
+     *
+     * @param grade
+     * @param type
+     * @return
+     */
+    public static int getEasyOrHard(String grade, int type) {
+        if (type == 1) {
+            return BASE_PRIORITY.get(grade);
+        } else {
+            return BASE_PRIORITY.get(grade) - 100;
+        }
+
+    }
 
 }

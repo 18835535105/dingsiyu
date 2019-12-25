@@ -46,4 +46,6 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
 
     @MapKey("unitId")
     Map<Long,Map<String,Object>> selectCountByUnitIds(@Param("unitIds") List<Long> unitIds);
+
+    int selectByUnitIdAndCourseId(@Param("unitId") Long unitId,@Param("courseId") Long courseId);
 }

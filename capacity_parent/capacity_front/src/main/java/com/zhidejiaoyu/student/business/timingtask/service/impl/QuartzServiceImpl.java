@@ -621,9 +621,50 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
             if (studentMap != null && studentMap.size() > 0) {
                 //判断当前学生是否拥有当前单元
                 Long unitId = Long.parseLong(studentMap.get("unitId").toString());
+                Long courseId = Long.parseLong(studentMap.get("courseId").toString());
                 int i = studentStudyPlanNewMapper.selectByStudentIdAndUnitId(studentId, unitId);
                 if (i <= 0) {
-                    
+                    Long userId = 0L;
+                    int type = Integer.parseInt(studentMap.get("type").toString());
+                    if (type == 1) {
+                        userId = Long.parseLong(studentMap.get("userId").toString());
+                    } else {
+                        userId = studentId;
+                    }
+                    //判断当前单元是上册还是下册全册
+                    String label = studentMap.get("label").toString();
+                    //学习的单元数量
+                    int number = 0;
+                    if (label.contains("上册") || label.contains("全册")) {
+                        //查询当前单元之前的本册书单元
+                        number = unitNewMapper.selectByUnitIdAndCourseId(unitId, courseId);
+                    } else if (label.contains("下册")) {
+                        //获取上册单元数量
+                        number = schoolTimeMapper.selectByGradeAndLabel(grade, "上册", type, userId);
+                        number += unitNewMapper.selectByUnitIdAndCourseId(unitId, courseId);
+                    }
+                    //获取数量
+                    int addNumber = PriorityUtil.CalculateTimeOfChange(number);
+                    StudentStudyPlanNew plan=new StudentStudyPlanNew();
+                    plan.setCourseId(courseId);
+                    plan.setStudentId(studentId);
+                    plan.setGroup(1);
+                    plan.setUnitId(unitId);
+                    plan.setUpdateTime(new Date());
+                    plan.setComplete(1);
+                    plan.setCurrentStudyCount(0);
+                    plan.setTotalStudyCount(0);
+                    plan.setEasyOrHard(70);
+                    //70,79
+                    plan.setBaseLevel(PriorityUtil.getEasyOrHard(grade,1));
+                    plan.setBaseLevel(1);
+                    plan.setTimeLevel(addNumber);
+                    plan.setFinalLevel(plan.getBaseLevel()+plan.getTimeLevel()+plan.getErrorLevel());
+                    studentStudyPlanNewMapper.insert(plan);
+                    plan.setBaseLevel(PriorityUtil.getEasyOrHard(grade,2));
+                    plan.setEasyOrHard(79);
+                    plan.setFinalLevel(plan.getBaseLevel()+plan.getTimeLevel()+plan.getErrorLevel());
+                    studentStudyPlanNewMapper.insert(plan);
                 }
             }
         });
