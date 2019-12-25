@@ -293,4 +293,6 @@ public interface StudentMapper extends BaseMapper<Student> {
     void updateStatus(@Param("students") List<Student> students);
 
     List<Long> selectAllStudentId();
+
+    List<Map<String,Object>> getAllStudentIdTeacherId();
 }

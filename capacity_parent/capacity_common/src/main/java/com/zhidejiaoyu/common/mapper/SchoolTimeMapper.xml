@@ -45,4 +45,24 @@
         limit 1
     </select>
 
+    <select id="selectByMonthAndWeek" parameterType="map" resultType="map">
+        select
+        course.id courseId,`time`.unit_id unitId,`time`.user_id userId ,
+        if(course.grade_ext=null or course.grade_ext='',course.grade_ext,course.grade ) grade
+        from school_time `time`
+        join course_new course on course.id=`time`.course_id
+        where `time`.week=#{week} and `time`.`month`=#{month} and type=1
+    </select>
+    <select id="selectByMonthAndWeekAndStudentId" parameterType="map" resultType="map">
+        select
+        course.id courseId,`time`.unit_id unitId,`time`.user_id userId ,
+        if(course.grade_ext=null or course.grade_ext='',course.grade_ext,course.grade )
+        from school_time `time`
+        join course_new course on course.id=`time`.course_id
+        where `time`.week=#{week} and `time`.`month`=#{month} and type=2 and user_id=#{studentId}
+    </select>
+    <select id="selectCountByStudentId" parameterType="map" resultType="int">
+        select count(id) from school_time where type=2 and user_id=#{studentId}
+    </select>
+
 </mapper>

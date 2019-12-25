@@ -23,4 +23,6 @@ public interface StudentStudyPlanNewMapper extends BaseMapper<StudentStudyPlanNe
      */
     StudentStudyPlanNew selectByStudentIdAndUnitIdAndEasyOrHard
             (@Param("studentId") Long studentId,@Param("unitId") Long unitId,@Param("easyOrHard") int easyOrHard);
+
+    int selectByStudentIdAndUnitId(@Param("studentId") Long studentId,@Param("unitId") Long unitId);
 }

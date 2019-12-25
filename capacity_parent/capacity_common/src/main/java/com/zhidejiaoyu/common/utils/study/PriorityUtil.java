@@ -106,5 +106,12 @@ public class PriorityUtil {
         return 3 * (GRADE_TO_NUM.get(studentGrade) + 1 - GRADE_TO_NUM.get(studyGrade));
     }
 
+    /**
+     * 每天定时任务 计算时间变化率
+     */
+    public static int CalculateTimeOfChange(int number) {
+        return 5 * number;
+    }
+
 
 }
