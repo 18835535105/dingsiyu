@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.LearnExtendMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.LearnExtend">
+        <id column="id" property="id" />
+        <result column="school_admin_id" property="schoolAdminId" />
+        <result column="learn_id" property="learnId" />
+        <result column="word_id" property="wordId" />
+        <result column="status" property="status" />
+        <result column="learn_time" property="learnTime" />
+        <result column="study_model" property="studyModel" />
+        <result column="study_count" property="studyCount" />
+        <result column="first_study_time" property="firstStudyTime" />
+        <result column="first_is_know" property="firstIsKnow" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+</mapper>

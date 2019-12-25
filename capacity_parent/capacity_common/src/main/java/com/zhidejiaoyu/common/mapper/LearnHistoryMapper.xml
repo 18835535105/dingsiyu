@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.LearnHistoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.LearnHistory">
+        <id column="id" property="id" />
+        <result column="student_id" property="studentId" />
+        <result column="unit_id" property="unitId" />
+        <result column="group" property="group" />
+        <result column="type" property="type" />
+        <result column="easy_or_hard" property="easyOrHard" />
+        <result column="study_count" property="studyCount" />
+        <result column="update_time" property="updateTime" />
+        <result column="state" property="state" />
+    </resultMap>
+
+</mapper>
