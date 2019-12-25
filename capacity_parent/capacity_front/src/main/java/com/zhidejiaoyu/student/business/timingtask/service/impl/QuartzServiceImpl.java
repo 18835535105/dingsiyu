@@ -623,7 +623,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 Long unitId = Long.parseLong(studentMap.get("unitId").toString());
                 int i = studentStudyPlanNewMapper.selectByStudentIdAndUnitId(studentId, unitId);
                 if (i <= 0) {
-
+                    
                 }
             }
         });

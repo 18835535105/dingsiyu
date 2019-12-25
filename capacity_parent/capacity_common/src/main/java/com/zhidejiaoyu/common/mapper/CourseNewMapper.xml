@@ -12,6 +12,7 @@
         <result column="gradeExt" property="gradeExt"/>
         <result column="picture_url" property="pictureUrl"/>
         <result column="course_name" property="courseName"/>
+        <result column="label_ext" property="labelExt"/>
         <result column="status" property="status"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
