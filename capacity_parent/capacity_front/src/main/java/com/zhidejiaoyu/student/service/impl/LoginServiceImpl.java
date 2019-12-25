@@ -421,6 +421,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 头像
         result.put("headUrl", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
         result.put("schoolName", student.getSchoolName());
+        result.put("petName", student.getPetName());
 
         this.getIndexTime(session, student, result);
 
