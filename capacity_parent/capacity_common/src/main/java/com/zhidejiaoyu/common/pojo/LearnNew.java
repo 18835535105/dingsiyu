@@ -32,6 +32,7 @@ public class LearnNew extends Model<LearnNew> {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
     private Long studentId;
+    private Long courseId;
     /**
      * 单元id
      */

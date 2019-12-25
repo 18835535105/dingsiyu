@@ -64,6 +64,9 @@ public class LearnExtend extends Model<LearnExtend> {
      * 首次学习是否是熟词:0:否;1:是
      */
     private Integer firstIsKnow;
+
+    private String flowName;
+
     private Date updateTime;
 
 

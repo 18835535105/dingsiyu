@@ -4,12 +4,13 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.LearnNew">
-        <id column="id" property="id"/>
-        <result column="student_id" property="studentId"/>
-        <result column="unit_id" property="unitId"/>
-        <result column="group" property="group"/>
-        <result column="easy_or_hard" property="easyOrHard"/>
-        <result column="update_time" property="updateTime"/>
+        <id column="id" property="id" />
+        <result column="student_id" property="studentId" />
+        <result column="course_id" property="courseId" />
+        <result column="unit_id" property="unitId" />
+        <result column="group" property="group" />
+        <result column="easy_or_hard" property="easyOrHard" />
+        <result column="update_time" property="updateTime" />
     </resultMap>
 
     <select id="selectStudyFiveStudent" parameterType="map" resultType="map">
