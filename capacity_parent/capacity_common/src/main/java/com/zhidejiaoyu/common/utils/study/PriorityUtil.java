@@ -98,4 +98,13 @@ public class PriorityUtil {
         BASE_PRIORITY.put("高二", 3000);
         BASE_PRIORITY.put("高三", 3200);
     }
+
+    /**
+     * 每天定时任务 计算学生变化率
+     */
+    private static int CalculateRateOfChange(int studentGrade, int studyGrade) {
+        return 3 * (studentGrade + 1 - studyGrade);
+    }
+
+
 }

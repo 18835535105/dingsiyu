@@ -133,4 +133,10 @@ public class QuartzController {
         return ServerResponse.createBySuccess();
     }
 
+    @PostMapping("/CalculateRateOfChange")
+    public ServerResponse<Object> CalculateRateOfChange() {
+        this.quartzService.CalculateRateOfChange();
+        return ServerResponse.createBySuccess();
+    }
+
 }

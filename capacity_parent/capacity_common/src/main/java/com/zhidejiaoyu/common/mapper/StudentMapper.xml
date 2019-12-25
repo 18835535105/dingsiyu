@@ -488,6 +488,9 @@
         </foreach>
         )
     </update>
+    <select id="selectAllStudentId" resultType="long">
+        select id from student where account_time is not null and ( `rank`>7 or (`rank` &lt; 7 and account_time >now()))
+    </select>
 
     <update id="updateSchoolGoldFirstTimeToNull" parameterType="map">
         update student set school_gold_first_time = null where id in (

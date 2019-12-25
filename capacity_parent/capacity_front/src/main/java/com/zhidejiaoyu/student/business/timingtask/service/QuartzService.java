@@ -65,4 +65,6 @@ public interface QuartzService {
      * @return
      */
     void updateWelfareAccountToOutOfDate();
+
+    void CalculateRateOfChange();
 }

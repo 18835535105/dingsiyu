@@ -146,6 +146,8 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     private SimpleSimpleStudentUnitMapper simpleSimpleStudentUnitMapper;
     @Resource
     private RecycleBinMapper recycleBinMapper;
+    @Resource
+    private LearnNewMapper learnNewMapper;
 
     /**
      * 每日 00:10:00 更新提醒消息中学生账号到期提醒
@@ -473,6 +475,17 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
             });
         }
         log.info("定时将招生账号置为过期状态完成...");
+    }
+
+    @Override
+    public void CalculateRateOfChange() {
+        if (checkPort(port)) {
+            return;
+        }
+        //获取所有充课学生和所有未到期学生
+        List<Long> studentIds = studentMapper.selectAllStudentId();
+        //获取当前学生中学习了五个单元以上的学生id
+        learnNewMapper.selectStudyFiveStudent(studentIds);
     }
 
     /**
