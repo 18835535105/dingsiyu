@@ -270,7 +270,9 @@ public class MemoryCapacityServiceImpl
             }
         } else {
             gold = calculationGold(eegRecording.getType(), eegRecording.getLevel(), null, eegRecording.getBigLevel());
-            eegRecording.setLevel(eegRecording.getBigLevel());
+            if (eegRecording.getType() != 1) {
+                eegRecording.setLevel(eegRecording.getBigLevel());
+            }
             eegRecording.setCreateTime(new Date());
             eegRecording.setStudentId(student.getId().intValue());
             eegRecordingMapper.insert(eegRecording);
