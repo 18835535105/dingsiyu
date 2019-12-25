@@ -1,5 +1,8 @@
 package com.zhidejiaoyu.common.utils.study;
 
+import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
+
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -129,4 +132,18 @@ public class PriorityUtil {
 
     }
 
+    /**
+     * 每学习完一个单元，更新优先级
+     *
+     * @param maxFinalLevel
+     * @param grade         学生当前年级
+     * @param currentGrade  教材年级
+     */
+    public static StudentStudyPlanNew finishUnitUpdateErrorLevel(StudentStudyPlanNew maxFinalLevel, String grade, String currentGrade) {
+        int errorLevel = maxFinalLevel.getErrorLevel() - 5 * (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(currentGrade));
+        maxFinalLevel.setErrorLevel(errorLevel);
+        maxFinalLevel.setFinalLevel(errorLevel + maxFinalLevel.getTimeLevel() + maxFinalLevel.getBaseLevel());
+        maxFinalLevel.setUpdateTime(new Date());
+        return maxFinalLevel;
+    }
 }

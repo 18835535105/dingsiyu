@@ -17,7 +17,15 @@
         id, student_id, course_id unit_id, `group`, easy_or_hard, update_time
     </sql>
 
-
+    <select id="selectByStudentStudyPlanNew" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from learn_new
+        where student_id = #{studentStudyPlanNew.studentId}
+        and unit_id = #{studentStudyPlanNew.unitId}
+        and easy_or_hard = #{studentStudyPlanNew.earyOrHard}
+        limit 1
+    </select>
 
 
 </mapper>

@@ -26,6 +26,15 @@
         total_study_count,flow_id,easy_or_hard,time_level,base_level,error_level,final_level,update_time
     </sql>
 
+    <select id="selectMaxFinalLevelByLimit" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"/>
+        from student_study_plan_new
+        where student_id = #{studentId}
+        order by final_level desc
+        limit ${limit}
+    </select>
+
     <select id="selectByStudentIdAndUnitIdAndEasyOrHard" parameterType="map" resultMap="BaseResultMap">
         select
         <include refid="base_sql"></include>
@@ -35,13 +44,12 @@
         and unit_id =#{unitId}
         and easy_or_hard=#{easyOrHard}
     </select>
+
     <select id="selectByStudentIdAndUnitId" parameterType="map" resultType="int">
-        select
-        count(id)
+        select count(id)
         from student_study_plan_new
-        where
-        student_id=#{studentId}
-        and unit_id =#{unitId}
+        where student_id = #{studentId}
+          and unit_id = #{unitId}
     </select>
 
 

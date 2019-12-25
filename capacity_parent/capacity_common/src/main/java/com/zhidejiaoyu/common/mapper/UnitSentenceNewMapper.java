@@ -2,6 +2,8 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.UnitSentenceNew;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * <p>
@@ -13,4 +15,13 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
  */
 public interface UnitSentenceNewMapper extends BaseMapper<UnitSentenceNew> {
 
+    /**
+     * 查询当前单元下个group
+     *
+     * @param unitId
+     * @param group
+     * @return
+     */
+    @Select("select group from unit_sentence_new where unit_id = #{unitId} and group > #{group}")
+    Integer selectNextGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
 }

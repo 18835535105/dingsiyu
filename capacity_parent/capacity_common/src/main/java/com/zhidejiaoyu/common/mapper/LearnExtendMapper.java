@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.LearnExtend;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +14,13 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
  */
 public interface LearnExtendMapper extends BaseMapper<LearnExtend> {
 
+    /**
+     * 查询当前单元是否已经学习过指定流程
+     *
+     * @param studentId
+     * @param unitId
+     * @param flowName
+     * @return
+     */
+    int countByStudentIdAndFlow(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("flowName") String flowName);
 }
