@@ -52,4 +52,13 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
 
     @Select("select count(b.id) from unit_vocabulary_new a join vocabulary b on a.vocabulary_id = b.id and a.unit_id = #{s} and b.recordpicurl is not null and b.delStatus = 1")
     Integer countWordByUnitidByPic(Long s);
+
+    /**
+     * 统计当前课程下有多少个单元
+     *
+     * @param courseId
+     * @return
+     */
+    @Select("select count(id) from unit_new where course_id = #{courseId}")
+    int countByCourseId(@Param("courseId") Long courseId);
 }

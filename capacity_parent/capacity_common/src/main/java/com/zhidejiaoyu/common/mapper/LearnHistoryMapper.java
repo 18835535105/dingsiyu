@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.mapper;
 import com.zhidejiaoyu.common.pojo.LearnHistory;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
@@ -31,4 +32,14 @@ public interface LearnHistoryMapper extends BaseMapper<LearnHistory> {
      */
     @Update("update learn_history set state = #{state} where student_id = #{studentId} and unit_id = #{unitId}")
     void updateStateByStudentIdAndUnitId(Long studentId, Long unitId, int state);
+
+    /**
+     * 统计当前课程已经学完的单元个数
+     *
+     * @param studentId
+     * @param courseId
+     * @return
+     */
+    @Select("select count(distinct unit_id) from learn_history where student_id = #{studentId} and course_id = #{courseId}")
+    int countUnitIdByCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
 }

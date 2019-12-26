@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.mapper;
 import com.zhidejiaoyu.common.pojo.StudentFlowNew;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
 
 /**
  * <p>
@@ -23,4 +24,12 @@ public interface StudentFlowNewMapper extends BaseMapper<StudentFlowNew> {
      */
     StudentFlowNew selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 
+    /**
+     * 更新学生流程
+     *
+     * @param studentId
+     * @param flowId
+     */
+    @Update("update student_flow set current_flow_id = #{node} where student_id = #{studentId} and type = #{type}")
+    void updateFlowByStudentId(@Param("studentId") Long studentId, @Param("flowId") Long flowId, @Param("type") Integer type);
 }
