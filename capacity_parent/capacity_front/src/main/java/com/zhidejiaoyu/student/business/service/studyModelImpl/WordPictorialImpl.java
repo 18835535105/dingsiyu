@@ -106,18 +106,17 @@ public class WordPictorialImpl extends BaseServiceImpl<LearnNewMapper, LearnNew>
         correct.put("engine", PerceiveEngineUtil.getPerceiveEngine(hard, cp.getMemoryStrength()));
 
         // 读音url
-      /*  correct.put("readUrl", baiduSpeak.getLanguagePath(correct.get("word").toString()));
+        correct.put("readUrl", baiduSpeak.getLanguagePath(correct.get("word").toString()));
 
         // 单词图片
         correct.put("recordpicurl", PictureUtil.getPictureByUnitId(ReviewServiceImpl.packagePictureUrl(correct), unitId));
 
         // 2. 从本课程非本单元下随机获取三个题, 三个作为错题, 并且id不等于正确题id
-        List<Map<String, Object>> mapErrorVocabulary = vocabularyMapper.getWordIdByCourse(new Long(correct.get("id").toString()), courseId, unitId);
+        List<Map<String, Object>> mapErrorVocabulary = vocabularyMapper.getWordIdNewByCourse(new Long(correct.get("id").toString()),  unitId);
         // 四道题
         mapErrorVocabulary.add(correct);
         // 随机打乱顺序
         Collections.shuffle(mapErrorVocabulary);
-*/
         // 封装选项正确答案
         /*Map<Object, Object> subject = new HashMap<>(16);
         for (Map<String, Object> m : mapErrorVocabulary) {

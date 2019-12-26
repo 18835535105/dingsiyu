@@ -39,7 +39,7 @@ public class MemoryDifficultyUtil {
      * 计算同步版当前单词/例句的记忆难度
      *
      * @param studyCapacity 记忆追踪模块对象
-     * @param flag          1:计算单词的记忆难度；2：计算例句的记忆难度
+     * @param flag   1:计算单词的记忆难度；2：计算例句的记忆难度
      * @return 当前单词的记忆难度 0:熟词；其余情况为生词
      */
     public int getMemoryDifficulty(StudyCapacity studyCapacity, Integer flag) throws RuntimeException {
@@ -50,62 +50,21 @@ public class MemoryDifficultyUtil {
             Long studentId = studyCapacity.getStudentId();
             Long unitId = studyCapacity.getUnitId();
             Long id = studyCapacity.getWordId();
-            int type = studyCapacity.getType();
+            int type=studyCapacity.getType();
             String studyModel = "";
-            switch (type) {
+            /**
+             * 2，单词播放机  3，慧记忆 4，会听写
+             *      *                 5，慧默写 6，单词游戏 7，句型翻译 8，句型听力 9，音译练习
+             *      *                 10，句型默写 11，课文试听 12，课文训练 13，闯关测试 14，课文跟读
+             *      *                 15，读语法 16，选语法 17，写语法 18，语法游戏
+             */
+            switch (type){
                 case 1:
-                    studyModel = "单词图鉴";
+                    studyModel="单词播放机";
                     break;
-                case 2:
-                    studyModel = "单词播放机";
+                case 1:
+                    studyModel="单词播放机";
                     break;
-                case 3:
-                    studyModel = "慧记忆";
-                    break;
-                case 4:
-                    studyModel = "慧听写";
-                    break;
-                case 5:
-                    studyModel = "慧默写";
-                    break;
-                case 6:
-                    studyModel = "单词游戏";
-                    break;
-                case 7:
-                    studyModel = "句型翻译";
-                    break;
-                case 8:
-                    studyModel = "句型听力";
-                    break;
-                case 9:
-                    studyModel = "音译练习";
-                    break;
-                case 10:
-                    studyModel = "句型默写";
-                    break;
-                case 11:
-                    studyModel = "课文试听";
-                    break;
-                case 12:
-                    studyModel = "课文训练";
-                    break;
-                case 13:
-                    studyModel = "闯关测试";
-                    break;
-                case 14:
-                    studyModel = "课文跟读";
-                    break;
-                case 15:
-                    studyModel = "读语法";
-                    break;
-                case 17:
-                    studyModel = "写语法";
-                    break;
-                case 18:
-                    studyModel = "语法游戏";
-                    break;
-                default:
-                    return 0;
             }
             // 获取记忆强度
             Double memoryStrength = studyCapacity.getMemoryStrength();

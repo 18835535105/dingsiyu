@@ -1221,7 +1221,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
     }
 
-    static Vocabulary packagePictureUrl(Map<String, Object> correct) {
+    public static Vocabulary packagePictureUrl(Map<String, Object> correct) {
         Vocabulary wordPictureVocabulary = new Vocabulary();
         wordPictureVocabulary.setSmallPictureUrl(correct.get("smallPictureUrl") == null ? null : correct.get("smallPictureUrl").toString());
         wordPictureVocabulary.setMiddlePictureUrl(correct.get("middlePictureUrl") == null ? null : correct.get("middlePictureUrl").toString());

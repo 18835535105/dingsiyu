@@ -176,6 +176,8 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
 
     List<Map<String, Object>> getWordIdByCourse(@Param("correctWordId") Long correctWordId, @Param("courseId") Long courseId, @Param("unidId") Long unidId);
 
+    List<Map<String, Object>> getWordIdNewByCourse(@Param("correctWordId") Long correctWordId, @Param("unidId") Long unidId);
+
     List<Vocabulary> getWordPicAll(@Param("unitId") Long unitId);
 
     List<Vocabulary> getWordIdByCourseAll(@Param("courseId") Long courseId);

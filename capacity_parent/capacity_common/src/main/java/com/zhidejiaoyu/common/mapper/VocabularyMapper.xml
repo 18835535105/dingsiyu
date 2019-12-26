@@ -376,6 +376,22 @@
         LIMIT 3
     </select>
 
+    <select id="getWordIdNewByCourse" resultType="map" parameterType="map">
+        SELECT a.id,
+               a.word,
+               a.word_chinese,
+               a.recordpicurl
+        FROM vocabulary a
+                 JOIN unit_vocabulary_new b ON a.id = b.vocabulary_id
+                 JOIN unit_new c ON b.unit_id = c.id
+            AND recordpicurl IS NOT NULL
+            AND a.delStatus = 1
+            AND b.unit_id &lt;&gt; #{unidId}
+            AND a.id &lt;&gt; #{correctWordId}
+        ORDER BY rand()
+        LIMIT 3
+    </select>
+
     <select id="getWordPicAll" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="unite_Column_List"/>
