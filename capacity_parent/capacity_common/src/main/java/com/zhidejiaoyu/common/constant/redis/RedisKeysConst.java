@@ -16,7 +16,7 @@ public interface RedisKeysConst {
     /**
      * 摸底测试
      */
-    String TEST_BEFORE_STUDY = "TEST_BEFORE_STUDY";
+    String TEST_BEFORE_STUDY = "TEST_BEFORE_STUDY:";
     /**
      * 摸底测试
      */

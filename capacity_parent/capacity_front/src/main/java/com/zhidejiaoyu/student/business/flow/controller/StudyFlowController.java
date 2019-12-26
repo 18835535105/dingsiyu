@@ -1,8 +1,8 @@
-package com.zhidejiaoyu.student.business.controller;
+package com.zhidejiaoyu.student.business.flow.controller;
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.dto.NodeDto;
-import com.zhidejiaoyu.student.business.service.StudyFlowService;
+import com.zhidejiaoyu.student.business.flow.service.StudyFlowService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +19,10 @@ import java.util.Objects;
 public class StudyFlowController {
 
     @Resource
-    private StudyFlowService studyFlowService;
+    private StudyFlowService flowService;
+
+    @Resource
+    private StudyFlowService freeFlowService;
 
 
     /**
@@ -34,9 +37,9 @@ public class StudyFlowController {
         dto.setTrueFlow(isTrueFlow);
         if (Objects.equals(dto.getType(), 1)){
             // 一键排课流程
-            return studyFlowService.getNode(dto, isTrueFlow, session);
+            return flowService.getNode(dto, isTrueFlow, session);
         }
         // 自由学习流程
-        return null;
+        return freeFlowService.getNode(dto, isTrueFlow, session);
     }
 }

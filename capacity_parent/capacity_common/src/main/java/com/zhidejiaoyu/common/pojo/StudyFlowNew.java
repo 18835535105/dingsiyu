@@ -57,19 +57,6 @@ public class StudyFlowNew extends Model<StudyFlowNew> {
      */
     private Integer type;
 
-    @TableField(exist = false)
-    private Long courseId;
-
-    @TableField(exist = false)
-    private Long unitId;
-
-    @TableField(exist = false)
-    private String courseName;
-
-    @TableField(exist = false)
-    private String unitName;
-
-
     @Override
     protected Serializable pkVal() {
         return this.id;

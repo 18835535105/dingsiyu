@@ -68,7 +68,7 @@ public class RedisOpt {
     public boolean getTestBeforeStudy(Long studentId) {
         StudentExpansion expansion = studentExpansionMapper.selectByStudentId(studentId);
         String phase = expansion.getPhase();
-        Object o = redisTemplate.opsForHash().get(RedisKeysConst.TEST_BEFORE_STUDY + studentId + phase, null);
+        Object o = redisTemplate.opsForHash().get(RedisKeysConst.TEST_BEFORE_STUDY + studentId, phase);
 
         if (o != null) {
             return true;
@@ -79,8 +79,8 @@ public class RedisOpt {
         for (TestRecord testRecord : testRecords) {
             String explain = testRecord.getExplain();
             if (explain.equals(phase)) {
-                redisTemplate.opsForHash().put(RedisKeysConst.TEST_BEFORE_STUDY + studentId + phase, null, true);
-                redisTemplate.expire(RedisKeysConst.TEST_BEFORE_STUDY + studentId + phase, 30, TimeUnit.DAYS);
+                redisTemplate.opsForHash().put(RedisKeysConst.TEST_BEFORE_STUDY + studentId, phase, true);
+                redisTemplate.expire(RedisKeysConst.TEST_BEFORE_STUDY + studentId, 30, TimeUnit.DAYS);
                 return true;
             }
         }
