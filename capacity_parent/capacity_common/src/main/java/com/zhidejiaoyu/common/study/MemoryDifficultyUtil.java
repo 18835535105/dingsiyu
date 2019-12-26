@@ -38,39 +38,80 @@ public class MemoryDifficultyUtil {
     /**
      * 计算同步版当前单词/例句的记忆难度
      *
-     * @param object 记忆追踪模块对象
-     * @param flag   1:计算单词的记忆难度；2：计算例句的记忆难度
+     * @param studyCapacity 记忆追踪模块对象
+     * @param flag          1:计算单词的记忆难度；2：计算例句的记忆难度
      * @return 当前单词的记忆难度 0:熟词；其余情况为生词
      */
-    public int getMemoryDifficulty(Object object, Integer flag) throws RuntimeException {
-        if (object == null) {
+    public int getMemoryDifficulty(StudyCapacity studyCapacity, Integer flag) throws RuntimeException {
+        if (studyCapacity == null) {
             return 0;
         }
         try {
-            Long studentId = (Long) this.getFieldValue(object, object.getClass().getField("studentId"));
-            Long unitId = (Long) this.getFieldValue(object, object.getClass().getField("unitId"));
-            Long id = (Long) this.getFieldValue(object, object.getClass().getField("vocabularyId"));
+            Long studentId = studyCapacity.getStudentId();
+            Long unitId = studyCapacity.getUnitId();
+            Long id = studyCapacity.getWordId();
+            int type = studyCapacity.getType();
             String studyModel = "";
-            if (object instanceof CapacityListen) {
-                studyModel = "慧听写";
-            } else if (object instanceof CapacityWrite) {
-                studyModel = "慧默写";
-            } else if (object instanceof CapacityPicture) {
-                studyModel = "单词图鉴";
-            } else if (object instanceof CapacityMemory) {
-                studyModel = "慧记忆";
-            } else if (object instanceof SentenceWrite) {
-                studyModel = "例句默写";
-            } else if (object instanceof SentenceTranslate) {
-                studyModel = "例句翻译";
-            } else if (object instanceof SentenceListen) {
-                studyModel = "例句听力";
+            switch (type) {
+                case 1:
+                    studyModel = "单词图鉴";
+                    break;
+                case 2:
+                    studyModel = "单词播放机";
+                    break;
+                case 3:
+                    studyModel = "慧记忆";
+                    break;
+                case 4:
+                    studyModel = "慧听写";
+                    break;
+                case 5:
+                    studyModel = "慧默写";
+                    break;
+                case 6:
+                    studyModel = "单词游戏";
+                    break;
+                case 7:
+                    studyModel = "句型翻译";
+                    break;
+                case 8:
+                    studyModel = "句型听力";
+                    break;
+                case 9:
+                    studyModel = "音译练习";
+                    break;
+                case 10:
+                    studyModel = "句型默写";
+                    break;
+                case 11:
+                    studyModel = "课文试听";
+                    break;
+                case 12:
+                    studyModel = "课文训练";
+                    break;
+                case 13:
+                    studyModel = "闯关测试";
+                    break;
+                case 14:
+                    studyModel = "课文跟读";
+                    break;
+                case 15:
+                    studyModel = "读语法";
+                    break;
+                case 17:
+                    studyModel = "写语法";
+                    break;
+                case 18:
+                    studyModel = "语法游戏";
+                    break;
+                default:
+                    return 0;
             }
             // 获取记忆强度
-            Double memoryStrength = (Double) this.getFieldValue(object, object.getClass().getField("memoryStrength"));
+            Double memoryStrength = studyCapacity.getMemoryStrength();
 
             // 获取单词的错误次数
-            Integer errCount = (Integer) this.getFieldValue(object, object.getClass().getField("faultTime"));
+            Integer errCount = studyCapacity.getFaultTime();
 
             // 获取单词的学习次数
             Integer studyCount = this.getStudyCount(studentId, unitId, id, flag, studyModel);

@@ -27,4 +27,17 @@
         le.id, le.school_admin_id, le.learn_id, le.word_id, le.`status`, le.learn_time, le.study_model, le.study_count,
         le.flowName, le.first_study_time,   le.first_is_know, le.update_time
     </sql>
+
+    <select id="selectByUnitIdAndStudentIdAndType" parameterType="long" resultType="map">
+        select
+        distinct word_id
+        from learn_extend
+        where student_id =#{studentId}
+        and unit_id=#{unitId}
+        and type=#{type}
+    </select>
+
+
+
+
 </mapper>

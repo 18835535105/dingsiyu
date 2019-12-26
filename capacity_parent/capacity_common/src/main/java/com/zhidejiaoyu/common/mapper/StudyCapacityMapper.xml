@@ -64,4 +64,28 @@
         limit 1
     </select>
 
+    <select id="selectNeedReviewWord" resultType="java.util.Map" parameterType="map">
+        select a.id,
+               a.word,
+               b.word_chinese,
+               b.memory_strength,
+               a.recordpicurl,
+               b.fault_time,
+               b.unit_id,
+               a.sound_mark,
+               a.small_picture_url  smallPictureUrl,
+               a.middle_picture_url middlePictureUrl,
+               a.high_picture_url   highPictureUrl
+        from vocabulary a
+        INNER JOIN study_capacity b
+        on a.id = b.word_id and b.unit_id = #{unidId}
+        and b.student_id = #{studentId}
+        and b.push &lt; #{s}
+        and b.memory_strength &lt; 1
+        and b.type=#{type}
+        and a.delStatus = 1
+        ORDER BY b.push
+        LIMIT 0,1
+  </select>
+
 </mapper>

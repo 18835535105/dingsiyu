@@ -6,6 +6,8 @@ import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.StudyCapacity;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Map;
+
 /**
  * <p>
  * 黄金记忆点 Mapper 接口
@@ -48,4 +50,16 @@ public interface StudyCapacityMapper extends BaseMapper<StudyCapacity> {
      * @param courseId
      */
     void deleteSyntaxByStudentIdAndCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
+
+    /**
+     * 获取需要复习的单元
+     * @param unitId
+     * @param studentId
+     * @param dateTime
+     * @return
+     */
+    Map<String, Object> selectNeedReviewWord(@Param("unitId") Long unitId,
+                                             @Param("studentId") Long studentId,
+                                             @Param("dateTime") String dateTime,
+                                             @Param("type") Integer type);
 }

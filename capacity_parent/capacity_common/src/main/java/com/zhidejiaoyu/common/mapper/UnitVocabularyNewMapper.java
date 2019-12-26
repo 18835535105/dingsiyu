@@ -2,6 +2,8 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.UnitVocabularyNew;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * <p>
@@ -15,4 +17,12 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
  */
 public interface UnitVocabularyNewMapper extends BaseMapper<UnitVocabularyNew> {
 
+    /**
+     * 查询当前单元下含有图片的单词总个数
+     *
+     * @param unitId
+     * @return
+     */
+    @Select("SELECT count(v.id) FROM unit_vocabulary_new uv, vocabulary v WHERE uv.vocabulary_id = v.id AND v.delStatus = 1 AND recordpicurl IS NOT NULL AND uv.unit_id = #{unitId}")
+    int countWordPictureByUnitId(@Param("unitId") Long unitId);
 }

@@ -5,10 +5,7 @@ import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
-import com.zhidejiaoyu.common.mapper.LevelMapper;
-import com.zhidejiaoyu.common.mapper.StudentExpansionMapper;
-import com.zhidejiaoyu.common.mapper.StudentMapper;
-import com.zhidejiaoyu.common.mapper.StudyFlowMapper;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.pojo.StudyFlow;
@@ -21,6 +18,7 @@ import com.zhidejiaoyu.student.common.SaveRunLog;
 import com.zhidejiaoyu.student.business.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
@@ -54,6 +52,11 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
 
     @Autowired
     private SaveRunLog saveRunLog;
+
+    @Resource
+    private LearnExtendMapper learnExtendMapper;
+    @Resource
+    private LearnNewMapper learnNewMapper;
 
     @Override
     public Student getStudent(HttpSession session) {
@@ -136,7 +139,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
      *
      * @return
      */
-    Map<String, Object> toUnitTest() {
+    public Map<String, Object> toUnitTest() {
         String token = TokenUtil.getToken();
         Map<String, Object> map = new HashMap<>(16);
         map.put("status", TestResponseCode.TO_UNIT_TEST.getCode());
@@ -203,6 +206,24 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
             level = 1;
         }
         return level;
+    }
+
+    /**
+     * 获取未学过的单元信息
+     *
+     * @param unitId
+     * @param studentId
+     * @param type
+     * @param model
+     * @return
+     */
+    public Map<String, Object> getSudyWords(Long unitId, Long studentId, Integer type, Integer model) {
+        Map<String, Object> correct;
+        //获取当前单词模块已经学习过的wordId
+        List<Long> longs = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, studentId, type);
+        // 获取新词
+        correct = learnNewMapper.selectStudyMap(studentId, unitId, longs, type, model);
+        return correct;
     }
 
 
