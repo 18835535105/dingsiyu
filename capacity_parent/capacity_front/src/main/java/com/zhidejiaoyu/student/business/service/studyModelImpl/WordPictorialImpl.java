@@ -1,18 +1,17 @@
 package com.zhidejiaoyu.student.business.service.studyModelImpl;
 
 import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.utils.PictureUtil;
+import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveData;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
-import com.zhidejiaoyu.student.business.service.impl.MemoryServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.ReviewServiceImpl;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +34,6 @@ public class WordPictorialImpl extends BaseServiceImpl<LearnNewMapper, LearnNew>
     @Resource
     private MemoryDifficultyUtil memoryDifficultyUtil;
     @Resource
-    private StudentMapper studentMapper;
-    @Resource
     private UnitVocabularyNewMapper unitVocabularyNewMapper;
     @Resource
     private VocabularyMapper vocabularyMapper;
@@ -46,17 +43,15 @@ public class WordPictorialImpl extends BaseServiceImpl<LearnNewMapper, LearnNew>
     private UnitNewMapper unitNewMapper;
     @Resource
     private StudyCapacityMapper studyCapacityMapper;
+
     @Resource
-    private LearnNewMapper learnNewMapper;
-    @Resource
-    private LearnExtendMapper learnExtendMapper;
+    private SaveData saveData;
     @Resource
     private RedisOpt redisOpt;
-    private static Integer model = 1;
-    private static Integer type = 1;
-    private static Integer easyOrHard=1;
+    private Integer model = 1;
+    private Integer type = 1;
+    private Integer easyOrHard = 1;
     private String studyModel = "单词图鉴";
-
 
 
     @Override
@@ -64,7 +59,7 @@ public class WordPictorialImpl extends BaseServiceImpl<LearnNewMapper, LearnNew>
         Student student = getStudent(session);
         Long studentId = student.getId();
         // 判断学生是否在本系统首次学习，如果是记录首次学习时间
-        judgeIsFirstStudy(session, student);
+        saveData.judgeIsFirstStudy(session, student);
         //获取是否有可以学习的单词信息
         int wordCount = unitVocabularyNewMapper.countWordPictureByUnitId(unitId);
         if (wordCount == 0) {
@@ -156,136 +151,15 @@ public class WordPictorialImpl extends BaseServiceImpl<LearnNewMapper, LearnNew>
     @Override
     public Object saveStudy(HttpSession session,
                             Long unitId, Long wordId, boolean isTrue,
-                            Integer plan, Integer total,Long courseId) {
+                            Integer plan, Integer total, Long courseId,
+                            Long flowId) {
         Student student = getStudent(session);
-        Date now = DateUtil.parseYYYYMMDDHHMMSS(new Date());
-        Long studentId = student.getId();
-
-        judgeIsFirstStudy(session, student);
-        //获取学生学习当前模块的learn_id
-        List<Long> learnIds = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
-        //如果有多余的删除
-        Long learnId=learnIds.get(0);
-        if (learnIds.size() > 1) {
-            List<Long> longs = learnIds.subList(1, learnIds.size());
-            learnNewMapper.deleteBatchIds(longs);
-        }
-        //获取learnExtend数据
-        List<LearnExtend> learnExtends=learnExtendMapper.selectByLearnIdsAndWordIdAndStudyModel(learnId,wordId,studyModel);
-        LearnExtend currentLearn = learnExtends.get(0);
-        //如果有多余的删除
-        if(learnExtends.size() > 1){
-            List<LearnExtend> extendList = learnExtends.subList(1, learnIds.size());
-            List<Long> deleteLong=new ArrayList<>();
-            extendList.forEach(extend -> deleteLong.add(extend.getId()));
-            learnNewMapper.deleteBatchIds(deleteLong);
-        }
-        /**
-         * 查看慧默写  会听写  单词图鉴是否为上次学习 如果是 删除
-         * 开始
-         */
-        boolean flag = false;
-        //查看当前数据是否为以前学习过的数据
-        studyCapacityMapper.selectByStudentIdAndUnitIdAndWordIdAndType(studentId,unitId,wordId,type);
-       /* List<CapacityPicture> capacityPictures = capacityPictureMapper.selectByUnitIdAndId(student.getId(), unitId, wordId);
-        flag = capacityPictures.size() > 0 && capacityPictures.get(0).getPush().getTime() < System.currentTimeMillis();
-
-        if (currentLearn == null && flag) {
-            capacityPictureMapper.deleteByStudentIdAndUnitIdAndVocabulary(student.getId(), learn.getUnitId(),
-                        learn.getVocabularyId());
+        if (saveData.saveVocabularyModel(student, session, unitId, wordId, isTrue, plan, total,
+                flowId, easyOrHard, type, studyModel)) {
             return ServerResponse.createBySuccess();
         }
-        // 保存学习记录
-        // 第一次学习，如果答对记为熟词，答错记为生词
-        if (currentLearn == null) {
-            learn.setStudentId(studentId);
-            learn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
-            learn.setStudyModel(studyModel);
-            learn.setType(1);
-            learn.setStudyCount(1);
-            learn.setLearnCount(1);
-            learn.setUpdateTime(now);
-            StudyFlow currentStudyFlow = super.getCurrentStudyFlow(studentId);
-            if (currentStudyFlow != null) {
-                learn.setFlowName(currentStudyFlow.getFlowName());
-            }
-            if (courseLearnCount == 0) {
-                // 首次学习当前课程，记录课程首次学习时间
-                learn.setFirstStudyTime(now);
-            }
-            if (isTrue) {
-                // 如果认识该单词，记为熟词
-                learn.setStatus(1);
-                learn.setFirstIsKnown(1);
-            } else {
-                learn.setStatus(0);
-                learn.setFirstIsKnown(0);
-                // 单词不认识将该单词记入记忆追踪中
-
-                    saveWordLearnAndCapacity.saveCapacityMemory(learn, student, false, 0);
-
-
-            }
-
-            MemoryServiceImpl.packageAboutStudyPlan(learn, studentId, capacityStudentUnitMapper, studentStudyPlanMapper);
-
-            int count = learnMapper.insert(learn);
-
-            // 统计初出茅庐勋章
-            executorService.execute(() -> medalAwardAsync.inexperienced(student));
-
-            if (count > 0 && total == (plan + 1)) {
-                return ServerResponse.createBySuccess();
-            }
-            if (count > 0) {
-                return ServerResponse.createBySuccess();
-            }
-        } else {
-            learn.setStudyCount(currentLearn.getStudyCount() + 1);
-            if (isTrue) {
-
-                capacityPicture = (CapacityPicture) saveWordLearnAndCapacity.saveCapacityMemory(learn, student, true, 0);
-
-            } else {
-
-                capacityPicture = (CapacityPicture) saveWordLearnAndCapacity.saveCapacityMemory(learn, student, false, 0);
-
-            }
-            // 更新学习记录
-            currentLearn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
-            session.removeAttribute(TimeConstant.BEGIN_START_TIME);
-
-            currentLearn.setStudyCount(currentLearn.getStudyCount() + 1);
-            // 熟词
-            currentLearn.setStatus(memoryDifficult == 0 ? 1 : 0);
-
-            currentLearn.setUpdateTime(now);
-
-            MemoryServiceImpl.packageAboutStudyPlan(currentLearn, studentId, capacityStudentUnitMapper, studentStudyPlanMapper);
-
-            int i = learnMapper.updateById(currentLearn);
-
-
-            if (i > 0) {
-                return ServerResponse.createBySuccess();
-            }
-        }*/
         return ServerResponse.createByErrorMessage("学习记录保存失败");
     }
 
 
-    /**
-     * 判断学生是否在本系统首次学习，如果是记录首次学习时间
-     *
-     * @param session
-     * @param student
-     */
-    private void judgeIsFirstStudy(HttpSession session, Student student) {
-        if (student.getFirstStudyTime() == null) {
-            // 说明学生是第一次在本系统学习，记录首次学习时间
-            student.setFirstStudyTime(new Date());
-            studentMapper.updateByPrimaryKeySelective(student);
-            session.setAttribute(UserConstant.CURRENT_STUDENT, student);
-        }
-    }
 }

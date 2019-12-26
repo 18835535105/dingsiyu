@@ -1,9 +1,7 @@
 package com.zhidejiaoyu.common.study;
 
 import com.zhidejiaoyu.common.mapper.StudentRestudyMapper;
-import com.zhidejiaoyu.common.pojo.Learn;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.StudentRestudy;
+import com.zhidejiaoyu.common.pojo.*;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -37,6 +35,26 @@ public class StudentRestudyUtil {
                 .version(version)
                 .word(word)
                 .vocabularyId(learn.getVocabularyId())
+                .updateTime(new Date())
+                .build());
+    }
+
+    /**
+     * 保存单词的复习记录
+     *
+     * @param learn
+     * @param word    单词
+     * @param version 1:提分版；2：同步版
+     */
+    public void saveWordRestudy(LearnNew learn, LearnExtend learnExtend, Student student, String word, int version) {
+        studentRestudyMapper.insert(StudentRestudy.builder()
+                .courseId(learn.getCourseId())
+                .unitId(learn.getUnitId())
+                .studentId(student.getId())
+                .type(1)
+                .version(version)
+                .word(word)
+                .vocabularyId(learnExtend.getWordId())
                 .updateTime(new Date())
                 .build());
     }

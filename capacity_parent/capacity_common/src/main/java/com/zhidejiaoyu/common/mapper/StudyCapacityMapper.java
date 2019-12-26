@@ -55,6 +55,7 @@ public interface StudyCapacityMapper extends BaseMapper<StudyCapacity> {
 
     /**
      * 获取需要复习的单元
+     *
      * @param unitId
      * @param studentId
      * @param dateTime
@@ -65,6 +66,9 @@ public interface StudyCapacityMapper extends BaseMapper<StudyCapacity> {
                                              @Param("dateTime") String dateTime,
                                              @Param("type") Integer type);
 
-    List<StudyCapacity> selectByStudentIdAndUnitIdAndWordIdAndType(@Param("studentId") Long studentId,@Param("unitId") Long unitId,
-                                                                   @Param("wordId") Long wordId,@Param("type") Integer type);
+    List<StudyCapacity> selectByStudentIdAndUnitIdAndWordIdAndType(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+                                                                   @Param("wordId") Long wordId, @Param("type") Integer type);
+
+    void deleteByStudentIdAndUnitIdAndVocabulary(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+                                                 @Param("wordId") Long wordId, @Param("type") Integer type);
 }

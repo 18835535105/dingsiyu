@@ -18,16 +18,16 @@ public class LearnNewController extends BaseController {
 
     @Resource
     private IStudyService wordPictorialService;
-
+    @Resource
+    private IStudyService memoryWordService;
 
     private Map<Integer, IStudyService> map = new HashMap<>();
 
     @PostConstruct
     private void initMap() {
         map.put(1, wordPictorialService);
-       /* map.put(2,);
-        map.put(3,);
-        map.put(4,);
+        map.put(3, memoryWordService);
+        /*map.put(4,);
         map.put(5,);
         map.put(6,);
         map.put(7,);
@@ -71,10 +71,11 @@ public class LearnNewController extends BaseController {
      * @return
      */
     @RequestMapping("saveStudy")
-    public Object saveStudy(HttpSession session, Integer getModel, Long unitId,Long courseId,
-                            Long wordId, boolean isknow, Integer plan, Integer total) {
+    public Object saveStudy(HttpSession session, Integer getModel,
+                            Long unitId, Long courseId, Long wordId,
+                            boolean isknow, Integer plan, Integer total, Long flowId) {
         IStudyService iStudyService = map.get(getModel);
-        return iStudyService.saveStudy(session, unitId, wordId, isknow, plan, total,courseId);
+        return iStudyService.saveStudy(session, unitId, wordId, isknow, plan, total, courseId, flowId);
     }
 
 

@@ -6,10 +6,7 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.StudentExpansion;
-import com.zhidejiaoyu.common.pojo.StudyFlow;
-import com.zhidejiaoyu.common.pojo.TestRecord;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.TokenUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
@@ -57,6 +54,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
     private LearnExtendMapper learnExtendMapper;
     @Resource
     private LearnNewMapper learnNewMapper;
+
 
     @Override
     public Student getStudent(HttpSession session) {
@@ -225,6 +223,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         correct = learnNewMapper.selectStudyMap(studentId, unitId, longs, type, model);
         return correct;
     }
+
 
 
 }

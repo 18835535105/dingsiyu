@@ -42,6 +42,7 @@
     <select id="selectSchoolAdminIdByTeacherId" resultType="java.lang.Integer" parameterType="map">
         select school_admin_id
         from teacher
-        where teacher_id = #{teacherId}
+        where teacher_id = #{teacherId} or school_admin_id=#{teacherId}
     </select>
+
 </mapper>

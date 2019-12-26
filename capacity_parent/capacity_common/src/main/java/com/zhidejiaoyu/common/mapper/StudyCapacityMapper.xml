@@ -89,7 +89,20 @@
   </select>
 
     <select id="selectByStudentIdAndUnitIdAndWordIdAndType" resultMap="BaseResultMap" parameterType="map">
-
+        select
+        <include refid="base_sql"></include>
+        from study_capacity
+        where student_id=#{studentId}
+        and unit_id =#{unitId}
+        and word_id=#{wordId}
+        and `type`=#{type}
     </select>
+    <delete id="deleteByStudentIdAndUnitIdAndVocabulary" parameterType="map">
+        delete from study_capacity where
+         student_id=#{studentId}
+        and unit_id =#{unitId}
+        and word_id=#{wordId}
+         and `type`=#{type}
+    </delete>
 
 </mapper>

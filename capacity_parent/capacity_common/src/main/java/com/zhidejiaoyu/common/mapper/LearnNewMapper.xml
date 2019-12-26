@@ -62,7 +62,9 @@
             unit_vocabulary_new uv
             WHERE v.id = uv.vocabulary_id
             AND uv.unit_id = #{unitId}
-            AND v.recordpicurl is not NULL
+            <if test="type==1">
+                AND v.recordpicurl is not NULL
+            </if>
             AND v.delStatus = 1
             and v.id not in (
             <foreach collection="wordIds" item="wordId" separator=",">
