@@ -12,7 +12,9 @@ import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.business.service.impl.MemoryServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.ReviewServiceImpl;
+import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -41,9 +43,20 @@ public class WordPictorialImpl extends BaseServiceImpl<LearnNewMapper, LearnNew>
     @Resource
     private BaiduSpeak baiduSpeak;
     @Resource
+    private UnitNewMapper unitNewMapper;
+    @Resource
     private StudyCapacityMapper studyCapacityMapper;
+    @Resource
+    private LearnNewMapper learnNewMapper;
+    @Resource
+    private LearnExtendMapper learnExtendMapper;
+    @Resource
+    private RedisOpt redisOpt;
     private static Integer model = 1;
     private static Integer type = 1;
+    private static Integer easyOrHard=1;
+    private String studyModel = "单词图鉴";
+
 
 
     @Override
@@ -112,15 +125,14 @@ public class WordPictorialImpl extends BaseServiceImpl<LearnNewMapper, LearnNew>
         correct.put("recordpicurl", PictureUtil.getPictureByUnitId(ReviewServiceImpl.packagePictureUrl(correct), unitId));
 
         // 2. 从本课程非本单元下随机获取三个题, 三个作为错题, 并且id不等于正确题id
-        List<Map<String, Object>> mapErrorVocabulary = vocabularyMapper.getWordIdNewByCourse(new Long(correct.get("id").toString()),  unitId);
+        List<Map<String, Object>> mapErrorVocabulary = vocabularyMapper.getWordIdNewByCourse(new Long(correct.get("id").toString()), unitId);
         // 四道题
         mapErrorVocabulary.add(correct);
         // 随机打乱顺序
         Collections.shuffle(mapErrorVocabulary);
         // 封装选项正确答案
-        /*Map<Object, Object> subject = new HashMap<>(16);
+        Map<Object, Object> subject = new HashMap<>(16);
         for (Map<String, Object> m : mapErrorVocabulary) {
-
             boolean b = false;
             if (m.get("word").equals(correct.get("word"))) {
                 b = true;
@@ -129,35 +141,136 @@ public class WordPictorialImpl extends BaseServiceImpl<LearnNewMapper, LearnNew>
             subject.put(m.get("word"), b);
         }
         // 把四个选项添加到correct正确答案数据中
-        correct.put("subject", subject);*/
-
-       /* // 3. count单元表单词有多少个查询存在图片的    /.
-        Integer count = unitMapper.countWordByUnitidByPic(unitId);
+        correct.put("subject", subject);
+        // 3. count单元表单词有多少个查询存在图片的    /.
+        Integer count = unitNewMapper.countWordByUnitidByPic(unitId);
         correct.put("wordCount", count);
-
         // 5. 是否是第一次学习单词图鉴，true:第一次学习，进入学习引导页；false：不是第一次学习
-        Integer the = learnMapper.theFirstTimeToWordPic(studentId);
-        if (the == null) {
-            correct.put("firstStudy", true);
-            // 初始化一条数据，引导页进行完之后进入学习页面
-            Learn learn = new Learn();
-            learn.setStudentId(studentId);
-            learn.setStudyModel("单词图鉴");
-            learnMapper.insert(learn);
-        } else {
-            correct.put("firstStudy", false);
-        }
-
+        correct.put("firstStudy", redisOpt.getGuideModel(studentId, "单词图鉴"));
         // 记录学生开始学习该单词/例句的时间
-        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());*/
-
+        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         return ServerResponse.createBySuccess(correct);
     }
 
 
     @Override
-    public Object saveStudy(Long studentId, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total) {
-        return null;
+    public Object saveStudy(HttpSession session,
+                            Long unitId, Long wordId, boolean isTrue,
+                            Integer plan, Integer total,Long courseId) {
+        Student student = getStudent(session);
+        Date now = DateUtil.parseYYYYMMDDHHMMSS(new Date());
+        Long studentId = student.getId();
+
+        judgeIsFirstStudy(session, student);
+        //获取学生学习当前模块的learn_id
+        List<Long> learnIds = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
+        //如果有多余的删除
+        Long learnId=learnIds.get(0);
+        if (learnIds.size() > 1) {
+            List<Long> longs = learnIds.subList(1, learnIds.size());
+            learnNewMapper.deleteBatchIds(longs);
+        }
+        //获取learnExtend数据
+        List<LearnExtend> learnExtends=learnExtendMapper.selectByLearnIdsAndWordIdAndStudyModel(learnId,wordId,studyModel);
+        LearnExtend currentLearn = learnExtends.get(0);
+        //如果有多余的删除
+        if(learnExtends.size() > 1){
+            List<LearnExtend> extendList = learnExtends.subList(1, learnIds.size());
+            List<Long> deleteLong=new ArrayList<>();
+            extendList.forEach(extend -> deleteLong.add(extend.getId()));
+            learnNewMapper.deleteBatchIds(deleteLong);
+        }
+        /**
+         * 查看慧默写  会听写  单词图鉴是否为上次学习 如果是 删除
+         * 开始
+         */
+        boolean flag = false;
+        //查看当前数据是否为以前学习过的数据
+        studyCapacityMapper.selectByStudentIdAndUnitIdAndWordIdAndType(studentId,unitId,wordId,type);
+       /* List<CapacityPicture> capacityPictures = capacityPictureMapper.selectByUnitIdAndId(student.getId(), unitId, wordId);
+        flag = capacityPictures.size() > 0 && capacityPictures.get(0).getPush().getTime() < System.currentTimeMillis();
+
+        if (currentLearn == null && flag) {
+            capacityPictureMapper.deleteByStudentIdAndUnitIdAndVocabulary(student.getId(), learn.getUnitId(),
+                        learn.getVocabularyId());
+            return ServerResponse.createBySuccess();
+        }
+        // 保存学习记录
+        // 第一次学习，如果答对记为熟词，答错记为生词
+        if (currentLearn == null) {
+            learn.setStudentId(studentId);
+            learn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+            learn.setStudyModel(studyModel);
+            learn.setType(1);
+            learn.setStudyCount(1);
+            learn.setLearnCount(1);
+            learn.setUpdateTime(now);
+            StudyFlow currentStudyFlow = super.getCurrentStudyFlow(studentId);
+            if (currentStudyFlow != null) {
+                learn.setFlowName(currentStudyFlow.getFlowName());
+            }
+            if (courseLearnCount == 0) {
+                // 首次学习当前课程，记录课程首次学习时间
+                learn.setFirstStudyTime(now);
+            }
+            if (isTrue) {
+                // 如果认识该单词，记为熟词
+                learn.setStatus(1);
+                learn.setFirstIsKnown(1);
+            } else {
+                learn.setStatus(0);
+                learn.setFirstIsKnown(0);
+                // 单词不认识将该单词记入记忆追踪中
+
+                    saveWordLearnAndCapacity.saveCapacityMemory(learn, student, false, 0);
+
+
+            }
+
+            MemoryServiceImpl.packageAboutStudyPlan(learn, studentId, capacityStudentUnitMapper, studentStudyPlanMapper);
+
+            int count = learnMapper.insert(learn);
+
+            // 统计初出茅庐勋章
+            executorService.execute(() -> medalAwardAsync.inexperienced(student));
+
+            if (count > 0 && total == (plan + 1)) {
+                return ServerResponse.createBySuccess();
+            }
+            if (count > 0) {
+                return ServerResponse.createBySuccess();
+            }
+        } else {
+            learn.setStudyCount(currentLearn.getStudyCount() + 1);
+            if (isTrue) {
+
+                capacityPicture = (CapacityPicture) saveWordLearnAndCapacity.saveCapacityMemory(learn, student, true, 0);
+
+            } else {
+
+                capacityPicture = (CapacityPicture) saveWordLearnAndCapacity.saveCapacityMemory(learn, student, false, 0);
+
+            }
+            // 更新学习记录
+            currentLearn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+            session.removeAttribute(TimeConstant.BEGIN_START_TIME);
+
+            currentLearn.setStudyCount(currentLearn.getStudyCount() + 1);
+            // 熟词
+            currentLearn.setStatus(memoryDifficult == 0 ? 1 : 0);
+
+            currentLearn.setUpdateTime(now);
+
+            MemoryServiceImpl.packageAboutStudyPlan(currentLearn, studentId, capacityStudentUnitMapper, studentStudyPlanMapper);
+
+            int i = learnMapper.updateById(currentLearn);
+
+
+            if (i > 0) {
+                return ServerResponse.createBySuccess();
+            }
+        }*/
+        return ServerResponse.createByErrorMessage("学习记录保存失败");
     }
 
 

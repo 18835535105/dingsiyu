@@ -38,6 +38,7 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
      * @return
      */
     List<LearnNew> selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+
     /**
      * 获取接下来要学的词信息
      *
@@ -51,4 +52,7 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
                                        @Param("wordIds") List<Long> wodIds,
                                        @Param("type") Integer type,
                                        @Param("model") Integer model);
+
+    List<Long> selectByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+                                                    @Param("easyOrHard") Integer easyOrHard);
 }

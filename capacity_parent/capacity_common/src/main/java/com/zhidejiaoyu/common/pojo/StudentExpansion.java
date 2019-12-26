@@ -62,6 +62,11 @@ public class StudentExpansion extends Model<StudentExpansion> {
      */
     private Date betterThreeTime;
 
+    /**
+     * 引导页
+     */
+    private String guide;
+
     @Override
     protected Serializable pkVal() {
         return this.id;

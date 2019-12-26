@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.pojo.LearnExtend;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -45,4 +46,14 @@ public interface LearnExtendMapper extends BaseMapper<LearnExtend> {
      * @return
      */
     List<Long> selectByUnitIdAndStudentIdAndType(@Param("unitId") Long unitId,@Param("studentId") Long studentId,@Param("type") int type);
+
+    /**
+     *  获取当前模块的所有数据
+     * @param learnId
+     * @param wordId
+     * @param studyModel
+     * @return
+     */
+    List<LearnExtend> selectByLearnIdsAndWordIdAndStudyModel(@Param("learnId") Long learnId,@Param("wordId") Long wordId,
+                                                             @Param("studyModel") String studyModel);
 }

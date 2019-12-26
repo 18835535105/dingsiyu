@@ -1,11 +1,13 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.sun.tracing.dtrace.ProviderAttributes;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.StudyCapacity;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,4 +64,7 @@ public interface StudyCapacityMapper extends BaseMapper<StudyCapacity> {
                                              @Param("studentId") Long studentId,
                                              @Param("dateTime") String dateTime,
                                              @Param("type") Integer type);
+
+    List<StudyCapacity> selectByStudentIdAndUnitIdAndWordIdAndType(@Param("studentId") Long studentId,@Param("unitId") Long unitId,
+                                                                   @Param("wordId") Long wordId,@Param("type") Integer type);
 }

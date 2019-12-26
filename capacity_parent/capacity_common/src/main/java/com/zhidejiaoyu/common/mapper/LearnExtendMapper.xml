@@ -46,6 +46,15 @@
         and type=#{type}
     </select>
 
+    <select id="selectByLearnIdsAndWordIdAndStudyModel" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"></include>
+        from learn_extend
+        where learn_id =#{learnId}
+        and word_id=#{wordId}
+        and study_mode=#{studyModel}
+    </select>
+
 
 
 

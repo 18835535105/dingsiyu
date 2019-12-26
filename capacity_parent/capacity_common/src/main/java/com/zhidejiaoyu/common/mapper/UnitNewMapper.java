@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.UnitNew;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,10 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
     List<Long> selectIdsByCourseNames(@Param("courseNames") List<String> courseNames);
 
     @MapKey("unitId")
-    Map<Long,Map<String,Object>> selectCountByUnitIds(@Param("unitIds") List<Long> unitIds);
+    Map<Long, Map<String, Object>> selectCountByUnitIds(@Param("unitIds") List<Long> unitIds);
 
-    int selectByUnitIdAndCourseId(@Param("unitId") Long unitId,@Param("courseId") Long courseId);
+    int selectByUnitIdAndCourseId(@Param("unitId") Long unitId, @Param("courseId") Long courseId);
+
+    @Select("select count(b.id) from unit_vocabulary_new a join vocabulary b on a.vocabulary_id = b.id and a.unit_id = #{s} and b.recordpicurl is not null and b.delStatus = 1")
+    Integer countWordByUnitidByPic(Long s);
 }

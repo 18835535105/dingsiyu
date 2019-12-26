@@ -10,7 +10,7 @@ public interface IStudyService extends IService<LearnNew> {
 
     Object getStudy(HttpSession session, Long unitId);
 
-    Object saveStudy(Long studentId, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total);
+    Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total,Long courseId);
 
 
 }

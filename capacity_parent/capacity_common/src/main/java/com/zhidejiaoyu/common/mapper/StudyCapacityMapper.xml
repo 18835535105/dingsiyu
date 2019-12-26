@@ -88,4 +88,8 @@
         LIMIT 0,1
   </select>
 
+    <select id="selectByStudentIdAndUnitIdAndWordIdAndType" resultMap="BaseResultMap" parameterType="map">
+
+    </select>
+
 </mapper>

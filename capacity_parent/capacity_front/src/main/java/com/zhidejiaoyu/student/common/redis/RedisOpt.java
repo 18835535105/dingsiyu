@@ -88,6 +88,26 @@ public class RedisOpt {
 
     }
 
+    public boolean getGuideModel(Long studentId, String model) {
+        String str = redisTemplate.opsForHash().get(RedisKeysConst.LOOK_GUIDE + studentId, null).toString();
+        if (str.contains(model)) {
+            return false;
+        }
+        StudentExpansion explain = studentExpansionMapper.selectByStudentId(studentId);
+        String guide = explain.getGuide();
+        if (guide.contains(model)) {
+            redisTemplate.opsForHash().put(RedisKeysConst.LOOK_GUIDE + studentId, null, guide);
+            redisTemplate.expire(RedisKeysConst.LOOK_GUIDE + studentId, 30, TimeUnit.DAYS);
+            return false;
+        }
+        explain.setGuide(guide + "," + model);
+        studentExpansionMapper.updateById(explain);
+        //保存测试记录
+        redisTemplate.opsForHash().put(RedisKeysConst.LOOK_GUIDE + studentId, null, guide);
+        redisTemplate.expire(RedisKeysConst.LOOK_GUIDE + studentId, 30, TimeUnit.DAYS);
+        return true;
+    }
+
 
     public void addDrawRecordIndex(String name, Integer count) {
         String hKey = RedisKeysConst.DRAW_COUNT_WITH_NAME;

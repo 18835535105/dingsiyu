@@ -45,6 +45,39 @@
         where student_id = #{studentId}
         and unit_id = #{unitId}
     </select>
+    <select id="selectByStudentIdAndUnitIdAndEasyOrHard" resultType="long" parameterType="map" >
+        select
+        id
+        from learn_new
+        where student_id = #{studentId}
+        and unit_id = #{unitId}
+        and easy_or_hard = #{easyOrHard}
+        limit 1;
+    </select>
+    <select id="selectStudyMap" parameterType="map" resultType="map">
+        <if test="model==1">
+            SELECT
+            <include refid="getByType"></include>
+            FROM vocabulary v,
+            unit_vocabulary_new uv
+            WHERE v.id = uv.vocabulary_id
+            AND uv.unit_id = #{unitId}
+            AND v.recordpicurl is not NULL
+            AND v.delStatus = 1
+            and v.id not in (
+            <foreach collection="wordIds" item="wordId" separator=",">
+                #{wordId}
+            </foreach>
+            )
+            LIMIT 1
+        </if>
+        <if test="model==2">
+
+        </if>
+        <if test="model==3">
+
+        </if>
+    </select>
 
 
 </mapper>
