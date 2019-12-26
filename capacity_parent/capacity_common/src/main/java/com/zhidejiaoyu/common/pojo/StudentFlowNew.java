@@ -47,6 +47,11 @@ public class StudentFlowNew extends Model<StudentFlowNew> {
     private Long unitId;
     private Date updateTime;
 
+    /**
+     * 当前记录所属模块：1、一键排课流程；2、自由学习单词模块流程；3、自由学习句型模块流程；4、自由学习课文模块流程
+     */
+    private Integer type;
+
 
     @Override
     protected Serializable pkVal() {

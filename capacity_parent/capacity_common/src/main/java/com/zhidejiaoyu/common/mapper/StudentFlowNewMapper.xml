@@ -8,6 +8,7 @@
         <result column="student_id" property="studentId" />
         <result column="current_flow_id" property="currentFlowId" />
         <result column="unit_id" property="unitId" />
+        <result column="type" property="type" />
         <result column="update_time" property="updateTime" />
     </resultMap>
 
