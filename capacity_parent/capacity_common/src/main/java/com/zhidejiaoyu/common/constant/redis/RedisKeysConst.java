@@ -20,7 +20,7 @@ public interface RedisKeysConst {
     /**
      * 摸底测试
      */
-    String LOOK_GUIDE = "LOOK_GUIDE";
+    String LOOK_GUIDE = "LOOK_GUIDE:";
     /**
      * 当前课程下每个单元的单词总数量
      * 数据结构hash key - WORD_COUNT_WITH_UNIT_IN_COURSE:课程id
