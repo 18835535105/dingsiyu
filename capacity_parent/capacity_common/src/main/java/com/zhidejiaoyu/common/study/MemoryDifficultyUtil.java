@@ -39,7 +39,7 @@ public class MemoryDifficultyUtil {
      * 计算同步版当前单词/例句的记忆难度
      *
      * @param studyCapacity 记忆追踪模块对象
-     * @param flag   1:计算单词的记忆难度；2：计算例句的记忆难度
+     * @param flag          1:计算单词的记忆难度；2：计算例句的记忆难度
      * @return 当前单词的记忆难度 0:熟词；其余情况为生词
      */
     public int getMemoryDifficulty(StudyCapacity studyCapacity, Integer flag) throws RuntimeException {
@@ -50,27 +50,124 @@ public class MemoryDifficultyUtil {
             Long studentId = studyCapacity.getStudentId();
             Long unitId = studyCapacity.getUnitId();
             Long id = studyCapacity.getWordId();
-            int type=studyCapacity.getType();
+            int type = studyCapacity.getType();
             String studyModel = "";
-            /**
-             * 2，单词播放机  3，慧记忆 4，会听写
-             *      *                 5，慧默写 6，单词游戏 7，句型翻译 8，句型听力 9，音译练习
-             *      *                 10，句型默写 11，课文试听 12，课文训练 13，闯关测试 14，课文跟读
-             *      *                 15，读语法 16，选语法 17，写语法 18，语法游戏
-             */
-            switch (type){
+            switch (type) {
                 case 1:
-                    studyModel="单词播放机";
+                    studyModel = "单词图鉴";
                     break;
-                case 1:
-                    studyModel="单词播放机";
+                case 2:
+                    studyModel = "单词播放机";
                     break;
+                case 3:
+                    studyModel = "慧记忆";
+                    break;
+                case 4:
+                    studyModel = "慧听写";
+                    break;
+                case 5:
+                    studyModel = "慧默写";
+                    break;
+                case 6:
+                    studyModel = "单词游戏";
+                    break;
+                case 7:
+                    studyModel = "句型翻译";
+                    break;
+                case 8:
+                    studyModel = "句型听力";
+                    break;
+                case 9:
+                    studyModel = "音译练习";
+                    break;
+                case 10:
+                    studyModel = "句型默写";
+                    break;
+                case 11:
+                    studyModel = "课文试听";
+                    break;
+                case 12:
+                    studyModel = "课文训练";
+                    break;
+                case 13:
+                    studyModel = "闯关测试";
+                    break;
+                case 14:
+                    studyModel = "课文跟读";
+                    break;
+                case 15:
+                    studyModel = "读语法";
+                    break;
+                case 17:
+                    studyModel = "写语法";
+                    break;
+                case 18:
+                    studyModel = "语法游戏";
+                    break;
+                default:
+                    return 0;
             }
             // 获取记忆强度
             Double memoryStrength = studyCapacity.getMemoryStrength();
 
             // 获取单词的错误次数
             Integer errCount = studyCapacity.getFaultTime();
+
+            // 获取单词的学习次数
+            Integer studyCount = this.getStudyCount(studentId, unitId, id, flag, studyModel);
+
+            // 保存记忆追踪时计算记忆难度：由于先保存的记忆追踪信息，其中的错误次数已经+1，而学习次数还是原来的，可能出现错误次数>学习次数的的情况，所以学习次数也要在原基础上+1
+            if (errCount > studyCount) {
+                studyCount++;
+            }
+
+            if (errCount > studyCount) {
+                log.warn("学生 {} 在单元 {} 模块 {} 下的单词 {} 错误次数大于了学习次数！", studentId, unitId, studyModel, id);
+                errCount = studyCount;
+            }
+            return getMemoryDifficulty(memoryStrength, errCount, studyCount);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * 计算同步版当前单词/例句的记忆难度
+     *
+     * @param object 记忆追踪模块对象
+     * @param flag   1:计算单词的记忆难度；2：计算例句的记忆难度
+     * @return 当前单词的记忆难度 0:熟词；其余情况为生词
+     */
+    public int getMemoryDifficulty(Object object, Integer flag) throws RuntimeException {
+        if (object == null) {
+            return 0;
+        }
+        try {
+            Long studentId = (Long) this.getFieldValue(object, object.getClass().getField("studentId"));
+            Long unitId = (Long) this.getFieldValue(object, object.getClass().getField("unitId"));
+            Long id = (Long) this.getFieldValue(object, object.getClass().getField("vocabularyId"));
+            String studyModel = "";
+            if (object instanceof CapacityListen) {
+                studyModel = "慧听写";
+            } else if (object instanceof CapacityWrite) {
+                studyModel = "慧默写";
+            } else if (object instanceof CapacityPicture) {
+                studyModel = "单词图鉴";
+            } else if (object instanceof CapacityMemory) {
+                studyModel = "慧记忆";
+            } else if (object instanceof SentenceWrite) {
+                studyModel = "例句默写";
+            } else if (object instanceof SentenceTranslate) {
+                studyModel = "例句翻译";
+            } else if (object instanceof SentenceListen) {
+                studyModel = "例句听力";
+            }
+            // 获取记忆强度
+            Double memoryStrength = (Double) this.getFieldValue(object, object.getClass().getField("memoryStrength"));
+
+            // 获取单词的错误次数
+            Integer errCount = (Integer) this.getFieldValue(object, object.getClass().getField("faultTime"));
 
             // 获取单词的学习次数
             Integer studyCount = this.getStudyCount(studentId, unitId, id, flag, studyModel);
