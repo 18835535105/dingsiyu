@@ -1,14 +1,12 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
-
-import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -19,8 +17,6 @@ import org.apache.ibatis.annotations.Param;
  * @since 2019-12-25
  */
 public interface LearnNewMapper extends BaseMapper<LearnNew> {
-
-    List<Map<String, Object>> selectStudyFiveStudent(@Param("studentIds") List<Long> studentIds);
 
     /**
      * 查询最大优先级对应的学习记录
@@ -52,6 +48,17 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
                                        @Param("wordIds") List<Long> wodIds,
                                        @Param("type") Integer type,
                                        @Param("model") Integer model);
+
+    /**
+     * 查询当前单元是否已经学习过指定流程
+     *
+     * @param studentId
+     * @param unitId
+     * @param flowName
+     * @return
+     */
+    int countByStudentIdAndFlow(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("flowName") String flowName);
+
 
     List<Long> selectByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                                     @Param("easyOrHard") Integer easyOrHard);

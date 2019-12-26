@@ -78,11 +78,22 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         if (dto.getNodeId() == null) {
             // 在星球页请求，返回当前正在学习的节点信息
             StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(student.getId(), 1).get(0);
+
+            if (studentStudyPlanNew == null) {
+                throw new ServiceException("学生还没有进行摸底测试，未查询到可以学习的课程！");
+            }
+
             StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitId(student.getId(), studentStudyPlanNew.getUnitId());
             if (studentFlowNew != null) {
                 StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(studentFlowNew.getCurrentFlowId());
 
                 return ServerResponse.createBySuccess(packageFlowVO(studyFlowNew, studentFlowNew.getUnitId()));
+            } else {
+
+                this.initStudentFlow(student, studentStudyPlanNew);
+
+                StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(studentStudyPlanNew.getFlowId());
+                return ServerResponse.createBySuccess(packageFlowVO(studyFlowNew, studentStudyPlanNew.getUnitId()));
             }
         }
 
@@ -109,6 +120,16 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
 
         // 判断下个节点
         return judgeNextNode(dto);
+    }
+
+    public void initStudentFlow(Student student, StudentStudyPlanNew studentStudyPlanNew) {
+        studentFlowNewMapper.insert(StudentFlowNew.builder()
+                .currentFlowId(studentStudyPlanNew.getFlowId())
+                .unitId(studentStudyPlanNew.getUnitId())
+                .studentId(student.getId())
+                .updateTime(new Date())
+                .type(1)
+                .build());
     }
 
     public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Long unitId) {

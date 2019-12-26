@@ -74,6 +74,12 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
     @Resource
     private StudentExpansionMapper studentExpansionMapper;
 
+    @Resource
+    private LearnNewMapper learnNewMapper;
+
+    @Resource
+    private StudentFlowNewMapper studentFlowNewMapper;
+
     @Override
     public ServerResponse<List<SubjectsVO>> getSubjects() {
 
@@ -279,6 +285,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
      *
      * @param resultList
      * @param student
+     * @return 最终优先级最大的记录
      */
     public void pushCourse(List<SaveSubjectsDTO.Result> resultList, Student student) {
         Map<Long, List<SaveSubjectsDTO.Result>> unitIdMap = resultList.stream()
@@ -302,12 +309,15 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         Date updateTime = new Date();
         int timePriority = PriorityUtil.BASE_TIME_PRIORITY;
         Set<String> phaseSet = new HashSet<>();
+        StudentStudyPlanNew maxStudentStudyPlanNew = null;
+        int maxFinalLevel = 0;
         for (Long unitId : unitIds) {
 
             String unitGrade = unitIdAndGrade.get(unitId);
             timePriority = this.getTimePriority(timePriority, phaseSet, unitGrade);
 
             int basePriority = this.getBasePriority(unitIdMap, unitGrade, grade, unitId);
+            int finalLevel = basePriority + 1 + timePriority;
             StudentStudyPlanNew.StudentStudyPlanNewBuilder studentStudyPlanNewBuilder = StudentStudyPlanNew.builder()
                     .studentId(student.getId())
                     .complete(1)
@@ -319,22 +329,56 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
                     .totalStudyCount(1)
                     .updateTime(updateTime)
                     .unitId(unitId)
-                    .finalLevel(basePriority + 1 + timePriority);
+                    .finalLevel(finalLevel);
 
-            studentStudyPlanNews.add(studentStudyPlanNewBuilder
+            StudentStudyPlanNew easyStudentStudyPlan = studentStudyPlanNewBuilder
                     .easyOrHard(1)
                     .baseLevel(basePriority)
                     .flowId(70L)
-                    .build());
+                    .build();
+            studentStudyPlanNews.add(easyStudentStudyPlan);
 
-            studentStudyPlanNews.add(studentStudyPlanNewBuilder
+            StudentStudyPlanNew hardStudentStudyPlan = studentStudyPlanNewBuilder
                     .easyOrHard(2)
                     .baseLevel(basePriority - PriorityUtil.HARD_NUM)
                     .flowId(79L)
-                    .build());
+                    .build();
+            studentStudyPlanNews.add(hardStudentStudyPlan);
+
+            if (finalLevel > maxFinalLevel) {
+                maxStudentStudyPlanNew = easyStudentStudyPlan;
+            }
         }
 
         this.insertBatch(studentStudyPlanNews);
+
+        // 初始化学生学习流程
+        this.initStudentFlow(student, maxStudentStudyPlanNew);
+
+        // 初始化学习内容
+        this.initLearn(student, maxStudentStudyPlanNew);
+
+    }
+
+    public void initLearn(Student student, StudentStudyPlanNew maxStudentStudyPlanNew) {
+        learnNewMapper.insert(LearnNew.builder()
+                .courseId(maxStudentStudyPlanNew.getCourseId())
+                .updateTime(new Date())
+                .unitId(maxStudentStudyPlanNew.getUnitId())
+                .studentId(student.getId())
+                .group(1)
+                .easyOrHard(maxStudentStudyPlanNew.getEasyOrHard())
+                .build());
+    }
+
+    public void initStudentFlow(Student student, StudentStudyPlanNew maxStudentStudyPlanNew) {
+        studentFlowNewMapper.insert(StudentFlowNew.builder()
+                .currentFlowId(maxStudentStudyPlanNew.getFlowId())
+                .unitId(maxStudentStudyPlanNew.getUnitId())
+                .studentId(student.getId())
+                .updateTime(new Date())
+                .type(1)
+                .build());
     }
 
     /**
@@ -350,7 +394,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
             phaseSet.add(unitGrade);
             return PriorityUtil.BASE_TIME_PRIORITY;
         } else {
-           return timePriority + PriorityUtil.BASE_TIME_PRIORITY;
+            return timePriority + PriorityUtil.BASE_TIME_PRIORITY;
         }
     }
 
