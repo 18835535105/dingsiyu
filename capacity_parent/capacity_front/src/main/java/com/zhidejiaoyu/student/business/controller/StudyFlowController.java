@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.util.Objects;
 
 /**
  * 流程
@@ -31,6 +32,11 @@ public class StudyFlowController {
     @RequestMapping("/getNode")
     public ServerResponse<Object> getNode(NodeDto dto, @RequestParam(required = false) String isTrueFlow, HttpSession session) {
         dto.setTrueFlow(isTrueFlow);
-        return studyFlowService.getNode(dto, isTrueFlow, session);
+        if (Objects.equals(dto.getType(), 1)){
+            // 一键排课流程
+            return studyFlowService.getNode(dto, isTrueFlow, session);
+        }
+        // 自由学习流程
+        return null;
     }
 }

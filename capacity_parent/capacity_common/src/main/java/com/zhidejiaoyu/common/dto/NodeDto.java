@@ -43,6 +43,13 @@ public class NodeDto {
     private Integer group;
 
     /**
+     * 区分一键排课流程和自由学习流程
+     * 1：一键排课
+     * 2：自由学习
+     */
+    private Integer type;
+
+    /**
      * 非请求参数
      */
     private StudyFlowNew studyFlowNew;

@@ -22,6 +22,16 @@ public interface UnitSentenceNewMapper extends BaseMapper<UnitSentenceNew> {
      * @param group
      * @return
      */
-    @Select("select group from unit_sentence_new where unit_id = #{unitId} and group > #{group}")
+    @Select("select `group` from unit_sentence_new where unit_id = #{unitId} and `group` > #{group} limit 1")
     Integer selectNextGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
+
+    /**
+     * 查询句型模块当前单元group的个数
+     *
+     * @param unitId
+     * @param group
+     * @return
+     */
+    @Select("SELECT COUNT(1) FROM unit_sentence_new WHERE (unit_id = #{unitId} AND `group` = #{group})")
+    Integer countByUnitIdAndGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
 }

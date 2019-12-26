@@ -29,4 +29,13 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
      * @return
      */
     LearnNew selectByStudentStudyPlanNew(@Param("studentStudyPlanNew") StudentStudyPlanNew studentStudyPlanNew);
+
+    /**
+     * 根据学生id和单元id查询学习表数据
+     *
+     * @param studentId
+     * @param unitId
+     * @return
+     */
+    List<LearnNew> selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 }

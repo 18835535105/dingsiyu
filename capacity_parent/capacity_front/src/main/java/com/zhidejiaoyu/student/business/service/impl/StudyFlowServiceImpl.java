@@ -203,10 +203,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     private StudyFlowNew judgeHasCurrentModel(StudyFlowNew studyFlowNew, NodeDto dto) {
         String flowName = studyFlowNew.getFlowName();
         // 单词模块
+        Long unitId = dto.getUnitId();
+        Integer group = dto.getGroup();
         if (Objects.equals(flowName, "流程1") || Objects.equals(flowName, "流程2")) {
-            Integer wordCount = unitVocabularyNewMapper.selectCount(new EntityWrapper<UnitVocabularyNew>()
-                    .eq("unit_id", dto.getUnitId())
-                    .eq("group", dto.getGroup()));
+            Integer wordCount = unitVocabularyNewMapper.countUnitIdAndGroup(unitId, group);
             if (wordCount > 0) {
                 return studyFlowNew;
             }
@@ -223,9 +223,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
         // 句型模块
         if (Objects.equals(flowName, "流程3") || Objects.equals(flowName, "流程4")) {
-            Integer sentenceCount = unitSentenceNewMapper.selectCount(new EntityWrapper<UnitSentenceNew>()
-                    .eq("unit_id", dto.getUnitId())
-                    .eq("group", dto.getGroup()));
+            Integer sentenceCount = unitSentenceNewMapper.countByUnitIdAndGroup(unitId, group);
             if (sentenceCount > 0) {
                 return studyFlowNew;
             }
@@ -238,9 +236,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
         // 课文模块
         if (Objects.equals(flowName, "流程5")) {
-            Integer teksCount = unitTeksNewMapper.selectCount(new EntityWrapper<UnitTeksNew>()
-                    .eq("unit_id", dto.getUnitId())
-                    .eq("group", dto.getGroup()));
+            Integer teksCount = unitTeksNewMapper.countByUnitIdAndGroup(unitId, group);
             if (teksCount > 0) {
                 return studyFlowNew;
             }
@@ -258,32 +254,12 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
      */
     private StudyFlowNew finishGroup(NodeDto dto) {
         StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(dto.getStudent().getId(), 1).get(0);
-        LearnNew learnNew = learnNewMapper.selectByStudentStudyPlanNew(studentStudyPlanNew);
 
         // 判断哪些模块有当前group
         this.judgeHasCurrentGroup(dto, studentStudyPlanNew);
 
         // 判断单元是否有下个group
-        Integer group = unitVocabularyNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
-        if (group != null) {
-            dto.setGroup(group);
-            learnNew.setGroup(group);
-            learnNewMapper.updateById(learnNew);
-        } else {
-            group = unitSentenceNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
-            if (group != null) {
-                dto.setGroup(group);
-                learnNew.setGroup(group);
-                learnNewMapper.updateById(learnNew);
-            } else {
-                group = unitSentenceNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
-                if (group != null) {
-                    dto.setGroup(group);
-                    learnNew.setGroup(group);
-                    learnNewMapper.updateById(learnNew);
-                }
-            }
-        }
+        Integer group = this.judgeHasNextGroup(dto, studentStudyPlanNew);
 
         if (group == null) {
             // 说明当前单元学习完毕
@@ -307,25 +283,69 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     }
 
     /**
+     * 判断是否有下个group，如果有，将下个group初始化到正在学习表中，如果没有，返回null，再判断单元信息
+     *
+     * @param dto
+     * @param studentStudyPlanNew
+     * @return
+     */
+    private Integer judgeHasNextGroup(NodeDto dto, StudentStudyPlanNew studentStudyPlanNew) {
+        LearnNew learnNew = learnNewMapper.selectByStudentStudyPlanNew(studentStudyPlanNew);
+        if (learnNew != null) {
+            Long learnNewId = learnNew.getId();
+            learnExtendMapper.deleteByLearnId(learnNewId);
+            learnNewMapper.deleteById(learnNewId);
+        }
+        // 判断单词模块是否有下个group
+        Integer group = unitVocabularyNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
+        if (group != null) {
+            this.saveLearnNew(dto, studentStudyPlanNew, group);
+            return group;
+        }
+
+        // 判断句型模块是否有下个group
+        group = unitSentenceNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
+        if (group != null) {
+            this.saveLearnNew(dto, studentStudyPlanNew, group);
+            return group;
+        }
+
+        // 判断课文模块是否有下个group
+        group = unitTeksNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
+        if (group != null) {
+            this.saveLearnNew(dto, studentStudyPlanNew, group);
+            return group;
+        }
+        return null;
+    }
+
+    private void saveLearnNew(NodeDto dto, StudentStudyPlanNew studentStudyPlanNew, Integer group) {
+        learnNewMapper.insert(LearnNew.builder()
+                .easyOrHard(studentStudyPlanNew.getEasyOrHard())
+                .group(group)
+                .studentId(dto.getStudent().getId())
+                .unitId(studentStudyPlanNew.getUnitId())
+                .updateTime(new Date())
+                .courseId(studentStudyPlanNew.getCourseId())
+                .build());
+    }
+
+    /**
      * 判断哪些模块有当前group，并更新或新增当前group的学习已完成表
      *
      * @param dto
      * @param studentStudyPlanNew
      */
     private void judgeHasCurrentGroup(NodeDto dto, StudentStudyPlanNew studentStudyPlanNew) {
-        Integer count = unitVocabularyNewMapper.selectCount(new EntityWrapper<UnitVocabularyNew>()
-                .eq("unit_id", dto.getUnitId())
-                .eq("group", dto.getGroup()));
+        Long unitId = dto.getUnitId();
+        Integer group = dto.getGroup();
+        Integer count = unitVocabularyNewMapper.countUnitIdAndGroup(unitId, group);
         this.saveOrUpdateLearnHistory(dto, studentStudyPlanNew, count, 1);
 
-        count = unitSentenceNewMapper.selectCount(new EntityWrapper<UnitSentenceNew>()
-                .eq("unit_id", dto.getUnitId())
-                .eq("group", dto.getGroup()));
+        count = unitSentenceNewMapper.countByUnitIdAndGroup(unitId, group);
         this.saveOrUpdateLearnHistory(dto, studentStudyPlanNew, count, 2);
 
-        count = unitTeksNewMapper.selectCount(new EntityWrapper<UnitTeksNew>()
-                .eq("unit_id", dto.getUnitId())
-                .eq("group", dto.getGroup()));
+        count = unitTeksNewMapper.countByUnitIdAndGroup(unitId, group);
         this.saveOrUpdateLearnHistory(dto, studentStudyPlanNew, count, 4);
     }
 
@@ -370,7 +390,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         StudentStudyPlanNew maxStudentStudyPlanNew = this.initLearnInfo(dto, studentId);
 
         // 将当前单元的已学习记录状态置为已完成
-        this.updateLearnHistory(dto);
+        learnHistoryMapper.updateStateByStudentIdAndUnitId(studentId, dto.getUnitId(), 2);
 
         Long courseId = maxStudentStudyPlanNew.getCourseId();
         Long unitId = maxStudentStudyPlanNew.getUnitId();
@@ -387,12 +407,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 .build();
     }
 
-    private void updateLearnHistory(NodeDto dto) {
-        learnHistoryMapper.update(LearnHistory.builder().state(2).updateTime(new Date()).build(),
-                new EntityWrapper<LearnHistory>().eq("student_id", dto.getStudent().getId())
-                        .eq("unit_id", dto.getUnitId()));
-    }
-
     /**
      * 根据优先级初始化学习表数据
      *
@@ -401,13 +415,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
      * @return
      */
     private StudentStudyPlanNew initLearnInfo(NodeDto dto, Long studentId) {
-        // 从正在学习表中删除当前单元信息
-        List<LearnNew> learnNews = learnNewMapper.selectList(new EntityWrapper<LearnNew>().eq("student_id", studentId)
-                .eq("unit_id", dto.getUnitId()));
-        learnExtendMapper.delete(new EntityWrapper<LearnExtend>().in("learn_id", learnNews.stream().map(LearnNew::getId).collect(Collectors.toList())));
-        learnNewMapper.deleteBatchIds(learnNews);
-
-        // 初始化下个优先级的单元数据
         List<StudentStudyPlanNew> studentStudyPlanNews = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(studentId, 5);
         StudentStudyPlanNew maxStudentStudyPlanNew = studentStudyPlanNews.get(0);
         StudentStudyPlanNew finalMaxStudentStudyPlanNew = maxStudentStudyPlanNew;
@@ -480,9 +487,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
      */
     private boolean judgeHasSentenceModel(StudyFlowNew studyFlowNew, NodeDto dto) {
         // 没有单词模块判断是否有句型模块
-        Integer sentenceCount = unitSentenceNewMapper.selectCount(new EntityWrapper<UnitSentenceNew>()
-                .eq("unit_id", dto.getUnitId())
-                .eq("group", dto.getGroup()));
+        Integer sentenceCount = unitSentenceNewMapper.countByUnitIdAndGroup(dto.getUnitId(), dto.getGroup());
         if (sentenceCount > 0) {
             studyFlowNew.setId(85L);
             return true;
@@ -499,9 +504,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
      */
     private boolean judgeHasTeksModel(StudyFlowNew studyFlowNew, NodeDto dto) {
         // 没有句型模块判断是否有课文模块
-        Integer teksCount = unitTeksNewMapper.selectCount(new EntityWrapper<UnitTeksNew>()
-                .eq("unit_id", dto.getUnitId())
-                .eq("group", dto.getGroup()));
+        Integer teksCount = unitTeksNewMapper.countByUnitIdAndGroup(dto.getUnitId(), dto.getGroup());
         if (teksCount > 0) {
             studyFlowNew.setId(89L);
             return true;

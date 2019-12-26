@@ -2,11 +2,12 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.LearnExtend;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
- *  Mapper 接口
+ * Mapper 接口
  * </p>
  *
  * @author zdjy
@@ -23,4 +24,12 @@ public interface LearnExtendMapper extends BaseMapper<LearnExtend> {
      * @return
      */
     int countByStudentIdAndFlow(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("flowName") String flowName);
+
+    /**
+     * 根据学习id删除记录
+     *
+     * @param learnId
+     */
+    @Delete("delete from learn_extend where learn_id = #{learnId}")
+    void deleteByLearnId(Long learnId);
 }

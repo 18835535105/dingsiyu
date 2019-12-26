@@ -24,6 +24,16 @@ public interface UnitVocabularyNewMapper extends BaseMapper<UnitVocabularyNew> {
      * @param group
      * @return
      */
-    @Select("select group from unit_vocabulary_new where unit_id = #{unitId} and group > #{group}")
+    @Select("select `group` from unit_vocabulary_new where unit_id = #{unitId} and `group` > #{group} limit 1")
     Integer selectNextGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
+
+    /**
+     * 查询单词模块当前单元group的个数
+     *
+     * @param unitId
+     * @param group
+     * @return
+     */
+    @Select("SELECT COUNT(1) FROM unit_vocabulary_new WHERE (unit_id = #{unitId} AND `group` = #{group})")
+    Integer countUnitIdAndGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
 }
