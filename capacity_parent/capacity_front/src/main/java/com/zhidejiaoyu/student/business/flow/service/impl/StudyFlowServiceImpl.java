@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.service.impl;
+package com.zhidejiaoyu.student.business.flow.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
@@ -8,7 +8,9 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
-import com.zhidejiaoyu.student.business.service.StudyFlowService;
+import com.zhidejiaoyu.common.vo.flow.FlowVO;
+import com.zhidejiaoyu.student.business.flow.service.StudyFlowService;
+import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -21,9 +23,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Service
 @Slf4j
-public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, StudyFlow> implements StudyFlowService {
+@Service(value = "flowService")
+public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, StudyFlowNew> implements StudyFlowService {
 
     @Resource
     private StudyFlowNewMapper studyFlowNewMapper;
@@ -72,6 +74,18 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> getNode(NodeDto dto, String isTrueFlow, HttpSession session) {
         Student student = getStudent(session);
+
+        if (dto.getNodeId() == null) {
+            // 在星球页请求，返回当前正在学习的节点信息
+            StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(student.getId(), 1).get(0);
+            StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitId(student.getId(), studentStudyPlanNew.getUnitId());
+            if (studentFlowNew != null) {
+                StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(studentFlowNew.getCurrentFlowId());
+
+                return ServerResponse.createBySuccess(packageFlowVO(studyFlowNew, studentFlowNew.getUnitId()));
+            }
+        }
+
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(dto.getNodeId());
 
         if (studyFlowNew == null) {
@@ -95,6 +109,19 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
         // 判断下个节点
         return judgeNextNode(dto);
+    }
+
+    public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Long unitId) {
+        UnitNew unitNew = unitNewMapper.selectById(unitId);
+        CourseNew courseNew = courseNewMapper.selectById(unitNew.getCourseId());
+        return FlowVO.builder()
+                .courseId(courseNew.getId())
+                .courseName(courseNew.getCourseName())
+                .id(studyFlowNew.getId())
+                .modelName(studyFlowNew.getModelName())
+                .unitId(unitNew.getId())
+                .unitName(unitNew.getUnitName())
+                .build();
     }
 
     private ServerResponse<Object> judgeNextNode(NodeDto dto) {
@@ -172,16 +199,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
 
         // 判断当前单元单词是否有图片，如果都没有图片不进入单词图鉴
         StudyFlowNew studyFlowNew = this.getStudyFlow(dto, nextFlowId);
-        UnitNew unitNew = unitNewMapper.selectById(dto.getUnitId());
-        CourseNew courseNew = courseNewMapper.selectById(dto.getCourseId());
-
-        studyFlowNew.setCourseId(dto.getCourseId());
-        studyFlowNew.setUnitId(dto.getUnitId());
-        studyFlowNew.setCourseName(courseNew.getCourseName());
-        studyFlowNew.setUnitName(unitNew.getUnitName());
 
         // 判断当前单元是否含有当前模块的内容，如果没有当前模块的内容学习下个模块的内容
-        studyFlowNew = this.judgeHasCurrentModel(studyFlowNew, dto);
+        FlowVO flowVO = this.judgeHasCurrentModel(studyFlowNew, dto);
 
         studentFlowNewMapper.update(StudentFlowNew.builder()
                 .currentFlowId(studyFlowNew.getId())
@@ -190,7 +210,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
                 .eq("unit_id", dto.getUnitId()));
 
 
-        return ServerResponse.createBySuccess("true", studyFlowNew);
+        return ServerResponse.createBySuccess("true", flowVO);
     }
 
     /**
@@ -200,7 +220,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
      * @param dto
      * @return
      */
-    private StudyFlowNew judgeHasCurrentModel(StudyFlowNew studyFlowNew, NodeDto dto) {
+    private FlowVO judgeHasCurrentModel(StudyFlowNew studyFlowNew, NodeDto dto) {
         String flowName = studyFlowNew.getFlowName();
         // 单词模块
         Long unitId = dto.getUnitId();
@@ -208,15 +228,15 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         if (Objects.equals(flowName, "流程1") || Objects.equals(flowName, "流程2")) {
             Integer wordCount = unitVocabularyNewMapper.countUnitIdAndGroup(unitId, group);
             if (wordCount > 0) {
-                return studyFlowNew;
+                return this.packageFlowVO(studyFlowNew, dto.getUnitId());
             }
 
             if (this.judgeHasSentenceModel(studyFlowNew, dto)) {
-                return studyFlowNew;
+                return this.packageFlowVO(studyFlowNew, dto.getUnitId());
             }
 
             if (this.judgeHasTeksModel(studyFlowNew, dto)) {
-                return studyFlowNew;
+                return this.packageFlowVO(studyFlowNew, dto.getUnitId());
             }
 
         }
@@ -225,12 +245,12 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         if (Objects.equals(flowName, "流程3") || Objects.equals(flowName, "流程4")) {
             Integer sentenceCount = unitSentenceNewMapper.countByUnitIdAndGroup(unitId, group);
             if (sentenceCount > 0) {
-                return studyFlowNew;
+                return this.packageFlowVO(studyFlowNew, dto.getUnitId());
             }
 
             // 没有句型模块判断是否有课文模块
             if (this.judgeHasTeksModel(studyFlowNew, dto)) {
-                return studyFlowNew;
+                return this.packageFlowVO(studyFlowNew, dto.getUnitId());
             }
         }
 
@@ -238,7 +258,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         if (Objects.equals(flowName, "流程5")) {
             Integer teksCount = unitTeksNewMapper.countByUnitIdAndGroup(unitId, group);
             if (teksCount > 0) {
-                return studyFlowNew;
+                return this.packageFlowVO(studyFlowNew, dto.getUnitId());
             }
         }
 
@@ -252,7 +272,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
      * @param dto
      * @return
      */
-    private StudyFlowNew finishGroup(NodeDto dto) {
+    private FlowVO finishGroup(NodeDto dto) {
         StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(dto.getStudent().getId(), 1).get(0);
 
         // 判断哪些模块有当前group
@@ -266,20 +286,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
             return this.finishUnit(dto);
         }
 
+        Long nodeId = dto.getNodeId();
+        StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(nodeId);
 
-        Long courseId = dto.getCourseId();
-        Long unitId = dto.getUnitId();
-
-        CourseNew courseNew = courseNewMapper.selectById(courseId);
-        UnitNew unitNew = unitNewMapper.selectById(unitId);
-
-        return StudyFlowNew.builder()
-                .id(dto.getNodeId())
-                .courseId(courseId)
-                .unitId(unitId)
-                .courseName(courseNew.getCourseName())
-                .unitName(unitNew.getUnitName())
-                .build();
+        return this.packageFlowVO(studyFlowNew, dto.getUnitId());
     }
 
     /**
@@ -381,7 +391,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
      * @param dto
      * @return
      */
-    private StudyFlowNew finishUnit(NodeDto dto) {
+    private FlowVO finishUnit(NodeDto dto) {
         Long studentId = dto.getStudent().getId();
 
         // 更新优先级表中的变化优先级
@@ -392,19 +402,11 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowMapper, Study
         // 将当前单元的已学习记录状态置为已完成
         learnHistoryMapper.updateStateByStudentIdAndUnitId(studentId, dto.getUnitId(), 2);
 
-        Long courseId = maxStudentStudyPlanNew.getCourseId();
-        Long unitId = maxStudentStudyPlanNew.getUnitId();
+        Long flowId = maxStudentStudyPlanNew.getFlowId();
+        StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(flowId);
 
-        CourseNew courseNew = courseNewMapper.selectById(courseId);
-        UnitNew unitNew = unitNewMapper.selectById(unitId);
+        return packageFlowVO(studyFlowNew, maxStudentStudyPlanNew.getUnitId());
 
-        return StudyFlowNew.builder()
-                .id(maxStudentStudyPlanNew.getFlowId())
-                .courseId(courseId)
-                .unitId(unitId)
-                .courseName(courseNew.getCourseName())
-                .unitName(unitNew.getUnitName())
-                .build();
     }
 
     /**
