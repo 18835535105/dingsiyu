@@ -1,9 +1,10 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.sun.tracing.dtrace.ProviderAttributes;
-import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -25,6 +26,14 @@ public interface StudentStudyPlanNewMapper extends BaseMapper<StudentStudyPlanNe
      */
     StudentStudyPlanNew selectByStudentIdAndUnitIdAndEasyOrHard
     (@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("easyOrHard") int easyOrHard);
+
+    /**
+     * 获取最终优先级最高的 limit 条记录
+     *
+     * @param studentId
+     * @return
+     */
+    List<StudentStudyPlanNew> selectMaxFinalLevelByLimit(@Param("studentId") Long studentId, @Param("limit") Integer limit);
 
     int selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 }

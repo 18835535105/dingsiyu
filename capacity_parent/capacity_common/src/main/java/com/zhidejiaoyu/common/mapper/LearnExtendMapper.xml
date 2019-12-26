@@ -27,6 +27,15 @@
         le.id, le.school_admin_id, le.learn_id, le.word_id, le.`status`, le.learn_time, le.study_model, le.study_count,
         le.flowName, le.first_study_time,   le.first_is_know, le.update_time
     </sql>
+    <select id="countByStudentIdAndFlow" resultType="java.lang.Integer" parameterType="map">
+        select count(l.id)
+        from learn_new l
+                 left join learn_extend le
+                           on le.learn_id = l.id and l.student_id = #{studentId} and l.unit_id = #{unitId} and
+                              le.flow_name = #{flowName}
+    </select>
+
+
 
     <select id="selectByUnitIdAndStudentIdAndType" parameterType="long" resultType="map">
         select

@@ -10,8 +10,7 @@ package com.zhidejiaoyu.common.pojo;
 
         import com.baomidou.mybatisplus.annotations.Version;
 
-        import lombok.Data;
-        import lombok.EqualsAndHashCode;
+        import lombok.*;
         import lombok.experimental.Accessors;
 
 /**
@@ -23,6 +22,9 @@ package com.zhidejiaoyu.common.pojo;
  * @since 2019-12-25
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class LearnNew extends Model<LearnNew> {

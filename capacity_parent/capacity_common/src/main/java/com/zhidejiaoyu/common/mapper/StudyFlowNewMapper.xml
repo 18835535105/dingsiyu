@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.StudyFlowNewMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudyFlowNew">
+        <id column="id" property="id"/>
+        <result column="next_true_flow" property="nextTrueFlow"/>
+        <result column="next_false_flow" property="nextFalseFlow"/>
+        <result column="model_name" property="modelName"/>
+        <result column="flow_name" property="flowName"/>
+        <result column="type" property="type"/>
+    </resultMap>
+    <sql id="base_sql">
+        id, next_true_flow, next_false_flow, model_name, flow_name, type
+    </sql>
+    <sql id="more_table_sql">
+        sfn.id, sfn.next_true_flow, sfn.next_false_flow, sfn.model_name, sfn.flow_name, sfn.type
+    </sql>
+    <select id="selectStudentCurrentFlow" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from study_flow_new sfn,
+        student_flow_new stfn
+        where stfn.current_flow_id = sfn.id
+        and stfn.student_id = #{dto.student.id}
+        and stfn.unit_id = #{dto.unitId}
+        limit 1
+    </select>
+
+</mapper>

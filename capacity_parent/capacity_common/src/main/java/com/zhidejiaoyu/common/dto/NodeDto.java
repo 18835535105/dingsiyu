@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.dto;
 
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.StudyFlow;
+import com.zhidejiaoyu.common.pojo.StudyFlowNew;
 import lombok.Data;
 
 import javax.servlet.http.HttpSession;
@@ -38,9 +38,21 @@ public class NodeDto {
     private Long grade;
 
     /**
+     * 当前学习所在分组
+     */
+    private Integer group;
+
+    /**
+     * 区分一键排课流程和自由学习流程
+     * 1：一键排课
+     * 2：自由学习
+     */
+    private Integer type;
+
+    /**
      * 非请求参数
      */
-    private StudyFlow studyFlow;
+    private StudyFlowNew studyFlowNew;
 
     /**
      * 非请求参数

@@ -54,7 +54,7 @@ public class StudentStudyPlanNew extends Model<StudentStudyPlanNew> {
     /**
      * 学习流程表id（存放难、易模块的流程id）
      */
-    private Integer flowId;
+    private Long flowId;
     /**
      * 难易类型：1：简单类型；2：难类型
      */

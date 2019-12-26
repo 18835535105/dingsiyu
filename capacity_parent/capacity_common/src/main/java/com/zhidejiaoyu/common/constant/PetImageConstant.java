@@ -112,7 +112,7 @@ public class PetImageConstant {
     public static final String HONEY_NOT_PASS = AliyunInfoConst.host + "static/img/edit-user-msg/honey-not-pass.png";
 
     /**
-     * 李糖心 100 分
+     * 威士顿 100 分
      */
     public static final String CAT_ONE_HUNDRED = AliyunInfoConst.host + "static/img/edit-user-msg/cat-one-hundred.png";
 

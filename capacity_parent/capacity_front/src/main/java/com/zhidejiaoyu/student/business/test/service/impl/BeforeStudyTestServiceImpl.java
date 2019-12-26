@@ -324,13 +324,13 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
             studentStudyPlanNews.add(studentStudyPlanNewBuilder
                     .easyOrHard(1)
                     .baseLevel(basePriority)
-                    .flowId(11)
+                    .flowId(70L)
                     .build());
 
             studentStudyPlanNews.add(studentStudyPlanNewBuilder
                     .easyOrHard(2)
                     .baseLevel(basePriority - PriorityUtil.HARD_NUM)
-                    .flowId(24)
+                    .flowId(79L)
                     .build());
         }
 

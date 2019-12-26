@@ -106,7 +106,7 @@ public class WordPictorialImpl extends BaseServiceImpl<LearnNewMapper, LearnNew>
         correct.put("engine", PerceiveEngineUtil.getPerceiveEngine(hard, cp.getMemoryStrength()));
 
         // 读音url
-        correct.put("readUrl", baiduSpeak.getLanguagePath(correct.get("word").toString()));
+      /*  correct.put("readUrl", baiduSpeak.getLanguagePath(correct.get("word").toString()));
 
         // 单词图片
         correct.put("recordpicurl", PictureUtil.getPictureByUnitId(ReviewServiceImpl.packagePictureUrl(correct), unitId));
@@ -117,9 +117,9 @@ public class WordPictorialImpl extends BaseServiceImpl<LearnNewMapper, LearnNew>
         mapErrorVocabulary.add(correct);
         // 随机打乱顺序
         Collections.shuffle(mapErrorVocabulary);
-
+*/
         // 封装选项正确答案
-        Map<Object, Object> subject = new HashMap<>(16);
+        /*Map<Object, Object> subject = new HashMap<>(16);
         for (Map<String, Object> m : mapErrorVocabulary) {
 
             boolean b = false;
@@ -130,9 +130,9 @@ public class WordPictorialImpl extends BaseServiceImpl<LearnNewMapper, LearnNew>
             subject.put(m.get("word"), b);
         }
         // 把四个选项添加到correct正确答案数据中
-        correct.put("subject", subject);
+        correct.put("subject", subject);*/
 
-        // 3. count单元表单词有多少个查询存在图片的    /.
+       /* // 3. count单元表单词有多少个查询存在图片的    /.
         Integer count = unitMapper.countWordByUnitidByPic(unitId);
         correct.put("wordCount", count);
 
@@ -150,7 +150,7 @@ public class WordPictorialImpl extends BaseServiceImpl<LearnNewMapper, LearnNew>
         }
 
         // 记录学生开始学习该单词/例句的时间
-        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
+        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());*/
 
         return ServerResponse.createBySuccess(correct);
     }
