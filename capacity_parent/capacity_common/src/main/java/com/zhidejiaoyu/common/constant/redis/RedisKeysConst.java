@@ -16,7 +16,7 @@ public interface RedisKeysConst {
     /**
      * 摸底测试
      */
-    String TEST_BEFORE_STUDY = "TEST_BEFORE_STUDY";
+    String TEST_BEFORE_STUDY = "TEST_BEFORE_STUDY:";
     /**
      * 当前课程下每个单元的单词总数量
      * 数据结构hash key - WORD_COUNT_WITH_UNIT_IN_COURSE:课程id
