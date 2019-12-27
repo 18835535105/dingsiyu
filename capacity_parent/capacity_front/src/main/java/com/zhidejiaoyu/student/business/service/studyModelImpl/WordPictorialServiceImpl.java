@@ -74,7 +74,7 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
         Map<String, Object> correct = studyCapacityMapper.selectNeedReviewWord(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, learnNews.getGroup());
         // 没有需要复习的
         if (correct == null) {
-            correct = this.getSudyWords(unitId, studentId, type, model, learnNews.getGroup());
+            correct = this.getSudyWords(unitId, studentId, type, model, learnNews.getGroup(), studyModel);
             if (correct == null) {
                 return super.toUnitTest();
             }

@@ -274,11 +274,11 @@ public class SaveData {
      * @return 如果当前单词是本单元最后一个单词，返回 null
      */
     public ServerResponse<Object> getNextMemoryWord(HttpSession session, Long unitId, Student student, boolean firstStudy,
-                                            Integer plan, Integer wordCount, Integer group, Integer type) {
+                                                    Integer plan, Integer wordCount, Integer group, Integer type, String studyModel) {
         if (wordCount - 1 >= plan) {
             // 记录学生开始学习该单词的时间
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-            Vocabulary currentStudyWord = getVocabulary(unitId, student, group, type);
+            Vocabulary currentStudyWord = getVocabulary(unitId, student, group, type, studyModel);
             // 查询单词释义
             String wordChinese = unitVocabularyNewMapper.selectWordChineseByUnitIdAndWordId(unitId, currentStudyWord.getId());
             if (type.equals(3)) {
@@ -294,9 +294,9 @@ public class SaveData {
         return null;
     }
 
-    public Vocabulary getVocabulary(Long unitId, Student student, Integer group, Integer type) {
+    public Vocabulary getVocabulary(Long unitId, Student student, Integer group, Integer type, String studyModel) {
         // 查询学习记录本模块学习过的所有单词id
-        List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), type);
+        List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel);
         return vocabularyMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);
     }
 

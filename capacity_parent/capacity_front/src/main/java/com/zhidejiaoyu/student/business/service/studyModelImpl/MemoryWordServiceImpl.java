@@ -68,7 +68,7 @@ public class MemoryWordServiceImpl extends BaseServiceImpl<LearnNewMapper, Learn
             return saveData.returnGoldWord(studyCapacity, plan.longValue(), firstStudy, wordCount.longValue(), type);
         }
         // 如果没有到达黄金记忆点的单词，获取当前学习进度的下一个单词
-        return saveData.getNextMemoryWord(session, unitId, student, firstStudy, plan, wordCount, learnNews.getGroup(), type);
+        return saveData.getNextMemoryWord(session, unitId, student, firstStudy, plan, wordCount, learnNews.getGroup(), type, studyModel);
     }
 
 

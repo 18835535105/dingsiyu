@@ -74,7 +74,7 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
         // 2. 如果记忆追踪中没有需要复习的, 去单词表中取出一个单词,条件是(learn表中单词id不存在的)
         if (studyCapacity == null) {
             // 查询学习记录本模块学习过的所有单词id
-            vocabulary = saveData.getVocabulary(unitId, student, learnNews.getGroup(), type);
+            vocabulary = saveData.getVocabulary(unitId, student, learnNews.getGroup(), type,studyModel);
             // 是新单词
             map.put("studyNew", true);
             // 记忆强度

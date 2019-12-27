@@ -89,21 +89,25 @@ public class RedisOpt {
     }
 
     public boolean getGuideModel(Long studentId, String model) {
-        String str = redisTemplate.opsForHash().get(RedisKeysConst.LOOK_GUIDE , studentId).toString();
-        if (str.contains(model)) {
+        Object o = redisTemplate.opsForHash().get(RedisKeysConst.LOOK_GUIDE, studentId);
+
+        if (o != null && model.contains(o.toString())) {
             return false;
         }
         StudentExpansion explain = studentExpansionMapper.selectByStudentId(studentId);
         String guide = explain.getGuide();
-        if (guide.contains(model)) {
-            redisTemplate.opsForHash().put(RedisKeysConst.LOOK_GUIDE , studentId, guide);
-            redisTemplate.expire(RedisKeysConst.LOOK_GUIDE + studentId, 30, TimeUnit.DAYS);
-            return false;
+        if(guide!=null){
+            if (model.contains(guide)) {
+                redisTemplate.opsForHash().put(RedisKeysConst.LOOK_GUIDE, studentId, guide);
+                redisTemplate.expire(RedisKeysConst.LOOK_GUIDE + studentId, 30, TimeUnit.DAYS);
+                return false;
+            }
         }
+
         explain.setGuide(guide + "," + model);
         studentExpansionMapper.updateById(explain);
         //保存测试记录
-        redisTemplate.opsForHash().put(RedisKeysConst.LOOK_GUIDE , studentId, guide);
+        redisTemplate.opsForHash().put(RedisKeysConst.LOOK_GUIDE, studentId, guide);
         redisTemplate.expire(RedisKeysConst.LOOK_GUIDE + studentId, 30, TimeUnit.DAYS);
         return true;
     }

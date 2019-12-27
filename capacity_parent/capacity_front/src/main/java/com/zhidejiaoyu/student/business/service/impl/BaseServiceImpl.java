@@ -215,10 +215,10 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
      * @param model
      * @return
      */
-    public Map<String, Object> getSudyWords(Long unitId, Long studentId, Integer type, Integer model,Integer group) {
+    public Map<String, Object> getSudyWords(Long unitId, Long studentId, Integer type, Integer model,Integer group,String studyModel) {
         Map<String, Object> correct;
         //获取当前单词模块已经学习过的wordId
-        List<Long> longs = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, studentId, type);
+        List<Long> longs = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, studentId, studyModel);
         // 获取新词
         correct = learnNewMapper.selectStudyMap(studentId, unitId, longs, type, model,group);
         return correct;

@@ -48,7 +48,7 @@ public interface UnitVocabularyNewMapper extends BaseMapper<UnitVocabularyNew> {
     @Select("SELECT count(v.id) FROM unit_vocabulary_new uv, vocabulary v WHERE uv.vocabulary_id = v.id AND v.delStatus = 1 AND recordpicurl IS NOT NULL AND uv.unit_id = #{unitId}")
     int countWordPictureByUnitId(@Param("unitId") Long unitId);
 
-    @Select("select count(id) from unit_vocabulary_new where unit_id=#{unitId} and group =#{group}")
+    @Select("select count(id) from unit_vocabulary_new where unit_id=#{unitId} and `group` =#{group}")
     int countByUnitId(@Param("unitId") Long unitId, @Param("group") Integer group);
 
     List<String> selectInterferenceTerm(@Param("unitId") Long unitId, @Param("wordId") Long vocabularyId, @Param("chinese") String wordChinese);
