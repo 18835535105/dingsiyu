@@ -39,17 +39,35 @@
     </select>
     <select id="selectCountByUnitIds" resultType="map" parameterType="map">
         select new.id unitId,
-            (select count(voc.id) from unit_vocabulary_new voc where voc.unit_id=new.id )+
-            (select count(sen.id) from unit_sentence_new sen where sen.unit_id=new.id)+
-            (select count(teks.id) from unit_teks_new teks where teks.unit_id=new.id) count
-            from unit_new new where id in (
-                <foreach collection="unitIds" separator="," item="unitId">
-                    #{unitId}
-                </foreach>
-            )
+        (select count(voc.id) from unit_vocabulary_new voc where voc.unit_id=new.id )+
+        (select count(sen.id) from unit_sentence_new sen where sen.unit_id=new.id)+
+        (select count(teks.id) from unit_teks_new teks where teks.unit_id=new.id) count
+        from unit_new new where id in (
+        <foreach collection="unitIds" separator="," item="unitId">
+            #{unitId}
+        </foreach>
+        )
     </select>
     <select id="selectByUnitIdAndCourseId" resultType="int" parameterType="map">
-        select count(id) from unit_new where course_id=#{courseId} and id &lt; #{unitId}
+        select count(id)
+        from unit_new
+        where course_id = #{courseId}
+          and id &lt; #{unitId}
+    </select>
+    <select id="selectIdAndNameByCourseId" resultType="java.util.Map" parameterType="map">
+        select u.id, u.unit_name unitName from unit_new u
+        <if test="type == 1">
+            left join unit_vocabulary_new uvn on uvn.unit_id = u.id
+        </if>
+        <if test="type == 2">
+            left join unit_sentence_new usn on usn.unit_id = u.id
+        </if>
+
+        <if test="type == 4">
+            left join unit_teks_new utn on utn.unit_id = u.id
+        </if>
+        and u.course_id = #{courseId}
+        order by u.id
     </select>
 
 </mapper>

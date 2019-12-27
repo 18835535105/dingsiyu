@@ -81,6 +81,9 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
     @Resource
     private StudentFlowNewMapper studentFlowNewMapper;
 
+    @Resource
+    private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
+
     @Override
     public ServerResponse<List<SubjectsVO>> getSubjects() {
 
@@ -310,8 +313,6 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         Date updateTime = new Date();
         int timePriority = PriorityUtil.BASE_TIME_PRIORITY;
         Set<String> phaseSet = new HashSet<>();
-        StudentStudyPlanNew maxStudentStudyPlanNew = null;
-        int maxFinalLevel = 0;
         for (Long unitId : unitIds) {
 
             String unitGrade = unitIdAndGrade.get(unitId);
@@ -345,15 +346,12 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
                     .flowId(FlowIdConstant.HARD_START)
                     .build();
             studentStudyPlanNews.add(hardStudentStudyPlan);
-
-            if (finalLevel > maxFinalLevel) {
-                maxStudentStudyPlanNew = easyStudentStudyPlan;
-            }
         }
 
         this.insertBatch(studentStudyPlanNews);
 
         // 初始化学生学习流程
+        StudentStudyPlanNew maxStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(student.getId(), 1).get(0);
         this.initStudentFlow(student, maxStudentStudyPlanNew);
 
         // 初始化学习内容
