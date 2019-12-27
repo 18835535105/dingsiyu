@@ -56,7 +56,7 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
 
 
     @Override
-    public Object getStudy(HttpSession session, Long unitId) {
+    public Object getStudy(HttpSession session, Long unitId,Integer difficulty) {
         Student student = getStudent(session);
         Long studentId = student.getId();
         // 判断学生是否在本系统首次学习，如果是记录首次学习时间

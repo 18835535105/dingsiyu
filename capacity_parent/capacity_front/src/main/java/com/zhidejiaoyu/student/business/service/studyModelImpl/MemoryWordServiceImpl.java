@@ -41,7 +41,7 @@ public class MemoryWordServiceImpl extends BaseServiceImpl<LearnNewMapper, Learn
     private String studyModel = "慧记忆";
 
     @Override
-    public Object getStudy(HttpSession session, Long unitId) {
+    public Object getStudy(HttpSession session, Long unitId,Integer difficulty) {
         Student student = getStudent(session);
         Long studentId = student.getId();
         // 判断学生是否在本系统首次学习，如果是记录首次学习时间

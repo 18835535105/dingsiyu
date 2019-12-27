@@ -8,9 +8,9 @@ import javax.servlet.http.HttpSession;
 public interface IStudyService extends IService<LearnNew> {
 
 
-    Object getStudy(HttpSession session, Long unitId);
+    Object getStudy(HttpSession session, Long unitId, Integer difficulty);
 
-    Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total,Long courseId,Long flowId);
+    Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId);
 
 
 }

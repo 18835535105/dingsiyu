@@ -41,7 +41,7 @@ public class WordWriteServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
     private String studyModel = "慧默写";
 
     @Override
-    public Object getStudy(HttpSession session, Long unitId) {
+    public Object getStudy(HttpSession session, Long unitId, Integer difficulty) {
         Student student = getStudent(session);
         Long studentId = student.getId();
         boolean firstStudy = redisOpt.getGuideModel(studentId, studyModel);

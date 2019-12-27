@@ -47,7 +47,7 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
 
 
     @Override
-    public Object getStudy(HttpSession session, Long unitId) {
+    public Object getStudy(HttpSession session, Long unitId,Integer difficulty) {
         // 获取当前学生信息
         Student student = getStudent(session);
         Long studentId = student.getId();
