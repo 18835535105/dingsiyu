@@ -16,7 +16,7 @@ import javax.servlet.http.HttpSession;
 /**
  *
  */
-@Service(value = "MemoryWordService")
+@Service(value = "memoryWordService")
 @Slf4j
 public class MemoryWordServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnNew> implements IStudyService {
     @Resource
