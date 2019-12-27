@@ -180,10 +180,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 return ServerResponse.createBySuccess("2", result);
             }
 
-            // 判断学生是否需要进行智能复习,学生登录时在session中增加该字段，在接口 /login/vocabularyIndex 如果获取到该字段不为空，
-            // 判断学生是否需要进行智能复习，如果该字段为空不再判断是否需要进行智能复习
-            HttpUtil.getHttpSession().setAttribute("needCapacityReview", true);
-
             // 判断学生是否是在加盟校半径 1 公里外登录
             final String finalIp = ip;
             executorService.execute(() -> this.isOtherLocation(stu, finalIp));

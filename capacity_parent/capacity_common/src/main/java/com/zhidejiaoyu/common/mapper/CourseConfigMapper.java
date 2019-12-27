@@ -2,10 +2,13 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.CourseConfig;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
- *  Mapper 接口
+ * Mapper 接口
  * </p>
  *
  * @author zdjy
@@ -13,4 +16,13 @@ import com.zhidejiaoyu.common.pojo.CourseConfig;
  */
 public interface CourseConfigMapper extends BaseMapper<CourseConfig> {
 
+    /**
+     * 查询用户指定的配置信息
+     *
+     * @param userId
+     * @param type
+     * @param oneKeyLearn
+     * @return
+     */
+    List<CourseConfig> selectByUserIdAndTypeAndOneKeyLearn(@Param("userId") Long userId, @Param("type") int type, @Param("oneKeyLearn") int oneKeyLearn);
 }

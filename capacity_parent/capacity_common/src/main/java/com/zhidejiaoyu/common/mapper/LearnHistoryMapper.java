@@ -42,4 +42,13 @@ public interface LearnHistoryMapper extends BaseMapper<LearnHistory> {
      */
     @Select("select count(distinct unit_id) from learn_history where student_id = #{studentId} and course_id = #{courseId}")
     int countUnitIdByCourseId(@Param("studentId") Long studentId, @Param("courseId") Long courseId);
+
+    /**
+     * 统计各个课程下已学习单元个数
+     *
+     * @param courseIds
+     * @param type      1:单词；2：句型；3：语法；3：课文
+     * @return
+     */
+    Map<Long, Map<Long, Integer>> countUnitByCourseIds(@Param("courseIds") List<Long> courseIds, @Param("type") int type);
 }

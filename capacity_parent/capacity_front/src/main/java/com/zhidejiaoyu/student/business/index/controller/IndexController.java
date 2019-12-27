@@ -1,13 +1,15 @@
 package com.zhidejiaoyu.student.business.index.controller;
 
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.index.service.IndexCourseInfoService;
 import com.zhidejiaoyu.student.business.index.service.IndexService;
+import com.zhidejiaoyu.student.business.index.vo.course.CourseInfoVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -21,24 +23,22 @@ import javax.servlet.http.HttpSession;
  */
 @Slf4j
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/index")
 public class IndexController {
 
     @Resource
     private IndexService indexService;
 
+    @Resource
+    private IndexCourseInfoService indexCourseInfoService;
+
     /**
      * 首页数据(单词首页)
      *
-     * @param overReview true:智能复习节点完成；false：智能复习节点未完成
      * @return 首页需要展示的数据
      */
     @RequestMapping("/vocabularyIndex")
-    public ServerResponse<Object> indexDate(HttpSession session, @RequestParam(required = false, defaultValue = "false") Boolean overReview) {
-        // 进入单词首页时如果需要智能复习，该标识记录需要智能复习的模块名称，智能复习节点完成后清除该节点
-        if (overReview) {
-            session.removeAttribute("needReview");
-        }
+    public ServerResponse<Object> indexDate(HttpSession session) {
         return indexService.wordIndex(session);
     }
 
@@ -76,5 +76,19 @@ public class IndexController {
     @GetMapping("/getRiepCount")
     public Object getNeedReviewCount(HttpSession session) {
         return indexService.getNeedReviewCount(session);
+    }
+
+    /**
+     * 获取各个年级课程数据
+     *
+     * @param type 1：单词；2：句型；3：语法；4：课文
+     * @return
+     */
+    @GetMapping("/getStudyCourse")
+    public ServerResponse<CourseInfoVO> getStudyCourse(Integer type) {
+        if (type == null) {
+            throw new ServiceException("获取年级课程数据出错！type=null!");
+        }
+        return indexCourseInfoService.getStudyCourse(type);
     }
 }

@@ -19,9 +19,9 @@
         <result column="delStatus" property="delStatus"/>
     </resultMap>
     <select id="selectGradeByCourseId" resultType="string" parameterType="map">
-        select
-            if(grade_ext=null or grade_ext='',grade_ext,grade )
-            from course_new where id =#{courseId}
+        select if(grade_ext = null or grade_ext = '', grade_ext, grade)
+        from course_new
+        where id = #{courseId}
     </select>
     <select id="selectPhaseByUnitId" resultType="java.lang.String" parameterType="map">
         select c.study_paragraph
@@ -46,6 +46,30 @@
             #{unitId}
         </foreach>
         )
+    </select>
+    <select id="countUnitByIds" resultType="java.util.Map" parameterType="map">
+        select c.id courseId, count(distinct u.id) count
+        from course_new c
+        left join unit_new u on c.id = u.course_id
+        <!--含有单词的课程-->
+        <if test="type == 1">
+            left join unit_vocabulary_new uvn on uvn.unit_id = u.id
+        </if>
+        <!--含有句型的课程-->
+        <if test="type == 2">
+            left join unit_sentence_new uvn on uvn.unit_id = u.id
+        </if>
+
+        <!--含有课文的课程-->
+        <if test="type == 4">
+            left join unit_teks_new uvn on uvn.unit_id = u.id
+        </if>
+        and c.id in (
+        <foreach collection="courseIds" separator="," item="courseId">
+            #{courseId}
+        </foreach>
+        )
+        group by course_id
     </select>
 
 

@@ -24,6 +24,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.common.vo.TestResultVo;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
+import com.zhidejiaoyu.student.business.flow.FlowIdConstant;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.TestServiceImpl;
 import com.zhidejiaoyu.student.business.test.constant.TestConstant;
@@ -334,14 +335,14 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
             StudentStudyPlanNew easyStudentStudyPlan = studentStudyPlanNewBuilder
                     .easyOrHard(1)
                     .baseLevel(basePriority)
-                    .flowId(70L)
+                    .flowId(FlowIdConstant.EASY_START)
                     .build();
             studentStudyPlanNews.add(easyStudentStudyPlan);
 
             StudentStudyPlanNew hardStudentStudyPlan = studentStudyPlanNewBuilder
                     .easyOrHard(2)
                     .baseLevel(basePriority - PriorityUtil.HARD_NUM)
-                    .flowId(79L)
+                    .flowId(FlowIdConstant.HARD_START)
                     .build();
             studentStudyPlanNews.add(hardStudentStudyPlan);
 
