@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.index.service.IndexService;
+import com.zhidejiaoyu.student.business.index.vo.ClickPictureVO;
 import com.zhidejiaoyu.student.business.index.vo.NeedReviewCountVO;
 import com.zhidejiaoyu.student.business.index.vo.WordIndexVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -47,7 +48,7 @@ public class IndexServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabula
     private StudentMapper studentMapper;
 
     @Override
-    public ServerResponse<Object> wordIndex(HttpSession session) {
+    public ServerResponse<Object> index(HttpSession session) {
         Student student = super.getStudent(session);
 
         // 封装返回数据
@@ -62,51 +63,24 @@ public class IndexServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabula
         return ServerResponse.createBySuccess(voBuilder.build());
     }
 
-    /**
-     * 例句首页数据
-     */
     @Override
-    public ServerResponse<Object> sentenceIndex(HttpSession session) {
-
-        Student student = super.getStudent(session);
-
-        // 封装返回数据
-        Map<String, Object> result = new HashMap<>(16);
-        result.put("role", "1");
-
-        // 学生id
-        result.put("student_id", student.getId());
-        // 账号
-        result.put("account", student.getAccount());
-        // 姓名
-        result.put("studentName", student.getStudentName());
-        // 头像
-        result.put("headUrl", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
-        result.put("schoolName", student.getSchoolName());
-
-//        this.getIndexTime(session, student, result);
-
-        return ServerResponse.createBySuccess(result);
-    }
-
-    @Override
-    public ServerResponse<Object> clickPortrait(HttpSession session, Integer type) {
+    public ServerResponse<Object> clickPortrait(HttpSession session) {
 
         Student student = getStudent(session);
         Long studentId = student.getId();
 
-        Map<String, Object> map = new HashMap<>(16);
-        map.put("sex", student.getSex());
-
         // 获取我的总金币
         int myGold = (int) BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
-        map.put("myGold", myGold);
-        getMyLevelInfo(map, myGold, redisOpt);
 
-        // 获取今日获得金币
-        this.getTodayGold(studentId, map);
+        ClickPictureVO.ClickPictureVOBuilder clickPictureVoBuilder = ClickPictureVO.builder()
+                .sex(student.getSex())
+                .myGold(myGold)
+                .myThisGold(this.getTodayGold(studentId));
 
-        return ServerResponse.createBySuccess(map);
+
+        this.getMyLevelInfo(clickPictureVoBuilder, myGold, redisOpt);
+
+        return ServerResponse.createBySuccess(clickPictureVoBuilder.build());
     }
 
     @Override
@@ -126,11 +100,10 @@ public class IndexServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabula
      * 封装今日得到的金币数
      *
      * @param studentId
-     * @param map
      */
-    private void getTodayGold(Long studentId, Map<String, Object> map) {
+    private double getTodayGold(Long studentId) {
         List<String> list = runLogMapper.getStudentGold(DateUtil.formatYYYYMMDD(new Date()), studentId);
-        getTodayGold(map, list);
+        return getTodayGold(new HashMap<>(16), list);
     }
 
     /**
@@ -139,7 +112,7 @@ public class IndexServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabula
      * @param map
      * @param list
      */
-    public static void getTodayGold(Map<String, Object> map, List<String> list) {
+    public static double getTodayGold(Map<String, Object> map, List<String> list) {
         double count = 0.0;
         String regex = "#(.*)#";
         Pattern pattern = Pattern.compile(regex);
@@ -151,15 +124,16 @@ public class IndexServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabula
             }
         }
         map.put("myThisGold", count);
+        return count;
     }
 
     /**
      * 封装我的等级信息
      *
-     * @param map
+     * @param builder
      * @param myGold
      */
-    public static void getMyLevelInfo(Map<String, Object> map, int myGold, RedisOpt redisOpt) {
+    private void getMyLevelInfo(ClickPictureVO.ClickPictureVOBuilder builder, int myGold, RedisOpt redisOpt) {
         // 获取等级规则
         List<Map<String, Object>> levels = redisOpt.getAllLevel();
 
@@ -176,19 +150,12 @@ public class IndexServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabula
             int si = (i + 1) < size ? (i + 1) : i;
             boolean flag = (myGold >= myrecord && myGold < nextLevelGold) || j == size;
             if (flag) {
-                // 我的等级
-                map.put("childName", levels.get(i).get("child_name"));
-                // 距离下一等级还差多少金币
-                map.put("jap", (nextLevelGold - myGold));
-                // 我的等级图片
-                map.put("imgUrl", AliyunInfoConst.host + levels.get(i).get("img_url"));
-                // 下一个等级名/ 下一个等级需要多少金币 / 下一个等级图片
-                // 下一级等级名
-                map.put("childNameBelow", levels.get(si).get("child_name"));
-                // 下一级金币数量
-                map.put("japBelow", (nextLevelGold));
-                // 下一级等级图片
-                map.put("imgUrlBelow", AliyunInfoConst.host + levels.get(si).get("img_url"));
+                builder.childName(String.valueOf(levels.get(i).get("child_name")))
+                        .jap(nextLevelGold - myGold)
+                        .imgUrl(AliyunInfoConst.host + levels.get(i).get("img_url"))
+                        .childNameBelow(String.valueOf(levels.get(si).get("child_name")))
+                        .jap(nextLevelGold)
+                        .imgUrlBelow(AliyunInfoConst.host + levels.get(si).get("img_url"));
                 break;
             }
             myrecord = levelGold;

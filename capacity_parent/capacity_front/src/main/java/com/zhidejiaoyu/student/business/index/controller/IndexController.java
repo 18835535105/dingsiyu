@@ -1,8 +1,6 @@
 package com.zhidejiaoyu.student.business.index.controller;
 
-import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
-import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.index.service.IndexCourseInfoService;
 import com.zhidejiaoyu.student.business.index.service.IndexService;
@@ -38,8 +36,8 @@ public class IndexController {
      * @return 首页需要展示的数据
      */
     @RequestMapping("/vocabularyIndex")
-    public ServerResponse<Object> indexDate(HttpSession session) {
-        return indexService.wordIndex(session);
+    public ServerResponse<Object> index(HttpSession session) {
+        return indexService.index(session);
     }
 
     /**
@@ -49,22 +47,17 @@ public class IndexController {
      */
     @RequestMapping("/sentenceIndex")
     public ServerResponse<Object> sentenceIndex(HttpSession session) {
-        return indexService.sentenceIndex(session);
+        return indexService.index(session);
     }
 
     /**
      * 首页点击头像
      *
-     * @param type 类型：1.单词；2.句型；3.课文；4.字母、音标
+     * @param session
      */
     @RequestMapping("/portrait")
-    public ServerResponse<Object> clickPortrait(HttpSession session, Integer type) {
-        if (type == null) {
-            Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-            log.warn("学生[{} -{} -{}]头像信息中：type=null", student.getId(), student.getAccount(), student.getStudentName());
-            type = 1;
-        }
-        return indexService.clickPortrait(session, type);
+    public ServerResponse<Object> clickPortrait(HttpSession session) {
+        return indexService.clickPortrait(session);
     }
 
     /**

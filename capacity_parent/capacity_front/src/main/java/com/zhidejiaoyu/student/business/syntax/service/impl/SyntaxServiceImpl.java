@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.business.syntax.service.impl;
 
-import com.zhidejiaoyu.common.vo.syntax.SyntaxCourseVo;
 import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.mapper.StudentStudyPlanMapper;
 import com.zhidejiaoyu.common.mapper.StudentStudySyntaxMapper;
@@ -12,8 +11,9 @@ import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.pojo.SyntaxUnit;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.syntax.SyntaxCourseVo;
+import com.zhidejiaoyu.student.business.index.service.impl.IndexCourseInfoServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
-import com.zhidejiaoyu.student.business.syntax.constant.GradeNameConstant;
 import com.zhidejiaoyu.student.business.syntax.service.SyntaxService;
 import org.springframework.stereotype.Service;
 
@@ -59,9 +59,9 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
             SyntaxCourseVo useMap = new SyntaxCourseVo();
             //添加返回年级及英文年级选项
             String grade = map.get("grade").toString();
-            String gradeEnglish = getGradeAndLabelEnglishName(grade);
+            String gradeEnglish = IndexCourseInfoServiceImpl.getGradeAndLabelEnglishName(grade);
             String label = map.get("label").toString();
-            String labelEnglish = getGradeAndLabelEnglishName(label);
+            String labelEnglish = IndexCourseInfoServiceImpl.getGradeAndLabelEnglishName(label);
             useMap.setGrade(grade + "(" + label + ")");
             useMap.setEnglishGrade(gradeEnglish + "-" + labelEnglish);
             //添加课程id以及单元id名称
@@ -144,59 +144,8 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
         return (int) (learningSize * 1.0 / modelSize * 100);
     }
 
-
-    private String getGradeAndLabelEnglishName(String grade) {
-        if (grade == null) {
-            return "one";
-        }
-        if (GradeNameConstant.FIRST_GRADE.equals(grade)) {
-            return "one";
-        }
-        if (GradeNameConstant.SECOND_GRADE.equals(grade)) {
-            return "two";
-        }
-        if (GradeNameConstant.WRITE_GRADE.equals(grade)) {
-            return "three";
-        }
-        if (GradeNameConstant.FOURTH_GRADE.equals(grade)) {
-            return "four";
-        }
-        if (GradeNameConstant.FIFTH_GRADE.equals(grade)) {
-            return "five";
-        }
-        if (GradeNameConstant.SIXTH_GRADE.equals(grade)) {
-            return "six";
-        }
-        if (GradeNameConstant.SEVENTH_GRADE.equals(grade)) {
-            return "serven";
-        }
-        if (GradeNameConstant.EIGHTH_GRADE.equals(grade)) {
-            return "eight";
-        }
-        if (GradeNameConstant.NINTH_GRADE.equals(grade)) {
-            return "nine";
-        }
-
-        if (GradeNameConstant.SENIOR_ONE.equals(grade)) {
-            return "ten";
-        }
-        if (GradeNameConstant.SENIOR_TWO.equals(grade)) {
-            return "eleven";
-        }
-        if (GradeNameConstant.SENIOR_THREE.equals(grade)) {
-            return "twelve";
-        }
-        if (GradeNameConstant.VOLUME_1.equals(grade)) {
-            return "up";
-        }
-        if (GradeNameConstant.VOLUME_2.equals(grade)) {
-            return "down";
-        }
-        return null;
-    }
-
     @Override
-    public ServerResponse getSyntaxNode(Long unitId) {
+    public ServerResponse<Object> getSyntaxNode(Long unitId) {
 
         Student student = super.getStudent(HttpUtil.getHttpSession());
 

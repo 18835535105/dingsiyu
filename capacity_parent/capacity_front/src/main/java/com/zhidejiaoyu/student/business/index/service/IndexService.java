@@ -18,23 +18,15 @@ public interface IndexService extends BaseService<Vocabulary> {
      * @param session
      * @return
      */
-    ServerResponse<Object> wordIndex(HttpSession session);
-
-    /**
-     * 句型首页数据
-     *
-     * @param session
-     * @return
-     */
-    ServerResponse<Object> sentenceIndex(HttpSession session);
+    ServerResponse<Object> index(HttpSession session);
 
     /**
      * 首页点击头像
      *
      * @param session
-     * @param type    类型：1.单词；2.句型；3.课文；4.字母、音标
+     * @return
      */
-    ServerResponse<Object> clickPortrait(HttpSession session, Integer type);
+    ServerResponse<Object> clickPortrait(HttpSession session);
 
     /**
      * 首页右侧小人显示需要复习的单词和句型数
