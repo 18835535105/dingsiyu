@@ -21,10 +21,11 @@ public interface GameService extends BaseService<GameStore> {
      *
      * @param session
      * @param pageNum
-     * @param wordList
+     * @param unitId 单元id
+     *
      * @return
      */
-    ServerResponse<GameOneVo> getGameOne(HttpSession session, Integer pageNum, List<String> wordList);
+    ServerResponse<GameOneVo> getGameOne(HttpSession session, Integer pageNum,List<String> wordList, Long unitId);
 
     /**
      * 获取游戏《桌牌捕音》试题

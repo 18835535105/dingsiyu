@@ -126,7 +126,7 @@
         distinct
         <include refid="unite_Column_List"/>
         FROM vocabulary
-        v, unit_vocabulary uv
+        v, unit_vocabulary_new uv
         where uv.unit_id = #{unitId}
         AND v.id
         =
@@ -321,7 +321,7 @@
         SELECT
         distinct
         <include refid="unite_Column_List"/>
-        FROM vocabulary v, unit_vocabulary uv, unit u
+        FROM vocabulary v, unit_vocabulary_new uv, unit_new u
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = #{courseId}
     </select>
@@ -553,7 +553,7 @@
         SELECT
         distinct
         v.id, v.word, uv.word_chinese
-        FROM vocabulary v, unit_vocabulary uv, unit u
+        FROM vocabulary v, unit_vocabulary_new uv, unit_new u
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = #{courseId}
         <if test="wordMapList.size > 0">
@@ -674,7 +674,7 @@
         v.recordpicurl,
         v.read_url,
         if(uv.word_chinese like '%.%' and (LENGTH(SUBSTRING_INDEX(uv.word_chinese, '.', 1)) > 6), 1, 0) i
-        FROM vocabulary v, unit_vocabulary uv, unit u
+        FROM vocabulary v, unit_vocabulary_new uv, unit_new u
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = #{courseId}
         <if test="vocabularies.size > 0">
@@ -692,7 +692,7 @@
         SELECT
         distinct
         v.id, v.word, uv.word_chinese
-        FROM vocabulary v, unit_vocabulary uv, unit u, course c
+        FROM vocabulary v, unit_vocabulary_new uv, unit u, course c
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = c.id and c.study_paragraph = #{studyParagraph}
         <if test="ignoreList.size > 0">

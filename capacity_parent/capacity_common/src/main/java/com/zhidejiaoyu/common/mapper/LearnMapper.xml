@@ -988,9 +988,9 @@
     </select>
     <select id="selectLearnedByUnitId" resultType="java.util.Map" parameterType="map">
         select v.word, uv.word_chinese wordChinese, v.id
-        from learn l,
+        from learn_extend l,
              vocabulary v,
-             unit_vocabulary uv
+             unit_vocabulary_new uv
         where l.unit_id = #{unitId}
           and l.student_id = #{studentId}
           and l.vocabulary_id = v.id

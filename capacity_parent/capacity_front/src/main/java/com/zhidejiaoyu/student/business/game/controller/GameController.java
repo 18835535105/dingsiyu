@@ -50,8 +50,8 @@ public class GameController extends BaseController {
      */
     @GetMapping("/getGameOne")
     public ServerResponse<GameOneVo> getGameOne(HttpSession session, @RequestParam(required = false, defaultValue = "1") Integer pageNum,
-                                                @RequestParam(required = false, name = "wordList[]") List<String> wordList) {
-        return gameService.getGameOne(session, pageNum, wordList);
+                                                @RequestParam(required = false, name = "wordList[]") List<String> wordList,Long unitId) {
+        return gameService.getGameOne(session, pageNum, wordList,unitId);
     }
 
     /**

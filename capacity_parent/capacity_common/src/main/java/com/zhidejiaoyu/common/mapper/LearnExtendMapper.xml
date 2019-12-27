@@ -68,5 +68,20 @@
         and extend.study_mode=#{studyModel}
     </select>
 
+    <select id="selectLearnedByUnitId" parameterType="map" resultType="map">
+         select v.word, uv.word_chinese wordChinese, v.id
+        from learn_extend l,
+             vocabulary v,
+             unit_vocabulary_new uv
+        where l.unit_id = #{unitId}
+          and l.student_id = #{studentId}
+          and l.vocabulary_id = v.id
+          and uv.vocabulary_id = v.id
+          and uv.unit_id = #{unitId}
+        group by v.id
+        limit #{start}
+            , #{end}
+    </select>
+
 
 </mapper>

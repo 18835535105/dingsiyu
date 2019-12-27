@@ -229,8 +229,8 @@ public class TestController {
      * @return
      */
     @GetMapping("/getStrengthGame")
-    public ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session) {
-        return testService.getStrengthGame(session);
+    public ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session,Long unitId) {
+        return testService.getStrengthGame(session,unitId);
     }
 
     /**
@@ -240,8 +240,8 @@ public class TestController {
      * @return
      */
     @GetMapping("/getGameTest")
-    public ServerResponse<Map<String, Object>> getGameSubject(HttpSession session) {
-        return testService.getGameSubject(session);
+    public ServerResponse<Map<String, Object>> getGameSubject(HttpSession session,Long unitId) {
+        return testService.getGameSubject(session,unitId);
     }
 
     /**

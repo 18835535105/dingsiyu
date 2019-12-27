@@ -27,7 +27,7 @@ public interface TestService extends BaseService<TestRecord> {
      * @param session
      * @return
      */
-    ServerResponse<Map<String, Object>> getGameSubject(HttpSession session);
+    ServerResponse<Map<String, Object>> getGameSubject(HttpSession session,Long unitId);
 
     /**
      * 保存学生游戏测试记录，并根据学生游戏测试的成绩推送不同课程或者进入等级测试
@@ -125,7 +125,7 @@ public interface TestService extends BaseService<TestRecord> {
 
     ServerResponse<Object> saveCapTeksTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO);
 
-    ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session);
+    ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session,Long unitId);
 
     /**
      * 保存单元闯关测试记录

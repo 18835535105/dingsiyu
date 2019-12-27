@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -39,12 +40,12 @@ public interface LearnExtendMapper extends BaseMapper<LearnExtend> {
     /**
      * 查询当前单元所有已经学习过的单词信息
      *
-     * @param unitId    单元id
+     * @param unitId  单元id
      * @param learnId 学习id
-     * @param type      模块 1，单词播放机 2，单词图鉴 3，慧记忆 4，会听写
-     *                  5，慧默写 6，单词游戏 7，句型翻译 8，句型听力 9，音译练习
-     *                  10，句型默写 11，课文试听 12，课文训练 13，闯关测试 14，课文跟读
-     *                  15，读语法 16，选语法 17，写语法 18，语法游戏
+     * @param type    模块 1，单词播放机 2，单词图鉴 3，慧记忆 4，会听写
+     *                5，慧默写 6，单词游戏 7，句型翻译 8，句型听力 9，音译练习
+     *                10，句型默写 11，课文试听 12，课文训练 13，闯关测试 14，课文跟读
+     *                15，读语法 16，选语法 17，写语法 18，语法游戏
      * @return
      */
     List<Long> selectByUnitIdAndStudentIdAndType(@Param("unitId") Long unitId, @Param("learnId") Long learnId,
@@ -62,5 +63,8 @@ public interface LearnExtendMapper extends BaseMapper<LearnExtend> {
                                                              @Param("studyModel") String studyModel);
 
     Integer countLearnWord(@Param("learnId") Long learnId, @Param("unitId") Long unitId,
-                        @Param("group") Integer group, @Param("studyModel") String studyModel);
+                           @Param("group") Integer group, @Param("studyModel") String studyModel);
+
+    List<Map<String, Object>> selectLearnedByUnitId(@Param("studentId") Long id, @Param("unitId") Long unitId,
+                                                    @Param("start") int startRow, @Param("end") int end);
 }

@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
@@ -137,6 +138,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Autowired
     private BaiduSpeak baiduSpeak;
 
+    @Resource
+    private UnitNewMapper unitNewMapper;
+
     /**
      * 游戏测试题目获取，获取20个单词供测试
      *
@@ -144,7 +148,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      * @return
      */
     @Override
-    public ServerResponse<Map<String, Object>> getGameSubject(HttpSession session) {
+    public ServerResponse<Map<String, Object>> getGameSubject(HttpSession session, Long unitId) {
         // 获取当前学生信息
         Student student = getStudent(session);
         // 查询当前学生游戏测试的次数，如果已经测试两次不再允许游戏测试
@@ -166,12 +170,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         // 设置游戏测试开始时间
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(student.getId(), 1);
         List<Vocabulary> vocabularies;
         Long courseId;
         PageHelper.startPage(1, 100);
-        if (capacityStudentUnit != null) {
-            courseId = capacityStudentUnit.getCourseId();
+        if (unitId != null) {
+            UnitNew unitNew = unitNewMapper.selectById(unitId);
+            courseId = unitNew.getCourseId();
             vocabularies = vocabularyMapper.selectByCourseId(courseId);
         } else {
             courseId = 2751L;
@@ -246,7 +250,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     @Override
-    public ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session) {
+    public ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session, Long unitId) {
 
         Student student = super.getStudent(session);
         Long studentId = student.getId();
@@ -256,9 +260,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (count > 0) {
             return ServerResponse.createBySuccess(ResponseCode.FORBIDDEN.getCode(), ResponseCode.FORBIDDEN.getMsg());
         }
-
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(studentId, 1);
-        if (capacityStudentUnit == null) {
+        UnitNew unitNew = unitNewMapper.selectById(unitId);
+        if (unitNew == null) {
             log.warn("学生[{} - {} - {}]没有分配智慧单词学习计划！", student.getId(), student.getAccount(), student.getStudentName());
             return ServerResponse.createByError(301, "学生未分配智能版单词学习计划！");
         }
@@ -267,12 +270,15 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         // 随机选出20个正确单词信息
         PageHelper.startPage(1, 20);
-        List<Vocabulary> rightVocabularies = vocabularyMapper.selectByStartUnitIdAndEndUnitId(capacityStudentUnit.getStartunit(), capacityStudentUnit.getEndunit());
+        List<Vocabulary> rightVocabularies = vocabularyMapper.selectByUnitId(unitId);
         Map<String, String> map = this.getWordMap(rightVocabularies);
 
         int size = rightVocabularies.size();
+        if (rightVocabularies.size() > 20) {
+            rightVocabularies = rightVocabularies.subList(0, 20);
+        }
         int errorSize = size * 3;
-        long currentCourseId = capacityStudentUnit.getCourseId();
+        long currentCourseId = unitNew.getCourseId();
         PageHelper.startPage(1, errorSize);
         List<Vocabulary> errorVocabularies = vocabularyMapper.selectByCourseIdWithoutWordIds(currentCourseId, rightVocabularies);
         map.putAll(this.getWordMap(errorVocabularies));
@@ -303,7 +309,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Map<String, Object> resultMap = packageStrengthVo(student, rightVocabularies, map, size, errorSize, errorVocabularies);
         if (resultMap != null) {
             resultMap.put("courseId", currentCourseId);
-            resultMap.put("unitId", capacityStudentUnit.getStartunit());
+            resultMap.put("unitId", unitId);
         }
         return ServerResponse.createBySuccess(resultMap);
     }

@@ -78,7 +78,7 @@ public class RedisOpt {
                 testRecordMapper.selectListByGenre(studentId, GenreConstant.TEST_BEFORE_STUDY);
         for (TestRecord testRecord : testRecords) {
             String explain = testRecord.getExplain();
-            if (explain.equals(phase)) {
+            if (phase.equals(explain)) {
                 redisTemplate.opsForHash().put(RedisKeysConst.TEST_BEFORE_STUDY + studentId, phase, true);
                 redisTemplate.expire(RedisKeysConst.TEST_BEFORE_STUDY + studentId, 30, TimeUnit.DAYS);
                 return true;
