@@ -319,36 +319,6 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             return studyFlowNewMapper.selectById(flowId1);
         }
 
-        // 流程 2 慧听写的单词图鉴
-        int flowTwoListenPicture = 35;
-        if (flowId == flowTwoListenPicture) {
-            if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlowNew().getType()) {
-                // 去流程 2 的慧默写
-                flowId1 = 28;
-                this.changeFlowNodeLog(student, "慧默写", unitNew, flowId1);
-                return studyFlowNewMapper.selectById(flowId1);
-            }
-            // 返回流程 1
-            flowId1 = 9;
-            this.changeFlowNodeLog(student, "单词播放机", unitNew, flowId1);
-            return studyFlowNewMapper.selectById(9);
-        }
-
-        // 流程 2 慧默写的单词图鉴
-        int flowTwoWritePicture = 33;
-        if (flowId == flowTwoWritePicture) {
-            if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlowNew().getType()) {
-                // 去游戏
-                flowId1 = 31;
-                this.changeFlowNodeLog(student, "游戏", unitNew, flowId1);
-                return studyFlowNewMapper.selectById(flowId1);
-            }
-            // 返回流程 1
-            flowId1 = 9;
-            this.changeFlowNodeLog(student, "单词播放机", unitNew, flowId1);
-            return studyFlowNewMapper.selectById(9);
-        }
-
         return byPrimaryKey;
     }
 
