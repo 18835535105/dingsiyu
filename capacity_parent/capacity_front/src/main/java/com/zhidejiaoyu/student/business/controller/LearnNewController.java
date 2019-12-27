@@ -1,8 +1,6 @@
 package com.zhidejiaoyu.student.business.controller;
 
-import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.student.business.service.IStudyService;
-import com.zhidejiaoyu.student.business.service.LearnNewService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,16 +18,19 @@ public class LearnNewController extends BaseController {
     private IStudyService wordPictorialService;
     @Resource
     private IStudyService memoryWordService;
-
+    @Resource
+    private IStudyService dictationService;
+    @Resource
+    private IStudyService wordWriteService;
     private Map<Integer, IStudyService> map = new HashMap<>();
 
     @PostConstruct
     private void initMap() {
         map.put(1, wordPictorialService);
         map.put(3, memoryWordService);
-        /*map.put(4,);
-        map.put(5,);
-        map.put(6,);
+        map.put(4, dictationService);
+        map.put(5, wordWriteService);
+        /*map.put(6,);
         map.put(7,);
         map.put(8,);
         map.put(9,);

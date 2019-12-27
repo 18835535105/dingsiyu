@@ -22,6 +22,10 @@
     <sql id="base_sql">
         id, student_id, course_id, unit_id, word_id, word, syllable, word_chinese, fault_time, push, memory_strength, type, update_time
     </sql>
+    <sql id="sc_base_sql">
+        sc.id, sc.student_id, sc.course_id, sc.unit_id, sc.word_id, sc.word, sc.syllable,
+         sc.word_chinese, sc.fault_time, sc.push, sc.memory_strength, sc.type, sc.update_time
+    </sql>
     <delete id="deleteSyntaxByStudentIdAndCourseId" parameterType="map">
         delete
         from study_capacity
@@ -65,7 +69,7 @@
     </select>
 
     <select id="selectNeedReviewWord" resultType="java.util.Map" parameterType="map">
-        select a.id,
+        select distinct a.id,
                a.word,
                b.word_chinese,
                b.memory_strength,
@@ -79,15 +83,39 @@
         from vocabulary a
         INNER JOIN study_capacity b
         on a.id = b.word_id and b.unit_id = #{unidId}
+        inner join unit_vocabulary_new voNew
+        on voNew.vocabulary_id=a.id
+        inner join learn_new leaNew
+        on leaNew.unitId=voNew.unit_id
         and b.student_id = #{studentId}
+        and voNew.group=#{group}
         and b.push &lt; #{s}
+        and leaNew.easy_or_hard=#{easyOrHard}
         and b.memory_strength &lt; 1
         and b.type=#{type}
         and a.delStatus = 1
         ORDER BY b.push
         LIMIT 0,1
   </select>
-
+    <select id="selectLearnHistory" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="sc_base_sql"></include>
+        from vocabulary a
+        INNER JOIN study_capacity sc
+        on a.id = sc.word_id and sc.unit_id = #{unidId}
+        inner join unit_vocabulary_new voNew
+        on voNew.vocabulary_id=a.id
+        inner join learn_new leaNew
+        on leaNew.unitId=voNew.unit_id
+        and sc.student_id = #{studentId}
+        and voNew.group=#{group}
+        and sc.push &lt; #{s}
+        and leaNew.easy_or_hard=#{easyOrHard}
+        and sc.memory_strength &lt; 1
+        and sc.type=#{type}
+        and a.delStatus = 1
+        ORDER BY sc.push
+        LIMIT 0,1
+    </select>
     <select id="selectByStudentIdAndUnitIdAndWordIdAndType" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="base_sql"></include>

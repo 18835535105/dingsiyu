@@ -53,6 +53,8 @@
         from learn_new
         where student_id = #{studentId}
         and unit_id = #{unitId}
+        and easy_or_hard=#{easyOrHard}
+        limit 1
     </select>
 
     <select id="selectByStudentIdAndUnitIdAndEasyOrHard" resultType="long" parameterType="map">
@@ -68,9 +70,10 @@
             SELECT
             <include refid="getByType"></include>
             FROM vocabulary v,
-            unit_vocabulary_new uv
-            WHERE v.id = uv.vocabulary_id
-            AND uv.unit_id = #{unitId}
+            join unit_vocabulary_new uv
+            on v.id = uv.vocabulary_id
+            WHERE  uv.unit_id = #{unitId}
+            and uv.group=#{group}
             <if test="type==1">
                 AND v.recordpicurl is not NULL
             </if>

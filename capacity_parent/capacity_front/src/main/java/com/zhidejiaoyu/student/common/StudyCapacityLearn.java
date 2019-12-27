@@ -1,17 +1,21 @@
 package com.zhidejiaoyu.student.common;
 
-import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.StudyCapacityMapper;
+import com.zhidejiaoyu.common.mapper.UnitVocabularyMapper;
+import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.StudentRestudyUtil;
 import com.zhidejiaoyu.common.study.memorystrength.StudyMemoryStrength;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
+@Component
 public class StudyCapacityLearn {
 
 

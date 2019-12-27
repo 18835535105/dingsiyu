@@ -386,4 +386,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @return
      */
     List<SubjectsVO> selectSubjectsVOByUnitIds(@Param("unitIds") List<Long> unitIds);
+
+    Vocabulary selectOneWordNotInIdsNew(@Param("wordIds") List<Long> wordIds,@Param("unitId") Long unitId,
+                                        @Param("group") Integer group);
 }

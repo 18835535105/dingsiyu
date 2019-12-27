@@ -4,13 +4,24 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.UnitVocabularyNew">
-        <id column="id" property="id" />
-        <result column="unit_id" property="unitId" />
-        <result column="vocabulary_id" property="vocabularyId" />
-        <result column="classify" property="classify" />
-        <result column="word_chinese" property="wordChinese" />
-        <result column="group" property="group" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="vocabulary_id" property="vocabularyId"/>
+        <result column="classify" property="classify"/>
+        <result column="word_chinese" property="wordChinese"/>
+        <result column="group" property="group"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
+
+
+    <select id="selectInterferenceTerm" resultType="string" parameterType="map">
+        select word_chinese
+        from unit_vocabulary_new
+        where
+        vocabulary_id &lt;> #{wordId}
+        and unit_id=#{unitId}
+        and  word_chinese &lt;> #{chinese}
+        limit 0,3
+    </select>
 
 </mapper>

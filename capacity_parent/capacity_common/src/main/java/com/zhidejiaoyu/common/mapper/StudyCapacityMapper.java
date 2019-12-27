@@ -64,11 +64,20 @@ public interface StudyCapacityMapper extends BaseMapper<StudyCapacity> {
     Map<String, Object> selectNeedReviewWord(@Param("unitId") Long unitId,
                                              @Param("studentId") Long studentId,
                                              @Param("dateTime") String dateTime,
-                                             @Param("type") Integer type);
+                                             @Param("type") Integer type,
+                                             @Param("easyOrHard")Integer easyOrHard,
+                                             @Param("group")Integer group);
 
     List<StudyCapacity> selectByStudentIdAndUnitIdAndWordIdAndType(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                                                    @Param("wordId") Long wordId, @Param("type") Integer type);
 
     void deleteByStudentIdAndUnitIdAndVocabulary(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                                  @Param("wordId") Long wordId, @Param("type") Integer type);
+
+    StudyCapacity selectLearnHistory(@Param("unitId") Long unitId,
+                                           @Param("studentId") Long studentId,
+                                           @Param("dateTime") String dateTime,
+                                           @Param("type") Integer type,
+                                           @Param("easyOrHard")Integer easyOrHard,
+                                           @Param("group")Integer group);
 }
