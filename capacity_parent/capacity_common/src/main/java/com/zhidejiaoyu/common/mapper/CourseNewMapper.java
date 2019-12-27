@@ -3,9 +3,11 @@ package com.zhidejiaoyu.common.mapper;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.dto.testbeforestudy.GradeAndUnitIdDTO;
 import com.zhidejiaoyu.common.pojo.CourseNew;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -42,4 +44,15 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
     List<GradeAndUnitIdDTO> selectGradeByUnitIds(@Param("unitIds") List<Long> unitIds);
 
     String selectGradeByCourseId(@Param("courseId") Long courseId);
+
+    /**
+     * 查询各个课程下指定模块单元总个数
+     *
+     * @param courseIds
+     * @param type      1:单词；2：句型；3：语法；4：课文
+     * @return
+     */
+    // todo: 暂时还没有语法处理逻辑
+    @MapKey("courseId")
+    Map<Long, Map<Long, Integer>> countUnitByIds(@Param("courseIds") List<Long> courseIds, @Param("type") int type);
 }

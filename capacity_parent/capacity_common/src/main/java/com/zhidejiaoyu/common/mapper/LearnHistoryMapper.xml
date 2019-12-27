@@ -4,16 +4,16 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.LearnHistory">
-        <id column="id" property="id" />
-        <result column="student_id" property="studentId" />
-        <result column="course_id" property="courseId" />
-        <result column="unit_id" property="unitId" />
-        <result column="group" property="group" />
-        <result column="type" property="type" />
-        <result column="easy_or_hard" property="easyOrHard" />
-        <result column="study_count" property="studyCount" />
-        <result column="update_time" property="updateTime" />
-        <result column="state" property="state" />
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="course_id" property="courseId"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="group" property="group"/>
+        <result column="type" property="type"/>
+        <result column="easy_or_hard" property="easyOrHard"/>
+        <result column="study_count" property="studyCount"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="state" property="state"/>
     </resultMap>
 
     <select id="selectStudyFiveStudent" parameterType="map" resultType="map">
@@ -34,6 +34,18 @@
         group by student_id;
     </select>
     <select id="selectStudyUnitByStudentId" parameterType="map" resultType="map">
-        select distinct(unit_id) unitId,easy_or_hard easyOrHard from learn_history where student_id =#{studentId} group by unit_id,easy_or_hard
+        select distinct(unit_id) unitId, easy_or_hard easyOrHard
+        from learn_history
+        where student_id = #{studentId}
+        group by unit_id, easy_or_hard
+    </select>
+    <select id="countUnitByCourseIds" resultType="java.util.Map" parameterType="map">
+        select course_id courseId, count(distinct unit_id) count from learn_history where course_id in (
+        <foreach collection="courseIds" item="courseId" separator=",">
+            #{courseId}
+        </foreach>
+        )
+        and type = #{type}
+        group by course_id
     </select>
 </mapper>
