@@ -53,6 +53,6 @@ public interface UnitVocabularyNewMapper extends BaseMapper<UnitVocabularyNew> {
 
     List<String> selectInterferenceTerm(@Param("unitId") Long unitId, @Param("wordId") Long vocabularyId, @Param("chinese") String wordChinese);
 
-    @Select("select word_chinese from unit_vocabulary_new where unit_id=#{unitId} and word_id =#{wordId}")
+    @Select("select word_chinese from unit_vocabulary_new where unit_id=#{unitId} and vocabulary_id =#{wordId}")
     String selectWordChineseByUnitIdAndWordId(@Param("unitId") Long unitId, @Param("wordId") Long wordId);
 }

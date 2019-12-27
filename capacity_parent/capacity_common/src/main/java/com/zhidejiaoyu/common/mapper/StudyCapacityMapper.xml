@@ -89,7 +89,7 @@
         on leaNew.unit_Id=voNew.unit_id
         and b.student_id = #{studentId}
         and voNew.group=#{group}
-        and b.push &lt; #{s}
+        and b.push &lt; #{dateTime}
         and leaNew.easy_or_hard=#{easyOrHard}
         and b.memory_strength &lt; 1
         and b.type=#{type}
