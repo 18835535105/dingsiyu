@@ -18,4 +18,13 @@ public interface IndexCourseInfoService extends BaseService<CourseConfig> {
      * @return
      */
     ServerResponse<CourseInfoVO> getStudyCourse(Integer type);
+
+    /**
+     * 获取当前单元下所有单元信息
+     *
+     * @param courseId
+     * @param type     1：单词；2：句型；3：语法；4：课文
+     * @return
+     */
+    ServerResponse<Object> getUnitInfo(Long courseId, Integer type);
 }

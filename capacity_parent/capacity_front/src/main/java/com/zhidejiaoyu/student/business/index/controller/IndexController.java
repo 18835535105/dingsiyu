@@ -31,22 +31,12 @@ public class IndexController {
     private IndexCourseInfoService indexCourseInfoService;
 
     /**
-     * 首页数据(单词首页)
+     * 首页数据
      *
      * @return 首页需要展示的数据
      */
-    @RequestMapping("/vocabularyIndex")
+    @RequestMapping("/index")
     public ServerResponse<Object> index(HttpSession session) {
-        return indexService.index(session);
-    }
-
-    /**
-     * 首页数据(例句首页)
-     *
-     * @return 首页需要展示的数据
-     */
-    @RequestMapping("/sentenceIndex")
-    public ServerResponse<Object> sentenceIndex(HttpSession session) {
         return indexService.index(session);
     }
 
@@ -83,5 +73,17 @@ public class IndexController {
             throw new ServiceException("获取年级课程数据出错！type=null!");
         }
         return indexCourseInfoService.getStudyCourse(type);
+    }
+
+    /**
+     * 获取当前单元下所有单元信息
+     *
+     * @param courseId
+     * @param type     1：单词；2：句型；3：语法；4：课文
+     * @return
+     */
+    @GetMapping("/getUnitInfo")
+    public ServerResponse<Object> getUnitInfo(Long courseId, Integer type) {
+        return indexCourseInfoService.getUnitInfo(courseId, type);
     }
 }
