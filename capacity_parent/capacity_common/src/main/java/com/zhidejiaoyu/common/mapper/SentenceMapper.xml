@@ -193,6 +193,26 @@
         ORDER BY s.id ASC
         LIMIT 1
     </select>
+    <select id="selectOneWordNotInIdsNew" parameterType="map" resultMap="BaseResultMap">
+        SELECT
+        <include refid="relevance_base_sql"/>
+        FROM
+        sentence s,
+        unit_sentence_new us
+        WHERE
+        s.id = us.sentence_id
+        AND us.unit_id = #{unitId}
+        and us.group=#{group}
+        <if test="ids.size > 0">
+            AND s.id NOT IN (
+            <foreach collection="ids" separator="," item="id">
+                #{id}
+            </foreach>
+            )
+        </if>
+        ORDER BY s.id ASC
+        LIMIT 1
+    </select>
     <select id="selectByIds" resultType="com.zhidejiaoyu.common.pojo.Sentence" parameterType="map">
         SELECT
         *
@@ -306,7 +326,7 @@
         and u.id = us.unit_id
         and u.id in (
         <foreach collection="unitIds" item="unitId" separator=",">
-          #{unitId}
+            #{unitId}
         </foreach>
         )
     </select>

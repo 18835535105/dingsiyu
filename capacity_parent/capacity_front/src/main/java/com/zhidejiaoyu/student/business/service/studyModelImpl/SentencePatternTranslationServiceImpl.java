@@ -3,7 +3,6 @@ package com.zhidejiaoyu.student.business.service.studyModelImpl;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
-import java.util.List;
 
 @Service(value = "sentencePatternTranslationService")
 @Slf4j
@@ -81,11 +79,11 @@ public class SentencePatternTranslationServiceImpl extends BaseServiceImpl<Learn
             }
             // 获取当前学习进度的下一个例句
             // 获取当前单元已学习的当前模块的例句id
-           /* List<Long> ids = learnMapper.selectLearnedWordIdByUnitId(student, unitId, "例句翻译");
-            Sentence sentence = sentenceMapper.selectOneSentenceNotInIds(ids, unitId);
-            SentenceTranslateVo sentenceTranslateVo = getSentenceTranslateVo(plan, firstStudy, sentenceCount, difficulty, sentence);
-            sentenceTranslateVo.setStudyNew(true);*/
-            return ServerResponse.createBySuccess(null);
+            Sentence sentence = saveSentenceData.getSentence(unitId, student, learnNews.getGroup(), type, studyModel);
+            SentenceTranslateVo sentenceTranslateVo = saveSentenceData.getSentenceTranslateVo(plan.longValue(), firstStudy,
+                    sentenceCount.longValue(), type, sentence);
+            sentenceTranslateVo.setStudyNew(true);
+            return ServerResponse.createBySuccess(sentenceTranslateVo);
         }
         return null;
     }

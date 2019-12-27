@@ -340,7 +340,7 @@ public class CommonMethod implements Serializable {
                 return "慧默写";
             } else if (4 == classify) {
                 return "例句听力";
-            } else if (5 == classify) {
+            } else if (7 == classify) {
                 return "例句翻译";
             } else if (6 == classify) {
                 return "例句默写";

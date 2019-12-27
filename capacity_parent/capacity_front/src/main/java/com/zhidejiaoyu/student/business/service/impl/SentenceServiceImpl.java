@@ -979,7 +979,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
     }
 
 
-    private SentenceTranslateVo getSentenceTranslateVo(Long plan, boolean firstStudy, Long sentenceCount, Integer type, Sentence sentence) {
+    public SentenceTranslateVo getSentenceTranslateVo(Long plan, boolean firstStudy, Long sentenceCount, Integer type, Sentence sentence) {
         SentenceTranslateVo sentenceTranslateVo = new SentenceTranslateVo();
         sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
         sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*", " ").replace("$", ""));

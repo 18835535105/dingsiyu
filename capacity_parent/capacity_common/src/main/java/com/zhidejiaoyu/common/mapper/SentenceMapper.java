@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Sentence;
+import com.zhidejiaoyu.common.pojo.Vocabulary;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -126,7 +127,7 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
      */
 	Integer insertSentence(Sentence se);
 
-	@Select("select count(a.id) from sentence a, unit_sentence b where a.id = b.sentence_id and b.unit_id = #{unitId}")
+	@Select("select count(a.id) from sentence a, unit_sentence_new b where a.id = b.sentence_id and b.unit_id = #{unitId}")
 	Long countByUnitId(@Param("unitId") Long unitId);
 
 	/**
@@ -203,4 +204,6 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
 
     List<Map<String, Object>> selectSentenceLaterLearnTimeByStudentId(Long id);
 
+    Sentence selectOneWordNotInIdsNew(@Param("wordIds") List<Long> wordIds,
+                                        @Param("unitId") Long unitId,@Param("group") Integer group);
 }
