@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
@@ -103,6 +104,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             throw new ServiceException("未查询到流程信息！");
         }
 
+        int easyOrHard = studyFlowNew.getModelName().contains("写") ? 2 : 1;
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), dto.getUnitId(), easyOrHard);
+        dto.setGroup(learnNew == null ? 1 : learnNew.getGroup());
         dto.setStudyFlowNew(studyFlowNew);
         dto.setSession(session);
         dto.setStudent(student);
@@ -597,9 +601,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
                 return studyFlowNewMapper.selectById(flowId1);
             }
             // 返回流程 1
-            flowId1 = 70;
+            flowId1 = 79;
             this.changeFlowNodeLog(student, "单词播放机", unitNew, flowId1);
-            return studyFlowNewMapper.selectById(9);
+            return studyFlowNewMapper.selectById(flowId1);
         }
 
         // 流程 2 慧默写的单词图鉴

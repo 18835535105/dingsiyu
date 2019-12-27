@@ -61,4 +61,13 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
      */
     @Select("select count(id) from unit_new where course_id = #{courseId}")
     int countByCourseId(@Param("courseId") Long courseId);
+
+    /**
+     * 查询当前课程下的所有单元信息
+     *
+     * @param courseId
+     * @param type
+     * @return
+     */
+    List<Map<String, Object>> selectIdAndNameByCourseId(@Param("courseId") Long courseId, @Param("type") Integer type);
 }

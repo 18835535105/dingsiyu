@@ -33,4 +33,6 @@ public class FlowVO implements Serializable {
      * 流程id
      */
     private Long id;
+
+    private Integer group;
 }
