@@ -60,7 +60,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     @Autowired
     private SimpleLearnMapper learnMapper;
 
-	@Autowired
+    @Autowired
     private SimpleUnitVocabularyMapper simpleUnitVocabularyMapper;
 
     @Autowired
@@ -144,10 +144,10 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         result.put("petName", student.getPetName());
         result.put("schoolName", student.getSchoolName());
         //性别
-        if(1==student.getSex()){
-            result.put("sex","男");
-        }else{
-            result.put("sex","女");
+        if (1 == student.getSex()) {
+            result.put("sex", "男");
+        } else {
+            result.put("sex", "女");
         }
 
         // 判断学生是否有智能版单词
@@ -182,10 +182,10 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
             resultMap.put("open", false);
 
             // 1.获取模块对应在学的单元id
-            if(allCourse.containsKey(i)) {
-            	courseId = allCourse.get(i).get("course_id") == null ? 0 : allCourse.get(i).get("course_id").intValue();
+            if (allCourse.containsKey(i)) {
+                courseId = allCourse.get(i).get("course_id") == null ? 0 : allCourse.get(i).get("course_id").intValue();
                 // 当前模块已开启
-            	resultMap.put("open", true);
+                resultMap.put("open", true);
             }
 
             // 课程下一共有多少单词 /.
@@ -195,11 +195,11 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
             Integer sum = learnMapper.selectCourseWordNumberByStudentId(studentId, courseId, i);
 
             //-- 4.某课程某模块学习速度;
-            Integer sumValid = simpleDurationMapper.valid_timeIndex(studentId, courseId, i+13);
+            Integer sumValid = simpleDurationMapper.valid_timeIndex(studentId, courseId, i + 13);
             if (sumValid == null) {
-            	sumValid = 0;
+                sumValid = 0;
             }
-            int speed = (int) (BigDecimalUtil.div(sum, sumValid)*3600);
+            int speed = (int) (BigDecimalUtil.div(sum, sumValid) * 3600);
 
             // 继续学习状态
             resultMap.put("state", 2);
@@ -209,13 +209,13 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
             resultMap.put("speed", speed + "");
 
             // 3.开始学习状态
-            if(sum == 0) {
-            	// learn表是否有数据
-            	Integer status = learnMapper.getModelLearnInfo(studentId, testModelStr(i));
-            	if(status == null) {
+            if (sum == 0) {
+                // learn表是否有数据
+                Integer status = learnMapper.getModelLearnInfo(studentId, testModelStr(i));
+                if (status == null) {
                     // 开始学习
-            		resultMap.put("state", 1);
-            	}
+                    resultMap.put("state", 1);
+                }
             }
             courseId = 0;
             result.put(i + "", resultMap);
@@ -233,33 +233,33 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
      * @param type 1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写;
      */
     private boolean testModel(int type) {
-    	if(type == 1 || type == 2 || type == 3 || type == 4 || type == 6 || type == 8 || type == 9) {
-    		return true;
-    	}else {
-    		return false;
-    	}
-	}
+        if (type == 1 || type == 2 || type == 3 || type == 4 || type == 6 || type == 8 || type == 9) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     private String testModelStr(int type) {
-    	if(type == 1) {
-    		return "单词辨音";
-    	}else if(type == 2) {
-    		return "词组辨音";
-    	}else if(type == 3) {
-    		return "快速单词";
-    	}else if(type == 4) {
-    		return "快速词组";
-    	}else if(type == 5) {
-    		return "词汇考点";
-    	}else if(type == 6) {
-    		return "快速句型";
-    	}else if(type == 7) {
-    		return "语法辨析";
-    	}else if(type == 8) {
-    		return "单词默写";
-    	}else {
-    		return "词组默写";
-    	}
+        if (type == 1) {
+            return "单词辨音";
+        } else if (type == 2) {
+            return "词组辨音";
+        } else if (type == 3) {
+            return "快速单词";
+        } else if (type == 4) {
+            return "快速词组";
+        } else if (type == 5) {
+            return "词汇考点";
+        } else if (type == 6) {
+            return "快速句型";
+        } else if (type == 7) {
+            return "语法辨析";
+        } else if (type == 8) {
+            return "单词默写";
+        } else {
+            return "词组默写";
+        }
     }
 
     /**
@@ -338,7 +338,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
                 //select SUM(valid_time) from duration where unit_id = 1 and student_id = 1 and study_model = '慧记忆'
                 Integer sumValid = simpleDurationMapper.valid_timeIndex(studentId, unitId, i);
 
-                Integer speed = (int) (BigDecimalUtil.div(sum, sumValid)*3600);
+                Integer speed = (int) (BigDecimalUtil.div(sum, sumValid) * 3600);
                 a.put("point", point + ""); // 分数
                 a.put("speed", speed + ""); // 速度
                 if (point >= 80) {       // 方框状态
@@ -421,13 +421,56 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         int myGold = (int) BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
         map.put("myGold", myGold);
 
-        IndexServiceImpl.getMyLevelInfo(map, myGold, redisOpt);
+        this.getMyLevelInfo(map, myGold, redisOpt);
 
         // 获取今日获得金币
         List<String> list = runLogMapper.getStudentGold(DateUtil.formatYYYYMMDD(new Date()), studentId);
         IndexServiceImpl.getTodayGold(map, list);
 
         return ServerResponse.createBySuccess(map);
+    }
+
+    /**
+     * 封装我的等级信息
+     *
+     * @param map
+     * @param myGold
+     */
+    private void getMyLevelInfo(Map<String, Object> map, int myGold, RedisOpt redisOpt) {
+        // 获取等级规则
+        List<Map<String, Object>> levels = redisOpt.getAllLevel();
+
+        int myrecord = 0;
+        // 下一等级索引
+        int j = 1;
+        int size = levels.size();
+        for (int i = 0; i < size; i++) {
+            // 循环的当前等级分数
+            int levelGold = (int) levels.get(i).get("gold");
+            // 下一等级分数
+            int nextLevelGold = (int) levels.get((i + 1) < levels.size() ? (i + 1) : i).get("gold");
+            // 下一等级索引
+            int si = (i + 1) < size ? (i + 1) : i;
+            boolean flag = (myGold >= myrecord && myGold < nextLevelGold) || j == size;
+            if (flag) {
+                // 我的等级
+                map.put("childName", levels.get(i).get("child_name"));
+                // 距离下一等级还差多少金币
+                map.put("jap", (nextLevelGold - myGold));
+                // 我的等级图片
+                map.put("imgUrl", AliyunInfoConst.host + levels.get(i).get("img_url"));
+                // 下一个等级名/ 下一个等级需要多少金币 / 下一个等级图片
+                // 下一级等级名
+                map.put("childNameBelow", levels.get(si).get("child_name"));
+                // 下一级金币数量
+                map.put("japBelow", (nextLevelGold));
+                // 下一级等级图片
+                map.put("imgUrlBelow", AliyunInfoConst.host + levels.get(si).get("img_url"));
+                break;
+            }
+            myrecord = levelGold;
+            j++;
+        }
     }
 
     @Override

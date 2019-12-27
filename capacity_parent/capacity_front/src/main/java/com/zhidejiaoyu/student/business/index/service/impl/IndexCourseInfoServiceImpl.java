@@ -36,6 +36,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
     public static final String COURSE_ID = "courseId";
     public static final String COUNT = "count";
+
     @Resource
     private CourseConfigMapper courseConfigMapper;
 
@@ -116,20 +117,13 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                     .courseId(courseNew.getId())
                     .grade(courseNew.getGrade() + "（" + courseNew.getLabel() + "）");
 
-            String englishGrade = this.getGradeAndLabelEnglishName(grade);
-            String englishLabel = this.getGradeAndLabelEnglishName(courseNew.getLabel());
+            String englishGrade = getGradeAndLabelEnglishName(grade);
+            String englishLabel = getGradeAndLabelEnglishName(courseNew.getLabel());
 
-            int totalUnitCount = 0;
-            if (unitCountInCourse != null && unitCountInCourse.get(COURSE_ID) != null
-                    && unitCountInCourse.get(COURSE_ID).get(COUNT) != null) {
-                totalUnitCount = unitCountInCourse.get(COURSE_ID).get(COUNT);
-            }
-
-            int learnedUnitCount = 0;
-            if (learnUnitCountInCourse != null && learnUnitCountInCourse.get(COURSE_ID) != null
-                    && learnUnitCountInCourse.get(COURSE_ID).get(COUNT) != null) {
-                learnedUnitCount = learnUnitCountInCourse.get(COURSE_ID).get(COUNT);
-            }
+            // 单元总个数
+            int totalUnitCount = this.getUnitCount(unitCountInCourse);
+            // 已学单元总个数
+            int learnedUnitCount = this.getUnitCount(learnUnitCountInCourse);
 
             if (learnedUnitCount == 0) {
                 courseVoBuilder.combatProgress(0).battle(1);
@@ -156,13 +150,23 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         return ServerResponse.createBySuccess(courseInfoVO);
     }
 
+    @SuppressWarnings("all")
+    private int getUnitCount(Map<Long, Map<Long, Integer>> unitCountInCourse) {
+        int unitCount = 0;
+        if (unitCountInCourse != null && unitCountInCourse.get(COURSE_ID) != null
+                && unitCountInCourse.get(COURSE_ID).get(COUNT) != null) {
+            unitCount = unitCountInCourse.get(COURSE_ID).get(COUNT);
+        }
+        return unitCount;
+    }
+
     /**
      * 将年级转换为英文
      *
      * @param grade
      * @return
      */
-    private String getGradeAndLabelEnglishName(String grade) {
+    public static String getGradeAndLabelEnglishName(String grade) {
         if (grade == null) {
             return "one";
         }
