@@ -140,6 +140,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         UnitNew unitNew = unitNewMapper.selectById(unitId);
         CourseNew courseNew = courseNewMapper.selectById(unitNew.getCourseId());
         String token = TokenUtil.getToken();
+        HttpUtil.getHttpSession().setAttribute("token", token);
         return FlowVO.builder()
                 .courseId(courseNew.getId())
                 .courseName(courseNew.getCourseName())
