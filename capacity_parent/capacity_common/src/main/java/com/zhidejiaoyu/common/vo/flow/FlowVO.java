@@ -35,4 +35,6 @@ public class FlowVO implements Serializable {
     private Long id;
 
     private Integer group;
+
+    private String token;
 }
