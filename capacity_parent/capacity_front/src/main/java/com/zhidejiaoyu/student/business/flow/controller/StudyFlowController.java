@@ -43,17 +43,4 @@ public class StudyFlowController {
         // 自由学习流程
         return freeFlowService.getNode(dto, isTrueFlow, session);
     }
-
-    /**
-     * 自由学习选择单元获取当前单元应学习的节点
-     *
-     * @param unitId
-     * @param easyOrHard 1：容易；2：复杂
-     * @param type       2：单词；3：句型；4：课文
-     * @return
-     */
-    @RequestMapping("/getIndexNode")
-    public ServerResponse<FlowVO> getIndexNode(Long unitId, Integer easyOrHard, Integer type) {
-        return freeFlowService.getIndexNode(unitId, easyOrHard, type);
-    }
 }
