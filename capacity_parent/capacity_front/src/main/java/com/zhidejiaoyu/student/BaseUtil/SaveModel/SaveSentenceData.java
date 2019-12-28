@@ -1,26 +1,43 @@
 package com.zhidejiaoyu.student.BaseUtil.SaveModel;
 
-import com.zhidejiaoyu.common.mapper.LearnExtendMapper;
-import com.zhidejiaoyu.common.mapper.SentenceMapper;
+import com.zhidejiaoyu.common.constant.TimeConstant;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.CommonMethod;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
 import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
+import com.zhidejiaoyu.student.common.redis.RedisOpt;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
 @Component
+@Slf4j
 public class SaveSentenceData {
 
     private final String STUDYMODEL1 = "例句翻译";
     private final String STUDYMODEL2 = "例句听力";
     private final String STUDYMODEL3 = "例句默写";
 
+    @Resource
+    private LearnNewMapper learnNewMapper;
+    @Resource
+    private LearnExtendMapper learnExtendMapper;
+    @Resource
+    private UnitSentenceNewMapper unitSentenceNewMapper;
+    @Resource
+    private StudyCapacityMapper studyCapacityMapper;
+    @Resource
+    private SaveSentenceData saveSentenceData;
     @Resource
     private SentenceMapper sentenceMapper;
     @Resource
@@ -30,7 +47,55 @@ public class SaveSentenceData {
     @Resource
     private CommonMethod commonMethod;
     @Resource
-    private LearnExtendMapper learnExtendMapper;
+    private RedisOpt redisOpt;
+
+
+    public ServerResponse<Object> getSudyModel(HttpSession session, Long unitId, Integer difficulty, Student student,
+                                               Long studentId, String studyModel, Integer easyOrHard, Integer type) {
+        boolean firstStudy = redisOpt.getGuideModel(studentId, studyModel);
+        // 记录学生开始学习该例句的时间
+        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
+
+        //获取当前单元下的learnId
+        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitId(studentId, unitId, easyOrHard);
+        // 查询学生当前单元下已学习单词的个数，即学习进度
+        Integer plan = learnExtendMapper.countLearnWord(learnNews.getId(), unitId, learnNews.getGroup(), studyModel);
+        // 获取当前单元下的所有单词的总个数
+        Integer sentenceCount = unitSentenceNewMapper.countByUnitIdAndGroup(unitId, learnNews.getGroup());
+        if (sentenceCount == 0) {
+            log.error("单元 {} 下没有例句信息！", unitId);
+            return ServerResponse.createByErrorMessage("当前单元下没有例句！");
+        }
+        if (sentenceCount <= plan) {
+            return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
+        }
+        // 查看当前单元下记忆追踪中有无达到黄金记忆点的例句
+        //获取单词id
+        StudyCapacity studyCapacity = studyCapacityMapper.selectLearnHistory(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, learnNews.getGroup());
+        // 有到达黄金记忆点的例句优先复习
+        if (studyCapacity != null) {
+            // 返回达到黄金记忆点的例句信息
+            //SentenceTranslate sentenceTranslate = sentenceTranslates.get(0);
+            return saveSentenceData.returnGoldWord(studyCapacity, plan.longValue(), firstStudy, sentenceCount.longValue(), difficulty, studyModel);
+        }
+        // 获取当前学习进度的下一个例句
+        Sentence sentence = saveSentenceData.getSentence(unitId, student, learnNews.getGroup(), type, studyModel);
+        if (type == 7) {
+            SentenceTranslateVo sentenceTranslateVo = saveSentenceData.getSentenceTranslateVo(plan.longValue(), firstStudy,
+                    sentenceCount.longValue(), type, sentence);
+            sentenceTranslateVo.setStudyNew(true);
+            return ServerResponse.createBySuccess(sentenceTranslateVo);
+        }
+        if (type == 8) {
+            return getSentenceTranslateVoServerResponse(firstStudy, plan.longValue(),
+                    sentenceCount.longValue(), sentence, type);
+        }
+        if (type == 10) {
+            return getSentenceTranslateVoServerResponse(firstStudy, plan.longValue(),
+                    sentenceCount.longValue(), sentence, type);
+        }
+        return ServerResponse.createBySuccess(null);
+    }
 
     /**
      * 返回记忆达到黄金记忆点的例句信息
@@ -43,8 +108,8 @@ public class SaveSentenceData {
      * @return 例句翻译学习页面展示信息
      */
 
-    public ServerResponse<SentenceTranslateVo> returnGoldWord(StudyCapacity studyCapacity, Long plan, boolean firstStudy,
-                                                              Long sentenceCount, Integer type, String studyModel) {
+    public ServerResponse<Object> returnGoldWord(StudyCapacity studyCapacity, Long plan, boolean firstStudy,
+                                                 Long sentenceCount, Integer type, String studyModel) {
         SentenceTranslateVo sentenceTranslateVo;
         // 例句翻译
         if (STUDYMODEL1.equals(studyModel)) {
@@ -89,6 +154,13 @@ public class SaveSentenceData {
         return sentenceTranslateVo;
     }
 
+    private ServerResponse<Object> getSentenceTranslateVoServerResponse(boolean firstStudy, Long plan, Long sentenceCount, Sentence sentence, Integer type) {
+        SentenceTranslateVo sentenceTranslateVo = getSentenceTranslateVos(plan, firstStudy, sentenceCount, sentence, 0.0);
+        testResultUtil.getOrderEnglishList(sentenceTranslateVo, sentence.getCentreExample(), sentence.getExampleDisturb(), type);
+        sentenceTranslateVo.setStudyNew(true);
+        return ServerResponse.createBySuccess(sentenceTranslateVo);
+    }
+
     public SentenceTranslateVo getSentenceTranslateVos(Long plan, boolean firstStudy, Long sentenceCount, Sentence sentence, double memoryStrength) {
         SentenceTranslateVo sentenceTranslateVo = new SentenceTranslateVo();
         sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
@@ -102,6 +174,7 @@ public class SaveSentenceData {
         sentenceTranslateVo.setMemoryStrength(memoryStrength);
         return sentenceTranslateVo;
     }
+
     private SentenceTranslateVo getListenSentenceVo(Sentence sentence, boolean firstStudy, Long plan, double memoryStrength, Long sentenceCount, Integer type) {
         SentenceTranslateVo sentenceTranslateVo = getSentenceTranslateVos(plan, firstStudy, sentenceCount, sentence, memoryStrength);
         sentenceTranslateVo.setStudyNew(false);

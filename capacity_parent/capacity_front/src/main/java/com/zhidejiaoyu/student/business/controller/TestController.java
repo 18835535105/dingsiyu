@@ -112,11 +112,11 @@ public class TestController {
      */
     @GetMapping("/gitUnitSentenceTest")
     @ResponseBody
-    public ServerResponse<Object> gitUnitSentenceTest(Long unitId) {
+    public ServerResponse<Object> gitUnitSentenceTest(HttpSession session,Long unitId) {
         if (unitId == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), "unitId 不能为 null");
         }
-        return testService.gitUnitSentenceTest(unitId);
+        return testService.gitUnitSentenceTest(session,unitId);
     }
 
     /**

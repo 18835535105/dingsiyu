@@ -102,7 +102,7 @@ public interface TestService extends BaseService<TestRecord> {
      * @param unitId
      * @return
      */
-    ServerResponse<Object> gitUnitSentenceTest(Long unitId);
+    ServerResponse<Object> gitUnitSentenceTest(HttpSession session,Long unitId);
 
     /**
      * 音译测试（音译测试）

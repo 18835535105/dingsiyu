@@ -83,6 +83,18 @@
         s.id = us.sentence_id
         and us.unit_id = #{unitId}
     </select>
+    <select id="selectByUnitIdAndGroup" parameterType="map"
+            resultType="com.zhidejiaoyu.common.pojo.Sentence">
+        select
+        <include refid="relevance_base_sql"/>
+        from sentence s,
+        unit_sentence_new us
+        where
+        s.id = us.sentence_id
+        and us.unit_id = #{unitId}
+        and us.group=#{group}
+    </select>
+
 
     <!-- 分页数据 -->
     <!--
@@ -305,8 +317,8 @@
         select
         <include refid="relevance_base_sql"></include>
         from sentence s
-        join unit_sentence us on s.id=us.sentence_id
-        join sentence_unit un on us.unit_id=un.id
+        join unit_sentence_new us on s.id=us.sentence_id
+        join sentence_unit_new un on us.unit_id=un.id
         where un.course_id=#{courseId}
         ORDER BY RAND() LIMIT 30
     </select>

@@ -14,24 +14,23 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
-@Service(value = "sentencePatternListeningService")
+@Service(value = "sentencePatternWritingService")
 @Slf4j
-public class SentencePatternListeningServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnNew> implements IStudyService {
+public class SentencePatternWritingServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnNew> implements IStudyService {
 
     @Resource
     private SaveData saveData;
     @Resource
     private SaveSentenceData saveSentenceData;
-    private Integer type = 8;
-    private Integer easyOrHard = 1;
-    private String studyModel = "例句听力";
+    private Integer type = 10;
+    private Integer easyOrHard = 2;
+    private String studyModel = "例句默写";
 
     @Override
     public Object getStudy(HttpSession session, Long unitId, Integer difficulty) {
         Student student = getStudent(session);
         Long studentId = student.getId();
         return saveSentenceData.getSudyModel(session, unitId, difficulty, student, studentId, studyModel, easyOrHard, type);
-
     }
 
     @Override

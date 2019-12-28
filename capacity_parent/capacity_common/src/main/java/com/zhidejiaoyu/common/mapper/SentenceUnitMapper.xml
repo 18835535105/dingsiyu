@@ -25,7 +25,7 @@
     </select>
 
     <select id="getCourseIdByunitId" resultType="java.lang.Long" parameterType="java.lang.Integer">
-        select course_id from sentence_unit where id=#{unitId};
+        select course_id from sentence_unit_new where id=#{unitId};
     </select>
 
 </mapper>

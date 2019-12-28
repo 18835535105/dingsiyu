@@ -206,4 +206,6 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
 
     Sentence selectOneWordNotInIdsNew(@Param("wordIds") List<Long> wordIds,
                                         @Param("unitId") Long unitId,@Param("group") Integer group);
+
+    List<Sentence> selectByUnitIdAndGroup(@Param("unitId") Long unitId,@Param("group") Integer group);
 }
