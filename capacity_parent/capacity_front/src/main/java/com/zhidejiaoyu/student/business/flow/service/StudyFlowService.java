@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.flow.service;
 import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.pojo.StudyFlowNew;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.flow.FlowVO;
 import com.zhidejiaoyu.student.business.service.BaseService;
 
 import javax.servlet.http.HttpSession;
@@ -32,4 +33,14 @@ public interface StudyFlowService extends BaseService<StudyFlowNew> {
      * @return
      */
     ServerResponse<Object> toAnotherFlow(NodeDto dto, int nextFlowId);
+
+    /**
+     * 自由学习选择单元获取当前单元应学习的节点
+     *
+     * @param unitId
+     * @param orHard
+     * @param easyOrHard 1：简单；2：困难
+     * @return
+     */
+    ServerResponse<FlowVO> getIndexNode(Long unitId, Integer orHard, Integer easyOrHard);
 }

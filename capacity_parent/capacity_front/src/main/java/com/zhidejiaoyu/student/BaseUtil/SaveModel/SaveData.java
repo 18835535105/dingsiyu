@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.BaseUtil.SaveModel;
 
-import com.alibaba.druid.sql.visitor.functions.Char;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
@@ -114,7 +113,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         //获取校长id
         learn.setSchoolAdminId(Long.parseLong(teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId()).toString()));
         //获取学生学习当前模块的learn_id
-        List<Long> learnIds = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
+        List<Long> learnIds = learnNewMapper.selectIdByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
         //如果有多余的删除
         Long learnId = learnIds.get(0);
         if (learnIds.size() > 1) {
