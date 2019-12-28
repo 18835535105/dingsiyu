@@ -131,7 +131,7 @@
         AND v.id = uv.vocabulary_id AND v.delStatus = 1
     </select>
     <select id="selectByUnitIdAndGroup" resultMap="BaseResultMap"
-            parameterType="java.lang.Long">
+            parameterType="map">
         SELECT
         distinct
         <include refid="unite_Column_List"/>
