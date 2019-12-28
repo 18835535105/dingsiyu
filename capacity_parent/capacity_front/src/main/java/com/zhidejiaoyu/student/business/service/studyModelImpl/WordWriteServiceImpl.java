@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.service.studyModelImpl;
 import com.zhidejiaoyu.common.mapper.LearnNewMapper;
 import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveData;
 import com.zhidejiaoyu.student.business.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -30,6 +31,11 @@ public class WordWriteServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
 
     @Override
     public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId) {
-        return null;
+        Student student = getStudent(session);
+        if (saveData.saveVocabularyModel(student, session, unitId, wordId, isTrue, plan, total,
+                flowId, easyOrHard, type, studyModel)) {
+            return ServerResponse.createBySuccess();
+        }
+        return ServerResponse.createByErrorMessage("学习记录保存失败");
     }
 }

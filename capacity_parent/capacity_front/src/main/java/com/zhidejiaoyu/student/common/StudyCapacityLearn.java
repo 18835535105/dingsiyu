@@ -1,8 +1,6 @@
 package com.zhidejiaoyu.student.common;
 
-import com.zhidejiaoyu.common.mapper.StudyCapacityMapper;
-import com.zhidejiaoyu.common.mapper.UnitVocabularyMapper;
-import com.zhidejiaoyu.common.mapper.VocabularyMapper;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.StudentRestudyUtil;
@@ -34,6 +32,10 @@ public class StudyCapacityLearn {
 
     @Resource
     private StudyMemoryStrength studyMemoryStrength;
+    @Resource
+    private SentenceMapper sentenceMapper;
+    @Resource
+    private UnitSentenceNewMapper unitSentenceNewMapper;
 
     /**
      * 保存指定模块的单词学习记录和慧追踪信息
@@ -45,19 +47,42 @@ public class StudyCapacityLearn {
      * @return
      */
     public StudyCapacity saveCapacityMemory(LearnNew learn, LearnExtend learnExtend, Student student, boolean isKnown, Integer studyModel) {
-        Vocabulary vocabulary = vocabularyMapper.selectByPrimaryKey(learnExtend.getWordId());
+        if (studyModel < 7) {
+            Vocabulary vocabulary = vocabularyMapper.selectByPrimaryKey(learnExtend.getWordId());
+//        if (studyModel != 1 && studyModel != 2 && studyModel != 3 && studyModel != 4 && studyModel != 5) {
+//            throw new RuntimeException("studyModel=" + studyModel + " 非法！");
+//        }
+            // 通过学生id，单元id和单词id获取当前单词的记忆追踪信息
+            StudyCapacity capacity = getCapacityInfo(learn, student, studyModel, vocabulary);
+            String wordChinese = unitVocabularyMapper.selectWordChineseByUnitIdAndWordId(learn.getUnitId(), vocabulary.getId());
+            // 封装记忆追踪信息
+            if (wordChinese == null) {
+                wordChinese = vocabulary.getWordChinese();
+            }
+            capacity = packageCapacityInfo(learn, learnExtend, student, isKnown, studyModel, vocabulary, capacity, wordChinese);
+            return capacity;
+        } else if (studyModel < 11) {
+            Sentence sentence = sentenceMapper.selectById(learnExtend.getWordId());
+            // 通过学生id，单元id和单词id获取当前单词的记忆追踪信息
+            StudyCapacity capacity = getCapacityInfo(learn, student, studyModel, sentence);
+            String chinese = unitSentenceNewMapper.selectSentenceChineseByUnitIdAndSentenceId(learn.getUnitId(), sentence.getId());
+            capacity = packageCapacityInfo(learn, learnExtend, student, isKnown, studyModel, sentence, capacity, chinese);
+            return capacity;
+        }
 
-        if (studyModel != 1 && studyModel != 2 && studyModel != 3 && studyModel != 4 && studyModel != 5) {
-            throw new RuntimeException("studyModel=" + studyModel + " 非法！");
+       return null;
+    }
+
+    private StudyCapacity getCapacityInfo(LearnNew learn, Student student, Integer studyModel, Sentence sentence) {
+        StudyCapacity capacity = null;
+        List<StudyCapacity> studyCapacities = studyCapacityMapper.selectByStudentIdAndUnitIdAndWordIdAndType(student.getId(), learn.getUnitId(),
+                sentence.getId(), studyModel);
+        if (studyCapacities.size() > 1) {
+            studyCapacityMapper.deleteById(studyCapacities.get(1).getId());
+            capacity = studyCapacities.get(0);
+        } else if (studyCapacities.size() > 0) {
+            capacity = studyCapacities.get(0);
         }
-        // 通过学生id，单元id和单词id获取当前单词的记忆追踪信息
-        StudyCapacity capacity = getCapacityInfo(learn, student, studyModel, vocabulary);
-        String wordChinese = unitVocabularyMapper.selectWordChineseByUnitIdAndWordId(learn.getUnitId(), vocabulary.getId());
-        // 封装记忆追踪信息
-        if (wordChinese == null) {
-            wordChinese = vocabulary.getWordChinese();
-        }
-        capacity = packageCapacityInfo(learn, learnExtend, student, isKnown, studyModel, vocabulary, capacity, wordChinese);
         return capacity;
     }
 
@@ -73,16 +98,67 @@ public class StudyCapacityLearn {
                 studyCapacity.setStudentId(student.getId());
                 studyCapacity.setUnitId(learn.getUnitId());
                 studyCapacity.setWordId(learnExtend.getWordId());
-                studyCapacity.setWord(vocabulary.getWord());
-                studyCapacity.setSyllable(StringUtils.isEmpty(vocabulary.getSyllable()) ? vocabulary.getWord() : vocabulary.getSyllable());
                 studyCapacity.setWordChinese(wordChinese);
                 Date push = GoldMemoryTime.getGoldMemoryTime(0.12, new Date());
                 studyCapacity.setPush(push);
+                studyCapacity.setWord(vocabulary.getWord());
+                studyCapacity.setSyllable(StringUtils.isEmpty(vocabulary.getSyllable()) ? vocabulary.getWord() : vocabulary.getSyllable());
                 studyCapacityMapper.insert(studyCapacity);
             }
         } else {
             // 保存学生复习记录
             studentRestudyUtil.saveWordRestudy(learn, learnExtend, student, vocabulary.getWord(), 2);
+            // 认识该单词
+            if (isKnown) {
+                // 重新计算黄金记忆点时间
+                double memoryStrength = studyCapacity.getMemoryStrength();
+                Date push = GoldMemoryTime.getGoldMemoryTime(memoryStrength, new Date());
+                studyCapacity.setPush(push);
+
+                // 重新计算记忆强度
+                studyCapacity.setMemoryStrength(studyMemoryStrength.getMemoryStrength(memoryStrength, true));
+            } else {
+                // 错误次数在原基础上 +1
+                int afterFaultTime = studyCapacity.getFaultTime() + 1;
+                if (learnExtend.getStudyCount() != null && afterFaultTime > learnExtend.getStudyCount()) {
+                    afterFaultTime = learnExtend.getStudyCount();
+                }
+                studyCapacity.setFaultTime(afterFaultTime);
+                // 重新计算黄金记忆点时间
+                double memoryStrength = studyCapacity.getMemoryStrength();
+                Date push = GoldMemoryTime.getGoldMemoryTime(memoryStrength, new Date());
+                studyCapacity.setPush(push);
+
+                // 重新计算记忆强度
+                studyCapacity.setMemoryStrength(studyMemoryStrength.getMemoryStrength(memoryStrength, false));
+            }
+
+            studyCapacityMapper.updateById(studyCapacity);
+        }
+
+        return studyCapacity;
+    }
+    private StudyCapacity packageCapacityInfo(LearnNew learn, LearnExtend learnExtend, Student student, boolean isKnown, Integer studyModel,
+                                              Sentence sentence, StudyCapacity studyCapacity, String wordChinese) {
+        if (studyCapacity == null) {
+            if (!isKnown) {
+                studyCapacity = new StudyCapacity();
+                studyCapacity.setCourseId(learn.getCourseId());
+                studyCapacity.setFaultTime(1);
+                studyCapacity.setType(studyModel);
+                studyCapacity.setMemoryStrength(0.12);
+                studyCapacity.setStudentId(student.getId());
+                studyCapacity.setUnitId(learn.getUnitId());
+                studyCapacity.setWordId(learnExtend.getWordId());
+                studyCapacity.setWordChinese(wordChinese);
+                Date push = GoldMemoryTime.getGoldMemoryTime(0.12, new Date());
+                studyCapacity.setPush(push);
+                studyCapacity.setWord(sentence.getCentreTranslate());
+                studyCapacityMapper.insert(studyCapacity);
+            }
+        } else {
+            // 保存学生复习记录
+            studentRestudyUtil.saveSentenceRestudy(learn, learnExtend, student, sentence.getCentreTranslate(), 2);
             // 认识该单词
             if (isKnown) {
                 // 重新计算黄金记忆点时间

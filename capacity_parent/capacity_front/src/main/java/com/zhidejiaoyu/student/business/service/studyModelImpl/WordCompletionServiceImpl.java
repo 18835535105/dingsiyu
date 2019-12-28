@@ -27,7 +27,7 @@ public class WordCompletionServiceImpl extends BaseServiceImpl<LearnNewMapper, L
     @Resource
     private SaveData saveData;
     private Integer type = 6;
-    private Integer easyOrHard = 1;
+    private Integer easyOrHard = 2;
     private String studyModel = "单词填字";
 
     @Override
@@ -42,6 +42,11 @@ public class WordCompletionServiceImpl extends BaseServiceImpl<LearnNewMapper, L
 
     @Override
     public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId) {
-        return null;
+        Student student = getStudent(session);
+        if (saveData.saveVocabularyModel(student, session, unitId, wordId, isTrue, plan, total,
+                flowId, easyOrHard, type, studyModel)) {
+            return ServerResponse.createBySuccess();
+        }
+        return ServerResponse.createByErrorMessage("学习记录保存失败");
     }
 }

@@ -66,6 +66,26 @@ public class StudentRestudyUtil {
      * @param sentence 句子
      * @param version  1:提分版；2：同步版
      */
+    public void saveSentenceRestudy(LearnNew learn, LearnExtend learnExtend, Student student, String sentence, int version) {
+        studentRestudyMapper.insert(StudentRestudy.builder()
+                .courseId(learn.getCourseId())
+                .unitId(learn.getUnitId())
+                .studentId(student.getId())
+                .type(2)
+                .version(version)
+                .word(sentence)
+                .vocabularyId(learnExtend.getWordId())
+                .updateTime(new Date())
+                .build());
+    }
+
+    /**
+     * 保存句型的复习记录
+     *
+     * @param learn
+     * @param sentence 句子
+     * @param version  1:提分版；2：同步版
+     */
     public void saveSentenceRestudy(Learn learn, Student student, String sentence, int version) {
         studentRestudyMapper.insert(StudentRestudy.builder()
                 .courseId(learn.getCourseId())

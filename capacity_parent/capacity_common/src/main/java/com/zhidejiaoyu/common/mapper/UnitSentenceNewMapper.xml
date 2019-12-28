@@ -4,14 +4,22 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.UnitSentenceNew">
-        <id column="id" property="id" />
-        <result column="unit_id" property="unitId" />
-        <result column="sentence_id" property="sentenceId" />
-        <result column="chinese" property="chinese" />
-        <result column="english_disturb" property="englishDisturb" />
-        <result column="chinese_disturb" property="chineseDisturb" />
-        <result column="group" property="group" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="sentence_id" property="sentenceId"/>
+        <result column="chinese" property="chinese"/>
+        <result column="english_disturb" property="englishDisturb"/>
+        <result column="chinese_disturb" property="chineseDisturb"/>
+        <result column="group" property="group"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
+
+    <select id="selectSentenceChineseByUnitIdAndSentenceId" parameterType="map" resultType="string">
+        select
+        chinese
+        from unit_sentence_new
+        where unit_id=#{unitId}
+        and sentence_id=#{sentenceId}
+    </select>
 
 </mapper>

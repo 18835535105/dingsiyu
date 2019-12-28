@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
+import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveData;
 import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveSentenceData;
 import com.zhidejiaoyu.student.business.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -30,6 +31,8 @@ public class SentencePatternTranslationServiceImpl extends BaseServiceImpl<Learn
 
     @Resource
     private RedisOpt redisOpt;
+    @Resource
+    private SaveData saveData;
     @Resource
     private LearnNewMapper learnNewMapper;
     @Resource
@@ -50,8 +53,6 @@ public class SentencePatternTranslationServiceImpl extends BaseServiceImpl<Learn
 
         Student student = getStudent(session);
         Long studentId = student.getId();
-        // 转换类型
-        String classify = studyModel;
         boolean firstStudy = redisOpt.getGuideModel(studentId, studyModel);
         // 记录学生开始学习该例句的时间
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
@@ -69,32 +70,31 @@ public class SentencePatternTranslationServiceImpl extends BaseServiceImpl<Learn
         if (sentenceCount <= plan) {
             return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
         }
-
         // 查看当前单元下记忆追踪中有无达到黄金记忆点的例句
-        // 例句翻译
-        if ("例句翻译".equals(classify)) {
-            //获取单词id
-            StudyCapacity studyCapacity = studyCapacityMapper.selectLearnHistory(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, learnNews.getGroup());
-
-            // 有到达黄金记忆点的例句优先复习
-            if (studyCapacity != null) {
-                // 返回达到黄金记忆点的例句信息
-                //SentenceTranslate sentenceTranslate = sentenceTranslates.get(0);
-                return saveSentenceData.returnGoldWord(studyCapacity, plan.longValue(), firstStudy, sentenceCount.longValue(), difficulty, studyModel);
-            }
-            // 获取当前学习进度的下一个例句
-            // 获取当前单元已学习的当前模块的例句id
-            Sentence sentence = saveSentenceData.getSentence(unitId, student, learnNews.getGroup(), type, studyModel);
-            SentenceTranslateVo sentenceTranslateVo = saveSentenceData.getSentenceTranslateVo(plan.longValue(), firstStudy,
-                    sentenceCount.longValue(), type, sentence);
-            sentenceTranslateVo.setStudyNew(true);
-            return ServerResponse.createBySuccess(sentenceTranslateVo);
+        //获取单词id
+        StudyCapacity studyCapacity = studyCapacityMapper.selectLearnHistory(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, learnNews.getGroup());
+        // 有到达黄金记忆点的例句优先复习
+        if (studyCapacity != null) {
+            // 返回达到黄金记忆点的例句信息
+            //SentenceTranslate sentenceTranslate = sentenceTranslates.get(0);
+            return saveSentenceData.returnGoldWord(studyCapacity, plan.longValue(), firstStudy, sentenceCount.longValue(), difficulty, studyModel);
         }
-        return null;
+        // 获取当前学习进度的下一个例句
+        // 获取当前单元已学习的当前模块的例句id
+        Sentence sentence = saveSentenceData.getSentence(unitId, student, learnNews.getGroup(), type, studyModel);
+        SentenceTranslateVo sentenceTranslateVo = saveSentenceData.getSentenceTranslateVo(plan.longValue(), firstStudy,
+                sentenceCount.longValue(), type, sentence);
+        sentenceTranslateVo.setStudyNew(true);
+        return ServerResponse.createBySuccess(sentenceTranslateVo);
     }
 
     @Override
     public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId) {
-        return null;
+        Student student = getStudent(session);
+        if (saveData.saveVocabularyModel(student, session, unitId, wordId, isTrue, plan, total,
+                flowId, easyOrHard, type, studyModel)) {
+            return ServerResponse.createBySuccess();
+        }
+        return ServerResponse.createByErrorMessage("学习记录保存失败");
     }
 }

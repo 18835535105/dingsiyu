@@ -203,9 +203,9 @@
         s.id = us.sentence_id
         AND us.unit_id = #{unitId}
         and us.group=#{group}
-        <if test="ids.size > 0">
+        <if test="wordIds.size > 0">
             AND s.id NOT IN (
-            <foreach collection="ids" separator="," item="id">
+            <foreach collection="wordIds" separator="," item="id">
                 #{id}
             </foreach>
             )
