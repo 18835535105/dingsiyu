@@ -19,7 +19,7 @@ public interface FlowConstant {
     /**
      * 困难流程开始节点
      */
-    long HARD_START = 79;
+    long HARD_START = 118;
 
 
     /**
