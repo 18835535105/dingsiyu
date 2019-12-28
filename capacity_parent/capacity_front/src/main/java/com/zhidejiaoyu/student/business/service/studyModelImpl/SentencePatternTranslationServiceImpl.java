@@ -1,8 +1,14 @@
 package com.zhidejiaoyu.student.business.service.studyModelImpl;
 
 import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.mapper.LearnExtendMapper;
+import com.zhidejiaoyu.common.mapper.LearnNewMapper;
+import com.zhidejiaoyu.common.mapper.StudyCapacityMapper;
+import com.zhidejiaoyu.common.mapper.UnitSentenceNewMapper;
+import com.zhidejiaoyu.common.pojo.LearnNew;
+import com.zhidejiaoyu.common.pojo.Sentence;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.StudyCapacity;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
@@ -21,8 +27,7 @@ import java.util.Date;
 @Service(value = "sentencePatternTranslationService")
 @Slf4j
 public class SentencePatternTranslationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnNew> implements IStudyService {
-    @Resource
-    private SentenceMapper sentenceMapper;
+
     @Resource
     private RedisOpt redisOpt;
     @Resource

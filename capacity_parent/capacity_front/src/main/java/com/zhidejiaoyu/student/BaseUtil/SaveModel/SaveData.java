@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.BaseUtil.SaveModel;
 
+import com.alibaba.druid.sql.visitor.functions.Char;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
@@ -11,24 +12,29 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.WordCompletionStudyVo;
 import com.zhidejiaoyu.common.vo.WordWriteStudyVo;
 import com.zhidejiaoyu.common.vo.study.MemoryStudyVo;
+import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.common.StudyCapacityLearn;
+import com.zhidejiaoyu.student.common.redis.RedisOpt;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.regex.Pattern;
 
 /**
  * 保存数据结构储存接口
  */
 @Component
-public class SaveData {
+@Slf4j
+public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     @Resource
     private StudentMapper studentMapper;
     @Resource
@@ -53,6 +59,43 @@ public class SaveData {
     private VocabularyMapper vocabularyMapper;
     @Resource
     private BaiduSpeak baiduSpeak;
+    @Resource
+    private RedisOpt redisOpt;
+
+    /**
+     * 以字母或数字结尾
+     */
+    final String END_MATCH = ".*[a-zA-Z]$";
+
+
+    public Object getStudyWord(HttpSession session, Long unitId, Student student,
+                               Long studentId, Integer easyOrHard, String studyModel, Integer type) {
+        // 判断学生是否在本系统首次学习，如果是记录首次学习时间
+        this.judgeIsFirstStudy(session, student);
+        boolean firstStudy = redisOpt.getGuideModel(studentId, studyModel);
+        //获取当前单元下的learnId
+        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitId(studentId, unitId, easyOrHard);
+        // 查询学生当前单元下已学习单词的个数，即学习进度
+        Integer plan = learnExtendMapper.countLearnWord(learnNews.getId(), unitId, learnNews.getGroup(), studyModel);
+        // 获取当前单元下的所有单词的总个数
+        Integer wordCount = unitVocabularyNewMapper.countByUnitId(unitId, learnNews.getGroup());
+        if (wordCount == 0) {
+            log.error("单元 {} 下没有单词信息！", unitId);
+            return ServerResponse.createByErrorMessage("当前单元下没有单词！");
+        }
+        if (wordCount.equals(plan)) {
+            return super.toUnitTest();
+        }
+        //获取单词id
+        StudyCapacity studyCapacity = studyCapacityMapper.selectLearnHistory(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, learnNews.getGroup());
+
+        if (studyCapacity != null) {
+            // 返回达到黄金记忆点的单词信息
+            return this.returnGoldWord(studyCapacity, plan.longValue(), firstStudy, wordCount.longValue(), type);
+        }
+        // 如果没有到达黄金记忆点的单词，获取当前学习进度的下一个单词
+        return this.getNextMemoryWord(session, unitId, student, firstStudy, plan, wordCount, learnNews.getGroup(), type, studyModel);
+    }
 
     /**
      * 记忆难度
@@ -226,8 +269,69 @@ public class SaveData {
         } else if (type.equals(5)) {
             WordWriteStudyVo wordWriteStudyVo = getWordWriteStudyVo(firstStudy, vocabulary, wordChinese, plan.longValue(), wordCount.longValue());
             return ServerResponse.createBySuccess(wordWriteStudyVo);
+        } else if (type.equals(6)) {
+            WordCompletionStudyVo wordCompletionStudyVo = getWordCompletionStudyVo(firstStudy, vocabulary, wordChinese, plan.longValue(), wordCount.longValue());
+            return ServerResponse.createBySuccess(wordCompletionStudyVo);
         }
         return null;
+    }
+
+    private WordCompletionStudyVo getWordCompletionStudyVo(boolean firstStudy, Vocabulary vocabulary, String wordChinese, long longValue, long longValue1) {
+        WordCompletionStudyVo wordCompletionStudyVo = new WordCompletionStudyVo();
+        String soundMark = StringUtils.isEmpty(vocabulary.getSoundMark()) ? "" : vocabulary.getSoundMark();
+        wordCompletionStudyVo.setWordId(vocabulary.getId());
+        wordCompletionStudyVo.setMemoryStrength(0.00);
+        wordCompletionStudyVo.setSoundmark(soundMark);
+        wordCompletionStudyVo.setWord(vocabulary.getWord());
+        wordCompletionStudyVo.setSyllable(StringUtils.isEmpty(vocabulary.getSyllable()) ? vocabulary.getWord() : vocabulary.getSyllable());
+        wordCompletionStudyVo.setWordChinese(wordChinese);
+        wordCompletionStudyVo.setPlan(longValue);
+        wordCompletionStudyVo.setStudyNew(true);
+        wordCompletionStudyVo.setFirstStudy(firstStudy);
+        wordCompletionStudyVo.setWordCount(longValue1);
+        wordCompletionStudyVo.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
+        Map<String, Object> returnMap = new HashMap<>();
+        getStudyWordComplets(vocabulary.getWord(), returnMap);
+        wordCompletionStudyVo.setWords(returnMap);
+        return wordCompletionStudyVo;
+    }
+
+    private void getStudyWordComplets(String word, Map<String, Object> returnMap) {
+        char[] chars = word.toCharArray();
+        word = word.trim();
+        List<Integer> letterList = new ArrayList();
+        int startI = 0;
+        List<String> strList = new ArrayList<>();
+        for (char ch : chars) {
+            strList.add(ch + "");
+        }
+        for (String letter : strList) {
+            if (Pattern.matches(END_MATCH, letter)) {
+                letterList.add(startI);
+            }
+            startI++;
+        }
+        Random random = new Random();
+        int size = letterList.size() / 2;
+        Map<Integer, Integer> map = new HashMap<>();
+        while (map.size() < size) {
+            int i = random.nextInt(letterList.size());
+            map.put(i, i);
+        }
+        Set<Integer> integers = map.keySet();
+        List<String> returnList = new ArrayList<>();
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < strList.size(); i++) {
+            if (integers.contains(i)) {
+                String letts = strList.get(i);
+                returnList.add(letts);
+                builder.append("$&$");
+            } else {
+                builder.append(strList.get(i));
+            }
+        }
+        returnMap.put("getWord", builder.toString());
+        returnMap.put("successWords", returnList);
     }
 
     private MemoryStudyVo getMemoryStudyVo(String word, String syllable, Long plan, boolean firstStudy, Long wordCount, int memoryDifficulty, double memoryStrength, Long vocabularyId, Vocabulary vocabulary, Long unitId, String wordChinese) {
@@ -295,6 +399,9 @@ public class SaveData {
             } else if (type.equals(5)) {
                 WordWriteStudyVo wordWriteStudyVo = getWordWriteStudyVo(firstStudy, currentStudyWord, wordChinese, plan.longValue(), wordCount.longValue());
                 return ServerResponse.createBySuccess(wordWriteStudyVo);
+            } else if (type.equals(6)) {
+                WordCompletionStudyVo wordCompletionStudyVo = getWordCompletionStudyVo(firstStudy, currentStudyWord, wordChinese, plan.longValue(), wordCount.longValue());
+                return ServerResponse.createBySuccess(wordCompletionStudyVo);
             }
         }
         return null;
