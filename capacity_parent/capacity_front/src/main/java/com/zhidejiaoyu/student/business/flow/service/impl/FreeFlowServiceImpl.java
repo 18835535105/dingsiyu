@@ -92,7 +92,37 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> getNode(NodeDto dto, String isTrueFlow, HttpSession session) {
-        Student student = getStudent(session);
+        Student student = super.getStudent(session);
+
+        Long studentId = student.getId();
+
+        Long unitId = dto.getUnitId();
+        Integer easyOrHard = dto.getEasyOrHard();
+        Integer modelType = dto.getModelType();
+
+        if (dto.getNodeId() == null) {
+            LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
+            if (learnNew != null) {
+                StudyFlowNew studyFlowNew = studyFlowNewMapper.selectByStudentIdAndUnitIdAndType(studentId, unitId, modelType);
+                if (studyFlowNew != null) {
+                    return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew, unitId));
+                }
+                return this.getFlowVOServerResponse(unitId, easyOrHard, modelType, studentId);
+            }
+
+            UnitNew unitNew = unitNewMapper.selectById(unitId);
+            learnNewMapper.insert(LearnNew.builder()
+                    .easyOrHard(easyOrHard)
+                    .group(1)
+                    .studentId(studentId)
+                    .unitId(unitId)
+                    .updateTime(new Date())
+                    .courseId(unitNew.getCourseId())
+                    .build());
+            return this.getFlowVOServerResponse(unitId, easyOrHard, modelType, studentId);
+        }
+
+
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(dto.getNodeId());
 
         dto.setStudyFlowNew(studyFlowNew);
@@ -103,7 +133,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             // 学习下一单元, 前端需要一个弹框提示
             if (studyFlowNew.getNextTrueFlow() == 0) {
                 // 开启下一单元并且返回需要学习的流程信息
-                this.saveOpenUnitLog(student, dto.getUnitId());
+                this.saveOpenUnitLog(student, unitId);
                 // 保存证书
                 this.judgeCourseCcie(dto);
                 return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
@@ -189,33 +219,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         return ServerResponse.createBySuccess("true", this.packageFlowVO(studyFlowNew, dto.getUnitId()));
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<FlowVO> getIndexNode(Long unitId, Integer easyOrHard, Integer type) {
-        Student student = super.getStudent(HttpUtil.getHttpSession());
-        Long studentId = student.getId();
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
-        if (learnNew != null) {
-            StudyFlowNew studyFlowNew = studyFlowNewMapper.selectByStudentIdAndUnitIdAndType(studentId, unitId, type);
-            if (studyFlowNew != null) {
-                return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew, unitId));
-            }
-            return this.getFlowVOServerResponse(unitId, easyOrHard, type, studentId);
-        }
-
-        UnitNew unitNew = unitNewMapper.selectById(unitId);
-        learnNewMapper.insert(LearnNew.builder()
-                .easyOrHard(easyOrHard)
-                .group(1)
-                .studentId(studentId)
-                .unitId(unitId)
-                .updateTime(new Date())
-                .courseId(unitNew.getCourseId())
-                .build());
-        return this.getFlowVOServerResponse(unitId, easyOrHard, type, studentId);
-    }
-
-    public ServerResponse<FlowVO> getFlowVOServerResponse(Long unitId, Integer easyOrHard, Integer type, Long studentId) {
+    public ServerResponse<Object> getFlowVOServerResponse(Long unitId, Integer easyOrHard, Integer type, Long studentId) {
         StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitIdAndType(studentId, unitId, type);
         Long startFlowId = this.getStartFlowId(easyOrHard, type);
         if (studentFlowNew == null) {

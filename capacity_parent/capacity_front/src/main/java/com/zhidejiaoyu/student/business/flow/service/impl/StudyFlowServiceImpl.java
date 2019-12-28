@@ -170,11 +170,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         return ServerResponse.createBySuccess("true", flowVO);
     }
 
-    @Override
-    public ServerResponse<FlowVO> getIndexNode(Long unitId, Integer orHard, Integer easyOrHard) {
-        return null;
-    }
-
     /**
      * 验证当前单元中的group是否包含当前学习模块，如果不包含，学习下个学习模块
      *
