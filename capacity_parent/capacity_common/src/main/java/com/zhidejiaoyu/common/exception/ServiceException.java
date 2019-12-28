@@ -8,13 +8,14 @@ import com.zhidejiaoyu.common.exception.Enum.ServiceExceptionEnum;
  * @author wuchenxi
  * @date 2019-06-28
  */
-public class ServiceException extends RuntimeException{
+public class ServiceException extends RuntimeException {
 
     private Integer code;
 
     private String message;
 
-    private ServiceException() {}
+    private ServiceException() {
+    }
 
     public ServiceException(ServiceExceptionEnum serviceExceptionEnum) {
         this.code = serviceExceptionEnum.getCode();

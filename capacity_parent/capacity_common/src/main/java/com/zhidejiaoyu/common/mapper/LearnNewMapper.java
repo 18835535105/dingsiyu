@@ -33,7 +33,7 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
      * @param unitId
      * @return
      */
-    LearnNew selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId,@Param("easyOrHard")Integer easyOrHard);
+    LearnNew selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("easyOrHard")Integer easyOrHard);
 
     /**
      * 获取接下来要学的词信息
