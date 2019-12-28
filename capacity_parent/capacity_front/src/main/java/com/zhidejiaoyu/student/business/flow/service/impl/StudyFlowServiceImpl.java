@@ -138,6 +138,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Long unitId) {
         UnitNew unitNew = unitNewMapper.selectById(unitId);
         CourseNew courseNew = courseNewMapper.selectById(unitNew.getCourseId());
+        String token = TokenUtil.getToken();
         return FlowVO.builder()
                 .courseId(courseNew.getId())
                 .courseName(courseNew.getCourseName())
@@ -145,6 +146,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
                 .modelName(studyFlowNew.getModelName())
                 .unitId(unitNew.getId())
                 .unitName(unitNew.getUnitName())
+                .token(token)
                 .build();
     }
 

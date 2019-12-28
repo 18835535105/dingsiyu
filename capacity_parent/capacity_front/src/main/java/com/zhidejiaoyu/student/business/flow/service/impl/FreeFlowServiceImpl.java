@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.CcieUtil;
+import com.zhidejiaoyu.common.utils.TokenUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
@@ -257,6 +258,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Long unitId) {
         UnitNew unitNew = unitNewMapper.selectById(unitId);
         CourseNew courseNew = courseNewMapper.selectById(unitNew.getCourseId());
+        String token = TokenUtil.getToken();
         return FlowVO.builder()
                 .courseId(courseNew.getId())
                 .courseName(courseNew.getCourseName())
@@ -264,6 +266,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
                 .modelName(studyFlowNew.getModelName())
                 .unitId(unitNew.getId())
                 .unitName(unitNew.getUnitName())
+                .token(token)
                 .build();
     }
 
