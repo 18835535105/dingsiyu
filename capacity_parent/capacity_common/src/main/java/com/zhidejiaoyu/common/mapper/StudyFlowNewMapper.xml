@@ -27,5 +27,13 @@
         and stfn.unit_id = #{dto.unitId}
         limit 1
     </select>
-
+    <select id="selectByStudentIdAndUnitIdAndType" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from study_flow_new sfn
+        join student_flow_new sf
+        on sf.current_flow_id = sfn.id and sf.student_id = #{studentId} and
+        sf.unit_id = #{unitId} and sf.type = #{type}
+        limit 1
+    </select>
 </mapper>

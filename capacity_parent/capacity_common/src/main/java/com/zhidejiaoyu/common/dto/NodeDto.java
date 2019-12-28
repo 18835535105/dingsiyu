@@ -38,9 +38,19 @@ public class NodeDto {
     private Long grade;
 
     /**
+     * 1：容易；2：困难
+     */
+    private Integer easyOrHard;
+
+    /**
      * 当前学习所在分组
      */
     private Integer group;
+
+    /**
+     * 2：单词；3：句型；4：课文
+     */
+    private Integer modelType;
 
     /**
      * 区分一键排课流程和自由学习流程

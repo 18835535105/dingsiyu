@@ -1,11 +1,14 @@
 package com.zhidejiaoyu.student.business.flow;
 
+import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.mapper.CourseNewMapper;
+import com.zhidejiaoyu.common.mapper.LearnExtendMapper;
 import com.zhidejiaoyu.common.mapper.StudyFlowNewMapper;
 import com.zhidejiaoyu.common.mapper.UnitNewMapper;
 import com.zhidejiaoyu.common.pojo.CourseNew;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudyFlowNew;
 import com.zhidejiaoyu.common.pojo.UnitNew;
 import com.zhidejiaoyu.common.utils.TokenUtil;
@@ -109,6 +112,10 @@ public class FlowCommonMethod {
         CourseNew courseNew = courseNewMapper.selectById(unitNew.getCourseId());
         String token = TokenUtil.getToken();
         HttpUtil.getHttpSession().setAttribute("token", token);
+
+        Student student = (Student) HttpUtil.getHttpSession().getAttribute(UserConstant.CURRENT_STUDENT);
+//        LearnExtendMapper.del
+
         return FlowVO.builder()
                 .courseId(courseNew.getId())
                 .courseName(courseNew.getCourseName())
