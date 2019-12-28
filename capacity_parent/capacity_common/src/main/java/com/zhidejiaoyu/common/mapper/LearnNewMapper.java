@@ -61,6 +61,6 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
     int countByStudentIdAndFlow(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("flowName") String flowName);
 
 
-    List<Long> selectByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
-                                                    @Param("easyOrHard") Integer easyOrHard);
+    List<Long> selectIdByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+                                                         @Param("easyOrHard") Integer easyOrHard);
 }

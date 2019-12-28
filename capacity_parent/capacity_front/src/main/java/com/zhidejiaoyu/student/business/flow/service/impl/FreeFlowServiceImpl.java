@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudyFlowNew;
 import com.zhidejiaoyu.common.pojo.UnitNew;
 import com.zhidejiaoyu.common.utils.CcieUtil;
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
@@ -20,10 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 自由学习节点
@@ -192,6 +190,14 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         }
 
         return ServerResponse.createBySuccess("true", this.packageFlowVO(studyFlowNew, dto.getUnitId()));
+    }
+
+    @Override
+    public ServerResponse<FlowVO> getIndexNode(Long unitId, Integer orHard, Integer easyOrHard) {
+        Student student = super.getStudent(HttpUtil.getHttpSession());
+//        learnNewMapper.selectIdByStudentIdAndUnitIdAndEasyOrHard(student.getId(), unitId, easyOrHard);
+
+        return null;
     }
 
     public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Long unitId) {

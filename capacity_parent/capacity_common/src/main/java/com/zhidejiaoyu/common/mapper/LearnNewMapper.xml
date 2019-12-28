@@ -57,7 +57,7 @@
         limit 1
     </select>
 
-    <select id="selectByStudentIdAndUnitIdAndEasyOrHard" resultType="long" parameterType="map">
+    <select id="selectIdByStudentIdAndUnitIdAndEasyOrHard" resultType="long" parameterType="map">
         select id
         from learn_new
         where student_id = #{studentId}
