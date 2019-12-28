@@ -55,7 +55,7 @@
           and id &lt; #{unitId}
     </select>
     <select id="selectIdAndNameByCourseId" resultType="java.util.Map" parameterType="map">
-        select u.id, u.unit_name unitName from unit_new u
+        select u.id unitId, u.unit_name unitName from unit_new u
         <if test="type == 1">
             left join unit_vocabulary_new uvn on uvn.unit_id = u.id
         </if>
@@ -66,7 +66,8 @@
         <if test="type == 4">
             left join unit_teks_new utn on utn.unit_id = u.id
         </if>
-        and u.course_id = #{courseId}
+        where u.course_id = #{courseId}
+        group by u.id
         order by u.id
     </select>
 

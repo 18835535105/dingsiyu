@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.CcieUtil;
+import com.zhidejiaoyu.common.utils.TokenUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
@@ -257,6 +258,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Long unitId) {
         UnitNew unitNew = unitNewMapper.selectById(unitId);
         CourseNew courseNew = courseNewMapper.selectById(unitNew.getCourseId());
+        String token = TokenUtil.getToken();
         return FlowVO.builder()
                 .courseId(courseNew.getId())
                 .courseName(courseNew.getCourseName())
@@ -264,6 +266,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
                 .modelName(studyFlowNew.getModelName())
                 .unitId(unitNew.getId())
                 .unitName(unitNew.getUnitName())
+                .token(token)
                 .build();
     }
 
@@ -317,36 +320,6 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             flowId1 = 9;
             this.changeFlowNodeLog(student, "单词播放机", unitNew, flowId1);
             return studyFlowNewMapper.selectById(flowId1);
-        }
-
-        // 流程 2 慧听写的单词图鉴
-        int flowTwoListenPicture = 35;
-        if (flowId == flowTwoListenPicture) {
-            if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlowNew().getType()) {
-                // 去流程 2 的慧默写
-                flowId1 = 28;
-                this.changeFlowNodeLog(student, "慧默写", unitNew, flowId1);
-                return studyFlowNewMapper.selectById(flowId1);
-            }
-            // 返回流程 1
-            flowId1 = 9;
-            this.changeFlowNodeLog(student, "单词播放机", unitNew, flowId1);
-            return studyFlowNewMapper.selectById(9);
-        }
-
-        // 流程 2 慧默写的单词图鉴
-        int flowTwoWritePicture = 33;
-        if (flowId == flowTwoWritePicture) {
-            if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlowNew().getType()) {
-                // 去游戏
-                flowId1 = 31;
-                this.changeFlowNodeLog(student, "游戏", unitNew, flowId1);
-                return studyFlowNewMapper.selectById(flowId1);
-            }
-            // 返回流程 1
-            flowId1 = 9;
-            this.changeFlowNodeLog(student, "单词播放机", unitNew, flowId1);
-            return studyFlowNewMapper.selectById(9);
         }
 
         return byPrimaryKey;

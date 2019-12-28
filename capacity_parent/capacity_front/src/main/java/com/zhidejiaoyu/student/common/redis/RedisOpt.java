@@ -79,8 +79,8 @@ public class RedisOpt {
         for (TestRecord testRecord : testRecords) {
             String explain = testRecord.getExplain();
             if (phase.equals(explain)) {
-//                redisTemplate.opsForHash().put(RedisKeysConst.TEST_BEFORE_STUDY + studentId, phase, true);
-//                redisTemplate.expire(RedisKeysConst.TEST_BEFORE_STUDY + studentId, 30, TimeUnit.DAYS);
+                redisTemplate.opsForHash().put(RedisKeysConst.TEST_BEFORE_STUDY + studentId, phase, true);
+                redisTemplate.expire(RedisKeysConst.TEST_BEFORE_STUDY + studentId, 30, TimeUnit.DAYS);
                 return true;
             }
         }

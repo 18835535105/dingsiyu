@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.CourseConfigMapper;
 import com.zhidejiaoyu.common.mapper.CourseNewMapper;
 import com.zhidejiaoyu.common.mapper.LearnHistoryMapper;
+import com.zhidejiaoyu.common.mapper.UnitNewMapper;
 import com.zhidejiaoyu.common.pojo.CourseConfig;
 import com.zhidejiaoyu.common.pojo.CourseNew;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -46,6 +47,9 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     @Resource
     private LearnHistoryMapper learnHistoryMapper;
 
+    @Resource
+    private UnitNewMapper unitNewMapper;
+
     @Override
     public ServerResponse<CourseInfoVO> getStudyCourse(Integer type) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
@@ -72,6 +76,14 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         }
 
         throw new ServiceException("未查询到学生的自由学习课程！");
+    }
+
+    @Override
+    public ServerResponse<Object> getUnitInfo(Long courseId, Integer type) {
+
+        List<Map<String, Object>> map = unitNewMapper.selectIdAndNameByCourseId(courseId, type);
+
+        return ServerResponse.createBySuccess(map);
     }
 
 
