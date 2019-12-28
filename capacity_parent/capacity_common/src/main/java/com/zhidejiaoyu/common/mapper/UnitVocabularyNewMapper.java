@@ -55,4 +55,12 @@ public interface UnitVocabularyNewMapper extends BaseMapper<UnitVocabularyNew> {
 
     @Select("select word_chinese from unit_vocabulary_new where unit_id=#{unitId} and vocabulary_id =#{wordId}")
     String selectWordChineseByUnitIdAndWordId(@Param("unitId") Long unitId, @Param("wordId") Long wordId);
+
+    /**
+     * 统计当前单元下含有单词图鉴的单词个数
+     *
+     * @param unitId
+     * @return
+     */
+    int countPicture(@Param("unitId") Long unitId);
 }

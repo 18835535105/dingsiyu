@@ -1,16 +1,15 @@
 package com.zhidejiaoyu.student.business.flow.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.utils.TokenUtil;
-import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
+import com.zhidejiaoyu.student.business.flow.FlowCommonMethod;
+import com.zhidejiaoyu.student.business.flow.FlowConstant;
 import com.zhidejiaoyu.student.business.flow.service.StudyFlowService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -42,9 +41,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     private UnitNewMapper unitNewMapper;
 
     @Resource
-    private VocabularyMapper vocabularyMapper;
-
-    @Resource
     private UnitVocabularyNewMapper unitVocabularyNewMapper;
 
     @Resource
@@ -64,6 +60,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
 
     @Resource
     private LearnHistoryMapper learnHistoryMapper;
+
+    @Resource
+    private FlowCommonMethod flowCommonMethod;
 
     /**
      * 节点学完, 把下一节初始化到student_flow表, 并把下一节点返回
@@ -102,6 +101,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(dto.getNodeId());
 
         if (studyFlowNew == null) {
+            log.error("未查询到id={}的流程信息！", dto.getNodeId());
             throw new ServiceException("未查询到流程信息！");
         }
 
@@ -124,7 +124,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         }
 
         // 判断下个节点
-        return judgeNextNode(dto);
+        return flowCommonMethod.judgeNextNode(dto, this);
     }
 
     public void initStudentFlow(Student student, StudentStudyPlanNew studentStudyPlanNew) {
@@ -138,83 +138,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     }
 
     public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Long unitId) {
-        UnitNew unitNew = unitNewMapper.selectById(unitId);
-        CourseNew courseNew = courseNewMapper.selectById(unitNew.getCourseId());
-        String token = TokenUtil.getToken();
-        HttpUtil.getHttpSession().setAttribute("token", token);
-        return FlowVO.builder()
-                .courseId(courseNew.getId())
-                .courseName(courseNew.getCourseName())
-                .id(studyFlowNew.getId())
-                .modelName(studyFlowNew.getModelName())
-                .unitId(unitNew.getId())
-                .unitName(unitNew.getUnitName())
-                .token(token)
-                .build();
+        return flowCommonMethod.packageFlowVO(studyFlowNew, unitId);
     }
 
-    private ServerResponse<Object> judgeNextNode(NodeDto dto) {
-        String isTrueFlow = dto.getTrueFlow();
-        StudyFlowNew studyFlowNew = dto.getStudyFlowNew();
-        // 学生选择项，是否进行下一个节点， true：进行下一个节点；否则跳过下个节点
-        if (isTrueFlow != null) {
-            if (Objects.equals("true", isTrueFlow)) {
-                return toAnotherFlow(dto, studyFlowNew.getNextTrueFlow());
-            } else {
-                return toAnotherFlow(dto, studyFlowNew.getNextFalseFlow());
-            }
-        }
 
-        // 判断学生是否在当前分数段
-        if (studyFlowNew.getType() != null) {
-            StudyFlowNew falseFlow = studyFlowNewMapper.selectById(studyFlowNew.getNextFalseFlow());
-            StudyFlowNew trueFlow = studyFlowNewMapper.selectById(studyFlowNew.getNextTrueFlow());
-
-            // 游戏前测节点 id
-            int gameTestFlowId = 3;
-            if (Objects.equals(gameTestFlowId, falseFlow.getType())) {
-                ServerResponse<Object> x = toNextNode(dto, falseFlow);
-                if (x != null) {
-                    return x;
-                }
-            } else if (Objects.equals(gameTestFlowId, trueFlow.getType())) {
-                ServerResponse<Object> x = toNextNode(dto, trueFlow);
-                if (x != null) {
-                    return x;
-                }
-            }
-
-            Long grade = dto.getGrade();
-            if (grade >= studyFlowNew.getType()) {
-                return toAnotherFlow(dto, studyFlowNew.getNextTrueFlow());
-            } else if (grade < studyFlowNew.getType()) {
-                return toAnotherFlow(dto, studyFlowNew.getNextFalseFlow());
-            } else {
-                // 判断是否进行单词好声音
-                return ServerResponse.createBySuccess("true", studyFlowNew);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * 注意：该方法将删除学生学习相关信息
-     *
-     * @param flow
-     * @return
-     */
-    private ServerResponse<Object> toNextNode(NodeDto dto, StudyFlowNew flow) {
-        Long grade = dto.getGrade();
-        if (grade != null) {
-            // 50 <= 分数 < 90分走 nextTrue 流程，分数 < 50 走 nextFalse 流程
-            if (grade >= PointConstant.FIFTY && grade < PointConstant.NINETY) {
-                return toAnotherFlow(dto, flow.getNextTrueFlow());
-            } else if (grade < PointConstant.NINETY) {
-                return toAnotherFlow(dto, flow.getNextFalseFlow());
-            }
-        }
-        return null;
-    }
 
     /**
      * 进入其他流程
@@ -223,7 +150,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
      * @param nextFlowId 下个节点id
      * @return
      */
-    private ServerResponse<Object> toAnotherFlow(NodeDto dto, int nextFlowId) {
+    @Override
+    public ServerResponse<Object> toAnotherFlow(NodeDto dto, int nextFlowId) {
         Student student = dto.getStudent();
 
         // 判断当前单元单词是否有图片，如果都没有图片不进入单词图鉴
@@ -254,7 +182,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         // 单词模块
         Long unitId = dto.getUnitId();
         Integer group = dto.getGroup();
-        if (Objects.equals(flowName, "流程1") || Objects.equals(flowName, "流程2")) {
+        if (Objects.equals(flowName, FlowConstant.FLOW_ONE) || Objects.equals(flowName, FlowConstant.FLOW_TWO)) {
             Integer wordCount = unitVocabularyNewMapper.countUnitIdAndGroup(unitId, group);
             if (wordCount > 0) {
                 return this.packageFlowVO(studyFlowNew, dto.getUnitId());
@@ -271,7 +199,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         }
 
         // 句型模块
-        if (Objects.equals(flowName, "流程3") || Objects.equals(flowName, "流程4")) {
+        if (Objects.equals(flowName, FlowConstant.FLOW_THREE) || Objects.equals(flowName, FlowConstant.FLOW_FOUR)) {
             Integer sentenceCount = unitSentenceNewMapper.countByUnitIdAndGroup(unitId, group);
             if (sentenceCount > 0) {
                 return this.packageFlowVO(studyFlowNew, dto.getUnitId());
@@ -284,7 +212,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         }
 
         // 课文模块
-        if (Objects.equals(flowName, "流程5")) {
+        if (Objects.equals(flowName, FlowConstant.FLOW_FIVE)) {
             Integer teksCount = unitTeksNewMapper.countByUnitIdAndGroup(unitId, group);
             if (teksCount > 0) {
                 return this.packageFlowVO(studyFlowNew, dto.getUnitId());
@@ -545,27 +473,27 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
 
     /**
      * @param dto
-     * @param flowId 下个流程节点的 id
+     * @param nextFlowId 下个流程节点的 id
      * @return
      */
-    private StudyFlowNew getStudyFlow(NodeDto dto, int flowId) {
-        StudyFlowNew byPrimaryKey = studyFlowNewMapper.selectById(flowId);
+    private StudyFlowNew getStudyFlow(NodeDto dto, int nextFlowId) {
+        StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(nextFlowId);
 
         // 如果下个节点不是单词图鉴模块，执行正常流程
         String studyModel = "单词图鉴";
-        if (!byPrimaryKey.getModelName().contains(studyModel)) {
-            return byPrimaryKey;
+        if (!studyFlowNew.getModelName().contains(studyModel)) {
+            return studyFlowNew;
         }
 
         Long unitId = dto.getUnitId();
         if (unitId == null) {
-            return byPrimaryKey;
+            return studyFlowNew;
         }
 
         // 当前单元含有图片的单词个数，如果大于零，执行正常流程，否则跳过单词图鉴模块
-        int pictureCount = vocabularyMapper.countPicture(unitId);
+        int pictureCount = unitVocabularyNewMapper.countPicture(unitId);
         if (pictureCount > 0) {
-            return byPrimaryKey;
+            return studyFlowNew;
         }
 
         UnitNew unitNew = unitNewMapper.selectById(unitId);
@@ -576,7 +504,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         // 流程 1 单词图鉴流程 id
         int flowOnePicture = 73;
         // 流程 1 的单词图鉴
-        if (flowId == flowOnePicture) {
+        if (nextFlowId == flowOnePicture) {
             if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlowNew().getType()) {
                 // 去句型翻译
                 flowId1 = 85;
@@ -584,7 +512,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
                 return studyFlowNewMapper.selectById(flowId1);
             }
             // 如果是从单词播放机直接进入单词图鉴，将流程跳转到慧记忆
-            if (Objects.equals(dto.getNodeId(), 78)) {
+            if (Objects.equals(dto.getNodeId(), 78L)) {
                 flowId1 = 71;
                 this.changeFlowNodeLog(student, "慧记忆", unitNew, flowId1);
                 return studyFlowNewMapper.selectById(flowId1);
@@ -595,7 +523,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             return studyFlowNewMapper.selectById(flowId1);
         }
 
-        return byPrimaryKey;
+        return studyFlowNew;
     }
 
     /**

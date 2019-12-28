@@ -1,12 +1,12 @@
 package com.zhidejiaoyu.student.business.flow;
 
 /**
- * 及格主要的流程id常量
+ * 流程中常用的常量
  *
  * @author: wuchenxi
  * @date: 2019/12/26 18:07:07
  */
-public interface FlowIdConstant {
+public interface FlowConstant {
 
     /**
      * 一键学习
@@ -44,4 +44,11 @@ public interface FlowIdConstant {
      * 课文试听
      */
     long FREE_TEKS_LISTEN = 115;
+
+
+    String FLOW_ONE = "流程1";
+    String FLOW_TWO = "流程2";
+    String FLOW_THREE = "流程3";
+    String FLOW_FOUR = "流程4";
+    String FLOW_FIVE = "流程5";
 }

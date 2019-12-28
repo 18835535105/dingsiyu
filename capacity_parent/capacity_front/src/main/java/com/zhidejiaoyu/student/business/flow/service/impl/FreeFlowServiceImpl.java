@@ -1,16 +1,17 @@
 package com.zhidejiaoyu.student.business.flow.service.impl;
 
-import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.pojo.OpenUnitLog;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.StudyFlowNew;
+import com.zhidejiaoyu.common.pojo.UnitNew;
 import com.zhidejiaoyu.common.utils.CcieUtil;
-import com.zhidejiaoyu.common.utils.TokenUtil;
-import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
-import com.zhidejiaoyu.student.business.flow.FlowIdConstant;
+import com.zhidejiaoyu.student.business.flow.FlowCommonMethod;
+import com.zhidejiaoyu.student.business.flow.FlowConstant;
 import com.zhidejiaoyu.student.business.flow.service.StudyFlowService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -61,9 +62,6 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     private UnitNewMapper unitNewMapper;
 
     @Resource
-    private CourseNewMapper courseNewMapper;
-
-    @Resource
     private OpenUnitLogMapper openUnitLogMapper;
 
     @Resource
@@ -73,17 +71,20 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     private CcieUtil ccieUtil;
 
     @Resource
-    private VocabularyMapper vocabularyMapper;
+    private UnitVocabularyNewMapper unitVocabularyNewMapper;
 
     @Resource
     private LearnHistoryMapper learnHistoryMapper;
 
+    @Resource
+    private FlowCommonMethod flowCommonMethod;
+
     static {
-        FLOW_NAME_TO_TYPE.put("流程1", 2);
-        FLOW_NAME_TO_TYPE.put("流程2", 2);
-        FLOW_NAME_TO_TYPE.put("流程3", 3);
-        FLOW_NAME_TO_TYPE.put("流程4", 3);
-        FLOW_NAME_TO_TYPE.put("流程5", 4);
+        FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_ONE, 2);
+        FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_TWO, 2);
+        FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_THREE, 3);
+        FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_FOUR, 3);
+        FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_FIVE, 4);
     }
 
     /**
@@ -129,7 +130,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
                     return this.toAnotherFlow(dto, studyFlowNew.getNextTrueFlow());
                 } else {
                     // 判断下个节点
-                    return judgeNextNode(dto);
+                    return flowCommonMethod.judgeNextNode(dto, this);
                 }
             }
         }
@@ -159,10 +160,9 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
      * @return
      */
     private ServerResponse<Object> toFlowOne(NodeDto dto) {
-        String FLOW_ONE_STR = "流程1";
-        int count = learnNewMapper.countByStudentIdAndFlow(dto.getStudent().getId(), dto.getUnitId(), FLOW_ONE_STR);
+        int count = learnNewMapper.countByStudentIdAndFlow(dto.getStudent().getId(), dto.getUnitId(), FlowConstant.FLOW_ONE);
         if (count == 0) {
-            return toAnotherFlow(dto, (int) FlowIdConstant.FREE_PLAYER);
+            return toAnotherFlow(dto, (int) FlowConstant.FREE_PLAYER);
         }
         this.saveOpenUnitLog(dto.getStudent(), dto.getUnitId());
         // 保存证书
@@ -170,75 +170,13 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
     }
 
-    private ServerResponse<Object> judgeNextNode(NodeDto dto) {
-        String isTrueFlow = dto.getTrueFlow();
-        StudyFlowNew studyFlowNew = dto.getStudyFlowNew();
-        // 学生选择项，是否进行下一个节点， true：进行下一个节点；否则跳过下个节点
-        if (isTrueFlow != null) {
-            if (Objects.equals("true", isTrueFlow)) {
-                return toAnotherFlow(dto, studyFlowNew.getNextTrueFlow());
-            } else {
-                return toAnotherFlow(dto, studyFlowNew.getNextFalseFlow());
-            }
-        }
-
-        // 判断学生是否在当前分数段
-        if (studyFlowNew.getType() != null) {
-            StudyFlowNew falseFlow = studyFlowNewMapper.selectById(studyFlowNew.getNextFalseFlow());
-            StudyFlowNew trueFlow = studyFlowNewMapper.selectById(studyFlowNew.getNextTrueFlow());
-
-            // 游戏前测节点 id
-            int gameTestFlowId = 3;
-            if (Objects.equals(gameTestFlowId, falseFlow.getType())) {
-                ServerResponse<Object> x = toNextNode(dto, falseFlow);
-                if (x != null) {
-                    return x;
-                }
-            } else if (Objects.equals(gameTestFlowId, trueFlow.getType())) {
-                ServerResponse<Object> x = toNextNode(dto, trueFlow);
-                if (x != null) {
-                    return x;
-                }
-            }
-
-            Long grade = dto.getGrade();
-            if (grade >= studyFlowNew.getType()) {
-                return toAnotherFlow(dto, studyFlowNew.getNextTrueFlow());
-            } else if (grade < studyFlowNew.getType()) {
-                return toAnotherFlow(dto, studyFlowNew.getNextFalseFlow());
-            } else {
-                // 判断是否进行单词好声音
-                return ServerResponse.createBySuccess("true", studyFlowNew);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * 注意：该方法将删除学生学习相关信息
-     *
-     * @param flow
-     * @return
-     */
-    private ServerResponse<Object> toNextNode(NodeDto dto, StudyFlowNew flow) {
-        Long grade = dto.getGrade();
-        if (grade != null) {
-            // 50 <= 分数 < 90分走 nextTrue 流程，分数 < 50 走 nextFalse 流程
-            if (grade >= PointConstant.FIFTY && grade < PointConstant.NINETY) {
-                return toAnotherFlow(dto, flow.getNextTrueFlow());
-            } else if (grade < PointConstant.NINETY) {
-                return toAnotherFlow(dto, flow.getNextFalseFlow());
-            }
-        }
-        return null;
-    }
-
     /**
      * 进入其他流程
      *
      * @return
      */
-    private ServerResponse<Object> toAnotherFlow(NodeDto dto, int flowId) {
+    @Override
+    public ServerResponse<Object> toAnotherFlow(NodeDto dto, int flowId) {
         Student student = dto.getStudent();
 
         // 判断当前单元单词是否有图片，如果都没有图片不进入单词图鉴
@@ -250,26 +188,14 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             return toFlowOne(dto);
         } else if (Objects.equals(TO_FLOW_TWO, studyFlowNew.getNextTrueFlow())) {
             log.info("[{} -{} -{}] 前往流程 2.", student.getId(), student.getAccount(), student.getStudentName());
-            return toAnotherFlow(dto, (int) FlowIdConstant.FREE_WORD_LISTEN);
+            return toAnotherFlow(dto, (int) FlowConstant.FREE_WORD_LISTEN);
         }
 
         return ServerResponse.createBySuccess("true", this.packageFlowVO(studyFlowNew, dto.getUnitId()));
     }
 
     public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Long unitId) {
-        UnitNew unitNew = unitNewMapper.selectById(unitId);
-        CourseNew courseNew = courseNewMapper.selectById(unitNew.getCourseId());
-        String token = TokenUtil.getToken();
-        HttpUtil.getHttpSession().setAttribute("token", token);
-        return FlowVO.builder()
-                .courseId(courseNew.getId())
-                .courseName(courseNew.getCourseName())
-                .id(studyFlowNew.getId())
-                .modelName(studyFlowNew.getModelName())
-                .unitId(unitNew.getId())
-                .unitName(unitNew.getUnitName())
-                .token(token)
-                .build();
+        return flowCommonMethod.packageFlowVO(studyFlowNew, unitId);
     }
 
     /**
@@ -292,7 +218,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         }
 
         // 当前单元含有图片的单词个数，如果大于零，执行正常流程，否则跳过单词图鉴模块
-        int pictureCount = vocabularyMapper.countPicture(unitId);
+        int pictureCount = unitVocabularyNewMapper.countPicture(unitId);
         if (pictureCount > 0) {
             return byPrimaryKey;
         }

@@ -17,11 +17,20 @@
     <select id="selectInterferenceTerm" resultType="string" parameterType="map">
         select word_chinese
         from unit_vocabulary_new
-        where
-        vocabulary_id &lt;> #{wordId}
-        and unit_id=#{unitId}
-        and  word_chinese &lt;> #{chinese}
+        where vocabulary_id &lt;> #{wordId}
+          and unit_id = #{unitId}
+          and word_chinese &lt;> #{chinese}
         limit 0,3
+    </select>
+    <select id="countPicture" resultType="java.lang.Integer" parameterType="map">
+        select count(v.id)
+        from vocabulary v,
+             unit_vocabulary_new uv
+        where uv.unit_id = #{unitId}
+          and uv.vocabulary_id = v.id
+          and (v.small_picture_url is not null
+            or v.middle_picture_url is not null
+            or v.high_picture_url is not null)
     </select>
 
 </mapper>
