@@ -166,7 +166,7 @@
         vocabulary_id id,
         word_chinese wordChinese
         FROM
-        unit_vocabulary
+        unit_vocabulary_new
         WHERE
         unit_id = #{unitId}
         and vocabulary_id in (

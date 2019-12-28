@@ -12,14 +12,14 @@
         <result column="learn_time" property="learnTime"/>
         <result column="study_model" property="studyModel"/>
         <result column="study_count" property="studyCount"/>
-        <result column="flowName" property="flowName"/>
+        <result column="flow_name" property="flowName"/>
         <result column="first_study_time" property="firstStudyTime"/>
         <result column="first_is_know" property="firstIsKnow"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <sql id="base_sql">
-        id, school_admin_id, learn_id, word_id, `status`, learn_time, study_model, study_count, flowName, first_study_time,
+        id, school_admin_id, learn_id, word_id, `status`, learn_time, study_model, study_count, flow_name, first_study_time,
         first_is_know, update_time
     </sql>
 
@@ -42,7 +42,8 @@
         from learn_extend extend
         join learn_new learn on extend.learn_id=learn.id
 
-        where extend.learn_id =#{learnId}
+        where
+        learn.student_id =#{studentId}
         and learn.unit_id=#{unitId}
         and extend.study_model=#{type}
     </select>
@@ -53,7 +54,7 @@
         from learn_extend
         where learn_id =#{learnId}
         and word_id=#{wordId}
-        and study_mode=#{studyModel}
+        and study_model=#{studyModel}
     </select>
 
     <select id="countLearnWord" resultType="int" parameterType="map">

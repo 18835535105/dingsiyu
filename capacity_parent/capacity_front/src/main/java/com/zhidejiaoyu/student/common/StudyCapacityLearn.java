@@ -47,13 +47,16 @@ public class StudyCapacityLearn {
     public StudyCapacity saveCapacityMemory(LearnNew learn, LearnExtend learnExtend, Student student, boolean isKnown, Integer studyModel) {
         Vocabulary vocabulary = vocabularyMapper.selectByPrimaryKey(learnExtend.getWordId());
 
-        if (studyModel != 1 && studyModel != 2 && studyModel != 3 && studyModel != 0) {
+        if (studyModel != 1 && studyModel != 2 && studyModel != 3 && studyModel != 4 && studyModel != 5) {
             throw new RuntimeException("studyModel=" + studyModel + " 非法！");
         }
         // 通过学生id，单元id和单词id获取当前单词的记忆追踪信息
         StudyCapacity capacity = getCapacityInfo(learn, student, studyModel, vocabulary);
         String wordChinese = unitVocabularyMapper.selectWordChineseByUnitIdAndWordId(learn.getUnitId(), vocabulary.getId());
         // 封装记忆追踪信息
+        if (wordChinese == null) {
+            wordChinese = vocabulary.getWordChinese();
+        }
         capacity = packageCapacityInfo(learn, learnExtend, student, isKnown, studyModel, vocabulary, capacity, wordChinese);
         return capacity;
     }
@@ -65,6 +68,7 @@ public class StudyCapacityLearn {
                 studyCapacity = new StudyCapacity();
                 studyCapacity.setCourseId(learn.getCourseId());
                 studyCapacity.setFaultTime(1);
+                studyCapacity.setType(studyModel);
                 studyCapacity.setMemoryStrength(0.12);
                 studyCapacity.setStudentId(student.getId());
                 studyCapacity.setUnitId(learn.getUnitId());
@@ -76,11 +80,9 @@ public class StudyCapacityLearn {
                 studyCapacity.setPush(push);
                 studyCapacityMapper.insert(studyCapacity);
             }
-
         } else {
             // 保存学生复习记录
             studentRestudyUtil.saveWordRestudy(learn, learnExtend, student, vocabulary.getWord(), 2);
-
             // 认识该单词
             if (isKnown) {
                 // 重新计算黄金记忆点时间

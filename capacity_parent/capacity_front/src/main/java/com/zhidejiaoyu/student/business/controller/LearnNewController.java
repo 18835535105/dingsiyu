@@ -76,9 +76,9 @@ public class LearnNewController extends BaseController {
     @RequestMapping("/saveStudy")
     public Object saveStudy(HttpSession session, Integer getModel,
                             Long unitId, Long courseId, Long wordId,
-                            boolean isknow, Integer plan, Integer total, Long flowId) {
+                            boolean isKnown, Integer plan, Integer total, Long flowId) {
         IStudyService iStudyService = map.get(getModel);
-        return iStudyService.saveStudy(session, unitId, wordId, isknow, plan, total, courseId, flowId);
+        return iStudyService.saveStudy(session, unitId, wordId, isKnown, plan, total, courseId, flowId);
     }
 
 

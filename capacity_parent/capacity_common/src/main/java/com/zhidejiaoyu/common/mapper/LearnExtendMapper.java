@@ -48,7 +48,7 @@ public interface LearnExtendMapper extends BaseMapper<LearnExtend> {
      *                15，读语法 16，选语法 17，写语法 18，语法游戏
      * @return
      */
-    List<Long> selectByUnitIdAndStudentIdAndType(@Param("unitId") Long unitId, @Param("learnId") Long learnId,
+    List<Long> selectByUnitIdAndStudentIdAndType(@Param("unitId") Long unitId, @Param("studentId") Long studentId,
                                                  @Param("type") String studyModel);
 
     /**

@@ -128,9 +128,18 @@
         FROM vocabulary
         v, unit_vocabulary_new uv
         where uv.unit_id = #{unitId}
-        AND v.id
-        =
-        uv.vocabulary_id AND v.delStatus = 1
+        AND v.id = uv.vocabulary_id AND v.delStatus = 1
+    </select>
+    <select id="selectByUnitIdAndGroup" resultMap="BaseResultMap"
+            parameterType="java.lang.Long">
+        SELECT
+        distinct
+        <include refid="unite_Column_List"/>
+        FROM vocabulary v join unit_vocabulary_new uv on v.id=uv.vocabulary_id
+        where
+        uv.unit_id = #{unitId}
+        AND v.delStatus = 1
+        and uv.group=#{group}
     </select>
 
     <select id="selectByWordIds" parameterType="java.util.List"
@@ -418,9 +427,9 @@
     <select id="getWordPicAll" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="unite_Column_List"/>
-        from unit_vocabulary a
+        from unit_vocabulary_new a
         join vocabulary v on a.vocabulary_id = v.id
-        and a.unit_id = #{unitId} and v.recordpicurl is not null and v.delStatus = 1;
+        and a.unit_id = #{unitId} and v.recordpicurl is not null and v.delStatus = 1 and a.group=#{group}
     </select>
     <select id="getWordIdByCourseAll" resultMap="BaseResultMap" parameterType="map">
         SELECT

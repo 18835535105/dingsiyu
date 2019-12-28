@@ -3,10 +3,7 @@ package com.zhidejiaoyu.student.business.service.impl;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.CapacityPicture;
-import com.zhidejiaoyu.common.pojo.Learn;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.Vocabulary;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.study.WordPictureUtil;
 import com.zhidejiaoyu.common.utils.PictureUtil;
@@ -57,6 +54,8 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
 
     @Autowired
     private UnitVocabularyMapper unitVocabularyMapper;
+    @Autowired
+    private LearnNewMapper learnNewMapper;
 
     /**
      * 获取单词图鉴学习数据
@@ -205,9 +204,10 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
     @Override
     public ServerResponse<Object> getWordPicUnitTest(HttpSession session, Long unitId, Long courseId, Boolean isTrue) {
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-
+        Student student = getStudent(session);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, 1);
         // 获取单元下所有有图片的单词
-        List<Vocabulary> list = vocabularyMapper.getWordPicAll(unitId);
+        List<Vocabulary> list = vocabularyMapper.getWordPicAll(unitId,learnNew.getGroup());
 
         // 随机获取带图片的单词, 正确答案的三倍
         List<Vocabulary> listSelect = vocabularyMapper.getWordIdByAll(list.size() * 4);

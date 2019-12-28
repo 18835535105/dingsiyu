@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 
@@ -80,14 +81,18 @@ public class SaveData {
 
         //获取learnExtend数据
         List<LearnExtend> learnExtends = learnExtendMapper.selectByLearnIdsAndWordIdAndStudyModel(learnId, wordId, studyModel);
-        LearnExtend currentLearn = learnExtends.get(0);
-        //如果有多余的删除
-        if (learnExtends.size() > 1) {
-            List<LearnExtend> extendList = learnExtends.subList(1, learnIds.size());
-            List<Long> deleteLong = new ArrayList<>();
-            extendList.forEach(extend -> deleteLong.add(extend.getId()));
-            learnNewMapper.deleteBatchIds(deleteLong);
+        LearnExtend currentLearn = null;
+        if (learnExtends.size() > 0) {
+            currentLearn = learnExtends.get(0);
+            //如果有多余的删除
+            if (learnExtends.size() > 1) {
+                List<LearnExtend> extendList = learnExtends.subList(1, learnIds.size());
+                List<Long> deleteLong = new ArrayList<>();
+                extendList.forEach(extend -> deleteLong.add(extend.getId()));
+                learnNewMapper.deleteBatchIds(deleteLong);
+            }
         }
+
         /**
          * 查看慧默写  会听写  单词图鉴是否为上次学习 如果是 删除
          * 开始
@@ -139,9 +144,9 @@ public class SaveData {
             learn.setStudyCount(currentLearn.getStudyCount() + 1);
             StudyCapacity studyCapacity;
             if (isTrue) {
-                studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learn, student, true, 0);
+                studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learn, student, true, type);
             } else {
-                studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learn, student, false, 0);
+                studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learn, student, false, type);
             }
             // 计算记忆难度
             int memoryDifficult = memoryDifficultyUtil.getMemoryDifficulty(studyCapacity, 1);
@@ -153,6 +158,7 @@ public class SaveData {
             currentLearn.setStatus(memoryDifficult == 0 ? 1 : 0);
             currentLearn.setUpdateTime(now);
             int i = learnExtendMapper.updateById(currentLearn);
+            return true;
         }
         return false;
     }
@@ -200,8 +206,8 @@ public class SaveData {
      * @param firstStudy
      * @return
      */
-    public Object returnGoldWord(StudyCapacity studyCapacity, Long plan, boolean firstStudy,
-                                 Long wordCount, Integer type) {
+    public ServerResponse<Object> returnGoldWord(StudyCapacity studyCapacity, Long plan, boolean firstStudy,
+                                                 Long wordCount, Integer type) {
         // 计算当前单词的记忆难度
         int memoryDifficulty = memoryDifficultyUtil.getMemoryDifficulty(studyCapacity, 1);
         // 计算当前单词的记忆强度
@@ -216,10 +222,10 @@ public class SaveData {
         if (type.equals(3)) {
             MemoryStudyVo memoryStudyVo = getMemoryStudyVo(studyCapacity.getWord(), studyCapacity.getSyllable(),
                     plan, firstStudy, wordCount, memoryDifficulty, memoryStrength, vocabularyId, vocabulary, unitId, wordChinese);
-            return memoryStudyVo;
+            return ServerResponse.createBySuccess(memoryStudyVo);
         } else if (type.equals(5)) {
             WordWriteStudyVo wordWriteStudyVo = getWordWriteStudyVo(firstStudy, vocabulary, wordChinese, plan.longValue(), wordCount.longValue());
-            return wordWriteStudyVo;
+            return ServerResponse.createBySuccess(wordWriteStudyVo);
         }
         return null;
     }

@@ -35,6 +35,14 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
     List<Vocabulary> selectByUnitId(@Param("unitId") Long unitId);
 
     /**
+     * 获取当前单元下的所有单词信息(不含删除的单词)
+     *
+     * @param unitId
+     * @return
+     */
+    List<Vocabulary> selectByUnitIdAndGroup(@Param("unitId") Long unitId,@Param("group") Integer group);
+
+    /**
      * 根据单词id查询该单词的中文意思
      *
      * @param id
@@ -178,7 +186,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
 
     List<Map<String, Object>> getWordIdNewByCourse(@Param("correctWordId") Long correctWordId, @Param("unidId") Long unidId);
 
-    List<Vocabulary> getWordPicAll(@Param("unitId") Long unitId);
+    List<Vocabulary> getWordPicAll(@Param("unitId") Long unitId,@Param("group") Integer group);
 
     List<Vocabulary> getWordIdByCourseAll(@Param("courseId") Long courseId);
 

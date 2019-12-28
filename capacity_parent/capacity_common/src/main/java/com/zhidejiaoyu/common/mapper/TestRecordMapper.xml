@@ -21,6 +21,7 @@
         <result column="award_gold" property="awardGold" jdbcType="INTEGER"/>
         <result column="better_count" property="betterCount" jdbcType="INTEGER"/>
         <result column="pass" property="pass" jdbcType="INTEGER"/>
+        <result column="group" property="group" jdbcType="INTEGER"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>

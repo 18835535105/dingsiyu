@@ -98,6 +98,10 @@ public class TestRecord extends Model<TestRecord> {
      * 1：测试通过；2：测试未通过
      */
     private Integer pass;
+    /**
+     * 组号
+     */
+    private Integer group;
 
     @Override
     protected Serializable pkVal() {

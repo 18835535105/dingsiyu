@@ -47,6 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @Slf4j
@@ -140,6 +141,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     @Resource
     private UnitNewMapper unitNewMapper;
+    @Resource
+    private LearnNewMapper learnNewMapper;
 
     /**
      * 游戏测试题目获取，获取20个单词供测试
@@ -923,14 +926,17 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Student student = getStudent(session);
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         // 获取当前单元下的所有单词
-        List<Vocabulary> vocabularies = redisOpt.getWordInfoInUnit(unitId);
+        Integer easyOrHard = 0;
         String[] type;
         if ("慧记忆".equals(studyModel)) {
             type = new String[]{"英译汉", "汉译英"};
+            easyOrHard = 1;
         } else {
             type = new String[]{"听力理解"};
+            easyOrHard = 2;
         }
-
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, easyOrHard);
+        List<Vocabulary> vocabularies = redisOpt.getWordInfoInUnitAndGroup(unitId, learnNew.getGroup());
         // 需要封装的测试题个数
         int subjectNum = Math.min(vocabularies.size(), 20);
 
@@ -1210,7 +1216,13 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             student.setPetName("大明白");
             student.setPartUrl(PetImageConstant.DEFAULT_IMG.replace(AliyunInfoConst.host, ""));
         }
-
+        Integer earyOrHard = 0;
+        @NotNull(message = "测试类型不能为空") Integer classify1 = wordUnitTestDTO.getClassify();
+        if (classify1.equals(0) || classify1.equals(1) || classify1.equals(4) || classify1.equals(5)) {
+            earyOrHard = 1;
+        } else {
+            earyOrHard = 2;
+        }
         TestResultVo vo = new TestResultVo();
         // 是否是第一次进行当前模块下的单元闯关测试标识
         boolean isFirst = false;
@@ -1272,6 +1284,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
 
         if (testRecord != null) {
+            LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId[0], earyOrHard);
+            testRecord.setGroup(learnNew.getGroup());
             testRecordMapper.insert(testRecord);
             // 保存测试记录详情
             if (testDetail != null) {

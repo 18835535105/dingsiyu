@@ -91,19 +91,18 @@ public class RedisOpt {
     public boolean getGuideModel(Long studentId, String model) {
         Object o = redisTemplate.opsForHash().get(RedisKeysConst.LOOK_GUIDE, studentId);
 
-        if (o != null && model.contains(o.toString())) {
+        if (o != null && o.toString().contains(model)) {
             return false;
         }
         StudentExpansion explain = studentExpansionMapper.selectByStudentId(studentId);
         String guide = explain.getGuide();
         if(guide!=null){
-            if (model.contains(guide)) {
+            if (guide.contains(model)) {
                 redisTemplate.opsForHash().put(RedisKeysConst.LOOK_GUIDE, studentId, guide);
                 redisTemplate.expire(RedisKeysConst.LOOK_GUIDE + studentId, 30, TimeUnit.DAYS);
                 return false;
             }
         }
-
         explain.setGuide(guide + "," + model);
         studentExpansionMapper.updateById(explain);
         //保存测试记录
@@ -289,6 +288,24 @@ public class RedisOpt {
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], unitId=[{}], error=[{}]", object, unitId, e.getMessage());
                 vocabularies = vocabularyMapper.selectByUnitId(unitId);
+            }
+        }
+        return vocabularies;
+    }
+
+    public List<Vocabulary> getWordInfoInUnitAndGroup(Long unitId,Integer group) {
+        String hKey = RedisKeysConst.WORD_INFO_IN_UNIT + unitId+":"+group;
+        List<Vocabulary> vocabularies;
+        Object object = getRedisHashObject(hKey);
+        if (object == null) {
+            vocabularies = vocabularyMapper.selectByUnitIdAndGroup(unitId,group);
+            redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, hKey, vocabularies);
+        } else {
+            try {
+                vocabularies = (List<Vocabulary>) object;
+            } catch (Exception e) {
+                log.error("类型转换错误，object=[{}], unitId=[{}], error=[{}]", object, unitId, e.getMessage());
+                vocabularies = vocabularyMapper.selectByUnitIdAndGroup(unitId,group);
             }
         }
         return vocabularies;
