@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.dto.NodeDto;
+import com.zhidejiaoyu.common.pojo.StudentFlowNew;
 import com.zhidejiaoyu.common.pojo.StudyFlowNew;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -22,4 +23,12 @@ public interface StudyFlowNewMapper extends BaseMapper<StudyFlowNew> {
      * @return
      */
     StudyFlowNew selectStudentCurrentFlow(@Param("dto") NodeDto dto);
+
+    /**
+     * @param studentId
+     * @param unitId
+     * @param type
+     * @return
+     */
+    StudyFlowNew selectByStudentIdAndUnitIdAndType(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("type") Integer type);
 }

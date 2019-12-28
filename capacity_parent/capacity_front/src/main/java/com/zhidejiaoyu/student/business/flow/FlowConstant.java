@@ -31,6 +31,11 @@ public interface FlowConstant {
     long FREE_PLAYER = 11;
 
     /**
+     * 字母填写
+     */
+    long FREE_LETTER_WRITE = 118;
+
+    /**
      * 慧听写
      */
     long FREE_WORD_LISTEN = 24;
@@ -39,6 +44,10 @@ public interface FlowConstant {
      * 句型翻译
      */
     long FREE_SENTENCE_TRANSLATE = 110;
+    /**
+     * 句型默写
+     */
+    long FREE_SENTENCE_WRITE = 113;
 
     /**
      * 课文试听

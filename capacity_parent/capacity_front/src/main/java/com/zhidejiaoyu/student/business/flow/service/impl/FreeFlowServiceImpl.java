@@ -2,10 +2,7 @@ package com.zhidejiaoyu.student.business.flow.service.impl;
 
 import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.OpenUnitLog;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.StudyFlowNew;
-import com.zhidejiaoyu.common.pojo.UnitNew;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.CcieUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
@@ -193,11 +190,70 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     }
 
     @Override
-    public ServerResponse<FlowVO> getIndexNode(Long unitId, Integer orHard, Integer easyOrHard) {
+    @Transactional(rollbackFor = Exception.class)
+    public ServerResponse<FlowVO> getIndexNode(Long unitId, Integer easyOrHard, Integer type) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
-//        learnNewMapper.selectIdByStudentIdAndUnitIdAndEasyOrHard(student.getId(), unitId, easyOrHard);
+        Long studentId = student.getId();
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
+        if (learnNew != null) {
+            StudyFlowNew studyFlowNew = studyFlowNewMapper.selectByStudentIdAndUnitIdAndType(studentId, unitId, type);
+            if (studyFlowNew != null) {
+                return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew, unitId));
+            }
+            return this.getFlowVOServerResponse(unitId, easyOrHard, type, studentId);
+        }
 
-        return null;
+        UnitNew unitNew = unitNewMapper.selectById(unitId);
+        learnNewMapper.insert(LearnNew.builder()
+                .easyOrHard(easyOrHard)
+                .group(1)
+                .studentId(studentId)
+                .unitId(unitId)
+                .updateTime(new Date())
+                .courseId(unitNew.getCourseId())
+                .build());
+        return this.getFlowVOServerResponse(unitId, easyOrHard, type, studentId);
+    }
+
+    public ServerResponse<FlowVO> getFlowVOServerResponse(Long unitId, Integer easyOrHard, Integer type, Long studentId) {
+        StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitIdAndType(studentId, unitId, type);
+        Long startFlowId = this.getStartFlowId(easyOrHard, type);
+        if (studentFlowNew == null) {
+            studentFlowNewMapper.insert(StudentFlowNew.builder()
+                    .type(type)
+                    .updateTime(new Date())
+                    .studentId(studentId)
+                    .unitId(unitId)
+                    .currentFlowId(startFlowId)
+                    .build());
+        } else {
+            studentFlowNew.setCurrentFlowId(startFlowId);
+            studentFlowNew.setUpdateTime(new Date());
+            studentFlowNew.setUnitId(unitId);
+            studentFlowNewMapper.updateById(studentFlowNew);
+        }
+        StudyFlowNew studyFlowNew1 = studyFlowNewMapper.selectById(startFlowId);
+        return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew1, unitId));
+    }
+
+    /**
+     * 获取当前模块起始节点
+     *
+     * @param easyOrHard
+     * @param type
+     * @return
+     */
+    private Long getStartFlowId(Integer easyOrHard, Integer type) {
+        switch (type) {
+            case 2:
+                return Objects.equals(easyOrHard, 1) ? FlowConstant.FREE_PLAYER : FlowConstant.FREE_LETTER_WRITE;
+            case 3:
+                return Objects.equals(easyOrHard, 1) ? FlowConstant.FREE_SENTENCE_TRANSLATE : FlowConstant.FREE_SENTENCE_WRITE;
+            case 4:
+                return FlowConstant.FREE_TEKS_LISTEN;
+            default:
+                return null;
+        }
     }
 
     public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Long unitId) {

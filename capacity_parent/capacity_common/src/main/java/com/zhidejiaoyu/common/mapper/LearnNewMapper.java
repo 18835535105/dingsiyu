@@ -63,4 +63,13 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
 
     List<Long> selectIdByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                                          @Param("easyOrHard") Integer easyOrHard);
+
+    /**
+     *
+     * @param studentId
+     * @param unitId
+     * @param easyOrHard
+     * @return
+     */
+    LearnNew selectByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("easyOrHard") Integer easyOrHard);
 }

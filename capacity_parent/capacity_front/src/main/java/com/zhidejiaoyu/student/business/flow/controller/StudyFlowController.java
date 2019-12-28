@@ -48,8 +48,8 @@ public class StudyFlowController {
      * 自由学习选择单元获取当前单元应学习的节点
      *
      * @param unitId
-     * @param easyOrHard
-     * @param type 1：单词；2：句型；3：课文
+     * @param easyOrHard 1：容易；2：复杂
+     * @param type       2：单词；3：句型；4：课文
      * @return
      */
     @RequestMapping("/getIndexNode")

@@ -38,9 +38,9 @@ public interface StudyFlowService extends BaseService<StudyFlowNew> {
      * 自由学习选择单元获取当前单元应学习的节点
      *
      * @param unitId
-     * @param orHard
+     * @param type       2：单词；3：句型；4：课文
      * @param easyOrHard 1：简单；2：困难
      * @return
      */
-    ServerResponse<FlowVO> getIndexNode(Long unitId, Integer orHard, Integer easyOrHard);
+    ServerResponse<FlowVO> getIndexNode(Long unitId, Integer easyOrHard, Integer type);
 }

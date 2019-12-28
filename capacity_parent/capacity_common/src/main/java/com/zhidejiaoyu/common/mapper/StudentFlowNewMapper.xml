@@ -23,5 +23,15 @@
         and type = 1
         limit 1
     </select>
+    <select id="selectByStudentIdAndUnitIdAndType" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from student_flow_new
+        where student_id = #{studentId}
+        and unit_id = #{unitId}
+        and type = #{type}
+        limit 1
+    </select>
+
 
 </mapper>
