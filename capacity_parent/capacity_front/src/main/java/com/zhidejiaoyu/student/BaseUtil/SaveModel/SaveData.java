@@ -315,8 +315,8 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         int size = letterList.size() / 2;
         Map<Integer, Integer> map = new HashMap<>();
         while (map.size() < size) {
-            int i = random.nextInt(letterList.size()-1);
-            Integer integer = letterList.get(letterList.get(i));
+            int i = random.nextInt(letterList.size());
+            Integer integer = letterList.get(i);
             map.put(integer, integer);
         }
         Set<Integer> integers = map.keySet();

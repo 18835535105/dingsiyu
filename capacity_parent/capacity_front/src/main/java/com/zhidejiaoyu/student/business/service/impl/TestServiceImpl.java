@@ -37,6 +37,7 @@ import com.zhidejiaoyu.common.vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.vo.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
 import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveData;
+import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveSentenceData;
 import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveTeksData;
 import com.zhidejiaoyu.student.business.service.TestService;
 import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
@@ -145,10 +146,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     private UnitNewMapper unitNewMapper;
     @Resource
     private LearnNewMapper learnNewMapper;
-    @Resource
-    private TeacherMapper teacherMapper;
-    @Resource
-    private LearnExtendMapper learnExtendMapper;
+
+
 
 
     /**
@@ -996,7 +995,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     public ServerResponse<Object> saveCapSentenceTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
         Student student = getStudent(session);
         TestRecord testRecord;
-
+        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(),wordUnitTestDTO.getUnitId()[0],student);
         wordUnitTestDTO.setClassify(8);
 
         // 判断当前单元是不是首次进行测试
