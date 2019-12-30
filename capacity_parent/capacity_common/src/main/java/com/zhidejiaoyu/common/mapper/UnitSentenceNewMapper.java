@@ -22,7 +22,7 @@ public interface UnitSentenceNewMapper extends BaseMapper<UnitSentenceNew> {
      * @param group
      * @return
      */
-    @Select("select `group` from unit_sentence_new where unit_id = #{unitId} and `group` > #{group} limit 1")
+    @Select("select `group` from unit_sentence_new where unit_id = #{unitId} and `group` > #{group} order by id limit 1")
     Integer selectNextGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
 
     /**

@@ -67,6 +67,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     @Resource
     private FlowCommonMethod flowCommonMethod;
 
+    @Resource
+    private SyntaxUnitTopicNewMapper syntaxUnitTopicNewMapper;
+
     /**
      * 节点学完, 把下一节初始化到student_flow表, 并把下一节点返回
      *
@@ -287,6 +290,13 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             this.saveLearnNew(dto, studentStudyPlanNew, group);
             return group;
         }
+
+        group = syntaxUnitTopicNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
+        if (group != null) {
+            this.saveLearnNew(dto, studentStudyPlanNew, group);
+            return group;
+        }
+
         return null;
     }
 
@@ -315,6 +325,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
 
         count = unitSentenceNewMapper.countByUnitIdAndGroup(unitId, group);
         this.saveOrUpdateLearnHistory(dto, studentStudyPlanNew, count, 2);
+
+        count = syntaxUnitTopicNewMapper.countByUnitAndGroup(unitId, group);
+        this.saveOrUpdateLearnHistory(dto, studentStudyPlanNew, count, 3);
 
         count = unitTeksNewMapper.countByUnitIdAndGroup(unitId, group);
         this.saveOrUpdateLearnHistory(dto, studentStudyPlanNew, count, 4);
