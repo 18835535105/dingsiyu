@@ -74,7 +74,7 @@ public class StudyCapacity extends Model<StudyCapacity> {
      */
     private Integer type;
     private Date updateTime;
-
+    private Integer group;
 
     @Override
     protected Serializable pkVal() {

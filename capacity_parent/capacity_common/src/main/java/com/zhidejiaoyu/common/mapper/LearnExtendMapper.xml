@@ -85,5 +85,14 @@
             , #{end}
     </select>
 
+    <select id="selectCountByLearnIdAndWordIdAndType" parameterType="map" resultType="int">
+        select
+        count(id)
+        from learn_extend
+        where word_id =#{wordId}
+        and learn_id=#{learnId}
+        and `type` =#{type}
+    </select>
+
 
 </mapper>

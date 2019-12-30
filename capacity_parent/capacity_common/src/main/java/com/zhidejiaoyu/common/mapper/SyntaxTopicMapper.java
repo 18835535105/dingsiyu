@@ -31,7 +31,7 @@ public interface SyntaxTopicMapper extends BaseMapper<SyntaxTopic> {
      * @param type   1：选语法；2:写语法
      * @return
      */
-    Integer countByUnitIdAndType(@Param("unitId") Long unitId, @Param("type") int type);
+    Integer countByUnitIdAndType(@Param("unitId") Long unitId, @Param("type") int type, @Param("group") Integer group);
 
     /**
      * 查询当前单元下下一个未学习的语法内容
@@ -41,5 +41,5 @@ public interface SyntaxTopicMapper extends BaseMapper<SyntaxTopic> {
      * @param studyModel 学习模块
      * @return
      */
-    SyntaxTopic selectNextByUnitIdAndType(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("studyModel") String studyModel);
+    SyntaxTopic selectNextByUnitIdAndType(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("group") Integer group ,@Param("studyModel") String studyModel);
 }

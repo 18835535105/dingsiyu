@@ -25,7 +25,10 @@
         select
         <include refid="teks_base_sql"></include>
         from teks_new teks
-        join unit_teks_new
+        join unit_teks_new unit on teks.id = unit.teks_id
+        where
+        unit.unit_id=#{unitId}
+        and unit.group=#{group}
     </select>
     <select id="getTwentyTeks" resultMap="BaseResultMap" parameterType="map">
         select <include refid="base_sql"></include> from teks t order by rand() limit 20

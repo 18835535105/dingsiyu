@@ -1,14 +1,12 @@
 package com.zhidejiaoyu.student.business.syntax.service.impl;
 
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.vo.syntax.LearnSyntaxVO;
 import com.zhidejiaoyu.common.vo.syntax.game.GameVO;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
 import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
-import com.zhidejiaoyu.common.mapper.KnowledgePointMapper;
-import com.zhidejiaoyu.common.mapper.LearnMapper;
-import com.zhidejiaoyu.common.mapper.SyntaxTopicMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
@@ -36,9 +34,6 @@ import java.util.Objects;
 public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, SyntaxTopic> implements LearnSyntaxService {
 
     @Resource
-    private LearnMapper learnMapper;
-
-    @Resource
     private SyntaxRedisOpt syntaxRedisOpt;
 
     @Resource
@@ -53,16 +48,23 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
     @Resource
     private SelectNeedView selectNeedView;
 
+
     @Resource
-    private LearnModelInfo learnModelInfo;
+    private LearnNewMapper learnNewMapper;
+    @Resource
+    private LearnExtendMapper learnExtendMapper;
+
+    private Integer easyOrHard = 1;
 
     @Override
     public ServerResponse getLearnSyntax(Long unitId) {
         HttpUtil.getHttpSession().setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         Student student = super.getStudent(HttpUtil.getHttpSession());
 
-        int plan = learnMapper.countLearnedSyntax(student.getId(), unitId, SyntaxModelNameConstant.SELECT_SYNTAX);
-        int total = syntaxRedisOpt.getTotalSyntaxContentWithUnitId(unitId, SyntaxModelNameConstant.SELECT_SYNTAX);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, easyOrHard);
+        int plan = learnExtendMapper.countLearnWord(student.getId(), unitId, learnNew.getGroup(), SyntaxModelNameConstant.LEARN_SYNTAX);
+
+        int total = syntaxRedisOpt.getTotalSyntaxContentWithUnitId(unitId, learnNew.getGroup(), SyntaxModelNameConstant.SELECT_SYNTAX);
 
         // 如果有需要复习的，返回需要复习的数据
         NeedViewDTO dto = NeedViewDTO.builder()
@@ -70,6 +72,7 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
                 .studentId(student.getId())
                 .plan(plan)
                 .total(total)
+                .group(learnNew.getGroup())
                 .type(StudyCapacityTypeConstant.SELECT_SYNTAX)
                 .build();
 
@@ -90,9 +93,9 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
             return serverResponse;
         }
 
-        // 说明当前单元学语法模块内容都已掌握，进入语法游戏模块
+       /* // 说明当前单元学语法模块内容都已掌握，进入语法游戏模块
         StudentStudySyntax studentStudySyntax = learnModelInfo.packageStudentStudySyntax(unitId, student, SyntaxModelNameConstant.GAME);
-        learnModelInfo.updateLearnType(studentStudySyntax);
+        learnModelInfo.updateLearnType(studentStudySyntax);*/
 
         return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
 
@@ -104,11 +107,13 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
         Student student = super.getStudent(HttpUtil.getHttpSession());
         learn.setStudentId(student.getId());
         learn.setStudyModel(SyntaxModelNameConstant.SELECT_SYNTAX);
-        return saveLearnInfo.saveSyntax(learn, known, StudyCapacityTypeConstant.SELECT_SYNTAX);
+        //return saveLearnInfo.saveSyntax(learn, known, StudyCapacityTypeConstant.SELECT_SYNTAX);
+
+        return null;
     }
 
     private ServerResponse getNewSyntaxTopic(NeedViewDTO dto) {
-        SyntaxTopic syntaxTopic = syntaxTopicMapper.selectNextByUnitIdAndType(dto.getStudentId(), dto.getUnitId(), SyntaxModelNameConstant.SELECT_SYNTAX);
+        SyntaxTopic syntaxTopic = syntaxTopicMapper.selectNextByUnitIdAndType(dto.getStudentId(), dto.getUnitId(), dto.getGroup(), SyntaxModelNameConstant.SELECT_SYNTAX);
         if (!Objects.isNull(syntaxTopic)) {
             KnowledgePoint knowledgePoint = knowledgePointMapper.selectByTopicId(syntaxTopic.getId());
             LearnSyntaxVO knowledgePoint1 = this.packageNewKnowledgePoint(dto, knowledgePoint);

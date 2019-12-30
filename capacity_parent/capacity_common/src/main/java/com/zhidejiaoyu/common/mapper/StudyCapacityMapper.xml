@@ -16,14 +16,15 @@
         <result column="push" property="push"/>
         <result column="memory_strength" property="memoryStrength"/>
         <result column="type" property="type"/>
+        <result column="group" property="group"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <sql id="base_sql">
-        id, student_id, course_id, unit_id, word_id, word, syllable, word_chinese, fault_time, push, memory_strength, type, update_time
+        id, student_id, course_id, unit_id, word_id, word, syllable, word_chinese, fault_time, push, memory_strength,`group`, `type`, update_time
     </sql>
     <sql id="sc_base_sql">
-        sc.id, sc.student_id, sc.course_id, sc.unit_id, sc.word_id, sc.word, sc.syllable,
+        sc.id, sc.student_id, sc.course_id, sc.unit_id, sc.word_id, sc.word, sc.syllable,sc.group,
          sc.word_chinese, sc.fault_time, sc.push, sc.memory_strength, sc.type, sc.update_time
     </sql>
     <delete id="deleteSyntaxByStudentIdAndCourseId" parameterType="map">
@@ -44,6 +45,7 @@
         and type = #{dto.type}
         and memory_strength &lt; 1
         and push &lt;= now()
+        and 'group' = #{group}
         order by push limit 1
     </select>
     <select id="selectUnKnownByStudentIdAndUnitId" resultMap="BaseResultMap" parameterType="map">
@@ -52,6 +54,7 @@
         from study_capacity
         where student_id = #{dto.studentId}
         and unit_id = #{dto.unitId}
+        and 'group' = #{dto.group}
         and type = #{dto.type}
         and memory_strength &lt; 1
         order by push limit 1
@@ -98,7 +101,8 @@
         LIMIT 0,1
   </select>
     <select id="selectLearnHistory" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="sc_base_sql"></include>
+        select
+        <include refid="sc_base_sql"></include>
         from vocabulary a
         INNER JOIN study_capacity sc
         on a.id = sc.word_id
@@ -107,7 +111,7 @@
         inner join learn_new leaNew
         on leaNew.unit_id=voNew.unit_id
         where
-         sc.unit_id = #{unitId}
+        sc.unit_id = #{unitId}
         and sc.student_id = #{studentId}
         and voNew.group=#{group}
         and sc.push &lt; #{dateTime}

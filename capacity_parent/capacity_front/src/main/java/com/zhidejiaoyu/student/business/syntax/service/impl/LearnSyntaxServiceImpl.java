@@ -1,14 +1,12 @@
 package com.zhidejiaoyu.student.business.syntax.service.impl;
 
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.vo.syntax.KnowledgePointVO;
 import com.zhidejiaoyu.common.vo.syntax.LearnSyntaxVO;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
 import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
-import com.zhidejiaoyu.common.mapper.KnowledgePointMapper;
-import com.zhidejiaoyu.common.mapper.LearnMapper;
-import com.zhidejiaoyu.common.mapper.SyntaxTopicMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
@@ -40,7 +38,7 @@ import java.util.stream.Collectors;
 public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, SyntaxTopic> implements LearnSyntaxService {
 
     @Resource
-    private LearnMapper learnMapper;
+    private LearnNewMapper learnNewMapper;
 
     @Resource
     private SyntaxRedisOpt syntaxRedisOpt;
@@ -57,13 +55,19 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
     @Resource
     private LearnModelInfo learnModelInfo;
 
+    @Resource
+    private LearnExtendMapper learnExtendMapper;
+
+    private Integer easyOrHard = 1;
+
     @Override
     public ServerResponse getLearnSyntax(Long unitId) {
         HttpUtil.getHttpSession().setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         Student student = super.getStudent(HttpUtil.getHttpSession());
 
-        int plan = learnMapper.countLearnedSyntax(student.getId(), unitId, SyntaxModelNameConstant.LEARN_SYNTAX);
-        int total = syntaxRedisOpt.getTotalKnowledgePointWithUnitId(unitId);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, easyOrHard);
+        int plan = learnExtendMapper.countLearnWord(student.getId(), unitId, learnNew.getGroup(), SyntaxModelNameConstant.LEARN_SYNTAX);
+        int total = syntaxRedisOpt.getTotalKnowledgePointWithUnitId(unitId, learnNew.getGroup());
 
         // 如果有需要复习的，返回需要复习的数据
         NeedViewDTO dto = NeedViewDTO.builder()
@@ -72,6 +76,7 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                 .plan(plan)
                 .total(total)
                 .type(StudyCapacityTypeConstant.LEARN_SYNTAX)
+                .group(learnNew.getGroup())
                 .build();
 
         ServerResponse studyCapacity = learnNeedView.getNeedView(dto);
@@ -91,9 +96,9 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
             return serverResponse;
         }
 
-        // 说明当前单元学语法模块内容都已掌握，进入选语法模块
+       /* // 说明当前单元学语法模块内容都已掌握，进入选语法模块
         StudentStudySyntax studentStudySyntax = learnModelInfo.packageStudentStudySyntax(unitId, student, SyntaxModelNameConstant.SELECT_SYNTAX);
-        learnModelInfo.updateLearnType(studentStudySyntax);
+        learnModelInfo.updateLearnType(studentStudySyntax);*/
 
         return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
     }
@@ -104,7 +109,7 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         Student student = super.getStudent(HttpUtil.getHttpSession());
         learn.setStudentId(student.getId());
         learn.setStudyModel(SyntaxModelNameConstant.LEARN_SYNTAX);
-        return saveLearnInfo.saveSyntax(learn, known, StudyCapacityTypeConstant.LEARN_SYNTAX);
+        return saveLearnInfo.saveSyntax(learn, known, StudyCapacityTypeConstant.LEARN_SYNTAX,easyOrHard);
     }
 
     /**
@@ -114,7 +119,7 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
      * @return
      */
     private ServerResponse getNewKnowledgePoint(NeedViewDTO dto) {
-        KnowledgePoint knowledgePoint = knowledgePointMapper.selectNextByUnitId(dto.getStudentId(), dto.getUnitId());
+        KnowledgePoint knowledgePoint = knowledgePointMapper.selectNextByUnitId(dto.getStudentId(), dto.getUnitId(), dto.getGroup());
         if (!Objects.isNull(knowledgePoint)) {
             return ServerResponse.createBySuccess(this.packageNewKnowledgePoint(dto, knowledgePoint));
         }

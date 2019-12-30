@@ -80,12 +80,11 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> getLearnSyntax(Long unitId) {
-
         HttpUtil.getHttpSession().setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         Student student = super.getStudent(HttpUtil.getHttpSession());
 
         int plan = learnMapper.countLearnedSyntax(student.getId(), unitId, SyntaxModelNameConstant.WRITE_SYNTAX);
-        int total = syntaxRedisOpt.getTotalSyntaxContentWithUnitId(unitId, SyntaxModelNameConstant.WRITE_SYNTAX);
+        int total = syntaxRedisOpt.getTotalSyntaxContentWithUnitId(unitId, 1, SyntaxModelNameConstant.WRITE_SYNTAX);
 
         // 如果有需要复习的，返回需要复习的数据
         NeedViewDTO dto = NeedViewDTO.builder()
@@ -116,7 +115,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         if (initNextUnitOrCourse(student, dto)) {
             return ServerResponse.createBySuccess(ResponseCode.COURSE_FINISH);
         }
-        SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId + 1);
+       /* SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId + 1);
         // 说明当前单元写语法模块内容都已掌握，进入下一单元语法游戏模块
         learnModelInfo.packageStudentStudySyntax(unitId, student, SyntaxModelNameConstant.GAME);
         if (syntaxUnit != null) {
@@ -126,7 +125,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                     .unitName(syntaxUnit.getUnitName())
                     .unitIndex(syntaxUnit.getUnitIndex())
                     .build());
-        }
+        }*/
         return ServerResponse.createBySuccess(ResponseCode.COURSE_FINISH);
     }
 
@@ -175,7 +174,8 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         Student student = super.getStudent(HttpUtil.getHttpSession());
         learn.setStudentId(student.getId());
         learn.setStudyModel(SyntaxModelNameConstant.WRITE_SYNTAX);
-        return saveLearnInfo.saveSyntax(learn, known, StudyCapacityTypeConstant.WRITE_SYNTAX);
+        //saveLearnInfo.saveSyntax(learn, known, StudyCapacityTypeConstant.WRITE_SYNTAX);
+        return null;
     }
 
 
@@ -186,7 +186,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
      * @return
      */
     private ServerResponse<Object> getNewSyntaxTopic(NeedViewDTO dto) {
-        SyntaxTopic syntaxTopic = syntaxTopicMapper.selectNextByUnitIdAndType(dto.getStudentId(), dto.getUnitId(), SyntaxModelNameConstant.WRITE_SYNTAX);
+        SyntaxTopic syntaxTopic = syntaxTopicMapper.selectNextByUnitIdAndType(dto.getStudentId(), dto.getUnitId(), dto.getGroup(), SyntaxModelNameConstant.WRITE_SYNTAX);
         if (!Objects.isNull(syntaxTopic)) {
             KnowledgePoint knowledgePoint = knowledgePointMapper.selectByTopicId(syntaxTopic.getId());
             return ServerResponse.createBySuccess(WriteSyntaxVO.builder()

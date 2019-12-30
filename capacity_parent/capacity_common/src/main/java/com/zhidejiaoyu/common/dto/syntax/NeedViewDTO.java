@@ -34,5 +34,7 @@ public class NeedViewDTO {
      * 记忆追踪的type
      */
     private Integer type;
+
+    private Integer group;
 }
 

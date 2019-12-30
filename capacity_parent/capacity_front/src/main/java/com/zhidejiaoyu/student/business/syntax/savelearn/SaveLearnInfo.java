@@ -1,12 +1,8 @@
 package com.zhidejiaoyu.student.business.syntax.savelearn;
 
 import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.mapper.KnowledgePointMapper;
-import com.zhidejiaoyu.common.mapper.LearnMapper;
-import com.zhidejiaoyu.common.mapper.StudyCapacityMapper;
-import com.zhidejiaoyu.common.pojo.KnowledgePoint;
-import com.zhidejiaoyu.common.pojo.Learn;
-import com.zhidejiaoyu.common.pojo.StudyCapacity;
+import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.memorystrength.SyntaxMemoryStrength;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
@@ -37,6 +33,10 @@ public class SaveLearnInfo {
 
     @Resource
     private SyntaxMemoryStrength syntaxMemoryStrength;
+    @Resource
+    private LearnExtendMapper learnExtendMapper;
+    @Resource
+    private LearnNewMapper learnNewMapper;
 
     /**
      * 保存语法学习记录
@@ -46,10 +46,12 @@ public class SaveLearnInfo {
      * @param type
      * @return
      */
-    public ServerResponse<Object> saveSyntax(Learn learn, Boolean known, int type) {
+    public ServerResponse<Object> saveSyntax(Learn learn, Boolean known, int type,int easyOrHard) {
         Learn learned = learnMapper.selectLearnedSyntaxByUnitIdAndStudyModelAndWordId(learn);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(learn.getStudentId(), learn.getUnitId(), easyOrHard);
+        LearnExtend learnExtend=new LearnExtend();
         if (Objects.isNull(learned)) {
-            this.saveFirstLearn(learn, known, type);
+            //this.saveFirstLearn(learn, known, type);
         } else {
             this.updateNotFirstLearn(known, learned, type);
         }
@@ -83,22 +85,22 @@ public class SaveLearnInfo {
      * @param known
      * @param type
      */
-    private void saveFirstLearn(Learn learn, Boolean known, int type) {
+    private void saveFirstLearn(LearnExtend learn, Boolean known, int type) {
         // 首次学习
         learn.setLearnTime((Date) HttpUtil.getHttpSession().getAttribute(TimeConstant.BEGIN_START_TIME));
         learn.setStudyCount(1);
         learn.setUpdateTime(new Date());
         if (known) {
             learn.setStatus(1);
-            learn.setFirstIsKnown(1);
+           // learn.setFirstIsKnown(1);
         } else {
             // 保存记忆追踪
-            this.initStudyCapacity(learn, type);
+            //this.initStudyCapacity(learn, type);
 
             learn.setStatus(0);
-            learn.setFirstIsKnown(0);
+            //learn.setFirstIsKnown(0);
         }
-        learnMapper.insert(learn);
+        //learnMapper.insert(learn);
     }
 
     private void initStudyCapacity(Learn learn, int type) {

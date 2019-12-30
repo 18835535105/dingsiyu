@@ -77,4 +77,13 @@ public interface LearnExtendMapper extends BaseMapper<LearnExtend> {
      */
     @Delete("delete from learn_extend where learn_id = #{learnId} and study_model = #{modelName}")
     void deleteByUnitIdAndStudyModel(@Param("learnId") Long learnId, @Param("modelName") String modelName);
+
+    /**
+     * 查询句子学习次数
+     * @param learnId
+     * @param wordId
+     * @param type
+     * @return
+     */
+    Integer selectCountByLearnIdAndWordIdAndType(@Param("learnId") Long learnId,@Param("wordId") Long wordId,@Param("type") Integer type);
 }

@@ -38,18 +38,18 @@ public class SyntaxRedisOpt {
      * @param unitId
      * @return
      */
-    public int getTotalKnowledgePointWithUnitId(Long unitId) {
-        String key = SyntaxKeysConst.KNOWLEDGE_POINT_COUNT_WITH_UNIT + unitId;
+    public int getTotalKnowledgePointWithUnitId(Long unitId, Integer group) {
+        String key = SyntaxKeysConst.KNOWLEDGE_POINT_COUNT_WITH_UNIT + unitId + ":" + group;
         Object o = redisTemplate.opsForValue().get(key);
         if (Objects.isNull(o)) {
-            return getTotalKnowledgePointWithUnitId(unitId, key);
+            return getTotalKnowledgePointWithUnitId(unitId, key, group);
         }
 
         try {
             return Integer.parseInt(o.toString());
         } catch (NumberFormatException e) {
             log.warn("缓存数据转换错误", e);
-            return getTotalKnowledgePointWithUnitId(unitId, key);
+            return getTotalKnowledgePointWithUnitId(unitId, key, group);
         }
     }
 
@@ -59,18 +59,18 @@ public class SyntaxRedisOpt {
      * @param unitId
      * @return
      */
-    public int getTotalSyntaxContentWithUnitId(Long unitId, String studyModel) {
-        String key = SyntaxKeysConst.SYNTAX_CONTENT_COUNT_WITH_UNIT + unitId + ":" + studyModel;
+    public int getTotalSyntaxContentWithUnitId(Long unitId, Integer group, String studyModel) {
+        String key = SyntaxKeysConst.SYNTAX_CONTENT_COUNT_WITH_UNIT + unitId + ":" + group + ":" + studyModel;
         Object o = redisTemplate.opsForValue().get(key);
         if (Objects.isNull(o)) {
-            return this.getTotalSyntaxContentWithUnitId(unitId, studyModel, key);
+            return this.getTotalSyntaxContentWithUnitId(unitId, studyModel, key, group);
         }
 
         try {
             return Integer.parseInt(o.toString());
         } catch (NumberFormatException e) {
             log.warn("缓存数据转换错误", e);
-            return this.getTotalSyntaxContentWithUnitId(unitId, studyModel, key);
+            return this.getTotalSyntaxContentWithUnitId(unitId, studyModel, key, group);
         }
     }
 
@@ -81,8 +81,8 @@ public class SyntaxRedisOpt {
      * @param key
      * @return
      */
-    private int getTotalKnowledgePointWithUnitId(Long unitId, String key) {
-        int count = knowledgePointMapper.countByUnitId(unitId);
+    private int getTotalKnowledgePointWithUnitId(Long unitId, String key, Integer group) {
+        int count = knowledgePointMapper.countByUnitId(unitId,group);
         redisTemplate.opsForValue().set(key, count);
         redisTemplate.expire(key, 5, TimeUnit.MINUTES);
         return count;
@@ -96,8 +96,8 @@ public class SyntaxRedisOpt {
      * @param key
      * @return
      */
-    private int getTotalSyntaxContentWithUnitId(Long unitId, String studyModel, String key) {
-        Integer count = syntaxTopicMapper.countByUnitIdAndType(unitId, Objects.equals(studyModel, SyntaxModelNameConstant.SELECT_SYNTAX) ? 1 : 2);
+    private int getTotalSyntaxContentWithUnitId(Long unitId, String studyModel, String key, Integer group) {
+        Integer count = syntaxTopicMapper.countByUnitIdAndType(unitId, Objects.equals(studyModel, SyntaxModelNameConstant.SELECT_SYNTAX) ? 1 : 2, group);
         int returnCount = Objects.isNull(count) ? 0 : count;
         redisTemplate.opsForValue().set(key, returnCount);
         redisTemplate.expire(key, 5, TimeUnit.MINUTES);

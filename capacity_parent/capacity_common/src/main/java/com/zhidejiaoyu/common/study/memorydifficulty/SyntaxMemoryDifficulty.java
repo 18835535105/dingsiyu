@@ -3,8 +3,12 @@ package com.zhidejiaoyu.common.study.memorydifficulty;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
 import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
+import com.zhidejiaoyu.common.mapper.LearnExtendMapper;
 import com.zhidejiaoyu.common.mapper.LearnMapper;
+import com.zhidejiaoyu.common.mapper.LearnNewMapper;
 import com.zhidejiaoyu.common.pojo.Learn;
+import com.zhidejiaoyu.common.pojo.LearnExtend;
+import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.StudyCapacity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -26,6 +30,10 @@ public class SyntaxMemoryDifficulty extends CheckMemoryDifficultyParam implement
 
     @Resource
     private LearnMapper learnMapper;
+    @Resource
+    private LearnExtendMapper learnExtendMapper;
+    @Resource
+    private LearnNewMapper learnNewMapper;
 
     @Override
     public Integer getMemoryDifficulty(StudyCapacity studyCapacity) {
@@ -33,13 +41,14 @@ public class SyntaxMemoryDifficulty extends CheckMemoryDifficultyParam implement
             return 1;
         }
 
-        // 学习次数
-        List<Learn> learns = learnMapper.selectList(new EntityWrapper<Learn>().eq("student_id", studyCapacity.getStudentId())
-                .eq("unit_id", studyCapacity.getUnitId())
-                .eq("vocabulary_id", studyCapacity.getWordId())
-                .eq("study_model", this.getStudyModel(studyCapacity.getType()))
-                .eq("type", 1));
-        Integer studyCount = CollectionUtils.isEmpty(learns) ? 1 : learns.get(0).getStudyCount();
+        Integer easyOrHard = 1;
+        if (studyCapacity.getType().equals(22)) {
+            easyOrHard = 2;
+        }
+        //获取当前learnId
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(studyCapacity.getStudentId(), studyCapacity.getUnitId(), easyOrHard);
+        // 获取当前学习次数
+        Integer studyCount=learnExtendMapper.selectCountByLearnIdAndWordIdAndType(learnNew.getId(),studyCapacity.getWordId(),studyCapacity.getType());
         if (studyCapacity.getFaultTime() > studyCount) {
             studyCount = studyCapacity.getFaultTime() + 1;
         }

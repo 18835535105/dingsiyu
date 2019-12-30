@@ -36,6 +36,8 @@ public class LearnNewController extends BaseController {
     private IStudyService breakThroughTheTextService;
     @Resource
     private IStudyService textTrainingService;
+
+
     private Map<Integer, IStudyService> map = new HashMap<>();
 
     @PostConstruct
@@ -53,7 +55,7 @@ public class LearnNewController extends BaseController {
         map.put(13, breakThroughTheTextService);
         /*
         map.put(14,);
-        map.put(15,);
+
         map.put(16,);
         map.put(17,);
         map.put(18,);
