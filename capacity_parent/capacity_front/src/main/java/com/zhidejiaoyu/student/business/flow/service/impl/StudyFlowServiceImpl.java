@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * @author wuchenxi
+ */
 @Slf4j
 @Service(value = "flowService")
 public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, StudyFlowNew> implements StudyFlowService {
@@ -74,7 +77,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> getNode(NodeDto dto, String isTrueFlow, HttpSession session) {
-        Student student = getStudent(session);
+        Student student = super.getStudent(session);
 
         if (dto.getNodeId() == null) {
             // 在星球页请求，返回当前正在学习的节点信息
@@ -107,7 +110,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
 
         int easyOrHard = studyFlowNew.getModelName().contains("写") ? 2 : 1;
         dto.setEasyOrHard(easyOrHard);
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(dto.getStudent().getId(), dto.getUnitId(), dto.getEasyOrHard());
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), dto.getUnitId(), dto.getEasyOrHard());
 
         if (learnNew != null) {
             // 如果学生有当前单元的学习记录，删除其学习详情，防止学生重新学习该单元时获取不到题目
@@ -165,12 +168,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         // 判断当前单元是否含有当前模块的内容，如果没有当前模块的内容学习下个模块的内容
         FlowVO flowVO = this.judgeHasCurrentModel(studyFlowNew, dto);
 
-        studentFlowNewMapper.update(StudentFlowNew.builder()
-                .currentFlowId(studyFlowNew.getId())
-                .updateTime(new Date())
-                .build(), new EntityWrapper<StudentFlowNew>().eq("student_id", student.getId())
-                .eq("unit_id", dto.getUnitId()));
-
+        studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(student.getId(), studyFlowNew.getId(), dto.getUnitId(), 1);
 
         return ServerResponse.createBySuccess("true", flowVO);
     }
@@ -358,6 +356,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         // 更新优先级表中的变化优先级
         this.updateLevel(dto, studentId);
 
+        flowCommonMethod.saveOpenUnitLog(dto.getStudent(), dto.getUnitId());
+
         StudentStudyPlanNew maxStudentStudyPlanNew = this.initLearnInfo(dto, studentId);
 
         // 将当前单元的已学习记录状态置为已完成
@@ -512,33 +512,21 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlowNew().getType()) {
                 // 去句型翻译
                 flowId1 = 85;
-                this.changeFlowNodeLog(student, "句型翻译", unitNew, flowId1);
+                flowCommonMethod.changeFlowNodeLog(student, "句型翻译", unitNew, flowId1);
                 return studyFlowNewMapper.selectById(flowId1);
             }
             // 如果是从单词播放机直接进入单词图鉴，将流程跳转到慧记忆
             if (Objects.equals(dto.getNodeId(), 78L)) {
                 flowId1 = 71;
-                this.changeFlowNodeLog(student, "慧记忆", unitNew, flowId1);
+                flowCommonMethod.changeFlowNodeLog(student, "慧记忆", unitNew, flowId1);
                 return studyFlowNewMapper.selectById(flowId1);
             }
             // 返回流程 1
             flowId1 = 70;
-            this.changeFlowNodeLog(student, "单词播放机", unitNew, flowId1);
+            flowCommonMethod.changeFlowNodeLog(student, "单词播放机", unitNew, flowId1);
             return studyFlowNewMapper.selectById(flowId1);
         }
 
         return studyFlowNew;
     }
-
-    /**
-     * 当需要调过单词图鉴节点的时候记录日志
-     *
-     * @param student
-     * @param model   学习模块
-     */
-    private void changeFlowNodeLog(Student student, String model, UnitNew unit, int flowId) {
-        log.info("单元[{}]没有单词图片，学生[{} - {} - {}]进入{}流程，流程 id=[{}]",
-                unit.getJointName(), student.getId(), student.getAccount(), student.getStudentName(), model, flowId);
-    }
-
 }

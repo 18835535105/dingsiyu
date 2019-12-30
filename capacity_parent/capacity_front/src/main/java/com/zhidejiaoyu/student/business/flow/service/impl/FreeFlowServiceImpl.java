@@ -4,7 +4,6 @@ import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.CcieUtil;
-import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
@@ -18,7 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 自由学习节点
@@ -29,15 +31,6 @@ import java.util.*;
 @Slf4j
 @Service(value = "freeFlowService")
 public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, StudyFlowNew> implements StudyFlowService {
-    /**
-     * 进入流程 1 标识
-     */
-    private static final int TO_FLOW_ONE = -3;
-
-    /**
-     * 进入流程 2 标识
-     */
-    private static final int TO_FLOW_TWO = -1;
 
     /**
      * 流程名称与 studentStudyPlanNew 中type值的映射
@@ -55,9 +48,6 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
 
     @Resource
     private UnitNewMapper unitNewMapper;
-
-    @Resource
-    private OpenUnitLogMapper openUnitLogMapper;
 
     @Resource
     private CcieMapper ccieMapper;
@@ -110,7 +100,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
                 if (studyFlowNew != null) {
                     return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew, unitId));
                 }
-                return this.getFlowVOServerResponse(unitId, easyOrHard, modelType, studentId);
+                return this.getFlowVoServerResponse(unitId, easyOrHard, modelType, studentId);
             }
 
             UnitNew unitNew = unitNewMapper.selectById(unitId);
@@ -122,9 +112,8 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
                     .updateTime(new Date())
                     .courseId(unitNew.getCourseId())
                     .build());
-            return this.getFlowVOServerResponse(unitId, easyOrHard, modelType, studentId);
+            return this.getFlowVoServerResponse(unitId, easyOrHard, modelType, studentId);
         }
-
 
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(dto.getNodeId());
 
@@ -140,37 +129,25 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         dto.setSession(session);
         dto.setStudent(student);
 
-        if (studyFlowNew != null) {
-            // 学习下一单元, 前端需要一个弹框提示
-            if (studyFlowNew.getNextTrueFlow() == 0) {
-                // 开启下一单元并且返回需要学习的流程信息
-                this.saveOpenUnitLog(student, unitId);
-                // 保存证书
-                this.judgeCourseCcie(dto);
-                return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
-            } else if (Objects.equals(TO_FLOW_TWO, studyFlowNew.getNextTrueFlow())) {
-                // 进入流程2
-                return toAnotherFlow(dto, 24);
-            } else if (Objects.equals(TO_FLOW_ONE, studyFlowNew.getNextTrueFlow())) {
-                // 进入流程1
-                // 判断当前单元流程1学习次数，如果没有学习，初始化同一单元的流程1；如果已学习初始化下一单元的流程1
-                return toFlowOne(dto);
-            } else if (Objects.equals(-2, studyFlowNew.getNextTrueFlow())) {
-                // 继续上次流程
-                StudyFlowNew lastStudyFlow = studyFlowNewMapper.selectStudentCurrentFlow(dto);
-                return ServerResponse.createBySuccess("true", lastStudyFlow);
-            } else {
-                // 其余正常流程
-                if (studyFlowNew.getNextFalseFlow() == null) {
-                    // 直接进入下个流程节点
-                    return this.toAnotherFlow(dto, studyFlowNew.getNextTrueFlow());
-                } else {
-                    // 判断下个节点
-                    return flowCommonMethod.judgeNextNode(dto, this);
-                }
-            }
+        if (studyFlowNew == null) {
+            return null;
         }
-        return null;
+
+        // 学习下一单元, 前端需要一个弹框提示
+        if (studyFlowNew.getNextTrueFlow() == 0) {
+            // 开启下一单元并且返回需要学习的流程信息
+            flowCommonMethod.saveOpenUnitLog(student, unitId);
+            // 保存证书
+            this.judgeCourseCcie(dto);
+            return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
+        }
+        // 其余正常流程
+        if (studyFlowNew.getNextFalseFlow() == null) {
+            // 直接进入下个流程节点
+            return this.toAnotherFlow(dto, studyFlowNew.getNextTrueFlow());
+        }
+        // 判断下个节点
+        return flowCommonMethod.judgeNextNode(dto, this);
     }
 
     private void judgeCourseCcie(NodeDto dto) {
@@ -190,23 +167,6 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     }
 
     /**
-     * 前往流程 1 的时候判断是当前单元的流程 1 还是下一单元的流程 1
-     *
-     * @param dto
-     * @return
-     */
-    private ServerResponse<Object> toFlowOne(NodeDto dto) {
-        int count = learnNewMapper.countByStudentIdAndFlow(dto.getStudent().getId(), dto.getUnitId(), FlowConstant.FLOW_ONE);
-        if (count == 0) {
-            return toAnotherFlow(dto, (int) FlowConstant.FREE_PLAYER);
-        }
-        this.saveOpenUnitLog(dto.getStudent(), dto.getUnitId());
-        // 保存证书
-        this.judgeCourseCcie(dto);
-        return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
-    }
-
-    /**
      * 进入其他流程
      *
      * @return
@@ -217,25 +177,19 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
 
         // 判断当前单元单词是否有图片，如果都没有图片不进入单词图鉴
         StudyFlowNew studyFlowNew = this.getStudyFlow(dto, flowId);
-        studentFlowNewMapper.updateFlowByStudentId(student.getId(), studyFlowNew.getId(), FLOW_NAME_TO_TYPE.get(studyFlowNew.getFlowName()));
+        studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(student.getId(), studyFlowNew.getId(),
+                dto.getUnitId(), FLOW_NAME_TO_TYPE.get(studyFlowNew.getFlowName()));
 
-        if (Objects.equals(TO_FLOW_ONE, studyFlowNew.getNextTrueFlow())) {
-            log.info("[{} -{} -{}] 前往流程 1.", student.getId(), student.getAccount(), student.getStudentName());
-            return toFlowOne(dto);
-        } else if (Objects.equals(TO_FLOW_TWO, studyFlowNew.getNextTrueFlow())) {
-            log.info("[{} -{} -{}] 前往流程 2.", student.getId(), student.getAccount(), student.getStudentName());
-            return toAnotherFlow(dto, (int) FlowConstant.FREE_WORD_LISTEN);
-        }
-
-        return ServerResponse.createBySuccess("true", this.packageFlowVO(studyFlowNew, dto.getUnitId()));
+        FlowVO flowVo = this.packageFlowVO(studyFlowNew, dto.getUnitId());
+        return ServerResponse.createBySuccess("true", flowVo);
     }
 
-    public ServerResponse<Object> getFlowVOServerResponse(Long unitId, Integer easyOrHard, Integer type, Long studentId) {
-        StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitIdAndType(studentId, unitId, type);
-        Long startFlowId = this.getStartFlowId(easyOrHard, type);
+    public ServerResponse<Object> getFlowVoServerResponse(Long unitId, Integer easyOrHard, Integer modelType, Long studentId) {
+        StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitIdAndType(studentId, unitId, modelType);
+        Long startFlowId = this.getStartFlowId(easyOrHard, modelType);
         if (studentFlowNew == null) {
             studentFlowNewMapper.insert(StudentFlowNew.builder()
-                    .type(type)
+                    .type(modelType)
                     .updateTime(new Date())
                     .studentId(studentId)
                     .unitId(unitId)
@@ -312,46 +266,21 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlowNew().getType()) {
                 // 去流程 2 的慧听写
                 flowId1 = 18;
-                this.changeFlowNodeLog(student, "慧听写", unitNew, flowId1);
+                flowCommonMethod.changeFlowNodeLog(student, "慧听写", unitNew, flowId1);
                 return studyFlowNewMapper.selectById(flowId1);
             }
             // 如果是从单词播放机直接进入单词图鉴，将流程跳转到慧记忆
             if (Objects.equals(dto.getNodeId(), 22L)) {
                 flowId1 = 48;
-                this.changeFlowNodeLog(student, "慧记忆", unitNew, flowId1);
+                flowCommonMethod.changeFlowNodeLog(student, "慧记忆", unitNew, flowId1);
                 return studyFlowNewMapper.selectById(flowId1);
             }
             // 返回流程 1
             flowId1 = 9;
-            this.changeFlowNodeLog(student, "单词播放机", unitNew, flowId1);
+            flowCommonMethod.changeFlowNodeLog(student, "单词播放机", unitNew, flowId1);
             return studyFlowNewMapper.selectById(flowId1);
         }
 
         return byPrimaryKey;
     }
-
-    /**
-     * 当需要调过单词图鉴节点的时候记录日志
-     *
-     * @param student
-     * @param model   学习模块
-     */
-    private void changeFlowNodeLog(Student student, String model, UnitNew unit, int flowId) {
-        log.info("单元[{}]没有单词图片，学生[{} - {} - {}]进入{}流程，流程 id=[{}]",
-                unit.getJointName(), student.getId(), student.getAccount(), student.getStudentName(), model, flowId);
-    }
-
-    private void saveOpenUnitLog(Student student, Long unitId) {
-        // 保存开启单元日志记录
-        OpenUnitLog openUnitLog = new OpenUnitLog();
-        openUnitLog.setCreateTime(new Date());
-        openUnitLog.setCurrentUnitId(unitId);
-        openUnitLog.setStudentId(student.getId());
-        try {
-            openUnitLogMapper.insert(openUnitLog);
-        } catch (Exception e) {
-            log.error("学生 {}-{} 保存开启单元日志出错；当前单元 {}，下一单元 {}", student.getId(), student.getStudentName(), unitId, e);
-        }
-    }
-
 }

@@ -1,30 +1,29 @@
 package com.zhidejiaoyu.student.business.flow;
 
-import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.mapper.CourseNewMapper;
-import com.zhidejiaoyu.common.mapper.LearnExtendMapper;
+import com.zhidejiaoyu.common.mapper.OpenUnitLogMapper;
 import com.zhidejiaoyu.common.mapper.StudyFlowNewMapper;
 import com.zhidejiaoyu.common.mapper.UnitNewMapper;
-import com.zhidejiaoyu.common.pojo.CourseNew;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.StudyFlowNew;
-import com.zhidejiaoyu.common.pojo.UnitNew;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.TokenUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
 import com.zhidejiaoyu.student.business.flow.service.StudyFlowService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.Objects;
 
 /**
  * @author: wuchenxi
  * @date: 2019/12/28 10:16:16
  */
+@Slf4j
 @Component
 public class FlowCommonMethod {
 
@@ -36,6 +35,9 @@ public class FlowCommonMethod {
 
     @Resource
     private CourseNewMapper courseNewMapper;
+
+    @Resource
+    private OpenUnitLogMapper openUnitLogMapper;
 
     public ServerResponse<Object> judgeNextNode(NodeDto dto, StudyFlowService studyFlowService) {
         String isTrueFlow = dto.getTrueFlow();
@@ -123,4 +125,35 @@ public class FlowCommonMethod {
                 .token(token)
                 .build();
     }
+
+    /**
+     * 保存单元开启日志
+     *
+     * @param student
+     * @param unitId
+     */
+    public void saveOpenUnitLog(Student student, Long unitId) {
+        // 保存开启单元日志记录
+        OpenUnitLog openUnitLog = new OpenUnitLog();
+        openUnitLog.setCreateTime(new Date());
+        openUnitLog.setCurrentUnitId(unitId);
+        openUnitLog.setStudentId(student.getId());
+        try {
+            openUnitLogMapper.insert(openUnitLog);
+        } catch (Exception e) {
+            log.error("学生 {}-{} 保存开启单元日志出错；当前单元 {}，下一单元 {}", student.getId(), student.getStudentName(), unitId, e);
+        }
+    }
+
+    /**
+     * 当需要调过单词图鉴节点的时候记录日志
+     *
+     * @param student
+     * @param model   学习模块
+     */
+    public void changeFlowNodeLog(Student student, String model, UnitNew unit, int flowId) {
+        log.info("单元[{}]没有单词图片，学生[{} - {} - {}]进入{}流程，流程 id=[{}]",
+                unit.getJointName(), student.getId(), student.getAccount(), student.getStudentName(), model, flowId);
+    }
+
 }
