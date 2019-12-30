@@ -19,6 +19,7 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.constant.PetMP3Constant;
 import com.zhidejiaoyu.common.dto.WordUnitTestDTO;
+import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveTeksData;
 import com.zhidejiaoyu.student.business.service.TeksService;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -102,6 +104,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private BaiduSpeak baiduSpeak;
     @Autowired
     private CommonMethod commonMethod;
+    @Autowired
+    private TeksNewMapper teksNewMapper;
 
     @Autowired
     private TestRecordMapper testRecordMapper;
@@ -129,6 +133,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
 
     @Autowired
     private TeksUnitMapper teksUnitMapper;
+    @Resource
+    private SaveTeksData saveTeksData;
 
 
     @Override
@@ -741,6 +747,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     public ServerResponse<Object> addData(TestRecord testRecord, HttpSession session) {
         //学生对象
         Student student = super.getStudent(session);
+        saveTeksData.insertLearnExtend(testRecord.getFlowId(),testRecord.getUnitId(),student);
         final String model = "课文默写测试";
         //测试开始时间
         //测试结束时间
@@ -1007,10 +1014,15 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     public ServerResponse<Object> getTeksTest(HttpSession session, Integer unitId) {
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         //获取单元中的课文语句
-        List<Teks> teks = teksMapper.selTeksByUnitId(unitId);
+        List<TeksNew> teks = teksNewMapper.getTwentyTeks();
+        return getTeks(teks);
+    }
+
+    @Override
+    public ServerResponse<Object> getTeks(List<TeksNew> teks) {
         //第一步去除课文中只有一句话的句子
-        List<Teks> useTeks = new ArrayList<>();
-        for (Teks teks1 : teks) {
+        List<TeksNew> useTeks = new ArrayList<>();
+        for (TeksNew teks1 : teks) {
             String sentence = teks1.getSentence();
             String[] s = sentence.split(" ");
             boolean isTrue = true;
@@ -1031,10 +1043,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             }
         }
         //附加项选择
-        List<Teks> addTeks = null;
+        List<TeksNew> addTeks = null;
         //根据清楚后的语句小于4句时添加
         if (useTeks.size() < 4) {
-            addTeks = teksMapper.getTwentyTeks();
+            addTeks = teksNewMapper.getTwentyTeks();
         }
         return getReturnTestTeks(useTeks, addTeks);
     }
@@ -1092,17 +1104,18 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
 
-    private ServerResponse<Object> getReturnTestTeks(List<Teks> teks, List<Teks> addTeks) {
+    @Override
+    public ServerResponse<Object> getReturnTestTeks(List<TeksNew> teks, List<TeksNew> addTeks) {
         List<Map<String, Object>> returnList = new ArrayList<>();
         List<Map<String, Object>> choseFour = new ArrayList<>();
         List<Map<String, Object>> hearingList = new ArrayList<>();
-        List<Teks> optionList = new ArrayList<>(teks);
+        List<TeksNew> optionList = new ArrayList<>(teks);
         //去除附加选项中与原课文语句相同的语句
         if (addTeks != null && addTeks.size() > 0) {
-            for (Teks teks1 : addTeks) {
+            for (TeksNew teks1 : addTeks) {
                 boolean isAdd = true;
 
-                for (Teks teks2 : optionList) {
+                for (TeksNew teks2 : optionList) {
                     if (teks2.getSentence().equals(teks1.getSentence())) {
                         isAdd = false;
                     }
@@ -1128,17 +1141,17 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 int i = teks.size() % 5;
                 if (i != 4) {
                     //获取四选四习题
-                    List<Teks> fourOption = teks.subList(0, fourLength * 4);
+                    List<TeksNew> fourOption = teks.subList(0, fourLength * 4);
                     fourChooseFour(fourOption, choseFour);
                     //获取听力习题
-                    List<Teks> hearOption = teks.subList(fourLength * 4, teks.size());
+                    List<TeksNew> hearOption = teks.subList(fourLength * 4, teks.size());
                     hearing(hearOption, hearingList, optionList);
                 } else {
                     //获取四选四习题
-                    List<Teks> fourOption = teks.subList(0, (fourLength + 1) * 4);
+                    List<TeksNew> fourOption = teks.subList(0, (fourLength + 1) * 4);
                     fourChooseFour(fourOption, choseFour);
                     //获取听力习题
-                    List<Teks> hearOption = teks.subList((fourLength + 1) * 4, teks.size());
+                    List<TeksNew> hearOption = teks.subList((fourLength + 1) * 4, teks.size());
                     hearing(hearOption, hearingList, optionList);
                 }
                 //排列习题的顺序
@@ -1169,11 +1182,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
     //四选四题目获取
-    private void fourChooseFour(List<Teks> optionList, List<Map<String, Object>> choseFour) {
+    private void fourChooseFour(List<TeksNew> optionList, List<Map<String, Object>> choseFour) {
         for (int i = 0; i < optionList.size(); i += 4) {
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("type", "fourChoseFour");
-            List<Teks> teks = optionList.subList(i, i + 4);
+            List<TeksNew> teks = optionList.subList(i, i + 4);
             List<Object> objects = new ArrayList<>();
             List<Map<String, Object>> answers = new ArrayList<>();
             List<String> returnAnswers = new ArrayList<>();
@@ -1189,7 +1202,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
     //四选四题目挖空并储存选项和答案
-    private void answersFour(Teks teks, List<Object> senOption, List<Map<String, Object>> answers, Integer
+    private void answersFour(TeksNew teks, List<Object> senOption, List<Map<String, Object>> answers, Integer
             index, List<String> returnAnswers) {
         String sentence = teks.getSentence();
         Integer teksId = teks.getId();
@@ -1232,11 +1245,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
     //获取听力题
-    private void hearing(List<Teks> hearingList, List<Map<String, Object>> returnList, List<Teks> optionList) {
+    private void hearing(List<TeksNew> hearingList, List<Map<String, Object>> returnList, List<TeksNew> optionList) {
         for (int i = 0; i < hearingList.size(); i++) {
             Collections.shuffle(optionList);
-            List<Teks> list = new ArrayList<>();
-            for (Teks teks : optionList) {
+            List<TeksNew> list = new ArrayList<>();
+            for (TeksNew teks : optionList) {
                 if (!teks.getSentence().trim().equals(hearingList.get(i).getSentence().trim())) {
                     list.add(teks);
                 }
@@ -1248,12 +1261,12 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             returnMap.put("pronunciation", baiduSpeak.getSentencePath(hearingList.get(i).getSentence().replace("#", " ").replace("$", "")));
             returnMap.put("english", hearingList.get(i).getSentence().replace("#", " ").replace("$", ""));
             returnMap.put("type", "HanElectBritish");
-            HanElectBritish(hearingList.get(i), new ArrayList<Teks>(list.subList(0, 3)), returnMap);
+            HanElectBritish(hearingList.get(i), new ArrayList<TeksNew>(list.subList(0, 3)), returnMap);
             returnList.add(returnMap);
         }
     }
 
-    private void HanElectBritish(Teks teks, List<Teks> optionList, Map<String, Object> returnMap) {
+    private void HanElectBritish(TeksNew teks, List<TeksNew> optionList, Map<String, Object> returnMap) {
         List<String> option = new ArrayList<>();
         option.add(teks.getSentence().replace("#", " ").replace("$", ""));
         for (int i = 0; i < 3; i++) {

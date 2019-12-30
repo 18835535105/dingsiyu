@@ -69,4 +69,9 @@ public class WordUnitTestDTO {
      * 正确题数量(用于例句单元闯关测试)
      */
     private Integer rightCount;
+
+    /**
+     * 流程id
+     */
+    private Long flowId;
 }

@@ -27,5 +27,8 @@
         from teks_new teks
         join unit_teks_new
     </select>
+    <select id="getTwentyTeks" resultMap="BaseResultMap" parameterType="map">
+        select <include refid="base_sql"></include> from teks t order by rand() limit 20
+    </select>
 
 </mapper>

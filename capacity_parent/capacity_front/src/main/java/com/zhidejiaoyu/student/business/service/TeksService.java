@@ -75,4 +75,6 @@ public interface TeksService extends BaseService<Teks> {
 
     void getList(String[] split, Map<String, Object> map);
     void getListTeks(List<Object> resultTeks, TeksNew teks);
+    ServerResponse<Object> getReturnTestTeks(List<TeksNew> teks, List<TeksNew> addTeks);
+    ServerResponse<Object> getTeks(List<TeksNew> teks);
 }

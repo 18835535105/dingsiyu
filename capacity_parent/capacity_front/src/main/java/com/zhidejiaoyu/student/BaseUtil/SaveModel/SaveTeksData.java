@@ -1,13 +1,7 @@
 package com.zhidejiaoyu.student.BaseUtil.SaveModel;
 
-import com.zhidejiaoyu.common.mapper.LearnExtendMapper;
-import com.zhidejiaoyu.common.mapper.LearnNewMapper;
-import com.zhidejiaoyu.common.mapper.TeksNewMapper;
-import com.zhidejiaoyu.common.mapper.TestRecordMapper;
-import com.zhidejiaoyu.common.pojo.LearnNew;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.Teks;
-import com.zhidejiaoyu.common.pojo.TeksNew;
+import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.TeksService;
@@ -17,10 +11,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -38,6 +29,10 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private TeksService teksService;
     @Resource
     private TestRecordMapper testRecordMapper;
+    @Resource
+    private SaveData saveData;
+    @Resource
+    private TeacherMapper teacherMapper;
 
     public Object getSudyModel(HttpSession session, Long unitId,
                                Student student, Long studentId,
@@ -55,8 +50,15 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             return getTeksAuditionData(unitId, learnNews.getGroup());
         } else if (type.equals(12)) {
             return getTextTraining(unitId, learnNews.getGroup(), studentId);
+        } else if (type.equals(13)) {
+            return breakThroughTheText(unitId, learnNews.getGroup());
         }
         return null;
+    }
+
+    private Object breakThroughTheText(Long unitId, Integer group) {
+        List<TeksNew> teks = teksNewMapper.selTeksByUnitIdAndGroup(unitId, group);
+        return teksService.getTeks(teks);
     }
 
     private Object getTextTraining(Long unitId, Integer group, Long studentId) {
@@ -128,5 +130,25 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             return ServerResponse.createBySuccess(resultTeks);
         }
         return null;
+    }
+
+    public void insertLearnExtend(Long flowId, Long unitId, Student student) {
+        StudyFlowNew flow = saveData.getCurrentStudyFlowById(flowId);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, 1);
+        LearnExtend learnExtend = new LearnExtend();
+        learnExtend.setStudyModel("闯关测试");
+        learnExtend.setLearnId(learnNew.getId());
+        learnExtend.setStudyCount(0);
+        learnExtend.setLearnTime(new Date());
+        learnExtend.setUpdateTime(new Date());
+        learnExtend.setFlowName(flow.getFlowName());
+        learnExtend.setSchoolAdminId(Long.parseLong(teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId()).toString()));
+        learnExtend.setFirstIsKnow(1);
+        learnExtendMapper.insert(learnExtend);
+    }
+
+    public void saveStudy(HttpSession session, Long unitId, Long flowId) {
+        Student student = getStudent(session);
+        insertLearnExtend(unitId,flowId,student);
     }
 }

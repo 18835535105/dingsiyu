@@ -206,7 +206,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     }
 
 
-    protected StudyFlowNew getCurrentStudyFlowById(Long flowId) {
+    public StudyFlowNew getCurrentStudyFlowById(Long flowId) {
         return studyFlowNewMapper.selectById(flowId);
     }
 
@@ -315,22 +315,27 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         int size = letterList.size() / 2;
         Map<Integer, Integer> map = new HashMap<>();
         while (map.size() < size) {
-            int i = random.nextInt(letterList.size());
-            map.put(i, i);
+            int i = random.nextInt(letterList.size()-1);
+            Integer integer = letterList.get(letterList.get(i));
+            map.put(integer, integer);
         }
         Set<Integer> integers = map.keySet();
         List<String> returnList = new ArrayList<>();
-        StringBuilder builder = new StringBuilder();
+        List<String> allList = new ArrayList<>();
+        // StringBuilder builder = new StringBuilder();
         for (int i = 0; i < strList.size(); i++) {
             if (integers.contains(i)) {
                 String letts = strList.get(i);
                 returnList.add(letts);
-                builder.append("$&$");
+                allList.add("$&$");
+                //builder.append("$&$");
             } else {
-                builder.append(strList.get(i));
+                allList.add(strList.get(i));
+                returnList.add(strList.get(i));
+                //builder.append(strList.get(i));
             }
         }
-        returnMap.put("getWord", builder.toString());
+        returnMap.put("getWord", allList);
         returnMap.put("successWords", returnList);
     }
 

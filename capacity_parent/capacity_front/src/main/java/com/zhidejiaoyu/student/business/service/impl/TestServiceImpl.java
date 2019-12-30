@@ -36,6 +36,8 @@ import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.vo.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
+import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveData;
+import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveTeksData;
 import com.zhidejiaoyu.student.business.service.TestService;
 import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
@@ -106,6 +108,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Autowired
     private CcieUtil ccieUtil;
 
+    @Resource
+    private SaveTeksData saveTeksData;
 
     @Autowired
     private TestRecordInfoMapper testRecordInfoMapper;
@@ -141,6 +145,10 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     private UnitNewMapper unitNewMapper;
     @Resource
     private LearnNewMapper learnNewMapper;
+    @Resource
+    private TeacherMapper teacherMapper;
+    @Resource
+    private LearnExtendMapper learnExtendMapper;
 
 
     /**
@@ -965,11 +973,11 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      * @return
      */
     @Override
-    public ServerResponse<Object> gitUnitSentenceTest(HttpSession session,Long unitId) {
+    public ServerResponse<Object> gitUnitSentenceTest(HttpSession session, Long unitId) {
         Student student = getStudent(session);
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, 1);
         //获取单元句子
-        List<Sentence> sentences = sentenceMapper.selectByUnitIdAndGroup(unitId,learnNew.getGroup());
+        List<Sentence> sentences = sentenceMapper.selectByUnitIdAndGroup(unitId, learnNew.getGroup());
         List<Sentence> sentenceList = null;
         //获取干扰项句子 在当前课程下选择
         if (sentences.size() < 4) {
@@ -1051,9 +1059,10 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @TestChangeAnnotation(isUnitTest = false)
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> saveCapTeksTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
+
         Student student = getStudent(session);
         TestRecord testRecord;
-
+        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student);
         wordUnitTestDTO.setClassify(9);
 
         // 判断当前单元是不是首次进行测试
@@ -1124,6 +1133,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
         return getObjectServerResponse(session, wordUnitTestDTO, student, testRecord);
     }
+
+
 
 
     private ServerResponse<Object> getObjectServerResponse(HttpSession session, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord) {
