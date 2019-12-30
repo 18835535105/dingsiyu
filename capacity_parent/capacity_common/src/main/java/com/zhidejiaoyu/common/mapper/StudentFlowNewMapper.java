@@ -29,9 +29,12 @@ public interface StudentFlowNewMapper extends BaseMapper<StudentFlowNew> {
      *
      * @param studentId
      * @param flowId
+     * @param unitId
+     * @param type
      */
-    @Update("update student_flow set current_flow_id = #{flowId} where student_id = #{studentId} and type = #{type}")
-    void updateFlowByStudentId(@Param("studentId") Long studentId, @Param("flowId") Long flowId, @Param("type") Integer type);
+    @Update("update student_flow_new set current_flow_id = #{flowId} where student_id = #{studentId} and unit_id = #{unitId} and type = #{type}")
+    void updateFlowIdByStudentIdAndUnitIdAndType(@Param("studentId") Long studentId, @Param("flowId") Long flowId,
+                                                 @Param("unitId") Long unitId, @Param("type") Integer type);
 
 
     StudentFlowNew selectByStudentIdAndUnitIdAndType(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
