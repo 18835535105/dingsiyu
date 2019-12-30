@@ -113,9 +113,6 @@ public class FlowCommonMethod {
         String token = TokenUtil.getToken();
         HttpUtil.getHttpSession().setAttribute("token", token);
 
-        Student student = (Student) HttpUtil.getHttpSession().getAttribute(UserConstant.CURRENT_STUDENT);
-//        LearnExtendMapper.del
-
         return FlowVO.builder()
                 .courseId(courseNew.getId())
                 .courseName(courseNew.getCourseName())

@@ -74,6 +74,9 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     @Resource
     private FlowCommonMethod flowCommonMethod;
 
+    @Resource
+    private LearnExtendMapper learnExtendMapper;
+
     static {
         FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_ONE, 2);
         FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_TWO, 2);
@@ -124,6 +127,14 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
 
 
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(dto.getNodeId());
+
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(dto.getStudent().getId(), dto.getUnitId(), dto.getEasyOrHard());
+
+        if (learnNew != null) {
+            // 如果学生有当前单元的学习记录，删除其学习详情，防止学生重新学习该单元时获取不到题目
+            learnExtendMapper.deleteByUnitIdAndStudyModel(learnNew.getId(), studyFlowNew.getModelName());
+            dto.setGroup(learnNew.getGroup());
+        }
 
         dto.setStudyFlowNew(studyFlowNew);
         dto.setSession(session);
