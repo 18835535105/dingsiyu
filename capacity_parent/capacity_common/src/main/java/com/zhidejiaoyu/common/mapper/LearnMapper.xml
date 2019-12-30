@@ -988,17 +988,12 @@
     </select>
     <select id="selectLearnedByUnitId" resultType="java.util.Map" parameterType="map">
         select v.word, uv.word_chinese wordChinese, v.id
-        from learn_extend l,
-             vocabulary v,
+        from vocabulary v,
              unit_vocabulary_new uv
-        where l.unit_id = #{unitId}
-          and l.student_id = #{studentId}
-          and l.vocabulary_id = v.id
-          and uv.vocabulary_id = v.id
+        where uv.vocabulary_id = v.id
           and uv.unit_id = #{unitId}
         group by v.id
-        limit #{beginRow}
-            , #{pageSize}
+        limit #{beginRow}, #{pageSize}
     </select>
     <update id="updLearnByUnitIdAndStudyModelAndStudentId" parameterType="map">
         update learn

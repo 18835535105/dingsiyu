@@ -98,9 +98,9 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             if (learnNew != null) {
                 StudyFlowNew studyFlowNew = studyFlowNewMapper.selectByStudentIdAndUnitIdAndType(studentId, unitId, modelType);
                 if (studyFlowNew != null) {
-                    return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew, unitId));
+                    return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew, student, unitId));
                 }
-                return this.getFlowVoServerResponse(unitId, easyOrHard, modelType, studentId);
+                return this.getFlowVoServerResponse(unitId, easyOrHard, modelType, student);
             }
 
             UnitNew unitNew = unitNewMapper.selectById(unitId);
@@ -112,7 +112,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
                     .updateTime(new Date())
                     .courseId(unitNew.getCourseId())
                     .build());
-            return this.getFlowVoServerResponse(unitId, easyOrHard, modelType, studentId);
+            return this.getFlowVoServerResponse(unitId, easyOrHard, modelType, student);
         }
 
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(dto.getNodeId());
@@ -180,11 +180,12 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(student.getId(), studyFlowNew.getId(),
                 dto.getUnitId(), FLOW_NAME_TO_TYPE.get(studyFlowNew.getFlowName()));
 
-        FlowVO flowVo = this.packageFlowVO(studyFlowNew, dto.getUnitId());
+        FlowVO flowVo = this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
         return ServerResponse.createBySuccess("true", flowVo);
     }
 
-    public ServerResponse<Object> getFlowVoServerResponse(Long unitId, Integer easyOrHard, Integer modelType, Long studentId) {
+    public ServerResponse<Object> getFlowVoServerResponse(Long unitId, Integer easyOrHard, Integer modelType, Student student) {
+        Long studentId = student.getId();
         StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitIdAndType(studentId, unitId, modelType);
         Long startFlowId = this.getStartFlowId(easyOrHard, modelType);
         if (studentFlowNew == null) {
@@ -202,7 +203,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             studentFlowNewMapper.updateById(studentFlowNew);
         }
         StudyFlowNew studyFlowNew1 = studyFlowNewMapper.selectById(startFlowId);
-        return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew1, unitId));
+        return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew1, student, unitId));
     }
 
     /**
@@ -225,8 +226,8 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         }
     }
 
-    public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Long unitId) {
-        return flowCommonMethod.packageFlowVO(studyFlowNew, unitId);
+    public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Student student, Long unitId) {
+        return flowCommonMethod.packageFlowVO(studyFlowNew, student, unitId);
     }
 
     /**

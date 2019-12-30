@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
 import com.zhidejiaoyu.student.business.flow.service.StudyFlowService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -106,10 +107,11 @@ public class FlowCommonMethod {
      * 封装响应信息
      *
      * @param studyFlowNew
+     * @param student
      * @param unitId
      * @return
      */
-    public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Long unitId) {
+    public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Student student, Long unitId) {
         UnitNew unitNew = unitNewMapper.selectById(unitId);
         CourseNew courseNew = courseNewMapper.selectById(unitNew.getCourseId());
         String token = TokenUtil.getToken();
@@ -123,6 +125,7 @@ public class FlowCommonMethod {
                 .unitId(unitNew.getId())
                 .unitName(unitNew.getUnitName())
                 .token(token)
+                .petName(StringUtils.isEmpty(student.getPetName()) ? "大明白" : student.getPetName())
                 .build();
     }
 

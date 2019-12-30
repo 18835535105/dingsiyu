@@ -37,15 +37,13 @@
 
 
     <select id="selectByUnitIdAndStudentIdAndType" parameterType="map" resultType="long">
-        select
-        distinct word_id
+        select distinct word_id
         from learn_extend extend
-        join learn_new learn on extend.learn_id=learn.id
+                 join learn_new learn on extend.learn_id = learn.id
 
-        where
-        learn.student_id =#{studentId}
-        and learn.unit_id=#{unitId}
-        and extend.study_model=#{type}
+        where learn.student_id = #{studentId}
+          and learn.unit_id = #{unitId}
+          and extend.study_model = #{type}
     </select>
 
     <select id="selectByLearnIdsAndWordIdAndStudyModel" parameterType="map" resultMap="BaseResultMap">
@@ -60,29 +58,24 @@
     <select id="countLearnWord" resultType="int" parameterType="map">
         select count(distinct extend.word_id)
         from learn_extend extend
-        join learn_new ln
-        on extend.learn_id=ln.id
-        join unit_vocabulary_new unit
-        on unit.unit_id= ln.unit_id
-        where extend.learn_id =#{learnId}
-        and unit.unit_id=#{unitId}
-        and unit.group=#{group}
-        and extend.study_model=#{studyModel}
+                 join learn_new ln
+                      on extend.learn_id = ln.id
+                 join unit_vocabulary_new unit
+                      on unit.unit_id = ln.unit_id
+        where extend.learn_id = #{learnId}
+          and unit.unit_id = #{unitId}
+          and unit.group = #{group}
+          and extend.study_model = #{studyModel}
     </select>
 
     <select id="selectLearnedByUnitId" parameterType="map" resultType="map">
-         select v.word, uv.word_chinese wordChinese, v.id
-        from learn_extend l,
-             vocabulary v,
+        select v.word, uv.word_chinese wordChinese, v.id
+        from vocabulary v,
              unit_vocabulary_new uv
-        where l.unit_id = #{unitId}
-          and l.student_id = #{studentId}
-          and l.vocabulary_id = v.id
-          and uv.vocabulary_id = v.id
+        where uv.vocabulary_id = v.id
           and uv.unit_id = #{unitId}
         group by v.id
-        limit #{start}
-            , #{end}
+        limit #{start}, #{end}
     </select>
 
 

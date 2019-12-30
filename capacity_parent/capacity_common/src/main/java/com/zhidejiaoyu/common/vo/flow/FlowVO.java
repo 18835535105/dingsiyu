@@ -34,5 +34,10 @@ public class FlowVO implements Serializable {
      */
     private Long id;
 
+    /**
+     * 宠物名称
+     */
+    private String petName;
+
     private String token;
 }
