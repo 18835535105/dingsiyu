@@ -20,15 +20,19 @@
         teks.id,teks.sentence,teks.speaker,teks.paraphrase,teks.pronunciation,teks.update_time
     </sql>
 
-
     <select id="selTeksByUnitIdAndGroup" resultMap="BaseResultMap" parameterType="map">
         select
-        <include refid="teks_base_sql"></include>
+        <include refid="teks_base_sql"/>
         from teks_new teks
-        join unit_teks_new
+        join unit_teks_new u
+        where teks.id = u.teks_id
+        and u.unit_id = #{unitId}
+        and u.group = #{group}
     </select>
     <select id="getTwentyTeks" resultMap="BaseResultMap" parameterType="map">
-        select <include refid="base_sql"></include> from teks t order by rand() limit 20
+        select
+        <include refid="base_sql"/>
+        from teks t order by rand() limit 20
     </select>
 
 </mapper>
