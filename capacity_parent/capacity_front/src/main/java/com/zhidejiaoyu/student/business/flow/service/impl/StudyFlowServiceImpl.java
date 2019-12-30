@@ -108,7 +108,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             throw new ServiceException("未查询到流程信息！");
         }
 
-        int easyOrHard = studyFlowNew.getModelName().contains("写") ? 2 : 1;
+        String modelName = studyFlowNew.getModelName();
+        int easyOrHard = modelName.contains("写") || Objects.equals(modelName, "课文训练") ? 2 : 1;
         dto.setEasyOrHard(easyOrHard);
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), dto.getUnitId(), dto.getEasyOrHard());
 
