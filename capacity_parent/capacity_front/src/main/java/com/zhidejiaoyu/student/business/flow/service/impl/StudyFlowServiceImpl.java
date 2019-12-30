@@ -106,8 +106,14 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         }
 
         int easyOrHard = studyFlowNew.getModelName().contains("写") ? 2 : 1;
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), dto.getUnitId(), easyOrHard);
-        dto.setGroup(learnNew == null ? 1 : learnNew.getGroup());
+        dto.setEasyOrHard(easyOrHard);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(dto.getStudent().getId(), dto.getUnitId(), dto.getEasyOrHard());
+
+        if (learnNew != null) {
+            // 如果学生有当前单元的学习记录，删除其学习详情，防止学生重新学习该单元时获取不到题目
+            learnExtendMapper.deleteByLearnId(learnNew.getId());
+            dto.setGroup(learnNew.getGroup());
+        }
         dto.setStudyFlowNew(studyFlowNew);
         dto.setSession(session);
         dto.setStudent(student);
@@ -140,7 +146,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Long unitId) {
         return flowCommonMethod.packageFlowVO(studyFlowNew, unitId);
     }
-
 
 
     /**
@@ -260,7 +265,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         LearnNew learnNew = learnNewMapper.selectByStudentStudyPlanNew(studentStudyPlanNew);
         if (learnNew != null) {
             Long learnNewId = learnNew.getId();
-            learnExtendMapper.deleteByLearnId(learnNewId);
             learnNewMapper.deleteById(learnNewId);
         }
         // 判断单词模块是否有下个group
