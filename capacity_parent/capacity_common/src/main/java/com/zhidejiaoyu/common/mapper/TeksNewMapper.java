@@ -2,6 +2,9 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.TeksNew;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
  */
 public interface TeksNewMapper extends BaseMapper<TeksNew> {
 
+    List<TeksNew> selTeksByUnitId(@Param("unitId") Long unitId, @Param("group") Integer group);
 }

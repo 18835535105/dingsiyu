@@ -4,12 +4,28 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.TeksNew">
-        <id column="id" property="id" />
-        <result column="sentence" property="sentence" />
-        <result column="speaker" property="speaker" />
-        <result column="paraphrase" property="paraphrase" />
-        <result column="pronunciation" property="pronunciation" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="sentence" property="sentence"/>
+        <result column="speaker" property="speaker"/>
+        <result column="paraphrase" property="paraphrase"/>
+        <result column="pronunciation" property="pronunciation"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
+
+
+    <sql id="base_sql">
+        id,sentence,speaker,paraphrase,pronunciation,update_time
+    </sql>
+    <sql id="teks_base_sql">
+        teks.id,teks.sentence,teks.speaker,teks.paraphrase,teks.pronunciation,teks.update_time
+    </sql>
+
+
+    <select id="selTeksByUnitId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="teks_base_sql"></include>
+        from teks_new teks
+        join unit_teks_new
+    </select>
 
 </mapper>

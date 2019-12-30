@@ -305,7 +305,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             strList.add(ch + "");
         }
         for (String letter : strList) {
-            if (Pattern.matches(END_MATCH, letter)) {
+            if (Pattern.matches(END_MATCH, letter)&&!letter.equals(" ")) {
                 letterList.add(startI);
             }
             startI++;
