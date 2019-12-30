@@ -220,7 +220,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             case 3:
                 return Objects.equals(easyOrHard, 1) ? FlowConstant.FREE_SENTENCE_TRANSLATE : FlowConstant.FREE_SENTENCE_WRITE;
             case 4:
-                return FlowConstant.FREE_TEKS_LISTEN;
+                return Objects.equals(easyOrHard, 1) ? FlowConstant.FREE_TEKS_LISTEN : FlowConstant.free_teks_train;
             default:
                 return null;
         }
