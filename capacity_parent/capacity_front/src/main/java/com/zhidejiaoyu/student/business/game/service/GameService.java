@@ -31,9 +31,11 @@ public interface GameService extends BaseService<GameStore> {
      * 获取游戏《桌牌捕音》试题
      *
      * @param session
+     * @param courseId
+     * @param unitId
      * @return
      */
-    ServerResponse<List<GameTwoVo>> getGameTwo(HttpSession session);
+    ServerResponse<List<GameTwoVo>> getGameTwo(HttpSession session, Long courseId, Long unitId);
 
     /**
      * 保存《桌牌捕音》游戏数据

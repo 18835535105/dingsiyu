@@ -67,6 +67,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     @Resource
     private FlowCommonMethod flowCommonMethod;
 
+    @Resource
+    private SyntaxUnitTopicNewMapper syntaxUnitTopicNewMapper;
+
     /**
      * 节点学完, 把下一节初始化到student_flow表, 并把下一节点返回
      *
@@ -91,13 +94,13 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             if (studentFlowNew != null) {
                 StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(studentFlowNew.getCurrentFlowId());
 
-                return ServerResponse.createBySuccess(packageFlowVO(studyFlowNew, studentFlowNew.getUnitId()));
+                return ServerResponse.createBySuccess(packageFlowVO(studyFlowNew, student, studentFlowNew.getUnitId()));
             } else {
 
                 this.initStudentFlow(student, studentStudyPlanNew);
 
                 StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(studentStudyPlanNew.getFlowId());
-                return ServerResponse.createBySuccess(packageFlowVO(studyFlowNew, studentStudyPlanNew.getUnitId()));
+                return ServerResponse.createBySuccess(packageFlowVO(studyFlowNew, student, studentStudyPlanNew.getUnitId()));
             }
         }
 
@@ -108,7 +111,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             throw new ServiceException("未查询到流程信息！");
         }
 
-        int easyOrHard = studyFlowNew.getModelName().contains("写") ? 2 : 1;
+        String modelName = studyFlowNew.getModelName();
+        int easyOrHard = modelName.contains("写") || Objects.equals(modelName, "课文训练") ? 2 : 1;
         dto.setEasyOrHard(easyOrHard);
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), dto.getUnitId(), dto.getEasyOrHard());
 
@@ -146,8 +150,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
                 .build());
     }
 
-    public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Long unitId) {
-        return flowCommonMethod.packageFlowVO(studyFlowNew, unitId);
+    public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Student student, Long unitId) {
+        return flowCommonMethod.packageFlowVO(studyFlowNew, student, unitId);
     }
 
 
@@ -185,18 +189,19 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         // 单词模块
         Long unitId = dto.getUnitId();
         Integer group = dto.getGroup();
+        Student student = dto.getStudent();
         if (Objects.equals(flowName, FlowConstant.FLOW_ONE) || Objects.equals(flowName, FlowConstant.FLOW_TWO)) {
             Integer wordCount = unitVocabularyNewMapper.countUnitIdAndGroup(unitId, group);
             if (wordCount > 0) {
-                return this.packageFlowVO(studyFlowNew, dto.getUnitId());
+                return this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
             }
 
             if (this.judgeHasSentenceModel(studyFlowNew, dto)) {
-                return this.packageFlowVO(studyFlowNew, dto.getUnitId());
+                return this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
             }
 
             if (this.judgeHasTeksModel(studyFlowNew, dto)) {
-                return this.packageFlowVO(studyFlowNew, dto.getUnitId());
+                return this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
             }
 
         }
@@ -205,12 +210,12 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         if (Objects.equals(flowName, FlowConstant.FLOW_THREE) || Objects.equals(flowName, FlowConstant.FLOW_FOUR)) {
             Integer sentenceCount = unitSentenceNewMapper.countByUnitIdAndGroup(unitId, group);
             if (sentenceCount > 0) {
-                return this.packageFlowVO(studyFlowNew, dto.getUnitId());
+                return this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
             }
 
             // 没有句型模块判断是否有课文模块
             if (this.judgeHasTeksModel(studyFlowNew, dto)) {
-                return this.packageFlowVO(studyFlowNew, dto.getUnitId());
+                return this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
             }
         }
 
@@ -218,7 +223,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         if (Objects.equals(flowName, FlowConstant.FLOW_FIVE)) {
             Integer teksCount = unitTeksNewMapper.countByUnitIdAndGroup(unitId, group);
             if (teksCount > 0) {
-                return this.packageFlowVO(studyFlowNew, dto.getUnitId());
+                return this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
             }
         }
 
@@ -249,7 +254,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         Long nodeId = dto.getNodeId();
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(nodeId);
 
-        return this.packageFlowVO(studyFlowNew, dto.getUnitId());
+        return this.packageFlowVO(studyFlowNew, dto.getStudent(), dto.getUnitId());
     }
 
     /**
@@ -285,6 +290,13 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             this.saveLearnNew(dto, studentStudyPlanNew, group);
             return group;
         }
+
+        group = syntaxUnitTopicNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
+        if (group != null) {
+            this.saveLearnNew(dto, studentStudyPlanNew, group);
+            return group;
+        }
+
         return null;
     }
 
@@ -313,6 +325,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
 
         count = unitSentenceNewMapper.countByUnitIdAndGroup(unitId, group);
         this.saveOrUpdateLearnHistory(dto, studentStudyPlanNew, count, 2);
+
+        count = syntaxUnitTopicNewMapper.countByUnitAndGroup(unitId, group);
+        this.saveOrUpdateLearnHistory(dto, studentStudyPlanNew, count, 3);
 
         count = unitTeksNewMapper.countByUnitIdAndGroup(unitId, group);
         this.saveOrUpdateLearnHistory(dto, studentStudyPlanNew, count, 4);
@@ -351,12 +366,13 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
      * @return
      */
     private FlowVO finishUnit(NodeDto dto) {
-        Long studentId = dto.getStudent().getId();
+        Student student = dto.getStudent();
+        Long studentId = student.getId();
 
         // 更新优先级表中的变化优先级
         this.updateLevel(dto, studentId);
 
-        flowCommonMethod.saveOpenUnitLog(dto.getStudent(), dto.getUnitId());
+        flowCommonMethod.saveOpenUnitLog(student, dto.getUnitId());
 
         StudentStudyPlanNew maxStudentStudyPlanNew = this.initLearnInfo(dto, studentId);
 
@@ -366,7 +382,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         Long flowId = maxStudentStudyPlanNew.getFlowId();
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(flowId);
 
-        return packageFlowVO(studyFlowNew, maxStudentStudyPlanNew.getUnitId());
+        return packageFlowVO(studyFlowNew, student, maxStudentStudyPlanNew.getUnitId());
 
     }
 

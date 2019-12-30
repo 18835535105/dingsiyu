@@ -50,10 +50,24 @@ public interface FlowConstant {
     long FREE_SENTENCE_WRITE = 113;
 
     /**
-     * 课文试听
+     * 课文试听（简单）
      */
     long FREE_TEKS_LISTEN = 115;
 
+    /**
+     * 课文训练（难）
+     */
+    long FREE_TEKS_TRAIN = 116;
+
+    /**
+     * 语法游戏（简单）
+     */
+    long FREE_SYNTAX_GAME = 125;
+
+    /**
+     * 写语法（难）
+     */
+    long FREE_SYNTAX_WRITE = 128;
 
     String FLOW_ONE = "流程1";
     String FLOW_TWO = "流程2";

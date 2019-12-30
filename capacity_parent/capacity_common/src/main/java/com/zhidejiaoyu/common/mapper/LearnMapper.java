@@ -555,11 +555,10 @@ public interface LearnMapper extends BaseMapper<Learn> {
     /**
      * 查询学生当前单元已学信息
      *
-     * @param studentId
      * @param unitId
      * @return
      */
-    List<Map<String, Object>> selectLearnedByUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("beginRow") Integer beginRow, @Param("pageSize") Integer pageSize);
+    List<Map<String, Object>> selectLearnedByUnitId(@Param("unitId") Long unitId, @Param("beginRow") Integer beginRow, @Param("pageSize") Integer pageSize);
 
     /**
      * 修改单元下正在学习单词学习状态

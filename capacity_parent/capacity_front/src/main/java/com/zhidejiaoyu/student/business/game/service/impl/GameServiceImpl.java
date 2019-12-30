@@ -1,8 +1,6 @@
 package com.zhidejiaoyu.student.business.game.service.impl;
 
 import com.github.pagehelper.PageHelper;
-import com.zhidejiaoyu.common.vo.game.GameOneVo;
-import com.zhidejiaoyu.common.vo.game.GameTwoVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
@@ -11,10 +9,11 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.game.GameOneVo;
+import com.zhidejiaoyu.common.vo.game.GameTwoVo;
 import com.zhidejiaoyu.student.business.game.service.GameService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,29 +30,23 @@ import java.util.stream.Collectors;
 @Service
 public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore> implements GameService {
 
-    @Autowired
+    @Resource
     private GameStoreMapper gameStoreMapper;
 
-    @Autowired
+    @Resource
     private LearnMapper learnMapper;
 
-    @Autowired
+    @Resource
     private GameScoreMapper gameScoreMapper;
 
-    @Autowired
+    @Resource
     private StudentMapper studentMapper;
 
-    @Autowired
+    @Resource
     private VocabularyMapper vocabularyMapper;
 
-    @Autowired
-    private CapacityStudentUnitMapper capacityStudentUnitMapper;
-
-    @Autowired
-    private CourseMapper courseMapper;
-
-    @Autowired
-    private LearnNewMapper learnNewMapper;
+    @Resource
+    private CourseNewMapper courseNewMapper;
 
     @Resource
     private UnitNewMapper unitNewMapper;
@@ -61,16 +54,15 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
     @Resource
     private LearnExtendMapper learnExtendMapper;
 
-    @Autowired
+    @Resource
     private BaiduSpeak baiduSpeak;
 
     @Override
     public ServerResponse<GameOneVo> getGameOne(HttpSession session, Integer pageNum, List<String> wordList, Long unitId) {
-        Student student = getStudent(session);
         session.setAttribute(TimeConstant.GAME_BEGIN_START_TIME, new Date());
 
         // 从当前正在学习的课程已学习的单词中随机查找10个单词
-        List<Map<String, Object>> wordMap = this.getGameOneSubject(student, pageNum, wordList, unitId);
+        List<Map<String, Object>> wordMap = this.getGameOneSubject(pageNum, wordList, unitId);
 
         List<Map<String, Object>> subjects = new ArrayList<>(30);
 
@@ -95,10 +87,10 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         return ServerResponse.createBySuccess(gameOneVo);
     }
 
-    private List<Map<String, Object>> getGameOneSubject(Student student, Integer pageNum, List<String> wordList, Long unitId) {
+    private List<Map<String, Object>> getGameOneSubject(Integer pageNum, List<String> wordList, Long unitId) {
         int startRow = (pageNum - 1) * 10;
         // 从当前单元单词中随机获取10题
-        List<Map<String, Object>> unitLearns = learnExtendMapper.selectLearnedByUnitId(student.getId(), unitId, startRow, 10);
+        List<Map<String, Object>> unitLearns = learnExtendMapper.selectLearnedByUnitId(unitId, startRow, 10);
         UnitNew unitNew = unitNewMapper.selectById(unitId);
         if (unitLearns.size() < 10) {
             List<Map<String, Object>> ignoreList = new ArrayList<>(unitLearns);
@@ -119,16 +111,10 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
     }
 
     @Override
-    public ServerResponse<List<GameTwoVo>> getGameTwo(HttpSession session) {
-        Student student = getStudent(session);
+    public ServerResponse<List<GameTwoVo>> getGameTwo(HttpSession session, Long courseId, Long unitId) {
+        Student student = super.getStudent(session);
 
-        // 从当前课程随机取10个已学的单词
-        CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(student.getId(), 1);
-        if (capacityStudentUnit == null) {
-            log.warn("学生 [{} - {} - {}] 没有智能版课程，获取“桌牌捕音”游戏数据失败！", student.getId(), student.getAccount(), student.getStudentName());
-            return null;
-        }
-        List<Map<String, Object>> needReviewWords = this.getGameTwoSubject(student, capacityStudentUnit);
+        List<Map<String, Object>> needReviewWords = this.getGameTwoSubject(courseId, unitId);
         List<Long> wordIds = new ArrayList<>(10);
         List<Vocabulary> vocabularies = needReviewWords.stream().map(map -> {
             wordIds.add(Long.valueOf(map.get("id").toString()));
@@ -140,7 +126,7 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         }).collect(Collectors.toList());
 
         // 从学生当前正在学习的课程中随机获取110个单词
-        List<Map<String, String>> wordMapList = learnMapper.selectWordInCurrentCourse(capacityStudentUnit.getCourseId(), wordIds);
+        List<Map<String, String>> wordMapList = learnMapper.selectWordInCurrentCourse(courseId, wordIds);
         if (wordMapList.size() < 110) {
             // 如果当前课程下单词总数补足110个，从其他智能版课程随机再取剩余数量的单词
             List<Map<String, String>> otherWordList = learnMapper.selectWordRandomInCourse(student.getId(), 110 - wordMapList.size(), wordIds);
@@ -225,14 +211,13 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
     /**
      * 获取游戏题目
      *
-     * @param student
-     * @param capacityStudentUnit
+     * @param courseId
+     * @param unitId
      * @return
      */
-    private List<Map<String, Object>> getGameTwoSubject(Student student, CapacityStudentUnit capacityStudentUnit) {
-        Long courseId = capacityStudentUnit.getCourseId();
+    private List<Map<String, Object>> getGameTwoSubject(Long courseId, Long unitId) {
         // 从当前单元单词中随机获取10题
-        List<Map<String, Object>> unitLearns = learnMapper.selectLearnedByUnitId(student.getId(), capacityStudentUnit.getUnitId(), 0, 10);
+        List<Map<String, Object>> unitLearns = learnMapper.selectLearnedByUnitId(unitId, 0, 10);
         if (unitLearns.size() < 10) {
             List<Map<String, Object>> ignoreList = new ArrayList<>(unitLearns);
             PageHelper.startPage(1, 10 - unitLearns.size());
@@ -253,9 +238,9 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
             size = unitLearns.size() + vocabularies.size();
             if (size < 10) {
                 // 如果还补足 10 个，从同一学段中随机取余下单词
-                Course course = courseMapper.selectById(courseId);
+                CourseNew courseNew = courseNewMapper.selectById(courseId);
                 PageHelper.startPage(1, 10 - size);
-                vocabularies.addAll(vocabularyMapper.selectByPhaseNotInWord(course.getStudyParagraph(), ignoreList));
+                vocabularies.addAll(vocabularyMapper.selectByPhaseNotInWord(courseNew.getStudyParagraph(), ignoreList));
             }
         }
 

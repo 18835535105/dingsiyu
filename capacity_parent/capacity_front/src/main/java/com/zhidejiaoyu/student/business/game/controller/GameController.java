@@ -50,8 +50,8 @@ public class GameController extends BaseController {
      */
     @GetMapping("/getGameOne")
     public ServerResponse<GameOneVo> getGameOne(HttpSession session, @RequestParam(required = false, defaultValue = "1") Integer pageNum,
-                                                @RequestParam(required = false, name = "wordList[]") List<String> wordList,Long unitId) {
-        return gameService.getGameOne(session, pageNum, wordList,unitId);
+                                                @RequestParam(required = false, name = "wordList[]") List<String> wordList, Long unitId) {
+        return gameService.getGameOne(session, pageNum, wordList, unitId);
     }
 
     /**
@@ -59,12 +59,14 @@ public class GameController extends BaseController {
      * 随机取当前课程已学的10个单词，已学单词不足时可从当前课程取剩余的单词
      *
      * @param session
+     * @param courseId 课程id
+     * @param unitId   单元id
      * @return
      */
     @GetMapping("/getGameTwo")
-    public ServerResponse<List<GameTwoVo>> getGameTwo(HttpSession session) {
+    public ServerResponse<List<GameTwoVo>> getGameTwo(HttpSession session, Long courseId, Long unitId) {
         session.setAttribute(TimeConstant.GAME_BEGIN_START_TIME, new Date());
-        return gameService.getGameTwo(session);
+        return gameService.getGameTwo(session, courseId, unitId);
     }
 
     /**

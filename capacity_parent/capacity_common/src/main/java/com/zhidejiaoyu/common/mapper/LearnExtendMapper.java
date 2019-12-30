@@ -66,7 +66,7 @@ public interface LearnExtendMapper extends BaseMapper<LearnExtend> {
     Integer countLearnWord(@Param("learnId") Long learnId, @Param("unitId") Long unitId,
                            @Param("group") Integer group, @Param("studyModel") String studyModel);
 
-    List<Map<String, Object>> selectLearnedByUnitId(@Param("studentId") Long id, @Param("unitId") Long unitId,
+    List<Map<String, Object>> selectLearnedByUnitId(@Param("unitId") Long unitId,
                                                     @Param("start") int startRow, @Param("end") int end);
 
     /**
