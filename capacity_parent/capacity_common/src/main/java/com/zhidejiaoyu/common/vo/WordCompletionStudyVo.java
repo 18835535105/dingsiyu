@@ -31,6 +31,9 @@ public class WordCompletionStudyVo implements Serializable {
      */
     private String wordChinese;
 
+    /** 单词记忆难度 */
+    private Integer memoryDifficulty;
+
     /**
      * 单词音标
      */

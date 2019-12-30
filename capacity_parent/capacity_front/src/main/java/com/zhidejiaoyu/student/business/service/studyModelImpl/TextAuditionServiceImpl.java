@@ -7,10 +7,12 @@ import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveData;
 import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveTeksData;
 import com.zhidejiaoyu.student.business.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
+@Service(value = "textAuditionService")
 public class TextAuditionServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnNew> implements IStudyService {
     @Resource
     private SaveTeksData saveTeksData;

@@ -269,16 +269,17 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             WordWriteStudyVo wordWriteStudyVo = getWordWriteStudyVo(firstStudy, vocabulary, wordChinese, plan.longValue(), wordCount.longValue());
             return ServerResponse.createBySuccess(wordWriteStudyVo);
         } else if (type.equals(6)) {
-            WordCompletionStudyVo wordCompletionStudyVo = getWordCompletionStudyVo(firstStudy, vocabulary, wordChinese, plan.longValue(), wordCount.longValue());
+            WordCompletionStudyVo wordCompletionStudyVo = getWordCompletionStudyVo(firstStudy, memoryDifficulty, vocabulary, wordChinese, plan.longValue(), wordCount.longValue());
             return ServerResponse.createBySuccess(wordCompletionStudyVo);
         }
         return null;
     }
 
-    private WordCompletionStudyVo getWordCompletionStudyVo(boolean firstStudy, Vocabulary vocabulary, String wordChinese, long longValue, long longValue1) {
+    private WordCompletionStudyVo getWordCompletionStudyVo(boolean firstStudy, int memoryDifficulty, Vocabulary vocabulary, String wordChinese, long longValue, long longValue1) {
         WordCompletionStudyVo wordCompletionStudyVo = new WordCompletionStudyVo();
         String soundMark = StringUtils.isEmpty(vocabulary.getSoundMark()) ? "" : vocabulary.getSoundMark();
         wordCompletionStudyVo.setWordId(vocabulary.getId());
+        wordCompletionStudyVo.setMemoryDifficulty(memoryDifficulty);
         wordCompletionStudyVo.setMemoryStrength(0.00);
         wordCompletionStudyVo.setSoundmark(soundMark);
         wordCompletionStudyVo.setWord(vocabulary.getWord());
@@ -305,7 +306,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             strList.add(ch + "");
         }
         for (String letter : strList) {
-            if (Pattern.matches(END_MATCH, letter)&&!letter.equals(" ")) {
+            if (Pattern.matches(END_MATCH, letter) && !letter.equals(" ")) {
                 letterList.add(startI);
             }
             startI++;
@@ -399,7 +400,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 WordWriteStudyVo wordWriteStudyVo = getWordWriteStudyVo(firstStudy, currentStudyWord, wordChinese, plan.longValue(), wordCount.longValue());
                 return ServerResponse.createBySuccess(wordWriteStudyVo);
             } else if (type.equals(6)) {
-                WordCompletionStudyVo wordCompletionStudyVo = getWordCompletionStudyVo(firstStudy, currentStudyWord, wordChinese, plan.longValue(), wordCount.longValue());
+                WordCompletionStudyVo wordCompletionStudyVo = getWordCompletionStudyVo(firstStudy, 0, currentStudyWord, wordChinese, plan.longValue(), wordCount.longValue());
                 return ServerResponse.createBySuccess(wordCompletionStudyVo);
             }
         }

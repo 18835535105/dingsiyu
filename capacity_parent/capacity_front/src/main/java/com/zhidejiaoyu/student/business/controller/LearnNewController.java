@@ -28,6 +28,11 @@ public class LearnNewController extends BaseController {
     private IStudyService sentencePatternTranslationService;
     @Resource
     private IStudyService sentencePatternListeningService;
+    @Resource
+    private IStudyService sentencePatternWritingService;
+    @Resource
+    private IStudyService textAuditionService;
+
     private Map<Integer, IStudyService> map = new HashMap<>();
 
     @PostConstruct
@@ -38,10 +43,11 @@ public class LearnNewController extends BaseController {
         map.put(5, wordWriteService);
         map.put(6, wordCompletionService);
         map.put(7, sentencePatternTranslationService);
-        map.put(8,sentencePatternListeningService);
+        map.put(8, sentencePatternListeningService);
+        map.put(10, sentencePatternWritingService);
+        map.put(11, textAuditionService);
+
         /*map.put(9,);
-        map.put(10,);
-        map.put(11,);
         map.put(12,);
         map.put(13,);
         map.put(14,);

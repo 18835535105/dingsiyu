@@ -3,12 +3,14 @@ package com.zhidejiaoyu.student.BaseUtil.SaveModel;
 import com.zhidejiaoyu.common.mapper.LearnExtendMapper;
 import com.zhidejiaoyu.common.mapper.LearnNewMapper;
 import com.zhidejiaoyu.common.mapper.TeksNewMapper;
+import com.zhidejiaoyu.common.mapper.TestRecordMapper;
 import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Teks;
 import com.zhidejiaoyu.common.pojo.TeksNew;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.service.TeksService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,7 +18,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -30,6 +34,10 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private BaiduSpeak baiduSpeak;
     @Resource
     private TeksNewMapper teksNewMapper;
+    @Resource
+    private TeksService teksService;
+    @Resource
+    private TestRecordMapper testRecordMapper;
 
     public Object getSudyModel(HttpSession session, Long unitId,
                                Student student, Long studentId,
@@ -45,16 +53,69 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitId(studentId, unitId, easyOrHard);
         if (type.equals(11)) {
             return getTeksAuditionData(unitId, learnNews.getGroup());
+        } else if (type.equals(12)) {
+            return getTextTraining(unitId, learnNews.getGroup(), studentId);
         }
-
-
         return null;
+    }
 
+    private Object getTextTraining(Long unitId, Integer group, Long studentId) {
+        Map<String, Object> map = new HashMap<>();
+        //获取当前单元当前group数据
+        List<TeksNew> teks = teksNewMapper.selTeksByUnitIdAndGroup(unitId, group);
+        map.put("chooseTeks", getChooseTeks(teks, unitId, studentId));
+        map.put("writeTeks", getWriteTeks(teks));
+        return ServerResponse.createBySuccess(map);
+    }
+
+    private Object getWriteTeks(List<TeksNew> listTeks) {
+        List<Object> resultTeks = new ArrayList<>();
+        for (TeksNew teksNew : listTeks) {
+            teksService.getListTeks(resultTeks, teksNew);
+        }
+        return resultTeks;
+    }
+
+    private Object getChooseTeks(List<TeksNew> teks, Long unitId, Long studentId) {
+        if (teks.size() > 0) {
+            //返回的集合
+            List<Map<String, Object>> resultList = new ArrayList<>();
+            Map<String, Object> resultMap = new HashMap<>();
+            //遍历数据
+            for (TeksNew teks1 : teks) {
+                //将遍历的数据放入到
+                Map<String, Object> map = new HashMap<>();
+                map.put("chinese", teks1.getParaphrase());
+                map.put("pronunciation", baiduSpeak.getSentencePath(teks1.getSentence().replace("#", " ").replace("$", "")));
+                map.put("id", teks1.getId());
+                String[] sentenceList = teks1.getSentence().trim().split(" ");
+                teksService.getList(sentenceList, map);
+                resultList.add(map);
+            }
+            Integer integer = getStudyMaxPoint(unitId, studentId);
+            if (integer == null) {
+                resultMap.put("maxScore", 0);
+            } else {
+                resultMap.put("maxScore", integer);
+            }
+            resultMap.put("list", resultList);
+            resultMap.put("number", teks.size());
+            return ServerResponse.createBySuccess(resultMap);
+        }
+        return null;
+    }
+
+    private Integer getStudyMaxPoint(Long unitId, Long studentId) {
+        Map<String, Object> selMap = new HashMap<>();
+        selMap.put("unitId", unitId);
+        selMap.put("studentId", studentId);
+        selMap.put("model", "课文默写测试");
+        selMap.put("genre", null);
+        return testRecordMapper.selectMaxPointByUnitStudentModel(selMap);
     }
 
     private Object getTeksAuditionData(Long unitId, Integer group) {
-
-        List<TeksNew> teks = teksNewMapper.selTeksByUnitId(unitId, group);
+        List<TeksNew> teks = teksNewMapper.selTeksByUnitIdAndGroup(unitId, group);
         if (teks.size() > 0) {
             List<TeksNew> resultTeks = new ArrayList<>();
             int i = 0;
@@ -66,7 +127,6 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             }
             return ServerResponse.createBySuccess(resultTeks);
         }
-
         return null;
     }
 }

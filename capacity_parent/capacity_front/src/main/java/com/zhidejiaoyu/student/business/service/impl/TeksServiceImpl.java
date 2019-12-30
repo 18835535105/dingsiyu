@@ -236,7 +236,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
                 map.put("pronunciation", baiduSpeak.getSentencePath(teks1.getSentence().replace("#", " ").replace("$", "")));
                 map.put("id", teks1.getId());
                 String[] sentenceList = teks1.getSentence().trim().split(" ");
-                getList(sentenceList, map);
+                this.getList(sentenceList, map);
                 resultList.add(map);
                 resultMap.put("list", resultList);
                 resultMap.put("number", teks.size());
@@ -259,7 +259,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
 
-    private void getList(String[] split, Map<String, Object> map) {
+    @Override
+    public void getList(String[] split, Map<String, Object> map) {
         // 正确顺序
         List<String> rightList = new ArrayList<>();
         // 存储标点
@@ -604,70 +605,76 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         List<Object> resultTeks = new ArrayList<>();
         if (listTeks.size() > 0) {
             for (Teks teks : listTeks) {
-                //保存返回的数据
-                Map<String, Object> map = new HashMap<>();
-                map.put("chinese", teks.getParaphrase());
-                map.put("pronunciation", baiduSpeak.getSentencePath(teks.getSentence()).replace("#", " ").replace("$", ""));
-                map.put("sentence", teks.getSentence().replace("#", " ").replace("$", ""));
-                map.put("id", teks.getId());
-                List<String> sentenceList = getLeterRegitList(teks.getSentence());
-                int[] integers;
-                List<String> blanceSentence = new ArrayList<>();
-                List<String> vocabulary = new ArrayList<>();
-                if (sentenceList.size() > 2) {
-                    integers = wirterBlank(sentenceList);
-                    if (integers.length == 1) {
-                        //当空格数为一时调用
-                        for (int i = 0; i < sentenceList.size(); i++) {
-                            if (i == (integers[0])) {
-                                addList(sentenceList.get(i), blanceSentence, vocabulary);
-                            } else {
-                                vocabulary.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
-                                blanceSentence.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
-                            }
-                        }
-                        map.put("blanceSentence", blanceSentence);
-                        map.put("vocabulary", vocabulary);
-                    } else if (integers.length == 2) {
-                        //当空格数为二时调用
-                        for (int i = 0; i < sentenceList.size(); i++) {
-                            if (i == (integers[0]) || i == (integers[1])) {
-                                addList(sentenceList.get(i), blanceSentence, vocabulary);
-                            } else {
-                                vocabulary.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
-                                blanceSentence.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
-                            }
-                        }
-                        map.put("blanceSentence", blanceSentence);
-                        map.put("vocabulary", vocabulary);
-                    } else if (integers.length == 3) {
-                        //当空格数为三时调用
-                        for (int i = 0; i < sentenceList.size(); i++) {
-                            if (i == (integers[0] - 1) || i == (integers[1] - 1) || i == (integers[2] - 1)) {
-                                addList(sentenceList.get(i), blanceSentence, vocabulary);
-                            } else {
-                                vocabulary.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
-                                blanceSentence.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
-                            }
-                        }
-                        map.put("blanceSentence", blanceSentence);
-                        map.put("vocabulary", vocabulary);
-                    }
-
-                    resultTeks.add(map);
-
-                } else {
-                    for (String voca : sentenceList) {
-                        vocabulary.add(voca);
-                        blanceSentence.add(voca);
-                    }
-                    map.put("blanceSentence", blanceSentence);
-                    map.put("vocabulary", vocabulary);
-                }
+                //getListTeks(resultTeks, teks);
             }
             return ServerResponse.createBySuccess(resultTeks);
         }
         return ServerResponse.createByError();
+    }
+
+    @Override
+    public void getListTeks(List<Object> resultTeks, TeksNew teks) {
+        //保存返回的数据
+        Map<String, Object> map = new HashMap<>();
+        map.put("chinese", teks.getParaphrase());
+        map.put("pronunciation", baiduSpeak.getSentencePath(teks.getSentence()).replace("#", " ").replace("$", ""));
+        map.put("sentence", teks.getSentence().replace("#", " ").replace("$", ""));
+        map.put("id", teks.getId());
+        List<String> sentenceList = getLeterRegitList(teks.getSentence());
+        int[] integers;
+        List<String> blanceSentence = new ArrayList<>();
+        List<String> vocabulary = new ArrayList<>();
+        if (sentenceList.size() > 2) {
+            integers = wirterBlank(sentenceList);
+            if (integers.length == 1) {
+                //当空格数为一时调用
+                for (int i = 0; i < sentenceList.size(); i++) {
+                    if (i == (integers[0])) {
+                        addList(sentenceList.get(i), blanceSentence, vocabulary);
+                    } else {
+                        vocabulary.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
+                        blanceSentence.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
+                    }
+                }
+                map.put("blanceSentence", blanceSentence);
+                map.put("vocabulary", vocabulary);
+            } else if (integers.length == 2) {
+                //当空格数为二时调用
+                for (int i = 0; i < sentenceList.size(); i++) {
+                    if (i == (integers[0]) || i == (integers[1])) {
+                        addList(sentenceList.get(i), blanceSentence, vocabulary);
+                    } else {
+                        vocabulary.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
+                        blanceSentence.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
+                    }
+                }
+                map.put("blanceSentence", blanceSentence);
+                map.put("vocabulary", vocabulary);
+            } else if (integers.length == 3) {
+                //当空格数为三时调用
+                for (int i = 0; i < sentenceList.size(); i++) {
+                    if (i == (integers[0] - 1) || i == (integers[1] - 1) || i == (integers[2] - 1)) {
+                        addList(sentenceList.get(i), blanceSentence, vocabulary);
+                    } else {
+                        vocabulary.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
+                        blanceSentence.add(sentenceList.get(i).replace("#", " ").replace("$", ""));
+                    }
+                }
+                map.put("blanceSentence", blanceSentence);
+                map.put("vocabulary", vocabulary);
+            }
+
+            resultTeks.add(map);
+
+        } else {
+            for (String voca : sentenceList) {
+                vocabulary.add(voca);
+                blanceSentence.add(voca);
+            }
+            map.put("blanceSentence", blanceSentence);
+            map.put("vocabulary", vocabulary);
+            resultTeks.add(map);
+        }
     }
 
     private List<String> getLeterRegitList(String sentence) {

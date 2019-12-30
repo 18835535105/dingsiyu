@@ -21,7 +21,7 @@
     </sql>
 
 
-    <select id="selTeksByUnitId" resultMap="BaseResultMap" parameterType="map">
+    <select id="selTeksByUnitIdAndGroup" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="teks_base_sql"></include>
         from teks_new teks
