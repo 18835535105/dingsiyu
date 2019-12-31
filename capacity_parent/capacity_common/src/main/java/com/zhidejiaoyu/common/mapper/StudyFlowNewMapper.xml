@@ -17,23 +17,13 @@
     <sql id="more_table_sql">
         sfn.id, sfn.next_true_flow, sfn.next_false_flow, sfn.model_name, sfn.flow_name, sfn.type
     </sql>
-    <select id="selectStudentCurrentFlow" resultMap="BaseResultMap" parameterType="map">
-        select
-        <include refid="more_table_sql"/>
-        from study_flow_new sfn,
-        student_flow_new stfn
-        where stfn.current_flow_id = sfn.id
-        and stfn.student_id = #{dto.student.id}
-        and stfn.unit_id = #{dto.unitId}
-        limit 1
-    </select>
-    <select id="selectByStudentIdAndUnitIdAndType" resultMap="BaseResultMap" parameterType="map">
+    <select id="selectByLearnId" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="more_table_sql"/>
         from study_flow_new sfn
         join student_flow_new sf
-        on sf.current_flow_id = sfn.id and sf.student_id = #{studentId} and
-        sf.unit_id = #{unitId} and sf.type = #{type}
+        on sf.current_flow_id = sfn.id
+        and sf.learn_id = #{learnId}
         limit 1
     </select>
 </mapper>

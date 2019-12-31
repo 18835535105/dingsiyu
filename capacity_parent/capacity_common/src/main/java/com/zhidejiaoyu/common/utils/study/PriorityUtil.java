@@ -1,6 +1,10 @@
 package com.zhidejiaoyu.common.utils.study;
 
+import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -12,6 +16,7 @@ import java.util.Map;
  * @author: wuchenxi
  * @date: 2019/12/24 14:49:49
  */
+@Slf4j
 public class PriorityUtil {
 
     /**
@@ -105,14 +110,14 @@ public class PriorityUtil {
     /**
      * 每天定时任务 计算学生变化率
      */
-    public static int CalculateRateOfChange(String studentGrade, String studyGrade) {
+    public static int calculateRateOfChange(String studentGrade, String studyGrade) {
         return 3 * (GRADE_TO_NUM.get(studentGrade) + 1 - GRADE_TO_NUM.get(studyGrade));
     }
 
     /**
      * 每天定时任务 计算时间变化率
      */
-    public static int CalculateTimeOfChange(int number) {
+    public static int calculateTimeOfChange(int number) {
         return 5 * number;
     }
 
@@ -139,11 +144,27 @@ public class PriorityUtil {
      * @param grade         学生当前年级
      * @param currentGrade  教材年级
      */
-    public static StudentStudyPlanNew finishUnitUpdateErrorLevel(StudentStudyPlanNew maxFinalLevel, String grade, String currentGrade) {
+    public static void finishUnitUpdateErrorLevel(StudentStudyPlanNew maxFinalLevel, String grade, String currentGrade) {
+        Student student = (Student) HttpUtil.getHttpSession().getAttribute(UserConstant.CURRENT_STUDENT);
+
+        String oldStudentStudyPlanNew = maxFinalLevel.toString();
+
+        printNotFoundGradeNumLog(grade, currentGrade);
+
         int errorLevel = maxFinalLevel.getErrorLevel() - 5 * (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(currentGrade));
         maxFinalLevel.setErrorLevel(errorLevel);
         maxFinalLevel.setFinalLevel(errorLevel + maxFinalLevel.getTimeLevel() + maxFinalLevel.getBaseLevel());
         maxFinalLevel.setUpdateTime(new Date());
-        return maxFinalLevel;
+        log.info("学生[{} - {} - {}]学习完单元更新优先级，原优先级：[{}]， 更新后优先级：[{}]", student.getId(), student.getAccount(),
+                student.getStudentName(), oldStudentStudyPlanNew, maxFinalLevel.toString());
+    }
+
+    private static void printNotFoundGradeNumLog(String grade, String currentGrade) {
+        if (!GRADE_TO_NUM.containsKey(grade)) {
+            log.warn("GRADE_TO_NUM不包含{}", grade);
+        }
+        if (!GRADE_TO_NUM.containsKey(currentGrade)) {
+            log.warn("currentGrade不包含{}", currentGrade);
+        }
     }
 }

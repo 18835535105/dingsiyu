@@ -1,7 +1,8 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.zhidejiaoyu.common.pojo.StudentFlowNew;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.StudentFlowNew;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
 
@@ -16,27 +17,22 @@ import org.apache.ibatis.annotations.Update;
 public interface StudentFlowNewMapper extends BaseMapper<StudentFlowNew> {
 
     /**
-     * 根据查询学生当前单元的一键排课流程
-     *
-     * @param studentId
-     * @param unitId
-     * @return
-     */
-    StudentFlowNew selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
-
-    /**
      * 更新学生流程
      *
-     * @param studentId
      * @param flowId
+     * @param learnId
+     */
+    @Update("update student_flow_new set current_flow_id = #{flowId} where learn_id = #{learnId}")
+    void updateFlowIdByStudentIdAndUnitIdAndType(@Param("flowId") Long flowId, @Param("learnId") Long learnId);
+
+    /**
+     * 根据查询学生当前单元的指定类型流程
+     *
+     * @param studentId
      * @param unitId
      * @param type
+     * @return
      */
-    @Update("update student_flow_new set current_flow_id = #{flowId} where student_id = #{studentId} and unit_id = #{unitId} and type = #{type}")
-    void updateFlowIdByStudentIdAndUnitIdAndType(@Param("studentId") Long studentId, @Param("flowId") Long flowId,
-                                                 @Param("unitId") Long unitId, @Param("type") Integer type);
-
-
     StudentFlowNew selectByStudentIdAndUnitIdAndType(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                                      @Param("type") Integer type);
 }

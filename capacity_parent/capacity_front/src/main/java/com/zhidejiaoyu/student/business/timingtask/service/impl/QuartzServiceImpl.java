@@ -558,7 +558,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                         Student student = studentMapper.selectById(studentId);
                         //获取课程年级数值
                         String strGrade = courseNewMapper.selectGradeByCourseId(studentStudyPlanNew.getCourseId());
-                        int number = PriorityUtil.CalculateRateOfChange(student.getGrade(), strGrade);
+                        int number = PriorityUtil.calculateRateOfChange(student.getGrade(), strGrade);
                         studentStudyPlanNew.setErrorLevel(studentStudyPlanNew.getErrorLevel() + number);
                         studentStudyPlanNew.setFinalLevel(studentStudyPlanNew.getFinalLevel() + number);
                         studentStudyPlanNewMapper.updateById(studentStudyPlanNew);
@@ -645,7 +645,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                         number += unitNewMapper.selectByUnitIdAndCourseId(unitId, courseId);
                     }
                     //获取数量
-                    int addNumber = PriorityUtil.CalculateTimeOfChange(number);
+                    int addNumber = PriorityUtil.calculateTimeOfChange(number);
                     StudentStudyPlanNew plan=new StudentStudyPlanNew();
                     plan.setCourseId(courseId);
                     plan.setStudentId(studentId);

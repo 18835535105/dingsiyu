@@ -93,7 +93,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
                 throw new ServiceException("学生还没有进行摸底测试，未查询到可以学习的课程！");
             }
 
-            StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitId(student.getId(), maxFinalLevelStudentStudyPlanNew.getUnitId());
+            StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitIdAndType(student.getId(), maxFinalLevelStudentStudyPlanNew.getUnitId(), 1);
+
+            LearnNew learnNew = this.saveLearn(maxFinalLevelStudentStudyPlanNew);
 
             StudyFlowNew studyFlowNew;
             if (studentFlowNew != null) {
@@ -102,8 +104,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
                 this.initStudentFlow(student, maxFinalLevelStudentStudyPlanNew);
                 studyFlowNew = studyFlowNewMapper.selectById(maxFinalLevelStudentStudyPlanNew.getFlowId());
             }
-
-            this.saveLearn(maxFinalLevelStudentStudyPlanNew);
 
             return ServerResponse.createBySuccess(packageFlowVO(studyFlowNew, student, maxFinalLevelStudentStudyPlanNew.getUnitId()));
         }
@@ -145,10 +145,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         return flowCommonMethod.judgeNextNode(dto, this);
     }
 
-    public void initStudentFlow(Student student, StudentStudyPlanNew studentStudyPlanNew) {
+    public void initStudentFlow(Student student, StudentStudyPlanNew studentStudyPlanNew, LearnNew learnNew) {
         studentFlowNewMapper.insert(StudentFlowNew.builder()
                 .currentFlowId(studentStudyPlanNew.getFlowId())
-                .unitId(studentStudyPlanNew.getUnitId())
+                .learnId(learnNew.getId())
                 .studentId(student.getId())
                 .updateTime(new Date())
                 .type(1)
@@ -169,7 +169,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
      */
     @Override
     public ServerResponse<Object> toAnotherFlow(NodeDto dto, int nextFlowId) {
-        Student student = dto.getStudent();
 
         // 判断当前单元单词是否有图片，如果都没有图片不进入单词图鉴
         StudyFlowNew studyFlowNew = this.getStudyFlow(dto, nextFlowId);
@@ -177,7 +176,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         // 判断当前单元是否含有当前模块的内容，如果没有当前模块的内容学习下个模块的内容
         FlowVO flowVO = this.judgeHasCurrentModel(studyFlowNew, dto);
 
-        studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(student.getId(), studyFlowNew.getId(), dto.getUnitId(), 1);
+        studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(studyFlowNew.getId(), dto.getLearnNew().getId());
 
         return ServerResponse.createBySuccess("true", flowVO);
     }
@@ -425,7 +424,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         Long flowId = maxStudentStudyPlanNew.getFlowId();
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(flowId);
 
-        return packageFlowVO(studyFlowNew, student, maxStudentStudyPlanNew.getUnitId());
+        return this.packageFlowVO(studyFlowNew, student, maxStudentStudyPlanNew.getUnitId());
 
     }
 
@@ -482,22 +481,21 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
      *
      * @param studentStudyPlanNew
      */
-    private void saveLearn(StudentStudyPlanNew studentStudyPlanNew) {
-        Integer count = learnNewMapper.selectCount(new EntityWrapper<LearnNew>()
-                .eq("student_id", studentStudyPlanNew.getStudentId())
-                .eq("unit_id", studentStudyPlanNew.getUnitId())
-                .eq("easy_or_hard", studentStudyPlanNew.getEasyOrHard()));
-        if (count == 0) {
-            learnNewMapper.insert(LearnNew.builder()
+    private LearnNew saveLearn(StudentStudyPlanNew studentStudyPlanNew) {
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentStudyPlanNew.getStudentId(), studentStudyPlanNew.getUnitId(),
+                studentStudyPlanNew.getEasyOrHard());
+        if (learnNew == null) {
+            learnNew = LearnNew.builder()
                     .courseId(studentStudyPlanNew.getCourseId())
                     .easyOrHard(studentStudyPlanNew.getEasyOrHard())
                     .group(1)
                     .studentId(studentStudyPlanNew.getStudentId())
                     .unitId(studentStudyPlanNew.getUnitId())
                     .updateTime(new Date())
-                    .build());
+                    .build();
+            learnNewMapper.insert(learnNew);
         }
-
+        return learnNew;
     }
 
     /**
