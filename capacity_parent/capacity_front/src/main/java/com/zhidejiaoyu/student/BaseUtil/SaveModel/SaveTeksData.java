@@ -121,10 +121,8 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         List<TeksNew> teks = teksNewMapper.selTeksByUnitIdAndGroup(unitId, group);
         if (teks.size() > 0) {
             List<TeksNew> resultTeks = new ArrayList<>();
-            int i = 0;
             for (TeksNew teks1 : teks) {
                 teks1.setPronunciation(baiduSpeak.getSentencePath(teks1.getSentence().replace("#", " ").replace("$", "")));
-                i++;
                 teks1.setSentence(teks1.getSentence().replace("#", " ").replace("$", ""));
                 resultTeks.add(teks1);
             }
