@@ -80,6 +80,9 @@ public class SaveSentenceData {
         }
         // 获取当前学习进度的下一个例句
         Sentence sentence = saveSentenceData.getSentence(unitId, student, learnNews.getGroup(), type, studyModel);
+        if (sentence == null) {
+            return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
+        }
         if (type == 7) {
             SentenceTranslateVo sentenceTranslateVo = saveSentenceData.getSentenceTranslateVo(plan.longValue(), firstStudy,
                     sentenceCount.longValue(), type, sentence);

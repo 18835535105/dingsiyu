@@ -270,10 +270,10 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                     plan, firstStudy, wordCount, memoryDifficulty, memoryStrength, vocabularyId, vocabulary, unitId, wordChinese, false);
             return ServerResponse.createBySuccess(memoryStudyVo);
         } else if (type.equals(5)) {
-            WordWriteStudyVo wordWriteStudyVo = getWordWriteStudyVo(firstStudy, vocabulary, wordChinese, plan.longValue(), wordCount.longValue());
+            WordWriteStudyVo wordWriteStudyVo = getWordWriteStudyVo(firstStudy, vocabulary, wordChinese, plan, wordCount);
             return ServerResponse.createBySuccess(wordWriteStudyVo);
         } else if (type.equals(6)) {
-            WordCompletionStudyVo wordCompletionStudyVo = getWordCompletionStudyVo(firstStudy, memoryDifficulty, vocabulary, wordChinese, plan.longValue(), wordCount.longValue());
+            WordCompletionStudyVo wordCompletionStudyVo = getWordCompletionStudyVo(firstStudy, memoryDifficulty, vocabulary, wordChinese, plan, wordCount);
             return ServerResponse.createBySuccess(wordCompletionStudyVo);
         }
         return null;
