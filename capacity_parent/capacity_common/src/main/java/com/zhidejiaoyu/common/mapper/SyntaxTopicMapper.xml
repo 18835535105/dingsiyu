@@ -25,7 +25,7 @@
     <select id="selectSelectSyntaxByUnitId" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="more_table_sql"/>
-        from syntax_topic st, syntax_unit_topic sut
+        from syntax_topic st, syntax_unit_topic_new sut
         where st.id = sut.topic_id
         and sut.unit_id = #{unitId}
         and st.type = 1

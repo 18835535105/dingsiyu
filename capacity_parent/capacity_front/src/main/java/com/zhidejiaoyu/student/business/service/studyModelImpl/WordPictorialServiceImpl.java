@@ -61,14 +61,15 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
         Long studentId = student.getId();
         // 判断学生是否在本系统首次学习，如果是记录首次学习时间
         saveData.judgeIsFirstStudy(session, student);
+        //获取当前单元下的learnId
+        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitId(studentId, unitId, easyOrHard);
         //获取是否有可以学习的单词信息
-        int wordCount = unitVocabularyNewMapper.countWordPictureByUnitId(unitId);
+        int wordCount = unitVocabularyNewMapper.countWordPictureByUnitId(unitId, learnNews.getGroup());
         if (wordCount == 0) {
             log.error("单元 {} 下没有单词图鉴信息！", unitId);
             return ServerResponse.createByErrorMessage("The unit no pictures");
         }
-        //获取当前单元下的learnId
-        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitId(studentId, unitId, easyOrHard);
+
         // 1. 根据随机数获取题型, 并查出一道正确的题
         // 1.1 去慧记忆中查询单词图鉴是否有需要复习的单词
         Map<String, Object> correct = studyCapacityMapper.selectNeedReviewWord(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, learnNews.getGroup());

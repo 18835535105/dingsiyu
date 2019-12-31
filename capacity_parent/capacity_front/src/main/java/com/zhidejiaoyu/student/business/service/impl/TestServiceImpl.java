@@ -1318,14 +1318,16 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     private void saveError(Long unitId, Long[] errorIds, Student student, Integer classify) {
+        if(errorIds!=null){
+            Integer easyOrHard = 1;
+            if (classify.equals(2) || classify.equals(3) || classify.equals(6)) {
+                easyOrHard = 2;
+            }
+            LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, easyOrHard);
 
-        Integer easyOrHard = 1;
-        if (classify.equals(2) || classify.equals(3) || classify.equals(6)) {
-            easyOrHard = 2;
-        }
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, easyOrHard);
-        for (int i = 0; i < errorIds.length; i++) {
-            saveData.saveErrorLearnLog(unitId, getModelInteger(classify), easyOrHard, getModel(classify), learnNew, errorIds[i]);
+            for (int i = 0; i < errorIds.length; i++) {
+                saveData.saveErrorLearnLog(unitId, getModelInteger(classify), easyOrHard, getModel(classify), learnNew, errorIds[i]);
+            }
         }
     }
 

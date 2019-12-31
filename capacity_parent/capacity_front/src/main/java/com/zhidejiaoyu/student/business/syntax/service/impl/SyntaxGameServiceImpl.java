@@ -69,6 +69,9 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     @Resource
     private StudentStudyPlanMapper studentStudyPlanMapper;
 
+    @Resource
+    private UnitNewMapper unitNewMapper;
+
     @Override
     public ServerResponse<Object> getSyntaxGame(Long unitId) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
@@ -142,8 +145,8 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     private List<SyntaxTopic> getSyntaxTopics(Long unitId) {
         List<SyntaxTopic> syntaxTopics = syntaxTopicMapper.selectSelectSyntaxByUnitId(unitId);
         if (CollectionUtils.isEmpty(syntaxTopics)) {
-            SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
-            log.error("语法单元[{} - {}]没有没有选语法题目！", syntaxUnit.getId(), syntaxUnit.getJointName());
+            UnitNew unitNew = unitNewMapper.selectById(unitId);
+            log.error("语法单元[{} - {}]没有没有选语法题目！", unitNew.getId(), unitNew.getJointName());
             throw new ServiceException(500, "未查询到游戏题目！");
         }
         List<SyntaxTopic> result = new ArrayList<>(syntaxTopics);
