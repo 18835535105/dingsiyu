@@ -24,9 +24,9 @@ import java.util.Random;
 @Slf4j
 public class SaveSentenceData {
 
-    private final String STUDYMODEL1 = "例句翻译";
-    private final String STUDYMODEL2 = "例句听力";
-    private final String STUDYMODEL3 = "例句默写";
+    private static final String STUDYMODEL1 = "例句翻译";
+    private static final String STUDYMODEL2 = "例句听力";
+    private static final String STUDYMODEL3 = "例句默写";
 
     @Resource
     private LearnNewMapper learnNewMapper;
@@ -80,6 +80,9 @@ public class SaveSentenceData {
         }
         // 获取当前学习进度的下一个例句
         Sentence sentence = saveSentenceData.getSentence(unitId, student, learnNews.getGroup(), type, studyModel);
+        if (sentence == null) {
+            return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
+        }
         if (type == 7) {
             SentenceTranslateVo sentenceTranslateVo = saveSentenceData.getSentenceTranslateVo(plan.longValue(), firstStudy,
                     sentenceCount.longValue(), type, sentence);
@@ -95,7 +98,7 @@ public class SaveSentenceData {
             return getSentenceTranslateVoServerResponse(firstStudy, plan.longValue(),
                     sentenceCount.longValue(), sentence, type);
         }
-        return ServerResponse.createBySuccess(null);
+        return ServerResponse.createBySuccess();
     }
 
     /**
@@ -109,7 +112,7 @@ public class SaveSentenceData {
      * @return 例句翻译学习页面展示信息
      */
 
-    public ServerResponse<Object> returnGoldWord(StudyCapacity studyCapacity, Long plan, boolean firstStudy,
+    private ServerResponse<Object> returnGoldWord(StudyCapacity studyCapacity, Long plan, boolean firstStudy,
                                                  Long sentenceCount, Integer type, String studyModel) {
         SentenceTranslateVo sentenceTranslateVo;
         // 例句翻译
@@ -140,11 +143,11 @@ public class SaveSentenceData {
             sentenceTranslateVo = this.getSentenceVo(sentence, firstStudy, plan, memoryStrength, sentenceCount, type);
             return ServerResponse.createBySuccess(sentenceTranslateVo);
         }
-        return ServerResponse.createBySuccess(null);
+        return ServerResponse.createBySuccess();
     }
 
 
-    public SentenceTranslateVo getSentenceTranslateVo(Long plan, boolean firstStudy, Long sentenceCount, Integer type, Sentence sentence) {
+    private SentenceTranslateVo getSentenceTranslateVo(Long plan, boolean firstStudy, Long sentenceCount, Integer type, Sentence sentence) {
         SentenceTranslateVo sentenceTranslateVo = getSentenceTranslateVos(plan, firstStudy, sentenceCount, sentence, 0.0);
         int nextInt = new Random().nextInt(10);
         if (nextInt > 2) {
@@ -162,7 +165,7 @@ public class SaveSentenceData {
         return ServerResponse.createBySuccess(sentenceTranslateVo);
     }
 
-    public SentenceTranslateVo getSentenceTranslateVos(Long plan, boolean firstStudy, Long sentenceCount, Sentence sentence, double memoryStrength) {
+    private SentenceTranslateVo getSentenceTranslateVos(Long plan, boolean firstStudy, Long sentenceCount, Sentence sentence, double memoryStrength) {
         SentenceTranslateVo sentenceTranslateVo = new SentenceTranslateVo();
         sentenceTranslateVo.setChinese(sentence.getCentreTranslate().replace("*", ""));
         sentenceTranslateVo.setEnglish(sentence.getCentreExample().replace("#", " ").replace("*", " ").replace("$", ""));
@@ -195,7 +198,7 @@ public class SaveSentenceData {
         return sentenceTranslateVo;
     }
 
-    public Sentence getSentence(Long unitId, Student student, Integer group, Integer type, String studyModel) {
+    private Sentence getSentence(Long unitId, Student student, Integer group, Integer type, String studyModel) {
         // 查询学习记录本模块学习过的所有单词id
         List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel);
         return sentenceMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);

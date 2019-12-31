@@ -19,7 +19,6 @@ import com.zhidejiaoyu.student.common.StudyCapacityLearn;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -40,9 +39,9 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private LearnNewMapper learnNewMapper;
     @Resource
     private LearnExtendMapper learnExtendMapper;
-    @Autowired
+    @Resource
     private MedalAwardAsync medalAwardAsync;
-    @Autowired
+    @Resource
     private ExecutorService executorService;
     @Resource
     private StudyCapacityLearn studyCapacityLearn;
@@ -66,7 +65,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     /**
      * 以字母或数字结尾
      */
-    final String END_MATCH = ".*[a-zA-Z]$";
+    private static final String END_MATCH = ".*[a-zA-Z]$";
 
 
     public Object getStudyWord(HttpSession session, Long unitId, Student student,
@@ -137,11 +136,9 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             }
         }
 
-        /**
-         * 查看慧默写  会听写  单词图鉴是否为上次学习 如果是 删除
-         * 开始
-         */
-        boolean flag = false;
+        //查看慧默写  会听写  单词图鉴是否为上次学习 如果是 删除
+        //          开始
+        boolean flag;
         //查看当前数据是否为以前学习过的数据
         List<StudyCapacity> studyCapacities = studyCapacityMapper.selectByStudentIdAndUnitIdAndWordIdAndType(studentId, unitId, wordId, type);
 
@@ -229,7 +226,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         }
     }
 
-    public List<Map<String, Boolean>> getChinese(Long unitId, Long vocabularyId, String wordChinese) {
+    private List<Map<String, Boolean>> getChinese(Long unitId, Long vocabularyId, String wordChinese) {
         List<Map<String, Boolean>> returnList = new ArrayList<>();
         List<String> strings = unitVocabularyNewMapper.selectInterferenceTerm(unitId, vocabularyId, wordChinese);
         Map<String, Boolean> map = new HashMap<>();
@@ -252,8 +249,8 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
      * @param firstStudy
      * @return
      */
-    public ServerResponse<Object> returnGoldWord(StudyCapacity studyCapacity, Long plan, boolean firstStudy,
-                                                 Long wordCount, Integer type) {
+    private ServerResponse<Object> returnGoldWord(StudyCapacity studyCapacity, Long plan, boolean firstStudy,
+                                                  Long wordCount, Integer type) {
         // 计算当前单词的记忆难度
         int memoryDifficulty = memoryDifficultyUtil.getMemoryDifficulty(studyCapacity, 1);
         // 计算当前单词的记忆强度
@@ -270,10 +267,10 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                     plan, firstStudy, wordCount, memoryDifficulty, memoryStrength, vocabularyId, vocabulary, unitId, wordChinese, false);
             return ServerResponse.createBySuccess(memoryStudyVo);
         } else if (type.equals(5)) {
-            WordWriteStudyVo wordWriteStudyVo = getWordWriteStudyVo(firstStudy, vocabulary, wordChinese, plan.longValue(), wordCount.longValue());
+            WordWriteStudyVo wordWriteStudyVo = getWordWriteStudyVo(firstStudy, vocabulary, wordChinese, plan, wordCount);
             return ServerResponse.createBySuccess(wordWriteStudyVo);
         } else if (type.equals(6)) {
-            WordCompletionStudyVo wordCompletionStudyVo = getWordCompletionStudyVo(firstStudy, memoryDifficulty, vocabulary, wordChinese, plan.longValue(), wordCount.longValue());
+            WordCompletionStudyVo wordCompletionStudyVo = getWordCompletionStudyVo(firstStudy, memoryDifficulty, vocabulary, wordChinese, plan, wordCount);
             return ServerResponse.createBySuccess(wordCompletionStudyVo);
         }
         return null;
@@ -303,17 +300,17 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private void getStudyWordComplets(String word, Map<String, Object> returnMap) {
         char[] chars = word.toCharArray();
         word = word.trim();
-        List<Integer> letterList = new ArrayList();
-        int startI = 0;
+        List<Integer> letterList = new ArrayList<>();
+        int starti = 0;
         List<String> strList = new ArrayList<>();
         for (char ch : chars) {
             strList.add(ch + "");
         }
         for (String letter : strList) {
             if (Pattern.matches(END_MATCH, letter) && !letter.equals(" ")) {
-                letterList.add(startI);
+                letterList.add(starti);
             }
-            startI++;
+            starti++;
         }
         Random random = new Random();
         int size = letterList.size() / 2;
@@ -392,12 +389,12 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
      * @param wordCount  当前单元单词总数
      * @return 如果当前单词是本单元最后一个单词，返回 null
      */
-    public ServerResponse<Object> getNextMemoryWord(HttpSession session, Long unitId, Student student, boolean firstStudy,
-                                                    Integer plan, Integer wordCount, Integer group, Integer type, String studyModel) {
+    private ServerResponse<Object> getNextMemoryWord(HttpSession session, Long unitId, Student student, boolean firstStudy,
+                                                     Integer plan, Integer wordCount, Integer group, Integer type, String studyModel) {
         if (wordCount - 1 >= plan) {
             // 记录学生开始学习该单词的时间
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-            Vocabulary currentStudyWord = getVocabulary(unitId, student, group, type, studyModel);
+            Vocabulary currentStudyWord = getVocabulary(unitId, student, group, studyModel);
             // 查询单词释义
             String wordChinese = unitVocabularyNewMapper.selectWordChineseByUnitIdAndWordId(unitId, currentStudyWord.getId());
             if (type.equals(3)) {
@@ -416,7 +413,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         return null;
     }
 
-    public Vocabulary getVocabulary(Long unitId, Student student, Integer group, Integer type, String studyModel) {
+    public Vocabulary getVocabulary(Long unitId, Student student, Integer group, String studyModel) {
         // 查询学习记录本模块学习过的所有单词id
         List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel);
         return vocabularyMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);
