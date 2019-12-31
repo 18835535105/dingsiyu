@@ -70,6 +70,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     @Resource
     private SyntaxUnitTopicNewMapper syntaxUnitTopicNewMapper;
 
+    @Resource
+    private StudyCapacityMapper studyCapacityMapper;
+
     /**
      * 节点学完, 把下一节初始化到student_flow表, 并把下一节点返回
      *
@@ -119,8 +122,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
 
         if (learnNew != null) {
             // 如果学生有当前单元的学习记录，删除其学习详情，防止学生重新学习该单元时获取不到题目
+            studyCapacityMapper.deleteByStudentIdAndUnitIdAndGroup(student.getId(), dto.getUnitId(), learnNew.getGroup());
             learnExtendMapper.deleteByLearnId(learnNew.getId());
-//            studyCapacityMapper.deleteByStudentIdAndUnitIdAndTypeAndGroup(student.getId(), dto.getUnitId(), )
             dto.setGroup(learnNew.getGroup());
         }
         dto.setStudyFlowNew(studyFlowNew);

@@ -1,15 +1,13 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.sun.tracing.dtrace.ProviderAttributes;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
-import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.LearnExtend;
 import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.StudyCapacity;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +41,7 @@ public interface StudyCapacityMapper extends BaseMapper<StudyCapacity> {
      * 跟句学生id，单元id，type获取学生语法的记忆追踪信息
      *
      * @param learn
+     * @param learnExtend
      * @param type
      * @return
      */
@@ -68,8 +67,8 @@ public interface StudyCapacityMapper extends BaseMapper<StudyCapacity> {
                                              @Param("studentId") Long studentId,
                                              @Param("dateTime") String dateTime,
                                              @Param("type") Integer type,
-                                             @Param("easyOrHard")Integer easyOrHard,
-                                             @Param("group")Integer group);
+                                             @Param("easyOrHard") Integer easyOrHard,
+                                             @Param("group") Integer group);
 
     List<StudyCapacity> selectByStudentIdAndUnitIdAndWordIdAndType(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                                                    @Param("wordId") Long wordId, @Param("type") Integer type);
@@ -78,9 +77,32 @@ public interface StudyCapacityMapper extends BaseMapper<StudyCapacity> {
                                                  @Param("wordId") Long wordId, @Param("type") Integer type);
 
     StudyCapacity selectLearnHistory(@Param("unitId") Long unitId,
-                                           @Param("studentId") Long studentId,
-                                           @Param("dateTime") String dateTime,
-                                           @Param("type") Integer type,
-                                           @Param("easyOrHard")Integer easyOrHard,
-                                           @Param("group")Integer group);
+                                     @Param("studentId") Long studentId,
+                                     @Param("dateTime") String dateTime,
+                                     @Param("type") Integer type,
+                                     @Param("easyOrHard") Integer easyOrHard,
+                                     @Param("group") Integer group);
+
+    /**
+     * 一键学习跳转接点时删除当前单元group的记忆追踪数据，防止删除学习数据后匹配不到学习记录
+     *
+     * @param studentId
+     * @param unitId
+     * @param group
+     */
+    @Delete("delete from study_capacity where student_id = #{studentId} and unit_id = #{unitId} and `group` = #{group}")
+    void deleteByStudentIdAndUnitIdAndGroup(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+                                            @Param("group") Integer group);
+
+    /**
+     * 自由学习跳转接点是删除当前单元、学习模块group的记忆追踪数据
+     *
+     * @param studentId
+     * @param unitId
+     * @param type
+     * @param group
+     */
+    @Delete("delete from study_capacity where student_id = #{studentId} and unit_id = #{unitId} and type = #{type} and `group` = #{group}")
+    void deleteByStudentIdAndUnitIdAndTypeAndGroup(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+                                                   @Param("type") Integer type, @Param("group") Integer group);
 }

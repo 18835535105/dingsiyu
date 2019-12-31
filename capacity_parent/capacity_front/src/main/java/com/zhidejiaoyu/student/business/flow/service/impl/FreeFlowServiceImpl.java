@@ -62,11 +62,18 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     @Resource
     private LearnExtendMapper learnExtendMapper;
 
+    @Resource
+    private StudyCapacityMapper studyCapacityMapper;
 
     /**
      * 流程名称与 studentStudyPlanNew 中type值的映射
      */
     private static final Map<String, Integer> FLOW_NAME_TO_TYPE = new HashMap<>();
+
+    /**
+     * 流程名称与 studyCapacity 中 type 的映射
+     */
+    private static final Map<String, Integer> FLOW_NAME_TO_STUDY_CAPACITY_TYPE = new HashMap<>();
 
     static {
         FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_ONE, 2);
@@ -75,6 +82,22 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_FOUR, 3);
         FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_FIVE, 4);
         FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_SIX, 5);
+
+        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("单词图鉴", 1);
+        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("慧记忆", 3);
+        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("慧听写", 4);
+        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("慧默写", 5);
+        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("字母填写", 6);
+        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("句型翻译", 7);
+        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("句型听力", 8);
+        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("音译练习", 9);
+        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("句型默写", 10);
+        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("课文试听", 11);
+        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("课文训练", 12);
+        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("闯关测试", 13);
+        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("学语法", 20);
+        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("选语法", 21);
+        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("写语法", 22);
     }
 
     /**
@@ -123,7 +146,13 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
 
         if (learnNew != null) {
             // 如果学生有当前单元的学习记录，删除其学习详情，防止学生重新学习该单元时获取不到题目
-            learnExtendMapper.deleteByUnitIdAndStudyModel(learnNew.getId(), studyFlowNew.getModelName());
+            String modelName = studyFlowNew.getModelName();
+            if (FLOW_NAME_TO_STUDY_CAPACITY_TYPE.containsKey(modelName)) {
+                studyCapacityMapper.deleteByStudentIdAndUnitIdAndTypeAndGroup(student.getId(), dto.getUnitId(),
+                        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.get(modelName), learnNew.getGroup());
+            }
+
+            learnExtendMapper.deleteByUnitIdAndStudyModel(learnNew.getId(), modelName);
             dto.setGroup(learnNew.getGroup());
         }
 
