@@ -174,7 +174,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 learn.setFirstIsKnow(0);
                 // 单词不认识将该单词记入记忆追踪中
                 studyCapacityLearn.saveCapacityMemory(learnNew, learn, student, false, type);
-                saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, learnExtends.get(0).getWordId());
+                saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, learn.getWordId());
             }
             int count = learnExtendMapper.insert(learn);
             // 统计初出茅庐勋章
@@ -351,7 +351,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         memoryStudyVo.setMemoryStrength(memoryStrength);
         memoryStudyVo.setSoundMark(StringUtils.isEmpty(vocabulary.getSoundMark()) ? "" : vocabulary.getSoundMark());
         memoryStudyVo.setWord(word);
-        memoryStudyVo.setSyllable(syllable);
+        memoryStudyVo.setSyllable(syllable == null ? word : syllable);
         memoryStudyVo.setWordChinese(wordChinese);
         memoryStudyVo.setPlan(plan);
         memoryStudyVo.setStudyNew(false);
@@ -422,7 +422,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         return vocabularyMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);
     }
 
-    public void saveErrorLearnLog(Long unitId, int type, int easyOrHard, String studyModel, LearnNew learnNew,Long wordId) {
+    public void saveErrorLearnLog(Long unitId, int type, int easyOrHard, String studyModel, LearnNew learnNew, Long wordId) {
         ErrorLearnLog errorLearnLog = new ErrorLearnLog();
         errorLearnLog.setEasyOrHard(easyOrHard);
         errorLearnLog.setGroup(learnNew.getGroup());

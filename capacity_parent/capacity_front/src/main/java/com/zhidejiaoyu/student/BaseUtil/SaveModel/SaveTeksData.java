@@ -39,10 +39,11 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                                String studyModel, Integer easyOrHard,
                                Integer type) {
         //查看课文数据是否保存过
-        List<Long> longs = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, studentId, studyModel);
+      /*  List<Long> longs = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, studentId, studyModel);
+
         if (longs.size() > 0) {
             return super.toUnitTest();
-        }
+        }*/
         //获取单元下需要学习的group
         //获取当前单元下的learnId
         LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitId(studentId, unitId, easyOrHard);
