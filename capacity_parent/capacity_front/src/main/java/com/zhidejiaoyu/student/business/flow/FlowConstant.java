@@ -69,9 +69,25 @@ public interface FlowConstant {
      */
     long FREE_SYNTAX_WRITE = 128;
 
+    /**
+     * 单词模块
+     */
     String FLOW_ONE = "流程1";
     String FLOW_TWO = "流程2";
+
+    /**
+     * 句型模块
+     */
     String FLOW_THREE = "流程3";
     String FLOW_FOUR = "流程4";
+
+    /**
+     * 课文模块
+     */
     String FLOW_FIVE = "流程5";
+
+    /**
+     * 语法模块
+     */
+    String FLOW_SIX = "流程6";
 }

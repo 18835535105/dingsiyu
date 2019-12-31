@@ -204,6 +204,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
                 return this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
             }
 
+            if (this.judgeHasSyntaxModel(studyFlowNew, dto)) {
+                return this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
+            }
+
         }
 
         // 句型模块
@@ -217,6 +221,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             if (this.judgeHasTeksModel(studyFlowNew, dto)) {
                 return this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
             }
+
+            if (this.judgeHasSyntaxModel(studyFlowNew, dto)) {
+                return this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
+            }
         }
 
         // 课文模块
@@ -225,10 +233,40 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             if (teksCount > 0) {
                 return this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
             }
+
+            if (this.judgeHasSyntaxModel(studyFlowNew, dto)) {
+                return this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
+            }
+        }
+
+        // 语法模块
+        if (Objects.equals(flowName, FlowConstant.FLOW_SIX)) {
+            int syntaxCount = syntaxUnitTopicNewMapper.countByUnitIdAndGroup(dto.getUnitId(), dto.getGroup());
+            if (syntaxCount > 0) {
+                return this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
+            }
         }
 
         // 学习完当前group
         return this.finishGroup(dto);
+    }
+
+    /**
+     * 判断当前单元group有没有语法模块
+     *
+     * @param studyFlowNew
+     * @param dto
+     * @return
+     */
+    private boolean judgeHasSyntaxModel(StudyFlowNew studyFlowNew, NodeDto dto) {
+        // 没有句型模块判断是否有语法模块
+        int syntaxCount = syntaxUnitTopicNewMapper.countByUnitIdAndGroup(dto.getUnitId(), dto.getGroup());
+        if (syntaxCount > 0) {
+            // 初始化语法游戏节点
+            studyFlowNew.setId(120L);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -326,7 +364,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         count = unitSentenceNewMapper.countByUnitIdAndGroup(unitId, group);
         this.saveOrUpdateLearnHistory(dto, studentStudyPlanNew, count, 2);
 
-        count = syntaxUnitTopicNewMapper.countByUnitAndGroup(unitId, group);
+        count = syntaxUnitTopicNewMapper.countByUnitIdAndGroup(unitId, group);
         this.saveOrUpdateLearnHistory(dto, studentStudyPlanNew, count, 3);
 
         count = unitTeksNewMapper.countByUnitIdAndGroup(unitId, group);

@@ -25,7 +25,7 @@ public interface SyntaxUnitTopicNewMapper extends BaseMapper<SyntaxUnitTopicNew>
      * @return
      */
     @Select("select count(id) from syntax_unit_topic_new where unit_id = #{unitId} and `group` = #{group}")
-    int countByUnitAndGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
+    int countByUnitIdAndGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
 
     /**
      * 查找当前单元的下一个group

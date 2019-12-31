@@ -32,11 +32,6 @@ import java.util.Objects;
 @Service(value = "freeFlowService")
 public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, StudyFlowNew> implements StudyFlowService {
 
-    /**
-     * 流程名称与 studentStudyPlanNew 中type值的映射
-     */
-    private static final Map<String, Integer> FLOW_NAME_TO_TYPE = new HashMap<>();
-
     @Resource
     private StudyFlowNewMapper studyFlowNewMapper;
 
@@ -67,12 +62,19 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     @Resource
     private LearnExtendMapper learnExtendMapper;
 
+
+    /**
+     * 流程名称与 studentStudyPlanNew 中type值的映射
+     */
+    private static final Map<String, Integer> FLOW_NAME_TO_TYPE = new HashMap<>();
+
     static {
         FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_ONE, 2);
         FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_TWO, 2);
         FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_THREE, 3);
         FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_FOUR, 3);
         FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_FIVE, 4);
+        FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_SIX, 5);
     }
 
     /**
