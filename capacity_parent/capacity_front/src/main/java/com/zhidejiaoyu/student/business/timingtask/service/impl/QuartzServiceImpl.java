@@ -515,7 +515,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
             //错误率最大的单元
             Map<String, Object> isMap = new HashMap<>();
             List<Map<String, Object>> maps = learnHistoryMapper.selectStudyUnitByStudentId(studentId);
-            if (maps.size() > 0) {
+            if (maps.size() > 5) {
                 //2,查询单元下数据的总数量
                 List<Long> unitIds = new ArrayList<>();
                 maps.forEach(map -> {
@@ -574,6 +574,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                         }
                     }
                 }
+
             }
         });
     }
