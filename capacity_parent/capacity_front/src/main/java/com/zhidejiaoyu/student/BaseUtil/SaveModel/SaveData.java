@@ -267,7 +267,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
 
         if (type.equals(3)) {
             MemoryStudyVo memoryStudyVo = getMemoryStudyVo(studyCapacity.getWord(), studyCapacity.getSyllable(),
-                    plan, firstStudy, wordCount, memoryDifficulty, memoryStrength, vocabularyId, vocabulary, unitId, wordChinese);
+                    plan, firstStudy, wordCount, memoryDifficulty, memoryStrength, vocabularyId, vocabulary, unitId, wordChinese, false);
             return ServerResponse.createBySuccess(memoryStudyVo);
         } else if (type.equals(5)) {
             WordWriteStudyVo wordWriteStudyVo = getWordWriteStudyVo(firstStudy, vocabulary, wordChinese, plan.longValue(), wordCount.longValue());
@@ -343,7 +343,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         returnMap.put("successWords", returnList);
     }
 
-    private MemoryStudyVo getMemoryStudyVo(String word, String syllable, Long plan, boolean firstStudy, Long wordCount, int memoryDifficulty, double memoryStrength, Long vocabularyId, Vocabulary vocabulary, Long unitId, String wordChinese) {
+    private MemoryStudyVo getMemoryStudyVo(String word, String syllable, Long plan, boolean firstStudy, Long wordCount, int memoryDifficulty, double memoryStrength, Long vocabularyId, Vocabulary vocabulary, Long unitId, String wordChinese, Boolean studyNew) {
 
         MemoryStudyVo memoryStudyVo = new MemoryStudyVo();
         memoryStudyVo.setWordId(vocabularyId);
@@ -354,7 +354,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         memoryStudyVo.setSyllable(syllable == null ? word : syllable);
         memoryStudyVo.setWordChinese(wordChinese);
         memoryStudyVo.setPlan(plan);
-        memoryStudyVo.setStudyNew(false);
+        memoryStudyVo.setStudyNew(studyNew);
         memoryStudyVo.setFirstStudy(firstStudy);
         memoryStudyVo.setWordCount(wordCount);
         memoryStudyVo.setReadUrl(baiduSpeak.getLanguagePath(word));
@@ -403,7 +403,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             if (type.equals(3)) {
                 MemoryStudyVo memoryStudyVo = getMemoryStudyVo(currentStudyWord.getWord(), currentStudyWord.getSyllable(),
                         plan.longValue(), firstStudy, wordCount.longValue(), 0,
-                        0.00, currentStudyWord.getId(), currentStudyWord, unitId, wordChinese);
+                        0.00, currentStudyWord.getId(), currentStudyWord, unitId, wordChinese, true);
                 return ServerResponse.createBySuccess(memoryStudyVo);
             } else if (type.equals(5)) {
                 WordWriteStudyVo wordWriteStudyVo = getWordWriteStudyVo(firstStudy, currentStudyWord, wordChinese, plan.longValue(), wordCount.longValue());

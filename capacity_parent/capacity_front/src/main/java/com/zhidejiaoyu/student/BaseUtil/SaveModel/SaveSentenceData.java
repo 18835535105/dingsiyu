@@ -87,6 +87,7 @@ public class SaveSentenceData {
             return ServerResponse.createBySuccess(sentenceTranslateVo);
         }
         if (type == 8) {
+
             return getSentenceTranslateVoServerResponse(firstStudy, plan.longValue(),
                     sentenceCount.longValue(), sentence, type);
         }
