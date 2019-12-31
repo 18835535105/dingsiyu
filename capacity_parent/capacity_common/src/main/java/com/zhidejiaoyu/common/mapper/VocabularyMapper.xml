@@ -128,6 +128,7 @@
         FROM vocabulary
         v, unit_vocabulary_new uv
         where uv.unit_id = #{unitId}
+
         AND v.id = uv.vocabulary_id AND v.delStatus = 1
     </select>
     <select id="selectByUnitIdAndGroup" resultMap="BaseResultMap"

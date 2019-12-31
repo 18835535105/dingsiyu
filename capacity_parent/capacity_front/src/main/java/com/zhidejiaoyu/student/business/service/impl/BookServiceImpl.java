@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
@@ -66,6 +67,9 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
 
     @Autowired
     private RedisOpt redisOpt;
+
+    @Resource
+    private LearnNewMapper learnNewMapper;
 
     private final String WORD_MEMORY = "慧记忆";
     private final String WORD_LISTEN = "慧听写";
@@ -299,8 +303,10 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
     public ServerResponse<PlayerVo> getPlayer(HttpSession session, Long courseId, Long unitId, Integer order) {
         PlayerVo playerVo = new PlayerVo();
         List<BookVo> bookVos = null;
+        Student student = getStudent(session);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, 1);
         // 查询当前单元下的所有单词
-        List<Vocabulary> vocabularies = redisOpt.getWordInfoInUnit(unitId);
+        List<Vocabulary> vocabularies = redisOpt.getWordInfoInUnitAndGroup(unitId, learnNew.getGroup());
         if (vocabularies.size() > 0) {
             bookVos = this.getVocabularyBooKVo(vocabularies, unitId);
             playerVo.setTotal(vocabularies.size());
