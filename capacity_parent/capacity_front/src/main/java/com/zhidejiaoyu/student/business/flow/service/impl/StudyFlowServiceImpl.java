@@ -425,7 +425,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         Long flowId = maxStudentStudyPlanNew.getFlowId();
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(flowId);
 
-        return packageFlowVO(studyFlowNew, student, maxStudentStudyPlanNew.getUnitId());
+        return this.packageFlowVO(studyFlowNew, student, maxStudentStudyPlanNew.getUnitId());
 
     }
 
