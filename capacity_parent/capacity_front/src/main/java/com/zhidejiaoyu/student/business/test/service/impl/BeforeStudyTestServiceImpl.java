@@ -352,28 +352,30 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
 
         // 初始化学生学习流程
         StudentStudyPlanNew maxStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(student.getId(), 1).get(0);
-        this.initStudentFlow(student, maxStudentStudyPlanNew);
 
         // 初始化学习内容
-        this.initLearn(student, maxStudentStudyPlanNew);
+        LearnNew learnNew = this.initLearn(student, maxStudentStudyPlanNew);
 
+        this.initStudentFlow(student, maxStudentStudyPlanNew, learnNew);
     }
 
-    public void initLearn(Student student, StudentStudyPlanNew maxStudentStudyPlanNew) {
-        learnNewMapper.insert(LearnNew.builder()
+    public LearnNew initLearn(Student student, StudentStudyPlanNew maxStudentStudyPlanNew) {
+        LearnNew learnNew = LearnNew.builder()
                 .courseId(maxStudentStudyPlanNew.getCourseId())
                 .updateTime(new Date())
                 .unitId(maxStudentStudyPlanNew.getUnitId())
                 .studentId(student.getId())
                 .group(1)
                 .easyOrHard(maxStudentStudyPlanNew.getEasyOrHard())
-                .build());
+                .build();
+        learnNewMapper.insert(learnNew);
+        return learnNew;
     }
 
-    public void initStudentFlow(Student student, StudentStudyPlanNew maxStudentStudyPlanNew) {
+    public void initStudentFlow(Student student, StudentStudyPlanNew maxStudentStudyPlanNew, LearnNew learnNew) {
         studentFlowNewMapper.insert(StudentFlowNew.builder()
                 .currentFlowId(maxStudentStudyPlanNew.getFlowId())
-                .unitId(maxStudentStudyPlanNew.getUnitId())
+                .learnId(learnNew.getId())
                 .studentId(student.getId())
                 .updateTime(new Date())
                 .type(1)

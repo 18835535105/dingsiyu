@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.dto;
 
+import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudyFlowNew;
 import lombok.Data;
@@ -73,6 +74,11 @@ public class NodeDto {
      * 非请求参数
      */
     private Student student;
+
+    /**
+     * 非请求参数
+     */
+    private LearnNew learnNew;
 
     /**
      * 非请求参数<br>

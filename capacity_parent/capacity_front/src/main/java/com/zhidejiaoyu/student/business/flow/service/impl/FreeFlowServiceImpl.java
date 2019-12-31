@@ -118,31 +118,33 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         Integer easyOrHard = dto.getEasyOrHard();
         Integer modelType = dto.getModelType();
 
+        LearnNew learnNew;
         if (dto.getNodeId() == null) {
-            LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
+            learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
             if (learnNew != null) {
-                StudyFlowNew studyFlowNew = studyFlowNewMapper.selectByStudentIdAndUnitIdAndType(studentId, unitId, modelType);
+                StudyFlowNew studyFlowNew = studyFlowNewMapper.selectByLearnId(learnNew.getId());
                 if (studyFlowNew != null) {
                     return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew, student, unitId));
                 }
-                return this.getFlowVoServerResponse(unitId, easyOrHard, modelType, student);
+                return this.getFlowVoServerResponse(learnNew, modelType, student);
             }
 
             UnitNew unitNew = unitNewMapper.selectById(unitId);
-            learnNewMapper.insert(LearnNew.builder()
+            learnNew = LearnNew.builder()
                     .easyOrHard(easyOrHard)
                     .group(1)
                     .studentId(studentId)
                     .unitId(unitId)
                     .updateTime(new Date())
                     .courseId(unitNew.getCourseId())
-                    .build());
-            return this.getFlowVoServerResponse(unitId, easyOrHard, modelType, student);
+                    .build();
+            learnNewMapper.insert(learnNew);
+            return this.getFlowVoServerResponse(learnNew, modelType, student);
         }
 
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(dto.getNodeId());
 
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(dto.getStudent().getId(), dto.getUnitId(), dto.getEasyOrHard());
+        learnNew = learnNewMapper.selectByStudentIdAndUnitId(dto.getStudent().getId(), dto.getUnitId(), dto.getEasyOrHard());
 
         if (learnNew != null) {
             // 如果学生有当前单元的学习记录，删除其学习详情，防止学生重新学习该单元时获取不到题目
@@ -154,6 +156,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
 
             learnExtendMapper.deleteByUnitIdAndStudyModel(learnNew.getId(), modelName);
             dto.setGroup(learnNew.getGroup());
+            dto.setLearnNew(learnNew);
         }
 
         dto.setStudyFlowNew(studyFlowNew);
@@ -208,33 +211,33 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
 
         // 判断当前单元单词是否有图片，如果都没有图片不进入单词图鉴
         StudyFlowNew studyFlowNew = this.getStudyFlow(dto, flowId);
-        studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(student.getId(), studyFlowNew.getId(),
-                dto.getUnitId(), FLOW_NAME_TO_TYPE.get(studyFlowNew.getFlowName()));
+        studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(studyFlowNew.getId(), dto.getLearnNew().getId());
 
         FlowVO flowVo = this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
         return ServerResponse.createBySuccess("true", flowVo);
     }
 
-    public ServerResponse<Object> getFlowVoServerResponse(Long unitId, Integer easyOrHard, Integer modelType, Student student) {
+    public ServerResponse<Object> getFlowVoServerResponse(LearnNew learnNew, Integer modelType, Student student) {
         Long studentId = student.getId();
-        StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitIdAndType(studentId, unitId, modelType);
-        Long startFlowId = this.getStartFlowId(easyOrHard, modelType);
+
+        StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByLearnId(learnNew.getId());
+        Long startFlowId = this.getStartFlowId(learnNew.getEasyOrHard(), modelType);
         if (studentFlowNew == null) {
             studentFlowNewMapper.insert(StudentFlowNew.builder()
                     .type(modelType)
                     .updateTime(new Date())
                     .studentId(studentId)
-                    .unitId(unitId)
+                    .learnId(learnNew.getId())
                     .currentFlowId(startFlowId)
                     .build());
         } else {
             studentFlowNew.setCurrentFlowId(startFlowId);
             studentFlowNew.setUpdateTime(new Date());
-            studentFlowNew.setUnitId(unitId);
+            studentFlowNew.setLearnId(learnNew.getId());
             studentFlowNewMapper.updateById(studentFlowNew);
         }
         StudyFlowNew studyFlowNew1 = studyFlowNewMapper.selectById(startFlowId);
-        return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew1, student, unitId));
+        return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew1, student, learnNew.getUnitId()));
     }
 
     /**

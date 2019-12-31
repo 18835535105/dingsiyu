@@ -7,29 +7,31 @@
         <id column="id" property="id"/>
         <result column="student_id" property="studentId"/>
         <result column="current_flow_id" property="currentFlowId"/>
-        <result column="unit_id" property="unitId"/>
+        <result column="learn_id" property="learnId"/>
         <result column="type" property="type"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
     <sql id="base_sql">
-        id, student_id, current_flow_id, unit_id, type, update_time
+        id, student_id, current_flow_id, learn_id, type, update_time
     </sql>
-    <select id="selectByStudentIdAndUnitId" resultMap="BaseResultMap" parameterType="map">
-        select
-        <include refid="base_sql"/>
-        from student_flow_new
-        where student_id = #{studentId}
-        and unit_id = #{unitId}
-        and type = 1
-        limit 1
-    </select>
+
+    <sql id="more_table_sql">
+        sfn.id, sfn.student_id, sfn.current_flow_id, sfn.learn_id, sfn.type, sfn.update_time
+    </sql>
     <select id="selectByStudentIdAndUnitIdAndType" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="base_sql"/>
-        from student_flow_new
-        where student_id = #{studentId}
-        and unit_id = #{unitId}
-        and type = #{type}
+        from student_flow_new sfn join learn l on sfn.learn_id = l.id
+        and sfn.student_id = #{studentId}
+        and l.unit_id = #{unitId}
+        and sfn.type = #{type}
+        limit 1
+    </select>
+    <select id="selectByLearnId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from student_flow_new sfn
+        where sfn.learn_id = #{learnId}
         limit 1
     </select>
 

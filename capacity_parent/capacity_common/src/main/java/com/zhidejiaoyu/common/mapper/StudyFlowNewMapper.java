@@ -1,9 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.zhidejiaoyu.common.dto.NodeDto;
-import com.zhidejiaoyu.common.pojo.StudentFlowNew;
-import com.zhidejiaoyu.common.pojo.StudyFlowNew;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.StudyFlowNew;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -17,18 +15,10 @@ import org.apache.ibatis.annotations.Param;
 public interface StudyFlowNewMapper extends BaseMapper<StudyFlowNew> {
 
     /**
-     * 获取学生当前正在学习的流程
+     * 通过learn_id查询当前学生的流程节点信息
      *
-     * @param dto
+     * @param learnId
      * @return
      */
-    StudyFlowNew selectStudentCurrentFlow(@Param("dto") NodeDto dto);
-
-    /**
-     * @param studentId
-     * @param unitId
-     * @param type
-     * @return
-     */
-    StudyFlowNew selectByStudentIdAndUnitIdAndType(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("type") Integer type);
+    StudyFlowNew selectByLearnId(@Param("learnId") Long learnId);
 }

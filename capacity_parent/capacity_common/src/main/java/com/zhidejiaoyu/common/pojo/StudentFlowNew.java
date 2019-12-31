@@ -42,9 +42,9 @@ public class StudentFlowNew extends Model<StudentFlowNew> {
      */
     private Long currentFlowId;
     /**
-     * 单元id
+     * learn_new id
      */
-    private Long unitId;
+    private Long learnId;
     private Date updateTime;
 
     /**
