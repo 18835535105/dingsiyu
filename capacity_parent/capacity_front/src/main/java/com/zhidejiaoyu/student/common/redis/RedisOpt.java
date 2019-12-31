@@ -96,7 +96,7 @@ public class RedisOpt {
         }
         StudentExpansion explain = studentExpansionMapper.selectByStudentId(studentId);
         String guide = explain.getGuide();
-        if(guide!=null){
+        if (guide != null) {
             if (guide.contains(model)) {
                 redisTemplate.opsForHash().put(RedisKeysConst.LOOK_GUIDE, studentId, guide);
                 redisTemplate.expire(RedisKeysConst.LOOK_GUIDE + studentId, 30, TimeUnit.DAYS);
@@ -293,19 +293,19 @@ public class RedisOpt {
         return vocabularies;
     }
 
-    public List<Vocabulary> getWordInfoInUnitAndGroup(Long unitId,Integer group) {
-        String hKey = RedisKeysConst.WORD_INFO_IN_UNIT + unitId+":"+group;
+    public List<Vocabulary> getWordInfoInUnitAndGroup(Long unitId, Integer group) {
+        String hKey = RedisKeysConst.WORD_INFO_IN_UNIT + unitId + ":" + group;
         List<Vocabulary> vocabularies;
         Object object = getRedisHashObject(hKey);
         if (object == null) {
-            vocabularies = vocabularyMapper.selectByUnitIdAndGroup(unitId,group);
+            vocabularies = vocabularyMapper.selectByUnitIdAndGroup(unitId, group);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, hKey, vocabularies);
         } else {
             try {
                 vocabularies = (List<Vocabulary>) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], unitId=[{}], error=[{}]", object, unitId, e.getMessage());
-                vocabularies = vocabularyMapper.selectByUnitIdAndGroup(unitId,group);
+                vocabularies = vocabularyMapper.selectByUnitIdAndGroup(unitId, group);
             }
         }
         return vocabularies;
