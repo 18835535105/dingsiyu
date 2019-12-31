@@ -105,11 +105,11 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse saveLearnSyntax(Learn learn, Boolean known) {
+    public ServerResponse saveLearnSyntax(Learn learn, Boolean known,Long flowId) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
         learn.setStudentId(student.getId());
         learn.setStudyModel(SyntaxModelNameConstant.LEARN_SYNTAX);
-        return saveLearnInfo.saveSyntax(learn, known, StudyCapacityTypeConstant.LEARN_SYNTAX,easyOrHard);
+        return saveLearnInfo.saveSyntax(student,learn, known, StudyCapacityTypeConstant.LEARN_SYNTAX,easyOrHard,flowId,SyntaxModelNameConstant.LEARN_SYNTAX);
     }
 
     /**

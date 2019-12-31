@@ -96,7 +96,7 @@ public class SaveTestLearnAndCapacity {
                                      Long[] errorWordId, HttpSession session, Student student,
                                      Long[] unitId, Integer classify) {
         // 保存正确单词/例句的学习记录和记忆追踪信息
-        saveWord(correctWord, correctWordId, session, student, unitId, classify, true);
+        //saveWord(correctWord, correctWordId, session, student, unitId, classify, true);
 
         // 保存错误单词/例句的学习记录和记忆追踪信息
         saveWord(errorWord, errorWordId, session, student, unitId, classify, false);
@@ -134,7 +134,7 @@ public class SaveTestLearnAndCapacity {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
 
         // 保存正确单词/例句的学习记录和记忆追踪信息
-        saveWord(correctWord, correctWordId, session, student, unitId, type, true);
+        //saveWord(correctWord, correctWordId, session, student, unitId, type, true);
 
         // 保存错误单词/例句的学习记录和记忆追踪信息
         saveWord(errorWord, errorWordId, session, student, unitId, type, false);
@@ -151,7 +151,8 @@ public class SaveTestLearnAndCapacity {
      */
     private void saveLearnAndCapacity(HttpSession session, Student student, Long unitId, Long id, Integer classify,
                                       boolean isTrue) {
-        // 查询学习记录
+
+        /*// 查询学习记录
         List<Learn> learns;
         if (classify <= 3) {
             // 查询单词的学习记录
@@ -211,7 +212,7 @@ public class SaveTestLearnAndCapacity {
             learn.setStatus(0);
         }
         learn.setUpdateTime(new Date());
-        learnMapper.updateById(learn);
+        learnMapper.updateById(learn);*/
     }
 
     /**

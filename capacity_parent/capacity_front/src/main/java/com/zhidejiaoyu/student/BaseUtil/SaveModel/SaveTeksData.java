@@ -132,11 +132,11 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         return null;
     }
 
-    public void insertLearnExtend(Long flowId, Long unitId, Student student) {
+    public void insertLearnExtend(Long flowId, Long unitId, Student student, String studyModel) {
         StudyFlowNew flow = saveData.getCurrentStudyFlowById(flowId);
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, 1);
         LearnExtend learnExtend = new LearnExtend();
-        learnExtend.setStudyModel("闯关测试");
+        learnExtend.setStudyModel(studyModel);
         learnExtend.setLearnId(learnNew.getId());
         learnExtend.setStudyCount(0);
         learnExtend.setLearnTime(new Date());
@@ -147,8 +147,8 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         learnExtendMapper.insert(learnExtend);
     }
 
-    public void saveStudy(HttpSession session, Long unitId, Long flowId) {
+    public void saveStudy(HttpSession session, Long unitId, Long flowId, String studyModel) {
         Student student = getStudent(session);
-        insertLearnExtend(unitId,flowId,student);
+        insertLearnExtend(flowId, unitId, student, studyModel);
     }
 }

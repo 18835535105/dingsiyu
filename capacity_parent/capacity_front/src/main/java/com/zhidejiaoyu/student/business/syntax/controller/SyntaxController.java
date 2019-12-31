@@ -90,13 +90,13 @@ public class SyntaxController extends BaseController {
      * @return
      */
     @PostMapping("/saveLearnSyntax")
-    public ServerResponse<Object> saveLearnSyntax(Learn learn, Boolean known) {
+    public ServerResponse<Object> saveLearnSyntax(Learn learn, Boolean known, Long flowId) {
         if (learn.getUnitId() == null) {
             Student student = super.getStudent(HttpUtil.getHttpSession());
             log.error("学生[{} - {} - {}]在保存学语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
             throw new RuntimeException("参数错误");
         }
-        return learnSyntaxService.saveLearnSyntax(learn, known);
+        return learnSyntaxService.saveLearnSyntax(learn, known, flowId);
     }
 
     /**
@@ -123,13 +123,13 @@ public class SyntaxController extends BaseController {
      * @return
      */
     @PostMapping("/saveSelectSyntax")
-    public ServerResponse<Object> saveSelectSyntax(Learn learn, Boolean known) {
+    public ServerResponse<Object> saveSelectSyntax(Learn learn, Boolean known, Long flowId) {
         if (learn.getUnitId() == null) {
             Student student = super.getStudent(HttpUtil.getHttpSession());
             log.error("学生[{} - {} - {}]在保存选语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
             throw new RuntimeException("参数错误");
         }
-        return selectSyntaxService.saveLearnSyntax(learn, known);
+        return selectSyntaxService.saveLearnSyntax(learn, known, flowId);
     }
 
     /**
@@ -156,12 +156,12 @@ public class SyntaxController extends BaseController {
      * @return
      */
     @PostMapping("/saveWriteSyntax")
-    public ServerResponse<Object> saveWriteSyntax(Learn learn, Boolean known) {
+    public ServerResponse<Object> saveWriteSyntax(Learn learn, Boolean known, Long flowId) {
         if (learn.getUnitId() == null) {
             Student student = super.getStudent(HttpUtil.getHttpSession());
             log.error("学生[{} - {} - {}]在保存写语法数据时，unitId=null", student.getId(), student.getAccount(), student.getStudentName());
             throw new RuntimeException("参数错误");
         }
-        return writeSyntaxService.saveLearnSyntax(learn, known);
+        return writeSyntaxService.saveLearnSyntax(learn, known, flowId);
     }
 }

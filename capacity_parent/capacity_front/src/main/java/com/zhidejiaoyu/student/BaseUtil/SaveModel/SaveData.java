@@ -60,6 +60,8 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private BaiduSpeak baiduSpeak;
     @Resource
     private RedisOpt redisOpt;
+    @Resource
+    private ErrorLearnLogMapper errorLearnLogMapper;
 
     /**
      * 以字母或数字结尾
@@ -172,6 +174,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 learn.setFirstIsKnow(0);
                 // 单词不认识将该单词记入记忆追踪中
                 studyCapacityLearn.saveCapacityMemory(learnNew, learn, student, false, type);
+                saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, learnExtends.get(0).getWordId());
             }
             int count = learnExtendMapper.insert(learn);
             // 统计初出茅庐勋章
@@ -189,6 +192,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learn, student, true, type);
             } else {
                 studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learn, student, false, type);
+                saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, learnExtends.get(0).getWordId());
             }
             // 计算记忆难度
             int memoryDifficult = memoryDifficultyUtil.getMemoryDifficulty(studyCapacity, 1);
@@ -416,6 +420,20 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         // 查询学习记录本模块学习过的所有单词id
         List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel);
         return vocabularyMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);
+    }
+
+    public void saveErrorLearnLog(Long unitId, int type, int easyOrHard, String studyModel, LearnNew learnNew,Long wordId) {
+        ErrorLearnLog errorLearnLog = new ErrorLearnLog();
+        errorLearnLog.setEasyOrHard(easyOrHard);
+        errorLearnLog.setGroup(learnNew.getGroup());
+        errorLearnLog.setStudentId(learnNew.getStudentId());
+        errorLearnLog.setStudyModel(studyModel);
+        errorLearnLog.setGroup(learnNew.getGroup());
+        errorLearnLog.setType(type);
+        errorLearnLog.setUnitId(unitId);
+        errorLearnLog.setUpdateTime(new Date());
+        errorLearnLog.setWordId(wordId);
+        errorLearnLogMapper.insert(errorLearnLog);
     }
 
 }

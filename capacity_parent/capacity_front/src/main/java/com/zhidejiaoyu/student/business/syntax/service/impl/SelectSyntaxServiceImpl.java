@@ -103,7 +103,7 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse saveLearnSyntax(Learn learn, Boolean known) {
+    public ServerResponse saveLearnSyntax(Learn learn, Boolean known,Long flowId) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
         learn.setStudentId(student.getId());
         learn.setStudyModel(SyntaxModelNameConstant.SELECT_SYNTAX);

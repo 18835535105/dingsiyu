@@ -170,7 +170,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<Object> saveLearnSyntax(Learn learn, Boolean known) {
+    public ServerResponse<Object> saveLearnSyntax(Learn learn, Boolean known,Long flowId) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
         learn.setStudentId(student.getId());
         learn.setStudyModel(SyntaxModelNameConstant.WRITE_SYNTAX);

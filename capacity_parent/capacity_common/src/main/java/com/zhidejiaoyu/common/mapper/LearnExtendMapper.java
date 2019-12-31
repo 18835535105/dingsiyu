@@ -86,4 +86,6 @@ public interface LearnExtendMapper extends BaseMapper<LearnExtend> {
      * @return
      */
     Integer selectCountByLearnIdAndWordIdAndType(@Param("learnId") Long learnId,@Param("wordId") Long wordId,@Param("type") Integer type);
+
+    LearnExtend selectByLearnIdAndWordIdAndType(@Param("learnId") Long learnId,@Param("wordId") Long wordId,@Param("type") Integer type);
 }

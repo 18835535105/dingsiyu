@@ -87,5 +87,15 @@
         and `type` =#{type}
     </select>
 
+    <select id="selectByLearnIdAndWordIdAndType" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"></include>
+        from learn_extend
+        where word_id =#{wordId}
+        and learn_id=#{learnId}
+        and `type` =#{type}
+        limit 1;
+    </select>
+
 
 </mapper>

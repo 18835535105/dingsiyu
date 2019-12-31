@@ -81,6 +81,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     @Autowired
     private SentenceMapper sentenceMapper;
+    @Resource
+    private SaveData saveData;
 
     @Autowired
     private VocabularyMapper vocabularyMapper;
@@ -146,8 +148,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     private UnitNewMapper unitNewMapper;
     @Resource
     private LearnNewMapper learnNewMapper;
-
-
 
 
     /**
@@ -995,7 +995,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     public ServerResponse<Object> saveCapSentenceTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
         Student student = getStudent(session);
         TestRecord testRecord;
-        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(),wordUnitTestDTO.getUnitId()[0],student);
+        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "音译测试");
         wordUnitTestDTO.setClassify(8);
 
         // 判断当前单元是不是首次进行测试
@@ -1061,7 +1061,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         Student student = getStudent(session);
         TestRecord testRecord;
-        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student);
+        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "课文训练");
         wordUnitTestDTO.setClassify(9);
 
         // 判断当前单元是不是首次进行测试
@@ -1132,8 +1132,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
         return getObjectServerResponse(session, wordUnitTestDTO, student, testRecord);
     }
-
-
 
 
     private ServerResponse<Object> getObjectServerResponse(HttpSession session, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord) {
@@ -1237,10 +1235,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         TestResultVo vo = new TestResultVo();
         // 是否是第一次进行当前模块下的单元闯关测试标识
         boolean isFirst = false;
-
-        String[] correctWord = wordUnitTestDTO.getCorrectWord();
-        Long[] correctWordId = wordUnitTestDTO.getCorrectWordId();
-        String[] errorWord = wordUnitTestDTO.getErrorWord();
         Long[] errorWordId = wordUnitTestDTO.getErrorWordId();
         Long[] unitId = wordUnitTestDTO.getUnitId();
         Long courseId = wordUnitTestDTO.getCourseId();
@@ -1261,8 +1255,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Integer goldCount = 0;
         int addEnergy = 0;
         if (!redisOpt.isRepeatSubmit(student.getId(), (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME))) {
-            saveTestLearnAndCapacity.saveTestAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, unitId, classify);
-
+            //saveTestLearnAndCapacity.saveTestAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, unitId, classify);
+            //保存错误信息
+            saveError(unitId[0], errorWordId, student, classify);
             goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord, false);
 
             testRecord = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, testRecord, goldCount);
@@ -1322,6 +1317,70 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         return ServerResponse.createBySuccess(vo);
     }
 
+    private void saveError(Long unitId, Long[] errorIds, Student student, Integer classify) {
+
+        Integer easyOrHard = 1;
+        if (classify.equals(2) || classify.equals(3) || classify.equals(6)) {
+            easyOrHard = 2;
+        }
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, easyOrHard);
+        for (int i = 0; i < errorIds.length; i++) {
+            saveData.saveErrorLearnLog(unitId, getModelInteger(classify), easyOrHard, getModel(classify), learnNew, errorIds[i]);
+        }
+    }
+
+    private String getModel(Integer classIfy) {
+        //0=单词图鉴 1=慧记忆 2=慧听写 3=慧默写 4=例句听力 5=例句翻译 6=例句默写
+        if (classIfy.equals(0)) {
+            return "单词图鉴";
+        }
+        if (classIfy.equals(1)) {
+            return "慧记忆";
+        }
+        if (classIfy.equals(2)) {
+            return "慧听写";
+        }
+        if (classIfy.equals(3)) {
+            return "慧默写";
+        }
+        if (classIfy.equals(4)) {
+            return "例句听力";
+        }
+        if (classIfy.equals(5)) {
+            return "例句翻译";
+        }
+        if (classIfy.equals(6)) {
+            return "例句默写";
+        }
+        return null;
+
+    }
+
+    private Integer getModelInteger(Integer classIfy) {
+        if (classIfy.equals(0)) {
+            return 1;
+        }
+        if (classIfy.equals(1)) {
+            return 3;
+        }
+        if (classIfy.equals(2)) {
+            return 4;
+        }
+        if (classIfy.equals(3)) {
+            return 5;
+        }
+        if (classIfy.equals(4)) {
+            return 7;
+        }
+        if (classIfy.equals(5)) {
+            return 8;
+        }
+        if (classIfy.equals(6)) {
+            return 10;
+        }
+        return 0;
+    }
+
     /**
      * 保存句子测试
      *
@@ -1345,10 +1404,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         TestResultVo vo = new TestResultVo();
         // 是否是第一次进行当前模块下的单元闯关测试标识
         boolean isFirst = false;
-
-        String[] correctWord = wordUnitTestDTO.getCorrectWord();
-        Long[] correctWordId = wordUnitTestDTO.getCorrectWordId();
-        String[] errorWord = wordUnitTestDTO.getErrorWord();
         Long[] errorWordId = wordUnitTestDTO.getErrorWordId();
         Long[] unitId = wordUnitTestDTO.getUnitId();
         Long courseId = unitMapper.selectCourseIdByUnitId(unitId[0]);
@@ -1370,7 +1425,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (testRecord == null) {
             isFirst = true;
         }
-        saveTestLearnAndCapacity.saveTestAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, unitId, classify);
+        saveError(unitId[0], errorWordId, student, classify);
 
         // 根据不同分数奖励学生金币
         int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord, true);

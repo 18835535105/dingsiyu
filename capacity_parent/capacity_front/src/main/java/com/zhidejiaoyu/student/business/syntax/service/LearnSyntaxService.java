@@ -26,5 +26,5 @@ public interface LearnSyntaxService extends BaseService<SyntaxTopic> {
      * @param known 是否知道 true：知道；false：不知道
      * @return
      */
-    ServerResponse<Object> saveLearnSyntax(Learn learn, Boolean known);
+    ServerResponse<Object> saveLearnSyntax(Learn learn, Boolean known, Long flowId);
 }

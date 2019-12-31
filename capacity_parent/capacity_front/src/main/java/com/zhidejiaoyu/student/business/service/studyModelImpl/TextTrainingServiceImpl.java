@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.service.studyModelImpl;
 import com.zhidejiaoyu.common.mapper.LearnNewMapper;
 import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveTeksData;
 import com.zhidejiaoyu.student.business.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -29,6 +30,7 @@ public class TextTrainingServiceImpl extends BaseServiceImpl<LearnNewMapper, Lea
 
     @Override
     public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId) {
-        return null;
+        saveTeksData.saveStudy(session, unitId, flowId, studyModel);
+        return ServerResponse.createBySuccess();
     }
 }

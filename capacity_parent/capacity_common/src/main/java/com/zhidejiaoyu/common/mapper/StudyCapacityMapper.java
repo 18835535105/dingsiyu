@@ -4,9 +4,12 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.sun.tracing.dtrace.ProviderAttributes;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
 import com.zhidejiaoyu.common.pojo.Learn;
+import com.zhidejiaoyu.common.pojo.LearnExtend;
+import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.StudyCapacity;
 import org.apache.ibatis.annotations.Param;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +46,7 @@ public interface StudyCapacityMapper extends BaseMapper<StudyCapacity> {
      * @param type
      * @return
      */
-    StudyCapacity selectByLearn(@Param("learn") Learn learn, @Param("type") int type);
+    StudyCapacity selectByLearn(@Param("learn") LearnNew learn, @Param("extend") LearnExtend learnExtend, @Param("type") int type);
 
     /**
      * 删除学生指定课程语法的记忆追踪信息
