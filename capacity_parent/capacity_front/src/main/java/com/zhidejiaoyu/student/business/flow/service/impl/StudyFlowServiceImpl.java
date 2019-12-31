@@ -84,24 +84,25 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
 
         if (dto.getNodeId() == null) {
             // 在星球页请求，返回当前正在学习的节点信息
-            StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(student.getId(), 1).get(0);
+            StudentStudyPlanNew maxFinalLevelStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(student.getId(), 1).get(0);
 
-            if (studentStudyPlanNew == null) {
+            if (maxFinalLevelStudentStudyPlanNew == null) {
                 throw new ServiceException("学生还没有进行摸底测试，未查询到可以学习的课程！");
             }
 
-            StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitId(student.getId(), studentStudyPlanNew.getUnitId());
+            StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitId(student.getId(), maxFinalLevelStudentStudyPlanNew.getUnitId());
+
+            StudyFlowNew studyFlowNew;
             if (studentFlowNew != null) {
-                StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(studentFlowNew.getCurrentFlowId());
-
-                return ServerResponse.createBySuccess(packageFlowVO(studyFlowNew, student, studentFlowNew.getUnitId()));
+                studyFlowNew = studyFlowNewMapper.selectById(studentFlowNew.getCurrentFlowId());
             } else {
-
-                this.initStudentFlow(student, studentStudyPlanNew);
-
-                StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(studentStudyPlanNew.getFlowId());
-                return ServerResponse.createBySuccess(packageFlowVO(studyFlowNew, student, studentStudyPlanNew.getUnitId()));
+                this.initStudentFlow(student, maxFinalLevelStudentStudyPlanNew);
+                studyFlowNew = studyFlowNewMapper.selectById(maxFinalLevelStudentStudyPlanNew.getFlowId());
             }
+
+            this.saveLearn(maxFinalLevelStudentStudyPlanNew);
+
+            return ServerResponse.createBySuccess(packageFlowVO(studyFlowNew, student, maxFinalLevelStudentStudyPlanNew.getUnitId()));
         }
 
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(dto.getNodeId());
@@ -119,6 +120,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         if (learnNew != null) {
             // 如果学生有当前单元的学习记录，删除其学习详情，防止学生重新学习该单元时获取不到题目
             learnExtendMapper.deleteByLearnId(learnNew.getId());
+//            studyCapacityMapper.deleteByStudentIdAndUnitIdAndTypeAndGroup(student.getId(), dto.getUnitId(), )
             dto.setGroup(learnNew.getGroup());
         }
         dto.setStudyFlowNew(studyFlowNew);
