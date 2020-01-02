@@ -34,14 +34,29 @@
         where sfn.learn_id = #{learnId}
         limit 1
     </select>
-    <select id="selectDelFlowIdByLearnIdsAndStudentId" parameterType="map" resultType="long">
+    <select id="selectByLearnIdAndType" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from student_flow_new sfn
+        where sfn.learn_id = #{learnId}
+        and `type`=#{type}
+        limit 1
+    </select>
+    <select id="selectDelIdByLearnIdsAndStudentId" parameterType="map" resultType="long">
         select id from student_flow_new where learn_id not in (
-            <foreach collection="learnList" separator="," item="learnId">
-                #{learnId}
-            </foreach>
+        <foreach collection="learnList" separator="," item="learnId">
+            #{learnId}
+        </foreach>
         )
         and student_id =#{studentId}
     </select>
+    <delete id="deleteByLearnIds" parameterType="map">
+        delect from student_flow_new where learn_id in (
+            <foreach collection="delLearnIds" item="learnId" separator=",">
+                #{learnId}
+            </foreach>
+        )
+    </delete>
 
 
 </mapper>

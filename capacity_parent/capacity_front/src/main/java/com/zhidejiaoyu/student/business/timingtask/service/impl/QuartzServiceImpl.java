@@ -534,14 +534,14 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                     int count = errorLearnLogMapper.selectCountByStudentIdAndUnitIdAndEasyOrHard
                             (studentId, studyUnit, easyOrHard);
                     Map<String, Object> studyMap = allUnitStudyCount.get(studyUnit);
-                    Integer studyCount = Integer.parseInt(studyMap.get("count").toString());
+                    int studyCount = Integer.parseInt(studyMap.get("count").toString());
                     double studyDouble = 1.0 * count / studyCount;
                     if (isMap.size() == 0) {
                         isMap.put("unitId", studyUnit);
                         isMap.put("easyOrHard", easyOrHard);
                         isMap.put("studyDouble", studyDouble);
                     } else {
-                        Double paseStudyDouble = Double.parseDouble(isMap.get("studyDouble").toString());
+                        double paseStudyDouble = Double.parseDouble(isMap.get("studyDouble").toString());
                         if (studyDouble > paseStudyDouble) {
                             isMap.put("unitId", studyUnit);
                             isMap.put("easyOrHard", easyOrHard);
@@ -552,7 +552,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 //更新错误率删除errorLog数据
                 if (isMap.size() > 0) {
                     double studyDouble = Double.parseDouble(isMap.get("studyDouble").toString());
-                    Long unitId = Long.parseLong(isMap.get("unitId").toString());
+                    long unitId = Long.parseLong(isMap.get("unitId").toString());
                     int easyOrHard = Integer.parseInt(isMap.get("easyOrHard").toString());
                     if (studyDouble > 0.0) {
                         //获取错误率最大的优先级
@@ -580,10 +580,66 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 }
                 //获取学生learn_new表与student_flow_new不匹配的数据
                 //获取learn表id
-                List<Long> longs = learnNewMapper.selectIdByStudentId(studentId);
-                studentFlowNewMapper.selectDelFlowIdByLearnIdsAndStudentId(longs,studentId);
+                List<Long> learnIds = learnNewMapper.selectIdByStudentId(studentId);
+                List<Long> delIds = studentFlowNewMapper.selectDelIdByLearnIdsAndStudentId(learnIds, studentId);
+                studentFlowNewMapper.deleteBatchIds(delIds);
+                //获取学生优先级最大的课程
+                StudentStudyPlanNew plan = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
+                LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, plan.getUnitId(), plan.getEasyOrHard());
+                //查看是否有当前learnNew数据
+                if (learnNew == null) {
+                    learnNew = new LearnNew();
+                    learnNew.setCourseId(plan.getCourseId());
+                    learnNew.setEasyOrHard(plan.getEasyOrHard());
+                    learnNew.setGroup(1);
+                    learnNew.setStudentId(studentId);
+                    learnNew.setUnitId(plan.getUnitId());
+                    learnNew.setUpdateTime(new Date());
+                    learnNewMapper.insert(learnNew);
+                    StudentFlowNew studentFlowNew = new StudentFlowNew();
+                    getStudentFlow(studentId, plan, learnNew, studentFlowNew);
+                    //判断learnNEW中的数据是否大于10个
+                    delLearnNew(studentId);
+                } else {
+                    learnNew.setUpdateTime(new Date());
+                    learnNewMapper.updateById(learnNew);
+                    //查看是否有flowNew数据
+                    StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByLearnIdAndType(learnNew.getId(), 1);
+                    if (studentFlowNew == null) {
+                        studentFlowNew = new StudentFlowNew();
+                        getStudentFlow(studentId, plan, learnNew, studentFlowNew);
+                    }
+                    delLearnNew(studentId);
+                }
             }
         });
+    }
+
+    private void delLearnNew(Long studentId) {
+        int number = learnNewMapper.selectCountByStudentId(studentId);
+        if (number > 10) {
+            number -= 10;
+            //获取需要删除的数据
+            List<LearnNew> learnNews = learnNewMapper.selectDelLearnIdByStudentIdAndNumber(studentId, number);
+            List<Long> delLearnIds = new ArrayList<>();
+            List<Long> delUnitIds = new ArrayList<>();
+            learnNews.forEach(learn -> {
+                delLearnIds.add(learn.getId());
+                delUnitIds.add(learn.getUnitId());
+            });
+            studentFlowNewMapper.deleteByLearnIds(delLearnIds);
+            learnNewMapper.deleteBatchIds(delLearnIds);
+            log.error("删除学生[{}],课程Id为[{}]", studentId, delUnitIds);
+        }
+    }
+
+    private void getStudentFlow(Long studentId, StudentStudyPlanNew plan, LearnNew learnNew, StudentFlowNew studentFlowNew) {
+        studentFlowNew.setCurrentFlowId(plan.getFlowId());
+        studentFlowNew.setLearnId(learnNew.getId());
+        studentFlowNew.setUpdateTime(new Date());
+        studentFlowNew.setStudentId(studentId);
+        studentFlowNew.setType(1);
+        studentFlowNewMapper.insert(studentFlowNew);
     }
 
     @Override
@@ -653,7 +709,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                     }
                     //获取数量
                     int addNumber = PriorityUtil.calculateTimeOfChange(number);
-                    StudentStudyPlanNew plan=new StudentStudyPlanNew();
+                    StudentStudyPlanNew plan = new StudentStudyPlanNew();
                     plan.setCourseId(courseId);
                     plan.setStudentId(studentId);
                     plan.setGroup(1);
@@ -664,14 +720,14 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                     plan.setTotalStudyCount(0);
                     plan.setEasyOrHard(70);
                     //70,79
-                    plan.setBaseLevel(PriorityUtil.getEasyOrHard(grade,1));
+                    plan.setBaseLevel(PriorityUtil.getEasyOrHard(grade, 1));
                     plan.setBaseLevel(1);
                     plan.setTimeLevel(addNumber);
-                    plan.setFinalLevel(plan.getBaseLevel()+plan.getTimeLevel()+plan.getErrorLevel());
+                    plan.setFinalLevel(plan.getBaseLevel() + plan.getTimeLevel() + plan.getErrorLevel());
                     studentStudyPlanNewMapper.insert(plan);
-                    plan.setBaseLevel(PriorityUtil.getEasyOrHard(grade,2));
+                    plan.setBaseLevel(PriorityUtil.getEasyOrHard(grade, 2));
                     plan.setEasyOrHard(79);
-                    plan.setFinalLevel(plan.getBaseLevel()+plan.getTimeLevel()+plan.getErrorLevel());
+                    plan.setFinalLevel(plan.getBaseLevel() + plan.getTimeLevel() + plan.getErrorLevel());
                     studentStudyPlanNewMapper.insert(plan);
                 }
             }
@@ -986,7 +1042,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                     weekRank = schoolWeekRankMap.get(schoolAdminId);
                     monthRank = schoolMonthRankMap.get(schoolAdminId);
                     // 与上个同学总金币相同，名次相同,不同名次累加
-                    if (currentGold != preGold) {
+                    if (currentGold == preGold) {
                         rank++;
                         if (isMonday) {
                             // 周一，更新全校周排行

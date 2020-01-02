@@ -38,7 +38,7 @@ public interface StudentFlowNewMapper extends BaseMapper<StudentFlowNew> {
     StudentFlowNew selectByStudentIdAndUnitIdAndType(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                                      @Param("type") Integer type);
 
-    List<Long> selectDelFlowIdByLearnIdsAndStudentId(@Param("learnList") List<Long> longs,@Param("studentId") Long studentId);
+    List<Long> selectDelIdByLearnIdsAndStudentId(@Param("learnList") List<Long> longs, @Param("studentId") Long studentId);
 
     /**
      * 删除学生指定类型的流程信息
@@ -55,4 +55,8 @@ public interface StudentFlowNewMapper extends BaseMapper<StudentFlowNew> {
      * @return
      */
     StudentFlowNew selectByLearnId(@Param("learnId") Long learnId);
+
+    StudentFlowNew selectByLearnIdAndType(@Param("learnId") Long learnId,@Param("type") int type);
+
+    void deleteByLearnIds(@Param("delLearnIds") List<Long> delLearnIds);
 }

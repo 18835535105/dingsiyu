@@ -52,5 +52,14 @@
           and unit_id = #{unitId}
     </select>
 
+    <select id="selectMaxFinalByStudentId" parameterType="long" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"></include>
+        from student_study_plan_new
+        where student_id = #{studentId}
+        order by final_level desc
+        limit 1
+    </select>
+
 
 </mapper>

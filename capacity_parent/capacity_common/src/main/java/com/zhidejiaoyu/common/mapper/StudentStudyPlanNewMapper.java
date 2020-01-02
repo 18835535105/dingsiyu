@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.StudentFlowNew;
 import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
 import org.apache.ibatis.annotations.Param;
 
@@ -36,4 +37,6 @@ public interface StudentStudyPlanNewMapper extends BaseMapper<StudentStudyPlanNe
     List<StudentStudyPlanNew> selectMaxFinalLevelByLimit(@Param("studentId") Long studentId, @Param("limit") Integer limit);
 
     int selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+
+    StudentStudyPlanNew selectMaxFinalByStudentId(@Param("studentId") Long studentId);
 }

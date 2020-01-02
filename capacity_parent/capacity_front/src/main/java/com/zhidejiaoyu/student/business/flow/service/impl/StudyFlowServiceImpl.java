@@ -101,7 +101,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             if (studentFlowNew != null) {
                 studyFlowNew = studyFlowNewMapper.selectById(studentFlowNew.getCurrentFlowId());
             } else {
-                this.initStudentFlow(student, maxFinalLevelStudentStudyPlanNew);
+                this.initStudentFlow(student, maxFinalLevelStudentStudyPlanNew,learnNew);
                 studyFlowNew = studyFlowNewMapper.selectById(maxFinalLevelStudentStudyPlanNew.getFlowId());
             }
 
