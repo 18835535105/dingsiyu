@@ -103,6 +103,8 @@ public class StudyCapacityLearn {
                 studyCapacity.setPush(push);
                 studyCapacity.setWord(vocabulary.getWord());
                 studyCapacity.setSyllable(StringUtils.isEmpty(vocabulary.getSyllable()) ? vocabulary.getWord() : vocabulary.getSyllable());
+                studyCapacity.setUpdateTime(new Date());
+                studyCapacity.setGroup(learn.getGroup());
                 studyCapacityMapper.insert(studyCapacity);
             }
         } else {

@@ -453,28 +453,27 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     private FlowVO finishUnit(NodeDto dto) {
 
         // 更新优先级表中的变化优先级
-        StudentStudyPlanNew maxFinalLevel = this.getMaxFinalLevelStudentStudyPlanNew(dto);
+        StudentStudyPlanNew oldMaxFinalLevel = this.getMaxFinalLevelStudentStudyPlanNew(dto);
+        this.updateLevel(dto, oldMaxFinalLevel);
 
         Student student = dto.getStudent();
         Long studentId = student.getId();
 
-        this.updateLevel(dto, maxFinalLevel);
-
         flowCommonMethod.saveOpenUnitLog(student, dto.getUnitId());
 
         // 根据优先级初始化学习表数据
-        LearnNew learnNew = this.saveLearn(maxFinalLevel);
+        StudentStudyPlanNew maxStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
+        LearnNew learnNew = this.saveLearn(maxStudentStudyPlanNew);
 
         // 将当前单元的已学习记录状态置为已完成
         learnHistoryMapper.updateStateByStudentIdAndUnitId(studentId, dto.getUnitId(), 2);
 
         studentFlowNewMapper.deleteByLearnId(dto.getLearnNew().getId());
-        Long flowId = maxFinalLevel.getFlowId();
+        Long flowId = maxStudentStudyPlanNew.getFlowId();
         this.initStudentFlow(dto.getStudent().getId(), flowId, learnNew.getId());
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(flowId);
 
-        return this.packageFlowVO(studyFlowNew, student, maxFinalLevel.getUnitId());
-
+        return this.packageFlowVO(studyFlowNew, student, maxStudentStudyPlanNew.getUnitId());
     }
 
     /**

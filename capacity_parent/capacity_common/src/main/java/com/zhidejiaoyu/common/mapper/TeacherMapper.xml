@@ -30,7 +30,8 @@
     </sql>
 
     <select id="selectByTeacherId" resultMap="BaseResultMap" parameterType="map">
-        select <include refid="base_sql"/>
+        select
+        <include refid="base_sql"/>
         from teacher
         where teacher_id = #{teacherId}
     </select>
@@ -42,7 +43,9 @@
     <select id="selectSchoolAdminIdByTeacherId" resultType="java.lang.Integer" parameterType="map">
         select school_admin_id
         from teacher
-        where teacher_id = #{teacherId} or school_admin_id=#{teacherId}
+        where teacher_id = #{teacherId}
+           or school_admin_id = #{teacherId}
+        limit 1
     </select>
 
 </mapper>
