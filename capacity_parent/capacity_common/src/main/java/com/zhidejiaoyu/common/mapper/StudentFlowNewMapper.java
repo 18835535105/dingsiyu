@@ -39,4 +39,20 @@ public interface StudentFlowNewMapper extends BaseMapper<StudentFlowNew> {
                                                      @Param("type") Integer type);
 
     List<Long> selectDelFlowIdByLearnIdsAndStudentId(@Param("learnList") List<Long> longs,@Param("studentId") Long studentId);
+
+    /**
+     * 删除学生指定类型的流程信息
+     *
+     * @param learnId
+     */
+    @Delete("delete from student_flow_new where learn_id = #{learnId}")
+    void deleteByLearnId(@Param("learnId") Long learnId);
+
+    /**
+     * 通过learn_id查询计划信息
+     *
+     * @param learnId
+     * @return
+     */
+    StudentFlowNew selectByLearnId(@Param("learnId") Long learnId);
 }

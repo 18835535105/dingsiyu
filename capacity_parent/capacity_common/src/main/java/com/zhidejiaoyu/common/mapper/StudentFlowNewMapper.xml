@@ -20,7 +20,7 @@
     </sql>
     <select id="selectByStudentIdAndUnitIdAndType" resultMap="BaseResultMap" parameterType="map">
         select
-        <include refid="base_sql"/>
+        <include refid="more_table_sql"/>
         from student_flow_new sfn join learn l on sfn.learn_id = l.id
         and sfn.student_id = #{studentId}
         and l.unit_id = #{unitId}
