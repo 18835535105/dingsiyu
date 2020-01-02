@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
      * @param unitId
      * @return
      */
-    LearnNew selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("easyOrHard")Integer easyOrHard);
+    LearnNew selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("easyOrHard") Integer easyOrHard);
 
     /**
      * 获取接下来要学的词信息
@@ -48,7 +49,7 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
                                        @Param("wordIds") List<Long> wodIds,
                                        @Param("type") Integer type,
                                        @Param("model") Integer model,
-                                       @Param("group")Integer group);
+                                       @Param("group") Integer group);
 
     /**
      * 查询当前单元是否已经学习过指定流程
@@ -65,11 +66,13 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
                                                          @Param("easyOrHard") Integer easyOrHard);
 
     /**
-     *
      * @param studentId
      * @param unitId
      * @param easyOrHard
      * @return
      */
     LearnNew selectByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("easyOrHard") Integer easyOrHard);
+
+    @Select("select id from leran_new where student_id =#{studentId}")
+    List<Long> selectIdByStudentId(@Param("studentId") Long studentId);
 }

@@ -34,6 +34,14 @@
         where sfn.learn_id = #{learnId}
         limit 1
     </select>
+    <select id="selectDelFlowIdByLearnIdsAndStudentId" parameterType="map" resultType="long">
+        select id from student_flow_new where learn_id not in (
+            <foreach collection="learnList" separator="," item="learnId">
+                #{learnId}
+            </foreach>
+        )
+        and student_id =#{studentId}
+    </select>
 
 
 </mapper>

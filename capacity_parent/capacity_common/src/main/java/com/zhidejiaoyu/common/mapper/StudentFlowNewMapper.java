@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.List;
+
 /**
  * <p>
  * Mapper 接口
@@ -35,4 +37,6 @@ public interface StudentFlowNewMapper extends BaseMapper<StudentFlowNew> {
      */
     StudentFlowNew selectByStudentIdAndUnitIdAndType(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                                      @Param("type") Integer type);
+
+    List<Long> selectDelFlowIdByLearnIdsAndStudentId(@Param("learnList") List<Long> longs,@Param("studentId") Long studentId);
 }

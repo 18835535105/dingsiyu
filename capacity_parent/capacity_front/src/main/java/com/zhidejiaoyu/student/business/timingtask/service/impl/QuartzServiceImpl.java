@@ -159,6 +159,10 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     private CourseNewMapper courseNewMapper;
     @Resource
     private SchoolTimeMapper schoolTimeMapper;
+    @Resource
+    private LearnNewMapper learnNewMapper;
+    @Resource
+    private StudentFlowNewMapper studentFlowNewMapper;
 
     /**
      * 每日 00:10:00 更新提醒消息中学生账号到期提醒
@@ -574,7 +578,10 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                         }
                     }
                 }
-
+                //获取学生learn_new表与student_flow_new不匹配的数据
+                //获取learn表id
+                List<Long> longs = learnNewMapper.selectIdByStudentId(studentId);
+                studentFlowNewMapper.selectDelFlowIdByLearnIdsAndStudentId(longs,studentId);
             }
         });
     }
