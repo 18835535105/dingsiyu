@@ -13,7 +13,6 @@ import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.redis.SyntaxRedisOpt;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
-import com.zhidejiaoyu.student.business.syntax.learnmodel.LearnModelInfo;
 import com.zhidejiaoyu.student.business.syntax.needview.SelectNeedView;
 import com.zhidejiaoyu.student.business.syntax.savelearn.SaveLearnInfo;
 import com.zhidejiaoyu.student.business.syntax.service.LearnSyntaxService;
@@ -61,7 +60,7 @@ public class SelectSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, 
         HttpUtil.getHttpSession().setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         Student student = super.getStudent(HttpUtil.getHttpSession());
 
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, easyOrHard);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(student.getId(), unitId, easyOrHard);
         int plan = learnExtendMapper.countLearnWord(student.getId(), unitId, learnNew.getGroup(), SyntaxModelNameConstant.LEARN_SYNTAX);
 
         int total = syntaxRedisOpt.getTotalSyntaxContentWithUnitId(unitId, learnNew.getGroup(), SyntaxModelNameConstant.SELECT_SYNTAX);

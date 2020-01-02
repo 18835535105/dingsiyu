@@ -57,7 +57,7 @@ public class SaveSentenceData {
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
         //获取当前单元下的learnId
-        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitId(studentId, unitId, easyOrHard);
+        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
         // 查询学生当前单元下已学习单词的个数，即学习进度
         Integer plan = learnExtendMapper.countLearnWord(learnNews.getId(), unitId, learnNews.getGroup(), studyModel);
         // 获取当前单元下的所有单词的总个数

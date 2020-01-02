@@ -144,7 +144,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
 
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(dto.getNodeId());
 
-        learnNew = learnNewMapper.selectByStudentIdAndUnitId(dto.getStudent().getId(), dto.getUnitId(), dto.getEasyOrHard());
+        learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(dto.getStudent().getId(), dto.getUnitId(), dto.getEasyOrHard());
 
         if (learnNew != null) {
             // 如果学生有当前单元的学习记录，删除其学习详情，防止学生重新学习该单元时获取不到题目

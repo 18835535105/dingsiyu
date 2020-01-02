@@ -31,12 +31,10 @@ public interface StudentFlowNewMapper extends BaseMapper<StudentFlowNew> {
      * 根据查询学生当前单元的指定类型流程
      *
      * @param studentId
-     * @param unitId
      * @param type
      * @return
      */
-    StudentFlowNew selectByStudentIdAndUnitIdAndType(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
-                                                     @Param("type") Integer type);
+    StudentFlowNew selectByStudentIdAndType(@Param("studentId") Long studentId, @Param("type") Integer type);
 
     List<Long> selectDelIdByLearnIdsAndStudentId(@Param("learnList") List<Long> longs, @Param("studentId") Long studentId);
 

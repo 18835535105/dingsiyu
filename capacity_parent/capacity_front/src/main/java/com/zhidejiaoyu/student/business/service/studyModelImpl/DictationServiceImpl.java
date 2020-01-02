@@ -2,7 +2,6 @@ package com.zhidejiaoyu.student.business.service.studyModelImpl;
 
 import com.github.pagehelper.util.StringUtil;
 import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -19,7 +18,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service(value = "dictationService")
@@ -55,7 +53,7 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
         saveData.judgeIsFirstStudy(session, student);
         // 记录学生开始学习该单词/例句的时间
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitId(studentId, unitId, easyOrHard);
+        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
         // 查询学生当前单元下已学习单词的个数，即学习进度
         Integer plan = learnExtendMapper.countLearnWord(learnNews.getId(), unitId, learnNews.getGroup(), studyModel);
         // 获取当前单元下的所有单词的总个数

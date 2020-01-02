@@ -37,7 +37,6 @@ import com.zhidejiaoyu.common.vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.vo.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
 import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveData;
-import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveSentenceData;
 import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveTeksData;
 import com.zhidejiaoyu.student.business.service.TestService;
 import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
@@ -941,7 +940,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             type = new String[]{"听力理解"};
             easyOrHard = 2;
         }
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, easyOrHard);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(student.getId(), unitId, easyOrHard);
         List<Vocabulary> vocabularies = redisOpt.getWordInfoInUnitAndGroup(unitId, learnNew.getGroup());
         // 需要封装的测试题个数
         int subjectNum = Math.min(vocabularies.size(), 20);
@@ -974,7 +973,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Override
     public ServerResponse<Object> gitUnitSentenceTest(HttpSession session, Long unitId) {
         Student student = getStudent(session);
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, 1);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(student.getId(), unitId, 1);
         //获取单元句子
         List<Sentence> sentences = sentenceMapper.selectByUnitIdAndGroup(unitId, learnNew.getGroup());
         List<Sentence> sentenceList = null;
@@ -1290,7 +1289,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
 
         if (testRecord != null) {
-            LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId[0], earyOrHard);
+            LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(student.getId(), unitId[0], earyOrHard);
             testRecord.setGroup(learnNew.getGroup());
             testRecordMapper.insert(testRecord);
             // 保存测试记录详情
@@ -1323,7 +1322,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             if (classify.equals(2) || classify.equals(3) || classify.equals(6)) {
                 easyOrHard = 2;
             }
-            LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, easyOrHard);
+            LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(student.getId(), unitId, easyOrHard);
 
             for (int i = 0; i < errorIds.length; i++) {
                 saveData.saveErrorLearnLog(unitId, getModelInteger(classify), easyOrHard, getModel(classify), learnNew, errorIds[i]);

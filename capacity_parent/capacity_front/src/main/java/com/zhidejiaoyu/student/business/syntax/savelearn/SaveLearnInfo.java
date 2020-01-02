@@ -53,7 +53,7 @@ public class SaveLearnInfo {
      */
     public ServerResponse<Object> saveSyntax(Student student, Learn learn, Boolean known, int type, int easyOrHard, Long flowId, String studyModel) {
         //Learn learned = learnMapper.selectLearnedSyntaxByUnitIdAndStudyModelAndWordId(learn);
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(learn.getStudentId(), learn.getUnitId(), easyOrHard);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(learn.getStudentId(), learn.getUnitId(), easyOrHard);
         Integer integer = learnExtendMapper.selectCountByLearnIdAndWordIdAndType(learnNew.getId(), learn.getVocabularyId(), type);
         LearnExtend extend = learnExtendMapper.selectByLearnIdAndWordIdAndType(learnNew.getId(), learn.getVocabularyId(), type);
         if (integer == 0) {

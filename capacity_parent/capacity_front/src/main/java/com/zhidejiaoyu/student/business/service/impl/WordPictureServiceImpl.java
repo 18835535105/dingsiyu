@@ -188,7 +188,7 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
         if (student.getFirstStudyTime() == null) {
             // 说明学生是第一次在本系统学习，记录首次学习时间
             student.setFirstStudyTime(new Date());
-            studentMapper.updateByPrimaryKeySelective(student);
+            studentMapper.updateById(student);
             session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         }
     }
@@ -205,7 +205,7 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
     public ServerResponse<Object> getWordPicUnitTest(HttpSession session, Long unitId, Long courseId, Boolean isTrue) {
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         Student student = getStudent(session);
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, 1);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(student.getId(), unitId, 1);
         // 获取单元下所有有图片的单词
         List<Vocabulary> list = vocabularyMapper.getWordPicAll(unitId,learnNew.getGroup());
 

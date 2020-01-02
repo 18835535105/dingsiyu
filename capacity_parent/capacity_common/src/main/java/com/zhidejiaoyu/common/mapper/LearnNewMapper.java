@@ -32,9 +32,10 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
      *
      * @param studentId
      * @param unitId
+     * @param easyOrHard
      * @return
      */
-    LearnNew selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("easyOrHard") Integer easyOrHard);
+    LearnNew selectByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("easyOrHard") Integer easyOrHard);
 
     /**
      * 获取接下来要学的词信息
@@ -65,19 +66,11 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
     List<Long> selectIdByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                                          @Param("easyOrHard") Integer easyOrHard);
 
-    /**
-     * @param studentId
-     * @param unitId
-     * @param easyOrHard
-     * @return
-     */
-    LearnNew selectByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("easyOrHard") Integer easyOrHard);
-
     @Select("select id from leran_new where student_id =#{studentId}")
     List<Long> selectIdByStudentId(@Param("studentId") Long studentId);
 
     @Select("select count(id) from leran_new where student_id =#{studentId}")
     int selectCountByStudentId(Long studentId);
 
-    List<LearnNew> selectDelLearnIdByStudentIdAndNumber(@Param("studentId") Long studentId,@Param("number") int number);
+    List<LearnNew> selectDelLearnIdByStudentIdAndNumber(@Param("studentId") Long studentId, @Param("number") int number);
 }

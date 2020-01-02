@@ -27,4 +27,9 @@ public class StudentFlowNewMapperTest extends BaseTest {
                 .build(), new EntityWrapper<StudentFlowNew>().eq("student_id", 9604)
                 .eq("unit_id", 11111));
     }
+
+    @Test
+    public void deleteByStudentAndType() {
+        studentFlowNewMapper.deleteByLearnId(12L);
+    }
 }

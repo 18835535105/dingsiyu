@@ -54,22 +54,6 @@ public class FlowCommonMethod {
 
         // 判断学生是否在当前分数段
         if (studyFlowNew.getType() != null) {
-            StudyFlowNew falseFlow = studyFlowNewMapper.selectById(studyFlowNew.getNextFalseFlow());
-            StudyFlowNew trueFlow = studyFlowNewMapper.selectById(studyFlowNew.getNextTrueFlow());
-
-            // 游戏前测节点 id
-            int gameTestFlowId = 3;
-            if (Objects.equals(gameTestFlowId, falseFlow.getType())) {
-                ServerResponse<Object> x = this.toNextNode(dto, falseFlow, studyFlowService);
-                if (x != null) {
-                    return x;
-                }
-            } else if (Objects.equals(gameTestFlowId, trueFlow.getType())) {
-                ServerResponse<Object> x = this.toNextNode(dto, trueFlow, studyFlowService);
-                if (x != null) {
-                    return x;
-                }
-            }
 
             Long grade = dto.getGrade();
             if (grade >= studyFlowNew.getType()) {

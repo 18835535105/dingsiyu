@@ -304,7 +304,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
         PlayerVo playerVo = new PlayerVo();
         List<BookVo> bookVos = null;
         Student student = getStudent(session);
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitId(student.getId(), unitId, 1);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(student.getId(), unitId, 1);
         // 查询当前单元下的所有单词
         List<Vocabulary> vocabularies = redisOpt.getWordInfoInUnitAndGroup(unitId, learnNew.getGroup());
         if (vocabularies.size() > 0) {

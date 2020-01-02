@@ -18,13 +18,12 @@
     <sql id="more_table_sql">
         sfn.id, sfn.student_id, sfn.current_flow_id, sfn.learn_id, sfn.type, sfn.update_time
     </sql>
-    <select id="selectByStudentIdAndUnitIdAndType" resultMap="BaseResultMap" parameterType="map">
+    <select id="selectByStudentIdAndType" resultMap="BaseResultMap" parameterType="map">
         select
-        <include refid="more_table_sql"/>
-        from student_flow_new sfn join learn l on sfn.learn_id = l.id
-        and sfn.student_id = #{studentId}
-        and l.unit_id = #{unitId}
-        and sfn.type = #{type}
+        <include refid="base_sql"/>
+        from student_flow_new
+        where student_id = #{studentId}
+        and type = #{type}
         limit 1
     </select>
     <select id="selectByLearnId" resultMap="BaseResultMap" parameterType="map">
