@@ -28,6 +28,7 @@
              unit_vocabulary_new uv
         where uv.unit_id = #{unitId}
           and uv.vocabulary_id = v.id
+          and uv.group = #{group}
           and (v.small_picture_url is not null
             or v.middle_picture_url is not null
             or v.high_picture_url is not null)

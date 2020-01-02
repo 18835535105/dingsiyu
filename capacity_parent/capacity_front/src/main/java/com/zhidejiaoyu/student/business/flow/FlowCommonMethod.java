@@ -29,9 +29,6 @@ import java.util.Objects;
 public class FlowCommonMethod {
 
     @Resource
-    private StudyFlowNewMapper studyFlowNewMapper;
-
-    @Resource
     private UnitNewMapper unitNewMapper;
 
     @Resource
@@ -39,6 +36,9 @@ public class FlowCommonMethod {
 
     @Resource
     private OpenUnitLogMapper openUnitLogMapper;
+
+    @Resource
+    private StudyFlowNewMapper studyFlowNewMapper;
 
     public ServerResponse<Object> judgeNextNode(NodeDto dto, StudyFlowService studyFlowService) {
         String isTrueFlow = dto.getTrueFlow();
@@ -54,6 +54,23 @@ public class FlowCommonMethod {
 
         // 判断学生是否在当前分数段
         if (studyFlowNew.getType() != null) {
+
+            StudyFlowNew falseFlow = studyFlowNewMapper.selectById(studyFlowNew.getNextFalseFlow());
+            StudyFlowNew trueFlow = studyFlowNewMapper.selectById(studyFlowNew.getNextTrueFlow());
+
+            // 游戏前测节点 id
+            int gameTestFlowId = 3;
+            if (falseFlow != null && Objects.equals(gameTestFlowId, falseFlow.getType())) {
+                ServerResponse<Object> x = this.toNextNode(dto, falseFlow, studyFlowService);
+                if (x != null) {
+                    return x;
+                }
+            } else if (trueFlow != null && Objects.equals(gameTestFlowId, trueFlow.getType())) {
+                ServerResponse<Object> x = this.toNextNode(dto, trueFlow, studyFlowService);
+                if (x != null) {
+                    return x;
+                }
+            }
 
             Long grade = dto.getGrade();
             if (grade >= studyFlowNew.getType()) {

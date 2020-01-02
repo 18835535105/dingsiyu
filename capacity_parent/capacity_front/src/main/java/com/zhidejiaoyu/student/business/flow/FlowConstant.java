@@ -21,6 +21,11 @@ public interface FlowConstant {
      */
     long HARD_START = 118;
 
+    /**
+     * 一键学习课文试听
+     */
+    long TEKS_LISTEN = 89;
+
 
     /**
      * 自由学习
