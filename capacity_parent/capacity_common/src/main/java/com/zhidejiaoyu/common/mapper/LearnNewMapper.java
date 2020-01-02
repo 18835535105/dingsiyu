@@ -66,10 +66,10 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
     List<Long> selectIdByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                                          @Param("easyOrHard") Integer easyOrHard);
 
-    @Select("select id from leran_new where student_id =#{studentId}")
+    @Select("select id from learn_new where student_id =#{studentId}")
     List<Long> selectIdByStudentId(@Param("studentId") Long studentId);
 
-    @Select("select count(id) from leran_new where student_id =#{studentId}")
+    @Select("select count(id) from learn_new where student_id =#{studentId}")
     int selectCountByStudentId(Long studentId);
 
     List<LearnNew> selectDelLearnIdByStudentIdAndNumber(@Param("studentId") Long studentId, @Param("number") int number);

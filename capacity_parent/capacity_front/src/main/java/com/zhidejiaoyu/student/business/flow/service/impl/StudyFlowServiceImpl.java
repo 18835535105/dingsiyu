@@ -423,6 +423,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             // 查询已完成表中是否已有当前group信息，有更新，没有新增
             LearnHistory.LearnHistoryBuilder builder = LearnHistory.builder()
                     .studentId(dto.getStudent().getId())
+                    .courseId(dto.getCourseId())
                     .unitId(dto.getUnitId())
                     .group(dto.getGroup())
                     .easyOrHard(dto.getEasyOrHard())
