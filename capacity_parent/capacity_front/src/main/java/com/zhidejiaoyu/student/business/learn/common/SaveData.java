@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
+import com.zhidejiaoyu.common.study.memorydifficulty.WordMemoryDifficulty;
 import com.zhidejiaoyu.common.utils.PictureUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
@@ -62,6 +63,9 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     @Resource
     private ErrorLearnLogMapper errorLearnLogMapper;
 
+    @Resource
+    private WordMemoryDifficulty wordMemoryDifficulty;
+
     /**
      * 以字母或数字结尾
      */
@@ -109,10 +113,8 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
 
         Date now = DateUtil.parseYYYYMMDDHHMMSS(new Date());
         Long studentId = student.getId();
-        LearnExtend learn = new LearnExtend();
         judgeIsFirstStudy(session, student);
-        //获取校长id
-        learn.setSchoolAdminId(Long.parseLong(teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId()).toString()));
+
         //获取学生学习当前模块的learn_id
         List<Long> learnIds = learnNewMapper.selectIdByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
         //如果有多余的删除
@@ -148,32 +150,35 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             studyCapacityMapper.deleteByStudentIdAndUnitIdAndVocabulary(studentId, unitId, wordId, type);
             return true;
         }
-        learn.setLearnId(learnId);
-        learn.setWordId(wordId);
+        LearnExtend learnExtend = new LearnExtend();
+        //获取校长id
+        learnExtend.setSchoolAdminId(Long.parseLong(teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId()).toString()));
+        learnExtend.setLearnId(learnId);
+        learnExtend.setWordId(wordId);
         // 保存学习记录
         // 第一次学习，如果答对记为熟词，答错记为生词
         LearnNew learnNew = learnNewMapper.selectById(learnId);
         if (currentLearn == null) {
-            learn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
-            learn.setStudyModel(studyModel);
-            learn.setStudyCount(1);
-            learn.setUpdateTime(now);
+            learnExtend.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
+            learnExtend.setStudyModel(studyModel);
+            learnExtend.setStudyCount(1);
+            learnExtend.setUpdateTime(now);
             StudyFlowNew currentStudyFlow = this.getCurrentStudyFlowById(flowId);
             if (currentStudyFlow != null) {
-                learn.setFlowName(currentStudyFlow.getFlowName());
+                learnExtend.setFlowName(currentStudyFlow.getFlowName());
             }
             if (isTrue) {
                 // 如果认识该单词，记为熟词
-                learn.setStatus(1);
-                learn.setFirstIsKnow(1);
+                learnExtend.setStatus(1);
+                learnExtend.setFirstIsKnow(1);
             } else {
-                learn.setStatus(0);
-                learn.setFirstIsKnow(0);
+                learnExtend.setStatus(0);
+                learnExtend.setFirstIsKnow(0);
                 // 单词不认识将该单词记入记忆追踪中
-                studyCapacityLearn.saveCapacityMemory(learnNew, learn, student, false, type);
-                saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, learn.getWordId());
+                studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, false, type);
+                saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, learnExtend.getWordId());
             }
-            int count = learnExtendMapper.insert(learn);
+            int count = learnExtendMapper.insert(learnExtend);
             // 统计初出茅庐勋章
             executorService.execute(() -> medalAwardAsync.inexperienced(student));
             if (count > 0 && total == (plan + 1)) {
@@ -181,16 +186,16 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             }
             return count > 0;
         } else {
-            learn.setStudyCount(currentLearn.getStudyCount() + 1);
+            learnExtend.setStudyCount(currentLearn.getStudyCount() + 1);
             StudyCapacity studyCapacity;
             if (isTrue) {
-                studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learn, student, true, type);
+                studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, true, type);
             } else {
-                studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learn, student, false, type);
+                studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, false, type);
                 saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, learnExtends.get(0).getWordId());
             }
             // 计算记忆难度
-            int memoryDifficult = memoryDifficultyUtil.getMemoryDifficulty(studyCapacity, 1);
+            int memoryDifficult = wordMemoryDifficulty.getMemoryDifficulty(studyCapacity);
             // 更新学习记录
             currentLearn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
             session.removeAttribute(TimeConstant.BEGIN_START_TIME);
@@ -249,7 +254,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private ServerResponse<Object> returnGoldWord(StudyCapacity studyCapacity, Long plan, boolean firstStudy,
                                                   Long wordCount, Integer type) {
         // 计算当前单词的记忆难度
-        int memoryDifficulty = memoryDifficultyUtil.getMemoryDifficulty(studyCapacity, 1);
+        int memoryDifficulty = wordMemoryDifficulty.getMemoryDifficulty(studyCapacity);
         // 计算当前单词的记忆强度
         double memoryStrength = studyCapacity.getMemoryStrength();
         Long vocabularyId = studyCapacity.getWordId();

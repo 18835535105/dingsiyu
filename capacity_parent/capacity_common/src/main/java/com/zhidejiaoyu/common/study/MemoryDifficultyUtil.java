@@ -6,9 +6,9 @@ import com.zhidejiaoyu.common.mapper.simple.SimpleLearnMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.List;
@@ -23,114 +23,18 @@ import java.util.List;
 @Component
 public class MemoryDifficultyUtil {
 
-    @Autowired
+    @Resource
     private LearnMapper learnMapper;
 
-    @Autowired
+    @Resource
     private SimpleLearnMapper simpleLearnMapper;
 
-    @Autowired
+    @Resource
     private SimpleCommonMethod simpleCommonMethod;
 
-    @Autowired
+    @Resource
     private StudentMapper studentMapper;
 
-    /**
-     * 计算同步版当前单词/例句的记忆难度
-     *
-     * @param studyCapacity 记忆追踪模块对象
-     * @param flag          1:计算单词的记忆难度；2：计算例句的记忆难度
-     * @return 当前单词的记忆难度 0:熟词；其余情况为生词
-     */
-    public int getMemoryDifficulty(StudyCapacity studyCapacity, Integer flag) throws RuntimeException {
-        if (studyCapacity == null) {
-            return 0;
-        }
-        try {
-            Long studentId = studyCapacity.getStudentId();
-            Long unitId = studyCapacity.getUnitId();
-            Long id = studyCapacity.getWordId();
-            int type = studyCapacity.getType();
-            String studyModel = "";
-            switch (type) {
-                case 1:
-                    studyModel = "单词图鉴";
-                    break;
-                case 2:
-                    studyModel = "单词播放机";
-                    break;
-                case 3:
-                    studyModel = "慧记忆";
-                    break;
-                case 4:
-                    studyModel = "慧听写";
-                    break;
-                case 5:
-                    studyModel = "慧默写";
-                    break;
-                case 6:
-                    studyModel = "单词游戏";
-                    break;
-                case 7:
-                    studyModel = "句型翻译";
-                    break;
-                case 8:
-                    studyModel = "句型听力";
-                    break;
-                case 9:
-                    studyModel = "音译练习";
-                    break;
-                case 10:
-                    studyModel = "句型默写";
-                    break;
-                case 11:
-                    studyModel = "课文试听";
-                    break;
-                case 12:
-                    studyModel = "课文训练";
-                    break;
-                case 13:
-                    studyModel = "闯关测试";
-                    break;
-                case 14:
-                    studyModel = "课文跟读";
-                    break;
-                case 15:
-                    studyModel = "读语法";
-                    break;
-                case 17:
-                    studyModel = "写语法";
-                    break;
-                case 18:
-                    studyModel = "语法游戏";
-                    break;
-                default:
-                    return 0;
-            }
-            // 获取记忆强度
-            Double memoryStrength = studyCapacity.getMemoryStrength();
-
-            // 获取单词的错误次数
-            Integer errCount = studyCapacity.getFaultTime();
-
-            // 获取单词的学习次数
-            Integer studyCount = this.getStudyCount(studentId, unitId, id, flag, studyModel);
-
-            // 保存记忆追踪时计算记忆难度：由于先保存的记忆追踪信息，其中的错误次数已经+1，而学习次数还是原来的，可能出现错误次数>学习次数的的情况，所以学习次数也要在原基础上+1
-            if (errCount > studyCount) {
-                studyCount++;
-            }
-
-            if (errCount > studyCount) {
-                log.warn("学生 {} 在单元 {} 模块 {} 下的单词 {} 错误次数大于了学习次数！", studentId, unitId, studyModel, id);
-                errCount = studyCount;
-            }
-            return getMemoryDifficulty(memoryStrength, errCount, studyCount);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
 
     /**
      * 计算同步版当前单词/例句的记忆难度

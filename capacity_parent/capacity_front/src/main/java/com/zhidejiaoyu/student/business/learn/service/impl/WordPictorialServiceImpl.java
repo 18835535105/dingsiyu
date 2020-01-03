@@ -2,14 +2,16 @@ package com.zhidejiaoyu.student.business.learn.service.impl;
 
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
+import com.zhidejiaoyu.common.pojo.LearnNew;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.StudyCapacity;
+import com.zhidejiaoyu.common.study.memorydifficulty.WordMemoryDifficulty;
 import com.zhidejiaoyu.common.utils.PictureUtil;
-import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.ReviewServiceImpl;
@@ -28,11 +30,6 @@ import java.util.*;
 @Slf4j
 public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnNew> implements IStudyService {
 
-    /**
-     * 记忆难度
-     */
-    @Resource
-    private MemoryDifficultyUtil memoryDifficultyUtil;
     @Resource
     private UnitVocabularyNewMapper unitVocabularyNewMapper;
     @Resource
@@ -49,6 +46,10 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
     private SaveData saveData;
     @Resource
     private RedisOpt redisOpt;
+
+    @Resource
+    private WordMemoryDifficulty wordMemoryDifficulty;
+
     private Integer model = 1;
     private Integer type = 1;
     private Integer easyOrHard = 1;
@@ -62,9 +63,9 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
         // 判断学生是否在本系统首次学习，如果是记录首次学习时间
         saveData.judgeIsFirstStudy(session, student);
         //获取当前单元下的learnId
-        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
         //获取是否有可以学习的单词信息
-        int wordCount = unitVocabularyNewMapper.countWordPictureByUnitId(unitId, learnNews.getGroup());
+        int wordCount = unitVocabularyNewMapper.countWordPictureByUnitId(unitId, learnNew.getGroup());
         if (wordCount == 0) {
             log.error("单元 {} 下没有单词图鉴信息！", unitId);
             return ServerResponse.createByErrorMessage("The unit no pictures");
@@ -72,10 +73,10 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
 
         // 1. 根据随机数获取题型, 并查出一道正确的题
         // 1.1 去慧记忆中查询单词图鉴是否有需要复习的单词
-        Map<String, Object> correct = studyCapacityMapper.selectNeedReviewWord(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, learnNews.getGroup());
+        Map<String, Object> correct = studyCapacityMapper.selectNeedReviewWord(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, learnNew.getGroup());
         // 没有需要复习的
         if (correct == null) {
-            correct = this.getSudyWords(unitId, studentId, type, model, learnNews.getGroup(), studyModel);
+            correct = this.getSudyWords(unitId, studentId, type, model, learnNew.getGroup(), studyModel);
             if (correct == null) {
                 return super.toUnitTest();
             }
@@ -94,28 +95,28 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
         // 记忆难度
-        StudyCapacity cp = new StudyCapacity();
-        cp.setStudentId(studentId);
-        cp.setUnitId(unitId);
-        cp.setWordId(Long.valueOf(correct.get("id").toString()));
+        StudyCapacity studyCapacity = new StudyCapacity();
+        studyCapacity.setStudentId(studentId);
+        studyCapacity.setUnitId(unitId);
+        studyCapacity.setWordId(Long.valueOf(correct.get("id").toString()));
         Object faultTime = correct.get("fault_time");
         Object memoryStrength = correct.get("memory_strength");
-        cp.setType(type);
+        studyCapacity.setType(type);
         if (faultTime == null) {
-            cp.setFaultTime(0);
+            studyCapacity.setFaultTime(0);
         } else {
-            cp.setFaultTime(Integer.parseInt(faultTime.toString()));
+            studyCapacity.setFaultTime(Integer.parseInt(faultTime.toString()));
         }
         if (memoryStrength == null) {
-            cp.setMemoryStrength(0.0);
+            studyCapacity.setMemoryStrength(0.0);
         } else {
-            cp.setMemoryStrength(Double.parseDouble(memoryStrength.toString()));
+            studyCapacity.setMemoryStrength(Double.parseDouble(memoryStrength.toString()));
         }
-        int hard = memoryDifficultyUtil.getMemoryDifficulty(cp, 1);
+        int hard = wordMemoryDifficulty.getMemoryDifficulty(studyCapacity);
         correct.put("memoryDifficulty", hard);
 
         // 认知引擎
-        correct.put("engine", PerceiveEngineUtil.getPerceiveEngine(hard, cp.getMemoryStrength()));
+        correct.put("engine", PerceiveEngineUtil.getPerceiveEngine(hard, studyCapacity.getMemoryStrength()));
 
         // 读音url
         correct.put("readUrl", baiduSpeak.getLanguagePath(correct.get("word").toString()));

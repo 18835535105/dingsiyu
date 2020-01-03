@@ -2,10 +2,9 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.LearnExtend;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.zhidejiaoyu.common.pojo.LearnNew;
+import com.zhidejiaoyu.common.pojo.StudyCapacity;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Map;
@@ -80,12 +79,22 @@ public interface LearnExtendMapper extends BaseMapper<LearnExtend> {
 
     /**
      * 查询句子学习次数
+     *
      * @param learnId
      * @param wordId
      * @param type
      * @return
      */
-    Integer selectCountByLearnIdAndWordIdAndType(@Param("learnId") Long learnId,@Param("wordId") Long wordId,@Param("type") Integer type);
+    Integer selectCountByLearnIdAndWordIdAndType(@Param("learnId") Long learnId, @Param("wordId") Long wordId, @Param("type") Integer type);
 
-    LearnExtend selectByLearnIdAndWordIdAndType(@Param("learnId") Long learnId,@Param("wordId") Long wordId,@Param("type") Integer type);
+    LearnExtend selectByLearnIdAndWordIdAndType(@Param("learnId") Long learnId, @Param("wordId") Long wordId, @Param("type") Integer type);
+
+    /**
+     * 查询指定单词的学习次数
+     *
+     * @param studyCapacity
+     * @param studyModel
+     * @return
+     */
+    Integer selectStudyCount(@Param("studyCapacity") StudyCapacity studyCapacity, @Param("studyModel") String studyModel);
 }
