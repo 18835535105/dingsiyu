@@ -17,7 +17,14 @@ public interface IMemoryStrength {
      */
     Double getMemoryStrength(Double currentMemoryStrength, Boolean isRight);
 
-    default Double defaultetMemoryStrength(Double currentMemoryStrength, Boolean isRight) {
+    /**
+     * 计算记忆强度
+     *
+     * @param currentMemoryStrength
+     * @param isRight
+     * @return
+     */
+    default Double defaultMemoryStrength(Double currentMemoryStrength, Boolean isRight) {
         if (isRight) {
             double memoryStrength = BigDecimalUtil.add(currentMemoryStrength, 0.13);
             return memoryStrength > 1 ? 1.0 : memoryStrength;

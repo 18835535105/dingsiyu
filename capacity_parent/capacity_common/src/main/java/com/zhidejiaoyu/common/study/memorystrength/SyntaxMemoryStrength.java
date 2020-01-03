@@ -13,6 +13,6 @@ import org.springframework.stereotype.Component;
 public class SyntaxMemoryStrength implements IMemoryStrength {
     @Override
     public Double getMemoryStrength(Double currentMemoryStrength, Boolean isRight) {
-        return defaultetMemoryStrength(currentMemoryStrength, isRight);
+        return defaultMemoryStrength(currentMemoryStrength, isRight);
     }
 }

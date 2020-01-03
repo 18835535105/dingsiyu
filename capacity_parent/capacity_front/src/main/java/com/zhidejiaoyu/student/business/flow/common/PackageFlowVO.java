@@ -21,6 +21,7 @@ import javax.annotation.Resource;
  * @date: 2020/1/3 10:34:34
  */
 @Component
+@SuppressWarnings("all")
 public class PackageFlowVO {
 
     @Resource

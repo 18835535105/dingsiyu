@@ -12,6 +12,6 @@ import org.springframework.stereotype.Component;
 public class StudyMemoryStrength implements IMemoryStrength {
     @Override
     public Double getMemoryStrength(Double currentMemoryStrength, Boolean isRight) {
-        return defaultetMemoryStrength(currentMemoryStrength, isRight);
+        return defaultMemoryStrength(currentMemoryStrength, isRight);
     }
 }
