@@ -157,6 +157,8 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             learnExtendMapper.deleteByUnitIdAndStudyModel(learnNew.getId(), modelName);
             dto.setGroup(learnNew.getGroup());
             dto.setLearnNew(learnNew);
+        } else {
+            dto.setGroup(1);
         }
 
         dto.setStudyFlowNew(studyFlowNew);
@@ -286,7 +288,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         }
 
         // 当前单元含有图片的单词个数，如果大于零，执行正常流程，否则跳过单词图鉴模块
-        int pictureCount = unitVocabularyNewMapper.countPicture(unitId);
+        int pictureCount = unitVocabularyNewMapper.countPicture(unitId, dto.getGroup());
         if (pictureCount > 0) {
             return byPrimaryKey;
         }

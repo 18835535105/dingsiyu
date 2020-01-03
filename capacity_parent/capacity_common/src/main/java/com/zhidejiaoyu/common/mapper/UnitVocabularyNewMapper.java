@@ -60,7 +60,8 @@ public interface UnitVocabularyNewMapper extends BaseMapper<UnitVocabularyNew> {
      * 统计当前单元下含有单词图鉴的单词个数
      *
      * @param unitId
+     * @param group
      * @return
      */
-    int countPicture(@Param("unitId") Long unitId);
+    int countPicture(@Param("unitId") Long unitId, @Param("group") Integer group);
 }

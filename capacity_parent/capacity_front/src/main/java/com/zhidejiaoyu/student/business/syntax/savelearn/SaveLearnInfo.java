@@ -27,8 +27,6 @@ public class SaveLearnInfo {
     private StudyCapacityMapper studyCapacityMapper;
 
     @Resource
-    private LearnMapper learnMapper;
-    @Resource
     private TeacherMapper teacherMapper;
 
     @Resource
@@ -52,7 +50,6 @@ public class SaveLearnInfo {
      * @return
      */
     public ServerResponse<Object> saveSyntax(Student student, Learn learn, Boolean known, int type, int easyOrHard, Long flowId, String studyModel) {
-        //Learn learned = learnMapper.selectLearnedSyntaxByUnitIdAndStudyModelAndWordId(learn);
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(learn.getStudentId(), learn.getUnitId(), easyOrHard);
         Integer integer = learnExtendMapper.selectCountByLearnIdAndWordIdAndType(learnNew.getId(), learn.getVocabularyId(), type);
         LearnExtend extend = learnExtendMapper.selectByLearnIdAndWordIdAndType(learnNew.getId(), learn.getVocabularyId(), type);
