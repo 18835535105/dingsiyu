@@ -34,7 +34,7 @@ public class SyntaxMemoryDifficulty extends CheckMemoryDifficultyParam implement
             return 1;
         }
 
-        Integer easyOrHard = 1;
+        int easyOrHard = 1;
         if (studyCapacity.getType().equals(22)) {
             easyOrHard = 2;
         }

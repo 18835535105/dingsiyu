@@ -2,10 +2,7 @@ package com.zhidejiaoyu.student.business.flow;
 
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.dto.NodeDto;
-import com.zhidejiaoyu.common.mapper.CourseNewMapper;
-import com.zhidejiaoyu.common.mapper.OpenUnitLogMapper;
-import com.zhidejiaoyu.common.mapper.StudyFlowNewMapper;
-import com.zhidejiaoyu.common.mapper.UnitNewMapper;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.TokenUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
@@ -39,6 +36,9 @@ public class FlowCommonMethod {
 
     @Resource
     private StudyFlowNewMapper studyFlowNewMapper;
+
+    @Resource
+    private UnitVocabularyNewMapper unitVocabularyNewMapper;
 
     public ServerResponse<Object> judgeNextNode(NodeDto dto, StudyFlowService studyFlowService) {
         String isTrueFlow = dto.getTrueFlow();
@@ -158,6 +158,33 @@ public class FlowCommonMethod {
     public void changeFlowNodeLog(Student student, String model, UnitNew unit, int flowId) {
         log.info("单元[{}]没有单词图片，学生[{} - {} - {}]进入{}流程，流程 id=[{}]",
                 unit.getJointName(), student.getId(), student.getAccount(), student.getStudentName(), model, flowId);
+    }
+
+    /**
+     * 验证是否可以进行单词图鉴流程
+     *
+     * @param dto
+     * @param studyFlowNew
+     * @return true：可以正常执行流程；false：不执行单词图鉴流程
+     */
+    public boolean judgeWordPicture(NodeDto dto, StudyFlowNew studyFlowNew) {
+        // 如果下个节点不是单词图鉴模块，执行正常流程
+        String studyModel = "单词图鉴";
+        if (!studyFlowNew.getModelName().contains(studyModel)) {
+            return true;
+        }
+
+        Long unitId = dto.getUnitId();
+        if (unitId == null) {
+            return true;
+        }
+
+        // 当前单元含有图片的单词个数，如果大于零，执行正常流程，否则跳过单词图鉴模块
+        int pictureCount = unitVocabularyNewMapper.countPicture(unitId, dto.getGroup());
+        if (pictureCount > 0) {
+            return true;
+        }
+        return false;
     }
 
 }

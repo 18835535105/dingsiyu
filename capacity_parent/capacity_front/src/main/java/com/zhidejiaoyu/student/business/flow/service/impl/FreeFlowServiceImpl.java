@@ -51,9 +51,6 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     private CcieUtil ccieUtil;
 
     @Resource
-    private UnitVocabularyNewMapper unitVocabularyNewMapper;
-
-    @Resource
     private LearnHistoryMapper learnHistoryMapper;
 
     @Resource
@@ -66,23 +63,11 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     private StudyCapacityMapper studyCapacityMapper;
 
     /**
-     * 流程名称与 studentStudyPlanNew 中type值的映射
-     */
-    private static final Map<String, Integer> FLOW_NAME_TO_TYPE = new HashMap<>();
-
-    /**
      * 流程名称与 studyCapacity 中 type 的映射
      */
     private static final Map<String, Integer> FLOW_NAME_TO_STUDY_CAPACITY_TYPE = new HashMap<>();
 
     static {
-        FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_ONE, 2);
-        FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_TWO, 2);
-        FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_THREE, 3);
-        FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_FOUR, 3);
-        FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_FIVE, 4);
-        FLOW_NAME_TO_TYPE.put(FlowConstant.FLOW_SIX, 5);
-
         FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("单词图鉴", 1);
         FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("慧记忆", 3);
         FLOW_NAME_TO_STUDY_CAPACITY_TYPE.put("慧听写", 4);
@@ -144,13 +129,13 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
 
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(dto.getNodeId());
 
-        learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(dto.getStudent().getId(), dto.getUnitId(), dto.getEasyOrHard());
+        learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, dto.getUnitId(), dto.getEasyOrHard());
 
         if (learnNew != null) {
             // 如果学生有当前单元的学习记录，删除其学习详情，防止学生重新学习该单元时获取不到题目
             String modelName = studyFlowNew.getModelName();
             if (FLOW_NAME_TO_STUDY_CAPACITY_TYPE.containsKey(modelName)) {
-                studyCapacityMapper.deleteByStudentIdAndUnitIdAndTypeAndGroup(student.getId(), dto.getUnitId(),
+                studyCapacityMapper.deleteByStudentIdAndUnitIdAndTypeAndGroup(studentId, dto.getUnitId(),
                         FLOW_NAME_TO_STUDY_CAPACITY_TYPE.get(modelName), learnNew.getGroup());
             }
 
@@ -208,11 +193,11 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
      * @return
      */
     @Override
-    public ServerResponse<Object> toAnotherFlow(NodeDto dto, int flowId) {
+    public ServerResponse<Object> toAnotherFlow(NodeDto dto, int nextFlowId) {
         Student student = dto.getStudent();
 
         // 判断当前单元单词是否有图片，如果都没有图片不进入单词图鉴
-        StudyFlowNew studyFlowNew = this.getStudyFlow(dto, flowId);
+        StudyFlowNew studyFlowNew = this.getStudyFlow(dto, nextFlowId);
         studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(studyFlowNew.getId(), dto.getLearnNew().getId());
 
         FlowVO flowVo = this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
@@ -270,56 +255,41 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
 
     /**
      * @param dto
-     * @param flowId 下个流程节点的 id
+     * @param nextFlowId 下个流程节点的 id
      * @return
      */
-    private StudyFlowNew getStudyFlow(NodeDto dto, int flowId) {
-        StudyFlowNew byPrimaryKey = studyFlowNewMapper.selectById(flowId);
+    private StudyFlowNew getStudyFlow(NodeDto dto, int nextFlowId) {
+        StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(nextFlowId);
 
-        // 如果下个节点不是单词图鉴模块，执行正常流程
-        String studyModel = "单词图鉴";
-        if (!byPrimaryKey.getModelName().contains(studyModel)) {
-            return byPrimaryKey;
+        boolean canStudyWordPicture = flowCommonMethod.judgeWordPicture(dto, studyFlowNew);
+        if (canStudyWordPicture) {
+            return studyFlowNew;
         }
 
-        Long unitId = dto.getUnitId();
-        if (unitId == null) {
-            return byPrimaryKey;
-        }
-
-        // 当前单元含有图片的单词个数，如果大于零，执行正常流程，否则跳过单词图鉴模块
-        int pictureCount = unitVocabularyNewMapper.countPicture(unitId, dto.getGroup());
-        if (pictureCount > 0) {
-            return byPrimaryKey;
-        }
-
-        UnitNew unitNew = unitNewMapper.selectById(unitId);
-        Student student = dto.getStudent() == null ? new Student() : dto.getStudent();
-
-        // 需要跳转到的流程 id
-        int flowId1;
         // 流程 1 单词图鉴流程 id
         int flowOnePicture = 15;
         // 流程 1 的单词图鉴
-        if (flowId == flowOnePicture) {
+        if (nextFlowId == flowOnePicture) {
+            UnitNew unitNew = unitNewMapper.selectById(dto.getUnitId());
+            Student student = dto.getStudent() == null ? new Student() : dto.getStudent();
             if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlowNew().getType()) {
                 // 去流程 2 的慧听写
-                flowId1 = 18;
-                flowCommonMethod.changeFlowNodeLog(student, "慧听写", unitNew, flowId1);
-                return studyFlowNewMapper.selectById(flowId1);
+                int flowId = 18;
+                flowCommonMethod.changeFlowNodeLog(student, "慧听写", unitNew, flowId);
+                return studyFlowNewMapper.selectById(flowId);
             }
             // 如果是从单词播放机直接进入单词图鉴，将流程跳转到慧记忆
             if (Objects.equals(dto.getNodeId(), 22L)) {
-                flowId1 = 48;
-                flowCommonMethod.changeFlowNodeLog(student, "慧记忆", unitNew, flowId1);
-                return studyFlowNewMapper.selectById(flowId1);
+                int flowId = 48;
+                flowCommonMethod.changeFlowNodeLog(student, "慧记忆", unitNew, flowId);
+                return studyFlowNewMapper.selectById(flowId);
             }
             // 返回流程 1
-            flowId1 = 9;
-            flowCommonMethod.changeFlowNodeLog(student, "单词播放机", unitNew, flowId1);
-            return studyFlowNewMapper.selectById(flowId1);
+            int flowId = 9;
+            flowCommonMethod.changeFlowNodeLog(student, "单词播放机", unitNew, flowId);
+            return studyFlowNewMapper.selectById(flowId);
         }
 
-        return byPrimaryKey;
+        return studyFlowNew;
     }
 }

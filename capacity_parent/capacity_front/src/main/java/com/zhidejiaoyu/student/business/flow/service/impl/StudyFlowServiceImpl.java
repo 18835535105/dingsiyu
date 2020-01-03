@@ -576,6 +576,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         return false;
     }
 
+
+
     /**
      * @param dto
      * @param nextFlowId 下个流程节点的 id
@@ -584,48 +586,33 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     private StudyFlowNew getStudyFlow(NodeDto dto, int nextFlowId) {
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(nextFlowId);
 
-        // 如果下个节点不是单词图鉴模块，执行正常流程
-        String studyModel = "单词图鉴";
-        if (!studyFlowNew.getModelName().contains(studyModel)) {
+        boolean canStudyWordPicture = flowCommonMethod.judgeWordPicture(dto, studyFlowNew);
+        if (canStudyWordPicture) {
             return studyFlowNew;
         }
 
-        Long unitId = dto.getUnitId();
-        if (unitId == null) {
-            return studyFlowNew;
-        }
-
-        // 当前单元含有图片的单词个数，如果大于零，执行正常流程，否则跳过单词图鉴模块
-        int pictureCount = unitVocabularyNewMapper.countPicture(unitId, dto.getGroup());
-        if (pictureCount > 0) {
-            return studyFlowNew;
-        }
-
-        UnitNew unitNew = unitNewMapper.selectById(unitId);
-        Student student = dto.getStudent() == null ? new Student() : dto.getStudent();
-
-        // 需要跳转到的流程 id
-        int flowId1;
         // 流程 1 单词图鉴流程 id
         int flowOnePicture = 73;
         // 流程 1 的单词图鉴
         if (nextFlowId == flowOnePicture) {
+            UnitNew unitNew = unitNewMapper.selectById(dto.getUnitId());
+            Student student = dto.getStudent() == null ? new Student() : dto.getStudent();
             if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlowNew().getType()) {
                 // 去句型翻译
-                flowId1 = 85;
-                flowCommonMethod.changeFlowNodeLog(student, "句型翻译", unitNew, flowId1);
-                return studyFlowNewMapper.selectById(flowId1);
+                int flowId = 85;
+                flowCommonMethod.changeFlowNodeLog(student, "句型翻译", unitNew, flowId);
+                return studyFlowNewMapper.selectById(flowId);
             }
             // 如果是从单词播放机直接进入单词图鉴，将流程跳转到慧记忆
             if (Objects.equals(dto.getNodeId(), 78L)) {
-                flowId1 = 71;
-                flowCommonMethod.changeFlowNodeLog(student, "慧记忆", unitNew, flowId1);
-                return studyFlowNewMapper.selectById(flowId1);
+                int flowId = 71;
+                flowCommonMethod.changeFlowNodeLog(student, "慧记忆", unitNew, flowId);
+                return studyFlowNewMapper.selectById(flowId);
             }
             // 返回流程 1
-            flowId1 = 70;
-            flowCommonMethod.changeFlowNodeLog(student, "单词播放机", unitNew, flowId1);
-            return studyFlowNewMapper.selectById(flowId1);
+            int flowId = 70;
+            flowCommonMethod.changeFlowNodeLog(student, "单词播放机", unitNew, flowId);
+            return studyFlowNewMapper.selectById(flowId);
         }
 
         return studyFlowNew;
