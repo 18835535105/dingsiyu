@@ -7,8 +7,11 @@ import com.zhidejiaoyu.common.utils.CcieUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
-import com.zhidejiaoyu.student.business.flow.FlowCommonMethod;
+import com.zhidejiaoyu.student.business.flow.common.JudgeNextNode;
 import com.zhidejiaoyu.student.business.flow.FlowConstant;
+import com.zhidejiaoyu.student.business.flow.common.JudgeWordPicture;
+import com.zhidejiaoyu.student.business.flow.common.LogOpt;
+import com.zhidejiaoyu.student.business.flow.common.PackageFlowVO;
 import com.zhidejiaoyu.student.business.flow.service.StudyFlowService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -54,13 +57,22 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     private LearnHistoryMapper learnHistoryMapper;
 
     @Resource
-    private FlowCommonMethod flowCommonMethod;
+    private JudgeNextNode judgeNextNode;
 
     @Resource
     private LearnExtendMapper learnExtendMapper;
 
     @Resource
     private StudyCapacityMapper studyCapacityMapper;
+
+    @Resource
+    private PackageFlowVO packageFlowVO;
+
+    @Resource
+    private LogOpt logOpt;
+
+    @Resource
+    private JudgeWordPicture judgeWordPicture;
 
     /**
      * 流程名称与 studyCapacity 中 type 的映射
@@ -157,7 +169,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         // 学习下一单元, 前端需要一个弹框提示
         if (studyFlowNew.getNextTrueFlow() == 0) {
             // 开启下一单元并且返回需要学习的流程信息
-            flowCommonMethod.saveOpenUnitLog(student, unitId);
+            logOpt.saveOpenUnitLog(student, unitId);
             // 保存证书
             this.judgeCourseCcie(dto);
             return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
@@ -168,7 +180,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             return this.toAnotherFlow(dto, studyFlowNew.getNextTrueFlow());
         }
         // 判断下个节点
-        return flowCommonMethod.judgeNextNode(dto, this);
+        return judgeNextNode.judgeNextNode(dto, this);
     }
 
     private void judgeCourseCcie(NodeDto dto) {
@@ -250,7 +262,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     }
 
     public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Student student, Long unitId) {
-        return flowCommonMethod.packageFlowVO(studyFlowNew, student, unitId);
+        return packageFlowVO.packageFlowVO(studyFlowNew, student, unitId);
     }
 
     /**
@@ -261,7 +273,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     private StudyFlowNew getStudyFlow(NodeDto dto, int nextFlowId) {
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(nextFlowId);
 
-        boolean canStudyWordPicture = flowCommonMethod.judgeWordPicture(dto, studyFlowNew);
+        boolean canStudyWordPicture = judgeWordPicture.judgeWordPicture(dto, studyFlowNew);
         if (canStudyWordPicture) {
             return studyFlowNew;
         }
@@ -275,18 +287,18 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlowNew().getType()) {
                 // 去流程 2 的慧听写
                 int flowId = 18;
-                flowCommonMethod.changeFlowNodeLog(student, "慧听写", unitNew, flowId);
+                logOpt.changeFlowNodeLog(student, "慧听写", unitNew, flowId);
                 return studyFlowNewMapper.selectById(flowId);
             }
             // 如果是从单词播放机直接进入单词图鉴，将流程跳转到慧记忆
             if (Objects.equals(dto.getNodeId(), 22L)) {
                 int flowId = 48;
-                flowCommonMethod.changeFlowNodeLog(student, "慧记忆", unitNew, flowId);
+                logOpt.changeFlowNodeLog(student, "慧记忆", unitNew, flowId);
                 return studyFlowNewMapper.selectById(flowId);
             }
             // 返回流程 1
             int flowId = 9;
-            flowCommonMethod.changeFlowNodeLog(student, "单词播放机", unitNew, flowId);
+            logOpt.changeFlowNodeLog(student, "单词播放机", unitNew, flowId);
             return studyFlowNewMapper.selectById(flowId);
         }
 
