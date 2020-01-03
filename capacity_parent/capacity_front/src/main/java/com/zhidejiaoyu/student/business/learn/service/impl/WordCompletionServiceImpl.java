@@ -1,12 +1,12 @@
-package com.zhidejiaoyu.student.business.service.studyModelImpl;
+package com.zhidejiaoyu.student.business.learn.service.impl;
+
 
 import com.zhidejiaoyu.common.mapper.LearnNewMapper;
 import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveData;
-import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveSentenceData;
-import com.zhidejiaoyu.student.business.service.IStudyService;
+import com.zhidejiaoyu.student.business.learn.common.SaveData;
+import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,27 +14,24 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
-@Service(value = "sentencePatternTranslationService")
+@Service("wordCompletionService")
 @Slf4j
-public class SentencePatternTranslationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnNew> implements IStudyService {
-
+public class WordCompletionServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnNew> implements IStudyService {
 
     @Resource
     private SaveData saveData;
-    @Resource
-    private SaveSentenceData saveSentenceData;
-    private Integer type = 7;
-    private Integer easyOrHard = 1;
-    private String studyModel = "例句翻译";
-
+    private Integer type = 6;
+    private Integer easyOrHard = 2;
+    private String studyModel = "单词填字";
 
     @Override
     public Object getStudy(HttpSession session, Long unitId, Integer difficulty) {
-
         Student student = getStudent(session);
         Long studentId = student.getId();
-        return saveSentenceData.getSudyModel(session, unitId, difficulty, student, studentId, studyModel, easyOrHard, type);
+        return saveData.getStudyWord(session, unitId, student, studentId,easyOrHard,studyModel,type);
+
     }
+
 
 
     @Override

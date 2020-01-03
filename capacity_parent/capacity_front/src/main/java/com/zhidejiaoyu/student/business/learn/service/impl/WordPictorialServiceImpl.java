@@ -1,16 +1,16 @@
-package com.zhidejiaoyu.student.business.service.studyModelImpl;
+package com.zhidejiaoyu.student.business.learn.service.impl;
 
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.MemoryDifficultyUtil;
 import com.zhidejiaoyu.common.utils.PictureUtil;
-import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveData;
+import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.business.service.IStudyService;
+import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.ReviewServiceImpl;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;

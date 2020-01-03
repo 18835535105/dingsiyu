@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
@@ -26,7 +25,6 @@ import static org.springframework.boot.SpringApplication.run;
 @EnableCaching
 @EnableScheduling
 @ServletComponentScan
-@ComponentScan(basePackages = {"com.zhidejiaoyu", "com.zhidejiaoyu.aliyunoss"})
 @MapperScan(basePackages = {"com.zhidejiaoyu.common.mapper"})
 @EnableRedisHttpSession(redisNamespace = "spring:session:student")
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class, JpaRepositoriesAutoConfiguration.class})

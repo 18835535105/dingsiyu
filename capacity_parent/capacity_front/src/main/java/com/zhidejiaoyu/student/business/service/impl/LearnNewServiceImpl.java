@@ -4,15 +4,11 @@ import com.zhidejiaoyu.common.mapper.LearnNewMapper;
 import com.zhidejiaoyu.common.mapper.StudentStudyPlanNewMapper;
 import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.student.business.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.LearnNewService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class LearnNewServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnNew> implements LearnNewService {

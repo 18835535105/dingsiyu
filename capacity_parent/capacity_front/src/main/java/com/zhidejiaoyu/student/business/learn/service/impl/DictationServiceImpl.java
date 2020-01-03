@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.service.studyModelImpl;
+package com.zhidejiaoyu.student.business.learn.service.impl;
 
 import com.github.pagehelper.util.StringUtil;
 import com.zhidejiaoyu.common.constant.TimeConstant;
@@ -7,8 +7,8 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveData;
-import com.zhidejiaoyu.student.business.service.IStudyService;
+import com.zhidejiaoyu.student.business.learn.common.SaveData;
+import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;

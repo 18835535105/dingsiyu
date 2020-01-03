@@ -1,6 +1,7 @@
-package com.zhidejiaoyu.student.business.controller;
+package com.zhidejiaoyu.student.business.learn.controller;
 
-import com.zhidejiaoyu.student.business.service.IStudyService;
+import com.zhidejiaoyu.student.business.controller.BaseController;
+import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

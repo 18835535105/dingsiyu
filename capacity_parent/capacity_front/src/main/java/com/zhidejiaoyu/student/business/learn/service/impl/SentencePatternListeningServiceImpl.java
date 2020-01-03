@@ -1,12 +1,12 @@
-package com.zhidejiaoyu.student.business.service.studyModelImpl;
+package com.zhidejiaoyu.student.business.learn.service.impl;
 
 import com.zhidejiaoyu.common.mapper.LearnNewMapper;
 import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveData;
-import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveSentenceData;
-import com.zhidejiaoyu.student.business.service.IStudyService;
+import com.zhidejiaoyu.student.business.learn.common.SaveData;
+import com.zhidejiaoyu.student.business.learn.common.SaveSentenceData;
+import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class SentencePatternListeningServiceImpl extends BaseServiceImpl<LearnNe
     public Object getStudy(HttpSession session, Long unitId, Integer difficulty) {
         Student student = getStudent(session);
         Long studentId = student.getId();
-        return saveSentenceData.getSudyModel(session, unitId, difficulty, student, studentId, studyModel, easyOrHard, type);
+        return saveSentenceData.getStudyModel(session, unitId, difficulty, student, studentId, studyModel, easyOrHard, type);
 
     }
 

@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.service;
+package com.zhidejiaoyu.student.business.learn.service;
 
 import com.baomidou.mybatisplus.service.IService;
 import com.zhidejiaoyu.common.pojo.LearnNew;

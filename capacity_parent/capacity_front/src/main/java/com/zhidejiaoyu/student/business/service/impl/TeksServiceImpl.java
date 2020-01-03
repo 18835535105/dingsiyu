@@ -19,7 +19,7 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.constant.PetMP3Constant;
 import com.zhidejiaoyu.common.dto.WordUnitTestDTO;
-import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveTeksData;
+import com.zhidejiaoyu.student.business.learn.common.SaveTeksData;
 import com.zhidejiaoyu.student.business.service.TeksService;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import lombok.extern.slf4j.Slf4j;

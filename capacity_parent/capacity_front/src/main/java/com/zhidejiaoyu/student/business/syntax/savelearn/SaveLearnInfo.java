@@ -7,7 +7,7 @@ import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.memorystrength.SyntaxMemoryStrength;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.BaseUtil.SaveModel.SaveData;
+import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

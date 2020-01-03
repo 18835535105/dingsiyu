@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.BaseUtil.SaveModel;
+package com.zhidejiaoyu.student.business.learn.common;
 
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -34,10 +34,7 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     @Resource
     private TeacherMapper teacherMapper;
 
-    public Object getSudyModel(HttpSession session, Long unitId,
-                               Student student, Long studentId,
-                               String studyModel, Integer easyOrHard,
-                               Integer type) {
+    public Object getStudyModel(Long unitId, Long studentId, Integer easyOrHard, Integer type) {
         //查看课文数据是否保存过
       /*  List<Long> longs = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, studentId, studyModel);
 

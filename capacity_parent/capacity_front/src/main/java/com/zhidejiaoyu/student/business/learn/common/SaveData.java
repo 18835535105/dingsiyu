@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.BaseUtil.SaveModel;
+package com.zhidejiaoyu.student.business.learn.common;
 
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
@@ -179,9 +179,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             if (count > 0 && total == (plan + 1)) {
                 return true;
             }
-            if (count > 0) {
-                return true;
-            }
+            return count > 0;
         } else {
             learn.setStudyCount(currentLearn.getStudyCount() + 1);
             StudyCapacity studyCapacity;
@@ -200,10 +198,9 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             // 熟词
             currentLearn.setStatus(memoryDifficult == 0 ? 1 : 0);
             currentLearn.setUpdateTime(now);
-            int i = learnExtendMapper.updateById(currentLearn);
+            learnExtendMapper.updateById(currentLearn);
             return true;
         }
-        return false;
     }
 
 

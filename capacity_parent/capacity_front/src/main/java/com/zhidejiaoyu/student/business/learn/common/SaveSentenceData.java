@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.BaseUtil.SaveModel;
+package com.zhidejiaoyu.student.business.learn.common;
 
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -50,8 +50,8 @@ public class SaveSentenceData {
     private RedisOpt redisOpt;
 
 
-    public ServerResponse<Object> getSudyModel(HttpSession session, Long unitId, Integer difficulty, Student student,
-                                               Long studentId, String studyModel, Integer easyOrHard, Integer type) {
+    public ServerResponse<Object> getStudyModel(HttpSession session, Long unitId, Integer difficulty, Student student,
+                                                Long studentId, String studyModel, Integer easyOrHard, Integer type) {
         boolean firstStudy = redisOpt.getGuideModel(studentId, studyModel);
         // 记录学生开始学习该例句的时间
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
@@ -79,7 +79,7 @@ public class SaveSentenceData {
             return saveSentenceData.returnGoldWord(studyCapacity, plan.longValue(), firstStudy, sentenceCount.longValue(), difficulty, studyModel);
         }
         // 获取当前学习进度的下一个例句
-        Sentence sentence = saveSentenceData.getSentence(unitId, student, learnNews.getGroup(), type, studyModel);
+        Sentence sentence = saveSentenceData.getSentence(unitId, student, learnNews.getGroup(), studyModel);
         if (sentence == null) {
             return ServerResponse.createBySuccess(TestResponseCode.TO_UNIT_TEST.getCode(), TestResponseCode.TO_UNIT_TEST.getMsg());
         }
@@ -198,7 +198,7 @@ public class SaveSentenceData {
         return sentenceTranslateVo;
     }
 
-    private Sentence getSentence(Long unitId, Student student, Integer group, Integer type, String studyModel) {
+    private Sentence getSentence(Long unitId, Student student, Integer group, String studyModel) {
         // 查询学习记录本模块学习过的所有单词id
         List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel);
         return sentenceMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);
