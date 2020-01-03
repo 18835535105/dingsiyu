@@ -78,7 +78,7 @@
         select
         <include refid="relevance_base_sql"/>
         from sentence s,
-        unit_sentence us
+        unit_sentence_new us
         where
         s.id = us.sentence_id
         and us.unit_id = #{unitId}
