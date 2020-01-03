@@ -245,9 +245,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     }
 
     public static void main(String[] args) {
-        System.out.println(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
-        QuartzServiceImpl quart = new QuartzServiceImpl();
-        quart.updateEnergy();
+
     }
 
     @Transactional(rollbackFor = Exception.class)
