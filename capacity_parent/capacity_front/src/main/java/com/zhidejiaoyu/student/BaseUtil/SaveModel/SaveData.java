@@ -267,37 +267,37 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                     plan, firstStudy, wordCount, memoryDifficulty, memoryStrength, vocabularyId, vocabulary, unitId, wordChinese, false);
             return ServerResponse.createBySuccess(memoryStudyVo);
         } else if (type.equals(5)) {
-            WordWriteStudyVo wordWriteStudyVo = getWordWriteStudyVo(firstStudy, vocabulary, wordChinese, plan, wordCount);
+            WordWriteStudyVo wordWriteStudyVo = getWordWriteStudyVo(firstStudy, vocabulary, memoryStrength, wordChinese, plan, wordCount, false);
             return ServerResponse.createBySuccess(wordWriteStudyVo);
         } else if (type.equals(6)) {
-            WordCompletionStudyVo wordCompletionStudyVo = getWordCompletionStudyVo(firstStudy, memoryDifficulty, vocabulary, wordChinese, plan, wordCount);
+            WordCompletionStudyVo wordCompletionStudyVo = getWordCompletionStudyVo(firstStudy, memoryDifficulty, memoryStrength, vocabulary, wordChinese, plan, wordCount, false);
             return ServerResponse.createBySuccess(wordCompletionStudyVo);
         }
         return null;
     }
 
-    private WordCompletionStudyVo getWordCompletionStudyVo(boolean firstStudy, int memoryDifficulty, Vocabulary vocabulary, String wordChinese, long longValue, long longValue1) {
+    private WordCompletionStudyVo getWordCompletionStudyVo(boolean firstStudy, int memoryDifficulty, double memoryStrength, Vocabulary vocabulary, String wordChinese, long longValue, long longValue1, boolean studyNew) {
         WordCompletionStudyVo wordCompletionStudyVo = new WordCompletionStudyVo();
         String soundMark = StringUtils.isEmpty(vocabulary.getSoundMark()) ? "" : vocabulary.getSoundMark();
         wordCompletionStudyVo.setWordId(vocabulary.getId());
         wordCompletionStudyVo.setMemoryDifficulty(memoryDifficulty);
-        wordCompletionStudyVo.setMemoryStrength(0.00);
+        wordCompletionStudyVo.setMemoryStrength(memoryStrength);
         wordCompletionStudyVo.setSoundmark(soundMark);
         wordCompletionStudyVo.setWord(vocabulary.getWord());
         wordCompletionStudyVo.setSyllable(StringUtils.isEmpty(vocabulary.getSyllable()) ? vocabulary.getWord() : vocabulary.getSyllable());
         wordCompletionStudyVo.setWordChinese(wordChinese);
         wordCompletionStudyVo.setPlan(longValue);
-        wordCompletionStudyVo.setStudyNew(true);
+        wordCompletionStudyVo.setStudyNew(studyNew);
         wordCompletionStudyVo.setFirstStudy(firstStudy);
         wordCompletionStudyVo.setWordCount(longValue1);
         wordCompletionStudyVo.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
         Map<String, Object> returnMap = new HashMap<>();
-        getStudyWordComplets(vocabulary.getWord(), returnMap);
+        getStudyWordComplets(vocabulary.getWord(), returnMap,wordCompletionStudyVo);
         wordCompletionStudyVo.setWords(returnMap);
         return wordCompletionStudyVo;
     }
 
-    private void getStudyWordComplets(String word, Map<String, Object> returnMap) {
+    private void getStudyWordComplets(String word, Map<String, Object> returnMap,WordCompletionStudyVo wordCompletionStudyVo) {
         char[] chars = word.toCharArray();
         word = word.trim();
         List<Integer> letterList = new ArrayList<>();
@@ -314,6 +314,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         }
         Random random = new Random();
         int size = letterList.size() / 2;
+        wordCompletionStudyVo.setSize(size);
         Map<Integer, Integer> map = new HashMap<>();
         while (map.size() < size) {
             int i = random.nextInt(letterList.size());
@@ -361,17 +362,17 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         return memoryStudyVo;
     }
 
-    private WordWriteStudyVo getWordWriteStudyVo(boolean firstStudy, Vocabulary vocabulary, String wordChinese, long l, long l2) {
+    private WordWriteStudyVo getWordWriteStudyVo(boolean firstStudy, Vocabulary vocabulary, double memoryStrength, String wordChinese, long l, long l2, boolean studyNew) {
         WordWriteStudyVo wordWriteStudyVo = new WordWriteStudyVo();
         String soundMark = StringUtils.isEmpty(vocabulary.getSoundMark()) ? "" : vocabulary.getSoundMark();
         wordWriteStudyVo.setWordId(vocabulary.getId());
-        wordWriteStudyVo.setMemoryStrength(0.00);
+        wordWriteStudyVo.setMemoryStrength(memoryStrength);
         wordWriteStudyVo.setSoundmark(soundMark);
         wordWriteStudyVo.setWord(vocabulary.getWord());
         wordWriteStudyVo.setSyllable(StringUtils.isEmpty(vocabulary.getSyllable()) ? vocabulary.getWord() : vocabulary.getSyllable());
         wordWriteStudyVo.setWordChinese(wordChinese);
         wordWriteStudyVo.setPlan(l);
-        wordWriteStudyVo.setStudyNew(true);
+        wordWriteStudyVo.setStudyNew(studyNew);
         wordWriteStudyVo.setFirstStudy(firstStudy);
         wordWriteStudyVo.setWordCount(l2);
         wordWriteStudyVo.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
@@ -403,10 +404,10 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                         0.00, currentStudyWord.getId(), currentStudyWord, unitId, wordChinese, true);
                 return ServerResponse.createBySuccess(memoryStudyVo);
             } else if (type.equals(5)) {
-                WordWriteStudyVo wordWriteStudyVo = getWordWriteStudyVo(firstStudy, currentStudyWord, wordChinese, plan.longValue(), wordCount.longValue());
+                WordWriteStudyVo wordWriteStudyVo = getWordWriteStudyVo(firstStudy, currentStudyWord, 0.0, wordChinese, plan.longValue(), wordCount.longValue(), true);
                 return ServerResponse.createBySuccess(wordWriteStudyVo);
             } else if (type.equals(6)) {
-                WordCompletionStudyVo wordCompletionStudyVo = getWordCompletionStudyVo(firstStudy, 0, currentStudyWord, wordChinese, plan.longValue(), wordCount.longValue());
+                WordCompletionStudyVo wordCompletionStudyVo = getWordCompletionStudyVo(firstStudy, 0, 0.0, currentStudyWord, wordChinese, plan.longValue(), wordCount.longValue(), true);
                 return ServerResponse.createBySuccess(wordCompletionStudyVo);
             }
         }

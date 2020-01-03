@@ -69,4 +69,9 @@ public class WordCompletionStudyVo implements Serializable {
      */
     private String readUrl;
 
+    /**
+     * 答案长度
+     */
+    private Integer size;
+
 }
