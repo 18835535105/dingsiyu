@@ -430,7 +430,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 RecycleBin bin = new RecycleBin();
                 bin.setCreateTime(date);
                 bin.setDelStatus(1);
-                bin.setOperateUserId(1L);
+                bin.setOperateUserId(student.getTeacherId());
                 bin.setOperateUserName("管理员");
                 bin.setStudentId(student.getId());
                 saveList.add(bin);
