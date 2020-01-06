@@ -37,9 +37,9 @@
 
 
     <select id="selectByUnitIdAndStudentIdAndType" parameterType="map" resultType="long">
-        select distinct word_id
+        select distinct extend.word_id
         from learn_extend extend
-                 join learn_new learn on extend.learn_id = learn.id
+        join learn_new learn on extend.learn_id = learn.id
 
         where learn.student_id = #{studentId}
           and learn.unit_id = #{unitId}

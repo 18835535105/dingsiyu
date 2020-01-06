@@ -217,8 +217,8 @@
         and us.group=#{group}
         <if test="wordIds.size > 0">
             AND s.id NOT IN (
-            <foreach collection="wordIds" separator="," item="id">
-                #{id}
+            <foreach collection="wordIds" separator="," item="wordId">
+                #{wordId}
             </foreach>
             )
         </if>

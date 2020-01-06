@@ -2,7 +2,10 @@ package com.zhidejiaoyu.student.business.learn.common;
 
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.pojo.LearnNew;
+import com.zhidejiaoyu.common.pojo.Sentence;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.StudyCapacity;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
@@ -113,7 +116,7 @@ public class SaveSentenceData {
      */
 
     private ServerResponse<Object> returnGoldWord(StudyCapacity studyCapacity, Long plan, boolean firstStudy,
-                                                 Long sentenceCount, Integer type, String studyModel) {
+                                                  Long sentenceCount, Integer type, String studyModel) {
         SentenceTranslateVo sentenceTranslateVo;
         // 例句翻译
         if (STUDYMODEL1.equals(studyModel)) {
