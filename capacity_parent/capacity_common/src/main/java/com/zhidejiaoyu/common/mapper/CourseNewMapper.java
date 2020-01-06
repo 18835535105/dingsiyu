@@ -52,7 +52,6 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
      * @param type      1:单词；2：句型；3：语法；4：课文
      * @return
      */
-    // todo: 暂时还没有语法处理逻辑
     @MapKey("courseId")
-    Map<Long, Map<Long, Integer>> countUnitByIds(@Param("courseIds") List<Long> courseIds, @Param("type") int type);
+    Map<Long, Map<Long, Object>> countUnitByIds(@Param("courseIds") List<Long> courseIds, @Param("type") int type);
 }

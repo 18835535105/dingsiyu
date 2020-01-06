@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.LearnHistory;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -46,9 +47,11 @@ public interface LearnHistoryMapper extends BaseMapper<LearnHistory> {
     /**
      * 统计各个课程下已学习单元个数
      *
+     * @param studentId
      * @param courseIds
      * @param type      1:单词；2：句型；3：语法；3：课文
      * @return
      */
-    Map<Long, Map<Long, Integer>> countUnitByCourseIds(@Param("courseIds") List<Long> courseIds, @Param("type") int type);
+    @MapKey("courseId")
+    Map<Long, Map<Long, Object>> countUnitByStudentIdAndCourseIds(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds, @Param("type") int type);
 }

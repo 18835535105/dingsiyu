@@ -39,13 +39,33 @@
         where student_id = #{studentId}
         group by unit_id, easy_or_hard
     </select>
-    <select id="countUnitByCourseIds" resultType="java.util.Map" parameterType="map">
-        select course_id courseId, count(distinct unit_id) count from learn_history where course_id in (
+    <select id="countUnitByStudentIdAndCourseIds" resultType="java.util.Map" parameterType="map">
+        select t.courseId, sum(t.count) count from (
+        select course_id courseId, count(distinct unit_id) count
+        from learn_history
+        where student_id = #{studentId}
+        and course_id in (
         <foreach collection="courseIds" item="courseId" separator=",">
             #{courseId}
         </foreach>
         )
         and type = #{type}
+        and state = 2
+        and easy_or_hard = 1
         group by course_id
+        union all
+        select course_id courseId, count(distinct unit_id) count
+        from learn_history
+        where student_id = #{studentId}
+        and course_id in (
+        <foreach collection="courseIds" item="courseId" separator=",">
+            #{courseId}
+        </foreach>
+        )
+        and type = #{type}
+        and state = 2
+        and easy_or_hard = 2
+        group by course_id) t
+        group by t.courseId
     </select>
 </mapper>

@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapper, CourseConfig> implements IndexCourseInfoService {
 
 
-    public static final String COURSE_ID = "courseId";
     public static final String COUNT = "count";
 
     @Resource
@@ -112,10 +111,10 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
         List<CourseNew> courseNews = courseNewMapper.selectBatchIds(courseIds);
         // 各个课程下所有单元个数
-        Map<Long, Map<Long, Integer>> unitCountInCourse = courseNewMapper.countUnitByIds(courseIds, type);
+        Map<Long, Map<Long, Object>> unitCountInCourse = courseNewMapper.countUnitByIds(courseIds, type);
 
         // 各个课程下已学习单元个数
-        Map<Long, Map<Long, Integer>> learnUnitCountInCourse = learnHistoryMapper.countUnitByCourseIds(courseIds, type);
+        Map<Long, Map<Long, Object>> learnUnitCountInCourse = learnHistoryMapper.countUnitByStudentIdAndCourseIds(student.getId(), courseIds, type);
 
         // 其他年级
         List<CourseVO> previousGrade = new ArrayList<>();
@@ -125,17 +124,18 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
             String grade = StringUtils.isNotBlank(courseNew.getGradeExt()) ? courseNew.getGradeExt() : courseNew.getGrade();
 
+            Long courseId = courseNew.getId();
             CourseVO.CourseVOBuilder courseVoBuilder = CourseVO.builder()
-                    .courseId(courseNew.getId())
+                    .courseId(courseId)
                     .grade(courseNew.getGrade() + "（" + courseNew.getLabel() + "）");
 
             String englishGrade = getGradeAndLabelEnglishName(grade);
             String englishLabel = getGradeAndLabelEnglishName(courseNew.getLabel());
 
             // 单元总个数
-            int totalUnitCount = this.getUnitCount(unitCountInCourse);
+            long totalUnitCount = this.getUnitCount(unitCountInCourse, courseId) * 2;
             // 已学单元总个数
-            int learnedUnitCount = this.getUnitCount(learnUnitCountInCourse);
+            long learnedUnitCount = this.getUnitCount(learnUnitCountInCourse, courseId);
 
             if (learnedUnitCount == 0) {
                 courseVoBuilder.combatProgress(0).battle(1);
@@ -163,11 +163,11 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     }
 
     @SuppressWarnings("all")
-    private int getUnitCount(Map<Long, Map<Long, Integer>> unitCountInCourse) {
-        int unitCount = 0;
-        if (unitCountInCourse != null && unitCountInCourse.get(COURSE_ID) != null
-                && unitCountInCourse.get(COURSE_ID).get(COUNT) != null) {
-            unitCount = unitCountInCourse.get(COURSE_ID).get(COUNT);
+    private long getUnitCount(Map<Long, Map<Long, Object>> unitCountInCourse, Long courseId) {
+        long unitCount = 0;
+        if (unitCountInCourse != null && unitCountInCourse.get(courseId) != null
+                && unitCountInCourse.get(courseId).get(COUNT) != null) {
+            unitCount = Long.parseLong(unitCountInCourse.get(courseId).get(COUNT).toString());
         }
         return unitCount;
     }

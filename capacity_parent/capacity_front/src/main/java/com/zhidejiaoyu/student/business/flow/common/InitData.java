@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 初始化数据
@@ -30,6 +32,18 @@ public class InitData {
 
     @Resource
     private LearnNewMapper learnNewMapper;
+
+    /**
+     * studentFlowNew中type与learnHistory中type中的type对应关系
+     */
+    private static final Map<Integer, Integer> MAP = new HashMap<>(16);
+
+    static {
+        MAP.put(2, 1);
+        MAP.put(3, 2);
+        MAP.put(4, 4);
+        MAP.put(5, 3);
+    }
 
     /**
      * 初始化学生流程
@@ -85,7 +99,7 @@ public class InitData {
      * @param dto
      */
     public void saveOrUpdateFreeLearnHistory(NodeDto dto) {
-        this.saveOrUpdateOneKeyLearnHistory(dto, 1, dto.getModelType());
+        this.saveOrUpdateOneKeyLearnHistory(dto, 1, MAP.get(dto.getModelType()));
     }
 
     /**
