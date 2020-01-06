@@ -73,7 +73,7 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
             log.error("单元 {} 下没有单词图鉴信息！", unitId);
             return ServerResponse.createByErrorMessage("The unit no pictures");
         }
-        WordPictorialVo vo=new WordPictorialVo();
+        WordPictorialVo vo = new WordPictorialVo();
         // 1. 根据随机数获取题型, 并查出一道正确的题
         // 1.1 去慧记忆中查询单词图鉴是否有需要复习的单词
         Map<String, Object> correct = studyCapacityMapper.selectNeedReviewWord(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, learnNew.getGroup());
@@ -145,7 +145,7 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
         // 记录学生开始学习该单词/例句的时间
         vo.setWord(correct.get("word").toString());
         vo.setId(Long.parseLong(correct.get("id").toString()));
-        vo.setSound_mark(correct.get("sound_mark").toString());
+        vo.setSound_mark(correct.get("sound_mark") == null ? null : correct.get("sound_mark").toString());
         vo.setMiddlePictureUrl(correct.get("middlePictureUrl") == null ? null : correct.get("middlePictureUrl").toString());
         vo.setSmallPictureUrl(correct.get("smallPictureUrl") == null ? null : correct.get("smallPictureUrl").toString());
         vo.setWord_chinese(correct.get("word_chinese").toString());
