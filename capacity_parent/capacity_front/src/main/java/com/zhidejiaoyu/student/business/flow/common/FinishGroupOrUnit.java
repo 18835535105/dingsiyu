@@ -3,6 +3,8 @@ package com.zhidejiaoyu.student.business.flow.common;
 import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.server.ResponseCode;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
 import com.zhidejiaoyu.student.business.flow.FlowConstant;
@@ -106,7 +108,7 @@ public class FinishGroupOrUnit {
      * @param dto
      * @return
      */
-    public FlowVO finishFreeGroup(NodeDto dto) {
+    public Object finishFreeGroup(NodeDto dto) {
 
         // 更新学习历史表
         initData.saveOrUpdateFreeLearnHistory(dto);
@@ -121,7 +123,8 @@ public class FinishGroupOrUnit {
 
         if (learnNew == null) {
             // 说明当前单元学习完毕
-            return this.finishUnit(dto);
+            this.finishUnit(dto);
+            return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
         }
 
         studentFlowNewMapper.deleteByLearnId(learnNewId);

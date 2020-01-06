@@ -326,24 +326,24 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
                 //获取加成比例
                 List<Map<String, Object>> levels = redisOpt.getAllLevel();
                 //查询挑战学生信息
-                Student challengerStudnet = simpleStudentMapper.selectByPrimaryKey(gauntlet.getChallengerStudentId());
-                Double challengeGold = challengerStudnet.getSystemGold() + challengerStudnet.getOfflineGold();
+                Student challengerStudent = simpleStudentMapper.selectById(gauntlet.getChallengerStudentId());
+                Double challengeGold = challengerStudent.getSystemGold() + challengerStudent.getOfflineGold();
                 //获取挑战学生等级信息
                 int challengeLevel = getLevels(challengeGold.intValue(), levels);
                 //查询被挑战学生信息
-                Student beChallengerStudnet = simpleStudentMapper.selectByPrimaryKey(gauntlet.getBeChallengerStudentId());
-                Double beChallengeGold = beChallengerStudnet.getSystemGold() + beChallengerStudnet.getOfflineGold();
+                Student beChallengerStudent = simpleStudentMapper.selectById(gauntlet.getBeChallengerStudentId());
+                Double beChallengeGold = beChallengerStudent.getSystemGold() + beChallengerStudent.getOfflineGold();
                 //获取被挑战学生等级信息
                 int beChallengeLevel = getLevels(beChallengeGold.intValue(), levels);
                 Map<String, Double> map = new HashMap<>();
                 if (gauntlet.getChallengerPoint() - point > 0) {
                     //获取挑战人勋章数量
-                    List<Map<String, Object>> maps = simpleAwardMapper.selAwardCountByStudentId(challengerStudnet.getId());
+                    List<Map<String, Object>> maps = simpleAwardMapper.selAwardCountByStudentId(challengerStudent.getId());
                     //获得加成
-                    map = LevelUtil.getAddition(challengeLevel, beChallengeLevel, 1, challengerStudnet.getId(), map, maps);
+                    map = LevelUtil.getAddition(challengeLevel, beChallengeLevel, 1, challengerStudent.getId(), map, maps);
                 } else if (gauntlet.getChallengerPoint() - point == 0) {
-                    List<Map<String, Object>> maps = simpleAwardMapper.selAwardCountByStudentId(challengerStudnet.getId());
-                    map = LevelUtil.getAddition(challengeLevel, beChallengeLevel, 2, challengerStudnet.getId(), map, maps);
+                    List<Map<String, Object>> maps = simpleAwardMapper.selAwardCountByStudentId(challengerStudent.getId());
+                    map = LevelUtil.getAddition(challengeLevel, beChallengeLevel, 2, challengerStudent.getId(), map, maps);
                 }
                 gauntlet.setBeChallengerPoint(point);
                 //根据得分计算加成数量及保存数据
@@ -394,9 +394,9 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
                     gauntlet.setChallengeGold(goldChallenge);
                     gauntlet.setBeChallengeGold(0);
                     if (goldChallenge > 0) {
-                        Student winnerStudent = simpleStudentMapper.selectByPrimaryKey(gauntlet.getChallengerStudentId());
+                        Student winnerStudent = simpleStudentMapper.selectById(gauntlet.getChallengerStudentId());
                         winnerStudent.setSystemGold(winnerStudent.getSystemGold() + goldChallenge);
-                        simpleStudentMapper.updateByPrimaryKey(winnerStudent);
+                        simpleStudentMapper.updateById(winnerStudent);
                         RunLog runLog = new RunLog();
                         runLog.setOperateUserId(gauntlet.getChallengerStudentId());
                         runLog.setType(4);
@@ -659,12 +659,12 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
                 returnMap.put("study", "-" + gauntlet.getChallengeStudy());
                 returnMap.put("gold", "-" + gauntlet.getChallengeGold());
             }
-            Student student = simpleStudentMapper.selectByPrimaryKey(gauntlet.getChallengerStudentId());
+            Student student = simpleStudentMapper.selectById(gauntlet.getChallengerStudentId());
             returnMap.put("oneself", student.getNickname());
             returnMap.put("oneselfUrl", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
             returnMap.put("oneselfPoint", gauntlet.getChallengerPoint());
             returnMap.put("challengePoint", gauntlet.getBeChallengerPoint());
-            Student challengeStudent = simpleStudentMapper.selectByPrimaryKey(gauntlet.getBeChallengerStudentId());
+            Student challengeStudent = simpleStudentMapper.selectById(gauntlet.getBeChallengerStudentId());
             returnMap.put("challenge", challengeStudent.getNickname());
             returnMap.put("challengeUrl", GetOssFile.getPublicObjectUrl(challengeStudent.getHeadUrl()));
             returnMap.put("gradeGold", gauntlet.getGrade());
@@ -680,10 +680,10 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             }
             returnMap.put("oneselfPoint", gauntlet.getBeChallengerPoint());
             returnMap.put("challengePoint", gauntlet.getChallengerPoint());
-            Student student = simpleStudentMapper.selectByPrimaryKey(gauntlet.getChallengerStudentId());
+            Student student = simpleStudentMapper.selectById(gauntlet.getChallengerStudentId());
             returnMap.put("challenge", student.getNickname());
             returnMap.put("challengeUrl", AliyunInfoConst.host + student.getHeadUrl());
-            Student challengeStudent = simpleStudentMapper.selectByPrimaryKey(gauntlet.getBeChallengerStudentId());
+            Student challengeStudent = simpleStudentMapper.selectById(gauntlet.getBeChallengerStudentId());
             returnMap.put("oneself", challengeStudent.getNickname());
             returnMap.put("oneselfUrl", AliyunInfoConst.host + challengeStudent.getHeadUrl());
             returnMap.put("gradeGold", 0);
@@ -723,13 +723,13 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         StudentExpansion challengeStudentExpansion = simpleStudentExpansionMapper.selectByStudentId(winnerStudentId);
         challengeStudentExpansion.setStudyPower(challengeStudentExpansion.getStudyPower() + study);
         simpleStudentExpansionMapper.updateById(challengeStudentExpansion);
-        Student winnerStudent = simpleStudentMapper.selectByPrimaryKey(winnerStudentId);
+        Student winnerStudent = simpleStudentMapper.selectById(winnerStudentId);
         if (winnerStudent.getSystemGold() == null) {
             winnerStudent.setSystemGold(winnerGold.doubleValue());
         } else {
             winnerStudent.setSystemGold(winnerStudent.getSystemGold() + winnerGold);
         }
-        simpleStudentMapper.updateByPrimaryKey(winnerStudent);
+        simpleStudentMapper.updateById(winnerStudent);
         RunLog runLog = new RunLog();
         runLog.setOperateUserId(winnerStudentId);
         runLog.setType(4);

@@ -149,7 +149,6 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         if (studyFlowNew.getNextTrueFlow() == 0) {
 
             if (checkNextUnitOrGroup(dto, studyFlowNew)) {
-                Long unitId = dto.getUnitId();
                 // 保存证书
                 this.judgeCourseCcie(dto);
 
