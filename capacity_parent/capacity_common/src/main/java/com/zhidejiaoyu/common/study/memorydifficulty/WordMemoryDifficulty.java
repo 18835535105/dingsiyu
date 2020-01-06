@@ -41,9 +41,15 @@ public class WordMemoryDifficulty extends CheckMemoryDifficultyParam implements 
 
             // 获取单词的错误次数
             Integer errCount = studyCapacity.getFaultTime();
+            if (errCount == null) {
+                return 0;
+            }
 
             // 获取单词的学习次数
             Integer studyCount = learnExtendMapper.selectStudyCount(studyCapacity, studyModel);
+            if (studyCount == null) {
+                return 0;
+            }
 
             // 保存记忆追踪时计算记忆难度：由于先保存的记忆追踪信息，其中的错误次数已经+1，而学习次数还是原来的，可能出现错误次数>学习次数的的情况，所以学习次数也要在原基础上+1
             if (errCount > studyCount) {
@@ -56,7 +62,7 @@ public class WordMemoryDifficulty extends CheckMemoryDifficultyParam implements 
             }
             return getMemoryDifficulty(memoryStrength, errCount, studyCount);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("计算单词的记忆难度出错！", e);
         }
         return 0;
     }

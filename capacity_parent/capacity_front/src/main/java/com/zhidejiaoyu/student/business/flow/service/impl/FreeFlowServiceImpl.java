@@ -127,7 +127,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             String modelName = studyFlowNew.getModelName();
             if (FLOW_NAME_TO_STUDY_CAPACITY_TYPE.containsKey(modelName)) {
                 studyCapacityMapper.deleteByStudentIdAndUnitIdAndTypeAndGroup(studentId, dto.getUnitId(),
-                        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.get(modelName), learnNew.getGroup());
+                        FLOW_NAME_TO_STUDY_CAPACITY_TYPE.get(modelName));
             }
 
             learnExtendMapper.deleteByUnitIdAndStudyModel(learnNew.getId(), modelName);

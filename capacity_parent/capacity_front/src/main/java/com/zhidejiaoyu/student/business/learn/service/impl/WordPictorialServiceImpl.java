@@ -1,7 +1,10 @@
 package com.zhidejiaoyu.student.business.learn.service.impl;
 
 import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.LearnNewMapper;
+import com.zhidejiaoyu.common.mapper.StudyCapacityMapper;
+import com.zhidejiaoyu.common.mapper.UnitVocabularyNewMapper;
+import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudyCapacity;
@@ -19,6 +22,7 @@ import com.zhidejiaoyu.student.business.service.impl.ReviewServiceImpl;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -140,10 +144,10 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
         vo.setFirstStudy(redisOpt.getGuideModel(studentId, studyModel));
         // 记录学生开始学习该单词/例句的时间
         vo.setWord(correct.get("word").toString());
-        vo.setId(Long.parseLong(correct.get("word").toString()));
+        vo.setId(Long.parseLong(correct.get("id").toString()));
         vo.setSound_mark(correct.get("sound_mark").toString());
-        vo.setMiddlePictureUrl(correct.get("middlePictureUrl").toString());
-        vo.setSmallPictureUrl(correct.get("smallPictureUrl").toString());
+        vo.setMiddlePictureUrl(correct.get("middlePictureUrl") == null ? null : correct.get("middlePictureUrl").toString());
+        vo.setSmallPictureUrl(correct.get("smallPictureUrl") == null ? null : correct.get("smallPictureUrl").toString());
         vo.setWord_chinese(correct.get("word_chinese").toString());
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         return ServerResponse.createBySuccess(correct);
@@ -151,6 +155,7 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Object saveStudy(HttpSession session,
                             Long unitId, Long wordId, boolean isTrue,
                             Integer plan, Integer total, Long courseId,

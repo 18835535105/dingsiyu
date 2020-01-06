@@ -100,9 +100,8 @@ public interface StudyCapacityMapper extends BaseMapper<StudyCapacity> {
      * @param studentId
      * @param unitId
      * @param type
-     * @param group
      */
-    @Delete("delete from study_capacity where student_id = #{studentId} and unit_id = #{unitId} and type = #{type} and `group` = #{group}")
+    @Delete("delete from study_capacity where student_id = #{studentId} and unit_id = #{unitId} and type = #{type}")
     void deleteByStudentIdAndUnitIdAndTypeAndGroup(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
-                                                   @Param("type") Integer type, @Param("group") Integer group);
+                                                   @Param("type") Integer type);
 }
