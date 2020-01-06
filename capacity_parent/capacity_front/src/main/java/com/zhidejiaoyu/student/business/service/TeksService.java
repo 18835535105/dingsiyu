@@ -51,7 +51,7 @@ public interface TeksService extends BaseService<Teks> {
      * @param session
      * @return
      */
-    ServerResponse<Object> addData(TestRecord testRecord, HttpSession session);
+    ServerResponse<Object> addData(TestRecord testRecord, HttpSession session,Long flowId);
 
     ServerResponse<Object> selHistoryPronunciation(Integer unitId, HttpSession session);
 

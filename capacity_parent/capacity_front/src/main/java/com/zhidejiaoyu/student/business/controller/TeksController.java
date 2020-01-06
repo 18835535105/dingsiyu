@@ -128,8 +128,8 @@ public class TeksController  {
      */
     @PostMapping("/addData")
     @ResponseBody
-    public ServerResponse<Object> addData(TestRecord testRecord, HttpSession session){
-        return teksService.addData(testRecord,session);
+    public ServerResponse<Object> addData(TestRecord testRecord, HttpSession session,Long flowId){
+        return teksService.addData(testRecord,session,flowId);
     }
 
 

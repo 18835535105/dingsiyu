@@ -744,10 +744,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @TestChangeAnnotation(isUnitTest = false)
     @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<Object> addData(TestRecord testRecord, HttpSession session) {
+    public ServerResponse<Object> addData(TestRecord testRecord, HttpSession session,Long flowId) {
         //学生对象
         Student student = super.getStudent(session);
-        saveTeksData.insertLearnExtend(testRecord.getFlowId(),testRecord.getUnitId(),student,"闯关测试");
+        saveTeksData.insertLearnExtend(flowId,testRecord.getUnitId(),student,"课文训练",2);
         final String model = "课文默写测试";
         //测试开始时间
         //测试结束时间
