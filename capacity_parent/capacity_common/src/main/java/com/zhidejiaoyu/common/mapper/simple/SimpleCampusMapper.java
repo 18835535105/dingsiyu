@@ -39,7 +39,7 @@ public interface SimpleCampusMapper extends BaseMapper<Campus> {
 
     List<String> getSchoolName(@Param("longs") List<Long> longs) ;
 
-    @Select("select name from campus where teacher_id =#{teacherId}")
+    @Select("select name from campus where teacher_id =#{teacherId} limit 1")
     String selSchoolName(Long teacherId);
 
 
