@@ -896,7 +896,8 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         studentMap.put("stuId", student.getId());
         studentMap.put("myGold", Math.round(totalGold));
         studentMap.put("myChildName", getLevelStr((int) Math.round(totalGold), redisOpt.getAllLevel()));
-        studentMap.put("myMb", rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId()) == -1 ? 0 : rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId()));
+        long rank = rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId());
+        studentMap.put("myMb", rank == -1 ? 0 : rank);
         studentMap.put("myRanking", myRanking);
         long canUseGold = Math.round(student.getSystemGold());
         studentMap.put("canUseGold", canUseGold);
