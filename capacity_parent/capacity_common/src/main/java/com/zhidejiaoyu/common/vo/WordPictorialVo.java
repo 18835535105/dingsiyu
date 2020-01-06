@@ -2,10 +2,11 @@ package com.zhidejiaoyu.common.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Map;
 
 @Data
-public class WordPictorialVo {
+public class WordPictorialVo implements Serializable {
 
 
     private String word_chinese;

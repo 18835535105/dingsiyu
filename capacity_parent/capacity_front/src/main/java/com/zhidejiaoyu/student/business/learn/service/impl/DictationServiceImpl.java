@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.DictationVo;
 import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -45,7 +46,7 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
 
 
     @Override
-    public Object getStudy(HttpSession session, Long unitId,Integer difficulty) {
+    public Object getStudy(HttpSession session, Long unitId, Integer difficulty) {
         // 获取当前学生信息
         Student student = getStudent(session);
         Long studentId = student.getId();
@@ -58,6 +59,7 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
         Integer plan = learnExtendMapper.countLearnWord(learnNews.getId(), unitId, learnNews.getGroup(), studyModel);
         // 获取当前单元下的所有单词的总个数
         Integer wordCount = unitVocabularyNewMapper.countByUnitId(unitId, learnNews.getGroup());
+        DictationVo vo = new DictationVo();
         if (wordCount == 0) {
             log.error("单元 {} 下没有单词信息！", unitId);
             return ServerResponse.createByErrorMessage("当前单元下没有单词！");
@@ -74,44 +76,39 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
             // 查询学习记录本模块学习过的所有单词id
             vocabulary = saveData.getVocabulary(unitId, student, learnNews.getGroup(), studyModel);
             // 是新单词
-            map.put("studyNew", true);
+            vo.setStudyNew(true);
             // 记忆强度
-            map.put("memoryStrength", 0.00);
+            vo.setMemoryStrength(0.00);
+
         } else {
             vocabulary = vocabularyMapper.selectById(studyCapacity.getWordId());
             // 不是新词
-            map.put("studyNew", false);
+            vo.setStudyNew(false);
             // 记忆强度
-            map.put("memoryStrength", vocabulary.getMemory_strength());
+            vo.setMemoryStrength(studyCapacity.getMemoryStrength());
         }
         // 单元单词已学完,去单元测试
         if (vocabulary == null) {
             return super.toUnitTest();
         }
         // id
-        map.put("id", vocabulary.getId());
+        vo.setId(vocabulary.getId());
         // 单词
-        map.put("word", vocabulary.getWord());
+        vo.setWord(vocabulary.getWord());
         // 中文意思
-        map.put("wordChinese", vocabulary.getWordChinese());
-
+        vo.setWordChinese(vocabulary.getWordChinese());
         // 如果单词没音节,把音节字段设置为单词
-        if (StringUtil.isEmpty(vocabulary.getSyllable())) {
-            map.put("wordyj", vocabulary.getWord());
-        } else {
-            // 音节
-            map.put("wordyj", vocabulary.getSyllable());
-        }
+        vo.setWordyj(StringUtil.isEmpty(vocabulary.getSyllable()) ? vocabulary.getWord() : vocabulary.getSyllable());
         // 音标,读音url,词性
-        map.put("soundmark", vocabulary.getSoundMark());
+        vo.setSoundmark(vocabulary.getSoundMark());
         // 读音url
-        map.put("readUrl", baiduSpeak.getLanguagePath(vocabulary.getWord()));
-        // 3. count单元表单词有多少个    /.
-        map.put("wordCount", wordCount);
+        vo.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
+        // 3. count单元表单词有多少个
+        vo.setWordCount(wordCount);
         // 4. 该单元已学单词  ./
-        map.put("plan", plan);
-        map.put("firstStudy", redisOpt.getGuideModel(studentId, studyModel));
-        return ServerResponse.createBySuccess(map);
+        vo.setPlan(plan);
+        vo.setFirstStudy(redisOpt.getGuideModel(studentId, studyModel));
+        return ServerResponse.createBySuccess(vo);
 
     }
 
