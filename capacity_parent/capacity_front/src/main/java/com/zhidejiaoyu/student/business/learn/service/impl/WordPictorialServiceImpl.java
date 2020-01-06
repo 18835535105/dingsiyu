@@ -150,7 +150,7 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
         vo.setSmallPictureUrl(correct.get("smallPictureUrl") == null ? null : correct.get("smallPictureUrl").toString());
         vo.setWord_chinese(correct.get("word_chinese").toString());
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-        return ServerResponse.createBySuccess(correct);
+        return ServerResponse.createBySuccess(vo);
     }
 
 
