@@ -3,7 +3,10 @@ package com.zhidejiaoyu.common.dto;
 import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudyFlowNew;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.servlet.http.HttpSession;
 
@@ -14,6 +17,9 @@ import javax.servlet.http.HttpSession;
  * @date 2019-07-18
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class NodeDto {
 
     /**

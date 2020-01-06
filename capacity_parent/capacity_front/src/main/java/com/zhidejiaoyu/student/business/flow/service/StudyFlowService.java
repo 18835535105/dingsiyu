@@ -33,4 +33,17 @@ public interface StudyFlowService extends BaseService<StudyFlowNew> {
      */
     ServerResponse<Object> toAnotherFlow(NodeDto dto, int nextFlowId);
 
+    /**
+     * studyFlowNew.getType()=null，说明直接进入下一单元或者group
+     * studyFlowNew.getType()!=null并且测试分数大于或者等于需要达到的分数，说明直接进入下一单元或者group
+     *
+     * @param dto
+     * @param studyFlowNew
+     * @return
+     */
+    default boolean checkNextUnitOrGroup(NodeDto dto, StudyFlowNew studyFlowNew) {
+        return (studyFlowNew.getType() == null)
+                || (dto.getGrade() != null && studyFlowNew.getType() != null && dto.getGrade() >= studyFlowNew.getType());
+    }
+
 }

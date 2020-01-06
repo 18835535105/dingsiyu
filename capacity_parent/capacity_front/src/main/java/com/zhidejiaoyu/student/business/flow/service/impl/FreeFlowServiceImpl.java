@@ -7,11 +7,7 @@ import com.zhidejiaoyu.common.utils.CcieUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
-import com.zhidejiaoyu.student.business.flow.common.JudgeNextNode;
-import com.zhidejiaoyu.student.business.flow.FlowConstant;
-import com.zhidejiaoyu.student.business.flow.common.JudgeWordPicture;
-import com.zhidejiaoyu.student.business.flow.common.LogOpt;
-import com.zhidejiaoyu.student.business.flow.common.PackageFlowVO;
+import com.zhidejiaoyu.student.business.flow.common.*;
 import com.zhidejiaoyu.student.business.flow.service.StudyFlowService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -74,6 +70,12 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     @Resource
     private JudgeWordPicture judgeWordPicture;
 
+    @Resource
+    private InitData initData;
+
+    @Resource
+    private FinishGroupOrUnit finishGroupOrUnit;
+
     /**
      * 流程名称与 studyCapacity 中 type 的映射
      */
@@ -108,40 +110,17 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> getNode(NodeDto dto, String isTrueFlow, HttpSession session) {
         Student student = super.getStudent(session);
+        dto.setStudent(student);
 
-        Long studentId = student.getId();
-
-        Long unitId = dto.getUnitId();
-        Integer easyOrHard = dto.getEasyOrHard();
-        Integer modelType = dto.getModelType();
-
-        LearnNew learnNew;
         if (dto.getNodeId() == null) {
-            learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
-            if (learnNew != null) {
-                StudyFlowNew studyFlowNew = studyFlowNewMapper.selectByLearnId(learnNew.getId());
-                if (studyFlowNew != null) {
-                    return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew, student, unitId));
-                }
-                return this.getFlowVoServerResponse(learnNew, modelType, student);
-            }
-
-            UnitNew unitNew = unitNewMapper.selectById(unitId);
-            learnNew = LearnNew.builder()
-                    .easyOrHard(easyOrHard)
-                    .group(1)
-                    .studentId(studentId)
-                    .unitId(unitId)
-                    .updateTime(new Date())
-                    .courseId(unitNew.getCourseId())
-                    .build();
-            learnNewMapper.insert(learnNew);
-            return this.getFlowVoServerResponse(learnNew, modelType, student);
+            return this.getIndexNodeResponse(dto);
         }
 
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(dto.getNodeId());
 
-        learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, dto.getUnitId(), dto.getEasyOrHard());
+        Long studentId = student.getId();
+
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, dto.getUnitId(), dto.getEasyOrHard());
 
         if (learnNew != null) {
             // 如果学生有当前单元的学习记录，删除其学习详情，防止学生重新学习该单元时获取不到题目
@@ -168,11 +147,18 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
 
         // 学习下一单元, 前端需要一个弹框提示
         if (studyFlowNew.getNextTrueFlow() == 0) {
-            // 开启下一单元并且返回需要学习的流程信息
-            logOpt.saveOpenUnitLog(student, unitId);
-            // 保存证书
-            this.judgeCourseCcie(dto);
-            return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
+
+            if (checkNextUnitOrGroup(dto, studyFlowNew)) {
+                Long unitId = dto.getUnitId();
+                // 保存证书
+                this.judgeCourseCcie(dto);
+
+                // 验证当前模块是否有下一个group，如果有初始化，没有说明当前单元学习完毕
+                if (learnNew != null) {
+                    return ServerResponse.createBySuccess(finishGroupOrUnit.finishFreeGroup(dto));
+                }
+                return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
+            }
         }
         // 其余正常流程
         if (studyFlowNew.getNextFalseFlow() == null) {
@@ -181,6 +167,38 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         }
         // 判断下个节点
         return judgeNextNode.judgeNextNode(dto, this);
+    }
+
+    /**
+     * 学生选择单元的时候返回节点信息
+     *
+     * @param dto
+     * @return
+     */
+    public ServerResponse<Object> getIndexNodeResponse(NodeDto dto) {
+        Student student = dto.getStudent();
+        Long studentId = student.getId();
+        Long unitId = dto.getUnitId();
+        Integer easyOrHard = dto.getEasyOrHard();
+        Integer modelType = dto.getModelType();
+
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
+        if (learnNew != null) {
+            StudyFlowNew studyFlowNew = studyFlowNewMapper.selectByLearnId(learnNew.getId());
+            if (studyFlowNew != null) {
+                return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew, student, unitId));
+            }
+            return this.getFlowVoServerResponse(learnNew, modelType, student);
+        }
+
+        UnitNew unitNew = unitNewMapper.selectById(unitId);
+        learnNew = initData.saveLearnNew(NodeDto.builder()
+                .student(student)
+                .courseId(unitNew.getCourseId())
+                .unitId(unitId)
+                .easyOrHard(easyOrHard)
+                .build(), 1);
+        return this.getFlowVoServerResponse(learnNew, modelType, student);
     }
 
     private void judgeCourseCcie(NodeDto dto) {
@@ -220,7 +238,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         Long studentId = student.getId();
 
         StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByLearnId(learnNew.getId());
-        Long startFlowId = this.getStartFlowId(learnNew.getEasyOrHard(), modelType);
+        Long startFlowId = finishGroupOrUnit.getStartFlowId(learnNew.getEasyOrHard(), modelType);
         if (studentFlowNew == null) {
             studentFlowNewMapper.insert(StudentFlowNew.builder()
                     .type(modelType)
@@ -239,27 +257,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew1, student, learnNew.getUnitId()));
     }
 
-    /**
-     * 获取当前模块起始节点
-     *
-     * @param easyOrHard
-     * @param type
-     * @return
-     */
-    private Long getStartFlowId(Integer easyOrHard, Integer type) {
-        switch (type) {
-            case 2:
-                return Objects.equals(easyOrHard, 1) ? FlowConstant.FREE_PLAYER : FlowConstant.FREE_LETTER_WRITE;
-            case 3:
-                return Objects.equals(easyOrHard, 1) ? FlowConstant.FREE_SENTENCE_TRANSLATE : FlowConstant.FREE_SENTENCE_WRITE;
-            case 4:
-                return Objects.equals(easyOrHard, 1) ? FlowConstant.FREE_TEKS_LISTEN : FlowConstant.FREE_TEKS_TRAIN;
-            case 5:
-                return Objects.equals(easyOrHard, 1) ? FlowConstant.FREE_SYNTAX_GAME : FlowConstant.FREE_SYNTAX_WRITE;
-            default:
-                return null;
-        }
-    }
+
 
     public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Student student, Long unitId) {
         return packageFlowVO.packageFlowVO(studyFlowNew, student, unitId);

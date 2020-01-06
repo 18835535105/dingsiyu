@@ -6,26 +6,18 @@ import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
-import com.zhidejiaoyu.student.business.flow.common.JudgeNextNode;
 import com.zhidejiaoyu.student.business.flow.FlowConstant;
-import com.zhidejiaoyu.student.business.flow.common.JudgeWordPicture;
-import com.zhidejiaoyu.student.business.flow.common.LogOpt;
-import com.zhidejiaoyu.student.business.flow.common.PackageFlowVO;
+import com.zhidejiaoyu.student.business.flow.common.*;
 import com.zhidejiaoyu.student.business.flow.service.StudyFlowService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @author wuchenxi
@@ -39,9 +31,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
 
     @Resource
     private StudentFlowNewMapper studentFlowNewMapper;
-
-    @Resource
-    private CourseNewMapper courseNewMapper;
 
     @Resource
     private UnitNewMapper unitNewMapper;
@@ -65,9 +54,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
 
     @Resource
-    private LearnHistoryMapper learnHistoryMapper;
-
-    @Resource
     private JudgeNextNode judgeNextNode;
 
     @Resource
@@ -87,6 +73,12 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
 
     @Resource
     private JudgeWordPicture judgeWordPicture;
+
+    @Resource
+    private InitData initData;
+
+    @Resource
+    private FinishGroupOrUnit finishGroupOrUnit;
 
     /**
      * 节点学完, 把下一节初始化到student_flow表, 并把下一节点返回
@@ -113,7 +105,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         }
 
         String modelName = studyFlowNew.getModelName();
-        int easyOrHard = modelName.contains("写") || Objects.equals(modelName, "课文训练") ? 2 : 1;
+        // 带有“写”、“课文训练”、nodeId=84的流程都属于难流程
+        int easyOrHard = modelName.contains("写") || Objects.equals(modelName, "课文训练") || Objects.equals(84L, dto.getNodeId()) ? 2 : 1;
         dto.setEasyOrHard(easyOrHard);
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(student.getId(), dto.getUnitId(), dto.getEasyOrHard());
         if (learnNew != null) {
@@ -130,15 +123,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         dto.setStudent(student);
 
         if (studyFlowNew.getNextTrueFlow() == 0) {
-            /*
-                studyFlowNew.getType()=null，说明直接进入下一单元或者group
-                studyFlowNew.getType()!=null并且测试分数大于或者等于需要达到的分数，说明直接进入下一单元或者group
-                其他条件继续走下面的条件
-             */
-            boolean nextUnitOrGroup = (studyFlowNew.getType() == null)
-                    || (dto.getGrade() != null && studyFlowNew.getType() != null && dto.getGrade() >= studyFlowNew.getType());
-            if (nextUnitOrGroup) {
-                return ServerResponse.createBySuccess(this.finishGroup(dto));
+            if (checkNextUnitOrGroup(dto, studyFlowNew)) {
+                return ServerResponse.createBySuccess(finishGroupOrUnit.finishOneKeyGroup(dto));
             }
         }
         // 其余正常流程
@@ -171,10 +157,14 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             // 如果学生已经进行过摸底测试，初始化流程节点以及学习记录
             StudentStudyPlanNew maxFinalLevelStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(student.getId(), 1).get(0);
 
-            learnNew = this.saveLearn(maxFinalLevelStudentStudyPlanNew);
+            learnNew = initData.saveLearn(maxFinalLevelStudentStudyPlanNew);
 
             studentFlowNewMapper.deleteByLearnId(learnNew.getId());
-            this.initStudentFlow(student.getId(), maxFinalLevelStudentStudyPlanNew.getFlowId(), learnNew.getId());
+            initData.initStudentFlow(NodeDto.builder()
+                    .student(student)
+                    .nodeId(maxFinalLevelStudentStudyPlanNew.getFlowId())
+                    .learnNew(learnNew)
+                    .build());
             studyFlowNew = studyFlowNewMapper.selectById(maxFinalLevelStudentStudyPlanNew.getFlowId());
         } else {
             studyFlowNew = studyFlowNewMapper.selectById(studentFlowNew.getCurrentFlowId());
@@ -185,15 +175,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         return ServerResponse.createBySuccess(vo);
     }
 
-    public void initStudentFlow(Long studentId, Long flowId, Long learnId) {
-        studentFlowNewMapper.insert(StudentFlowNew.builder()
-                .currentFlowId(flowId)
-                .learnId(learnId)
-                .studentId(studentId)
-                .updateTime(new Date())
-                .type(1)
-                .build());
-    }
 
     public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Student student, Long unitId) {
         return packageFlowVO.packageFlowVO(studyFlowNew, student, unitId);
@@ -292,7 +273,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         }
 
         // 学习完当前group
-        return this.finishGroup(dto);
+        return finishGroupOrUnit.finishOneKeyGroup(dto);
     }
 
     private FlowVO judgeHasCurrentModel(StudyFlowNew studyFlowNew, Student student, Long unitId) {
@@ -316,242 +297,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             return true;
         }
         return false;
-    }
-
-    /**
-     * 学习完当前group
-     *
-     * @param dto
-     * @return
-     */
-    private FlowVO finishGroup(NodeDto dto) {
-
-        // 判断哪些模块有当前group
-        this.judgeHasCurrentGroup(dto);
-
-        // 判断单元是否有下个group
-        LearnNew learnNew = this.judgeHasNextGroup(dto);
-
-        // 删除当前学习记录
-        this.deleteLearnInfo(dto);
-
-        if (learnNew == null) {
-            // 说明当前单元学习完毕
-            return this.finishUnit(dto);
-        }
-
-        studentFlowNewMapper.deleteByLearnId(dto.getLearnNew().getId());
-
-        Long nodeId = dto.getEasyOrHard() == 1 ? FlowConstant.EASY_START : FlowConstant.HARD_START;
-        this.initStudentFlow(dto.getStudent().getId(), nodeId, learnNew.getId());
-        StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(nodeId);
-
-        return this.packageFlowVO(studyFlowNew, dto.getStudent(), dto.getUnitId());
-    }
-
-    private void deleteLearnInfo(NodeDto dto) {
-        LearnNew learnNew = dto.getLearnNew();
-        if (learnNew != null) {
-            learnExtendMapper.deleteByLearnId(learnNew.getId());
-            learnNewMapper.deleteById(learnNew.getId());
-        }
-    }
-
-    /**
-     * 判断是否有下个group，如果有，将下个group初始化到正在学习表中，如果没有，返回null，再判断单元信息
-     *
-     * @param dto
-     * @return
-     */
-    private LearnNew judgeHasNextGroup(NodeDto dto) {
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(dto.getStudent().getId(),
-                dto.getUnitId(), dto.getEasyOrHard());
-        if (learnNew != null) {
-            Long learnNewId = learnNew.getId();
-            learnNewMapper.deleteById(learnNewId);
-        }
-        // 判断单词模块是否有下个group
-        Integer group = unitVocabularyNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
-        if (group != null) {
-            return this.saveLearnNew(dto, group);
-        }
-
-        // 判断句型模块是否有下个group
-        group = unitSentenceNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
-        if (group != null) {
-            return this.saveLearnNew(dto, group);
-        }
-
-        // 判断课文模块是否有下个group
-        group = unitTeksNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
-        if (group != null) {
-            return this.saveLearnNew(dto, group);
-        }
-
-        group = syntaxUnitTopicNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
-        if (group != null) {
-            return this.saveLearnNew(dto, group);
-        }
-
-        return null;
-    }
-
-    private LearnNew saveLearnNew(NodeDto dto, Integer group) {
-        LearnNew learnNew = LearnNew.builder()
-                .easyOrHard(dto.getEasyOrHard())
-                .group(group)
-                .studentId(dto.getStudent().getId())
-                .unitId(dto.getUnitId())
-                .updateTime(new Date())
-                .courseId(dto.getCourseId())
-                .build();
-        learnNewMapper.insert(learnNew);
-        return learnNew;
-    }
-
-    /**
-     * 判断哪些模块有当前group，并更新或新增当前group的学习已完成表
-     *
-     * @param dto
-     */
-    private void judgeHasCurrentGroup(NodeDto dto) {
-        Long unitId = dto.getUnitId();
-        Integer group = dto.getGroup();
-        Integer count = unitVocabularyNewMapper.countUnitIdAndGroup(unitId, group);
-        this.saveOrUpdateLearnHistory(dto, count, 1);
-
-        count = unitSentenceNewMapper.countByUnitIdAndGroup(unitId, group);
-        this.saveOrUpdateLearnHistory(dto, count, 2);
-
-        count = syntaxUnitTopicNewMapper.countByUnitIdAndGroup(unitId, group);
-        this.saveOrUpdateLearnHistory(dto, count, 3);
-
-        count = unitTeksNewMapper.countByUnitIdAndGroup(unitId, group);
-        this.saveOrUpdateLearnHistory(dto, count, 4);
-    }
-
-    private void saveOrUpdateLearnHistory(NodeDto dto, Integer count, int type) {
-        if (count > 0) {
-            // 查询已完成表中是否已有当前group信息，有更新，没有新增
-            LearnHistory.LearnHistoryBuilder builder = LearnHistory.builder()
-                    .studentId(dto.getStudent().getId())
-                    .courseId(dto.getCourseId())
-                    .unitId(dto.getUnitId())
-                    .group(dto.getGroup())
-                    .easyOrHard(dto.getEasyOrHard())
-                    .type(type);
-            LearnHistory learnHistory = learnHistoryMapper.selectOne(builder.build());
-            if (learnHistory != null) {
-                learnHistory.setState(1);
-                learnHistory.setUpdateTime(new Date());
-                learnHistory.setStudyCount(learnHistory.getStudyCount() + 1);
-                learnHistoryMapper.updateById(learnHistory);
-            } else {
-                learnHistoryMapper.insert(builder
-                        .state(1)
-                        .studyCount(1)
-                        .updateTime(new Date())
-                        .build());
-            }
-        }
-    }
-
-    /**
-     * 单元完成操作
-     *
-     * @param dto
-     * @return
-     */
-    private FlowVO finishUnit(NodeDto dto) {
-
-        // 更新优先级表中的变化优先级
-        StudentStudyPlanNew oldMaxFinalLevel = this.getMaxFinalLevelStudentStudyPlanNew(dto);
-        this.updateLevel(dto, oldMaxFinalLevel);
-
-        Student student = dto.getStudent();
-        Long studentId = student.getId();
-
-        logOpt.saveOpenUnitLog(student, dto.getUnitId());
-
-        // 根据优先级初始化学习表数据
-        StudentStudyPlanNew maxStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
-        LearnNew learnNew = this.saveLearn(maxStudentStudyPlanNew);
-
-        // 将当前单元的已学习记录状态置为已完成
-        learnHistoryMapper.updateStateByStudentIdAndUnitId(studentId, dto.getUnitId(), 2);
-
-        studentFlowNewMapper.deleteByLearnId(dto.getLearnNew().getId());
-        Long flowId = maxStudentStudyPlanNew.getFlowId();
-        this.initStudentFlow(dto.getStudent().getId(), flowId, learnNew.getId());
-        StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(flowId);
-
-        return this.packageFlowVO(studyFlowNew, student, maxStudentStudyPlanNew.getUnitId());
-    }
-
-    /**
-     * 获取最终优先级最高的数据
-     *
-     * @param dto
-     * @return
-     */
-    private StudentStudyPlanNew getMaxFinalLevelStudentStudyPlanNew(NodeDto dto) {
-        List<StudentStudyPlanNew> studentStudyPlanNews = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(dto.getStudent().getId(), 5);
-        StudentStudyPlanNew maxStudentStudyPlanNew = studentStudyPlanNews.get(0);
-        StudentStudyPlanNew finalMaxStudentStudyPlanNew = maxStudentStudyPlanNew;
-        List<StudentStudyPlanNew> collect = studentStudyPlanNews.stream()
-                .filter(studentStudyPlanNew -> Objects.equals(studentStudyPlanNew.getFinalLevel(), finalMaxStudentStudyPlanNew.getFinalLevel()))
-                .collect(Collectors.toList());
-        if (collect.size() > 1) {
-            // 说明有相同优先级的数据，取最接近当前单元的一个
-            // 与当前单元的差值
-            int difference = -1;
-            // 最接近当前单元的记录
-            for (StudentStudyPlanNew studentStudyPlanNew : collect) {
-                Long unitId = studentStudyPlanNew.getUnitId();
-                long abs = Math.abs(unitId - dto.getUnitId());
-                if (difference == -1 || abs < difference) {
-                    difference = (int) abs;
-                    maxStudentStudyPlanNew = studentStudyPlanNew;
-                }
-            }
-        }
-        return maxStudentStudyPlanNew;
-    }
-
-    /**
-     * 单元学习完成，更新优先级表
-     *
-     * @param dto
-     * @param maxFinalLevel
-     */
-    private void updateLevel(NodeDto dto, StudentStudyPlanNew maxFinalLevel) {
-        CourseNew currentCourse = courseNewMapper.selectById(maxFinalLevel.getCourseId());
-        String gradeExt = currentCourse.getGradeExt();
-        String currentGrade = StringUtils.isNotBlank(gradeExt) ? gradeExt : currentCourse.getGrade();
-        PriorityUtil.finishUnitUpdateErrorLevel(maxFinalLevel, dto.getStudent().getGrade(), currentGrade);
-        studentStudyPlanNewMapper.updateById(maxFinalLevel);
-    }
-
-    /**
-     * 如果学习表中没有最高优先级的数据，新增
-     *
-     * @param studentStudyPlanNew
-     */
-    private LearnNew saveLearn(StudentStudyPlanNew studentStudyPlanNew) {
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentStudyPlanNew.getStudentId(), studentStudyPlanNew.getUnitId(),
-                studentStudyPlanNew.getEasyOrHard());
-        if (learnNew == null) {
-            learnNew = LearnNew.builder()
-                    .courseId(studentStudyPlanNew.getCourseId())
-                    .easyOrHard(studentStudyPlanNew.getEasyOrHard())
-                    .group(1)
-                    .studentId(studentStudyPlanNew.getStudentId())
-                    .unitId(studentStudyPlanNew.getUnitId())
-                    .updateTime(new Date())
-                    .build();
-            learnNewMapper.insert(learnNew);
-        }
-        return learnNew;
     }
 
     /**
@@ -587,7 +332,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         }
         return false;
     }
-
 
 
     /**
