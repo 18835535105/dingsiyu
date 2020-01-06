@@ -24,8 +24,6 @@ public class TestRecord extends Model<TestRecord> {
 
     private Long unitId;
 
-    private Long flowId;
-
     /**
      * 测试类型（学前游戏测试，等级测试，单元闯关测试，效果检测，阶段测试，复习测试，学后测试, 测试中心(已学测试,生词测试,熟词测试,五维测试)
      */

@@ -30,7 +30,7 @@ public class BreakThroughTheTextServiceImpl extends BaseServiceImpl<LearnNewMapp
 
     @Override
     public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId) {
-        saveTeksData.saveStudy(session, unitId, flowId,studyModel);
+        saveTeksData.saveStudy(session, unitId, flowId,studyModel,easyOrHard);
         return ServerResponse.createBySuccess();
     }
 }

@@ -17,7 +17,7 @@ public class TextTrainingServiceImpl extends BaseServiceImpl<LearnNewMapper, Lea
     @Resource
     private SaveTeksData saveTeksData;
 
-    private Integer type = 14;
+    private Integer type = 12;
     private Integer easyOrHard = 2;
     private String studyModel = "课文训练";
 
@@ -30,7 +30,7 @@ public class TextTrainingServiceImpl extends BaseServiceImpl<LearnNewMapper, Lea
 
     @Override
     public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId) {
-        saveTeksData.saveStudy(session, unitId, flowId, studyModel);
+        saveTeksData.saveStudy(session, unitId, flowId, studyModel,easyOrHard);
         return ServerResponse.createBySuccess();
     }
 }
