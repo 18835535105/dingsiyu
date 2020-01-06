@@ -898,6 +898,9 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         studentMap.put("myChildName", getLevelStr((int) Math.round(totalGold), redisOpt.getAllLevel()));
         studentMap.put("myMb", rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId()) == -1 ? 0 : rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId()));
         studentMap.put("myRanking", myRanking);
+        long canUseGold = Math.round(student.getSystemGold());
+        studentMap.put("canUseGold", canUseGold);
+        studentMap.put("usedGold", totalGold - canUseGold);
 
         // 如果是学生点击排行按钮进入排行，其初始页为0，后台强制其跳转到当前学生所在页
         if (rankDto.getPage() == 0) {
