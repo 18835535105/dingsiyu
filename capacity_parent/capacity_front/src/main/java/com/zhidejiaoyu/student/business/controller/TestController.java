@@ -96,11 +96,12 @@ public class TestController {
     @GetMapping("/getSentenceUnitTest")
     public ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId,
                                                                          @RequestParam(required = false, defaultValue = "1") Integer type,
-                                                                         @RequestParam(required = false, defaultValue = "1") Integer pageNum) {
+                                                                         @RequestParam(required = false, defaultValue = "1") Integer pageNum,
+                                                                         Integer studyModel) {
         if (unitId == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), "unitId 不能为 null");
         }
-        return testService.getSentenceUnitTest(session, unitId, type, pageNum);
+        return testService.getSentenceUnitTest(session, unitId, type, pageNum,studyModel);
     }
 
 

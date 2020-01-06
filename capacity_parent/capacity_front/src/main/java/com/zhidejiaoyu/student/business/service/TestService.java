@@ -83,7 +83,8 @@ public interface TestService extends BaseService<TestRecord> {
      * @param pageNum
      * @return
      */
-    ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId, Integer type, Integer pageNum);
+    ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId,
+                                                                  Integer type, Integer pageNum,Integer studyModel);
 
     /**
      * @param course_id

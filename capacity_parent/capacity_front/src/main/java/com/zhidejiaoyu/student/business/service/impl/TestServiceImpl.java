@@ -994,7 +994,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     public ServerResponse<Object> saveCapSentenceTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
         Student student = getStudent(session);
         TestRecord testRecord;
-        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "音译测试",1);
+        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "音译测试", 1);
         wordUnitTestDTO.setClassify(8);
 
         // 判断当前单元是不是首次进行测试
@@ -1060,7 +1060,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         Student student = getStudent(session);
         TestRecord testRecord;
-        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "闯关测试",1);
+        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "闯关测试", 1);
         wordUnitTestDTO.setClassify(9);
 
         // 判断当前单元是不是首次进行测试
@@ -1317,7 +1317,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     private void saveError(Long unitId, Long[] errorIds, Student student, Integer classify) {
-        if(errorIds!=null){
+        if (errorIds != null) {
             Integer easyOrHard = 1;
             if (classify.equals(2) || classify.equals(3) || classify.equals(6)) {
                 easyOrHard = 2;
@@ -1828,12 +1828,15 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     @Override
-    public ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId, Integer type, Integer pageNum) {
+    public ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId, Integer type, Integer pageNum, Integer studyModel) {
         if (session.getAttribute(TimeConstant.BEGIN_START_TIME) == null) {
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         }
+        Integer easyOrHard = (studyModel == null || studyModel != 6) ? 1 : 2;
+
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(getStudentId(session), unitId, easyOrHard);
         // 获取当前单元下其中一个例句
-        List<Sentence> sentences = sentenceMapper.selectByUnitId(unitId);
+        List<Sentence> sentences = sentenceMapper.selectByUnitIdAndGroup(unitId, learnNew.getGroup());
         List<SentenceTranslateVo> sentenceTestResults = testResultUtil.getSentenceTestResults(sentences, MathUtil.getRandom(4, 6), type);
         return ServerResponse.createBySuccess(sentenceTestResults);
     }
