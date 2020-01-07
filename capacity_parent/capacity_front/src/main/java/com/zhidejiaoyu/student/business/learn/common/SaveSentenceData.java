@@ -203,7 +203,7 @@ public class SaveSentenceData {
 
     private Sentence getSentence(Long unitId, Student student, Integer group, String studyModel) {
         // 查询学习记录本模块学习过的所有单词id
-        List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel);
+        List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel,2);
         return sentenceMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);
     }
 }

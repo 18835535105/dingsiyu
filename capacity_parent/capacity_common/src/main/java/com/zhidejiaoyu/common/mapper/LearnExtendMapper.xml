@@ -44,6 +44,7 @@
         where learn.student_id = #{studentId}
           and learn.unit_id = #{unitId}
           and extend.study_model = #{type}
+          and model_type =#{modelType}
     </select>
 
     <select id="selectByLearnIdsAndWordIdAndStudyModel" parameterType="map" resultMap="BaseResultMap">

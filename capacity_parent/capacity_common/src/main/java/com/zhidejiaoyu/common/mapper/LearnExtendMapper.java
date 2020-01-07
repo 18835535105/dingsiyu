@@ -49,7 +49,7 @@ public interface LearnExtendMapper extends BaseMapper<LearnExtend> {
      * @return
      */
     List<Long> selectByUnitIdAndStudentIdAndType(@Param("unitId") Long unitId, @Param("studentId") Long studentId,
-                                                 @Param("type") String studyModel);
+                                                 @Param("type") String studyModel,@Param("modelType")Integer modelType);
 
     /**
      * 获取当前模块的所有数据

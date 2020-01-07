@@ -419,7 +419,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
 
     public Vocabulary getVocabulary(Long unitId, Student student, Integer group, String studyModel) {
         // 查询学习记录本模块学习过的所有单词id
-        List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel);
+        List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel,modelType);
         return vocabularyMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);
     }
 
