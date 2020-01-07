@@ -102,22 +102,16 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         return this.getNextMemoryWord(session, unitId, student, firstStudy, plan, wordCount, learnNews.getGroup(), type, studyModel);
     }
 
-    /**
-     * 记忆难度
-     */
-    @Resource
-    private MemoryDifficultyUtil memoryDifficultyUtil;
-
     public boolean saveVocabularyModel(Student student, HttpSession session, Long unitId,
                                        Long wordId, boolean isTrue, Integer plan,
-                                       Integer total, Long flowId, Integer easyOrHard, Integer type, String studyModel) {
+                                       Integer total, Long flowId, Integer easyOrHard, Integer type, String studyModel,Integer model) {
 
         Date now = DateUtil.parseYYYYMMDDHHMMSS(new Date());
         Long studentId = student.getId();
         judgeIsFirstStudy(session, student);
 
         //获取学生学习当前模块的learn_id
-        List<Long> learnIds = learnNewMapper.selectIdByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard,modelType);
+        List<Long> learnIds = learnNewMapper.selectIdByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard,model);
         //如果有多余的删除
         Long learnId = learnIds.get(0);
         if (learnIds.size() > 1) {

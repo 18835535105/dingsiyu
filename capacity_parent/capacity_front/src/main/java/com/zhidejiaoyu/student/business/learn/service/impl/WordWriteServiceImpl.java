@@ -21,6 +21,7 @@ public class WordWriteServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
     private Integer type = 5;
     private Integer easyOrHard = 2;
     private String studyModel = "慧默写";
+    private Integer modelType = 1;
 
     @Override
     public Object getStudy(HttpSession session, Long unitId, Integer difficulty) {
@@ -33,7 +34,7 @@ public class WordWriteServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
     public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId) {
         Student student = getStudent(session);
         if (saveData.saveVocabularyModel(student, session, unitId, wordId, isTrue, plan, total,
-                flowId, easyOrHard, type, studyModel)) {
+                flowId, easyOrHard, type, studyModel, modelType)) {
             return ServerResponse.createBySuccess();
         }
         return ServerResponse.createByErrorMessage("学习记录保存失败");

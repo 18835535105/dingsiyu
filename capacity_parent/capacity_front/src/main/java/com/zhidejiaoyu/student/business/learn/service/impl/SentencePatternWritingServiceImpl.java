@@ -25,6 +25,7 @@ public class SentencePatternWritingServiceImpl extends BaseServiceImpl<LearnNewM
     private Integer type = 10;
     private Integer easyOrHard = 2;
     private String studyModel = "例句默写";
+    private Integer modelType = 2;
 
     @Override
     public Object getStudy(HttpSession session, Long unitId, Integer difficulty) {
@@ -37,7 +38,7 @@ public class SentencePatternWritingServiceImpl extends BaseServiceImpl<LearnNewM
     public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId) {
         Student student = getStudent(session);
         if (saveData.saveVocabularyModel(student, session, unitId, wordId, isTrue, plan, total,
-                flowId, easyOrHard, type, studyModel)) {
+                flowId, easyOrHard, type, studyModel, modelType)) {
             return ServerResponse.createBySuccess();
         }
         return ServerResponse.createByErrorMessage("学习记录保存失败");

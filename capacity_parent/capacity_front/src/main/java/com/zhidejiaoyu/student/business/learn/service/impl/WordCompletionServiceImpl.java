@@ -23,22 +23,22 @@ public class WordCompletionServiceImpl extends BaseServiceImpl<LearnNewMapper, L
     private Integer type = 6;
     private Integer easyOrHard = 2;
     private String studyModel = "单词填字";
+    private Integer modelType = 1;
 
     @Override
     public Object getStudy(HttpSession session, Long unitId, Integer difficulty) {
         Student student = getStudent(session);
         Long studentId = student.getId();
-        return saveData.getStudyWord(session, unitId, student, studentId,easyOrHard,studyModel,type);
+        return saveData.getStudyWord(session, unitId, student, studentId, easyOrHard, studyModel, type);
 
     }
-
 
 
     @Override
     public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId) {
         Student student = getStudent(session);
         if (saveData.saveVocabularyModel(student, session, unitId, wordId, isTrue, plan, total,
-                flowId, easyOrHard, type, studyModel)) {
+                flowId, easyOrHard, type, studyModel, modelType)) {
             return ServerResponse.createBySuccess();
         }
         return ServerResponse.createByErrorMessage("学习记录保存失败");

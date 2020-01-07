@@ -43,6 +43,7 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
     private Integer type = 4;
     private Integer easyOrHard = 2;
     private String studyModel = "慧听写";
+    private Integer modelType=1;
 
 
     @Override
@@ -117,7 +118,7 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
                             Integer plan, Integer total, Long courseId, Long flowId) {
         Student student = getStudent(session);
         if (saveData.saveVocabularyModel(student, session, unitId, wordId, isTrue, plan, total,
-                flowId, easyOrHard, type, studyModel)) {
+                flowId, easyOrHard, type, studyModel,modelType)) {
             return ServerResponse.createBySuccess();
         }
         return ServerResponse.createByErrorMessage("学习记录保存失败");

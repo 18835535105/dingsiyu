@@ -57,7 +57,7 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
     private Integer type = 1;
     private Integer easyOrHard = 1;
     private String studyModel = "单词图鉴";
-
+    private Integer modelType=1;
 
     @Override
     public Object getStudy(HttpSession session, Long unitId, Integer difficulty) {
@@ -162,7 +162,7 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
                             Long flowId) {
         Student student = getStudent(session);
         if (saveData.saveVocabularyModel(student, session, unitId, wordId, isTrue, plan, total,
-                flowId, easyOrHard, type, studyModel)) {
+                flowId, easyOrHard, type, studyModel,modelType)) {
             return ServerResponse.createBySuccess();
         }
         return ServerResponse.createByErrorMessage("学习记录保存失败");
