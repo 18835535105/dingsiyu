@@ -33,7 +33,7 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private SaveData saveData;
     @Resource
     private TeacherMapper teacherMapper;
-    private Integer modelType=3;
+    private Integer modelType = 3;
 
     public Object getStudyModel(Long unitId, Long studentId, Integer easyOrHard, Integer type) {
         //查看课文数据是否保存过
@@ -44,7 +44,7 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         }*/
         //获取单元下需要学习的group
         //获取当前单元下的learnId
-        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard,modelType);
+        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard, modelType);
         if (type.equals(11)) {
             return getTeksAuditionData(unitId, learnNews.getGroup());
         } else if (type.equals(12)) {
@@ -129,9 +129,9 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         return null;
     }
 
-    public void insertLearnExtend(Long flowId, Long unitId, Student student, String studyModel,Integer easyOrHard) {
+    public void insertLearnExtend(Long flowId, Long unitId, Student student, String studyModel, Integer easyOrHard, Integer model) {
         StudyFlowNew flow = saveData.getCurrentStudyFlowById(flowId);
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, easyOrHard,modelType);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, easyOrHard, model);
         LearnExtend learnExtend = new LearnExtend();
         learnExtend.setStudyModel(studyModel);
         learnExtend.setLearnId(learnNew.getId());
@@ -144,8 +144,8 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         learnExtendMapper.insert(learnExtend);
     }
 
-    public void saveStudy(HttpSession session, Long unitId, Long flowId, String studyModel,Integer easyOrHard) {
+    public void saveStudy(HttpSession session, Long unitId, Long flowId, String studyModel, Integer easyOrHard) {
         Student student = getStudent(session);
-        insertLearnExtend(flowId, unitId, student, studyModel,easyOrHard);
+        insertLearnExtend(flowId, unitId, student, studyModel, easyOrHard, 3);
     }
 }

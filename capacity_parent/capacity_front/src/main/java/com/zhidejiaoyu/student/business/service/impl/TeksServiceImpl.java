@@ -747,7 +747,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     public ServerResponse<Object> addData(TestRecord testRecord, HttpSession session,Long flowId) {
         //学生对象
         Student student = super.getStudent(session);
-        saveTeksData.insertLearnExtend(flowId,testRecord.getUnitId(),student,"课文训练",2);
+        saveTeksData.insertLearnExtend(flowId,testRecord.getUnitId(),student,"课文训练",2,3);
         final String model = "课文默写测试";
         //测试开始时间
         //测试结束时间

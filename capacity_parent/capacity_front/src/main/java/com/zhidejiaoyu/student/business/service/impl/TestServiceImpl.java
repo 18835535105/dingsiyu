@@ -994,7 +994,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     public ServerResponse<Object> saveCapSentenceTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
         Student student = getStudent(session);
         TestRecord testRecord;
-        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "音译测试", 1);
+        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "音译测试", 1,2);
         wordUnitTestDTO.setClassify(8);
 
         // 判断当前单元是不是首次进行测试
@@ -1060,7 +1060,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         Student student = getStudent(session);
         TestRecord testRecord;
-        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "闯关测试", 1);
+        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "闯关测试", 1,2);
         wordUnitTestDTO.setClassify(9);
 
         // 判断当前单元是不是首次进行测试
