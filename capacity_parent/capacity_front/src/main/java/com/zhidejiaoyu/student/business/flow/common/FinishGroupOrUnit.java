@@ -108,7 +108,7 @@ public class FinishGroupOrUnit {
      * @param dto
      * @return
      */
-    public Object finishFreeGroup(NodeDto dto) {
+    public ServerResponse<Object> finishFreeGroup(NodeDto dto) {
 
         // 更新学习历史表
         initData.saveOrUpdateFreeLearnHistory(dto);
@@ -137,7 +137,8 @@ public class FinishGroupOrUnit {
                 .build());
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(startFlowId);
 
-        return packageFlowVO.packageFlowVO(studyFlowNew, dto.getStudent(), dto.getUnitId());
+        FlowVO flowVO = packageFlowVO.packageFlowVO(studyFlowNew, dto.getStudent(), dto.getUnitId());
+        return ServerResponse.createBySuccess(flowVO);
     }
 
     /**

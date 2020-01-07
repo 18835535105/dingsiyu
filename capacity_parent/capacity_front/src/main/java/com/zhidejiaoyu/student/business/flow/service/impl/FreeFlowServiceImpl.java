@@ -65,9 +65,6 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     private PackageFlowVO packageFlowVO;
 
     @Resource
-    private LogOpt logOpt;
-
-    @Resource
     private JudgeWordPicture judgeWordPicture;
 
     @Resource
@@ -154,7 +151,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
 
                 // 验证当前模块是否有下一个group，如果有初始化，没有说明当前单元学习完毕
                 if (learnNew != null) {
-                    return ServerResponse.createBySuccess(finishGroupOrUnit.finishFreeGroup(dto));
+                    return finishGroupOrUnit.finishFreeGroup(dto);
                 }
                 return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
             }
@@ -177,6 +174,9 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     private String getModelName(String modelName) {
         if (modelName.contains("句型")) {
             return modelName.replace("句型", "例句");
+        }
+        if (Objects.equals("字母填写", modelName)) {
+            return "单词填字";
         }
         return modelName;
     }
@@ -236,14 +236,8 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
      */
     @Override
     public ServerResponse<Object> toAnotherFlow(NodeDto dto, int nextFlowId) {
-        Student student = dto.getStudent();
-
         // 判断当前单元单词是否有图片，如果都没有图片不进入单词图鉴
-        StudyFlowNew studyFlowNew = this.getStudyFlow(dto, nextFlowId);
-        studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(studyFlowNew.getId(), dto.getLearnNew().getId());
-
-        FlowVO flowVo = this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
-        return ServerResponse.createBySuccess("true", flowVo);
+        return this.getStudyFlow(dto, nextFlowId);
     }
 
     public ServerResponse<Object> getFlowVoServerResponse(LearnNew learnNew, Integer modelType, Student student) {
@@ -278,38 +272,19 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
      * @param nextFlowId 下个流程节点的 id
      * @return
      */
-    private StudyFlowNew getStudyFlow(NodeDto dto, int nextFlowId) {
+    private ServerResponse<Object> getStudyFlow(NodeDto dto, int nextFlowId) {
+
+        Student student = dto.getStudent() == null ? new Student() : dto.getStudent();
+
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(nextFlowId);
 
         boolean canStudyWordPicture = judgeWordPicture.judgeWordPicture(dto, studyFlowNew);
         if (canStudyWordPicture) {
-            return studyFlowNew;
+            studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(studyFlowNew.getId(), dto.getLearnNew().getId());
+            FlowVO flowVo = this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
+            return ServerResponse.createBySuccess(flowVo);
         }
 
-        // 流程 1 单词图鉴流程 id
-        int flowOnePicture = 15;
-        // 流程 1 的单词图鉴
-        if (nextFlowId == flowOnePicture) {
-            UnitNew unitNew = unitNewMapper.selectById(dto.getUnitId());
-            Student student = dto.getStudent() == null ? new Student() : dto.getStudent();
-            if (dto.getGrade() != null && dto.getGrade() >= dto.getStudyFlowNew().getType()) {
-                // 去流程 2 的慧听写
-                int flowId = 18;
-                logOpt.changeFlowNodeLog(student, "慧听写", unitNew, flowId);
-                return studyFlowNewMapper.selectById(flowId);
-            }
-            // 如果是从单词播放机直接进入单词图鉴，将流程跳转到慧记忆
-            if (Objects.equals(dto.getNodeId(), 22L)) {
-                int flowId = 48;
-                logOpt.changeFlowNodeLog(student, "慧记忆", unitNew, flowId);
-                return studyFlowNewMapper.selectById(flowId);
-            }
-            // 返回流程 1
-            int flowId = 9;
-            logOpt.changeFlowNodeLog(student, "单词播放机", unitNew, flowId);
-            return studyFlowNewMapper.selectById(flowId);
-        }
-
-        return studyFlowNew;
+        return finishGroupOrUnit.finishFreeGroup(dto);
     }
 }
