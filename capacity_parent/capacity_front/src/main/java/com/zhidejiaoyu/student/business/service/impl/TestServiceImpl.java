@@ -1060,7 +1060,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         Student student = getStudent(session);
         TestRecord testRecord;
-        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "闯关测试", 1,2);
+        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "闯关测试", 1,3);
         wordUnitTestDTO.setClassify(9);
 
         // 判断当前单元是不是首次进行测试

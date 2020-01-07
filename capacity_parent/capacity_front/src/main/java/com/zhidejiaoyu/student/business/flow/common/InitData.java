@@ -109,7 +109,7 @@ public class InitData {
      * @param group
      * @return
      */
-    public LearnNew saveLearnNew(NodeDto dto, Integer group) {
+    public LearnNew saveLearnNew(NodeDto dto, Integer group, int ModelType) {
         LearnNew learnNew = LearnNew.builder()
                 .easyOrHard(dto.getEasyOrHard())
                 .group(group)
@@ -117,6 +117,7 @@ public class InitData {
                 .unitId(dto.getUnitId())
                 .updateTime(new Date())
                 .courseId(dto.getCourseId())
+                .modelType(ModelType)
                 .build();
         learnNewMapper.insert(learnNew);
         return learnNew;
@@ -139,6 +140,7 @@ public class InitData {
                     .studentId(studentStudyPlanNew.getStudentId())
                     .unitId(studentStudyPlanNew.getUnitId())
                     .updateTime(new Date())
+                    .modelType(modelType)
                     .build();
             learnNewMapper.insert(learnNew);
         }

@@ -196,20 +196,25 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     public ServerResponse<Object> toAnotherFlow(NodeDto dto, int nextFlowId) {
 
         // 判断当前单元单词是否有图片，如果都没有图片不进入单词图鉴
-        StudyFlowNew studyFlowNew = this.getStudyFlow(dto, nextFlowId);
+        // 下个节点数据
+        StudyFlowNew nextStudyFlowNew = this.getStudyFlow(dto, nextFlowId);
 
         // 判断当前单元是否含有当前模块的内容，如果没有当前模块的内容学习下个模块的内容
-        FlowVO flowVO = this.judgeHasCurrentModel(studyFlowNew, dto);
+        FlowVO flowVO = this.judgeHasCurrentModel(nextStudyFlowNew, dto);
 
+        // 如果不相等，说明是跳模块学习，获取最新的节点信息
+        if (!Objects.equals(nextFlowId, flowVO.getId())) {
+            nextStudyFlowNew = studyFlowNewMapper.selectById(flowVO.getId());
+        }
         // 如果学习模块改变，修改learnNew中的modelType值
-        int modelType = FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(studyFlowNew.getFlowName());
+        int modelType = FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(nextStudyFlowNew.getFlowName());
         LearnNew learnNew = dto.getLearnNew();
         if (!Objects.equals(modelType, learnNew.getModelType())) {
             learnNew.setModelType(modelType);
             learnNewMapper.updateById(learnNew);
         }
 
-        studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(studyFlowNew.getId(), learnNew.getId());
+        studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(nextStudyFlowNew.getId(), learnNew.getId());
 
         return ServerResponse.createBySuccess(flowVO);
     }

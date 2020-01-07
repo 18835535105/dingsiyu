@@ -211,7 +211,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
                 .courseId(unitNew.getCourseId())
                 .unitId(unitId)
                 .easyOrHard(easyOrHard)
-                .build(), 1);
+                .build(), 1, dto.getModelType() - 1);
         return this.getFlowVoServerResponse(learnNew, modelType, student);
     }
 

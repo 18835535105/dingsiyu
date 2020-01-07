@@ -171,12 +171,19 @@ public class FinishGroupOrUnit {
         }
     }
 
+    /**
+     * 自由学习判断当前单元是否有下个group
+     *
+     * @param dto
+     * @return
+     */
     private LearnNew judgeHasNextFreeGroup(NodeDto dto) {
         Long unitId = dto.getUnitId();
         Integer group = dto.getGroup();
 
         Integer newGroup = null;
-        switch (dto.getModelType()) {
+        Integer modelType = dto.getModelType();
+        switch (modelType) {
             case 2:
                 newGroup = unitVocabularyNewMapper.selectNextGroup(unitId, group);
                 break;
@@ -193,7 +200,7 @@ public class FinishGroupOrUnit {
         }
 
         if (newGroup != null) {
-            return initData.saveLearnNew(dto, newGroup);
+            return initData.saveLearnNew(dto, newGroup, modelType - 1);
         }
         return null;
     }
@@ -214,24 +221,24 @@ public class FinishGroupOrUnit {
         // 判断单词模块是否有下个group
         Integer group = unitVocabularyNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
         if (group != null) {
-            return initData.saveLearnNew(dto, group);
+            return initData.saveLearnNew(dto, group, 1);
         }
 
         // 判断句型模块是否有下个group
         group = unitSentenceNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
         if (group != null) {
-            return initData.saveLearnNew(dto, group);
+            return initData.saveLearnNew(dto, group, 2);
         }
 
         // 判断课文模块是否有下个group
         group = unitTeksNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
         if (group != null) {
-            return initData.saveLearnNew(dto, group);
+            return initData.saveLearnNew(dto, group, 3);
         }
 
         group = syntaxUnitTopicNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
         if (group != null) {
-            return initData.saveLearnNew(dto, group);
+            return initData.saveLearnNew(dto, group, 4);
         }
 
         return null;
@@ -256,19 +263,22 @@ public class FinishGroupOrUnit {
 
         // 根据优先级初始化学习表数据
         StudentStudyPlanNew maxStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
-        LearnNew learnNew = initData.saveLearn(maxStudentStudyPlanNew, FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(dto.getStudyFlowNew().getFlowName()));
+        Long flowId = maxStudentStudyPlanNew.getFlowId();
+        StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(flowId);
+
+        Integer modelType = FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(studyFlowNew.getFlowName());
+        LearnNew learnNew = initData.saveLearn(maxStudentStudyPlanNew, modelType);
 
         // 将当前单元的已学习记录状态置为已完成
         learnHistoryMapper.updateStateByStudentIdAndUnitId(studentId, dto.getUnitId(), 2);
 
         studentFlowNewMapper.deleteByLearnId(dto.getLearnNew().getId());
-        Long flowId = maxStudentStudyPlanNew.getFlowId();
+
         initData.initStudentFlow(NodeDto.builder()
                 .student(dto.getStudent())
                 .nodeId(flowId)
                 .learnNew(learnNew)
                 .build());
-        StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(flowId);
 
         return packageFlowVO.packageFlowVO(studyFlowNew, student, maxStudentStudyPlanNew.getUnitId());
     }
