@@ -66,6 +66,7 @@
         where student_id = #{studentId}
           and unit_id = #{unitId}
           and easy_or_hard = #{easyOrHard}
+          and model_type=#{modelType}
         limit 1;
     </select>
     <select id="selectStudyMap" parameterType="map" resultType="map">

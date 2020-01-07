@@ -117,7 +117,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         judgeIsFirstStudy(session, student);
 
         //获取学生学习当前模块的learn_id
-        List<Long> learnIds = learnNewMapper.selectIdByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
+        List<Long> learnIds = learnNewMapper.selectIdByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard,modelType);
         //如果有多余的删除
         Long learnId = learnIds.get(0);
         if (learnIds.size() > 1) {

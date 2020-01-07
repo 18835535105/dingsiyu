@@ -55,7 +55,7 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
 
 
     List<Long> selectIdByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
-                                                         @Param("easyOrHard") Integer easyOrHard);
+                                                         @Param("easyOrHard") Integer easyOrHard,@Param("modelType")Integer modelType);
 
     @Select("select id from learn_new where student_id =#{studentId}")
     List<Long> selectIdByStudentId(@Param("studentId") Long studentId);
