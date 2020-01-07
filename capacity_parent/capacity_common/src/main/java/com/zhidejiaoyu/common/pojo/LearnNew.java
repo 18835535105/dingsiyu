@@ -1,17 +1,13 @@
 package com.zhidejiaoyu.common.pojo;
 
-        import com.baomidou.mybatisplus.enums.IdType;
-        import java.util.Date;
-        import com.baomidou.mybatisplus.annotations.TableId;
-        import com.baomidou.mybatisplus.annotations.TableId;
-        import com.baomidou.mybatisplus.enums.IdType;
-        import com.baomidou.mybatisplus.activerecord.Model;
-        import java.io.Serializable;
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableId;
+import com.baomidou.mybatisplus.enums.IdType;
+import lombok.*;
+import lombok.experimental.Accessors;
 
-        import com.baomidou.mybatisplus.annotations.Version;
-
-        import lombok.*;
-        import lombok.experimental.Accessors;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -47,6 +43,12 @@ public class LearnNew extends Model<LearnNew> {
      * 难易类型：1:简单类型；2:难类型
      */
     private Integer easyOrHard;
+
+    /**
+     * 1：单词；2：句型；3：课文；4：语法
+     */
+    private Integer modelType;
+
     private Date updateTime;
 
 

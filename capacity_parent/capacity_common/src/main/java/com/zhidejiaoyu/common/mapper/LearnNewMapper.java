@@ -52,16 +52,6 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
                                        @Param("model") Integer model,
                                        @Param("group") Integer group);
 
-    /**
-     * 查询当前单元是否已经学习过指定流程
-     *
-     * @param studentId
-     * @param unitId
-     * @param flowName
-     * @return
-     */
-    int countByStudentIdAndFlow(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("flowName") String flowName);
-
 
     List<Long> selectIdByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                                          @Param("easyOrHard") Integer easyOrHard);

@@ -10,11 +10,12 @@
         <result column="unit_id" property="unitId"/>
         <result column="group" property="group"/>
         <result column="easy_or_hard" property="easyOrHard"/>
+        <result column="model_type" property="modelType"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <sql id="base_sql">
-        id, student_id, course_id, unit_id, `group`, easy_or_hard, update_time
+        id, student_id, course_id, unit_id, `group`, easy_or_hard, model_type, update_time
     </sql>
     <sql id="getByType">
         <if test="type==1">
@@ -28,15 +29,6 @@
             v.sound_mark
         </if>
     </sql>
-
-    <select id="countByStudentIdAndFlow" resultType="java.lang.Integer" parameterType="map">
-        select count(id)
-        from learn_new l
-                 left join learn_extend le on l.id = le.learn_id
-            and l.student_id = #{studentId}
-            and l.unit_id = #{unitId}
-            and le.flow_name = #{flowName}
-    </select>
 
     <select id="selectByStudentStudyPlanNew" resultMap="BaseResultMap" parameterType="map">
         select
@@ -68,7 +60,7 @@
     <select id="selectStudyMap" parameterType="map" resultType="map">
         <if test="model==1">
             SELECT
-            <include refid="getByType"></include>
+            <include refid="getByType"/>
             FROM vocabulary v
             join unit_vocabulary_new uv
             on v.id = uv.vocabulary_id
@@ -97,7 +89,9 @@
     </select>
 
     <select id="selectDelLearnIdByStudentIdAndNumber" resultMap="BaseResultMap" parameterType="map">
-        select <include refid="base_sql"></include> from learn_new where student_id =#{studentId} order by update_time asc limit #{number}
+        select
+        <include refid="base_sql"/>
+        from learn_new where student_id =#{studentId} order by update_time limit #{number}
     </select>
 
 </mapper>

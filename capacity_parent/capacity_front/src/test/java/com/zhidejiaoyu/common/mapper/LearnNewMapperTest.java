@@ -19,6 +19,11 @@ public class LearnNewMapperTest {
     private LearnNewMapper learnNewMapper;
 
     @Test
+    public void selectById() {
+        learnNewMapper.selectById(150L);
+    }
+
+    @Test
     public void selectDelLearnIdByStudentIdAndNumber() {
         learnNewMapper.selectDelLearnIdByStudentIdAndNumber(9604L, 1);
     }
