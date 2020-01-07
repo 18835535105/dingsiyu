@@ -20,10 +20,11 @@
     </sql>
     <select id="selectByStudentIdAndType" resultMap="BaseResultMap" parameterType="map">
         select
-        <include refid="base_sql"/>
-        from student_flow_new
-        where student_id = #{studentId}
-        and type = #{type}
+        <include refid="more_table_sql"/>
+        from student_flow_new sfn
+        join learn_new ln on sfn.learn_id = ln.id
+        and sfn.student_id = #{studentId}
+        and sfn.type = #{type}
         limit 1
     </select>
     <select id="selectByLearnId" resultMap="BaseResultMap" parameterType="map">
@@ -51,9 +52,9 @@
     </select>
     <delete id="deleteByLearnIds" parameterType="map">
         delect from student_flow_new where learn_id in (
-            <foreach collection="delLearnIds" item="learnId" separator=",">
-                #{learnId}
-            </foreach>
+        <foreach collection="delLearnIds" item="learnId" separator=",">
+            #{learnId}
+        </foreach>
         )
     </delete>
 

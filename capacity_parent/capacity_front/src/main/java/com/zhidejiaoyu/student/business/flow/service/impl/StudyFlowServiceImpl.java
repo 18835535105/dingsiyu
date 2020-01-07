@@ -91,10 +91,11 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> getNode(NodeDto dto, String isTrueFlow, HttpSession session) {
         Student student = super.getStudent(session);
+        dto.setStudent(student);
 
         // 星球页请求数据，获取当前应该学习的节点数据
         if (dto.getNodeId() == null) {
-            return this.getIndexNodeResponse(student);
+            return this.getIndexNodeResponse(dto);
         }
 
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(dto.getNodeId());
@@ -108,7 +109,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         // 带有“写”、“课文训练”、nodeId=84的流程都属于难流程
         int easyOrHard = modelName.contains("写") || Objects.equals(modelName, "课文训练") || Objects.equals(84L, dto.getNodeId()) ? 2 : 1;
         dto.setEasyOrHard(easyOrHard);
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(student.getId(), dto.getUnitId(), dto.getEasyOrHard());
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(),
+                dto.getUnitId(), dto.getEasyOrHard(), FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(studyFlowNew.getFlowName()));
         if (learnNew != null) {
             // 如果学生有当前单元的学习记录，删除其学习详情，防止学生重新学习该单元时获取不到题目
             studyCapacityMapper.deleteByStudentIdAndUnitIdAndGroup(student.getId(), dto.getUnitId(), learnNew.getGroup());
@@ -120,7 +122,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         }
         dto.setStudyFlowNew(studyFlowNew);
         dto.setSession(session);
-        dto.setStudent(student);
 
         if (studyFlowNew.getNextTrueFlow() == 0) {
             if (checkNextUnitOrGroup(dto, studyFlowNew)) {
@@ -140,24 +141,28 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     /**
      * 学生在星球页获取应该学习的节点数据
      *
-     * @param student
+     * @param dto
      * @return
      */
-    public ServerResponse<Object> getIndexNodeResponse(Student student) {
+    public ServerResponse<Object> getIndexNodeResponse(NodeDto dto) {
+        Student student = dto.getStudent();
         // 在星球页请求，返回当前正在学习的节点信息
-        StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndType(student.getId(), 1);
+        Long studentId = student.getId();
+        StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndType(studentId, 1);
 
         StudyFlowNew studyFlowNew;
         LearnNew learnNew;
         if (studentFlowNew == null) {
-            TestRecord testRecord = testRecordMapper.selectByGenre(student.getId(), GenreConstant.TEST_BEFORE_STUDY);
+            TestRecord testRecord = testRecordMapper.selectByGenre(studentId, GenreConstant.TEST_BEFORE_STUDY);
             if (testRecord == null) {
                 throw new ServiceException("学生还没有进行摸底测试，未查询到可以学习的课程！");
             }
             // 如果学生已经进行过摸底测试，初始化流程节点以及学习记录
-            StudentStudyPlanNew maxFinalLevelStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(student.getId(), 1).get(0);
+            StudentStudyPlanNew maxFinalLevelStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(studentId, 1).get(0);
 
-            learnNew = initData.saveLearn(maxFinalLevelStudentStudyPlanNew);
+            studyFlowNew = studyFlowNewMapper.selectById(maxFinalLevelStudentStudyPlanNew.getFlowId());
+
+            learnNew = initData.saveLearn(maxFinalLevelStudentStudyPlanNew, FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(studyFlowNew.getFlowName()));
 
             studentFlowNewMapper.deleteByLearnId(learnNew.getId());
             initData.initStudentFlow(NodeDto.builder()
@@ -165,7 +170,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
                     .nodeId(maxFinalLevelStudentStudyPlanNew.getFlowId())
                     .learnNew(learnNew)
                     .build());
-            studyFlowNew = studyFlowNewMapper.selectById(maxFinalLevelStudentStudyPlanNew.getFlowId());
         } else {
             studyFlowNew = studyFlowNewMapper.selectById(studentFlowNew.getCurrentFlowId());
             learnNew = learnNewMapper.selectById(studentFlowNew.getLearnId());
@@ -197,7 +201,15 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         // 判断当前单元是否含有当前模块的内容，如果没有当前模块的内容学习下个模块的内容
         FlowVO flowVO = this.judgeHasCurrentModel(studyFlowNew, dto);
 
-        studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(studyFlowNew.getId(), dto.getLearnNew().getId());
+        // 如果学习模块改变，修改learnNew中的modelType值
+        int modelType = FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(studyFlowNew.getFlowName());
+        LearnNew learnNew = dto.getLearnNew();
+        if (!Objects.equals(modelType, learnNew.getModelType())) {
+            learnNew.setModelType(modelType);
+            learnNewMapper.updateById(learnNew);
+        }
+
+        studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(studyFlowNew.getId(), learnNew.getId());
 
         return ServerResponse.createBySuccess(flowVO);
     }

@@ -55,8 +55,8 @@
         from learn_new
         where student_id = #{studentId}
         and unit_id = #{unitId}
-        and easy_or_hard=#{easyOrHard}
-        and model_type=#{modelType}
+        and easy_or_hard = #{easyOrHard}
+        and model_type = #{modelType}
         limit 1
     </select>
 

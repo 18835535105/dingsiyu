@@ -205,8 +205,8 @@ public class FinishGroupOrUnit {
      * @return
      */
     private LearnNew judgeHasNextGroup(NodeDto dto) {
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(dto.getStudent().getId(),
-                dto.getUnitId(), dto.getEasyOrHard());
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(dto.getStudent().getId(),
+                dto.getUnitId(), dto.getEasyOrHard(), FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(dto.getStudyFlowNew().getFlowName()));
         if (learnNew != null) {
             Long learnNewId = learnNew.getId();
             learnNewMapper.deleteById(learnNewId);
@@ -256,7 +256,7 @@ public class FinishGroupOrUnit {
 
         // 根据优先级初始化学习表数据
         StudentStudyPlanNew maxStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
-        LearnNew learnNew = initData.saveLearn(maxStudentStudyPlanNew);
+        LearnNew learnNew = initData.saveLearn(maxStudentStudyPlanNew, FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(dto.getStudyFlowNew().getFlowName()));
 
         // 将当前单元的已学习记录状态置为已完成
         learnHistoryMapper.updateStateByStudentIdAndUnitId(studentId, dto.getUnitId(), 2);
