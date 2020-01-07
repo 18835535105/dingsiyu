@@ -126,11 +126,11 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             // 如果学生有当前单元的学习记录，删除其学习详情，防止学生重新学习该单元时获取不到题目
             String modelName = studyFlowNew.getModelName();
             if (FLOW_NAME_TO_STUDY_CAPACITY_TYPE.containsKey(modelName)) {
-                studyCapacityMapper.deleteByStudentIdAndUnitIdAndTypeAndGroup(studentId, dto.getUnitId(),
+                studyCapacityMapper.deleteByStudentIdAndUnitIdAndType(studentId, dto.getUnitId(),
                         FLOW_NAME_TO_STUDY_CAPACITY_TYPE.get(modelName));
             }
 
-            learnExtendMapper.deleteByUnitIdAndStudyModel(learnNew.getId(), modelName);
+            learnExtendMapper.deleteByUnitIdAndStudyModel(learnNew.getId(), this.getModelName(modelName));
             dto.setGroup(learnNew.getGroup());
             dto.setLearnNew(learnNew);
         } else {
@@ -166,6 +166,19 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         }
         // 判断下个节点
         return judgeNextNode.judgeNextNode(dto, this);
+    }
+
+    /**
+     * 匹配learnExtend中的studyModel
+     *
+     * @param modelName
+     * @return
+     */
+    private String getModelName(String modelName) {
+        if (modelName.contains("句型")) {
+            return modelName.replace("句型", "例句");
+        }
+        return modelName;
     }
 
     /**
@@ -255,8 +268,6 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         StudyFlowNew studyFlowNew1 = studyFlowNewMapper.selectById(startFlowId);
         return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew1, student, learnNew.getUnitId()));
     }
-
-
 
     public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Student student, Long unitId) {
         return packageFlowVO.packageFlowVO(studyFlowNew, student, unitId);

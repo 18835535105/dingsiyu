@@ -43,7 +43,7 @@ public interface StudyFlowService extends BaseService<StudyFlowNew> {
      */
     default boolean checkNextUnitOrGroup(NodeDto dto, StudyFlowNew studyFlowNew) {
         return (studyFlowNew.getType() == null)
-                || (dto.getGrade() != null && studyFlowNew.getType() != null && dto.getGrade() >= studyFlowNew.getType());
+                || (dto.getGrade() != null && dto.getGrade() >= studyFlowNew.getType());
     }
 
 }
