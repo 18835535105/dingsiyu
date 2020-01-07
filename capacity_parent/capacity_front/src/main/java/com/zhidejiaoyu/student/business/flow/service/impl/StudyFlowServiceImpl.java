@@ -199,7 +199,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
 
         studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(studyFlowNew.getId(), dto.getLearnNew().getId());
 
-        return ServerResponse.createBySuccess("true", flowVO);
+        return ServerResponse.createBySuccess(flowVO);
     }
 
     /**
