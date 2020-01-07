@@ -367,6 +367,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
                 .studentId(student.getId())
                 .group(1)
                 .easyOrHard(maxStudentStudyPlanNew.getEasyOrHard())
+                .modelType(1)
                 .build();
         learnNewMapper.insert(learnNew);
         return learnNew;
