@@ -66,7 +66,7 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
         // 判断学生是否在本系统首次学习，如果是记录首次学习时间
         saveData.judgeIsFirstStudy(session, student);
         //获取当前单元下的learnId
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard,1);
         //获取是否有可以学习的单词信息
         int wordCount = unitVocabularyNewMapper.countWordPictureByUnitId(unitId, learnNew.getGroup());
         if (wordCount == 0) {

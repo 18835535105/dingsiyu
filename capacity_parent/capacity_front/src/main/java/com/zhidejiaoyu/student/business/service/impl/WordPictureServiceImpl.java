@@ -205,7 +205,7 @@ public class WordPictureServiceImpl extends BaseServiceImpl<VocabularyMapper, Vo
     public ServerResponse<Object> getWordPicUnitTest(HttpSession session, Long unitId, Long courseId, Boolean isTrue) {
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         Student student = getStudent(session);
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(student.getId(), unitId, 1);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, 1,1);
         // 获取单元下所有有图片的单词
         List<Vocabulary> list = vocabularyMapper.getWordPicAll(unitId,learnNew.getGroup());
 

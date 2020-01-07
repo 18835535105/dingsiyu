@@ -54,7 +54,7 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
         saveData.judgeIsFirstStudy(session, student);
         // 记录学生开始学习该单词/例句的时间
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
+        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard,1);
         // 查询学生当前单元下已学习单词的个数，即学习进度
         Integer plan = learnExtendMapper.countLearnWord(learnNews.getId(), unitId, learnNews.getGroup(), studyModel);
         // 获取当前单元下的所有单词的总个数
