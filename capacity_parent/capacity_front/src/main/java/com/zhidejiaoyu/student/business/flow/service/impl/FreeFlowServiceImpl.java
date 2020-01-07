@@ -117,7 +117,8 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
 
         Long studentId = student.getId();
 
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, dto.getUnitId(), dto.getEasyOrHard());
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, dto.getUnitId(),
+                dto.getEasyOrHard(), dto.getModelType() - 1);
 
         if (learnNew != null) {
             // 如果学生有当前单元的学习记录，删除其学习详情，防止学生重新学习该单元时获取不到题目
@@ -194,7 +195,8 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         Integer easyOrHard = dto.getEasyOrHard();
         Integer modelType = dto.getModelType();
 
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard,
+                dto.getModelType() - 1);
         if (learnNew != null) {
             StudyFlowNew studyFlowNew = studyFlowNewMapper.selectByLearnId(learnNew.getId());
             if (studyFlowNew != null) {
@@ -236,8 +238,25 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
      */
     @Override
     public ServerResponse<Object> toAnotherFlow(NodeDto dto, int nextFlowId) {
-        // 判断当前单元单词是否有图片，如果都没有图片不进入单词图鉴
-        return this.getStudyFlow(dto, nextFlowId);
+        Student student = dto.getStudent() == null ? new Student() : dto.getStudent();
+
+        StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(nextFlowId);
+
+        boolean canStudyWordPicture = judgeWordPicture.judgeWordPicture(dto, studyFlowNew);
+        if (canStudyWordPicture) {
+            // 如果学习模块改变，修改learnNew中的modelType值
+            int modelType = FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(studyFlowNew.getFlowName());
+            LearnNew learnNew = dto.getLearnNew();
+            if (!Objects.equals(modelType, learnNew.getModelType())) {
+                learnNew.setModelType(modelType);
+                learnNewMapper.updateById(learnNew);
+            }
+
+            studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(studyFlowNew.getId(), dto.getLearnNew().getId());
+            FlowVO flowVo = this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
+            return ServerResponse.createBySuccess(flowVo);
+        }
+        return finishGroupOrUnit.finishFreeGroup(dto);
     }
 
     public ServerResponse<Object> getFlowVoServerResponse(LearnNew learnNew, Integer modelType, Student student) {
@@ -265,26 +284,5 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
 
     public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Student student, Long unitId) {
         return packageFlowVO.packageFlowVO(studyFlowNew, student, unitId);
-    }
-
-    /**
-     * @param dto
-     * @param nextFlowId 下个流程节点的 id
-     * @return
-     */
-    private ServerResponse<Object> getStudyFlow(NodeDto dto, int nextFlowId) {
-
-        Student student = dto.getStudent() == null ? new Student() : dto.getStudent();
-
-        StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(nextFlowId);
-
-        boolean canStudyWordPicture = judgeWordPicture.judgeWordPicture(dto, studyFlowNew);
-        if (canStudyWordPicture) {
-            studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(studyFlowNew.getId(), dto.getLearnNew().getId());
-            FlowVO flowVo = this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
-            return ServerResponse.createBySuccess(flowVo);
-        }
-
-        return finishGroupOrUnit.finishFreeGroup(dto);
     }
 }

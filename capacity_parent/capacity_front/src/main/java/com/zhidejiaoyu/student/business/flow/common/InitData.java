@@ -65,7 +65,7 @@ public class InitData {
      *
      * @param dto
      * @param count
-     * @param type               learnHistory type值
+     * @param type  learnHistory type值
      */
     public void saveOrUpdateOneKeyLearnHistory(NodeDto dto, Integer count, int type) {
         if (count > 0) {
@@ -126,10 +126,11 @@ public class InitData {
      * 如果学习表中没有最高优先级的数据，新增
      *
      * @param studentStudyPlanNew
+     * @param modelType           学习的模块
      */
-    public LearnNew saveLearn(StudentStudyPlanNew studentStudyPlanNew) {
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentStudyPlanNew.getStudentId(), studentStudyPlanNew.getUnitId(),
-                studentStudyPlanNew.getEasyOrHard());
+    public LearnNew saveLearn(StudentStudyPlanNew studentStudyPlanNew, int modelType) {
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentStudyPlanNew.getStudentId(),
+                studentStudyPlanNew.getUnitId(), studentStudyPlanNew.getEasyOrHard(), modelType);
         if (learnNew == null) {
             learnNew = LearnNew.builder()
                     .courseId(studentStudyPlanNew.getCourseId())
