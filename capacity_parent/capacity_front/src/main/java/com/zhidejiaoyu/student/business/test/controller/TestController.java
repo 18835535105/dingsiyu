@@ -51,17 +51,6 @@ public class TestController {
     }
 
     /**
-     * 获取等级测试测试题
-     *
-     * @param session
-     * @return
-     */
-    @GetMapping("/getLevelTest")
-    public ServerResponse<Map<String, Object>> getLevelTest(HttpSession session) {
-        return testService.getLevelTest(session);
-    }
-
-    /**
      * 获取单词相关单元闯关的测试题
      *
      * @param session
