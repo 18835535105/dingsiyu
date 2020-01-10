@@ -171,7 +171,7 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
             capacityMemory.setCourseId(capacityReview.getCourse_id());
             capacityMemory.setSyllable(capacityReview.getSyllable());
             capacityMemory.setWord(capacityReview.getWord().contains("#") ?
-                    capacityReview.getWord().replace("#", " ").replace("$", "") : capacityReview.getWord());
+                    capacityReview.getWord().replace("#", " ").replace("$", "") : capacityReview.getWord().replace("#", " ").replace("$", ""));
             capacityMemory.setWordChinese(capacityReview.getWord_chinese().contains("\\*") ?
                     capacityReview.getWord_chinese().replace("*", " ") : capacityReview.getWord_chinese());
             capacityMemory.setId(capacityReview.getId());
