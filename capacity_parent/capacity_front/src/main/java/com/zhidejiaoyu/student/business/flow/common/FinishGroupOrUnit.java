@@ -88,13 +88,12 @@ public class FinishGroupOrUnit {
 
         // 删除当前学习记录
         this.deleteLearnInfo(dto);
+        studentFlowNewMapper.deleteByLearnId(dto.getLearnNew().getId());
 
         if (learnNew == null) {
             // 说明当前单元学习完毕
             return this.finishOneKeyUnit(dto);
         }
-
-        studentFlowNewMapper.deleteByLearnId(dto.getLearnNew().getId());
 
         Long nodeId = dto.getEasyOrHard() == 1 ? FlowConstant.EASY_START : FlowConstant.HARD_START;
         initData.initStudentFlow(NodeDto.builder()
@@ -125,6 +124,7 @@ public class FinishGroupOrUnit {
         Long learnNewId = dto.getLearnNew().getId();
         learnExtendMapper.deleteByLearnId(learnNewId);
         learnNewMapper.deleteById(learnNewId);
+        studentFlowNewMapper.deleteByLearnId(learnNewId);
 
         Student student = dto.getStudent();
 
@@ -132,8 +132,6 @@ public class FinishGroupOrUnit {
 
             // 将当前单元的已学习记录状态置为已完成
             learnHistoryMapper.updateStateByStudentIdAndUnitId(student.getId(), dto.getUnitId(), 2);
-
-            studentFlowNewMapper.deleteByLearnId(dto.getLearnNew().getId());
 
             boolean isPaid = payLogRedisOpt.isPaid(student.getId());
             if (!isPaid) {
@@ -143,8 +141,6 @@ public class FinishGroupOrUnit {
             // 说明当前单元学习完毕
             return finishFreeUnit(dto, student);
         }
-
-        studentFlowNewMapper.deleteByLearnId(learnNewId);
 
         Long startFlowId = this.getStartFlowId(dto.getEasyOrHard(), dto.getModelType());
         initData.initStudentFlow(NodeDto.builder()
@@ -206,15 +202,16 @@ public class FinishGroupOrUnit {
      * @return
      */
     public Long getStartFlowId(Integer easyOrHard, Integer type) {
+        boolean isEasy = Objects.equals(easyOrHard, 1);
         switch (type) {
             case 2:
-                return Objects.equals(easyOrHard, 1) ? FlowConstant.FREE_PLAYER : FlowConstant.FREE_LETTER_WRITE;
+                return isEasy ? FlowConstant.FREE_PLAYER : FlowConstant.FREE_LETTER_WRITE;
             case 3:
-                return Objects.equals(easyOrHard, 1) ? FlowConstant.FREE_SENTENCE_TRANSLATE : FlowConstant.FREE_SENTENCE_WRITE;
+                return isEasy ? FlowConstant.FREE_SENTENCE_TRANSLATE : FlowConstant.FREE_SENTENCE_WRITE;
             case 4:
-                return Objects.equals(easyOrHard, 1) ? FlowConstant.FREE_TEKS_LISTEN : FlowConstant.FREE_TEKS_TRAIN;
+                return isEasy ? FlowConstant.FREE_TEKS_LISTEN : FlowConstant.FREE_TEKS_TRAIN;
             case 5:
-                return Objects.equals(easyOrHard, 1) ? FlowConstant.FREE_SYNTAX_GAME : FlowConstant.FREE_SYNTAX_WRITE;
+                return isEasy ? FlowConstant.FREE_SYNTAX_GAME : FlowConstant.FREE_SYNTAX_WRITE;
             default:
                 return null;
         }
@@ -328,8 +325,6 @@ public class FinishGroupOrUnit {
 
         // 将当前单元的已学习记录状态置为已完成
         learnHistoryMapper.updateStateByStudentIdAndUnitId(studentId, dto.getUnitId(), 2);
-
-        studentFlowNewMapper.deleteByLearnId(dto.getLearnNew().getId());
 
         initData.initStudentFlow(NodeDto.builder()
                 .student(dto.getStudent())

@@ -18,7 +18,7 @@ public interface RedisKeysConst {
      */
     String TEST_BEFORE_STUDY = "TEST_BEFORE_STUDY:";
     /**
-     * 摸底测试
+     * 学生已经学习过的模块
      */
     String LOOK_GUIDE = "LOOK_GUIDE:";
     /**

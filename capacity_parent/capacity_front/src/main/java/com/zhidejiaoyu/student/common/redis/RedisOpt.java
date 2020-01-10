@@ -111,27 +111,6 @@ public class RedisOpt {
         return true;
     }
 
-
-    public void addDrawRecordIndex(String name, Integer count) {
-        String hKey = RedisKeysConst.DRAW_COUNT_WITH_NAME;
-        redisTemplate.opsForHash().put(hKey, name, count);
-    }
-
-    public int selDrawRecordIndex(String name) {
-        String hKey = RedisKeysConst.DRAW_COUNT_WITH_NAME;
-        Object object = getRedisDraw(name);
-        if (object != null) {
-            return Integer.parseInt(object + "");
-        } else {
-            return 0;
-        }
-    }
-
-    public void delDrawRecord() {
-        Set<Object> keys = redisTemplate.opsForHash().keys(RedisKeysConst.DRAW_COUNT_WITH_NAME);
-        redisTemplate.opsForHash().delete(RedisKeysConst.DRAW_COUNT_WITH_NAME, keys);
-    }
-
     /**
      * 获取当前学生当前模块关联的所有课程, 返回id,version
      */
@@ -225,16 +204,6 @@ public class RedisOpt {
             }
         }
         return wordCount;
-    }
-
-    private Object getRedisDraw(String key) {
-        Object object = null;
-        try {
-            object = redisTemplate.opsForHash().get(RedisKeysConst.DRAW_COUNT_WITH_NAME, key);
-        } catch (Exception e) {
-            log.error("error=[{}]", e.getMessage());
-        }
-        return object;
     }
 
     private Object getRedisObject(String key) {
