@@ -319,7 +319,6 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
             timePriority = this.getTimePriority(timePriority, phaseSet, unitGrade);
 
             int basePriority = this.getBasePriority(unitIdMap, unitGrade, grade, unitId);
-            int finalLevel = basePriority + 1 + timePriority;
             StudentStudyPlanNew.StudentStudyPlanNewBuilder studentStudyPlanNewBuilder = StudentStudyPlanNew.builder()
                     .studentId(student.getId())
                     .complete(1)
@@ -330,13 +329,13 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
                     .timeLevel(timePriority)
                     .totalStudyCount(1)
                     .updateTime(updateTime)
-                    .unitId(unitId)
-                    .finalLevel(finalLevel);
+                    .unitId(unitId);
 
             StudentStudyPlanNew easyStudentStudyPlan = studentStudyPlanNewBuilder
                     .easyOrHard(1)
                     .baseLevel(basePriority)
                     .flowId(FlowConstant.EASY_START)
+                    .finalLevel(basePriority + 1 + timePriority)
                     .build();
             studentStudyPlanNews.add(easyStudentStudyPlan);
 
@@ -344,6 +343,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
                     .easyOrHard(2)
                     .baseLevel(basePriority - PriorityUtil.HARD_NUM)
                     .flowId(FlowConstant.HARD_START)
+                    .finalLevel(basePriority - PriorityUtil.HARD_NUM + 1 + timePriority)
                     .build();
             studentStudyPlanNews.add(hardStudentStudyPlan);
         }

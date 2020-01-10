@@ -54,4 +54,12 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
      */
     @MapKey("courseId")
     Map<Long, Map<Long, Object>> countUnitByIds(@Param("courseIds") List<Long> courseIds, @Param("type") int type);
+
+    /**
+     * 查询单元所属的课程
+     *
+     * @param unitId
+     * @return
+     */
+    CourseNew selectByUnitId(@Param("unitId") Long unitId);
 }

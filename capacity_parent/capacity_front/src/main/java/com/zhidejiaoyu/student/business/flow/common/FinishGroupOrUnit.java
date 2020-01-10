@@ -8,10 +8,12 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
 import com.zhidejiaoyu.student.business.flow.FlowConstant;
+import com.zhidejiaoyu.student.common.redis.PayLogRedisOpt;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -67,6 +69,9 @@ public class FinishGroupOrUnit {
     @Resource
     private CourseNewMapper courseNewMapper;
 
+    @Resource
+    private PayLogRedisOpt payLogRedisOpt;
+
     /**
      * 一键学习，学习完当前group
      *
@@ -86,7 +91,7 @@ public class FinishGroupOrUnit {
 
         if (learnNew == null) {
             // 说明当前单元学习完毕
-            return this.finishUnit(dto);
+            return this.finishOneKeyUnit(dto);
         }
 
         studentFlowNewMapper.deleteByLearnId(dto.getLearnNew().getId());
@@ -121,24 +126,76 @@ public class FinishGroupOrUnit {
         learnExtendMapper.deleteByLearnId(learnNewId);
         learnNewMapper.deleteById(learnNewId);
 
+        Student student = dto.getStudent();
+
         if (learnNew == null) {
+
+            // 将当前单元的已学习记录状态置为已完成
+            learnHistoryMapper.updateStateByStudentIdAndUnitId(student.getId(), dto.getUnitId(), 2);
+
+            studentFlowNewMapper.deleteByLearnId(dto.getLearnNew().getId());
+
+            boolean isPaid = payLogRedisOpt.isPaid(student.getId());
+            if (!isPaid) {
+                // 学生没有充值，不修改优先级
+                return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
+            }
             // 说明当前单元学习完毕
-            this.finishUnit(dto);
-            return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
+            return finishFreeUnit(dto, student);
         }
 
         studentFlowNewMapper.deleteByLearnId(learnNewId);
 
         Long startFlowId = this.getStartFlowId(dto.getEasyOrHard(), dto.getModelType());
         initData.initStudentFlow(NodeDto.builder()
-                .student(dto.getStudent())
+                .student(student)
                 .nodeId(startFlowId)
                 .learnNew(learnNew)
                 .build());
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(startFlowId);
 
-        FlowVO flowVO = packageFlowVO.packageFlowVO(studyFlowNew, dto.getStudent(), dto.getUnitId());
+        FlowVO flowVO = packageFlowVO.packageFlowVO(studyFlowNew, student, dto.getUnitId());
         return ServerResponse.createBySuccess(flowVO);
+    }
+
+    /**
+     * 自由学习单元学习完毕
+     *
+     * @param dto
+     * @param student
+     * @return
+     */
+    public ServerResponse<Object> finishFreeUnit(NodeDto dto, Student student) {
+        StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(student.getId(), dto.getUnitId(), dto.getEasyOrHard());
+        if (studentStudyPlanNew == null) {
+            CourseNew courseNew = courseNewMapper.selectByUnitId(dto.getUnitId());
+            // 说明当前课程还没有优先级，初始化当前课程的优先级
+            int basePriority = PriorityUtil.getBasePriority(student.getGrade(), courseNew.getGrade(), 0);
+            int timePriority = PriorityUtil.BASE_TIME_PRIORITY;
+
+            boolean isEasy = dto.getEasyOrHard() == 1;
+            studentStudyPlanNewMapper.insert(StudentStudyPlanNew.builder()
+                    .studentId(student.getId())
+                    .complete(1)
+                    .courseId(courseNew.getId())
+                    .currentStudyCount(1)
+                    .errorLevel(1)
+                    .group(0)
+                    .timeLevel(timePriority)
+                    .totalStudyCount(1)
+                    .updateTime(new Date())
+                    .unitId(dto.getUnitId())
+                    .finalLevel(isEasy ? basePriority + 1 + timePriority : basePriority - PriorityUtil.HARD_NUM + 1 + timePriority)
+                    .baseLevel(isEasy ? basePriority : basePriority - PriorityUtil.HARD_NUM)
+                    .easyOrHard(dto.getEasyOrHard())
+                    .flowId(isEasy ? FlowConstant.EASY_START : FlowConstant.HARD_START)
+                    .build());
+        } else {
+            // 已有当前课程的优先级，更新优先级
+            this.updateLevel(dto, studentStudyPlanNew);
+        }
+
+        return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
     }
 
     /**
@@ -245,12 +302,12 @@ public class FinishGroupOrUnit {
     }
 
     /**
-     * 单元完成操作
+     * 一键学习单元完成操作
      *
      * @param dto
      * @return
      */
-    private FlowVO finishUnit(NodeDto dto) {
+    private FlowVO finishOneKeyUnit(NodeDto dto) {
 
         // 更新优先级表中的变化优先级
         StudentStudyPlanNew oldMaxFinalLevel = this.getMaxFinalLevelStudentStudyPlanNew(dto);
