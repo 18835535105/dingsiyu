@@ -73,6 +73,7 @@ public class PackageFlowVO {
         Long unitId = dto.getUnitId();
         Student student = dto.getStudent();
         StudyFlowNew studyFlowNew = dto.getStudyFlowNew();
+        Boolean lastUnit = dto.getLastUnit();
 
         SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
         SyntaxCourse syntaxCourse = syntaxCourseMapper.selectById(syntaxUnit.getCourseId());
@@ -87,7 +88,7 @@ public class PackageFlowVO {
                 .unitId(syntaxUnit.getId())
                 .unitName(syntaxUnit.getUnitName())
                 .token(token)
-                .lastUnit(false)
+                .lastUnit(lastUnit)
                 .petName(StringUtils.isEmpty(student.getPetName()) ? "大明白" : student.getPetName())
                 .build();
     }

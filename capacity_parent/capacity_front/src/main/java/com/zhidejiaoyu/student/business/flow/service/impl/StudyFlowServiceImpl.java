@@ -197,8 +197,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         FlowVO flowVO;
         StudyFlowNew nextStudyFlowNew;
 
-        String syntaxModel = "语法";
-        if (dto.getStudyFlowNew().getModelName().contains(syntaxModel)) {
+        if (Objects.equals(dto.getStudyFlowNew().getFlowName(), FlowConstant.FLOW_SIX)) {
             nextStudyFlowNew = studyFlowNewMapper.selectById(nextFlowId);
             flowVO = packageFlowVO.packageSyntaxFlowVO(dto);
         } else {

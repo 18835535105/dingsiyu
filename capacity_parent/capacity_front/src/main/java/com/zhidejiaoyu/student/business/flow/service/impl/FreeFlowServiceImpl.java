@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.utils.CcieUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
+import com.zhidejiaoyu.student.business.flow.FlowConstant;
 import com.zhidejiaoyu.student.business.flow.common.*;
 import com.zhidejiaoyu.student.business.flow.service.StudyFlowService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -200,7 +201,17 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         if (learnNew != null) {
             StudyFlowNew studyFlowNew = studyFlowNewMapper.selectByLearnId(learnNew.getId());
             if (studyFlowNew != null) {
-                return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew, student, unitId));
+                FlowVO flowVO;
+                if (Objects.equals(studyFlowNew.getFlowName(), FlowConstant.FLOW_SIX)) {
+                    flowVO = packageFlowVO.packageSyntaxFlowVO(NodeDto.builder()
+                            .student(student)
+                            .unitId(unitId)
+                            .studyFlowNew(studyFlowNew)
+                            .build());
+                } else {
+                    flowVO = this.packageFlowVO(studyFlowNew, student, unitId);
+                }
+                return ServerResponse.createBySuccess(flowVO);
             }
             return this.getFlowVoServerResponse(learnNew, modelType, student);
         }
@@ -279,7 +290,17 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             studentFlowNewMapper.updateById(studentFlowNew);
         }
         StudyFlowNew studyFlowNew1 = studyFlowNewMapper.selectById(startFlowId);
-        return ServerResponse.createBySuccess(this.packageFlowVO(studyFlowNew1, student, learnNew.getUnitId()));
+        FlowVO flowVO;
+        if (Objects.equals(studyFlowNew1.getFlowName(), FlowConstant.FLOW_SIX)) {
+            flowVO = packageFlowVO.packageSyntaxFlowVO(NodeDto.builder()
+                    .student(student)
+                    .unitId(learnNew.getUnitId())
+                    .studyFlowNew(studyFlowNew1)
+                    .build());
+        } else {
+            flowVO = this.packageFlowVO(studyFlowNew1, student, learnNew.getUnitId());
+        }
+        return ServerResponse.createBySuccess(flowVO);
     }
 
     public FlowVO packageFlowVO(StudyFlowNew studyFlowNew, Student student, Long unitId) {

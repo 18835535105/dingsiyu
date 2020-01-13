@@ -231,6 +231,9 @@ public class FinishGroupOrUnit {
      * @return
      */
     public ServerResponse<Object> finishFreeUnit(NodeDto dto, Student student) {
+        if (Objects.equals(dto.getStudyFlowNew().getFlowName(), FlowConstant.FLOW_SIX)) {
+            return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
+        }
         StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(student.getId(), dto.getUnitId(), dto.getEasyOrHard());
         if (studentStudyPlanNew == null) {
             CourseNew courseNew = courseNewMapper.selectByUnitId(dto.getUnitId());
@@ -447,8 +450,7 @@ public class FinishGroupOrUnit {
      * @param dto
      */
     private void judgeHasCurrentGroup(NodeDto dto) {
-        String syntaxModel = "语法";
-        if (dto.getStudyFlowNew().getModelName().contains(syntaxModel)) {
+        if (Objects.equals(dto.getStudyFlowNew().getFlowName(), FlowConstant.FLOW_SIX)) {
             SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(dto.getUnitId());
             if (syntaxUnit != null) {
                 initData.saveOrUpdateOneKeyLearnHistory(NodeDto.builder()
