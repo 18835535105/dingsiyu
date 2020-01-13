@@ -39,4 +39,21 @@ public interface SyntaxUnitMapper extends BaseMapper<SyntaxUnit> {
      * @return
      */
     Long selectCourseIdByUnitId(@Param("unitId") Long unitId);
+
+    /**
+     * 通过jointName查询语法单元数据
+     *
+     * @param jointName
+     * @return
+     */
+    SyntaxUnit selectIdLikeJointName(@Param("jointName") String jointName);
+
+    /**
+     * 获取当前课程下个单元信息
+     *
+     * @param unitId
+     * @param courseId
+     * @return
+     */
+    SyntaxUnit selectNextUnitByCourseId(@Param("unitId") Long unitId, @Param("courseId") Long courseId);
 }

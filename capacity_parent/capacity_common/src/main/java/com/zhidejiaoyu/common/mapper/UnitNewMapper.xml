@@ -11,6 +11,15 @@
         <result column="delStatus" property="delStatus"/>
         <result column="unit_index" property="unitIndex"/>
     </resultMap>
+
+    <sql id="base_sql">
+        id, course_id, unit_name, joint_name, delStatus,  unit_index
+    </sql>
+
+    <sql id="more_table_sql">
+        un.id, un.course_id, un.unit_name, un.joint_name, un.delStatus,  un.unit_index
+    </sql>
+
     <select id="selectByGradeListAndVersionAndGrade" resultType="java.lang.Long">
         select distinct(u.id)
         from course_new c, unit_new u
@@ -69,6 +78,13 @@
         where u.course_id = #{courseId}
         group by u.id
         order by u.id
+    </select>
+    <select id="selectMaxUnitByCourseId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from unit_new un
+        order by un.id desc
+        limit 1
     </select>
 
 </mapper>

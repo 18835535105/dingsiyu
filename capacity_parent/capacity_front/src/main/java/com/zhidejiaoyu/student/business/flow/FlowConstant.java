@@ -26,6 +26,16 @@ public interface FlowConstant {
      */
     long TEKS_LISTEN = 89;
 
+    /**
+     * 一键学习语法游戏
+     */
+    long SYNTAX_GAME = 120;
+
+    /**
+     * 一键学习写语法节点
+     */
+    long SYNTAX_WRITE = 123;
+
 
     /**
      * 自由学习

@@ -70,4 +70,12 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
      * @return
      */
     List<Map<String, Object>> selectIdAndNameByCourseId(@Param("courseId") Long courseId, @Param("type") Integer type);
+
+    /**
+     * 查询当前课程最大的单元信息
+     *
+     * @param courseId
+     * @return
+     */
+    UnitNew selectMaxUnitByCourseId(@Param("courseId") Long courseId);
 }
