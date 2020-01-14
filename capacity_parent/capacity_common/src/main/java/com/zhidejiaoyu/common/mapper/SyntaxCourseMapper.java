@@ -2,6 +2,11 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.SyntaxCourse;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import org.apache.ibatis.annotations.MapKey;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -13,4 +18,12 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
  */
 public interface SyntaxCourseMapper extends BaseMapper<SyntaxCourse> {
 
+    /**
+     * 通过courseNewId匹配相对应的语法课程
+     *
+     * @param courseIds
+     * @return
+     */
+    @MapKey("id")
+    Map<Long, Map<String, Object>> selectByCourseNewIds(@Param("courseIds") List<Long> courseIds);
 }

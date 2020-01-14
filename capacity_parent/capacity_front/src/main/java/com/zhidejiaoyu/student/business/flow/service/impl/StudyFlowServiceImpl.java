@@ -80,6 +80,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     @Resource
     private FinishGroupOrUnit finishGroupOrUnit;
 
+    @Resource
+    private SyntaxUnitMapper syntaxUnitMapper;
+
     /**
      * 节点学完, 把下一节初始化到student_flow表, 并把下一节点返回
      *
@@ -174,8 +177,19 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             studyFlowNew = studyFlowNewMapper.selectById(studentFlowNew.getCurrentFlowId());
             learnNew = learnNewMapper.selectById(studentFlowNew.getLearnId());
         }
-
-        FlowVO vo = this.packageFlowVO(studyFlowNew, student, learnNew.getUnitId());
+        FlowVO vo;
+        if (Objects.equals(studyFlowNew.getFlowName(), FlowConstant.FLOW_SIX)) {
+            Long maxUnitId = syntaxUnitMapper.selectMaxUnitIdByUnitId(learnNew.getUnitId());
+            boolean isLastUnit = Objects.equals(maxUnitId, learnNew.getUnitId());
+            vo = packageFlowVO.packageSyntaxFlowVO(NodeDto.builder()
+                    .student(student)
+                    .unitId(learnNew.getUnitId())
+                    .studyFlowNew(studyFlowNew)
+                    .lastUnit(isLastUnit)
+                    .build());
+        } else {
+            vo = this.packageFlowVO(studyFlowNew, student, learnNew.getUnitId());
+        }
         return ServerResponse.createBySuccess(vo);
     }
 
@@ -199,7 +213,12 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
 
         if (Objects.equals(dto.getStudyFlowNew().getFlowName(), FlowConstant.FLOW_SIX)) {
             nextStudyFlowNew = studyFlowNewMapper.selectById(nextFlowId);
-            flowVO = packageFlowVO.packageSyntaxFlowVO(dto);
+            flowVO = packageFlowVO.packageSyntaxFlowVO(NodeDto.builder()
+                    .unitId(dto.getUnitId())
+                    .studyFlowNew(nextStudyFlowNew)
+                    .student(dto.getStudent())
+                    .lastUnit(dto.getLastUnit())
+                    .build());
         } else {
             // 判断当前单元单词是否有图片，如果都没有图片不进入单词图鉴
             // 下个节点数据

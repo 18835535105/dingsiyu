@@ -145,8 +145,8 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     private List<SyntaxTopic> getSyntaxTopics(Long unitId) {
         List<SyntaxTopic> syntaxTopics = syntaxTopicMapper.selectSelectSyntaxByUnitId(unitId);
         if (CollectionUtils.isEmpty(syntaxTopics)) {
-            UnitNew unitNew = unitNewMapper.selectById(unitId);
-            log.error("语法单元[{} - {}]没有没有选语法题目！", unitNew.getId(), unitNew.getJointName());
+            SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
+            log.error("语法单元[{} - {}]没有没有选语法题目！", syntaxUnit.getId(), syntaxUnit.getJointName());
             throw new ServiceException(500, "未查询到游戏题目！");
         }
         List<SyntaxTopic> result = new ArrayList<>(syntaxTopics);

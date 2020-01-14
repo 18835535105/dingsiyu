@@ -65,11 +65,6 @@
             join unit_sentence_new uvn on uvn.unit_id = u.id
         </if>
 
-        <!--含有语法的课程-->
-        <if test="type == 3">
-            join syntax_unit_topic_new sutn on uvn.unit_id = u.id
-        </if>
-
         <!--含有课文的课程-->
         <if test="type == 4">
             join unit_teks_new uvn on uvn.unit_id = u.id

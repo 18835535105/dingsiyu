@@ -3,8 +3,10 @@ package com.zhidejiaoyu.common.mapper;
 import com.zhidejiaoyu.common.pojo.SyntaxUnit;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -56,4 +58,13 @@ public interface SyntaxUnitMapper extends BaseMapper<SyntaxUnit> {
      * @return
      */
     SyntaxUnit selectNextUnitByCourseId(@Param("unitId") Long unitId, @Param("courseId") Long courseId);
+
+    /**
+     * 查询当前课程下的所有语法单元id和单元名
+     *
+     * @param courseId
+     * @return
+     */
+    @Select("select id unitId, unit_name unitName from syntax_unit where course_id = #{courseId}")
+    List<Map<String, Object>> selectIdAndNameByCourseId(@Param("courseId") Long courseId);
 }

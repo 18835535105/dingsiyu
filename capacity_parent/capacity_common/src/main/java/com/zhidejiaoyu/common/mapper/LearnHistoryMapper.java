@@ -49,7 +49,7 @@ public interface LearnHistoryMapper extends BaseMapper<LearnHistory> {
      *
      * @param studentId
      * @param courseIds
-     * @param type      1:单词；2：句型；3：语法；3：课文
+     * @param type      1:单词；2：句型；3：课文；4：语法
      * @return
      */
     @MapKey("courseId")

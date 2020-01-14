@@ -45,7 +45,6 @@
         and type = #{dto.type}
         and memory_strength &lt; 1
         and push &lt;= now()
-        and 'group' = #{group}
         order by push limit 1
     </select>
     <select id="selectUnKnownByStudentIdAndUnitId" resultMap="BaseResultMap" parameterType="map">
@@ -54,7 +53,6 @@
         from study_capacity
         where student_id = #{dto.studentId}
         and unit_id = #{dto.unitId}
-        and 'group' = #{dto.group}
         and type = #{dto.type}
         and memory_strength &lt; 1
         order by push limit 1
@@ -65,7 +63,7 @@
         from study_capacity
         where student_id = #{learn.studentId}
         and unit_id = #{learn.unitId}
-        and word_id = #{extend.vocabularyId}
+        and word_id = #{extend.wordId}
         and type = #{type}
         order by push
         limit 1

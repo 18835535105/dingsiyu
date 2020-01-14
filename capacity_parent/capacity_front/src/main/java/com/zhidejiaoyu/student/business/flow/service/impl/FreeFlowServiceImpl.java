@@ -74,6 +74,9 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     @Resource
     private FinishGroupOrUnit finishGroupOrUnit;
 
+    @Resource
+    private SyntaxUnitMapper syntaxUnitMapper;
+
     /**
      * 流程名称与 studyCapacity 中 type 的映射
      */
@@ -206,6 +209,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
                     flowVO = packageFlowVO.packageSyntaxFlowVO(NodeDto.builder()
                             .student(student)
                             .unitId(unitId)
+                            .lastUnit(false)
                             .studyFlowNew(studyFlowNew)
                             .build());
                 } else {
@@ -216,13 +220,25 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             return this.getFlowVoServerResponse(learnNew, modelType, student);
         }
 
-        UnitNew unitNew = unitNewMapper.selectById(unitId);
-        learnNew = initData.saveLearnNew(NodeDto.builder()
-                .student(student)
-                .courseId(unitNew.getCourseId())
-                .unitId(unitId)
-                .easyOrHard(easyOrHard)
-                .build(), 1, dto.getModelType() - 1);
+        if (Objects.equals(dto.getModelType(), 5)) {
+            // 语法模块
+            SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
+            learnNew = initData.saveLearnNew(NodeDto.builder()
+                    .student(student)
+                    .courseId(syntaxUnit.getCourseId())
+                    .unitId(unitId)
+                    .easyOrHard(easyOrHard)
+                    .build(), 1, dto.getModelType() - 1);
+        } else {
+            UnitNew unitNew = unitNewMapper.selectById(unitId);
+            learnNew = initData.saveLearnNew(NodeDto.builder()
+                    .student(student)
+                    .courseId(unitNew.getCourseId())
+                    .unitId(unitId)
+                    .easyOrHard(easyOrHard)
+                    .build(), 1, dto.getModelType() - 1);
+        }
+
         return this.getFlowVoServerResponse(learnNew, modelType, student);
     }
 
@@ -264,7 +280,16 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             }
 
             studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(studyFlowNew.getId(), dto.getLearnNew().getId());
-            FlowVO flowVo = this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
+            FlowVO flowVo;
+            if (Objects.equals(dto.getStudyFlowNew().getFlowName(), FlowConstant.FLOW_SIX)) {
+                flowVo = packageFlowVO.packageSyntaxFlowVO(NodeDto.builder()
+                        .student(student)
+                        .unitId(dto.getUnitId())
+                        .studyFlowNew(studyFlowNew)
+                        .build());
+            } else {
+                flowVo = this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
+            }
             return ServerResponse.createBySuccess(flowVo);
         }
         return finishGroupOrUnit.finishFreeGroup(dto);

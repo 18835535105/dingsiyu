@@ -29,13 +29,13 @@ public class LearnNeedView implements INeedView {
     private SyntaxMemoryDifficulty syntaxMemoryDifficulty;
 
     @Override
-    public ServerResponse getNeedView(NeedViewDTO dto) {
+    public ServerResponse<Object> getNeedView(NeedViewDTO dto) {
         StudyCapacity studyCapacity = studyCapacityMapper.selectLargerThanGoldTimeWithStudentIdAndUnitId(dto);
         return this.packageNeedViewLearnSyntax(studyCapacity, dto);
     }
 
     @Override
-    public ServerResponse getNextNotGoldTime(NeedViewDTO dto) {
+    public ServerResponse<Object> getNextNotGoldTime(NeedViewDTO dto) {
         StudyCapacity nextStudyCapacity = studyCapacityMapper.selectUnKnownByStudentIdAndUnitId(dto);
         return this.packageNeedViewLearnSyntax(nextStudyCapacity, dto);
     }
@@ -47,7 +47,7 @@ public class LearnNeedView implements INeedView {
      * @param dto
      * @return
      */
-    private ServerResponse packageNeedViewLearnSyntax(StudyCapacity studyCapacity, NeedViewDTO dto) {
+    private ServerResponse<Object> packageNeedViewLearnSyntax(StudyCapacity studyCapacity, NeedViewDTO dto) {
         if (!Objects.isNull(studyCapacity)) {
             return ServerResponse.createBySuccess(LearnSyntaxVO.builder()
                     .id(studyCapacity.getWordId())

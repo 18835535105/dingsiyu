@@ -48,13 +48,13 @@ public class InitData {
     /**
      * 初始化学生流程
      *
-     * @param dto
+     * @param dto 需要参数：nodeId，learnNew
      */
     public void initStudentFlow(NodeDto dto) {
         studentFlowNewMapper.insert(StudentFlowNew.builder()
                 .currentFlowId(dto.getNodeId())
                 .learnId(dto.getLearnNew().getId())
-                .studentId(dto.getStudent().getId())
+                .studentId(dto.getLearnNew().getStudentId())
                 .updateTime(new Date())
                 .type(dto.getModelType() == null ? 1 : dto.getModelType())
                 .build());
@@ -105,11 +105,12 @@ public class InitData {
     /**
      * 保存学习表
      *
-     * @param dto
+     * @param dto   需要参数：easyOrHard，student, unitId, courseId
      * @param group
+     * @param modelType
      * @return
      */
-    public LearnNew saveLearnNew(NodeDto dto, Integer group, int ModelType) {
+    public LearnNew saveLearnNew(NodeDto dto, Integer group, int modelType) {
         LearnNew learnNew = LearnNew.builder()
                 .easyOrHard(dto.getEasyOrHard())
                 .group(group)
@@ -117,7 +118,7 @@ public class InitData {
                 .unitId(dto.getUnitId())
                 .updateTime(new Date())
                 .courseId(dto.getCourseId())
-                .modelType(ModelType)
+                .modelType(modelType)
                 .build();
         learnNewMapper.insert(learnNew);
         return learnNew;

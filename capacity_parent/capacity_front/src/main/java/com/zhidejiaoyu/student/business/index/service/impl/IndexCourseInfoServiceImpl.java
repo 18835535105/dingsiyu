@@ -1,16 +1,15 @@
 package com.zhidejiaoyu.student.business.index.service.impl;
 
 import com.zhidejiaoyu.common.exception.ServiceException;
-import com.zhidejiaoyu.common.mapper.CourseConfigMapper;
-import com.zhidejiaoyu.common.mapper.CourseNewMapper;
-import com.zhidejiaoyu.common.mapper.LearnHistoryMapper;
-import com.zhidejiaoyu.common.mapper.UnitNewMapper;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.CourseConfig;
 import com.zhidejiaoyu.common.pojo.CourseNew;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.SyntaxCourse;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.index.dto.UnitInfoDTO;
 import com.zhidejiaoyu.student.business.index.service.IndexCourseInfoService;
 import com.zhidejiaoyu.student.business.index.vo.course.CourseInfoVO;
 import com.zhidejiaoyu.student.business.index.vo.course.CourseVO;
@@ -21,10 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -48,6 +44,12 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
     @Resource
     private UnitNewMapper unitNewMapper;
+
+    @Resource
+    private SyntaxCourseMapper syntaxCourseMapper;
+
+    @Resource
+    private SyntaxUnitMapper syntaxUnitMapper;
 
     @Override
     public ServerResponse<CourseInfoVO> getStudyCourse(Integer type) {
@@ -78,9 +80,14 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     }
 
     @Override
-    public ServerResponse<Object> getUnitInfo(Long courseId, Integer type) {
+    public ServerResponse<Object> getUnitInfo(UnitInfoDTO dto) {
 
-        List<Map<String, Object>> map = unitNewMapper.selectIdAndNameByCourseId(courseId, type);
+        List<Map<String, Object>> map;
+        if (dto.getType() == 3) {
+            map = syntaxUnitMapper.selectIdAndNameByCourseId(dto.getCourseId());
+        } else {
+            map = unitNewMapper.selectIdAndNameByCourseId(dto.getCourseId(), dto.getType());
+        }
 
         return ServerResponse.createBySuccess(map);
     }
@@ -110,56 +117,129 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         }
 
         List<CourseNew> courseNews = courseNewMapper.selectBatchIds(courseIds);
-        // 各个课程下所有单元个数
-        Map<Long, Map<Long, Object>> unitCountInCourse = courseNewMapper.countUnitByIds(courseIds, type);
-
-        // 各个课程下已学习单元个数
-        Map<Long, Map<Long, Object>> learnUnitCountInCourse = learnHistoryMapper.countUnitByStudentIdAndCourseIds(student.getId(), courseIds, type);
 
         // 其他年级
         List<CourseVO> previousGrade = new ArrayList<>();
         // 当前年级
         List<CourseVO> currentGrade = new ArrayList<>();
-        courseNews.forEach(courseNew -> {
+        if (type == 3) {
+            this.packageSyntaxInfoVO(student, courseIds, previousGrade, currentGrade);
+        } else {
+            // 各个课程下所有单元个数
+            Map<Long, Map<Long, Object>> unitCountInCourse = courseNewMapper.countUnitByIds(courseIds, type);
 
-            String grade = StringUtils.isNotBlank(courseNew.getGradeExt()) ? courseNew.getGradeExt() : courseNew.getGrade();
+            // 各个课程下已学习单元个数
+            Map<Long, Map<Long, Object>> learnUnitCountInCourse = learnHistoryMapper.countUnitByStudentIdAndCourseIds(student.getId(), courseIds, type == 4 ? 3 : type);
 
-            Long courseId = courseNew.getId();
-            CourseVO.CourseVOBuilder courseVoBuilder = CourseVO.builder()
-                    .courseId(courseId)
-                    .grade(courseNew.getGrade() + "（" + courseNew.getLabel() + "）");
 
-            String englishGrade = getGradeAndLabelEnglishName(grade);
-            String englishLabel = getGradeAndLabelEnglishName(courseNew.getLabel());
-
-            // 单元总个数
-            long totalUnitCount = this.getUnitCount(unitCountInCourse, courseId) * 2;
-            // 已学单元总个数
-            long learnedUnitCount = this.getUnitCount(learnUnitCountInCourse, courseId);
-
-            if (learnedUnitCount == 0) {
-                courseVoBuilder.combatProgress(0).battle(1);
-            } else if (totalUnitCount == learnedUnitCount) {
-                courseVoBuilder.combatProgress(100).battle(3);
-            } else {
-                courseVoBuilder.combatProgress((int) (learnedUnitCount * 1.0 / totalUnitCount * 100)).battle(2);
-            }
-
-            courseVoBuilder.englishGrade(englishGrade + "-" + englishLabel);
-
-            if (Objects.equals(grade, student.getGrade())) {
-                // 当前年级
-                currentGrade.add(courseVoBuilder.build());
-            } else {
-                // 不是当前年级
-                previousGrade.add(courseVoBuilder.build());
-            }
-        });
+            courseNews.forEach(courseNew -> packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, courseNew));
+        }
 
         courseInfoVO.setCurrentGrade(currentGrade);
         courseInfoVO.setPreviousGrade(previousGrade);
 
         return ServerResponse.createBySuccess(courseInfoVO);
+    }
+
+    /**
+     * 封装语法课程响应数据
+     *
+     * @param student
+     * @param courseIds
+     * @param previousGrade 其他年级
+     * @param currentGrade  当前年级
+     */
+    private void packageSyntaxInfoVO(Student student, List<Long> courseIds, List<CourseVO> previousGrade, List<CourseVO> currentGrade) {
+        // 获取所有语法课程数据
+        Map<Long, Map<String, Object>> syntaxCourseMap = syntaxCourseMapper.selectByCourseNewIds(courseIds);
+
+        List<Long> syntaxCourseIds = new ArrayList<>();
+        // 各个课程下所有单元个数
+        Map<Long, Map<Long, Object>> unitCountInCourse = new HashMap<>(16);
+
+        syntaxCourseMap.forEach((courseId, map) -> {
+            syntaxCourseIds.add(courseId);
+
+            Map<Long, Object> map1 = new HashMap<>(16);
+            map1.put(courseId, map.get("unitCount"));
+            unitCountInCourse.put(courseId, map1);
+        });
+
+        Map<Long, Map<Long, Object>> learnUnitCountInCourse = learnHistoryMapper.countUnitByStudentIdAndCourseIds(student.getId(), syntaxCourseIds, 3);
+
+        syntaxCourseMap.forEach((courseId, map) -> {
+            // 添加返回年级及英文年级选项
+            String grade = map.get("grade").toString();
+            String label = map.get("label").toString();
+
+            SyntaxCourse syntaxCourse = SyntaxCourse.builder()
+                    .id(courseId)
+                    .grade(grade)
+                    .label(label)
+                    .build();
+
+            this.packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, syntaxCourse);
+        });
+    }
+
+    /**
+     * @param student
+     * @param unitCountInCourse
+     * @param learnUnitCountInCourse
+     * @param previousGrade
+     * @param currentGrade
+     * @param object
+     */
+    private void packageVO(Student student, Map<Long, Map<Long, Object>> unitCountInCourse,
+                           Map<Long, Map<Long, Object>> learnUnitCountInCourse,
+                           List<CourseVO> previousGrade, List<CourseVO> currentGrade, Object object) {
+        String grade;
+        Long courseId;
+        // 单元总个数
+        long totalUnitCount;
+        CourseVO.CourseVOBuilder courseVoBuilder;
+        if (object instanceof CourseNew) {
+            CourseNew courseNew = (CourseNew) object;
+
+            grade = StringUtils.isNotBlank(courseNew.getGradeExt()) ? courseNew.getGradeExt() : courseNew.getGrade();
+            courseId = courseNew.getId();
+            courseVoBuilder = CourseVO.builder()
+                    .courseId(courseId)
+                    .grade(courseNew.getGrade() + "（" + courseNew.getLabel() + "）")
+                    .englishGrade(getGradeAndLabelEnglishName(grade, courseNew.getLabel()));
+
+            totalUnitCount = this.getUnitCount(unitCountInCourse, courseId) * 2;
+        } else {
+            SyntaxCourse syntaxCourse = (SyntaxCourse) object;
+
+            grade = syntaxCourse.getGrade();
+            courseId = syntaxCourse.getId();
+            courseVoBuilder = CourseVO.builder()
+                    .courseId(courseId)
+                    .grade(syntaxCourse.getGrade() + "（" + syntaxCourse.getLabel() + "）")
+                    .englishGrade(getGradeAndLabelEnglishName(grade, syntaxCourse.getLabel()));
+            totalUnitCount = Long.parseLong(unitCountInCourse.get(courseId).get(courseId).toString()) * 2;
+        }
+
+        // 已学单元总个数
+        long learnedUnitCount;
+        learnedUnitCount = this.getUnitCount(learnUnitCountInCourse, courseId);
+
+        if (learnedUnitCount == 0) {
+            courseVoBuilder.combatProgress(0).battle(1);
+        } else if (totalUnitCount == learnedUnitCount) {
+            courseVoBuilder.combatProgress(100).battle(3);
+        } else {
+            courseVoBuilder.combatProgress((int) (learnedUnitCount * 1.0 / totalUnitCount * 100)).battle(2);
+        }
+
+        if (Objects.equals(grade, student.getGrade())) {
+            // 当前年级
+            currentGrade.add(courseVoBuilder.build());
+        } else {
+            // 不是当前年级
+            previousGrade.add(courseVoBuilder.build());
+        }
     }
 
     @SuppressWarnings("all")
@@ -178,54 +258,56 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
      * @param grade
      * @return
      */
-    public static String getGradeAndLabelEnglishName(String grade) {
+    public static String getGradeAndLabelEnglishName(String grade, String label) {
+        String grade1 = null;
+        String label1 = null;
         if (grade == null) {
-            return "one";
+            grade1 = "one";
         }
         if (GradeNameConstant.FIRST_GRADE.equals(grade)) {
-            return "one";
+            grade1 = "one";
         }
         if (GradeNameConstant.SECOND_GRADE.equals(grade)) {
-            return "two";
+            grade1 = "two";
         }
         if (GradeNameConstant.WRITE_GRADE.equals(grade)) {
-            return "three";
+            grade1 = "three";
         }
         if (GradeNameConstant.FOURTH_GRADE.equals(grade)) {
-            return "four";
+            grade1 = "four";
         }
         if (GradeNameConstant.FIFTH_GRADE.equals(grade)) {
-            return "five";
+            grade1 = "five";
         }
         if (GradeNameConstant.SIXTH_GRADE.equals(grade)) {
-            return "six";
+            grade1 = "six";
         }
         if (GradeNameConstant.SEVENTH_GRADE.equals(grade)) {
-            return "seven";
+            grade1 = "seven";
         }
         if (GradeNameConstant.EIGHTH_GRADE.equals(grade)) {
-            return "eight";
+            grade1 = "eight";
         }
         if (GradeNameConstant.NINTH_GRADE.equals(grade)) {
-            return "nine";
+            grade1 = "nine";
         }
 
         if (GradeNameConstant.SENIOR_ONE.equals(grade)) {
-            return "ten";
+            grade1 = "ten";
         }
         if (GradeNameConstant.SENIOR_TWO.equals(grade)) {
-            return "eleven";
+            grade1 = "eleven";
         }
         if (GradeNameConstant.SENIOR_THREE.equals(grade)) {
-            return "twelve";
+            grade1 = "twelve";
         }
-        if (GradeNameConstant.VOLUME_1.equals(grade)) {
-            return "up";
+        if (GradeNameConstant.VOLUME_1.equals(label)) {
+            label1 = "up";
         }
-        if (GradeNameConstant.VOLUME_2.equals(grade)) {
-            return "down";
+        if (GradeNameConstant.VOLUME_2.equals(label)) {
+            label1 = "down";
         }
-        return null;
+        return grade1 + "-" + label1;
     }
 }
 

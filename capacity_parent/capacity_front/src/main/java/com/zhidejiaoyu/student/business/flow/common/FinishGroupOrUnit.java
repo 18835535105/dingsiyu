@@ -120,15 +120,14 @@ public class FinishGroupOrUnit {
         if (dto.getLastUnit()) {
             // 说明当前课程的单元已学习到最后一个单元，获取当前课程下个语法单元节点
             SyntaxUnit syntaxUnit = syntaxUnitMapper.selectNextUnitByCourseId(dto.getUnitId(), dto.getCourseId());
-            StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(isEasy ? FlowConstant.SYNTAX_GAME : FlowConstant.SYNTAX_WRITE);
             if (syntaxUnit != null) {
-                initData.saveLearnNew(dto, 1, 4);
-                return packageFlowVO.packageSyntaxFlowVO(NodeDto.builder()
-                        .studyFlowNew(studyFlowNew)
+                StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(isEasy ? FlowConstant.SYNTAX_GAME : FlowConstant.SYNTAX_WRITE);
+                return this.getSyntaxFlowVo(NodeDto.builder()
                         .student(dto.getStudent())
-                        .unitId(syntaxUnit.getId())
+                        .easyOrHard(isEasy ? 1 : 2)
                         .lastUnit(true)
-                        .build());
+                        .studyFlowNew(studyFlowNew)
+                        .build(), syntaxUnit);
             }
         } else {
 
@@ -137,32 +136,59 @@ public class FinishGroupOrUnit {
 
             // 获取当前单词对应的语法课程
             SyntaxUnit syntaxUnit = this.getSyntaxUnit(dto);
+            if (syntaxUnit == null) {
+                return null;
+            }
 
             UnitNew unitNew = unitNewMapper.selectMaxUnitByCourseId(dto.getCourseId());
 
-            boolean isLastUnit = false;
-            if (Objects.equals(dto.getUnitId(), unitNew.getId())) {
-                // 说明是课程的最后一个单元
-                isLastUnit = true;
-            }
+            boolean isLastUnit = Objects.equals(dto.getUnitId(), unitNew.getId());
 
             StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(isEasy ? FlowConstant.SYNTAX_GAME : FlowConstant.SYNTAX_WRITE);
 
-            if (syntaxUnit != null) {
-                initData.saveLearnNew(dto, 1, 4);
-                return packageFlowVO.packageSyntaxFlowVO(NodeDto.builder()
-                        .studyFlowNew(studyFlowNew)
-                        .student(dto.getStudent())
-                        .unitId(syntaxUnit.getId())
-                        .lastUnit(isLastUnit)
-                        .build());
-            }
+            return this.getSyntaxFlowVo(NodeDto.builder()
+                    .student(dto.getStudent())
+                    .easyOrHard(isEasy ? 1 : 2)
+                    .lastUnit(isLastUnit)
+                    .studyFlowNew(studyFlowNew)
+                    .build(), syntaxUnit);
         }
         return null;
     }
 
+    private FlowVO getSyntaxFlowVo(NodeDto dto, SyntaxUnit syntaxUnit) {
+        Student student = dto.getStudent();
+        Long syntaxUnitId = syntaxUnit.getId();
+        Long syntaxCourseId = syntaxUnit.getCourseId();
+        StudyFlowNew studyFlowNew = dto.getStudyFlowNew();
+
+        LearnNew learnNew = initData.saveLearnNew(NodeDto.builder()
+                .student(student)
+                .easyOrHard(dto.getEasyOrHard())
+                .unitId(syntaxUnitId)
+                .courseId(syntaxCourseId)
+                .build(), 1, 4);
+
+        initData.initStudentFlow(NodeDto.builder()
+                .nodeId(studyFlowNew.getId())
+                .learnNew(learnNew)
+                .modelType(1)
+                .build());
+
+        return packageFlowVO.packageSyntaxFlowVO(NodeDto.builder()
+                .studyFlowNew(studyFlowNew)
+                .student(student)
+                .unitId(syntaxUnitId)
+                .lastUnit(dto.getLastUnit())
+                .build());
+    }
+
     private SyntaxUnit getSyntaxUnit(NodeDto dto) {
         CourseNew courseNew = courseNewMapper.selectById(dto.getCourseId());
+        if (courseNew == null) {
+            return null;
+        }
+
         UnitNew unitNew = unitNewMapper.selectById(dto.getUnitId());
         String grade = courseNew.getGrade();
         String label = courseNew.getLabel();
@@ -170,7 +196,7 @@ public class FinishGroupOrUnit {
                 (StringUtils.isEmpty(grade) ? courseNew.getGradeExt() : grade) +
                 "-" +
                 (StringUtils.isEmpty(label) ? courseNew.getLabelExt() : label) +
-                "-" +
+                ")-" +
                 unitNew.getUnitName();
         return syntaxUnitMapper.selectIdLikeJointName(jointNameLike);
     }
