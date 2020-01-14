@@ -138,7 +138,8 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
      * @return
      */
     private ServerResponse<Object> getNewSyntaxTopic(NeedViewDTO dto) {
-        SyntaxTopic syntaxTopic = syntaxTopicMapper.selectNextByUnitIdAndType(dto.getStudentId(), dto.getUnitId(), SyntaxModelNameConstant.WRITE_SYNTAX);
+        SyntaxTopic syntaxTopic = syntaxTopicMapper.selectNextByUnitIdAndType(dto.getStudentId(), dto.getUnitId(),
+                SyntaxModelNameConstant.WRITE_SYNTAX);
         if (!Objects.isNull(syntaxTopic)) {
             KnowledgePoint knowledgePoint = knowledgePointMapper.selectByTopicId(syntaxTopic.getId());
             return ServerResponse.createBySuccess(WriteSyntaxVO.builder()

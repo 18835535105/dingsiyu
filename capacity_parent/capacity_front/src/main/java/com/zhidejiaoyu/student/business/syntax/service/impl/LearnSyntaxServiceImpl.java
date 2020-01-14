@@ -1,23 +1,28 @@
 package com.zhidejiaoyu.student.business.syntax.service.impl;
 
-import com.zhidejiaoyu.common.dto.syntax.SaveSyntaxDTO;
-import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.vo.syntax.KnowledgePointVO;
-import com.zhidejiaoyu.common.vo.syntax.LearnSyntaxVO;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
 import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.dto.syntax.SaveSyntaxDTO;
+import com.zhidejiaoyu.common.mapper.KnowledgePointMapper;
+import com.zhidejiaoyu.common.mapper.LearnExtendMapper;
+import com.zhidejiaoyu.common.mapper.LearnNewMapper;
+import com.zhidejiaoyu.common.mapper.SyntaxTopicMapper;
+import com.zhidejiaoyu.common.pojo.KnowledgePoint;
+import com.zhidejiaoyu.common.pojo.LearnNew;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.common.redis.SyntaxRedisOpt;
+import com.zhidejiaoyu.common.vo.syntax.KnowledgePointVO;
+import com.zhidejiaoyu.common.vo.syntax.LearnSyntaxVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
-import com.zhidejiaoyu.student.business.syntax.learnmodel.LearnModelInfo;
 import com.zhidejiaoyu.student.business.syntax.needview.LearnNeedView;
 import com.zhidejiaoyu.student.business.syntax.savelearn.SaveLearnInfo;
 import com.zhidejiaoyu.student.business.syntax.service.LearnSyntaxService;
+import com.zhidejiaoyu.student.common.redis.SyntaxRedisOpt;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,9 +57,6 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
 
     @Resource
     private LearnNeedView learnNeedView;
-
-    @Resource
-    private LearnModelInfo learnModelInfo;
 
     @Resource
     private LearnExtendMapper learnExtendMapper;
