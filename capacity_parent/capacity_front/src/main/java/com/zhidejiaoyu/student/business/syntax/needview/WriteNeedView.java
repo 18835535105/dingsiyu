@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.syntax.needview;
 
+import com.zhidejiaoyu.common.vo.syntax.KnowledgePointVO;
 import com.zhidejiaoyu.common.vo.syntax.TopicVO;
 import com.zhidejiaoyu.common.vo.syntax.WriteSyntaxVO;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
@@ -64,19 +65,24 @@ public class WriteNeedView implements INeedView {
 
             SyntaxTopic syntaxTopic = syntaxTopicMapper.selectById(studyCapacity.getWordId());
 
+            String answer = syntaxTopic.getAnswer();
+            KnowledgePointVO pointVO = LearnSyntaxServiceImpl.getContent(knowledgePoint);
+            Integer memoryDifficulty = syntaxMemoryDifficulty.getMemoryDifficulty(studyCapacity);
+            int memoryStrength = getMemoryStrength(studyCapacity);
             return ServerResponse.createBySuccess(WriteSyntaxVO.builder()
-                    .knowledgePoint(LearnSyntaxServiceImpl.getContent(knowledgePoint))
+                    .knowledgePoint(pointVO)
                     .topic(TopicVO.builder()
-                            .answer(syntaxTopic.getAnswer())
+                            .answer(answer)
                             .title(syntaxTopic.getTopic())
                             .build())
-                    .memoryDifficult(syntaxMemoryDifficulty.getMemoryDifficulty(studyCapacity))
-                    .memoryStrength(getMemoryStrength(studyCapacity))
+                    .memoryDifficult(memoryDifficulty)
+                    .memoryStrength(memoryStrength)
                     .plan(dto.getPlan())
                     .studyNew(false)
                     .id(syntaxTopic.getId())
                     .total(dto.getTotal())
-                    .model(syntaxTopic.getModel())
+                    // 如果有两个正确答案，不显示单词首字母，否则按正常逻辑
+                    .model(answer.contains("/") ? 2 : syntaxTopic.getModel())
                     .build());
         }
         return null;
