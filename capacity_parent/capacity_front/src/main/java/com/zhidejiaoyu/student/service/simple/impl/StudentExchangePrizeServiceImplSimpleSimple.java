@@ -3,17 +3,20 @@ package com.zhidejiaoyu.student.service.simple.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.common.Vo.prize.GetPrizeVO;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.common.redis.PayLogRedisOpt;
 import com.zhidejiaoyu.student.service.simple.SimpleIStudentExchangePrizeServiceSimple;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
@@ -43,6 +46,9 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
     @Autowired
     private SimpleRunLogMapper runLogMapper;
 
+    @Resource
+    private PayLogRedisOpt payLogRedisOpt;
+
 
     @Override
     public ServerResponse<Object> getAllList(HttpSession session) {
@@ -52,64 +58,66 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         }
         Long teacherId = student.getTeacherId();
         Integer schoolAdminById = simpleTeacherMapper.getSchoolAdminById(teacherId.intValue());
-        String string = simpleCampusMapper.selSchoolName(teacherId);
+        String schoolName = simpleCampusMapper.selSchoolName(teacherId);
         Map<String, Object> returnMap = new HashMap<>();
-        Map<String, Object> oneMap = new HashMap<>();
-        Map<String, Object> twoMap = new HashMap<>();
-        Map<String, Object> threeMap = new HashMap<>();
+
         Double systemGold = student.getSystemGold();
         if (systemGold > 1) {
-            Long round = Math.round(systemGold);
-            returnMap.put("sysGold", round.intValue());
+            long round = Math.round(systemGold);
+            returnMap.put("sysGold", (int) round);
         } else {
             returnMap.put("sysGold", 0);
         }
-        if (schoolAdminById == null || StringUtils.isEmpty(string)) {
+
+        // 如果学生没有充值，兑换按钮置灰
+        boolean isPaid = payLogRedisOpt.isPaid(student.getId());
+        returnMap.put("isPaid", isPaid);
+
+        if (schoolAdminById == null || StringUtils.isEmpty(schoolName)) {
             if (schoolAdminById == null) {
                 schoolAdminById = teacherId.intValue();
-                Integer teacherCount = simpleTeacherMapper.getTeacherCountByAdminId(teacherId);
-                if (teacherCount == null && teacherCount == 0) {
-                    addResultMapByAllList(oneMap, null, 1, false);
-                    addResultMapByAllList(twoMap, null, 2, false);
-                    addResultMapByAllList(threeMap, null, 3, false);
+                int teacherCount = simpleTeacherMapper.getTeacherCountByAdminId(teacherId);
+                if (teacherCount == 0) {
+                    Map<String, Object> oneMap = new HashMap<>();
+                    Map<String, Object> twoMap = new HashMap<>();
+                    Map<String, Object> threeMap = new HashMap<>();
+                    addResultMapByAllList(oneMap, 1);
+                    addResultMapByAllList(twoMap, 2);
+                    addResultMapByAllList(threeMap, 3);
                     returnMap.put("oneMap", oneMap);
                     returnMap.put("twoMap", twoMap);
                     returnMap.put("threeMap", threeMap);
                     return ServerResponse.createBySuccess(returnMap);
                 }
             }
-            //一类放置
-            List<PrizeExchangeList> oneType = simplePrizeExchangeListMapper.getAllByType(null, schoolAdminById, 1);
-            Integer oneCount = simplePrizeExchangeListMapper.getCountByType(null, schoolAdminById, 1);
-            getResultMap(oneMap, oneType);
-            addResultMapByAll(oneMap, 1, oneCount > 5 ? true : false);
-            //二类放置
-            List<PrizeExchangeList> twoType = simplePrizeExchangeListMapper.getAllByType(null, schoolAdminById, 2);
-            Integer twoCount = simplePrizeExchangeListMapper.getCountByType(null, schoolAdminById, 2);
-            getResultMap(twoMap, twoType);
-            addResultMapByAll(twoMap, 2, twoCount > 5 ? true : false);
-            //三类放置
-            List<PrizeExchangeList> threeType = simplePrizeExchangeListMapper.getAllByType(null, schoolAdminById, 3);
-            Integer threeCount = simplePrizeExchangeListMapper.getCountByType(null, schoolAdminById, 3);
-            getResultMap(threeMap, threeType);
-            addResultMapByAll(threeMap, 3, threeCount > 5 ? true : false);
-        } else {
-            //一类放置
-            List<PrizeExchangeList> oneType = simplePrizeExchangeListMapper.getAllByType(teacherId, null, 1);
-            Integer oneCount = simplePrizeExchangeListMapper.getCountByType(teacherId, null, 1);
-            getResultMap(oneMap, oneType);
-            addResultMapByAll(oneMap, 1, oneCount > 5 ? true : false);
-            //二类放置
-            List<PrizeExchangeList> twoType = simplePrizeExchangeListMapper.getAllByType(teacherId, null, 2);
-            Integer twoCount = simplePrizeExchangeListMapper.getCountByType(teacherId, null, 2);
-            getResultMap(twoMap, twoType);
-            addResultMapByAll(twoMap, 2, twoCount > 5 ? true : false);
-            //三类放置
-            List<PrizeExchangeList> threeType = simplePrizeExchangeListMapper.getAllByType(teacherId, null, 3);
-            Integer threeCount = simplePrizeExchangeListMapper.getCountByType(teacherId, null, 3);
-            getResultMap(threeMap, threeType);
-            addResultMapByAll(threeMap, 3, threeCount > 5 ? true : false);
+            return packagePrize(schoolAdminById, returnMap, null);
         }
+        return packagePrize(null, returnMap, teacherId);
+    }
+
+    public ServerResponse<Object> packagePrize(Integer schoolAdminById, Map<String, Object> returnMap, Long teacherId) {
+        Map<String, Object> oneMap = new HashMap<>(16);
+        Map<String, Object> twoMap = new HashMap<>(16);
+        Map<String, Object> threeMap = new HashMap<>(16);
+
+        // 一类放置
+        List<PrizeExchangeList> oneType = simplePrizeExchangeListMapper.getAllByType(teacherId, schoolAdminById, 1);
+        Integer oneCount = simplePrizeExchangeListMapper.getCountByType(teacherId, schoolAdminById, 1);
+        getResultMap(oneMap, oneType);
+        addResultMapByAll(oneMap, 1, oneCount > 5);
+
+        // 二类放置
+        List<PrizeExchangeList> twoType = simplePrizeExchangeListMapper.getAllByType(teacherId, schoolAdminById, 2);
+        Integer twoCount = simplePrizeExchangeListMapper.getCountByType(teacherId, schoolAdminById, 2);
+        getResultMap(twoMap, twoType);
+        addResultMapByAll(twoMap, 2, twoCount > 5);
+
+        // 三类放置
+        List<PrizeExchangeList> threeType = simplePrizeExchangeListMapper.getAllByType(teacherId, schoolAdminById, 3);
+        Integer threeCount = simplePrizeExchangeListMapper.getCountByType(teacherId, schoolAdminById, 3);
+        getResultMap(threeMap, threeType);
+        addResultMapByAll(threeMap, 3, threeCount > 5);
+
         returnMap.put("oneMap", oneMap);
         returnMap.put("twoMap", twoMap);
         returnMap.put("threeMap", threeMap);
@@ -123,7 +131,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         Long teacherId = student.getTeacherId();
         Integer adminId = simpleTeacherMapper.getSchoolAdminById(teacherId.intValue());
         String string = simpleCampusMapper.selSchoolName(teacherId);
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>(16);
 
         List<PrizeExchangeList> prizeExchangeLists;
         if (adminId == null || StringUtils.isEmpty(string)) {
@@ -184,7 +192,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         resultMap.put("row", row);
         Integer total = simpleStudentExchangePrizeMapper.getAllNumber(studentId);
         resultMap.put("total", total);
-        Integer resultInteger = total - (page - 1) * row;
+        int resultInteger = total - (page - 1) * row;
         List<Map<String, Object>> resultList = new ArrayList<>();
         for (Map<String, Object> map : all) {
             Integer state = (Integer) map.get("state");
@@ -217,41 +225,52 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
     @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> addExchangePrize(HttpSession session, Long prizeId) {
-        Map<String, Object> resultMap = new HashMap<>();
         Student student = getStudent(session);
         Double systemGold = student.getSystemGold();
         PrizeExchangeList prizeExchangeList = simplePrizeExchangeListMapper.selById(prizeId);
-        resultMap.put("prizeExchange", prizeExchangeList);
-        resultMap.put("sysGold", student.getSystemGold().intValue());
-        if (prizeExchangeList.getExchangePrize() < systemGold) {
-            if (prizeExchangeList.getSurplusNumber() > 0) {
-                int index = addStudentExchangePrize(1, prizeId, student.getId());
-                if (index > 0) {
-                    simplePrizeExchangeListMapper.updSulpersNumber(prizeId, prizeExchangeList.getSurplusNumber() - 1);
-                    addOperationLog(prizeExchangeList.getPrize(), student.getId().intValue());
-                    addGoldLog(student.getId(), prizeExchangeList.getExchangePrize());
-                    student.setSystemGold(student.getSystemGold() - prizeExchangeList.getExchangePrize());
-                    student.setOfflineGold(student.getOfflineGold() + prizeExchangeList.getExchangePrize());
-                    simpleStudentMapper.updateByPrimaryKey(student);
 
-                    session.setAttribute(UserConstant.CURRENT_STUDENT, student);
-                    resultMap.put("sysGold", student.getSystemGold().intValue());
-                    resultMap.put("msg", "兑换成功,请联系老师帮助兑换");
-                    return ServerResponse.createBySuccess(resultMap);
-                } else {
-                    resultMap.put("msg", "系统繁忙请稍后再试");
-                    return ServerResponse.createBySuccess(resultMap);
-                }
-            } else {
-                addStudentExchangePrize(3, prizeId, student.getId());
-                resultMap.put("msg", "奖品数量不足，无法兑换");
-                return ServerResponse.createBySuccess(resultMap);
-            }
-        } else {
-            addStudentExchangePrize(6, prizeId, student.getId());
-            resultMap.put("msg", "您的金币不足，无法兑换");
-            return ServerResponse.createBySuccess(resultMap);
+        GetPrizeVO getPrizeVO = new GetPrizeVO();
+        prizeExchangeList.setPrizeUrl(GetOssFile.getPublicObjectUrl(prizeExchangeList.getPrizeUrl()));
+        getPrizeVO.setPrizeExchange(prizeExchangeList);
+        getPrizeVO.setSysGold(student.getSystemGold().intValue());
+
+        boolean isPaid = payLogRedisOpt.isPaid(student.getId());
+        if (!isPaid) {
+            // 未充值
+            getPrizeVO.setMsg("同学你还不是正式学员，请成为正式学员，在藏宝阁兑换奖励吧！");
+            return ServerResponse.createBySuccess(getPrizeVO);
         }
+
+        if (prizeExchangeList.getExchangePrize() > systemGold) {
+            addStudentExchangePrize(6, prizeId, student.getId());
+            getPrizeVO.setMsg("您的金币不足，无法兑换");
+            return ServerResponse.createBySuccess(getPrizeVO);
+        }
+
+        if (prizeExchangeList.getSurplusNumber() <= 0) {
+            addStudentExchangePrize(3, prizeId, student.getId());
+            getPrizeVO.setMsg("奖品数量不足，无法兑换");
+            return ServerResponse.createBySuccess(getPrizeVO);
+        }
+
+
+        int index = addStudentExchangePrize(1, prizeId, student.getId());
+        if (index > 0) {
+            simplePrizeExchangeListMapper.updSulpersNumber(prizeId, prizeExchangeList.getSurplusNumber() - 1);
+            addOperationLog(prizeExchangeList.getPrize(), student.getId().intValue());
+            addGoldLog(student.getId(), prizeExchangeList.getExchangePrize());
+            student.setSystemGold(student.getSystemGold() - prizeExchangeList.getExchangePrize());
+            student.setOfflineGold(student.getOfflineGold() + prizeExchangeList.getExchangePrize());
+            simpleStudentMapper.updateById(student);
+
+            session.setAttribute(UserConstant.CURRENT_STUDENT, student);
+            getPrizeVO.setSysGold(student.getSystemGold().intValue());
+            getPrizeVO.setMsg("兑换成功,请联系老师帮助兑换");
+            return ServerResponse.createBySuccess(getPrizeVO);
+        }
+
+        getPrizeVO.setMsg("系统繁忙请稍后再试");
+        return ServerResponse.createBySuccess(getPrizeVO);
     }
 
 
@@ -264,16 +283,16 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         return simpleStudentExchangePrizeMapper.insert(studentExchangePrize);
     }
 
-    private int addOperationLog(String prize, Integer studentId) {
+    private void addOperationLog(String prize, Integer studentId) {
         RunLog runLog = new RunLog();
         runLog.setCreateTime(new Date());
         runLog.setLogContent(studentId + "：兑奖管理 ：" + prize + " 兑换成功");
         runLog.setType(8);
         runLog.setOperateUserId(studentId.longValue());
-        return runLogMapper.insert(runLog);
+        runLogMapper.insert(runLog);
     }
 
-    private int addGoldLog(Long studentId, Integer price) {
+    private void addGoldLog(Long studentId, Integer price) {
         GoldLog goldLog = new GoldLog();
         goldLog.setCreateTime(new Date());
         goldLog.setGoldReduce(price);
@@ -281,13 +300,13 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         goldLog.setStudentId(studentId);
         goldLog.setReason("兑换奖励");
         goldLog.setReadFlag(0);
-        return simpleGoldLogMapper.insert(goldLog);
+        simpleGoldLogMapper.insert(goldLog);
     }
 
-    private void addResultMapByAllList(Map<String, Object> map, Object data, int type, boolean more) {
-        map.put("list", data);
+    private void addResultMapByAllList(Map<String, Object> map, int type) {
+        map.put("list", null);
         map.put("type", type);
-        map.put("more", more);
+        map.put("more", false);
     }
 
     private void addResultMapByAll(Map<String, Object> map, int type, boolean more) {

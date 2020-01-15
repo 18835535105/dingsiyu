@@ -24,7 +24,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"sys_config"};
+        String[] tableName = {"receive_email"};
 
         /**
          * 配置：
