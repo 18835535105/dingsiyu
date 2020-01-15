@@ -10,7 +10,6 @@ import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.common.redis.PayLogRedisOpt;
-import com.zhidejiaoyu.student.service.simple.SimpleIStudentExchangePrizeServiceSimple;
 import com.zhidejiaoyu.student.business.service.simple.SimpleIStudentExchangePrizeServiceSimple;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
