@@ -9,7 +9,7 @@
         <result column="grade" property="grade"/>
         <result column="version" property="version"/>
         <result column="label" property="label"/>
-        <result column="gradeExt" property="gradeExt"/>
+        <result column="grade_ext" property="gradeExt"/>
         <result column="picture_url" property="pictureUrl"/>
         <result column="course_name" property="courseName"/>
         <result column="label_ext" property="labelExt"/>
@@ -20,7 +20,12 @@
     </resultMap>
 
     <sql id="base_sql">
-        id, study_paragraph, grade, version, label, gradeExt, picture_url, course_name, label_ext, `status`, create_time, update_time, delStatus
+        id, study_paragraph, grade, version, label, grade_ext, picture_url, course_name, label_ext, `status`, create_time, update_time, delStatus
+    </sql>
+
+    <sql id="more_table_sql">
+        cn.id, cn.study_paragraph, cn.grade, cn.version, cn.label, cn.grade_ext, cn.picture_url, cn.course_name,
+        cn.label_ext, cn.status, cn.create_time, cn.update_time, cn.delStatus
     </sql>
 
     <select id="selectGradeByCourseId" resultType="string" parameterType="map">
@@ -78,7 +83,7 @@
     </select>
     <select id="selectByUnitId" resultMap="BaseResultMap" parameterType="map">
         select
-        <include refid="base_sql"/>
+        <include refid="more_table_sql"/>
         from course_new cn
         join unit_new un on cn.id = un.course_id and un.id = #{unitId}
         limit 1
