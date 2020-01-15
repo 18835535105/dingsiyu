@@ -322,7 +322,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         // 没有单词模块判断是否有句型模块
         Integer sentenceCount = unitSentenceNewMapper.countByUnitIdAndGroup(dto.getUnitId(), dto.getGroup());
         if (sentenceCount > 0) {
-            studyFlowNew.setId(85L);
+            studyFlowNew.setId(dto.getEasyOrHard() == 1 ? FlowConstant.SENTENCE_TRANSLATE : FlowConstant.SENTENCE_WRITE);
             return true;
         }
         return false;
@@ -339,7 +339,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         // 没有句型模块判断是否有课文模块
         Integer teksCount = unitTeksNewMapper.countByUnitIdAndGroup(dto.getUnitId(), dto.getGroup());
         if (teksCount > 0) {
-            studyFlowNew.setId(FlowConstant.TEKS_LISTEN);
+            studyFlowNew.setId(dto.getEasyOrHard() == 1 ? FlowConstant.TEKS_LISTEN : FlowConstant.TEKS_TRAINING);
             return true;
         }
         return false;

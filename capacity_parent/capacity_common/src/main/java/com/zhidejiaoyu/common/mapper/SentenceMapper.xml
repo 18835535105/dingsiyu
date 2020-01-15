@@ -12,7 +12,7 @@
 
 
     <!-- 多表关联查询sentence对象 -->
-    <sql id="relevance_base_sql">
+    <sql id="more_table_sql">
         s.id, s.centreExample, s.centreTranslate, s.ExampleDisturb, s.TranslateDisturb, s.read_url
     </sql>
 
@@ -76,7 +76,7 @@
     <select id="selectByUnitId" parameterType="java.lang.Long"
             resultType="com.zhidejiaoyu.common.pojo.Sentence">
         select
-        <include refid="relevance_base_sql"/>
+        <include refid="more_table_sql"/>
         from sentence s,
         unit_sentence_new us
         where
@@ -86,7 +86,7 @@
     <select id="selectByUnitIdAndGroup" parameterType="map"
             resultType="com.zhidejiaoyu.common.pojo.Sentence">
         select
-        <include refid="relevance_base_sql"/>
+        <include refid="more_table_sql"/>
         from sentence s,
         unit_sentence_new us
         where
@@ -149,13 +149,13 @@
     <!-- 根据例句id和学段查询当前例句的翻译 -->
     <select id="selectChineseByIdAndPhase" parameterType="map"
             resultType="java.lang.String">
-        select
-            centreTranslate
-        from sentence where id = #{id}
+        select centreTranslate
+        from sentence
+        where id = #{id}
     </select>
     <select id="selectUnKnowSentenceByUnitId" parameterType="map" resultType="com.zhidejiaoyu.common.pojo.Sentence">
         select
-        <include refid="relevance_base_sql"/>
+        <include refid="more_table_sql"/>
         from sentence s,learn l where s.id = l.example_id and
         l.example_id is not null and
         l.unit_id = #{unitId} and l.student_id = #{studentId} and l.study_model = #{studyModel} and l.type=1
@@ -170,7 +170,7 @@
     </select>
     <select id="selectUnLearnedSentenceByUnitId" parameterType="map" resultType="com.zhidejiaoyu.common.pojo.Sentence">
         select
-        <include refid="relevance_base_sql"/>
+        <include refid="more_table_sql"/>
         from sentence s, unit_sentence us where us.unit_id = #{unitId} and us.sentence_id = s.id and s.id not in (select
         l.example_id from learn l where l.example_id is not null and
         l.unit_id = #{unitId} and l.student_id = #{studentId} and l.study_model = #{studyModel} and l.type = 1 )
@@ -180,15 +180,9 @@
         from sentence
         where id = #{exampleId}
     </select>
-    <select id="selectByWords" parameterType="java.util.List" resultType="com.zhidejiaoyu.common.pojo.Sentence">
-        select * from sentence where word in
-        <foreach collection="words" open="(" close=")" item="word" separator=",">
-            word
-        </foreach>
-    </select>
     <select id="selectOneSentenceNotInIds" resultType="com.zhidejiaoyu.common.pojo.Sentence" parameterType="map">
         SELECT
-        <include refid="relevance_base_sql"/>
+        <include refid="more_table_sql"/>
         FROM
         sentence s,
         unit_sentence us
@@ -207,7 +201,7 @@
     </select>
     <select id="selectOneWordNotInIdsNew" parameterType="map" resultMap="BaseResultMap">
         SELECT
-        <include refid="relevance_base_sql"/>
+        <include refid="more_table_sql"/>
         FROM
         sentence s,
         unit_sentence_new us
@@ -236,7 +230,7 @@
     </select>
     <select id="selectUnKnowSentenceByCourseId" resultType="com.zhidejiaoyu.common.pojo.Sentence" parameterType="map">
         select
-        <include refid="relevance_base_sql"/>
+        <include refid="more_table_sql"/>
         from sentence s,learn l where s.id = l.example_id and
         l.example_id is not null and
         l.course_id = #{courseId} and l.student_id = #{studentId} and l.study_model = #{studyModel}
@@ -252,7 +246,7 @@
     <select id="selectUnLearnedSentenceByCourseId" resultType="com.zhidejiaoyu.common.pojo.Sentence"
             parameterType="map">
         select
-        <include refid="relevance_base_sql"/>
+        <include refid="more_table_sql"/>
         from sentence s where s.id not in (select l.example_id from learn l where l.example_id is not null and
         l.course_id = #{courseId} and l.student_id = #{studentId} and l.study_model = #{studyModel})
     </select>
@@ -267,15 +261,15 @@
 
     <!-- 删除例句和单元的关联 -->
     <delete id="delUnit_vocabulary" parameterType="map">
-        delete from
-            unit_sentence
+        delete
+        from unit_sentence
         where sentence_id = #{id} ${unit_id}
     </delete>
 
     <select id="selectSentenceVoice" parameterType="java.lang.Long"
             resultType="com.zhidejiaoyu.common.pojo.Sentence">
         select
-        <include refid="relevance_base_sql"/>
+        <include refid="more_table_sql"/>
         from sentence s,
         unit_sentence us,
         student_unit su
@@ -288,7 +282,7 @@
     </select>
     <select id="selectOneByUnitId" resultType="com.zhidejiaoyu.common.pojo.Sentence" parameterType="map">
         select
-        <include refid="relevance_base_sql"/>
+        <include refid="more_table_sql"/>
         from sentence s,
         unit_sentence us,
         student_unit su
@@ -302,7 +296,7 @@
 
     <select id="selectUnlearnInBookPlayer" resultType="com.zhidejiaoyu.common.pojo.Sentence" parameterType="map">
         select
-        <include refid="relevance_base_sql"/>
+        <include refid="more_table_sql"/>
         from unit_sentence us,
         sentence s
         where us.sentence_id = s.id
@@ -315,20 +309,21 @@
 
     <select id="selectRoundSentence" parameterType="java.lang.Long" resultType="com.zhidejiaoyu.common.pojo.Sentence">
         select
-        <include refid="relevance_base_sql"></include>
+        <include refid="more_table_sql"/>
         from sentence s
         join unit_sentence_new us on s.id=us.sentence_id
-        join sentence_unit_new un on us.unit_id=un.id
+        join unit_new un on us.unit_id=un.id
         where un.course_id=#{courseId}
         ORDER BY RAND() LIMIT 30
     </select>
 
     <select id="selectSentenceLaterLearnTimeByStudentId" parameterType="java.lang.Long" resultType="java.util.Map">
-        select DISTINCT unit.joint_name , learn.student_id , MAX(learn.update_time) learn_time ,course.course_name
+        select DISTINCT unit.joint_name, learn.student_id, MAX(learn.update_time) learn_time, course.course_name
         from learn learn
-        join sentence_unit unit on unit.id=learn.unit_id
-        join sentence_course course on course.id=learn.course_id
-        where student_id = #{studentId} and example_id is not null
+                 join sentence_unit unit on unit.id = learn.unit_id
+                 join sentence_course course on course.id = learn.course_id
+        where student_id = #{studentId}
+          and example_id is not null
         group by unit.course_id
         order by learn.update_time desc;
     </select>

@@ -4,12 +4,12 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.SentenceUnit">
-        <id column="id" property="id" />
-        <result column="course_id" property="courseId" />
-        <result column="unit_name" property="unitName" />
-        <result column="joint_name" property="jointName" />
-        <result column="delStatus" property="delStatus" />
-        <result column="unit_index" property="unitIndex" />
+        <id column="id" property="id"/>
+        <result column="course_id" property="courseId"/>
+        <result column="unit_name" property="unitName"/>
+        <result column="joint_name" property="jointName"/>
+        <result column="delStatus" property="delStatus"/>
+        <result column="unit_index" property="unitIndex"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -24,8 +24,10 @@
         where id = #{id,jdbcType=BIGINT}
     </select>
 
-    <select id="getCourseIdByunitId" resultType="java.lang.Long" parameterType="java.lang.Integer">
-        select course_id from sentence_unit_new where id=#{unitId};
+    <select id="getCourseIdById" resultType="java.lang.Long" parameterType="java.lang.Integer">
+        select course_id
+        from unit_new
+        where id = #{unitId}
     </select>
 
 </mapper>

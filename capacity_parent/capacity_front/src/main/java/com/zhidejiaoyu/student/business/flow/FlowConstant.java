@@ -19,12 +19,27 @@ public interface FlowConstant {
     /**
      * 困难流程开始节点
      */
-    long HARD_START = 118;
+    long HARD_START = 129;
+
+    /**
+     * 一键学习句型翻译
+     */
+    long SENTENCE_TRANSLATE = 85;
+
+    /**
+     * 一键学习句型默写
+     */
+    long SENTENCE_WRITE = 88;
 
     /**
      * 一键学习课文试听
      */
     long TEKS_LISTEN = 89;
+
+    /**
+     * 一键学习课文训练
+     */
+    long TEKS_TRAINING = 90;
 
     /**
      * 一键学习语法游戏

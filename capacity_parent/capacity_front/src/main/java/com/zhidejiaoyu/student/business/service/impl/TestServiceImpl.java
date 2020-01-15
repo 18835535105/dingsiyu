@@ -954,7 +954,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         //获取干扰项句子 在当前课程下选择
         if (sentences.size() < 4) {
             //获取测试单元所在的课程
-            Long courseId = sentenceUnitMapper.getCourseIdByunitId(unitId.intValue());
+            Long courseId = sentenceUnitMapper.getCourseIdById(unitId.intValue());
             sentenceList = sentenceMapper.selectRoundSentence(courseId);
         }
         List<Object> list = testSentenceUtil.resultTestSentence(sentences, sentenceList);
@@ -1261,8 +1261,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
 
         if (testRecord != null) {
-            LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId[0], easyOrHard, 1);
-            testRecord.setGroup(learnNew.getGroup());
+            int modelType = this.getModelType(wordUnitTestDTO.getClassify());
+            if (modelType != -1) {
+                LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId[0], easyOrHard, modelType);
+                testRecord.setGroup(learnNew.getGroup());
+            }
+
             testRecordMapper.insert(testRecord);
             // 保存测试记录详情
             if (testDetail != null) {
@@ -1286,6 +1290,25 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
         return ServerResponse.createBySuccess(vo);
+    }
+
+    private int getModelType(Integer classify) {
+        switch (classify) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+                return 1;
+            case 4:
+            case 5:
+            case 6:
+            case 8:
+                return 2;
+            case 9:
+                return 3;
+            default:
+        }
+        return -1;
     }
 
     private void saveError(Long unitId, Long[] errorIds, Student student, Integer classify, Integer modelType) {
