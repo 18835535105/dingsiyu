@@ -28,18 +28,20 @@ public class SimpleStudentExchangePrizeController {
 
     /**
      * 兑换主页查询
+     *
      * @param session
      * @return
      */
     @GetMapping("/getAllList")
     @ResponseBody
-    public ServerResponse<Object> getAllList(HttpSession session){
+    public ServerResponse<Object> getAllList(HttpSession session) {
         return studentExchangePrizeService.getAllList(session);
     }
 
 
     /**
      * 查询可兑换奖励
+     *
      * @param page
      * @param row
      * @param session
@@ -48,12 +50,13 @@ public class SimpleStudentExchangePrizeController {
      */
     @GetMapping("/getList")
     @ResponseBody
-    public ServerResponse<Object> getList(int page, int row, HttpSession session, int type){
-        return studentExchangePrizeService.getList(page,row,session,type);
+    public ServerResponse<Object> getList(int page, int row, HttpSession session, int type) {
+        return studentExchangePrizeService.getList(page, row, session, type);
     }
 
     /**
      * 兑奖查询
+     *
      * @param page
      * @param row
      * @param session
@@ -61,39 +64,22 @@ public class SimpleStudentExchangePrizeController {
      */
     @GetMapping("getExchangePrize")
     @ResponseBody
-    public ServerResponse<Object> getExchangePrize(int page, int row, HttpSession session){
-        return studentExchangePrizeService.getExchangePrize(page,row,session);
+    public ServerResponse<Object> getExchangePrize(int page, int row, HttpSession session) {
+        return studentExchangePrizeService.getExchangePrize(page, row, session);
     }
 
     /**
      * 添加兑换
+     *
      * @param session
      * @param prizeId
      * @return
      */
     @PostMapping("addExchangePrize")
     @ResponseBody
-    public ServerResponse<Object> addExchangePrize(HttpSession session, Long prizeId){
-        return studentExchangePrizeService.addExchangePrize(session,prizeId);
+    public ServerResponse<Object> addExchangePrize(HttpSession session, Long prizeId) {
+        return studentExchangePrizeService.addExchangePrize(session, prizeId);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
