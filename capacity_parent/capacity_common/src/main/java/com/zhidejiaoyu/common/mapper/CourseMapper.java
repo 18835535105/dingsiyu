@@ -372,4 +372,6 @@ public interface CourseMapper extends BaseMapper<Course> {
     List<String> selectSimpleVersionByStudentId(@Param("studentId") Long studentId);
 
     List<Course> getAllCourseByStudyParagraph(@Param("paragraph") String studyParagraph);
+
+    List<Map<String,Object>> selectCourseByCourseIds(@Param("courseIds") List<Long> simpleCouseIds);
 }

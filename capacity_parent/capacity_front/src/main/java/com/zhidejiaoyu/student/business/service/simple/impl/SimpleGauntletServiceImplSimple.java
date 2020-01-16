@@ -3,10 +3,7 @@ package com.zhidejiaoyu.student.business.service.simple.impl;
 import com.github.pagehelper.PageHelper;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.mapper.CourseConfigMapper;
-import com.zhidejiaoyu.common.mapper.CourseNewMapper;
-import com.zhidejiaoyu.common.mapper.StudentStudyPlanNewMapper;
-import com.zhidejiaoyu.common.mapper.TeacherMapper;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.grade.GradeUtil;
 import com.zhidejiaoyu.common.vo.simple.StrengthGameVo;
@@ -89,6 +86,8 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     private SimpleStudentUnitMapper simpleStudentUnitMapper;
     @Resource
     private CourseNewMapper courseNewMapper;
+    @Resource
+    private CourseMapper courseMapper;
 
     @Override
     public ServerResponse<Map<String, Object>> getStudentByType(HttpSession session, Integer type, Integer page, Integer rows, String account) {
@@ -267,15 +266,15 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         Student student = getStudent(session);
         Long studentId = student.getId();
         //获取学生版本
-        List<Long> courseIds = studentStudyPlanNewMapper.getCourseId(studentId);
-        courseIds.addAll(simpleStudentUnitMapper.getAllCourseIdByTypeToStudent(studentId, 2));
+        List<String> gradeList = GradeUtil.smallThanCurrent(student.getVersion(), student.getGrade());
+        List<Long> courseIds = studentStudyPlanNewMapper.getCourseIdAndGradeList(studentId, gradeList);
+
         //获取course_config数据
         //查看是否学生是否拥有课程
         //判断学生是否有排课的内容
         if (student.getVersion() != null && student.getGrade() != null) {
             int count = courseConfigMapper.countByUserIdAndType(studentId, 2);
             List<Long> longs;
-            List<String> gradeList = GradeUtil.smallThanCurrent(student.getVersion(), student.getGrade());
             if (count > 0) {
                 longs = courseConfigMapper.selectByUserId(studentId, gradeList);
             } else {
@@ -297,6 +296,10 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         //获取学生正在学习的版本
         GradeUtil.smallThanCurrent(student.getVersion(), student.getGrade());
         List<Map<String, Object>> courses = simpleCourseMapper.getCourseByIds(courseIds);
+        List<Long> simpleCouseIds = simpleStudentUnitMapper.getAllCourseIdByTypeToStudent(studentId, 2);
+        if (simpleCouseIds.size() > 0) {
+            courses.addAll(courseMapper.selectCourseByCourseIds(simpleCouseIds));
+        }
         return ServerResponse.createBySuccess(courses);
     }
 

@@ -699,4 +699,13 @@
         select <include refid="Base_Column_List"></include> from course where study_paragraph =#{paragraph}
     </select>
 
+    <select id="selectCourseByCourseIds" parameterType="map" resultType="map">
+        select id,course_name name from course
+        where id in(
+        <foreach collection="courseIds" item="courseId" separator=",">
+            #{courseId}
+        </foreach>
+        )
+    </select>
+
 </mapper>
