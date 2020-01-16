@@ -316,7 +316,7 @@
     <select id="getAllCourseIdByTypeToStudent" parameterType="map" resultType="long">
         select course.id
         from student_unit unit
-        join course course on unit.course_id=course.id
+        join course_new course on unit.course_id=course.id
         where unit.student_id=#{studentId} and unit.type=#{type}
         and course.version like '%单词辨音%' group by course.id
     </select>

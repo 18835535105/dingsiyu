@@ -1089,8 +1089,8 @@
     <select id="getWordByCourseGetNumber" resultMap="BaseResultMap" parameterType="map">
         select v.id, v.word, uv.word_chinese
         from vocabulary v
-                 join unit_vocabulary uv on v.id = uv.vocabulary_id
-                 join unit unit on unit.id = uv.unit_id
+                 join unit_vocabulary_new uv on v.id = uv.vocabulary_id
+                 join unit_new unit on unit.id = uv.unit_id
         where unit.course_id = #{courseId}
         order by rand()
         limit #{start},#{row}
@@ -1099,7 +1099,7 @@
     <select id="selectByCourseIdWithoutWordIds" resultMap="BaseResultMap" parameterType="map">
         SELECT
         <include refid="unite_Column_List"/>
-        FROM vocabulary v, unit_vocabulary uv, unit u
+        FROM vocabulary v, unit_vocabulary_new uv, unit_new u
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = #{courseId}
         <if test="vocabularies.size > 0">
@@ -1115,7 +1115,7 @@
     <select id="getWord" parameterType="map" resultMap="BaseResultMap">
         select
         v.id, v.word, uv.word_chinese
-        from vocabulary v, unit_vocabulary uv, unit u
+        from vocabulary v, unit_vocabulary_new uv, unit_new u
         where v.id = uv.vocabulary_id and v.delStatus = 1
         and uv.unit_id = u.id and u.joint_name like '%单词%'
         and v.id not in (

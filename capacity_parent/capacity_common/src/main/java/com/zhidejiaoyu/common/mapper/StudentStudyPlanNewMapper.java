@@ -39,4 +39,6 @@ public interface StudentStudyPlanNewMapper extends BaseMapper<StudentStudyPlanNe
     int selectByStudentIdAndUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
 
     StudentStudyPlanNew selectMaxFinalByStudentId(@Param("studentId") Long studentId);
+
+    List<Long> getCourseId(@Param("studentId") Long studentId);
 }

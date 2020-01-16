@@ -549,7 +549,7 @@
                  JOIN student_unit b ON a.id = b.course_id and b.type = 2 AND b.student_id = #{studentId}
     </select>
     <select id="getCourseByIds" parameterType="map" resultType="map">
-        select id,course_name name from course
+        select id,course_name name from course_new
         where id in(
         <foreach collection="courseIds" item="courseId" separator=",">
             #{courseId}

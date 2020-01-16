@@ -3,7 +3,12 @@ package com.zhidejiaoyu.student.business.service.simple.impl;
 import com.github.pagehelper.PageHelper;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.common.mapper.CourseConfigMapper;
+import com.zhidejiaoyu.common.mapper.CourseNewMapper;
+import com.zhidejiaoyu.common.mapper.StudentStudyPlanNewMapper;
+import com.zhidejiaoyu.common.mapper.TeacherMapper;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.grade.GradeUtil;
 import com.zhidejiaoyu.common.vo.simple.StrengthGameVo;
 import com.zhidejiaoyu.common.vo.simple.StudentGauntletVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -20,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -40,6 +46,9 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     @Autowired
     private SimpleStudentMapper simpleStudentMapper;
 
+    @Resource
+    private TeacherMapper teacherMapper;
+
     @Autowired
     private SimpleTeacherMapper simpleTeacherMapper;
 
@@ -52,11 +61,11 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     @Autowired
     private BaiduSpeak baiduSpeak;
 
-    @Autowired
-    private SimpleStudentStudyPlanMapper simpleStudentStudyPlanMapper;
+    @Resource
+    private CourseConfigMapper courseConfigMapper;
 
     @Autowired
-    private SimpleSimpleStudentUnitMapper simpleSimpleStudentUnitMapper;
+    private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
 
     @Autowired
     private SimpleCourseMapper simpleCourseMapper;
@@ -78,6 +87,8 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
 
     @Autowired
     private SimpleStudentUnitMapper simpleStudentUnitMapper;
+    @Resource
+    private CourseNewMapper courseNewMapper;
 
     @Override
     public ServerResponse<Map<String, Object>> getStudentByType(HttpSession session, Integer type, Integer page, Integer rows, String account) {
@@ -253,15 +264,44 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
      */
     @Override
     public ServerResponse<Object> getCourse(HttpSession session) {
-        Long studentId = super.getStudentId(session);
-        List<Long> courseIds = simpleStudentStudyPlanMapper.getCourseId(studentId);
+        Student student = getStudent(session);
+        Long studentId = student.getId();
+        //获取学生版本
+        List<Long> courseIds = studentStudyPlanNewMapper.getCourseId(studentId);
         courseIds.addAll(simpleStudentUnitMapper.getAllCourseIdByTypeToStudent(studentId, 2));
+        //获取course_config数据
+        //查看是否学生是否拥有课程
+        //判断学生是否有排课的内容
+        if (student.getVersion() != null && student.getGrade() != null) {
+            int count = courseConfigMapper.countByUserIdAndType(studentId, 2);
+            List<Long> longs;
+            List<String> gradeList = GradeUtil.smallThanCurrent(student.getVersion(), student.getGrade());
+            if (count > 0) {
+                longs = courseConfigMapper.selectByUserId(studentId, gradeList);
+            } else {
+                //如果学生没有排课查看校区是否有排课
+                //获取校长id
+                Integer schoolAdminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
+                count = courseConfigMapper.countByUserIdAndType(schoolAdminId.longValue(), 1);
+                if (count > 0) {
+                    longs = courseConfigMapper.selectByUserId(schoolAdminId.longValue(), gradeList);
+                } else {
+                    //如果学校没有分课，查询总部分课
+                    longs = courseConfigMapper.selectByUserId(1L, gradeList);
+                }
+            }
+            if (longs.size() > 0) {
+                courseIds.addAll(longs);
+            }
+        }
+        //获取学生正在学习的版本
+        GradeUtil.smallThanCurrent(student.getVersion(), student.getGrade());
         List<Map<String, Object>> courses = simpleCourseMapper.getCourseByIds(courseIds);
         return ServerResponse.createBySuccess(courses);
     }
 
     /**
-     * 查看挑战被挑战数据
+     * countByStudentId
      *
      * @param type
      * @param challengeType
@@ -467,7 +507,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             returnMap.put("isFirst", false);
             Gauntlet gauntlet = gauntlets.get(0);
             Long courseId = gauntlet.getCourseId();
-            Course course = simpleCourseMapper.selectById(courseId);
+            CourseNew course = courseNewMapper.selectById(courseId);
             returnMap.put("gold", gauntlet.getBetGold());
             returnMap.put("courseId", courseId);
             returnMap.put("gameName", gauntlet.getChallengeName());
@@ -639,7 +679,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         Map<String, Object> returnMap = new HashMap<>();
         returnMap.put("courseId", gauntlet.getCourseId());
         //查询课程信息
-        Course course = simpleCourseMapper.selectById(gauntlet.getCourseId());
+        CourseNew course = courseNewMapper.selectById(gauntlet.getCourseId());
         if (course == null) {
             returnMap.put("courseName", "单词课程");
         } else {

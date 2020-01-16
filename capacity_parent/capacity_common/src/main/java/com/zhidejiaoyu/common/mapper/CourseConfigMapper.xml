@@ -17,6 +17,10 @@
         id, user_id, course_id, study_model, one_key_learn, type, update_time
     </sql>
 
+    <select id="countByUserIdAndType" parameterType="map" resultType="int">
+        select count(id) from course_config where user_id = #{userId} and type = #{type}
+    </select>
+
     <select id="selectByUserIdAndTypeAndOneKeyLearn" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="base_sql"/>
@@ -24,6 +28,31 @@
         where user_id = #{userId}
         and type = #{type}
         and one_key_learn = #{oneKeyLearn}
+    </select>
+    <select id="selectByUserId" parameterType="map" resultType="long">
+        select
+        config.course_id
+        from course_config config
+        join course_new cou on cou.id=config.course_id
+        where config.user_id = #{userId}
+        and
+        (
+        cou.grade in
+        (
+        <foreach collection="gradeList" separator="," item="grade">
+            #{grade}
+        </foreach>
+        )
+        or
+        cou.grade_ext in (
+        <foreach collection="gradeList" separator="," item="grade">
+            #{grade}
+        </foreach>
+        )
+        )
+        and config.`type` = 2
+        and config.one_key_learn=2
+        and config.study_model like concat('%','1','%')
     </select>
 
 </mapper>
