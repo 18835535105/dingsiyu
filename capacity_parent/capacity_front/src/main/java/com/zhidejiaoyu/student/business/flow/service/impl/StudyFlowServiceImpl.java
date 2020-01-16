@@ -80,6 +80,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     @Resource
     private FinishGroupOrUnit finishGroupOrUnit;
 
+    @Resource
+    private SyntaxUnitMapper syntaxUnitMapper;
+
     /**
      * 节点学完, 把下一节初始化到student_flow表, 并把下一节点返回
      *
@@ -174,8 +177,19 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             studyFlowNew = studyFlowNewMapper.selectById(studentFlowNew.getCurrentFlowId());
             learnNew = learnNewMapper.selectById(studentFlowNew.getLearnId());
         }
-
-        FlowVO vo = this.packageFlowVO(studyFlowNew, student, learnNew.getUnitId());
+        FlowVO vo;
+        if (Objects.equals(studyFlowNew.getFlowName(), FlowConstant.FLOW_SIX)) {
+            Long maxUnitId = syntaxUnitMapper.selectMaxUnitIdByUnitId(learnNew.getUnitId());
+            boolean isLastUnit = Objects.equals(maxUnitId, learnNew.getUnitId());
+            vo = packageFlowVO.packageSyntaxFlowVO(NodeDto.builder()
+                    .student(student)
+                    .unitId(learnNew.getUnitId())
+                    .studyFlowNew(studyFlowNew)
+                    .lastUnit(isLastUnit)
+                    .build());
+        } else {
+            vo = this.packageFlowVO(studyFlowNew, student, learnNew.getUnitId());
+        }
         return ServerResponse.createBySuccess(vo);
     }
 
@@ -194,17 +208,29 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
      */
     @Override
     public ServerResponse<Object> toAnotherFlow(NodeDto dto, int nextFlowId) {
+        FlowVO flowVO;
+        StudyFlowNew nextStudyFlowNew;
 
-        // 判断当前单元单词是否有图片，如果都没有图片不进入单词图鉴
-        // 下个节点数据
-        StudyFlowNew nextStudyFlowNew = this.getStudyFlow(dto, nextFlowId);
+        if (Objects.equals(dto.getStudyFlowNew().getFlowName(), FlowConstant.FLOW_SIX)) {
+            nextStudyFlowNew = studyFlowNewMapper.selectById(nextFlowId);
+            flowVO = packageFlowVO.packageSyntaxFlowVO(NodeDto.builder()
+                    .unitId(dto.getUnitId())
+                    .studyFlowNew(nextStudyFlowNew)
+                    .student(dto.getStudent())
+                    .lastUnit(dto.getLastUnit())
+                    .build());
+        } else {
+            // 判断当前单元单词是否有图片，如果都没有图片不进入单词图鉴
+            // 下个节点数据
+            nextStudyFlowNew = this.getStudyFlow(dto, nextFlowId);
 
-        // 判断当前单元是否含有当前模块的内容，如果没有当前模块的内容学习下个模块的内容
-        FlowVO flowVO = this.judgeHasCurrentModel(nextStudyFlowNew, dto);
+            // 判断当前单元是否含有当前模块的内容，如果没有当前模块的内容学习下个模块的内容
+            flowVO = this.judgeHasCurrentModel(nextStudyFlowNew, dto);
 
-        // 如果不相等，说明是跳模块学习，获取最新的节点信息
-        if (!Objects.equals(nextFlowId, flowVO.getId())) {
-            nextStudyFlowNew = studyFlowNewMapper.selectById(flowVO.getId());
+            // 如果不相等，说明是跳模块学习，获取最新的节点信息
+            if (!Objects.equals((long) nextFlowId, flowVO.getId())) {
+                nextStudyFlowNew = studyFlowNewMapper.selectById(flowVO.getId());
+            }
         }
         // 如果学习模块改变，修改learnNew中的modelType值
         int modelType = FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(nextStudyFlowNew.getFlowName());
@@ -245,11 +271,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             if (this.judgeHasTeksModel(studyFlowNew, dto)) {
                 return this.judgeHasCurrentModel(studyFlowNew, student, dto.getUnitId());
             }
-
-            if (this.judgeHasSyntaxModel(studyFlowNew, dto)) {
-                return this.judgeHasCurrentModel(studyFlowNew, student, dto.getUnitId());
-            }
-
         }
 
         // 句型模块
@@ -263,20 +284,12 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             if (this.judgeHasTeksModel(studyFlowNew, dto)) {
                 return this.judgeHasCurrentModel(studyFlowNew, student, dto.getUnitId());
             }
-
-            if (this.judgeHasSyntaxModel(studyFlowNew, dto)) {
-                return this.judgeHasCurrentModel(studyFlowNew, student, dto.getUnitId());
-            }
         }
 
         // 课文模块
         if (Objects.equals(flowName, FlowConstant.FLOW_FIVE)) {
             Integer teksCount = unitTeksNewMapper.countByUnitIdAndGroup(unitId, group);
             if (teksCount > 0) {
-                return this.judgeHasCurrentModel(studyFlowNew, student, dto.getUnitId());
-            }
-
-            if (this.judgeHasSyntaxModel(studyFlowNew, dto)) {
                 return this.judgeHasCurrentModel(studyFlowNew, student, dto.getUnitId());
             }
         }
@@ -299,24 +312,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     }
 
     /**
-     * 判断当前单元group有没有语法模块
-     *
-     * @param studyFlowNew
-     * @param dto
-     * @return
-     */
-    private boolean judgeHasSyntaxModel(StudyFlowNew studyFlowNew, NodeDto dto) {
-        // 没有句型模块判断是否有语法模块
-        int syntaxCount = syntaxUnitTopicNewMapper.countByUnitIdAndGroup(dto.getUnitId(), dto.getGroup());
-        if (syntaxCount > 0) {
-            // 初始化语法游戏节点
-            studyFlowNew.setId(120L);
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * 判断当前单元group是否有句型模块
      *
      * @param studyFlowNew
@@ -327,7 +322,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         // 没有单词模块判断是否有句型模块
         Integer sentenceCount = unitSentenceNewMapper.countByUnitIdAndGroup(dto.getUnitId(), dto.getGroup());
         if (sentenceCount > 0) {
-            studyFlowNew.setId(85L);
+            studyFlowNew.setId(dto.getEasyOrHard() == 1 ? FlowConstant.SENTENCE_TRANSLATE : FlowConstant.SENTENCE_WRITE);
             return true;
         }
         return false;
@@ -344,7 +339,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         // 没有句型模块判断是否有课文模块
         Integer teksCount = unitTeksNewMapper.countByUnitIdAndGroup(dto.getUnitId(), dto.getGroup());
         if (teksCount > 0) {
-            studyFlowNew.setId(FlowConstant.TEKS_LISTEN);
+            studyFlowNew.setId(dto.getEasyOrHard() == 1 ? FlowConstant.TEKS_LISTEN : FlowConstant.TEKS_TRAINING);
             return true;
         }
         return false;

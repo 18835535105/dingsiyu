@@ -4,14 +4,36 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.SyntaxCourse">
-        <id column="id" property="id" />
-        <result column="study_paragraph" property="studyParagraph" />
-        <result column="grade" property="grade" />
-        <result column="version" property="version" />
-        <result column="label" property="label" />
-        <result column="course_name" property="courseName" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="study_paragraph" property="studyParagraph"/>
+        <result column="grade" property="grade"/>
+        <result column="version" property="version"/>
+        <result column="label" property="label"/>
+        <result column="course_name" property="courseName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
+
+    <sql id="more_table_sql">
+        sc.id, sc.study_paragraph, sc.grade, sc.version, sc.label, sc.course_name, sc.create_time, sc.update_time
+    </sql>
+
+    <select id="selectByCourseNewIds" resultType="java.util.Map" parameterType="map">
+        select
+        sc.id, sc.grade, sc.label, count(su.id) unitCount
+        from syntax_course sc
+        join syntax_unit su on su.course_id = sc.id
+        join course_new cn
+        on (sc.grade = cn.grade or sc.grade = cn.grade_ext) and (sc.label = cn.label or sc.label = cn.label_ext)
+        and cn.id in (
+        <foreach collection="courseIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+        group by sc.id
+        order by su.id asc
+
+    </select>
+
 
 </mapper>

@@ -24,8 +24,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"study_flow_new"};
-
+        String[] tableName = {"sys_config"};
 
         /**
          * 配置：

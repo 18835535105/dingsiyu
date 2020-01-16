@@ -8,10 +8,12 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
 import com.zhidejiaoyu.student.business.flow.FlowConstant;
+import com.zhidejiaoyu.student.common.redis.PayLogRedisOpt;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -44,9 +46,6 @@ public class FinishGroupOrUnit {
     private UnitSentenceNewMapper unitSentenceNewMapper;
 
     @Resource
-    private SyntaxUnitTopicNewMapper syntaxUnitTopicNewMapper;
-
-    @Resource
     private UnitTeksNewMapper unitTeksNewMapper;
 
     @Resource
@@ -67,6 +66,15 @@ public class FinishGroupOrUnit {
     @Resource
     private CourseNewMapper courseNewMapper;
 
+    @Resource
+    private PayLogRedisOpt payLogRedisOpt;
+
+    @Resource
+    private UnitNewMapper unitNewMapper;
+
+    @Resource
+    private SyntaxUnitMapper syntaxUnitMapper;
+
     /**
      * 一键学习，学习完当前group
      *
@@ -83,15 +91,21 @@ public class FinishGroupOrUnit {
 
         // 删除当前学习记录
         this.deleteLearnInfo(dto);
-
-        if (learnNew == null) {
-            // 说明当前单元学习完毕
-            return this.finishUnit(dto);
-        }
-
         studentFlowNewMapper.deleteByLearnId(dto.getLearnNew().getId());
 
-        Long nodeId = dto.getEasyOrHard() == 1 ? FlowConstant.EASY_START : FlowConstant.HARD_START;
+        boolean isEasy = dto.getEasyOrHard() == 1;
+        if (learnNew == null) {
+            // 说明当前单元学习完毕
+            // 学习语法模块
+            FlowVO flowVO = this.toSyntaxFlow(dto, isEasy);
+            if (flowVO != null) {
+                return flowVO;
+            }
+            // 语法模块学习完，学习下一优先级内容
+            return this.finishOneKeyUnit(dto);
+        }
+
+        Long nodeId = isEasy ? FlowConstant.EASY_START : FlowConstant.HARD_START;
         initData.initStudentFlow(NodeDto.builder()
                 .student(dto.getStudent())
                 .nodeId(nodeId)
@@ -100,6 +114,91 @@ public class FinishGroupOrUnit {
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(nodeId);
 
         return packageFlowVO.packageFlowVO(studyFlowNew, dto.getStudent(), dto.getUnitId());
+    }
+
+    private FlowVO toSyntaxFlow(NodeDto dto, boolean isEasy) {
+        if (dto.getLastUnit()) {
+            // 说明当前课程的单元已学习到最后一个单元，获取当前课程下个语法单元节点
+            SyntaxUnit syntaxUnit = syntaxUnitMapper.selectNextUnitByCourseId(dto.getUnitId(), dto.getCourseId());
+            if (syntaxUnit != null) {
+                StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(isEasy ? FlowConstant.SYNTAX_GAME : FlowConstant.SYNTAX_WRITE);
+                return this.getSyntaxFlowVo(NodeDto.builder()
+                        .student(dto.getStudent())
+                        .easyOrHard(isEasy ? 1 : 2)
+                        .lastUnit(true)
+                        .studyFlowNew(studyFlowNew)
+                        .build(), syntaxUnit);
+            }
+        } else {
+
+            // 将当前单元的已学习记录状态置为已完成
+            learnHistoryMapper.updateStateByStudentIdAndUnitId(dto.getStudent().getId(), dto.getUnitId(), 2);
+
+            // 获取当前单词对应的语法课程
+            SyntaxUnit syntaxUnit = this.getSyntaxUnit(dto);
+            if (syntaxUnit == null) {
+                return null;
+            }
+
+            UnitNew unitNew = unitNewMapper.selectMaxUnitByCourseId(dto.getCourseId());
+
+            boolean isLastUnit = Objects.equals(dto.getUnitId(), unitNew.getId());
+
+            StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(isEasy ? FlowConstant.SYNTAX_GAME : FlowConstant.SYNTAX_WRITE);
+
+            return this.getSyntaxFlowVo(NodeDto.builder()
+                    .student(dto.getStudent())
+                    .easyOrHard(isEasy ? 1 : 2)
+                    .lastUnit(isLastUnit)
+                    .studyFlowNew(studyFlowNew)
+                    .build(), syntaxUnit);
+        }
+        return null;
+    }
+
+    private FlowVO getSyntaxFlowVo(NodeDto dto, SyntaxUnit syntaxUnit) {
+        Student student = dto.getStudent();
+        Long syntaxUnitId = syntaxUnit.getId();
+        Long syntaxCourseId = syntaxUnit.getCourseId();
+        StudyFlowNew studyFlowNew = dto.getStudyFlowNew();
+
+        LearnNew learnNew = initData.saveLearnNew(NodeDto.builder()
+                .student(student)
+                .easyOrHard(dto.getEasyOrHard())
+                .unitId(syntaxUnitId)
+                .courseId(syntaxCourseId)
+                .build(), 1, 4);
+
+        initData.initStudentFlow(NodeDto.builder()
+                .nodeId(studyFlowNew.getId())
+                .learnNew(learnNew)
+                .modelType(1)
+                .build());
+
+        return packageFlowVO.packageSyntaxFlowVO(NodeDto.builder()
+                .studyFlowNew(studyFlowNew)
+                .student(student)
+                .unitId(syntaxUnitId)
+                .lastUnit(dto.getLastUnit())
+                .build());
+    }
+
+    private SyntaxUnit getSyntaxUnit(NodeDto dto) {
+        CourseNew courseNew = courseNewMapper.selectById(dto.getCourseId());
+        if (courseNew == null) {
+            return null;
+        }
+
+        UnitNew unitNew = unitNewMapper.selectById(dto.getUnitId());
+        String grade = courseNew.getGrade();
+        String label = courseNew.getLabel();
+        String jointNameLike = "(" +
+                (StringUtils.isEmpty(grade) ? courseNew.getGradeExt() : grade) +
+                "-" +
+                (StringUtils.isEmpty(label) ? courseNew.getLabelExt() : label) +
+                ")-" +
+                unitNew.getUnitName();
+        return syntaxUnitMapper.selectIdLikeJointName(jointNameLike);
     }
 
     /**
@@ -120,25 +219,77 @@ public class FinishGroupOrUnit {
         Long learnNewId = dto.getLearnNew().getId();
         learnExtendMapper.deleteByLearnId(learnNewId);
         learnNewMapper.deleteById(learnNewId);
+        studentFlowNewMapper.deleteByLearnId(learnNewId);
+
+        Student student = dto.getStudent();
 
         if (learnNew == null) {
-            // 说明当前单元学习完毕
-            this.finishUnit(dto);
-            return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
-        }
 
-        studentFlowNewMapper.deleteByLearnId(learnNewId);
+            // 将当前单元的已学习记录状态置为已完成
+            learnHistoryMapper.updateStateByStudentIdAndUnitId(student.getId(), dto.getUnitId(), 2);
+
+            boolean isPaid = payLogRedisOpt.isPaid(student.getId());
+            if (!isPaid) {
+                // 学生没有充值，不修改优先级
+                return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
+            }
+            // 说明当前单元学习完毕
+            return finishFreeUnit(dto, student);
+        }
 
         Long startFlowId = this.getStartFlowId(dto.getEasyOrHard(), dto.getModelType());
         initData.initStudentFlow(NodeDto.builder()
-                .student(dto.getStudent())
+                .student(student)
                 .nodeId(startFlowId)
                 .learnNew(learnNew)
                 .build());
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(startFlowId);
 
-        FlowVO flowVO = packageFlowVO.packageFlowVO(studyFlowNew, dto.getStudent(), dto.getUnitId());
+        FlowVO flowVO = packageFlowVO.packageFlowVO(studyFlowNew, student, dto.getUnitId());
         return ServerResponse.createBySuccess(flowVO);
+    }
+
+    /**
+     * 自由学习单元学习完毕
+     *
+     * @param dto
+     * @param student
+     * @return
+     */
+    public ServerResponse<Object> finishFreeUnit(NodeDto dto, Student student) {
+        if (Objects.equals(dto.getStudyFlowNew().getFlowName(), FlowConstant.FLOW_SIX)) {
+            return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
+        }
+        StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(student.getId(), dto.getUnitId(), dto.getEasyOrHard());
+        if (studentStudyPlanNew == null) {
+            CourseNew courseNew = courseNewMapper.selectByUnitId(dto.getUnitId());
+            // 说明当前课程还没有优先级，初始化当前课程的优先级
+            int basePriority = PriorityUtil.getBasePriority(student.getGrade(), courseNew.getGrade(), 0);
+            int timePriority = PriorityUtil.BASE_TIME_PRIORITY;
+
+            boolean isEasy = dto.getEasyOrHard() == 1;
+            studentStudyPlanNewMapper.insert(StudentStudyPlanNew.builder()
+                    .studentId(student.getId())
+                    .complete(1)
+                    .courseId(courseNew.getId())
+                    .currentStudyCount(1)
+                    .errorLevel(1)
+                    .group(0)
+                    .timeLevel(timePriority)
+                    .totalStudyCount(1)
+                    .updateTime(new Date())
+                    .unitId(dto.getUnitId())
+                    .finalLevel(isEasy ? basePriority + 1 + timePriority : basePriority - PriorityUtil.HARD_NUM + 1 + timePriority)
+                    .baseLevel(isEasy ? basePriority : basePriority - PriorityUtil.HARD_NUM)
+                    .easyOrHard(dto.getEasyOrHard())
+                    .flowId(isEasy ? FlowConstant.EASY_START : FlowConstant.HARD_START)
+                    .build());
+        } else {
+            // 已有当前课程的优先级，更新优先级
+            this.updateLevel(dto, studentStudyPlanNew);
+        }
+
+        return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
     }
 
     /**
@@ -149,15 +300,16 @@ public class FinishGroupOrUnit {
      * @return
      */
     public Long getStartFlowId(Integer easyOrHard, Integer type) {
+        boolean isEasy = Objects.equals(easyOrHard, 1);
         switch (type) {
             case 2:
-                return Objects.equals(easyOrHard, 1) ? FlowConstant.FREE_PLAYER : FlowConstant.FREE_LETTER_WRITE;
+                return isEasy ? FlowConstant.FREE_PLAYER : FlowConstant.FREE_LETTER_WRITE;
             case 3:
-                return Objects.equals(easyOrHard, 1) ? FlowConstant.FREE_SENTENCE_TRANSLATE : FlowConstant.FREE_SENTENCE_WRITE;
+                return isEasy ? FlowConstant.FREE_SENTENCE_TRANSLATE : FlowConstant.FREE_SENTENCE_WRITE;
             case 4:
-                return Objects.equals(easyOrHard, 1) ? FlowConstant.FREE_TEKS_LISTEN : FlowConstant.FREE_TEKS_TRAIN;
+                return isEasy ? FlowConstant.FREE_TEKS_LISTEN : FlowConstant.FREE_TEKS_TRAIN;
             case 5:
-                return Objects.equals(easyOrHard, 1) ? FlowConstant.FREE_SYNTAX_GAME : FlowConstant.FREE_SYNTAX_WRITE;
+                return isEasy ? FlowConstant.FREE_SYNTAX_GAME : FlowConstant.FREE_SYNTAX_WRITE;
             default:
                 return null;
         }
@@ -192,9 +344,6 @@ public class FinishGroupOrUnit {
                 break;
             case 4:
                 newGroup = unitTeksNewMapper.selectNextGroup(unitId, group);
-                break;
-            case 5:
-                newGroup = syntaxUnitTopicNewMapper.selectNextGroup(unitId, group);
                 break;
             default:
         }
@@ -236,21 +385,16 @@ public class FinishGroupOrUnit {
             return initData.saveLearnNew(dto, group, 3);
         }
 
-        group = syntaxUnitTopicNewMapper.selectNextGroup(dto.getUnitId(), dto.getGroup());
-        if (group != null) {
-            return initData.saveLearnNew(dto, group, 4);
-        }
-
         return null;
     }
 
     /**
-     * 单元完成操作
+     * 一键学习单元完成操作
      *
      * @param dto
      * @return
      */
-    private FlowVO finishUnit(NodeDto dto) {
+    private FlowVO finishOneKeyUnit(NodeDto dto) {
 
         // 更新优先级表中的变化优先级
         StudentStudyPlanNew oldMaxFinalLevel = this.getMaxFinalLevelStudentStudyPlanNew(dto);
@@ -271,8 +415,6 @@ public class FinishGroupOrUnit {
 
         // 将当前单元的已学习记录状态置为已完成
         learnHistoryMapper.updateStateByStudentIdAndUnitId(studentId, dto.getUnitId(), 2);
-
-        studentFlowNewMapper.deleteByLearnId(dto.getLearnNew().getId());
 
         initData.initStudentFlow(NodeDto.builder()
                 .student(dto.getStudent())
@@ -334,19 +476,30 @@ public class FinishGroupOrUnit {
      * @param dto
      */
     private void judgeHasCurrentGroup(NodeDto dto) {
-        Long unitId = dto.getUnitId();
-        Integer group = dto.getGroup();
-        Integer count = unitVocabularyNewMapper.countUnitIdAndGroup(unitId, group);
-        initData.saveOrUpdateOneKeyLearnHistory(dto, count, 1);
+        if (Objects.equals(dto.getStudyFlowNew().getFlowName(), FlowConstant.FLOW_SIX)) {
+            SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(dto.getUnitId());
+            if (syntaxUnit != null) {
+                initData.saveOrUpdateOneKeyLearnHistory(NodeDto.builder()
+                        .student(dto.getStudent())
+                        .unitId(syntaxUnit.getId())
+                        .courseId(syntaxUnit.getCourseId())
+                        .group(1)
+                        .easyOrHard(dto.getEasyOrHard())
+                        .build(), 1, 3);
+            }
+        } else {
+            Long unitId = dto.getUnitId();
+            Integer group = dto.getGroup();
+            Integer count = unitVocabularyNewMapper.countUnitIdAndGroup(unitId, group);
+            initData.saveOrUpdateOneKeyLearnHistory(dto, count, 1);
 
-        count = unitSentenceNewMapper.countByUnitIdAndGroup(unitId, group);
-        initData.saveOrUpdateOneKeyLearnHistory(dto, count, 2);
+            count = unitSentenceNewMapper.countByUnitIdAndGroup(unitId, group);
+            initData.saveOrUpdateOneKeyLearnHistory(dto, count, 2);
 
-        count = syntaxUnitTopicNewMapper.countByUnitIdAndGroup(unitId, group);
-        initData.saveOrUpdateOneKeyLearnHistory(dto, count, 3);
+            count = unitTeksNewMapper.countByUnitIdAndGroup(unitId, group);
+            initData.saveOrUpdateOneKeyLearnHistory(dto, count, 4);
+        }
 
-        count = unitTeksNewMapper.countByUnitIdAndGroup(unitId, group);
-        initData.saveOrUpdateOneKeyLearnHistory(dto, count, 4);
     }
 
 

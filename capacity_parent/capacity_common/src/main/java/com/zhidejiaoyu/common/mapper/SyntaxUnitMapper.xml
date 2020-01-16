@@ -16,6 +16,10 @@
         su.id, su.course_id, su.unit_name, su.joint_name, su.unit_index, su.update_time
     </sql>
 
+    <sql id="base_sql">
+        id, course_id, unit_name, joint_name, unit_index, update_time
+    </sql>
+
     <select id="selectUnitIdByCourseId" resultType="long" parameterType="long">
         select id
         from syntax_unit
@@ -30,6 +34,21 @@
         select course_id
         from syntax_unit
         where id = #{unitId}
+        limit 1
+    </select>
+    <select id="selectIdLikeJointName" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from syntax_unit
+        where joint_name like concat('%', #{jointName}, '%')
+    </select>
+    <select id="selectNextUnitByCourseId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from syntax_unit
+        where course_id = #{courseId}
+        and id > #{unitId}
+        order by id desc
         limit 1
     </select>
 

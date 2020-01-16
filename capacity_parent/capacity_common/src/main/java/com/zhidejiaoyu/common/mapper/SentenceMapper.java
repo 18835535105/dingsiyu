@@ -2,9 +2,8 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Sentence;
-import com.zhidejiaoyu.common.pojo.Vocabulary;
-import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -110,14 +109,6 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
      * @return
      */
     Sentence selectByPrimaryKey(Long exampleId);
-
-    /**
-     * 根据单词英文查找例句集合
-     *
-     * @param words 单词英文集合
-     * @return
-     */
-    List<Sentence> selectByWords(@Param("words") List<String> words);
 
     /**
      * 新增主建返回

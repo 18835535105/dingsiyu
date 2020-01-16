@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.business.flow.common;
 
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.dto.NodeDto;
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.StudyFlowNewMapper;
 import com.zhidejiaoyu.common.pojo.StudyFlowNew;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -58,6 +59,9 @@ public class JudgeNextNode {
             }
 
             Long grade = dto.getGrade();
+            if (grade == null) {
+                throw new ServiceException("参数grade=null!");
+            }
             if (grade >= studyFlowNew.getType()) {
                 return studyFlowService.toAnotherFlow(dto, studyFlowNew.getNextTrueFlow());
             } else if (grade < studyFlowNew.getType()) {

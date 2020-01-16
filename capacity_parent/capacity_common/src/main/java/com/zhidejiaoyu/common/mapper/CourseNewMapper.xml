@@ -9,7 +9,7 @@
         <result column="grade" property="grade"/>
         <result column="version" property="version"/>
         <result column="label" property="label"/>
-        <result column="gradeExt" property="gradeExt"/>
+        <result column="grade_ext" property="gradeExt"/>
         <result column="picture_url" property="pictureUrl"/>
         <result column="course_name" property="courseName"/>
         <result column="label_ext" property="labelExt"/>
@@ -18,6 +18,16 @@
         <result column="update_time" property="updateTime"/>
         <result column="delStatus" property="delStatus"/>
     </resultMap>
+
+    <sql id="base_sql">
+        id, study_paragraph, grade, version, label, grade_ext, picture_url, course_name, label_ext, `status`, create_time, update_time, delStatus
+    </sql>
+
+    <sql id="more_table_sql">
+        cn.id, cn.study_paragraph, cn.grade, cn.version, cn.label, cn.grade_ext, cn.picture_url, cn.course_name,
+        cn.label_ext, cn.status, cn.create_time, cn.update_time, cn.delStatus
+    </sql>
+
     <select id="selectGradeByCourseId" resultType="string" parameterType="map">
         select if(grade_ext = null or grade_ext = '', grade_ext, grade)
         from course_new
@@ -50,24 +60,19 @@
     <select id="countUnitByIds" resultType="java.util.Map" parameterType="map">
         select c.id courseId, count(distinct u.id) count
         from course_new c
-        left join unit_new u on c.id = u.course_id
+        join unit_new u on c.id = u.course_id
         <!--含有单词的课程-->
         <if test="type == 1">
-            left join unit_vocabulary_new uvn on uvn.unit_id = u.id
+            join unit_vocabulary_new uvn on uvn.unit_id = u.id
         </if>
         <!--含有句型的课程-->
         <if test="type == 2">
-            left join unit_sentence_new uvn on uvn.unit_id = u.id
-        </if>
-
-        <!--含有语法的课程-->
-        <if test="type == 3">
-            left join syntax_unit_topic_new sutn on uvn.unit_id = u.id
+            join unit_sentence_new uvn on uvn.unit_id = u.id
         </if>
 
         <!--含有课文的课程-->
         <if test="type == 4">
-            left join unit_teks_new uvn on uvn.unit_id = u.id
+            join unit_teks_new uvn on uvn.unit_id = u.id
         </if>
         and c.id in (
         <foreach collection="courseIds" separator="," item="courseId">
@@ -75,6 +80,13 @@
         </foreach>
         )
         group by course_id
+    </select>
+    <select id="selectByUnitId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from course_new cn
+        join unit_new un on cn.id = un.course_id and un.id = #{unitId}
+        limit 1
     </select>
 
 

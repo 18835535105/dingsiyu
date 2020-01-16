@@ -68,6 +68,28 @@ public class PriorityUtil {
     }
 
     /**
+     * 获取变化优先级
+     *
+     * @param errorCount   错题数
+     * @param basePriority 基础优先级
+     * @param grade        学生当前年级
+     * @param wordInGrade  测试的单词所在年级
+     * @return
+     */
+    public static int getErrorPriority(int errorCount, int basePriority, String grade, String wordInGrade) {
+        switch (errorCount) {
+            case 1:
+                return basePriority + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 197;
+            case 2:
+                return basePriority + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 200;
+            case 3:
+                return basePriority + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 203;
+            default:
+                return basePriority;
+        }
+    }
+
+    /**
      * 年级转换为对应的数字
      */
     private static void initGradeToNum() {

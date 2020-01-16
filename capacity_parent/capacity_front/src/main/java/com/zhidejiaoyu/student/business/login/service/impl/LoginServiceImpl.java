@@ -274,7 +274,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             return ServerResponse.createByErrorMessage("原密码输入错误！");
         }
         student.setPassword(password);
-        int state = studentMapper.updateByPrimaryKeySelective(student);
+        int state = studentMapper.updateById(student);
         if (state == 1) {
             session.setAttribute(UserConstant.CURRENT_STUDENT, student);
             return ServerResponse.createBySuccessMessage("修改成功");

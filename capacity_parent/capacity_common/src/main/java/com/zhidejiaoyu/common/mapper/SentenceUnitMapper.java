@@ -35,5 +35,5 @@ public interface SentenceUnitMapper extends BaseMapper<SentenceUnit> {
      * @param unitId 单元id
      * @return
      */
-    Long getCourseIdByunitId(@Param("unitId") Integer unitId);
+    Long getCourseIdById(@Param("unitId") Integer unitId);
 }

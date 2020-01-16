@@ -2,16 +2,20 @@ package com.zhidejiaoyu.student.business.index.controller;
 
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.index.dto.UnitInfoDTO;
 import com.zhidejiaoyu.student.business.index.service.IndexCourseInfoService;
 import com.zhidejiaoyu.student.business.index.service.IndexService;
 import com.zhidejiaoyu.student.business.index.vo.course.CourseInfoVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 /**
  * 单词首页面数据展示
@@ -19,6 +23,7 @@ import javax.servlet.http.HttpSession;
  * @author: wuchenxi
  * @date: 2019/12/21 14:25:25
  */
+@Validated
 @Slf4j
 @RestController
 @RequestMapping("/index")
@@ -78,12 +83,11 @@ public class IndexController {
     /**
      * 获取当前单元下所有单元信息
      *
-     * @param courseId
-     * @param type     1：单词；2：句型；3：语法；4：课文
+     * @param dto
      * @return
      */
     @GetMapping("/getUnitInfo")
-    public ServerResponse<Object> getUnitInfo(Long courseId, Integer type) {
-        return indexCourseInfoService.getUnitInfo(courseId, type);
+    public ServerResponse<Object> getUnitInfo(@Valid UnitInfoDTO dto, BindingResult result) {
+        return indexCourseInfoService.getUnitInfo(dto);
     }
 }

@@ -19,7 +19,6 @@ import com.zhidejiaoyu.common.vo.syntax.game.GameSelect;
 import com.zhidejiaoyu.common.vo.syntax.game.GameVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.TestServiceImpl;
-import com.zhidejiaoyu.student.business.syntax.learnmodel.LearnModelInfo;
 import com.zhidejiaoyu.student.business.syntax.service.SyntaxGameService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -64,13 +63,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     private PetSayUtil petSayUtil;
 
     @Resource
-    private LearnModelInfo learnModelInfo;
-
-    @Resource
     private StudentStudyPlanMapper studentStudyPlanMapper;
-
-    @Resource
-    private UnitNewMapper unitNewMapper;
 
     @Override
     public ServerResponse<Object> getSyntaxGame(Long unitId) {
@@ -145,8 +138,8 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     private List<SyntaxTopic> getSyntaxTopics(Long unitId) {
         List<SyntaxTopic> syntaxTopics = syntaxTopicMapper.selectSelectSyntaxByUnitId(unitId);
         if (CollectionUtils.isEmpty(syntaxTopics)) {
-            UnitNew unitNew = unitNewMapper.selectById(unitId);
-            log.error("语法单元[{} - {}]没有没有选语法题目！", unitNew.getId(), unitNew.getJointName());
+            SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
+            log.error("语法单元[{} - {}]没有没有选语法题目！", syntaxUnit.getId(), syntaxUnit.getJointName());
             throw new ServiceException(500, "未查询到游戏题目！");
         }
         List<SyntaxTopic> result = new ArrayList<>(syntaxTopics);
@@ -187,7 +180,6 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
         } else {
             studentStudySyntax.setModel(this.getNextModelNotFirstLearn(testRecord));
             studentStudySyntaxMapper.updateById(studentStudySyntax);
-            learnModelInfo.updateLearnType(studentStudySyntax);
         }
 
         TestResultVo vo = this.getTestResultVo(testRecord, student, isFirst);

@@ -317,26 +317,26 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
 
             String unitGrade = unitIdAndGrade.get(unitId);
             timePriority = this.getTimePriority(timePriority, phaseSet, unitGrade);
-
             int basePriority = this.getBasePriority(unitIdMap, unitGrade, grade, unitId);
-            int finalLevel = basePriority + 1 + timePriority;
+            int errorPriority = this.getErrorPriority(unitIdMap, unitGrade, grade, unitId, basePriority);
+
             StudentStudyPlanNew.StudentStudyPlanNewBuilder studentStudyPlanNewBuilder = StudentStudyPlanNew.builder()
                     .studentId(student.getId())
                     .complete(1)
                     .courseId(unitIdAndCourseId.get(unitId))
                     .currentStudyCount(1)
-                    .errorLevel(1)
+                    .errorLevel(errorPriority)
                     .group(0)
                     .timeLevel(timePriority)
                     .totalStudyCount(1)
                     .updateTime(updateTime)
-                    .unitId(unitId)
-                    .finalLevel(finalLevel);
+                    .unitId(unitId);
 
             StudentStudyPlanNew easyStudentStudyPlan = studentStudyPlanNewBuilder
                     .easyOrHard(1)
                     .baseLevel(basePriority)
                     .flowId(FlowConstant.EASY_START)
+                    .finalLevel(basePriority + errorPriority + timePriority)
                     .build();
             studentStudyPlanNews.add(easyStudentStudyPlan);
 
@@ -344,6 +344,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
                     .easyOrHard(2)
                     .baseLevel(basePriority - PriorityUtil.HARD_NUM)
                     .flowId(FlowConstant.HARD_START)
+                    .finalLevel(basePriority - PriorityUtil.HARD_NUM + errorPriority + timePriority)
                     .build();
             studentStudyPlanNews.add(hardStudentStudyPlan);
         }
@@ -408,6 +409,26 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         // 答错个数
         long errorCount = unitIdMap.get(unitId).get(0).getErrorCount();
         return PriorityUtil.getBasePriority(grade, unitGrade, (int) errorCount);
+    }
+
+    /**
+     * 获取变化优先级
+     *
+     * @param unitIdMap
+     * @param unitGrade    测试题所在年级
+     * @param grade        学生当前所在年级
+     * @param unitId
+     * @param basePriority
+     * @return
+     */
+    public int getErrorPriority(Map<Long, List<SaveSubjectsDTO.Result>> unitIdMap, String unitGrade,
+                                String grade, Long unitId, int basePriority) {
+        if (!unitIdMap.containsKey(unitId)) {
+            return PriorityUtil.getErrorPriority(0, basePriority, grade, unitGrade);
+        }
+        // 答错个数
+        long errorCount = unitIdMap.get(unitId).get(0).getErrorCount();
+        return PriorityUtil.getErrorPriority((int) errorCount, basePriority, grade, unitGrade);
     }
 
     /**

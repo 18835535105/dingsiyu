@@ -1,7 +1,5 @@
 package com.zhidejiaoyu.common.study.memorydifficulty;
 
-import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
-import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.mapper.LearnExtendMapper;
 import com.zhidejiaoyu.common.mapper.LearnNewMapper;
 import com.zhidejiaoyu.common.pojo.LearnNew;
@@ -10,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Objects;
 
 /**
  * 获取语法的记忆难度
@@ -41,7 +38,7 @@ public class SyntaxMemoryDifficulty extends CheckMemoryDifficultyParam implement
         //获取当前learnId
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studyCapacity.getStudentId(), studyCapacity.getUnitId(), easyOrHard,4);
         // 获取当前学习次数
-        Integer studyCount=learnExtendMapper.selectCountByLearnIdAndWordIdAndType(learnNew.getId(),studyCapacity.getWordId(),studyCapacity.getType());
+        Integer studyCount=learnExtendMapper.countByLearnIdAndWordIdAndType(learnNew.getId(),studyCapacity.getWordId());
         if (studyCapacity.getFaultTime() > studyCount) {
             studyCount = studyCapacity.getFaultTime() + 1;
         }

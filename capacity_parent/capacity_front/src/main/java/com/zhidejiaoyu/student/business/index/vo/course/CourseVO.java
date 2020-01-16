@@ -35,23 +35,9 @@ public class CourseVO implements Serializable {
     private String grade;
 
     /**
-     * 进入的模块，null进入游戏
-     */
-    private String model;
-
-    private Long unitId;
-
-    /**
      * 战斗进度
      */
     private Integer combatProgress;
-
-    /**
-     * 单元序号
-     */
-    private Integer unitIndex;
-
-    private String unitName;
 
     /**
      * 1，未战斗 2，正在战斗 3，已完成

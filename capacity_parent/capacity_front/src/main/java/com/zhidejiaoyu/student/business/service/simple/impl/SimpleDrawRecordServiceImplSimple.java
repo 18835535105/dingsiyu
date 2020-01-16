@@ -11,12 +11,12 @@ import com.zhidejiaoyu.student.business.service.simple.SimpleConsumeServiceSimpl
 import com.zhidejiaoyu.student.business.service.simple.SimpleDrawRecordServiceSimple;
 import com.zhidejiaoyu.student.business.service.simple.SimpleStudentSkinServiceSimple;
 import com.zhidejiaoyu.student.business.service.simple.SimpleSyntheticRewardsListServiceSimple;
-import com.zhidejiaoyu.student.common.SaveRunLog;
-import com.zhidejiaoyu.student.common.redis.RedisOpt;
+import com.zhidejiaoyu.student.common.redis.AwardRedisOpt;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -44,8 +44,6 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
     @Autowired
     private SimpleConsumeServiceSimple consumeService;
     @Autowired
-    private SimpleRunLogMapper runLogMapper;
-    @Autowired
     private SimpleSyntheticRewardsListMapper synMapper;
     @Autowired
     private SimpleExhumationMapper simpleExhumationMapper;
@@ -53,10 +51,9 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
     private SimpleConsumeMapper simpleConsumeMapper;
     @Autowired
     private SimpleStudentMapper simpleStudentMapper;
-    @Autowired
-    private RedisOpt redisOpt;
-    @Autowired
-    private SaveRunLog saveRunLog;
+
+    @Resource
+    private AwardRedisOpt awardRedisOpt;
 
 
     @Override
@@ -111,12 +108,11 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
                     // 初始值
                     final int[] init = {1750, 1236, 1236, 1750, 1750, 1236, 1236};
                     returnSize = init[type - 1];
-                    redisOpt.addDrawRecordIndex(name, returnSize);
                 } else {
                     // 当天不是第一位抽奖人，在原奖品类型基础上加上随机数
-                    returnSize = redisOpt.selDrawRecordIndex(name) + random.nextInt(100);
-                    redisOpt.addDrawRecordIndex(name, returnSize);
+                    returnSize = awardRedisOpt.selDrawRecordIndex(name) + random.nextInt(100);
                 }
+                awardRedisOpt.addDrawRecordIndex(name, returnSize);
             } else if (type >= 8 && type <= 17) {
                 List<String> names = new ArrayList<>(10);
                 for (int i = 8; i <= 17; i++) {
@@ -125,11 +121,10 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
                 size = simpleDrawRecordMapper.selDrawSizes(names, date);
                 if (size == 1) {
                     returnSize = 87;
-                    redisOpt.addDrawRecordIndex("美丽印记", returnSize);
                 } else {
-                    returnSize = redisOpt.selDrawRecordIndex("美丽印记") + random.nextInt(100);
-                    redisOpt.addDrawRecordIndex("美丽印记", returnSize);
+                    returnSize = awardRedisOpt.selDrawRecordIndex("美丽印记") + random.nextInt(100);
                 }
+                awardRedisOpt.addDrawRecordIndex("美丽印记", returnSize);
             } else if (type >= 18 && type <= 27) {
                 List<String> names = new ArrayList<>(10);
                 for (int i = 18; i <= 27; i++) {
@@ -138,10 +133,10 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
                 size = simpleDrawRecordMapper.selDrawSizes(names, date);
                 if (size == 1) {
                     returnSize = 87;
-                    redisOpt.addDrawRecordIndex("觉醒手套", returnSize);
+                    awardRedisOpt.addDrawRecordIndex("觉醒手套", returnSize);
                 } else {
-                    returnSize = redisOpt.selDrawRecordIndex("觉醒手套") + random.nextInt(100);
-                    redisOpt.addDrawRecordIndex("觉醒手套", returnSize);
+                    returnSize = awardRedisOpt.selDrawRecordIndex("觉醒手套") + random.nextInt(100);
+                    awardRedisOpt.addDrawRecordIndex("觉醒手套", returnSize);
                 }
             } else if (type >= 28 && type <= 37) {
                 List<String> names = new ArrayList<>(10);
@@ -151,10 +146,10 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
                 size = simpleDrawRecordMapper.selDrawSizes(names, date);
                 if (size == 1) {
                     returnSize = 103;
-                    redisOpt.addDrawRecordIndex("皮肤", returnSize);
+                    awardRedisOpt.addDrawRecordIndex("皮肤", returnSize);
                 } else {
-                    returnSize = redisOpt.selDrawRecordIndex("皮肤") + random.nextInt(100);
-                    redisOpt.addDrawRecordIndex("皮肤", returnSize);
+                    returnSize = awardRedisOpt.selDrawRecordIndex("皮肤") + random.nextInt(100);
+                    awardRedisOpt.addDrawRecordIndex("皮肤", returnSize);
                 }
             }
             resultInt[1] = returnSize;
@@ -193,7 +188,6 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
                 if (type == 2 || type == 6) {
                     //添加金币
                     //金币信息放入runlog中
-                    RunLog runLog;
                     if (type == 2) {
                         consumeService.addConsume(1, 2, session);
                         super.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在抽獎中奖励#" + 2 + "#枚金币");

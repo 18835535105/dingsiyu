@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.student.business.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzService;
+import com.zhidejiaoyu.student.common.redis.AwardRedisOpt;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -56,6 +57,9 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
 
     @Resource
     private RedisOpt redisOpt;
+
+    @Resource
+    private AwardRedisOpt awardRedisOpt;
 
     @Resource
     private SimpleTeacherMapper simpleTeacherMapper;
@@ -1203,7 +1207,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
         if (checkPort(port)) {
             return;
         }
-        redisOpt.delDrawRecord();
+        awardRedisOpt.delDrawRecord();
     }
 
 }

@@ -49,7 +49,7 @@ public interface LearnExtendMapper extends BaseMapper<LearnExtend> {
      * @return
      */
     List<Long> selectByUnitIdAndStudentIdAndType(@Param("unitId") Long unitId, @Param("studentId") Long studentId,
-                                                 @Param("type") String studyModel,@Param("modelType")Integer modelType);
+                                                 @Param("type") String studyModel, @Param("modelType") Integer modelType);
 
     /**
      * 获取当前模块的所有数据
@@ -82,12 +82,18 @@ public interface LearnExtendMapper extends BaseMapper<LearnExtend> {
      *
      * @param learnId
      * @param wordId
-     * @param type
      * @return
      */
-    Integer selectCountByLearnIdAndWordIdAndType(@Param("learnId") Long learnId, @Param("wordId") Long wordId, @Param("type") Integer type);
+    Integer countByLearnIdAndWordIdAndType(@Param("learnId") Long learnId, @Param("wordId") Long wordId);
 
-    LearnExtend selectByLearnIdAndWordIdAndType(@Param("learnId") Long learnId, @Param("wordId") Long wordId, @Param("type") Integer type);
+    /**
+     * 查询已学习的数据
+     *
+     * @param learnId
+     * @param wordId
+     * @return
+     */
+    LearnExtend selectByLearnIdAndWordIdAndType(@Param("learnId") Long learnId, @Param("wordId") Long wordId);
 
     /**
      * 查询指定单词的学习次数
@@ -97,4 +103,14 @@ public interface LearnExtendMapper extends BaseMapper<LearnExtend> {
      * @return
      */
     Integer selectStudyCount(@Param("studyCapacity") StudyCapacity studyCapacity, @Param("studyModel") String studyModel);
+
+    /**
+     * 统计学生当前单元学习的语法内容
+     *
+     * @param studentId
+     * @param unitId
+     * @param studyModel 语法模块
+     * @return
+     */
+    int countLearnedSyntax(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("studyModel") String studyModel);
 }

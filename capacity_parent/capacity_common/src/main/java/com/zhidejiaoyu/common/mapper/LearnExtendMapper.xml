@@ -39,17 +39,17 @@
     <select id="selectByUnitIdAndStudentIdAndType" parameterType="map" resultType="long">
         select distinct extend.word_id
         from learn_extend extend
-        join learn_new learn on extend.learn_id = learn.id
+                 join learn_new learn on extend.learn_id = learn.id
 
         where learn.student_id = #{studentId}
           and learn.unit_id = #{unitId}
           and extend.study_model = #{type}
-          and model_type =#{modelType}
+          and model_type = #{modelType}
     </select>
 
     <select id="selectByLearnIdsAndWordIdAndStudyModel" parameterType="map" resultMap="BaseResultMap">
         select
-        <include refid="base_sql"></include>
+        <include refid="base_sql"/>
         from learn_extend
         where learn_id =#{learnId}
         and word_id=#{wordId}
@@ -79,22 +79,20 @@
         limit #{start}, #{end}
     </select>
 
-    <select id="selectCountByLearnIdAndWordIdAndType" parameterType="map" resultType="int">
+    <select id="countByLearnIdAndWordIdAndType" parameterType="map" resultType="int">
         select count(id)
         from learn_extend
         where word_id = #{wordId}
           and learn_id = #{learnId}
-          and `type` = #{type}
     </select>
 
     <select id="selectByLearnIdAndWordIdAndType" parameterType="map" resultMap="BaseResultMap">
         select
-        <include refid="base_sql"></include>
+        <include refid="base_sql"/>
         from learn_extend
         where word_id =#{wordId}
         and learn_id=#{learnId}
-        and `type` =#{type}
-        limit 1;
+        limit 1
     </select>
     <select id="selectStudyCount" resultType="java.lang.Integer" parameterType="map">
         select le.study_count
@@ -106,6 +104,14 @@
             and le.study_model = #{studyModel}
             and le.word_id = #{studyCapacity.wordId}
         limit 1
+    </select>
+    <select id="countLearnedSyntax" resultType="java.lang.Integer" parameterType="map">
+        select count(le.id)
+        from learn_new ln
+                 join learn_extend le on ln.id = le.learn_id
+        where ln.student_id = #{studentId}
+          and ln.unit_id = #{unitId}
+          and le.study_model = #{studyModel}
     </select>
 
 

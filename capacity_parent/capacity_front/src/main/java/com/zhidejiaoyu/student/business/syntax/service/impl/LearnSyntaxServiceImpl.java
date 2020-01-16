@@ -1,22 +1,28 @@
 package com.zhidejiaoyu.student.business.syntax.service.impl;
 
-import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.vo.syntax.KnowledgePointVO;
-import com.zhidejiaoyu.common.vo.syntax.LearnSyntaxVO;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
 import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.dto.syntax.SaveSyntaxDTO;
+import com.zhidejiaoyu.common.mapper.KnowledgePointMapper;
+import com.zhidejiaoyu.common.mapper.LearnExtendMapper;
+import com.zhidejiaoyu.common.mapper.LearnNewMapper;
+import com.zhidejiaoyu.common.mapper.SyntaxTopicMapper;
+import com.zhidejiaoyu.common.pojo.KnowledgePoint;
+import com.zhidejiaoyu.common.pojo.LearnNew;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.common.redis.SyntaxRedisOpt;
+import com.zhidejiaoyu.common.vo.syntax.KnowledgePointVO;
+import com.zhidejiaoyu.common.vo.syntax.LearnSyntaxVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
-import com.zhidejiaoyu.student.business.syntax.learnmodel.LearnModelInfo;
 import com.zhidejiaoyu.student.business.syntax.needview.LearnNeedView;
 import com.zhidejiaoyu.student.business.syntax.savelearn.SaveLearnInfo;
 import com.zhidejiaoyu.student.business.syntax.service.LearnSyntaxService;
+import com.zhidejiaoyu.student.common.redis.SyntaxRedisOpt;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,21 +59,17 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
     private LearnNeedView learnNeedView;
 
     @Resource
-    private LearnModelInfo learnModelInfo;
-
-    @Resource
     private LearnExtendMapper learnExtendMapper;
 
-    private Integer easyOrHard = 1;
-
     @Override
-    public ServerResponse getLearnSyntax(Long unitId) {
+    public ServerResponse<Object> getLearnSyntax(Long unitId) {
         HttpUtil.getHttpSession().setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         Student student = super.getStudent(HttpUtil.getHttpSession());
 
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, easyOrHard,4);
-        int plan = learnExtendMapper.countLearnWord(student.getId(), unitId, learnNew.getGroup(), SyntaxModelNameConstant.LEARN_SYNTAX);
-        int total = syntaxRedisOpt.getTotalKnowledgePointWithUnitId(unitId, learnNew.getGroup());
+        Integer easyOrHard = 1;
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, easyOrHard, 4);
+        int plan = learnExtendMapper.countLearnedSyntax(student.getId(), unitId, SyntaxModelNameConstant.LEARN_SYNTAX);
+        int total = syntaxRedisOpt.getTotalKnowledgePointWithUnitId(unitId);
 
         // 如果有需要复习的，返回需要复习的数据
         NeedViewDTO dto = NeedViewDTO.builder()
@@ -79,37 +81,35 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                 .group(learnNew.getGroup())
                 .build();
 
-        ServerResponse studyCapacity = learnNeedView.getNeedView(dto);
+        ServerResponse<Object> studyCapacity = learnNeedView.getNeedView(dto);
         if (!Objects.isNull(studyCapacity)) {
             return studyCapacity;
         }
 
         // 如果有可以学习的新知识点，返回新知识点数据
-        ServerResponse knowledgePoint = this.getNewKnowledgePoint(dto);
+        ServerResponse<Object> knowledgePoint = this.getNewKnowledgePoint(dto);
         if (!Objects.isNull(knowledgePoint)) {
             return knowledgePoint;
         }
 
         // 获取没有达到黄金记忆点的生知识点
-        ServerResponse serverResponse = learnNeedView.getNextNotGoldTime(dto);
+        ServerResponse<Object> serverResponse = learnNeedView.getNextNotGoldTime(dto);
         if (!Objects.isNull(serverResponse)) {
             return serverResponse;
         }
-
-       /* // 说明当前单元学语法模块内容都已掌握，进入选语法模块
-        StudentStudySyntax studentStudySyntax = learnModelInfo.packageStudentStudySyntax(unitId, student, SyntaxModelNameConstant.SELECT_SYNTAX);
-        learnModelInfo.updateLearnType(studentStudySyntax);*/
 
         return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse saveLearnSyntax(Learn learn, Boolean known,Long flowId) {
+    public ServerResponse<Object> saveLearnSyntax(SaveSyntaxDTO dto) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
-        learn.setStudentId(student.getId());
-        learn.setStudyModel(SyntaxModelNameConstant.LEARN_SYNTAX);
-        return saveLearnInfo.saveSyntax(student,learn, known, StudyCapacityTypeConstant.LEARN_SYNTAX,easyOrHard,flowId,SyntaxModelNameConstant.LEARN_SYNTAX);
+        dto.setStudent(student);
+        dto.setStudyModel(SyntaxModelNameConstant.LEARN_SYNTAX);
+        dto.setEasyOrHard(1);
+        dto.setType(StudyCapacityTypeConstant.LEARN_SYNTAX);
+        return saveLearnInfo.saveSyntax(dto);
     }
 
     /**
@@ -118,7 +118,7 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
      * @param dto
      * @return
      */
-    private ServerResponse getNewKnowledgePoint(NeedViewDTO dto) {
+    private ServerResponse<Object> getNewKnowledgePoint(NeedViewDTO dto) {
         KnowledgePoint knowledgePoint = knowledgePointMapper.selectNextByUnitId(dto.getStudentId(), dto.getUnitId(), dto.getGroup());
         if (!Objects.isNull(knowledgePoint)) {
             return ServerResponse.createBySuccess(this.packageNewKnowledgePoint(dto, knowledgePoint));

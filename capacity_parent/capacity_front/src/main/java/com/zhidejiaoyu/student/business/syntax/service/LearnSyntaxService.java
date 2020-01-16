@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.business.syntax.service;
 
-import com.zhidejiaoyu.common.pojo.Learn;
+import com.zhidejiaoyu.common.dto.syntax.SaveSyntaxDTO;
 import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.BaseService;
@@ -22,9 +22,8 @@ public interface LearnSyntaxService extends BaseService<SyntaxTopic> {
     /**
      * 保存语法数据
      *
-     * @param learn
-     * @param known 是否知道 true：知道；false：不知道
+     * @param dto
      * @return
      */
-    ServerResponse<Object> saveLearnSyntax(Learn learn, Boolean known, Long flowId);
+    ServerResponse<Object> saveLearnSyntax(SaveSyntaxDTO dto);
 }

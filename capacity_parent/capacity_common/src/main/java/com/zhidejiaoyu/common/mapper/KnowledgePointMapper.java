@@ -20,7 +20,7 @@ public interface KnowledgePointMapper extends BaseMapper<KnowledgePoint> {
      * @param unitId
      * @return
      */
-    int countByUnitId(@Param("unitId") Long unitId, @Param("group") Integer group);
+    int countByUnitId(@Param("unitId") Long unitId);
 
     /**
      * 获取单元下一个可学习的知识点

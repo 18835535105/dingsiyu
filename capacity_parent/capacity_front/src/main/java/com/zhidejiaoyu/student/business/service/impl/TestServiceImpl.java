@@ -39,7 +39,6 @@ import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
 import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.student.business.learn.common.SaveTeksData;
 import com.zhidejiaoyu.student.business.service.TestService;
-import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -56,30 +55,9 @@ import java.util.*;
 @Service
 public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecord> implements TestService {
 
-    /**
-     * 50分
-     */
-    private static final int FIVE = 50;
-    /**
-     * 60分
-     */
-    private static final int SIX = 60;
-    /**
-     * 80分
-     */
-    private static final int PASS = 80;
-    /**
-     * 90分
-     */
-    private static final int NINETY_POINT = 90;
-    /**
-     * 100分
-     */
-    private static final int FULL_MARK = 100;
-
-
     @Autowired
     private SentenceMapper sentenceMapper;
+
     @Resource
     private SaveData saveData;
 
@@ -100,9 +78,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     @Autowired
     private CommonMethod commonMethod;
-
-    @Autowired
-    private SaveTestLearnAndCapacity saveTestLearnAndCapacity;
 
     @Autowired
     private PetSayUtil petSayUtil;
@@ -261,7 +236,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     public ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session, Long unitId) {
 
         Student student = super.getStudent(session);
-        Long studentId = student.getId();
 
         // 判断学生是否已经进行过游戏测试，如果进行过不允许再次进行；否则返回游戏题目
         int count = testRecordMapper.countGameCount(student);
@@ -524,9 +498,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
         vo.setPoint(point);
         testRecordMapper.insert(testRecord);
-        if (point < PASS) {
+        if (point < PointConstant.EIGHTY) {
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
-        } else if (point < NINETY_POINT) {
+        } else if (point < PointConstant.NINETY) {
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
         } else {
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
@@ -708,7 +682,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             studentFlow.setStudentId(student.getId());
             studentFlow.setTimeMachine(0);
             studentFlow.setPresentFlow(1);
-            if (point >= PASS) {
+            if (point >= PointConstant.EIGHTY) {
                 // 流程2
                 studentFlow.setCurrentFlowId(24L);
             } else {
@@ -717,7 +691,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             }
             studentFlowMapper.insert(studentFlow);
         } else {
-            if (point >= PASS) {
+            if (point >= PointConstant.EIGHTY) {
                 // 流程2
                 studentFlow.setCurrentFlowId(24L);
             } else {
@@ -738,7 +712,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     private void createGameTestRecord(TestRecord testRecord, Student student, Map<String, Object> map) {
         testRecord.setExplain("游戏测试次数#1#");
         String msg;
-        if (testRecord.getPoint() >= PASS) {
+        if (testRecord.getPoint() >= PointConstant.EIGHTY) {
             msg = "恭喜你旗开得胜，祝未来勇闯天涯！";
             map.put("tip", msg);
             testRecord.setExplain(testRecord.getExplain() + msg);
@@ -779,7 +753,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         testRecord.setExplain("游戏测试次数#2#");
         String msg;
-        if (testRecord.getPoint() >= PASS) {
+        if (testRecord.getPoint() >= PointConstant.EIGHTY) {
             msg = "恭喜你旗开得胜，祝未来勇闯天涯！";
             map.put("tip", msg);
             testRecord.setExplain(testRecord.getExplain() + msg);
@@ -826,17 +800,17 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     private int award(Student student, TestRecord testRecord) {
         int point = testRecord.getPoint();
         int goldCount = 0;
-        if (point >= PASS && point < NINETY_POINT) {
+        if (point >= PointConstant.EIGHTY && point < PointConstant.NINETY) {
             goldCount = 3;
             this.saveLog(student, goldCount, null, "游戏测试");
-        } else if (point >= NINETY_POINT && point < FULL_MARK) {
+        } else if (point >= PointConstant.NINETY && point < PointConstant.HUNDRED) {
             goldCount = 5;
             this.saveLog(student, goldCount, null, "游戏测试");
-        } else if (point == FULL_MARK) {
+        } else if (point == PointConstant.HUNDRED) {
             goldCount = 10;
             this.saveLog(student, goldCount, null, "游戏测试");
         }
-        studentMapper.updateByPrimaryKeySelective(student);
+        studentMapper.updateById(student);
         return goldCount;
     }
 
@@ -931,7 +905,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         Student student = getStudent(session);
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         // 获取当前单元下的所有单词
-        Integer easyOrHard = 0;
+        int easyOrHard;
         String[] type;
         if ("慧记忆".equals(studyModel)) {
             type = new String[]{"英译汉", "汉译英"};
@@ -940,7 +914,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             type = new String[]{"听力理解"};
             easyOrHard = 2;
         }
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, easyOrHard,1);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, easyOrHard, 1);
         List<Vocabulary> vocabularies = redisOpt.getWordInfoInUnitAndGroup(unitId, learnNew.getGroup());
         // 需要封装的测试题个数
         int subjectNum = Math.min(vocabularies.size(), 20);
@@ -973,14 +947,14 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Override
     public ServerResponse<Object> gitUnitSentenceTest(HttpSession session, Long unitId) {
         Student student = getStudent(session);
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, 1,2);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, 1, 2);
         //获取单元句子
         List<Sentence> sentences = sentenceMapper.selectByUnitIdAndGroup(unitId, learnNew.getGroup());
         List<Sentence> sentenceList = null;
         //获取干扰项句子 在当前课程下选择
         if (sentences.size() < 4) {
             //获取测试单元所在的课程
-            Long courseId = sentenceUnitMapper.getCourseIdByunitId(unitId.intValue());
+            Long courseId = sentenceUnitMapper.getCourseIdById(unitId.intValue());
             sentenceList = sentenceMapper.selectRoundSentence(courseId);
         }
         List<Object> list = testSentenceUtil.resultTestSentence(sentences, sentenceList);
@@ -994,7 +968,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     public ServerResponse<Object> saveCapSentenceTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO) {
         Student student = getStudent(session);
         TestRecord testRecord;
-        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "音译测试", 1,2);
+        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "音译测试", 1, 2);
         wordUnitTestDTO.setClassify(8);
 
         // 判断当前单元是不是首次进行测试
@@ -1006,16 +980,15 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
 
         int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld, true);
+        testRecord = new TestRecord();
         if (testRecordOld == null) {
-            testRecord = new TestRecord();
             // 首次测试大于或等于80分，超过历史最高分次数 +1
-            if (wordUnitTestDTO.getPoint() >= PASS) {
+            if (wordUnitTestDTO.getPoint() >= PointConstant.EIGHTY) {
                 testRecord.setBetterCount(1);
             } else {
                 testRecord.setBetterCount(0);
             }
         } else {
-            testRecord = new TestRecord();
             testRecord.setBetterCount(testRecordOld.getBetterCount());
         }
         testRecord.setCourseId(wordUnitTestDTO.getCourseId());
@@ -1060,7 +1033,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         Student student = getStudent(session);
         TestRecord testRecord;
-        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "闯关测试", 1,3);
+        saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "闯关测试", 1, 3);
         wordUnitTestDTO.setClassify(9);
 
         // 判断当前单元是不是首次进行测试
@@ -1072,16 +1045,15 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
 
         int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld, true);
+        testRecord = new TestRecord();
         if (testRecordOld == null) {
-            testRecord = new TestRecord();
             // 首次测试大于或等于80分，超过历史最高分次数 +1
-            if (wordUnitTestDTO.getPoint() >= PASS) {
+            if (wordUnitTestDTO.getPoint() >= PointConstant.EIGHTY) {
                 testRecord.setBetterCount(1);
             } else {
                 testRecord.setBetterCount(0);
             }
         } else {
-            testRecord = new TestRecord();
             testRecord.setBetterCount(testRecordOld.getBetterCount());
         }
         testRecord.setCourseId(wordUnitTestDTO.getCourseId());
@@ -1143,12 +1115,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 testRecord.getStudyModel(), testRecord.getGenre());
         resultMap.put("energy", getEnergy(student, wordUnitTestDTO.getPoint(), number));
         resultMap.put("gold", testRecord.getAwardGold());
-        if (point < PASS) {
+        if (point < PointConstant.EIGHTY) {
             resultMap.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
             resultMap.put("text", "很遗憾，闯关失败，再接再厉。");
             resultMap.put("backMsg", new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
             testRecord.setPass(2);
-        } else if (point < NINETY_POINT) {
+        } else if (point < PointConstant.NINETY) {
             resultMap.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
             resultMap.put("text", "闯关成功，独孤求败！");
             resultMap.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
@@ -1163,7 +1135,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         resultMap.put("imgUrl", AliyunInfoConst.host + student.getPartUrl());
 
         testRecordMapper.insert(testRecord);
-        studentMapper.updateByPrimaryKeySelective(student);
+        studentMapper.updateById(student);
         return ServerResponse.createBySuccess(resultMap);
     }
 
@@ -1224,12 +1196,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             student.setPetName("大明白");
             student.setPartUrl(PetImageConstant.DEFAULT_IMG.replace(AliyunInfoConst.host, ""));
         }
-        Integer earyOrHard = 0;
+        int easyOrHard;
         @NotNull(message = "测试类型不能为空") Integer classify1 = wordUnitTestDTO.getClassify();
         if (classify1.equals(0) || classify1.equals(1) || classify1.equals(4) || classify1.equals(5)) {
-            earyOrHard = 1;
+            easyOrHard = 1;
         } else {
-            earyOrHard = 2;
+            easyOrHard = 2;
         }
         TestResultVo vo = new TestResultVo();
         // 是否是第一次进行当前模块下的单元闯关测试标识
@@ -1256,7 +1228,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (!redisOpt.isRepeatSubmit(student.getId(), (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME))) {
             //saveTestLearnAndCapacity.saveTestAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, unitId, classify);
             //保存错误信息
-            saveError(unitId[0], errorWordId, student, classify,1);
+            saveError(unitId[0], errorWordId, student, classify, 1);
             goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord, false);
 
             testRecord = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, testRecord, goldCount);
@@ -1271,26 +1243,30 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         String msg;
         // 默写
         if (classify == 3 || classify == 6) {
-            msg = getMessage(student, vo, testRecord, point, FIVE);
-            if (point >= FIVE) {
+            msg = getMessage(student, vo, testRecord, point, PointConstant.FIFTY);
+            if (point >= PointConstant.FIFTY) {
                 ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0], point);
             }
         } else if (classify == 4 || classify == 2) {
             // 听力
-            msg = getMessage(student, vo, testRecord, point, SIX);
-            if (point >= SIX) {
+            msg = getMessage(student, vo, testRecord, point, PointConstant.SIXTY);
+            if (point >= PointConstant.SIXTY) {
                 ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0], point);
             }
         } else {
-            msg = getMessage(student, vo, testRecord, point, PASS);
-            if (point >= PASS) {
+            msg = getMessage(student, vo, testRecord, point, PointConstant.EIGHTY);
+            if (point >= PointConstant.EIGHTY) {
                 ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0], point);
             }
         }
 
         if (testRecord != null) {
-            LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId[0], earyOrHard,1);
-            testRecord.setGroup(learnNew.getGroup());
+            int modelType = this.getModelType(wordUnitTestDTO.getClassify());
+            if (modelType != -1) {
+                LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId[0], easyOrHard, modelType);
+                testRecord.setGroup(learnNew.getGroup());
+            }
+
             testRecordMapper.insert(testRecord);
             // 保存测试记录详情
             if (testDetail != null) {
@@ -1309,23 +1285,42 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
         vo.setGold(goldCount);
         vo.setEnergy(addEnergy);
-        studentMapper.updateByPrimaryKeySelective(student);
+        studentMapper.updateById(student);
         getLevel(session);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
         return ServerResponse.createBySuccess(vo);
     }
 
-    private void saveError(Long unitId, Long[] errorIds, Student student, Integer classify,Integer modelType) {
+    private int getModelType(Integer classify) {
+        switch (classify) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+                return 1;
+            case 4:
+            case 5:
+            case 6:
+            case 8:
+                return 2;
+            case 9:
+                return 3;
+            default:
+        }
+        return -1;
+    }
+
+    private void saveError(Long unitId, Long[] errorIds, Student student, Integer classify, Integer modelType) {
         if (errorIds != null) {
-            Integer easyOrHard = 1;
+            int easyOrHard = 1;
             if (classify.equals(2) || classify.equals(3) || classify.equals(6)) {
                 easyOrHard = 2;
             }
-            LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, easyOrHard,modelType);
+            LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, easyOrHard, modelType);
 
-            for (int i = 0; i < errorIds.length; i++) {
-                saveData.saveErrorLearnLog(unitId, getModelInteger(classify), easyOrHard, getModel(classify), learnNew, errorIds[i]);
+            for (Long errorId : errorIds) {
+                saveData.saveErrorLearnLog(unitId, getModelInteger(classify), easyOrHard, getModel(classify), learnNew, errorId);
             }
         }
     }
@@ -1426,7 +1421,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (testRecord == null) {
             isFirst = true;
         }
-        saveError(unitId[0], errorWordId, student, classify,2);
+        saveError(unitId[0], errorWordId, student, classify, 2);
 
         // 根据不同分数奖励学生金币
         int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord, true);
@@ -1436,12 +1431,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         String msg;
         // 默写
         if (classify == 3 || classify == 6) {
-            msg = getMessage(student, vo, testRecord, point, FIVE);
+            msg = getMessage(student, vo, testRecord, point, PointConstant.FIFTY);
         } else if (classify == 4 || classify == 2) {
             // 听力
-            msg = getMessage(student, vo, testRecord, point, SIX);
+            msg = getMessage(student, vo, testRecord, point, PointConstant.SIXTY);
         } else {
-            msg = getMessage(student, vo, testRecord, point, PASS);
+            msg = getMessage(student, vo, testRecord, point, PointConstant.EIGHTY);
         }
 
         testRecordMapper.insert(testRecord);
@@ -1455,7 +1450,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         vo.setGold(goldCount);
         vo.setEnergy(addEnergy);
         ccieUtil.saveCcieTest(student, 1, classify, courseId, unitId[0], point);
-        studentMapper.updateByPrimaryKeySelective(student);
+        studentMapper.updateById(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         getLevel(session);
         return ServerResponse.createBySuccess(vo);
@@ -1486,7 +1481,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
             vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(testRecord.getPoint()), "的同学，继续努力吧！"});
             testRecord.setPass(2);
-        } else if (testRecord.getPoint() < FULL_MARK) {
+        } else if (testRecord.getPoint() < PointConstant.HUNDRED) {
             msg = "闯关成功，独孤求败！";
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
             vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(testRecord.getPoint()), "的同学，再接再励！"});
@@ -1665,7 +1660,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
         testRecord.setAwardGold(goldCount);
         TestResultVo vo = new TestResultVo();
-        String message = getMessage(student, vo, testRecord, point, PASS);
+        String message = getMessage(student, vo, testRecord, point, PointConstant.EIGHTY);
         testRecord.setExplain(message);
 
         vo.setMsg(message);
@@ -1788,7 +1783,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (testRecordOld == null) {
             testRecord = new TestRecord();
             // 首次测试大于或等于80分，超过历史最高分次数 +1
-            if (point >= PASS) {
+            if (point >= PointConstant.EIGHTY) {
                 testRecord.setBetterCount(1);
             } else {
                 testRecord.setBetterCount(0);
@@ -1815,13 +1810,13 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     public static String getUnitTestMsg(int point) {
-        if (point >= 0 && point < PASS) {
+        if (point >= 0 && point < PointConstant.EIGHTY) {
             return "很遗憾，闯关失败，再接再厉。";
         }
-        if (point >= PASS && point < FULL_MARK) {
+        if (point >= PointConstant.EIGHTY && point < PointConstant.HUNDRED) {
             return "闯关成功，独孤求败！";
         }
-        if (point == FULL_MARK) {
+        if (point == PointConstant.HUNDRED) {
             return "恭喜你刷新了纪录！";
         }
         return "";
@@ -1834,7 +1829,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
         Integer easyOrHard = (studyModel == null || studyModel != 6) ? 1 : 2;
 
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(getStudentId(session), unitId, easyOrHard,2);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(getStudentId(session), unitId, easyOrHard, 2);
         // 获取当前单元下其中一个例句
         List<Sentence> sentences = sentenceMapper.selectByUnitIdAndGroup(unitId, learnNew.getGroup());
         List<SentenceTranslateVo> sentenceTestResults = testResultUtil.getSentenceTestResults(sentences, MathUtil.getRandom(4, 6), type);
@@ -1843,7 +1838,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
 
     @Override
-    public ServerResponse<Object> showRecord(String course_id, Integer type, HttpSession session, Integer page, Integer rows) {
+    public ServerResponse<Object> showRecord(String courseId, Integer type, HttpSession session, Integer page, Integer rows) {
         Student student = getStudent(session);
         Long studentId = student.getId();
 

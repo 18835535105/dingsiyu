@@ -51,17 +51,6 @@ public class TestController {
     }
 
     /**
-     * 获取等级测试测试题
-     *
-     * @param session
-     * @return
-     */
-    @GetMapping("/getLevelTest")
-    public ServerResponse<Map<String, Object>> getLevelTest(HttpSession session) {
-        return testService.getLevelTest(session);
-    }
-
-    /**
      * 获取单词相关单元闯关的测试题
      *
      * @param session
@@ -101,7 +90,7 @@ public class TestController {
         if (unitId == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), "unitId 不能为 null");
         }
-        return testService.getSentenceUnitTest(session, unitId, type, pageNum,studyModel);
+        return testService.getSentenceUnitTest(session, unitId, type, pageNum, studyModel);
     }
 
 
@@ -113,11 +102,11 @@ public class TestController {
      */
     @GetMapping("/gitUnitSentenceTest")
     @ResponseBody
-    public ServerResponse<Object> gitUnitSentenceTest(HttpSession session,Long unitId) {
+    public ServerResponse<Object> gitUnitSentenceTest(HttpSession session, Long unitId) {
         if (unitId == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), "unitId 不能为 null");
         }
-        return testService.gitUnitSentenceTest(session,unitId);
+        return testService.gitUnitSentenceTest(session, unitId);
     }
 
     /**
@@ -230,8 +219,8 @@ public class TestController {
      * @return
      */
     @GetMapping("/getStrengthGame")
-    public ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session,Long unitId) {
-        return testService.getStrengthGame(session,unitId);
+    public ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session, Long unitId) {
+        return testService.getStrengthGame(session, unitId);
     }
 
     /**
@@ -241,8 +230,8 @@ public class TestController {
      * @return
      */
     @GetMapping("/getGameTest")
-    public ServerResponse<Map<String, Object>> getGameSubject(HttpSession session,Long unitId) {
-        return testService.getGameSubject(session,unitId);
+    public ServerResponse<Map<String, Object>> getGameSubject(HttpSession session, Long unitId) {
+        return testService.getGameSubject(session, unitId);
     }
 
     /**

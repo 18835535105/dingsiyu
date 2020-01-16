@@ -3,7 +3,8 @@ package com.zhidejiaoyu.common.pojo;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -11,54 +12,37 @@ import java.util.Date;
 
 /**
  * <p>
- * 超级语法课程表
+ * 收件人邮箱
  * </p>
  *
  * @author zdjy
- * @since 2019-10-29
+ * @since 2020-01-15
  */
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class SyntaxCourse extends Model<SyntaxCourse> {
+public class ReceiveEmail extends Model<ReceiveEmail> {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 课程表主建
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
     /**
-     * 学段
+     * 收件人姓名
      */
-    private String studyParagraph;
+    private String name;
     /**
-     * 年级
+     * 收件人邮箱
      */
-    private String grade;
+    private String email;
     /**
-     * 版本
+     * 类型
      */
-    private String version;
+    private Integer type;
     /**
-     * 标签
+     * 注释
      */
-    private String label;
-    /**
-     * 课程名
-     */
-    private String courseName;
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-    /**
-     * 更新时间
-     */
+    private String explain;
     private Date updateTime;
 
 
