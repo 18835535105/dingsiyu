@@ -135,16 +135,18 @@ public class QuartzController {
 
     /**
      * 更改学生错误优先级
+     *
      * @return
      */
     @PostMapping("/CalculateRateOfChange")
-    public ServerResponse<Object> CalculateRateOfChange() {
-        this.quartzService.CalculateRateOfChange();
+    public ServerResponse<Object> calculateRateOfChange() {
+        this.quartzService.calculateRateOfChange();
         return ServerResponse.createBySuccess();
     }
 
     /**
      * 每周给学生添加课程
+     *
      * @return
      */
     @PostMapping("/addStudyByWeek")

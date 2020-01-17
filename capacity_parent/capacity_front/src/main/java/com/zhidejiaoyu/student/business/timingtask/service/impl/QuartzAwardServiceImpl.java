@@ -151,7 +151,7 @@ public class QuartzAwardServiceImpl implements QuartzAwardService, BaseQuartzSer
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @Scheduled(cron = "0 40 0 1 * ?")
+//    @Scheduled(cron = "0 40 0 1 * ?")
     public void deleteRank() {
 
         if (checkPort(port)) {
@@ -222,7 +222,7 @@ public class QuartzAwardServiceImpl implements QuartzAwardService, BaseQuartzSer
     }
 
     @Override
-    @Scheduled(cron = "0 0 0 * * ? ")
+//    @Scheduled(cron = "0 0 0 * * ? ")
     public void deleteDailyAward() {
         if (checkPort(port)) {
             return;
