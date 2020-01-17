@@ -78,7 +78,7 @@
 
     <select id="selectMaxFinalByStudentId" parameterType="long" resultMap="BaseResultMap">
         select
-        <include refid="base_sql"></include>
+        <include refid="base_sql"/>
         from student_study_plan_new
         where student_id = #{studentId}
         order by final_level desc

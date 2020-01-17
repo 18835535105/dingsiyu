@@ -50,6 +50,18 @@
         )
         and student_id =#{studentId}
     </select>
+    <select id="selectByStudentIdAndUnitIdAndEasyOrHard"
+            resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from learn_new ln
+        join student_flow_new sfn on ln.id = sfn.learn_id
+        and ln.student_id = #{studentId}
+        and ln.unit_id = #{unitId}
+        and ln.easy_or_hard = #{easyOrHard}
+        and sfn.type = 1
+        limit 1
+    </select>
     <delete id="deleteByLearnIds" parameterType="map">
         delete from student_flow_new where learn_id in (
         <foreach collection="delLearnIds" item="learnId" separator=",">

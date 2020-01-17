@@ -54,7 +54,17 @@ public interface StudentFlowNewMapper extends BaseMapper<StudentFlowNew> {
      */
     StudentFlowNew selectByLearnId(@Param("learnId") Long learnId);
 
-    StudentFlowNew selectByLearnIdAndType(@Param("learnId") Long learnId,@Param("type") int type);
+    StudentFlowNew selectByLearnIdAndType(@Param("learnId") Long learnId, @Param("type") int type);
 
     void deleteByLearnIds(@Param("delLearnIds") List<Long> delLearnIds);
+
+    /**
+     * 查询学生学习一键学习流程
+     *
+     * @param studentId
+     * @param unitId
+     * @param easyOrHard
+     * @return
+     */
+    StudentFlowNew selectByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("easyOrHard") Integer easyOrHard);
 }
