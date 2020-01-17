@@ -379,9 +379,9 @@ public interface SimpleVocabularyMapper extends BaseMapper<Vocabulary> {
     @MapKey("id")
     Map<Long, Map<Long, Long>> countWordMapByCourseIds(@Param("courseIds") List<Long> courseIds);
 
-    List<Vocabulary> getWordByCourseGetNumber(@Param("courseId") Long courseId, @Param("start") Integer start, @Param("row") Integer row);
+    List<Vocabulary> getWordByCourseGetNumber(@Param("courseId") Long courseId, @Param("start") Integer start, @Param("row") Integer row,@Param("type") int type);
 
-    List<Vocabulary> selectByCourseIdWithoutWordIds(@Param("courseId") Long courseId, @Param("vocabularies") List<Vocabulary> vocabularys);
+    List<Vocabulary> selectByCourseIdWithoutWordIds(@Param("courseId") Long courseId, @Param("vocabularies") List<Vocabulary> vocabularys,@Param("type")int type);
 
     List<Vocabulary> getWord(@Param("start") int start, @Param("row") int end, @Param("wordIds") List<Long> wordIds);
 }

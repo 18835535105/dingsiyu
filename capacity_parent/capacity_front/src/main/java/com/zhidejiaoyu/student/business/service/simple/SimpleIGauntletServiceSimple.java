@@ -24,7 +24,7 @@ public interface SimpleIGauntletServiceSimple extends SimpleBaseService<Gauntlet
 
     ServerResponse<Object> addPkRecord(HttpSession session, String gameName, Long studentId, Integer gold, Long courseId, String challengerMsg);
 
-    ServerResponse<Object> getGame(Integer pageNum, Long courseId, String gameName, HttpSession session);
+    ServerResponse<Object> getGame(Integer pageNum, Long courseId, String gameName, HttpSession session,int type);
 
     ServerResponse<Object> getCourse(HttpSession session);
 

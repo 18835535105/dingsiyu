@@ -71,8 +71,8 @@ public class GauntletController {
      * @return
      */
     @RequestMapping("/getGame")
-    public ServerResponse<Object> getGame(Integer pageNum, Long courseId, String gameName, HttpSession session){
-        return gauntletService.getGame(pageNum,courseId,gameName,session);
+    public ServerResponse<Object> getGame(Integer pageNum, Long courseId, String gameName, HttpSession session,int type){
+        return gauntletService.getGame(pageNum,courseId,gameName,session,type);
     }
 
     /**

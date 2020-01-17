@@ -227,29 +227,29 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
      * @return
      */
     @Override
-    public ServerResponse<Object> getGame(Integer pageNum, Long courseId, String gameName, HttpSession session) {
+    public ServerResponse<Object> getGame(Integer pageNum, Long courseId, String gameName, HttpSession session, int type) {
         Student student = getStudent(session);
         if ("找同学".equals(gameName)) {
             List<Map<String, Object>> subjects = new ArrayList<>();
-            getGameOne(courseId, subjects);
+            getGameOne(courseId, subjects, type);
             Map<String, Object> map = new HashMap<>();
             map.put("testResults", subjects);
             map.put("petUrl", AliyunInfoConst.host + student.getPartUrl());
             return ServerResponse.createBySuccess(map);
         }
         if ("桌牌捕音".equals(gameName)) {
-            return getGameTwo(courseId);
+            return getGameTwo(courseId, type);
         }
         if ("冰火两重天".equals(gameName)) {
             Map<String, Object> map = new HashMap<>();
             List<Map<String, Object>> subjects = new ArrayList<>();
-            getGameThree(subjects, pageNum, courseId);
+            getGameThree(subjects, pageNum, courseId, type);
             map.put("matchKeyValue", subjects);
             return ServerResponse.createBySuccess(map);
         }
         if ("实力初显".equals(gameName)) {
             Map<String, Object> map = new HashMap<>();
-            getGameFour(map, courseId, student);
+            getGameFour(map, courseId, student, type);
             return ServerResponse.createBySuccess(map);
         }
         return null;
@@ -268,7 +268,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         //获取学生版本
         List<String> gradeList = GradeUtil.smallThanCurrent(student.getVersion(), student.getGrade());
         List<Long> courseIds = studentStudyPlanNewMapper.getCourseIdAndGradeList(studentId, gradeList);
-
+        List<Map<String, Object>> returnMap = new ArrayList<>();
         //获取course_config数据
         //查看是否学生是否拥有课程
         //判断学生是否有排课的内容
@@ -296,11 +296,20 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         //获取学生正在学习的版本
         GradeUtil.smallThanCurrent(student.getVersion(), student.getGrade());
         List<Map<String, Object>> courses = simpleCourseMapper.getCourseByIds(courseIds);
+        courses.forEach(map -> {
+            map.put("type", 2);
+            returnMap.add(map);
+        });
         List<Long> simpleCouseIds = simpleStudentUnitMapper.getAllCourseIdByTypeToStudent(studentId, 2);
         if (simpleCouseIds.size() > 0) {
-            courses.addAll(courseMapper.selectCourseByCourseIds(simpleCouseIds));
+            List<Map<String, Object>> maps = courseMapper.selectCourseByCourseIds(simpleCouseIds);
+            maps.forEach(map -> {
+                map.put("type", 1);
+                returnMap.add(map);
+
+            });
         }
-        return ServerResponse.createBySuccess(courses);
+        return ServerResponse.createBySuccess(returnMap);
     }
 
     /**
@@ -843,9 +852,9 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     }
 
 
-    private ServerResponse<Object> getGameTwo(Long courseId) {
+    private ServerResponse<Object> getGameTwo(Long courseId, int type) {
         // 从当前课程随机取10个已学的单词
-        List<Vocabulary> gameTwoSubject = this.getGameTwoSubject(courseId);
+        List<Vocabulary> gameTwoSubject = this.getGameTwoSubject(courseId,type);
         List<Long> wordIds = gameTwoSubject.stream().map(Vocabulary::getId).collect(Collectors.toList());
         // 从单词中随机取出11个单词
         List<Vocabulary> wordList = vocabularyMapper.getWord(0, 110, wordIds);
@@ -857,14 +866,14 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
      *
      * @return
      */
-    private List<Vocabulary> getGameTwoSubject(Long courseId) {
-        List<Vocabulary> vocabularies = vocabularyMapper.getWordByCourseGetNumber(courseId, 0, 10);
+    private List<Vocabulary> getGameTwoSubject(Long courseId, int type) {
+        List<Vocabulary> vocabularies = vocabularyMapper.getWordByCourseGetNumber(courseId, 0, 10, type);
         Collections.shuffle(vocabularies);
         return vocabularies;
     }
 
-    private void getGameOne(Long courseId, List<Map<String, Object>> subjects) {
-        List<Vocabulary> vocabularys = vocabularyMapper.getWordByCourseGetNumber(courseId, 0, 80);
+    private void getGameOne(Long courseId, List<Map<String, Object>> subjects, int type) {
+        List<Vocabulary> vocabularys = vocabularyMapper.getWordByCourseGetNumber(courseId, 0, 80, type);
         int page = vocabularys.size() / 4;
         if (vocabularys.size() % 4 != 0) {
             if (vocabularys.size() > 4) {
@@ -896,10 +905,10 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         }
     }
 
-    private void getGameThree(List<Map<String, Object>> subjects, Integer pageNum, Long courseId) {
+    private void getGameThree(List<Map<String, Object>> subjects, Integer pageNum, Long courseId, int type) {
         Integer row = 10;
         Integer start = (pageNum - 1) * 10;
-        List<Vocabulary> vocabularys = vocabularyMapper.getWordByCourseGetNumber(courseId, start, row);
+        List<Vocabulary> vocabularys = vocabularyMapper.getWordByCourseGetNumber(courseId, start, row,type);
         vocabularys.forEach(vocabulary -> {
             Map<String, Object> subjectMap1 = new HashMap<>(16);
             subjectMap1.put("title", vocabulary.getWordChinese());
@@ -913,17 +922,17 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         Collections.shuffle(subjects);
     }
 
-    private void getGameFour(Map<String, Object> map, Long courseId, Student student) {
-        List<Vocabulary> vocabularys = vocabularyMapper.getWordByCourseGetNumber(courseId, 0, 20);
+    private void getGameFour(Map<String, Object> map, Long courseId, Student student, int type) {
+        List<Vocabulary> vocabularys = vocabularyMapper.getWordByCourseGetNumber(courseId, 0, 20,type);
         Map<String, String> reMap = this.getWordMap(vocabularys);
         int size = vocabularys.size();
         int errorSize = size * 3;
-        List<Vocabulary> errorVocabularies = vocabularyMapper.selectByCourseIdWithoutWordIds(courseId, vocabularys);
+        List<Vocabulary> errorVocabularies = vocabularyMapper.selectByCourseIdWithoutWordIds(courseId, vocabularys,type);
         List<Vocabulary> ignore = new ArrayList<>(errorVocabularies);
         reMap.putAll(this.getWordMap(ignore));
         if (errorVocabularies.size() < errorSize) {
             PageHelper.startPage(1, errorSize - errorVocabularies.size());
-            List<Vocabulary> otherErrorVocabularies = vocabularyMapper.selectByCourseIdWithoutWordIds(courseId + 1, ignore);
+            List<Vocabulary> otherErrorVocabularies = vocabularyMapper.selectByCourseIdWithoutWordIds(courseId + 1, ignore,type);
             if (otherErrorVocabularies.size() > 0) {
                 errorVocabularies.addAll(otherErrorVocabularies);
                 ignore.addAll(otherErrorVocabularies);
@@ -931,7 +940,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             }
             if (otherErrorVocabularies.size() < errorSize) {
                 PageHelper.startPage(1, errorSize - errorVocabularies.size());
-                otherErrorVocabularies = vocabularyMapper.selectByCourseIdWithoutWordIds(courseId - 1, ignore);
+                otherErrorVocabularies = vocabularyMapper.selectByCourseIdWithoutWordIds(courseId - 1, ignore,type);
                 if (otherErrorVocabularies.size() > 0) {
                     errorVocabularies.addAll(otherErrorVocabularies);
                     reMap.putAll(this.getWordMap(otherErrorVocabularies));
