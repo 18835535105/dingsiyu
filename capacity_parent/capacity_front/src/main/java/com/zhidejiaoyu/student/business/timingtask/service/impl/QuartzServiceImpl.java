@@ -883,14 +883,13 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 rankList.add(studentRank);
             });
         });
-
         try {
             simpleStudentRankMapper.insertList(rankList);
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
-        return true;
     }
 
     /**
