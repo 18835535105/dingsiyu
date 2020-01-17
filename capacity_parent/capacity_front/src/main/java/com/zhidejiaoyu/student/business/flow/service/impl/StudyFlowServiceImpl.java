@@ -152,11 +152,17 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         // 在星球页请求，返回当前正在学习的节点信息
         Long studentId = student.getId();
 
-        // 查询学生最高优先级数据
-        StudentStudyPlanNew maxFinalLevelStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
+        // 查询一键学习中的语法流程，优先学习（因为语法的课程信息与单词的不同）
+        StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndLearModelType(studentId, 4);
 
-        StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId,
-                maxFinalLevelStudentStudyPlanNew.getUnitId(), maxFinalLevelStudentStudyPlanNew.getEasyOrHard());
+        StudentStudyPlanNew maxFinalLevelStudentStudyPlanNew = null;
+        if (studentFlowNew == null) {
+            // 查询学生最高优先级数据
+            maxFinalLevelStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
+
+            studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId,
+                    maxFinalLevelStudentStudyPlanNew.getUnitId(), maxFinalLevelStudentStudyPlanNew.getEasyOrHard());
+        }
 
         StudyFlowNew studyFlowNew;
         LearnNew learnNew;

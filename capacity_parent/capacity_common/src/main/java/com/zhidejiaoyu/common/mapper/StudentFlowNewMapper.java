@@ -67,4 +67,13 @@ public interface StudentFlowNewMapper extends BaseMapper<StudentFlowNew> {
      * @return
      */
     StudentFlowNew selectByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("easyOrHard") Integer easyOrHard);
+
+    /**
+     * 查询学习表中指定modelType的学习流程
+     *
+     * @param studentId
+     * @param modelType learnNew中的modelType
+     * @return
+     */
+    StudentFlowNew selectByStudentIdAndLearModelType(@Param("studentId") Long studentId, @Param("modelType") int modelType);
 }
