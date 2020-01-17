@@ -18,7 +18,7 @@ public class ExportStudentOnlineTimeWithSchoolSummary {
 
     @CellStyleFormat()
     @ExcelProperty(value = "学校名称", index = 0)
-    @ColumnWidth(50)
+    @ColumnWidth(40)
     private String schoolName;
 
     @CellStyleFormat()
