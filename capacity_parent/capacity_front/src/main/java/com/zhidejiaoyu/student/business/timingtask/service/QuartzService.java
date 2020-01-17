@@ -66,7 +66,7 @@ public interface QuartzService {
      */
     void updateWelfareAccountToOutOfDate();
 
-    void CalculateRateOfChange();
+    void calculateRateOfChange();
 
     void addStudyByWeek();
 }

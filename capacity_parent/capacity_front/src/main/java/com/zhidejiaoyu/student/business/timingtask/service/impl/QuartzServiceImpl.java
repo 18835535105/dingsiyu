@@ -11,7 +11,6 @@ import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.student.business.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzService;
 import com.zhidejiaoyu.student.common.redis.AwardRedisOpt;
-import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
@@ -22,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -54,9 +54,6 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
 
     @Resource
     private SimpleWorshipMapper simpleWorshipMapper;
-
-    @Resource
-    private RedisOpt redisOpt;
 
     @Resource
     private AwardRedisOpt awardRedisOpt;
@@ -249,11 +246,12 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     }
 
     public static void main(String[] args) {
-
+        System.out.println(new BigDecimal("0.1").equals(new BigDecimal("0.1")));
+        System.out.println(new BigDecimal("0.1").equals(new BigDecimal("0.2")));
     }
 
     @Transactional(rollbackFor = Exception.class)
-    @Scheduled(cron = "0 20 0 * * ?")
+//    @Scheduled(cron = "0 20 0 * * ?")
     @Override
     public void updateEnergy() {
         if (checkPort(port)) {
@@ -268,7 +266,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    @Scheduled(cron = "0 30 0 * * ?")
+//    @Scheduled(cron = "0 30 0 * * ?")
     @Override
     public void updateFrozen() {
         if (checkPort(port)) {
@@ -287,7 +285,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    @Scheduled(cron = "0 5 0 1 * ? ")
+//    @Scheduled(cron = "0 5 0 1 * ? ")
     @Override
     public void updateClassMonthRank() {
         if (checkPort(port)) {
@@ -343,11 +341,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
             List<Gauntlet> gauntlets1 = simpleGauntletMapper.selectStudy(2, studentExpansion.getStudentId());
             for (Gauntlet gauntlet : gauntlets1) {
                 if (gauntlet.getChallengeStudy() != null) {
-                    if (study - gauntlet.getChallengeStudy() > 0) {
-                        study = study - gauntlet.getChallengeStudy();
-                    } else {
-                        study = 0;
-                    }
+                    study = Math.max(study - gauntlet.getChallengeStudy(), 0);
                 }
             }
             //查询被发起挑战的胜利场次获取的学习力
@@ -375,7 +369,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     }
 
     @Override
-    @Scheduled(cron = "0 5 0 * * 1")
+//    @Scheduled(cron = "0 5 0 * * 1")
     public void deleteStudentLocation() {
         if (checkPort(port)) {
             return;
@@ -389,7 +383,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
      * 每天清楚体验账号到期60天的账号
      */
     @Override
-    @Scheduled(cron = "0 15 2 * * ?")
+//    @Scheduled(cron = "0 15 2 * * ?")
     public void deleteExperienceAccount() {
         if (checkPort(port)) {
             return;
@@ -432,7 +426,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
 
 
     @Override
-    @Scheduled(cron = "0 15 1 * * ?")
+//    @Scheduled(cron = "0 15 1 * * ?")
     public void saveRecycleBin() {
         if (checkPort(port)) {
             return;
@@ -459,7 +453,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 rankOpt.deleteWorshipRank(student);
                 builder.append("账号：").append(student.getAccount()).append(" 姓名：")
                         .append(student.getStudentName())
-                        .append(" 学校：").append(student.getSchoolName() + ",");
+                        .append(" 学校：").append(student.getSchoolName()).append(",");
             });
             RunLog runLog = new RunLog();
             runLog.setType(3);
@@ -499,7 +493,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
      */
     @Override
     @Scheduled(cron = "0 0 3 * * ?")
-    public void CalculateRateOfChange() {
+    public void calculateRateOfChange() {
         if (checkPort(port)) {
             return;
         }
@@ -524,9 +518,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
             if (maps.size() > 5) {
                 //2,查询单元下数据的总数量
                 List<Long> unitIds = new ArrayList<>();
-                maps.forEach(map -> {
-                    unitIds.add(Long.parseLong(map.get("unitId").toString()));
-                });
+                maps.forEach(map -> unitIds.add(Long.parseLong(map.get("unitId").toString())));
                 Map<Long, Map<String, Object>> allUnitStudyCount =
                         unitNewMapper.selectCountByUnitIds(unitIds);
                 //获取最大多错误率
@@ -706,7 +698,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 Long courseId = Long.parseLong(studentMap.get("courseId").toString());
                 int i = studentStudyPlanNewMapper.selectByStudentIdAndUnitId(studentId, unitId);
                 if (i <= 0) {
-                    Long userId = 0L;
+                    long userId;
                     int type = Integer.parseInt(studentMap.get("type").toString());
                     if (type == 1) {
                         userId = Long.parseLong(studentMap.get("userId").toString());
@@ -943,7 +935,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
      * 每天 00:30:00 更新学生全校日排行记录
      */
     @Transactional(rollbackFor = Exception.class)
-    @Scheduled(cron = "0 30 0 * * ?")
+//    @Scheduled(cron = "0 30 0 * * ?")
     @Override
     public void updateRank() {
         if (checkPort(port)) {
@@ -1117,25 +1109,20 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                     rank = schoolRankMap.get(schoolAdminId) == null ? 0 : schoolRankMap.get(schoolAdminId);
                     weekRank = schoolWeekRankMap.get(schoolAdminId) == null ? 0 : schoolWeekRankMap.get(schoolAdminId);
                     monthRank = schoolMonthRankMap.get(schoolAdminId) == null ? 0 : schoolMonthRankMap.get(schoolAdminId);
-                    if (currentGold != preGold) {
+                    if (new BigDecimal(currentGold).equals(new BigDecimal(preGold))) {
                         rank++;
                         weekRank++;
                         monthRank++;
                     }
-
-                    schoolRankMap.put(schoolAdminId, rank);
-                    schoolWeekRankMap.put(schoolAdminId, weekRank);
-                    schoolMonthRankMap.put(schoolAdminId, monthRank);
                 } else {
                     // 跟上个同学不是同一所学校
                     rank = 1;
                     weekRank = 1;
                     monthRank = 1;
-
-                    schoolRankMap.put(schoolAdminId, rank);
-                    schoolWeekRankMap.put(schoolAdminId, weekRank);
-                    schoolMonthRankMap.put(schoolAdminId, monthRank);
                 }
+                schoolRankMap.put(schoolAdminId, rank);
+                schoolWeekRankMap.put(schoolAdminId, weekRank);
+                schoolMonthRankMap.put(schoolAdminId, monthRank);
 
                 insertRankList = new RankList();
                 insertRankList.setSchoolDayRank(rank);
@@ -1192,7 +1179,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     }
 
     @Override
-    @Scheduled(cron = "0 0 2 * * ? ")
+//    @Scheduled(cron = "0 0 2 * * ? ")
     public void deleteSessionMap() {
         if (checkPort(port)) {
             return;
@@ -1218,7 +1205,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
 
 
     @Override
-    @Scheduled(cron = "0 10 0 * * ? ")
+//    @Scheduled(cron = "0 10 0 * * ? ")
     public void deleteDrawRedis() {
         if (checkPort(port)) {
             return;
