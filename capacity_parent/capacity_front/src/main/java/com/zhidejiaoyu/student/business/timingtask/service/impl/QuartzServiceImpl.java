@@ -599,21 +599,18 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                     learnNew.setUnitId(plan.getUnitId());
                     learnNew.setUpdateTime(new Date());
                     learnNewMapper.insert(learnNew);
-                    StudentFlowNew studentFlowNew = new StudentFlowNew();
-                    getStudentFlow(studentId, plan, learnNew, studentFlowNew);
+                    getStudentFlow(plan, learnNew);
                     //判断learnNEW中的数据是否大于10个
-                    delLearnNew(studentId);
                 } else {
                     learnNew.setUpdateTime(new Date());
                     learnNewMapper.updateById(learnNew);
                     //查看是否有flowNew数据
                     StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByLearnIdAndType(learnNew.getId(), 1);
                     if (studentFlowNew == null) {
-                        studentFlowNew = new StudentFlowNew();
-                        getStudentFlow(studentId, plan, learnNew, studentFlowNew);
+                        getStudentFlow(plan, learnNew);
                     }
-                    delLearnNew(studentId);
                 }
+                delLearnNew(studentId);
             }
         });
     }
@@ -638,11 +635,12 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
         }
     }
 
-    private void getStudentFlow(Long studentId, StudentStudyPlanNew plan, LearnNew learnNew, StudentFlowNew studentFlowNew) {
+    private void getStudentFlow(StudentStudyPlanNew plan, LearnNew learnNew) {
+        StudentFlowNew studentFlowNew = new StudentFlowNew();
         studentFlowNew.setCurrentFlowId(plan.getFlowId());
         studentFlowNew.setLearnId(learnNew.getId());
         studentFlowNew.setUpdateTime(new Date());
-        studentFlowNew.setStudentId(studentId);
+        studentFlowNew.setStudentId(learnNew.getStudentId());
         studentFlowNew.setType(1);
         studentFlowNewMapper.insert(studentFlowNew);
     }

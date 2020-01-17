@@ -44,7 +44,7 @@ public class ClickPictureVO {
     /**
      * 下一级金币数量
      */
-    private String japBelow;
+    private Integer japBelow;
 
     /**
      * 下一级等级图片
