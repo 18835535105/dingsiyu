@@ -51,7 +51,7 @@
         and student_id =#{studentId}
     </select>
     <delete id="deleteByLearnIds" parameterType="map">
-        delect from student_flow_new where learn_id in (
+        delete from student_flow_new where learn_id in (
         <foreach collection="delLearnIds" item="learnId" separator=",">
             #{learnId}
         </foreach>
