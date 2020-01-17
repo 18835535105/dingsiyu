@@ -55,13 +55,13 @@
         <include refid="base_sql"/>
         from student_study_plan_new
         where student_id = #{studentId}
-        order by final_level desc
+        order by final_level desc, id
         limit ${limit}
     </select>
 
     <select id="selectByStudentIdAndUnitIdAndEasyOrHard" parameterType="map" resultMap="BaseResultMap">
         select
-        <include refid="base_sql"></include>
+        <include refid="base_sql"/>
         from student_study_plan_new
         where
         student_id=#{studentId}
@@ -81,7 +81,7 @@
         <include refid="base_sql"/>
         from student_study_plan_new
         where student_id = #{studentId}
-        order by final_level desc
+        order by final_level desc, id
         limit 1
     </select>
 
