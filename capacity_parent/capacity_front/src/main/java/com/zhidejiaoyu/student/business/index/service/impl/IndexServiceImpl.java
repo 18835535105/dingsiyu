@@ -154,7 +154,7 @@ public class IndexServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabula
                         .jap(nextLevelGold - myGold)
                         .imgUrl(AliyunInfoConst.host + levels.get(i).get("img_url"))
                         .childNameBelow(String.valueOf(levels.get(si).get("child_name")))
-                        .jap(nextLevelGold)
+                        .japBelow(nextLevelGold)
                         .imgUrlBelow(AliyunInfoConst.host + levels.get(si).get("img_url"));
                 break;
             }
