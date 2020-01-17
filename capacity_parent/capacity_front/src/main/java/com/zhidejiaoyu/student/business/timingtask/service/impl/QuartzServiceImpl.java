@@ -495,7 +495,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     }
 
     /**
-     * 获取单元学习进度
+     * 获取单元学习进度，给学生增加错误优先级
      */
     @Override
     @Scheduled(cron = "0 0 3 * * ?")
@@ -644,6 +644,9 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
         studentFlowNewMapper.insert(studentFlowNew);
     }
 
+    /**
+     * 每周给学生添加课程
+     */
     @Override
     @Scheduled(cron = "0 30 3 * * ?")
     public void addStudyByWeek() {
