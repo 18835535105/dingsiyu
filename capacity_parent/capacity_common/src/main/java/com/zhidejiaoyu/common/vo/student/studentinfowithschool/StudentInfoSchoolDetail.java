@@ -35,4 +35,14 @@ public class StudentInfoSchoolDetail {
      * 统计日期
      */
     private String time;
+
+    /**
+     * 学生创建日期
+     */
+    private String createTime;
+
+    /**
+     * 是否充课, 0：未充课；非0：已充课
+     */
+    private String paid;
 }
