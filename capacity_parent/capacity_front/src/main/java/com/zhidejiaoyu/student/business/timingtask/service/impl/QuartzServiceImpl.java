@@ -537,8 +537,8 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                                 isMap.put("easyOrHard", easyOrHard);
                                 isMap.put("studyDouble", studyDouble);
                             } else {
-                                double paseStudyDouble = Double.parseDouble(isMap.get("studyDouble").toString());
-                                if (studyDouble > paseStudyDouble) {
+                                double parseStudyDouble = Double.parseDouble(isMap.get("studyDouble").toString());
+                                if (studyDouble > parseStudyDouble) {
                                     isMap.put("unitId", studyUnit);
                                     isMap.put("easyOrHard", easyOrHard);
                                     isMap.put("studyDouble", studyDouble);
@@ -598,8 +598,9 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                     learnNew.setStudentId(studentId);
                     learnNew.setUnitId(plan.getUnitId());
                     learnNew.setUpdateTime(new Date());
+                    learnNew.setModelType(1);
                     learnNewMapper.insert(learnNew);
-                    getStudentFlow(plan, learnNew);
+                    saveStudentFlow(plan, learnNew);
                     //判断learnNEW中的数据是否大于10个
                 } else {
                     learnNew.setUpdateTime(new Date());
@@ -607,7 +608,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                     //查看是否有flowNew数据
                     StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByLearnIdAndType(learnNew.getId(), 1);
                     if (studentFlowNew == null) {
-                        getStudentFlow(plan, learnNew);
+                        saveStudentFlow(plan, learnNew);
                     }
                 }
                 delLearnNew(studentId);
@@ -635,7 +636,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
         }
     }
 
-    private void getStudentFlow(StudentStudyPlanNew plan, LearnNew learnNew) {
+    private void saveStudentFlow(StudentStudyPlanNew plan, LearnNew learnNew) {
         StudentFlowNew studentFlowNew = new StudentFlowNew();
         studentFlowNew.setCurrentFlowId(plan.getFlowId());
         studentFlowNew.setLearnId(learnNew.getId());

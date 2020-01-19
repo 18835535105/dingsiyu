@@ -68,6 +68,7 @@
         from learn_new ln
         join student_flow_new sfn on ln.id = sfn.learn_id and ln.student_id = #{studentId}
         and ln.model_type = #{modelType}
+        and sfn.type = 1
         limit 1
     </select>
     <delete id="deleteByLearnIds" parameterType="map">
