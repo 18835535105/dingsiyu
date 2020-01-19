@@ -264,7 +264,9 @@ public class FinishGroupOrUnit {
         if (studentStudyPlanNew == null) {
             CourseNew courseNew = courseNewMapper.selectByUnitId(dto.getUnitId());
             // 说明当前课程还没有优先级，初始化当前课程的优先级
-            int basePriority = PriorityUtil.getBasePriority(student.getGrade(), courseNew.getGrade(), 0);
+            String grade = StringUtils.isNotEmpty(courseNew.getGrade()) ? courseNew.getGrade() : courseNew.getGradeExt();
+            String label = StringUtils.isNotEmpty(courseNew.getLabel()) ? courseNew.getLabel() : courseNew.getLabelExt();
+            int basePriority = PriorityUtil.getBasePriority(student.getGrade(), grade, label, 0);
             int timePriority = PriorityUtil.BASE_TIME_PRIORITY;
 
             boolean isEasy = dto.getEasyOrHard() == 1;

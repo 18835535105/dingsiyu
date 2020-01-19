@@ -14,7 +14,7 @@ import com.zhidejiaoyu.student.business.index.service.IndexCourseInfoService;
 import com.zhidejiaoyu.student.business.index.vo.course.CourseInfoVO;
 import com.zhidejiaoyu.student.business.index.vo.course.CourseVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
-import com.zhidejiaoyu.student.business.syntax.constant.GradeNameConstant;
+import com.zhidejiaoyu.common.constant.GradeNameConstant;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;

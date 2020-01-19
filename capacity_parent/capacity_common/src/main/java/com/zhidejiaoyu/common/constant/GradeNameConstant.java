@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.syntax.constant;
+package com.zhidejiaoyu.common.constant;
 
 /**
  * 年级常量名
