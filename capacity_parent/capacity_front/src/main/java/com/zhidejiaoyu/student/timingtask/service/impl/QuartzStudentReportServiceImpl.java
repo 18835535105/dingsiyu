@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.excelmodel.student.ExportRechargePayCardModel;
 import com.zhidejiaoyu.common.excelmodel.student.ExportStudentOnlineTimeWithSchoolDetail;
 import com.zhidejiaoyu.common.excelmodel.student.ExportStudentOnlineTimeWithSchoolSummary;
 import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.pojo.ReceiveEmail;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentHours;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -20,6 +21,7 @@ import com.zhidejiaoyu.student.mail.service.MailService;
 import com.zhidejiaoyu.student.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.timingtask.service.QuartzStudentReportService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
@@ -63,6 +65,9 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
     @Resource
     private MailService mailService;
 
+    @Resource
+    private ReceiveEmailMapper receiveEmailMapper;
+
     @Scheduled(cron = "0 0 1 * * ?")
     @Override
     public void exportStudentWithSchool() {
@@ -90,12 +95,16 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
     }
 
     private void sendEmail(String fileName) {
-        mailService.sendAttachmentsMail(Mail.builder()
-                .to(new String[]{"763396567@qq.com", "18515530997@163.com"})
-                .filePath(FileConstant.TMP_EXCEL + fileName)
-                .subject(fileName)
-                .content(fileName)
-                .build());
+       List<ReceiveEmail> receiveEmails = receiveEmailMapper.selectByType(1);
+       if (CollectionUtils.isNotEmpty(receiveEmails)) {
+           String[] receivers = receiveEmails.stream().map(ReceiveEmail::getEmail).toArray(String[]::new);
+           mailService.sendAttachmentsMail(Mail.builder()
+                   .to(receivers)
+                   .filePath(FileConstant.TMP_EXCEL + fileName)
+                   .subject(fileName)
+                   .content(fileName)
+                   .build());
+       }
     }
 
     @Override
@@ -177,6 +186,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
 
         List<ExportStudentOnlineTimeWithSchoolDetail> models = studentInfoSchoolDetails.stream().map(studentInfoSchoolDetail -> {
             ExportStudentOnlineTimeWithSchoolDetail exportStudentOnlineTimeWithSchoolDetail = new ExportStudentOnlineTimeWithSchoolDetail();
+            studentInfoSchoolDetail.setPaid(Objects.equals("0", studentInfoSchoolDetail.getPaid()) ? "未充课" : "已充课");
             BeanUtils.copyProperties(studentInfoSchoolDetail, exportStudentOnlineTimeWithSchoolDetail);
             return exportStudentOnlineTimeWithSchoolDetail;
         }).collect(Collectors.toList());
@@ -206,7 +216,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
                         if (str.contains(":")) {
                             String[] split1 = str.split(":");
                             Integer cardId = Integer.parseInt(split1[0]);
-                            Integer number = Integer.parseInt(split1[1]);
+                            int number = Integer.parseInt(split1[1]);
                             Integer carNumber = studentCardMap.get(cardId);
                             if (carNumber != null) {
                                 carNumber += number;

@@ -90,4 +90,9 @@ public class RedisKeysConst {
      * 被标记为异地登录被挤掉的 sessionId
      */
     public static final String MULTIPLE_LOGIN_SESSION_ID = "MULTIPLE_LOGIN_SESSION_ID:";
+
+    /**
+     * 学生是否已充值标识，有记录的学生id说明已经充值过
+     */
+    public static final String IS_PAID = "IS_PAID";
 }
