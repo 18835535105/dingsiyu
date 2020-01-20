@@ -168,7 +168,7 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
             return "six";
         }
         if (GradeNameConstant.SEVENTH_GRADE.equals(grade)) {
-            return "serven";
+            return "seven";
         }
         if (GradeNameConstant.EIGHTH_GRADE.equals(grade)) {
             return "eight";
