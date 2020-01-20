@@ -192,6 +192,9 @@ public class SyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Syntax
         if (GradeNameConstant.VOLUME_2.equals(grade)) {
             return "down";
         }
+        if (GradeNameConstant.Full_VOLUME.equals(grade)) {
+            return "down";
+        }
         return null;
     }
 
