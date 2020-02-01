@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.common.mapper.simple;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.sun.tracing.dtrace.ProviderAttributes;
 import com.zhidejiaoyu.common.pojo.SimpleStudentUnit;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
