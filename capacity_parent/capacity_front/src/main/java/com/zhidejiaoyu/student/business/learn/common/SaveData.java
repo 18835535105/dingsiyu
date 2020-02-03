@@ -147,7 +147,17 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         }
         LearnExtend learnExtend = new LearnExtend();
         //获取校长id
-        learnExtend.setSchoolAdminId(Long.parseLong(teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId()).toString()));
+        if(student.getTeacherId()==null){
+            learnExtend.setSchoolAdminId(null);
+        }else{
+            Integer integer = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
+            if(integer==null){
+                learnExtend.setSchoolAdminId(1L);
+            }else{
+                learnExtend.setSchoolAdminId(Long.parseLong(teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId()).toString()));
+            }
+
+        }
         learnExtend.setLearnId(learnId);
         learnExtend.setWordId(wordId);
         // 保存学习记录
