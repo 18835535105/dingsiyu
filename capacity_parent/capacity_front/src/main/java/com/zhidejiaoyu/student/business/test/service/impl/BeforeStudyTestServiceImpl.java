@@ -31,6 +31,7 @@ import com.zhidejiaoyu.student.business.test.constant.TestConstant;
 import com.zhidejiaoyu.student.business.test.service.BeforeStudyTestService;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -302,7 +303,9 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         }
 
         // 匹配单元对应的年级
-        Map<Long, String> unitIdAndGrade = this.getUnitIdAndGrade(unitIds);
+        Map<String, Map<Long, String>> unitIdAndGradeAndLabel = this.getUnitIdAndGrade(unitIds);
+        Map<Long, String> unitIdAndGrade = unitIdAndGradeAndLabel.get("gradeMap");
+        Map<Long, String> unitIdAndLabel = unitIdAndGradeAndLabel.get("labelMap");
 
         // 匹配单元对应的课程id
         Map<Long, Long> unitIdAndCourseId = this.getUnitIdAndCourseId(unitIds);
@@ -316,8 +319,9 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         for (Long unitId : unitIds) {
 
             String unitGrade = unitIdAndGrade.get(unitId);
+            String unitLabel = unitIdAndLabel.get(unitId);
             timePriority = this.getTimePriority(timePriority, phaseSet, unitGrade);
-            int basePriority = this.getBasePriority(unitIdMap, unitGrade, grade, unitId);
+            int basePriority = this.getBasePriority(unitIdMap, unitGrade, unitLabel, grade, unitId);
             int errorPriority = this.getErrorPriority(unitIdMap, unitGrade, grade, unitId, basePriority);
 
             StudentStudyPlanNew.StudentStudyPlanNewBuilder studentStudyPlanNewBuilder = StudentStudyPlanNew.builder()
@@ -401,14 +405,14 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         }
     }
 
-    public int getBasePriority(Map<Long, List<SaveSubjectsDTO.Result>> unitIdMap, String unitGrade,
+    public int getBasePriority(Map<Long, List<SaveSubjectsDTO.Result>> unitIdMap, String unitGrade, String unitLabel,
                                String grade, Long unitId) {
         if (!unitIdMap.containsKey(unitId)) {
-            return PriorityUtil.getBasePriority(grade, unitGrade, 0);
+            return PriorityUtil.getBasePriority(grade, unitGrade, unitLabel, 0);
         }
         // 答错个数
         long errorCount = unitIdMap.get(unitId).get(0).getErrorCount();
-        return PriorityUtil.getBasePriority(grade, unitGrade, (int) errorCount);
+        return PriorityUtil.getBasePriority(grade, unitGrade, unitLabel, (int) errorCount);
     }
 
     /**
@@ -448,14 +452,27 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
      * 匹配单元对应的年级
      *
      * @param unitIds
-     * @return
+     * @return key:labelMap->单元id对应的上下册；gradeMap->单元id对应的年级
+     * value:key—->当前单元id；value：当前单元对应的年级或者上下册
      */
-    public Map<Long, String> getUnitIdAndGrade(List<Long> unitIds) {
-        List<GradeAndUnitIdDTO> gradeAndUnitIdDTOList = courseNewMapper.selectGradeByUnitIds(unitIds);
+    public Map<String, Map<Long, String>> getUnitIdAndGrade(List<Long> unitIds) {
+        List<GradeAndUnitIdDTO> gradeAndUnitIdDTOList = courseNewMapper.selectGradeAndLabelByUnitIds(unitIds);
+
+        Map<String, Map<Long, String>> unitIdAndGradeAndLabel = new HashMap<>(16);
+
         Map<Long, String> unitIdAndGrade = new HashMap<>(16);
-        gradeAndUnitIdDTOList.forEach(gradeAndUnitIdDTO -> unitIdAndGrade.put(gradeAndUnitIdDTO.getUnitId(),
-                StringUtil.isNotEmpty(gradeAndUnitIdDTO.getGradeExt()) ? gradeAndUnitIdDTO.getGradeExt() : gradeAndUnitIdDTO.getGrade()));
-        return unitIdAndGrade;
+        Map<Long, String> unitIdAndLabel = new HashMap<>(16);
+
+        gradeAndUnitIdDTOList.forEach(gradeAndUnitIdDTO -> {
+            unitIdAndGrade.put(gradeAndUnitIdDTO.getUnitId(),
+                    StringUtil.isNotEmpty(gradeAndUnitIdDTO.getGradeExt()) ? gradeAndUnitIdDTO.getGradeExt() : gradeAndUnitIdDTO.getGrade());
+
+            unitIdAndLabel.put(gradeAndUnitIdDTO.getUnitId(),
+                    StringUtils.isNotEmpty(gradeAndUnitIdDTO.getLabelExt()) ? gradeAndUnitIdDTO.getLabelExt() : gradeAndUnitIdDTO.getLabel());
+        });
+        unitIdAndGradeAndLabel.put("labelMap", unitIdAndLabel);
+        unitIdAndGradeAndLabel.put("gradeMap", unitIdAndGrade);
+        return unitIdAndGradeAndLabel;
     }
 
     /**

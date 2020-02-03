@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.utils.study;
 
+import com.zhidejiaoyu.common.constant.GradeNameConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 计算优先级
@@ -40,7 +42,7 @@ public class PriorityUtil {
     public static final Map<String, Integer> GRADE_TO_NUM = new HashMap<>(16);
 
     static {
-        intiBasePriority();
+        initBasePriority();
         initGradeToNum();
     }
 
@@ -51,20 +53,37 @@ public class PriorityUtil {
      *
      * @param grade       学生当前所在年级
      * @param wordInGrade 测试的单词所在年级
+     * @param wordInLabel 测试的单元所在上下册
      * @param errorCount  当前单元答错个数
      * @return
      */
-    public static int getBasePriority(String grade, String wordInGrade, int errorCount) {
+    public static int getBasePriority(String grade, String wordInGrade, String wordInLabel, int errorCount) {
+
+        // 非当前学年，六年级下册均为2200，高三下册为3400
+        // 学生不是6年级，当前测试单元为6年级下册，基础优先级为2200
+        if (!Objects.equals(grade, GradeNameConstant.SIXTH_GRADE)
+                && Objects.equals(wordInGrade, GradeNameConstant.SIXTH_GRADE)
+                && Objects.equals(GradeNameConstant.VOLUME_2, wordInLabel)) {
+            return 2200;
+        }
+        // 学生年级不是高三，当前测试单元为高三下册单元，基础优先级为3400
+        if (!Objects.equals(grade, GradeNameConstant.SENIOR_THREE)
+                && Objects.equals(wordInGrade, GradeNameConstant.SENIOR_THREE)
+                && Objects.equals(GradeNameConstant.VOLUME_2, wordInLabel)) {
+            return 3400;
+        }
+
+        int basePriority = BASE_PRIORITY.get(grade) == null ? 0 : BASE_PRIORITY.get(grade);
         if (errorCount == 1) {
-            return BASE_PRIORITY.get(grade) + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 197;
+            return basePriority + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 197;
         }
         if (errorCount == 2) {
-            return BASE_PRIORITY.get(grade) + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 200;
+            return basePriority + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 200;
         }
         if (errorCount == 3) {
-            return BASE_PRIORITY.get(grade) + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 203;
+            return basePriority + (GRADE_TO_NUM.get(grade) + 1 - GRADE_TO_NUM.get(wordInGrade)) * 203;
         }
-        return BASE_PRIORITY.get(grade);
+        return basePriority;
     }
 
     /**
@@ -112,7 +131,7 @@ public class PriorityUtil {
     /**
      * 获取各个年级的基础优先级值
      */
-    private static void intiBasePriority() {
+    private static void initBasePriority() {
         BASE_PRIORITY.put("一年级", 1000);
         BASE_PRIORITY.put("二年级", 1200);
         BASE_PRIORITY.put("三年级", 1400);

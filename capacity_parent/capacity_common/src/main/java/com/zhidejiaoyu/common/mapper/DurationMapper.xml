@@ -79,7 +79,8 @@
         study_model, study_count, study_plan_id
     </sql>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from duration
+        delete
+        from duration
         where id = #{id,jdbcType=BIGINT}
     </delete>
     <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.DurationExample">
@@ -248,17 +249,13 @@
         <!-- and study_model = '慧记忆' -->
     </select>
     <select id="selectValidTimeAndOnlineTime" resultType="java.util.Map" parameterType="map">
-        SELECT
-            valid_time validTime,
-            (
-                TO_SECONDS(login_out_time) - TO_SECONDS(login_time)
-            )          onlineTime
-        FROM
-            duration
-        WHERE
-            student_id = #{student.id}
-        GROUP BY
-            login_time;
+        SELECT valid_time validTime,
+               (
+                   TO_SECONDS(login_out_time) - TO_SECONDS(login_time)
+                   )      onlineTime
+        FROM duration
+        WHERE student_id = #{student.id}
+        GROUP BY login_time;
 
     </select>
     <select id="planSeniority" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
@@ -431,7 +428,9 @@
     </select>
     <select id="countByLoginOutTime" resultType="java.lang.Integer" parameterType="map">
         select count(id)
-        from duration where student_id = #{studentId} and login_out_time like concat(#{loginOutTime}, '%')
+        from duration
+        where student_id = #{studentId}
+          and login_out_time like concat(#{loginOutTime}, '%')
     </select>
     <select id="selectLastDuration" resultMap="BaseResultMap" parameterType="map">
         select
@@ -455,12 +454,14 @@
         select t.school                                schoolName,
                s.account,
                s.student_name                          studentName,
+               s.register_date                         createTime,
                (select sum(online_time)
                 from duration
                 where student_id = s.id
                   and TO_DAYS(login_out_time) = TO_DAYS(#{date})
                 GROUP BY student_id)                   onlineTime,
-               date_format(rl.create_time, '%Y-%m-%d') time
+               date_format(rl.create_time, '%Y-%m-%d') time,
+               (select count(id) from pay_log where student_id = s.id) paid
         from run_log rl,
              student s,
              teacher t
@@ -472,11 +473,10 @@
     </select>
 
     <select id="selectLoginTimeByDate" parameterType="map" resultType="date">
-        select
-        max(login_time)
+        select max(login_time)
         from duration
-        where student_id =#{studentId}
-        and date(login_time)&lt;=date(#{date})
+        where student_id = #{studentId}
+          and date(login_time) &lt;= date(#{date})
     </select>
 
     <delete id="deleteByStudentIds" parameterType="map">

@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.excelmodel.student;
 
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import com.zhidejiaoyu.common.annotation.excel.CellStyleFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,6 +18,7 @@ public class ExportStudentOnlineTimeWithSchoolDetail {
 
     @CellStyleFormat()
     @ExcelProperty(value = "学校名称", index = 0)
+    @ColumnWidth(40)
     private String schoolName;
 
     @CellStyleFormat()
@@ -34,4 +36,12 @@ public class ExportStudentOnlineTimeWithSchoolDetail {
     @CellStyleFormat()
     @ExcelProperty(value = "统计日期", index = 4)
     private String time;
+
+    @CellStyleFormat()
+    @ExcelProperty(value = "学生创建日期", index = 5)
+    private String createTime;
+
+    @CellStyleFormat()
+    @ExcelProperty(value = "是否充课", index = 6)
+    private String paid;
 }

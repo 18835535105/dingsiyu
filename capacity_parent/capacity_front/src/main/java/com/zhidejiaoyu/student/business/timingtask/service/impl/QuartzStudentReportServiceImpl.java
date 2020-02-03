@@ -186,6 +186,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
 
         List<ExportStudentOnlineTimeWithSchoolDetail> models = studentInfoSchoolDetails.stream().map(studentInfoSchoolDetail -> {
             ExportStudentOnlineTimeWithSchoolDetail exportStudentOnlineTimeWithSchoolDetail = new ExportStudentOnlineTimeWithSchoolDetail();
+            studentInfoSchoolDetail.setPaid(Objects.equals("0", studentInfoSchoolDetail.getPaid()) ? "未充课" : "已充课");
             BeanUtils.copyProperties(studentInfoSchoolDetail, exportStudentOnlineTimeWithSchoolDetail);
             return exportStudentOnlineTimeWithSchoolDetail;
         }).collect(Collectors.toList());

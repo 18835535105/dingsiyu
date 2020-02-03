@@ -151,7 +151,18 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         Student student = dto.getStudent();
         // 在星球页请求，返回当前正在学习的节点信息
         Long studentId = student.getId();
-        StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndType(studentId, 1);
+
+        // 查询一键学习中的语法流程，优先学习（因为语法的课程信息与单词的不同）
+        StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndLearModelType(studentId, 4);
+
+        StudentStudyPlanNew maxFinalLevelStudentStudyPlanNew = null;
+        if (studentFlowNew == null) {
+            // 查询学生最高优先级数据
+            maxFinalLevelStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
+
+            studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId,
+                    maxFinalLevelStudentStudyPlanNew.getUnitId(), maxFinalLevelStudentStudyPlanNew.getEasyOrHard());
+        }
 
         StudyFlowNew studyFlowNew;
         LearnNew learnNew;
@@ -161,8 +172,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
                 throw new ServiceException("学生还没有进行摸底测试，未查询到可以学习的课程！");
             }
             // 如果学生已经进行过摸底测试，初始化流程节点以及学习记录
-            StudentStudyPlanNew maxFinalLevelStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(studentId, 1).get(0);
-
             studyFlowNew = studyFlowNewMapper.selectById(maxFinalLevelStudentStudyPlanNew.getFlowId());
 
             learnNew = initData.saveLearn(maxFinalLevelStudentStudyPlanNew, FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(studyFlowNew.getFlowName()));
