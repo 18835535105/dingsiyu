@@ -48,9 +48,9 @@ public class GameController extends BaseController {
      * @param wordList 当前游戏题目中的单词集合，避免下次取的游戏题目与上次题目有重复的
      * @return
      */
-    @GetMapping("/getGameOne")
+    @PostMapping("/getGameOne")
     public ServerResponse<GameOneVo> getGameOne(HttpSession session, @RequestParam(required = false, defaultValue = "1") Integer pageNum,
-                                                @RequestParam(required = false, name = "wordList[]") List<String> wordList, Long unitId) {
+                                                @RequestParam(required = false, name = "wordList") List<String> wordList, Long unitId) {
         return gameService.getGameOne(session, pageNum, wordList, unitId);
     }
 
