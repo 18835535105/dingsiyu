@@ -122,17 +122,20 @@ xfyun:
 spring:
   profiles: dev
   datasource:
-    url: jdbc:mysql://192.168.0.2:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    #url: jdbc:mysql://192.168.0.2:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://123.56.142.84:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: zdjy
     password: zdjy
   redis:
-    host: ${ip}
+    #host: ${ip}
+    host: 123.56.142.84
     port: 6379
 
 server:
   port: 8083
 
 ip: 192.168.0.2
+domain: http://localhost:8083
 adminDomin: http://localhost:9999
 
 mybatis-plus:
@@ -179,7 +182,9 @@ spring:
 logging:
   config: classpath:logback-test.xml
 
-ip: 192.168.0.2
+ip: 123.56.142.84
+domain: http://localhost:8082
+url: https://capacity.test
 adminDomin: http://192.168.0.2:9999/dept
 
 cross:
