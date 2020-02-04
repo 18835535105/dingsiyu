@@ -37,7 +37,8 @@ public class LearnNewController extends BaseController {
     private IStudyService breakThroughTheTextService;
     @Resource
     private IStudyService textTrainingService;
-
+    @Resource
+    private IStudyService sentencePatternGameService;
 
     private Map<Integer, IStudyService> map = new HashMap<>();
 
@@ -54,6 +55,7 @@ public class LearnNewController extends BaseController {
         map.put(11, textAuditionService);
         map.put(12, textTrainingService);
         map.put(13, breakThroughTheTextService);
+        map.put(19, sentencePatternGameService);
         /*
         map.put(14,);
 
@@ -70,7 +72,7 @@ public class LearnNewController extends BaseController {
      * @param getModel   模块  1，单词图鉴 3，慧记忆 4，会听写
      *                   5，慧默写 6，单词游戏 7，句型翻译 8，句型听力 9，音译练习
      *                   10，句型默写 11，课文试听 12，课文训练 13，闯关测试 14，课文跟读
-     *                   15，读语法 16，选语法 17，写语法 18，语法游戏
+     *                   15，读语法 16，选语法 17，写语法 18，语法游戏 19，句型游戏
      * @param difficulty 1：普通模式；2：暴走模式
      * @return
      */
