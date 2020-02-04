@@ -13,6 +13,9 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
+    <sql id="base_sql">
+        id, unit_id, vocabulary_id, classify, word_chinese, `group`, update_time
+    </sql>
 
     <select id="selectInterferenceTerm" resultType="string" parameterType="map">
         select word_chinese
@@ -32,6 +35,16 @@
           and (v.small_picture_url is not null
             or v.middle_picture_url is not null
             or v.high_picture_url is not null)
+    </select>
+    <select id="selectByUnitIdAndGroup" resultType="com.zhidejiaoyu.common.vo.beforelearngame.VocabularyVO"
+            parameterType="map">
+        select v.word,
+               uvn.word_chinese wordChinese,
+               uvn.unit_id      unitId
+        from unit_vocabulary_new uvn
+                 join vocabulary v on uvn.vocabulary_id = v.id
+        where unit_id = #{unitId}
+          and `group` = #{group}
     </select>
 
 </mapper>

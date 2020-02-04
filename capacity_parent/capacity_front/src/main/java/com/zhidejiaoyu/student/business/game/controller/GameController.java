@@ -87,4 +87,14 @@ public class GameController extends BaseController {
         return gameService.saveGameTwo(session, gameScore);
     }
 
+    /**
+     * 获取单词学前游戏测试题
+     *
+     * @return
+     */
+    @GetMapping("/getBeforeLearnGame")
+    public ServerResponse<Object> getBeforeLearnGame() {
+        return gameService.getBeforeLearnGame();
+    }
+
 }
