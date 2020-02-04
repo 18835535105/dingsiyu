@@ -5,8 +5,8 @@
         <id column="id" property="id"/>
         <result column="centreExample" property="centreExample"/>
         <result column="centreTranslate" property="centreTranslate"/>
-        <result column="ExampleDisturb" property="ExampleDisturb"/>
-        <result column="TranslateDisturb" property="TranslateDisturb"/>
+        <result column="ExampleDisturb" property="exampleDisturb"/>
+        <result column="TranslateDisturb" property="translateDisturb"/>
         <result column="read_url" property="readUrl"/>
     </resultMap>
 
@@ -93,6 +93,13 @@
         s.id = us.sentence_id
         and us.unit_id = #{unitId}
         and us.group=#{group}
+    </select>
+    <select id="selectNotIds" resultType="string" parameterType="map">
+        select centreExample from sentence where id not in (
+            <foreach collection="sentenceIds" item="id" separator=",">
+                #{id}
+            </foreach>
+        )
     </select>
 
 

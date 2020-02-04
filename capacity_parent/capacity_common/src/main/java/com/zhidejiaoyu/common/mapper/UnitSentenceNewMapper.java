@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * <p>
  * 单元-例句(中间表) Mapper 接口
@@ -36,4 +39,6 @@ public interface UnitSentenceNewMapper extends BaseMapper<UnitSentenceNew> {
     Integer countByUnitIdAndGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
 
     String selectSentenceChineseByUnitIdAndSentenceId(@Param("unitId") Long unitId,@Param("sentenceId") Long sentenceId);
+
+    List<Map<String,Object>> selectSentenceAndChineseByUnitIdAndGroup(@Param("unitId") Long unitId,@Param("group") Integer group);
 }

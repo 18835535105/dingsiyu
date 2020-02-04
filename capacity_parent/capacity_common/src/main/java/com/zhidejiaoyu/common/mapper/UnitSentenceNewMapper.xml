@@ -21,5 +21,15 @@
         where unit_id=#{unitId}
         and sentence_id=#{sentenceId}
     </select>
+    <select id="selectSentenceAndChineseByUnitIdAndGroup" resultType="map" parameterType="map">
+        select
+        unit.chinese chinese ,sen.centreExample sentece,sen.id id
+        from
+        unit_sentence_new unit
+        join sentence sen
+        on unit.sentence_id = sen.id
+        where unit.group=#{group}
+        and unit.unit_id =#{unitId}
+    </select>
 
 </mapper>
