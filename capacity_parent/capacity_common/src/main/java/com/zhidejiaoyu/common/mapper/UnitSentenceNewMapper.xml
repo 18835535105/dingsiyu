@@ -23,7 +23,7 @@
     </select>
     <select id="selectSentenceAndChineseByUnitIdAndGroup" resultType="map" parameterType="map">
         select
-        unit.chinese chinese ,sen.centreExample sentece,sen.id id
+        unit.chinese chinese ,sen.centreExample sentence,sen.id id
         from
         unit_sentence_new unit
         join sentence sen
