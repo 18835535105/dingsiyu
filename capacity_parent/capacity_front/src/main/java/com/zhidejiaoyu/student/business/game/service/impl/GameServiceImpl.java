@@ -383,7 +383,7 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
             Collections.shuffle(vocabularyVos);
             // 从剩余单词中随机取出三个作为错误选项
             List<AnswerVO> vos = vocabularyVos.stream()
-                    .filter(vo -> Objects.equals(vocabularyVO.getWord(), vo.getWord()))
+                    .filter(vo -> !Objects.equals(vocabularyVO.getWord(), vo.getWord()))
                     .limit(3)
                     .map(vo -> AnswerVO.builder()
                             .right(false)
