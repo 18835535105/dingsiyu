@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.UnitVocabularyNew;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.vo.beforelearngame.VocabularyVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -64,4 +65,13 @@ public interface UnitVocabularyNewMapper extends BaseMapper<UnitVocabularyNew> {
      * @return
      */
     int countPicture(@Param("unitId") Long unitId, @Param("group") Integer group);
+
+    /**
+     * 查询当前单元当前group下的单词数据
+     *
+     * @param unitId
+     * @param group
+     * @return
+     */
+    List<VocabularyVO> selectByUnitIdAndGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
 }

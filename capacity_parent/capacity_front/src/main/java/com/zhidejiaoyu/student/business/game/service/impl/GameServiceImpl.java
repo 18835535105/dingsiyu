@@ -7,8 +7,12 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.beforelearngame.AnswerVO;
+import com.zhidejiaoyu.common.vo.beforelearngame.SubjectVO;
+import com.zhidejiaoyu.common.vo.beforelearngame.VocabularyVO;
 import com.zhidejiaoyu.common.vo.game.GameOneVo;
 import com.zhidejiaoyu.common.vo.game.GameTwoVo;
 import com.zhidejiaoyu.student.business.game.service.GameService;
@@ -29,6 +33,11 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore> implements GameService {
+
+    /**
+     * 学前游戏测试题目数量
+     */
+    public static final int BEFORE_LEARN_GAME_COUNT = 10;
 
     @Resource
     private GameStoreMapper gameStoreMapper;
@@ -56,6 +65,18 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
 
     @Resource
     private BaiduSpeak baiduSpeak;
+
+    @Resource
+    private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
+
+    @Resource
+    private StudentFlowNewMapper studentFlowNewMapper;
+
+    @Resource
+    private LearnNewMapper learnNewMapper;
+
+    @Resource
+    private UnitVocabularyNewMapper unitVocabularyNewMapper;
 
     @Override
     public ServerResponse<GameOneVo> getGameOne(HttpSession session, Integer pageNum, List<String> wordList, Long unitId) {
@@ -297,6 +318,103 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
                 return ServerResponse.createBySuccess(gameStore.getGameName());
             }
         }
+    }
+
+    @Override
+    public ServerResponse<Object> getBeforeLearnGame() {
+
+        List<VocabularyVO> groupWordInfo = this.getCurrentGroupWordInfo();
+
+        int size = groupWordInfo.size();
+        if (size >= BEFORE_LEARN_GAME_COUNT) {
+            return ServerResponse.createBySuccess(this.packageResultList(groupWordInfo));
+        }
+
+        // 当前group单词数不足10个
+        List<SubjectVO> vos = this.packageResultList(groupWordInfo);
+        List<SubjectVO> resultVos = this.getSubjectVO(vos, new ArrayList<>(10));
+        return ServerResponse.createBySuccess(resultVos);
+    }
+
+    /**
+     * 获取当前group单词数据
+     *
+     * @return
+     */
+    public List<VocabularyVO> getCurrentGroupWordInfo() {
+        Long studentId = super.getStudentId(HttpUtil.getHttpSession());
+
+        // 查询学生最高优先级数据
+        StudentStudyPlanNew maxFinalLevelStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
+
+        StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId,
+                maxFinalLevelStudentStudyPlanNew.getUnitId(), maxFinalLevelStudentStudyPlanNew.getEasyOrHard());
+
+        LearnNew learnNew = learnNewMapper.selectById(studentFlowNew.getLearnId());
+
+        return unitVocabularyNewMapper.selectByUnitIdAndGroup(learnNew.getUnitId(), learnNew.getGroup());
+    }
+
+    public List<SubjectVO> getSubjectVO(List<SubjectVO> subjectVos, List<SubjectVO> resultVos) {
+        int size = resultVos.size();
+        if (size < BEFORE_LEARN_GAME_COUNT) {
+            resultVos.addAll(subjectVos);
+            if (resultVos.size() > BEFORE_LEARN_GAME_COUNT) {
+                return resultVos.subList(0, 9);
+            }
+            this.getSubjectVO(subjectVos, resultVos);
+        }
+        return resultVos;
+    }
+
+    /**
+     * 封装单词学前游戏测试题
+     *
+     * @param vocabularyVos
+     * @return
+     */
+    public List<SubjectVO> packageResultList(List<VocabularyVO> vocabularyVos) {
+        List<SubjectVO> resultList = new ArrayList<>(10);
+        Collections.shuffle(vocabularyVos);
+        int size = vocabularyVos.size();
+        for (int i = 0; i < Math.min(size, 10); i++) {
+            VocabularyVO vocabularyVO = vocabularyVos.get(i);
+
+            Collections.shuffle(vocabularyVos);
+            // 从剩余单词中随机取出三个作为错误选项
+            List<AnswerVO> vos = vocabularyVos.stream()
+                    .filter(vo -> !Objects.equals(vocabularyVO.getWord(), vo.getWord()))
+                    .limit(3)
+                    .map(vo -> AnswerVO.builder()
+                            .right(false)
+                            .title(vo.getWord())
+                            .build())
+                    .collect(Collectors.toList());
+            // 添加正确答案
+            vos.add(AnswerVO.builder()
+                    .title(vocabularyVO.getWord())
+                    .right(true)
+                    .build());
+
+            // 如果选项不足4个，增加错误选项
+            if (vos.size() < 4) {
+                for (int i1 = 0; i1 < 4 - vos.size(); i1++) {
+                    vos.add(AnswerVO.builder()
+                            .title("")
+                            .right(false)
+                            .build());
+                }
+            }
+
+            Collections.shuffle(vos);
+            SubjectVO subjectVO = SubjectVO.builder()
+                    .select(vos)
+                    .topic(vocabularyVO.getWordChinese())
+                    .build();
+
+            resultList.add(subjectVO);
+        }
+        return resultList;
     }
 
     /**

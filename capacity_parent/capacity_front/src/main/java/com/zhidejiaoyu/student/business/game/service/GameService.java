@@ -21,11 +21,10 @@ public interface GameService extends BaseService<GameStore> {
      *
      * @param session
      * @param pageNum
-     * @param unitId 单元id
-     *
+     * @param unitId  单元id
      * @return
      */
-    ServerResponse<GameOneVo> getGameOne(HttpSession session, Integer pageNum,List<String> wordList, Long unitId);
+    ServerResponse<GameOneVo> getGameOne(HttpSession session, Integer pageNum, List<String> wordList, Long unitId);
 
     /**
      * 获取游戏《桌牌捕音》试题
@@ -53,5 +52,12 @@ public interface GameService extends BaseService<GameStore> {
      * @return
      */
     ServerResponse<String> getGameName(HttpSession session);
+
+    /**
+     * 获取学前游戏《飞船建设》题目
+     *
+     * @return
+     */
+    ServerResponse<Object> getBeforeLearnGame();
 }
 

@@ -48,7 +48,7 @@ public class FlowVO implements Serializable {
      * true：是最后一个单元，学习剩余的所有语法课程
      * false：不是最后一个单元，学习当前课程对应的语法课程
      */
-     Boolean lastUnit;
+     private Boolean lastUnit;
 
 
     /**
