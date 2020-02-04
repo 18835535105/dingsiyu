@@ -6,13 +6,10 @@ import com.zhidejiaoyu.common.mapper.DurationMapper;
 import com.zhidejiaoyu.common.pojo.Duration;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.SessionCookieConfig;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.Objects;

@@ -103,4 +103,9 @@ public interface RedisKeysConst {
      * 学生是否已充值标识，有记录的学生id说明已经充值过
      */
     String IS_PAID = "IS_PAID";
+
+    /**
+     * 用于标识学生指定的group中的单词首次答错是否需要额外增加50%的记忆强度
+     */
+    String FIRST_FALSE_ADD = "FIRST_FALSE_ADD";
 }

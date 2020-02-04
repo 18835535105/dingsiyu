@@ -6,7 +6,6 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.*;
 import com.zhidejiaoyu.common.study.memorystrength.TestMemoryStrength;
-import com.zhidejiaoyu.student.business.service.impl.MemoryServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

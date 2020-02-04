@@ -1,16 +1,20 @@
 package com.zhidejiaoyu.student.business.flow.service.impl;
 
+import com.zhidejiaoyu.common.constant.session.SessionConstant;
+import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
 import com.zhidejiaoyu.student.business.flow.FlowConstant;
 import com.zhidejiaoyu.student.business.flow.common.*;
 import com.zhidejiaoyu.student.business.flow.service.StudyFlowService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,6 +87,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     @Resource
     private SyntaxUnitMapper syntaxUnitMapper;
 
+    @Resource
+    private RedisOpt redisOpt;
+
     /**
      * 节点学完, 把下一节初始化到student_flow表, 并把下一节点返回
      *
@@ -126,6 +133,18 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         dto.setStudyFlowNew(studyFlowNew);
         dto.setSession(session);
 
+        // 判断单词游戏
+        ServerResponse<Object> response = this.judgeBeforeGame(dto);
+        if (response != null) {
+            return response;
+        }
+
+        // 判断句型游戏
+        response = this.judgeSentenceGame(dto);
+        if (response != null) {
+            return response;
+        }
+
         if (studyFlowNew.getNextTrueFlow() == 0) {
             if (checkNextUnitOrGroup(dto, studyFlowNew)) {
                 return ServerResponse.createBySuccess(finishGroupOrUnit.finishOneKeyGroup(dto));
@@ -139,6 +158,60 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
 
         // 判断下个节点
         return judgeNextNode.judgeNextNode(dto, this);
+    }
+
+    /**
+     * 如果当前节点是句型游戏测试，判断下个节点
+     *
+     * @param dto
+     * @return
+     */
+    private ServerResponse<Object> judgeSentenceGame(NodeDto dto) {
+        if (Objects.equals(dto.getNodeId(), FlowConstant.SENTENCE_GAME)) {
+            if (dto.getGrade() == 5) {
+                // 全部答对
+                return this.toAnotherFlow(dto, (int) FlowConstant.SENTENCE_TRANSLATE);
+            }
+
+            if (dto.getGrade() >= 3 || dto.getGrade() <= 4) {
+                return this.toAnotherFlow(dto, (int) FlowConstant.YIN_YI_EXERCISE_TWO);
+            }
+
+            if (dto.getGrade() <= 2) {
+                return this.toAnotherFlow(dto, (int) FlowConstant.YIN_YI_EXERCISE_ONE);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 如果当前节点是学前游戏测试，判断下个节点
+     *
+     * @param dto
+     * @return
+     */
+    public ServerResponse<Object> judgeBeforeGame(NodeDto dto) {
+        if (Objects.equals(dto.getNodeId(), FlowConstant.BEFORE_GROUP_GAME)) {
+            Long studentId = dto.getStudent().getId();
+            boolean isEasy = dto.getEasyOrHard() == 1;
+            if (dto.getGrade() == PointConstant.HUNDRED) {
+                // 全部答对
+                return isEasy ? this.toAnotherFlow(dto, (int) FlowConstant.SENTENCE_TRANSLATE) : this.toAnotherFlow(dto, (int) FlowConstant.LETTER_WRITE);
+            }
+
+            if (dto.getGrade() >= PointConstant.EIGHTY) {
+                return isEasy ? this.toAnotherFlow(dto, (int) FlowConstant.PLAYER) : this.toAnotherFlow(dto, (int) FlowConstant.LETTER_WRITE);
+            }
+
+            if (dto.getGrade() < PointConstant.EIGHTY) {
+                // 将当前group所有单词的记忆强度初始化为50%
+                redisOpt.saveFirstFalseAdd(studentId, dto.getUnitId(), dto.getGroup());
+                HttpUtil.getHttpSession().setAttribute(SessionConstant.FIRST_FALSE_ADD, true);
+                // 从单词播放机继续学习单词流程
+                return isEasy ? this.toAnotherFlow(dto, (int) FlowConstant.PLAYER) : this.toAnotherFlow(dto, (int) FlowConstant.LETTER_WRITE);
+            }
+        }
+        return null;
     }
 
     /**
@@ -199,6 +272,12 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         } else {
             vo = this.packageFlowVO(studyFlowNew, student, learnNew.getUnitId());
         }
+
+        boolean firstFalseAdd = redisOpt.getFirstFalseAdd(studentId, learnNew.getUnitId(), learnNew.getGroup());
+        if (firstFalseAdd) {
+            HttpUtil.getHttpSession().setAttribute(SessionConstant.FIRST_FALSE_ADD, true);
+        }
+
         return ServerResponse.createBySuccess(vo);
     }
 

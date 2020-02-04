@@ -1,9 +1,12 @@
 package com.zhidejiaoyu.student.business.flow.service.impl;
 
+import com.zhidejiaoyu.common.constant.session.SessionConstant;
+import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.CcieUtil;
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
@@ -11,6 +14,7 @@ import com.zhidejiaoyu.student.business.flow.FlowConstant;
 import com.zhidejiaoyu.student.business.flow.common.*;
 import com.zhidejiaoyu.student.business.flow.service.StudyFlowService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,6 +80,9 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
 
     @Resource
     private SyntaxUnitMapper syntaxUnitMapper;
+
+    @Resource
+    private RedisOpt redisOpt;
 
     /**
      * 流程名称与 studyCapacity 中 type 的映射
@@ -147,6 +154,18 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             return null;
         }
 
+        // 判断单词游戏前测下个节点
+        ServerResponse<Object> res = judgeBeforeGame(dto);
+        if (res != null) {
+            return res;
+        }
+
+        // 判断句型游戏下个节点
+        res = judgeSentenceGame(dto);
+        if (res != null) {
+            return res;
+        }
+
         // 学习下一单元, 前端需要一个弹框提示
         if (studyFlowNew.getNextTrueFlow() == 0) {
 
@@ -168,6 +187,59 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         }
         // 判断下个节点
         return judgeNextNode.judgeNextNode(dto, this);
+    }
+
+    /**
+     * 如果当前节点是句型游戏测试，判断下个节点
+     *
+     * @param dto
+     * @return
+     */
+    private ServerResponse<Object> judgeSentenceGame(NodeDto dto) {
+        if (Objects.equals(dto.getNodeId(), FlowConstant.FREE_SENTENCE_GAME)) {
+            if (dto.getGrade() == 5) {
+                // 全部答对
+                return this.toAnotherFlow(dto, (int) FlowConstant.FREE_SENTENCE_TRANSLATE);
+            }
+
+            if (dto.getGrade() >= 3 || dto.getGrade() <= 4) {
+                return this.toAnotherFlow(dto, (int) FlowConstant.FREE_YIN_YI_EXERCISE_TWO);
+            }
+
+            if (dto.getGrade() <= 2) {
+                return this.toAnotherFlow(dto, (int) FlowConstant.FREE_YIN_YI_EXERCISE_ONE);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 如果当前节点是学前游戏测试，判断下个节点
+     *
+     * @param dto
+     * @return
+     */
+    public ServerResponse<Object> judgeBeforeGame(NodeDto dto) {
+        if (Objects.equals(dto.getNodeId(), FlowConstant.BEFORE_GROUP_GAME)) {
+            Long studentId = dto.getStudent().getId();
+            boolean isEasy = dto.getEasyOrHard() == 1;
+            if (dto.getGrade() == PointConstant.HUNDRED) {
+                // 全部答对
+                return isEasy ? finishGroupOrUnit.finishFreeGroup(dto) : this.toAnotherFlow(dto, (int) FlowConstant.FREE_LETTER_WRITE);
+            }
+
+            if (dto.getGrade() >= PointConstant.EIGHTY) {
+                return isEasy ? this.toAnotherFlow(dto, (int) FlowConstant.FREE_PLAYER) : this.toAnotherFlow(dto, (int) FlowConstant.FREE_LETTER_WRITE);
+            }
+
+            if (dto.getGrade() < PointConstant.EIGHTY) {
+                // 将当前group所有单词的记忆强度初始化为50%
+                redisOpt.saveFirstFalseAdd(studentId, dto.getUnitId(), dto.getGroup());
+                HttpUtil.getHttpSession().setAttribute(SessionConstant.FIRST_FALSE_ADD, true);
+                return isEasy ? this.toAnotherFlow(dto, (int) FlowConstant.FREE_PLAYER) : this.toAnotherFlow(dto, (int) FlowConstant.FREE_LETTER_WRITE);
+            }
+        }
+        return null;
     }
 
     /**
@@ -237,6 +309,11 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
                     .unitId(unitId)
                     .easyOrHard(easyOrHard)
                     .build(), 1, dto.getModelType() - 1);
+        }
+
+        boolean firstFalseAdd = redisOpt.getFirstFalseAdd(studentId, learnNew.getUnitId(), learnNew.getGroup());
+        if (firstFalseAdd) {
+            HttpUtil.getHttpSession().setAttribute(SessionConstant.FIRST_FALSE_ADD, true);
         }
 
         return this.getFlowVoServerResponse(learnNew, modelType, student);

@@ -1,10 +1,12 @@
 package com.zhidejiaoyu.student.common;
 
+import com.zhidejiaoyu.common.constant.session.SessionConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.StudentRestudyUtil;
 import com.zhidejiaoyu.common.study.memorystrength.StudyMemoryStrength;
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +93,9 @@ public class SaveWordLearnAndCapacity {
                 }
                 capacity.setCourseId(learn.getCourseId());
                 capacity.setFaultTime(1);
-                capacity.setMemoryStrength(0.12);
+
+                Object object = HttpUtil.getHttpSession().getAttribute(SessionConstant.FIRST_FALSE_ADD);
+                capacity.setMemoryStrength((object == null || !(boolean) object) ? 0.12 : 0.62);
                 capacity.setStudentId(student.getId());
                 capacity.setUnitId(learn.getUnitId());
                 capacity.setVocabularyId(learn.getVocabularyId());
