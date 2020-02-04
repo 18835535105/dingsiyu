@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.controller;
+package com.zhidejiaoyu.student.business.test.controller;
 
 import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.vo.testVo.TestDetailVo;
@@ -102,11 +102,11 @@ public class TestController {
      */
     @GetMapping("/gitUnitSentenceTest")
     @ResponseBody
-    public ServerResponse<Object> gitUnitSentenceTest(HttpSession session, Long unitId) {
+    public ServerResponse<Object> gitUnitSentenceTest(HttpSession session, Long unitId,Integer type) {
         if (unitId == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), "unitId 不能为 null");
         }
-        return testService.gitUnitSentenceTest(session, unitId);
+        return testService.gitUnitSentenceTest(session, unitId,type);
     }
 
     /**

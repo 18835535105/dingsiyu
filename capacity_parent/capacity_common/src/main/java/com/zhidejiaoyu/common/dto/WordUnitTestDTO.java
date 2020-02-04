@@ -74,4 +74,8 @@ public class WordUnitTestDTO {
      * 流程id
      */
     private Long flowId;
+    /**
+     * 模块1，听模块 2，译模块
+     */
+    private Integer type;
 }

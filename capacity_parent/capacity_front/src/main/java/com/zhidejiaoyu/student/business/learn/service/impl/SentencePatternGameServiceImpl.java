@@ -20,7 +20,7 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 
 /**
- * 语法游戏界面
+ * 句型游戏界面
  */
 @Service(value = "sentencePatternGameService")
 @Slf4j
@@ -152,7 +152,6 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
         resultMap.put("gold", gold);
         resultMap.put("point", total);
         resultMap.put("imgUrl", AliyunInfoConst.host + student.getPartUrl());
-
         return resultMap;
     }
 }

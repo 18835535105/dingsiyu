@@ -945,7 +945,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      * @return
      */
     @Override
-    public ServerResponse<Object> gitUnitSentenceTest(HttpSession session, Long unitId) {
+    public ServerResponse<Object> gitUnitSentenceTest(HttpSession session, Long unitId, Integer type) {
         Student student = getStudent(session);
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, 1, 2);
         //获取单元句子
@@ -957,7 +957,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             Long courseId = sentenceUnitMapper.getCourseIdById(unitId.intValue());
             sentenceList = sentenceMapper.selectRoundSentence(courseId);
         }
-        List<Object> list = testSentenceUtil.resultTestSentence(sentences, sentenceList);
+        List<Object> list = testSentenceUtil.resultTestSentence(sentences, sentenceList, type);
         return ServerResponse.createBySuccess(list);
     }
 
@@ -970,16 +970,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         TestRecord testRecord;
         saveTeksData.insertLearnExtend(wordUnitTestDTO.getFlowId(), wordUnitTestDTO.getUnitId()[0], student, "音译测试", 1, 2);
         wordUnitTestDTO.setClassify(8);
-
         // 判断当前单元是不是首次进行测试
-        boolean isFirst = false;
         TestRecord testRecordOld = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
                 wordUnitTestDTO.getUnitId()[0], "音译测试", "音译测试");
-        if (testRecordOld == null) {
-            isFirst = true;
-        }
-
-        int goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecordOld, true);
         testRecord = new TestRecord();
         if (testRecordOld == null) {
             // 首次测试大于或等于80分，超过历史最高分次数 +1
@@ -993,7 +986,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
         testRecord.setCourseId(wordUnitTestDTO.getCourseId());
         testRecord.setUnitId(wordUnitTestDTO.getUnitId()[0]);
-        testRecord.setPoint(wordUnitTestDTO.getPoint());
         int rightCount = 0;
         int errorCount = 0;
         if (wordUnitTestDTO.getErrorCount() != null) {
@@ -1005,7 +997,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setErrorCount(errorCount);
         testRecord.setRightCount(rightCount);
         testRecord.setQuantity(errorCount + rightCount);
-        testRecord.setAwardGold(goldCount);
         testRecord.setGenre("音译测试");
         testRecord.setStudentId(student.getId());
         Date date = new Date();
@@ -1014,14 +1005,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             testRecord.setQuantity(wordUnitTestDTO.getErrorCount() + wordUnitTestDTO.getRightCount());
         }
         testRecord.setStudyModel("音译测试");
-        if (student.getBonusExpires() != null) {
-            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
-                Double doubleGoldCount = goldCount * 0.2;
-                student.setSystemGold(student.getSystemGold() + doubleGoldCount);
-                testRecord.setAwardGold(goldCount + doubleGoldCount.intValue());
-            }
-        }
-        return getObjectServerResponse(session, wordUnitTestDTO, student, testRecord);
+        testRecordMapper.insert(testRecord);
+        return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
     }
 
 
