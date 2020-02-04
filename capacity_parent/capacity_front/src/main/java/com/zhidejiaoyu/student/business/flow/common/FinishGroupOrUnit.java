@@ -307,7 +307,7 @@ public class FinishGroupOrUnit {
             case 2:
                 return isEasy ? FlowConstant.FREE_PLAYER : FlowConstant.FREE_LETTER_WRITE;
             case 3:
-                return isEasy ? FlowConstant.FREE_SENTENCE_TRANSLATE : FlowConstant.FREE_SENTENCE_WRITE;
+                return isEasy ? FlowConstant.FREE_SENTENCE_GAME : FlowConstant.FREE_SENTENCE_WRITE;
             case 4:
                 return isEasy ? FlowConstant.FREE_TEKS_LISTEN : FlowConstant.FREE_TEKS_TRAIN;
             case 5:

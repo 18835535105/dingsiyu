@@ -22,6 +22,11 @@ public interface FlowConstant {
     long HARD_START = 129;
 
     /**
+     * 一键学习句型游戏
+     */
+    long SENTENCE_GAME = 130;
+
+    /**
      * 一键学习句型翻译
      */
     long SENTENCE_TRANSLATE = 85;
@@ -69,6 +74,11 @@ public interface FlowConstant {
      * 慧听写
      */
     long FREE_WORD_LISTEN = 24;
+
+    /**
+     * 句型游戏
+     */
+    long FREE_SENTENCE_GAME = 134;
 
     /**
      * 句型翻译
