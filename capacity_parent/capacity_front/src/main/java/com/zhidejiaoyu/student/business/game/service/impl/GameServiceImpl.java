@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.session.SessionConstant;
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
@@ -318,10 +319,13 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         Integer group = (Integer) (type == 1 ? HttpUtil.getHttpSession().getAttribute(SessionConstant.ONE_KEY_GROUP) :
                 HttpUtil.getHttpSession().getAttribute(SessionConstant.FREE_GROUP));
 
-        log.info("获取的group=", group);
+        log.info("获取的group={}", group);
         List<VocabularyVO> groupWordInfo = unitVocabularyNewMapper.selectByUnitIdAndGroup(unitId, group == null ? 1 : group);
 
         int size = groupWordInfo.size();
+        if (size == 0) {
+            throw new ServiceException("单词unitId=" + unitId + " group=" + group + "未查询到单词数据！");
+        }
         List<SubjectVO> subjectVos = this.packageResultList(groupWordInfo);
         if (size >= BEFORE_LEARN_GAME_COUNT) {
             return ServerResponse.createBySuccess(subjectVos);
@@ -336,10 +340,10 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         int size = resultVos.size();
         if (size < BEFORE_LEARN_GAME_COUNT) {
             resultVos.addAll(subjectVos);
-            if (resultVos.size() > BEFORE_LEARN_GAME_COUNT) {
-                return resultVos.subList(0, 9);
-            }
             this.getSubjectVO(subjectVos, resultVos);
+        }
+        if (resultVos.size() > BEFORE_LEARN_GAME_COUNT) {
+            return resultVos.subList(0, BEFORE_LEARN_GAME_COUNT);
         }
         return resultVos;
     }
