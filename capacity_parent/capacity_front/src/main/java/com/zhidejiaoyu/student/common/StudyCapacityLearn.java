@@ -1,10 +1,12 @@
 package com.zhidejiaoyu.student.common;
 
+import com.zhidejiaoyu.common.constant.session.SessionConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.StudentRestudyUtil;
 import com.zhidejiaoyu.common.study.memorystrength.StudyMemoryStrength;
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -70,7 +72,7 @@ public class StudyCapacityLearn {
             return capacity;
         }
 
-       return null;
+        return null;
     }
 
     private StudyCapacity getCapacityInfo(LearnNew learn, Student student, Integer studyModel, Sentence sentence) {
@@ -91,10 +93,18 @@ public class StudyCapacityLearn {
         if (studyCapacity == null) {
             if (!isKnown) {
                 studyCapacity = new StudyCapacity();
+
+                if (studyModel < 7) {
+                    // 单词首次答错判断记忆强度是否需要在原基础上 +50%
+                    Object object = HttpUtil.getHttpSession().getAttribute(SessionConstant.FIRST_FALSE_ADD);
+                    studyCapacity.setMemoryStrength((object == null || !(boolean) object) ? 0.12 : 0.62);
+                } else {
+                    studyCapacity.setMemoryStrength(0.12);
+                }
+
                 studyCapacity.setCourseId(learn.getCourseId());
                 studyCapacity.setFaultTime(1);
                 studyCapacity.setType(studyModel);
-                studyCapacity.setMemoryStrength(0.12);
                 studyCapacity.setStudentId(student.getId());
                 studyCapacity.setUnitId(learn.getUnitId());
                 studyCapacity.setWordId(learnExtend.getWordId());
@@ -140,6 +150,7 @@ public class StudyCapacityLearn {
 
         return studyCapacity;
     }
+
     private StudyCapacity packageCapacityInfo(LearnNew learn, LearnExtend learnExtend, Student student, boolean isKnown, Integer studyModel,
                                               Sentence sentence, StudyCapacity studyCapacity, String wordChinese) {
         if (studyCapacity == null) {
