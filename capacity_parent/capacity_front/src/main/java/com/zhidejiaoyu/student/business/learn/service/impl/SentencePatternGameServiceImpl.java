@@ -136,22 +136,22 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
                 + "》中奖励#" + gold + "#枚金币" + "单元id:" + unitId);
         Map<String, Object> resultMap = new HashMap<>();
         if (total < PointConstant.EIGHTY) {
-            resultMap.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
-            resultMap.put("text", "很遗憾，闯关失败，再接再厉。");
+            resultMap.put("petSay", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
+            resultMap.put("msg", "很遗憾，闯关失败，再接再厉。");
             resultMap.put("backMsg", new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(total), "的同学，继续努力吧！"});
         } else if (total < PointConstant.NINETY) {
-            resultMap.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
-            resultMap.put("text", "闯关成功，独孤求败！");
+            resultMap.put("petSay", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
+            resultMap.put("msg", "闯关成功，独孤求败！");
             resultMap.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(total), "的同学，再接再励！"});
         } else {
-            resultMap.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
-            resultMap.put("text", "恭喜你刷新了纪录！");
+            resultMap.put("petSay", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+            resultMap.put("msg", "恭喜你刷新了纪录！");
             resultMap.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(total), "的同学，再接再励！"});
         }
         resultMap.put("energy", enger);
         resultMap.put("gold", gold);
         resultMap.put("point", total);
-        resultMap.put("imgUrl", AliyunInfoConst.host + student.getPartUrl());
+        resultMap.put("petUrl", AliyunInfoConst.host + student.getPartUrl());
         return resultMap;
     }
 }
