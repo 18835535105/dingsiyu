@@ -316,8 +316,11 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
     @Override
     public ServerResponse<Object> getBeforeLearnGame(Long unitId, Integer type) {
 
-        Integer group = (Integer) (type == 1 ? HttpUtil.getHttpSession().getAttribute(SessionConstant.ONE_KEY_GROUP) :
-                HttpUtil.getHttpSession().getAttribute(SessionConstant.FREE_GROUP));
+        HttpSession session = HttpUtil.getHttpSession();
+        session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
+
+        Integer group = (Integer) (type == 1 ? session.getAttribute(SessionConstant.ONE_KEY_GROUP) :
+                session.getAttribute(SessionConstant.FREE_GROUP));
 
         log.info("获取的group={}", group);
         List<VocabularyVO> groupWordInfo = unitVocabularyNewMapper.selectByUnitIdAndGroup(unitId, group == null ? 1 : group);

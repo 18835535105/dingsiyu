@@ -274,6 +274,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard,
                 dto.getModelType() - 1);
         if (learnNew != null) {
+            HttpUtil.getHttpSession().setAttribute(SessionConstant.FREE_GROUP, learnNew.getGroup());
             StudyFlowNew studyFlowNew = studyFlowNewMapper.selectByLearnId(learnNew.getId());
             if (studyFlowNew != null) {
                 FlowVO flowVO;
