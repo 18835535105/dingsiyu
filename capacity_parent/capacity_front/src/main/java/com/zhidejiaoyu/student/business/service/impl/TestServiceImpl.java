@@ -209,6 +209,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setTestEndTime(new Date());
         testRecord.setTestStartTime((Date) HttpUtil.getHttpSession().getAttribute(TimeConstant.BEGIN_START_TIME));
         testRecord.setStudentId(student.getId());
+        testRecord.setExplain(testResultVo.getMsg());
         testRecordMapper.insert(testRecord);
 
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
