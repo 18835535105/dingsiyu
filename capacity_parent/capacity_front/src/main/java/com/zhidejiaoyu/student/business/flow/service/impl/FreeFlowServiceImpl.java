@@ -220,7 +220,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
      * @return
      */
     public ServerResponse<Object> judgeBeforeGame(NodeDto dto) {
-        if (Objects.equals(dto.getNodeId(), FlowConstant.BEFORE_GROUP_GAME)) {
+        if (Objects.equals(dto.getNodeId(), FlowConstant.FREE_BEFORE_GROUP_GAME)) {
             Long studentId = dto.getStudent().getId();
             boolean isEasy = dto.getEasyOrHard() == 1;
             if (dto.getGrade() == PointConstant.HUNDRED) {
