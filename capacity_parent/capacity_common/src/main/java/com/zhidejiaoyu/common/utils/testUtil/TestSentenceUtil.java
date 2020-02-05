@@ -79,7 +79,7 @@ public class TestSentenceUtil {
         selMap.put("chinese", chinese);
         selMap.put("hearing", baiduSpeak.getSentencePath(sentences.getCentreExample().replace("$", "")));
         if (type.equals(1)) {
-            arrange(anawerList, english, selMap);
+            arrange(chineseList, chinese, selMap);
         } else if(type.equals(2)){
             int ran = MathUtil.getRandom(1, 10);
             if (ran >= 1 && ran < 5) {
@@ -89,7 +89,8 @@ public class TestSentenceUtil {
                 arrange(chineseList, chinese, selMap);
             }
         }else{
-            arrange(chineseList, chinese, selMap);
+            arrange(anawerList, english, selMap);
+
         }
 
         return selMap;
