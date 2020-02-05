@@ -115,7 +115,7 @@ public class FinishGroupOrUnit {
             return this.finishOneKeyUnit(dto);
         }
 
-        Long nodeId = isEasy ? FlowConstant.BEFORE_GROUP_GAME : FlowConstant.LETTER_WRITE;
+        long nodeId = this.getNodeId(learnNew, isEasy);
         initData.initStudentFlow(NodeDto.builder()
                 .student(dto.getStudent())
                 .nodeId(nodeId)
@@ -124,6 +124,26 @@ public class FinishGroupOrUnit {
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(nodeId);
 
         return packageFlowVO.packageFlowVO(studyFlowNew, dto.getStudent(), dto.getUnitId());
+    }
+
+    /**
+     * 获取下个group的开始节点id
+     *
+     * @param learnNew
+     * @param isEasy   true：简单流程；false：复杂流程
+     * @return
+     */
+    public long getNodeId(LearnNew learnNew, boolean isEasy) {
+        if (Objects.equals(learnNew.getModelType(), 1)) {
+            // 单词模块节点
+            return isEasy ? FlowConstant.BEFORE_GROUP_GAME : FlowConstant.LETTER_WRITE;
+        }
+        if (Objects.equals(learnNew.getModelType(), 2)) {
+            // 句型模块节点
+            return isEasy ? FlowConstant.SENTENCE_GAME : FlowConstant.SENTENCE_WRITE;
+        }
+        // 课文模块节点
+        return isEasy ? FlowConstant.TEKS_LISTEN : FlowConstant.TEKS_TRAINING;
     }
 
     private FlowVO toSyntaxFlow(NodeDto dto, boolean isEasy) {
