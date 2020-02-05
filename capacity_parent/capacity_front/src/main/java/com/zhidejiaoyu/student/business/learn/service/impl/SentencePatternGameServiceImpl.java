@@ -46,7 +46,7 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
         Integer group;
         Student student = getStudent(session);
         Long studentId = student.getId();
-        List<Map<String, Object>> getMaps;
+        List<Map<String, Object>> getMaps =new ArrayList<>();
         Map<String, Object> returnMap = new HashMap<>();
         List<Map<String, Object>> returnList = new ArrayList<>();
         //获取当前单元下的group
@@ -60,7 +60,7 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
         List<Map<String, Object>> lookMaps = unitSentenceNewMapper.selectSentenceAndChineseByUnitIdAndGroup(unitId, group);
         if (lookMaps.size() > 0) {
             if (lookMaps.size() < 5) {
-                getMaps = lookMaps;
+                getMaps.addAll(lookMaps);
                 while (getMaps.size() < 5) {
                     for (Map<String, Object> map : lookMaps) {
                         if (getMaps.size() < 5) {
