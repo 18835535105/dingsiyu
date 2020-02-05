@@ -197,16 +197,16 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
      */
     private ServerResponse<Object> judgeSentenceGame(NodeDto dto) {
         if (Objects.equals(dto.getNodeId(), FlowConstant.FREE_SENTENCE_GAME)) {
-            if (dto.getGrade() == 5) {
+            if (dto.getGrade() == PointConstant.HUNDRED) {
                 // 全部答对
                 return this.toAnotherFlow(dto, (int) FlowConstant.FREE_SENTENCE_TRANSLATE);
             }
 
-            if (dto.getGrade() >= 3 || dto.getGrade() <= 4) {
+            if (dto.getGrade() >= PointConstant.SIXTY && dto.getGrade() < PointConstant.HUNDRED) {
                 return this.toAnotherFlow(dto, (int) FlowConstant.FREE_YIN_YI_EXERCISE_TWO);
             }
 
-            if (dto.getGrade() <= 2) {
+            if (dto.getGrade() < PointConstant.SIXTY) {
                 return this.toAnotherFlow(dto, (int) FlowConstant.FREE_YIN_YI_EXERCISE_ONE);
             }
         }

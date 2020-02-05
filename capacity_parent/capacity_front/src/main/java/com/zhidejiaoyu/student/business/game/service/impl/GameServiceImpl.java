@@ -359,14 +359,15 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
      */
     public List<SubjectVO> packageResultList(List<VocabularyVO> vocabularyVos) {
         List<SubjectVO> resultList = new ArrayList<>(10);
+        List<VocabularyVO> tmpVocabularyVos = new ArrayList<>(vocabularyVos);
         Collections.shuffle(vocabularyVos);
         int size = vocabularyVos.size();
-        for (int i = 0; i < Math.min(size, 10); i++) {
+        for (int i = 0; i < Math.min(size, BEFORE_LEARN_GAME_COUNT); i++) {
             VocabularyVO vocabularyVO = vocabularyVos.get(i);
 
-            Collections.shuffle(vocabularyVos);
+            Collections.shuffle(tmpVocabularyVos);
             // 从剩余单词中随机取出三个作为错误选项
-            List<AnswerVO> vos = vocabularyVos.stream()
+            List<AnswerVO> vos = tmpVocabularyVos.stream()
                     .filter(vo -> !Objects.equals(vocabularyVO.getWord(), vo.getWord()))
                     .limit(3)
                     .map(vo -> AnswerVO.builder()
