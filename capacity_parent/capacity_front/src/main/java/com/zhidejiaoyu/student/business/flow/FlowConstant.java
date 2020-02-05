@@ -11,15 +11,21 @@ public interface FlowConstant {
     /**
      * 一键学习
      */
-    /**
-     * 简单模块开始节点
-     */
-    long EASY_START = 70;
 
     /**
-     * 困难流程开始节点
+     * 学前游戏
      */
-    long HARD_START = 129;
+    long BEFORE_GROUP_GAME = 138;
+
+    /**
+     * 单词播放机
+     */
+    long PLAYER = 70;
+
+    /**
+     * 字母拼写
+     */
+    long LETTER_WRITE = 129;
 
     /**
      * 一键学习句型游戏
@@ -56,10 +62,24 @@ public interface FlowConstant {
      */
     long SYNTAX_WRITE = 123;
 
+    /**
+     * 音译练习1
+     */
+    long YIN_YI_EXERCISE_ONE = 132;
+
+    /**
+     * 音译练习2
+     */
+    long YIN_YI_EXERCISE_TWO = 87;
 
     /**
      * 自由学习
      */
+    /**
+     * 学前游戏
+     */
+    long FREE_BEFORE_GROUP_GAME = 139;
+
     /**
      * 单词播放机
      */
@@ -108,6 +128,16 @@ public interface FlowConstant {
      * 写语法（难）
      */
     long FREE_SYNTAX_WRITE = 128;
+
+    /**
+     * 音译练习1
+     */
+    long FREE_YIN_YI_EXERCISE_ONE = 136;
+
+    /**
+     * 音译练习2
+     */
+    long FREE_YIN_YI_EXERCISE_TWO = 112;
 
     /**
      * 单词模块

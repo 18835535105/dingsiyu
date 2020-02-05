@@ -339,7 +339,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
             StudentStudyPlanNew easyStudentStudyPlan = studentStudyPlanNewBuilder
                     .easyOrHard(1)
                     .baseLevel(basePriority)
-                    .flowId(FlowConstant.EASY_START)
+                    .flowId(FlowConstant.BEFORE_GROUP_GAME)
                     .finalLevel(basePriority + errorPriority + timePriority)
                     .build();
             studentStudyPlanNews.add(easyStudentStudyPlan);
@@ -347,7 +347,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
             StudentStudyPlanNew hardStudentStudyPlan = studentStudyPlanNewBuilder
                     .easyOrHard(2)
                     .baseLevel(basePriority - PriorityUtil.HARD_NUM)
-                    .flowId(FlowConstant.HARD_START)
+                    .flowId(FlowConstant.BEFORE_GROUP_GAME)
                     .finalLevel(basePriority - PriorityUtil.HARD_NUM + errorPriority + timePriority)
                     .build();
             studentStudyPlanNews.add(hardStudentStudyPlan);

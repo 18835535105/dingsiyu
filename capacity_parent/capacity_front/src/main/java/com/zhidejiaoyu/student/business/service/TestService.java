@@ -36,7 +36,7 @@ public interface TestService extends BaseService<TestRecord> {
      * @param testRecord 测试记录
      * @return
      */
-    ServerResponse<Map<String, Object>> saveGameTestRecord(HttpSession session, TestRecord testRecord);
+    ServerResponse<TestResultVo> saveGameTestRecord(HttpSession session, TestRecord testRecord);
 
     /**
      * 获取等级测试测试题

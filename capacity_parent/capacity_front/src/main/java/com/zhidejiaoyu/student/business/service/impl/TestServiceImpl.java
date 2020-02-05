@@ -9,9 +9,11 @@ import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
 import com.zhidejiaoyu.common.constant.*;
+import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.constant.study.StudyModelConstant;
 import com.zhidejiaoyu.common.constant.study.TestGenreConstant;
+import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.common.dto.phonetic.UnitTestDto;
 import com.zhidejiaoyu.common.mapper.*;
@@ -21,6 +23,7 @@ import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.CcieUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
@@ -183,11 +186,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     @Override
     @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<Map<String, Object>> saveGameTestRecord(HttpSession session, TestRecord testRecord) {
+    public ServerResponse<TestResultVo> saveGameTestRecord(HttpSession session, TestRecord testRecord) {
         Student student = getStudent(session);
-
-        // 存放响应的 提示语，推送课程名称，奖励金币数
-        Map<String, Object> map = new HashMap<>(16);
 
         // 游戏测试开始时间
         Date date = new Date();
@@ -195,41 +195,48 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
 
         testRecord.setStudentId(student.getId());
-        testRecord.setGenre("学前游戏测试");
-        testRecord.setStudyModel("学前游戏测试");
-        testRecord.setQuantity(20);
 
-        // 查看当前学生是否已经有游戏测试记录
-        TestRecordExample example = new TestRecordExample();
-        example.createCriteria().andStudentIdEqualTo(student.getId()).andGenreEqualTo("学前游戏测试");
-        List<TestRecord> records = testRecordMapper.selectByExample(example);
-
-        // 已经有游戏测试记录进行记录的更新
-        if (records.size() > 0) {
-            updateGameTestRecord(testRecord, student, map, records);
-        } else {
-            // 无游戏测试记录，新增记录
-            createGameTestRecord(testRecord, student, map);
-            // 根据游戏分数初始化不同流程
-            StudentFlow studentFlow = studentFlowMapper.selectByStudentId(student.getId(), 0, 1);
-            this.initStudentFlow(student, testRecord.getPoint(), studentFlow);
-        }
         getLevel(session);
-        // 流程名称
-        StudyFlow studyFlow = studyFlowMapper.selectById(3);
-        if (studyFlow != null) {
-            int grade = studyFlow.getType();
-            if (testRecord.getPoint() >= grade) {
-                map.put("flow", "流程二");
-            } else {
-                map.put("flow", "流程一");
-            }
-        } else {
-            map.put("flow", "流程一");
-        }
+
+        TestResultVo testResultVo = this.getTestResultVo(testRecord, student);
+
+        testRecord.setAwardGold(testResultVo.getGold());
+        testRecord.setGenre(GenreConstant.BEFORE_LEARN_GAME_TEST);
+        testRecord.setHistoryBadPoint(testRecord.getPoint());
+        testRecord.setHistoryBestPoint(testRecord.getPoint());
+        testRecord.setQuantity(testRecord.getRightCount() + testRecord.getErrorCount());
+        testRecord.setStudyModel(GenreConstant.BEFORE_LEARN_GAME_TEST);
+        testRecord.setTestEndTime(new Date());
+        testRecord.setTestStartTime((Date) HttpUtil.getHttpSession().getAttribute(TimeConstant.BEGIN_START_TIME));
+        testRecord.setStudentId(student.getId());
+        testRecordMapper.insert(testRecord);
 
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
-        return ServerResponse.createBySuccess(map);
+        return ServerResponse.createBySuccess(testResultVo);
+    }
+
+    private TestResultVo getTestResultVo(TestRecord testRecord, Student student) {
+        // 奖励金币， 能量
+        int awardGold = 0;
+        int awardEnergy = 0;
+        if (testRecord.getPoint() >= PointConstant.FIFTY) {
+            if (testRecord.getPoint() < PointConstant.EIGHTY) {
+                awardEnergy = awardGold = 1;
+            } else {
+                awardEnergy = awardGold = 3;
+            }
+            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
+            student.setEnergy(awardEnergy);
+            studentMapper.updateById(student);
+            super.saveRunLog(student, 4, "在学前游戏测试中奖励#" + awardGold + "#枚金币");
+        }
+
+        TestResultVo vo = new TestResultVo();
+        vo.setMsg(getMessage(student, vo, testRecord, testRecord.getPoint(), PointConstant.EIGHTY));
+        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, testRecord.getPoint(), GenreConstant.UNIT_TEST));
+        vo.setGold(awardGold);
+        vo.setEnergy(awardEnergy);
+        return vo;
     }
 
     @Override
@@ -734,57 +741,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         int count = testRecordMapper.insertSelective(testRecord);
         if (count == 0) {
             String errMsg = "id为 " + student.getId() + " 的学生 " + student.getStudentName() + " 游戏测试记录保存失败！";
-            super.saveRunLog(student, 2, errMsg);
-            log.error(errMsg);
-        }
-    }
-
-    /**
-     * 已有游戏测试记录，更新游戏测试记录
-     *
-     * @param testRecord
-     * @param student
-     * @param map
-     * @param records
-     */
-    private void updateGameTestRecord(TestRecord testRecord, Student student, Map<String, Object> map, List<TestRecord> records) {
-        TestRecord record = records.get(0);
-        testRecord.setId(record.getId());
-
-        testRecord.setExplain("游戏测试次数#2#");
-        String msg;
-        if (testRecord.getPoint() >= PointConstant.EIGHTY) {
-            msg = "恭喜你旗开得胜，祝未来勇闯天涯！";
-            map.put("tip", msg);
-            testRecord.setExplain(testRecord.getExplain() + msg);
-        } else {
-            msg = "虽败犹荣，我们从头来过。";
-            map.put("tip", msg);
-            testRecord.setExplain(testRecord.getExplain() + msg);
-
-            map.put("tip", "游戏还不错吧？下面我们来开始学习吧。");
-
-        }
-
-        // 第二次测试只有成绩比第一次高才可以获得金币
-        int goldCount = 0;
-        if (testRecord.getPoint() > record.getPoint()) {
-            goldCount = this.award(student, testRecord);
-            testRecord.setAwardGold(goldCount);
-        }
-        map.put("gold", goldCount);
-
-        // 比较出最高分
-        if (testRecord.getPoint() < record.getHistoryBadPoint()) {
-            testRecord.setHistoryBadPoint(record.getPoint());
-        } else if (testRecord.getPoint() > record.getHistoryBestPoint()) {
-            testRecord.setHistoryBestPoint(testRecord.getPoint());
-        }
-
-        // 更新游戏测试记录
-        int count = testRecordMapper.updateByPrimaryKeySelective(testRecord);
-        if (count == 0) {
-            String errMsg = "id为 " + student.getId() + " 的学生 " + student.getStudentName() + " 更新游戏测试记录失败！";
             super.saveRunLog(student, 2, errMsg);
             log.error(errMsg);
         }

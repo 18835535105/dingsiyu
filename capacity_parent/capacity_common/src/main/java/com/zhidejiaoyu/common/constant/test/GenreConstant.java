@@ -11,4 +11,6 @@ public interface GenreConstant {
     String UNIT_TEST = "单元闯关测试";
 
     String TEST_BEFORE_STUDY = "摸底测试";
+
+    String BEFORE_LEARN_GAME_TEST = "学前游戏测试";
 }

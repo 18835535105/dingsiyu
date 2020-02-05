@@ -435,4 +435,47 @@ public class RedisOpt {
         }
     }
 
+    /**
+     * 如果单词《飞船建造》游戏得分小于80分，记录单元group
+     *
+     * @param studentId
+     * @param unitId
+     * @param group
+     */
+    public void saveFirstFalseAdd(Long studentId, Long unitId, Integer group) {
+        String k = RedisKeysConst.FIRST_FALSE_ADD + ":" + studentId + ":" + unitId + ":" + group;
+        redisTemplate.opsForValue().set(k, true);
+        redisTemplate.expire(k, 30, TimeUnit.DAYS);
+    }
+
+    /**
+     * 清除单词首次错误记忆强度增加50%标识
+     *
+     * @param studentId
+     * @param unitId
+     * @param group
+     */
+    public void clearFirstFalseAdd(Long studentId, Long unitId, Integer group) {
+        String k = RedisKeysConst.FIRST_FALSE_ADD + ":" + studentId + ":" + unitId + ":" + group;
+        redisTemplate.opsForValue().set(k, false);
+        redisTemplate.expire(k, 10, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 获取单词首次错误记忆强度增加50%标识
+     *
+     * @param studentId
+     * @param unitId
+     * @param group
+     * @return true:当前group单词首次答错需要额外增加50%的记忆强度
+     */
+    public boolean getFirstFalseAdd(Long studentId, Long unitId, Integer group) {
+        String k = RedisKeysConst.FIRST_FALSE_ADD + ":" + studentId + ":" + unitId + ":" + group;
+        Object o = redisTemplate.opsForValue().get(k);
+        if (o == null) {
+            return false;
+        }
+
+        return (boolean) o;
+    }
 }

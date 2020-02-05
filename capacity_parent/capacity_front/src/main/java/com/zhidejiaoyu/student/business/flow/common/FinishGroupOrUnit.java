@@ -1,14 +1,17 @@
 package com.zhidejiaoyu.student.business.flow.common;
 
+import com.zhidejiaoyu.common.constant.session.SessionConstant;
 import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
 import com.zhidejiaoyu.student.business.flow.FlowConstant;
 import com.zhidejiaoyu.student.common.redis.PayLogRedisOpt;
+import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -75,6 +78,9 @@ public class FinishGroupOrUnit {
     @Resource
     private SyntaxUnitMapper syntaxUnitMapper;
 
+    @Resource
+    private RedisOpt redisOpt;
+
     /**
      * 一键学习，学习完当前group
      *
@@ -82,6 +88,10 @@ public class FinishGroupOrUnit {
      * @return
      */
     public FlowVO finishOneKeyGroup(NodeDto dto) {
+
+        // 清除单词首次错误记忆强度增加50%标识
+        redisOpt.clearFirstFalseAdd(dto.getStudent().getId(), dto.getUnitId(), dto.getGroup());
+        HttpUtil.getHttpSession().removeAttribute(SessionConstant.FIRST_FALSE_ADD);
 
         // 判断哪些模块有当前group
         this.judgeHasCurrentGroup(dto);
@@ -105,15 +115,36 @@ public class FinishGroupOrUnit {
             return this.finishOneKeyUnit(dto);
         }
 
-        Long nodeId = isEasy ? FlowConstant.EASY_START : FlowConstant.HARD_START;
+        long nodeId = this.getNodeId(learnNew, isEasy);
         initData.initStudentFlow(NodeDto.builder()
                 .student(dto.getStudent())
                 .nodeId(nodeId)
                 .learnNew(learnNew)
                 .build());
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(nodeId);
+        HttpUtil.getHttpSession().setAttribute(SessionConstant.ONE_KEY_GROUP, learnNew.getGroup());
 
         return packageFlowVO.packageFlowVO(studyFlowNew, dto.getStudent(), dto.getUnitId());
+    }
+
+    /**
+     * 获取下个group的开始节点id
+     *
+     * @param learnNew
+     * @param isEasy   true：简单流程；false：复杂流程
+     * @return
+     */
+    public long getNodeId(LearnNew learnNew, boolean isEasy) {
+        if (Objects.equals(learnNew.getModelType(), 1)) {
+            // 单词模块节点
+            return isEasy ? FlowConstant.BEFORE_GROUP_GAME : FlowConstant.LETTER_WRITE;
+        }
+        if (Objects.equals(learnNew.getModelType(), 2)) {
+            // 句型模块节点
+            return isEasy ? FlowConstant.SENTENCE_GAME : FlowConstant.SENTENCE_WRITE;
+        }
+        // 课文模块节点
+        return isEasy ? FlowConstant.TEKS_LISTEN : FlowConstant.TEKS_TRAINING;
     }
 
     private FlowVO toSyntaxFlow(NodeDto dto, boolean isEasy) {
@@ -209,6 +240,10 @@ public class FinishGroupOrUnit {
      */
     public ServerResponse<Object> finishFreeGroup(NodeDto dto) {
 
+        // 清除单词首次错误记忆强度增加50%标识
+        redisOpt.clearFirstFalseAdd(dto.getStudent().getId(), dto.getUnitId(), dto.getGroup());
+        HttpUtil.getHttpSession().removeAttribute(SessionConstant.FIRST_FALSE_ADD);
+
         // 更新学习历史表
         initData.saveOrUpdateFreeLearnHistory(dto);
 
@@ -244,6 +279,8 @@ public class FinishGroupOrUnit {
                 .learnNew(learnNew)
                 .build());
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(startFlowId);
+
+        HttpUtil.getHttpSession().setAttribute(SessionConstant.FREE_GROUP, learnNew.getGroup());
 
         FlowVO flowVO = packageFlowVO.packageFlowVO(studyFlowNew, student, dto.getUnitId());
         return ServerResponse.createBySuccess(flowVO);
@@ -284,7 +321,7 @@ public class FinishGroupOrUnit {
                     .finalLevel(isEasy ? basePriority + 1 + timePriority : basePriority - PriorityUtil.HARD_NUM + 1 + timePriority)
                     .baseLevel(isEasy ? basePriority : basePriority - PriorityUtil.HARD_NUM)
                     .easyOrHard(dto.getEasyOrHard())
-                    .flowId(isEasy ? FlowConstant.EASY_START : FlowConstant.HARD_START)
+                    .flowId(FlowConstant.FREE_BEFORE_GROUP_GAME)
                     .build());
         } else {
             // 已有当前课程的优先级，更新优先级
@@ -305,7 +342,7 @@ public class FinishGroupOrUnit {
         boolean isEasy = Objects.equals(easyOrHard, 1);
         switch (type) {
             case 2:
-                return isEasy ? FlowConstant.FREE_PLAYER : FlowConstant.FREE_LETTER_WRITE;
+                return FlowConstant.FREE_BEFORE_GROUP_GAME;
             case 3:
                 return isEasy ? FlowConstant.FREE_SENTENCE_GAME : FlowConstant.FREE_SENTENCE_WRITE;
             case 4:
