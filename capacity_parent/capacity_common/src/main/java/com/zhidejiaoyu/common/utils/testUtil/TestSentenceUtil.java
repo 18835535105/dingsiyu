@@ -58,7 +58,7 @@ public class TestSentenceUtil {
 
     //汉译英
     private Map<String, Object> chineseToEnglish(Sentence sentences, List<Sentence> disturb) {
-        Map<String, Object> selMap = getEnglish(sentences, disturb, 1);
+        Map<String, Object> selMap = getEnglish(sentences, disturb, 3);
         selMap.put("type", "chinese");
         return selMap;
     }
@@ -80,7 +80,7 @@ public class TestSentenceUtil {
         selMap.put("hearing", baiduSpeak.getSentencePath(sentences.getCentreExample().replace("$", "")));
         if (type.equals(1)) {
             arrange(anawerList, english, selMap);
-        } else {
+        } else if(type.equals(2)){
             int ran = MathUtil.getRandom(1, 10);
             if (ran >= 1 && ran < 5) {
                 arrange(anawerList, english, selMap);
@@ -88,7 +88,8 @@ public class TestSentenceUtil {
             if (ran >= 5 && ran <= 10) {
                 arrange(chineseList, chinese, selMap);
             }
-
+        }else{
+            arrange(chineseList, chinese, selMap);
         }
 
         return selMap;
