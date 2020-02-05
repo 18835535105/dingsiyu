@@ -1,22 +1,22 @@
 package com.zhidejiaoyu.student.business.test.controller;
 
-import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
-import com.zhidejiaoyu.common.vo.testVo.TestDetailVo;
+import com.zhidejiaoyu.common.dto.WordUnitTestDTO;
+import com.zhidejiaoyu.common.dto.phonetic.UnitTestDto;
 import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.utils.ValidateUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
-import com.zhidejiaoyu.common.dto.WordUnitTestDTO;
-import com.zhidejiaoyu.common.dto.phonetic.UnitTestDto;
-import com.zhidejiaoyu.student.business.service.TestService;
 import com.zhidejiaoyu.common.vo.TestResultVo;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
+import com.zhidejiaoyu.common.vo.testVo.TestDetailVo;
+import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
+import com.zhidejiaoyu.student.business.service.TestService;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ import java.util.Objects;
 @RequestMapping("/test")
 public class TestController {
 
-    @Autowired
+    @Resource
     private TestService testService;
 
 
@@ -46,7 +46,7 @@ public class TestController {
      * @return
      */
     @PostMapping("/saveGameTestRecord")
-    public ServerResponse<Map<String, Object>> saveGameTestRecord(HttpSession session, TestRecord testRecord) {
+    public ServerResponse<TestResultVo> saveGameTestRecord(HttpSession session, TestRecord testRecord) {
         return testService.saveGameTestRecord(session, testRecord);
     }
 
@@ -102,11 +102,11 @@ public class TestController {
      */
     @GetMapping("/gitUnitSentenceTest")
     @ResponseBody
-    public ServerResponse<Object> gitUnitSentenceTest(HttpSession session, Long unitId,Integer type) {
+    public ServerResponse<Object> gitUnitSentenceTest(HttpSession session, Long unitId, Integer type) {
         if (unitId == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), "unitId 不能为 null");
         }
-        return testService.gitUnitSentenceTest(session, unitId,type);
+        return testService.gitUnitSentenceTest(session, unitId, type);
     }
 
     /**
