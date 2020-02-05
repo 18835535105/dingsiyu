@@ -315,6 +315,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         if (firstFalseAdd) {
             HttpUtil.getHttpSession().setAttribute(SessionConstant.FIRST_FALSE_ADD, true);
         }
+        HttpUtil.getHttpSession().setAttribute(SessionConstant.FREE_GROUP, learnNew.getGroup());
 
         return this.getFlowVoServerResponse(learnNew, modelType, student);
     }

@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.session.SessionConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
@@ -321,38 +322,22 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
     }
 
     @Override
-    public ServerResponse<Object> getBeforeLearnGame() {
+    public ServerResponse<Object> getBeforeLearnGame(Long unitId, Integer type) {
 
-        List<VocabularyVO> groupWordInfo = this.getCurrentGroupWordInfo();
+        Integer group = (Integer) (type == 1 ? HttpUtil.getHttpSession().getAttribute(SessionConstant.ONE_KEY_GROUP) :
+                HttpUtil.getHttpSession().getAttribute(SessionConstant.FREE_GROUP));
+
+        List<VocabularyVO> groupWordInfo = unitVocabularyNewMapper.selectByUnitIdAndGroup(unitId, group);
 
         int size = groupWordInfo.size();
+        List<SubjectVO> subjectVos = this.packageResultList(groupWordInfo);
         if (size >= BEFORE_LEARN_GAME_COUNT) {
-            return ServerResponse.createBySuccess(this.packageResultList(groupWordInfo));
+            return ServerResponse.createBySuccess(subjectVos);
         }
 
         // 当前group单词数不足10个
-        List<SubjectVO> vos = this.packageResultList(groupWordInfo);
-        List<SubjectVO> resultVos = this.getSubjectVO(vos, new ArrayList<>(10));
+        List<SubjectVO> resultVos = this.getSubjectVO(subjectVos, new ArrayList<>(10));
         return ServerResponse.createBySuccess(resultVos);
-    }
-
-    /**
-     * 获取当前group单词数据
-     *
-     * @return
-     */
-    public List<VocabularyVO> getCurrentGroupWordInfo() {
-        Long studentId = super.getStudentId(HttpUtil.getHttpSession());
-
-        // 查询学生最高优先级数据
-        StudentStudyPlanNew maxFinalLevelStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
-
-        StudentFlowNew studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId,
-                maxFinalLevelStudentStudyPlanNew.getUnitId(), maxFinalLevelStudentStudyPlanNew.getEasyOrHard());
-
-        LearnNew learnNew = learnNewMapper.selectById(studentFlowNew.getLearnId());
-
-        return unitVocabularyNewMapper.selectByUnitIdAndGroup(learnNew.getUnitId(), learnNew.getGroup());
     }
 
     public List<SubjectVO> getSubjectVO(List<SubjectVO> subjectVos, List<SubjectVO> resultVos) {

@@ -122,6 +122,7 @@ public class FinishGroupOrUnit {
                 .learnNew(learnNew)
                 .build());
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(nodeId);
+        HttpUtil.getHttpSession().setAttribute(SessionConstant.ONE_KEY_GROUP, learnNew.getGroup());
 
         return packageFlowVO.packageFlowVO(studyFlowNew, dto.getStudent(), dto.getUnitId());
     }
@@ -278,6 +279,8 @@ public class FinishGroupOrUnit {
                 .learnNew(learnNew)
                 .build());
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(startFlowId);
+
+        HttpUtil.getHttpSession().setAttribute(SessionConstant.FREE_GROUP, learnNew.getGroup());
 
         FlowVO flowVO = packageFlowVO.packageFlowVO(studyFlowNew, student, dto.getUnitId());
         return ServerResponse.createBySuccess(flowVO);

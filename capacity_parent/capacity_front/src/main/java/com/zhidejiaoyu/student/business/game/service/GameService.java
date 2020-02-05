@@ -56,8 +56,10 @@ public interface GameService extends BaseService<GameStore> {
     /**
      * 获取学前游戏《飞船建设》题目
      *
+     * @param unitId 单元id
+     * @param type   1:一键排课；2：自由学习
      * @return
      */
-    ServerResponse<Object> getBeforeLearnGame();
+    ServerResponse<Object> getBeforeLearnGame(Long unitId, Integer type);
 }
 

@@ -277,6 +277,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         if (firstFalseAdd) {
             HttpUtil.getHttpSession().setAttribute(SessionConstant.FIRST_FALSE_ADD, true);
         }
+        HttpUtil.getHttpSession().setAttribute(SessionConstant.ONE_KEY_GROUP, learnNew.getGroup());
 
         return ServerResponse.createBySuccess(vo);
     }

@@ -90,11 +90,13 @@ public class GameController extends BaseController {
     /**
      * 获取单词学前游戏测试题
      *
+     * @param unitId 单元id
+     * @param type 1:一键排课；2：自由学习
      * @return
      */
     @GetMapping("/getBeforeLearnGame")
-    public ServerResponse<Object> getBeforeLearnGame() {
-        return gameService.getBeforeLearnGame();
+    public ServerResponse<Object> getBeforeLearnGame(Long unitId, Integer type) {
+        return gameService.getBeforeLearnGame(unitId, type);
     }
 
 }
