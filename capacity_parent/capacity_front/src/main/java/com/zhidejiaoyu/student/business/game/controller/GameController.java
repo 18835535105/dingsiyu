@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.game.controller;
 
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.vo.game.GameOneVo;
 import com.zhidejiaoyu.common.vo.game.GameTwoVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
@@ -96,6 +97,12 @@ public class GameController extends BaseController {
      */
     @GetMapping("/getBeforeLearnGame")
     public ServerResponse<Object> getBeforeLearnGame(Long unitId, Integer type) {
+        if (unitId == null) {
+            throw new ServiceException("unitId can't be null!");
+        }
+        if (type == null) {
+            throw new ServiceException("type can't be null!");
+        }
         return gameService.getBeforeLearnGame(unitId, type);
     }
 
