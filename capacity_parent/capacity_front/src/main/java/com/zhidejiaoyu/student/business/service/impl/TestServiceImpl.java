@@ -963,7 +963,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
         testRecord.setStudyModel("音译测试");
         testRecordMapper.insert(testRecord);
-        return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
+        return ServerResponse.createBySuccess();
     }
 
 
