@@ -68,15 +68,6 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
     private BaiduSpeak baiduSpeak;
 
     @Resource
-    private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
-
-    @Resource
-    private StudentFlowNewMapper studentFlowNewMapper;
-
-    @Resource
-    private LearnNewMapper learnNewMapper;
-
-    @Resource
     private UnitVocabularyNewMapper unitVocabularyNewMapper;
 
     @Override
@@ -327,7 +318,8 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
         Integer group = (Integer) (type == 1 ? HttpUtil.getHttpSession().getAttribute(SessionConstant.ONE_KEY_GROUP) :
                 HttpUtil.getHttpSession().getAttribute(SessionConstant.FREE_GROUP));
 
-        List<VocabularyVO> groupWordInfo = unitVocabularyNewMapper.selectByUnitIdAndGroup(unitId, group);
+        log.info("获取的group=", group);
+        List<VocabularyVO> groupWordInfo = unitVocabularyNewMapper.selectByUnitIdAndGroup(unitId, group == null ? 1 : group);
 
         int size = groupWordInfo.size();
         List<SubjectVO> subjectVos = this.packageResultList(groupWordInfo);
