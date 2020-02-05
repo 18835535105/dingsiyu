@@ -274,7 +274,9 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard,
                 dto.getModelType() - 1);
         if (learnNew != null) {
-            HttpUtil.getHttpSession().setAttribute(SessionConstant.FREE_GROUP, learnNew.getGroup());
+            setFirstFalseAdd(studentId, learnNew, redisOpt);
+            setFreeGroup(learnNew);
+
             StudyFlowNew studyFlowNew = studyFlowNewMapper.selectByLearnId(learnNew.getId());
             if (studyFlowNew != null) {
                 FlowVO flowVO;
@@ -312,13 +314,21 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
                     .build(), 1, dto.getModelType() - 1);
         }
 
+        setFirstFalseAdd(studentId, learnNew, redisOpt);
+        setFreeGroup(learnNew);
+
+        return this.getFlowVoServerResponse(learnNew, modelType, student);
+    }
+
+    public static void setFirstFalseAdd(Long studentId, LearnNew learnNew, RedisOpt redisOpt) {
         boolean firstFalseAdd = redisOpt.getFirstFalseAdd(studentId, learnNew.getUnitId(), learnNew.getGroup());
         if (firstFalseAdd) {
             HttpUtil.getHttpSession().setAttribute(SessionConstant.FIRST_FALSE_ADD, true);
         }
-        HttpUtil.getHttpSession().setAttribute(SessionConstant.FREE_GROUP, learnNew.getGroup());
+    }
 
-        return this.getFlowVoServerResponse(learnNew, modelType, student);
+    public static void setFreeGroup(LearnNew learnNew) {
+        HttpUtil.getHttpSession().setAttribute(SessionConstant.FREE_GROUP, learnNew.getGroup());
     }
 
     private void judgeCourseCcie(NodeDto dto) {

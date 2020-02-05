@@ -94,8 +94,7 @@ public class SaveWordLearnAndCapacity {
                 capacity.setCourseId(learn.getCourseId());
                 capacity.setFaultTime(1);
 
-                Object object = HttpUtil.getHttpSession().getAttribute(SessionConstant.FIRST_FALSE_ADD);
-                capacity.setMemoryStrength((object == null || !(boolean) object) ? 0.12 : 0.62);
+                capacity.setMemoryStrength(0.12);
                 capacity.setStudentId(student.getId());
                 capacity.setUnitId(learn.getUnitId());
                 capacity.setVocabularyId(learn.getVocabularyId());

@@ -192,7 +192,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         // 游戏测试开始时间
         Date date = new Date();
         saveTestRecordTime(testRecord, session, date);
-        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
 
         testRecord.setStudentId(student.getId());
 
@@ -207,12 +206,13 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setQuantity(testRecord.getRightCount() + testRecord.getErrorCount());
         testRecord.setStudyModel(GenreConstant.BEFORE_LEARN_GAME_TEST);
         testRecord.setTestEndTime(new Date());
-        testRecord.setTestStartTime((Date) HttpUtil.getHttpSession().getAttribute(TimeConstant.BEGIN_START_TIME));
+        testRecord.setTestStartTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
         testRecord.setStudentId(student.getId());
         testRecord.setExplain(testResultVo.getMsg());
         testRecordMapper.insert(testRecord);
 
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
+        session.removeAttribute(TimeConstant.BEGIN_START_TIME);
         return ServerResponse.createBySuccess(testResultVo);
     }
 

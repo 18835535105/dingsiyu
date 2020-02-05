@@ -10,6 +10,8 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.study.PriorityUtil;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
 import com.zhidejiaoyu.student.business.flow.FlowConstant;
+import com.zhidejiaoyu.student.business.flow.service.impl.FreeFlowServiceImpl;
+import com.zhidejiaoyu.student.business.flow.service.impl.StudyFlowServiceImpl;
 import com.zhidejiaoyu.student.common.redis.PayLogRedisOpt;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import org.apache.commons.lang.StringUtils;
@@ -122,7 +124,7 @@ public class FinishGroupOrUnit {
                 .learnNew(learnNew)
                 .build());
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(nodeId);
-        HttpUtil.getHttpSession().setAttribute(SessionConstant.ONE_KEY_GROUP, learnNew.getGroup());
+        StudyFlowServiceImpl.setOneKeyGroup(learnNew);
 
         return packageFlowVO.packageFlowVO(studyFlowNew, dto.getStudent(), dto.getUnitId());
     }
@@ -280,7 +282,7 @@ public class FinishGroupOrUnit {
                 .build());
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(startFlowId);
 
-        HttpUtil.getHttpSession().setAttribute(SessionConstant.FREE_GROUP, learnNew.getGroup());
+        FreeFlowServiceImpl.setFreeGroup(learnNew);
 
         FlowVO flowVO = packageFlowVO.packageFlowVO(studyFlowNew, student, dto.getUnitId());
         return ServerResponse.createBySuccess(flowVO);

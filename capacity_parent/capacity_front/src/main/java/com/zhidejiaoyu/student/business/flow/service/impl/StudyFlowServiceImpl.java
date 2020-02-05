@@ -273,13 +273,14 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             vo = this.packageFlowVO(studyFlowNew, student, learnNew.getUnitId());
         }
 
-        boolean firstFalseAdd = redisOpt.getFirstFalseAdd(studentId, learnNew.getUnitId(), learnNew.getGroup());
-        if (firstFalseAdd) {
-            HttpUtil.getHttpSession().setAttribute(SessionConstant.FIRST_FALSE_ADD, true);
-        }
-        HttpUtil.getHttpSession().setAttribute(SessionConstant.ONE_KEY_GROUP, learnNew.getGroup());
+        FreeFlowServiceImpl.setFirstFalseAdd(studentId, learnNew, redisOpt);
+        setOneKeyGroup(learnNew);
 
         return ServerResponse.createBySuccess(vo);
+    }
+
+    public static void setOneKeyGroup(LearnNew learnNew) {
+        HttpUtil.getHttpSession().setAttribute(SessionConstant.ONE_KEY_GROUP, learnNew.getGroup());
     }
 
 
