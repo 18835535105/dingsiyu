@@ -21,5 +21,5 @@ public interface GradeNameConstant {
     String SENIOR_THREE = "高三";
     String VOLUME_1 = "上册";
     String VOLUME_2 = "下册";
-
+    String Full_VOLUME = "全册";
 }
