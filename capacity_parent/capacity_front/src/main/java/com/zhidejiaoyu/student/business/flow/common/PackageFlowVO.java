@@ -51,6 +51,7 @@ public class PackageFlowVO {
         String token = TokenUtil.getToken();
         HttpUtil.getHttpSession().setAttribute("token", token);
 
+        String englishGrade = IndexCourseInfoServiceImpl.getGradeAndLabelEnglishName(courseNew.getGrade(), courseNew.getLabel());
         return FlowVO.builder()
                 .courseId(courseNew.getId())
                 .courseName(courseNew.getCourseName())
@@ -60,6 +61,7 @@ public class PackageFlowVO {
                 .unitName(unitNew.getUnitName())
                 .token(token)
                 .lastUnit(false)
+                .englishGrade(englishGrade)
                 .petName(StringUtils.isEmpty(student.getPetName()) ? "大明白" : student.getPetName())
                 .build();
     }
