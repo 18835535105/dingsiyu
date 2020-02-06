@@ -141,7 +141,7 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         learnExtend.setFlowName(flow.getFlowName());
         Integer teacherId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
         if(teacherId == null){
-            learnExtend.setSchoolAdminId(Long.parseLong(teacherId.toString()));
+            learnExtend.setSchoolAdminId(teacherId.longValue());
         }
         learnExtend.setFirstIsKnow(1);
         learnExtendMapper.insert(learnExtend);
