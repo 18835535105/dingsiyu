@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -61,6 +62,7 @@ public class TestRecordInfo extends Model<TestRecordInfo> {
      */
     private String answer;
 
+    private Date createTime;
 
     @Override
     protected Serializable pkVal() {

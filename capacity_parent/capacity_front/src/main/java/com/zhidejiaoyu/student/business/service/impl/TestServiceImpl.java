@@ -9,7 +9,6 @@ import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
 import com.zhidejiaoyu.common.constant.*;
-import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.constant.study.StudyModelConstant;
 import com.zhidejiaoyu.common.constant.study.TestGenreConstant;
@@ -23,7 +22,6 @@ import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.CcieUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
-import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
@@ -105,9 +103,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     @Autowired
     private LearnMapper learnMapper;
-
-    @Autowired
-    private StudyFlowMapper studyFlowMapper;
 
     @Autowired
     private TestGoldUtil testGoldUtil;
@@ -675,76 +670,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             return resultMap;
         }
         return null;
-    }
-
-    /**
-     * 游戏结束初始化学习流程
-     *
-     * @param student
-     * @param point
-     * @param studentFlow
-     */
-    private void initStudentFlow(Student student, Integer point, StudentFlow studentFlow) {
-        if (studentFlow == null) {
-            studentFlow = new StudentFlow();
-            studentFlow.setStudentId(student.getId());
-            studentFlow.setTimeMachine(0);
-            studentFlow.setPresentFlow(1);
-            if (point >= PointConstant.EIGHTY) {
-                // 流程2
-                studentFlow.setCurrentFlowId(24L);
-            } else {
-                // 流程1
-                studentFlow.setCurrentFlowId(11L);
-            }
-            studentFlowMapper.insert(studentFlow);
-        } else {
-            if (point >= PointConstant.EIGHTY) {
-                // 流程2
-                studentFlow.setCurrentFlowId(24L);
-            } else {
-                // 流程1
-                studentFlow.setCurrentFlowId(11L);
-            }
-            studentFlowMapper.updateById(studentFlow);
-        }
-    }
-
-    /**
-     * 无游戏测试记录，新增游戏测试记录
-     *
-     * @param testRecord
-     * @param student
-     * @param map
-     */
-    private void createGameTestRecord(TestRecord testRecord, Student student, Map<String, Object> map) {
-        testRecord.setExplain("游戏测试次数#1#");
-        String msg;
-        if (testRecord.getPoint() >= PointConstant.EIGHTY) {
-            msg = "恭喜你旗开得胜，祝未来勇闯天涯！";
-            map.put("tip", msg);
-            testRecord.setExplain(testRecord.getExplain() + msg);
-        } else {
-            msg = "失败乃成功他母亲，速速利用第二次机会迎回春天！";
-            map.put("tip", msg);
-            testRecord.setExplain(testRecord.getExplain() + msg);
-            map.put("tip", "游戏还不错吧？下面我们来开始学习吧。");
-        }
-
-        // 保存历史最高分和历史最低分
-        testRecord.setHistoryBestPoint(testRecord.getPoint());
-        testRecord.setHistoryBadPoint(testRecord.getPoint());
-
-        // 奖励
-        int goldCount = this.award(student, testRecord);
-        map.put("gold", goldCount);
-        testRecord.setAwardGold(goldCount);
-        int count = testRecordMapper.insertSelective(testRecord);
-        if (count == 0) {
-            String errMsg = "id为 " + student.getId() + " 的学生 " + student.getStudentName() + " 游戏测试记录保存失败！";
-            super.saveRunLog(student, 2, errMsg);
-            log.error(errMsg);
-        }
     }
 
     /**
@@ -1466,7 +1391,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                         if (Objects.equals(subject.get(key), true)) {
                             finalTestRecordInfo.setAnswer(matchSelected(j[0]));
                         }
-                        this.setOptions(finalTestRecordInfo, j[0], key);
+                        setOptions(finalTestRecordInfo, j[0], key);
                         if (finalObject.getJSONObject("userInput") != null) {
                             selected[0] = matchSelected(finalObject.getJSONObject("userInput").getInteger("optionIndex"));
                         }
@@ -1495,8 +1420,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
     }
 
-
-    private void setOptions(TestRecordInfo testRecordInfo, int j, String option) {
+    public static void setOptions(TestRecordInfo testRecordInfo, int j, String option) {
         switch (j) {
             case 0:
                 testRecordInfo.setOptionA(option);
@@ -1520,7 +1444,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
      * @param integer
      * @return
      */
-    static String matchSelected(Integer integer) {
+    public static String matchSelected(Integer integer) {
         switch (integer) {
             case 0:
                 return "A";

@@ -13,13 +13,14 @@
         <result column="option_c" property="optionC" />
         <result column="option_d" property="optionD" />
         <result column="answer" property="answer" />
+        <result column="create_time" property="createTime" />
     </resultMap>
 
     <insert id="insertList" parameterType="map">
         insert into test_record_info values
         <foreach collection="testRecordInfos" item="info" separator=",">
             (#{info.id}, #{info.testId}, #{info.selected}, #{info.word}, #{info.optionA}, #{info.optionB},
-            #{info.optionC},#{info.optionD},#{info.answer})
+            #{info.optionC},#{info.optionD},#{info.answer}, now())
         </foreach>
     </insert>
     <select id="countByRecordIds" resultType="java.util.Map" parameterType="map">

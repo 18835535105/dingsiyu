@@ -30,6 +30,7 @@ import com.zhidejiaoyu.common.vo.simple.testVo.SimpleTestResultVO;
 import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResultUtil;
 import com.zhidejiaoyu.common.vo.testVo.SentenceTestResultVO;
 import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
+import com.zhidejiaoyu.student.business.service.impl.TestServiceImpl;
 import com.zhidejiaoyu.student.common.SaveLearnAndCapacity;
 import com.zhidejiaoyu.common.constant.PetImageConstant;
 import com.zhidejiaoyu.common.constant.PetMP3Constant;
@@ -1256,12 +1257,12 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
                         JSONObject finalObject = object;
                         subject.forEach((key, val) -> {
                             if (Objects.equals(subject.get(key), true)) {
-                                finalTestRecordInfo.setAnswer(matchSelected(j[0]));
+                                finalTestRecordInfo.setAnswer(TestServiceImpl.matchSelected(j[0]));
                             }
-                            this.setOptions(finalTestRecordInfo, j[0], key);
+                            TestServiceImpl.setOptions(finalTestRecordInfo, j[0], key);
 
                             if (finalObject.getJSONObject("userInput") != null) {
-                                selected[0] = this.matchSelected(finalObject.getJSONObject("userInput").getInteger("optionIndex"));
+                                selected[0] = TestServiceImpl.matchSelected(finalObject.getJSONObject("userInput").getInteger("optionIndex"));
                             }
                             finalTestRecordInfo.setWord(word);
                             j[0]++;
@@ -1285,49 +1286,10 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
                 try {
                     simpleTestRecordInfoMapper.insertList(testRecordInfos);
                 } catch (Exception e) {
-                    log.error("学生测试记录详情保存失败：studentId=[{}], testId=[{}], modelType=[{}], error=[{}]",
-                            student.getId(), testRecordId, modelType, e.getMessage());
+                    log.error("学生测试记录详情保存失败：studentId=[{}], testId=[{}], modelType=[{}]",
+                            student.getId(), testRecordId, modelType, e);
                 }
             }
-        }
-    }
-
-    private void setOptions(TestRecordInfo testRecordInfo, int j, String option) {
-        switch (j) {
-            case 0:
-                testRecordInfo.setOptionA(option);
-                break;
-            case 1:
-                testRecordInfo.setOptionB(option);
-                break;
-            case 2:
-                testRecordInfo.setOptionC(option);
-                break;
-            case 3:
-                testRecordInfo.setOptionD(option);
-                break;
-            default:
-        }
-    }
-
-    /**
-     * 匹配选项
-     *
-     * @param integer
-     * @return
-     */
-    private String matchSelected(Integer integer) {
-        switch (integer) {
-            case 0:
-                return "A";
-            case 1:
-                return "B";
-            case 2:
-                return "C";
-            case 3:
-                return "D";
-            default:
-                return null;
         }
     }
 
@@ -1495,7 +1457,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      */
     private String getUseTime(String useTime) {
         if (!StringUtils.isEmpty(useTime)) {
-            int intUseTime = Integer.valueOf(useTime);
+            int intUseTime = Integer.parseInt(useTime);
             return "用时：" + (intUseTime / 60) + " 分 " + (intUseTime % 60) + "秒";
         }
         return "用时：0 分 0 秒";
