@@ -182,7 +182,7 @@ logging:
 
 ip: 123.56.142.84
 #ip: 192.168.0.2
-adminDomin: http://${ip}:9999/dept
+adminDomin: http://test.admin.yydz100.com/dept
 
 cross:
   url: http://192.168.0.*:5000
