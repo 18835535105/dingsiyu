@@ -56,7 +56,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         Student student = super.getStudent(HttpUtil.getHttpSession());
 
         // 查询学生可自由学习的课程
-        List<CourseConfig> courseConfigs = courseConfigMapper.selectByUserIdAndTypeAndOneKeyLearn(student.getId(), 2, 2);
+        List<CourseConfig> courseConfigs = courseConfigMapper.selectByUserIdAndTypeAndOneKeyLearn(student.getId(), 2);
         if (CollectionUtils.isNotEmpty(courseConfigs)) {
             return this.packageCourse(student, courseConfigs, type);
         }
@@ -64,14 +64,14 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         // 说明没有针对学生的教材配置，查询校区的教材配置
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
         if (schoolAdminId != null) {
-            courseConfigs = courseConfigMapper.selectByUserIdAndTypeAndOneKeyLearn((long) schoolAdminId, 1, 2);
+            courseConfigs = courseConfigMapper.selectByUserIdAndTypeAndOneKeyLearn((long) schoolAdminId, 1);
             if (CollectionUtils.isNotEmpty(courseConfigs)) {
                 return this.packageCourse(student, courseConfigs, type);
             }
         }
 
         // 说明没有针对校区的教材配置，查询总部的教材配置
-        courseConfigs = courseConfigMapper.selectByUserIdAndTypeAndOneKeyLearn(1L, 1, 2);
+        courseConfigs = courseConfigMapper.selectByUserIdAndTypeAndOneKeyLearn(1L, 1);
         if (CollectionUtils.isNotEmpty(courseConfigs)) {
             return this.packageCourse(student, courseConfigs, type);
         }

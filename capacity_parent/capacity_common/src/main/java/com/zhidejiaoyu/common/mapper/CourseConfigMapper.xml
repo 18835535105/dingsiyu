@@ -18,7 +18,10 @@
     </sql>
 
     <select id="countByUserIdAndType" parameterType="map" resultType="int">
-        select count(id) from course_config where user_id = #{userId} and type = #{type}
+        select count(id)
+        from course_config
+        where user_id = #{userId}
+          and type = #{type}
     </select>
 
     <select id="selectByUserIdAndTypeAndOneKeyLearn" resultMap="BaseResultMap" parameterType="map">
@@ -27,7 +30,6 @@
         from course_config
         where user_id = #{userId}
         and type = #{type}
-        and one_key_learn = #{oneKeyLearn}
     </select>
     <select id="selectByUserId" parameterType="map" resultType="long">
         select
