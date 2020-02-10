@@ -1413,8 +1413,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 try {
                     testRecordInfoMapper.insertList(testRecordInfos);
                 } catch (Exception e) {
-                    log.error("学生测试记录详情保存失败：studentId=[{}], testId=[{}], modelType=[{}], error=[{}]",
-                            student.getId(), testRecordId, modelType, e.getMessage());
+                    log.error("学生测试记录详情保存失败：studentId=[{}], testId=[{}], modelType=[{}]",
+                            student.getId(), testRecordId, modelType, e);
                 }
             }
         }
