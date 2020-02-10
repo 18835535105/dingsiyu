@@ -138,17 +138,6 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             smallCourseIds.addAll(courseNewMapper.selectByGradeListAndVersionAndGrade(targetVersion, smallGradeList));
         }
 
-        if (CollectionUtils.isEmpty(smallCourseIds)) {
-            return ServerResponse.createBySuccess(CourseInfoVO.builder()
-                    .currentGrade(null)
-                    .previousGrade(null)
-                    .versions(versionVos)
-                    .InGrade(student.getGrade())
-                    .build());
-        }
-
-        List<CourseNew> courseNews = courseNewMapper.selectBatchIds(smallCourseIds);
-
         // 其他年级
         List<CourseVO> previousGrade = new ArrayList<>();
         // 当前年级
@@ -156,12 +145,23 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         if (type == 3) {
             this.packageSyntaxInfoVO(student, courseIds, previousGrade, currentGrade);
         } else {
+
+            if (CollectionUtils.isEmpty(smallCourseIds)) {
+                return ServerResponse.createBySuccess(CourseInfoVO.builder()
+                        .currentGrade(null)
+                        .previousGrade(null)
+                        .versions(versionVos)
+                        .InGrade(student.getGrade())
+                        .build());
+            }
+
             // 各个课程下所有单元个数
             Map<Long, Map<Long, Object>> unitCountInCourse = courseNewMapper.countUnitByIds(courseIds, type);
 
             // 各个课程下已学习单元个数
             Map<Long, Map<Long, Object>> learnUnitCountInCourse = learnHistoryMapper.countUnitByStudentIdAndCourseIds(student.getId(), courseIds, type == 4 ? 3 : type);
 
+            List<CourseNew> courseNews = courseNewMapper.selectBatchIds(smallCourseIds);
 
             courseNews.forEach(courseNew -> packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, courseNew));
         }
