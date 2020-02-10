@@ -128,7 +128,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         long count = canStudyCourseNews.stream().filter(courseNew -> Objects.equals(student.getVersion(), courseNew.getVersion())).count();
         String targetVersion = this.getTargetVersion(courseId, count, versionVos);
 
-        List<String> gradeList = GradeUtil.smallThanCurrent(targetVersion, student.getGrade());
+        List<String> gradeList = GradeUtil.smallThanCurrentAllPhase(targetVersion, student.getGrade());
 
         List<Long> smallCourseIds = new ArrayList<>();
         if (gradeList.size() > 1) {
