@@ -62,4 +62,21 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
      * @return
      */
     CourseNew selectByUnitId(@Param("unitId") Long unitId);
+
+    /**
+     * 查询指定版本、年级的课程id
+     *
+     * @param version        版本
+     * @param smallGradeList 年级集合
+     * @return
+     */
+    List<Long> selectByGradeListAndVersionAndGrade(@Param("version") String version, @Param("smallGradeList") List<String> smallGradeList);
+
+    /**
+     * 批量获取课程信息
+     *
+     * @param courseIds
+     * @return
+     */
+    List<CourseNew> selectByIds(@Param("courseIds") List<Long> courseIds);
 }

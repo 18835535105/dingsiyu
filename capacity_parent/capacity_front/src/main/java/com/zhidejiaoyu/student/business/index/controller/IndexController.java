@@ -69,15 +69,16 @@ public class IndexController {
     /**
      * 获取各个年级课程数据
      *
-     * @param type 1：单词；2：句型；3：语法；4：课文
+     * @param type    1：单词；2：句型；3：语法；4：课文
+     * @param version 版本
      * @return
      */
     @GetMapping("/getStudyCourse")
-    public ServerResponse<CourseInfoVO> getStudyCourse(Integer type) {
+    public ServerResponse<CourseInfoVO> getStudyCourse(Integer type, String version) {
         if (type == null) {
             throw new ServiceException("获取年级课程数据出错！type=null!");
         }
-        return indexCourseInfoService.getStudyCourse(type);
+        return indexCourseInfoService.getStudyCourse(type, version);
     }
 
     /**

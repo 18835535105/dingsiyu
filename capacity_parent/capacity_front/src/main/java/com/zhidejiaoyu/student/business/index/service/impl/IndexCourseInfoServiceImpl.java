@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.index.service.impl;
 
+import com.zhidejiaoyu.common.constant.GradeNameConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.CourseConfig;
@@ -7,14 +8,15 @@ import com.zhidejiaoyu.common.pojo.CourseNew;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.SyntaxCourse;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
+import com.zhidejiaoyu.common.utils.grade.GradeUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.index.dto.UnitInfoDTO;
 import com.zhidejiaoyu.student.business.index.service.IndexCourseInfoService;
 import com.zhidejiaoyu.student.business.index.vo.course.CourseInfoVO;
 import com.zhidejiaoyu.student.business.index.vo.course.CourseVO;
+import com.zhidejiaoyu.student.business.index.vo.course.VersionVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
-import com.zhidejiaoyu.common.constant.GradeNameConstant;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -52,13 +54,13 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     private SyntaxUnitMapper syntaxUnitMapper;
 
     @Override
-    public ServerResponse<CourseInfoVO> getStudyCourse(Integer type) {
+    public ServerResponse<CourseInfoVO> getStudyCourse(Integer type, String version) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
 
         // 查询学生可自由学习的课程
         List<CourseConfig> courseConfigs = courseConfigMapper.selectByUserIdAndTypeAndOneKeyLearn(student.getId(), 2);
         if (CollectionUtils.isNotEmpty(courseConfigs)) {
-            return this.packageCourse(student, courseConfigs, type);
+            return this.packageCourse(student, courseConfigs, type, version);
         }
 
         // 说明没有针对学生的教材配置，查询校区的教材配置
@@ -66,14 +68,14 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         if (schoolAdminId != null) {
             courseConfigs = courseConfigMapper.selectByUserIdAndTypeAndOneKeyLearn((long) schoolAdminId, 1);
             if (CollectionUtils.isNotEmpty(courseConfigs)) {
-                return this.packageCourse(student, courseConfigs, type);
+                return this.packageCourse(student, courseConfigs, type, version);
             }
         }
 
         // 说明没有针对校区的教材配置，查询总部的教材配置
         courseConfigs = courseConfigMapper.selectByUserIdAndTypeAndOneKeyLearn(1L, 1);
         if (CollectionUtils.isNotEmpty(courseConfigs)) {
-            return this.packageCourse(student, courseConfigs, type);
+            return this.packageCourse(student, courseConfigs, type, version);
         }
 
         throw new ServiceException("未查询到学生的自由学习课程！");
@@ -99,9 +101,10 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
      * @param student
      * @param courseConfigs
      * @param type
+     * @param version
      * @return
      */
-    private ServerResponse<CourseInfoVO> packageCourse(Student student, List<CourseConfig> courseConfigs, int type) {
+    private ServerResponse<CourseInfoVO> packageCourse(Student student, List<CourseConfig> courseConfigs, int type, String version) {
 
         CourseInfoVO courseInfoVO = new CourseInfoVO();
         courseInfoVO.setInGrade(student.getGrade());
@@ -116,7 +119,55 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             throw new ServiceException(300, "未查询到可以学习的课程！");
         }
 
-        List<CourseNew> courseNews = courseNewMapper.selectBatchIds(courseIds);
+        // 获取学生可以学习的版本集合
+        List<CourseNew> canStudyCourseNews = courseNewMapper.selectByIds(courseIds);
+        // 判断配置的课程中是否有学生所在的版本
+        long count = canStudyCourseNews.stream().filter(courseNew -> Objects.equals(student.getVersion(), courseNew.getVersion())).count();
+        String targetVersion;
+        List<VersionVO> versionVos = canStudyCourseNews.stream().map(courseNew -> {
+            if (Objects.equals(courseNew.getVersion(), student.getVersion())) {
+                return VersionVO.builder()
+                        .selected(true)
+                        .version(courseNew.getVersion())
+                        .build();
+            }
+            return VersionVO.builder()
+                    .selected(false)
+                    .version(courseNew.getVersion())
+                    .build();
+        }).collect(Collectors.toList());
+        if (StringUtils.isEmpty(version)) {
+            if (count == 0 && CollectionUtils.isNotEmpty(versionVos)) {
+                targetVersion = versionVos.get(0).getVersion();
+                versionVos.get(0).setSelected(true);
+            } else {
+                targetVersion = versionVos.stream().filter(VersionVO::getSelected).map(VersionVO::getVersion).collect(Collectors.joining());
+            }
+        } else {
+            targetVersion = version;
+            versionVos.forEach(versionVO -> versionVO.setSelected(Objects.equals(version, versionVO.getVersion())));
+        }
+
+        List<String> gradeList = GradeUtil.smallThanCurrent(targetVersion, student.getGrade());
+
+        List<Long> smallCourseIds = new ArrayList<>();
+        int size = gradeList.size();
+        if (size > 1) {
+            List<String> smallGradeList = gradeList.subList(0, size - 1);
+            // 当前版本中小于或等于当前年级的所有课程id
+            smallCourseIds.addAll(courseNewMapper.selectByGradeListAndVersionAndGrade(targetVersion, smallGradeList));
+        }
+
+        if (CollectionUtils.isEmpty(smallCourseIds)) {
+            return ServerResponse.createBySuccess(CourseInfoVO.builder()
+                    .currentGrade(null)
+                    .previousGrade(null)
+                    .versions(versionVos)
+                    .InGrade(student.getGrade())
+                    .build());
+        }
+
+        List<CourseNew> courseNews = courseNewMapper.selectBatchIds(smallCourseIds);
 
         // 其他年级
         List<CourseVO> previousGrade = new ArrayList<>();
@@ -137,6 +188,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
         courseInfoVO.setCurrentGrade(currentGrade);
         courseInfoVO.setPreviousGrade(previousGrade);
+        courseInfoVO.setVersions(versionVos);
 
         return ServerResponse.createBySuccess(courseInfoVO);
     }
@@ -222,8 +274,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         }
 
         // 已学单元总个数
-        long learnedUnitCount;
-        learnedUnitCount = this.getUnitCount(learnUnitCountInCourse, courseId);
+        long learnedUnitCount = this.getUnitCount(learnUnitCountInCourse, courseId);
 
         if (learnedUnitCount == 0) {
             courseVoBuilder.combatProgress(0).battle(1);
