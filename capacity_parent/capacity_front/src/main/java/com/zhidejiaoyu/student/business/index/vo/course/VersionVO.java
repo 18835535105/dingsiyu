@@ -16,6 +16,12 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VersionVO implements Serializable {
+
+    /**
+     * 课程id
+     */
+    private Long courseId;
+
     /**
      * 版本名称
      */

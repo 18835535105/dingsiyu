@@ -54,13 +54,13 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     private SyntaxUnitMapper syntaxUnitMapper;
 
     @Override
-    public ServerResponse<CourseInfoVO> getStudyCourse(Integer type, String version) {
+    public ServerResponse<CourseInfoVO> getStudyCourse(Integer type, Long courseId) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
 
         // 查询学生可自由学习的课程
         List<CourseConfig> courseConfigs = courseConfigMapper.selectByUserIdAndTypeAndOneKeyLearn(student.getId(), 2);
         if (CollectionUtils.isNotEmpty(courseConfigs)) {
-            return this.packageCourse(student, courseConfigs, type, version);
+            return this.packageCourse(student, courseConfigs, type, courseId);
         }
 
         // 说明没有针对学生的教材配置，查询校区的教材配置
@@ -68,14 +68,14 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         if (schoolAdminId != null) {
             courseConfigs = courseConfigMapper.selectByUserIdAndTypeAndOneKeyLearn((long) schoolAdminId, 1);
             if (CollectionUtils.isNotEmpty(courseConfigs)) {
-                return this.packageCourse(student, courseConfigs, type, version);
+                return this.packageCourse(student, courseConfigs, type, courseId);
             }
         }
 
         // 说明没有针对校区的教材配置，查询总部的教材配置
         courseConfigs = courseConfigMapper.selectByUserIdAndTypeAndOneKeyLearn(1L, 1);
         if (CollectionUtils.isNotEmpty(courseConfigs)) {
-            return this.packageCourse(student, courseConfigs, type, version);
+            return this.packageCourse(student, courseConfigs, type, courseId);
         }
 
         throw new ServiceException("未查询到学生的自由学习课程！");
@@ -101,10 +101,10 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
      * @param student
      * @param courseConfigs
      * @param type
-     * @param version
+     * @param courseId      用于查询版本名称
      * @return
      */
-    private ServerResponse<CourseInfoVO> packageCourse(Student student, List<CourseConfig> courseConfigs, int type, String version) {
+    private ServerResponse<CourseInfoVO> packageCourse(Student student, List<CourseConfig> courseConfigs, int type, Long courseId) {
 
         CourseInfoVO courseInfoVO = new CourseInfoVO();
         courseInfoVO.setInGrade(student.getGrade());
@@ -121,32 +121,12 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
         // 获取学生可以学习的版本集合
         List<CourseNew> canStudyCourseNews = courseNewMapper.selectByIds(courseIds);
+
+        List<VersionVO> versionVos = this.getVersionVos(student, canStudyCourseNews);
+
         // 判断配置的课程中是否有学生所在的版本
         long count = canStudyCourseNews.stream().filter(courseNew -> Objects.equals(student.getVersion(), courseNew.getVersion())).count();
-        String targetVersion;
-        List<VersionVO> versionVos = canStudyCourseNews.stream().map(courseNew -> {
-            if (Objects.equals(courseNew.getVersion(), student.getVersion())) {
-                return VersionVO.builder()
-                        .selected(true)
-                        .version(courseNew.getVersion())
-                        .build();
-            }
-            return VersionVO.builder()
-                    .selected(false)
-                    .version(courseNew.getVersion())
-                    .build();
-        }).collect(Collectors.toList());
-        if (StringUtils.isEmpty(version)) {
-            if (count == 0 && CollectionUtils.isNotEmpty(versionVos)) {
-                targetVersion = versionVos.get(0).getVersion();
-                versionVos.get(0).setSelected(true);
-            } else {
-                targetVersion = versionVos.stream().filter(VersionVO::getSelected).map(VersionVO::getVersion).collect(Collectors.joining());
-            }
-        } else {
-            targetVersion = version;
-            versionVos.forEach(versionVO -> versionVO.setSelected(Objects.equals(version, versionVO.getVersion())));
-        }
+        String targetVersion = this.getTargetVersion(courseId, count, versionVos);
 
         List<String> gradeList = GradeUtil.smallThanCurrent(targetVersion, student.getGrade());
 
@@ -191,6 +171,55 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         courseInfoVO.setVersions(versionVos);
 
         return ServerResponse.createBySuccess(courseInfoVO);
+    }
+
+    /**
+     * 获取最终页面被选中的版本信息
+     *
+     * @param courseId
+     * @param count
+     * @param versionVos
+     * @return
+     */
+    private String getTargetVersion(Long courseId, long count, List<VersionVO> versionVos) {
+        String targetVersion;
+        if (courseId == null) {
+            if (count == 0 && CollectionUtils.isNotEmpty(versionVos)) {
+                targetVersion = versionVos.get(0).getVersion();
+                versionVos.get(0).setSelected(true);
+            } else {
+                targetVersion = versionVos.stream().filter(VersionVO::getSelected).map(VersionVO::getVersion).collect(Collectors.joining());
+            }
+        } else {
+            CourseNew courseNew = courseNewMapper.selectById(courseId);
+            targetVersion = courseNew.getVersion();
+            versionVos.forEach(versionVO -> versionVO.setSelected(Objects.equals(targetVersion, versionVO.getVersion())));
+        }
+        return targetVersion;
+    }
+
+    /**
+     * 封装最终响应的版本集合
+     *
+     * @param student
+     * @param canStudyCourseNews
+     * @return
+     */
+    private List<VersionVO> getVersionVos(Student student, List<CourseNew> canStudyCourseNews) {
+        return canStudyCourseNews.stream().map(courseNew -> {
+            if (Objects.equals(courseNew.getVersion(), student.getVersion())) {
+                return VersionVO.builder()
+                        .selected(true)
+                        .courseId(courseNew.getId())
+                        .version(courseNew.getVersion())
+                        .build();
+            }
+            return VersionVO.builder()
+                    .selected(false)
+                    .courseId(courseNew.getId())
+                    .version(courseNew.getVersion())
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     /**
