@@ -131,11 +131,9 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         List<String> gradeList = GradeUtil.smallThanCurrent(targetVersion, student.getGrade());
 
         List<Long> smallCourseIds = new ArrayList<>();
-        int size = gradeList.size();
-        if (size > 1) {
-            List<String> smallGradeList = gradeList.subList(0, size - 1);
+        if (gradeList.size() > 1) {
             // 当前版本中小于或等于当前年级的所有课程id
-            smallCourseIds.addAll(courseNewMapper.selectByGradeListAndVersionAndGrade(targetVersion, smallGradeList));
+            smallCourseIds.addAll(courseNewMapper.selectByGradeListAndVersionAndGrade(targetVersion, gradeList));
         }
 
         // 其他年级
