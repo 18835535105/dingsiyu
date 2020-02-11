@@ -910,9 +910,28 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         maps.put("unitId", unitId);
         maps.put("studentId", student.getId());
         List<Map<String, Object>> map = teksMapper.selHistoryPronunciation(maps);
+        Map<String, Map<String, Object>> isMap = new HashMap<>();
+        map.forEach(sMap -> {
+            String wordId = sMap.get("wordId").toString();
+            Map<String, Object> map1 = isMap.get(wordId);
+            if (map1 == null) {
+                isMap.put(wordId, sMap);
+            } else {
+                Integer sVoiceId = Integer.parseInt(sMap.get("voiceId").toString());
+                Integer gVoiceId = Integer.parseInt(map1.get("voiceId").toString());
+                if (gVoiceId < sVoiceId) {
+                    isMap.put(wordId, sMap);
+                }
+            }
+        });
+        Set<String> strings = isMap.keySet();
+        List<Map<String, Object>> getMaps=new ArrayList<>();
+        strings.forEach(string->{
+            getMaps.add(isMap.get(string));
+        });
         List<Map<String, Object>> resultMap = new ArrayList<>();
         String url;
-        for (Map<String, Object> getMap : map) {
+        for (Map<String, Object> getMap : getMaps) {
             url = getMap.get("url") == null ? "" : getMap.get("url").toString();
             getMap.put("url", url);
             String sentence = getMap.get("sentence").toString();
