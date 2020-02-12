@@ -15,10 +15,11 @@ public interface IndexCourseInfoService extends BaseService<CourseConfig> {
     /**
      * 获取各个年级课程数据
      *
-     * @param type 1：单词；2：句型；3：语法；4：课文
+     * @param type     1：单词；2：句型；3：语法；4：课文
+     * @param courseId 课程id，用于查询课程版本
      * @return
      */
-    ServerResponse<CourseInfoVO> getStudyCourse(Integer type);
+    ServerResponse<CourseInfoVO> getStudyCourse(Integer type, Long courseId);
 
     /**
      * 获取当前单元下所有单元信息

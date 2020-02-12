@@ -33,4 +33,9 @@ public class CourseInfoVO {
      * 当前年级课程信息
      */
     private List<CourseVO> currentGrade;
+
+    /**
+     * 学生版本信息
+     */
+    private List<VersionVO> versions;
 }

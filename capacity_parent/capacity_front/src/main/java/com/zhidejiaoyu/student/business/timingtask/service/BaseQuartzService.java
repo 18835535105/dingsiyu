@@ -16,6 +16,7 @@ public interface BaseQuartzService {
      */
     default boolean checkPort(int port) {
         int localPort = ServiceInfoUtil.getPort();
+        System.out.println("当前服务器端口：" + localPort + " 执行定时任务需要的端口：" + port);
         return localPort != 0 && port != localPort;
     }
 }

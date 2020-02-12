@@ -67,6 +67,8 @@
         student_id=#{studentId}
         and unit_id =#{unitId}
         and easy_or_hard=#{easyOrHard}
+        order by id
+        limit 1
     </select>
 
     <select id="selectByStudentIdAndUnitId" parameterType="map" resultType="int">

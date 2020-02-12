@@ -88,6 +88,26 @@
         join unit_new un on cn.id = un.course_id and un.id = #{unitId}
         limit 1
     </select>
+    <select id="selectByGradeListAndVersionAndGrade" resultType="java.lang.Long" parameterType="map">
+        select distinct(c.id)
+        from course_new c
+        where c.version = #{version}
+        and c.grade in (
+        <foreach collection="smallGradeList" item="grade" separator=",">
+            #{grade}
+        </foreach>)
+    </select>
+    <select id="selectByIds" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from course_new where id in (
+        <foreach collection="courseIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+        group by version
+        order by id
+    </select>
 
 
 </mapper>

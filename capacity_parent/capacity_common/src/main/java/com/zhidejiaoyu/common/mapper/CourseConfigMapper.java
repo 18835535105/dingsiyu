@@ -21,16 +21,16 @@ public interface CourseConfigMapper extends BaseMapper<CourseConfig> {
      *
      * @param userId
      * @param type
-     * @param oneKeyLearn
      * @return
      */
-    List<CourseConfig> selectByUserIdAndTypeAndOneKeyLearn(@Param("userId") Long userId, @Param("type") int type, @Param("oneKeyLearn") int oneKeyLearn);
+    List<CourseConfig> selectByUserIdAndTypeAndOneKeyLearn(@Param("userId") Long userId, @Param("type") int type);
 
-    List<Long> selectByUserId(@Param("userId") Long userId,@Param("gradeList") List<String> gradeList);
+    List<Long> selectByUserId(@Param("userId") Long userId, @Param("gradeList") List<String> gradeList);
 
     /**
      * 查看是否有排课的内容
+     *
      * @param userId
      */
-    int countByUserIdAndType(@Param("userId") Long userId,@Param("type")int type);
+    int countByUserIdAndType(@Param("userId") Long userId, @Param("type") int type);
 }
