@@ -76,7 +76,7 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
             LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, 1,1);
             if (flag == 1) {
                 //获取当前单元下的learnId
-                vocabularies = vocabularyMapper.selectWordVoice(student.getId(), unitId,learnNews.getGroup());
+                vocabularies = vocabularyMapper.selectWordVoice( unitId,learnNews.getGroup());
             } else {
                 vocabularies = redisOpt.getVoiceInfoInUnit(unitId, learnNews.getGroup());
             }
