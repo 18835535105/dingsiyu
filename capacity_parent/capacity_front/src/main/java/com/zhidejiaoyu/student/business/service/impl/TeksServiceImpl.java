@@ -137,8 +137,6 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private SaveTeksData saveTeksData;
     @Resource
     private LearnNewMapper learnNewMapper;
-    @Resource
-    private TeksNew teksNew;
 
 
     @Override
