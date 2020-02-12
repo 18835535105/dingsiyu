@@ -497,6 +497,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
         if (checkPort(port)) {
             return;
         }
+        log.info("更新学生优先级开始。。。");
         //获取所有充课学生和所有未到期学生
         List<Long> studentIds = studentMapper.selectAllStudentId();
         //获取学生学习数量 可能修改
@@ -614,6 +615,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 delLearnNew(studentId);
             }
         });
+        log.info("更新学生优先级完成。。。");
     }
 
     private void delLearnNew(Long studentId) {
@@ -655,6 +657,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
         if (checkPort(port)) {
             return;
         }
+        log.info("根据school_time配置更新学生课程开始。。。");
         //获取当前日期月的第几周
         int week = DateUtil.getWeekOfMonth(new Date());
         int month = DateUtil.getMonth();
@@ -742,7 +745,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
             }
         });
 
-
+        log.info("根据school_time配置更新学生课程完成。。。");
     }
 
 
