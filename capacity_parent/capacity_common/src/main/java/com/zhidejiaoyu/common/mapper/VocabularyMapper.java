@@ -239,7 +239,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @param unitId
      * @return
      */
-    List<Vocabulary> selectWordVoice(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+    List<Vocabulary> selectWordVoice(@Param("studentId") Long studentId, @Param("unitId") Long unitId,@Param("group") Integer group);
 
     /**
      * 查询单词本中单词播放机还未学习的单词

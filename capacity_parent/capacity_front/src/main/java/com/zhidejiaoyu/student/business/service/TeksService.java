@@ -57,7 +57,7 @@ public interface TeksService extends BaseService<Teks> {
 
     ServerResponse<Object> isHistoryPronunciation(Integer unitId, HttpSession session);
 
-    ServerResponse<Object> selSpeakTeksByUnitId(Integer unitId, HttpSession session);
+    ServerResponse<Object> selSpeakTeksByUnitId(Long unitId, HttpSession session);
 
     ServerResponse<Object> selHistoryByCountAndUnitId(Integer count, Integer unitId, HttpSession session);
 

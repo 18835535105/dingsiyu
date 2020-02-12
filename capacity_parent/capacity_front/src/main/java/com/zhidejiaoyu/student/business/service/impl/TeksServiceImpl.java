@@ -135,6 +135,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private TeksUnitMapper teksUnitMapper;
     @Resource
     private SaveTeksData saveTeksData;
+    @Resource
+    private LearnNewMapper learnNewMapper;
+    @Resource
+    private TeksNew teksNew;
 
 
     @Override
@@ -155,18 +159,19 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     }
 
     @Override
-    public ServerResponse<Object> selSpeakTeksByUnitId(Integer unitId, HttpSession session) {
+    public ServerResponse<Object> selSpeakTeksByUnitId(Long unitId, HttpSession session) {
         Student student = getStudent(session);
         Map<String, Object> map = new HashMap<>();
-        List<Teks> teks = teksMapper.selTeksByUnitId(unitId);
+        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, 1,1);
+        List<TeksNew> teks = teksNewMapper.selTeksByUnitIdAndGroup(unitId,learnNews.getGroup());
         Map<String, Object> getMap = new HashMap<>();
         getMap.put("studentId", student.getId());
         getMap.put("unitId", unitId);
         Integer integer = voiceMapper.selMaxCountByUnitIdAndStudentId(getMap);
         if (teks.size() > 0) {
-            List<Teks> resultTeks = new ArrayList<>();
+            List<TeksNew> resultTeks = new ArrayList<>();
             int i = 0;
-            for (Teks teks1 : teks) {
+            for (TeksNew teks1 : teks) {
                 teks1.setPronunciation(baiduSpeak.getSentencePath(teks1.getSentence()).replace("#", " ").replace("$", ""));
                 teks1.setSentence(teks1.getSentence().replace("#", " ").replace("$", ""));
                 i++;

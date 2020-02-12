@@ -537,10 +537,11 @@
         SELECT
         distinct
         <include refid="unite_Column_List"/>
-        FROM vocabulary
-        v, unit_vocabulary uv,
+        FROM vocabulary_new
+        v, unit_vocabulary_new uv,
         student_unit su
         where su.unit_id = uv.unit_id and su.student_id = #{studentId} and uv.unit_id = #{unitId}
+        and uv.group =#{group}
         AND v.id
         =
         uv.vocabulary_id AND v.delStatus = 1

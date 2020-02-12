@@ -262,6 +262,30 @@ public class RedisOpt {
         return vocabularies;
     }
 
+    /**
+     * 当前单元下所有单词信息
+     *
+     * @param unitId
+     * @return
+     */
+    public List<Vocabulary> getVoiceInfoInUnit(Long unitId,Integer group) {
+        String hKey = RedisKeysConst.WORD_INFO_IN_UNIT + unitId+" "+ RedisKeysConst.WORD_INFO_IN_UNIT_GROUP+group;
+        List<Vocabulary> vocabularies;
+        Object object = getRedisHashObject(hKey);
+        if (object == null) {
+            vocabularies = vocabularyMapper.selectByUnitIdAndGroup(unitId,group);
+            redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, hKey, vocabularies);
+        } else {
+            try {
+                vocabularies = (List<Vocabulary>) object;
+            } catch (Exception e) {
+                log.error("类型转换错误，object=[{}], unitId=[{}], error=[{}]", object, unitId, e.getMessage());
+                vocabularies = vocabularyMapper.selectByUnitIdAndGroup(unitId,group);
+            }
+        }
+        return vocabularies;
+    }
+
     public List<Vocabulary> getWordInfoInUnitAndGroup(Long unitId, Integer group) {
         String hKey = RedisKeysConst.WORD_INFO_IN_UNIT + unitId + ":" + group;
         List<Vocabulary> vocabularies;

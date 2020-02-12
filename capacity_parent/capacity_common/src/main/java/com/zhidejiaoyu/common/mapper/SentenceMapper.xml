@@ -279,12 +279,13 @@
         select
         <include refid="more_table_sql"/>
         from sentence s,
-        unit_sentence us,
-        student_unit su
+        unit_sentence_new us,
+        unit_new su
         where su.unit_id = us.unit_id
         and s.id = us.sentence_id
         and student_id = #{studentId}
         and su.unit_id = #{unitId}
+        and us.group = #{group}
         and s.id not in (select word_id from voice where student_id = #{studentId} and unit_id = #{unitId} and word_id =
         and type = 2)
     </select>

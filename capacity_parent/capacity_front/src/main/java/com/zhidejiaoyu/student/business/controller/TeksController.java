@@ -107,7 +107,7 @@ public class TeksController  {
     //好声音获取课文
     @RequestMapping("/selSpeakTeksByUnitId")
     @ResponseBody
-    public Object selSpeakTeksByUnitId(Integer unitId,HttpSession session){
+    public Object selSpeakTeksByUnitId(Long unitId,HttpSession session){
         return  teksService.selSpeakTeksByUnitId(unitId,session);
     }
 

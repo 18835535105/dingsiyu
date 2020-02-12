@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -63,6 +64,8 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
     @Autowired
     private LearnMapper learnMapper;
+    @Resource
+    private LearnNewMapper learnNewMapper;
 
     @Override
     public ServerResponse getSubjects(HttpSession session, Long unitId, Integer type, Integer flag) {
@@ -70,10 +73,12 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
         List<VoiceVo> voiceVos;
         if (type == 1) {
             List<Vocabulary> vocabularies;
+            LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, 1,1);
             if (flag == 1) {
-                vocabularies = vocabularyMapper.selectWordVoice(student.getId(), unitId);
+                //获取当前单元下的learnId
+                vocabularies = vocabularyMapper.selectWordVoice(student.getId(), unitId,learnNews.getGroup());
             } else {
-                vocabularies = redisOpt.getWordInfoInUnit(unitId);
+                vocabularies = redisOpt.getVoiceInfoInUnit(unitId, learnNews.getGroup());
             }
             if (vocabularies.size() == 0) {
                 return ServerResponse.createBySuccess("当前单元没有待学习的单词。");
@@ -94,7 +99,8 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
             Collections.shuffle(voiceVos);
             return ServerResponse.createBySuccess(voiceVos);
         } else {
-            List<Sentence> sentences = sentenceMapper.selectSentenceVoice(student.getId(), unitId);
+            LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, 1,2);
+            List<Sentence> sentences = sentenceMapper.selectSentenceVoice(student.getId(), unitId,learnNews.getGroup());
             if (sentences.size() == 0) {
                 return ServerResponse.createBySuccess("当前单元没有待学习的句型。");
             }

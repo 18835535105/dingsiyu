@@ -75,6 +75,10 @@ public interface RedisKeysConst {
      * 当前单元下所有单词信息
      */
     String WORD_INFO_IN_UNIT = "WORD_INFO_IN_UNIT:";
+    /**
+     * 当前单元下所有分组信息
+     */
+    String WORD_INFO_IN_UNIT_GROUP = "WORD_INFO_IN_GROUP:";
 
     String SENTENCE_INFO_IN_UNIT = "SENTENCE_INFO_IN_UNIT:";
 

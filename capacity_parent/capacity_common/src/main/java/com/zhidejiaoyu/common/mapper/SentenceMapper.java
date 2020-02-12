@@ -18,7 +18,7 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
      * @param sentence
      * @return
      */
-    List<Sentence> sentencePage(@Param("sentence")String sentence, @Param("course_id")String course_id);
+    List<Sentence> sentencePage(@Param("sentence") String sentence, @Param("course_id") String course_id);
 
     /**
      * 新增
@@ -55,7 +55,7 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
     /**
      * 根据例句id和学段查询当前例句的翻译
      *
-     * @param id    例句id
+     * @param id 例句id
      * @return
      */
     String selectChineseByIdAndPhase(@Param("id") Long id);
@@ -116,25 +116,26 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
      * @param se
      * @return
      */
-	Integer insertSentence(Sentence se);
+    Integer insertSentence(Sentence se);
 
-	@Select("select count(a.id) from sentence a, unit_sentence_new b where a.id = b.sentence_id and b.unit_id = #{unitId}")
-	Long countByUnitId(@Param("unitId") Long unitId);
+    @Select("select count(a.id) from sentence a, unit_sentence_new b where a.id = b.sentence_id and b.unit_id = #{unitId}")
+    Long countByUnitId(@Param("unitId") Long unitId);
 
-	/**
-	 * 删除取消关联的单元
-	 *
-	 * @param id 例句id
-	 * @param unit_id 不需要删除的单元id
-	 */
-	void delUnit_vocabulary(@Param("id")Long id, @Param("unit_id")String unit_id);
+    /**
+     * 删除取消关联的单元
+     *
+     * @param id      例句id
+     * @param unit_id 不需要删除的单元id
+     */
+    void delUnit_vocabulary(@Param("id") Long id, @Param("unit_id") String unit_id);
 
-	@Select("select COUNT(c.id) FROM unit a JOIN unit_sentence b ON a.id = b.unit_id JOIN sentence c ON b.sentence_id = c.id AND a.course_id = #{course_id}")
-	Integer courseCountSentence(@Param("course_id")Long course_id);
+    @Select("select COUNT(c.id) FROM unit a JOIN unit_sentence b ON a.id = b.unit_id JOIN sentence c ON b.sentence_id = c.id AND a.course_id = #{course_id}")
+    Integer courseCountSentence(@Param("course_id") Long course_id);
 
     /**
      * 查看当前课程下例句总数
-     * @param unitIds  单元id集合
+     *
+     * @param unitIds 单元id集合
      * @return
      */
 
@@ -142,6 +143,7 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
 
     /**
      * 查询当前单元未学习的首个例句
+     *
      * @param ids
      * @param unitId
      * @return
@@ -180,7 +182,7 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
      * @param unitId
      * @return
      */
-    List<Sentence> selectSentenceVoice(@Param("studentId") Long studentId, @Param("unitId") Long unitId);
+    List<Sentence> selectSentenceVoice(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("group") Integer group);
 
     /**
      * 获取当前单元还未学习过的句型信息
@@ -196,9 +198,9 @@ public interface SentenceMapper extends BaseMapper<Sentence> {
     List<Map<String, Object>> selectSentenceLaterLearnTimeByStudentId(Long id);
 
     Sentence selectOneWordNotInIdsNew(@Param("wordIds") List<Long> wordIds,
-                                        @Param("unitId") Long unitId,@Param("group") Integer group);
+                                      @Param("unitId") Long unitId, @Param("group") Integer group);
 
-    List<Sentence> selectByUnitIdAndGroup(@Param("unitId") Long unitId,@Param("group") Integer group);
+    List<Sentence> selectByUnitIdAndGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
 
     List<String> selectNotIds(@Param("sentenceIds") List<Long> sentenIds);
 }
