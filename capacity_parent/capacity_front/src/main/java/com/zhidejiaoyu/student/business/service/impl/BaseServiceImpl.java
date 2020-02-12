@@ -52,6 +52,7 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
 
     @Resource
     private LearnExtendMapper learnExtendMapper;
+
     @Resource
     private LearnNewMapper learnNewMapper;
 

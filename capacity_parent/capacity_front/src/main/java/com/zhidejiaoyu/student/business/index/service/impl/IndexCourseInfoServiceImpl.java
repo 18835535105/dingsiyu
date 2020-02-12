@@ -35,6 +35,11 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
     public static final String COUNT = "count";
 
+    /**
+     * 语法模块type值
+     */
+    private static final int SYNTAX_MODEL_TYPE = 3;
+
     @Resource
     private CourseConfigMapper courseConfigMapper;
 
@@ -85,7 +90,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     public ServerResponse<Object> getUnitInfo(UnitInfoDTO dto) {
 
         List<Map<String, Object>> map;
-        if (dto.getType() == 3) {
+        if (dto.getType() == SYNTAX_MODEL_TYPE) {
             map = syntaxUnitMapper.selectIdAndNameByCourseId(dto.getCourseId());
         } else {
             map = unitNewMapper.selectIdAndNameByCourseId(dto.getCourseId(), dto.getType());
@@ -105,9 +110,6 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
      * @return
      */
     private ServerResponse<CourseInfoVO> packageCourse(Student student, List<CourseConfig> courseConfigs, int type, Long courseId) {
-
-        CourseInfoVO courseInfoVO = new CourseInfoVO();
-        courseInfoVO.setInGrade(student.getGrade());
 
         // 过滤出能够学习单词的课程id
         List<Long> courseIds = courseConfigs.stream()
@@ -140,7 +142,8 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         List<CourseVO> previousGrade = new ArrayList<>();
         // 当前年级
         List<CourseVO> currentGrade = new ArrayList<>();
-        if (type == 3) {
+
+        if (type == SYNTAX_MODEL_TYPE) {
             this.packageSyntaxInfoVO(student, courseIds, previousGrade, currentGrade);
         } else {
 
@@ -164,11 +167,12 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             courseNews.forEach(courseNew -> packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, courseNew));
         }
 
-        courseInfoVO.setCurrentGrade(currentGrade);
-        courseInfoVO.setPreviousGrade(previousGrade);
-        courseInfoVO.setVersions(versionVos);
-
-        return ServerResponse.createBySuccess(courseInfoVO);
+        return ServerResponse.createBySuccess(CourseInfoVO.builder()
+                .currentGrade(currentGrade)
+                .previousGrade(previousGrade)
+                .versions(versionVos)
+                .InGrade(student.getGrade())
+                .build());
     }
 
     /**
@@ -244,7 +248,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             unitCountInCourse.put(courseId, map1);
         });
 
-        Map<Long, Map<Long, Object>> learnUnitCountInCourse = learnHistoryMapper.countUnitByStudentIdAndCourseIds(student.getId(), syntaxCourseIds, 3);
+        Map<Long, Map<Long, Object>> learnUnitCountInCourse = learnHistoryMapper.countUnitByStudentIdAndCourseIds(student.getId(), syntaxCourseIds, SYNTAX_MODEL_TYPE);
 
         syntaxCourseMap.forEach((courseId, map) -> {
             // 添加返回年级及英文年级选项

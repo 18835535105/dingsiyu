@@ -159,20 +159,18 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @Override
     public ServerResponse<Object> selSpeakTeksByUnitId(Long unitId, HttpSession session) {
         Student student = getStudent(session);
-        Map<String, Object> map = new HashMap<>();
-        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, 1,1);
+        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, 1,3);
         List<TeksNew> teks = teksNewMapper.selTeksByUnitIdAndGroup(unitId,learnNews.getGroup());
-        Map<String, Object> getMap = new HashMap<>();
+        Map<String, Object> getMap = new HashMap<>(16);
         getMap.put("studentId", student.getId());
         getMap.put("unitId", unitId);
         Integer integer = voiceMapper.selMaxCountByUnitIdAndStudentId(getMap);
         if (teks.size() > 0) {
+            Map<String, Object> map = new HashMap<>(16);
             List<TeksNew> resultTeks = new ArrayList<>();
-            int i = 0;
             for (TeksNew teks1 : teks) {
                 teks1.setPronunciation(baiduSpeak.getSentencePath(teks1.getSentence()).replace("#", " ").replace("$", ""));
                 teks1.setSentence(teks1.getSentence().replace("#", " ").replace("$", ""));
-                i++;
                 resultTeks.add(teks1);
             }
             map.put("list", resultTeks);
