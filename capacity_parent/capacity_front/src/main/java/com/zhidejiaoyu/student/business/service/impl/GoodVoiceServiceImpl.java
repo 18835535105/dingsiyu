@@ -243,7 +243,8 @@ public class GoodVoiceServiceImpl extends BaseServiceImpl<StudentMapper, Student
             voice.setVoiceUrl(String.valueOf(map.get("voiceUrl")));
             voiceMapper.insert(voice);
         }
-        if (type == 2) {
+        int sentenceType = 2;
+        if (type == sentenceType) {
             Learn learn = new Learn();
             learn.setLearnTime(new Date());
             learn.setUpdateTime(new Date());
