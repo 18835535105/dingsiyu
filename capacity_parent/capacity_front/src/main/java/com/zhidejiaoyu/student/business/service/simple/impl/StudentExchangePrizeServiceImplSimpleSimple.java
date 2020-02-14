@@ -3,7 +3,7 @@ package com.zhidejiaoyu.student.business.service.simple.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.Vo.prize.GetPrizeVO;
+import com.zhidejiaoyu.common.vo.prize.GetPrizeVO;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
