@@ -1089,13 +1089,17 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             isFirst = true;
         }
 
+        int model = 1;
+        if (classify >= 4 && classify <= 6) {
+            model = 2;
+        }
         // 根据不同分数奖励学生金币
         Integer goldCount = 0;
         int addEnergy = 0;
         if (!redisOpt.isRepeatSubmit(student.getId(), (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME))) {
             //saveTestLearnAndCapacity.saveTestAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, unitId, classify);
             //保存错误信息
-            saveError(unitId[0], errorWordId, student, classify, 1);
+            saveError(unitId[0], errorWordId, student, classify, model);
             goldCount = this.saveGold(isFirst, wordUnitTestDTO, student, testRecord, false);
 
             testRecord = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, testRecord, goldCount);
