@@ -24,7 +24,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"sys_config"};
+        String[] tableName = {"student_pay_config"};
 
         /**
          * 配置：
@@ -39,8 +39,8 @@ public class MpGeneratorUtil {
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig
                 //设置代码生成路径
-//                .setOutputDir("D://pojo")
-                .setOutputDir("/Users/wuchenxi/Desktop/zdjy")
+                .setOutputDir("D://pojo")
+                //.setOutputDir("/Users/wuchenxi/Desktop/zdjy")
                 //设置作者
                 .setAuthor("zdjy")
                 //设置二级缓存的开闭
@@ -59,7 +59,8 @@ public class MpGeneratorUtil {
         dataSourceConfig
                 //设置数据库类型
                 .setDbType(DbType.MYSQL)
-                .setUrl("jdbc:mysql://192.168.0.2:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false")
+//                .setUrl("jdbc:mysql://192.168.0.2:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false")
+                .setUrl("jdbc:mysql://123.56.142.84:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false")
                 .setUsername("zdjy")
                 .setPassword("zdjy")
                 .setDriverName("com.mysql.jdbc.Driver");
