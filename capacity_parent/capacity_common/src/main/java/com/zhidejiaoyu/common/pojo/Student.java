@@ -13,6 +13,7 @@ import java.util.Date;
 
 /**
  * 学生信息表
+ *
  * @author wuchenxi
  */
 @Data
@@ -274,7 +275,12 @@ public class Student extends Model<Student> {
     private Integer diamond;
 
     /**
-     *金币加成到期时间
+     * 小程序openid，用于绑定队长账号，多个小程序之间用 , 隔开
+     */
+    private String openid;
+
+    /**
+     * 金币加成到期时间
      */
     private Date bonusExpires;
 

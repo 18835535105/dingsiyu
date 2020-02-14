@@ -19,6 +19,7 @@
         <result column="status" property="status" />
         <result column="createtime" property="createtime" />
         <result column="version" property="version" />
+        <result column="business_card_img_url" property="businessCardImgUrl" />
     </resultMap>
 
 </mapper>

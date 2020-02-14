@@ -67,6 +67,11 @@ public class ErrorLearnLog extends Model<ErrorLearnLog> {
      */
     private Long wordId;
 
+    /**
+     * 当前记录被复习的次数，每复习一次+1，默认为1
+     */
+    private Integer reviewCount;
+
 
     @Override
     protected Serializable pkVal() {

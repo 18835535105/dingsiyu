@@ -15,10 +15,11 @@
         <result column="topic" property="topic"/>
         <result column="error_answer" property="errorAnswer"/>
         <result column="update_time" property="updateTime"/>
+        <result column="review_count" property="reviewCount"/>
     </resultMap>
 
     <sql id="base_sql">
-        id,student_id,unit_id,word_id,`type`,study_model,easy_or_hard,`group`,topic,error_answer,update_time
+        id,student_id,unit_id,word_id,`type`,study_model,easy_or_hard,`group`,topic,error_answer,update_time, review_count
     </sql>
 
     <select id="selectCountByStudentIdAndUnitIdAndEasyOrHard" parameterType="map" resultType="int">
