@@ -907,9 +907,17 @@
         group by stu.id
     </select>
     <select id="selectByAccount" resultMap="BaseResultMap" parameterType="map">
-        select <include refid="Base_Column_List"/>
+        select
+        <include refid="Base_Column_List"/>
         from student
         where account = #{account}
+        limit 1
+    </select>
+    <select id="selectByOpenId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from student
+        where openid = #{openid}
         limit 1
     </select>
 

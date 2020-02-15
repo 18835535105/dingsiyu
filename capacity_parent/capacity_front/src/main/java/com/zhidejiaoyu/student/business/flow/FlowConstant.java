@@ -13,9 +13,14 @@ public interface FlowConstant {
      */
 
     /**
-     * 学前游戏
+     * 学前游戏（简单流程）
      */
-    long BEFORE_GROUP_GAME = 138;
+    long BEFORE_GROUP_GAME_EASY = 138;
+
+    /**
+     * 学前游戏（难流程）
+     */
+    long BEFORE_GROUP_GAME_HARD = 144;
 
     /**
      * 单词播放机

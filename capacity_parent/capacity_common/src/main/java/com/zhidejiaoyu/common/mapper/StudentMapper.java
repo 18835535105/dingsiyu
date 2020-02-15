@@ -303,4 +303,12 @@ public interface StudentMapper extends BaseMapper<Student> {
      * @return
      */
     Student selectByAccount(@Param("account") String account);
+
+    /**
+     * 根据openid查询学生信息
+     *
+     * @param openid
+     * @return
+     */
+    Student selectByOpenId(@Param("openid") String openid);
 }
