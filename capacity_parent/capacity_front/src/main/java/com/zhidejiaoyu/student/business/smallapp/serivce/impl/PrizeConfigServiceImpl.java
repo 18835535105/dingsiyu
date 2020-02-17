@@ -18,6 +18,8 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
     @Resource
     private PrizeConfigMapper prizeConfigMapper;
     @Resource
+    private StudentMapper studentMapper;
+    @Resource
     private SysUserMapper sysUserMapper;
     @Resource
     private TeacherMapper teacherMapper;
@@ -29,7 +31,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
     private final String STUDY_MODEL = "小程序测试";
 
     @Override
-    public Object getPrizeConfig(String openId, Long adminId) {
+    public Object getPrizeConfig(String openId, Long adminId, Long studentId) {
         //判断当前openId是否已经领取过今日的奖品
         Date date = new Date();
         Map<String, Object> returnMap = new HashMap<>();
@@ -46,6 +48,9 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
             studentPayConfig.setWenXinId(openId);
             studentPayConfig.setObtain("" + date.getTime() + new Random(1000).nextInt());
             studentPayConfigMapper.insert(studentPayConfig);
+            Student student = studentMapper.selectById(studentId);
+            student.setSystemGold(student.getSystemGold() + 5);
+            studentMapper.updateById(student);
         } else {
             payconfigId = studentPayConfig.getPrizeConfigId();
         }
