@@ -139,7 +139,7 @@ public class FinishGroupOrUnit {
     public long getNodeId(LearnNew learnNew, boolean isEasy) {
         if (Objects.equals(learnNew.getModelType(), 1)) {
             // 单词模块节点
-            return isEasy ? FlowConstant.BEFORE_GROUP_GAME : FlowConstant.LETTER_WRITE;
+            return isEasy ? FlowConstant.BEFORE_GROUP_GAME_EASY : FlowConstant.BEFORE_GROUP_GAME_HARD;
         }
         if (Objects.equals(learnNew.getModelType(), 2)) {
             // 句型模块节点

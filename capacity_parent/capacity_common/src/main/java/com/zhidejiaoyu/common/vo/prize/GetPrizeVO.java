@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.common.Vo.prize;
+package com.zhidejiaoyu.common.vo.prize;
 
 import com.zhidejiaoyu.common.pojo.PrizeExchangeList;
 import lombok.AllArgsConstructor;

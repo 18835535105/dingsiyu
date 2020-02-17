@@ -531,7 +531,7 @@
     <select id="selectByGenre" resultType="com.zhidejiaoyu.common.pojo.TestRecord" parameterType="map">
         select
         <include refid="Base_Column_List"/>
-        from test_record where student_id = #{stuId} and genre = #{genre}
+        from test_record where student_id = #{stuId} and genre = #{genre} limit 1
     </select>
     <select id="selectListByGenre" resultType="com.zhidejiaoyu.common.pojo.TestRecord" parameterType="map">
         select

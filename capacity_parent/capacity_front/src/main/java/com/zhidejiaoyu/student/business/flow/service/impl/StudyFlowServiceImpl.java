@@ -117,7 +117,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
 
         String modelName = studyFlowNew.getModelName();
         // 带有“写”、“课文训练”、nodeId=84的流程都属于难流程
-        int easyOrHard = modelName.contains("写") || Objects.equals(modelName, "课文训练") || Objects.equals(84L, dto.getNodeId()) ? 2 : 1;
+        int easyOrHard = this.getEasyOrHard(dto, modelName);
         dto.setEasyOrHard(easyOrHard);
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(),
                 dto.getUnitId(), dto.getEasyOrHard(), FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(studyFlowNew.getFlowName()));
@@ -160,6 +160,13 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         return judgeNextNode.judgeNextNode(dto, this);
     }
 
+    public int getEasyOrHard(NodeDto dto, String modelName) {
+        return modelName.contains("写")
+                || Objects.equals(modelName, "课文训练")
+                || Objects.equals(84L, dto.getNodeId())
+                || dto.getNodeId() == FlowConstant.BEFORE_GROUP_GAME_HARD ? 2 : 1;
+    }
+
     /**
      * 如果当前节点是句型游戏测试，判断下个节点
      *
@@ -191,7 +198,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
      * @return
      */
     public ServerResponse<Object> judgeBeforeGame(NodeDto dto) {
-        if (Objects.equals(dto.getNodeId(), FlowConstant.BEFORE_GROUP_GAME)) {
+        if (Objects.equals(dto.getNodeId(), FlowConstant.BEFORE_GROUP_GAME_EASY)
+                || Objects.equals(dto.getNodeId(), FlowConstant.BEFORE_GROUP_GAME_HARD)) {
             Long studentId = dto.getStudent().getId();
             boolean isEasy = dto.getEasyOrHard() == 1;
             if (dto.getGrade() == PointConstant.HUNDRED) {

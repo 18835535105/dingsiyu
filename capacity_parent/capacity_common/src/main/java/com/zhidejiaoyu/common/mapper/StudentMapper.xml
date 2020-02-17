@@ -492,7 +492,10 @@
         )
     </update>
     <select id="selectAllStudentId" resultType="long">
-        select id from student where account_time is not null and ( `rank`>7 or (`rank` &lt; 7 and account_time >now()))
+        select id
+        from student
+        where account_time is not null
+          and (`rank` > 7 or (`rank` &lt; 7 and account_time > now()))
     </select>
 
     <update id="updateSchoolGoldFirstTimeToNull" parameterType="map">
@@ -891,19 +894,31 @@
         and `rank` &lt;= 7
     </select>
     <select id="getAllStudentIdTeacherId" resultType="map">
-        select
-        stu.id studentId,
-        tea.school_admin_id adminId,
-        stu.grade grade
+        select stu.id              studentId,
+               tea.school_admin_id adminId,
+               stu.grade           grade
         from student stu
-        join teacher tea
-        on stu.teacher_id= tea.teacher_id or stu.teacher_id = tea.school_admin_id
-        join test_record test
-        on test.student_id = stu.id
-        where
-        stu.account_time is not null
-        and test.study_model like '%摸底测试%'
+                 join teacher tea
+                      on stu.teacher_id = tea.teacher_id or stu.teacher_id = tea.school_admin_id
+                 join test_record test
+                      on test.student_id = stu.id
+        where stu.account_time is not null
+          and test.study_model like '%摸底测试%'
         group by stu.id
+    </select>
+    <select id="selectByAccount" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from student
+        where account = #{account}
+        limit 1
+    </select>
+    <select id="selectByOpenId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from student
+        where openid = #{openid}
+        limit 1
     </select>
 
 </mapper>

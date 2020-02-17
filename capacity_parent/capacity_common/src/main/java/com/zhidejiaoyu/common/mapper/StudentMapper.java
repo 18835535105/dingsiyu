@@ -294,5 +294,21 @@ public interface StudentMapper extends BaseMapper<Student> {
 
     List<Long> selectAllStudentId();
 
-    List<Map<String,Object>> getAllStudentIdTeacherId();
+    List<Map<String, Object>> getAllStudentIdTeacherId();
+
+    /**
+     * 根据账号查询学生信息
+     *
+     * @param account
+     * @return
+     */
+    Student selectByAccount(@Param("account") String account);
+
+    /**
+     * 根据openid查询学生信息
+     *
+     * @param openid
+     * @return
+     */
+    Student selectByOpenId(@Param("openid") String openid);
 }
