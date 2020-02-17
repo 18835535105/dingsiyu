@@ -9,7 +9,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
-import com.zhidejiaoyu.student.business.smallapp.constant.SmallAppConstant;
+import com.zhidejiaoyu.student.business.smallapp.constant.SmallAppApiConstant;
 import com.zhidejiaoyu.student.business.smallapp.dto.AuthorizationDTO;
 import com.zhidejiaoyu.student.business.smallapp.dto.BindAccountDTO;
 import com.zhidejiaoyu.student.business.smallapp.enums.AuthorizationEnum;
@@ -21,7 +21,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
-import javax.mail.Session;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
@@ -114,9 +113,9 @@ public class AuthorizationServiceImpl extends BaseServiceImpl<StudentMapper, Stu
      */
     public String authorization(String code) {
         try {
-            return restTemplate.getForObject(SmallAppConstant.AUTHORIZATION_API_URL +
-                            "appid=" + SmallAppConstant.APP_ID +
-                            "&secret=" + SmallAppConstant.SECRET +
+            return restTemplate.getForObject(SmallAppApiConstant.AUTHORIZATION_API_URL +
+                            "appid=" + SmallAppApiConstant.APP_ID +
+                            "&secret=" + SmallAppApiConstant.SECRET +
                             "&js_code=" + code +
                             "&grant_type=authorization_code",
                     String.class);

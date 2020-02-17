@@ -18,4 +18,12 @@ public interface IndexService extends BaseService<Student> {
      * @return
      */
     ServerResponse<Object> index();
+
+    /**
+     * 补签
+     *
+     * @param date 补签日期
+     * @return
+     */
+    ServerResponse<Object> replenish(String date);
 }

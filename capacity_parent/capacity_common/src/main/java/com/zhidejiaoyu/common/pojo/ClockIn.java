@@ -3,8 +3,7 @@ package com.zhidejiaoyu.common.pojo;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -21,6 +20,9 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ClockIn extends Model<ClockIn> {
 
     private static final long serialVersionUID = 1L;

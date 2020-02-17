@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.common.mapper.simple;
+package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.GoldLog;
@@ -14,7 +14,7 @@ import java.util.List;
  * @author zdjy
  * @since 2018-10-23
  */
-public interface SimpleGoldLogMapper extends BaseMapper<GoldLog> {
+public interface GoldLogMapper extends BaseMapper<GoldLog> {
 
     void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 }

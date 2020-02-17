@@ -115,7 +115,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     @Resource
     private RunLogMapper runLogMapper;
     @Resource
-    private SimpleGoldLogMapper goldLogMapper;
+    private GoldLogMapper goldLogMapper;
     @Resource
     private SimpleStudentExchangePrizeMapper studentExchangePrizeMapper;
     @Resource

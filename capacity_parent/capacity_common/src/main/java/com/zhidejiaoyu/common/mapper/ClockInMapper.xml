@@ -22,5 +22,18 @@
         and create_time like concat(#{currentMonth}, '%')
         order by create_time
     </select>
+    <select id="selectLaseCardDays" resultType="java.lang.Integer" parameterType="map">
+        select card_days
+        from clock_in
+        where student_id = #{studentId}
+        order by create_time desc
+        limit 1
+    </select>
+    <select id="countByStudentIdAndCardTime" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from clock_in
+        where student_id = #{studentId}
+          and card_time = #{date}
+    </select>
 
 </mapper>

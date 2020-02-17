@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.service.simple.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.common.mapper.GoldLogMapper;
 import com.zhidejiaoyu.common.vo.prize.GetPrizeVO;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.UserConstant;
@@ -38,7 +39,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
     @Autowired
     private SimpleStudentExchangePrizeMapper simpleStudentExchangePrizeMapper;
     @Autowired
-    private SimpleGoldLogMapper simpleGoldLogMapper;
+    private GoldLogMapper GoldLogMapper;
     @Autowired
     private SimpleCampusMapper simpleCampusMapper;
     @Autowired
@@ -300,7 +301,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         goldLog.setStudentId(studentId);
         goldLog.setReason("兑换奖励");
         goldLog.setReadFlag(0);
-        simpleGoldLogMapper.insert(goldLog);
+        GoldLogMapper.insert(goldLog);
     }
 
     private void addResultMapByAllList(Map<String, Object> map, int type) {

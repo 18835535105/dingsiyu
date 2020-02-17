@@ -1,12 +1,16 @@
 package com.zhidejiaoyu.student.business.smallapp.serivce.impl;
 
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.AdsenseMapper;
 import com.zhidejiaoyu.common.mapper.ClockInMapper;
+import com.zhidejiaoyu.common.mapper.GoldLogMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.pojo.Adsense;
 import com.zhidejiaoyu.common.pojo.ClockIn;
+import com.zhidejiaoyu.common.pojo.GoldLog;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
@@ -15,13 +19,17 @@ import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.smallapp.serivce.IndexService;
 import com.zhidejiaoyu.student.business.smallapp.vo.TotalDataVO;
 import com.zhidejiaoyu.student.business.smallapp.vo.index.AdsensesVO;
+import com.zhidejiaoyu.student.business.smallapp.vo.index.CardVO;
 import com.zhidejiaoyu.student.business.smallapp.vo.index.IndexVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,6 +47,12 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Resource
     private ClockInMapper clockInMapper;
+
+    @Resource
+    private StudentMapper studentMapper;
+
+    @Resource
+    private GoldLogMapper goldLogMapper;
 
     @Override
     public ServerResponse<Object> index() {
@@ -62,11 +76,61 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         String currentMonth = DateUtil.getCurrentDay(DateUtil.YYYYMM);
         List<ClockIn> clockIns = clockInMapper.selectByStudentIdWithCurrentMonth(student.getId(), currentMonth);
 
+        Integer cardDays = clockInMapper.selectLaseCardDays(student.getId());
 
         return ServerResponse.createBySuccess(IndexVO.builder()
                 .adsenses(adsensesVos)
                 .totalData(totalDataVO)
+                .card(CardVO.builder()
+                        .cardDays(cardDays == null ? 0 : cardDays)
+                        .build())
                 .build());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ServerResponse<Object> replenish(String date) {
+
+        // 补签需要消耗的金币数
+        int reduceGold = 50;
+        HttpSession httpSession = HttpUtil.getHttpSession();
+        Student student = super.getStudent(httpSession);
+
+        if (student.getSystemGold() < reduceGold) {
+            return ServerResponse.createByError(400, "金币不足！");
+        }
+
+        Date now = new Date();
+        int count = clockInMapper.countByStudentIdAndCardTime(student.getId(), date);
+        if (count == 0) {
+            clockInMapper.insert(ClockIn.builder()
+                    .cardDays(0)
+                    .cardTime(DateUtil.parse(date, DateUtil.YYYYMMDD))
+                    .createTime(now)
+                    .studentId(student.getId())
+                    .type(2)
+                    .build());
+
+            goldLogMapper.insert(GoldLog.builder()
+                    .createTime(now)
+                    .goldAdd(0)
+                    .goldReduce(reduceGold)
+                    .operatorId(student.getId().intValue())
+                    .readFlag(2)
+                    .reason("补签")
+                    .studentId(student.getId())
+                    .build());
+
+            student.setSystemGold(BigDecimalUtil.sub(student.getSystemGold(), reduceGold));
+            student.setOfflineGold(BigDecimalUtil.add(student.getOfflineGold(), reduceGold));
+            studentMapper.updateById(student);
+            httpSession.setAttribute(UserConstant.CURRENT_STUDENT, student);
+
+            return ServerResponse.createBySuccess();
+        }
+
+        return ServerResponse.createByError(400, "选择的日期已打卡，无需再次打卡！");
+
     }
 
     /**

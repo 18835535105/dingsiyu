@@ -23,4 +23,10 @@ public class CardVO implements Serializable {
      * 连续打卡天数
      */
     private Integer cardDays;
+
+    /**
+     * 签到信息
+     */
+    static class Infos {
+    }
 }
