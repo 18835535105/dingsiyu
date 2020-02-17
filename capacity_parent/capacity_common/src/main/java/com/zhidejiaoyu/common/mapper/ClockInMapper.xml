@@ -4,12 +4,23 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.ClockIn">
-        <id column="id" property="id" />
-        <result column="student_id" property="studentId" />
-        <result column="card_days" property="cardDays" />
-        <result column="card_time" property="cardTime" />
-        <result column="type" property="type" />
-        <result column="create_time" property="createTime" />
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="card_days" property="cardDays"/>
+        <result column="card_time" property="cardTime"/>
+        <result column="type" property="type"/>
+        <result column="create_time" property="createTime"/>
     </resultMap>
+    <sql id="base_sql">
+        id, student_id, card_days, card_time, type, create_time
+    </sql>
+    <select id="selectByStudentIdWithCurrentMonth" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from clock_in
+        where student_id = #{studentId}
+        and create_time like concat(#{currentMonth}, '%')
+        order by create_time
+    </select>
 
 </mapper>
