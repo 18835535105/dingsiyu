@@ -4,8 +4,10 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.controller.BaseController;
 import com.zhidejiaoyu.student.business.smallapp.dto.BindAccountDTO;
 import com.zhidejiaoyu.student.business.smallapp.serivce.IndexService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,14 +30,13 @@ public class IndexController extends BaseController {
     private IndexService smallAppIndexService;
 
     /**
-     * 绑定队长账号
+     * 首页数据
      *
-     * @param dto
      * @return
      */
-    @PostMapping("/bind")
-    public ServerResponse<Object> bind(@Valid BindAccountDTO dto, BindingResult result) {
-       return smallAppIndexService.bind(dto);
+    @GetMapping("/index")
+    public ServerResponse<Object> index() {
+        return smallAppIndexService.index();
     }
 
 }

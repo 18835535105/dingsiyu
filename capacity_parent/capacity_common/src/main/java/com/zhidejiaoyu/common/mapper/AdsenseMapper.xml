@@ -4,13 +4,24 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Adsense">
-        <id column="id" property="id" />
-        <result column="school_admin_id" property="schoolAdminId" />
-        <result column="img_url" property="imgUrl" />
-        <result column="to_url" property="toUrl" />
-        <result column="type" property="type" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="school_admin_id" property="schoolAdminId"/>
+        <result column="img_url" property="imgUrl"/>
+        <result column="to_url" property="toUrl"/>
+        <result column="type" property="type"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
+    <sql id="base_sql">
+        id, school_admin_id, img_url, to_url, type, create_time, update_time
+    </sql>
+    <select id="selectOrderByUpdateTimeLimitFive" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from adsense
+        where school_admin_id = #{schoolAdminId}
+        order by update_time desc
+        limit 5
+    </select>
 
 </mapper>

@@ -27,11 +27,13 @@ public class DateUtil implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final String YYYYMMDD = "yyyy-MM-dd";
+    public static final String YYYYMMDD = "yyyy-MM-dd";
 
     public static final String YYYYMMDDHHMMSS = "yyyy-MM-dd HH:mm:ss";
 
     private static final String YYYY = "yyyy";
+
+    public static final String YYYYMM = "yyyy-MM";
 
     /**
      * 当前时间 yyyy-MM-dd HH:mm:ss

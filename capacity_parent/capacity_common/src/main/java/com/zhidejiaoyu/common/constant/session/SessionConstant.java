@@ -22,4 +22,10 @@ public interface SessionConstant {
      * 一键排课group
      */
     String FREE_GROUP = "FREE_GROUP";
+
+
+    /**
+     * 小程序openid
+     */
+    String OPENID = "OPENID";
 }
