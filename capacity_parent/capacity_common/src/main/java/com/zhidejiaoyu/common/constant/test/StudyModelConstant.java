@@ -8,4 +8,6 @@ package com.zhidejiaoyu.common.constant.test;
  */
 public interface StudyModelConstant {
     String SYNTAX_GAME = "超级语法";
+
+    String SMALLAPP_STUDY_MODEL = "小程序测试";
 }

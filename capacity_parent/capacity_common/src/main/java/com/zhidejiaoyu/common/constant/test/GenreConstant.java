@@ -13,4 +13,6 @@ public interface GenreConstant {
     String TEST_BEFORE_STUDY = "摸底测试";
 
     String BEFORE_LEARN_GAME_TEST = "学前游戏测试";
+
+    String SMALLAPP_GENRE = "飞行测试";
 }

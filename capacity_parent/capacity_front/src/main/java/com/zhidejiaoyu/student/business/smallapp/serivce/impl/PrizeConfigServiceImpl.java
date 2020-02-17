@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.smallapp.serivce.impl;
 
-import com.zhidejiaoyu.common.constant.SmallProgramConstant;
+import com.zhidejiaoyu.common.constant.test.GenreConstant;
+import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -67,7 +68,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
     public Object getAdmin(HttpSession session) {
         Student student = getStudent(session);
         Integer adminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
-        TestRecord testRecord = testRecordMapper.selectByStudentIdAndGenreAndStudyModel(student.getId(), SmallProgramConstant.GENRE, SmallProgramConstant.STUDY_MODEL);
+        TestRecord testRecord = testRecordMapper.selectByStudentIdAndGenreAndStudyModel(student.getId(), GenreConstant.SMALLAPP_GENRE, StudyModelConstant.SMALLAPP_STUDY_MODEL);
         String imgUrl = shareConfigMapper.selectImgByAdminId(adminId);
         Map<String, Object> map = new HashMap<>();
         map.put("adminId", adminId);
