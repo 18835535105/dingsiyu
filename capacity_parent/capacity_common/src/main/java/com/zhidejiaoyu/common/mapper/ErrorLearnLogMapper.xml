@@ -38,5 +38,15 @@
         and unit_id=#{unitId}
         and easy_or_hard=#{easyOrHard}
     </select>
+    <select id="selectVocabularyByStudentId" parameterType="map" resultType="map">
+        select distinct log.word_id wordId, voc.word word,voc.word_chinese wordChinese
+          from error_learn_log log j
+          oin vocabulary voc
+          on log.word_id = voc.id
+          where log.type=1
+          and log.student_id=#{studentId}
+          order by review_count asc
+          limit 15
+    </select>
 
 </mapper>

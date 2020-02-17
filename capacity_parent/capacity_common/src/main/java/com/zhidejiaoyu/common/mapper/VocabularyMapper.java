@@ -396,4 +396,6 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
 
     Vocabulary selectOneWordNotInIdsNew(@Param("wordIds") List<Long> wordIds,@Param("unitId") Long unitId,
                                         @Param("group") Integer group);
+
+    List<String> selectChineseByNotVocabularyIds(@Param("wordIds") List<Long> vocabularyIds);
 }

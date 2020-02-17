@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -19,4 +20,6 @@ public interface ErrorLearnLogMapper extends BaseMapper<ErrorLearnLog> {
     int selectCountByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") long unitId, @Param("easyOrHard") long easyOrHard);
 
     List<ErrorLearnLog> selectByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") long unitId, @Param("easyOrHard") long easyOrHard);
+
+    List<Map<String,Object>> selectVocabularyByStudentId(@Param("studentId") Long studentId);
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -18,4 +19,5 @@ import java.util.List;
 public interface ErrorLearnLogHistoryMapper extends BaseMapper<ErrorLearnLogHistory> {
 
     void insertListByErrorLearnLogs(@Param("logs") List<ErrorLearnLog> errorLearnLogs);
+
 }

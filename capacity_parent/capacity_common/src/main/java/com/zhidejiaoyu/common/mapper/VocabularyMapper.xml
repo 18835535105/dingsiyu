@@ -814,6 +814,18 @@
         )
         and v.id = uvn.vocabulary_id
     </select>
+    <select id="selectChineseByNotVocabularyIds" resultType="string" parameterType="map">
+        select
+        word_chinese
+        from vocabulary
+        where
+        id not in (
+        <foreach collection="wordIds" open="word" separator=",">
+            #{word}
+        </foreach>
+        )
+        limit 20
+    </select>
 
 
 </mapper>
