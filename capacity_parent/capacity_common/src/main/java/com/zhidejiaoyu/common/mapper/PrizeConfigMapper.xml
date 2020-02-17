@@ -4,12 +4,22 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.PrizeConfig">
-        <id column="id" property="id" />
-        <result column="school_admin_id" property="schoolAdminId" />
-        <result column="chance" property="chance" />
-        <result column="prize_name" property="prizeName" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="school_admin_id" property="schoolAdminId"/>
+        <result column="chance" property="chance"/>
+        <result column="prize_name" property="prizeName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
+    <sql id="base_sql">
+        id,school_admin_id,chance,prize_name,create_time,update_time
+    </sql>
+
+    <select id="selectByAdminId" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"></include>
+         from prize_config
+         where school_admin_id=#{adminId}
+    </select>
 
 </mapper>

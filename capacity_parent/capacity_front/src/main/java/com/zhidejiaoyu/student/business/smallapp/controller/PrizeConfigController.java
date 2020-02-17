@@ -1,8 +1,12 @@
 package com.zhidejiaoyu.student.business.smallapp.controller;
 
 import com.zhidejiaoyu.student.business.controller.BaseController;
+import com.zhidejiaoyu.student.business.smallapp.serivce.PrizeConfigService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 /**
  * 微信抽奖页面
@@ -11,14 +15,21 @@ import org.springframework.web.bind.annotation.RestController;
  * @date: 2020/2/14 15:42:00
  */
 @RestController
-@RequestMapping("/prizeConfig")
+@RequestMapping("/smallApp/prizeConfig")
 public class PrizeConfigController extends BaseController {
 
-
+    @Resource
+    private PrizeConfigService prizeConfigService;
 
     @RequestMapping("/getPrizeConfig")
-    public Object getPrize(String weiXinId){
-        return null;
+    public Object getPrize(String openId, Long adminId) {
+        return prizeConfigService.getPrizeConfig(openId, adminId);
+    }
+
+
+    @RequestMapping("/getAdmin")
+    public Object getAdmin(HttpSession session) {
+        return prizeConfigService.getAdmin(session);
     }
 
 }

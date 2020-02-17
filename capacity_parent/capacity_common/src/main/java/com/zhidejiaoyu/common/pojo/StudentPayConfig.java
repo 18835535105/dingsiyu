@@ -1,9 +1,11 @@
 package com.zhidejiaoyu.common.pojo;
 
 import java.util.Date;
+
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
 import com.baomidou.mybatisplus.activerecord.Model;
+
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotations.Version;
@@ -39,13 +41,19 @@ public class StudentPayConfig extends Model<StudentPayConfig> {
     private Long prizeConfigId;
     /**
      * 1，未领取，2已领取，3校管删除
-
      */
     private Integer type;
     /**
      * 创建时间
      */
     private Date createTime;
+
+    /**
+     * 获取奖品码
+     *
+     * @return
+     */
+    private String obtain;
 
 
     @Override

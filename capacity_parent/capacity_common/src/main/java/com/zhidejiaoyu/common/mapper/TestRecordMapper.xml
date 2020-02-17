@@ -929,4 +929,14 @@
         </foreach>
         )
     </delete>
+    <select id="selectByStudentIdAndGenreAndStudyModel">
+        select
+        <include refid="Base_Column_List"/>
+        from test_record
+        where student_id = #{studentId}
+        and genre = #{genre}
+        and study_model=#{studyModel}
+        order by id desc
+        limit 1
+    </select>
 </mapper>

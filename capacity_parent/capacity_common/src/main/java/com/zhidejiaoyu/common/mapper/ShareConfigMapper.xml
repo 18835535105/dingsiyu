@@ -4,13 +4,18 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.ShareConfig">
-        <id column="id" property="id" />
-        <result column="school_admin_id" property="schoolAdminId" />
-        <result column="img_url" property="imgUrl" />
-        <result column="uploader_id" property="uploaderId" />
-        <result column="img_word" property="imgWord" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="school_admin_id" property="schoolAdminId"/>
+        <result column="img_url" property="imgUrl"/>
+        <result column="uploader_id" property="uploaderId"/>
+        <result column="img_word" property="imgWord"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
+
+
+    <select id="selectImgByAdminId" resultType="string" parameterType="map">
+        select img_url from share_config where school_admin_id=#{adminId}
+    </select>
 
 </mapper>

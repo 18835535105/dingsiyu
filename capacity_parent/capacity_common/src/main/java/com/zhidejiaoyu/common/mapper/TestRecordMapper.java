@@ -314,5 +314,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     List<TestRecord> selectFullPoint(@Param("studentId") Long studentId);
 
     void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
+
+    TestRecord selectByStudentIdAndGenreAndStudyModel(@Param("studentId") Long studentId,@Param("genre") String genre,@Param("studyModel") String studyModel);
 }
 
