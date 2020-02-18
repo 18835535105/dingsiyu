@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.vo.SeniorityVo;
+import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DurationInfoVO;
 import com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolDetail;
 import com.zhidejiaoyu.common.pojo.*;
 import org.apache.ibatis.annotations.Delete;
@@ -201,4 +202,21 @@ public interface DurationMapper extends BaseMapper<Duration> {
     Date selectLoginTimeByDate(@Param("studentId") Long studentId, @Param("date") Date date);
 
     void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
+
+    /**
+     * 查询学生的学习日期及在线时长
+     *
+     * @param studentId
+     * @return
+     */
+    List<DurationInfoVO> selectLearnDateAndOnlineTime(@Param("studentId") Long studentId);
+
+    /**
+     * 查询指定日期的学习时长及学习模块
+     *
+     * @param studentId
+     * @param learnDateList
+     * @return
+     */
+    List<DurationInfoVO> selectDurationInfos(@Param("studentId") Long studentId, @Param("learnDateList") List<String> learnDateList);
 }

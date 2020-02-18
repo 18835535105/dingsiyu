@@ -26,4 +26,11 @@ public interface IndexService extends BaseService<Student> {
      * @return
      */
     ServerResponse<Object> replenish(String date);
+
+    /**
+     * 飞行记录（学习记录）
+     *
+     * @return
+     */
+    ServerResponse<Object> record();
 }

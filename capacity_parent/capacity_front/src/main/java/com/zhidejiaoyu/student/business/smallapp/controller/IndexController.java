@@ -50,4 +50,14 @@ public class IndexController extends BaseController {
         return smallAppIndexService.replenish(date);
     }
 
+    /**
+     * 飞行记录（学习记录）
+     *
+     * @return
+     */
+    @GetMapping("/record")
+    public ServerResponse<Object> record() {
+        return smallAppIndexService.record();
+    }
+
 }

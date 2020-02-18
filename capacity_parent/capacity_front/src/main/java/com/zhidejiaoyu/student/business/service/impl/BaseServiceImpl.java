@@ -63,9 +63,20 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
     }
 
     @Override
+    public Student getStudent() {
+        return studentMapper.selectById(this.getStudentId());
+    }
+
+    @Override
     public Long getStudentId(HttpSession session) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
         return student.getId();
+    }
+
+    @Override
+    public Long getStudentId() {
+        HttpSession httpSession = HttpUtil.getHttpSession();
+        return this.getStudentId(httpSession);
     }
 
     /**
