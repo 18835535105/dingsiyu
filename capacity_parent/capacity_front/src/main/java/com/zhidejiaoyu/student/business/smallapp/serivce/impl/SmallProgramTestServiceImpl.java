@@ -35,6 +35,8 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     private TeacherMapper teacherMapper;
     @Resource
     private ShareConfigMapper shareConfigMapper;
+    @Resource
+    private TestRecordMapper testRecordMapper;
 
 
     @Override
@@ -98,6 +100,9 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             testRecord.setTestEndTime(date);
             testRecord.setTestStartTime(startDate);
             returnMap.put("point", point);
+            testRecordMapper.insert(testRecord);
+        } else {
+            returnMap.put("point", 0);
         }
         student.setSystemGold(student.getSystemGold() + 50);
         studentMapper.updateById(student);
@@ -105,7 +110,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         ShareConfig shareConfig = shareConfigMapper.selectByAdminId(adminId);
         returnMap.put("img", shareConfig.getImgUrl());
         returnMap.put("word", shareConfig.getImgWord());
-        returnMap.put("point", 0);
+
         returnMap.put("gold", student.getSystemGold());
         return returnMap;
     }
