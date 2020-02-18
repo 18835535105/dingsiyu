@@ -105,6 +105,9 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             returnMap.put("point", 0);
         }
         student.setSystemGold(student.getSystemGold() + 50);
+        String msg = "id为：" + student.getId() + "的学生在[" + GenreConstant.SMALLAPP_GENRE
+                + "]模块下的单元闯关测试中闯关成功，获得#" + 50 + "#枚金币";
+        super.saveRunLog(student, 4, null, null, msg);
         studentMapper.updateById(student);
         Integer adminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
         ShareConfig shareConfig = shareConfigMapper.selectByAdminId(adminId);
