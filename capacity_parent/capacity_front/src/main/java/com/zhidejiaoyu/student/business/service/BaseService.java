@@ -22,6 +22,8 @@ public interface BaseService<T> extends IService<T> {
      */
     Student getStudent(HttpSession session);
 
+    Student getStudent();
+
     /**
      * 从session中获取学生id
      *
@@ -29,6 +31,8 @@ public interface BaseService<T> extends IService<T> {
      * @return
      */
     Long getStudentId(HttpSession session);
+
+    Long getStudentId();
 
     void getLevel(HttpSession session);
 
