@@ -820,7 +820,7 @@
         from vocabulary
         where
         id not in (
-        <foreach collection="wordIds" open="word" separator=",">
+        <foreach collection="wordIds" item="word" separator=",">
             #{word}
         </foreach>
         )

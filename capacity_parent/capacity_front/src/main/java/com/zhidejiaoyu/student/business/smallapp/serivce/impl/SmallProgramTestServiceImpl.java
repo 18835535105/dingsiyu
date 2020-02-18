@@ -108,10 +108,14 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         studentMapper.updateById(student);
         Integer adminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
         ShareConfig shareConfig = shareConfigMapper.selectByAdminId(adminId);
-        returnMap.put("img", shareConfig.getImgUrl());
-        returnMap.put("word", shareConfig.getImgWord());
-
-        returnMap.put("gold", student.getSystemGold());
+        if (shareConfig == null) {
+            returnMap.put("img", null);
+            returnMap.put("word", null);
+        } else {
+            returnMap.put("img", shareConfig.getImgUrl());
+            returnMap.put("word", shareConfig.getImgWord());
+        }
+        returnMap.put("gold", student.getSystemGold().intValue());
         return returnMap;
     }
 
