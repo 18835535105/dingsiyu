@@ -1,15 +1,14 @@
 package com.zhidejiaoyu.student.business.smallapp.serivce.impl;
 
-import com.zhidejiaoyu.common.mapper.ErrorLearnLogMapper;
-import com.zhidejiaoyu.common.mapper.StudentMapper;
-import com.zhidejiaoyu.common.mapper.StudentStudyPlanNewMapper;
-import com.zhidejiaoyu.common.mapper.VocabularyMapper;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
-import com.zhidejiaoyu.common.pojo.Vocabulary;
+import com.zhidejiaoyu.common.constant.TimeConstant;
+import com.zhidejiaoyu.common.constant.test.GenreConstant;
+import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
+import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.smallapp.serivce.SmallProgramTestService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -32,10 +31,17 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     private VocabularyMapper vocabularyMapper;
     @Resource
     private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
+    @Resource
+    private TeacherMapper teacherMapper;
+    @Resource
+    private ShareConfigMapper shareConfigMapper;
 
 
     @Override
     public Object getTest(HttpSession session) {
+        if (session.getAttribute(TimeConstant.BEGIN_START_TIME) == null) {
+            session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
+        }
         Student student = getStudent(session);
         List<Map<String, Object>> maps = errorLearnLogMapper.selectVocabularyByStudentId(student.getId());
         Map<String, Object> returnMap = new HashMap<>();
@@ -73,7 +79,48 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         }
         returnMap.put("optionList", getOptionList(getMaps, vocabularyIds));
         returnMap.put("writeList", getWriteList(getMaps));
+        //更新获取单词复习数量
+        updateErrorLearnLog(vocabularyIds, student.getId());
         return returnMap;
+    }
+
+    @Override
+    public Object saveTest(Integer point, HttpSession session) {
+        Student student = getStudent(session);
+        Map<String, Object> returnMap = new HashMap<>();
+        Date startDate = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
+        Date date = new Date();
+        if (point > 80) {
+            TestRecord testRecord = new TestRecord();
+            testRecord.setGenre(GenreConstant.SMALLAPP_GENRE);
+            testRecord.setStudyModel(StudyModelConstant.SMALLAPP_STUDY_MODEL);
+            testRecord.setStudentId(student.getId());
+            testRecord.setTestEndTime(date);
+            testRecord.setTestStartTime(startDate);
+            returnMap.put("point", point);
+        }
+        student.setSystemGold(student.getSystemGold() + 50);
+        studentMapper.updateById(student);
+        Integer adminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
+        ShareConfig shareConfig = shareConfigMapper.selectByAdminId(adminId);
+        returnMap.put("img", shareConfig.getImgUrl());
+        returnMap.put("word", shareConfig.getImgWord());
+        returnMap.put("point", 0);
+        returnMap.put("gold", student.getSystemGold());
+        return returnMap;
+    }
+
+    private void updateErrorLearnLog(List<Long> vocabularyIds, Long studentId) {
+        List<ErrorLearnLog> errorLearnLogs = errorLearnLogMapper.selectVocabularyByStudentIdAndVocabularyIds(studentId, vocabularyIds);
+        errorLearnLogs.forEach(log -> {
+            Integer reviewCount = log.getReviewCount();
+            if (reviewCount == null) {
+                log.setReviewCount(1);
+            } else {
+                log.setReviewCount(reviewCount + 1);
+            }
+            errorLearnLogMapper.updateById(log);
+        });
     }
 
     private List<Map<String, Object>> getWriteList(List<Map<String, Object>> getMaps) {

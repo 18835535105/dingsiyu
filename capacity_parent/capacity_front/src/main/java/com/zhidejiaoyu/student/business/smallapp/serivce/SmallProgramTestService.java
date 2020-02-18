@@ -17,4 +17,6 @@ public interface SmallProgramTestService extends BaseService<Student> {
 
 
     Object getTest(HttpSession session);
+
+    Object saveTest(Integer point, HttpSession session);
 }

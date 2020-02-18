@@ -13,9 +13,15 @@
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
+    <sql id="base_sql">
+        id,school_admin_id,img_url,uploader_id,img_word,create_time,update_time
+    </sql>
 
     <select id="selectImgByAdminId" resultType="string" parameterType="map">
         select img_url from share_config where school_admin_id=#{adminId}
     </select>
 
+    <select id="selectByAdminId" resultMap="BaseResultMap" parameterType="map">
+        select <include refid="base_sql"></include> from share_config where school_admin_id=#{adminId}
+    </select>
 </mapper>

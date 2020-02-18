@@ -15,4 +15,6 @@ import org.apache.ibatis.annotations.Param;
 public interface ShareConfigMapper extends BaseMapper<ShareConfig> {
 
     String selectImgByAdminId(@Param("adminId") Integer adminId);
+
+    ShareConfig selectByAdminId(@Param("adminId") Integer adminId);
 }

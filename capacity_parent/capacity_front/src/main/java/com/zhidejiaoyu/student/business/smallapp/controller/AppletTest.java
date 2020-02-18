@@ -20,6 +20,10 @@ public class AppletTest {
         return smallProgramTestService.getTest(session);
     }
 
+    @RequestMapping("saveTest")
+    public Object saveTest(Integer point ,HttpSession session){
+        return smallProgramTestService.saveTest(point,session);
+    }
 
 
 
