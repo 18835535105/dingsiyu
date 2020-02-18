@@ -4,11 +4,9 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.Adsense;
-import com.zhidejiaoyu.common.pojo.ClockIn;
-import com.zhidejiaoyu.common.pojo.GoldLog;
-import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -20,6 +18,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DurationInfoVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.smallapp.serivce.IndexService;
+import com.zhidejiaoyu.student.business.smallapp.vo.StateVO;
 import com.zhidejiaoyu.student.business.smallapp.vo.TotalDataVO;
 import com.zhidejiaoyu.student.business.smallapp.vo.index.AdsensesVO;
 import com.zhidejiaoyu.student.business.smallapp.vo.index.CardVO;
@@ -58,6 +57,12 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Resource
     private DurationMapper durationMapper;
+
+    @Resource
+    private TestRecordMapper testRecordMapper;
+
+    @Resource
+    private LearnNewMapper learnNewMapper;
 
     @Override
     public ServerResponse<Object> index() {
@@ -171,6 +176,64 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         return ServerResponse.createBySuccess(pageVo);
     }
 
+    @Override
+    public ServerResponse<Object> myState() {
+
+        Long studentId = super.getStudentId();
+
+        String today = DateUtil.formatYYYYMMDD(new Date());
+
+        String beforeSevenDays = DateUtil.getBeforeDayDateStr(new Date(), 7, DateUtil.YYYYMMDD) + " 00:00:00";
+
+        // 耐久度
+        Integer onlineTime = durationMapper.selectOnlineTime(studentId, beforeSevenDays, today);
+        String onlineTimeStr = this.getOnlineTime(onlineTime);
+
+        // 复习命中率
+        int count = testRecordMapper.countByGenreWithBeginTimeAndEndTime(studentId, GenreConstant.SMALLAPP_GENRE, beforeSevenDays, today);
+
+        // 机动力
+        Double efficiency = durationMapper.selectLastStudyEfficiency(studentId);
+
+        // 成绩平均值
+        Double avg = testRecordMapper.selectScoreAvg(studentId, 100);
+
+        // 单词数
+        int wordCount = learnNewMapper.countLearnedWordCount(studentId);
+
+        double score = Double.parseDouble(String.format("%.2f", avg));
+        return ServerResponse.createBySuccess(StateVO.builder()
+                .onlineTime(onlineTimeStr)
+                .reviewCount(Math.min(7, count))
+                .efficiency(efficiency > 1 ? 100 + "%" : Math.floor(efficiency * 100) + "%")
+                .score(Math.min(100, score))
+                .wordLearnedCount(Math.min(wordCount, 6000))
+                .build());
+    }
+
+    private String getOnlineTime(Integer onlineTime) {
+        String onlineTimeStr;
+        if (onlineTime == null) {
+            onlineTimeStr = "0秒";
+        } else {
+            if (onlineTime < 60) {
+                onlineTimeStr = onlineTime + "秒";
+            } else if (onlineTime < 3600) {
+                onlineTimeStr = (onlineTime / 60) + "分" + (onlineTime % 60) + "秒";
+            } else {
+                int hours = onlineTime / 3600;
+                int remainSeconds = onlineTime - hours * 3600;
+
+                if (hours > 10) {
+                    onlineTimeStr = 10 + "小时";
+                } else {
+                    onlineTimeStr = (Math.min(hours, 10)) + "小时" + (remainSeconds / 60) + "分" + (remainSeconds % 60) + "秒";
+                }
+            }
+        }
+        return onlineTimeStr;
+    }
+
     /**
      * @param durationInfoVos 需要展示的学习日期及各个日期的在线时长
      * @param durationInfos   各个日期具体的学习时长
@@ -251,7 +314,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     public static void main(String[] args) {
 
-        System.out.println(DateUtil.parse("2020-01-09", DateUtil.YYYYMMDD).getTime());
-        System.out.println(DateUtil.parse("2020-02-13", DateUtil.YYYYMMDD).getTime());
+        System.out.println(String.format("%.2f", 99.991));
+        System.out.println(String.format("%.2f", 100.019));
     }
 }

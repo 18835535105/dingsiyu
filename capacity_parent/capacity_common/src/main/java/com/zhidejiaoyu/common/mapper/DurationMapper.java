@@ -219,4 +219,12 @@ public interface DurationMapper extends BaseMapper<Duration> {
      * @return
      */
     List<DurationInfoVO> selectDurationInfos(@Param("studentId") Long studentId, @Param("learnDateList") List<String> learnDateList);
+
+    /**
+     * 查询学生最后一次的学习效率
+     *
+     * @param studentId
+     * @return
+     */
+    Double selectLastStudyEfficiency(@Param("studentId") Long studentId);
 }

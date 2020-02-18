@@ -60,4 +60,13 @@ public class IndexController extends BaseController {
         return smallAppIndexService.record();
     }
 
+    /**
+     * 飞行状态
+     *
+     * @return
+     */
+    @GetMapping("/myState")
+    public ServerResponse<Object> myState() {
+        return smallAppIndexService.myState();
+    }
 }

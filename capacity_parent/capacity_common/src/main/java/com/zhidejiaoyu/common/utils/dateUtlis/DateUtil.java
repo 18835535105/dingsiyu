@@ -454,6 +454,28 @@ public class DateUtil implements Serializable {
     }
 
     /**
+     * 获取几天前的日期
+     *
+     * @param date
+     * @param days
+     * @return
+     */
+    public static Date getBeforeDaysDate(Date date, int days) {
+        return new DateTime(date).minusDays(days).toDate();
+    }
+
+    /**
+     * 获取几天前的日期字符串
+     *
+     * @param date
+     * @param days
+     * @return
+     */
+    public static String getBeforeDayDateStr(Date date, int days, String format) {
+        return formatDate(getBeforeWeekDate(date, days), format);
+    }
+
+    /**
      * 获取指定日期在日期所在月位于第几周
      *
      * @param date
@@ -465,12 +487,13 @@ public class DateUtil implements Serializable {
         return calendar.get(Calendar.WEEK_OF_MONTH);
     }
 
-    public static int getMonth(){
+    public static int getMonth() {
         Calendar cal = Calendar.getInstance();
         return cal.get(Calendar.MONTH) + 1;
     }
 
-    private DateUtil(){}
+    private DateUtil() {
+    }
 
     public static void main(String[] args) {
         System.out.println(beforeHoursTime(1));

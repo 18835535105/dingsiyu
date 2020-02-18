@@ -939,4 +939,12 @@
         order by id desc
         limit 1
     </select>
+    <select id="selectScoreAvg" resultType="java.lang.Double" parameterType="map">
+        select avg(point)
+        from test_record
+        where student_id = #{studentId}
+          and point is not null
+        order by id desc
+        limit #{limit}
+    </select>
 </mapper>

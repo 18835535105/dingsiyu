@@ -501,6 +501,16 @@
         )
         order by login_time desc
     </select>
+    <select id="selectLastStudyEfficiency" resultType="java.lang.Double" parameterType="map">
+        select sum(d.valid_time) / sum(d.online_time)
+        from duration d,
+             (select max(d2.login_time) loginTime, d2.student_id studentId
+              from duration d2
+              where student_id = #{studentId}
+              limit 1) t
+        where d.student_id = t.studentId
+          and TO_DAYS(d.login_time) = TO_DAYS(t.loginTime)
+    </select>
 
     <delete id="deleteByStudentIds" parameterType="map">
         delete from duration

@@ -55,7 +55,7 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
 
 
     List<Long> selectIdByStudentIdAndUnitIdAndEasyOrHard(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
-                                                         @Param("easyOrHard") Integer easyOrHard,@Param("modelType")Integer modelType);
+                                                         @Param("easyOrHard") Integer easyOrHard, @Param("modelType") Integer modelType);
 
     @Select("select id from learn_new where student_id =#{studentId}")
     List<Long> selectIdByStudentId(@Param("studentId") Long studentId);
@@ -76,4 +76,12 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
      */
     LearnNew selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                                                  @Param("easyOrHard") Integer easyOrHard, @Param("modelType") int modelType);
+
+    /**
+     * 统计学生学习的所有单词数（去重）
+     *
+     * @param studentId
+     * @return
+     */
+    int countLearnedWordCount(@Param("studentId") Long studentId);
 }

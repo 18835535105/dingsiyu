@@ -65,18 +65,20 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
 
     /**
      * 读取离线在最后一回的测试数据
+     *
      * @param studentId
      * @param unitId
      * @param genre
      * @param studyModel
      * @return
      */
-    TestRecord  selectByStudentIdAndUnitIdAndGenreAndStudyModel(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
-                                          @Param("genre") String genre, @Param("studyModel") String studyModel);
+    TestRecord selectByStudentIdAndUnitIdAndGenreAndStudyModel(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
+                                                               @Param("genre") String genre, @Param("studyModel") String studyModel);
 
 
     TestRecord selectByStudentIdAndUnitIdAndGenre(@Param("studentId") Long studentId, @Param("unitId") Long unitId,
                                                   @Param("genre") String genre);
+
     /**
      * 查询指定类型的测试记录
      *
@@ -106,11 +108,13 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
 
     /**
      * 根据测试类型查询测试记录数据
+     *
      * @param stuId
      * @param genre
      * @return
      */
     List<TestRecord> selectListByGenre(@Param("stuId") Long stuId, @Param("genre") String genre);
+
     /**
      * 查询学生所有课程单元闯关成功的个数
      *
@@ -182,6 +186,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
 
     /**
      * 修改游戏测试记录次数为 2 次
+     *
      * @param student
      */
     void updateGameRecord(@Param("student") Student student);
@@ -196,19 +201,19 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      *
      * @param studentId
      * @param unitId
-     * @param classify 类型 0=单词图鉴 1=慧记忆 2=听写 3=默写 4=例句听力 5=例句翻译 6=例句默写
+     * @param classify  类型 0=单词图鉴 1=慧记忆 2=听写 3=默写 4=例句听力 5=例句翻译 6=例句默写
      * @return
      */
     Integer selectUnitTestMaxPointByStudyModel(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("model") Integer classify);
 
-    List<SeniorityVo> planSeniority(@Param("grade") String grade, @Param("study_paragraph") String study_paragraph, @Param("haveTest") Integer haveTest, @Param("version") String version, @Param("classId")Long classId);
+    List<SeniorityVo> planSeniority(@Param("grade") String grade, @Param("study_paragraph") String study_paragraph, @Param("haveTest") Integer haveTest, @Param("version") String version, @Param("classId") Long classId);
 
     @Select("SELECT COUNT(id) AS testCount FROM test_record WHERE student_id = #{stuId}  GROUP BY student_id")
     Integer onePlanSeniority(@Param("stuId") Long stuId);
 
-    List<SeniorityVo> planSenioritySchool(@Param("study_paragraph") String study_paragraph, @Param("haveUnit") Integer haveUnit, @Param("version") String version, @Param("teacherId")Long teacherId);
+    List<SeniorityVo> planSenioritySchool(@Param("study_paragraph") String study_paragraph, @Param("haveUnit") Integer haveUnit, @Param("version") String version, @Param("teacherId") Long teacherId);
 
-    List<SeniorityVo> planSeniorityNationwide(@Param("study_paragraph") String study_paragraph,@Param("haveTest") Integer haveTest, @Param("version") String version);
+    List<SeniorityVo> planSeniorityNationwide(@Param("study_paragraph") String study_paragraph, @Param("haveTest") Integer haveTest, @Param("version") String version);
 
     /**
      * 查询学生不同课程课程测试的最低分
@@ -232,7 +237,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      *
      * @param studentId
      * @param unitIds
-     * @return  key 单元id
+     * @return key 单元id
      */
     @MapKey("unitId")
     Map<Long, Map<Long, Long>> selectHasUnitTest(@Param("studentId") Long studentId, @Param("unitIds") List<Long> unitIds);
@@ -244,7 +249,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      *
      * @param stuId
      * @param testId
-     * @param type  1:单词；2：句型；3：课文
+     * @param type   1:单词；2：句型；3：课文
      * @return
      */
     TestDetailVo selectTestDetailVo(@Param("stuId") Long stuId, @Param("testId") Long testId, @Param("type") Integer type);
@@ -267,7 +272,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     int countGameCount(@Param("stu") Student stu);
 
 
-    TestRecord selectByStudentIdAndGenre(@Param("id") Long id,@Param("unitId") Long unitId);
+    TestRecord selectByStudentIdAndGenre(@Param("id") Long id, @Param("unitId") Long unitId);
 
     /**
      * 查询当前测试是否已存在
@@ -290,7 +295,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     @Delete("delete from test_record where student_id = #{studentId} and genre = '学前游戏测试'")
     void deleteGameRecord(@Param("studentId") Long studentId);
 
-    Integer selectUnitTestMaxPointByStudyModels(@Param("studentId") Long studentId,@Param("letterUnitId") Integer letterUnitIds,@Param("model") Integer model);
+    Integer selectUnitTestMaxPointByStudyModels(@Param("studentId") Long studentId, @Param("letterUnitId") Integer letterUnitIds, @Param("model") Integer model);
 
     /**
      * 统计学生今天进行的单元闯关测试次数
@@ -315,6 +320,28 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
 
     void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
 
-    TestRecord selectByStudentIdAndGenreAndStudyModel(@Param("studentId") Long studentId,@Param("genre") String genre,@Param("studyModel") String studyModel);
+    TestRecord selectByStudentIdAndGenreAndStudyModel(@Param("studentId") Long studentId, @Param("genre") String genre, @Param("studyModel") String studyModel);
+
+    /**
+     * 统计指定测试类型在指定日期范围的测试次数
+     *
+     * @param studentId
+     * @param genre
+     * @param beginTime
+     * @param endTime
+     * @return
+     */
+    @Select("select count(id) from test_record where student_id = #{studentId} and genre = #{genre} and test_start_time >= #{beginTime} and test_end_time <= #{endTime}")
+    int countByGenreWithBeginTimeAndEndTime(@Param("studentId") Long studentId, @Param("genre") String genre,
+                                            @Param("beginTime") String beginTime, @Param("endTime") String endTime);
+
+    /**
+     * 查询学生若干次测试的平均分
+     *
+     * @param studentId
+     * @param limit
+     * @return
+     */
+    Double selectScoreAvg(@Param("studentId") Long studentId, @Param("limit") int limit);
 }
 

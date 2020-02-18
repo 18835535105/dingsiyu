@@ -33,4 +33,12 @@ public interface IndexService extends BaseService<Student> {
      * @return
      */
     ServerResponse<Object> record();
+
+    /**
+     * 飞行状态
+     *
+     * @return
+     */
+    ServerResponse<Object> myState();
+
 }
