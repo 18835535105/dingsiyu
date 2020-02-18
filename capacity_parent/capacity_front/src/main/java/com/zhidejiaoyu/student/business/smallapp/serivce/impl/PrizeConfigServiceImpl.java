@@ -121,4 +121,14 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         return integer.get("prizeId");
 
     }
+
+    @Override
+    public Student getStudent() {
+        return null;
+    }
+
+    @Override
+    public Long getStudentId() {
+        return null;
+    }
 }
