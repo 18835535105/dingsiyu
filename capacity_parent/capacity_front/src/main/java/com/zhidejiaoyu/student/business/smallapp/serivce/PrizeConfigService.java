@@ -8,5 +8,5 @@ import javax.servlet.http.HttpSession;
 public interface PrizeConfigService extends BaseService<PrizeConfig> {
     Object getPrizeConfig(String openId, Long adminId, Long studentId);
 
-    Object getAdmin(HttpSession session);
+    Object getAdmin(Long studentId);
 }

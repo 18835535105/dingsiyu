@@ -65,8 +65,8 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
     }
 
     @Override
-    public Object getAdmin(HttpSession session) {
-        Student student = getStudent(session);
+    public Object getAdmin(Long studentId) {
+        Student student = studentMapper.selectById(studentId);
         Integer adminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
         TestRecord testRecord = testRecordMapper.selectByStudentIdAndGenreAndStudyModel(student.getId(), GenreConstant.SMALLAPP_GENRE, StudyModelConstant.SMALLAPP_STUDY_MODEL);
         String imgUrl = shareConfigMapper.selectImgByAdminId(adminId);
