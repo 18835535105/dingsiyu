@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zhidejiaoyu.common.mapper.simple.SimplePrizeExchangeListMapper">
+<mapper namespace="com.zhidejiaoyu.common.mapper.PrizeExchangeListMapper">
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.PrizeExchangeList">
@@ -22,7 +22,9 @@
     </sql>
 
     <select id="getAll" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"></include> from prize_exchange_list
+        select
+        <include refid="Base_Column_List"/>
+        from prize_exchange_list
         where
         type = #{type}
         <if test="schoolId !=null ">
@@ -35,11 +37,15 @@
     </select>
 
     <select id="selById" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"></include> from prize_exchange_list where id =#{prizeId}
+        select
+        <include refid="Base_Column_List"/>
+        from prize_exchange_list where id =#{prizeId}
     </select>
 
     <select id="getAllByType" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"></include> from prize_exchange_list
+        select
+        <include refid="Base_Column_List"/>
+        from prize_exchange_list
         where type = #{type}
         <if test="teacherId != null">
             and teacher_id =#{teacherId}
@@ -60,6 +66,20 @@
         <if test="adminId != null">
             and school_id =#{adminId}
         </if>
+    </select>
+    <select id="selectBySchoolId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from prize_exchange_list
+        where school_id = #{schoolAdminId}
+        order by
+        <if test="orderField == 1">
+            exchange_prize
+        </if>
+        <if test="orderField == 2">
+            create_time
+        </if>
+        ${orderBy}
     </select>
 
 

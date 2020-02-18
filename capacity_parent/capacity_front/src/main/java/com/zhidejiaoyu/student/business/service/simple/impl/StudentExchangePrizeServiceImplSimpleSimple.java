@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.GoldLogMapper;
+import com.zhidejiaoyu.common.mapper.PrizeExchangeListMapper;
 import com.zhidejiaoyu.common.vo.prize.GetPrizeVO;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.UserConstant;
@@ -33,7 +34,7 @@ import java.util.*;
 public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServiceImpl<SimpleStudentExchangePrizeMapper, StudentExchangePrize> implements SimpleIStudentExchangePrizeServiceSimple {
 
     @Autowired
-    private SimplePrizeExchangeListMapper simplePrizeExchangeListMapper;
+    private PrizeExchangeListMapper prizeExchangeListMapper;
     @Autowired
     private SimpleStudentMapper simpleStudentMapper;
     @Autowired
@@ -102,20 +103,20 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
         Map<String, Object> threeMap = new HashMap<>(16);
 
         // 一类放置
-        List<PrizeExchangeList> oneType = simplePrizeExchangeListMapper.getAllByType(teacherId, schoolAdminById, 1);
-        Integer oneCount = simplePrizeExchangeListMapper.getCountByType(teacherId, schoolAdminById, 1);
+        List<PrizeExchangeList> oneType = prizeExchangeListMapper.getAllByType(teacherId, schoolAdminById, 1);
+        Integer oneCount = prizeExchangeListMapper.getCountByType(teacherId, schoolAdminById, 1);
         getResultMap(oneMap, oneType);
         addResultMapByAll(oneMap, 1, oneCount > 5);
 
         // 二类放置
-        List<PrizeExchangeList> twoType = simplePrizeExchangeListMapper.getAllByType(teacherId, schoolAdminById, 2);
-        Integer twoCount = simplePrizeExchangeListMapper.getCountByType(teacherId, schoolAdminById, 2);
+        List<PrizeExchangeList> twoType = prizeExchangeListMapper.getAllByType(teacherId, schoolAdminById, 2);
+        Integer twoCount = prizeExchangeListMapper.getCountByType(teacherId, schoolAdminById, 2);
         getResultMap(twoMap, twoType);
         addResultMapByAll(twoMap, 2, twoCount > 5);
 
         // 三类放置
-        List<PrizeExchangeList> threeType = simplePrizeExchangeListMapper.getAllByType(teacherId, schoolAdminById, 3);
-        Integer threeCount = simplePrizeExchangeListMapper.getCountByType(teacherId, schoolAdminById, 3);
+        List<PrizeExchangeList> threeType = prizeExchangeListMapper.getAllByType(teacherId, schoolAdminById, 3);
+        Integer threeCount = prizeExchangeListMapper.getCountByType(teacherId, schoolAdminById, 3);
         getResultMap(threeMap, threeType);
         addResultMapByAll(threeMap, 3, threeCount > 5);
 
@@ -146,10 +147,10 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
                 }
             }
             PageHelper.startPage(page, row);
-            prizeExchangeLists = simplePrizeExchangeListMapper.getAll(adminId.longValue(), null, type);
+            prizeExchangeLists = prizeExchangeListMapper.getAll(adminId.longValue(), null, type);
         } else {
             PageHelper.startPage(page, row);
-            prizeExchangeLists = simplePrizeExchangeListMapper.getAll(null, teacherId, type);
+            prizeExchangeLists = prizeExchangeListMapper.getAll(null, teacherId, type);
         }
         Double systemGold = student.getSystemGold();
         if (systemGold > 1) {
@@ -228,7 +229,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
     public ServerResponse<Object> addExchangePrize(HttpSession session, Long prizeId) {
         Student student = getStudent(session);
         Double systemGold = student.getSystemGold();
-        PrizeExchangeList prizeExchangeList = simplePrizeExchangeListMapper.selById(prizeId);
+        PrizeExchangeList prizeExchangeList = prizeExchangeListMapper.selById(prizeId);
 
         GetPrizeVO getPrizeVO = new GetPrizeVO();
         prizeExchangeList.setPrizeUrl(GetOssFile.getPublicObjectUrl(prizeExchangeList.getPrizeUrl()));
@@ -257,7 +258,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
 
         int index = addStudentExchangePrize(1, prizeId, student.getId());
         if (index > 0) {
-            simplePrizeExchangeListMapper.updSulpersNumber(prizeId, prizeExchangeList.getSurplusNumber() - 1);
+            prizeExchangeListMapper.updSulpersNumber(prizeId, prizeExchangeList.getSurplusNumber() - 1);
             addOperationLog(prizeExchangeList.getPrize(), student.getId().intValue());
             addGoldLog(student.getId(), prizeExchangeList.getExchangePrize());
             student.setSystemGold(student.getSystemGold() - prizeExchangeList.getExchangePrize());

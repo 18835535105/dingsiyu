@@ -6,6 +6,7 @@ import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.mapper.PrizeExchangeListMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
@@ -17,7 +18,9 @@ import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DurationInfoVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.business.smallapp.dto.PrizeDTO;
 import com.zhidejiaoyu.student.business.smallapp.serivce.IndexService;
+import com.zhidejiaoyu.student.business.smallapp.vo.PrizeVO;
 import com.zhidejiaoyu.student.business.smallapp.vo.StateVO;
 import com.zhidejiaoyu.student.business.smallapp.vo.TotalDataVO;
 import com.zhidejiaoyu.student.business.smallapp.vo.index.AdsensesVO;
@@ -63,6 +66,9 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Resource
     private LearnNewMapper learnNewMapper;
+
+    @Resource
+    private PrizeExchangeListMapper prizeExchangeListMapper;
 
     @Override
     public ServerResponse<Object> index() {
@@ -209,6 +215,33 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 .score(Math.min(100, score))
                 .wordLearnedCount(Math.min(wordCount, 6000))
                 .build());
+    }
+
+    @Override
+    public ServerResponse<Object> prize(PrizeDTO dto) {
+
+        Student student = super.getStudent();
+        Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
+
+        PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
+        List<PrizeExchangeList> prizeExchangeLists = prizeExchangeListMapper.selectBySchoolId(schoolAdminId, dto.getOrderField(), dto.getOrderBy());
+
+        PageInfo<PrizeExchangeList> pageInfo = new PageInfo<>(prizeExchangeLists);
+
+        List<PrizeVO> prizeVos = prizeExchangeLists.stream().map(prizeExchangeList -> PrizeVO.builder()
+                .gold(prizeExchangeList.getExchangePrize())
+                .imgUrl(GetOssFile.getPublicObjectUrl(prizeExchangeList.getPrizeUrl()))
+                .name(prizeExchangeList.getPrize())
+                .build())
+                .collect(Collectors.toList());
+
+        PageInfo<PrizeVO> returnPageInfo = new PageInfo<>();
+        returnPageInfo.setTotal(pageInfo.getTotal());
+        returnPageInfo.setList(prizeVos);
+        returnPageInfo.setPages(pageInfo.getPages());
+
+        PageVo pageVo = PageUtil.packagePage(returnPageInfo);
+        return ServerResponse.createBySuccess(pageVo);
     }
 
     private String getOnlineTime(Integer onlineTime) {

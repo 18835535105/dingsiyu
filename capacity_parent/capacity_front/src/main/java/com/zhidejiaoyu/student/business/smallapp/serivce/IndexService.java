@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.smallapp.serivce;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.BaseService;
+import com.zhidejiaoyu.student.business.smallapp.dto.PrizeDTO;
 
 /**
  * 首页数据
@@ -41,4 +42,11 @@ public interface IndexService extends BaseService<Student> {
      */
     ServerResponse<Object> myState();
 
+    /**
+     * 藏宝阁
+     *
+     * @param dto
+     * @return
+     */
+    ServerResponse<Object> prize(PrizeDTO dto);
 }
