@@ -14,6 +14,7 @@ import com.zhidejiaoyu.student.business.smallapp.dto.AuthorizationDTO;
 import com.zhidejiaoyu.student.business.smallapp.dto.BindAccountDTO;
 import com.zhidejiaoyu.student.business.smallapp.enums.AuthorizationEnum;
 import com.zhidejiaoyu.student.business.smallapp.serivce.AuthorizationService;
+import com.zhidejiaoyu.student.business.smallapp.vo.AuthorizationVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -93,16 +94,22 @@ public class AuthorizationServiceImpl extends BaseServiceImpl<StudentMapper, Stu
             throw new ServiceException(500, AuthorizationEnum.getMsg(authorizationDTO.getErrcode()));
         }
 
+        AuthorizationVO authorizationVo = AuthorizationVO.builder()
+                .openId(authorizationDTO.getOpenid())
+                .sessionKey(authorizationDTO.getSession_key())
+                .build();
+
         // 验证小程序是否已经绑定队长账号
         String openid = authorizationDTO.getOpenid();
         Student student = studentMapper.selectByOpenId(openid);
         request.getSession().setAttribute(SessionConstant.OPENID, openid);
         if (student == null) {
-            return ServerResponse.createBySuccess(501, "当前用户暂未绑定队长账号！");
+            // 当前用户还未绑定队长账号
+            return ServerResponse.createBySuccess(501, authorizationVo);
         }
 
         request.getSession().setAttribute(UserConstant.CURRENT_STUDENT, student);
-        return ServerResponse.createBySuccess(openid);
+        return ServerResponse.createBySuccess(authorizationVo);
     }
 
     /**
