@@ -249,26 +249,22 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     private String getOnlineTime(Integer onlineTime) {
-        String onlineTimeStr;
         if (onlineTime == null) {
-            onlineTimeStr = "0秒";
-        } else {
-            if (onlineTime < 60) {
-                onlineTimeStr = onlineTime + "秒";
-            } else if (onlineTime < 3600) {
-                onlineTimeStr = (onlineTime / 60) + "分" + (onlineTime % 60) + "秒";
-            } else {
-                int hours = onlineTime / 3600;
-                int remainSeconds = onlineTime - hours * 3600;
-
-                if (hours > 10) {
-                    onlineTimeStr = 10 + "小时";
-                } else {
-                    onlineTimeStr = (Math.min(hours, 10)) + "小时" + (remainSeconds / 60) + "分" + (remainSeconds % 60) + "秒";
-                }
-            }
+            return "0秒";
         }
-        return onlineTimeStr;
+        if (onlineTime < 60) {
+            return onlineTime + "秒";
+        }
+        if (onlineTime < 3600) {
+            return (onlineTime / 60) + "分" + (onlineTime % 60) + "秒";
+        }
+        int hours = onlineTime / 3600;
+        int remainSeconds = onlineTime - hours * 3600;
+
+        if (hours > 10) {
+            return 10 + "小时";
+        }
+        return (Math.min(hours, 10)) + "小时" + (remainSeconds / 60) + "分" + (remainSeconds % 60) + "秒";
     }
 
     /**
