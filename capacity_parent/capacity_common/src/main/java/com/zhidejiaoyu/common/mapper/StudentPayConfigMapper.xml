@@ -6,15 +6,17 @@
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentPayConfig">
         <id column="id" property="id"/>
         <result column="wen_xin_id" property="wenXinId"/>
+        <result column="student_id" property="studentId"/>
         <result column="prize_config_id" property="prizeConfigId"/>
         <result column="type" property="type"/>
         <result column="create_time" property="createTime"/>
         <result column="obtain" property="obtain"/>
-
+        <result column="we_chat_img_url" property="weChatImgUrl"/>
+        <result column="we_chat_name" property="weChatName"/>
     </resultMap>
 
     <sql id="base_sql">
-        id,wen_xin_id,prize_config_id,`type`,create_time
+        id,wen_xin_id,prize_config_id,`type`,create_time,we_chat_img_url,we_chat_name
     </sql>
 
     <select id="selectByWenXiIdAndDate" parameterType="map" resultMap="BaseResultMap">
@@ -23,6 +25,15 @@
         from student_pay_config
         where wen_xin_id =#{openId}
         and to_days(create_time) = to_days(#{date})
+    </select>
+
+    <select id="selectWeChatNameAndWeChatImgUrlByStudentId" parameterType="map" resultType="map">
+        select
+        we_chat_img_url weChatImgUrl,we_chat_name weChatName
+        from
+        student_pay_config
+        where
+        student_id =#{studentId}
     </select>
 
 

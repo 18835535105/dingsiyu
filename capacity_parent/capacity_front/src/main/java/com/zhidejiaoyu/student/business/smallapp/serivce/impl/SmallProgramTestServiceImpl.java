@@ -176,13 +176,5 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         return returnList;
     }
 
-    @Override
-    public Student getStudent() {
-        return null;
-    }
 
-    @Override
-    public Long getStudentId() {
-        return null;
-    }
 }

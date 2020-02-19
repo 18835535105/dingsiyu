@@ -22,8 +22,8 @@ public class PrizeConfigController extends BaseController {
     private PrizeConfigService prizeConfigService;
 
     @RequestMapping("/getPrizeConfig")
-    public Object getPrize(String openId, Long adminId, Long studentId) {
-        return prizeConfigService.getPrizeConfig(openId, adminId, studentId);
+    public Object getPrize(String openId, Long adminId, Long studentId,String weChatimgUrl,String weChatName) {
+        return prizeConfigService.getPrizeConfig(openId, adminId, studentId,weChatimgUrl,weChatName);
     }
 
 

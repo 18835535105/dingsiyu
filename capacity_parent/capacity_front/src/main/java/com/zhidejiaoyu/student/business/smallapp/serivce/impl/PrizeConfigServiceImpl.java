@@ -9,7 +9,6 @@ import com.zhidejiaoyu.student.business.smallapp.serivce.PrizeConfigService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @Service
@@ -31,7 +30,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
     private ShareConfigMapper shareConfigMapper;
 
     @Override
-    public Object getPrizeConfig(String openId, Long adminId, Long studentId) {
+    public Object getPrizeConfig(String openId, Long adminId, Long studentId, String weChatimgUrl, String weChatName) {
         //判断当前openId是否已经领取过今日的奖品
         Date date = new Date();
         Map<String, Object> returnMap = new HashMap<>();
@@ -47,6 +46,9 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
             studentPayConfig.setPrizeConfigId(payconfigId);
             studentPayConfig.setWenXinId(openId);
             studentPayConfig.setObtain("" + date.getTime() + new Random(1000).nextInt());
+            studentPayConfig.setWeChatImgUrl(weChatimgUrl);
+            studentPayConfig.setWeChatName(weChatName);
+            studentPayConfig.setStudentId(studentId);
             studentPayConfigMapper.insert(studentPayConfig);
             Student student = studentMapper.selectById(studentId);
             student.setSystemGold(student.getSystemGold() + 5);
@@ -58,10 +60,14 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         returnMap.put("prizeName", prizeConfig.getPrizeName());
         SysUser sysUser = sysUserMapper.selectById(adminId);
         returnMap.put("adminPhone", sysUser.getPhone());
+        ShareConfig shareConfig = shareConfigMapper.selectByAdminId(adminId.intValue());
+        if (shareConfig != null) {
+            returnMap.put("background", shareConfig.getImgUrl());
+        } else {
+            returnMap.put("background", null);
+        }
         returnMap.put("obtain", studentPayConfig.getObtain());
-
-
-        return null;
+        return returnMap;
     }
 
     @Override
@@ -72,6 +78,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         String imgUrl = shareConfigMapper.selectImgByAdminId(adminId);
         Map<String, Object> map = new HashMap<>();
         map.put("adminId", adminId);
+        map.put("weChatList", studentPayConfigMapper.selectWeChatNameAndWeChatImgUrlByStudentId(studentId));
         map.put("point", testRecord.getPoint());
         map.put("imgUrl", imgUrl);
         map.put("studentId", student.getId());
@@ -120,15 +127,5 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         });
         return integer.get("prizeId");
 
-    }
-
-    @Override
-    public Student getStudent() {
-        return null;
-    }
-
-    @Override
-    public Long getStudentId() {
-        return null;
     }
 }

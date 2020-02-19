@@ -36,6 +36,10 @@ public class StudentPayConfig extends Model<StudentPayConfig> {
      */
     private String wenXinId;
     /**
+     * 学生id
+     */
+    private Long studentId;
+    /**
      * 奖品id
      */
     private Long prizeConfigId;
@@ -54,6 +58,18 @@ public class StudentPayConfig extends Model<StudentPayConfig> {
      * @return
      */
     private String obtain;
+
+    /**
+     * 微信头像地址
+     * @return
+     */
+    private String weChatImgUrl;
+
+    /**
+     * 微信名称
+     * @return
+     */
+    private String weChatName;
 
 
     @Override
