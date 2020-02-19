@@ -54,11 +54,7 @@ public class AuthorizationController {
      */
     @RequestMapping("/authorization")
     public ServerResponse<Object> authorization(HttpServletRequest request) {
-        ServerResponse<Object> res = authorizationService.authorization(request);
-        if (res.getStatus() == ResponseCode.SUCCESS.getCode()) {
-            return indexService.index();
-        }
-        return res;
+        return authorizationService.authorization(request);
     }
 
     /**

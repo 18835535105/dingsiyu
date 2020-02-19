@@ -72,7 +72,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Override
     public ServerResponse<Object> index() {
-        Student student = super.getStudent(HttpUtil.getHttpSession());
+        Student student = super.getStudent();
         if (student == null) {
             return ServerResponse.createByError(400, "用户还未绑定学生账号！");
         }
