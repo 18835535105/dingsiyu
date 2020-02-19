@@ -88,7 +88,7 @@ public class AuthorizationServiceImpl extends BaseServiceImpl<StudentMapper, Stu
         String forObject = this.authorization(code);
 
         AuthorizationDTO authorizationDTO = JSON.parseObject(forObject, AuthorizationDTO.class);
-        if (authorizationDTO.getErrcode() != 0) {
+        if (StringUtils.isEmpty(authorizationDTO.getOpenid())) {
             log.warn("小程序授权失败！授权结果=[{}]", authorizationDTO.toString());
             throw new ServiceException(500, AuthorizationEnum.getMsg(authorizationDTO.getErrcode()));
         }
