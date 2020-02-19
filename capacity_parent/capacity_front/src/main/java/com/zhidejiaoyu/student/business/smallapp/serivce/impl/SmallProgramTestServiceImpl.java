@@ -40,11 +40,11 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
 
 
     @Override
-    public Object getTest(HttpSession session) {
+    public Object getTest(HttpSession session, String openId) {
         if (session.getAttribute(TimeConstant.BEGIN_START_TIME) == null) {
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         }
-        Student student = getStudent(session);
+        Student student = studentMapper.selectByOpenId(openId);
         List<Map<String, Object>> maps = errorLearnLogMapper.selectVocabularyByStudentId(student.getId());
         Map<String, Object> returnMap = new HashMap<>();
         if (maps.size() == 0) {
@@ -87,8 +87,8 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     }
 
     @Override
-    public Object saveTest(Integer point, HttpSession session) {
-        Student student = getStudent(session);
+    public Object saveTest(Integer point, HttpSession session, String openId) {
+        Student student = studentMapper.selectByOpenId(openId);
         Map<String, Object> returnMap = new HashMap<>();
         Date startDate = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
         Date date = new Date();
