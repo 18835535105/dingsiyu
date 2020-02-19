@@ -17,6 +17,9 @@ import javax.validation.constraints.NotEmpty;
 @AllArgsConstructor
 public class PrizeDTO {
 
+    @NotEmpty(message = "openId can't be null")
+    private String openId;
+
     /**
      * 排序字段
      * 1：金币；2：日期

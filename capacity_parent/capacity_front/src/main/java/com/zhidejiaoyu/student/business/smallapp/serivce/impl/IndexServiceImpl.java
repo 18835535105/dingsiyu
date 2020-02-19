@@ -3,7 +3,6 @@ package com.zhidejiaoyu.student.business.smallapp.serivce.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.PrizeExchangeListMapper;
@@ -12,7 +11,6 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.duration.DurationStudyModelUtil;
-import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -33,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -71,8 +68,8 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private PrizeExchangeListMapper prizeExchangeListMapper;
 
     @Override
-    public ServerResponse<Object> index() {
-        Student student = super.getStudent();
+    public ServerResponse<Object> index(String openId) {
+        Student student = studentMapper.selectByOpenId(openId);
         if (student == null) {
             return ServerResponse.createByError(400, "用户还未绑定学生账号！");
         }
@@ -109,12 +106,12 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<Object> replenish(String date) {
+    public ServerResponse<Object> replenish(String date, String openId) {
+
+        Student student = studentMapper.selectByOpenId(openId);
 
         // 补签需要消耗的金币数
         int reduceGold = 50;
-        HttpSession httpSession = HttpUtil.getHttpSession();
-        Student student = super.getStudent(httpSession);
 
         if (student.getSystemGold() < reduceGold) {
             return ServerResponse.createByError(400, "金币不足！");
@@ -144,7 +141,6 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             student.setSystemGold(BigDecimalUtil.sub(student.getSystemGold(), reduceGold));
             student.setOfflineGold(BigDecimalUtil.add(student.getOfflineGold(), reduceGold));
             studentMapper.updateById(student);
-            httpSession.setAttribute(UserConstant.CURRENT_STUDENT, student);
 
             return ServerResponse.createBySuccess();
         }
@@ -154,9 +150,10 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     @Override
-    public ServerResponse<Object> record() {
+    public ServerResponse<Object> record(String openId) {
 
-        Long studentId = super.getStudentId();
+        Student student = studentMapper.selectByOpenId(openId);
+        Long studentId = student.getId();
 
         PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
         // 查询有学习记录的在线时长与学习日期
@@ -187,9 +184,10 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     }
 
     @Override
-    public ServerResponse<Object> myState() {
+    public ServerResponse<Object> myState(String openId) {
 
-        Long studentId = super.getStudentId();
+        Student student = studentMapper.selectByOpenId(openId);
+        Long studentId = student.getId();
 
         String today = DateUtil.formatYYYYMMDD(new Date());
 
@@ -224,7 +222,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Override
     public ServerResponse<Object> prize(PrizeDTO dto) {
 
-        Student student = super.getStudent();
+        Student student = studentMapper.selectByOpenId(dto.getOpenId());
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
 
         PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());

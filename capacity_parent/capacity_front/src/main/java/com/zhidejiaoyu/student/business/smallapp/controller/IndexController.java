@@ -37,43 +37,58 @@ public class IndexController extends BaseController {
      * @return
      */
     @GetMapping("/index")
-    public ServerResponse<Object> index() {
-        return smallAppIndexService.index();
+    public ServerResponse<Object> index(String openId) {
+        if (StringUtils.isEmpty(openId)) {
+            throw new ServiceException("openId can't be null");
+        }
+        return smallAppIndexService.index(openId);
     }
 
     /**
      * 补签
      *
      * @param date 补签的日期
+     * @param openId
      * @return
      */
     @PostMapping("/replenish")
-    public ServerResponse<Object> replenish(String date) {
+    public ServerResponse<Object> replenish(String date, String openId) {
         if (StringUtils.isEmpty(date)) {
             throw new ServiceException("date can't be null");
         }
+        if (StringUtils.isEmpty(openId)) {
+            throw new ServiceException("openId can't be null");
+        }
 
-        return smallAppIndexService.replenish(date);
+        return smallAppIndexService.replenish(date, openId);
     }
 
     /**
      * 飞行记录（学习记录）
      *
+     * @param openId
      * @return
      */
     @GetMapping("/record")
-    public ServerResponse<Object> record() {
-        return smallAppIndexService.record();
+    public ServerResponse<Object> record(String openId) {
+        if (StringUtils.isEmpty(openId)) {
+            throw new ServiceException("openId can't be null");
+        }
+        return smallAppIndexService.record(openId);
     }
 
     /**
      * 飞行状态
      *
+     * @param openId
      * @return
      */
     @GetMapping("/myState")
-    public ServerResponse<Object> myState() {
-        return smallAppIndexService.myState();
+    public ServerResponse<Object> myState(String openId) {
+        if (StringUtils.isEmpty(openId)) {
+            throw new ServiceException("openId can't be null");
+        }
+        return smallAppIndexService.myState(openId);
     }
 
     /**

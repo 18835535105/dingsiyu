@@ -1,12 +1,9 @@
 package com.zhidejiaoyu.student.business.smallapp.serivce.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.zhidejiaoyu.common.constant.UserConstant;
-import com.zhidejiaoyu.common.constant.session.SessionConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.smallapp.constant.SmallAppApiConstant;
@@ -42,7 +39,7 @@ public class AuthorizationServiceImpl extends BaseServiceImpl<StudentMapper, Stu
     @Override
     public ServerResponse<Object> bind(BindAccountDTO dto) {
 
-        String currentOpenid = HttpUtil.getHttpSession().getAttribute(SessionConstant.OPENID).toString();
+        String currentOpenid = dto.getOpenId();
         // 判断当前用户是否已绑定队长账号
         Student checkStudent = studentMapper.selectByOpenId(currentOpenid);
         if (checkStudent != null) {
@@ -102,13 +99,11 @@ public class AuthorizationServiceImpl extends BaseServiceImpl<StudentMapper, Stu
         // 验证小程序是否已经绑定队长账号
         String openid = authorizationDTO.getOpenid();
         Student student = studentMapper.selectByOpenId(openid);
-        request.getSession().setAttribute(SessionConstant.OPENID, openid);
         if (student == null) {
             // 当前用户还未绑定队长账号
             return ServerResponse.createBySuccess(501, authorizationVo);
         }
 
-        request.getSession().setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(authorizationVo);
     }
 
@@ -136,6 +131,5 @@ public class AuthorizationServiceImpl extends BaseServiceImpl<StudentMapper, Stu
     public void updateOpenId(Student student, String openId) {
         student.setOpenid(openId);
         studentMapper.updateById(student);
-        HttpUtil.getHttpSession().setAttribute(UserConstant.CURRENT_STUDENT, student);
     }
 }

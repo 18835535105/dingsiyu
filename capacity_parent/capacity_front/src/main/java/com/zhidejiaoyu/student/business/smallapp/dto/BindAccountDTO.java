@@ -14,6 +14,12 @@ import javax.validation.constraints.NotEmpty;
 public class BindAccountDTO {
 
     /**
+     * 用户标识
+     */
+    @NotEmpty(message = "openId can't be null")
+    private String openId;
+
+    /**
      * 学生账号
      */
     @NotEmpty(message = "account can't be null")

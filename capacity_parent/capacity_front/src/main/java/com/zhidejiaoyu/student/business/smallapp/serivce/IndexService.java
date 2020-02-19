@@ -17,30 +17,34 @@ public interface IndexService extends BaseService<Student> {
      * 首页数据
      *
      * @return
+     * @param openId
      */
-    ServerResponse<Object> index();
+    ServerResponse<Object> index(String openId);
 
     /**
      * 补签
      *
      * @param date 补签日期
+     * @param openId
      * @return
      */
-    ServerResponse<Object> replenish(String date);
+    ServerResponse<Object> replenish(String date, String openId);
 
     /**
      * 飞行记录（学习记录）
      *
      * @return
+     * @param openId
      */
-    ServerResponse<Object> record();
+    ServerResponse<Object> record(String openId);
 
     /**
      * 飞行状态
      *
      * @return
+     * @param openId
      */
-    ServerResponse<Object> myState();
+    ServerResponse<Object> myState(String openId);
 
     /**
      * 藏宝阁
