@@ -78,12 +78,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         }
 
         // 头部公有数据
-        TotalDataVO totalDataVO = TotalDataVO.builder()
-                .headImg(GetOssFile.getPublicObjectUrl(student.getHeadUrl()))
-                .say(this.getSay())
-                .studentName(student.getStudentName())
-                .systemGold(String.valueOf(Math.round(student.getSystemGold())))
-                .build();
+        TotalDataVO totalDataVO = this.getTotalVo(student);
 
         // 广告位
         List<AdsensesVO> adsensesVos = this.getAdsensesVOList(student);
@@ -101,6 +96,15 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                         .cardDays(cardDays == null ? 0 : cardDays)
                         .build())
                 .build());
+    }
+
+    public TotalDataVO getTotalVo(Student student) {
+        return TotalDataVO.builder()
+                .headImg(GetOssFile.getPublicObjectUrl(student.getHeadUrl()))
+                .say(this.getSay())
+                .studentName(student.getStudentName())
+                .systemGold(String.valueOf(Math.round(student.getSystemGold())))
+                .build();
     }
 
     @Override
@@ -211,7 +215,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         return ServerResponse.createBySuccess(StateVO.builder()
                 .onlineTime(onlineTimeStr)
                 .reviewCount(Math.min(7, count))
-                .efficiency(efficiency > 1 ? 100 + "%" : Math.floor(efficiency * 100) + "%")
+                .efficiency(efficiency > 1 ? 100 + "%" : (int) Math.floor(efficiency * 100) + "%")
                 .score(Math.min(100, score))
                 .wordLearnedCount(Math.min(wordCount, 6000))
                 .build());
