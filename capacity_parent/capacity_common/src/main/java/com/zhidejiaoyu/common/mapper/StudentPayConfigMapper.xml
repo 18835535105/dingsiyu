@@ -29,11 +29,12 @@
 
     <select id="selectWeChatNameAndWeChatImgUrlByStudentId" parameterType="map" resultType="map">
         select
-        we_chat_img_url weChatImgUrl,we_chat_name weChatName
+        distinct wen_xin_id ,we_chat_img_url weChatImgUrl,we_chat_name weChatName
         from
         student_pay_config
         where
         student_id =#{studentId}
+        order by create_time desc
     </select>
 
 
