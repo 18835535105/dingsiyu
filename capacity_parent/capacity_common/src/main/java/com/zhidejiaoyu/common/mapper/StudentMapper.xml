@@ -916,7 +916,7 @@
     <select id="selectByOpenId" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="Base_Column_List"/>
-        from studentconcat
+        from student
         where openid = #{openid}
         limit 1
     </select>
