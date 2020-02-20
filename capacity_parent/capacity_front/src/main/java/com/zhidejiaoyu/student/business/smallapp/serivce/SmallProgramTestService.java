@@ -16,7 +16,7 @@ import javax.servlet.http.HttpSession;
 public interface SmallProgramTestService extends BaseService<Student> {
 
 
-    Object getTest(HttpSession session);
+    Object getTest(HttpSession session,String openId);
 
-    Object saveTest(Integer point, HttpSession session);
+    Object saveTest(Integer point, HttpSession session,String openId);
 }

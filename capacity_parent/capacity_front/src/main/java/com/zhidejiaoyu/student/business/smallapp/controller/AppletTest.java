@@ -16,13 +16,13 @@ public class AppletTest {
 
 
     @RequestMapping("getTest")
-    public Object getTest(HttpSession session){
-        return smallProgramTestService.getTest(session);
+    public Object getTest(HttpSession session,String openId){
+        return smallProgramTestService.getTest(session,openId);
     }
 
     @RequestMapping("saveTest")
-    public Object saveTest(Integer point ,HttpSession session){
-        return smallProgramTestService.saveTest(point,session);
+    public Object saveTest(Integer point ,HttpSession session,String openId){
+        return smallProgramTestService.saveTest(point,session,openId);
     }
 
 
