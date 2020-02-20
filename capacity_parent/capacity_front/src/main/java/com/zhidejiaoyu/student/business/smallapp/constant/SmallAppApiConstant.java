@@ -17,4 +17,13 @@ public interface SmallAppApiConstant {
      */
     String AUTHORIZATION_API_URL = "https://api.weixin.qq.com/sns/jscode2session?";
 
+    /**
+     * 获取 access_token 接口
+     */
+    String GET_ACCESS_TOKEN_API = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + APP_ID + "&secret=" + SECRET;
+
+    /**
+     * <a href="https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.createQRCode.html">生成小程序码</a>
+     */
+    String CREATE_AQR_CODE = "https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode?access_token=";
 }

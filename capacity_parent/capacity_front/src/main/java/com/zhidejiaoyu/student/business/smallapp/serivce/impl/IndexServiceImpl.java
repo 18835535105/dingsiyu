@@ -195,7 +195,6 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         // 耐久度
         Integer onlineTime = durationMapper.selectOnlineTime(studentId, beforeSevenDays, today);
-        String onlineTimeStr = this.getOnlineTime(onlineTime);
 
         // 复习命中率
         int count = testRecordMapper.countByGenreWithBeginTimeAndEndTime(studentId, GenreConstant.SMALLAPP_GENRE, beforeSevenDays, today);
@@ -211,9 +210,9 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         double score = Double.parseDouble(String.format("%.2f", avg));
         return ServerResponse.createBySuccess(StateVO.builder()
-                .onlineTime(onlineTimeStr)
+                .onlineTime(Math.min(onlineTime, 36000))
                 .reviewCount(Math.min(7, count))
-                .efficiency(efficiency > 1 ? 100 + "%" : (int) Math.floor(efficiency * 100) + "%")
+                .efficiency(Math.min(efficiency, 0.97))
                 .score(Math.min(100, score))
                 .wordLearnedCount(Math.min(wordCount, 6000))
                 .build());
@@ -244,25 +243,6 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         PageVo pageVo = PageUtil.packagePage(returnPageInfo);
         return ServerResponse.createBySuccess(pageVo);
-    }
-
-    private String getOnlineTime(Integer onlineTime) {
-        if (onlineTime == null) {
-            return "0秒";
-        }
-        if (onlineTime < 60) {
-            return onlineTime + "秒";
-        }
-        if (onlineTime < 3600) {
-            return (onlineTime / 60) + "分" + (onlineTime % 60) + "秒";
-        }
-        int hours = onlineTime / 3600;
-        int remainSeconds = onlineTime - hours * 3600;
-
-        if (hours > 10) {
-            return 10 + "小时";
-        }
-        return (Math.min(hours, 10)) + "小时" + (remainSeconds / 60) + "分" + (remainSeconds % 60) + "秒";
     }
 
     /**

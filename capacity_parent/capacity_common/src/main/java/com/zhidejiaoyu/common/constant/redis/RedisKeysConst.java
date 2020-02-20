@@ -112,4 +112,9 @@ public interface RedisKeysConst {
      * 用于标识学生指定的group中的单词首次答错是否需要额外增加50%的记忆强度
      */
     String FIRST_FALSE_ADD = "FIRST_FALSE_ADD";
+
+    /**
+     * 微信 access_token key 值
+     */
+    String WECHAT_ACCESS_TOKEN = "WECHAT_ACCESS_TOKEN";
 }
