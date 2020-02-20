@@ -917,7 +917,7 @@
         select
         <include refid="Base_Column_List"/>
         from studentconcat
-        where openid like = #{openid}
+        where openid = #{openid}
         limit 1
     </select>
 
