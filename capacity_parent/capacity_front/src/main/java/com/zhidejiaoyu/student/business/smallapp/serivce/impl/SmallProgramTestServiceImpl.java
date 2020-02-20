@@ -160,13 +160,15 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             chineses.add(wordChinese);
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("subject", map.get("word").toString());
-            List<Map<String, Boolean>> optionList = new ArrayList<>();
+            List<Map<String, Object>> optionList = new ArrayList<>();
             for (String chinese : chineses) {
-                Map<String, Boolean> booleanMap = new HashMap<>();
+                Map<String, Object> booleanMap = new HashMap<>();
                 if (wordChinese.equals(chinese)) {
-                    booleanMap.put(chinese, true);
+                    booleanMap.put("title", chinese);
+                    booleanMap.put("result", true);
                 } else {
-                    booleanMap.put(chinese, false);
+                    booleanMap.put("title", chinese);
+                    booleanMap.put("result", false);
                 }
                 optionList.add(booleanMap);
             }
