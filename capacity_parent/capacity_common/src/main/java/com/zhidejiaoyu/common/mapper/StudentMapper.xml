@@ -916,8 +916,8 @@
     <select id="selectByOpenId" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="Base_Column_List"/>
-        from student
-        where openid like concat('%', #{openid}, '%'}
+        from studentconcat
+        where openid like = #{openid}
         limit 1
     </select>
 
