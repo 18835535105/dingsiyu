@@ -19,9 +19,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class StateVO implements Serializable {
     /**
-     * 耐久度，在线时长
+     * 耐久度，在线时长（秒）
      */
-    private String onlineTime;
+    private Integer onlineTime;
 
     /**
      * 学习单词数
@@ -34,9 +34,9 @@ public class StateVO implements Serializable {
     private Double score;
 
     /**
-     * 学习效率
+     * 学习效率（小数）
      */
-    private String efficiency;
+    private Double efficiency;
 
     /**
      * 复习次数（执行飞行任务的次数）
