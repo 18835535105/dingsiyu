@@ -24,9 +24,12 @@ public class CardVO implements Serializable {
      */
     private Integer cardDays;
 
+    private Infos infos;
+
     /**
      * 签到信息
      */
+    @Data
     static class Infos {
     }
 }
