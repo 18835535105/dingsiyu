@@ -23,7 +23,12 @@ public interface SmallAppApiConstant {
     String GET_ACCESS_TOKEN_API = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + APP_ID + "&secret=" + SECRET;
 
     /**
-     * <a href="https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.createQRCode.html">生成小程序码</a>
+     * <a href="https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.createQRCode.html">生成小程序码，有个数限制</a>
      */
     String CREATE_AQR_CODE = "https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode?access_token=";
+
+    /**
+     * <a href="https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.getUnlimited.html">生成小程序码，无个数限制</a>
+     */
+    String GET_UNLIMIT_QR_CODE = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=";
 }
