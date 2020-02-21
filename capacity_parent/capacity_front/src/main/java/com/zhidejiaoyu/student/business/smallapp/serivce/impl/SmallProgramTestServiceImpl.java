@@ -130,7 +130,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         ShareConfig shareConfig = shareConfigMapper.selectByAdminId(adminId);
         if (shareConfig == null) {
             returnMap.put("img", null);
-            returnMap.put("word", null);
+            returnMap.put("word", "sfdfssdfsfsdfsdddsdfsdfsdf");
         } else {
             returnMap.put("img", shareConfig.getImgUrl());
             returnMap.put("word", shareConfig.getImgWord());

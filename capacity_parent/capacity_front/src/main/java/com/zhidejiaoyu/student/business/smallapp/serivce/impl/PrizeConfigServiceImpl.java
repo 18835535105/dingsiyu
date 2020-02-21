@@ -80,7 +80,6 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         Map<String, Object> map = new HashMap<>();
         map.put("adminId", adminId);
         map.put("weChatList", studentPayConfigMapper.selectWeChatNameAndWeChatImgUrlByStudentId(student.getId()));
-        map.put("wordList", "sfdfssdfsfsdfsdddsdfsdfsdf");
         map.put("point", testRecord.getPoint());
         map.put("imgUrl", imgUrl);
         map.put("studentName", student.getNickname());
