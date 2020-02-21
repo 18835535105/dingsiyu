@@ -83,10 +83,10 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         }else {
             getMaps = getMaps.subList(0, 15);
         }*/
-        if (getMaps.size() < 5) {
-            while (getMaps.size() < 5) {
+        if (getMaps.size() < 2) {
+            while (getMaps.size() < 2) {
                 for (Map<String, Object> map : maps) {
-                    if (getMaps.size() < 5) {
+                    if (getMaps.size() < 2) {
                         getMaps.add(map);
                     } else {
                         break;
@@ -94,7 +94,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
                 }
             }
         } else {
-            getMaps = getMaps.subList(0, 5);
+            getMaps = getMaps.subList(0, 2);
         }
         returnMap.put("optionList", getOptionList(getMaps, vocabularyIds));
         returnMap.put("writeList", getWriteList(getMaps));
