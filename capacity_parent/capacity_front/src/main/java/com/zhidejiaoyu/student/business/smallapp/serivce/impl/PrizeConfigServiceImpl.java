@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.smallapp.serivce.impl;
 
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -81,6 +82,8 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         map.put("weChatList", studentPayConfigMapper.selectWeChatNameAndWeChatImgUrlByStudentId(student.getId()));
         map.put("point", testRecord.getPoint());
         map.put("imgUrl", imgUrl);
+        map.put("studentName", student.getNickname());
+        map.put("headPortrait", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
         map.put("studentId", student.getId());
         return map;
     }
