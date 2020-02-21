@@ -140,6 +140,10 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             returnMap.put("img", shareConfig.getImgUrl());
             returnMap.put("word", shareConfig.getImgWord());
         }
+        String unlimited = CreateWxQrCodeUtil.getUnlimited(GetUnlimitedQRCodeDTO.builder()
+                .scene("?code=" + openId)
+                .build());
+        returnMap.put("QRCode", unlimited);
         returnMap.put("gold", student.getSystemGold().intValue());
         returnMap.put("studentId", student.getId());
         returnMap.put("studentName", student.getNickname());
