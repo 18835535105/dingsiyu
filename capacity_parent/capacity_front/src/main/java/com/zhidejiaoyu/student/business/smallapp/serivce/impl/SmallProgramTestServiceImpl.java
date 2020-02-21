@@ -6,7 +6,9 @@ import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.business.smallapp.dto.GetUnlimitedQRCodeDTO;
 import com.zhidejiaoyu.student.business.smallapp.serivce.SmallProgramTestService;
+import com.zhidejiaoyu.student.business.smallapp.util.CreateWxQrCodeUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -118,6 +120,10 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             returnMap.put("img", shareConfig.getImgUrl());
             returnMap.put("word", shareConfig.getImgWord());
         }
+        String unlimited = CreateWxQrCodeUtil.getUnlimited(GetUnlimitedQRCodeDTO.builder()
+                .scene("?code=" + openId)
+                .build());
+        returnMap.put("QRCode", unlimited);
         returnMap.put("gold", student.getSystemGold().intValue());
         returnMap.put("studentId", student.getId());
         return returnMap;
