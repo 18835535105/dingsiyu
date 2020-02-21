@@ -153,12 +153,12 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
 
     @Override
     public ResponseEntity<byte[]> getQRCode(String openId) {
-        String unlimited = CreateWxQrCodeUtil.getUnlimited(GetUnlimitedQRCodeDTO.builder()
+        byte[] unlimited = CreateWxQrCodeUtil.getUnlimited(GetUnlimitedQRCodeDTO.builder()
                 .scene("?code=" + openId)
                 .build());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
-        return new ResponseEntity<byte[]>(unlimited.getBytes(), headers, HttpStatus.OK);
+        return new ResponseEntity<byte[]>(unlimited, headers, HttpStatus.OK);
     }
 
     private void updateErrorLearnLog(List<Long> vocabularyIds, Long studentId) {
