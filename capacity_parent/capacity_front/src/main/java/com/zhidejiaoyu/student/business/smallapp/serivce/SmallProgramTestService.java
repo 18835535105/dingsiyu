@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.BaseService;
 import com.zhidejiaoyu.student.business.smallapp.dto.BindAccountDTO;
+import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpSession;
 
@@ -16,7 +17,9 @@ import javax.servlet.http.HttpSession;
 public interface SmallProgramTestService extends BaseService<Student> {
 
 
-    Object getTest(HttpSession session,String openId);
+    Object getTest(HttpSession session, String openId);
 
-    Object saveTest(Integer point, HttpSession session,String openId);
+    Object saveTest(Integer point, HttpSession session, String openId);
+
+    ResponseEntity<byte[]> getQRCode(String openId);
 }

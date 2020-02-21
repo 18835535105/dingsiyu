@@ -10,6 +10,10 @@ import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.smallapp.dto.GetUnlimitedQRCodeDTO;
 import com.zhidejiaoyu.student.business.smallapp.serivce.SmallProgramTestService;
 import com.zhidejiaoyu.student.business.smallapp.util.CreateWxQrCodeUtil;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -145,6 +149,16 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         returnMap.put("studentName", student.getNickname());
         returnMap.put("headPortrait", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
         return returnMap;
+    }
+
+    @Override
+    public ResponseEntity<byte[]> getQRCode(String openId) {
+        String unlimited = CreateWxQrCodeUtil.getUnlimited(GetUnlimitedQRCodeDTO.builder()
+                .scene("?code=" + openId)
+                .build());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<byte[]>(unlimited.getBytes(), headers, HttpStatus.OK);
     }
 
     private void updateErrorLearnLog(List<Long> vocabularyIds, Long studentId) {

@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.smallapp.controller;
 
 import com.zhidejiaoyu.student.business.smallapp.serivce.SmallProgramTestService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +26,10 @@ public class AppletTest {
         return smallProgramTestService.saveTest(point,session,openId);
     }
 
+    @RequestMapping("getQRCode")
+    public ResponseEntity<byte[]> getQRCode(String openId){
+        return smallProgramTestService.getQRCode( openId);
+    }
 
 
 
