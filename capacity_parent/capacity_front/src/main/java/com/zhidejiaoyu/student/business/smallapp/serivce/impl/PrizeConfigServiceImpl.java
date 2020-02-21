@@ -71,14 +71,14 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
     }
 
     @Override
-    public Object getAdmin(Long studentId) {
-        Student student = studentMapper.selectById(studentId);
+    public Object getAdmin(String openId) {
+        Student student = studentMapper.selectByOpenId(openId);
         Integer adminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
         TestRecord testRecord = testRecordMapper.selectByStudentIdAndGenreAndStudyModel(student.getId(), GenreConstant.SMALLAPP_GENRE, StudyModelConstant.SMALLAPP_STUDY_MODEL);
         String imgUrl = shareConfigMapper.selectImgByAdminId(adminId);
         Map<String, Object> map = new HashMap<>();
         map.put("adminId", adminId);
-        map.put("weChatList", studentPayConfigMapper.selectWeChatNameAndWeChatImgUrlByStudentId(studentId));
+        map.put("weChatList", studentPayConfigMapper.selectWeChatNameAndWeChatImgUrlByStudentId(student.getId()));
         map.put("point", testRecord.getPoint());
         map.put("imgUrl", imgUrl);
         map.put("studentId", student.getId());

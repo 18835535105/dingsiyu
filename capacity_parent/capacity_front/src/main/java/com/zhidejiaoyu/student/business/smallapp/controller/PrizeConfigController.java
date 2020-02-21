@@ -28,8 +28,8 @@ public class PrizeConfigController extends BaseController {
 
 
     @RequestMapping("/getAdmin")
-    public Object getAdmin(Long studentId) {
-        return prizeConfigService.getAdmin(studentId);
+    public Object getAdmin(String openId) {
+        return prizeConfigService.getAdmin(openId);
     }
 
 }
