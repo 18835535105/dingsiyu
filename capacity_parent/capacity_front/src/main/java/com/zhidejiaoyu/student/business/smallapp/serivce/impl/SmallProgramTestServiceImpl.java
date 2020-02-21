@@ -155,8 +155,9 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         List<Map<String, Object>> returnList = new ArrayList<>();
         getMaps.forEach(map -> {
             Collections.shuffle(strings);
-            List<String> chineses = strings.subList(0, 3);
+
             String wordChinese = map.get("wordChinese").toString();
+            List<String> chineses = getAnswer(strings, wordChinese);
             chineses.add(wordChinese);
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("subject", map.get("word").toString());
@@ -176,6 +177,28 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             returnList.add(returnMap);
         });
         return returnList;
+    }
+
+    private List<String> getAnswer(List<String> strings, String wordChinese) {
+        List<String> strings1 = strings.subList(0, 3);
+        List<String> stringAll = new ArrayList<>();
+        stringAll.addAll(strings);
+        List<String> removeList = new ArrayList<>();
+        for (int i = 0; i < strings1.size(); i++) {
+            if (strings1.get(i).equals(wordChinese)) {
+                removeList.add(strings1.get(i));
+            }
+        }
+        if (removeList.size() > 0) {
+            stringAll.remove(strings1);
+            strings1.removeAll(removeList);
+            Collections.shuffle(stringAll);
+            int size = strings1.size();
+            int addSize = 4 - size;
+            strings1.addAll(stringAll.subList(0, addSize));
+
+        }
+        return strings1;
     }
 
 
