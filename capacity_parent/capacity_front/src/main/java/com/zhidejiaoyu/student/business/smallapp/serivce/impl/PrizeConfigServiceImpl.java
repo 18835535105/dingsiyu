@@ -82,8 +82,6 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         map.put("weChatList", studentPayConfigMapper.selectWeChatNameAndWeChatImgUrlByStudentId(student.getId()));
         map.put("point", testRecord.getPoint());
         map.put("imgUrl", imgUrl);
-        map.put("studentName", student.getNickname());
-        map.put("headPortrait", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
         map.put("studentId", student.getId());
         return map;
     }

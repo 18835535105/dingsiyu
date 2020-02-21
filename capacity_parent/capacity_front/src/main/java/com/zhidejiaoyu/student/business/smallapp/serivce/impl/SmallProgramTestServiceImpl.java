@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.smallapp.serivce.impl;
 
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
@@ -141,6 +142,8 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         returnMap.put("QRCode", unlimited);
         returnMap.put("gold", student.getSystemGold().intValue());
         returnMap.put("studentId", student.getId());
+        returnMap.put("studentName", student.getNickname());
+        returnMap.put("headPortrait", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
         return returnMap;
     }
 
