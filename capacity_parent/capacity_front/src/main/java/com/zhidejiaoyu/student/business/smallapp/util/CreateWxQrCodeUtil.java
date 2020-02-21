@@ -69,8 +69,9 @@ public class CreateWxQrCodeUtil {
      * @return  图片base64字符串
      */
     public static String getUnlimited(GetUnlimitedQRCodeDTO dto) {
+        return AccessTokenUtil.getAccessToken();
 
-        String url = SmallAppApiConstant.GET_UNLIMIT_QR_CODE + AccessTokenUtil.getAccessToken();
+        /*String url = SmallAppApiConstant.GET_UNLIMIT_QR_CODE + AccessTokenUtil.getAccessToken();
 
         try {
             ResponseEntity<String> stringResponseEntity = restTemplate.postForEntity(url, JSON.toJSONString(dto), String.class);
@@ -82,7 +83,7 @@ public class CreateWxQrCodeUtil {
         } catch (RestClientException e) {
             log.error("生成小程序码失败！", e);
             throw new ServiceException("生成小程序码失败！");
-        }
+        }*/
     }
 
 }
