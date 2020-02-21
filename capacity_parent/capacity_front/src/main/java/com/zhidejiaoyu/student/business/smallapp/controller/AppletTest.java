@@ -16,17 +16,17 @@ public class AppletTest {
     private SmallProgramTestService smallProgramTestService;
 
 
-    @RequestMapping("getTest")
+    @RequestMapping("/getTest")
     public Object getTest(HttpSession session,String openId){
         return smallProgramTestService.getTest(session,openId);
     }
 
-    @RequestMapping("saveTest")
+    @RequestMapping("/saveTest")
     public Object saveTest(Integer point ,HttpSession session,String openId){
         return smallProgramTestService.saveTest(point,session,openId);
     }
 
-    @RequestMapping("getQRCode")
+    @RequestMapping("/getQRCode")
     public ResponseEntity<byte[]> getQRCode(String openId){
         return smallProgramTestService.getQRCode( openId);
     }
