@@ -16,15 +16,15 @@ public interface IndexService extends BaseService<Student> {
     /**
      * 首页数据
      *
-     * @return
      * @param openId
+     * @return
      */
     ServerResponse<Object> index(String openId);
 
     /**
      * 补签
      *
-     * @param date 补签日期
+     * @param date   补签日期
      * @param openId
      * @return
      */
@@ -33,16 +33,16 @@ public interface IndexService extends BaseService<Student> {
     /**
      * 飞行记录（学习记录）
      *
-     * @return
      * @param openId
+     * @return
      */
     ServerResponse<Object> record(String openId);
 
     /**
      * 飞行状态
      *
-     * @return
      * @param openId
+     * @return
      */
     ServerResponse<Object> myState(String openId);
 
@@ -53,4 +53,12 @@ public interface IndexService extends BaseService<Student> {
      * @return
      */
     ServerResponse<Object> prize(PrizeDTO dto);
+
+    /**
+     * 打卡日历信息
+     *
+     * @param openId
+     * @return
+     */
+    ServerResponse<Object> cardInfo(String openId);
 }

@@ -31,9 +31,4 @@ public class IndexVO implements Serializable {
      */
     private TotalDataVO totalData;
 
-    /**
-     * 打卡信息
-     */
-    private CardVO card;
-
 }

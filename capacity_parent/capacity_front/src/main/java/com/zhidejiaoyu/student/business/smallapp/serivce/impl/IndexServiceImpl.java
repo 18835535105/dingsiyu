@@ -80,18 +80,9 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         // 广告位
         List<AdsensesVO> adsensesVos = this.getAdsensesVOList(student);
 
-        // 签到信息
-        String currentMonth = DateUtil.getCurrentDay(DateUtil.YYYYMM);
-        List<ClockIn> clockIns = clockInMapper.selectByStudentIdWithCurrentMonth(student.getId(), currentMonth);
-
-        Integer cardDays = clockInMapper.selectLaseCardDays(student.getId());
-
         return ServerResponse.createBySuccess(IndexVO.builder()
                 .adsenses(adsensesVos)
                 .totalData(totalDataVO)
-                .card(CardVO.builder()
-                        .cardDays(cardDays == null ? 0 : cardDays)
-                        .build())
                 .build());
     }
 
@@ -243,6 +234,22 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         PageVo pageVo = PageUtil.packagePage(returnPageInfo);
         return ServerResponse.createBySuccess(pageVo);
+    }
+
+    @Override
+    public ServerResponse<Object> cardInfo(String openId) {
+        Student student = studentMapper.selectByOpenId(openId);
+
+        // 签到信息
+        String currentMonth = DateUtil.getCurrentDay(DateUtil.YYYYMM);
+        List<ClockIn> clockIns = clockInMapper.selectByStudentIdWithCurrentMonth(student.getId(), currentMonth);
+
+        Integer cardDays = clockInMapper.selectLaseCardDays(student.getId());
+
+        return ServerResponse.createBySuccess(CardVO.builder()
+                .cardDays(cardDays == null ? 0 : cardDays)
+                .infos(null)
+                .build());
     }
 
     /**

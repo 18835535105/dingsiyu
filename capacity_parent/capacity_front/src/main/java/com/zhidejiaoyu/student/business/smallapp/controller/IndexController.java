@@ -45,9 +45,23 @@ public class IndexController extends BaseController {
     }
 
     /**
+     * 打卡日历信息
+     *
+     * @param openId
+     * @return
+     */
+    @GetMapping("/cardInfo")
+    public ServerResponse<Object> cardInfo(String openId) {
+        if (StringUtils.isEmpty(openId)) {
+            throw new ServiceException("openId can't be null");
+        }
+        return smallAppIndexService.cardInfo(openId);
+    }
+
+    /**
      * 补签
      *
-     * @param date 补签的日期
+     * @param date   补签的日期
      * @param openId
      * @return
      */

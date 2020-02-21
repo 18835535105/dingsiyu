@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.business.smallapp.dto;
 
-import com.alibaba.fastjson.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +17,7 @@ import javax.validation.constraints.NotEmpty;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("all")
 public class GetUnlimitedQRCodeDTO {
 
     /**
@@ -44,10 +44,10 @@ public class GetUnlimitedQRCodeDTO {
     /**
      * auto_color 为 false 时生效，使用 rgb 设置颜色 例如 {"r":"xxx","g":"xxx","b":"xxx"} 十进制表示
      */
-    private JSONObject line_color;
+    private String line_color;
 
     /**
-     * 是否需要透明底色，为 true 时，生成透明底色的小程序
+     * 是否需要透明底色，为 true 时，生成透明底色的小程序，默认 false
      */
     private Boolean is_hyaline;
 }
