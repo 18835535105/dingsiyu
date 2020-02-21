@@ -68,22 +68,20 @@ public class CreateWxQrCodeUtil {
      * @param dto
      * @return  图片base64字符串
      */
-    public static String getUnlimited(GetUnlimitedQRCodeDTO dto) {
-        return AccessTokenUtil.getAccessToken();
+    public static byte[] getUnlimited(GetUnlimitedQRCodeDTO dto) {
+//        return AccessTokenUtil.getAccessToken();
 
-        /*String url = SmallAppApiConstant.GET_UNLIMIT_QR_CODE + AccessTokenUtil.getAccessToken();
+        String url = SmallAppApiConstant.GET_UNLIMIT_QR_CODE + AccessTokenUtil.getAccessToken();
 
         try {
-            ResponseEntity<String> stringResponseEntity = restTemplate.postForEntity(url, JSON.toJSONString(dto), String.class);
+            ResponseEntity<byte[]> responseEntity = restTemplate.postForEntity(url, JSON.toJSONString(dto), byte[].class);
 
-            byte[] zp = stringResponseEntity.getBody().getBytes();
+            return responseEntity.getBody();
 
-            BASE64Encoder encoder = new BASE64Encoder();
-            return encoder.encodeBuffer(zp).trim();
         } catch (RestClientException e) {
             log.error("生成小程序码失败！", e);
             throw new ServiceException("生成小程序码失败！");
-        }*/
+        }
     }
 
 }
