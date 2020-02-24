@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import sun.misc.BASE64Encoder;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -44,18 +43,15 @@ public class CreateWxQrCodeUtil {
      * @param width 图片宽度
      * @return
      */
-    public static String createQRCode(String path, Integer width) {
+    public static byte[] createQRCode(String path, Integer width) {
         String url = SmallAppApiConstant.CREATE_AQR_CODE + AccessTokenUtil.getAccessToken();
 
         try {
             Map<String, Object> paramMap = new HashMap<>(16);
             paramMap.put("path", path);
             paramMap.put("width", width);
-            ResponseEntity<String> stringResponseEntity = restTemplate.postForEntity(url, JSON.toJSONString(paramMap), String.class);
-            byte[] zp = stringResponseEntity.getBody().getBytes();
-
-            BASE64Encoder encoder = new BASE64Encoder();
-            return encoder.encodeBuffer(zp).trim();
+            ResponseEntity<byte[]> responseEntity = restTemplate.postForEntity(url, JSON.toJSONString(paramMap), byte[].class);
+            return responseEntity.getBody();
         } catch (RestClientException e) {
             log.error("生成小程序码失败！", e);
             throw new ServiceException("生成小程序码失败！");
@@ -66,10 +62,9 @@ public class CreateWxQrCodeUtil {
      * 获取小程序二维码，适用于需要的码数量较多的业务场景。通过该接口生成的小程序码，永久有效，无数量限制
      *
      * @param dto
-     * @return  图片base64字符串
+     * @return 图片二进制流
      */
     public static byte[] getUnlimited(GetUnlimitedQRCodeDTO dto) {
-//        return AccessTokenUtil.getAccessToken();
 
         String url = SmallAppApiConstant.GET_UNLIMIT_QR_CODE + AccessTokenUtil.getAccessToken();
 
