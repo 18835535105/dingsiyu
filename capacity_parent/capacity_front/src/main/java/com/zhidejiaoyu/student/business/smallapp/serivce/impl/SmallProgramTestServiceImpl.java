@@ -7,15 +7,8 @@ import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
-import com.zhidejiaoyu.student.business.smallapp.dto.GetUnlimitedQRCodeDTO;
 import com.zhidejiaoyu.student.business.smallapp.serivce.SmallProgramTestService;
-import com.zhidejiaoyu.student.business.smallapp.util.CreateWxQrCodeUtil;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -140,25 +133,11 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             returnMap.put("img", shareConfig.getImgUrl());
             returnMap.put("word", shareConfig.getImgWord());
         }
-        byte[] unlimited = CreateWxQrCodeUtil.getUnlimited(GetUnlimitedQRCodeDTO.builder()
-                .scene("?code=" + openId)
-                .build());
-        returnMap.put("QRCode", unlimited);
         returnMap.put("gold", student.getSystemGold().intValue());
         returnMap.put("studentId", student.getId());
         returnMap.put("studentName", student.getNickname());
         returnMap.put("headPortrait", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
         return returnMap;
-    }
-
-    @Override
-    public ResponseEntity<byte[]> getQRCode(String openId) {
-        byte[] unlimited = CreateWxQrCodeUtil.getUnlimited(GetUnlimitedQRCodeDTO.builder()
-                .scene("?code=" + openId)
-                .build());
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_JPEG);
-        return new ResponseEntity<byte[]>(unlimited, headers, HttpStatus.OK);
     }
 
     private void updateErrorLearnLog(List<Long> vocabularyIds, Long studentId) {

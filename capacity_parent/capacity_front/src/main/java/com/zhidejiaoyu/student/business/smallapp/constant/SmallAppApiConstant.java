@@ -25,7 +25,7 @@ public interface SmallAppApiConstant {
     /**
      * <a href="https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.createQRCode.html">生成小程序码，有个数限制</a>
      */
-    String CREATE_AQR_CODE = "https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode?access_token=";
+    String CREATE_AQR_CODE = "https://api.weixin.qq.com/wxa/getwxacode?access_token=";
 
     /**
      * <a href="https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.getUnlimited.html">生成小程序码，无个数限制</a>

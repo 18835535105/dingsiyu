@@ -16,7 +16,7 @@ public class CreateWxQrCodeUtilTest {
 
     @Test
     public void create() {
-        CreateWxQrCodeUtil.createQRCode("111", 120);
+//        CreateWxQrCodeUtil.createQRCode("111", 120);
     }
 
     @Test
