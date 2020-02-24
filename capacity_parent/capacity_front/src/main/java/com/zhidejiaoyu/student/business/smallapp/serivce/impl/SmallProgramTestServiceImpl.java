@@ -214,6 +214,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             returnMap.put("option", optionList);
             returnList.add(returnMap);
         });
+        Collections.shuffle(returnList);
         return returnList;
     }
 
