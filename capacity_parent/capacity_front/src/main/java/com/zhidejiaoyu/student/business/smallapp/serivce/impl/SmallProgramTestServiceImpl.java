@@ -220,24 +220,28 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     }
 
     private List<String> getAnswer(List<String> strings, String wordChinese) {
-        List<String> strings1 = strings.subList(0, 3);
         List<String> stringAll = new ArrayList<>();
         stringAll.addAll(strings);
-        List<String> removeList = new ArrayList<>();
-        for (int i = 0; i < strings1.size(); i++) {
-            if (strings1.get(i).equals(wordChinese)) {
-                removeList.add(strings1.get(i));
+        List<String> strings1 = stringAll.subList(0, 3);
+        if(stringAll.size()>0){
+            stringAll.remove(wordChinese);
+        }
+        /*List<String> removeList = new ArrayList<>();
+        for (String str : strings1) {
+            if (str.equals(wordChinese)) {
+                removeList.add(str);
             }
         }
         if (removeList.size() > 0) {
-            stringAll.remove(strings1);
+            if(strings1.size()>0){
+                stringAll.remove(strings1);
+            }
             strings1.removeAll(removeList);
             Collections.shuffle(stringAll);
             int size = strings1.size();
             int addSize = 4 - size;
             strings1.addAll(stringAll.subList(0, addSize));
-
-        }
+        }*/
         return strings1;
     }
 
