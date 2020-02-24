@@ -10,7 +10,7 @@ import javax.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/smallApp/test")
-public class AppletTest {
+public class AppletTestController {
 
     @Resource
     private SmallProgramTestService smallProgramTestService;
