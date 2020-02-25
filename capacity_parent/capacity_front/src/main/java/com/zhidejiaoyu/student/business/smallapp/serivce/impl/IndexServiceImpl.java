@@ -248,7 +248,9 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         return ServerResponse.createBySuccess(CardVO.builder()
                 .cardDays(cardDays == null ? 0 : cardDays)
-                .infos(null)
+                .infos(clockIns.stream()
+                        .map(clockIn -> DateUtil.formatDate(clockIn.getCardTime(), DateUtil.YYYYMMDD))
+                        .collect(Collectors.toList()))
                 .build());
     }
 

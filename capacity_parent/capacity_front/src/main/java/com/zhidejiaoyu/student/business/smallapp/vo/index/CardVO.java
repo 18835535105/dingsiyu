@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 签到表数据展示
@@ -24,12 +25,8 @@ public class CardVO implements Serializable {
      */
     private Integer cardDays;
 
-    private Infos infos;
-
     /**
      * 签到信息
      */
-    @Data
-    static class Infos {
-    }
+    private List<String> infos;
 }
