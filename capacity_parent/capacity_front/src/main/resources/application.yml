@@ -127,7 +127,7 @@ spring:
     password: zdjy
   redis:
     host: ${ip}
-    port: 6379
+    port: 6380
 
 server:
   port: 8083
@@ -175,7 +175,7 @@ spring:
     password: zdjy
   redis:
     host: ${ip}
-    port: 6379
+    port: 6380
 
 logging:
   config: classpath:logback-test.xml

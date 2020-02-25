@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -95,16 +96,29 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
     }
 
     private void sendEmail(String fileName) {
-       List<ReceiveEmail> receiveEmails = receiveEmailMapper.selectByType(1);
-       if (CollectionUtils.isNotEmpty(receiveEmails)) {
-           String[] receivers = receiveEmails.stream().map(ReceiveEmail::getEmail).toArray(String[]::new);
-           mailService.sendAttachmentsMail(Mail.builder()
-                   .to(receivers)
-                   .filePath(FileConstant.TMP_EXCEL + fileName)
-                   .subject(fileName)
-                   .content(fileName)
-                   .build());
-       }
+        List<ReceiveEmail> receiveEmails = receiveEmailMapper.selectByType(1);
+        if (CollectionUtils.isNotEmpty(receiveEmails)) {
+            String[] receivers = receiveEmails.stream().map(ReceiveEmail::getEmail).toArray(String[]::new);
+            mailService.sendAttachmentsMail(Mail.builder()
+                    .to(receivers)
+                    .filePath(FileConstant.TMP_EXCEL + fileName)
+                    .subject(fileName)
+                    .content(fileName)
+                    .build());
+        }
+        this.deleteTmpFile(fileName);
+    }
+
+    private void deleteTmpFile(String fileName) {
+        File file = new File(FileConstant.TMP_EXCEL + fileName);
+        if (file.exists()) {
+            boolean delete = file.delete();
+            if (delete) {
+                log.info("临时文件：{}已被成功删除！", fileName);
+            } else {
+                log.info("临时文件：{}删除失败！", fileName);
+            }
+        }
     }
 
     @Override
