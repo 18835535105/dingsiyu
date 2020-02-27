@@ -291,14 +291,21 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 return;
             }
 
+            String learnDate = this.getLearnDate(k);
             result.add(DurationInfoVO.builder()
-                    .learnDate(k)
+                    .learnDate(learnDate)
                     .onlineTime(stringListMap.get(k).get(0).getOnlineTime() / 60)
                     .studyModelStr(sb.length() > 1 ? sb.toString().substring(0, sb.length() - 1) : "单词")
                     .build());
         });
 
         return result;
+    }
+
+    public String getLearnDate(String k) {
+        String[] split = k.split("-");
+
+        return split[0] + "年" + split[1] + "月" + split[2] + "日";
     }
 
     /**
