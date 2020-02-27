@@ -287,6 +287,10 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
             set.forEach(s -> sb.append(s).append(","));
 
+            if (stringListMap.get(k) == null || stringListMap.get(k).get(0) == null || stringListMap.get(k).get(0).getOnlineTime() == null) {
+                return;
+            }
+
             result.add(DurationInfoVO.builder()
                     .learnDate(k)
                     .onlineTime(stringListMap.get(k).get(0).getOnlineTime() / 60)
