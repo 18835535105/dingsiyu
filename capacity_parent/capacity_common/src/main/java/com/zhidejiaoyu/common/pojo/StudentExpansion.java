@@ -67,7 +67,15 @@ public class StudentExpansion extends Model<StudentExpansion> {
      */
     private String guide;
 
+    /**
+     * 飞船配置需要展示的勋章id
+     */
     private String modelNo;
+
+    /**
+     * 源分战力值
+     */
+    private Integer sourcePower;
 
     @Override
     protected Serializable pkVal() {
