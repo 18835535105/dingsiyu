@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.EquipmentExpansionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.EquipmentExpansion">
+        <id column="id" property="id" />
+        <result column="equipment_id" property="equipmentId" />
+        <result column="durability" property="durability" />
+        <result column="common_attack" property="commonAttack" />
+        <result column="source_force_attack" property="sourceForceAttack" />
+        <result column="source_force" property="sourceForce" />
+        <result column="hit_rate" property="hitRate" />
+        <result column="mobility" property="mobility" />
+        <result column="intensification_degree" property="intensificationDegree" />
+        <result column="img_url" property="imgUrl" />
+    </resultMap>
+
+</mapper>

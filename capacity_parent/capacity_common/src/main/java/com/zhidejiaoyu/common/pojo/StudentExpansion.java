@@ -67,6 +67,8 @@ public class StudentExpansion extends Model<StudentExpansion> {
      */
     private String guide;
 
+    private String modelNo;
+
     @Override
     protected Serializable pkVal() {
         return this.id;
