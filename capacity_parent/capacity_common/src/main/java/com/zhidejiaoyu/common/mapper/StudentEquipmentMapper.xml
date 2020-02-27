@@ -4,11 +4,15 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentEquipment">
-        <id column="id" property="id" />
-        <result column="equipment_id" property="equipmentId" />
-        <result column="student_id" property="studentId" />
-        <result column="intensification_degree" property="intensificationDegree" />
-        <result column="type" property="type" />
+        <id column="id" property="id"/>
+        <result column="equipment_id" property="equipmentId"/>
+        <result column="student_id" property="studentId"/>
+        <result column="intensification_degree" property="intensificationDegree"/>
+        <result column="type" property="type"/>
     </resultMap>
+
+    <sql id="base_sql">
+        id, equipment_id, student_id, intensification_degree, type
+    </sql>
 
 </mapper>

@@ -60,5 +60,5 @@ public interface SyntheticRewardsListService extends BaseService<SyntheticReward
      */
     ServerResponse<Object> getMessage(HttpSession session, Integer nameInteger, Integer type);
 
-    ServerResponse<Object> getLucky(Integer studentId, HttpSession session);
+    ServerResponse<Object> getLucky(Long studentId, HttpSession session);
 }

@@ -18,6 +18,7 @@ public interface StudentSkinMapper extends BaseMapper<StudentSkin> {
 
     /**
      * 根据学生id获取学生皮肤
+     *
      * @param studentId
      * @return
      */
@@ -25,6 +26,7 @@ public interface StudentSkinMapper extends BaseMapper<StudentSkin> {
 
     /**
      * 获取学生已拥有皮肤
+     *
      * @param studentId
      * @return
      */
@@ -33,12 +35,8 @@ public interface StudentSkinMapper extends BaseMapper<StudentSkin> {
     List<StudentSkin> selSkinByStudentIdAndEndTime(Long studentId);
 
     /**
-     *  查询
-     */
-    StudentSkin selUseSkinByStudentId(Long studentId);
-
-    /**
      * 根据studentid和skinname查找学生皮肤
+     *
      * @param skin
      * @return
      */
@@ -46,6 +44,7 @@ public interface StudentSkinMapper extends BaseMapper<StudentSkin> {
 
     /**
      * 根据id修改使用状态和时间
+     *
      * @param studentSkin
      * @return
      */
@@ -54,14 +53,16 @@ public interface StudentSkinMapper extends BaseMapper<StudentSkin> {
 
     /**
      * 根据id查询正在使用的皮肤
+     *
      * @param studentId
      * @return
      */
-    StudentSkin selUseSkinByStudentIdAndName(Long studentId);
+    StudentSkin selectUseSkinByStudentId(Long studentId);
 
 
     /**
      * 获取试用皮肤信息
+     *
      * @param id
      * @return
      */

@@ -15,17 +15,17 @@
         <result column="pk_explain" property="pkExplain"/>
         <result column="better_three_time" property="betterThreeTime"/>
         <result column="guide" property="guide"/>
-        <result column="model_no" property="modelNo"/>
+        <result column="medal_no" property="medalNo"/>
         <result column="source_power" property="sourcePower"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, student_id, study_power , level ,is_look, audio_status, test_gold_add, pk_explain, better_three_time, `phase`,guide,model_no, source_power
+        id, student_id, study_power , `level` ,is_look, audio_status, test_gold_add, pk_explain, better_three_time, `phase`,guide,medal_no, source_power
     </sql>
 
     <sql id="more_table_column">
-        se.id, se.student_id, se.study_power , se.level , se.is_look, se.audio_status, se.test_gold_add, se.pk_explain, se.better_three_time,se.phase, se.source_power
+        se.id, se.student_id, se.study_power , se.level , se.is_look, se.audio_status, se.test_gold_add, se.pk_explain, se.better_three_time,se.phase, se.medal_no, se.source_power
     </sql>
 
     <select id="selectByStudentId" parameterType="long" resultMap="BaseResultMap">
