@@ -7,10 +7,12 @@ import com.zhidejiaoyu.common.pojo.StudentEquipment;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
+@Service
 public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements ShipAddEquipmentService {
 
     @Resource

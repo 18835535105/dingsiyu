@@ -8,25 +8,35 @@ import java.io.FileInputStream;
  * @author wuchenxi
  * @date 2018年5月16日 下午1:09:28
  */
-public class FileConstant {
+public interface FileConstant {
 
     /**
      * 宠物录音地址
      */
-    public static final String PET_SAY_AUDIO = "audio/pet-tip/";
+    String PET_SAY_AUDIO = "audio/pet-tip/";
 
     /**
      * 意见反馈图片地址
      */
-    public static final String FEEDBACK_IMG = "imgs/feedBackImg/";
+    String FEEDBACK_IMG = "imgs/feedBackImg/";
 
     /**
      * 学生报表excel
      */
-    public static final String STUDENT_REPORT_EXCEL = "excel/student_report/";
+    String STUDENT_REPORT_EXCEL = "excel/student_report/";
 
     /**
-     * 生成的临时excel文件存储位置
+     * 生成的临时excel文件存储位置（服务器）
      */
-    public static final String TMP_EXCEL = "/var/tmp/";
+    String TMP_EXCEL = "/var/tmp/";
+
+    /**
+     * 生成的二维码（服务器）
+     */
+    String QR_CODE = TMP_EXCEL + "QR_CODE";
+
+    /**
+     * 小程序码（oss）
+     */
+    String QR_CODE_OSS = "imgs/qr-code/";
 }

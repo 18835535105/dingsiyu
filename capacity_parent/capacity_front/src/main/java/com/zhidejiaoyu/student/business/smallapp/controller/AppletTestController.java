@@ -1,12 +1,6 @@
 package com.zhidejiaoyu.student.business.smallapp.controller;
 
-import com.zhidejiaoyu.student.business.smallapp.dto.GetLimitQRCodeDTO;
 import com.zhidejiaoyu.student.business.smallapp.serivce.SmallProgramTestService;
-import com.zhidejiaoyu.student.business.smallapp.util.CreateWxQrCodeUtil;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,12 +27,7 @@ public class AppletTestController {
 
     @RequestMapping("/getQRCode")
     public Object getQRCode(String openId, String weChatName, String weChatImgUrl) {
-        byte[] qrCode = CreateWxQrCodeUtil.createQRCode(GetLimitQRCodeDTO.builder()
-                .path("openid=" + openId + "&weChatName=" + weChatName + "&weChatImgUrl=" + weChatImgUrl)
-                .build());
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_PNG);
-        return new ResponseEntity<>(qrCode, headers, HttpStatus.OK);
+        return smallProgramTestService.getQRCode(openId, weChatName, weChatImgUrl);
     }
 
 

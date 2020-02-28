@@ -1,17 +1,25 @@
 package com.zhidejiaoyu.student.business.smallapp.serivce.impl;
 
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.aliyunoss.putObject.OssUpload;
+import com.zhidejiaoyu.common.constant.FileConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.business.smallapp.dto.GetLimitQRCodeDTO;
 import com.zhidejiaoyu.student.business.smallapp.serivce.SmallProgramTestService;
+import com.zhidejiaoyu.student.business.smallapp.util.CreateWxQrCodeUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -20,6 +28,7 @@ import java.util.*;
  * @author: wuchenxi
  * @date: 2020/2/14 15:00:00
  */
+@Slf4j
 @Service("smallProgramTestService")
 public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements SmallProgramTestService {
 
@@ -140,6 +149,40 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         return returnMap;
     }
 
+    @Override
+    public Object getQRCode(String openId, String weChatName, String weChatImgUrl) {
+
+        byte[] qrCode = CreateWxQrCodeUtil.createQRCode(GetLimitQRCodeDTO.builder()
+                .path("openid=" + openId + "&weChatName=" + weChatName + "&weChatImgUrl=" + weChatImgUrl)
+                .build());
+
+        String fileName = System.currentTimeMillis() + ".png";
+        String pathname = FileConstant.QR_CODE + fileName;
+        File file = new File(pathname);
+
+        try (OutputStream outputStream = new FileOutputStream(file)) {
+            outputStream.write(qrCode);
+            outputStream.flush();
+        } catch (Exception e) {
+            log.error("生成小程序码出错！", e);
+            throw new ServiceException("生成小程序码出错！");
+        }
+
+        try (InputStream inputStream = new FileInputStream(file)) {
+            boolean b = OssUpload.uploadWithInputStream(inputStream, FileConstant.QR_CODE_OSS, fileName);
+            if (b) {
+                log.info("小程序码生成成功！");
+                file.delete();
+                return ServerResponse.createBySuccess(GetOssFile.getPublicObjectUrl(FileConstant.QR_CODE_OSS + fileName));
+            }
+        } catch (Exception e) {
+            log.error("小程序码上传OSS失败！", e);
+            throw new ServiceException("小程序码上传OSS失败");
+        }
+
+        return ServerResponse.createByError(500, "生成小程序码失败！");
+    }
+
     private void updateErrorLearnLog(List<Long> vocabularyIds, Long studentId) {
         List<ErrorLearnLog> errorLearnLogs = errorLearnLogMapper.selectVocabularyByStudentIdAndVocabularyIds(studentId, vocabularyIds);
         errorLearnLogs.forEach(log -> {
@@ -199,8 +242,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     }
 
     private List<String> getAnswer(List<String> strings, String wordChinese) {
-        List<String> stringAll = new ArrayList<>();
-        stringAll.addAll(strings);
+        List<String> stringAll = new ArrayList<>(strings);
         List<String> strings1 = stringAll.subList(0, 3);
         if (stringAll.size() > 0) {
             stringAll.remove(wordChinese);

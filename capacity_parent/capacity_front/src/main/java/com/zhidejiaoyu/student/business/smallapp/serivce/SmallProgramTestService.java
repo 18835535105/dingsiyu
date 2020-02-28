@@ -17,4 +17,6 @@ public interface SmallProgramTestService extends BaseService<Student> {
     Object getTest(HttpSession session, String openId);
 
     Object saveTest(Integer point, HttpSession session, String openId);
+
+    Object getQRCode(String openId, String weChatName, String weChatImgUrl);
 }
