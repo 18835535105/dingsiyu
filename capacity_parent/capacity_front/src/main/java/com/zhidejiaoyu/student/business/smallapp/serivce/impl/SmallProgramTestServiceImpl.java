@@ -202,7 +202,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         List<String> stringAll = new ArrayList<>();
         stringAll.addAll(strings);
         List<String> strings1 = stringAll.subList(0, 3);
-        if(stringAll.size()>0){
+        if (stringAll.size() > 0) {
             stringAll.remove(wordChinese);
         }
         /*List<String> removeList = new ArrayList<>();

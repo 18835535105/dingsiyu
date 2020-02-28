@@ -32,9 +32,9 @@ public class AppletTestController {
     }
 
     @RequestMapping("/getQRCode")
-    public Object getQRCode(String openId) {
+    public Object getQRCode(String openId, String weChatName, String weChatImgUrl) {
         byte[] qrCode = CreateWxQrCodeUtil.createQRCode(GetLimitQRCodeDTO.builder()
-                .path("openid=" + openId)
+                .path("openid=" + openId + "&weChatName=" + weChatName + "&weChatImgUrl=" + weChatImgUrl)
                 .build());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);

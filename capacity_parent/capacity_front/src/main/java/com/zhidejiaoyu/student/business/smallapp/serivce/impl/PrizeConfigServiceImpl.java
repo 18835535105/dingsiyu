@@ -42,14 +42,14 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
             List<PrizeConfig> prizeConfigs = prizeConfigMapper.selectByAdminId(adminId);
             payconfigId = this.getPrize(prizeConfigs).longValue();
             //获取图片
-            studentPayConfig = new StudentPayConfig();
-            studentPayConfig.setCreateTime(date);
-            studentPayConfig.setPrizeConfigId(payconfigId);
-            studentPayConfig.setWenXinId(openId);
-            studentPayConfig.setObtain("" + date.getTime() + new Random(1000).nextInt());
-            studentPayConfig.setWeChatImgUrl(weChatimgUrl);
-            studentPayConfig.setWeChatName(weChatName);
-            studentPayConfig.setStudentId(studentId);
+            studentPayConfig = new StudentPayConfig()
+                    .setCreateTime(date)
+                    .setPrizeConfigId(payconfigId)
+                    .setWenXinId(openId)
+                    .setObtain("" + date.getTime() + new Random(1000).nextInt())
+                    .setWeChatImgUrl(weChatimgUrl)
+                    .setWeChatName(weChatName)
+                    .setStudentId(studentId);
             studentPayConfigMapper.insert(studentPayConfig);
             Student student = studentMapper.selectById(studentId);
             student.setSystemGold(student.getSystemGold() + 5);
