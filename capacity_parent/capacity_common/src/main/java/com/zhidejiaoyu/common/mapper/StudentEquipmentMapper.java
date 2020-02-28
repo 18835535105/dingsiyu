@@ -14,5 +14,4 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface StudentEquipmentMapper extends BaseMapper<StudentEquipment> {
 
-    StudentEquipment selectByStudentIdAndEquipmentId(@Param("studentId") Long studentId,@Param("equipmentId") Long equipmentId);
 }

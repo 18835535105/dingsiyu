@@ -269,7 +269,7 @@ public class PersonalCentreController extends BaseController {
     }
 
     @GetMapping("/getLucky")
-    public Object getLucky(Integer studentId, HttpSession session) {
+    public Object getLucky(Long studentId, HttpSession session) {
         return personalCentreService.getLucky(studentId, session);
     }
 

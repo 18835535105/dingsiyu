@@ -1071,11 +1071,11 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     }
 
     @Override
-    public Object getLucky(Integer studentId, HttpSession session) {
+    public Object getLucky(Long studentId, HttpSession session) {
         Map<String, Object> useMap = new HashMap<>();
         if (studentId == null) {
             Student student = getStudent(session);
-            studentId = student.getId().intValue();
+            studentId = student.getId();
             useMap.put("sex", student.getSex() == 1 ? "男" : "女");
         } else {
             Student student = studentMapper.selectById(studentId);
@@ -1084,7 +1084,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         Map<String, Object> resultMap = new HashMap<>();
         //查询手套印记
         List<SyntheticRewardsList> gloveOrFlower = syntheticRewardsListMapper.getGloveOrFlower(studentId);
-        SyntheticRewardsList useGloveOrFlower = syntheticRewardsListMapper.getUseGloveOrFlower(studentId);
+        SyntheticRewardsList useGloveOrFlower = syntheticRewardsListMapper.selectUseGloveOrFlower(studentId);
         List<Map<String, Object>> gloveOrFlowerList = new ArrayList<>();
 
         for (SyntheticRewardsList synthetic : gloveOrFlower) {

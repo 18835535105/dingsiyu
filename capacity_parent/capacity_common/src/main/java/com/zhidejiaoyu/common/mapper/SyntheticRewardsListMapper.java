@@ -20,21 +20,24 @@ public interface SyntheticRewardsListMapper extends BaseMapper<SyntheticRewardsL
 
     /**
      * 搜索全部手套或印记
+     *
      * @param studentId
      * @return
      */
-    List<SyntheticRewardsList> getGloveOrFlower(Integer studentId);
+    List<SyntheticRewardsList> getGloveOrFlower(Long studentId);
 
 
     /**
      * 搜索手套和印记
+     *
      * @return
      */
-    List<HashMap<String,Object>> selListMap(Map map);
+    List<HashMap<String, Object>> selListMap(Map map);
 
 
     /**
      * 查找学生 名称下的所有name数量
+     *
      * @param syntheticRewardsList
      * @return
      */
@@ -47,24 +50,27 @@ public interface SyntheticRewardsListMapper extends BaseMapper<SyntheticRewardsL
 
     /**
      * 根据学生id和名称查询数据
+     *
      * @param list
      * @return
      */
     List<SyntheticRewardsList> selGloveOrFlowerByStudentIdAndName(SyntheticRewardsList list);
 
 
-    @Select("select img_url,name from synthetic_rewards_list where student_id=#{studentId} and model = 1 order by id desc limit 0,4  ")
-    List<Map<String,Object>> selSurprised(Integer studentId);
-
-
     /**
      * 获取正在使用的手套和印记
+     *
      * @return
      */
-    Map<String,Object> selGloveOrFlowerByStudentIdAndNameByState(Map map);
+    Map<String, Object> selGloveOrFlowerByStudentIdAndNameByState(Map map);
 
+    /**
+     * 查询学生正在使用的手套或花瓣
+     *
+     * @param studentId
+     * @return
+     */
+    SyntheticRewardsList selectUseGloveOrFlower(Long studentId);
 
-    SyntheticRewardsList getUseGloveOrFlower(Integer studentId);
-
-    SyntheticRewardsList getIsUse(Integer studentId, String name);
+    SyntheticRewardsList getIsUse(Long studentId, String name);
 }

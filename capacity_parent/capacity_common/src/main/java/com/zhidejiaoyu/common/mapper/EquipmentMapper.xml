@@ -4,10 +4,26 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Equipment">
-        <id column="id" property="id" />
-        <result column="name" property="name" />
-        <result column="type" property="type" />
-        <result column="level" property="level" />
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="level" property="level"/>
     </resultMap>
+    <sql id="base_sql">
+        id, `name`, type, `level`
+    </sql>
+    <sql id="more_table_sql">
+        e.id, e.name, e.type, e.level
+    </sql>
+    <select id="selectUsedByStudentId" resultType="map" parameterType="map">
+        select e.type,
+               ee.img_url imgUrl
+        from equipment e
+                 join equipment_expansion ee on e.id = ee.equipment_id
+                 join student_equipment se on e.id = se.equipment_id
+            and se.student_id = #{studentId} and se.type = 1
+            and ee.intensification_degree = se.intensification_degree
+
+    </select>
 
 </mapper>

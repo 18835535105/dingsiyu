@@ -311,4 +311,13 @@ public interface StudentMapper extends BaseMapper<Student> {
      * @return
      */
     Student selectByOpenId(@Param("openid") String openid);
+
+    /**
+     * 查询学生源分战力排行数据
+     *
+     * @param studentIds
+     * @return
+     */
+    @MapKey("studentId")
+    Map<Long, Map<String, Object>> selectSourcePowerRankByIds(@Param("studentIds") List<Long> studentIds);
 }

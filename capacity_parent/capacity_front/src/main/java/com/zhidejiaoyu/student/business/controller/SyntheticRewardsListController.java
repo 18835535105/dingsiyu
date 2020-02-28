@@ -29,40 +29,44 @@ public class SyntheticRewardsListController {
 
     /**
      * 查找手套,花朵,和手套花朵碎片
+     *
      * @param session
      * @return
      */
     @PostMapping("/getGloveOrFlower")
     @ResponseBody
-    public ServerResponse<Object> getGloveOrFlower(HttpSession session){
+    public ServerResponse<Object> getGloveOrFlower(HttpSession session) {
         return syntheticRewardsListService.getGloveOrFlower(session);
     }
 
     /**
      * 查看所有手套及印记
+     *
      * @param session
      * @return
      */
     @PostMapping("/selSyntheticList")
     @ResponseBody
-    public ServerResponse<Object> selSyntheticList(HttpSession session){
+    public ServerResponse<Object> selSyntheticList(HttpSession session) {
         return syntheticRewardsListService.selSyntheticList(session);
     }
 
     /**
      * 使用印记或手套
+     *
      * @param session
      * @param nameInteger
      * @return
      */
     @PostMapping("/useSyntheticList")
     @ResponseBody
-    public ServerResponse<Object> useSyntheticList(HttpSession session, Integer nameInteger){
-        return syntheticRewardsListService.updSyntheticList(session,nameInteger);
+    public ServerResponse<Object> useSyntheticList(HttpSession session, Integer nameInteger) {
+        return syntheticRewardsListService.updSyntheticList(session, nameInteger);
     }
 
     /**
      * 查看手套,印记,皮肤信息
+     *
      * @param session
      * @param nameInteger
      * @param type
@@ -70,8 +74,8 @@ public class SyntheticRewardsListController {
      */
     @PostMapping("/getMessage")
     @ResponseBody
-    public ServerResponse<Object> getMessage(HttpSession session, Integer nameInteger, Integer type){
-        return syntheticRewardsListService.getMessage(session,nameInteger,type);
+    public ServerResponse<Object> getMessage(HttpSession session, Integer nameInteger, Integer type) {
+        return syntheticRewardsListService.getMessage(session, nameInteger, type);
     }
 
     /**
@@ -79,8 +83,8 @@ public class SyntheticRewardsListController {
      */
     @GetMapping("/getLucky")
     @ResponseBody
-    public ServerResponse<Object> getLucky(Integer studentId, HttpSession session){
-        return syntheticRewardsListService.getLucky(studentId,session);
+    public ServerResponse<Object> getLucky(Long studentId, HttpSession session) {
+        return syntheticRewardsListService.getLucky(studentId, session);
     }
 
 

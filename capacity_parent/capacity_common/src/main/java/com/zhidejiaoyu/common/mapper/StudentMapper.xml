@@ -920,5 +920,13 @@
         where openid like concat('%', #{openid}, '%')
         limit 1
     </select>
+    <select id="selectSourcePowerRankByIds" resultType="java.util.Map" parameterType="map">
+        select s.id studentId, se.source_power sourcePower, s.nickname nickName from student s join student_expansion se
+        on s.id = se.student_id and s.id id in (
+        <foreach collection="studentIds" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </select>
 
 </mapper>

@@ -237,11 +237,11 @@ public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRe
     }
 
     @Override
-    public ServerResponse<Object> getLucky(Integer studentId, HttpSession session) {
+    public ServerResponse<Object> getLucky(Long studentId, HttpSession session) {
         Map<String, Object> useMap = new HashMap<>();
         if (studentId == null) {
             Student student = getStudent(session);
-            studentId = student.getId().intValue();
+            studentId = student.getId();
             useMap.put("sex", student.getSex() == 1 ? "男" : "女");
         } else {
             Student student = studentMapper.selectById(studentId);
@@ -250,7 +250,7 @@ public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRe
         Map<String, Object> resultMap = new HashMap<>();
         //查询手套印记
         List<SyntheticRewardsList> gloveOrFlower = syntheticRewardsListMapper.getGloveOrFlower(studentId);
-        SyntheticRewardsList useGloveOrFlower = syntheticRewardsListMapper.getUseGloveOrFlower(studentId);
+        SyntheticRewardsList useGloveOrFlower = syntheticRewardsListMapper.selectUseGloveOrFlower(studentId);
         List<Map<String, Object>> gloveOrFlowerList = new ArrayList<>();
 
         for (SyntheticRewardsList synthetic : gloveOrFlower) {
@@ -286,7 +286,7 @@ public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRe
         }
         resultMap.put("gloveOrFlower", gloveOrFlowerList);
         List<Map<String, Object>> skinList = new ArrayList<>();
-        List<StudentSkin> studentSkins = studentSkinMapper.selSkinByStudentIdIsHave(studentId.longValue());
+        List<StudentSkin> studentSkins = studentSkinMapper.selSkinByStudentIdIsHave(studentId);
         for (StudentSkin studentSkin : studentSkins) {
             if (studentSkin.getState() == 1) {
                 useMap.put("skin", studentSkin.getImgUrl());

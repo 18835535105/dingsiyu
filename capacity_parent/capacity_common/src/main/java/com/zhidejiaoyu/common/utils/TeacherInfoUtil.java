@@ -1,7 +1,9 @@
 package com.zhidejiaoyu.common.utils;
 
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.TeacherMapper;
 import com.zhidejiaoyu.common.pojo.Student;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,7 @@ import javax.annotation.PostConstruct;
  * @author wuchenxi
  * @date 2019-06-21
  */
+@Slf4j
 @Component
 public class TeacherInfoUtil {
 
@@ -33,12 +36,25 @@ public class TeacherInfoUtil {
      * @return
      */
     public static Integer getSchoolAdminId(Student student) {
-        if (student.getTeacherId() == null) {
-            return null;
+        Long teacherId = student.getTeacherId();
+        if (teacherId == null) {
+            log.error("未查询到学生[{} - {} - {}]的教师信息！", student.getId(), student.getAccount(), student.getStudentName());
+            throw new ServiceException(500, "当前学生没有教师信息！");
         }
-        Integer schoolAdminId = teacherMapper.getSchoolAdminById(Integer.valueOf(student.getTeacherId().toString()));
+        return getSchoolAdminId(Integer.parseInt(teacherId.toString()));
+    }
+
+    /**
+     * 获取校管id
+     *
+     * @param teacherId 学生的所属教师id
+     * @return
+     */
+    public static Integer getSchoolAdminId(Integer teacherId) {
+
+        Integer schoolAdminId = teacherMapper.getSchoolAdminById(teacherId);
         if (schoolAdminId == null) {
-            return Integer.valueOf(student.getTeacherId().toString());
+            return teacherId;
         }
         return schoolAdminId;
     }

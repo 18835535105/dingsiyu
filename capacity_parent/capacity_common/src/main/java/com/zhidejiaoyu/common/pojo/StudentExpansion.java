@@ -70,7 +70,7 @@ public class StudentExpansion extends Model<StudentExpansion> {
     /**
      * 飞船配置需要展示的勋章id
      */
-    private String modelNo;
+    private String medalNo;
 
     /**
      * 源分战力值
