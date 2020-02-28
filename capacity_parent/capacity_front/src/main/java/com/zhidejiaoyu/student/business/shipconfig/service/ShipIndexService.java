@@ -18,4 +18,12 @@ public interface ShipIndexService extends BaseService<Student> {
      * @return
      */
     ServerResponse<Object> index();
+
+    /**
+     * 源分战力排行
+     *
+     * @param type 1：全国排行；2：校区排行
+     * @return
+     */
+    ServerResponse<Object> rank(Integer type);
 }

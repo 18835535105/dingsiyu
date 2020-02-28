@@ -10,14 +10,9 @@ import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * 排行操作类
@@ -28,7 +23,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class RankOpt {
+public class RankOpt extends BaseRankOpt {
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -188,33 +183,6 @@ public class RankOpt {
     }
 
     /**
-     * 获取指定类型排行参与人数
-     *
-     * @param key
-     * @return
-     */
-    public Long getMemberSize(String key) {
-        Long size = redisTemplate.opsForZSet().size(key);
-        return size == null ? 0L : size;
-    }
-
-    /**
-     * 按照 score 从高到低查询指定范围内的学生 id
-     *
-     * @param key
-     * @param start 起始索引
-     * @param end   结束索引
-     * @return
-     */
-    public List<Long> getReverseRangeMembersBetweenStartAndEnd(String key, Long start, Long end) {
-        Set<ZSetOperations.TypedTuple<Object>> typedTuples = redisTemplate.opsForZSet().reverseRangeWithScores(key, start, end - 1 >= 100 ? 100 : end - 1);
-        if (typedTuples == null || typedTuples.size() == 0) {
-            return new ArrayList<>();
-        }
-        return typedTuples.stream().map(typedTuple -> Long.valueOf(String.valueOf(typedTuple.getValue()))).collect(Collectors.toList());
-    }
-
-    /**
      * 获取 score
      *
      * @param key
@@ -229,17 +197,6 @@ public class RankOpt {
         return Math.round(score);
     }
 
-    /**
-     * 获取指定成员的索引（即学生的排名）
-     *
-     * @param key
-     * @param member
-     * @return 获取的排名从 1 开始
-     */
-    public long getRank(String key, Long member) {
-        Long rank = redisTemplate.opsForZSet().reverseRank(key, member);
-        return rank == null ? -1 : rank + 1;
-    }
 
     /**
      * 删除多余的排行信息

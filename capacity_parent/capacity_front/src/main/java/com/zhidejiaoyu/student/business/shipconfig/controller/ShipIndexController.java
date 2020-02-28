@@ -31,4 +31,17 @@ public class ShipIndexController {
         return shipIndexService.index();
     }
 
+    /**
+     * 源分战力排行
+     *
+     * @param type 1：全国排行；2：校区排行
+     * @return
+     */
+    @GetMapping("/rank")
+    public ServerResponse<Object> rank(Integer type) {
+        if (type == null) {
+            type = 1;
+        }
+        return shipIndexService.rank(type);
+    }
 }

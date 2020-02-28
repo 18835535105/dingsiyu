@@ -1,8 +1,5 @@
 package com.zhidejiaoyu.student.business.syntax.needview;
 
-import com.zhidejiaoyu.common.vo.syntax.KnowledgePointVO;
-import com.zhidejiaoyu.common.vo.syntax.TopicVO;
-import com.zhidejiaoyu.common.vo.syntax.WriteSyntaxVO;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
 import com.zhidejiaoyu.common.mapper.KnowledgePointMapper;
 import com.zhidejiaoyu.common.mapper.StudyCapacityMapper;
@@ -12,6 +9,9 @@ import com.zhidejiaoyu.common.pojo.StudyCapacity;
 import com.zhidejiaoyu.common.pojo.SyntaxTopic;
 import com.zhidejiaoyu.common.study.memorydifficulty.SyntaxMemoryDifficulty;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.syntax.KnowledgePointVO;
+import com.zhidejiaoyu.common.vo.syntax.TopicVO;
+import com.zhidejiaoyu.common.vo.syntax.WriteSyntaxVO;
 import com.zhidejiaoyu.student.business.syntax.service.impl.LearnSyntaxServiceImpl;
 import org.springframework.stereotype.Component;
 
