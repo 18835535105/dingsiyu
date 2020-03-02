@@ -30,7 +30,7 @@ public class SourcePowerRankOpt extends BaseRankOpt {
      */
     public void optSourcePowerRank(Student student, Integer sourcePower, Integer studyPower) {
 
-        double score = Double.parseDouble(String.valueOf(sourcePower) + "." + String.valueOf(studyPower));
+        double score = Double.parseDouble(sourcePower + "." + studyPower);
 
         try {
             redisTemplate.opsForZSet().add(SourcePowerKeysConst.COUNTRY_RANK, student.getId(), score);
