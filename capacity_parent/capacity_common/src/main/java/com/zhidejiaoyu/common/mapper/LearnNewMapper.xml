@@ -127,5 +127,34 @@
                  where l.student_id = #{studentId}
                    and vocabulary_id is not null) t
     </select>
+    <select id="countLearnedWordCountByStartDateAndEndDate" resultType="java.lang.Integer" parameterType="map">
+        select count(DISTINCT t.wordId)
+        from (
+                 select DISTINCT le.word_id wordId
+                 from learn_new ln2,
+                      learn_extend le
+                 where ln2.student_id = #{studentId}
+                   and ln2.model_type = 1
+                   and le.learn_id = ln2.id
+                   and le.update_time >= #{beginDate}
+                   and le.update_time &lt;= #{endDate}
+                 union all
+                 select DISTINCT uvn.vocabulary_id wordId
+                 from unit_vocabulary_new uvn,
+                      learn_history lh
+                 where lh.student_id = #{studentId}
+                   and lh.`type` = 1
+                   and lh.unit_id = uvn.unit_id
+                   and lh.update_time >= #{beginDate}
+                   and lh.update_time &lt;= #{endDate}
+                 union all
+                 select DISTINCT vocabulary_id wordId
+                 from learn l
+                 where l.student_id = #{studentId}
+                   and vocabulary_id is not null
+                   and l.update_time >= #{beginDate}
+                   and l.update_time &lt;= #{endDate}) t
+
+    </select>
 
 </mapper>

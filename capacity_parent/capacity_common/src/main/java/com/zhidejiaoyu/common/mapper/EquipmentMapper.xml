@@ -17,7 +17,13 @@
     </sql>
     <select id="selectUsedByStudentId" resultType="map" parameterType="map">
         select e.type,
-               ee.img_url imgUrl
+               ee.img_url imgUrl,
+               ee.durability,
+               ee.common_attack commmonAttack,
+               ee.source_force_attack sourceForceAttack,
+               ee.source_force sourceForce,
+               ee.hit_rate hitRate,
+               ee.mobility
         from equipment e
                  join equipment_expansion ee on e.id = ee.equipment_id
                  join student_equipment se on e.id = se.equipment_id

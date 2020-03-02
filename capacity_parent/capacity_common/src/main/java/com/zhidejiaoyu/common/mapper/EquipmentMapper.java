@@ -22,8 +22,14 @@ public interface EquipmentMapper extends BaseMapper<Equipment> {
      *
      * @param studentId
      * @return <ul>
-     *     <li>key:type 类型</li>
-     *     <li>key:imgUrl 图片地址</li>
+     * <li>key:type 类型</li>
+     * <li>key:imgUrl 图片地址</li>
+     * <li>key:durability 耐久度</li>
+     * <li>key:commonAttack 普通攻击</li>
+     * <li>key:sourceForceAttack 源力攻击</li>
+     * <li>key:sourceForce 源力</li>
+     * <li>key:hitRate 命中率</li>
+     * <li>key:mobility 机动力</li>
      * </ul>
      */
     List<Map<String, Object>> selectUsedByStudentId(@Param("studentId") Long studentId);

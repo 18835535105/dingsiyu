@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -84,4 +85,14 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
      * @return
      */
     int countLearnedWordCount(@Param("studentId") Long studentId);
+
+    /**
+     * 统计学生指定日期范围内学习的单词数
+     *
+     * @param studentId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    int countLearnedWordCountByStartDateAndEndDate(@Param("studentId") Long studentId, @Param("beginDate") String beginDate, @Param("endDate") String endDate);
 }

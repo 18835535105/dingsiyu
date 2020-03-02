@@ -9,11 +9,13 @@ import com.zhidejiaoyu.common.pojo.StudentSkin;
 import com.zhidejiaoyu.common.pojo.SyntheticRewardsList;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.shipconfig.constant.EquipmentTypeConstant;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
+import com.zhidejiaoyu.student.business.shipconfig.util.CalculateUtil;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.RankVO;
 import org.apache.commons.collections.CollectionUtils;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,6 +56,9 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Resource
     private SourcePowerRankOpt sourcePowerRankOpt;
 
+    @Resource
+    private LearnNewMapper learnNewMapper;
+
     @Override
     public ServerResponse<Object> index() {
         Student student = super.getStudent();
@@ -65,7 +71,11 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         List<String> medalImgList = this.getMedalImgList(studentExpansion);
 
         // 学生装备的飞船及装备信息
-        IndexVO indexVO = this.getIndexVoTmp(student);
+        List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(student.getId());
+        IndexVO indexVO = this.getIndexVoTmp(equipments);
+        IndexVO.MaxValue maxValue = this.getMaxValue(equipments);
+
+        IndexVO.StateOfWeek stateOfWeek = this.getStateOfWeek(student, maxValue);
 
         SyntheticRewardsList syntheticRewardsList = syntheticRewardsListMapper.selectUseGloveOrFlower(student.getId());
 
@@ -78,7 +88,77 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 .shipUrl(indexVO.getShipUrl())
                 .weaponsUrl(indexVO.getWeaponsUrl())
                 .sourceUrl(syntheticRewardsList == null ? "" : GetOssFile.getPublicObjectUrl(syntheticRewardsList.getImgUrl()))
+                .maxValue(maxValue)
+                .stateOfWeek(stateOfWeek)
                 .build());
+    }
+
+    private IndexVO.StateOfWeek getStateOfWeek(Student student, IndexVO.MaxValue maxValue) {
+        Date date = new Date();
+        String beforeSevenDaysDateStr = DateUtil.getBeforeDayDateStr(date, 7, DateUtil.YYYYMMDD);
+        int count = learnNewMapper.countLearnedWordCountByStartDateAndEndDate(student.getId(), beforeSevenDaysDateStr, DateUtil.formatDate(date, DateUtil.YYYYMMDD));
+
+        IndexVO.StateOfWeek stateOfWeek = new IndexVO.StateOfWeek();
+        stateOfWeek.setAttack(Integer.parseInt(CalculateUtil.getWeekState(maxValue.getAttack(), count)));
+        stateOfWeek.setDurability(Integer.parseInt(CalculateUtil.getWeekState(maxValue.getDurability(), count)));
+        stateOfWeek.setHitRate(Double.parseDouble(CalculateUtil.getWeekState(maxValue.getHitRate(), count)));
+        stateOfWeek.setMove(Integer.parseInt(CalculateUtil.getWeekState(maxValue.getMove(), count)));
+        stateOfWeek.setSource(Integer.parseInt(CalculateUtil.getWeekState(maxValue.getSource(), count)));
+
+        return stateOfWeek;
+    }
+
+    /**
+     * 获取各项最大值
+     *
+     * @param equipments
+     * @return
+     */
+    private IndexVO.MaxValue getMaxValue(List<Map<String, Object>> equipments) {
+        IndexVO.MaxValue maxValue = new IndexVO.MaxValue();
+        equipments.forEach(map -> {
+            // 攻击力
+            int commonAttack = Integer.parseInt(map.get("commonAttack").toString());
+            if (maxValue.getAttack() == null) {
+                maxValue.setAttack(Math.min(200, commonAttack));
+            } else {
+                maxValue.setAttack(Math.min(200, maxValue.getAttack() + commonAttack));
+            }
+
+            // 耐久度
+            int durability = Integer.parseInt(map.get("durability").toString());
+            if (maxValue.getDurability() == null) {
+                maxValue.setDurability(Math.min(3000, durability));
+            } else {
+                maxValue.setDurability(Math.min(3000, durability + maxValue.getDurability()));
+            }
+
+            // 源力
+            int sourceForce = Integer.parseInt(map.get("sourceForce").toString());
+            int sourceForceAttack = Integer.parseInt(map.get("sourceForceAttack").toString());
+            if (maxValue.getSource() == null) {
+                maxValue.setSource(Math.min(30000, sourceForce * sourceForceAttack));
+            } else {
+                maxValue.setSource(Math.min(30000, maxValue.getSource() + sourceForce * sourceForceAttack));
+            }
+
+            // 命中率
+            double hitRate = Double.parseDouble(map.get("hitRate").toString());
+            if (maxValue.getHitRate() == null) {
+                maxValue.setHitRate(Math.min(2, hitRate));
+            } else {
+                maxValue.setHitRate(Math.min(2, maxValue.getHitRate() + hitRate));
+            }
+
+            // 机动力
+            int mobility = Integer.parseInt(map.get("mobility").toString());
+            if (maxValue.getMove() == null) {
+                maxValue.setMove(Math.min(2, mobility));
+            } else {
+                maxValue.setMove(Math.min(2, maxValue.getMove() + mobility));
+            }
+        });
+        return maxValue;
     }
 
     @Override
@@ -86,7 +166,6 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
         Student student = super.getStudent();
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
-
 
         if (type == 2) {
             // 校区排行（全部学生）
@@ -128,8 +207,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 .rankInfoList(collect));
     }
 
-    public IndexVO getIndexVoTmp(Student student) {
-        List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(student.getId());
+    public IndexVO getIndexVoTmp(List<Map<String, Object>> equipments) {
         IndexVO indexVO = new IndexVO();
         if (CollectionUtils.isNotEmpty(equipments)) {
             equipments.forEach(map -> {

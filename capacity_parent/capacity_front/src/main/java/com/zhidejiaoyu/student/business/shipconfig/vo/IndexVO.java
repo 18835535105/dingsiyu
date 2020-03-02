@@ -1,9 +1,6 @@
 package com.zhidejiaoyu.student.business.shipconfig.vo;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.List;
@@ -59,4 +56,62 @@ public class IndexVO implements Serializable {
      * 背景图片地址
      */
     private String skinImgUrl;
+
+    /**
+     * 各项最大值
+     */
+    private MaxValue maxValue;
+
+    /**
+     * 本周各项状态
+     */
+    private StateOfWeek stateOfWeek;
+
+    /**
+     * 各项最大值
+     * 最大数值（基础值）=飞船+装备的累积值
+     * 说明：各个属性都有各自的基础值，比如说耐久度：飞船耐久度+武器耐久度+装备耐久度+装甲耐久度，其余属性依次类推
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MaxValue {
+        /**
+         * 命中率
+         */
+        private Double hitRate;
+
+        /**
+         * 机动力
+         */
+        private Integer move;
+
+        /**
+         * 攻击力
+         */
+        private Integer attack;
+
+        /**
+         * 源力
+         */
+        private Integer source;
+
+        /**
+         * 耐久度
+         */
+        private Integer durability;
+    }
+
+    /**
+     * 本周各项状态
+     * 本周状态=攻击百分比=基础值*(20%+学习单词数/30)
+     * 说明：
+     * 该计算逻辑中的基础值是取各个属性各自的基础值，比如本周攻击状态=攻击基础值*20%+学习单词数/30
+     * 学习单词数：最近7天学习的单词数（根据id去重）
+     */
+    @Data
+    @EqualsAndHashCode(callSuper = false)
+    public static class StateOfWeek extends MaxValue {
+    }
 }

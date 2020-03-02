@@ -27,4 +27,9 @@ public class LearnNewMapperTest {
     public void selectDelLearnIdByStudentIdAndNumber() {
         learnNewMapper.selectDelLearnIdByStudentIdAndNumber(9604L, 1);
     }
+
+    @Test
+    public void countLearnedWordCountByStartDateAndEndDate() {
+        learnNewMapper.countLearnedWordCountByStartDateAndEndDate(9604L, "2020-01-01", "2020-04-04");
+    }
 }
