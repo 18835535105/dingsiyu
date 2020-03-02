@@ -69,6 +69,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         if (teacherUser.getAccount().contains("js")) {
             sb.append("$&$").append(sysUser.getPhone()).append("（").append(sysUser.getName().substring(0, 1)).append("老师）");
         }
+        Teacher teacher = teacherMapper.selectTeacherBySchoolAdminId(adminId.intValue());
         returnMap.put("adminPhone", sb.toString());
         ShareConfig shareConfig = shareConfigMapper.selectByAdminId(adminId.intValue());
         if (shareConfig != null) {
@@ -77,7 +78,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
             returnMap.put("background", null);
         }
         returnMap.put("obtain", studentPayConfig.getObtain());
-        returnMap.put("campus", joinSchool.getSchoolName().replace("体验中心","校区"));
+        returnMap.put("campus", teacher.getSchool().replace("体验中心", "校区"));
         return returnMap;
     }
 

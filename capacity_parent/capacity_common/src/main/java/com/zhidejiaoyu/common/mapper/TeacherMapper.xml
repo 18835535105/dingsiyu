@@ -48,4 +48,12 @@
         limit 1
     </select>
 
+    <select id="selectTeacherBySchoolAdminId" resultMap="BaseResultMap" parameterType="map">
+         select <include refid="base_sql"></include>
+        from teacher
+        where teacher_id = #{teacherId}
+           or school_admin_id = #{teacherId}
+        limit 1
+    </select>
+
 </mapper>
