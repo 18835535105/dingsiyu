@@ -29,6 +29,8 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
     private TestRecordMapper testRecordMapper;
     @Resource
     private ShareConfigMapper shareConfigMapper;
+    @Resource
+    private JoinSchoolMapper joinSchoolMapper;
 
     @Override
     public Object getPrizeConfig(String openId, Long adminId, Long studentId, String weChatimgUrl, String weChatName) {
@@ -37,6 +39,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         Map<String, Object> returnMap = new HashMap<>();
         Long payconfigId;
         StudentPayConfig studentPayConfig = studentPayConfigMapper.selectByWenXiIdAndDate(openId, date);
+        Student student = studentMapper.selectById(studentId);
         if (studentPayConfig == null) {
             //获取学校奖品数据
             List<PrizeConfig> prizeConfigs = prizeConfigMapper.selectByAdminId(adminId);
@@ -51,7 +54,6 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
                     .setWeChatName(weChatName)
                     .setStudentId(studentId);
             studentPayConfigMapper.insert(studentPayConfig);
-            Student student = studentMapper.selectById(studentId);
             student.setSystemGold(student.getSystemGold() + 5);
             studentMapper.updateById(student);
         } else {
@@ -59,8 +61,15 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         }
         PrizeConfig prizeConfig = prizeConfigMapper.selectById(payconfigId);
         returnMap.put("prizeName", prizeConfig.getPrizeName());
+        JoinSchool joinSchool = joinSchoolMapper.selectByUserId(adminId.intValue());
+        returnMap.put("adress", joinSchool.getAddress());
         SysUser sysUser = sysUserMapper.selectById(adminId);
-        returnMap.put("adminPhone", sysUser.getPhone());
+        StringBuilder sb = new StringBuilder().append(sysUser.getPhone()).append("（").append(sysUser.getName().substring(0, 1)).append("老师）");
+        SysUser teacherUser = sysUserMapper.selectById(student.getTeacherId());
+        if (teacherUser.getAccount().contains("js")) {
+            sb.append("$&$").append(sysUser.getPhone()).append("（").append(sysUser.getName().substring(0, 1)).append("老师）");
+        }
+        returnMap.put("adminPhone", sb.toString());
         ShareConfig shareConfig = shareConfigMapper.selectByAdminId(adminId.intValue());
         if (shareConfig != null) {
             returnMap.put("background", shareConfig.getImgUrl());
