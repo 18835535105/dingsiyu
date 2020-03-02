@@ -12,11 +12,13 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+@Repository
 public interface TestRecordMapper extends BaseMapper<TestRecord> {
     int countByExample(TestRecordExample example);
 
@@ -343,5 +345,15 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      * @return
      */
     Double selectScoreAvg(@Param("studentId") Long studentId, @Param("limit") int limit);
+
+    /**
+     * 查询学生指定日期内的平均分
+     *
+     * @param studentId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    double selectScoreAvgByStartDateAndEndDate(@Param("studentId") Long studentId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 }
 

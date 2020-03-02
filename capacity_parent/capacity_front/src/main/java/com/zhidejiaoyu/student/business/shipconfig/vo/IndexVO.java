@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.shipconfig.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.io.Serializable;
@@ -60,12 +61,17 @@ public class IndexVO implements Serializable {
     /**
      * 各项最大值
      */
-    private MaxValue maxValue;
+    private BaseValue baseValue;
 
     /**
      * 本周各项状态
      */
     private StateOfWeek stateOfWeek;
+
+    /**
+     * 雷达图
+     */
+    private Radar radar;
 
     /**
      * 各项最大值
@@ -76,7 +82,7 @@ public class IndexVO implements Serializable {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class MaxValue {
+    public static class BaseValue {
         /**
          * 命中率
          */
@@ -101,6 +107,11 @@ public class IndexVO implements Serializable {
          * 耐久度
          */
         private Integer durability;
+
+        /**
+         * 源力攻击
+         */
+        private transient Integer sourceAttack;
     }
 
     /**
@@ -112,6 +123,15 @@ public class IndexVO implements Serializable {
      */
     @Data
     @EqualsAndHashCode(callSuper = false)
-    public static class StateOfWeek extends MaxValue {
+    public static class StateOfWeek extends BaseValue {
     }
+
+    /**
+     * 雷达图数据
+     */
+    @Data
+    @EqualsAndHashCode(callSuper = false)
+    public static class Radar extends BaseValue {
+    }
+
 }

@@ -56,9 +56,6 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Resource
     private SourcePowerRankOpt sourcePowerRankOpt;
 
-    @Resource
-    private LearnNewMapper learnNewMapper;
-
     @Override
     public ServerResponse<Object> index() {
         Student student = super.getStudent();
@@ -73,9 +70,11 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         // 学生装备的飞船及装备信息
         List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(student.getId());
         IndexVO indexVO = this.getIndexVoTmp(equipments);
-        IndexVO.MaxValue maxValue = this.getMaxValue(equipments);
+        IndexVO.BaseValue baseValue = this.getMaxValue(equipments);
 
-        IndexVO.StateOfWeek stateOfWeek = this.getStateOfWeek(student, maxValue);
+        IndexVO.StateOfWeek stateOfWeek = this.getStateOfWeek(student, baseValue);
+
+        IndexVO.Radar radar = this.getRadar(baseValue, stateOfWeek);
 
         SyntheticRewardsList syntheticRewardsList = syntheticRewardsListMapper.selectUseGloveOrFlower(student.getId());
 
@@ -88,22 +87,43 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 .shipUrl(indexVO.getShipUrl())
                 .weaponsUrl(indexVO.getWeaponsUrl())
                 .sourceUrl(syntheticRewardsList == null ? "" : GetOssFile.getPublicObjectUrl(syntheticRewardsList.getImgUrl()))
-                .maxValue(maxValue)
+                .baseValue(baseValue)
                 .stateOfWeek(stateOfWeek)
+                .radar(radar)
                 .build());
     }
 
-    private IndexVO.StateOfWeek getStateOfWeek(Student student, IndexVO.MaxValue maxValue) {
+    /**
+     * 获取雷达图数据
+     *
+     * @param baseValue
+     * @param stateOfWeek
+     * @return
+     */
+    private IndexVO.Radar getRadar(IndexVO.BaseValue baseValue, IndexVO.StateOfWeek stateOfWeek) {
+        IndexVO.Radar radar = new IndexVO.Radar();
+        radar.setAttack(stateOfWeek.getAttack() * baseValue.getAttack());
+        radar.setDurability(stateOfWeek.getDurability() * baseValue.getDurability());
+        radar.setHitRate(stateOfWeek.getHitRate() * baseValue.getHitRate());
+        radar.setMove(stateOfWeek.getMove() * baseValue.getMove());
+        radar.setSource(stateOfWeek.getSource() * baseValue.getSource());
+        return radar;
+    }
+
+    private IndexVO.StateOfWeek getStateOfWeek(Student student, IndexVO.BaseValue baseValue) {
         Date date = new Date();
         String beforeSevenDaysDateStr = DateUtil.getBeforeDayDateStr(date, 7, DateUtil.YYYYMMDD);
-        int count = learnNewMapper.countLearnedWordCountByStartDateAndEndDate(student.getId(), beforeSevenDaysDateStr, DateUtil.formatDate(date, DateUtil.YYYYMMDD));
+        String now = DateUtil.formatDate(new Date(), DateUtil.YYYYMMDD);
+
+        Long studentId = student.getId();
 
         IndexVO.StateOfWeek stateOfWeek = new IndexVO.StateOfWeek();
-        stateOfWeek.setAttack(Integer.parseInt(CalculateUtil.getWeekState(maxValue.getAttack(), count)));
-        stateOfWeek.setDurability(Integer.parseInt(CalculateUtil.getWeekState(maxValue.getDurability(), count)));
-        stateOfWeek.setHitRate(Double.parseDouble(CalculateUtil.getWeekState(maxValue.getHitRate(), count)));
-        stateOfWeek.setMove(Integer.parseInt(CalculateUtil.getWeekState(maxValue.getMove(), count)));
-        stateOfWeek.setSource(Integer.parseInt(CalculateUtil.getWeekState(maxValue.getSource(), count)));
+
+        stateOfWeek.setAttack(CalculateUtil.getAttack(baseValue.getAttack(), studentId, beforeSevenDaysDateStr, now));
+        stateOfWeek.setDurability(CalculateUtil.getDurability(baseValue.getDurability(), studentId, beforeSevenDaysDateStr, now));
+        stateOfWeek.setHitRate(CalculateUtil.getHitRate(baseValue.getHitRate(), studentId, beforeSevenDaysDateStr, now));
+        stateOfWeek.setMove(CalculateUtil.getMove(baseValue.getMove(), studentId, beforeSevenDaysDateStr, now));
+        stateOfWeek.setSource(CalculateUtil.getSource(baseValue, studentId, beforeSevenDaysDateStr, now));
 
         return stateOfWeek;
     }
@@ -114,51 +134,59 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
      * @param equipments
      * @return
      */
-    private IndexVO.MaxValue getMaxValue(List<Map<String, Object>> equipments) {
-        IndexVO.MaxValue maxValue = new IndexVO.MaxValue();
+    private IndexVO.BaseValue getMaxValue(List<Map<String, Object>> equipments) {
+        IndexVO.BaseValue baseValue = new IndexVO.BaseValue();
         equipments.forEach(map -> {
             // 攻击力
             int commonAttack = Integer.parseInt(map.get("commonAttack").toString());
-            if (maxValue.getAttack() == null) {
-                maxValue.setAttack(Math.min(200, commonAttack));
+            if (baseValue.getAttack() == null) {
+                baseValue.setAttack(commonAttack);
             } else {
-                maxValue.setAttack(Math.min(200, maxValue.getAttack() + commonAttack));
+                baseValue.setAttack(baseValue.getAttack() + commonAttack);
             }
 
             // 耐久度
             int durability = Integer.parseInt(map.get("durability").toString());
-            if (maxValue.getDurability() == null) {
-                maxValue.setDurability(Math.min(3000, durability));
+            if (baseValue.getDurability() == null) {
+                baseValue.setDurability(durability);
             } else {
-                maxValue.setDurability(Math.min(3000, durability + maxValue.getDurability()));
+                baseValue.setDurability(durability + baseValue.getDurability());
             }
 
             // 源力
             int sourceForce = Integer.parseInt(map.get("sourceForce").toString());
             int sourceForceAttack = Integer.parseInt(map.get("sourceForceAttack").toString());
-            if (maxValue.getSource() == null) {
-                maxValue.setSource(Math.min(30000, sourceForce * sourceForceAttack));
+            if (baseValue.getSource() == null) {
+                baseValue.setSource(sourceForce * sourceForceAttack);
             } else {
-                maxValue.setSource(Math.min(30000, maxValue.getSource() + sourceForce * sourceForceAttack));
+                baseValue.setSource(baseValue.getSource() + sourceForce * sourceForceAttack);
+            }
+
+            // 源力攻击
+            if (baseValue.getSourceAttack() == null) {
+                baseValue.setSourceAttack(sourceForceAttack);
+            } else {
+                baseValue.setSourceAttack(baseValue.getSourceAttack() + sourceForceAttack);
             }
 
             // 命中率
             double hitRate = Double.parseDouble(map.get("hitRate").toString());
-            if (maxValue.getHitRate() == null) {
-                maxValue.setHitRate(Math.min(2, hitRate));
+            if (baseValue.getHitRate() == null) {
+                baseValue.setHitRate(hitRate);
             } else {
-                maxValue.setHitRate(Math.min(2, maxValue.getHitRate() + hitRate));
+                baseValue.setHitRate(baseValue.getHitRate() + hitRate);
             }
 
             // 机动力
             int mobility = Integer.parseInt(map.get("mobility").toString());
-            if (maxValue.getMove() == null) {
-                maxValue.setMove(Math.min(2, mobility));
+            if (baseValue.getMove() == null) {
+                baseValue.setMove(mobility);
             } else {
-                maxValue.setMove(Math.min(2, maxValue.getMove() + mobility));
+                baseValue.setMove(baseValue.getMove() + mobility);
             }
+
         });
-        return maxValue;
+        return baseValue;
     }
 
     @Override
