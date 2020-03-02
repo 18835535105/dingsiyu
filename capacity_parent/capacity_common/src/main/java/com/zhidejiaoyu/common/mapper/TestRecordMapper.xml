@@ -947,4 +947,12 @@
         order by id desc
         limit #{limit}
     </select>
+    <select id="selectScoreAvgByStartDateAndEndDate" resultType="java.lang.Double" parameterType="map">
+        select avg(point)
+        from test_record
+        where student_id = #{studentId}
+          and point is not null
+          and test_end_time >= #{startTime}
+          and test_end_time &lt;= #{endTime}
+    </select>
 </mapper>
