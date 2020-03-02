@@ -77,6 +77,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
             returnMap.put("background", null);
         }
         returnMap.put("obtain", studentPayConfig.getObtain());
+        returnMap.put("campus", joinSchool.getSchoolName());
         return returnMap;
     }
 
