@@ -39,14 +39,6 @@ public interface IndexService extends BaseService<Student> {
     ServerResponse<Object> record(String openId);
 
     /**
-     * 飞行状态
-     *
-     * @param openId
-     * @return
-     */
-    ServerResponse<Object> myState(String openId);
-
-    /**
      * 藏宝阁
      *
      * @param dto
@@ -61,4 +53,12 @@ public interface IndexService extends BaseService<Student> {
      * @return
      */
     ServerResponse<Object> cardInfo(String openId);
+
+    /**
+     * 获取学生id
+     *
+     * @param openId
+     * @return
+     */
+    Long getStudentId(String openId);
 }

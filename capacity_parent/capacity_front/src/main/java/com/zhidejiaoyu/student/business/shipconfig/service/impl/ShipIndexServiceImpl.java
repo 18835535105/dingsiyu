@@ -59,24 +59,25 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Override
     public ServerResponse<Object> index() {
         Student student = super.getStudent();
-        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
+        Long studentId = student.getId();
+        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(studentId);
 
         // 皮肤
-        StudentSkin studentSkin = studentSkinMapper.selectUseSkinByStudentId(student.getId());
+        StudentSkin studentSkin = studentSkinMapper.selectUseSkinByStudentId(studentId);
 
         // 勋章图片
         List<String> medalImgList = this.getMedalImgList(studentExpansion);
 
         // 学生装备的飞船及装备信息
-        List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(student.getId());
+        List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
         IndexVO indexVO = this.getIndexVoTmp(equipments);
-        IndexVO.BaseValue baseValue = this.getMaxValue(equipments);
+        IndexVO.BaseValue baseValue = this.getBaseValue(equipments);
 
-        IndexVO.StateOfWeek stateOfWeek = this.getStateOfWeek(student, baseValue);
+        IndexVO.StateOfWeek stateOfWeek = this.getStateOfWeek(studentId, baseValue);
 
         IndexVO.Radar radar = this.getRadar(baseValue, stateOfWeek);
 
-        SyntheticRewardsList syntheticRewardsList = syntheticRewardsListMapper.selectUseGloveOrFlower(student.getId());
+        SyntheticRewardsList syntheticRewardsList = syntheticRewardsListMapper.selectUseGloveOrFlower(studentId);
 
         return ServerResponse.createBySuccess(IndexVO.builder()
                 .sourcePoser(studentExpansion.getSourcePower())
@@ -110,12 +111,10 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         return radar;
     }
 
-    private IndexVO.StateOfWeek getStateOfWeek(Student student, IndexVO.BaseValue baseValue) {
+    private IndexVO.StateOfWeek getStateOfWeek(Long studentId, IndexVO.BaseValue baseValue) {
         Date date = new Date();
         String beforeSevenDaysDateStr = DateUtil.getBeforeDayDateStr(date, 7, DateUtil.YYYYMMDD);
         String now = DateUtil.formatDate(new Date(), DateUtil.YYYYMMDD);
-
-        Long studentId = student.getId();
 
         IndexVO.StateOfWeek stateOfWeek = new IndexVO.StateOfWeek();
 
@@ -134,7 +133,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
      * @param equipments
      * @return
      */
-    private IndexVO.BaseValue getMaxValue(List<Map<String, Object>> equipments) {
+    private IndexVO.BaseValue getBaseValue(List<Map<String, Object>> equipments) {
         IndexVO.BaseValue baseValue = new IndexVO.BaseValue();
         equipments.forEach(map -> {
             // 攻击力
@@ -211,6 +210,16 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
             return this.packageRankVO(key, rank, studentIds);
         }
+    }
+
+    @Override
+    public IndexVO.Radar getRadar(Long studentId) {
+        List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
+        IndexVO.BaseValue baseValue = this.getBaseValue(equipments);
+
+        IndexVO.StateOfWeek stateOfWeek = this.getStateOfWeek(studentId, baseValue);
+
+        return this.getRadar(baseValue, stateOfWeek);
     }
 
     public ServerResponse<Object> packageRankVO(String key, long rank, List<Long> studentIds) {
