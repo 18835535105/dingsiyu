@@ -124,7 +124,7 @@ public class CalculateUtil {
      */
     public static int getSource(IndexVO.BaseValue baseValue, Long studentId, String beforeSevenDaysDateStr, String endDateStr) {
         double avg = testRecordMapper.selectScoreAvgByStartDateAndEndDate(studentId, beforeSevenDaysDateStr, endDateStr);
-        return Math.min(30000, (int) (baseValue.getAttack() * (0.5 + avg * 1.0 / 100)));
+        return Math.min(30000, (int) (baseValue.getSourceAttack() * (0.5 + avg * 1.0 / 100) * baseValue.getSource()));
     }
 
 
