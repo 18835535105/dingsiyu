@@ -39,4 +39,9 @@ public interface FileConstant {
      * 小程序码（oss）
      */
     String QR_CODE_OSS = "imgs/qr-code/";
+
+    /**
+     * 小程序海报图片地址
+     */
+    String SHARE_CONFIG_IMG = "imgs/shareConfigImg/";
 }
