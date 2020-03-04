@@ -151,7 +151,7 @@ public class CalculateUtil {
 
         // 学生装备的飞船及装备信息
         List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
-        IndexVO.BaseValue baseValue = shipIndexService.getMaxValue(equipments);
+        IndexVO.BaseValue baseValue = shipIndexService.getBaseValue(equipments);
         //获取攻击力
         int attack = getAttack(baseValue.getAttack(), studentId, beforeSevenDaysDateStr, endDateStr);
         //获取耐久度

@@ -138,7 +138,8 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
      * @param equipments
      * @return
      */
-    private IndexVO.BaseValue getBaseValue(List<Map<String, Object>> equipments) {
+    @Override
+    public IndexVO.BaseValue getBaseValue(List<Map<String, Object>> equipments) {
         IndexVO.BaseValue baseValue = new IndexVO.BaseValue();
         equipments.forEach(map -> {
             // 攻击力
@@ -205,7 +206,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
             // 机动力
             Object mobility1 = map.get("mobility");
-            if(mobility1 != null) {
+            if (mobility1 != null) {
                 int mobility = Integer.parseInt(mobility1.toString());
                 if (baseValue.getMove() == null) {
                     baseValue.setMove(mobility);

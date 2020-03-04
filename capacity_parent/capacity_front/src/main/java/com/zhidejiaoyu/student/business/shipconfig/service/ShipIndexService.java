@@ -45,5 +45,5 @@ public interface ShipIndexService extends BaseService<Student> {
      * @param equipments
      * @return
      */
-    IndexVO.BaseValue getMaxValue(List<Map<String, Object>> equipments);
+    IndexVO.BaseValue getBaseValue(List<Map<String, Object>> equipments);
 }
