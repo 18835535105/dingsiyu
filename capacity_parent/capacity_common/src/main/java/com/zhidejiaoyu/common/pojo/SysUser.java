@@ -91,12 +91,6 @@ public class SysUser extends Model<SysUser> {
      */
     private Integer version;
 
-    /**
-     * 校区名片路径
-     */
-    private String businessCardImgUrl;
-
-
     @Override
     protected Serializable pkVal() {
         return this.id;
