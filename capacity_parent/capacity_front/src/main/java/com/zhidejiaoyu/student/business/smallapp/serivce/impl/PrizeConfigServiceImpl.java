@@ -60,7 +60,9 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
             payconfigId = studentPayConfig.getPrizeConfigId();
         }
         PrizeConfig prizeConfig = prizeConfigMapper.selectById(payconfigId);
-        returnMap.put("prizeName", prizeConfig.getPrizeName());
+        returnMap.put("prizeName", prizeConfig.getPrizeCount() > 0 ? prizeConfig.getPrizeName() : "谢谢惠顾");
+        prizeConfig.setPrizeCount(prizeConfig.getPrizeCount() - 1);
+        prizeConfigMapper.updateById(prizeConfig);
         JoinSchool joinSchool = joinSchoolMapper.selectByUserId(adminId.intValue());
         returnMap.put("adress", joinSchool.getAddress());
         SysUser sysUser = sysUserMapper.selectById(adminId);
