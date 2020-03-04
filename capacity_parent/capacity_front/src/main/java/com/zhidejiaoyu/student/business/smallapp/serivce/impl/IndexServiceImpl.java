@@ -143,8 +143,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Override
     public ServerResponse<Object> record(String openId) {
 
-        Student student = studentMapper.selectByOpenId(openId);
-        Long studentId = student.getId();
+        Long studentId = this.getStudentId(openId);
 
         PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
         // 查询有学习记录的在线时长与学习日期
@@ -172,41 +171,6 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         PageVo pageVo = PageUtil.packagePage(resultPage);
         return ServerResponse.createBySuccess(pageVo);
-    }
-
-    @Override
-    public ServerResponse<Object> myState(String openId) {
-
-        Student student = studentMapper.selectByOpenId(openId);
-        Long studentId = student.getId();
-
-        String today = DateUtil.formatYYYYMMDD(new Date());
-
-        String beforeSevenDays = DateUtil.getBeforeDayDateStr(new Date(), 7, DateUtil.YYYYMMDD) + " 00:00:00";
-
-        // 耐久度
-        Integer onlineTime = durationMapper.selectOnlineTime(studentId, beforeSevenDays, today);
-
-        // 复习命中率
-        int count = testRecordMapper.countByGenreWithBeginTimeAndEndTime(studentId, GenreConstant.SMALLAPP_GENRE, beforeSevenDays, today);
-
-        // 机动力
-        Double efficiency = durationMapper.selectLastStudyEfficiency(studentId);
-
-        // 成绩平均值
-        Double avg = testRecordMapper.selectScoreAvg(studentId, 100);
-
-        // 单词数
-        int wordCount = learnNewMapper.countLearnedWordCount(studentId);
-
-        double score = Double.parseDouble(String.format("%.2f", avg));
-        return ServerResponse.createBySuccess(StateVO.builder()
-                .onlineTime(Math.min(onlineTime, 36000))
-                .reviewCount(Math.min(7, count))
-                .efficiency(Math.min(efficiency, 0.97))
-                .score(Math.min(100, score))
-                .wordLearnedCount(Math.min(wordCount, 6000))
-                .build());
     }
 
     @Override
@@ -252,6 +216,12 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                         .map(clockIn -> DateUtil.formatDate(clockIn.getCardTime(), DateUtil.YYYYMMDD))
                         .collect(Collectors.toList()))
                 .build());
+    }
+
+    @Override
+    public Long getStudentId(String openId) {
+        Student student = studentMapper.selectByOpenId(openId);
+        return student.getId();
     }
 
     /**

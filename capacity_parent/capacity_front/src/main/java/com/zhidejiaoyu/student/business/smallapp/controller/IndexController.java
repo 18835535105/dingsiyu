@@ -3,6 +3,8 @@ package com.zhidejiaoyu.student.business.smallapp.controller;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.controller.BaseController;
+import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
+import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import com.zhidejiaoyu.student.business.smallapp.dto.PrizeDTO;
 import com.zhidejiaoyu.student.business.smallapp.serivce.IndexService;
 import org.apache.commons.lang.StringUtils;
@@ -30,6 +32,9 @@ public class IndexController extends BaseController {
 
     @Resource
     private IndexService smallAppIndexService;
+
+    @Resource
+    private ShipIndexService shipIndexService;
 
     /**
      * 首页数据
@@ -102,7 +107,9 @@ public class IndexController extends BaseController {
         if (StringUtils.isEmpty(openId)) {
             throw new ServiceException("openId can't be null");
         }
-        return smallAppIndexService.myState(openId);
+        Long studentId = smallAppIndexService.getStudentId(openId);
+        IndexVO.Radar radar = shipIndexService.getRadar(studentId);
+        return ServerResponse.createBySuccess(radar);
     }
 
     /**

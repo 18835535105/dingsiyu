@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.BaseService;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
+import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,14 @@ public interface ShipIndexService extends BaseService<Student> {
      * @return
      */
     ServerResponse<Object> rank(Integer type);
+
+    /**
+     * 获取学生雷达图数据
+     *
+     * @param studentId
+     * @return
+     */
+    IndexVO.Radar getRadar(Long studentId);
 
     /**
      * 获取各项战力值
