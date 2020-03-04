@@ -39,6 +39,12 @@ public class PrizeConfig extends Model<PrizeConfig> {
      * 奖品名称
      */
     private String prizeName;
+
+    /**
+     * 可获得的奖品总个数
+     */
+    private Integer prizeCount;
+
     /**
      * 创建时间
      */
