@@ -113,6 +113,13 @@
           and ln.unit_id = #{unitId}
           and le.study_model = #{studyModel}
     </select>
+    <select id="selectWordListByStudentId" parameterType="map" resultType="long">
+        select
+        distinct word_id
+        from learn_extend
+        where student_id =#{studentId}
+        and study_model like concat('%','慧','%')
+    </select>
 
 
 </mapper>

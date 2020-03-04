@@ -4,16 +4,42 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.EquipmentExpansion">
-        <id column="id" property="id" />
-        <result column="equipment_id" property="equipmentId" />
-        <result column="durability" property="durability" />
-        <result column="common_attack" property="commonAttack" />
-        <result column="source_force_attack" property="sourceForceAttack" />
-        <result column="source_force" property="sourceForce" />
-        <result column="hit_rate" property="hitRate" />
-        <result column="mobility" property="mobility" />
-        <result column="intensification_degree" property="intensificationDegree" />
-        <result column="img_url" property="imgUrl" />
+        <id column="id" property="id"/>
+        <result column="equipment_id" property="equipmentId"/>
+        <result column="durability" property="durability"/>
+        <result column="common_attack" property="commonAttack"/>
+        <result column="source_force_attack" property="sourceForceAttack"/>
+        <result column="source_force" property="sourceForce"/>
+        <result column="hit_rate" property="hitRate"/>
+        <result column="mobility" property="mobility"/>
+        <result column="intensification_degree" property="intensificationDegree"/>
+        <result column="img_url" property="imgUrl"/>
     </resultMap>
+
+    <sql id="base_sql">
+        id,equipment_id,durability,common_attack,source_force_attack,source_force,hit_rate,mobility,intensification_degree,img_url
+    </sql>
+
+    <select id="selectLvOneAllUrl" resultType="map">
+        select
+        equipment_id equipmentId,img_url imgUrl
+        from equipment_expansion
+        where intensification_degree=1
+    </select>
+    <select id="selectAllUrlByType" resultType="map" parameterType="map">
+        select
+        exp.equipment_id equipmentId,exp.img_url imgUrl,exp.intensification_degree degree
+        from equipment_expansion exp
+        join equipment equ
+        on exp.equipment_id = equ.id
+        where equ.type=#{type}
+    </select>
+    <select id="selectUrlByEquipmentIdAndType" parameterType="map" resultType="string">
+        select
+        img_url
+        from equipment_expansion
+        where intensification_degree=#{degree}
+        and equipment_id=#{equipmentId}
+    </select>
 
 </mapper>

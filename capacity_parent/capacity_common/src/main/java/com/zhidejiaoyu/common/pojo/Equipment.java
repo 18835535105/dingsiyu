@@ -41,6 +41,11 @@ public class Equipment extends Model<Equipment> {
      */
     private Integer level;
 
+    /**
+     * 开启所需经验值
+     *
+     */
+    private Long empiricalValue;
 
     @Override
     protected Serializable pkVal() {

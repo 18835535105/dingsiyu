@@ -227,4 +227,6 @@ public interface DurationMapper extends BaseMapper<Duration> {
      * @return
      */
     Double selectLastStudyEfficiency(@Param("studentId") Long studentId);
+
+    List<Integer> selectDayTimeByStudentId(@Param("studentId") long studentId);
 }

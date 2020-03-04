@@ -8,12 +8,13 @@
         <result column="name" property="name"/>
         <result column="type" property="type"/>
         <result column="level" property="level"/>
+        <result column="empirical_value" property="empiricalValue"/>
     </resultMap>
     <sql id="base_sql">
-        id, `name`, type, `level`
+        id, `name`, type, `level`,empirical_value
     </sql>
     <sql id="more_table_sql">
-        e.id, e.name, e.type, e.level
+        e.id, e.name, e.type, e.level,e.empirical_value
     </sql>
     <select id="selectUsedByStudentId" resultType="map" parameterType="map">
         select e.type,
@@ -30,6 +31,18 @@
             and se.student_id = #{studentId} and se.type = 1
             and ee.intensification_degree = se.intensification_degree
 
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"></include>
+        from equipment
+    </select>
+    <select id="selectByType" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"></include>
+        from equipment
+        where `type` =#{type}
+        order by level asc
     </select>
 
 </mapper>

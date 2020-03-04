@@ -3,6 +3,8 @@ package com.zhidejiaoyu.common.mapper;
 import com.zhidejiaoyu.common.pojo.Equipment;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,7 @@ import java.util.Map;
  * @author zdjy
  * @since 2020-02-27
  */
+@Repository
 public interface EquipmentMapper extends BaseMapper<Equipment> {
 
     /**
@@ -34,4 +37,10 @@ public interface EquipmentMapper extends BaseMapper<Equipment> {
      */
     List<Map<String, Object>> selectUsedByStudentId(@Param("studentId") Long studentId);
 
+    List<Equipment> selectAll();
+
+    @Select("select id from equipment where type =#{type} and level =#{level}")
+    long selectIdByTypeAndLevel(@Param("type") int type, @Param("level") int level);
+
+    List<Equipment> selectByType(@Param("type") Integer type);
 }

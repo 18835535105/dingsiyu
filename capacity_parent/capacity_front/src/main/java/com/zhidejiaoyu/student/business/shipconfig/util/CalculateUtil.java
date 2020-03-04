@@ -2,13 +2,19 @@ package com.zhidejiaoyu.student.business.shipconfig.util;
 
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.DurationMapper;
+import com.zhidejiaoyu.common.mapper.EquipmentMapper;
 import com.zhidejiaoyu.common.mapper.LearnNewMapper;
 import com.zhidejiaoyu.common.mapper.TestRecordMapper;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 计算规则工具
@@ -25,6 +31,10 @@ public class CalculateUtil {
 
     private static TestRecordMapper testRecordMapper;
 
+    private static EquipmentMapper equipmentMapper;
+
+    private static ShipIndexService shipIndexService;
+
     @Resource(name = "learnNewMapper")
     private LearnNewMapper learnNewMapperTmp;
 
@@ -34,12 +44,19 @@ public class CalculateUtil {
     @Resource(name = "testRecordMapper")
     private TestRecordMapper testRecordMapperTmp;
 
+    @Resource(name = "equipmentMapper")
+    private EquipmentMapper equipmentMapperTmp;
+
+    @Resource
+    private ShipIndexService shipIndexServiceTmp;
+
     @PostConstruct
     public void init() {
         learnNewMapper = this.learnNewMapperTmp;
         durationMapper = this.durationMapperTmp;
         testRecordMapper = this.testRecordMapperTmp;
-
+        equipmentMapper = this.equipmentMapperTmp;
+        shipIndexService = this.shipIndexServiceTmp;
     }
 
     /**
@@ -125,6 +142,27 @@ public class CalculateUtil {
     public static int getSource(IndexVO.BaseValue baseValue, Long studentId, String beforeSevenDaysDateStr, String endDateStr) {
         double avg = testRecordMapper.selectScoreAvgByStartDateAndEndDate(studentId, beforeSevenDaysDateStr, endDateStr);
         return Math.min(30000, (int) (baseValue.getAttack() * (0.5 + avg * 1.0 / 100)));
+    }
+
+    /**
+     * 获取源力攻击
+     */
+    public static int getSouintrceForceAttack(Long studentId, String beforeSevenDaysDateStr, String endDateStr) {
+
+        // 学生装备的飞船及装备信息
+        List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
+        IndexVO.BaseValue baseValue = shipIndexService.getMaxValue(equipments);
+        //获取攻击力
+        int attack = getAttack(baseValue.getAttack(), studentId, beforeSevenDaysDateStr, endDateStr);
+        //获取耐久度
+        int durability = getDurability(baseValue.getDurability(), studentId, beforeSevenDaysDateStr, endDateStr);
+        //获取命中率
+        double hitRate = getHitRate(baseValue.getHitRate(), studentId, beforeSevenDaysDateStr, endDateStr);
+        //获取机动力
+        int move = getMove(baseValue.getMove(), studentId, beforeSevenDaysDateStr, endDateStr);
+        //获取源力
+        int source = getSource(baseValue, studentId, beforeSevenDaysDateStr, endDateStr);
+        return (int)((durability + attack * 5 + baseValue.getSourceAttack() * source) * (hitRate + move / 10000));
     }
 
 

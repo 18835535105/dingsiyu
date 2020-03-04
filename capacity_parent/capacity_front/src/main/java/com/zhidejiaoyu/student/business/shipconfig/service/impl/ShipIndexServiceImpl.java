@@ -134,7 +134,8 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
      * @param equipments
      * @return
      */
-    private IndexVO.BaseValue getMaxValue(List<Map<String, Object>> equipments) {
+    @Override
+    public IndexVO.BaseValue getMaxValue(List<Map<String, Object>> equipments) {
         IndexVO.BaseValue baseValue = new IndexVO.BaseValue();
         equipments.forEach(map -> {
             // 攻击力

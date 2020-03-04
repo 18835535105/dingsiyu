@@ -4,17 +4,29 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentEquipment">
-        <id column="id" property="id" />
-        <result column="equipment_id" property="equipmentId" />
-        <result column="student_id" property="studentId" />
-        <result column="intensification_degree" property="intensificationDegree" />
-        <result column="type" property="type" />
+        <id column="id" property="id"/>
+        <result column="equipment_id" property="equipmentId"/>
+        <result column="student_id" property="studentId"/>
+        <result column="intensification_degree" property="intensificationDegree"/>
+        <result column="type" property="type"/>
     </resultMap>
 
     <sql id="base_sql">
         id,equipment_id,student_id,intensification_degree,`type`
     </sql>
+    <sql id="stu_equ_base_sql">
+        stuEqu.id,stuEqu.equipment_id,stuEqu.student_id,stuEqu.intensification_degree,stuEqu.`type`
+    </sql>
 
+    <select id="selectByStudentIdAndType" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="stu_equ_base_sql"></include>
+        from student_equipment stuEqu
+        join equipment equ on stuEqu.equipment_id=equ.id
+        where
+        stuEqu.student_id =#{studentId}
+        and equ.type=#{type}
+    </select>
     <select id="selectByStudentIdAndEquipmentId" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="base_sql"></include>
@@ -23,5 +35,22 @@
         student_id =#{studentId}
         and equipment_id=#{equipmentId}
     </select>
+    <select id="selectEquipmentIdsByStudentId" resultType="long" parameterType="map">
+        select
+        equipment_id
+        from student_equipment
+        where
+        student_id =#{studentId}
+    </select>
+    <update id="updateTypeByEqumentsId" parameterType="map">
+        update student_equipment
+        set `type`=2
+        where student_id =#{studentId}
+        and equipment_id in (
+        <foreach collection="equmentIds" item="equmentId" separator=",">
+            #{equmentId}
+        </foreach>
+        )
+    </update>
 
 </mapper>

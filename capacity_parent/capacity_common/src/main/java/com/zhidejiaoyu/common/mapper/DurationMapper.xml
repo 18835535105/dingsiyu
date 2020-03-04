@@ -520,4 +520,12 @@
         </foreach>
         )
     </delete>
+    <select id="selectDayTimeByStudentId" parameterType="map" resultType="integer">
+        select
+         sum(online_time)
+         from duration
+         where student_id =#{studentId}
+         group by TO_DAYS(login_time)
+    </select>
+
 </mapper>

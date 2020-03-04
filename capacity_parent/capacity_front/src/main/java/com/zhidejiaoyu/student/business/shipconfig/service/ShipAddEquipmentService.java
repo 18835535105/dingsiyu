@@ -6,5 +6,11 @@ import com.zhidejiaoyu.student.business.service.BaseService;
 import javax.servlet.http.HttpSession;
 
 public interface ShipAddEquipmentService extends BaseService<Student> {
-    Object addStudentEquipment(HttpSession session, Long equipmentId);
+    Object queryAddStudentEquipment(HttpSession session);
+
+    Object strengthenStudentEquipment(HttpSession session, Long equipmentId);
+
+    Object getEquipmentInterface(HttpSession session, Integer type);
+
+    Object WearEquipment(HttpSession session, Long equipmentId);
 }

@@ -68,4 +68,14 @@
         group by course_id) t
         group by t.courseId
     </select>
+    <select id="selectWordListBystudentId" parameterType="map" resultType="long">
+        select
+        DISTINCT uv.vocabulary_id
+        from learn_history his
+        join unit_vocabulary_new uv
+        on his.unit_id = uv.unit_id and his.`group`=uv.`group`
+        where his.student_id=#{studentId}
+    </select>
+
+
 </mapper>

@@ -3,6 +3,10 @@ package com.zhidejiaoyu.student.business.shipconfig.service;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.BaseService;
+import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 飞船配置首页
@@ -26,4 +30,11 @@ public interface ShipIndexService extends BaseService<Student> {
      * @return
      */
     ServerResponse<Object> rank(Integer type);
+
+    /**
+     * 获取各项战力值
+     * @param equipments
+     * @return
+     */
+    IndexVO.BaseValue getMaxValue(List<Map<String, Object>> equipments);
 }
