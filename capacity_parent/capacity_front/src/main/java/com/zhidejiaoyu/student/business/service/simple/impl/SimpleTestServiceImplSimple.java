@@ -235,7 +235,6 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         String grade = student.getGrade();
         String phase = CommonMethod.getPhase(grade);
 
-        // todo: 以下取题以后改为从预科库中获取
         if ("初中".equals(phase)) {
             // 前往初中预科库查询简单单词
             vocabularies = vocabularyMapper.selectByStudentPhase(student, 1);
