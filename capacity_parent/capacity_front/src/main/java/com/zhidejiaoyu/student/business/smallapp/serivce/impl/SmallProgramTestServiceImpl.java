@@ -139,7 +139,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             returnMap.put("img", null);
             returnMap.put("word", "sfdfssdfsfsdfsdddsdfsdfsdf");
         } else {
-            returnMap.put("img", shareConfig.getImgUrl());
+            returnMap.put("img", GetOssFile.getPublicObjectUrl(shareConfig.getImgUrl()));
             returnMap.put("word", shareConfig.getImgWord());
         }
         returnMap.put("gold", student.getSystemGold().intValue());
