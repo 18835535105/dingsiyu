@@ -232,10 +232,18 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             if (studentEquipment != null) {
                 //是否开启
                 equMap.put("open", true);
-                if (studentEquipment.getIntensificationDegree() < 3) {
-                    //是否可强化
-                    equMap.put("strengthen", false);
+                if (equipment.getType().equals(5)) {
+                    if (studentEquipment.getIntensificationDegree() > 3) {
+                        //是否可强化
+                        equMap.put("strengthen", false);
+                    }
+                } else {
+                    if (studentEquipment.getIntensificationDegree() > 4) {
+                        //是否可强化
+                        equMap.put("strengthen", false);
+                    }
                 }
+
                 //强化等级
                 equMap.put("enhancementGrade", studentEquipment.getIntensificationDegree());
                 equMap.put("wear", studentEquipment.getType().equals(1));
@@ -290,7 +298,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                 gold = 150;
             }
         }
-        if (strengthen >= 4) {
+        if (strengthen > 4) {
             return 3;
         }
         if (student.getSystemGold() > gold) {
@@ -383,7 +391,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                 Equipment equipment = addEquipments.get(addId);
                 Map<String, Object> map = new HashMap<>();
                 map.put("name", equipment.getName());
-                map.put("url",  GetOssFile.getPublicObjectUrl(imgMap.get(addId).get("imgUrl").toString()));
+                map.put("url", GetOssFile.getPublicObjectUrl(imgMap.get(addId).get("imgUrl").toString()));
                 returnList.add(map);
             });
         }
