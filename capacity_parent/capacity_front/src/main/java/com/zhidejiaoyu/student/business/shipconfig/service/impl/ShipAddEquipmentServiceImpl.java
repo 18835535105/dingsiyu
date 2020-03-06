@@ -140,7 +140,6 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         Map<Long, List<Map<String, Object>>> equipmentMap = urlList.stream().collect(Collectors.groupingBy(ment -> Long.parseLong(ment.get("equipmentId").toString())));
         List<Map<String, Object>> equSort = getEquSort(studentEquiments, equipment, empiricalValue, returnMap, type);
         getImgUrl(equSort, equipmentMap, returnMap);
-        updateLeaderboards(student);
         return returnMap;
     }
 
