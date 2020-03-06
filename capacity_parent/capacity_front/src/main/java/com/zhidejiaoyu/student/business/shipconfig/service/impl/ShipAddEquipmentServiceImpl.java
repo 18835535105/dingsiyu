@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.shipconfig.service.impl;
 
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.Equipment;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -118,8 +119,8 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         getReturnMap(equipment, returnMap, true,
                 studentEquipment.getIntensificationDegree() < 3, studentEquipment.getIntensificationDegree(), studentEquipment.getType());
         //获取装备图片
-        returnMap.put("imgUrl", equipmentExpansionMapper.selectUrlByEquipmentIdAndType(equipmentId,
-                studentEquipment.getIntensificationDegree() > 3 ? 3 : studentEquipment.getIntensificationDegree()));
+        returnMap.put("imgUrl", GetOssFile.getPublicObjectUrl(equipmentExpansionMapper.selectUrlByEquipmentIdAndType(equipmentId,
+                studentEquipment.getIntensificationDegree() > 3 ? 3 : studentEquipment.getIntensificationDegree())));
         return ServerResponse.createBySuccess(returnMap);
     }
 
@@ -144,7 +145,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     }
 
     @Override
-    public Object WearEquipment(HttpSession session, Long equipmentId) {
+    public Object wearEquipment(HttpSession session, Long equipmentId) {
         Student student = getStudent(session);
         Equipment equipment = equipmentMapper.selectById(equipmentId);
         //获取全部同类型装备id
@@ -175,7 +176,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                     .filter(url ->
                             Integer.parseInt(url.get("degree").toString()) == Integer.parseInt(equ.get("enhancementGrade").toString()))
                     .collect(Collectors.toList());
-            equ.put("imgUrl", collect.get(0).get("imgUrl"));
+            equ.put("imgUrl", GetOssFile.getPublicObjectUrl(collect.get(0).get("imgUrl").toString()));
             returnList.add(equ);
         });
         returnMap.put("list", returnList);
@@ -381,7 +382,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                 Equipment equipment = addEquipments.get(addId);
                 Map<String, Object> map = new HashMap<>();
                 map.put("name", equipment.getName());
-                map.put("url", imgMap.get(addId).get("imgUrl"));
+                map.put("url",  GetOssFile.getPublicObjectUrl(imgMap.get(addId).get("imgUrl").toString()));
                 returnList.add(map);
             });
         }

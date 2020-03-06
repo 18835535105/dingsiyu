@@ -54,7 +54,7 @@ public class ShipAddEquipmentController {
      */
     @PostMapping("/WearEquipment")
     public Object wearEquipment(HttpSession session, Long equipmentId){
-        return shipAddEquipmentService.WearEquipment(session,equipmentId);
+        return shipAddEquipmentService.wearEquipment(session,equipmentId);
     }
 
 
