@@ -114,5 +114,5 @@ public interface LearnExtendMapper extends BaseMapper<LearnExtend> {
      */
     int countLearnedSyntax(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("studyModel") String studyModel);
 
-    List<Long> selectWordListByStudentId(@Param("stduentId") long studentId);
+    List<Long> selectWordListByStudentId(@Param("studentId") long studentId);
 }

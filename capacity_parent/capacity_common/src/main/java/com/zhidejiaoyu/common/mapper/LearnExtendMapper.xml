@@ -115,10 +115,12 @@
     </select>
     <select id="selectWordListByStudentId" parameterType="map" resultType="long">
         select
-        distinct word_id
-        from learn_extend
-        where student_id =#{studentId}
-        and study_model like concat('%','慧','%')
+        distinct learnEx.word_id
+        from learn_extend learnEx
+        join learn_new learn
+        on learnEx.learn_id =learn.id
+        where learn.student_id =#{studentId}
+        and learnEx.study_model like concat('%','慧','%')
     </select>
 
 

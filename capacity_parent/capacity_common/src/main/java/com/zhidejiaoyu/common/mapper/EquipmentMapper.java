@@ -39,8 +39,8 @@ public interface EquipmentMapper extends BaseMapper<Equipment> {
 
     List<Equipment> selectAll();
 
-    @Select("select id from equipment where type =#{type} and level =#{level}")
-    long selectIdByTypeAndLevel(@Param("type") int type, @Param("level") int level);
+
+    Equipment selectIdByTypeAndLevel(@Param("type") int type, @Param("level") int level);
 
     List<Equipment> selectByType(@Param("type") Integer type);
 }

@@ -391,7 +391,8 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                 Equipment equipment = addEquipments.get(addId);
                 Map<String, Object> map = new HashMap<>();
                 map.put("name", equipment.getName());
-                map.put("url", GetOssFile.getPublicObjectUrl(imgMap.get(addId).get("imgUrl").toString()));
+                //imgMap.get(addId).get("imgUrl").toString()
+                map.put("url", GetOssFile.getPublicObjectUrl("asdfsdfdsf"));
                 returnList.add(map);
             });
         }
@@ -408,23 +409,27 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     private Map<Long, Equipment> getEquipments(List<Equipment> equipments, List<Long> studentEquimentIds,
                                                Integer shipExperience, Boolean flag) {
         Map<Long, Equipment> addEquipment = new HashMap<>();
-        if (flag != null && flag) {
-            //获取第一个飞船信息
-            long equipmentId = equipmentMapper.selectIdByTypeAndLevel(1, 1);
-            addEquipment.put(equipmentId, addEquipment.get(equipmentId));
+        if (equipments != null && equipments.size() > 0) {
+
+            if (flag != null && flag) {
+                //获取第一个飞船信息
+                Equipment equipment = equipmentMapper.selectIdByTypeAndLevel(1, 1);
+                addEquipment.put(equipment.getId(), equipment);
+            }
+            //获取可添加物品
+            equipments.forEach(ment -> {
+                if (ment.getEmpiricalValue() < shipExperience) {
+                    addEquipment.put(ment.getId(), ment);
+                }
+            });
+            studentEquimentIds.forEach(studentMentId -> {
+                Equipment equipment = addEquipment.get(studentMentId);
+                if (equipment != null) {
+                    addEquipment.remove(studentMentId);
+                }
+            });
+
         }
-        //获取可添加物品
-        equipments.forEach(ment -> {
-            if (ment.getEmpiricalValue() < shipExperience) {
-                addEquipment.put(ment.getId(), ment);
-            }
-        });
-        studentEquimentIds.forEach(studentMentId -> {
-            Equipment equipment = addEquipment.get(studentMentId);
-            if (equipment != null) {
-                addEquipment.remove(studentMentId);
-            }
-        });
         return addEquipment;
     }
 

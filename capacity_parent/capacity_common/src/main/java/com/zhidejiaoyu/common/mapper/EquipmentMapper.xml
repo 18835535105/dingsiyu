@@ -45,4 +45,9 @@
         order by level
     </select>
 
+    <select id="selectIdByTypeAndLevel" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from equipment where type =#{type} and level =#{level}
+    </select>
 </mapper>
