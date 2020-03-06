@@ -6,8 +6,6 @@ package com.zhidejiaoyu.aliyunoss.common;
  */
 public interface AliyunInfoConst {
     String endpoint = "oss.yydz100.com";
-    String accessKeyId = "LTAIxQh72AIRDnKY";
-    String accessKeySecret = "XNACDGtXpOYHfFNG4hN6m5SBnYJgS0";
     String bucketName = "zdjy-back-oss";
 
     /**

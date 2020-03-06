@@ -3,6 +3,7 @@ package com.zhidejiaoyu.aliyunoss.config;
 import com.aliyun.oss.ClientBuilderConfiguration;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
+import com.zhidejiaoyu.aliyuncommon.constant.AliyunInfoConstant;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,6 @@ public class OssClientConfig {
         clientBuilderConfiguration.setConnectionTimeout(5000);
         clientBuilderConfiguration.setMaxErrorRetry(3);
         log.info("Init OssClient");
-        return new OSSClientBuilder().build(AliyunInfoConst.endpoint, AliyunInfoConst.accessKeyId, AliyunInfoConst.accessKeySecret, clientBuilderConfiguration);
+        return new OSSClientBuilder().build(AliyunInfoConst.endpoint, AliyunInfoConstant.accessKeyId, AliyunInfoConstant.accessKeySecret, clientBuilderConfiguration);
     }
 }
