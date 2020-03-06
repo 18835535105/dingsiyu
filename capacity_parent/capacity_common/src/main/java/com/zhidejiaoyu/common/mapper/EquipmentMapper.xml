@@ -18,12 +18,12 @@
     </sql>
     <select id="selectUsedByStudentId" resultType="map" parameterType="map">
         select e.type,
-               ee.img_url imgUrl,
+               ee.img_url             imgUrl,
                ee.durability,
-               ee.common_attack commmonAttack,
+               ee.common_attack       commmonAttack,
                ee.source_force_attack sourceForceAttack,
-               ee.source_force sourceForce,
-               ee.hit_rate hitRate,
+               ee.source_force        sourceForce,
+               ee.hit_rate            hitRate,
                ee.mobility
         from equipment e
                  join equipment_expansion ee on e.id = ee.equipment_id
@@ -34,15 +34,15 @@
     </select>
     <select id="selectAll" resultMap="BaseResultMap">
         select
-        <include refid="base_sql"></include>
+        <include refid="base_sql"/>
         from equipment
     </select>
     <select id="selectByType" resultMap="BaseResultMap" parameterType="map">
         select
-        <include refid="base_sql"></include>
+        <include refid="base_sql"/>
         from equipment
         where `type` =#{type}
-        order by level asc
+        order by level
     </select>
 
 </mapper>

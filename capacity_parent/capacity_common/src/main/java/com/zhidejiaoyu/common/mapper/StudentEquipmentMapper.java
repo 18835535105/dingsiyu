@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.StudentEquipment;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import java.util.Map;
  * @author zdjy
  * @since 2020-02-27
  */
+@Repository
 public interface StudentEquipmentMapper extends BaseMapper<StudentEquipment> {
 
     StudentEquipment selectByStudentIdAndEquipmentId(@Param("studentId") Long studentId, @Param("equipmentId") Long equipmentId);
@@ -25,5 +27,5 @@ public interface StudentEquipmentMapper extends BaseMapper<StudentEquipment> {
     @MapKey("equipmentId")
     Map<Long, StudentEquipment> selectByStudentIdAndType(@Param("studentId") Long studentId, @Param("type") Integer type);
 
-    void updateTypeByEqumentsId(@Param("equmentIds") List<Long> equipmentIds,@Param("studentId") Long studentId);
+    void updateTypeByEquipmentId(@Param("equipmentIds") List<Long> equipmentIds, @Param("studentId") Long studentId);
 }

@@ -52,34 +52,34 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     @Override
     public Object queryAddStudentEquipment(HttpSession session) {
         Student student = getStudent(session);
-        List<Map<String, Object>> reutrnList = new ArrayList<>();
+        List<Map<String, Object>> returnList = new ArrayList<>();
         List<Long> addIdList = new ArrayList<>();
         //获取等级开启奖品
         //判断是否通过摸底测试
-        boolean falg = redisOpt.getTestBeforeStudy(student.getId());
+        boolean flag = redisOpt.getTestBeforeStudy(student.getId());
         //获取所有装备
-        List<Equipment> equipment = equipmentMapper.selectAll();
+        List<Equipment> equipments = equipmentMapper.selectAll();
         //获取所有学生装备
-        List<Long> studentEquimentIds = studentEquipmentMapper.selectEquipmentIdsByStudentId(student.getId());
+        List<Long> studentEquipmentIds = studentEquipmentMapper.selectEquipmentIdsByStudentId(student.getId());
         //获取全部装备lv1的图片
         Map<Long, Map<String, Object>> map = equipmentExpansionMapper.selectLvOneAllUrl();
         //获取经验值
         EquipmentExperienceVo empiricalValue = getEmpiricalValue(student.getId(), 0);
         //将装备分组
-        Map<Integer, List<Equipment>> collect = equipment.stream().collect(Collectors.groupingBy(ment -> ment.getType()));
+        Map<Integer, List<Equipment>> collect = equipments.stream().collect(Collectors.groupingBy(Equipment::getType));
         //获取飞船需要添加的物品
-        addEquipmentByType(collect.get(1), studentEquimentIds, empiricalValue.getShipExperience(), reutrnList, addIdList, map, falg);
+        addEquipmentByType(collect.get(1), studentEquipmentIds, empiricalValue.getShipExperience(), returnList, addIdList, map, flag);
         //添加武器需要的物品
-        addEquipmentByType(collect.get(2), studentEquimentIds, empiricalValue.getWeaponExperience(), reutrnList, addIdList, map, null);
+        addEquipmentByType(collect.get(2), studentEquipmentIds, empiricalValue.getWeaponExperience(), returnList, addIdList, map, null);
         //添加导弹需要的物品
-        addEquipmentByType(collect.get(3), studentEquimentIds, empiricalValue.getMissileExperience(), reutrnList, addIdList, map, null);
+        addEquipmentByType(collect.get(3), studentEquipmentIds, empiricalValue.getMissileExperience(), returnList, addIdList, map, null);
         //添加装备需要的物品
-        addEquipmentByType(collect.get(4), studentEquimentIds, empiricalValue.getArmorExperience(), reutrnList, addIdList, map, null);
+        addEquipmentByType(collect.get(4), studentEquipmentIds, empiricalValue.getArmorExperience(), returnList, addIdList, map, null);
         if (addIdList.size() > 0) {
             addEquipment(addIdList, student.getId());
         }
-        if (reutrnList.size() > 0) {
-            return ServerResponse.createBySuccess(reutrnList);
+        if (returnList.size() > 0) {
+            return ServerResponse.createBySuccess(returnList);
         } else {
             return ServerResponse.createBySuccess();
         }
@@ -153,7 +153,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         List<Long> equipmentIds = new ArrayList<>();
         equipments.forEach(ment -> equipmentIds.add(ment.getId()));
         //修改学生装备状态
-        studentEquipmentMapper.updateTypeByEqumentsId(equipmentIds, student.getId());
+        studentEquipmentMapper.updateTypeByEquipmentId(equipmentIds, student.getId());
         StudentEquipment studentEquipment = studentEquipmentMapper.selectByStudentIdAndEquipmentId(student.getId(), equipmentId);
         studentEquipment.setType(1);
         studentEquipmentMapper.updateById(studentEquipment);
@@ -215,20 +215,20 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         if (type.equals(4)) {
             empValue = empiricalValue.getArmorExperience();
         }
-        List<Map<String, Object>> reutrnList = new ArrayList<>();
-        for (Equipment ment : equipments) {
+        List<Map<String, Object>> returnList = new ArrayList<>();
+        for (Equipment equipment : equipments) {
             Map<String, Object> equMap = new HashMap<>();
             if (currentLevelFalg) {
-                nextLevel = ment.getLevel();
-                nextLevelValue = ment.getEmpiricalValue();
+                nextLevel = equipment.getLevel();
+                nextLevelValue = equipment.getEmpiricalValue();
                 currentLevelFalg = false;
             }
-            if (ment.getEmpiricalValue() <= empValue) {
-                currentLevel = ment.getLevel();
+            if (equipment.getEmpiricalValue() <= empValue) {
+                currentLevel = equipment.getLevel();
                 currentLevelFalg = true;
             }
-            getReturnMap(ment, equMap, false, true, 1, 2);
-            StudentEquipment studentEquipment = studentEquiments.get(ment.getId());
+            getReturnMap(equipment, equMap, false, true, 1, 2);
+            StudentEquipment studentEquipment = studentEquiments.get(equipment.getId());
             if (studentEquipment != null) {
                 //是否开启
                 equMap.put("open", true);
@@ -240,12 +240,12 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                 equMap.put("enhancementGrade", studentEquipment.getIntensificationDegree());
                 equMap.put("wear", studentEquipment.getType().equals(1));
             }
-            reutrnList.add(equMap);
+            returnList.add(equMap);
         }
         returnMap.put("currentLevel", currentLevel);
         returnMap.put("nextLevel", nextLevel);
         returnMap.put("percentage", 1.0 * empValue / nextLevelValue);
-        return reutrnList;
+        return returnList;
     }
 
     private void getReturnMap(Equipment ment, Map<String, Object> equMap, boolean openFlag, boolean strengthen, Integer grade, Integer wear) {
@@ -320,7 +320,8 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                     .setEquipmentId(equipmentId)
                     .setIntensificationDegree(1)
                     .setStudentId(studentId)
-                    .setType(2);
+                    .setType(2)
+                    .setCreateTime(new Date());
             studentEquipmentMapper.insert(studentEquipment);
         }
     }
@@ -331,7 +332,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             //获取每天在线时常
             int maxTime = 60 * 60 * 4;
             List<Integer> integers = durationMapper.selectDayTimeByStudentId(studentId);
-            Integer timeIndex = 0;
+            int timeIndex = 0;
             for (Integer time : integers) {
                 if (time == null) {
                     time = 0;
@@ -397,9 +398,9 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
      * @return
      */
     private Map<Long, Equipment> getEquipments(List<Equipment> equipments, List<Long> studentEquimentIds,
-                                               Integer shipExperience, Boolean falg) {
+                                               Integer shipExperience, Boolean flag) {
         Map<Long, Equipment> addEquipment = new HashMap<>();
-        if (falg != null && falg) {
+        if (flag != null && flag) {
             //获取第一个飞船信息
             long equipmentId = equipmentMapper.selectIdByTypeAndLevel(1, 1);
             addEquipment.put(equipmentId, addEquipment.get(equipmentId));
