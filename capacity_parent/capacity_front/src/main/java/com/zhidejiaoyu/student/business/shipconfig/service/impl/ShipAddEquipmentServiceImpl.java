@@ -155,6 +155,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         studentEquipmentMapper.updateTypeByEquipmentId(equipmentIds, student.getId());
         StudentEquipment studentEquipment = studentEquipmentMapper.selectByStudentIdAndEquipmentId(student.getId(), equipmentId);
         studentEquipment.setType(1);
+        updateLeaderboards(student);
         studentEquipmentMapper.updateById(studentEquipment);
         return ServerResponse.createBySuccess();
     }
