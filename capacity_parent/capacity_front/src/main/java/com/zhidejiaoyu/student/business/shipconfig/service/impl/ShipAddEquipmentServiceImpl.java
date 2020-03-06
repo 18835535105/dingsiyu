@@ -131,7 +131,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         List<Equipment> equipment = equipmentMapper.selectByType(type);
         //获取当前类别所有学生装备
         Map<Long, StudentEquipment> studentEquiments = studentEquipmentMapper.selectByStudentIdAndType(student.getId(), type);
-        //获取全部装备lv1的图片
+        //获取全部装备的图片
         List<Map<String, Object>> urlList = equipmentExpansionMapper.selectAllUrlByType(type);
         //获取经验值
         EquipmentExperienceVo empiricalValue = getEmpiricalValue(student.getId(), type);
