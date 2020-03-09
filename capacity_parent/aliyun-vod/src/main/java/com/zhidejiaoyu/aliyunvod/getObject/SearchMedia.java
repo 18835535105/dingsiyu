@@ -39,6 +39,8 @@ public class SearchMedia {
         SearchMediaRequest request = new SearchMediaRequest();
         request.setSearchType("video");
         request.setFields("Title,CoverURL");
+        request.setPageNo(1);
+        request.setPageSize(50);
         return client.getAcsResponse(request);
     }
 
