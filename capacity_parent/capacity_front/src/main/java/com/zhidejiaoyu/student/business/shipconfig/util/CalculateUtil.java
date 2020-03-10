@@ -68,7 +68,7 @@ public class CalculateUtil {
      */
     public static int getAttack(Integer baseValue, Long studentId, String beforeSevenDaysDateStr, String endDateStr) {
         int count = learnNewMapper.countLearnedWordCountByStartDateAndEndDate(studentId, beforeSevenDaysDateStr, endDateStr);
-        return Math.min((int) (baseValue * (0.2 + count * 1.0 / 30)), 3000);
+        return (int) (baseValue * (0.2 + count * 1.0 / 30));
     }
 
     /**
@@ -85,7 +85,7 @@ public class CalculateUtil {
         if (validTime == null) {
             validTime = 0;
         }
-        return Math.min((int) (baseValue * (0.5 + validTime * 1.0 / 28800)), 30000);
+        return (int) (baseValue * (0.5 + validTime * 1.0 / 28800));
     }
 
     /**
@@ -99,7 +99,7 @@ public class CalculateUtil {
      */
     public static double getHitRate(Double baseValue, Long studentId, String beforeSevenDaysDateStr, String endDateStr) {
         int count = testRecordMapper.countByGenreWithBeginTimeAndEndTime(studentId, GenreConstant.SMALLAPP_GENRE, beforeSevenDaysDateStr, endDateStr);
-        return Math.min(baseValue * (0.5 + count * 1.0 / 7), 2);
+        return baseValue * (0.5 + count * 1.0 / 7);
     }
 
     /**
@@ -124,7 +124,7 @@ public class CalculateUtil {
             validTime = (int) (onlineTime * 0.98);
         }
 
-        return Math.min((int) (baseValue * (0.5 + validTime * 1.0 / onlineTime)), 200);
+        return (int) (baseValue * (0.5 + validTime * 1.0 / onlineTime));
     }
 
     /**
