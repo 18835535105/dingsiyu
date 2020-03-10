@@ -46,6 +46,11 @@ public class Equipment extends Model<Equipment> {
      *
      */
     private Long empiricalValue;
+    /**
+     * 飞船级别
+     *
+     */
+    private String grade;
 
     @Override
     protected Serializable pkVal() {

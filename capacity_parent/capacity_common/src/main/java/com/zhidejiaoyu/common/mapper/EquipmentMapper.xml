@@ -9,12 +9,13 @@
         <result column="type" property="type"/>
         <result column="level" property="level"/>
         <result column="empirical_value" property="empiricalValue"/>
+        <result column="grade" property="grade"/>
     </resultMap>
     <sql id="base_sql">
-        id, `name`, type, `level`,empirical_value
+        id, `name`, type, `level`,empirical_value,grade
     </sql>
     <sql id="more_table_sql">
-        e.id, e.name, e.type, e.level,e.empirical_value
+        e.id, e.name, e.type, e.level,e.empirical_value,e.grade
     </sql>
     <select id="selectUsedByStudentId" resultType="map" parameterType="map">
         select e.type,
