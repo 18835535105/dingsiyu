@@ -162,7 +162,7 @@ public class CalculateUtil {
         int move = getMove(baseValue.getMove(), studentId, beforeSevenDaysDateStr, endDateStr);
         //获取源力
         int source = getSource(baseValue, studentId, beforeSevenDaysDateStr, endDateStr);
-        return (int)((durability + attack * 5 + baseValue.getSourceAttack() * source) * (hitRate + move / 10000));
+        return (int)((durability + attack * 10 + baseValue.getSourceAttack() * source) * (hitRate + move / 10000));
     }
 
 
