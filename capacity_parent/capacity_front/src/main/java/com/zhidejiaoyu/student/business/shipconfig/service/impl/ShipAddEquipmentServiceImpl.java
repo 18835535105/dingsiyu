@@ -114,7 +114,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         }
         studentEquipment.setIntensificationDegree(studentEquipment.getIntensificationDegree() + 1);
         studentEquipmentMapper.updateById(studentEquipment);
-        updateLeaderboards(student);
+        updateLeaderBoards(student);
         Map<String, Object> returnMap = new HashMap<>();
         getReturnMap(equipment, returnMap, true,
                 studentEquipment.getIntensificationDegree() < 3, studentEquipment.getIntensificationDegree(), studentEquipment.getType());
@@ -155,7 +155,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         studentEquipmentMapper.updateTypeByEquipmentId(equipmentIds, student.getId());
         StudentEquipment studentEquipment = studentEquipmentMapper.selectByStudentIdAndEquipmentId(student.getId(), equipmentId);
         studentEquipment.setType(1);
-        updateLeaderboards(student);
+        updateLeaderBoards(student);
         studentEquipmentMapper.updateById(studentEquipment);
         return ServerResponse.createBySuccess();
     }
@@ -310,12 +310,12 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         }
     }
 
-    private void updateLeaderboards(Student student) {
+    private void updateLeaderBoards(Student student) {
         //获取更新后的源分战力
         Date date = new Date();
         String beforeSevenDaysDateStr = DateUtil.getBeforeDayDateStr(date, 7, DateUtil.YYYYMMDD);
         String now = DateUtil.formatDate(new Date(), DateUtil.YYYYMMDD);
-        Integer sourceForceAttack = CalculateUtil.getSouintrceForceAttack(student.getId(), beforeSevenDaysDateStr, now);
+        Integer sourceForceAttack = CalculateUtil.getSourcePoint(student.getId(), beforeSevenDaysDateStr, now);
         //获取pk值
         StudentExpansion expansion = studentExpansionMapper.selectByStudentId(student.getId());
         sourcePowerRankOpt.optSourcePowerRank(student, sourceForceAttack, expansion.getStudyPower());

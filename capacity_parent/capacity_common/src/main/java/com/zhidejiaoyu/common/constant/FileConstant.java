@@ -44,4 +44,29 @@ public interface FileConstant {
      * 小程序海报图片地址
      */
     String SHARE_CONFIG_IMG = "imgs/shareConfigImg/";
+
+    /**
+     * 飞船配置-飞船路径
+     */
+    String SHIP_IMG = "/static/img/ship-config/base_info/ship/";
+
+    /**
+     * 飞船配置-武器路径
+     */
+    String WEAPON_IMG = "/static/img/ship-config/base_info/weapon/";
+
+    /**
+     * 飞船配置-英雄路径
+     */
+    String HERO_IMG = "/static/img/ship-config/base_info/hero/";
+
+    /**
+     * 飞船配置-导弹路径
+     */
+    String MISSILE_IMG = "/static/img/ship-config/base_info/missile/";
+
+    /**
+     * 飞船配置-装甲路径
+     */
+    String ARMOR_IMG = "/static/img/ship-config/base_info/armor/";
 }

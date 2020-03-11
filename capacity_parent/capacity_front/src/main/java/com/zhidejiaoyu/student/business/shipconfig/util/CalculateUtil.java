@@ -5,14 +5,12 @@ import com.zhidejiaoyu.common.mapper.DurationMapper;
 import com.zhidejiaoyu.common.mapper.EquipmentMapper;
 import com.zhidejiaoyu.common.mapper.LearnNewMapper;
 import com.zhidejiaoyu.common.mapper.TestRecordMapper;
-import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -70,7 +68,7 @@ public class CalculateUtil {
      */
     public static int getAttack(Integer baseValue, Long studentId, String beforeSevenDaysDateStr, String endDateStr) {
         int count = learnNewMapper.countLearnedWordCountByStartDateAndEndDate(studentId, beforeSevenDaysDateStr, endDateStr);
-        return Math.min((int) (baseValue * (0.2 + count * 1.0 / 30)), 3000);
+        return (int) (baseValue * (0.2 + count * 1.0 / 30));
     }
 
     /**
@@ -87,7 +85,7 @@ public class CalculateUtil {
         if (validTime == null) {
             validTime = 0;
         }
-        return Math.min((int) (baseValue * (0.5 + validTime * 1.0 / 28800)), 30000);
+        return (int) (baseValue * (0.5 + validTime * 1.0 / 28800));
     }
 
     /**
@@ -101,7 +99,7 @@ public class CalculateUtil {
      */
     public static double getHitRate(Double baseValue, Long studentId, String beforeSevenDaysDateStr, String endDateStr) {
         int count = testRecordMapper.countByGenreWithBeginTimeAndEndTime(studentId, GenreConstant.SMALLAPP_GENRE, beforeSevenDaysDateStr, endDateStr);
-        return Math.min(baseValue * (0.5 + count * 1.0 / 7), 2);
+        return baseValue * (0.5 + count * 1.0 / 7);
     }
 
     /**
@@ -126,12 +124,11 @@ public class CalculateUtil {
             validTime = (int) (onlineTime * 0.98);
         }
 
-        return Math.min((int) (baseValue * (0.5 + validTime * 1.0 / onlineTime)), 200);
+        return (int) (baseValue * (0.5 + validTime * 1.0 / onlineTime));
     }
 
     /**
      * 源力状态 源力攻击状态*源力
-     * 源力攻击状态=源力攻击基础值*(50%+本周平均成绩/100)
      *
      * @param baseValue
      * @param studentId
@@ -140,29 +137,49 @@ public class CalculateUtil {
      * @return
      */
     public static int getSource(IndexVO.BaseValue baseValue, Long studentId, String beforeSevenDaysDateStr, String endDateStr) {
-        double avg = testRecordMapper.selectScoreAvgByStartDateAndEndDate(studentId, beforeSevenDaysDateStr, endDateStr);
-        return Math.min(30000, (int) (baseValue.getSourceAttack() * (0.5 + avg * 1.0 / 100) * baseValue.getSource()));
+        double sourceAttack = getSourceAttack(baseValue, studentId, beforeSevenDaysDateStr, endDateStr);
+        return Math.min(30000, (int) (sourceAttack * baseValue.getSource()));
     }
 
     /**
-     * 获取源力攻击
+     * 源力攻击状态 源力攻击基础值*(50%+本周平均成绩/100)
+     *
+     * @param baseValue
+     * @param studentId
+     * @param beforeSevenDaysDateStr
+     * @param endDateStr
+     * @return
      */
-    public static int getSouintrceForceAttack(Long studentId, String beforeSevenDaysDateStr, String endDateStr) {
+    public static double getSourceAttack(IndexVO.BaseValue baseValue, Long studentId, String beforeSevenDaysDateStr, String endDateStr) {
+        double avg = testRecordMapper.selectScoreAvgByStartDateAndEndDate(studentId, beforeSevenDaysDateStr, endDateStr);
+        return baseValue.getSourceAttack() * (0.5 + avg * 1.0 / 100);
+    }
+
+
+    /**
+     * 获取源分战力 源分战力=（耐久度+普通攻击*10+源力攻击*源力 ）*【命中率+（机动力/1000）】*（命中率+机动力/10000）
+     *
+     * @param studentId
+     * @param beforeSevenDaysDateStr
+     * @param endDateStr
+     * @return
+     */
+    public static int getSourcePoint(Long studentId, String beforeSevenDaysDateStr, String endDateStr) {
 
         // 学生装备的飞船及装备信息
         List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
         IndexVO.BaseValue baseValue = shipIndexService.getBaseValue(equipments);
-        //获取攻击力
+        // 获取攻击力
         int attack = getAttack(baseValue.getAttack(), studentId, beforeSevenDaysDateStr, endDateStr);
-        //获取耐久度
+        // 获取耐久度
         int durability = getDurability(baseValue.getDurability(), studentId, beforeSevenDaysDateStr, endDateStr);
-        //获取命中率
+        // 获取命中率
         double hitRate = getHitRate(baseValue.getHitRate(), studentId, beforeSevenDaysDateStr, endDateStr);
-        //获取机动力
+        // 获取机动力
         int move = getMove(baseValue.getMove(), studentId, beforeSevenDaysDateStr, endDateStr);
-        //获取源力
+        // 获取源力
         int source = getSource(baseValue, studentId, beforeSevenDaysDateStr, endDateStr);
-        return (int)((durability + attack * 10 + baseValue.getSourceAttack() * source) * (hitRate + move / 10000));
+        return (int) ((durability + attack * 10 + baseValue.getSourceAttack() * source) * (hitRate + move / 10000) * (hitRate + move / 10000));
     }
 
 

@@ -108,11 +108,11 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
      */
     private IndexVO.Radar getRadar(IndexVO.BaseValue baseValue, IndexVO.StateOfWeek stateOfWeek) {
         IndexVO.Radar radar = new IndexVO.Radar();
-        radar.setAttack(Math.min(3000, stateOfWeek.getAttack() * baseValue.getAttack()));
-        radar.setDurability(Math.min(30000, stateOfWeek.getDurability() * baseValue.getDurability()));
-        radar.setHitRate(Math.min(2, stateOfWeek.getHitRate() * baseValue.getHitRate()));
-        radar.setMove(Math.min(200, stateOfWeek.getMove() * baseValue.getMove()));
-        radar.setSource(Math.min(30000, stateOfWeek.getSource() * baseValue.getSource()));
+        radar.setAttack(Math.min(1000, stateOfWeek.getAttack() * baseValue.getAttack()));
+        radar.setDurability(Math.min(15000, stateOfWeek.getDurability() * baseValue.getDurability()));
+        radar.setHitRate(Math.min(1.5, stateOfWeek.getHitRate() * baseValue.getHitRate()));
+        radar.setMove(Math.min(500, stateOfWeek.getMove() * baseValue.getMove()));
+        radar.setSource(Math.min(10000, stateOfWeek.getSource() * baseValue.getSource()));
         return radar;
     }
 
