@@ -164,10 +164,10 @@ public class FileTransJavaDemo {
         final String accessKeySecret = AliyunInfoConstant.accessKeySecret;
         final String appKey = "7tCOZLl5ZGQ7XP06";
 
-        String path = "https://oss.yydz100.com/audio/mav-test/";
+        String path = "https://oss.yydz100.com/audio/mav-test/mav-test/";
 
         // 文件总数
-        int fileCount = 103;
+        int fileCount = 1452;
         for (int i = 0; i < fileCount; i++) {
             String fileLink = path + i + ".wav";
             FileTransJavaDemo demo = new FileTransJavaDemo(accessKeyId, accessKeySecret);
@@ -196,13 +196,19 @@ public class FileTransJavaDemo {
                 for (int i1 = 0; i1 < words.size(); i1++) {
                     sb.append(" ").append(words.getJSONObject(i1).getString("Word"));
                 }
+                // 文件新名称
                 String fileName = "/var/tmp/wav/" + sb.toString().trim().toLowerCase() + ".wav";
                 String oldFile = "/var/tmp/wav/" + i + ".wav";
                 File file = new File(oldFile);
                 if (!file.exists()) {
                     System.out.println("文件：" + oldFile + " 未找到！");
                 } else {
-                    file.renameTo(new File(fileName));
+                    File file1 = new File(fileName);
+                    if (file1.exists()) {
+                        System.out.println("文件：" + fileName + " 已存在！");
+                        continue;
+                    }
+                    file.renameTo(file1);
                     System.out.println("重命名文件：" + oldFile + " -> " + fileName + " 成功！");
                 }
 
