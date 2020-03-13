@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
+import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
 import com.zhidejiaoyu.common.utils.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
@@ -86,6 +87,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Resource
     private SysUserMapper sysUserMapper;
+
+    @Resource
+    private SourcePowerRankOpt sourcePowerRankOpt;
 
     /**
      * 账号关闭状态
@@ -475,6 +479,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 initRankInfo(student);
 
                 initStudentExpansion(student);
+
+                // 初始化源分战力排行
+                sourcePowerRankOpt.optSourcePowerRank(student, 0, 100);
             });
         }
     }
