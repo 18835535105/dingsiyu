@@ -59,6 +59,11 @@ public class IndexVO implements Serializable {
     private String skinImgUrl;
 
     /**
+     * 英雄图片地址
+     */
+    private String heroImgUrl;
+
+    /**
      * 各项最大值
      */
     private BaseValue baseValue;

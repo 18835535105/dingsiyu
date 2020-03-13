@@ -97,6 +97,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 .missileUrl(indexVO.getMissileUrl())
                 .shipUrl(indexVO.getShipUrl())
                 .weaponsUrl(indexVO.getWeaponsUrl())
+                .heroImgUrl(indexVO.getHeroImgUrl())
                 .sourceUrl(syntheticRewardsList == null ? "" : GetOssFile.getPublicObjectUrl(syntheticRewardsList.getImgUrl()))
                 .baseValue(baseValue)
                 .stateOfWeek(stateOfWeek)
@@ -304,15 +305,24 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         if (CollectionUtils.isNotEmpty(equipments)) {
             equipments.forEach(map -> {
                 Integer type = (Integer) map.get("type");
-                String imgUrl = (String) map.get("imgUrl");
-                if (type == EquipmentTypeConstant.SHIP) {
-                    indexVO.setShipUrl(imgUrl);
-                } else if (type == EquipmentTypeConstant.WEAPONS) {
-                    indexVO.setWeaponsUrl(imgUrl);
-                } else if (type == EquipmentTypeConstant.MISSILE) {
-                    indexVO.setMissileUrl(imgUrl);
-                } else if (type == EquipmentTypeConstant.ARMOR) {
-                    indexVO.setArmorUrl(imgUrl);
+                String imgUrl = GetOssFile.getPublicObjectUrl((String) map.get("imgUrl"));
+                switch (type) {
+                    case EquipmentTypeConstant.SHIP:
+                        indexVO.setShipUrl(imgUrl);
+                        break;
+                    case EquipmentTypeConstant.WEAPONS:
+                        indexVO.setWeaponsUrl(imgUrl);
+                        break;
+                    case EquipmentTypeConstant.MISSILE:
+                        indexVO.setMissileUrl(imgUrl);
+                        break;
+                    case EquipmentTypeConstant.ARMOR:
+                        indexVO.setArmorUrl(imgUrl);
+                        break;
+                    case EquipmentTypeConstant.HERO:
+                        indexVO.setHeroImgUrl(imgUrl);
+                        break;
+                    default:
                 }
             });
         }
