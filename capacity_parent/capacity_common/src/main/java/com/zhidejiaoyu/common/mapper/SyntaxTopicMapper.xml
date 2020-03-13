@@ -34,12 +34,19 @@
     <select id="countByUnitIdAndType" resultType="java.lang.Integer" parameterType="map">
         select count(st.id)
         from syntax_topic st,
-             syntax_unit_topic sut
+        syntax_unit_topic sut
         where st.id = sut.topic_id
-          and sut.unit_id = #{unitId}
-          <if test="type == 1">
-              and st.type = #{type}
-          </if>
+        and sut.unit_id = #{unitId}
+        <if test="type == 1">
+            and st.type = #{type}
+        </if>
+
+        <if test="type == 2">
+            /*写语法过滤掉题目中不含空的记录*/
+            and topic like '%$%'
+            /*写语法过滤掉答案超过10个字符的记录*/
+            and length(answer) &lt;= 10
+        </if>
     </select>
     <select id="selectNextByUnitIdAndType" resultMap="BaseResultMap" parameterType="map">
         select
@@ -51,9 +58,12 @@
         <if test="studyModel == '选语法'">
             and st.type = 1
         </if>
-          <if test="studyModel == '写语法'">
-              and topic like '%$%'
-          </if>
+        <if test="studyModel == '写语法'">
+            /*写语法过滤掉题目中不含空的记录*/
+            and topic like '%$%'
+            /*写语法过滤掉答案超过10个字符的记录*/
+            and length(answer) &lt;= 10
+        </if>
         and st.id not in (
         select le.word_id from learn_new ln join learn_extend le on ln.id = le.learn_id
         and ln.student_id = #{studentId}

@@ -74,6 +74,8 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
         HttpUtil.getHttpSession().setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         Student student = super.getStudent(HttpUtil.getHttpSession());
 
+        // 每单元最多可学习20个写语法题目
+        int maxPlan = 20;
         int plan = learnExtendMapper.countLearnedSyntax(student.getId(), unitId, SyntaxModelNameConstant.WRITE_SYNTAX);
         int total = syntaxRedisOpt.getTotalSyntaxContentWithUnitId(unitId, SyntaxModelNameConstant.WRITE_SYNTAX);
 
@@ -82,7 +84,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                 .unitId(unitId)
                 .studentId(student.getId())
                 .plan(plan)
-                .total(total)
+                .total(Math.min(total, maxPlan))
                 .type(StudyCapacityTypeConstant.WRITE_SYNTAX)
                 .build();
 
@@ -91,10 +93,14 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
             return studyCapacity;
         }
 
-        // 如果有可以学习的新知识点，返回新知识点数据
-        ServerResponse<Object> newSyntaxTopic = this.getNewSyntaxTopic(dto);
-        if (!Objects.isNull(newSyntaxTopic)) {
-            return newSyntaxTopic;
+        /*
+         如果有可以学习的新知识点，返回新知识点数据（如果学生本单元已学习20个语法，不再获取新语法题）
+         */
+        if (plan < maxPlan) {
+            ServerResponse<Object> newSyntaxTopic = this.getNewSyntaxTopic(dto);
+            if (!Objects.isNull(newSyntaxTopic)) {
+                return newSyntaxTopic;
+            }
         }
 
         ServerResponse<Object> serverResponse = writeNeedView.getNextNotGoldTime(dto);

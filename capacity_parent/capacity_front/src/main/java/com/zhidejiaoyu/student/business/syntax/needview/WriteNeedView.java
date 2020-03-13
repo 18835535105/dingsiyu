@@ -82,7 +82,7 @@ public class WriteNeedView implements INeedView {
                     .id(syntaxTopic.getId())
                     .total(dto.getTotal())
                     // 如果有两个正确答案，不显示单词首字母，否则按正常逻辑
-                    .model(answer.contains("/") ? 2 : syntaxTopic.getModel())
+                    .model(answer.contains("/") || syntaxTopic.getModel() == null ? 2 : syntaxTopic.getModel())
                     .build());
         }
         return null;
