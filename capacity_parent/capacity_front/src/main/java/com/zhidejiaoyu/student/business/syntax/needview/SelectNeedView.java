@@ -124,6 +124,7 @@ public class SelectNeedView implements INeedView {
                 .memoryStrength(knowledgePoint.getMemoryStrength())
                 .selects(selects)
                 .knowledgePoint(knowledgePoint.getContent())
+                .analysis(syntaxTopic.getAnalysis())
                 .build();
     }
 

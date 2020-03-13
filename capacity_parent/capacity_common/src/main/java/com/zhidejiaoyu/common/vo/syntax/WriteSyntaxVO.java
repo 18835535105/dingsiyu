@@ -64,4 +64,9 @@ public class WriteSyntaxVO implements Serializable {
      * 2：不需要显示首字母
      */
     private Integer model;
+
+    /**
+     * 解析
+     */
+    private String analysis;
 }
