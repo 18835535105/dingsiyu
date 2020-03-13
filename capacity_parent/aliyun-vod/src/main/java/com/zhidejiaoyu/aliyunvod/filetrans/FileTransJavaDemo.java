@@ -169,8 +169,16 @@ public class FileTransJavaDemo {
         String path = "https://oss.yydz100.com/audio/mav-test/" + num + "/";
 
         // 文件总数
-        int fileCount = 1452;
+        int fileCount = 2000;
         for (int i = 0; i < fileCount; i++) {
+
+            String oldFile = "/var/tmp/Laura_solo 单词-" + num + "-wav/" + i + ".wav";
+            File file = new File(oldFile);
+            if (!file.exists()) {
+                System.out.println("未找到文件：" + oldFile);
+                return;
+            }
+
             String fileLink = path + i + ".wav";
             FileTransJavaDemo demo = new FileTransJavaDemo(accessKeyId, accessKeySecret);
             // 第一步：提交录音文件识别请求，获取任务ID用于后续的识别结果轮询
@@ -190,6 +198,21 @@ public class FileTransJavaDemo {
                 JSONArray words = jsonObject.getJSONArray("Words");
 
                 if (words == null) {
+                    // 文件新名称
+                    String fileName = "/var/tmp/wav_new/" + i + "*" + i + ".wav";
+
+                    if (!file.exists()) {
+                        System.out.println("文件：" + oldFile + " 未找到！");
+                    } else {
+                        File file1 = new File(fileName);
+                        if (file1.exists()) {
+                            System.out.println("文件：" + fileName + " 已存在！");
+                            continue;
+                        }
+                        file.renameTo(file1);
+                        System.out.println("重命名文件：" + oldFile + " -> " + fileName + " 成功！");
+                    }
+
                     System.out.println(i + ".wav 未能正确识别！");
                     continue;
                 }
@@ -199,9 +222,8 @@ public class FileTransJavaDemo {
                     sb.append(" ").append(words.getJSONObject(i1).getString("Word"));
                 }
                 // 文件新名称
-                String fileName = "/var/tmp/wav/" + sb.toString().trim().toLowerCase() + ".wav";
-                String oldFile = "/var/tmp/wav/" + i + ".wav";
-                File file = new File(oldFile);
+                String fileName = "/var/tmp/wav_new/" + i + "*" + sb.toString().trim().toLowerCase() + ".wav";
+
                 if (!file.exists()) {
                     System.out.println("文件：" + oldFile + " 未找到！");
                 } else {
