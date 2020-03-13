@@ -164,7 +164,9 @@ public class FileTransJavaDemo {
         final String accessKeySecret = AliyunInfoConstant.accessKeySecret;
         final String appKey = "7tCOZLl5ZGQ7XP06";
 
-        String path = "https://oss.yydz100.com/audio/mav-test/mav-test/";
+        // 第几个录音文件序号
+        int num = 4;
+        String path = "https://oss.yydz100.com/audio/mav-test/" + num + "/";
 
         // 文件总数
         int fileCount = 1452;
@@ -216,7 +218,22 @@ public class FileTransJavaDemo {
                 System.out.println("录音文件识别结果查询失败！");
             }
         }
+    }
 
+    /**
+     * 重命名文件，去除文件名中的*
+     */
+    public static void splitStarWithFile() {
+        String filePath = "";
+        File file = new File(filePath);
+        File[] files = file.listFiles();
+        for (File file1 : files) {
+            String name = file1.getName();
+            String[] split = name.split("\\*");
 
+            String newFileName = filePath + "/" + split[1];
+
+            file1.renameTo(new File(newFileName));
+        }
     }
 }
