@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.syntax.service.impl;
 
+import com.github.pagehelper.util.StringUtil;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
@@ -161,7 +162,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
                     .id(syntaxTopic.getId())
                     .total(dto.getTotal())
                     .model(syntaxTopic.getModel())
-                    .analysis(syntaxTopic.getWriteAnalysis())
+                    .analysis(StringUtil.isEmpty(syntaxTopic.getWriteAnalysis()) ? null : syntaxTopic.getWriteAnalysis())
                     .build());
         }
         return null;
