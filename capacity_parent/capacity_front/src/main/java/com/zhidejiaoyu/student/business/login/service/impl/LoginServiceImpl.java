@@ -582,6 +582,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             studentExpansion.setLevel(level);
             studentExpansion.setIsLook(2);
             studentExpansion.setPkExplain(1);
+            studentExpansion.setSourcePower(0);
             studentExpansionMapper.insert(studentExpansion);
         }
     }

@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.pojo.StudentSkin;
 import com.zhidejiaoyu.common.pojo.SyntheticRewardsList;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
+import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
@@ -21,6 +22,7 @@ import com.zhidejiaoyu.student.business.shipconfig.vo.RankVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -70,9 +72,12 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
         // 学生装备的飞船及装备信息
         List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
-        if (CollectionUtils.isNotEmpty(equipments)) {
+        if (CollectionUtils.isEmpty(equipments)) {
             // 学生还没有装备数据
-            return ServerResponse.createBySuccess(new IndexVO());
+            return ServerResponse.createBySuccess(IndexVO.builder()
+                    .skinImgUrl(studentSkin == null ? "" : GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()))
+                    .medalUrl(medalImgList)
+                    .build());
         }
 
         IndexVO indexVO = this.getIndexVoTmp(equipments);
@@ -110,7 +115,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         IndexVO.Radar radar = new IndexVO.Radar();
         radar.setAttack(Math.min(1000, stateOfWeek.getAttack() * baseValue.getAttack()));
         radar.setDurability(Math.min(15000, stateOfWeek.getDurability() * baseValue.getDurability()));
-        radar.setHitRate(Math.min(1.5, stateOfWeek.getHitRate() * baseValue.getHitRate()));
+        radar.setHitRate(Math.min(1.5, BigDecimalUtil.mul(stateOfWeek.getHitRate(), baseValue.getHitRate(), 2)));
         radar.setMove(Math.min(500, stateOfWeek.getMove() * baseValue.getMove()));
         radar.setSource(Math.min(10000, stateOfWeek.getSource() * baseValue.getSource()));
         return radar;
@@ -128,6 +133,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         stateOfWeek.setHitRate(CalculateUtil.getHitRate(baseValue.getHitRate(), studentId, beforeSevenDaysDateStr, now));
         stateOfWeek.setMove(CalculateUtil.getMove(baseValue.getMove(), studentId, beforeSevenDaysDateStr, now));
         stateOfWeek.setSource(CalculateUtil.getSource(baseValue, studentId, beforeSevenDaysDateStr, now));
+        stateOfWeek.setSourceAttack((int) CalculateUtil.getSourceAttack(baseValue, studentId, beforeSevenDaysDateStr, now));
 
         return stateOfWeek;
     }
@@ -169,7 +175,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 baseValue.setDurability(0);
             }
 
-            // 源力
+            // 源分
             Object sourceForce1 = map.get("sourceForce");
             if (sourceForce1 != null) {
                 int sourceForce = Integer.parseInt(sourceForce1.toString());
@@ -180,7 +186,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                     baseValue.setSource(baseValue.getSource() + sourceForce * sourceForceAttack);
                 }
 
-                // 源力攻击
+                // 源分攻击
                 if (baseValue.getSourceAttack() == null) {
                     baseValue.setSourceAttack(sourceForceAttack);
                 } else {
@@ -220,11 +226,28 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         return baseValue;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void initRank() {
+        List<Student> students = studentMapper.selectList(null);
+        for (Student student : students) {
+            if (student.getTeacherId() == null) {
+                continue;
+            }
+            sourcePowerRankOpt.optSourcePowerRank(student, 0, 100);
+        }
+    }
+
     @Override
     public ServerResponse<Object> rank(Integer type) {
 
         Student student = super.getStudent();
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
+        int pageNum = PageUtil.getPageNum();
+        int pageSize = PageUtil.getPageSize();
+
+        long startIndex = (pageNum - 1) * pageSize;
+        long endIndex = startIndex + pageSize;
 
         if (type == 2) {
             // 校区排行（全部学生）
@@ -232,13 +255,13 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
             String key = SourcePowerKeysConst.SCHOOL_RANK + schoolAdminId;
             long rank = sourcePowerRankOpt.getRank(key, student.getId());
 
-            List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, (long) PageUtil.getPageNum(), (long) PageUtil.getPageSize(), null);
+            List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex , endIndex, null);
             return this.packageRankVO(key, rank, studentIds);
         } else {
             // 全国排行（前50名）
             String key = SourcePowerKeysConst.COUNTRY_RANK;
             long rank = sourcePowerRankOpt.getRank(key, student.getId());
-            List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, (long) PageUtil.getPageNum(), (long) PageUtil.getPageSize(), 50);
+            List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, 50);
 
             return this.packageRankVO(key, rank, studentIds);
         }
@@ -259,10 +282,9 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
         List<RankVO.RankInfo> collect = studentIds.stream().map(id -> {
             Map<String, Object> map = infoMap.get(id);
-
             return RankVO.RankInfo.builder()
-                    .nickName(String.valueOf(map.get("nickName")))
-                    .sourcePower((int) map.get("sourcePower"))
+                    .nickName(map == null || map.get("nickName") == null ? "默认姓名" : String.valueOf(map.get("nickName")))
+                    .sourcePower(map == null || map.get("sourcePower") == null ? 0 : (int) map.get("sourcePower"))
                     .studentId(id)
                     .build();
         }).collect(Collectors.toList());
@@ -273,7 +295,8 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         return ServerResponse.createBySuccess(RankVO.builder()
                 .myRank(rank)
                 .total(studentCount)
-                .rankInfoList(collect));
+                .rankInfoList(collect)
+                .build());
     }
 
     public IndexVO getIndexVoTmp(List<Map<String, Object>> equipments) {

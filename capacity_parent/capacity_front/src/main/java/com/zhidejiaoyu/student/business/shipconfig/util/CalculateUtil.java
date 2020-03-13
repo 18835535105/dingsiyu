@@ -128,7 +128,7 @@ public class CalculateUtil {
     }
 
     /**
-     * 源力状态 源力攻击状态*源力
+     * 源分状态 源分攻击状态*源分
      *
      * @param baseValue
      * @param studentId
@@ -142,7 +142,7 @@ public class CalculateUtil {
     }
 
     /**
-     * 源力攻击状态 源力攻击基础值*(50%+本周平均成绩/100)
+     * 源分攻击状态 源分攻击基础值*(50%+本周平均成绩/100)
      *
      * @param baseValue
      * @param studentId
@@ -157,7 +157,7 @@ public class CalculateUtil {
 
 
     /**
-     * 获取源分战力 源分战力=（耐久度+普通攻击*10+源力攻击*源力 ）*【命中率+（机动力/1000）】*（命中率+机动力/10000）
+     * 获取源分战力 源分战力=（耐久度+普通攻击*10+源分攻击*源分 ）*【命中率+（机动力/1000）】*（命中率+机动力/10000）
      *
      * @param studentId
      * @param beforeSevenDaysDateStr
@@ -177,7 +177,7 @@ public class CalculateUtil {
         double hitRate = getHitRate(baseValue.getHitRate(), studentId, beforeSevenDaysDateStr, endDateStr);
         // 获取机动力
         int move = getMove(baseValue.getMove(), studentId, beforeSevenDaysDateStr, endDateStr);
-        // 获取源力
+        // 获取源分
         int source = getSource(baseValue, studentId, beforeSevenDaysDateStr, endDateStr);
         return (int) ((durability + attack * 10 + baseValue.getSourceAttack() * source) * (hitRate + move / 10000) * (hitRate + move / 10000));
     }

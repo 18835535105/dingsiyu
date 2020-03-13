@@ -35,6 +35,7 @@ public class SourcePowerRankOpt extends BaseRankOpt {
         try {
             redisTemplate.opsForZSet().add(SourcePowerKeysConst.COUNTRY_RANK, student.getId(), score);
             redisTemplate.opsForZSet().add(SourcePowerKeysConst.SCHOOL_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId(), score);
+            log.info("添加学生[{}]源分战力排行成功！", student.getId());
         } catch (Exception e) {
             log.error("修改学生[{} - {} - {}]源分战力排行出错！", student.getId(), student.getAccount(), student.getStudentName());
         }

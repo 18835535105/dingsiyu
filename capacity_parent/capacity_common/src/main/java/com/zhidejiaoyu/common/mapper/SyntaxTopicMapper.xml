@@ -51,6 +51,9 @@
         <if test="studyModel == '写语法'">
             and st.type = 2
         </if>
+          <if test="studyModel == '写语法'">
+              and topic like '%$%'
+          </if>
         and st.id not in (
         select le.word_id from learn_new ln join learn_extend le on ln.id = le.learn_id
         and ln.student_id = #{studentId}
