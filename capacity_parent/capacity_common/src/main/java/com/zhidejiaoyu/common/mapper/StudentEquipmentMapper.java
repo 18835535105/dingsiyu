@@ -28,4 +28,12 @@ public interface StudentEquipmentMapper extends BaseMapper<StudentEquipment> {
     Map<Long, StudentEquipment> selectByStudentIdAndType(@Param("studentId") Long studentId, @Param("type") Integer type);
 
     void updateTypeByEquipmentId(@Param("equipmentIds") List<Long> equipmentIds, @Param("studentId") Long studentId);
+
+    /**
+     * 统计学生的数据数量
+     *
+     * @param studentId
+     * @return
+     */
+    int countByStudentId(@Param("studentId") Long studentId);
 }
