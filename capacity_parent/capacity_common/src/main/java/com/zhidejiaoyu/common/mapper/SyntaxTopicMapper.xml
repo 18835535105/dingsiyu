@@ -12,14 +12,15 @@
         <result column="update_time" property="updateTime"/>
         <result column="option" property="option"/>
         <result column="analysis" property="analysis"/>
+        <result column="write_analysis" property="writeAnalysis"/>
         <result column="model" property="model"/>
     </resultMap>
 
     <sql id="base_sql">
-        id, knowledge_point_id, topic, answer, type, update_time, `option`,analysis, model
+        id, knowledge_point_id, topic, answer, type, update_time, `option`,analysis, model, write_analysis
     </sql>
     <sql id="more_table_sql">
-        st.id, st.knowledge_point_id, st.topic, st.answer, st.type, st.update_time, st.option, st.analysis, model
+        st.id, st.knowledge_point_id, st.topic, st.answer, st.type, st.update_time, st.option, st.analysis, st.model, st.write_analysis
     </sql>
 
     <select id="selectSelectSyntaxByUnitId" resultMap="BaseResultMap" parameterType="map">
@@ -36,7 +37,9 @@
              syntax_unit_topic sut
         where st.id = sut.topic_id
           and sut.unit_id = #{unitId}
-          and st.type = #{type}
+          <if test="type == 1">
+              and st.type = #{type}
+          </if>
     </select>
     <select id="selectNextByUnitIdAndType" resultMap="BaseResultMap" parameterType="map">
         select
@@ -47,9 +50,6 @@
         and sut.unit_id = #{unitId}
         <if test="studyModel == '选语法'">
             and st.type = 1
-        </if>
-        <if test="studyModel == '写语法'">
-            and st.type = 2
         </if>
           <if test="studyModel == '写语法'">
               and topic like '%$%'

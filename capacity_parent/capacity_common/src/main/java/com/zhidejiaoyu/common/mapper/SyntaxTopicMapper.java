@@ -28,7 +28,7 @@ public interface SyntaxTopicMapper extends BaseMapper<SyntaxTopic> {
      * 统计当前单元指定类型的语法内容个数
      *
      * @param unitId
-     * @param type   1：选语法；2:写语法
+     * @param type   1：选语法；2：所有
      * @return
      */
     Integer countByUnitIdAndType(@Param("unitId") Long unitId, @Param("type") int type);
