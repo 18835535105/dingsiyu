@@ -193,9 +193,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                         .eq(SchoolTime::getUserId, userId)
                         .in(SchoolTime::getGrade, "高一", "高二"));
                 if (CollectionUtils.isNotEmpty(schoolTimes)) {
-                    List<Long> collect = schoolTimes.stream().map(SchoolTime::getCourseId).collect(Collectors.toList());
-                    Set<Long> set = new HashSet<>(collect);
-                    return new ArrayList<>(set);
+                    return schoolTimes.stream().map(SchoolTime::getCourseId).distinct().collect(Collectors.toList());
                 }
             }
         }
@@ -204,32 +202,18 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         int month = new DateTime().plusMonths(6).monthOfYear().get();
         List<SchoolTime> schoolTimes = schoolTimeMapper.selectAfterSixMonth(userId, grade, i >= 6 ? 12 : month);
 
-        List<SchoolTime> schoolTimes1 = null;
-        if (CollectionUtils.isNotEmpty(schoolTimes)) {
-            schoolTimes1 = schoolTimeMapper.selectNextByUserIdAndId(userId, schoolTimes.get(schoolTimes.size() - 1).getId());
-        }
+        SchoolTime schoolTime = schoolTimeMapper.selectNextByUserIdAndId(userId, schoolTimes.get(schoolTimes.size() - 1).getId());
 
-        List<Long> courseIds = schoolTimes.stream().map(SchoolTime::getCourseId).collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(schoolTimes1)) {
+        List<Long> courseIds = schoolTimes.stream().map(SchoolTime::getCourseId).distinct().collect(Collectors.toList());
+        if (schoolTime == null) {
             return courseIds;
         }
 
-        // 把非本年级可以半年后学习的课程添加进来
-        for (SchoolTime schoolTime : schoolTimes1) {
-            if (schoolTime.getMonth() == 12) {
-                courseIds.add(schoolTime.getCourseId());
-                break;
-            }
-
-            if (schoolTime.getMonth() > month) {
-                break;
-            }
-
+        if (schoolTime.getMonth() <= i + 6) {
             courseIds.add(schoolTime.getCourseId());
         }
 
-        Set<Long> set = new HashSet<>(courseIds);
-        return new ArrayList<>(set);
+        return courseIds.stream().distinct().collect(Collectors.toList());
     }
 
 

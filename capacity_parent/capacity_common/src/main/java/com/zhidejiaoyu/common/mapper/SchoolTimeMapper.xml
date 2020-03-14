@@ -116,7 +116,9 @@
         from school_time
         where user_id = #{userId}
         and id > #{id}
+        group by grade
         order by id
+        limit 1
     </select>
 
 </mapper>

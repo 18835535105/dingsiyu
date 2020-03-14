@@ -72,7 +72,7 @@ public interface SchoolTimeMapper extends BaseMapper<SchoolTime> {
      * @param id     当前校区时间id
      * @return
      */
-    List<SchoolTime> selectNextByUserIdAndId(@Param("userId") Integer userId, @Param("id") Long id);
+    SchoolTime selectNextByUserIdAndId(@Param("userId") Integer userId, @Param("id") Long id);
 
     /**
      * 查看是否配置了当前年级的课程
