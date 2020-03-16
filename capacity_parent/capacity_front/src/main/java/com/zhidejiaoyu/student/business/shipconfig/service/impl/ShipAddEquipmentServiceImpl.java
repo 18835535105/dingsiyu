@@ -413,8 +413,11 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
 
             if (flag != null && flag) {
                 //获取第一个飞船信息
-                Equipment equipment = equipmentMapper.selectIdByTypeAndLevel(1, 1);
-                addEquipment.put(equipment.getId(), equipment);
+                List<Equipment> equipment = equipmentMapper.selectIdByTypeAndLevel(1, 1);
+                equipment.forEach(equ -> {
+                    addEquipment.put(equ.getId(), equ);
+                });
+
             }
             //获取可添加物品
             equipments.forEach(ment -> {

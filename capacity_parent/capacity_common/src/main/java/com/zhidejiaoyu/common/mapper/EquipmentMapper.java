@@ -40,7 +40,7 @@ public interface EquipmentMapper extends BaseMapper<Equipment> {
     List<Equipment> selectAll();
 
 
-    Equipment selectIdByTypeAndLevel(@Param("type") int type, @Param("level") int level);
+    List<Equipment> selectIdByTypeAndLevel(@Param("type") int type, @Param("level") int level);
 
     List<Equipment> selectByType(@Param("type") Integer type);
 }
