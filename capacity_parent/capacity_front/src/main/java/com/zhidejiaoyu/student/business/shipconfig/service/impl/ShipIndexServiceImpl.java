@@ -139,6 +139,25 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         return stateOfWeek;
     }
 
+    @Override
+    public IndexVO.StateOfWeek getStateOfWeek(Long studentId) {
+        List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
+
+        if (CollectionUtils.isEmpty(equipments)) {
+            return (IndexVO.StateOfWeek) IndexVO.StateOfWeek.builder()
+                    .attack(0)
+                    .durability(0)
+                    .hitRate(0.0)
+                    .move(0)
+                    .source(0)
+                    .sourceAttack(0)
+                    .build()
+        }
+
+        IndexVO.BaseValue baseValue = this.getBaseValue(equipments);
+        return this.getStateOfWeek(studentId, baseValue);
+    }
+
     /**
      * 获取各项最大值（基础值）
      *
@@ -256,7 +275,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
             String key = SourcePowerKeysConst.SCHOOL_RANK + schoolAdminId;
             long rank = sourcePowerRankOpt.getRank(key, student.getId());
 
-            List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex , endIndex, null);
+            List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, null);
             return this.packageRankVO(key, rank, studentIds);
         } else {
             // 全国排行（前50名）

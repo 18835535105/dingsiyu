@@ -42,6 +42,7 @@ public interface ShipIndexService extends BaseService<Student> {
 
     /**
      * 获取各项战力值
+     *
      * @param equipments
      * @return
      */
@@ -51,4 +52,12 @@ public interface ShipIndexService extends BaseService<Student> {
      * 初始化源分战力排行
      */
     void initRank();
+
+    /**
+     * 获取最近7天状态
+     *
+     * @param studentId
+     * @return
+     */
+    IndexVO.StateOfWeek getStateOfWeek(Long studentId);
 }
