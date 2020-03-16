@@ -151,7 +151,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                     .move(0)
                     .source(0)
                     .sourceAttack(0)
-                    .build()
+                    .build();
         }
 
         IndexVO.BaseValue baseValue = this.getBaseValue(equipments);

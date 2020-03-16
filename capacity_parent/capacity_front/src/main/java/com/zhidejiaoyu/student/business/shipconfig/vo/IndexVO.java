@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.student.business.shipconfig.vo;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.io.Serializable;
