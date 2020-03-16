@@ -28,7 +28,7 @@ public class SourcePowerRankOpt extends BaseRankOpt {
      * @param sourcePower 源分战力值
      * @param studyPower  PK值
      */
-    public  void optSourcePowerRank(Student student, Integer sourcePower, Integer studyPower) {
+    public void optSourcePowerRank(Student student, Integer sourcePower, Integer studyPower) {
 
         double score = Double.parseDouble(sourcePower + "." + studyPower);
 
