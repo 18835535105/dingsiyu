@@ -77,6 +77,11 @@ public class StudentExpansion extends Model<StudentExpansion> {
      */
     private Integer sourcePower;
 
+    /**
+     * 最大排行
+     */
+    private Integer ranking;
+
     @Override
     protected Serializable pkVal() {
         return this.id;

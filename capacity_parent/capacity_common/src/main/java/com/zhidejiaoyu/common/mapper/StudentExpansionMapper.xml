@@ -17,11 +17,12 @@
         <result column="guide" property="guide"/>
         <result column="medal_no" property="medalNo"/>
         <result column="source_power" property="sourcePower"/>
+        <result column="ranking" property="ranking"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, student_id, study_power , `level` ,is_look, audio_status, test_gold_add, pk_explain, better_three_time, `phase`,guide,medal_no, source_power
+        id, student_id, study_power , `level` ,is_look, audio_status, test_gold_add, pk_explain, better_three_time, `phase`,guide,medal_no, source_power,ranking
     </sql>
 
     <sql id="more_table_column">
