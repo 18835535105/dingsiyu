@@ -117,4 +117,9 @@ public interface RedisKeysConst {
      * 微信 access_token key 值
      */
     String WECHAT_ACCESS_TOKEN = "WECHAT_ACCESS_TOKEN";
+
+    /**
+     * 标识学生已经初始化了飞船信息
+     */
+    String INIT_SHIP = "INIT_SHIP:";
 }

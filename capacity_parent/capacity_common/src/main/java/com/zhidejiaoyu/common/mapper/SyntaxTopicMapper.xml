@@ -12,14 +12,15 @@
         <result column="update_time" property="updateTime"/>
         <result column="option" property="option"/>
         <result column="analysis" property="analysis"/>
+        <result column="write_analysis" property="writeAnalysis"/>
         <result column="model" property="model"/>
     </resultMap>
 
     <sql id="base_sql">
-        id, knowledge_point_id, topic, answer, type, update_time, `option`,analysis, model
+        id, knowledge_point_id, topic, answer, type, update_time, `option`,analysis, model, write_analysis
     </sql>
     <sql id="more_table_sql">
-        st.id, st.knowledge_point_id, st.topic, st.answer, st.type, st.update_time, st.option, st.analysis, model
+        st.id, st.knowledge_point_id, st.topic, st.answer, st.type, st.update_time, st.option, st.analysis, st.model, st.write_analysis
     </sql>
 
     <select id="selectSelectSyntaxByUnitId" resultMap="BaseResultMap" parameterType="map">
@@ -33,10 +34,19 @@
     <select id="countByUnitIdAndType" resultType="java.lang.Integer" parameterType="map">
         select count(st.id)
         from syntax_topic st,
-             syntax_unit_topic sut
+        syntax_unit_topic sut
         where st.id = sut.topic_id
-          and sut.unit_id = #{unitId}
-          and st.type = #{type}
+        and sut.unit_id = #{unitId}
+        <if test="type == 1">
+            and st.type = #{type}
+        </if>
+
+        <if test="type == 2">
+            /*写语法过滤掉题目中不含空的记录*/
+            and topic like '%$%'
+            /*写语法过滤掉答案超过10个字符的记录*/
+            and length(answer) &lt;= 10
+        </if>
     </select>
     <select id="selectNextByUnitIdAndType" resultMap="BaseResultMap" parameterType="map">
         select
@@ -49,7 +59,10 @@
             and st.type = 1
         </if>
         <if test="studyModel == '写语法'">
-            and st.type = 2
+            /*写语法过滤掉题目中不含空的记录*/
+            and topic like '%$%'
+            /*写语法过滤掉答案超过10个字符的记录*/
+            and length(answer) &lt;= 10
         </if>
         and st.id not in (
         select le.word_id from learn_new ln join learn_extend le on ln.id = le.learn_id

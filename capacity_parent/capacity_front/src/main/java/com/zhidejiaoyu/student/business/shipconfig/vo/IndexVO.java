@@ -59,6 +59,11 @@ public class IndexVO implements Serializable {
     private String skinImgUrl;
 
     /**
+     * 英雄图片地址
+     */
+    private String heroImgUrl;
+
+    /**
      * 各项最大值
      */
     private BaseValue baseValue;
@@ -99,7 +104,7 @@ public class IndexVO implements Serializable {
         private Integer attack;
 
         /**
-         * 源力
+         * 源分次数
          */
         private Integer source;
 
@@ -109,9 +114,9 @@ public class IndexVO implements Serializable {
         private Integer durability;
 
         /**
-         * 源力攻击
+         * 源分攻击
          */
-        private transient Integer sourceAttack;
+        private Integer sourceAttack;
     }
 
     /**

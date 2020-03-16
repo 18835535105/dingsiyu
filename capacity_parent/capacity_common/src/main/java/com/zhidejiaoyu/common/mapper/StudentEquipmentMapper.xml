@@ -41,6 +41,11 @@
         from student_equipment
         where student_id = #{studentId}
     </select>
+    <select id="countByStudentId" resultType="java.lang.Integer" parameterType="map">
+        select count(id)
+        from student_equipment
+        where student_id = #{studentId}
+    </select>
     <update id="updateTypeByEquipmentId" parameterType="map">
         update student_equipment
         set `type`=2

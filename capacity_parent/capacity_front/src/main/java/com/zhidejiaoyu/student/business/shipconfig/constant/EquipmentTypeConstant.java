@@ -28,4 +28,9 @@ public interface EquipmentTypeConstant {
      */
     int MISSILE = 3;
 
+    /**
+     * 英雄类型
+     */
+    int HERO = 5;
+
 }

@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
+import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
 import com.zhidejiaoyu.common.utils.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
@@ -86,6 +87,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Resource
     private SysUserMapper sysUserMapper;
+
+    @Resource
+    private SourcePowerRankOpt sourcePowerRankOpt;
 
     /**
      * 账号关闭状态
@@ -182,7 +186,11 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
             // 判断学生是否是在加盟校半径 1 公里外登录
             final String finalIp = ip;
-            executorService.execute(() -> this.isOtherLocation(stu, finalIp));
+            executorService.execute(() -> {
+                // 判断是否已初始化登录即可领取的飞船，如果未初始化，进行初始化
+                redisOpt.initShip(stu.getId());
+                this.isOtherLocation(stu, finalIp);
+            });
 
             // 正常登陆
             log.info("学生[{} -> {} -> {}]登录成功。", stu.getId(), stu.getAccount(), stu.getStudentName());
@@ -393,6 +401,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         if (count <= 1) {
             executorService.execute(() -> {
 
+                // 初始化飞船信息
+                redisOpt.initShip(stu.getId());
+
                 // 招生账号每日首次登陆初始化 50 个能量供体验抽奖
                 this.addEnergy(stu);
 
@@ -468,6 +479,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 initRankInfo(student);
 
                 initStudentExpansion(student);
+
+                // 初始化源分战力排行
+                sourcePowerRankOpt.optSourcePowerRank(student, 0, 100);
             });
         }
     }
@@ -575,6 +589,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             studentExpansion.setLevel(level);
             studentExpansion.setIsLook(2);
             studentExpansion.setPkExplain(1);
+            studentExpansion.setSourcePower(0);
             studentExpansionMapper.insert(studentExpansion);
         }
     }

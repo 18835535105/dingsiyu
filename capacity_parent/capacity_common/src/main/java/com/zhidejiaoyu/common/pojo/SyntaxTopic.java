@@ -49,10 +49,16 @@ public class SyntaxTopic extends Model<SyntaxTopic> {
      */
     private String option;
     /**
-     * 解析
+     * 选语法解析
+     *
      * @return
      */
     private String analysis;
+
+    /**
+     * 写语法解析
+     */
+    private String writeAnalysis;
 
     /**
      * 判断是否有（）类型1，没有2，有

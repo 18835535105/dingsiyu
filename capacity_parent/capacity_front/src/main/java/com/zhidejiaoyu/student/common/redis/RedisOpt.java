@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.simple.SimpleCourseMapper;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.student.business.shipconfig.service.impl.ShipAddEquipmentServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -54,6 +55,9 @@ public class RedisOpt {
 
     @Autowired
     private RunLogMapper runLogMapper;
+
+    @Resource
+    private StudentEquipmentMapper studentEquipmentMapper;
 
     private static RedisTemplate<String, Object> staticRedisTemplate;
 
@@ -268,19 +272,19 @@ public class RedisOpt {
      * @param unitId
      * @return
      */
-    public List<Vocabulary> getVoiceInfoInUnit(Long unitId,Integer group) {
-        String hKey = RedisKeysConst.WORD_INFO_IN_UNIT + unitId+" "+ RedisKeysConst.WORD_INFO_IN_UNIT_GROUP+group;
+    public List<Vocabulary> getVoiceInfoInUnit(Long unitId, Integer group) {
+        String hKey = RedisKeysConst.WORD_INFO_IN_UNIT + unitId + " " + RedisKeysConst.WORD_INFO_IN_UNIT_GROUP + group;
         List<Vocabulary> vocabularies;
         Object object = getRedisHashObject(hKey);
         if (object == null) {
-            vocabularies = vocabularyMapper.selectByUnitIdAndGroup(unitId,group);
+            vocabularies = vocabularyMapper.selectByUnitIdAndGroup(unitId, group);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, hKey, vocabularies);
         } else {
             try {
                 vocabularies = (List<Vocabulary>) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], unitId=[{}], error=[{}]", object, unitId, e.getMessage());
-                vocabularies = vocabularyMapper.selectByUnitIdAndGroup(unitId,group);
+                vocabularies = vocabularyMapper.selectByUnitIdAndGroup(unitId, group);
             }
         }
         return vocabularies;
@@ -501,5 +505,28 @@ public class RedisOpt {
         }
 
         return (boolean) o;
+    }
+
+    /**
+     * 判断是否已初始化登录即可领取的飞船，如果未初始化，进行初始化
+     *
+     * @param studentId
+     */
+    public void initShip(Long studentId) {
+        String key = RedisKeysConst.INIT_SHIP + studentId;
+        Object o = redisTemplate.opsForValue().get(key);
+        if (o == null) {
+            int count = studentEquipmentMapper.countByStudentId(studentId);
+            if (count == 0) {
+                List<Long> equipmentIds = new ArrayList<>();
+                equipmentIds.add(1L);
+                equipmentIds.add(2L);
+                equipmentIds.add(3L);
+
+                ShipAddEquipmentServiceImpl.addEquipment(equipmentIds, studentId, studentEquipmentMapper);
+            }
+            redisTemplate.opsForValue().set(key, true);
+            redisTemplate.expire(key, 15, TimeUnit.DAYS);
+        }
     }
 }

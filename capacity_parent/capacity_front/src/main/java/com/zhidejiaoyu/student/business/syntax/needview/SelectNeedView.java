@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.syntax.needview;
 
+import com.github.pagehelper.util.StringUtil;
 import com.zhidejiaoyu.common.vo.syntax.LearnSyntaxVO;
 import com.zhidejiaoyu.common.vo.syntax.SelectSyntaxVO;
 import com.zhidejiaoyu.common.vo.syntax.game.GameSelect;
@@ -124,6 +125,7 @@ public class SelectNeedView implements INeedView {
                 .memoryStrength(knowledgePoint.getMemoryStrength())
                 .selects(selects)
                 .knowledgePoint(knowledgePoint.getContent())
+                .analysis(StringUtil.isEmpty(syntaxTopic.getAnalysis()) ? null : syntaxTopic.getAnalysis())
                 .build();
     }
 

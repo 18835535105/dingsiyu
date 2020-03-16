@@ -59,4 +59,9 @@ public class SelectSyntaxVO {
      * 记忆强度
      */
     private Integer memoryStrength;
+
+    /**
+     * 解析
+     */
+    private String analysis;
 }

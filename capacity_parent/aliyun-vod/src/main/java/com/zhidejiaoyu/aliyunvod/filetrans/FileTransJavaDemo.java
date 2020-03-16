@@ -164,11 +164,21 @@ public class FileTransJavaDemo {
         final String accessKeySecret = AliyunInfoConstant.accessKeySecret;
         final String appKey = "7tCOZLl5ZGQ7XP06";
 
-        String path = "https://oss.yydz100.com/audio/mav-test/";
+        // 第几个录音文件序号
+        int num = 4;
+        String path = "https://oss.yydz100.com/audio/mav-test/" + num + "/";
 
         // 文件总数
-        int fileCount = 103;
+        int fileCount = 2000;
         for (int i = 0; i < fileCount; i++) {
+
+            String oldFile = "/var/tmp/Laura_solo 单词-" + num + "-wav/" + i + ".wav";
+            File file = new File(oldFile);
+            if (!file.exists()) {
+                System.out.println("未找到文件：" + oldFile);
+                return;
+            }
+
             String fileLink = path + i + ".wav";
             FileTransJavaDemo demo = new FileTransJavaDemo(accessKeyId, accessKeySecret);
             // 第一步：提交录音文件识别请求，获取任务ID用于后续的识别结果轮询
@@ -188,6 +198,21 @@ public class FileTransJavaDemo {
                 JSONArray words = jsonObject.getJSONArray("Words");
 
                 if (words == null) {
+                    // 文件新名称
+                    String fileName = "/var/tmp/wav_new/" + i + "*" + i + ".wav";
+
+                    if (!file.exists()) {
+                        System.out.println("文件：" + oldFile + " 未找到！");
+                    } else {
+                        File file1 = new File(fileName);
+                        if (file1.exists()) {
+                            System.out.println("文件：" + fileName + " 已存在！");
+                            continue;
+                        }
+                        file.renameTo(file1);
+                        System.out.println("重命名文件：" + oldFile + " -> " + fileName + " 成功！");
+                    }
+
                     System.out.println(i + ".wav 未能正确识别！");
                     continue;
                 }
@@ -196,13 +221,18 @@ public class FileTransJavaDemo {
                 for (int i1 = 0; i1 < words.size(); i1++) {
                     sb.append(" ").append(words.getJSONObject(i1).getString("Word"));
                 }
-                String fileName = "/var/tmp/wav/" + sb.toString().trim().toLowerCase() + ".wav";
-                String oldFile = "/var/tmp/wav/" + i + ".wav";
-                File file = new File(oldFile);
+                // 文件新名称
+                String fileName = "/var/tmp/wav_new/" + i + "*" + sb.toString().trim().toLowerCase() + ".wav";
+
                 if (!file.exists()) {
                     System.out.println("文件：" + oldFile + " 未找到！");
                 } else {
-                    file.renameTo(new File(fileName));
+                    File file1 = new File(fileName);
+                    if (file1.exists()) {
+                        System.out.println("文件：" + fileName + " 已存在！");
+                        continue;
+                    }
+                    file.renameTo(file1);
                     System.out.println("重命名文件：" + oldFile + " -> " + fileName + " 成功！");
                 }
 
@@ -210,7 +240,22 @@ public class FileTransJavaDemo {
                 System.out.println("录音文件识别结果查询失败！");
             }
         }
+    }
 
+    /**
+     * 重命名文件，去除文件名中的*
+     */
+    public static void splitStarWithFile() {
+        String filePath = "";
+        File file = new File(filePath);
+        File[] files = file.listFiles();
+        for (File file1 : files) {
+            String name = file1.getName();
+            String[] split = name.split("\\*");
 
+            String newFileName = filePath + "/" + split[1];
+
+            file1.renameTo(new File(newFileName));
+        }
     }
 }

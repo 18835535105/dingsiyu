@@ -46,4 +46,9 @@ public interface ShipIndexService extends BaseService<Student> {
      * @return
      */
     IndexVO.BaseValue getBaseValue(List<Map<String, Object>> equipments);
+
+    /**
+     * 初始化源分战力排行
+     */
+    void initRank();
 }

@@ -76,7 +76,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         //添加装备需要的物品
         addEquipmentByType(collect.get(4), studentEquipmentIds, empiricalValue.getArmorExperience(), returnList, addIdList, map, null);
         if (addIdList.size() > 0) {
-            addEquipment(addIdList, student.getId());
+            addEquipment(addIdList, student.getId(), studentEquipmentMapper);
         }
         if (returnList.size() > 0) {
             return ServerResponse.createBySuccess(returnList);
@@ -321,9 +321,9 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         sourcePowerRankOpt.optSourcePowerRank(student, sourceForceAttack, expansion.getStudyPower());
     }
 
-    private void addEquipment(List<Long> equipmentIds, Long studentId) {
+    public static void addEquipment(List<Long> equipmentIds, Long studentId, StudentEquipmentMapper studentEquipmentMapper) {
         for (Long equipmentId : equipmentIds) {
-            //添加装备
+            // 添加装备
             StudentEquipment studentEquipment = new StudentEquipment()
                     .setEquipmentId(equipmentId)
                     .setIntensificationDegree(1)

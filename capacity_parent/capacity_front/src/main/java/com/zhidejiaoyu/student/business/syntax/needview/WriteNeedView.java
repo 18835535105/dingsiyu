@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.syntax.needview;
 
+import com.github.pagehelper.util.StringUtil;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
 import com.zhidejiaoyu.common.mapper.KnowledgePointMapper;
 import com.zhidejiaoyu.common.mapper.StudyCapacityMapper;
@@ -81,8 +82,9 @@ public class WriteNeedView implements INeedView {
                     .studyNew(false)
                     .id(syntaxTopic.getId())
                     .total(dto.getTotal())
+                    .analysis(StringUtil.isEmpty(syntaxTopic.getWriteAnalysis()) ? null : syntaxTopic.getWriteAnalysis())
                     // 如果有两个正确答案，不显示单词首字母，否则按正常逻辑
-                    .model(answer.contains("/") ? 2 : syntaxTopic.getModel())
+                    .model(answer.contains("/") || syntaxTopic.getModel() == null ? 2 : syntaxTopic.getModel())
                     .build());
         }
         return null;
