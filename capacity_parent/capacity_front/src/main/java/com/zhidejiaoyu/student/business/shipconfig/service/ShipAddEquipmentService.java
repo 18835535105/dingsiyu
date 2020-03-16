@@ -13,4 +13,6 @@ public interface ShipAddEquipmentService extends BaseService<Student> {
     Object getEquipmentInterface(HttpSession session, Integer type);
 
     Object wearEquipment(HttpSession session, Long equipmentId);
+
+    void updateLeaderBoards(Student student);
 }

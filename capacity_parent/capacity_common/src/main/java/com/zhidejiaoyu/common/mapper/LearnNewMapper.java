@@ -98,4 +98,11 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
      * @return
      */
     int countLearnedWordCountByStartDateAndEndDate(@Param("studentId") Long studentId, @Param("beginDate") String beginDate, @Param("endDate") String endDate);
+
+    /**
+     * 根据学生id和类型获取单元id
+     * @param studentId
+     * @param type
+     */
+    List<Long> getUnitIdByStudentIdAndType(@Param("studentId") Long studentId,@Param("type") int type);
 }

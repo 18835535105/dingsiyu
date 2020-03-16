@@ -143,4 +143,6 @@ public interface SimpleGauntletMapper extends BaseMapper<Gauntlet> {
     List<Gauntlet> selectStudy(@Param("type") int type, @Param("studentId") Long studentId);
 
     void deleteByChallengerStudentIdsOrBeChallengerStudentIds(@Param("studentIds") List<Long> studentIds);
+
+    int getCountByStudentIdAndTime(@Param("studentId") Long studentId,@Param("time") String toString,@Param("beforeTime") String beforeTime);
 }

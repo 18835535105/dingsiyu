@@ -36,7 +36,9 @@
     </sql>
 
     <select id="selByStudentIdAndFormat" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"/> from gauntlet where challenger_student_id=#{studentId} and
+        select
+        <include refid="Base_Column_List"/>
+        from gauntlet where challenger_student_id=#{studentId} and
         to_days(create_time) = to_days(#{time}) and challenger_point is not null;
     </select>
 
@@ -55,7 +57,7 @@
         <if test="type ==3 or type ==4">
             and be_challenger_student_id=#{studentId}
             <if test="type==3">
-                and be_challenger_status &lt;> 3 and be_challenger_status &lt;> 4  and be_challenger_status &lt;> 6
+                and be_challenger_status &lt;> 3 and be_challenger_status &lt;> 4 and be_challenger_status &lt;> 6
             </if>
             <if test="type==4">
                 and be_challenger_status = 1
@@ -67,10 +69,12 @@
         select count(id) from gauntlet where
         challenger_point is not null
         <if test="type==1">
-            and be_challenger_student_id=#{beStudentId} and challenger_student_id=#{studentId} and challenge_status &lt;>3 and challenge_status &lt;>4 and challenge_status &lt;>6
+            and be_challenger_student_id=#{beStudentId} and challenger_student_id=#{studentId} and challenge_status &lt;>3
+            and challenge_status &lt;>4 and challenge_status &lt;>6
         </if>
         <if test="type==2">
-            and be_challenger_student_id=#{studentId} and challenger_student_id=#{beStudentId} and challenge_status &lt;>3 and challenge_status &lt;>4 and challenge_status &lt;>6
+            and be_challenger_student_id=#{studentId} and challenger_student_id=#{beStudentId} and challenge_status &lt;>3
+            and challenge_status &lt;>4 and challenge_status &lt;>6
         </if>
     </select>
 
@@ -89,7 +93,7 @@
             <if test="challengeType==0">
                 and (challenge_status =1 or challenge_status =2
                 or challenge_status =3 or
-                (challenge_status =4 and create_time > #{time}) or challenge_status =5  or challenge_status =6)
+                (challenge_status =4 and create_time > #{time}) or challenge_status =5 or challenge_status =6)
             </if>
         </if>
         <if test="type!=1">
@@ -101,8 +105,9 @@
                 </if>
             </if>
             <if test="challengeType==0">
-                and (be_challenger_status =1 or be_challenger_status =2  or be_challenger_status =3
-                or (be_challenger_status =4 and create_time > #{time}) or be_challenger_status =5  or be_challenger_status =6)
+                and (be_challenger_status =1 or be_challenger_status =2 or be_challenger_status =3
+                or (be_challenger_status =4 and create_time > #{time}) or be_challenger_status =5 or
+                be_challenger_status =6)
             </if>
         </if>
         order by create_time desc
@@ -113,33 +118,34 @@
     <select id="getCount" parameterType="map" resultType="int">
         select count(id) from gauntlet
         where challenger_point is not null
-            <if test="type==1">
-                and challenger_student_id=#{studentId}
-                <if test="challengeType!=0">
-                    and challenge_status=#{challengeType}
-                    <if test="challengeType==4">
-                        and create_time > #{time}
-                    </if>
-                </if>
-                <if test="challengeType==0">
-                    and (challenge_status =1 or challenge_status =2
-                    or challenge_status =3 or
-                    (challenge_status =4 and create_time > #{time}) or challenge_status =5  or challenge_status =6)
+        <if test="type==1">
+            and challenger_student_id=#{studentId}
+            <if test="challengeType!=0">
+                and challenge_status=#{challengeType}
+                <if test="challengeType==4">
+                    and create_time > #{time}
                 </if>
             </if>
-            <if test="type!=1">
-                and be_challenger_student_id=#{studentId}
-                <if test="challengeType!=0">
-                    and be_challenger_status=#{challengeType}
-                    <if test="challengeType==4">
-                        and create_time > #{time}
-                    </if>
-                </if>
-                <if test="challengeType==0">
-                    and (be_challenger_status =1 or be_challenger_status =2  or be_challenger_status =3
-                    or (be_challenger_status =4 and create_time > #{time}) or be_challenger_status =5  or be_challenger_status =6)
+            <if test="challengeType==0">
+                and (challenge_status =1 or challenge_status =2
+                or challenge_status =3 or
+                (challenge_status =4 and create_time > #{time}) or challenge_status =5 or challenge_status =6)
+            </if>
+        </if>
+        <if test="type!=1">
+            and be_challenger_student_id=#{studentId}
+            <if test="challengeType!=0">
+                and be_challenger_status=#{challengeType}
+                <if test="challengeType==4">
+                    and create_time > #{time}
                 </if>
             </if>
+            <if test="challengeType==0">
+                and (be_challenger_status =1 or be_challenger_status =2 or be_challenger_status =3
+                or (be_challenger_status =4 and create_time > #{time}) or be_challenger_status =5 or
+                be_challenger_status =6)
+            </if>
+        </if>
 
         order by id desc
     </select>
@@ -148,7 +154,8 @@
         select
         <include refid="Base_Column_List"></include>
         from gauntlet
-        where challenger_student_id=#{studentId} and be_challenger_student_id=#{beStudentId} and challenge_status=3 and challenger_point is not null
+        where challenger_student_id=#{studentId} and be_challenger_student_id=#{beStudentId} and challenge_status=3 and
+        challenger_point is not null
         limit 1
     </select>
 
@@ -164,8 +171,10 @@
         where
 
         <if test="type ==0">
-            ((challenger_student_id=#{studentId} and (challenge_status &lt;>3 and challenge_status &lt;> 4 and challenge_status &lt;> 6))
-            or (be_challenger_student_id=#{studentId} and (be_challenger_status &lt;>3 and be_challenger_status &lt;> 4 and be_challenger_status &lt;> 6)))
+            ((challenger_student_id=#{studentId} and (challenge_status &lt;>3 and challenge_status &lt;> 4 and
+            challenge_status &lt;> 6))
+            or (be_challenger_student_id=#{studentId} and (be_challenger_status &lt;>3 and be_challenger_status &lt;> 4
+            and be_challenger_status &lt;> 6)))
         </if>
         <if test="type !=0">
             ((challenger_student_id=#{studentId} and challenge_status =#{type})
@@ -187,11 +196,12 @@
 
     <select id="selDelGauntlet" parameterType="map" resultMap="BaseResultMap">
         select <include refid="Base_Column_List"></include> from gauntlet
-        where ((challenger_student_id=#{studentId} and challenge_status = 3 ) or (be_challenger_student_id=#{studentId} and be_challenger_status = 3))
+        where ((challenger_student_id=#{studentId} and challenge_status = 3 ) or (be_challenger_student_id=#{studentId}
+        and be_challenger_status = 3))
         and create_time &lt; #{format}
     </select>
 
-    <update id="updateStatus" parameterType="map" >
+    <update id="updateStatus" parameterType="map">
         update gauntlet
         set challenge_status=4 and be_challenger_status=4
         where id in (
@@ -230,6 +240,14 @@
         )
     </delete>
 
+    <select id="getCountByStudentIdAndTime" resultType="int" parameterType="map">
+        select
+        count(id)
+        from gauntlet
+        where challenger_student_id=#{studentId}
+        and create_time >= #{beforeTime}
+        and create_time &lt;= #{time}
+    </select>
 
 
 </mapper>

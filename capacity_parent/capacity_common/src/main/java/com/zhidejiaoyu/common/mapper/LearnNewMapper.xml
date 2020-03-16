@@ -157,4 +157,8 @@
 
     </select>
 
+    <select id="getUnitIdByStudentIdAndType" parameterType="map" resultType="long">
+        select unit_id from learn_new where student_id=#{studentId} and `type` =#{type}
+    </select>
+
 </mapper>

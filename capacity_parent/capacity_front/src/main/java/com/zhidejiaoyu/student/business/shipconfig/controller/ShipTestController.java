@@ -17,16 +17,28 @@ public class ShipTestController {
 
     /**
      * 获取pk题目
+     *
      * @param session
-     * @param studentId
+     * @param beChallenged 被挑战人id
      * @return
      */
     @RequestMapping("/getTest")
-    public Object getTest(HttpSession session,Long studentId){
-        return shipTestService.getTest(session,studentId);
+    public Object getTest(HttpSession session, Long beChallenged) {
+        return shipTestService.getTest(session, beChallenged);
     }
 
-
+    /**
+     * 保存挑战记录
+     *
+     * @param session
+     * @param beChallenged 被挑战人id
+     * @param type         1挑战成功，2挑战失败
+     * @return
+     */
+    @RequestMapping("/saveTest")
+    public Object saveTest(HttpSession session, Long beChallenged, Integer type) {
+        return shipTestService.saveTest(session, beChallenged, type);
+    }
 
 
 }

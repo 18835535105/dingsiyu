@@ -310,7 +310,8 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         }
     }
 
-    private void updateLeaderBoards(Student student) {
+    @Override
+    public void updateLeaderBoards(Student student) {
         //获取更新后的源分战力
         Date date = new Date();
         String beforeSevenDaysDateStr = DateUtil.getBeforeDayDateStr(date, 7, DateUtil.YYYYMMDD);

@@ -7,4 +7,6 @@ import javax.servlet.http.HttpSession;
 
 public interface ShipTestService extends BaseService<Student> {
     Object getTest(HttpSession session, Long studentId);
+
+    Object saveTest(HttpSession session, Long beChallenged, Integer type);
 }
