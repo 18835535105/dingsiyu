@@ -41,4 +41,10 @@ public class ShipTestController {
     }
 
 
+    @RequestMapping("/getPKRecord")
+    public Object getPKRecord(HttpSession session){
+        return shipTestService.getPKRecord(session);
+    }
+
+
 }

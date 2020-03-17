@@ -80,7 +80,7 @@ public class StudentExpansion extends Model<StudentExpansion> {
     /**
      * 最大排行
      */
-    private Integer ranking;
+    private Long ranking;
 
     @Override
     protected Serializable pkVal() {

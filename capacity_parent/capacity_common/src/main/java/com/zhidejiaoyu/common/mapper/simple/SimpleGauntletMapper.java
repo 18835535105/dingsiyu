@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Update;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -145,4 +146,8 @@ public interface SimpleGauntletMapper extends BaseMapper<Gauntlet> {
     void deleteByChallengerStudentIdsOrBeChallengerStudentIds(@Param("studentIds") List<Long> studentIds);
 
     int getCountByStudentIdAndTime(@Param("studentId") Long studentId,@Param("time") String toString,@Param("beforeTime") String beforeTime);
+
+    List<Map<String,Object>> getPkRecord(@Param("student") Long studentId);
+
+    int getPkGames(@Param("studentId") Long studentId,@Param("type") int type);
 }
