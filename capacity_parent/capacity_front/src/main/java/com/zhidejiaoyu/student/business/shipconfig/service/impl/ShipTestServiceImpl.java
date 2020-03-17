@@ -99,7 +99,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         shipAddEquipmentService.updateLeaderBoards(student);
         Long currentRanking = this.getCurrentRanking(student);
         if (currentRanking < expansion.getRanking() && currentRanking != 0) {
-            expansion.setRanking(currentRanking.intValue());
+            expansion.setRanking(currentRanking);
         }
         studentExpansionMapper.updateById(expansion);
         returnMap.put("status", 1);
