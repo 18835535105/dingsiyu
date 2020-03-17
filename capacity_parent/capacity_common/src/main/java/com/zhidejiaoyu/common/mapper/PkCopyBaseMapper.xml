@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.PkCopyBaseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.PkCopyBase">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="level_name" property="levelName" />
+        <result column="type" property="type" />
+        <result column="challenge_cycle" property="challengeCycle" />
+        <result column="person_num" property="personNum" />
+        <result column="durability" property="durability" />
+        <result column="common_attack" property="commonAttack" />
+        <result column="source_force_attack" property="sourceForceAttack" />
+        <result column="source_force" property="sourceForce" />
+        <result column="hit_rate" property="hitRate" />
+        <result column="mobility" property="mobility" />
+        <result column="img_url" property="imgUrl" />
+    </resultMap>
+
+</mapper>
