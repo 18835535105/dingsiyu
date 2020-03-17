@@ -80,10 +80,9 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         if (type.equals(1)) {
             gauntlet.setChallengeStatus(1);
             gauntlet.setBeChallengerStatus(2);
-            expansion.setStudyPower(expansion.getStudyPower() + 5);
             StudentExpansion beChallengedStudent = studentExpansionMapper.selectByStudentId(beChallenged);
             if (beChallengedStudent.getStudyPower() > expansion.getStudyPower()) {
-                expansion.setStudyPower(expansion.getStudyPower() + 5);
+                expansion.setStudyPower(expansion.getStudyPower() + 10);
 
             }
         } else {
