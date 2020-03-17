@@ -41,9 +41,15 @@ public class ShipTestController {
     }
 
 
+    /**
+     *
+     * @param session
+     * @param type 1，pk数据 2，飞船挑战
+     * @return
+     */
     @RequestMapping("/getPKRecord")
-    public Object getPKRecord(HttpSession session){
-        return shipTestService.getPKRecord(session);
+    public Object getPKRecord(HttpSession session,int type){
+        return shipTestService.getPKRecord(session,type);
     }
 
 

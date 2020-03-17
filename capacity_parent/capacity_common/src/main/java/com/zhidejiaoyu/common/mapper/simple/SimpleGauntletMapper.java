@@ -147,7 +147,13 @@ public interface SimpleGauntletMapper extends BaseMapper<Gauntlet> {
 
     int getCountByStudentIdAndTime(@Param("studentId") Long studentId,@Param("time") String toString,@Param("beforeTime") String beforeTime);
 
-    List<Map<String,Object>> getPkRecord(@Param("student") Long studentId);
+    List<Map<String,Object>> getPkRecord(@Param("student") Long studentId,@Param("type") int type);
 
+    /**
+     *获取pk场数
+     * @param studentId
+     * @param type  1,胜利场数 2，总场数
+     * @return
+     */
     int getPkGames(@Param("studentId") Long studentId,@Param("type") int type);
 }

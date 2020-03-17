@@ -106,7 +106,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     }
 
     @Override
-    public Object getPKRecord(HttpSession session) {
+    public Object getPKRecord(HttpSession session,int type) {
         Student student = getStudent(session);
         Map<String, Object> returnMap = new HashMap<>();
         //获取最高排名
@@ -122,15 +122,15 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         //pk胜率
         returnMap.put("winPk", win);
         returnMap.put("highestRanking", expansion.getRanking());
-        List<Map<String, Object>> pkRecord = simpleGauntletMapper.getPkRecord(student.getId());
+        List<Map<String, Object>> pkRecord = simpleGauntletMapper.getPkRecord(student.getId(),type);
         List<Map<String, Object>> returnList = new ArrayList<>();
         pkRecord.forEach(record -> {
-            String headUrl1 = record.get("headUrl1").toString();
+            String headUrl1 = record.get("imgUrl1").toString();
             headUrl1 = GetOssFile.getPublicObjectUrl(headUrl1);
-            record.put("headUrl1", headUrl1);
-            String headUrl2 = record.get("headUrl2").toString();
+            record.put("imgUrl1", headUrl1);
+            String headUrl2 = record.get("imgUrl2").toString();
             headUrl2 = GetOssFile.getPublicObjectUrl(headUrl2);
-            record.put("headUrl2", headUrl2);
+            record.put("imgUrl2", headUrl2);
             returnList.add(record);
         });
         returnMap.put("list", returnList);

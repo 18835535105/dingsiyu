@@ -35,7 +35,7 @@
         id, challenger_student_id, be_challenger_student_id, course_id, bet_gold, challenge_name, challenger_point,
         be_challenger_point, challenger_msg, challenge_status, be_challenger_status, challenge_study,
         be_challenge_study, challenge_gold, be_challenge_gold,concede,create_time,challenger_study_now,be_challenger_study_now,
-        grade,award,challenger_img_url,be_challenger_img_url,type
+        grade,award,challenger_img_url,be_challenger_img_url,`type`
     </sql>
 
     <select id="selByStudentIdAndFormat" parameterType="map" resultMap="BaseResultMap">
@@ -256,13 +256,14 @@
         select
         ga.create_time createTime,ga.challenge_status status,
         stu1.nickname nickName1,stu2.nickname nickname2,
-        stu1.head_url headUrl1,stu2.head_url headUrl2
+        ga.challenger_img_url imgUrl1,ga.be_challenger_img_url imgUrl2
         from gauntlet ga
         join student stu1
         on ga.challenger_student_id=stu1.id
         join student stu2
         on ga.be_challenger_student_id=stu2.id
         where ga.challenger_student_id=#{studentId}
+        and ga.type=#{type}
         order by ga.create_time
         limit 20
     </select>
@@ -270,6 +271,7 @@
         select count(id)
         from gauntlet
         where challenger_student_id=#{studentId}
+        and `type`=1
         <if test="type!=1">
             and challenge_status=1
         </if>

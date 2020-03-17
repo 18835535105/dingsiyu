@@ -10,5 +10,5 @@ public interface ShipTestService extends BaseService<Student> {
 
     Object saveTest(HttpSession session, Long beChallenged, Integer type);
 
-    Object getPKRecord(HttpSession session);
+    Object getPKRecord(HttpSession session,int type);
 }
