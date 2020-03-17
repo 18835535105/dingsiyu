@@ -115,6 +115,15 @@ public class Gauntlet extends Model<Gauntlet> {
     @TableField("award")
     private Integer award;
 
+    @TableField("challenger_img_url")
+    private Integer challengerImgUrl;
+
+    @TableField("be_challenger_img_url")
+    private Integer beChallengerImgUrl;
+
+    @TableField("type")
+    private Integer type;
+
 
     @Override
     protected Serializable pkVal() {

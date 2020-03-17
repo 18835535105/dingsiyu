@@ -25,6 +25,9 @@
         <result column="be_challenger_study_now" property="beChallengerStudyNow"/>
         <result column="grade" property="grade"/>
         <result column="award" property="award"/>
+        <result column="challenger_img_url" property="challengerImgUrl"/>
+        <result column="be_challenger_img_url" property="beChallengerImgUrl"/>
+        <result column="type" property="type"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -32,7 +35,7 @@
         id, challenger_student_id, be_challenger_student_id, course_id, bet_gold, challenge_name, challenger_point,
         be_challenger_point, challenger_msg, challenge_status, be_challenger_status, challenge_study,
         be_challenge_study, challenge_gold, be_challenge_gold,concede,create_time,challenger_study_now,be_challenger_study_now,
-        grade,award
+        grade,award,challenger_img_url,be_challenger_img_url,type
     </sql>
 
     <select id="selByStudentIdAndFormat" parameterType="map" resultMap="BaseResultMap">
