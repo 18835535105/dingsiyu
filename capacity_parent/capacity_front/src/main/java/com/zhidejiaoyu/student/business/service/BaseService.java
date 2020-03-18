@@ -52,6 +52,7 @@ public interface BaseService<T> extends IService<T> {
      * @param courseId
      * @param unitId
      * @param msg      保存的日志内容
+     * @throws RuntimeException
      */
     void saveRunLog(Student student, Integer type, Long courseId, Long unitId, String msg) throws RuntimeException;
 
@@ -61,6 +62,7 @@ public interface BaseService<T> extends IService<T> {
      * @param student
      * @param type    保存的日志类型
      * @param msg     保存的日志内容
+     * @throws RuntimeException
      */
     void saveRunLog(Student student, Integer type, String msg) throws RuntimeException;
 

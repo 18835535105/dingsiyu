@@ -122,4 +122,12 @@ public interface RedisKeysConst {
      * 标识学生已经初始化了飞船信息
      */
     String INIT_SHIP = "INIT_SHIP:";
+
+    /**
+     * 参加校区副本挑战的同学id
+     * key=SCHOOL_COPY:校管id
+     * field=副本id
+     * value=参加挑战的学生id集合
+     */
+    String SCHOOL_COPY = "SCHOOL_COPY:";
 }

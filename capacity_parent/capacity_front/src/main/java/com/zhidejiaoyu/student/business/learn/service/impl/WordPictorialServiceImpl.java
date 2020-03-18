@@ -1,10 +1,7 @@
 package com.zhidejiaoyu.student.business.learn.service.impl;
 
 import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.mapper.LearnNewMapper;
-import com.zhidejiaoyu.common.mapper.StudyCapacityMapper;
-import com.zhidejiaoyu.common.mapper.UnitVocabularyNewMapper;
-import com.zhidejiaoyu.common.mapper.VocabularyMapper;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudyCapacity;
@@ -51,6 +48,9 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
     private RedisOpt redisOpt;
 
     @Resource
+    private LearnExtendMapper learnExtendMapper;
+
+    @Resource
     private WordMemoryDifficulty wordMemoryDifficulty;
 
     private Integer model = 1;
@@ -79,7 +79,7 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
         Map<String, Object> correct = studyCapacityMapper.selectNeedReviewWord(unitId, studentId, DateUtil.DateTime(), type, easyOrHard, learnNew.getGroup());
         // 没有需要复习的
         if (correct == null) {
-            correct = this.getSudyWords(unitId, studentId, type, model, learnNew.getGroup(), studyModel);
+            correct = this.getStudyWords(unitId, studentId, type, model, learnNew.getGroup(), studyModel);
             if (correct == null) {
                 return super.toUnitTest();
             }
@@ -153,6 +153,23 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
         return ServerResponse.createBySuccess(vo);
     }
 
+    /**
+     * 获取未学过的单元信息
+     *
+     * @param unitId
+     * @param studentId
+     * @param type
+     * @param model
+     * @return
+     */
+    public Map<String, Object> getStudyWords(Long unitId, Long studentId, Integer type, Integer model, Integer group, String studyModel) {
+        Map<String, Object> correct;
+        //获取当前单词模块已经学习过的wordId
+        List<Long> longs = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, studentId, studyModel, 1);
+        // 获取新词
+        correct = learnNewMapper.selectStudyMap(studentId, unitId, longs, type, model, group);
+        return correct;
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)

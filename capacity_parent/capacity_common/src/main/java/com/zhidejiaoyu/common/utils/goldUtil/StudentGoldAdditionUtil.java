@@ -18,15 +18,20 @@ public class StudentGoldAdditionUtil {
 
     public static Double getGoldAddition(Student student, Double gold) {
         Date date = new Date();
-        if (student.getBonusExpires() != null) {
-            if (student.getBonusExpires().getTime() >= date.getTime()) {
-                return gold * GLOVESADDITION;
-            } else {
-                return gold;
-            }
+        if (student.getBonusExpires() != null && student.getBonusExpires().getTime() >= date.getTime()) {
+            return gold * GLOVESADDITION;
         }
         return gold;
     }
 
+    public static Double getGoldAddition(Student student, Integer gold) {
+        if (gold == null) {
+            throw new IllegalArgumentException("gold can't be null");
+        }
+        return getGoldAddition(student, gold * 1.0);
+    }
+
+    private StudentGoldAdditionUtil() {
+    }
 
 }
