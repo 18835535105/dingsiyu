@@ -26,18 +26,20 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
      * @param studentId
      * @return
      */
-     List<Gauntlet> selByStudentIdAndFormat(@Param("studentId") Long studentId, @Param("time") Date time);
+    List<Gauntlet> selByStudentIdAndFormat(@Param("studentId") Long studentId, @Param("time") Date time);
 
     /**
      * 查询数据
+     *
      * @param studentId
-     * @param type 1,student发起人 总挑战数量 2,student发起人 总胜利数量  3,student被挑战人 总被挑战数量  4,student被挑战人 总胜利数量
+     * @param type      1,student发起人 总挑战数量 2,student发起人 总胜利数量  3,student被挑战人 总被挑战数量  4,student被挑战人 总胜利数量
      * @return
      */
     Integer getInformation(@Param("studentId") Long studentId, @Param("type") Integer type);
 
     /**
      * 查看显示数据
+     *
      * @param type
      * @param challengeType
      * @param start
@@ -52,6 +54,7 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
 
     /**
      * 查看挑战当前学生的挑战数量
+     *
      * @param studentId
      * @param id
      * @param type
@@ -61,6 +64,7 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
 
     /**
      * 查看全部挑战当前学生的数量
+     *
      * @param type
      * @param challengeType
      * @param studentId
@@ -73,6 +77,7 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
 
     /**
      * 根据挑战id查询挑战信息详情
+     *
      * @param gauntletId
      * @return
      */
@@ -80,6 +85,7 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
 
     /**
      * 根据type 和学生id查询挑战信息
+     *
      * @param studentId
      * @param start
      * @param end
@@ -90,6 +96,7 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
 
     /**
      * 查看挑战次数
+     *
      * @param id
      * @return
      */
@@ -97,6 +104,7 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
 
     /**
      * 查看需要去除的挑战数据
+     *
      * @param studentId
      * @param date
      * @return
@@ -105,6 +113,7 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
 
     /**
      * 根据挑战id修改挑战数据
+     *
      * @param status
      * @param gauntletIds
      */
@@ -112,6 +121,7 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
 
     /**
      * 获得当前学生为别挑战人时的挑战数量
+     *
      * @param studentId
      * @return
      */
@@ -120,6 +130,7 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
 
     /**
      * 根据挑战id修改超时状态
+     *
      * @param gauntletId
      * @return
      */
@@ -128,6 +139,7 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
 
     /**
      * 清楚当前时间之前的数据信息
+     *
      * @param time
      * @return
      */
@@ -137,6 +149,7 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
 
     /**
      * 根据状态查看挑战信息
+     *
      * @param type
      * @param studentId
      * @return
@@ -145,18 +158,26 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
 
     void deleteByChallengerStudentIdsOrBeChallengerStudentIds(@Param("studentIds") List<Long> studentIds);
 
-    int getCountByStudentIdAndTime(@Param("studentId") Long studentId,@Param("time") String toString,@Param("beforeTime") String beforeTime);
+    int getCountByStudentIdAndTime(@Param("studentId") Long studentId, @Param("time") String toString, @Param("beforeTime") String beforeTime);
 
-    List<Map<String,Object>> getPkRecord(@Param("student") Long studentId,@Param("type") int type);
+    List<Map<String, Object>> getPkRecord(@Param("student") Long studentId, @Param("type") int type);
 
     /**
-     *获取pk场数
+     * 获取pk场数
+     *
      * @param studentId
-     * @param type  1,胜利场数 2，总场数
+     * @param type      1,胜利场数 2，总场数
      * @return
      */
-    int getPkGames(@Param("studentId") Long studentId,@Param("type") int type);
+    int getPkGames(@Param("studentId") Long studentId, @Param("type") int type);
 
-
-    int countByStudentIdAndBossId(@Param("studentId") Long studentId,@Param("bossId") Long bossId);
+    /**
+     * 统计学生今天挑战的指定内容的次数
+     *
+     * @param studentId
+     * @param bossId
+     * @param type      1：飞船挑战；2：单人副本挑战；3：校区副本挑战；
+     * @return
+     */
+    int countByStudentIdAndBossId(@Param("studentId") Long studentId, @Param("bossId") Long bossId, @Param("type") Integer type);
 }
