@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.Equipment;
 import com.zhidejiaoyu.common.pojo.StudentEquipment;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -43,4 +44,6 @@ public interface StudentEquipmentMapper extends BaseMapper<StudentEquipment> {
      * @return
      */
     String selectImgUrlByStudentId(@Param("studentId") Long studentId);
+
+
 }

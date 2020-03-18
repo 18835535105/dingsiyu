@@ -16,6 +16,7 @@ import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipTestService;
+import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import com.zhidejiaoyu.student.common.redis.PkCopyRedisOpt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +64,14 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     @Resource
     private PkCopyRedisOpt pkCopyRedisOpt;
 
+    @Resource
+    private EquipmentMapper equipmentMapper;
+
+    /**
+     * @param session
+     * @param studentId 被挑战人id
+     * @return
+     */
     @Override
     public Object getTest(HttpSession session, Long studentId) {
         Student student = getStudent(session);
@@ -77,14 +86,35 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         //1.pk发起人的信息
         // 学生装备的飞船及装备信息
         returnMap.put("status", 1);
-        returnMap.put("originator", shipIndexService.getStateOfWeek(student.getId()));
-        returnMap.put("originatorImgUrl", GetOssFile.getPublicObjectUrl(studentEquipmentMapper.selectImgUrlByStudentId(student.getId())));
+        Map<String, Object> origintorMap = getEquipmentMap(student.getId());
+        returnMap.put("originator", origintorMap);
         //2.被pk人的信息
-        returnMap.put("challenged", shipIndexService.getStateOfWeek(studentId));
-        returnMap.put("challengedImgUrl", GetOssFile.getPublicObjectUrl(studentEquipmentMapper.selectImgUrlByStudentId(studentId)));
+        Map<String, Object> beOrigintorMap = getEquipmentMap(studentId);
+        returnMap.put("challenged", beOrigintorMap);
         //3.查询题目
         returnMap.put("subject", getSubject(student.getId()));
         return returnMap;
+    }
+
+    /**
+     * 返回学生的返回值信息
+     *
+     * @param studentId
+     * @return
+     */
+    private Map<String, Object> getEquipmentMap(Long studentId) {
+        Map<String, Object> origintorMap = new HashMap<>();
+        origintorMap.put("Battle", shipIndexService.getStateOfWeek(studentId));
+        origintorMap.put("imgUrl", GetOssFile.getPublicObjectUrl(studentEquipmentMapper.selectImgUrlByStudentId(studentId)));
+        Equipment equipment = equipmentMapper.selectNameAndGradeByStudentId(studentId);
+        if (equipment != null) {
+            origintorMap.put("name", equipment.getName());
+            origintorMap.put("grade", equipment.getGrade());
+        } else {
+            origintorMap.put("name", null);
+            origintorMap.put("grade", null);
+        }
+        return origintorMap;
     }
 
 
@@ -106,12 +136,29 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
             pkCopyBase.setDurability(pkCopyState.getDurability());
         }
         returnMap.put("status", 1);
-        returnMap.put("originator", shipIndexService.getStateOfWeek(student.getId()));
-        returnMap.put("originatorImgUrl", GetOssFile.getPublicObjectUrl(studentEquipmentMapper.selectImgUrlByStudentId(student.getId())));
-        returnMap.put("challenged", GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl()));
-        returnMap.put("challengedImgUrl", pkCopyBase);
+        Map<String, Object> origintorMap = getEquipmentMap(student.getId());
+        returnMap.put("originator", origintorMap);
+        Map<String, Object> beOrigintorMap = getBossEquipment(pkCopyBase);
+        returnMap.put("challenged", beOrigintorMap);
         //3.查询题目
         returnMap.put("subject", getSubject(student.getId()));
+        return returnMap;
+    }
+
+    private Map<String, Object> getBossEquipment(PkCopyBase pkCopyBase) {
+        Map<String, Object> returnMap = new HashMap<>();
+        returnMap.put("imgUrl", GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl()));
+        returnMap.put("grade", pkCopyBase.getLevelName());
+        returnMap.put("name", pkCopyBase.getName());
+        IndexVO.BaseValue build = IndexVO.StateOfWeek.builder()
+                .attack(pkCopyBase.getCommonAttack())
+                .durability(pkCopyBase.getDurability())
+                .hitRate(pkCopyBase.getHitRate())
+                .move(pkCopyBase.getMobility())
+                .source(pkCopyBase.getSourceForce())
+                .sourceAttack(pkCopyBase.getSourceForceAttack())
+                .build();
+        returnMap.put("Battle", build);
         return returnMap;
     }
 
@@ -301,7 +348,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                 student1.setSystemGold(BigDecimalUtil.add(student1.getSystemGold(), goldBonus));
                 studentMapper.updateById(student1);
 
-                super.saveRunLog(student1, 4,"学生[" + student1.getStudentName() + "]在校区副本挑战胜利，奖励#" + goldBonus + "#枚金币");
+                super.saveRunLog(student1, 4, "学生[" + student1.getStudentName() + "]在校区副本挑战胜利，奖励#" + goldBonus + "#枚金币");
             }
         }
     }
@@ -316,7 +363,8 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     private int getPkCount(Student student) {
         Date date = new Date();
         String beforeTime = DateUtil.beforeHoursTime(1);
-        int count = simpleGauntletMapper.getCountByStudentIdAndTime(student.getId(), date.toString(), beforeTime);
+        Date parse = DateUtil.parse(beforeTime, DateUtil.YYYYMMDDHHMMSS);
+        int count = simpleGauntletMapper.getCountByStudentIdAndTime(student.getId(), date, parse);
         if (count >= 5) {
             return 1;
         } else {
@@ -336,7 +384,9 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         //2,获取单元题目
         if (unitIds != null && unitIds.size() > 0) {
             List<SubjectsVO> subjectsVos = vocabularyMapper.selectSubjectsVOByUnitIds(unitIds);
+            //题目够15到截取，不够的话 循环添加
             if (subjectsVos.size() > 15) {
+                Collections.shuffle(subjectsVos);
                 subjectsVos = subjectsVos.subList(0, 15);
             } else {
                 List<SubjectsVO> subjectsVos1 = new ArrayList<>();
@@ -350,7 +400,13 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                 }
                 subjectsVos = subjectsVos1;
             }
-            return subjectsVos;
+            List<SubjectsVO> returnList = new ArrayList<>();
+            subjectsVos.forEach(vo -> {
+                vo.setReadUrl(GetOssFile.getPublicObjectUrl(vo.getReadUrl()));
+                returnList.add(vo);
+            });
+            Collections.shuffle(returnList);
+            return returnList;
         }
         return null;
     }

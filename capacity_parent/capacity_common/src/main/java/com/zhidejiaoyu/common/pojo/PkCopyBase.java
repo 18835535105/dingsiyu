@@ -69,7 +69,7 @@ public class PkCopyBase extends Model<PkCopyBase> {
     /**
      * 命中率
      */
-    private Integer hitRate;
+    private Double hitRate;
     /**
      * 机动力
      */

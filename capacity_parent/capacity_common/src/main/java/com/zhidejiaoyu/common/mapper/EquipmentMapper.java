@@ -43,4 +43,10 @@ public interface EquipmentMapper extends BaseMapper<Equipment> {
     List<Equipment> selectIdByTypeAndLevel(@Param("type") int type, @Param("level") int level);
 
     List<Equipment> selectByType(@Param("type") Integer type);
+
+    /**
+     * 获取正在使用的飞船名称和级别
+     * @param studentId
+     */
+    Equipment selectNameAndGradeByStudentId(@Param("studentId") Long studentId);
 }
