@@ -18,7 +18,7 @@ import java.util.Map;
  * @author stylefeng
  * @since 2019-03-15
  */
-public interface SimpleGauntletMapper extends BaseMapper<Gauntlet> {
+public interface GauntletMapper extends BaseMapper<Gauntlet> {
 
     /**
      * 学生当天已发出的挑战
@@ -169,8 +169,17 @@ public interface SimpleGauntletMapper extends BaseMapper<Gauntlet> {
      * @param type      1,胜利场数 2，总场数
      * @return
      */
-    int getPkGames(@Param("studentId") Long studentId, @Param("type") int type);
+    int getPkGames(@Param("studentId") Long studentId,@Param("type") int type);
 
+    /**
+     * 统计学生今天挑战的指定内容的次数
+     *
+     * @param studentId
+     * @param bossId
+     * @param type      1：飞船挑战；2：单人副本挑战；3：校区副本挑战；
+     * @return
+     */
+    int countByStudentIdAndBossId(@Param("studentId") Long studentId, @Param("bossId") Long bossId, @Param("type") Integer type);
 
     int countByStudentIdAndBossId(@Param("studentId") Long studentId, @Param("bossId") Long bossId);
 }
