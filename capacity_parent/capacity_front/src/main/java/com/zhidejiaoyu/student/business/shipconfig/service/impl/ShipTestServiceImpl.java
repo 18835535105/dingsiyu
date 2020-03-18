@@ -17,6 +17,7 @@ import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipTestService;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import com.zhidejiaoyu.student.common.redis.PkCopyRedisOpt;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -212,9 +213,39 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         return ServerResponse.createBySuccess();
     }
 
+    public static void main(String[] args) {
+        System.out.println(new DateTime().dayOfWeek().get());
+    }
+
     @Override
     public ServerResponse<Object> getSchoolCopyInfo(Long bossId) {
 
+        // 判断当前日期是否可以挑战校区副本
+        int dayOfWeek = new DateTime().dayOfWeek().get();
+        final int saturday = 6;
+        final int sunday = 7;
+        if (dayOfWeek != saturday && dayOfWeek != sunday) {
+            return ServerResponse.createByError(400, "校区副本只有周六周日才开放挑战！");
+        }
+
+        Student student = super.getStudent();
+        Long studentId = student.getId();
+
+        // 判断学生当前是否已经挑战过当前校区副本
+        int count = gauntletMapper.countByStudentIdAndBossId(studentId, bossId, 3);
+        if (count > 0) {
+            return ServerResponse.createByError(401, "您今天已经挑战过该副本！");
+        }
+
+        Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
+        // 返回副本信息
+        // todo: 返回副本信息
+        PkCopyState pkCopyState = pkCopyStateMapper.selectBySchoolAdminIdAndPkCopyBaseId(schoolAdminId, bossId);
+        if (pkCopyState == null) {
+            PkCopyBase pkCopyBase = pkCopyBaseMapper.selectById(bossId);
+        } else {
+
+        }
         return null;
     }
 
