@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.simple.SimpleGauntletMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
+import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
@@ -15,7 +16,9 @@ import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipTestService;
+import com.zhidejiaoyu.student.common.redis.PkCopyRedisOpt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -23,6 +26,11 @@ import java.util.*;
 
 @Service
 public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements ShipTestService {
+
+    /**
+     * 挑战副本成功奖励金币数
+     */
+    private static final int AWARD_GOLD = 10;
 
     @Resource
     private ShipIndexService shipIndexService;
@@ -41,13 +49,19 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     @Resource
     private StudentEquipmentMapper studentEquipmentMapper;
     @Resource
-    private PkCopyBaseMapper pkCopyBaseMapper;
+    private RunLogMapper runLogMapper;
+
     @Resource
     private PkCopyStateMapper pkCopyStateMapper;
+
+    @Resource
+    private PkCopyBaseMapper pkCopyBaseMapper;
+
     @Resource
     private StudentMapper studentMapper;
+
     @Resource
-    private RunLogMapper runLogMapper;
+    private PkCopyRedisOpt pkCopyRedisOpt;
 
     @Override
     public Object getTest(HttpSession session, Long studentId) {
@@ -132,7 +146,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
             pkCopyState.setType(1);
             pkCopyState.setCreateTime(new Date());
             pkCopyState.setPkCopyBaseId(bossId);
-            pkCopyState.setSchoolAdminId(TeacherInfoUtil.getSchoolAdminId(student).longValue());
+            pkCopyState.setSchoolAdminId(TeacherInfoUtil.getSchoolAdminId(student));
             PkCopyBase pkCopyBase = pkCopyBaseMapper.selectById(bossId);
             Integer durability = pkCopyBase.getDurability();
             durability -= bloodVolume;
@@ -232,6 +246,64 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         });
         returnMap.put("list", returnList);
         return returnMap;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ServerResponse<Object> saveSchoolCopyInfo(Long copyId, Integer reduceDurability) {
+
+        Student student = super.getStudent();
+        Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
+
+        pkCopyRedisOpt.saveSchoolCopyStudentInfo(schoolAdminId, copyId, student.getId());
+
+        /*
+         查询当前校区有没有学生正在挑战当前副本
+         如果有，当前副本耐久度=当前副本剩余耐久度-本次减少的耐久度
+         如果没有，当前副本耐久度=当前副本总耐久度-本次减少的耐久度
+         */
+        PkCopyState pkCopyState = pkCopyStateMapper.selectBySchoolAdminIdAndPkCopyBaseId(schoolAdminId, copyId);
+        Date nowTime = new Date();
+        if (pkCopyState == null) {
+            PkCopyBase pkCopyBase = pkCopyBaseMapper.selectById(copyId);
+            // 剩余耐久度
+            int durability = pkCopyBase.getDurability() - reduceDurability;
+            pkCopyStateMapper.insert(PkCopyState.builder()
+                    .type(2)
+                    .pkCopyBaseId(copyId)
+                    .schoolAdminId(schoolAdminId)
+                    .durability(Math.max(0, durability))
+                    .createTime(nowTime)
+                    .updateTime(nowTime)
+                    .build());
+            savePkSchoolCopyAward(copyId, schoolAdminId, durability);
+        } else if (pkCopyState.getDurability() > 0) {
+            int durability = pkCopyState.getDurability() - reduceDurability;
+
+            pkCopyState.setDurability(Math.max(0, durability));
+            pkCopyState.setUpdateTime(nowTime);
+            pkCopyStateMapper.updateById(pkCopyState);
+
+            savePkSchoolCopyAward(copyId, schoolAdminId, durability);
+
+        }
+
+        return ServerResponse.createBySuccess();
+    }
+
+    public void savePkSchoolCopyAward(Long copyId, Integer schoolAdminId, Integer durability) {
+        if (durability <= 0) {
+            // 挑战成功，对校区内所有挑战该副本的学生奖励金币
+            Set<Long> schoolCopyStudentInfoSet = pkCopyRedisOpt.getSchoolCopyStudentInfo(schoolAdminId, copyId);
+            for (Long studentId : schoolCopyStudentInfoSet) {
+                Student student1 = studentMapper.selectById(studentId);
+                Double goldBonus = StudentGoldAdditionUtil.getGoldAddition(student1, AWARD_GOLD);
+                student1.setSystemGold(BigDecimalUtil.add(student1.getSystemGold(), goldBonus));
+                studentMapper.updateById(student1);
+
+                super.saveRunLog(student1, 4,"学生[" + student1.getStudentName() + "]在校区副本挑战胜利，奖励#" + goldBonus + "#枚金币");
+            }
+        }
     }
 
 

@@ -1,7 +1,5 @@
 package com.zhidejiaoyu.common.constant;
 
-import java.io.FileInputStream;
-
 /**
  * 文件上传目录常量类
  *

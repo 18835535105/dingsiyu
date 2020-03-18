@@ -50,13 +50,6 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
     @Autowired
     private SaveRunLog saveRunLog;
 
-    @Resource
-    private LearnExtendMapper learnExtendMapper;
-
-    @Resource
-    private LearnNewMapper learnNewMapper;
-
-
     @Override
     public Student getStudent(HttpSession session) {
         return studentMapper.selectById(this.getStudentId(session));
@@ -217,24 +210,4 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         }
         return level;
     }
-
-    /**
-     * 获取未学过的单元信息
-     *
-     * @param unitId
-     * @param studentId
-     * @param type
-     * @param model
-     * @return
-     */
-    public Map<String, Object> getSudyWords(Long unitId, Long studentId, Integer type, Integer model, Integer group, String studyModel) {
-        Map<String, Object> correct;
-        //获取当前单词模块已经学习过的wordId
-        List<Long> longs = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, studentId, studyModel, 1);
-        // 获取新词
-        correct = learnNewMapper.selectStudyMap(studentId, unitId, longs, type, model, group);
-        return correct;
-    }
-
-
 }

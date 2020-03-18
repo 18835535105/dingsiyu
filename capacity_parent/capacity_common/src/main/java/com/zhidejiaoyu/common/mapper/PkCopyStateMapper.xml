@@ -4,22 +4,33 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.PkCopyState">
-        <id column="id" property="id" />
-        <result column="student_id" property="studentId" />
-        <result column="school_admin_id" property="schoolAdminId" />
-        <result column="pk_copy_base_id" property="pkCopyBaseId" />
-        <result column="durability" property="durability" />
-        <result column="type" property="type" />
-        <result column="create_time" property="createTime" />
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="school_admin_id" property="schoolAdminId"/>
+        <result column="pk_copy_base_id" property="pkCopyBaseId"/>
+        <result column="durability" property="durability"/>
+        <result column="type" property="type"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <sql id="base_sql">
-        id,student_id,school_admin_id,durability,pk_copy_base_id,`type`,create_time
+        id, student_id, school_admin_id, pk_copy_base_id, durability, type, create_time, update_time
     </sql>
+
+    <select id="selectBySchoolAdminIdAndPkCopyBaseId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from pk_copy_state
+        where school_admin_id = #{schoolAdminId}
+        and pk_copy_base_id = #{copyId}
+        and type = 2
+        limit 1
+    </select>
 
     <select id="selectByStudentIdAndBossId" resultMap="BaseResultMap" parameterType="map">
         select
-        <include refid="base_sql"></include>
+        <include refid="base_sql"/>
         from pk_copy_state
         where student_id=#{studentId}
         and pk_copy_base_id=#{bossId}

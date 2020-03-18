@@ -3,8 +3,7 @@ package com.zhidejiaoyu.common.pojo;
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -21,6 +20,9 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PkCopyState extends Model<PkCopyState> {
 
     private static final long serialVersionUID = 1L;
@@ -34,12 +36,12 @@ public class PkCopyState extends Model<PkCopyState> {
     /**
      * 校管id
      */
-    private Long schoolAdminId;
+    private Integer schoolAdminId;
 
     /**
      * 副本信息id
      */
-    private Integer pkCopyBaseId;
+    private Long pkCopyBaseId;
 
     /**
      * 剩余耐久度
@@ -53,10 +55,8 @@ public class PkCopyState extends Model<PkCopyState> {
      * 挑战结束时间
      */
     private Date createTime;
-    /**
-     * bossId
-     */
-    private Long pkCopyBaseId;
+
+    private Date updateTime;
 
 
     @Override
