@@ -7,6 +7,7 @@
         <id column="id" property="id" />
         <result column="student_id" property="studentId" />
         <result column="school_admin_id" property="schoolAdminId" />
+        <result column="pk_copy_base_id" property="pkCopyBaseId" />
         <result column="durability" property="durability" />
         <result column="type" property="type" />
         <result column="create_time" property="createTime" />
