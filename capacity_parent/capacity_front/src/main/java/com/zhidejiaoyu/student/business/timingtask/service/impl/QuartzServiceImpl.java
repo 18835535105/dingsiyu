@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.simple.*;
+import com.zhidejiaoyu.common.mapper.simple.GauntletMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;

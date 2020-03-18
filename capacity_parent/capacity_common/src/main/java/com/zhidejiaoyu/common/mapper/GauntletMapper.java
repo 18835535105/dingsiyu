@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.common.mapper.simple;
+package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Gauntlet;
@@ -181,5 +181,4 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
      */
     int countByStudentIdAndBossId(@Param("studentId") Long studentId, @Param("bossId") Long bossId, @Param("type") Integer type);
 
-    int countByStudentIdAndBossId(@Param("studentId") Long studentId, @Param("bossId") Long bossId);
 }

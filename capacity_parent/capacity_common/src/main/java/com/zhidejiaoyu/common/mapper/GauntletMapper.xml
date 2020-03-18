@@ -280,7 +280,7 @@
         select
         count(id)
         from gauntlet
-        where `type`=2
+        where `type`=#{count}
         and challenger_student_id = #{studentId}
         and be_challenger_student_id = #{bossId}
         and to_days(create_time) = to_days(now())

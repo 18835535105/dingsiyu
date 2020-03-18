@@ -3,7 +3,6 @@ package com.zhidejiaoyu.student.business.shipconfig.service.impl;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.redis.SourcePowerKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.mapper.GauntletMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
@@ -124,7 +123,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         Map<String, Object> returnMap = new HashMap<>();
         PkCopyBase pkCopyBase = pkCopyBaseMapper.selectById(bossId);
         //获得学生当天挑战次数
-        int count = gauntletMapper.countByStudentIdAndBossId(student.getId(), bossId);
+        int count = gauntletMapper.countByStudentIdAndBossId(student.getId(), bossId, 2);
         //判断是否到达每天挑战次数上限
         if (pkCopyBase.getChallengeCycle() <= count) {
             returnMap.put("status", 2);
@@ -371,7 +370,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                 student1.setSystemGold(BigDecimalUtil.add(student1.getSystemGold(), goldBonus));
                 studentMapper.updateById(student1);
 
-                super.saveRunLog(student1, 4,"学生[" + student1.getStudentName() + "]在校区副本挑战胜利，奖励#" + goldBonus + "#枚金币");
+                super.saveRunLog(student1, 4, "学生[" + student1.getStudentName() + "]在校区副本挑战胜利，奖励#" + goldBonus + "#枚金币");
             }
         }
     }
