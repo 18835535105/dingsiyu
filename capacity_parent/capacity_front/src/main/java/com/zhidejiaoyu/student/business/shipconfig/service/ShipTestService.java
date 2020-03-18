@@ -25,4 +25,12 @@ public interface ShipTestService extends BaseService<Student> {
     Object getSingleTesting(HttpSession session, Long bossId);
 
     Object saveSingleTesting(HttpSession session, Long bossId, Integer bloodVolume);
+
+    /**
+     * 获取校区副本挑战状态
+     *
+     * @param bossId 挑战的副本id
+     * @return
+     */
+    ServerResponse<Object> getSchoolCopyInfo(Long bossId);
 }

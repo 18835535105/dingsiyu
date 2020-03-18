@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.business.shipconfig.controller;
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipTestService;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -71,6 +72,20 @@ public class ShipTestController {
             return ServerResponse.createByError(400, "bloodVolume can't be null!");
         }
         return shipTestService.saveSchoolCopyInfo(bossId, bloodVolume);
+    }
+
+    /**
+     * 获取校区副本挑战状态
+     *
+     * @param bossId 挑战的副本id
+     * @return
+     */
+    @GetMapping("/getSchoolCopyInfo")
+    public ServerResponse<Object> getSchoolCopyInfo(Long bossId) {
+        if (bossId == null) {
+            return ServerResponse.createByError(400, "bossId can't be null!");
+        }
+        return shipTestService.getSchoolCopyInfo(bossId);
     }
 
     /**

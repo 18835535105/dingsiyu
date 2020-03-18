@@ -39,6 +39,7 @@ public interface StudentEquipmentMapper extends BaseMapper<StudentEquipment> {
 
     /**
      * 查询正在使用的飞船图片
+     *
      * @param studentId
      * @return
      */

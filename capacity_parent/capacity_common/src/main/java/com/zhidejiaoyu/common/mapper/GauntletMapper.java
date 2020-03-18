@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.common.mapper.simple;
+package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Gauntlet;
@@ -18,7 +18,7 @@ import java.util.Map;
  * @author stylefeng
  * @since 2019-03-15
  */
-public interface SimpleGauntletMapper extends BaseMapper<Gauntlet> {
+public interface GauntletMapper extends BaseMapper<Gauntlet> {
 
     /**
      * 学生当天已发出的挑战

@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  * @since 2019-03-15
  */
 @Service
-public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<SimpleGauntletMapper, Gauntlet> implements SimpleIGauntletServiceSimple {
+public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<GauntletMapper, Gauntlet> implements SimpleIGauntletServiceSimple {
 
     @Autowired
     private SimpleStudentMapper simpleStudentMapper;
@@ -50,7 +50,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     private SimpleTeacherMapper simpleTeacherMapper;
 
     @Autowired
-    private SimpleGauntletMapper simpleGauntletMapper;
+    private GauntletMapper gauntletMapper;
 
     @Autowired
     private SimpleVocabularyMapper vocabularyMapper;
@@ -142,7 +142,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     public ServerResponse<StudentGauntletVo> getStudyInteger(HttpSession session) {
         //获取个人的数据
         Student student = getStudent(session);
-        List<Gauntlet> gauntlets = simpleGauntletMapper.selByStudentIdAndFormat(student.getId(), new Date());
+        List<Gauntlet> gauntlets = gauntletMapper.selByStudentIdAndFormat(student.getId(), new Date());
         StudentGauntletVo studentGauntletVo = new StudentGauntletVo();
         studentGauntletVo.setId(student.getId());
         studentGauntletVo.setName(student.getNickname());
@@ -185,7 +185,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         Student student = getStudent(session);
         Gauntlet gauntlet = new Gauntlet();
         //获取今日是否有挑战的数据
-        List<Gauntlet> gauntlets = simpleGauntletMapper.selByStudentIdAndFormat(student.getId(), new Date());
+        List<Gauntlet> gauntlets = gauntletMapper.selByStudentIdAndFormat(student.getId(), new Date());
         //获取挑战人学习力等数据
         StudentExpansion studentExpansion = simpleStudentExpansionMapper.selectByStudentId(student.getId());
         //获取被挑战人学习力等数据
@@ -210,7 +210,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
                     null, challengerMsg, 3, 3, null,
                     null, null, null, new Date(), challengerStudyPower, beChallengerStudyPower);
         }
-        Integer insert = simpleGauntletMapper.insert(gauntlet);
+        Integer insert = gauntletMapper.insert(gauntlet);
         if (insert > 0) {
             return ServerResponse.createBySuccess(gauntlet.getId());
         }
@@ -334,9 +334,9 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         String format = simple.format(time);
         int start = (pageNum - 1) * rows;
         //根据type的不同来区分是查询我发出的挑战还是挑战我的数据
-        List<Gauntlet> gauntlets = simpleGauntletMapper.selGauntletByTypeAndChallengeType(type, challengeType, start, rows, studentId, format);
+        List<Gauntlet> gauntlets = gauntletMapper.selGauntletByTypeAndChallengeType(type, challengeType, start, rows, studentId, format);
         //获取要查询的挑战数量
-        Integer count = simpleGauntletMapper.getCount(type, challengeType, studentId, format);
+        Integer count = gauntletMapper.getCount(type, challengeType, studentId, format);
         returnMap.put("page", pageNum);
         returnMap.put("rows", rows);
         List<Map<String, Object>> list = new ArrayList<>();
@@ -361,18 +361,18 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> saveResult(Long gauntletId, Integer type, Integer isDelete, Integer point, String concede) {
         //根据挑战id获取挑战数据
-        Gauntlet gauntlet = simpleGauntletMapper.selectById(gauntletId);
+        Gauntlet gauntlet = gauntletMapper.selectById(gauntletId);
         if (type == 1) {
             //发起者保存分数
             gauntlet.setChallengerPoint(point);
-            simpleGauntletMapper.updateById(gauntlet);
+            gauntletMapper.updateById(gauntlet);
         } else {
             if (isDelete == 2) {
                 //挑战者拒绝挑战
                 gauntlet.setChallengeStatus(6);
                 gauntlet.setBeChallengerStatus(6);
                 gauntlet.setConcede(concede);
-                simpleGauntletMapper.updateById(gauntlet);
+                gauntletMapper.updateById(gauntlet);
             } else {
                 //挑战者接受挑战保存分数
                 //获取加成比例
@@ -470,7 +470,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
                     gauntlet.setAward(0);
                     addGoldAndStudy(gauntlet.getBeChallengerStudentId(), gauntlet.getChallengerStudentId(), study, gauntlet.getBetGold(), gauntlet.getBetGold());
                 }
-                simpleGauntletMapper.updateById(gauntlet);
+                gauntletMapper.updateById(gauntlet);
             }
         }
         return ServerResponse.createBySuccess();
@@ -487,7 +487,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         Student student = getStudent(session);
         Map<String, Object> returnMap = new HashMap<>();
         //获取学生挑战数据
-        List<Gauntlet> gauntlets = simpleGauntletMapper.selByStudentIdAndFormat(student.getId(), new Date());
+        List<Gauntlet> gauntlets = gauntletMapper.selByStudentIdAndFormat(student.getId(), new Date());
         //在没有挑战时返回
         if (gauntlets == null) {
             returnMap.put("isPk", true);
@@ -543,7 +543,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     public ServerResponse<Object> getPersonalPkData(HttpSession session, Integer page, Integer rows, Integer type) {
         Student student = getStudent(session);
         //查看挑战次数
-        Integer size = simpleGauntletMapper.selCountByStudentId(student.getId());
+        Integer size = gauntletMapper.selCountByStudentId(student.getId());
         Integer total = size % rows > 0 ? size / rows + 1 : size / rows;
         Map<String, Object> returnMap = new HashMap<>();
         returnMap.put("total", total);
@@ -553,7 +553,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         /**
          * 根据学生id查询每页显示的挑战数据
          */
-        List<Gauntlet> gauntlets = simpleGauntletMapper.selByStudentId(student.getId(), start, rows, type);
+        List<Gauntlet> gauntlets = gauntletMapper.selByStudentId(student.getId(), start, rows, type);
         List<Map<String, Object>> returnList = new ArrayList<>();
         //填装返回数据格式
         for (Gauntlet gauntlet : gauntlets) {
@@ -594,12 +594,12 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     @Override
     public ServerResponse<Object> removeGauntlet(Long gauntletId) {
         //在一人接受挑战时清楚其他发出的挑战记录
-        Gauntlet gauntlet = simpleGauntletMapper.selectById(gauntletId);
+        Gauntlet gauntlet = gauntletMapper.selectById(gauntletId);
         Date createTime = gauntlet.getCreateTime();
-        List<Gauntlet> gauntlets = simpleGauntletMapper.selByStudentIdAndFormat(gauntlet.getChallengerStudentId(), createTime);
+        List<Gauntlet> gauntlets = gauntletMapper.selByStudentIdAndFormat(gauntlet.getChallengerStudentId(), createTime);
         for (Gauntlet gauntlet1 : gauntlets) {
             if (!gauntlet1.getId().equals(gauntletId)) {
-                simpleGauntletMapper.updateByStatus(gauntlet1.getId());
+                gauntletMapper.updateByStatus(gauntlet1.getId());
             }
         }
 
@@ -615,9 +615,9 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         calendar.add(Calendar.HOUR_OF_DAY, -72);
         Date time = calendar.getTime();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        simpleGauntletMapper.updateByTime(format.format(time));
+        gauntletMapper.updateByTime(format.format(time));
         //查询收到挑战数量
-        Integer integer = simpleGauntletMapper.selReceiveChallenges(student.getId());
+        Integer integer = gauntletMapper.selReceiveChallenges(student.getId());
         if (integer != null) {
             return ServerResponse.createBySuccess(integer);
         } else {
@@ -687,7 +687,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     @Override
     public ServerResponse<Object> getInformation(Long gauntletId, Integer type) {
         //查看详情
-        Gauntlet gauntlet = simpleGauntletMapper.getInformationById(gauntletId);
+        Gauntlet gauntlet = gauntletMapper.getInformationById(gauntletId);
         Map<String, Object> returnMap = new HashMap<>();
         returnMap.put("courseId", gauntlet.getCourseId());
         //查询课程信息
@@ -1019,18 +1019,18 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
 
     private void getStudentGauntletVo(StudentGauntletVo studentGauntletVo, int type, Long studentId) {
         //查询我发起的总接受pk次数
-        Integer pkNumberforHis = simpleGauntletMapper.getInformation(studentGauntletVo.getId(), 1);
+        Integer pkNumberforHis = gauntletMapper.getInformation(studentGauntletVo.getId(), 1);
         //查询我发起的总胜利pk次数
-        Integer winnerNumberForHis = simpleGauntletMapper.getInformation(studentGauntletVo.getId(), 2);
+        Integer winnerNumberForHis = gauntletMapper.getInformation(studentGauntletVo.getId(), 2);
         //查询他人对我发起的总接受pk次数
-        Integer pkNumberForMe = simpleGauntletMapper.getInformation(studentGauntletVo.getId(), 3);
+        Integer pkNumberForMe = gauntletMapper.getInformation(studentGauntletVo.getId(), 3);
         //查询他人对我发起的总胜利pk次数
-        Integer winnerNumberForMe = simpleGauntletMapper.getInformation(studentGauntletVo.getId(), 4);
+        Integer winnerNumberForMe = gauntletMapper.getInformation(studentGauntletVo.getId(), 4);
         if (type == 2) {
-            Integer pkForMe = simpleGauntletMapper.getCountPkForMe(studentId, studentGauntletVo.getId(), 1);
-            pkForMe += simpleGauntletMapper.getCountPkForMe(studentId, studentGauntletVo.getId(), 2);
+            Integer pkForMe = gauntletMapper.getCountPkForMe(studentId, studentGauntletVo.getId(), 1);
+            pkForMe += gauntletMapper.getCountPkForMe(studentId, studentGauntletVo.getId(), 2);
             studentGauntletVo.setForMe(pkForMe);
-            Gauntlet byStudentIdAndBeStudentId = simpleGauntletMapper.getByStudentIdAndBeStudentId(studentId, studentGauntletVo.getId());
+            Gauntlet byStudentIdAndBeStudentId = gauntletMapper.getByStudentIdAndBeStudentId(studentId, studentGauntletVo.getId());
             if (byStudentIdAndBeStudentId != null) {
                 studentGauntletVo.setStatus(2);
             } else {
@@ -1078,13 +1078,13 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Simpl
      */
     private void delGauntlets(Student student) {
         String date = DateUtil.beforeHoursTime(72);
-        List<Gauntlet> gauntlets = simpleGauntletMapper.selDelGauntlet(student.getId(), date);
+        List<Gauntlet> gauntlets = gauntletMapper.selDelGauntlet(student.getId(), date);
         List<Long> gauntletIds = new ArrayList<>();
         for (Gauntlet gauntlet : gauntlets) {
             gauntletIds.add(gauntlet.getId());
         }
         if (gauntletIds.size() > 0) {
-            simpleGauntletMapper.updateStatus(4, gauntletIds);
+            gauntletMapper.updateStatus(4, gauntletIds);
         }
     }
 

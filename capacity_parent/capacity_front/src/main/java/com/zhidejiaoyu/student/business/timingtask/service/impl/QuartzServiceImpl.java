@@ -65,7 +65,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     private SimpleStudentExpansionMapper simpleStudentExpansionMapper;
 
     @Resource
-    private SimpleGauntletMapper simpleGauntletMapper;
+    private GauntletMapper gauntletMapper;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -96,8 +96,6 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     private LearnMapper learnMapper;
     @Resource
     private SimpleSimpleCapacityMapper simpleCapacityMapper;
-    @Resource
-    private SimpleGauntletMapper gauntletMapper;
     @Resource
     private CapacityListenMapper capacityListenMapper;
     @Resource
@@ -331,28 +329,28 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
             //查询基础获取学习力
             Integer study = simpleLevelMapper.getStudyById(studentExpansion.getLevel());
             //查询发起挑战的胜利场次获取的学习力
-            List<Gauntlet> gauntlets = simpleGauntletMapper.selectStudy(1, studentExpansion.getStudentId());
+            List<Gauntlet> gauntlets = gauntletMapper.selectStudy(1, studentExpansion.getStudentId());
             for (Gauntlet gauntlet : gauntlets) {
                 if (gauntlet.getChallengeStudy() != null) {
                     study = study + gauntlet.getChallengeStudy();
                 }
             }
             //获取发起挑战失败
-            List<Gauntlet> gauntlets1 = simpleGauntletMapper.selectStudy(2, studentExpansion.getStudentId());
+            List<Gauntlet> gauntlets1 = gauntletMapper.selectStudy(2, studentExpansion.getStudentId());
             for (Gauntlet gauntlet : gauntlets1) {
                 if (gauntlet.getChallengeStudy() != null) {
                     study = Math.max(study - gauntlet.getChallengeStudy(), 0);
                 }
             }
             //查询被发起挑战的胜利场次获取的学习力
-            List<Gauntlet> gauntlets2 = simpleGauntletMapper.selectStudy(3, studentExpansion.getStudentId());
+            List<Gauntlet> gauntlets2 = gauntletMapper.selectStudy(3, studentExpansion.getStudentId());
             for (Gauntlet gauntlet : gauntlets2) {
                 if (gauntlet.getBeChallengeStudy() != null) {
                     study = study + gauntlet.getBeChallengeStudy();
                 }
             }
             //获取发起挑战失败
-            List<Gauntlet> gauntlets3 = simpleGauntletMapper.selectStudy(4, studentExpansion.getStudentId());
+            List<Gauntlet> gauntlets3 = gauntletMapper.selectStudy(4, studentExpansion.getStudentId());
             for (Gauntlet gauntlet : gauntlets3) {
                 if (gauntlet.getBeChallengeStudy() != null) {
                     if (study - gauntlet.getBeChallengeStudy() > 0) {
