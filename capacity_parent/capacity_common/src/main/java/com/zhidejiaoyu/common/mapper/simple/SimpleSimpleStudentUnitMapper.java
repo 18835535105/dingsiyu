@@ -38,7 +38,7 @@ public interface SimpleSimpleStudentUnitMapper extends BaseMapper<SimpleStudentU
 	@Select("select course_id from simple_student_unit where student_id = #{studentId} AND type = #{type} limit 1")
 	Long getCourseIdByTypeToStudent(@Param("studentId") long studentId, @Param("type") int type);
 
-	@Select("select unit_id from simple_student_unit where student_id = #{studentId} AND type = #{type}")
+	@Select("select unit_id from simple_student_unit where student_id = #{studentId} AND type = #{type} limit 1")
 	Long getUnitIdByTypeToStudent(@Param("studentId") long studentId, @Param("type") int type);
 
 	@Update("update simple_student_unit set unit_id = #{unitId} where student_id = #{studentId} and course_id = #{courseId}")
