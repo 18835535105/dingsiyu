@@ -14,13 +14,13 @@ import java.util.Date;
 @Component
 public class StudentGoldAdditionUtil {
 
-    private static final double GLOVESADDITION = 0.2;
+    private static final double GLOVESADDITION = 1.2;
 
     public static Double getGoldAddition(Student student, Double gold) {
         Date date = new Date();
         if (student.getBonusExpires() != null) {
             if (student.getBonusExpires().getTime() >= date.getTime()) {
-                return gold * 1.2;
+                return gold * GLOVESADDITION;
             } else {
                 return gold;
             }
