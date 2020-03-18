@@ -37,5 +37,10 @@ public interface StudentEquipmentMapper extends BaseMapper<StudentEquipment> {
      */
     int countByStudentId(@Param("studentId") Long studentId);
 
+    /**
+     * 查询正在使用的飞船图片
+     * @param studentId
+     * @return
+     */
     String selectImgUrlByStudentId(@Param("studentId") Long studentId);
 }
