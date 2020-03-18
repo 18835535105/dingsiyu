@@ -189,12 +189,13 @@
     </select>
 
     <select id="selCountByStudentId" parameterType="long" resultType="int">
-        select
-        count(id)
+        select count(id)
         from gauntlet
-        where ((challenger_student_id=#{studentId} and (challenge_status &lt;>3 and challenge_status &lt;> 4 and challenge_status &lt;> 6))
-        or (be_challenger_student_id=#{studentId} and (be_challenger_status &lt;>3 and be_challenger_status &lt;> 4 and be_challenger_status &lt;> 6)))
-        and challenger_point is not null
+        where ((challenger_student_id = #{studentId} and
+                (challenge_status &lt;> 3 and challenge_status &lt;> 4 and challenge_status &lt;> 6))
+            or (be_challenger_student_id = #{studentId} and
+                (be_challenger_status &lt;> 3 and be_challenger_status &lt;> 4 and be_challenger_status &lt;> 6)))
+          and challenger_point is not null
     </select>
 
     <select id="selDelGauntlet" parameterType="map" resultMap="BaseResultMap">
@@ -244,26 +245,27 @@
     </delete>
 
     <select id="getCountByStudentIdAndTime" resultType="int" parameterType="map">
-        select
-        count(id)
+        select count(id)
         from gauntlet
-        where challenger_student_id=#{studentId}
-        and create_time >= #{beforeTime}
-        and create_time &lt;= #{time}
+        where challenger_student_id = #{studentId}
+          and create_time >= #{beforeTime}
+          and create_time &lt;= #{time}
     </select>
 
     <select id="getPkRecord" parameterType="map" resultType="map">
-        select
-        ga.create_time createTime,ga.challenge_status status,
-        stu1.nickname nickName1,stu2.nickname nickname2,
-        ga.challenger_img_url imgUrl1,ga.be_challenger_img_url imgUrl2
+        select ga.create_time           createTime,
+               ga.challenge_status      status,
+               stu1.nickname            nickName1,
+               stu2.nickname            nickname2,
+               ga.challenger_img_url    imgUrl1,
+               ga.be_challenger_img_url imgUrl2
         from gauntlet ga
-        join student stu1
-        on ga.challenger_student_id=stu1.id
-        join student stu2
-        on ga.be_challenger_student_id=stu2.id
-        where ga.challenger_student_id=#{studentId}
-        and ga.type=#{type}
+                 join student stu1
+                      on ga.challenger_student_id = stu1.id
+                 join student stu2
+                      on ga.be_challenger_student_id = stu2.id
+        where ga.challenger_student_id = #{studentId}
+          and ga.type = #{type}
         order by ga.create_time
         limit 20
     </select>
@@ -277,13 +279,12 @@
         </if>
     </select>
     <select id="countByStudentIdAndBossId" parameterType="map" resultType="int">
-        select
-        count(id)
+        select count(id)
         from gauntlet
-        where `type`=2
-        and challenger_student_id = #{studentId}
-        and be_challenger_student_id = #{bossId}
-        and to_days(create_time) = to_days(now())
+        where `type` = #{type}
+          and challenger_student_id = #{studentId}
+          and be_challenger_student_id = #{bossId}
+          and to_days(create_time) = to_days(now())
     </select>
 
 </mapper>
