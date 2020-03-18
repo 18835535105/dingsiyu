@@ -1,19 +1,15 @@
 package com.zhidejiaoyu.student.business.shipconfig.service.impl;
 
-import com.zhidejiaoyu.aliyunoss.config.OssClientConfig;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.redis.SourcePowerKeysConst;
-import com.zhidejiaoyu.common.mapper.LearnNewMapper;
-import com.zhidejiaoyu.common.mapper.StudentExpansionMapper;
-import com.zhidejiaoyu.common.mapper.StudentMapper;
-import com.zhidejiaoyu.common.mapper.VocabularyMapper;
+import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.simple.SimpleGauntletMapper;
-import com.zhidejiaoyu.common.pojo.Gauntlet;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.StudentExpansion;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
@@ -42,6 +38,16 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     private ShipAddEquipmentService shipAddEquipmentService;
     @Resource
     private SourcePowerRankOpt sourcePowerRankOpt;
+    @Resource
+    private StudentEquipmentMapper studentEquipmentMapper;
+    @Resource
+    private PkCopyBaseMapper pkCopyBaseMapper;
+    @Resource
+    private PkCopyStateMapper pkCopyStateMapper;
+    @Resource
+    private StudentMapper studentMapper;
+    @Resource
+    private RunLogMapper runLogMapper;
 
     @Override
     public Object getTest(HttpSession session, Long studentId) {
@@ -58,12 +64,101 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         // 学生装备的飞船及装备信息
         returnMap.put("status", 1);
         returnMap.put("originator", shipIndexService.getStateOfWeek(student.getId()));
+        returnMap.put("originatorImgUrl", GetOssFile.getPublicObjectUrl(studentEquipmentMapper.selectImgUrlByStudentId(student.getId())));
         //2.被pk人的信息
         returnMap.put("challenged", shipIndexService.getStateOfWeek(studentId));
+        returnMap.put("challengedImgUrl", GetOssFile.getPublicObjectUrl(studentEquipmentMapper.selectImgUrlByStudentId(studentId)));
         //3.查询题目
         returnMap.put("subject", getSubject(student.getId()));
         return returnMap;
     }
+
+
+    @Override
+    public Object getSingleTesting(HttpSession session, Long bossId) {
+        Student student = getStudent(session);
+        Map<String, Object> returnMap = new HashMap<>();
+        PkCopyBase pkCopyBase = pkCopyBaseMapper.selectById(bossId);
+        //获得学生当天挑战次数
+        int count = simpleGauntletMapper.countByStudentIdAndBossId(student.getId(), bossId);
+        //判断是否到达每天挑战次数上限
+        if (pkCopyBase.getChallengeCycle() <= count) {
+            returnMap.put("status", 2);
+            return returnMap;
+        }
+        //查询当前boss剩余学量
+        PkCopyState pkCopyState = pkCopyStateMapper.selectByStudentIdAndBossId(student.getId(), bossId);
+        if (pkCopyState != null) {
+            pkCopyBase.setDurability(pkCopyState.getDurability());
+        }
+        returnMap.put("status", 1);
+        returnMap.put("originator", shipIndexService.getStateOfWeek(student.getId()));
+        returnMap.put("originatorImgUrl", GetOssFile.getPublicObjectUrl(studentEquipmentMapper.selectImgUrlByStudentId(student.getId())));
+        returnMap.put("challenged", GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl()));
+        returnMap.put("challengedImgUrl", pkCopyBase);
+        //3.查询题目
+        returnMap.put("subject", getSubject(student.getId()));
+        return returnMap;
+    }
+
+    @Override
+    public Object saveSingleTesting(HttpSession session, Long bossId, Integer bloodVolume) {
+        Student student = getStudent(session);
+        //查询当前boss剩余学量
+        PkCopyState pkCopyState = pkCopyStateMapper.selectByStudentIdAndBossId(student.getId(), bossId);
+        Gauntlet gauntlet = new Gauntlet();
+        gauntlet.setBeChallengerStudentId(bossId);
+        gauntlet.setChallengerStudentId(student.getId());
+        gauntlet.setType(2);
+        gauntlet.setCreateTime(new Date());
+        //如果有信息，在这里减少学量
+        if (pkCopyState != null) {
+            bloodVolume = pkCopyState.getDurability() - bloodVolume;
+            if (bloodVolume <= 0) {
+                gauntlet.setChallengeStatus(1);
+                gauntlet.setBeChallengerStatus(2);
+                this.saveStudentGold(student, 10);
+
+                pkCopyState.setDurability(0);
+            } else {
+                gauntlet.setChallengeStatus(2);
+                gauntlet.setBeChallengerStatus(1);
+                pkCopyState.setDurability(bloodVolume);
+            }
+            pkCopyStateMapper.updateById(pkCopyState);
+        } else {
+            pkCopyState = new PkCopyState();
+            pkCopyState.setStudentId(student.getId());
+            pkCopyState.setType(1);
+            pkCopyState.setCreateTime(new Date());
+            pkCopyState.setPkCopyBaseId(bossId);
+            pkCopyState.setSchoolAdminId(TeacherInfoUtil.getSchoolAdminId(student).longValue());
+            PkCopyBase pkCopyBase = pkCopyBaseMapper.selectById(bossId);
+            Integer durability = pkCopyBase.getDurability();
+            durability -= bloodVolume;
+            if (durability <= 0) {
+                gauntlet.setChallengeStatus(1);
+                gauntlet.setBeChallengerStatus(2);
+                pkCopyState.setDurability(0);
+                this.saveStudentGold(student, 10);
+            } else {
+                gauntlet.setChallengeStatus(2);
+                gauntlet.setBeChallengerStatus(1);
+                pkCopyState.setDurability(durability);
+            }
+            pkCopyStateMapper.insert(pkCopyState);
+            simpleGauntletMapper.insert(gauntlet);
+        }
+        return ServerResponse.createBySuccess();
+    }
+
+    private void saveStudentGold(Student student, double gold) {
+        Double goldAddition = StudentGoldAdditionUtil.getGoldAddition(student, gold);
+        studentMapper.updateBySystemGold(goldAddition, student.getId());
+        RunLog runLog = new RunLog(student.getId(), 4, "学生飞船个人挑战获得#" + goldAddition + "#金币", new Date());
+        runLogMapper.insert(runLog);
+    }
+
 
     @Override
     public Object saveTest(HttpSession session, Long beChallenged, Integer type) {
@@ -83,14 +178,16 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
             StudentExpansion beChallengedStudent = studentExpansionMapper.selectByStudentId(beChallenged);
             if (beChallengedStudent.getStudyPower() > expansion.getStudyPower()) {
                 expansion.setStudyPower(expansion.getStudyPower() + 10);
-
             }
         } else {
             gauntlet.setChallengeStatus(2);
             gauntlet.setBeChallengerStatus(1);
             expansion.setStudyPower(expansion.getStudyPower() - 5 >= 0 ? expansion.getStudyPower() - 5 : 0);
         }
-
+        //获取飞船图片
+        gauntlet.setType(1);
+        gauntlet.setChallengerImgUrl(studentEquipmentMapper.selectImgUrlByStudentId(student.getId()));
+        gauntlet.setBeChallengerImgUrl(studentEquipmentMapper.selectImgUrlByStudentId(beChallenged));
         gauntlet.setChallengerStudentId(student.getId());
         gauntlet.setBeChallengerStudentId(beChallenged);
         gauntlet.setCreateTime(new Date());
@@ -106,7 +203,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     }
 
     @Override
-    public Object getPKRecord(HttpSession session,int type) {
+    public Object getPKRecord(HttpSession session, int type) {
         Student student = getStudent(session);
         Map<String, Object> returnMap = new HashMap<>();
         //获取最高排名
@@ -122,7 +219,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         //pk胜率
         returnMap.put("winPk", win);
         returnMap.put("highestRanking", expansion.getRanking());
-        List<Map<String, Object>> pkRecord = simpleGauntletMapper.getPkRecord(student.getId(),type);
+        List<Map<String, Object>> pkRecord = simpleGauntletMapper.getPkRecord(student.getId(), type);
         List<Map<String, Object>> returnList = new ArrayList<>();
         pkRecord.forEach(record -> {
             String headUrl1 = record.get("imgUrl1").toString();
@@ -136,6 +233,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         returnMap.put("list", returnList);
         return returnMap;
     }
+
 
     private long getCurrentRanking(Student student) {
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);

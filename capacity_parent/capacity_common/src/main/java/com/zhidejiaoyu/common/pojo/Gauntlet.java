@@ -116,10 +116,10 @@ public class Gauntlet extends Model<Gauntlet> {
     private Integer award;
 
     @TableField("challenger_img_url")
-    private Integer challengerImgUrl;
+    private String challengerImgUrl;
 
     @TableField("be_challenger_img_url")
-    private Integer beChallengerImgUrl;
+    private String beChallengerImgUrl;
 
     @TableField("type")
     private Integer type;

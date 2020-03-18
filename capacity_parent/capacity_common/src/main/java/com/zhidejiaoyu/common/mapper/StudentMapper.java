@@ -143,6 +143,9 @@ public interface StudentMapper extends BaseMapper<Student> {
     @Update("update student set system_gold = #{i} where id = #{studentId}")
     int updateBySystem_gold(@Param("i") int i, @Param("studentId") Long studentId);
 
+    @Update("update student set system_gold = #{gold} where id = #{studentId}")
+    int updateBySystemGold(@Param("gold") double gold, @Param("studentId") Long studentId);
+
     @Update("update student set unit_id = #{unitId} where id = #{studentId}")
     void updateUnitId(@Param("studentId") long studentId, @Param("unitId") int unitId);
 

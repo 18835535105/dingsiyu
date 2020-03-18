@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.business.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.vo.student.testCenter.TestCenterVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -1638,10 +1639,8 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             testRecord.setAwardGold(0);
         }
         int addGold = testGoldUtil.addGold(student, gold);
-        if (student.getBonusExpires() != null && System.currentTimeMillis() < student.getBonusExpires().getTime()) {
-            Double doubleGold = gold * 0.2;
-            addGold = doubleGold.intValue() + addGold;
-        }
+        addGold=StudentGoldAdditionUtil.getGoldAddition(student,gold+0.0).intValue();
+
         student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), addGold));
         testRecord.setAwardGold(addGold);
         msg.append(" 中获得#").append(addGold).append("#金币。");

@@ -53,4 +53,27 @@ public class ShipTestController {
     }
 
 
+    /**
+     * 获取单人副本测试
+     * @param session
+     * @param bossId
+     * @return
+     */
+    @RequestMapping("/getSingleTesting")
+    public Object getSingleTesting(HttpSession session,Long bossId){
+        return shipTestService.getSingleTesting(session,bossId);
+    }
+
+    /**
+     *
+     * @param session
+     * @param bossId
+     * @param bloodVolume 血量
+     * @return
+     */
+    @RequestMapping("/saveSingleTesting")
+    public Object saveSingleTesting(HttpSession session,Long bossId, Integer bloodVolume){
+        return shipTestService.saveSingleTesting(session,bossId,bloodVolume);
+    }
+
 }

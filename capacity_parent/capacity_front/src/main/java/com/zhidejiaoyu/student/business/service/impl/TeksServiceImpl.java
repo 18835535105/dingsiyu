@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.business.service.impl;
 
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
@@ -159,8 +160,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @Override
     public ServerResponse<Object> selSpeakTeksByUnitId(Long unitId, HttpSession session) {
         Student student = getStudent(session);
-        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, 1,3);
-        List<TeksNew> teks = teksNewMapper.selTeksByUnitIdAndGroup(unitId,learnNews.getGroup());
+        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, 1, 3);
+        List<TeksNew> teks = teksNewMapper.selTeksByUnitIdAndGroup(unitId, learnNews.getGroup());
         Map<String, Object> getMap = new HashMap<>(16);
         getMap.put("studentId", student.getId());
         getMap.put("unitId", unitId);
@@ -745,10 +746,10 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     @TestChangeAnnotation(isUnitTest = false)
     @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<Object> addData(TestRecord testRecord, HttpSession session,Long flowId) {
+    public ServerResponse<Object> addData(TestRecord testRecord, HttpSession session, Long flowId) {
         //学生对象
         Student student = super.getStudent(session);
-        saveTeksData.insertLearnExtend(flowId,testRecord.getUnitId(),student,"课文训练",2,3);
+        saveTeksData.insertLearnExtend(flowId, testRecord.getUnitId(), student, "课文训练", 2, 3);
         final String model = "课文默写测试";
         //测试开始时间
         //测试结束时间
@@ -777,12 +778,9 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         testRecord.setQuantity(testRecord.getErrorCount() + testRecord.getRightCount());
 
         getLevel(session);
+        double gold = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
         if (student.getBonusExpires() != null) {
-            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
-                Double doubleGOld = goldCount * 0.2;
-                student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), doubleGOld));
-                goldCount = goldCount + doubleGOld.intValue();
-            }
+            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
         }
         // 封装响应数据
         Map<String, Object> map = packageResultMap(student, wordUnitTestDTO, point, goldCount, testRecord, model);
@@ -926,8 +924,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             }
         });
         Set<String> strings = isMap.keySet();
-        List<Map<String, Object>> getMaps=new ArrayList<>();
-        strings.forEach(string->{
+        List<Map<String, Object>> getMaps = new ArrayList<>();
+        strings.forEach(string -> {
             getMaps.add(isMap.get(string));
         });
         List<Map<String, Object>> resultMap = new ArrayList<>();

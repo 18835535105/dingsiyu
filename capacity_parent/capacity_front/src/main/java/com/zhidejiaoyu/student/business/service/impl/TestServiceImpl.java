@@ -21,6 +21,7 @@ import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.CcieUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
@@ -349,9 +350,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             this.saveLog(student, goldCount, null, "字母单元闯关测试");
             if (student.getBonusExpires() != null) {
                 if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
-                    Double doubleGoldCount = goldCount * 0.2;
+                    Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student,goldCount+0.0);
                     student.setSystemGold(student.getSystemGold() + doubleGoldCount);
-                    testRecord.setAwardGold(goldCount + doubleGoldCount.intValue());
+                    testRecord.setAwardGold(doubleGoldCount.intValue());
                 }
             }
         }

@@ -51,6 +51,10 @@ public class PkCopyState extends Model<PkCopyState> {
      * 挑战结束时间
      */
     private Date createTime;
+    /**
+     * bossId
+     */
+    private Long pkCopyBaseId;
 
 
     @Override

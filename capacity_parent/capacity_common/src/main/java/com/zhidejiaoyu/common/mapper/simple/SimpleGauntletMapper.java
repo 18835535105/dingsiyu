@@ -156,4 +156,7 @@ public interface SimpleGauntletMapper extends BaseMapper<Gauntlet> {
      * @return
      */
     int getPkGames(@Param("studentId") Long studentId,@Param("type") int type);
+
+
+    int countByStudentIdAndBossId(@Param("studentId") Long studentId,@Param("bossId") Long bossId);
 }

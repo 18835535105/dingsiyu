@@ -36,4 +36,6 @@ public interface StudentEquipmentMapper extends BaseMapper<StudentEquipment> {
      * @return
      */
     int countByStudentId(@Param("studentId") Long studentId);
+
+    String selectImgUrlByStudentId(@Param("studentId") Long studentId);
 }

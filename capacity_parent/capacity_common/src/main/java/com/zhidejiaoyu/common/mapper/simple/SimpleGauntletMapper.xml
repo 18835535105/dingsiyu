@@ -275,7 +275,15 @@
         <if test="type!=1">
             and challenge_status=1
         </if>
-
+    </select>
+    <select id="countByStudentIdAndBossId" parameterType="map" resultType="int">
+        select
+        count(id)
+        from gauntlet
+        where `type`=2
+        and challenger_student_id = #{studentId}
+        and be_challenger_student_id = #{bossId}
+        and to_days(create_time) = to_days(now())
     </select>
 
 </mapper>

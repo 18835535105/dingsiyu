@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -65,11 +66,7 @@ public class GetValidTimeTip {
         // 金币数
         double gold = 0;
         // 提示语
-        if(student.getBonusExpires()!=null){
-            if(student.getBonusExpires().getTime() > System.currentTimeMillis()){
-                gold *= 1.2;
-            }
-        }
+        gold = StudentGoldAdditionUtil.getGoldAddition(student, gold);
         StringBuilder tip = new StringBuilder("本次学习获得金币：");
         gold += saveSimpleNewLearnAward(classify, loginTime, learnType, student);
         gold += saveSimpleValidLearnAward(loginTime, learnType, student, second, classify);
@@ -77,7 +74,7 @@ public class GetValidTimeTip {
         if (gold > 0) {
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
             studentMapper.updateByPrimaryKeySelective(student);
-            student= studentMapper.selectById(student.getId());
+            student = studentMapper.selectById(student.getId());
 
             session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         }
@@ -189,18 +186,15 @@ public class GetValidTimeTip {
         String learnType = commonMethod.getTestType(classify);
         // 金币数
         double gold = 0;
-        if (student.getBonusExpires() != null) {
-            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
-                gold *= 1.2;
-            }
-        }
         // 提示语
         StringBuilder tip = new StringBuilder("本次学习获得金币：");
         gold += saveNewLearnAward(classify, loginTime, learnType, student);
         gold += saveValidLearnAward(loginTime, learnType, student, second, classify);
         gold += saveKnownLearnAward(classify, loginTime, learnType, student);
         if (gold > 0) {
+            gold = StudentGoldAdditionUtil.getGoldAddition(student, gold);
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
+
             studentMapper.updateByPrimaryKeySelective(student);
             session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         }
@@ -284,7 +278,7 @@ public class GetValidTimeTip {
     private int saveNewLearnAward(Integer classify, Date loginTime, String learnType, Student student) {
         int awardCount;
         int learnCount;
-        int condition = classify == 1 ?  40 : 20;
+        int condition = classify == 1 ? 40 : 20;
         long stuId = student.getId();
         StringBuilder sb = new StringBuilder();
         awardCount = runLogMapper.countAwardCount(stuId, DateUtil.formatYYYYMMDDHHMMSS(loginTime), classify, "新学");

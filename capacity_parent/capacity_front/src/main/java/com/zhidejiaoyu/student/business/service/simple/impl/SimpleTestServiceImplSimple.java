@@ -6,6 +6,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.vo.simple.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.vo.simple.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -680,11 +681,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     private int saveLog(Student student, int goldCount, WordUnitTestDTO wordUnitTestDTO, String model) {
 
         double gold = goldCount;
-        if (student.getBonusExpires() != null) {
-            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
-                gold = gold + gold * 0.2;
-            }
-        }
+        gold = StudentGoldAdditionUtil.getGoldAddition(student, gold);
         student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
         String msg;
         if (model == null) {
