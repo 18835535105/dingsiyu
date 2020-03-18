@@ -69,4 +69,9 @@ public interface FileConstant {
      * 飞船配置-装甲路径
      */
     String ARMOR_IMG = "/static/img/ship-config/base_info/armor/";
+
+    /**
+     * 副本挑战图片路径
+     */
+    String COPY_IMG = "/static/img/ship-config/base_info/copy/";
 }
