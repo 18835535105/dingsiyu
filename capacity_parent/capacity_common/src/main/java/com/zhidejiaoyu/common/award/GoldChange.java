@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.award;
 import com.zhidejiaoyu.common.constant.TestAwardGoldConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 
 /**
  * 获取应该奖励的金币数
@@ -34,14 +35,9 @@ public class GoldChange {
         } else {
             goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
         }
-
         if (student.getBonusExpires() != null) {
-            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
-                Double v = goldCount * 0.2;
-                goldCount = goldCount + v.intValue();
-            }
+            goldCount=StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0).intValue();
         }
-
         return goldCount;
     }
 }
