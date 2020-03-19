@@ -171,12 +171,15 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         List<Map<String, Object>> returnList = new ArrayList<>();
         equSort.forEach(equ -> {
             List<Map<String, Object>> equipmentUrls = equipmentMap.get(Long.parseLong(equ.get("equipmentId").toString()));
-
             List<Map<String, Object>> collect = equipmentUrls.stream()
                     .filter(url ->
                             Integer.parseInt(url.get("degree").toString()) == Integer.parseInt(equ.get("enhancementGrade").toString()))
                     .collect(Collectors.toList());
-            equ.put("imgUrl", GetOssFile.getPublicObjectUrl(collect.get(0).get("imgUrl").toString()));
+            if (collect.size() > 0) {
+                equ.put("imgUrl", GetOssFile.getPublicObjectUrl(collect.get(0).get("imgUrl").toString()));
+            } else {
+                equ.put("imgUrl", null);
+            }
             returnList.add(equ);
         });
         returnMap.put("list", returnList);
@@ -292,15 +295,10 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                 gold = 100;
             }
         }
-        if (strengthen.equals(3)) {
-            gold = 150 * 1.2 * (lv - 1);
-            if (gold == 0.0) {
-                gold = 150;
-            }
-        }
-        if (strengthen > 4) {
+        if (strengthen >= 3) {
             return 3;
         }
+
         if (student.getSystemGold() > gold) {
             student.setSystemGold(student.getSystemGold() - gold);
             studentMapper.updateById(student);
