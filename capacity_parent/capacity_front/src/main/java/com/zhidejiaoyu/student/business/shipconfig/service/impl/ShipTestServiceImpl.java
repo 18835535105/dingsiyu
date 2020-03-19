@@ -79,13 +79,12 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         //查询一小时内的pk次数
         int pkCount = getPkCount(student);
         if (pkCount == 1) {
-            returnMap.put("status", 2);
-            return returnMap;
+            return ServerResponse.createByError(401, "挑战次数达到上限");
+
         }
         //查询pk信息
         //1.pk发起人的信息
         // 学生装备的飞船及装备信息
-        returnMap.put("status", 1);
         Map<String, Object> origintorMap = getEquipmentMap(student.getId());
         returnMap.put("originator", origintorMap);
         //2.被pk人的信息
@@ -93,7 +92,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         returnMap.put("challenged", beOrigintorMap);
         //3.查询题目
         returnMap.put("subject", getSubject(student.getId()));
-        return returnMap;
+        return ServerResponse.createBySuccess(returnMap);
     }
 
     /**
@@ -127,22 +126,20 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         int count = gauntletMapper.countByStudentIdAndBossId(student.getId(), bossId, 2);
         //判断是否到达每天挑战次数上限
         if (pkCopyBase.getChallengeCycle() <= count) {
-            returnMap.put("status", 2);
-            return returnMap;
+            return ServerResponse.createByError(401, "挑战次数达到上限");
         }
         //查询当前boss剩余学量
         PkCopyState pkCopyState = pkCopyStateMapper.selectByStudentIdAndBossId(student.getId(), bossId);
         if (pkCopyState != null) {
             pkCopyBase.setDurability(pkCopyState.getDurability());
         }
-        returnMap.put("status", 1);
         Map<String, Object> origintorMap = getEquipmentMap(student.getId());
         returnMap.put("originator", origintorMap);
         Map<String, Object> beOrigintorMap = getBossEquipment(pkCopyBase);
         returnMap.put("challenged", beOrigintorMap);
         //3.查询题目
         returnMap.put("subject", getSubject(student.getId()));
-        return returnMap;
+        return ServerResponse.createBySuccess(returnMap);
     }
 
     private Map<String, Object> getBossEquipment(PkCopyBase pkCopyBase) {

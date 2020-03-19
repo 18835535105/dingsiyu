@@ -393,7 +393,8 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                 Map<String, Object> map = new HashMap<>();
                 map.put("name", equipment.getName());
                 //imgMap.get(addId).get("imgUrl").toString()
-                map.put("url", GetOssFile.getPublicObjectUrl("asdfsdfdsf"));
+                Map<String, Object> map1 = imgMap.get(addId);
+                map.put("url", GetOssFile.getPublicObjectUrl(map1.get("imgUrl").toString()));
                 returnList.add(map);
             });
         }
