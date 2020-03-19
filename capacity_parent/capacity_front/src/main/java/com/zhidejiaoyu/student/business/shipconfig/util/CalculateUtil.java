@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.mapper.LearnNewMapper;
 import com.zhidejiaoyu.common.mapper.TestRecordMapper;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -168,6 +169,11 @@ public class CalculateUtil {
 
         // 学生装备的飞船及装备信息
         List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
+
+        if (CollectionUtils.isEmpty(equipments)) {
+            return 0;
+        }
+
         IndexVO.BaseValue baseValue = shipIndexService.getBaseValue(equipments);
         // 获取攻击力
         int attack = getAttack(baseValue.getAttack(), studentId, beforeSevenDaysDateStr, endDateStr);
