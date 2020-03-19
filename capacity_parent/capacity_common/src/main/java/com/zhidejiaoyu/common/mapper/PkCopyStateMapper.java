@@ -24,5 +24,11 @@ public interface PkCopyStateMapper extends BaseMapper<PkCopyState> {
      * @return
      */
     PkCopyState selectBySchoolAdminIdAndPkCopyBaseId(@Param("schoolAdminId") Integer schoolAdminId, @Param("copyId") Long copyId);
-    PkCopyState selectByStudentIdAndBossId(@Param("studentId") Long id,@Param("bossId") Long bossId);
+
+    PkCopyState selectByStudentIdAndBossId(@Param("studentId") Long id, @Param("bossId") Long bossId);
+
+    /**
+     * 删除校区副本挑战状态
+     */
+    void deleteSchoolCopy();
 }

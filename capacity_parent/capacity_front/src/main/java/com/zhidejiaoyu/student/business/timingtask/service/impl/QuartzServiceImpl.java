@@ -746,7 +746,6 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
         log.info("根据school_time配置更新学生课程完成。。。");
     }
 
-
     /**
      * 删除学生相关记录
      *

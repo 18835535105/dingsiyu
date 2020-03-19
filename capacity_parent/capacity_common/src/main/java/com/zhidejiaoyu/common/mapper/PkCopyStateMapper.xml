@@ -17,6 +17,11 @@
     <sql id="base_sql">
         id, student_id, school_admin_id, pk_copy_base_id, durability, type, create_time, update_time
     </sql>
+    <delete id="deleteSchoolCopy">
+        delete
+        from pk_copy_state
+        where type = 2
+    </delete>
 
     <select id="selectBySchoolAdminIdAndPkCopyBaseId" resultMap="BaseResultMap" parameterType="map">
         select
