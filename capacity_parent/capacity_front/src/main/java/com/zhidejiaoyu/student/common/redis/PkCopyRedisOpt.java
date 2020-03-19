@@ -1,12 +1,15 @@
 package com.zhidejiaoyu.student.common.redis;
 
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
+import com.zhidejiaoyu.common.mapper.PkCopyBaseMapper;
+import com.zhidejiaoyu.common.pojo.PkCopyBase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -22,6 +25,9 @@ public class PkCopyRedisOpt {
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Resource
+    private PkCopyBaseMapper pkCopyBaseMapper;
 
     /**
      * 记录参加校区指定副本挑战的学生id
@@ -58,5 +64,54 @@ public class PkCopyRedisOpt {
             return (Set<Long>) o;
         }
         return new HashSet<>();
+    }
+
+    /**
+     * 标记当前校区副本已挑战成功
+     *
+     * @param schoolAdminId 校管id
+     * @param pkCopyBaseId  副本id
+     * @return
+     */
+    public void markSchoolCopyAward(Integer schoolAdminId, Long pkCopyBaseId) {
+        String key = RedisKeysConst.SCHOOL_COPY_AWARD_MARK + schoolAdminId;
+        redisTemplate.opsForHash().put(key, pkCopyBaseId, true);
+        redisTemplate.expire(key, 2, TimeUnit.DAYS);
+    }
+
+    /**
+     * 判断当前校区副本是否已挑战成功
+     *
+     * @param schoolAdminId
+     * @param pkCopyBaseId
+     * @return <ul>
+     * <li>true:以挑战成功，金币奖励已发放</li>
+     * <li>false：未挑战成功，如果挑战成功可以发放金币奖励</li>
+     * </ul>
+     */
+    public boolean judgeSchoolCopyAward(Integer schoolAdminId, Long pkCopyBaseId) {
+        String key = RedisKeysConst.SCHOOL_COPY_AWARD_MARK + schoolAdminId;
+        Object o = redisTemplate.opsForHash().get(key, pkCopyBaseId);
+        return o != null;
+    }
+
+    /**
+     * 根据副本id获取副本信息
+     *
+     * @param pkCopyBaseId 副本id
+     * @return
+     */
+    public PkCopyBase getPkCopyBaseById(Long pkCopyBaseId) {
+        String key = RedisKeysConst.PK_COPY_BASE;
+        Object o = redisTemplate.opsForHash().get(key, pkCopyBaseId);
+        if (o == null) {
+            List<PkCopyBase> pkCopyBases = pkCopyBaseMapper.selectList(null);
+            for (PkCopyBase pkCopyBase : pkCopyBases) {
+                redisTemplate.opsForHash().put(key, pkCopyBase.getId(), pkCopyBase);
+            }
+            redisTemplate.expire(key, 1, TimeUnit.DAYS);
+            return (PkCopyBase) redisTemplate.opsForHash().get(key, pkCopyBaseId);
+        }
+        return (PkCopyBase) o;
     }
 }
