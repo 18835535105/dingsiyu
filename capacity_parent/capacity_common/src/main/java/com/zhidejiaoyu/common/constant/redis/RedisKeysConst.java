@@ -124,10 +124,26 @@ public interface RedisKeysConst {
     String INIT_SHIP = "INIT_SHIP:";
 
     /**
+     * 副本基本信息缓存
+     * key=PK_COPY_BASE
+     * field=副本id
+     * value=副本信息
+     */
+    String PK_COPY_BASE = "PK_COPY_BASE:";
+
+    /**
      * 参加校区副本挑战的同学id
      * key=SCHOOL_COPY:校管id
      * field=副本id
      * value=参加挑战的学生id集合
      */
     String SCHOOL_COPY = "SCHOOL_COPY:";
+
+    /**
+     * 记录校区指定副本是否挑战成功
+     * key=SCHOOL_COPY_AWARD_MARK:校管id
+     * field=副本id
+     * value=当前校区副本是否已挑战陈宫
+     */
+    String SCHOOL_COPY_AWARD_MARK = "SCHOOL_COPY_AWARD_MARK:";
 }

@@ -56,9 +56,6 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     private PkCopyStateMapper pkCopyStateMapper;
 
     @Resource
-    private PkCopyBaseMapper pkCopyBaseMapper;
-
-    @Resource
     private StudentMapper studentMapper;
 
     @Resource
@@ -103,7 +100,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      */
     private Map<String, Object> getEquipmentMap(Long studentId) {
         Map<String, Object> origintorMap = new HashMap<>();
-        origintorMap.put("Battle", shipIndexService.getStateOfWeek(studentId));
+        origintorMap.put("battle", shipIndexService.getStateOfWeek(studentId));
         origintorMap.put("imgUrl", GetOssFile.getPublicObjectUrl(studentEquipmentMapper.selectImgUrlByStudentId(studentId)));
         Equipment equipment = equipmentMapper.selectNameAndGradeByStudentId(studentId);
         if (equipment != null) {
@@ -121,7 +118,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     public Object getSingleTesting(HttpSession session, Long bossId) {
         Student student = getStudent(session);
         Map<String, Object> returnMap = new HashMap<>();
-        PkCopyBase pkCopyBase = pkCopyBaseMapper.selectById(bossId);
+        PkCopyBase pkCopyBase = pkCopyRedisOpt.getPkCopyBaseById(bossId);
         //获得学生当天挑战次数
         int count = gauntletMapper.countByStudentIdAndBossId(student.getId(), bossId, 2);
         //判断是否到达每天挑战次数上限
@@ -155,7 +152,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                 .source(pkCopyBase.getSourceForce())
                 .sourceAttack(pkCopyBase.getSourceForceAttack())
                 .build();
-        returnMap.put("Battle", build);
+        returnMap.put("battle", build);
         return returnMap;
     }
 
@@ -191,7 +188,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
             pkCopyState.setCreateTime(new Date());
             pkCopyState.setPkCopyBaseId(bossId);
             pkCopyState.setSchoolAdminId(TeacherInfoUtil.getSchoolAdminId(student));
-            PkCopyBase pkCopyBase = pkCopyBaseMapper.selectById(bossId);
+            PkCopyBase pkCopyBase = pkCopyRedisOpt.getPkCopyBaseById(bossId);
             Integer durability = pkCopyBase.getDurability();
             durability -= bloodVolume;
             if (durability <= 0) {
@@ -239,7 +236,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         // todo: 返回副本信息
         PkCopyState pkCopyState = pkCopyStateMapper.selectBySchoolAdminIdAndPkCopyBaseId(schoolAdminId, bossId);
         if (pkCopyState == null) {
-            PkCopyBase pkCopyBase = pkCopyBaseMapper.selectById(bossId);
+            PkCopyBase pkCopyBase = pkCopyRedisOpt.getPkCopyBaseById(bossId);
         } else {
 
         }
@@ -343,7 +340,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
          如果没有，当前副本耐久度=当前副本总耐久度-本次减少的耐久度
          */
         PkCopyState pkCopyState = pkCopyStateMapper.selectBySchoolAdminIdAndPkCopyBaseId(schoolAdminId, copyId);
-        PkCopyBase pkCopyBase = pkCopyBaseMapper.selectById(copyId);
+        PkCopyBase pkCopyBase = pkCopyRedisOpt.getPkCopyBaseById(copyId);
         // 剩余耐久度
         int durability;
         Date nowTime = new Date();
@@ -389,7 +386,9 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     }
 
     public void savePkSchoolCopyAward(Long copyId, Integer schoolAdminId, Integer durability) {
-        if (durability <= 0) {
+        boolean flag = pkCopyRedisOpt.judgeSchoolCopyAward(schoolAdminId, copyId);
+        if (durability <= 0 && flag) {
+            pkCopyRedisOpt.markSchoolCopyAward(schoolAdminId, copyId);
             // 挑战成功，对校区内所有挑战该副本的学生奖励金币
             Set<Long> schoolCopyStudentInfoSet = pkCopyRedisOpt.getSchoolCopyStudentInfo(schoolAdminId, copyId);
             for (Long studentId : schoolCopyStudentInfoSet) {
