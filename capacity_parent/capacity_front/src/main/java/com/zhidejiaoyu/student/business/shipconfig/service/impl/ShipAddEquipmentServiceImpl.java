@@ -235,18 +235,10 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             if (studentEquipment != null) {
                 //是否开启
                 equMap.put("open", true);
-                if (equipment.getType().equals(5)) {
-                    if (studentEquipment.getIntensificationDegree() > 3) {
-                        //是否可强化
-                        equMap.put("strengthen", false);
-                    }
-                } else {
-                    if (studentEquipment.getIntensificationDegree() > 4) {
-                        //是否可强化
-                        equMap.put("strengthen", false);
-                    }
+                if (studentEquipment.getIntensificationDegree() >= 3) {
+                    //是否可强化
+                    equMap.put("strengthen", false);
                 }
-
                 //强化等级
                 equMap.put("enhancementGrade", studentEquipment.getIntensificationDegree());
                 equMap.put("wear", studentEquipment.getType().equals(1));
