@@ -390,12 +390,14 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             addIdList.addAll(longs);
             addIdList.forEach(addId -> {
                 Equipment equipment = addEquipments.get(addId);
-                Map<String, Object> map = new HashMap<>();
-                map.put("name", equipment.getName());
-                //imgMap.get(addId).get("imgUrl").toString()
-                Map<String, Object> map1 = imgMap.get(addId);
-                map.put("url", GetOssFile.getPublicObjectUrl(map1.get("imgUrl").toString()));
-                returnList.add(map);
+                if (equipment != null) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("name", equipment.getName());
+                    //imgMap.get(addId).get("imgUrl").toString()
+                    Map<String, Object> map1 = imgMap.get(addId);
+                    map.put("url", GetOssFile.getPublicObjectUrl(map1.get("imgUrl").toString()));
+                    returnList.add(map);
+                }
             });
         }
     }
