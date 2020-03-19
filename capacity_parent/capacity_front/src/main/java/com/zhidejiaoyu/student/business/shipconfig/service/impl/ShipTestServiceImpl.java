@@ -101,7 +101,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      */
     private Map<String, Object> getEquipmentMap(Long studentId) {
         Map<String, Object> origintorMap = new HashMap<>();
-        origintorMap.put("Battle", shipIndexService.getStateOfWeek(studentId));
+        origintorMap.put("battle", shipIndexService.getStateOfWeek(studentId));
         origintorMap.put("imgUrl", GetOssFile.getPublicObjectUrl(studentEquipmentMapper.selectImgUrlByStudentId(studentId)));
         Equipment equipment = equipmentMapper.selectNameAndGradeByStudentId(studentId);
         if (equipment != null) {
@@ -155,7 +155,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                 .source(pkCopyBase.getSourceForce())
                 .sourceAttack(pkCopyBase.getSourceForceAttack())
                 .build();
-        returnMap.put("Battle", build);
+        returnMap.put("battle", build);
         return returnMap;
     }
 
