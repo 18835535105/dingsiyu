@@ -18,6 +18,7 @@ import com.zhidejiaoyu.student.business.shipconfig.service.ShipTestService;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.PkInfoVO;
 import com.zhidejiaoyu.student.common.redis.PkCopyRedisOpt;
+import org.apache.catalina.Server;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -257,8 +258,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         //查询一小时内的pk次数
         int pkCount = getPkCount(student);
         if (pkCount == 1) {
-            returnMap.put("status", 2);
-            return returnMap;
+            return ServerResponse.createByError(401,"今日挑战次数以超出");
         }
         Gauntlet gauntlet = new Gauntlet();
         if (type.equals(1)) {
@@ -287,8 +287,8 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
             expansion.setRanking(currentRanking);
         }
         studentExpansionMapper.updateById(expansion);
-        returnMap.put("status", 1);
-        return returnMap;
+
+        return ServerResponse.createBySuccess();
     }
 
     @Override
