@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.common.utils.ship;
+package com.zhidejiaoyu.common.vo.ship;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.business.shipconfig.vo;
 
-import com.zhidejiaoyu.common.utils.ship.EquipmentVo;
+import com.zhidejiaoyu.common.vo.ship.EquipmentVo;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +33,7 @@ public class PkInfoVO implements Serializable {
     private Challenged originator;
 
     /**
-     * 挑战者
+     * boss挑战
      */
     private BossPoll boss;
 

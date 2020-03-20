@@ -53,7 +53,7 @@
     </select>
 
     <select id="selectNameAndGradeByStudentId" parameterType="map"
-            resultType="com.zhidejiaoyu.common.utils.ship.EquipmentVo">
+            resultType="com.zhidejiaoyu.common.vo.ship.EquipmentVo">
         select
          e.id id, e.name equipmentName,e.grade grade,stuEqu.intensification_degree degree
         from equipment e
