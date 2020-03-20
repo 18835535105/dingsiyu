@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.utils.ship.EquipmentVo;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
@@ -18,7 +19,6 @@ import com.zhidejiaoyu.student.business.shipconfig.service.ShipTestService;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.PkInfoVO;
 import com.zhidejiaoyu.student.common.redis.PkCopyRedisOpt;
-import org.apache.catalina.Server;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,15 +94,27 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      * @return
      */
     private PkInfoVO.Challenged getEquipmentMap(Long studentId) {
-        Equipment equipment = equipmentMapper.selectNameAndGradeByStudentId(studentId);
-        String imgUrl = studentEquipmentMapper.selectImgUrlByStudentId(studentId);
-
         return PkInfoVO.Challenged.builder()
                 .battle(shipIndexService.getStateOfWeek(studentId))
-                .imgUrl(GetOssFile.getPublicObjectUrl(imgUrl))
-                .name(equipment == null ? null : equipment.getName())
-                .grade(equipment == null ? null : equipment.getGrade())
+                .armorEquipment(getEquipmentInformation(studentId, 4))
+                .missileEquipment(getEquipmentInformation(studentId, 3))
+                .shipEquipment(getEquipmentInformation(studentId, 1))
+                .armsEquipment(getEquipmentInformation(studentId, 2))
                 .build();
+    }
+
+    /**
+     * @param studentId 学生id
+     * @param type      1，飞船 2，武器 3，导弹 4，装甲
+     * @return
+     */
+    private EquipmentVo getEquipmentInformation(Long studentId, int type) {
+        EquipmentVo equipment = equipmentMapper.selectNameAndGradeByStudentId(studentId, type);
+        if (equipment != null) {
+            equipment.setImgUrl
+                    (GetOssFile.getPublicObjectUrl(studentEquipmentMapper.selectImgUrlByStudentId(studentId, type)));
+        }
+        return equipment;
     }
 
 
@@ -125,7 +137,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
 
         return ServerResponse.createBySuccess(PkInfoVO.builder()
                 .challenged(getEquipmentMap(studentId))
-                .originator(getBossEquipment(pkCopyBase))
+                .boss(getBossEquipment(pkCopyBase))
                 .subject(getSubject(studentId))
                 .build());
     }
@@ -136,8 +148,8 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      * @param pkCopyBase
      * @return
      */
-    private PkInfoVO.Challenged getBossEquipment(PkCopyBase pkCopyBase) {
-        return PkInfoVO.Challenged.builder()
+    private PkInfoVO.BossPoll getBossEquipment(PkCopyBase pkCopyBase) {
+        return PkInfoVO.BossPoll.builder()
                 .imgUrl(GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl()))
                 .grade(pkCopyBase.getLevelName())
                 .name(pkCopyBase.getName())
@@ -237,7 +249,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
 
         return ServerResponse.createBySuccess(PkInfoVO.builder()
                 .challenged(getEquipmentMap(studentId))
-                .originator(getBossEquipment(pkCopyBase))
+                .boss(getBossEquipment(pkCopyBase))
                 .subject(getSubject(studentId))
                 .build());
     }
@@ -258,7 +270,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         //查询一小时内的pk次数
         int pkCount = getPkCount(student);
         if (pkCount == 1) {
-            return ServerResponse.createByError(401,"今日挑战次数以超出");
+            return ServerResponse.createByError(401, "今日挑战次数以超出");
         }
         Gauntlet gauntlet = new Gauntlet();
         if (type.equals(1)) {
@@ -275,8 +287,8 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         }
         //获取飞船图片
         gauntlet.setType(1);
-        gauntlet.setChallengerImgUrl(studentEquipmentMapper.selectImgUrlByStudentId(student.getId()));
-        gauntlet.setBeChallengerImgUrl(studentEquipmentMapper.selectImgUrlByStudentId(beChallenged));
+        gauntlet.setChallengerImgUrl(studentEquipmentMapper.selectImgUrlByStudentId(student.getId(), 1));
+        gauntlet.setBeChallengerImgUrl(studentEquipmentMapper.selectImgUrlByStudentId(beChallenged, 1));
         gauntlet.setChallengerStudentId(student.getId());
         gauntlet.setBeChallengerStudentId(beChallenged);
         gauntlet.setCreateTime(new Date());
@@ -370,7 +382,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     }
 
     public void saveGauntlet(Long copyId, Student student, PkCopyBase pkCopyBase, int durability, Date nowTime) {
-        String shipImgUrl = studentEquipmentMapper.selectImgUrlByStudentId(student.getId());
+        String shipImgUrl = studentEquipmentMapper.selectImgUrlByStudentId(student.getId(), 1);
         gauntletMapper.insert(Gauntlet.builder()
                 .challengerStudentId(student.getId())
                 .beChallengerStudentId(copyId)

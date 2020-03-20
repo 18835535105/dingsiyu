@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.shipconfig.vo;
 
+import com.zhidejiaoyu.common.utils.ship.EquipmentVo;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,6 +33,11 @@ public class PkInfoVO implements Serializable {
     private Challenged originator;
 
     /**
+     * 挑战者
+     */
+    private BossPoll boss;
+
+    /**
      * 试题
      */
     private List<SubjectsVO> subject;
@@ -40,11 +46,8 @@ public class PkInfoVO implements Serializable {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class Challenged {
-        /**
-         * 飞船图片
-         */
-        private String imgUrl;
+    public static class BossPoll {
+
 
         /**
          * 战斗数据
@@ -52,14 +55,52 @@ public class PkInfoVO implements Serializable {
         private IndexVO.BaseValue battle;
 
         /**
+         * 图片名
+         */
+        private String imgUrl;
+        /**
+         * 装备名
+         */
+        private String name;
+        /**
+         * 装备等级
+         */
+        private Integer degree;
+        /**
          * 飞船型号
          */
         private String grade;
 
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class Challenged {
         /**
-         * 飞船名称
+         * 飞船数据
          */
-        private String name;
+        private EquipmentVo shipEquipment;
+
+        /**
+         * 战斗数据
+         */
+        private IndexVO.BaseValue battle;
+
+        /**
+         * 装甲数据
+         */
+        private EquipmentVo armorEquipment;
+
+        /**
+         * 导弹数据
+         */
+        private EquipmentVo missileEquipment;
+        /**
+         * 武器数据
+         */
+        private EquipmentVo armsEquipment;
 
     }
 }

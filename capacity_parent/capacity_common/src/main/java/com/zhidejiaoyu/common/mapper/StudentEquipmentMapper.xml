@@ -64,7 +64,7 @@
                  join equipment ment
                       on ment.id = stuEq.equipment_id
                           and stuEq.intensification_degree = expan.intensification_degree
-        where stuEq.type = 1
+        where stuEq.type = #{type}
           and ment.type = 1
           and stuEq.student_id = #{studentId}
         limit 1

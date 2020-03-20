@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.Equipment;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.zhidejiaoyu.common.utils.ship.EquipmentVo;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
@@ -45,8 +46,11 @@ public interface EquipmentMapper extends BaseMapper<Equipment> {
     List<Equipment> selectByType(@Param("type") Integer type);
 
     /**
-     * 获取正在使用的飞船名称和级别
-     * @param studentId
+     *获取正在使用的装备名称和级别
+     *
+     * @param studentId 学生id
+     * @param type 1，飞船 2，武器 3，导弹 4，装甲
+     * @return
      */
-    Equipment selectNameAndGradeByStudentId(@Param("studentId") Long studentId);
+     EquipmentVo selectNameAndGradeByStudentId(@Param("studentId") Long studentId, @Param("type")int type);
 }

@@ -52,14 +52,15 @@
         from equipment where type =#{type} and level =#{level}
     </select>
 
-    <select id="selectNameAndGradeByStudentId" parameterType="map" resultMap="BaseResultMap">
+    <select id="selectNameAndGradeByStudentId" parameterType="map"
+            resultType="com.zhidejiaoyu.common.utils.ship.EquipmentVo">
         select
-        <include refid="more_table_sql"></include>
+         e.id id, e.name equipmentName,e.grade grade,stuEqu.intensification_degree degree
         from equipment e
         join student_equipment stuEqu
         on e.id=stuEqu.equipment_id
         where stuEqu.student_id =#{studentId}
-        and e.type=1
+        and e.type=#{type}
         and stuEqu.type=1
     </select>
 
