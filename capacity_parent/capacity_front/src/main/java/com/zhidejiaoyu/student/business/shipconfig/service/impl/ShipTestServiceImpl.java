@@ -266,7 +266,6 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     public Object saveTest(HttpSession session, Long beChallenged, Integer type) {
         Student student = getStudent(session);
         StudentExpansion expansion = studentExpansionMapper.selectByStudentId(student.getId());
-        Map<String, Object> returnMap = new HashMap<>();
         //查询一小时内的pk次数
         int pkCount = getPkCount(student);
         if (pkCount == 1) {

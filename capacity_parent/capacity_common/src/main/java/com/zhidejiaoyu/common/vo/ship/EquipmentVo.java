@@ -7,6 +7,11 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+/**
+ * 学生飞船、装备……各个属性信息
+ *
+ * @author
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
