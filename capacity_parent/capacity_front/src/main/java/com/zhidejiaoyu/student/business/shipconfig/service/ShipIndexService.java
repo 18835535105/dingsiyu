@@ -59,5 +59,5 @@ public interface ShipIndexService extends BaseService<Student> {
      * @param studentId
      * @return
      */
-    IndexVO.StateOfWeek getStateOfWeek(Long studentId);
+    IndexVO.BaseValue getStateOfWeek(Long studentId);
 }

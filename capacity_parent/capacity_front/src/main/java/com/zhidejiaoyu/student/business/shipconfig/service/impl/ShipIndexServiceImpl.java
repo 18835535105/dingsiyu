@@ -140,11 +140,11 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     }
 
     @Override
-    public IndexVO.StateOfWeek getStateOfWeek(Long studentId) {
+    public IndexVO.BaseValue getStateOfWeek(Long studentId) {
         List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
 
         if (CollectionUtils.isEmpty(equipments)) {
-            return (IndexVO.StateOfWeek) IndexVO.StateOfWeek.builder()
+            return IndexVO.StateOfWeek.builder()
                     .attack(0)
                     .durability(0)
                     .hitRate(0.0)

@@ -16,6 +16,7 @@ import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentServi
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipTestService;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
+import com.zhidejiaoyu.student.business.shipconfig.vo.PkInfoVO;
 import com.zhidejiaoyu.student.common.redis.PkCopyRedisOpt;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
@@ -72,24 +73,17 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     @Override
     public Object getTest(HttpSession session, Long studentId) {
         Student student = getStudent(session);
-        Map<String, Object> returnMap = new HashMap<>();
         //查询一小时内的pk次数
         int pkCount = getPkCount(student);
         if (pkCount == 1) {
             return ServerResponse.createByError(401, "挑战次数达到上限");
-
         }
-        //查询pk信息
-        //1.pk发起人的信息
-        // 学生装备的飞船及装备信息
-        Map<String, Object> origintorMap = getEquipmentMap(student.getId());
-        returnMap.put("originator", origintorMap);
-        //2.被pk人的信息
-        Map<String, Object> beOrigintorMap = getEquipmentMap(studentId);
-        returnMap.put("challenged", beOrigintorMap);
-        //3.查询题目
-        returnMap.put("subject", getSubject(student.getId()));
-        return ServerResponse.createBySuccess(returnMap);
+
+        return ServerResponse.createBySuccess(PkInfoVO.builder()
+                .challenged(getEquipmentMap(studentId))
+                .originator(getEquipmentMap(student.getId()))
+                .subject(getSubject(student.getId()))
+                .build());
     }
 
     /**
@@ -98,62 +92,63 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      * @param studentId
      * @return
      */
-    private Map<String, Object> getEquipmentMap(Long studentId) {
-        Map<String, Object> origintorMap = new HashMap<>();
-        origintorMap.put("battle", shipIndexService.getStateOfWeek(studentId));
-        origintorMap.put("imgUrl", GetOssFile.getPublicObjectUrl(studentEquipmentMapper.selectImgUrlByStudentId(studentId)));
+    private PkInfoVO.Challenged getEquipmentMap(Long studentId) {
         Equipment equipment = equipmentMapper.selectNameAndGradeByStudentId(studentId);
-        if (equipment != null) {
-            origintorMap.put("name", equipment.getName());
-            origintorMap.put("grade", equipment.getGrade());
-        } else {
-            origintorMap.put("name", null);
-            origintorMap.put("grade", null);
-        }
-        return origintorMap;
+        String imgUrl = studentEquipmentMapper.selectImgUrlByStudentId(studentId);
+
+        return PkInfoVO.Challenged.builder()
+                .battle(shipIndexService.getStateOfWeek(studentId))
+                .imgUrl(GetOssFile.getPublicObjectUrl(imgUrl))
+                .name(equipment == null ? null : equipment.getName())
+                .grade(equipment == null ? null : equipment.getGrade())
+                .build();
     }
 
 
     @Override
     public Object getSingleTesting(HttpSession session, Long bossId) {
         Student student = getStudent(session);
-        Map<String, Object> returnMap = new HashMap<>();
         PkCopyBase pkCopyBase = pkCopyRedisOpt.getPkCopyBaseById(bossId);
         //获得学生当天挑战次数
-        int count = gauntletMapper.countByStudentIdAndBossId(student.getId(), bossId, 2);
+        Long studentId = student.getId();
+        int count = gauntletMapper.countByStudentIdAndBossId(studentId, bossId, 2);
         //判断是否到达每天挑战次数上限
         if (pkCopyBase.getChallengeCycle() <= count) {
             return ServerResponse.createByError(401, "挑战次数达到上限");
         }
         //查询当前boss剩余学量
-        PkCopyState pkCopyState = pkCopyStateMapper.selectByStudentIdAndBossId(student.getId(), bossId);
+        PkCopyState pkCopyState = pkCopyStateMapper.selectByStudentIdAndBossId(studentId, bossId);
         if (pkCopyState != null) {
             pkCopyBase.setDurability(pkCopyState.getDurability());
         }
-        Map<String, Object> origintorMap = getEquipmentMap(student.getId());
-        returnMap.put("originator", origintorMap);
-        Map<String, Object> beOrigintorMap = getBossEquipment(pkCopyBase);
-        returnMap.put("challenged", beOrigintorMap);
-        //3.查询题目
-        returnMap.put("subject", getSubject(student.getId()));
-        return ServerResponse.createBySuccess(returnMap);
+
+        return ServerResponse.createBySuccess(PkInfoVO.builder()
+                .challenged(getEquipmentMap(studentId))
+                .originator(getBossEquipment(pkCopyBase))
+                .subject(getSubject(studentId))
+                .build());
     }
 
-    private Map<String, Object> getBossEquipment(PkCopyBase pkCopyBase) {
-        Map<String, Object> returnMap = new HashMap<>();
-        returnMap.put("imgUrl", GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl()));
-        returnMap.put("grade", pkCopyBase.getLevelName());
-        returnMap.put("name", pkCopyBase.getName());
-        IndexVO.BaseValue build = IndexVO.StateOfWeek.builder()
-                .attack(pkCopyBase.getCommonAttack())
-                .durability(pkCopyBase.getDurability())
-                .hitRate(pkCopyBase.getHitRate())
-                .move(pkCopyBase.getMobility())
-                .source(pkCopyBase.getSourceForce())
-                .sourceAttack(pkCopyBase.getSourceForceAttack())
+    /**
+     * 获取被挑战的副本信息
+     *
+     * @param pkCopyBase
+     * @return
+     */
+    private PkInfoVO.Challenged getBossEquipment(PkCopyBase pkCopyBase) {
+        return PkInfoVO.Challenged.builder()
+                .imgUrl(GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl()))
+                .grade(pkCopyBase.getLevelName())
+                .name(pkCopyBase.getName())
+                .battle(IndexVO.BaseValue.builder()
+                        .attack(pkCopyBase.getCommonAttack())
+                        .durability(pkCopyBase.getDurability())
+                        .hitRate(pkCopyBase.getHitRate())
+                        .move(pkCopyBase.getMobility())
+                        .source(pkCopyBase.getSourceForce())
+                        .sourceAttack(pkCopyBase.getSourceForceAttack())
+                        .build())
                 .build();
-        returnMap.put("battle", build);
-        return returnMap;
     }
 
     @Override
@@ -219,7 +214,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         final int saturday = 6;
         final int sunday = 7;
         if (dayOfWeek != saturday && dayOfWeek != sunday) {
-            return ServerResponse.createByError(400, "校区副本只有周六周日才开放挑战！");
+            return ServerResponse.createBySuccess(400, "校区副本只有周六周日才开放挑战！");
         }
 
         Student student = super.getStudent();
@@ -228,19 +223,22 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         // 判断学生当前是否已经挑战过当前校区副本
         int count = gauntletMapper.countByStudentIdAndBossId(studentId, bossId, 3);
         if (count > 0) {
-            return ServerResponse.createByError(401, "您今天已经挑战过该副本！");
+            return ServerResponse.createBySuccess(401, "您今天已经挑战过该副本！");
         }
 
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
         // 返回副本信息
-        // todo: 返回副本信息
         PkCopyState pkCopyState = pkCopyStateMapper.selectBySchoolAdminIdAndPkCopyBaseId(schoolAdminId, bossId);
-        if (pkCopyState == null) {
-            PkCopyBase pkCopyBase = pkCopyRedisOpt.getPkCopyBaseById(bossId);
-        } else {
-
+        PkCopyBase pkCopyBase = pkCopyRedisOpt.getPkCopyBaseById(bossId);
+        if (pkCopyState != null) {
+            pkCopyBase.setDurability(pkCopyState.getDurability());
         }
-        return null;
+
+        return ServerResponse.createBySuccess(PkInfoVO.builder()
+                .challenged(getEquipmentMap(studentId))
+                .originator(getBossEquipment(pkCopyBase))
+                .subject(getSubject(studentId))
+                .build());
     }
 
     private void saveStudentGold(Student student) {
@@ -294,9 +292,9 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     }
 
     @Override
-    public Object getPKRecord(HttpSession session, int type) {
+    public Object getPkRecord(HttpSession session, int type) {
         Student student = getStudent(session);
-        Map<String, Object> returnMap = new HashMap<>();
+        Map<String, Object> returnMap = new HashMap<>(16);
         //获取最高排名
         StudentExpansion expansion = studentExpansionMapper.selectByStudentId(student.getId());
         //获取当前排名
@@ -427,21 +425,22 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      * @param studentId
      * @return
      */
-    private Object getSubject(Long studentId) {
+    private List<SubjectsVO> getSubject(Long studentId) {
         //1，获取单元
         List<Long> unitIds = learnNewMapper.getUnitIdByStudentIdAndType(studentId, 1);
         //2,获取单元题目
         if (unitIds != null && unitIds.size() > 0) {
             List<SubjectsVO> subjectsVos = vocabularyMapper.selectSubjectsVOByUnitIds(unitIds);
             //题目够15到截取，不够的话 循环添加
-            if (subjectsVos.size() > 15) {
+            int subjectNum = 15;
+            if (subjectsVos.size() > subjectNum) {
                 Collections.shuffle(subjectsVos);
-                subjectsVos = subjectsVos.subList(0, 15);
+                subjectsVos = subjectsVos.subList(0, subjectNum);
             } else {
                 List<SubjectsVO> subjectsVos1 = new ArrayList<>(subjectsVos);
-                while (subjectsVos1.size() < 15) {
+                while (subjectsVos1.size() < subjectNum) {
                     subjectsVos.forEach(subject -> {
-                        if (subjectsVos1.size() < 15) {
+                        if (subjectsVos1.size() < subjectNum) {
                             subjectsVos1.add(subject);
                         }
                     });
@@ -456,7 +455,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
             Collections.shuffle(returnList);
             return returnList;
         }
-        return null;
+        return Collections.emptyList();
     }
 
 

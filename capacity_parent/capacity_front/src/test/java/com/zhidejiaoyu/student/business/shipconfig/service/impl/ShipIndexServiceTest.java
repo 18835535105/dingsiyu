@@ -29,7 +29,7 @@ public class ShipIndexServiceTest {
 
     @Test
     public void getStateOfWeek() {
-        IndexVO.StateOfWeek stateOfWeek = shipIndexService.getStateOfWeek(9575L);
+        IndexVO.BaseValue stateOfWeek = shipIndexService.getStateOfWeek(9575L);
         log.info(stateOfWeek.toString());
     }
 }
