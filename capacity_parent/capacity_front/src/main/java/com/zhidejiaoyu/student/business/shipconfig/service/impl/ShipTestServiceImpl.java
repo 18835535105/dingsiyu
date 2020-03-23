@@ -169,7 +169,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      */
     private PkInfoVO.BossPoll getBossEquipment(PkCopyBase pkCopyBase) {
         return PkInfoVO.BossPoll.builder()
-                .imgUrl(GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl()))
+                .imgUrl(getImg(pkCopyBase.getImgUrl()))
                 .grade(pkCopyBase.getLevelName())
                 .name(pkCopyBase.getName())
                 .battle(IndexVO.BaseValue.builder()
