@@ -165,7 +165,7 @@ public class FileTransJavaDemo {
         final String appKey = "7tCOZLl5ZGQ7XP06";
 
         // 第几个录音文件序号
-        int num = 4;
+        int num = 5;
         String path = "https://oss.yydz100.com/audio/mav-test/" + num + "/";
 
         // 文件总数
