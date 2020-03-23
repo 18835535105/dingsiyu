@@ -38,7 +38,7 @@ public class SearchMedia {
     public static SearchMediaResponse searchMedia() throws Exception {
         SearchMediaRequest request = new SearchMediaRequest();
         request.setSearchType("video");
-        request.setFields("Title,CoverURL");
+        request.setFields("Title,CoverURL,CateName");
         request.setPageNo(1);
         request.setPageSize(50);
         return client.getAcsResponse(request);
