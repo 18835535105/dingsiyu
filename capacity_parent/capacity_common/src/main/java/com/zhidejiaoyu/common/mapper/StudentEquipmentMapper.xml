@@ -64,18 +64,23 @@
                  join equipment ment
                       on ment.id = stuEq.equipment_id
                           and stuEq.intensification_degree = expan.intensification_degree
-        where stuEq.type = #{type}
-          and ment.type = 1
+        where ment.type = #{type}
           and stuEq.student_id = #{studentId}
-        limit 1
+          and stuEq.type = 1
+
     </select>
 
     <select id="selectLeftUrlByStudentIdAndType" parameterType="map" resultType="string">
-        select
-        left_img_url
-        from equipment_expansion
-        where intensification_degree=#{degree}
-        and equipment_id=#{equipmentId}
+        select left_img_url
+        from student_equipment stuEq
+                 join equipment_expansion expan
+                      on stuEq.equipment_id = expan.equipment_id
+                 join equipment ment
+                      on ment.id = stuEq.equipment_id
+                          and stuEq.intensification_degree = expan.intensification_degree
+        where ment.type = #{type}
+          and stuEq.student_id = #{studentId}
+          and stuEq.type = 1
     </select>
 
 </mapper>

@@ -122,14 +122,18 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     private EquipmentVo getEquipmentInformation(Long studentId, int type) {
         EquipmentVo equipment = equipmentMapper.selectNameAndGradeByStudentId(studentId, type);
         if (equipment != null) {
-            String allImg = studentEquipmentMapper.selectImgUrlByStudentId(studentId, type);
-            equipment.setImgUrl
-                    (allImg.substring(allImg.lastIndexOf("/")).substring(allImg.lastIndexOf(".")));
-            String allImg1 = studentEquipmentMapper.selectLeftUrlByStudentIdAndType(studentId, type);
-            equipment.setLeftImgUrl
-                    (allImg1.substring(allImg1.lastIndexOf("/")).substring(allImg1.lastIndexOf(".")));
+            equipment.setImgUrl(getImg(studentEquipmentMapper.selectImgUrlByStudentId(studentId, type)));
+            equipment.setLeftImgUrl(getImg(studentEquipmentMapper.selectLeftUrlByStudentIdAndType(studentId, type)));
         }
         return equipment;
+    }
+
+    private String getImg(String allImg) {
+        int indexOf = allImg.lastIndexOf("/")+1;
+        allImg = allImg.substring(indexOf);
+        int indexOf1 = allImg.lastIndexOf(".");
+        allImg = allImg.substring(0,indexOf1);
+        return allImg;
     }
 
 
