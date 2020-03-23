@@ -124,6 +124,8 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         if (equipment != null) {
             equipment.setImgUrl
                     (GetOssFile.getPublicObjectUrl(studentEquipmentMapper.selectImgUrlByStudentId(studentId, type)));
+            equipment.setLeftImgUrl
+                    (GetOssFile.getPublicObjectUrl(studentEquipmentMapper.selectLeftUrlByEquipmentIdAndType(studentId, type)));
         }
         return equipment;
     }

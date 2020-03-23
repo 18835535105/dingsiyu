@@ -3,6 +3,7 @@ package com.zhidejiaoyu.common.pojo;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.IdType;
 import com.baomidou.mybatisplus.activerecord.Model;
+
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotations.Version;
@@ -13,7 +14,7 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author zdjy
@@ -64,6 +65,10 @@ public class EquipmentExpansion extends Model<EquipmentExpansion> {
      * 图片地址
      */
     private String imgUrl;
+    /**
+     * 左侧图片地址
+     */
+    private String leftImgUrl;
 
 
     @Override

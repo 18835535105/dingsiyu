@@ -23,6 +23,10 @@ public class EquipmentVo implements Serializable {
      */
     private String imgUrl;
     /**
+     * 图片名
+     */
+    private String leftImgUrl;
+    /**
      * 装备名
      */
     private String equipmentName;

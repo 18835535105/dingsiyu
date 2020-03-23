@@ -70,4 +70,12 @@
         limit 1
     </select>
 
+    <select id="selectLeftUrlByEquipmentIdAndType" parameterType="map" resultType="string">
+        select
+        left_img_url
+        from equipment_expansion
+        where intensification_degree=#{degree}
+        and equipment_id=#{equipmentId}
+    </select>
+
 </mapper>

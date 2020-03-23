@@ -38,12 +38,22 @@ public interface StudentEquipmentMapper extends BaseMapper<StudentEquipment> {
     int countByStudentId(@Param("studentId") Long studentId);
 
     /**
-     * 查询正在使用的装备图片
+     * 查询正在使用的右侧装备图片
      *
      * @param studentId
      * @return
      */
     String selectImgUrlByStudentId(@Param("studentId") Long studentId,@Param("type")Integer type);
+
+    /**
+     * 查询正在使用的左侧装备图片
+     *
+     * @param studentId
+     * @return
+     */
+    String selectLeftUrlByEquipmentIdAndType(@Param("studentId") Long studentId,@Param("type")Integer type);
+
+
 
 
 }
