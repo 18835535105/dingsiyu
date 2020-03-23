@@ -21,7 +21,7 @@
         select e.type,
                ee.img_url             imgUrl,
                ee.durability,
-               ee.common_attack       commmonAttack,
+               ee.common_attack       commonAttack,
                ee.source_force_attack sourceForceAttack,
                ee.source_force        sourceForce,
                ee.hit_rate            hitRate,
