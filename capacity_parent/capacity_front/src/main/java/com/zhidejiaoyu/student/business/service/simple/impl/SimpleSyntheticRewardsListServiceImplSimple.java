@@ -125,12 +125,8 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                     setMap.put("count", 6);
                     setMap.put("finalNameInteger", i);
                     setMap.put("isEnter", false);
-                    if (student.getBonusExpires() != null
-                            && student.getBonusExpires().getTime() >= System.currentTimeMillis()) {
-                        setMap.put("isWear", false);
-                    } else {
-                        setMap.put("isWear", true);
-                    }
+                    setMap.put("isWear", student.getBonusExpires() != null
+                            && student.getBonusExpires().getTime() >= System.currentTimeMillis() ? false : true);
                     retrun.put(i, setMap);
                 }
             }
@@ -171,12 +167,8 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                     setMap.put("count", 5);
                     setMap.put("finalNameInteger", i);
                     setMap.put("isEnter", false);
-                    if (student.getBonusExpires() != null
-                            && student.getBonusExpires().getTime() >= System.currentTimeMillis()) {
-                        setMap.put("isWear", false);
-                    } else {
-                        setMap.put("isWear", true);
-                    }
+                    setMap.put("isWear", student.getBonusExpires() != null
+                            && student.getBonusExpires().getTime() >= System.currentTimeMillis() ? false : true);
                     retrun.put(i, setMap);
                 }
 
