@@ -79,12 +79,23 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         if (pkCount == 1) {
             return ServerResponse.createByError(401, "挑战次数达到上限");
         }
-
+        //用完就删除
+        PkInfoVO.Challenged equipmentMap = getEquipmentMap(student.getId());
+        IndexVO.BaseValue battle = equipmentMap.getBattle();
+        battle.setAttack(25);
+        equipmentMap.setBattle(battle);
         return ServerResponse.createBySuccess(PkInfoVO.builder()
+                .challenged(equipmentMap)
+                .originator(equipmentMap)
+                .subject(getSubject(student.getId()))
+                .build());
+        //正确的数据
+       /* return ServerResponse.createBySuccess(PkInfoVO.builder()
                 .challenged(getEquipmentMap(studentId))
                 .originator(getEquipmentMap(student.getId()))
                 .subject(getSubject(student.getId()))
-                .build());
+                .build());*/
+
     }
 
     /**
@@ -111,10 +122,18 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     private EquipmentVo getEquipmentInformation(Long studentId, int type) {
         EquipmentVo equipment = equipmentMapper.selectNameAndGradeByStudentId(studentId, type);
         if (equipment != null) {
-            equipment.setImgUrl
-                    (GetOssFile.getPublicObjectUrl(studentEquipmentMapper.selectImgUrlByStudentId(studentId, type)));
+            equipment.setImgUrl(getImg(studentEquipmentMapper.selectImgUrlByStudentId(studentId, type)));
+            equipment.setLeftImgUrl(getImg(studentEquipmentMapper.selectLeftUrlByStudentIdAndType(studentId, type)));
         }
         return equipment;
+    }
+
+    private String getImg(String allImg) {
+        int indexOf = allImg.lastIndexOf("/")+1;
+        allImg = allImg.substring(indexOf);
+        int indexOf1 = allImg.lastIndexOf(".");
+        allImg = allImg.substring(0,indexOf1);
+        return allImg;
     }
 
 

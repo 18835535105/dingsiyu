@@ -14,10 +14,12 @@
         <result column="mobility" property="mobility"/>
         <result column="intensification_degree" property="intensificationDegree"/>
         <result column="img_url" property="imgUrl"/>
+        <result column="left_img_url" property="leftImgUrl"/>
+
     </resultMap>
 
     <sql id="base_sql">
-        id,equipment_id,durability,common_attack,source_force_attack,source_force,hit_rate,mobility,intensification_degree,img_url
+        id,equipment_id,durability,common_attack,source_force_attack,source_force,hit_rate,mobility,intensification_degree,img_url,left_img_url
     </sql>
 
     <select id="selectLvOneAllUrl" resultType="map">

@@ -62,6 +62,10 @@ public class EquipmentExpansion extends Model<EquipmentExpansion> {
      * 图片地址
      */
     private String imgUrl;
+    /**
+     * 左侧图片地址
+     */
+    private String leftImgUrl;
 
 
     @Override
