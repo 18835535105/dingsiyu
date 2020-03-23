@@ -79,12 +79,23 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         if (pkCount == 1) {
             return ServerResponse.createByError(401, "挑战次数达到上限");
         }
-
+        //用完就删除
+        PkInfoVO.Challenged equipmentMap = getEquipmentMap(student.getId());
+        IndexVO.BaseValue battle = equipmentMap.getBattle();
+        battle.setAttack(25);
+        equipmentMap.setBattle(battle);
         return ServerResponse.createBySuccess(PkInfoVO.builder()
+                .challenged(equipmentMap)
+                .originator(equipmentMap)
+                .subject(getSubject(student.getId()))
+                .build());
+        //正确的数据
+       /* return ServerResponse.createBySuccess(PkInfoVO.builder()
                 .challenged(getEquipmentMap(studentId))
                 .originator(getEquipmentMap(student.getId()))
                 .subject(getSubject(student.getId()))
-                .build());
+                .build());*/
+
     }
 
     /**
