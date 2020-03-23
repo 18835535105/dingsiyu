@@ -51,7 +51,7 @@ public interface StudentEquipmentMapper extends BaseMapper<StudentEquipment> {
      * @param studentId
      * @return
      */
-    String selectLeftUrlByEquipmentIdAndType(@Param("studentId") Long studentId,@Param("type")Integer type);
+    String selectLeftUrlByStudentIdAndType(@Param("studentId") Long studentId,@Param("type")Integer type);
 
 
 

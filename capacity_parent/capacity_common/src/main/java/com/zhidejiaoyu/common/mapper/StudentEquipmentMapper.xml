@@ -70,7 +70,7 @@
         limit 1
     </select>
 
-    <select id="selectLeftUrlByEquipmentIdAndType" parameterType="map" resultType="string">
+    <select id="selectLeftUrlByStudentIdAndType" parameterType="map" resultType="string">
         select
         left_img_url
         from equipment_expansion
