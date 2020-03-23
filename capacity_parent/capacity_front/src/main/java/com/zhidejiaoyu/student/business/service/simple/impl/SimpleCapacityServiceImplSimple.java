@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.business.service.simple.impl;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.constant.UserConstant;
@@ -75,8 +75,10 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
 
         PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
 
-        List<SimpleCapacity> simpleCapacities = simpleSimpleCapacityMapper.selectList(new EntityWrapper<SimpleCapacity>().eq("student_id", student.getId()).
-                eq("course_id", courseId).eq("type", type).lt("memory_strength", 1).orderBy("push", true));
+        List<SimpleCapacity> simpleCapacities = simpleSimpleCapacityMapper.selectList(new QueryWrapper<SimpleCapacity>()
+                .eq("student_id", student.getId()).
+                eq("course_id", courseId).eq("type", type).lt("memory_strength", 1)
+                .orderBy(true, true, "push"));
 
         PageInfo<SimpleCapacity> pageInfo = new PageInfo<>(simpleCapacities);
         vo.setTotalPages(pageInfo.getPages());
@@ -113,7 +115,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
     public ServerResponse<CapacityContentVo> getCapacityContent(HttpSession session, Integer type, Long courseId, Long id) {
         Student student = getStudent(session);
 
-        List<Learn> learns = learnMapper.selectList(new EntityWrapper<Learn>().eq("student_id", student.getId())
+        List<Learn> learns = learnMapper.selectList(new QueryWrapper<Learn>().eq("student_id", student.getId())
                 .eq("course_id", courseId).eq("vocabulary_id", id).eq("type", 1));
         if (learns.isEmpty()) {
             return ServerResponse.createByErrorMessage("当前单词无学习记录");
@@ -124,7 +126,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
             return ServerResponse.createByErrorMessage("未查询到当前单词信息！");
         }
 
-        List<SimpleCapacity> simpleCapacities = simpleSimpleCapacityMapper.selectList(new EntityWrapper<SimpleCapacity>()
+        List<SimpleCapacity> simpleCapacities = simpleSimpleCapacityMapper.selectList(new QueryWrapper<SimpleCapacity>()
                 .eq("student_id", student.getId()).eq("course_id", courseId).eq("type", type).eq("vocabulary_id", id));
         SimpleCapacity simpleCapacity;
         if (simpleCapacities != null && simpleCapacities.size() > 0) {
@@ -183,7 +185,7 @@ public class SimpleCapacityServiceImplSimple extends SimpleBaseServiceImpl<Simpl
         List<Long> ids = new ArrayList<>();
         // excel标题
         String[] title = {"序号", "英文", "中文解释", "记忆强度", "距离复习"};
-        List<SimpleCapacity> simpleCapacities = simpleSimpleCapacityMapper.selectList(new EntityWrapper<SimpleCapacity>().eq("student_id", student.getId())
+        List<SimpleCapacity> simpleCapacities = simpleSimpleCapacityMapper.selectList(new QueryWrapper<SimpleCapacity>().eq("student_id", student.getId())
                 .eq("course_id", courseId).eq("type", type));
 
         // excel文件名

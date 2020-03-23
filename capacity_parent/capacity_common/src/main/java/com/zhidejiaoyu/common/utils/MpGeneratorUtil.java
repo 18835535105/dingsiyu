@@ -1,13 +1,13 @@
 package com.zhidejiaoyu.common.utils;
 
 
-import com.baomidou.mybatisplus.enums.IdType;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
 import com.baomidou.mybatisplus.generator.config.GlobalConfig;
 import com.baomidou.mybatisplus.generator.config.PackageConfig;
 import com.baomidou.mybatisplus.generator.config.StrategyConfig;
-import com.baomidou.mybatisplus.generator.config.rules.DbType;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +26,7 @@ public class MpGeneratorUtil {
     private static void create() {
         String[] tableName = {"pk_copy_base","pk_copy_state"};
 
-        /**
+        /*
          * 配置：
          * 1.全局配置
          * 2.数据源配置
@@ -71,7 +71,7 @@ public class MpGeneratorUtil {
                 //开启全局大写命名
                 .setCapitalMode(true)
                 //开启下划线转换
-                .setDbColumnUnderline(true)
+//                .setDbColumnUnderline(true)
                 //开启驼峰命名
                 .setNaming(NamingStrategy.underline_to_camel)
                 .setEntityLombokModel(true)

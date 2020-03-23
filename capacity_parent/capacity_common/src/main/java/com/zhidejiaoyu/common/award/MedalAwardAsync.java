@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.award;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zhidejiaoyu.common.constant.MedalConstant;
 import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
@@ -200,7 +201,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
             int countryDayRank;
             if (rankList == null) {
                 schoolDayRank = studentMapper.countHasLoginLogStudentsBySchoolAdminId(schoolAdminId);
-                countryDayRank = studentMapper.selectCount(new EntityWrapper<Student>().isNotNull("account_time").in("role", new Object[]{1, 2}).ne("status", 3));
+                countryDayRank = studentMapper.selectCount(new QueryWrapper<Student>().isNotNull("account_time").in("role", new Object[]{1, 2}).ne("status", 3));
             } else {
                 schoolDayRank = rankList.getSchoolDayRank() == null ? 0 : rankList.getSchoolDayRank();
                 countryDayRank = rankList.getCountryDayRank() == null ? 0 : rankList.getCountryDayRank();
@@ -743,7 +744,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
         Long studentId = student.getId();
         SyntaxCourse syntaxCourse = syntaxCourseMapper.selectById(courseId);
         if (syntaxCourse != null) {
-            List<Medal> medals = medalMapper.selectList(new EntityWrapper<Medal>().like("parent_name", syntaxCourse.getGrade() + syntaxCourse.getLabel()));
+            List<Medal> medals = medalMapper.selectList(new QueryWrapper<Medal>().like("parent_name", syntaxCourse.getGrade() + syntaxCourse.getLabel()));
             try {
                 if (!CollectionUtils.isEmpty(medals)) {
                     Award award = awardMapper.selectByStudentIdAndMedalType(studentId, medals.get(0).getId());

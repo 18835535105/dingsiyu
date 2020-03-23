@@ -844,9 +844,19 @@
             "词组默写"
         </if>
     </sql>
-    <select id="showWordSimple" parameterType="map" resultType="com.zhidejiaoyu.common.vo.simple.SimpleCapacityVo">
+    <resultMap id="simpleCapacityVoResultMap" type="com.zhidejiaoyu.common.vo.simple.SimpleCapacityVo">
+        <result column="unit_id" property="unit_id"/>
+        <result column="id" property="id"/>
+        <result column="word" property="word"/>
+        <result column="word_chinese" property="word_chinese"/>
+        <result column="example_english" property="example_english"/>
+        <result column="example_chinese" property="example_chinese"/>
+        <result column="recordpicurl" property="recordpicurl"/>
+        <result column="sound_mark" property="soundMark"/>
+    </resultMap>
+    <select id="showWordSimple" parameterType="map" resultMap="simpleCapacityVoResultMap">
         select
-        uv.unit_id,
+        uv.unit_id as unit_id,
         v.id,
         v.word,
         if (uv.word_chinese is null, v.word_chinese, uv.word_chinese) word_chinese,

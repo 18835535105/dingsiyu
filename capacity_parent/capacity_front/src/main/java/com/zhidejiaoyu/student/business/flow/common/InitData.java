@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.flow.common;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.mapper.LearnHistoryMapper;
 import com.zhidejiaoyu.common.mapper.LearnNewMapper;
@@ -70,21 +71,27 @@ public class InitData {
     public void saveOrUpdateOneKeyLearnHistory(NodeDto dto, Integer count, int type) {
         if (count > 0) {
             // 查询已完成表中是否已有当前group信息，有更新，没有新增
-            LearnHistory.LearnHistoryBuilder builder = LearnHistory.builder()
-                    .studentId(dto.getStudent().getId())
-                    .courseId(dto.getCourseId())
-                    .unitId(dto.getUnitId())
-                    .group(dto.getGroup())
-                    .easyOrHard(dto.getEasyOrHard())
-                    .type(type);
-            LearnHistory learnHistory = learnHistoryMapper.selectOne(builder.build());
+            LearnHistory learnHistory = learnHistoryMapper.selectOne(new QueryWrapper<LearnHistory>()
+                    .eq("student_id", dto.getStudent().getId())
+                    .eq("course_id", dto.getCourseId())
+                    .eq("unit_id", dto.getUnitId())
+                    .eq("`group`", dto.getGroup())
+                    .eq("easy_or_hard", dto.getEasyOrHard())
+                    .eq("type", type)
+            );
             if (learnHistory != null) {
                 learnHistory.setState(1);
                 learnHistory.setUpdateTime(new Date());
                 learnHistory.setStudyCount(learnHistory.getStudyCount() + 1);
                 learnHistoryMapper.updateById(learnHistory);
             } else {
-                learnHistoryMapper.insert(builder
+                learnHistoryMapper.insert(LearnHistory.builder()
+                        .studentId(dto.getStudent().getId())
+                        .courseId(dto.getCourseId())
+                        .unitId(dto.getUnitId())
+                        .group(dto.getGroup())
+                        .easyOrHard(dto.getEasyOrHard())
+                        .type(type)
                         .state(1)
                         .studyCount(1)
                         .updateTime(new Date())
@@ -105,7 +112,7 @@ public class InitData {
     /**
      * 保存学习表
      *
-     * @param dto   需要参数：easyOrHard，student, unitId, courseId
+     * @param dto       需要参数：easyOrHard，student, unitId, courseId
      * @param group
      * @param modelType
      * @return

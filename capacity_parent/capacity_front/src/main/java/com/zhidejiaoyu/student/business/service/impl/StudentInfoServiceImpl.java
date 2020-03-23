@@ -1,17 +1,16 @@
 package com.zhidejiaoyu.student.business.service.impl;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.vo.student.level.ChildMedalVo;
-import com.zhidejiaoyu.common.vo.student.level.LevelVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.dto.EndValidTimeDto;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
@@ -21,12 +20,12 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.common.validTime.GetValidTimeTip;
-import com.zhidejiaoyu.common.dto.EndValidTimeDto;
+import com.zhidejiaoyu.common.vo.student.level.ChildMedalVo;
+import com.zhidejiaoyu.common.vo.student.level.LevelVo;
 import com.zhidejiaoyu.student.business.service.StudentInfoService;
+import com.zhidejiaoyu.student.common.validTime.GetValidTimeTip;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,10 +34,10 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 
+@Slf4j
 @Service
 public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements StudentInfoService {
 
-    private Logger log = LoggerFactory.getLogger(this.getClass());
     private RunLog runLog;
 
     @Autowired
@@ -650,7 +649,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     }
 
     private Map<String, String> getLevelInfo(LevelVo levelVo, Student student, Map<String, String> parentMap) {
-        List<Level> levels = levelMapper.selectList(new EntityWrapper<Level>().orderBy("id", true));
+        List<Level> levels = levelMapper.selectList(new QueryWrapper<Level>().orderBy(true, true, "id"));
         double gold = BigDecimalUtil.add(student.getSystemGold(), student.getOfflineGold());
         // 获取当前勋章子勋章索引
         Map<String, String> childMap = null;

@@ -1,8 +1,10 @@
 package com.zhidejiaoyu.common.pojo;
 
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.enums.IdType;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -208,6 +210,7 @@ public class Student extends Model<Student> {
     /**
      * 有效期 7天，14天，30天，365天
      */
+    @TableField("`rank`")
     private Integer rank;
 
     private Date updateTime;

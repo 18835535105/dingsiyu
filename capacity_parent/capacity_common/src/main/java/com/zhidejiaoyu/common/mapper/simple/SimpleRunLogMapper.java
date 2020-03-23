@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.common.mapper.simple;
 
-import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.RunLog;
 import com.zhidejiaoyu.common.pojo.RunLogExample;
 import com.zhidejiaoyu.common.pojo.Student;

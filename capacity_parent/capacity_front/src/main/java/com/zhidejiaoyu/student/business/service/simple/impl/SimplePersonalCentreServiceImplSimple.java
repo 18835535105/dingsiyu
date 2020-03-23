@@ -1,15 +1,9 @@
 package com.zhidejiaoyu.student.business.service.simple.impl;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
-import com.zhidejiaoyu.common.utils.dateUtlis.TimeUtil;
-import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
-import com.zhidejiaoyu.common.vo.SeniorityVo;
-import com.zhidejiaoyu.common.vo.simple.ccieVo.CcieVo;
-import com.zhidejiaoyu.common.vo.simple.ccieVo.MyCcieVo;
 import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.dto.rank.RankDto;
 import com.zhidejiaoyu.common.mapper.simple.*;
@@ -18,10 +12,16 @@ import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.dateUtlis.TimeUtil;
+import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.common.redis.RedisOpt;
-import com.zhidejiaoyu.student.business.service.simple.SimplePersonalCentreServiceSimple;
 import com.zhidejiaoyu.common.utils.simple.SimpleCcieUtil;
+import com.zhidejiaoyu.common.vo.SeniorityVo;
+import com.zhidejiaoyu.common.vo.simple.ccieVo.CcieVo;
+import com.zhidejiaoyu.common.vo.simple.ccieVo.MyCcieVo;
+import com.zhidejiaoyu.student.business.service.simple.SimplePersonalCentreServiceSimple;
+import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -197,9 +197,9 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
     }
 
     private void myCcie(Map<String, Object> map, Long studentId) {
-        EntityWrapper<Ccie> ccieEntityWrapper = new EntityWrapper<>();
-        ccieEntityWrapper.eq("student_id", studentId).eq("read_flag", 0);
-        int i = ccieMapper.selectCount(ccieEntityWrapper);
+        QueryWrapper<Ccie> ccieQueryWrapper = new QueryWrapper<>();
+        ccieQueryWrapper.eq("student_id", studentId).eq("read_flag", 0);
+        int i = ccieMapper.selectCount(ccieQueryWrapper);
         map.put("ccieRead", i);
     }
 

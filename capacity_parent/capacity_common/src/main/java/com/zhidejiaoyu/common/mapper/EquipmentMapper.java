@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.Equipment;
-import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.vo.ship.EquipmentVo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;

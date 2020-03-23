@@ -57,7 +57,7 @@
 
 		<dependency>
 			<groupId>com.baomidou</groupId>
-			<artifactId>mybatisplus-spring-boot-starter</artifactId>
+			<artifactId>mybatis-plus-boot-starter</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.velocity</groupId>
@@ -155,14 +155,16 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.baomidou</groupId>
-			<artifactId>mybatis-plus-core</artifactId>
-			<version>2.3</version>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.baomidou</groupId>
-			<artifactId>mybatis-plus-generate</artifactId>
-			<version>2.3</version>
+			<artifactId>mybatis-plus-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus-generator</artifactId>
 		</dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

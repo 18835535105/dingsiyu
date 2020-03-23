@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.CapacityMemory;
 import com.zhidejiaoyu.common.pojo.CapacityMemoryExample;
 import org.apache.ibatis.annotations.Delete;

@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.baomidou.mybatisplus.plugins.pagination.Pagination;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.StudentHours;
 import org.apache.ibatis.annotations.Param;
 
@@ -18,8 +17,6 @@ import java.util.Map;
  * @since 2019-09-27
  */
 public interface StudentHoursMapper extends BaseMapper<StudentHours> {
-
-    List<Map<String, Object>> selByAdminId(@Param("pagination") Pagination pagination, @Param("adminId") Integer adminId);
 
     List<StudentHours> selectDeatilsByAdminId(@Param("adminId") Long adminId, @Param("time") Date time);
 

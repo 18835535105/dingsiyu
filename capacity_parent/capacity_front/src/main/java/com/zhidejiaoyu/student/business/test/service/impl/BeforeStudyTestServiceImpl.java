@@ -353,7 +353,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
             studentStudyPlanNews.add(hardStudentStudyPlan);
         }
 
-        this.insertBatch(studentStudyPlanNews);
+        this.saveBatch(studentStudyPlanNews);
 
         // 初始化学生学习流程
         StudentStudyPlanNew maxStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalLevelByLimit(student.getId(), 1).get(0);

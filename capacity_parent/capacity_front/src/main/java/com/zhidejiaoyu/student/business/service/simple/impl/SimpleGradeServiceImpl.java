@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.business.service.simple.impl;
 
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zhidejiaoyu.common.mapper.simple.SimpleGradeMapper;
 import com.zhidejiaoyu.common.pojo.Grade;
 import com.zhidejiaoyu.student.business.service.simple.SimpleGradeService;

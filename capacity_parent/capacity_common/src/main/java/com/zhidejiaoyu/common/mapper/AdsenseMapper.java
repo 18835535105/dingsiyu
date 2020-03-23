@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.Adsense;
-import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;
 

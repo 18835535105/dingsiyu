@@ -1,8 +1,9 @@
 package com.zhidejiaoyu.common.pojo;
 
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.enums.IdType;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -38,6 +39,7 @@ public class GameScore extends Model<GameScore> {
      */
     private Integer passFlag;
 
+    @TableField("`explain`")
     private String explain;
 
     @Override

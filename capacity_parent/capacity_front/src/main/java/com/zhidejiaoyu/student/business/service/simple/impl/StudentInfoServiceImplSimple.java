@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.business.service.simple.impl;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
@@ -255,7 +255,8 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object deleteRepeatLogoutLogs() {
-        List<RunLog> runLogs = runLogMapper.selectList(new EntityWrapper<RunLog>().eq("type", 1).orderBy("operate_user_id", true).orderBy("create_time", true));
+        List<RunLog> runLogs = runLogMapper.selectList(new QueryWrapper<RunLog>().eq("type", 1)
+                .orderBy(true, true, "operate_user_id", "create_time"));
 
         List<Long> logIds = new ArrayList<>();
         int size = runLogs.size();

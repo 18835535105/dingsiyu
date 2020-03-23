@@ -21,7 +21,22 @@
 		id, student_id, course_id, unit_id, vocabulary_id, word, word_chinese, fault_time, push, memory_strength, type
 	</sql>
 
-    <select id="getSimpleWhetherFeview" parameterType="map" resultType="com.zhidejiaoyu.common.vo.simple.SimpleCapacityVo">
+	<resultMap id="simpleCapacityVoResultMap" type="com.zhidejiaoyu.common.vo.simple.SimpleCapacityVo">
+		<result column="unit_id" property="unit_id"/>
+		<result column="id" property="id"/>
+		<result column="word" property="word"/>
+		<result column="word_chinese" property="word_chinese"/>
+		<result column="example_english" property="example_english"/>
+		<result column="example_chinese" property="example_chinese"/>
+		<result column="recordpicurl" property="recordpicurl"/>
+		<result column="sound_mark" property="soundMark"/>
+		<result column="capacityId" property="capacityId"/>
+		<result column="fault_time" property="fault_time"/>
+		<result column="memory_strength" property="memory_strength"/>
+		<result column="student_id" property="student_id"/>
+	</resultMap>
+
+    <select id="getSimpleWhetherFeview" parameterType="map" resultMap="simpleCapacityVoResultMap">
     	SELECT
 			a.student_id,
 			a.unit_id,

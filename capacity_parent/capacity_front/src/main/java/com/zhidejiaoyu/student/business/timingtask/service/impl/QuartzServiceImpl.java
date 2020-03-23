@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.business.timingtask.service.impl;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.mapper.simple.*;
@@ -290,7 +290,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
             return;
         }
         // 班级与学生对应关系
-        List<Student> students = simpleStudentMapper.selectList(new EntityWrapper<Student>().isNotNull("account_time").gt("system_gold", 0));
+        List<Student> students = simpleStudentMapper.selectList(new QueryWrapper<Student>().isNotNull("account_time").gt("system_gold", 0));
 
         // 存放各个班级下所有学生信息
         Map<Long, List<Student>> studentClassMap = new HashMap<>(16);
@@ -473,7 +473,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
         }
 
         log.info("定时将招生账号置为过期状态开始...");
-        List<Student> students = studentMapper.selectList(new EntityWrapper<Student>().eq("role", 4));
+        List<Student> students = studentMapper.selectList(new QueryWrapper<Student>().eq("role", 4));
 
         if (CollectionUtils.isNotEmpty(students)) {
             String accountTime = DateUtil.DateTime();
@@ -803,14 +803,14 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
         gameScoreMapper.deleteByStudentIds(studentIdList);
 
         // 删除字母学习相关记录
-        letterListenMapper.delete(new EntityWrapper<LetterListen>().in("student_id", studentIdList));
-        letterPairMapper.delete(new EntityWrapper<LetterPair>().in("student_id", studentIdList));
-        letterWriteMapper.delete(new EntityWrapper<LetterWrite>().in("student_id", studentIdList));
+        letterListenMapper.delete(new QueryWrapper<LetterListen>().in("student_id", studentIdList));
+        letterPairMapper.delete(new QueryWrapper<LetterPair>().in("student_id", studentIdList));
+        letterWriteMapper.delete(new QueryWrapper<LetterWrite>().in("student_id", studentIdList));
         //清楚学习计划
         studentStudyPlanMapper.deleteByStudentIds(studentIdList);
         capacityStudentUnitMapper.deleteByStudentIds(studentIdList);
         // 删除开启单元的记录
-        openUnitLogMapper.delete(new EntityWrapper<OpenUnitLog>().in("student_id", studentIdList));
+        openUnitLogMapper.delete(new QueryWrapper<OpenUnitLog>().in("student_id", studentIdList));
     }
 
 

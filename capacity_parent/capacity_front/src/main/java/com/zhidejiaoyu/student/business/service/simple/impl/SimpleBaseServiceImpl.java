@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.business.service.simple.impl;
 
-import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleLevelMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleStudentExpansionMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleTeacherMapper;

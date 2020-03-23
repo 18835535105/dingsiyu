@@ -25,7 +25,7 @@ public class BaseController {
     private StudentInfoService studentInfoService;
 
     public Student getStudent(HttpSession session) {
-        return studentInfoService.selectById(this.getStudentId(session));
+        return studentInfoService.getById(this.getStudentId(session));
     }
 
     Long getStudentId(HttpSession session) {

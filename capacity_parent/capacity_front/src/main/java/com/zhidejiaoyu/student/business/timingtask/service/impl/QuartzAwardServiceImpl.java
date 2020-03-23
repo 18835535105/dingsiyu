@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.business.timingtask.service.impl;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.mapper.AwardMapper;
 import com.zhidejiaoyu.common.mapper.CcieMapper;
@@ -78,6 +78,9 @@ public class QuartzAwardServiceImpl implements QuartzAwardService, BaseQuartzSer
         // 各个学生获取的证书个数
         Map<Long, Map<Long, Long>> ccieCount = ccieMapper.countCcieByStudents(students);
         students.forEach(student -> {
+            if (student.getTeacherId() == null) {
+                return;
+            }
             Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
 
             double goldCount = BigDecimalUtil.add(student.getOfflineGold(), student.getSystemGold());
@@ -127,7 +130,7 @@ public class QuartzAwardServiceImpl implements QuartzAwardService, BaseQuartzSer
 
     @Override
     public void initMonsterMedal() {
-        List<Student> students = studentMapper.selectList(new EntityWrapper<Student>().isNotNull("account_time").ne("status", 3));
+        List<Student> students = studentMapper.selectList(new QueryWrapper<Student>().isNotNull("account_time").ne("status", 3));
         Date date = new Date();
         List<Long> parentIds = this.getMedalIds();
         List<Medal> medals = medalMapper.selectByParentIds(parentIds);

@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.mapper.simple;
 
-import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zhidejiaoyu.common.pojo.OperationLog;
 import org.apache.ibatis.annotations.Param;
 

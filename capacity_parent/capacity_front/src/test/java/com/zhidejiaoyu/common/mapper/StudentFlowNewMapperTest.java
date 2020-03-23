@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zhidejiaoyu.BaseTest;
 import com.zhidejiaoyu.common.pojo.StudentFlowNew;
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class StudentFlowNewMapperTest extends BaseTest {
         studentFlowNewMapper.update(StudentFlowNew.builder()
                 .currentFlowId(50L)
                 .updateTime(new Date())
-                .build(), new EntityWrapper<StudentFlowNew>().eq("student_id", 9604)
+                .build(), new QueryWrapper<StudentFlowNew>().eq("student_id", 9604)
                 .eq("unit_id", 11111));
     }
 

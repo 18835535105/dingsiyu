@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.vo.read.StrengthenVo;
 import com.zhidejiaoyu.common.vo.study.MemoryStudyVo;
 import com.zhidejiaoyu.common.pojo.ReadWord;

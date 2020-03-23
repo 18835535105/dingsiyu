@@ -15,14 +15,6 @@
         id,admin_id,student_id,type,create_time
     </sql>
 
-    <select id="selByAdminId" parameterType="map" resultType="map">
-        select hours.type,hours.create_time time,stu.account,stu.student_name name from student_hours hours
-        left join student stu on stu.id=hours.student_id
-        <if test="adminId!=1">
-            where hours.admin_id=#{adminId}
-        </if>
-        order by hours.create_time desc
-    </select>
 
     <select id="selectDeatilsByAdminId" parameterType="map" resultMap="BaseResultMap">
         select

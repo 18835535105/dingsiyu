@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.UnitVocabularyNew;
-import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.vo.beforelearngame.VocabularyVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;

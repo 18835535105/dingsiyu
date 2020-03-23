@@ -56,10 +56,10 @@
 
         <!--mysql-->
         <mysql-connector-java.version>8.0.13</mysql-connector-java.version>
-        <mybatis.version>3.4.6</mybatis.version>
-        <mybatis-plus-boot-starter.version>1.0.5</mybatis-plus-boot-starter.version>
+        <mybatis-plus-boot-starter.version>3.3.1</mybatis-plus-boot-starter.version>
+        <mybatis-spring-boot-starter.version>2.1.2</mybatis-spring-boot-starter.version>
         <velocity-engine-core.version>2.0</velocity-engine-core.version>
-        <pagehelper-spring-boot.version>1.2.5</pagehelper-spring-boot.version>
+        <pagehelper-spring-boot.version>1.2.13</pagehelper-spring-boot.version>
 
         <!--json-->
         <fastjson.version>1.2.66</fastjson.version>
@@ -145,8 +145,23 @@
             </dependency>
 
             <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis-spring-boot-starter.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatisplus-spring-boot-starter</artifactId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus-boot-starter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-core</artifactId>
+                <version>${mybatis-plus-boot-starter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-generator</artifactId>
                 <version>${mybatis-plus-boot-starter.version}</version>
             </dependency>
 

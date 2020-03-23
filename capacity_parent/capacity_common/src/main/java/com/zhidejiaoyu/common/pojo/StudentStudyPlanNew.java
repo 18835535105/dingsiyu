@@ -1,8 +1,10 @@
 package com.zhidejiaoyu.common.pojo;
 
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.enums.IdType;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -38,6 +40,7 @@ public class StudentStudyPlanNew extends Model<StudentStudyPlanNew> {
     /**
      * 分组序号
      */
+    @TableField("`group`")
     private Integer group;
     /**
      * 1：当前计划还没有学习或还没有学习完毕；2：学习完毕

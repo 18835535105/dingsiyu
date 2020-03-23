@@ -1,8 +1,9 @@
 package com.zhidejiaoyu.common.pojo;
 
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.enums.IdType;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -42,6 +43,7 @@ public class DrawRecord extends Model<DrawRecord> {
     /**
      * 抽奖说明
      */
+    @TableField("`explain`")
     private String explain;
 
 

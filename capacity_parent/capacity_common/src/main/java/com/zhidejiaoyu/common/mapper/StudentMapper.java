@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.baomidou.mybatisplus.mapper.BaseMapper;
-import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExample;
 import org.apache.ibatis.annotations.MapKey;
@@ -20,7 +20,7 @@ public interface StudentMapper extends BaseMapper<Student> {
     /**
      * @param example
      * @return
-     * @see com.baomidou.mybatisplus.mapper.BaseMapper#selectList(Wrapper)
+     * @see com.baomidou.mybatisplus.core.mapper.BaseMapper#selectList(Wrapper)
      */
     @Deprecated
     List<Student> selectByExample(StudentExample example);
@@ -28,7 +28,7 @@ public interface StudentMapper extends BaseMapper<Student> {
     /**
      * @param id
      * @return
-     * @see com.baomidou.mybatisplus.mapper.BaseMapper#selectById(Serializable)
+     * @see com.baomidou.mybatisplus.core.mapper.BaseMapper#selectById(Serializable)
      */
     @Deprecated
     Student selectByPrimaryKey(Long id);
@@ -36,7 +36,7 @@ public interface StudentMapper extends BaseMapper<Student> {
     /**
      * @param record
      * @return
-     * @see com.baomidou.mybatisplus.mapper.BaseMapper#updateById(Object)
+     * @see com.baomidou.mybatisplus.core.mapper.BaseMapper#updateById(Object)
      */
     @Deprecated
     int updateByPrimaryKeySelective(Student record);
@@ -44,7 +44,7 @@ public interface StudentMapper extends BaseMapper<Student> {
     /**
      * @param record
      * @return
-     * @see com.baomidou.mybatisplus.mapper.BaseMapper#updateAllColumnById(Object)
+     * @see com.baomidou.mybatisplus.core.mapper.BaseMapper#updateById(Object)
      */
     @Deprecated
     int updateByPrimaryKey(Student record);

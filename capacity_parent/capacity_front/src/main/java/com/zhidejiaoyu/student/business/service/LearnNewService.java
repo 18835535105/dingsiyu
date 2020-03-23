@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.business.service;
 
-import com.baomidou.mybatisplus.service.IService;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.zhidejiaoyu.common.pojo.LearnNew;
 
 import javax.servlet.http.HttpSession;

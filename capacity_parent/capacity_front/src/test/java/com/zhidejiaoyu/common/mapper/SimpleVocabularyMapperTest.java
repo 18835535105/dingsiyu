@@ -2,11 +2,14 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.github.pagehelper.PageHelper;
 import com.zhidejiaoyu.BaseTest;
+import com.zhidejiaoyu.common.mapper.simple.SimpleVocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
+import com.zhidejiaoyu.common.vo.simple.SimpleCapacityVo;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +24,9 @@ public class SimpleVocabularyMapperTest extends BaseTest {
 
     @Autowired
     private VocabularyMapper vocabularyMapper;
+
+    @Resource
+    private SimpleVocabularyMapper simpleVocabularyMapper;
 
     @Test
     public void testSelectWordByCourseId() {
@@ -48,5 +54,11 @@ public class SimpleVocabularyMapperTest extends BaseTest {
     @Test
     public void testSelCountByStudentIdLimitTen() {
         System.out.println(vocabularyMapper.selCountByStudentIdLimitTen(7846L, 1));
+    }
+
+    @Test
+    public void showWordSimple() {
+        SimpleCapacityVo simpleCapacityVo = simpleVocabularyMapper.showWordSimple(15651L, 7846L, 3);
+        log.info(simpleCapacityVo.toString());
     }
  }

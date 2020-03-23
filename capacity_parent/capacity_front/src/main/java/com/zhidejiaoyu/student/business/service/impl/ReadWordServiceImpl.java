@@ -463,18 +463,18 @@ public class ReadWordServiceImpl extends BaseServiceImpl<ReadWordMapper, ReadWor
         readWord.setCreateTime(now);
         readWord.setUpdateTime(now);
         readWord.setErrorCount(1);
-        this.insert(readWord);
+        this.save(readWord);
 
         if (StringUtils.isNotEmpty(PictureUtil.getPictureByUnitId(vocabulary, null))) {
             // 单词有图片才保存
             readWord.setType(2);
-            this.insert(readWord);
+            this.save(readWord);
         }
 
         readWord.setType(3);
-        this.insert(readWord);
+        this.save(readWord);
 
         readWord.setType(4);
-        this.insert(readWord);
+        this.save(readWord);
     }
 }

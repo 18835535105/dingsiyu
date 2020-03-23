@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.student.business.service;
 
 import com.zhidejiaoyu.common.pojo.PhoneticSymbol;
-import com.baomidou.mybatisplus.service.IService;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
 import javax.servlet.http.HttpSession;

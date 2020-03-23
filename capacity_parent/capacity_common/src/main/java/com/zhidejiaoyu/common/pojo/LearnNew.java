@@ -1,8 +1,9 @@
 package com.zhidejiaoyu.common.pojo;
 
-import com.baomidou.mybatisplus.activerecord.Model;
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.enums.IdType;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -38,6 +39,7 @@ public class LearnNew extends Model<LearnNew> {
     /**
      * 分组
      */
+    @TableField("`group`")
     private Integer group;
     /**
      * 难易类型：1:简单类型；2:难类型

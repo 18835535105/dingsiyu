@@ -3,7 +3,7 @@ package com.zhidejiaoyu.student.business.service.impl;
 import com.zhidejiaoyu.common.pojo.LetterVocabulary;
 import com.zhidejiaoyu.common.mapper.LetterVocabularyMapper;
 import com.zhidejiaoyu.student.business.service.LetterVocabularyService;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 /**

@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.common.mapper.simple;
 
-import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.vo.bookVo.BookVo;
 import com.zhidejiaoyu.common.vo.simple.SimpleCapacityVo;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -326,6 +326,7 @@ public interface SimpleVocabularyMapper extends BaseMapper<Vocabulary> {
      *
      * @param unitId
      * @param studentId
+     * @param type
      * @return
      */
     SimpleCapacityVo showWordSimple(@Param("unitId") Long unitId, @Param("studentId") Long studentId, @Param("type") int type);

@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.ExerciseSheetBeforeClass;
-import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

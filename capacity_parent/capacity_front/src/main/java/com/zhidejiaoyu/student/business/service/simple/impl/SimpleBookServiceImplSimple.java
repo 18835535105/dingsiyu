@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.business.service.simple.impl;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -187,7 +187,7 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<SimpleVoc
             learnedCount = learnMapper.countLearnWordByCourse(studentId, courseIds, typeStr);
 
             // 学生当前模块总单词数
-            List<Unit> units = unitMapper.selectList(new EntityWrapper<Unit>().in("course_id", courseIds));
+            List<Unit> units = unitMapper.selectList(new QueryWrapper<Unit>().in("course_id", courseIds));
             List<Long> unitIds = getUnitIdsFromUnits(units);
             total = simpleUnitVocabularyMapper.countWordByUnitIds(unitIds);
 
@@ -239,7 +239,7 @@ public class SimpleBookServiceImplSimple extends SimpleBaseServiceImpl<SimpleVoc
      * @return
      */
     private Long getWordCountInCourse(Long courseId) {
-        List<Unit> units = unitMapper.selectList(new EntityWrapper<Unit>().eq("course_id", courseId));
+        List<Unit> units = unitMapper.selectList(new QueryWrapper<Unit>().eq("course_id", courseId));
         List<Long> unitIds = getUnitIdsFromUnits(units);
         return simpleUnitVocabularyMapper.countWordByUnitIds(unitIds);
     }
