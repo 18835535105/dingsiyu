@@ -129,10 +129,11 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     }
 
     private String getImg(String allImg) {
-        int indexOf = allImg.lastIndexOf("/")+1;
+        int indexOf = allImg.lastIndexOf("/") + 1;
         allImg = allImg.substring(indexOf);
         int indexOf1 = allImg.lastIndexOf(".");
-        allImg = allImg.substring(0,indexOf1);
+        allImg = allImg.substring(0, indexOf1);
+        allImg = allImg.replace("-right", "").replace("-left", "");
         return allImg;
     }
 
