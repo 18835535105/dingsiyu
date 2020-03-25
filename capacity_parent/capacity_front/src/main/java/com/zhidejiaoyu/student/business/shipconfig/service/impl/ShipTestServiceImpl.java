@@ -105,12 +105,15 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      * @return
      */
     private PkInfoVO.Challenged getEquipmentMap(Long studentId) {
+        Student student = studentMapper.selectById(studentId);
         return PkInfoVO.Challenged.builder()
                 .battle(shipIndexService.getStateOfWeek(studentId))
                 .armorEquipment(getEquipmentInformation(studentId, 4))
                 .missileEquipment(getEquipmentInformation(studentId, 3))
                 .shipEquipment(getEquipmentInformation(studentId, 1))
                 .armsEquipment(getEquipmentInformation(studentId, 2))
+                .hardImg(GetOssFile.getPublicObjectUrl(student.getHeadUrl()))
+                .nickName(student.getNickname())
                 .build();
     }
 
@@ -129,10 +132,11 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     }
 
     private String getImg(String allImg) {
-        int indexOf = allImg.lastIndexOf("/")+1;
+        int indexOf = allImg.lastIndexOf("/") + 1;
         allImg = allImg.substring(indexOf);
         int indexOf1 = allImg.lastIndexOf(".");
-        allImg = allImg.substring(0,indexOf1);
+        allImg = allImg.substring(0, indexOf1);
+        allImg = allImg.replace("-right", "").replace("-left", "");
         return allImg;
     }
 

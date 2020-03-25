@@ -101,6 +101,14 @@ public class PkInfoVO implements Serializable {
          * 武器数据
          */
         private EquipmentVo armsEquipment;
+        /**
+         * 学生头像
+         */
+        private String hardImg;
+        /**
+         * 学生昵称
+         */
+        private String nickName;
 
     }
 }
