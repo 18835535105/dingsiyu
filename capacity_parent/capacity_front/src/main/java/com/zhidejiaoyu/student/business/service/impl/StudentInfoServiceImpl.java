@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.session.SessionConstant;
 import com.zhidejiaoyu.common.dto.EndValidTimeDto;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -344,7 +345,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
         Date loginTime = DateUtil.parseYYYYMMDDHHMMSS((Date) session.getAttribute(TimeConstant.LOGIN_TIME));
 
-        Duration duration = packageDuration(dto, student, loginTime);
+        Duration duration = packageDuration(dto, student, loginTime, session);
         try {
             durationMapper.insert(duration);
         } catch (Exception e) {
@@ -422,7 +423,12 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         return 0;
     }
 
-    private Duration packageDuration(EndValidTimeDto dto, Student student, Date loginTime) {
+    private Duration packageDuration(EndValidTimeDto dto, Student student, Date loginTime, HttpSession session) {
+
+        // 区分当前学习是自由学习还是一键学习，如果为空说明是自由学习
+        Object attribute = session.getAttribute(SessionConstant.STUDY_FLAG);
+        int studyFlag = attribute == null ? 2 : Integer.parseInt(attribute.toString());
+
         Duration duration = new Duration();
         duration.setCourseId(dto.getCourseId());
         Integer classify = dto.getClassify();
@@ -433,6 +439,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         duration.setStudentId(student.getId());
         duration.setOnlineTime(dto.getOnlineTime());
         duration.setLoginOutTime(new Date());
+        duration.setLearningModel(studyFlag);
 
         if (classify != null) {
             // 判断是不是单词流程相关的模块

@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.flow.controller;
 
+import com.zhidejiaoyu.common.constant.session.SessionConstant;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
@@ -40,9 +41,11 @@ public class StudyFlowController {
         dto.setTrueFlow(isTrueFlow);
         if (Objects.equals(dto.getType(), 1)) {
             // 一键排课流程
+            session.setAttribute(SessionConstant.STUDY_FLAG, 1);
             return flowService.getNode(dto, isTrueFlow, session);
         }
         // 自由学习流程
+        session.setAttribute(SessionConstant.STUDY_FLAG, 2);
         return freeFlowService.getNode(dto, isTrueFlow, session);
     }
 }
