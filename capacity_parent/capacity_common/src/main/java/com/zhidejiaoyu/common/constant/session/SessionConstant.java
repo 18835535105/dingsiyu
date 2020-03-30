@@ -23,4 +23,13 @@ public interface SessionConstant {
      */
     String FREE_GROUP = "FREE_GROUP";
 
+    /**
+     * 自由学习和一键学习标识
+     * <ul>
+     * <li>1:一键学习</li>
+     * <li>2:自由学习</li>
+     * </ul>
+     */
+    String STUDY_FLAG = "STUDY_FLAG";
+
 }

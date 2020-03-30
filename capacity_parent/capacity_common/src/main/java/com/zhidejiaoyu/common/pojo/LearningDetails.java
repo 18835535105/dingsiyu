@@ -64,7 +64,7 @@ public class LearningDetails implements Serializable {
     /**
      * 学习模块在线时常
      */
-    private Long onlionTime;
+    private Long onlineTime;
 
     /**
      * 有效时常
@@ -72,7 +72,7 @@ public class LearningDetails implements Serializable {
     private Long validTime;
 
     /**
-     * 1,自由学习 2,一键学习
+     * 1，一键学习，2， 自由学习
      */
     private Integer learningModel;
 

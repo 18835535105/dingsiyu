@@ -69,7 +69,7 @@ public class Duration extends Model<Duration> {
      */
     private Integer studyPlanId;
     /**
-     * 学习模式 1，自由学习 2，一键学习
+     * 学习模式 1，一键学习，2， 自由学习
      */
     private Integer learningModel;
 
