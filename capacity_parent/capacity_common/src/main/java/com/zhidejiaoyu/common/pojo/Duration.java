@@ -68,6 +68,10 @@ public class Duration extends Model<Duration> {
      * 学习计划 id，用于区分当前时长信息是属于哪个学习计划的
      */
     private Integer studyPlanId;
+    /**
+     * 学习模式 1，自由学习 2，一键学习
+     */
+    private Integer learningModel;
 
     @Override
     protected Serializable pkVal() {

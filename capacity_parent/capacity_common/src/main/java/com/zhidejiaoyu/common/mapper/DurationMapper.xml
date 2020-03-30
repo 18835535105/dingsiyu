@@ -13,6 +13,7 @@
         <result column="study_model" property="studyModel" jdbcType="INTEGER"/>
         <result column="study_count" property="studyCount"/>
         <result column="study_plan_id" property="studyPlanId"/>
+        <result column="learning_model" property="learningModel"/>
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
