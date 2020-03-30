@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.PunchRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.PunchRecord">
+        <id column="id" property="id" />
+        <result column="student_id" property="studentId" />
+        <result column="card_time" property="cardTime" />
+        <result column="point" property="point" />
+        <result column="oiling" property="oiling" />
+        <result column="creat_time" property="creatTime" />
+    </resultMap>
+
+    <sql id="base_sql">
+        id,student_id,card_time,point,oiling,creat_time
+    </sql>
+
+</mapper>

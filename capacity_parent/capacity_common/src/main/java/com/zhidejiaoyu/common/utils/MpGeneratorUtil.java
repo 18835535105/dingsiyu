@@ -24,7 +24,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"pk_copy_base","pk_copy_state"};
+        String[] tableName = {"student_daily_learning","learning_details","gold_record","punch_record"};
 
         /*
          * 配置：

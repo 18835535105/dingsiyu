@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.LearningDetailsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.LearningDetails">
+        <id column="id" property="id" />
+        <result column="student_id" property="studentId" />
+        <result column="course_id" property="courseId" />
+        <result column="unit_id" property="unitId" />
+        <result column="course_name" property="courseName" />
+        <result column="unit_name" property="unitName" />
+        <result column="type" property="type" />
+        <result column="group" property="group" />
+        <result column="onlion_time" property="onlionTime" />
+        <result column="valid_time" property="validTime" />
+        <result column="learning_model" property="learningModel" />
+        <result column="study_time" property="studyTime" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <sql id="base_sql">
+        id,student_id,course_id,unit_id,course_name,unit_name,`type`,`group`,onlion_time,valid_time,learning_model,study_time,create_time
+    </sql>
+
+</mapper>

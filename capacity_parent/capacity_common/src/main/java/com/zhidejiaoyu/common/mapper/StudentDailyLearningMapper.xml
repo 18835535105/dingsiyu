@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.StudentDailyLearningMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.StudentDailyLearning">
+        <id column="id" property="id" />
+        <result column="student_id" property="studentId" />
+        <result column="valid_time" property="validTime" />
+        <result column="gold_add" property="goldAdd" />
+        <result column="gold_consumption" property="goldConsumption" />
+        <result column="clock_in" property="clockIn" />
+        <result column="oiling" property="oiling" />
+        <result column="study_time" property="studyTime" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <sql id="base_sql">
+        id,student_id,valid_time,gold_add,gold_consumption,creat_time,oiling,study_time
+    </sql>
+
+</mapper>
