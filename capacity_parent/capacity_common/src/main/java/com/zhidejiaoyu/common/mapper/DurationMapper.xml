@@ -529,4 +529,28 @@
          group by TO_DAYS(login_time)
     </select>
 
+    <select id="selectValidTimeByStudentIds" resultType="map" parameterType="map">
+        SELECT valid_time validTime,student_id studentId
+        FROM duration
+        WHERE
+        studentId in (
+        <foreach collection="studentIds" separator="," item="studentId">
+            #{studentId}
+        </foreach>
+        )
+        and to_days(login_time)=to_days(#{date})
+        GROUP BY student_id;
+    </select>
+
+    <select id="selectLoginTimeByStudentIdAndDate" resultType="map" parameterType="map">
+        select
+        login_time
+        from duration
+        where student_id =#{studentId}
+        and to_days(login_time)=to_days(#{date})
+        order by login_time
+        limit 1
+    </select>
+
+
 </mapper>

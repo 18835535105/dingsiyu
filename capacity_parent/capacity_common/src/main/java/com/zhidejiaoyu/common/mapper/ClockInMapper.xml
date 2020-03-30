@@ -35,5 +35,14 @@
         where student_id = #{studentId}
           and card_time = #{date}
     </select>
+    <select id="selectByStudentIds" parameterType="map" resultType="map">
+        select student_id studentId
+        from clock_in
+        where student_id in (
+        <foreach collection="studentIds" separator="," item="studentId">
+            #{studentId}
+        </foreach>
+        )
+    </select>
 
 </mapper>

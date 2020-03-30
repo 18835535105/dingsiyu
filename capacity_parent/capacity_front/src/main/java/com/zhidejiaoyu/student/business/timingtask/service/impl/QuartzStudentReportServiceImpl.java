@@ -2,6 +2,8 @@ package com.zhidejiaoyu.student.business.timingtask.service.impl;
 
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.zhidejiaoyu.aliyunoss.putObject.OssUpload;
+import com.zhidejiaoyu.common.constant.test.GenreConstant;
+import com.zhidejiaoyu.common.pojo.StudentDailyLearning;
 import com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolDetail;
 import com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolSummary;
 import com.zhidejiaoyu.common.constant.FileConstant;
@@ -34,6 +36,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,7 +72,15 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
     @Resource
     private ReceiveEmailMapper receiveEmailMapper;
 
-//    @Scheduled(cron = "0 0 1 * * ?")
+    @Resource
+    private TestRecordMapper testRecordMapper;
+
+    @Resource
+    private StudentDailyLearningMapper studentDailyLearningMapper;
+    @Resource
+    private ClockInMapper clockInMapper;
+
+    //    @Scheduled(cron = "0 0 1 * * ?")
     @Override
     public void exportStudentWithSchool() {
         if (checkPort(port)) {
@@ -149,6 +160,49 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
         this.sendEmail(fileName);
 
         log.info("定时任务 -> 统计各校区学生充课信息完成。");
+    }
+
+    @Override
+    public void getStudentDailyLearning() {
+        Date beforeDaysDate = DateUtil.getBeforeDaysDate(new Date(), 1);
+        //获取昨日登入的学生
+        List<Long> studentIds = runLogMapper.selectLoginStudentId(beforeDaysDate);
+        if (studentIds != null && studentIds.size() > 0) {
+            //获取学生今日学习时常
+            Map<String, Map<String, Object>> studentLoginMap = durationMapper.selectValidTimeByStudentIds(studentIds, beforeDaysDate);
+            Map<Long, Map<String, Object>> longMapMap = clockInMapper.selectByStudentIds(studentIds, beforeDaysDate);
+            studentIds.forEach(studentId -> {
+                StudentDailyLearning studentDailyLearning = new StudentDailyLearning();
+                studentDailyLearning.setStudentId(studentId);
+                //创建时间
+                studentDailyLearning.setCreateTime(LocalDateTime.now());
+                //获取学生登入时间
+                Date date = durationMapper.selectLoginTimeByStudentIdAndDate(studentId, beforeDaysDate);
+                //获取学习时间
+                studentDailyLearning.setStudyTime(DateUtil.getLocalDateTime(date));
+                //获取金币数据
+                studentDailyLearning.setGoldAdd(getGoldAdd(studentId, beforeDaysDate, 4));
+                studentDailyLearning.setGoldConsumption(getGoldAdd(studentId, beforeDaysDate, 5));
+                //获取学习有效时常
+                studentDailyLearning.setValidTime(
+                        Integer.parseInt(studentLoginMap.get(studentId).get("validTime").toString()));
+                Map<String, Object> map = longMapMap.get(studentId);
+                studentDailyLearning.setClockIn(map != null && map.size() > 0 ? 1 : 2);
+                studentDailyLearningMapper.insert(studentDailyLearning);
+
+            });
+        }
+    }
+
+    private Integer getGoldAdd(Long studentId, Date date, int type) {
+        Integer gold = 0;
+        List<String> goldMap = runLogMapper.selectGoldByStudentIdAndDate(studentId, date, type);
+        for (String goldStr : goldMap) {
+            int indexOf = goldStr.indexOf("#");
+            int lastIndexOf = goldStr.lastIndexOf("#");
+            gold += Integer.parseInt(goldStr.substring(indexOf + 1, lastIndexOf));
+        }
+        return gold;
     }
 
     private ExcelWriterFactory getSizePayCardModel(Date time, Long adminId, String fileName) {

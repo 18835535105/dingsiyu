@@ -229,4 +229,9 @@ public interface DurationMapper extends BaseMapper<Duration> {
     Double selectLastStudyEfficiency(@Param("studentId") Long studentId);
 
     List<Integer> selectDayTimeByStudentId(@Param("studentId") long studentId);
+
+    @MapKey("studentId")
+    Map<String,Map<String,Object>> selectValidTimeByStudentIds(@Param("studentIds") List<Long> studentIds,@Param("date") Date date);
+
+    Date selectLoginTimeByStudentIdAndDate(@Param("studentId") Long studentId,@Param("date") Date date);
 }

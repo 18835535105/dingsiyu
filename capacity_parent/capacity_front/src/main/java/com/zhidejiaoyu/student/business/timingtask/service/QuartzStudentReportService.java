@@ -23,4 +23,11 @@ public interface QuartzStudentReportService {
      * @return
      */
     void exportStudentPay();
+    /**
+     * 获取学生每日摘要
+     */
+    void getStudentDailyLearning();
+
+
+
 }

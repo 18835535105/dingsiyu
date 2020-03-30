@@ -2,9 +2,12 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.ClockIn;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -41,4 +44,8 @@ public interface ClockInMapper extends BaseMapper<ClockIn> {
      * @return
      */
     int countByStudentIdAndCardTime(@Param("studentId") Long studentId, @Param("date") String date);
+
+
+    @MapKey("studentIds")
+    Map<Long, Map<String,Object>> selectByStudentIds(@Param("studentIds") List<Long> studentIds, @Param("date") Date date);
 }

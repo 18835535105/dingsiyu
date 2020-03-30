@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -123,4 +124,15 @@ public interface RunLogMapper extends BaseMapper<RunLog> {
     List<StudentInfoSchoolSummary> selectStudentInfoSchoolSummary(@Param("date") String date);
 
     void deleteByStudentIds(@Param("studentIds") List<Long> studentIdList);
+
+    /**
+     * 获取指定日期登入的学生id
+     * @param day    日期
+     */
+    List<Long> selectLoginStudentId(@Param("day") Date day);
+
+
+    List<String> selectGoldByStudentIdAndDate(@Param("studentId") Long studentId,@Param("date") Date date,@Param("type")int type);
+
+
 }

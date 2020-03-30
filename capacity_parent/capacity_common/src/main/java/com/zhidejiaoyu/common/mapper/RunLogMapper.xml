@@ -411,4 +411,19 @@
         </foreach>
         )
     </delete>
+
+    <select id="selectLoginStudentId" resultType="long" parameterType="map">
+        select operate_user_id from run_log where to_days(create_time)=to_days(#{day})
+    </select>
+
+    <select id="selectGoldByStudentIdAndDate" parameterType="map" resultMap="BaseResultMap">
+        select
+        log_content
+        from run_log
+        where
+        operate_user_id=#{studentId}
+        and `type`=#{type}
+        and to_days(create_time)=to_days(#{date})
+    </select>
+
 </mapper>

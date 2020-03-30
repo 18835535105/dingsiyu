@@ -960,4 +960,14 @@
         from test_record
         where student_id = #{studentId}
     </select>
+    <select id="selectByStudentIdsAndGenreAndDate" parameterType="map" resultType="map">
+        select student_id studentId,point point,create_time creatTime from test_record
+        where student_id in (
+        <foreach collection="studentIds" item="studentId" separator=",">
+            #{studentId}
+        </foreach>
+        )
+        and genre=#{genre}
+        and to_days(create_time)=to_days(#{date})
+    </select>
 </mapper>

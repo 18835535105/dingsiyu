@@ -492,6 +492,12 @@ public class DateUtil implements Serializable {
         return cal.get(Calendar.MONTH) + 1;
     }
 
+    public static LocalDateTime getLocalDateTime(Date date){
+        Instant instant = date.toInstant();
+        ZoneId zoneId = ZoneId.systemDefault();
+        return  instant.atZone(zoneId).toLocalDateTime();
+    }
+
     private DateUtil() {
     }
 
