@@ -168,8 +168,6 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
         for (RunLog runLog : runLogs) {
             String logContent = runLog.getLogContent();
             if (Objects.equals(runLog.getType(), 4)) {
-
-
                 int gold = getGold(logContent);
 
                 String reason = "";
@@ -207,7 +205,7 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
                     reason = "在校区副本挑战";
                 }
 
-                goldLogMapper.insert(GoldLog.builder()
+                GoldLog goldLog = GoldLog.builder()
                         .type(1)
                         .createTime(runLog.getCreateTime())
                         .goldAdd(gold)
@@ -216,7 +214,9 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
                         .operatorId(Integer.parseInt(runLog.getOperateUserId().toString()))
                         .readFlag(2)
                         .studentId(runLog.getOperateUserId())
-                        .build());
+                        .build();
+                log.info(goldLog.toString());
+                goldLogMapper.insert(goldLog);
 
             } else if (Objects.equals(runLog.getType(), 5)) {
                 String reason = "";
@@ -227,7 +227,7 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
                 }
 
                 int gold = getGold(logContent);
-                goldLogMapper.insert(GoldLog.builder()
+                GoldLog goldLog = GoldLog.builder()
                         .type(1)
                         .createTime(runLog.getCreateTime())
                         .goldAdd(0)
@@ -236,7 +236,9 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
                         .operatorId(Integer.parseInt(runLog.getOperateUserId().toString()))
                         .readFlag(2)
                         .studentId(runLog.getOperateUserId())
-                        .build());
+                        .build();
+                log.info(goldLog.toString());
+                goldLogMapper.insert(goldLog);
             }
         }
     }
