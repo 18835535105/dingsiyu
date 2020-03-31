@@ -3,7 +3,10 @@ package com.zhidejiaoyu.student.business.timingtask.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.pojo.GoldLog;
+import com.zhidejiaoyu.common.pojo.PunchRecord;
+import com.zhidejiaoyu.common.pojo.RunLog;
+import com.zhidejiaoyu.common.pojo.StudentDailyLearning;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzStudyCalendarService;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author: wuchenxi
@@ -60,7 +61,6 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
         log.info("初始化学习日历开始....");
         this.initStudentDailyLearning();
         this.initLearningDetails();
-        this.initGoldRecord();
         this.initPunchRecord();
         log.info("初始化学习日历结束！");
     }
