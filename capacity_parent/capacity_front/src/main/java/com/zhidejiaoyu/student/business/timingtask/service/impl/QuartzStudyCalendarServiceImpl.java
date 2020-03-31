@@ -91,8 +91,10 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
                 if (date != null) {
                     studentDailyLearning.setStudyTime(DateUtil.getLocalDateTime(date));
                     //获取金币数据
-                    studentDailyLearning.setGoldAdd(goldLogMapper.selectGoldByStudentIdAndDate(studentId, date, 1));
-                    studentDailyLearning.setGoldConsumption(goldLogMapper.selectGoldByStudentIdAndDate(studentId, date, 2));
+                    Integer goldAdd = goldLogMapper.selectGoldByStudentIdAndDate(studentId, date, 1);
+                    Integer consumption = goldLogMapper.selectGoldByStudentIdAndDate(studentId, date, 2);
+                    studentDailyLearning.setGoldAdd(goldAdd == null ? 0 : goldAdd);
+                    studentDailyLearning.setGoldConsumption(consumption == null ? 0 : consumption);
                     //获取学习有效时常
                     Map<String, Object> validTime = studentLoginMap.get(studentId);
                     studentDailyLearning.setValidTime(validTime != null ?
