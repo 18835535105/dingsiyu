@@ -46,5 +46,7 @@ public class RankVO implements Serializable {
          * 源分战力值
          */
         private Integer sourcePower;
+
+        private String headUrl;
     }
 }

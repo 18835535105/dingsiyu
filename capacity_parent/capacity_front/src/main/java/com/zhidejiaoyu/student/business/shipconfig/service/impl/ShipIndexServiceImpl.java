@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.shipconfig.service.impl;
 
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.common.constant.PetImageConstant;
 import com.zhidejiaoyu.common.constant.redis.SourcePowerKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -305,6 +306,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
             return RankVO.RankInfo.builder()
                     .nickName(map == null || map.get("nickName") == null ? "默认姓名" : String.valueOf(map.get("nickName")))
                     .sourcePower(map == null || map.get("sourcePower") == null ? 0 : (int) map.get("sourcePower"))
+                    .headUrl(map == null || map.get("headUrl") == null ? PetImageConstant.DEFAULT_IMG : map.get("headUrl").toString())
                     .studentId(id)
                     .build();
         }).collect(Collectors.toList());
