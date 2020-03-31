@@ -306,7 +306,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
             return RankVO.RankInfo.builder()
                     .nickName(map == null || map.get("nickName") == null ? "默认姓名" : String.valueOf(map.get("nickName")))
                     .sourcePower(map == null || map.get("sourcePower") == null ? 0 : (int) map.get("sourcePower"))
-                    .headUrl(map == null || map.get("headUrl") == null ? PetImageConstant.DEFAULT_IMG : map.get("headUrl").toString())
+                    .headUrl(map == null || map.get("partUrl") == null ? PetImageConstant.DEFAULT_IMG : map.get("partUrl").toString())
                     .studentId(id)
                     .build();
         }).collect(Collectors.toList());
