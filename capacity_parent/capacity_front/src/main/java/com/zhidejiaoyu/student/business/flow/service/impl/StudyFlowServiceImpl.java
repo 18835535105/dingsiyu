@@ -131,6 +131,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             dto.setGroup(1);
         }
         dto.setStudyFlowNew(studyFlowNew);
+        session.setAttribute(SessionConstant.STUDY_GROUP, dto.getGroup());
         dto.setSession(session);
 
         // 判断单词游戏

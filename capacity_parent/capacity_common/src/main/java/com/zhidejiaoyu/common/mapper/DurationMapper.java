@@ -19,18 +19,6 @@ import java.util.Map;
 @Repository
 public interface DurationMapper extends BaseMapper<Duration> {
 
-    int deleteByExample(DurationExample example);
-
-    int deleteByPrimaryKey(Long id);
-
-    int insertSelective(Duration record);
-
-    int updateByExample(@Param("record") Duration record, @Param("example") DurationExample example);
-
-    int updateByPrimaryKeySelective(Duration record);
-
-    int updateByPrimaryKey(Duration record);
-
     /**
      * 根据学生id删除
      *

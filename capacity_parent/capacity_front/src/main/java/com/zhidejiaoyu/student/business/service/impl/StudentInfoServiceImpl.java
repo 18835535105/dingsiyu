@@ -439,6 +439,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         duration.setOnlineTime(dto.getOnlineTime());
         duration.setLoginOutTime(new Date());
         duration.setLearningModel(studyFlag);
+        duration.setGroup((Integer) session.getAttribute(SessionConstant.STUDY_GROUP));
+
+        session.removeAttribute(SessionConstant.STUDY_GROUP);
 
         if (classify != null) {
             // 判断是不是单词流程相关的模块
@@ -704,13 +707,13 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             // 如果时长表有本次登录的当前模块时长信息,更新；否则新增时长记录
             if (durations.size() > 0) {
                 value.setId(durations.get(0).getId());
-                durationMapper.updateByPrimaryKeySelective(value);
+                durationMapper.updateById(value);
             } else {
                 value.setId(null);
                 value.setLoginOutTime(DateUtil.parseYYYYMMDDHHMMSS(new Date()));
                 try {
                     value.setId(null);
-                    durationMapper.insertSelective(value);
+                    durationMapper.insert(value);
                 } catch (Exception e) {
                     log.error("保存时长信息出错，当前 key->value => {} -> {}", key, value, e);
                 }

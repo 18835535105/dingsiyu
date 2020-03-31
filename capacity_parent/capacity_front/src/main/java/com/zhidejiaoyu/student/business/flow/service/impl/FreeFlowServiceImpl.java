@@ -150,6 +150,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         dto.setSession(session);
         dto.setStudent(student);
 
+        session.setAttribute(SessionConstant.STUDY_GROUP, dto.getGroup());
         if (studyFlowNew == null) {
             return null;
         }
