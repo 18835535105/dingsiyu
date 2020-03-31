@@ -143,4 +143,6 @@ public interface RunLogMapper extends BaseMapper<RunLog> {
      * @return
      */
     List<RunLog> selectByDateAndType(@Param("date") Date beforeDaysDate, @Param("type") int type);
+
+    Date selectLoginTimeByStudentIdAndDate(@Param("studentId") Long studentId,@Param("date") Date beforeDaysDate);
 }

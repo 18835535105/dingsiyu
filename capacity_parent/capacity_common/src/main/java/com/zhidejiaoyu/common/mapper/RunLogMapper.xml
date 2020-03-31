@@ -433,8 +433,17 @@
         select
         <include refid="Base_Column_List"></include>
         from run_log
-        where and `type`=#{type}
+        where  `type`=#{type}
         and to_days(create_time)=to_days(#{date})
+    </select>
+    <select id="selectLoginTimeByStudentIdAndDate" parameterType="map" resultType="date">
+        select
+        create_time
+        from run_log
+        where  `type`= 1
+        and to_days(create_time)=to_days(#{date})
+        and operate_user_id=#{studentId}
+        limit 1
     </select>
 
 </mapper>

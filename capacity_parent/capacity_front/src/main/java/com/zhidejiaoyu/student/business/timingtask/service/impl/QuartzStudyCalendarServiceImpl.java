@@ -86,26 +86,31 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
                 //创建时间
                 studentDailyLearning.setCreateTime(LocalDateTime.now());
                 //获取学生登入时间
-                Date date = durationMapper.selectLoginTimeByStudentIdAndDate(studentId, beforeDaysDate);
+                Date date = runLogMapper.selectLoginTimeByStudentIdAndDate(studentId, beforeDaysDate);
                 //获取学习时间
-                studentDailyLearning.setStudyTime(DateUtil.getLocalDateTime(date));
-                //获取金币数据
-                studentDailyLearning.setGoldAdd(goldLogMapper.selectGoldByStudentIdAndDate(studentId, date, 1));
-                studentDailyLearning.setGoldConsumption(goldLogMapper.selectGoldByStudentIdAndDate(studentId, date, 2));
-                //获取学习有效时常
-                studentDailyLearning.setValidTime(
-                        Integer.parseInt(studentLoginMap.get(studentId).get("validTime").toString()));
-                Map<String, Object> map = longMapMap.get(studentId);
-                studentDailyLearning.setClockIn(map != null && map.size() > 0 ? 1 : 2);
-                Map<String, Object> map1 = longMapMap1.get(studentId);
-                if (map1 != null) {
-                    Object count = map1.get("count");
-                    studentDailyLearning.setOiling(count != null ? Integer.parseInt(count.toString()) : 0);
-                } else {
-                    studentDailyLearning.setOiling(0);
+                if (date != null) {
+                    studentDailyLearning.setStudyTime(DateUtil.getLocalDateTime(date));
+                    //获取金币数据
+                    Integer goldAdd = goldLogMapper.selectGoldByStudentIdAndDate(studentId, date, 1);
+                    Integer consumption = goldLogMapper.selectGoldByStudentIdAndDate(studentId, date, 2);
+                    studentDailyLearning.setGoldAdd(goldAdd == null ? 0 : goldAdd);
+                    studentDailyLearning.setGoldConsumption(consumption == null ? 0 : consumption);
+                    //获取学习有效时常
+                    Map<String, Object> validTime = studentLoginMap.get(studentId);
+                    studentDailyLearning.setValidTime(validTime != null ?
+                            Integer.parseInt(validTime.get("validTime").toString()) : 0);
+                    Map<String, Object> map = longMapMap.get(studentId);
+                    studentDailyLearning.setClockIn(map != null && map.size() > 0 ? 1 : 2);
+                    Map<String, Object> map1 = longMapMap1.get(studentId);
+                    if (map1 != null) {
+                        Object count = map1.get("count");
+                        studentDailyLearning.setOiling(count != null ? Integer.parseInt(count.toString()) : 0);
+                    } else {
+                        studentDailyLearning.setOiling(0);
+                    }
+                    studentDailyLearningMapper.insert(studentDailyLearning);
                 }
 
-                studentDailyLearningMapper.insert(studentDailyLearning);
             });
         }
         log.info("定时任务 -> 统计学生详情结束。");
@@ -124,7 +129,7 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
 
     @Override
     public void getStudentDailyLearning() {
-        Date date = DateUtil.parseYYYYMMDDHHMMSS("2018-10-15 10:15:58");
+        Date date = DateUtil.parseYYYYMMDDHHMMSS("2020-02-18 10:15:58");
         while (date.getTime() <= System.currentTimeMillis()) {
             getStudentDily(date);
             getPushRecord(date);
@@ -154,7 +159,12 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
                     punchRecord.setOiling(0);
                 }
                 punchRecord.setCreatTime(LocalDateTime.now());
-                punchRecord.setPoint(Integer.parseInt(map.get("count").toString()));
+                if (map != null) {
+                    punchRecord.setPoint(map.get("count") != null ? Integer.parseInt(map.get("count").toString()) : 0);
+                } else {
+                    punchRecord.setPoint(0);
+                }
+
                 punchRecordMapper.insert(punchRecord);
             });
         }
