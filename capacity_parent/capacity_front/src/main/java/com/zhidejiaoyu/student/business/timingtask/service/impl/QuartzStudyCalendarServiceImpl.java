@@ -258,10 +258,15 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
         if (logContent.contains("#0.0#")) {
             return 0;
         }
-        return Integer.parseInt(logContent.split("#")[1]);
+        String s = logContent.split("#")[1];
+        return Integer.parseInt(s.contains(".") ? s.split("\\.")[0] : s);
     }
 
     public static void main(String[] args) {
-        System.out.println("抽奖获得金币#5#".split("#")[1]);
+//        System.out.println("抽奖获得金币#5#".split("#")[1]);
+//        System.out.println(Integer.parseInt("5.0"));
+        String s = "5.0";
+        System.out.println(Arrays.toString(s.split("\\.")));
+        System.out.println(Integer.parseInt(s.contains(".") ? s.split("\\.")[0] : s));
     }
 }
