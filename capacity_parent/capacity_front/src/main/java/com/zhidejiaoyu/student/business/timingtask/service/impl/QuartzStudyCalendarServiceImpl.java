@@ -127,17 +127,6 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
         getPushRecord(beforeDaysDate);
     }
 
-    @Override
-    public void getStudentDailyLearning() {
-        Date date = DateUtil.parseYYYYMMDDHHMMSS("2020-02-18 10:15:58");
-        while (date.getTime() <= System.currentTimeMillis()) {
-            getStudentDily(date);
-            getPushRecord(date);
-            date = DateUtil.getLastDaysDate(date, 1);
-        }
-
-    }
-
     private void getPushRecord(Date beforeDaysDate) {
         log.info("定时任务 -> 统计学生点赞数量开始。");
         //统计签到学生

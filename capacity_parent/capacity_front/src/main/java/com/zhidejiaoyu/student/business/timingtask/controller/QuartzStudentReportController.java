@@ -41,9 +41,4 @@ public class QuartzStudentReportController {
         quartzStudentReportService.exportStudentPay();
     }
 
-    @RequestMapping("getStudentDailyLearning")
-    public void getStudentDailyLearning(){
-        quartzStudyCalendarService.getStudentDailyLearning();
-    }
-
 }

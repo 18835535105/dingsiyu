@@ -23,7 +23,6 @@ public interface QuartzStudyCalendarService extends BaseQuartzService {
      */
     void initPunchRecord();
 
-    void getStudentDailyLearning();
 
     /**
      * 将runLog中的金币记录迁移到GoldLog中
