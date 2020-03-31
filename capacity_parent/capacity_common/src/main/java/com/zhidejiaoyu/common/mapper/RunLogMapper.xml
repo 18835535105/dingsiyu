@@ -4,8 +4,8 @@
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.RunLog">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="operate_user_id" property="operateUserId" jdbcType="BIGINT"/>
-        <result column="course_id" property="courseId" jdbcType="BIGINT" />
-        <result column="unit_id" property="unitId" jdbcType="BIGINT" />
+        <result column="course_id" property="courseId" jdbcType="BIGINT"/>
+        <result column="unit_id" property="unitId" jdbcType="BIGINT"/>
         <result column="type" property="type" jdbcType="INTEGER"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="log_content" property="logContent"/>
@@ -128,51 +128,51 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </delete>
-    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.RunLog" >
+    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.RunLog">
         insert into run_log
-        <trim prefix="(" suffix=")" suffixOverrides="," >
-            <if test="id != null" >
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
                 id,
             </if>
-            <if test="operateUserId != null" >
+            <if test="operateUserId != null">
                 operate_user_id,
             </if>
-            <if test="courseId != null" >
+            <if test="courseId != null">
                 course_id,
             </if>
-            <if test="unitId != null" >
+            <if test="unitId != null">
                 unit_id,
             </if>
-            <if test="type != null" >
+            <if test="type != null">
                 type,
             </if>
-            <if test="createTime != null" >
+            <if test="createTime != null">
                 create_time,
             </if>
-            <if test="logContent != null" >
+            <if test="logContent != null">
                 log_content,
             </if>
         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides="," >
-            <if test="id != null" >
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
                 #{id,jdbcType=BIGINT},
             </if>
-            <if test="operateUserId != null" >
+            <if test="operateUserId != null">
                 #{operateUserId,jdbcType=BIGINT},
             </if>
-            <if test="courseId != null" >
+            <if test="courseId != null">
                 #{courseId,jdbcType=BIGINT},
             </if>
-            <if test="unitId != null" >
+            <if test="unitId != null">
                 #{unitId,jdbcType=BIGINT},
             </if>
-            <if test="type != null" >
+            <if test="type != null">
                 #{type,jdbcType=INTEGER},
             </if>
-            <if test="createTime != null" >
+            <if test="createTime != null">
                 #{createTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="logContent != null" >
+            <if test="logContent != null">
                 #{logContent,jdbcType=LONGVARCHAR},
             </if>
         </trim>
@@ -238,23 +238,25 @@
         select count(id) FROM run_log where type = 7 and operate_user_id = #{studentId}
     </select>
     <select id="getGoldByStudentId" resultType="java.util.Map" parameterType="map">
-        select operate_user_id AS studentId, SUM(substring_index(t.s,'#',1)) AS jb from (SELECT operate_user_id, substring_index(log_content, '#', -2) s, create_time from run_log where type = 4 and log_content like '%#%' AND create_time >= #{data}) t
-          JOIN student s ON t.operate_user_id = s.id
-            <where>
-                <if test="model == '2' or model == '1'">
-                    AND s.province = #{student.province}
-                    AND s.area = #{student.area}
-                    AND s.city = #{student.city}
-                    AND s.school_name = #{student.schoolName}
+        select operate_user_id AS studentId, SUM(substring_index(t.s,'#',1)) AS jb from (SELECT operate_user_id,
+        substring_index(log_content, '#', -2) s, create_time from run_log where type = 4 and log_content like '%#%' AND
+        create_time >= #{data}) t
+        JOIN student s ON t.operate_user_id = s.id
+        <where>
+            <if test="model == '2' or model == '1'">
+                AND s.province = #{student.province}
+                AND s.area = #{student.area}
+                AND s.city = #{student.city}
+                AND s.school_name = #{student.schoolName}
+            </if>
+            <if test="model == '1'">
+                AND s.grade = #{student.grade}
+                <if test="student.squad != '' and student.squad != null ">
+                    AND s.squad = #{student.squad}
                 </if>
-                <if test="model == '1'">
-                    AND s.grade = #{student.grade}
-                    <if test="student.squad != '' and student.squad != null ">
-                        AND s.squad = #{student.squad}
-                    </if>
-                </if>
-            </where>
-          GROUP BY studentId ORDER BY jb desc
+            </if>
+        </where>
+        GROUP BY studentId ORDER BY jb desc
     </select>
 
     <select id="getAllQueryType" resultType="java.lang.Integer" parameterType="map">
@@ -288,7 +290,8 @@
     </select>
 
     <select id="selectStudentInfoSchoolSummary"
-            resultType="com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolSummary" parameterType="map">
+            resultType="com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolSummary"
+            parameterType="map">
         SELECT t.school                                schoolName,
                count(DISTINCT s.id)                    studentCount,
                date_format(rl.create_time, '%Y-%m-%d') time
@@ -305,36 +308,36 @@
         GROUP BY t.school
     </select>
 
-    <update id="updateByExampleSelective" parameterType="map" >
+    <update id="updateByExampleSelective" parameterType="map">
         update run_log
-        <set >
-            <if test="record.id != null" >
+        <set>
+            <if test="record.id != null">
                 id = #{record.id,jdbcType=BIGINT},
             </if>
-            <if test="record.operateUserId != null" >
+            <if test="record.operateUserId != null">
                 operate_user_id = #{record.operateUserId,jdbcType=BIGINT},
             </if>
-            <if test="record.courseId != null" >
+            <if test="record.courseId != null">
                 course_id = #{record.courseId,jdbcType=BIGINT},
             </if>
-            <if test="record.unitId != null" >
+            <if test="record.unitId != null">
                 unit_id = #{record.unitId,jdbcType=BIGINT},
             </if>
-            <if test="record.type != null" >
+            <if test="record.type != null">
                 type = #{record.type,jdbcType=INTEGER},
             </if>
-            <if test="record.createTime != null" >
+            <if test="record.createTime != null">
                 create_time = #{record.createTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="record.logContent != null" >
+            <if test="record.logContent != null">
                 log_content = #{record.logContent,jdbcType=LONGVARCHAR},
             </if>
         </set>
-        <if test="_parameter != null" >
-            <include refid="Update_By_Example_Where_Clause" />
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
         </if>
     </update>
-    <update id="updateByExampleWithBLOBs" parameterType="map" >
+    <update id="updateByExampleWithBLOBs" parameterType="map">
         update run_log
         set id = #{record.id,jdbcType=BIGINT},
         operate_user_id = #{record.operateUserId,jdbcType=BIGINT},
@@ -343,11 +346,11 @@
         type = #{record.type,jdbcType=INTEGER},
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
         log_content = #{record.logContent,jdbcType=LONGVARCHAR}
-        <if test="_parameter != null" >
-            <include refid="Update_By_Example_Where_Clause" />
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
         </if>
     </update>
-    <update id="updateByExample" parameterType="map" >
+    <update id="updateByExample" parameterType="map">
         update run_log
         set id = #{record.id,jdbcType=BIGINT},
         operate_user_id = #{record.operateUserId,jdbcType=BIGINT},
@@ -355,35 +358,35 @@
         unit_id = #{record.unitId,jdbcType=BIGINT},
         type = #{record.type,jdbcType=INTEGER},
         create_time = #{record.createTime,jdbcType=TIMESTAMP}
-        <if test="_parameter != null" >
-            <include refid="Update_By_Example_Where_Clause" />
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
         </if>
     </update>
-    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.RunLog" >
+    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.RunLog">
         update run_log
-        <set >
-            <if test="operateUserId != null" >
+        <set>
+            <if test="operateUserId != null">
                 operate_user_id = #{operateUserId,jdbcType=BIGINT},
             </if>
-            <if test="courseId != null" >
+            <if test="courseId != null">
                 course_id = #{courseId,jdbcType=BIGINT},
             </if>
-            <if test="unitId != null" >
+            <if test="unitId != null">
                 unit_id = #{unitId,jdbcType=BIGINT},
             </if>
-            <if test="type != null" >
+            <if test="type != null">
                 type = #{type,jdbcType=INTEGER},
             </if>
-            <if test="createTime != null" >
+            <if test="createTime != null">
                 create_time = #{createTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="logContent != null" >
+            <if test="logContent != null">
                 log_content = #{logContent,jdbcType=LONGVARCHAR},
             </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
-    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zhidejiaoyu.common.pojo.RunLog" >
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zhidejiaoyu.common.pojo.RunLog">
         update run_log
         set operate_user_id = #{operateUserId,jdbcType=BIGINT},
             course_id = #{courseId,jdbcType=BIGINT},
@@ -393,7 +396,7 @@
             log_content = #{logContent,jdbcType=LONGVARCHAR}
         where id = #{id,jdbcType=BIGINT}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.RunLog" >
+    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.RunLog">
         update run_log
         set operate_user_id = #{operateUserId,jdbcType=BIGINT},
             course_id = #{courseId,jdbcType=BIGINT},
@@ -423,6 +426,14 @@
         where
         operate_user_id=#{studentId}
         and `type`=#{type}
+        and to_days(create_time)=to_days(#{date})
+    </select>
+
+    <select id="selectByDateAndType" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"></include>
+        from run_log
+        where and `type`=#{type}
         and to_days(create_time)=to_days(#{date})
     </select>
 

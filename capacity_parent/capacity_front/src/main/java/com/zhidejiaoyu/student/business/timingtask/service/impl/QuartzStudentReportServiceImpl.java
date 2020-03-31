@@ -76,6 +76,9 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
     private WorshipMapper worshipMapper;
 
     @Resource
+    private GoldRecordMapper goldRecordMapper;
+
+    @Resource
     private StudentDailyLearningMapper studentDailyLearningMapper;
     @Resource
     private ClockInMapper clockInMapper;
@@ -164,7 +167,11 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
         log.info("定时任务 -> 统计各校区学生充课信息完成。");
     }
 
+    /**
+     * 添加学生详情和学生打卡信息
+     */
     @Override
+    @Scheduled(cron = "0 15 3 * * ?")
     public void getStudentDailyLearning() {
         Date beforeDaysDate = DateUtil.getBeforeDaysDate(new Date(), 1);
         //获取昨日登入的学生
@@ -223,13 +230,115 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
                 } else {
                     punchRecord.setOiling(0);
                 }
-                punchRecord.setCreatTime(DateUtil.getLocalDateTime(new Date()));
+                punchRecord.setCreatTime(LocalDateTime.now());
                 punchRecord.setPoint(Integer.parseInt(map.get("count").toString()));
                 punchRecordMapper.insert(punchRecord);
             });
         }
         log.info("定时任务 -> 统计学生点赞数量结束。");
     }
+
+    /**
+     * 增加金币数据
+     */
+    @Override
+    @Scheduled(cron = "0 15 4 * * ?")
+    public void getGoldAdd() {
+        log.info("定时任务 -> 统计学生每日增加减少金币开始。");
+        Date beforeDaysDate = DateUtil.getBeforeDaysDate(new Date(), 1);
+        //获取增加金币学生信息
+        List<RunLog> runLogs = runLogMapper.selectByDateAndType(beforeDaysDate, 4);
+        runLogs.forEach(runlog -> {
+            Integer goldRecordGold = getGoldRecordGold(runlog.getLogContent());
+            if (goldRecordGold != null) {
+                GoldRecord goldRecord = new GoldRecord();
+                goldRecord.setStudentId(runlog.getOperateUserId());
+                goldRecord.setContent(getGoldRecordContent(runlog.getLogContent()));
+                goldRecord.setGold(goldRecordGold);
+                goldRecord.setCreateTime(LocalDateTime.now());
+                goldRecord.setStudyTime(DateUtil.getLocalDateTime(runlog.getCreateTime()));
+                goldRecordMapper.insert(goldRecord);
+            }
+        });
+        log.info("定时任务 -> 统计学生每日增加减少金币完成。");
+    }
+
+    private Integer getGoldRecordGold(String content) {
+        int indexOf = content.indexOf("#");
+        int indexOf1 = content.lastIndexOf("#");
+        int gold = Integer.parseInt(content.substring(indexOf + 1, indexOf1));
+        return gold > 0 ? gold : null;
+    }
+
+    private String getGoldRecordContent(String content) {
+        if (content.contains("登陆")) {
+            return "登录奖励";
+        }
+        if (content.contains("单元测试")) {
+            return "单元测试";
+        }
+        if (content.contains("单元闯关")) {
+            return "单元闯关";
+        }
+        if (content.contains("飞行测试")) {
+            return "飞行测试";
+        }
+        if (content.contains("完善资料")) {
+            return "完善资料";
+        }
+        if (content.contains("单元前测")) {
+            return "单元前测";
+        }
+        if (content.contains("大于等于")) {
+            return "学习奖励";
+        }
+        if (content.contains("能力值测试")) {
+            return "能力值测试";
+        }
+        if (content.contains("任务奖励")) {
+            return "任务奖励";
+        }
+        if (content.contains("学后测试")) {
+            return "学后测试";
+        }
+        if (content.contains("抽奖") || content.contains("抽獎")) {
+            return "抽奖奖励";
+        }
+        if (content.contains("日奖励")) {
+            return "日奖励";
+        }
+        if (content.contains("意见")) {
+            return "意见采纳";
+        }
+        if (content.contains("游戏")) {
+            return "游戏奖励";
+        }
+        if (content.contains("五维测试")) {
+            return "五维测试";
+        }
+        if (content.contains("已学测试")) {
+            return "已学测试";
+        }
+        if (content.contains("词") || content.contains("句")) {
+            return "复习";
+        }
+        if (content.contains("pk")) {
+            return "pk对战";
+        }
+        if (content.contains("修改密码")) {
+            return "首次修改密码";
+        }
+        if (content.contains("记忆") || content.contains("眼脑训练")
+                || content.contains("火眼金睛") || content.contains("最强大脑")
+                || content.contains("乾坤挪移")) {
+            return "记忆挑战";
+        }
+        if (content.contains("副本挑战")) {
+            return "副本挑战";
+        }
+        return null;
+    }
+
 
     private Integer getGoldAdd(Long studentId, Date date, int type) {
         Integer gold = 0;

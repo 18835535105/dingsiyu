@@ -65,10 +65,10 @@ public interface RunLogMapper extends BaseMapper<RunLog> {
     /**
      * 获取当前学生指定模块下本次登录学习指定单词/例句个数获取的金币奖励数
      *
-     * @param stuId   当前学生id
+     * @param stuId     当前学生id
      * @param loginTime 本次登录时间
-     * @param key   1：慧记忆；2：慧听写；3：慧默写；4：例句听力；5：例句翻译；6：例句默写
-     * @param str   区分奖励类型
+     * @param key       1：慧记忆；2：慧听写；3：慧默写；4：例句听力；5：例句翻译；6：例句默写
+     * @param str       区分奖励类型
      * @return
      */
     int countAwardCount(@Param("stuId") long stuId, @Param("loginTime") String loginTime, @Param("key") Integer key, @Param("str") String str);
@@ -86,15 +86,16 @@ public interface RunLogMapper extends BaseMapper<RunLog> {
      *
      * @param studentId
      * @param unitId
-     * @param type 4:金币奖励；7：勋章奖励
+     * @param type      4:金币奖励；7：勋章奖励
      * @return
      */
     List<RunLog> selectGoldByUnitId(@Param("studentId") Long studentId, @Param("unitId") Long unitId, @Param("type") int type);
 
-    int getCountXZByStudentId(@Param("studentId")Long studentId);
+    int getCountXZByStudentId(@Param("studentId") Long studentId);
 
     /**
      * 今日排行（根据金币）
+     *
      * @param date
      * @param model 1=本班排行 2=本校排行 3=全国排行
      * @return 学生id - 从大倒小顺序
@@ -105,7 +106,7 @@ public interface RunLogMapper extends BaseMapper<RunLog> {
     Map<Long, Map<String, Object>> getGoldByStudentId(@Param("date") String data, @Param("model") String model, @Param("student") Student student);
 
     @MapKey("id")
-    Map<Long,Map<String,Long>> getMapKeyStudentrunLog();
+    Map<Long, Map<String, Long>> getMapKeyStudentrunLog();
 
     /**
      * 查询学生最后一条登录/退出日志
@@ -127,12 +128,19 @@ public interface RunLogMapper extends BaseMapper<RunLog> {
 
     /**
      * 获取指定日期登入的学生id
-     * @param day    日期
+     *
+     * @param day 日期
      */
     List<Long> selectLoginStudentId(@Param("day") Date day);
 
 
-    List<String> selectGoldByStudentIdAndDate(@Param("studentId") Long studentId,@Param("date") Date date,@Param("type")int type);
+    List<String> selectGoldByStudentIdAndDate(@Param("studentId") Long studentId, @Param("date") Date date, @Param("type") int type);
 
-
+    /**
+     * 根据日期和类型获取每日信息
+     * @param beforeDaysDate
+     * @param type
+     * @return
+     */
+    List<RunLog> selectByDateAndType(@Param("date") Date beforeDaysDate, @Param("type") int type);
 }
