@@ -164,7 +164,8 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void runLogToGoldLog() {
-        List<RunLog> runLogs = runLogMapper.selectList(new QueryWrapper<RunLog>().in("type", 4, 5));
+        List<RunLog> runLogs = runLogMapper.selectList(new QueryWrapper<RunLog>().in("type", 4, 5)
+                .notLike("log_content", "#0.0#"));
         for (RunLog runLog : runLogs) {
             String logContent = runLog.getLogContent();
             if (Objects.equals(runLog.getType(), 4)) {
@@ -244,6 +245,9 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
     }
 
     public int getGold(String logContent) {
+        if (logContent.contains("#0.0#")) {
+            return 0;
+        }
         return Integer.parseInt(logContent.split("#")[1]);
     }
 
