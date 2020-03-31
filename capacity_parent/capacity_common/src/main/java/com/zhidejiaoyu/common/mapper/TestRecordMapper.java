@@ -361,5 +361,8 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     @MapKey("studentId")
     Map<Long,Map<String,Object>> selectByStudentIdsAndGenreAndDate(@Param("studentIds") List<Long> studentIds,
                                                                      @Param("genre") String smallappGenre,@Param("date") Date beforeDaysDate);
+
+    @MapKey("studentId")
+    Map<Long,Map<String,Object>> selectByGenreAndDate(@Param("genre") String genre,@Param("date") Date date);
 }
 

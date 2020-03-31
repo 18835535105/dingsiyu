@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Worship;
 import com.zhidejiaoyu.common.pojo.WorshipExample;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -83,4 +84,7 @@ public interface WorshipMapper {
      * @return
      */
     int countByWorship(@Param("studentId") Long studentId);
+
+    @MapKey("studentId")
+    Map<Long,Map<String,Object>> selectByStudentIdsAndDate(@Param("studentIds") List<Long> studentIds,@Param("date") Date beforeDaysDate);
 }

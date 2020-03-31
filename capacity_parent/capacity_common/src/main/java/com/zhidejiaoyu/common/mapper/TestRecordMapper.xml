@@ -970,4 +970,12 @@
         and genre=#{genre}
         and to_days(create_time)=to_days(#{date})
     </select>
+    <select id="selectByGenreAndDate" resultType="map" parameterType="map">
+        select
+        student_id studentId,create_time time,point
+        from test_record
+        where genre=#{genre}
+        and to_days(create_time)=to_days(#{date})
+        group by student_id
+    </select>
 </mapper>

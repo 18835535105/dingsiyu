@@ -3,7 +3,7 @@ package com.zhidejiaoyu.student.business.timingtask.service.impl;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.zhidejiaoyu.aliyunoss.putObject.OssUpload;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
-import com.zhidejiaoyu.common.pojo.StudentDailyLearning;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolDetail;
 import com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolSummary;
 import com.zhidejiaoyu.common.constant.FileConstant;
@@ -12,9 +12,6 @@ import com.zhidejiaoyu.common.excelmodel.student.ExportRechargePayCardModel;
 import com.zhidejiaoyu.common.excelmodel.student.ExportStudentOnlineTimeWithSchoolDetail;
 import com.zhidejiaoyu.common.excelmodel.student.ExportStudentOnlineTimeWithSchoolSummary;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.ReceiveEmail;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.StudentHours;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.excelUtil.easyexcel.ExcelUtil;
 import com.zhidejiaoyu.common.utils.excelUtil.easyexcel.ExcelWriterFactory;
@@ -76,9 +73,14 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
     private TestRecordMapper testRecordMapper;
 
     @Resource
+    private WorshipMapper worshipMapper;
+
+    @Resource
     private StudentDailyLearningMapper studentDailyLearningMapper;
     @Resource
     private ClockInMapper clockInMapper;
+    @Resource
+    private PunchRecordMapper punchRecordMapper;
 
     //    @Scheduled(cron = "0 0 1 * * ?")
     @Override
@@ -166,11 +168,13 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
     public void getStudentDailyLearning() {
         Date beforeDaysDate = DateUtil.getBeforeDaysDate(new Date(), 1);
         //获取昨日登入的学生
+        log.info("定时任务 -> 统计学生详情开始。");
         List<Long> studentIds = runLogMapper.selectLoginStudentId(beforeDaysDate);
         if (studentIds != null && studentIds.size() > 0) {
             //获取学生今日学习时常
             Map<String, Map<String, Object>> studentLoginMap = durationMapper.selectValidTimeByStudentIds(studentIds, beforeDaysDate);
             Map<Long, Map<String, Object>> longMapMap = clockInMapper.selectByStudentIds(studentIds, beforeDaysDate);
+            Map<Long, Map<String, Object>> longMapMap1 = worshipMapper.selectByStudentIdsAndDate(studentIds, beforeDaysDate);
             studentIds.forEach(studentId -> {
                 StudentDailyLearning studentDailyLearning = new StudentDailyLearning();
                 studentDailyLearning.setStudentId(studentId);
@@ -188,10 +192,43 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
                         Integer.parseInt(studentLoginMap.get(studentId).get("validTime").toString()));
                 Map<String, Object> map = longMapMap.get(studentId);
                 studentDailyLearning.setClockIn(map != null && map.size() > 0 ? 1 : 2);
-                studentDailyLearningMapper.insert(studentDailyLearning);
+                Map<String, Object> map1 = longMapMap1.get(studentId);
+                if (map1 != null) {
+                    Object count = map1.get("count");
+                    studentDailyLearning.setOiling(count != null ? Integer.parseInt(count.toString()) : 0);
+                } else {
+                    studentDailyLearning.setOiling(0);
+                }
 
+                studentDailyLearningMapper.insert(studentDailyLearning);
             });
         }
+        log.info("定时任务 -> 统计学生详情结束。");
+        log.info("定时任务 -> 统计学生点赞数量开始。");
+        //统计签到学生
+        Map<Long, Map<String, Object>> studentMap = testRecordMapper.selectByGenreAndDate(GenreConstant.SMALLAPP_GENRE, beforeDaysDate);
+        Set<Long> longs = studentMap.keySet();
+        if (longs.size() > 0) {
+            List<Long> list = new ArrayList(longs);
+            Map<Long, Map<String, Object>> longMapMap1 = worshipMapper.selectByStudentIdsAndDate(list, beforeDaysDate);
+            list.forEach(studentId -> {
+                PunchRecord punchRecord = new PunchRecord();
+                punchRecord.setStudentId(studentId);
+                Map<String, Object> map = studentMap.get(studentId);
+                punchRecord.setCardTime((LocalDateTime) map.get("date"));
+                Map<String, Object> map1 = longMapMap1.get(studentId);
+                if (map1 != null) {
+                    Object count = map1.get("count");
+                    punchRecord.setOiling(count != null ? Integer.parseInt(count.toString()) : 0);
+                } else {
+                    punchRecord.setOiling(0);
+                }
+                punchRecord.setCreatTime(DateUtil.getLocalDateTime(new Date()));
+                punchRecord.setPoint(Integer.parseInt(map.get("count").toString()));
+                punchRecordMapper.insert(punchRecord);
+            });
+        }
+        log.info("定时任务 -> 统计学生点赞数量结束。");
     }
 
     private Integer getGoldAdd(Long studentId, Date date, int type) {
