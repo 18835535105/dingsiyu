@@ -465,6 +465,18 @@ public class DateUtil implements Serializable {
     }
 
     /**
+     * 获得几天后的时间
+     * @param date
+     * @param days
+     * @return
+     */
+    public static Date getLastDaysDate(Date date, int days) {
+        Calendar now =Calendar.getInstance();
+        now.setTime(date);
+        now.set(Calendar.DATE,now.get(Calendar.DATE)+days);
+        return now.getTime();
+    }
+    /**
      * 获取几天前的日期字符串
      *
      * @param date

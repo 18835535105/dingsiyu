@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.timingtask.controller;
 
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzStudentReportService;
+import com.zhidejiaoyu.student.business.timingtask.service.QuartzStudyCalendarService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +23,9 @@ public class QuartzStudentReportController {
     @Resource
     private QuartzStudentReportService quartzStudentReportService;
 
+    @Resource
+    private QuartzStudyCalendarService quartzStudyCalendarService;
+
     /**
      * 导出校区学生登录及在线时长信息
      *
@@ -35,6 +39,11 @@ public class QuartzStudentReportController {
     @RequestMapping("/exportStudentPay")
     public void exportStudentPay() {
         quartzStudentReportService.exportStudentPay();
+    }
+
+    @RequestMapping("getStudentDailyLearning")
+    public void getStudentDailyLearning(){
+        quartzStudyCalendarService.getStudentDailyLearning();
     }
 
 }

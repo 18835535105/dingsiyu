@@ -68,6 +68,10 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
     public void initStudentDailyLearning() {
         Date beforeDaysDate = DateUtil.getBeforeDaysDate(new Date(), 1);
         //获取昨日登入的学生
+        getStudentDily(beforeDaysDate);
+    }
+
+    private void getStudentDily(Date beforeDaysDate) {
         log.info("定时任务 -> 统计学生详情开始。");
         List<Long> studentIds = runLogMapper.selectLoginStudentId(beforeDaysDate);
         if (studentIds != null && studentIds.size() > 0) {
@@ -119,6 +123,21 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
     @Override
     public void initPunchRecord() {
         Date beforeDaysDate = DateUtil.getBeforeDaysDate(new Date(), 1);
+        getPushRecord(beforeDaysDate);
+    }
+
+    @Override
+    public void getStudentDailyLearning() {
+        Date date = DateUtil.parseYYYYMMDDHHMMSS("2018-10-15 10:15:58");
+        while (date.getTime() <= System.currentTimeMillis()) {
+            getStudentDily(date);
+            getPushRecord(date);
+            date = DateUtil.getLastDaysDate(date, 1);
+        }
+
+    }
+
+    private void getPushRecord(Date beforeDaysDate) {
         log.info("定时任务 -> 统计学生点赞数量开始。");
         //统计签到学生
         Map<Long, Map<String, Object>> studentMap = testRecordMapper.selectByGenreAndDate(GenreConstant.SMALLAPP_GENRE, beforeDaysDate);

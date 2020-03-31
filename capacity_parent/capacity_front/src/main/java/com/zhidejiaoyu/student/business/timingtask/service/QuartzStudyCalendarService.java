@@ -27,4 +27,6 @@ public interface QuartzStudyCalendarService extends BaseQuartzService {
      * 每日新增打卡机点赞记录数据
      */
     void initPunchRecord();
+
+    void getStudentDailyLearning();
 }

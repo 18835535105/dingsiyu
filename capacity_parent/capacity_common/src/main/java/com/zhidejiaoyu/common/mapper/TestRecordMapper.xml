@@ -961,21 +961,21 @@
         where student_id = #{studentId}
     </select>
     <select id="selectByStudentIdsAndGenreAndDate" parameterType="map" resultType="map">
-        select student_id studentId,point point,create_time creatTime from test_record
+        select student_id studentId,point point,test_start_time creatTime from test_record
         where student_id in (
         <foreach collection="studentIds" item="studentId" separator=",">
             #{studentId}
         </foreach>
         )
         and genre=#{genre}
-        and to_days(create_time)=to_days(#{date})
+        and to_days(test_start_time)=to_days(#{date})
     </select>
     <select id="selectByGenreAndDate" resultType="map" parameterType="map">
         select
-        student_id studentId,create_time time,point
+        student_id studentId,test_start_time time,point
         from test_record
         where genre=#{genre}
-        and to_days(create_time)=to_days(#{date})
+        and to_days(test_start_time)=to_days(#{date})
         group by student_id
     </select>
 </mapper>
