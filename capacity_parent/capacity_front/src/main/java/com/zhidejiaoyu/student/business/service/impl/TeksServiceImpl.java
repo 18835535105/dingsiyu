@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.business.service.impl;
 
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -23,6 +24,7 @@ import com.zhidejiaoyu.common.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.student.business.learn.common.SaveTeksData;
 import com.zhidejiaoyu.student.business.service.TeksService;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
+import com.zhidejiaoyu.student.common.SaveGoldLog;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -859,15 +861,18 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldCount));
         studentMapper.updateByPrimaryKeySelective(student);
         String msg;
+        String reason;
         if (classify != null) {
+            reason = GenreConstant.UNIT_TEST;
             msg = "id为：" + student.getId() + "的学生在[" + commonMethod.getTestType(classify)
                     + "]模块下的单元闯关测试中首次闯关成功，获得#" + goldCount + "#枚金币";
         } else {
+            reason = model;
             msg = "id为：" + student.getId() + "的学生在[" + model + "]模块下，获得#" + goldCount + "#枚金币";
         }
         if (goldCount > 0) {
             try {
-                super.saveRunLog(student, 4, msg);
+                SaveGoldLog.saveStudyGoldLog(student.getId(), reason, goldCount);
             } catch (RuntimeException e) {
                 log.error("保存学生[{} - {} - {}]日志出错！msg=[{}]", student.getId(), student.getAccount(), student.getStudentName(), msg, e);
             }

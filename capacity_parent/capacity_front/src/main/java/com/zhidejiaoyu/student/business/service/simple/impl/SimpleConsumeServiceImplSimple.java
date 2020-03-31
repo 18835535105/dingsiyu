@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.pojo.Consume;
 import com.zhidejiaoyu.common.pojo.RunLog;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.student.business.service.simple.SimpleConsumeServiceSimple;
+import com.zhidejiaoyu.student.common.SaveGoldLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,7 +90,7 @@ public class SimpleConsumeServiceImplSimple extends SimpleBaseServiceImpl<Simple
             }
         } else if (type == 2) {
             Consume consume = getConsume("钻石增加", type, number, student.getId().intValue(), 1);
-            Integer result = simpleConsumeMapper.insert(consume);
+            int result = simpleConsumeMapper.insert(consume);
             if (result > 0) {
                 Integer diamond = student.getDiamond();
                 if (diamond != null) {
@@ -115,12 +116,8 @@ public class SimpleConsumeServiceImplSimple extends SimpleBaseServiceImpl<Simple
         consume.setNumber(number);
         consume.setState(state);
         consume.setStudentId(studentId);
-        RunLog runLog = new RunLog();
-        runLog.setOperateUserId(Long.valueOf(studentId));
-        runLog.setCreateTime(new Date());
-        runLog.setType(4);
-        runLog.setLogContent("抽奖获得金币#" + number + "#");
-        runLogMapper.insert(runLog);
+
+        SaveGoldLog.saveStudyGoldLog(Long.valueOf(studentId), "抽奖获得", number);
         return consume;
     }
 

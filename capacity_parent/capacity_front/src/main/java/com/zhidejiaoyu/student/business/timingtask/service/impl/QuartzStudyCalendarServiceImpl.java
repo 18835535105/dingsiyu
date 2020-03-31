@@ -1,8 +1,9 @@
 package com.zhidejiaoyu.student.business.timingtask.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.GoldRecord;
+import com.zhidejiaoyu.common.pojo.GoldLog;
 import com.zhidejiaoyu.common.pojo.PunchRecord;
 import com.zhidejiaoyu.common.pojo.RunLog;
 import com.zhidejiaoyu.common.pojo.StudentDailyLearning;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -59,7 +61,6 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
         log.info("初始化学习日历开始....");
         this.initStudentDailyLearning();
         this.initLearningDetails();
-        this.initGoldRecord();
         this.initPunchRecord();
         log.info("初始化学习日历结束！");
     }
@@ -119,11 +120,6 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
     }
 
     @Override
-    public void initGoldRecord() {
-
-    }
-
-    @Override
     public void initPunchRecord() {
         Date beforeDaysDate = DateUtil.getBeforeDaysDate(new Date(), 1);
         getPushRecord(beforeDaysDate);
@@ -171,5 +167,95 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
             });
         }
         log.info("定时任务 -> 统计学生点赞数量结束。");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void runLogToGoldLog() {
+        List<RunLog> runLogs = runLogMapper.selectList(new QueryWrapper<RunLog>().in("type", 4, 5));
+        for (RunLog runLog : runLogs) {
+            String logContent = runLog.getLogContent();
+            if (Objects.equals(runLog.getType(), 4)) {
+                int gold = getGold(logContent);
+
+                String reason = "";
+                if (logContent.contains("今日首次登陆系统")) {
+                    reason = "登录系统";
+                } else if (logContent.contains("首次完善资料")) {
+                    reason = "首次完善资料";
+                } else if (logContent.contains("单元前测")) {
+                    reason = "单元前测";
+                } else if (logContent.contains("新学大于等于20个单词")) {
+                    reason = "新学大于等于20个单词";
+                } else if (logContent.contains("新学熟词大于等于10个单词")) {
+                    reason = "新学熟词大于等于10个单词";
+                } else if (logContent.contains("日奖励")) {
+                    reason = "日奖励";
+                } else if (logContent.contains("任务奖励")) {
+                    reason = "任务奖励";
+                } else if (logContent.contains("新学大于等于40个单词")) {
+                    reason = "新学大于等于40个单词";
+                } else if (logContent.contains("新学熟词大于等于20个单词")) {
+                    reason = "新学熟词大于等于20个单词";
+                } else if (logContent.contains("抽奖获得")) {
+                    reason = "抽奖获得";
+                } else if (logContent.contains("抽獎中奖励")) {
+                    reason = "抽奖获得";
+                } else if (logContent.contains("句型游戏")) {
+                    reason = "句型游戏";
+                } else if (logContent.contains("桌牌捕音")) {
+                    reason = "桌牌捕音";
+                } else if (logContent.contains("学前游戏测试")) {
+                    reason = "学前游戏测试";
+                } else if (logContent.contains("单元闯关测试")) {
+                    reason = "单元闯关测试";
+                } else if (logContent.contains("在校区副本挑战")) {
+                    reason = "在校区副本挑战";
+                }
+
+                GoldLog goldLog = GoldLog.builder()
+                        .type(1)
+                        .createTime(runLog.getCreateTime())
+                        .goldAdd(gold)
+                        .goldReduce(0)
+                        .reason(reason)
+                        .operatorId(Integer.parseInt(runLog.getOperateUserId().toString()))
+                        .readFlag(2)
+                        .studentId(runLog.getOperateUserId())
+                        .build();
+                log.info(goldLog.toString());
+                goldLogMapper.insert(goldLog);
+
+            } else if (Objects.equals(runLog.getType(), 5)) {
+                String reason = "";
+                if (logContent.contains("单元闯关测试")) {
+                    reason = "单元闯关测试";
+                } else if (logContent.contains("pk对战")) {
+                    reason = "pk对战";
+                }
+
+                int gold = getGold(logContent);
+                GoldLog goldLog = GoldLog.builder()
+                        .type(1)
+                        .createTime(runLog.getCreateTime())
+                        .goldAdd(0)
+                        .goldReduce(gold)
+                        .reason(reason)
+                        .operatorId(Integer.parseInt(runLog.getOperateUserId().toString()))
+                        .readFlag(2)
+                        .studentId(runLog.getOperateUserId())
+                        .build();
+                log.info(goldLog.toString());
+                goldLogMapper.insert(goldLog);
+            }
+        }
+    }
+
+    public int getGold(String logContent) {
+        return Integer.parseInt(logContent.split("#")[1]);
+    }
+
+    public static void main(String[] args) {
+        System.out.println("抽奖获得金币#5#".split("#")[1]);
     }
 }

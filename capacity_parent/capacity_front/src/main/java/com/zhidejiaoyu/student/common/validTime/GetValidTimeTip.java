@@ -7,13 +7,13 @@ import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleLearnMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleRunLogMapper;
 import com.zhidejiaoyu.common.pojo.LearnExample;
-import com.zhidejiaoyu.common.pojo.RunLog;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.study.CommonMethod;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
+import com.zhidejiaoyu.student.common.SaveGoldLog;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -103,11 +103,8 @@ public class GetValidTimeTip {
                 .andStudyCountEqualTo(1).andStatusEqualTo(1);
         learnCount = simpleLearnMapper.countByExample(learnExample);
         if (learnCount >= condition * (awardCount + 1)) {
-            sb.append("学生").append(student.getStudentName()).append("在").append(learnType)
-                    .append("模块本次新学熟词大于等于").append(condition).append("个单词，获得#1#个金币，登录时间：").append(DateUtil.formatYYYYMMDDHHMMSS(loginTime));
-            RunLog runLog = new RunLog(stuId, 4, sb.toString(), new Date());
-            simpleRunLogMapper.insert(runLog);
-            log.info(sb.toString());
+            sb.append("在").append(learnType).append("模块本次新学熟词大于等于").append(condition).append("个单词");
+            SaveGoldLog.saveStudyGoldLog(student.getId(), sb.toString(), 1);
             return 1;
         }
         return 0;
@@ -131,11 +128,9 @@ public class GetValidTimeTip {
         // 查询本次登录期间当前奖励次数
         int count = simpleRunLogMapper.countAwardCount(stuId, DateUtil.formatYYYYMMDDHHMMSS(loginTime), simpleCommonMethod.getTestType(classify), "有效时长大于等于30分钟");
         if (count == 0 && minute >= condition) {
-            sb.append("学生").append(student.getStudentName()).append("在").append(learnType).
-                    append("模块学习过程中有效时长大于等于30分钟，获得#5#个金币，登录时间：").append(DateUtil.formatYYYYMMDDHHMMSS(loginTime));
-            RunLog runLog = new RunLog(stuId, 4, sb.toString(), new Date());
-            simpleRunLogMapper.insert(runLog);
-            log.info(sb.toString());
+            sb.append("在").append(learnType).append("模块学习过程中有效时长大于等于30分钟");
+
+            SaveGoldLog.saveStudyGoldLog(student.getId(), sb.toString(), 5);
             return 5;
         }
         return 0;
@@ -163,11 +158,8 @@ public class GetValidTimeTip {
                 .andStudyCountEqualTo(1);
         learnCount = simpleLearnMapper.countByExample(learnExample);
         if (learnCount >= condition * (awardCount + 1)) {
-            sb.append("学生").append(student.getStudentName()).append("在").append(learnType).append("模块本次登录新学大于等于")
-                    .append(condition).append("个单词，获得#1#个金币，登录时间：").append(DateUtil.formatYYYYMMDDHHMMSS(loginTime));
-            RunLog runLog = new RunLog(stuId, 4, sb.toString(), new Date());
-            simpleRunLogMapper.insert(runLog);
-            log.info(sb.toString());
+            sb.append("在").append(learnType).append("模块本次登录新学大于等于").append(condition).append("个单词");
+            SaveGoldLog.saveStudyGoldLog(student.getId(), sb.toString(), 1);
             return 1;
         }
         return 0;
@@ -223,13 +215,8 @@ public class GetValidTimeTip {
                 .andStudyCountEqualTo(1).andStatusEqualTo(1);
         learnCount = learnMapper.countByExample(learnExample);
         if (learnCount >= condition * (awardCount + 1)) {
-            sb.append("学生").append(student.getStudentName()).append("在").append(learnType)
-                    .append("模块本次新学熟词大于等于").append(condition).append("个单词，获得#1#个金币，登录时间：").append(DateUtil.formatYYYYMMDDHHMMSS(loginTime));
-            RunLog runLog = new RunLog(stuId, 4, sb.toString(), new Date());
-            runLog.setUnitId(student.getUnitId());
-            runLog.setCourseId(student.getCourseId());
-            runLogMapper.insert(runLog);
-            log.info(sb.toString());
+            sb.append("在").append(learnType).append("模块本次新学熟词大于等于").append(condition).append("个单词");
+            SaveGoldLog.saveStudyGoldLog(student.getId(), sb.toString(), 1);
             return 1;
         }
         return 0;
@@ -253,14 +240,9 @@ public class GetValidTimeTip {
         // 查询本次登录期间当前奖励次数
         int count = runLogMapper.countAwardCount(stuId, DateUtil.formatYYYYMMDDHHMMSS(loginTime), classify, "有效时长大于等于30分钟");
         if (count == 0 && minute >= condition) {
-            sb.append("学生").append(student.getStudentName()).append("在").append(learnType).
-                    append("模块学习过程中有效时长大于等于30分钟，获得#5#个金币，登录时间：").append(DateUtil.formatYYYYMMDDHHMMSS(loginTime));
-            RunLog runLog = new RunLog(stuId, 4, sb.toString(), new Date());
-            runLog.setUnitId(student.getUnitId());
-            runLog.setCourseId(student.getCourseId());
-            runLogMapper.insert(runLog);
+            sb.append("在").append(learnType).append("模块学习过程中有效时长大于等于30分钟");
 
-            log.info(sb.toString());
+            SaveGoldLog.saveStudyGoldLog(student.getId(), sb.toString(), 5);
             return 5;
         }
         return 0;
@@ -288,13 +270,8 @@ public class GetValidTimeTip {
                 .andStudyCountEqualTo(1);
         learnCount = learnMapper.countByExample(learnExample);
         if (learnCount >= condition * (awardCount + 1)) {
-            sb.append("学生").append(student.getStudentName()).append("在").append(learnType).append("模块本次登录新学大于等于")
-                    .append(condition).append("个单词，获得#1#个金币，登录时间：").append(DateUtil.formatYYYYMMDDHHMMSS(loginTime));
-            RunLog runLog = new RunLog(stuId, 4, sb.toString(), new Date());
-            runLog.setUnitId(student.getUnitId());
-            runLog.setCourseId(student.getCourseId());
-            runLogMapper.insert(runLog);
-            log.info(sb.toString());
+            sb.append("在").append(learnType).append("模块本次登录新学大于等于").append(condition).append("个单词");
+            SaveGoldLog.saveStudyGoldLog(student.getId(), sb.toString(), 1);
             return 1;
         }
         return 0;

@@ -24,6 +24,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.level.ChildMedalVo;
 import com.zhidejiaoyu.common.vo.student.level.LevelVo;
 import com.zhidejiaoyu.student.business.service.StudentInfoService;
+import com.zhidejiaoyu.student.common.SaveGoldLog;
 import com.zhidejiaoyu.student.common.validTime.GetValidTimeTip;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -183,9 +184,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             award.setCanGet(1);
             awardMapper.insert(award);
 
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), 10));
-            RunLog runLog = new RunLog(student.getId(), 4, "学生首次修改密码，奖励#10#金币", new Date());
-            runLogMapper.insert(runLog);
+            int gold = 10;
+            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
+            SaveGoldLog.saveStudyGoldLog(student.getId(), "首次修改密码", gold);
         }
     }
 
@@ -198,25 +199,23 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
      */
     private String saveAwardInfo(Student student, double scale) {
         String tip;
+        int gold;
         if (scale == 1) {
             // 完善完必填信息和选填信息（算修改密码），奖励金币30个
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), 30));
-            tip = "恭喜获得30枚金币，已收入囊中。";
-            log.info("id为 " + student.getId() + " 的学生在 " + DateUtil.DateTime(new Date()) + " 首次完善资料达 " + scale * 100 + "%，奖励金币#30#枚！");
-            runLog = new RunLog(student.getId(), 4, "id为 " + student.getId() + " 的学生首次完善资料达 " + scale * 100 + "%，奖励金币#30#枚！", new Date());
-            runLogMapper.insert(runLog);
+            gold = 30;
             int awardContentType = 11;
             goldAwardAsync.dailyAward(student, awardContentType);
         } else {
             // 完善完必填信息，奖励金币20个
-            student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), 20));
-            tip = "恭喜获得20枚金币，已收入囊中。";
-            log.info("id为 " + student.getId() + " 的学生在 " + DateUtil.DateTime(new Date()) + " 首次完善资料达 " + scale * 100 + "%，奖励金币#20#枚！");
-            runLog = new RunLog(student.getId(), 4, "id为 " + student.getId() + " 的学生首次完善资料达 " + scale * 100 + "%，奖励金币#20#枚！", new Date());
-            runLogMapper.insert(runLog);
+            gold = 20;
             int awardContentType = 10;
             goldAwardAsync.dailyAward(student, awardContentType);
         }
+        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
+        tip = "恭喜获得" + gold + "枚金币，已收入囊中。";
+        log.info("id为 " + student.getId() + " 的学生在 " + DateUtil.DateTime(new Date()) + " 首次完善信息达 " + scale * 100 + "%，奖励金币#" + gold + "#枚！");
+
+        SaveGoldLog.saveStudyGoldLog(student.getId(), "首次完善信息", gold);
         return tip;
     }
 

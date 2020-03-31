@@ -107,5 +107,4 @@ public interface SimpleRunLogMapper extends BaseMapper<RunLog> {
 
     @MapKey("id")
     Map<Long, Map<String, Long>> getMapKeyStudentrunLog();
-
 }

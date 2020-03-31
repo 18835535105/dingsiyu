@@ -19,14 +19,14 @@ public interface QuartzStudyCalendarService extends BaseQuartzService {
     void initLearningDetails();
 
     /**
-     * 每日新增金币变化记录数据
-     */
-    void initGoldRecord();
-
-    /**
      * 每日新增打卡机点赞记录数据
      */
     void initPunchRecord();
 
     void getStudentDailyLearning();
+
+    /**
+     * 将runLog中的金币记录迁移到GoldLog中
+     */
+    void runLogToGoldLog();
 }
