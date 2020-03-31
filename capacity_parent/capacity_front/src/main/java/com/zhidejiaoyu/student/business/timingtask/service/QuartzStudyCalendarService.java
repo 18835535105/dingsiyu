@@ -30,3 +30,9 @@ public interface QuartzStudyCalendarService extends BaseQuartzService {
 
     void getStudentDailyLearning();
 }
+
+    /**
+     * 将runLog中的金币记录迁移到GoldLog中
+     */
+    void runLogToGoldLog();
+}

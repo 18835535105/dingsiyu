@@ -11,6 +11,7 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.common.SaveGoldLog;
 import com.zhidejiaoyu.student.common.redis.PayLogRedisOpt;
 import com.zhidejiaoyu.student.business.service.simple.SimpleIStudentExchangePrizeServiceSimple;
 import org.apache.commons.lang.StringUtils;
@@ -295,14 +296,7 @@ public class StudentExchangePrizeServiceImplSimpleSimple extends SimpleBaseServi
     }
 
     private void addGoldLog(Long studentId, Integer price) {
-        GoldLog goldLog = new GoldLog();
-        goldLog.setCreateTime(new Date());
-        goldLog.setGoldReduce(price);
-        goldLog.setOperatorId(studentId.intValue());
-        goldLog.setStudentId(studentId);
-        goldLog.setReason("兑换奖励");
-        goldLog.setReadFlag(0);
-        GoldLogMapper.insert(goldLog);
+        SaveGoldLog.savePrizeGoldLog(studentId, "兑换奖品", price);
     }
 
     private void addResultMapByAllList(Map<String, Object> map, int type) {

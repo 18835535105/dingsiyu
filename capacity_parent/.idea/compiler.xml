@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -13,6 +14,12 @@
         <module name="aliyun-common" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="guns-admin" target="1.8" />
+      <module name="guns-core" target="1.8" />
+      <module name="spring-boot-admin-server" target="1.8" />
+      <module name="wechat" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
@@ -21,6 +28,10 @@
       <module name="aliyun-vod" options="-parameters" />
       <module name="capacity_common" options="-parameters" />
       <module name="capacity_front" options="-parameters" />
+      <module name="guns-admin" options="-parameters" />
+      <module name="guns-core" options="-parameters" />
+      <module name="spring-boot-admin-server" options="-parameters" />
+      <module name="wechat" options="-parameters" />
     </option>
   </component>
 </project>

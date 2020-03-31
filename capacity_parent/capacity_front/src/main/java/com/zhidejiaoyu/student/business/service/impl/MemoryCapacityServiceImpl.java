@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.constant.PetMP3Constant;
 import com.zhidejiaoyu.student.business.service.MemoryCapacityService;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
+import com.zhidejiaoyu.student.common.SaveGoldLog;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -295,7 +296,7 @@ public class MemoryCapacityServiceImpl
             if (eegRecording.getType() == 4) {
                 model = "最强大脑";
             }
-            super.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在脑电波：" + model + "中奖励#" + gold + "#枚金币");
+            SaveGoldLog.saveStudyGoldLog(student.getId(), model, gold);
         }
         Map<String, Object> map = new HashMap<>();
         String url = null;
@@ -380,7 +381,7 @@ public class MemoryCapacityServiceImpl
         student.setEnergy(student.getEnergy() + energy);
         studentMapper.updateById(student);
         if (gold > 0) {
-            super.saveRunLog(student, 4, "学生[" + student.getStudentName() + "]在" + model + "中奖励#" + gold + "#枚金币");
+            SaveGoldLog.saveStudyGoldLog(student.getId(), model, gold);
         }
     }
 

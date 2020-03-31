@@ -15,6 +15,7 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.simple.SimpleAwardServiceSimple;
+import com.zhidejiaoyu.student.common.SaveGoldLog;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -414,8 +415,6 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                     Integer awardGold = awardContentType.getAwardGold();
                     // 金币奖励
                     awardType = award.getType() == 1 ? "日奖励" : "任务奖励";
-                    msg = "id为[" + student.getId() + "]的学生[" + student.getStudentName() + "]在["
-                            + DateUtil.DateTime(new Date()) + "]领取了[" + awardType + "]下[" + awardContent + "]的#" + awardGold + "#个金币";
                     // 更新学生金币信息
                     student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
                     try {
@@ -425,11 +424,8 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                         return ServerResponse.createByErrorMessage("更新学生金币信息出错!");
                     }
                     // 保存领取奖励日志
-                    RunLog runLog = new RunLog(student.getId(), 4, msg, new Date());
-                    runLog.setUnitId(student.getUnitId());
-                    runLog.setCourseId(student.getCourseId());
                     try {
-                        runLogMapper.insert(runLog);
+                        SaveGoldLog.saveStudyGoldLog(student.getId(), awardType ,awardGold);
                         getLevel(session);
                     } catch (Exception e) {
                         log.error("id为[{}]的学生在领取[{}]中[{}]奖励时保存日志出错！", student.getId(), awardType, awardContent, e);

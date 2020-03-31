@@ -12,6 +12,7 @@
         <result column="reason" property="reason"/>
         <result column="create_time" property="createTime"/>
         <result column="read_flag" property="readFlag"/>
+        <result column="type" property="type"/>
     </resultMap>
 
     <delete id="deleteByStudentIds" parameterType="map">

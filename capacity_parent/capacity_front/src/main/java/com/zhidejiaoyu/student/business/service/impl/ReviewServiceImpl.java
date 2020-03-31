@@ -26,6 +26,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
 import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
 import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
+import com.zhidejiaoyu.student.common.SaveGoldLog;
 import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
 import com.zhidejiaoyu.common.constant.PetMP3Constant;
 import com.zhidejiaoyu.common.dto.WordUnitTestDTO;
@@ -815,9 +816,9 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         Long uID = (unitId == null || unitId.length == 0) ? null : unitId[0];
         //获取单元闯关获取的能量数量
         TestResultVo vo = new TestResultVo();
-        int number =0;
-        if(uID!=null){
-            number=testRecordMapper.selCount(student.getId(), courseId, unitId[0],
+        int number = 0;
+        if (uID != null) {
+            number = testRecordMapper.selCount(student.getId(), courseId, unitId[0],
                     commonMethod.getTestType(classify), genre);
         }
         vo.setEnergy(getEnergy(student, point, number));
@@ -838,7 +839,6 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
 
         // 封装提示语
         packagePetSay(testRecord, wordUnitTestDTO, student, vo, genre);
-
 
 
         testRecordMapper.insert(testRecord);
@@ -1524,7 +1524,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             session, Student student, Integer point, String genre, Long courseId, Long[] unitIds) {
         Long unitId = (unitIds == null || unitIds.length == 0) ? null : unitIds[0];
         String studyModel = commonMethod.getTestType(classify);
-        StringBuilder msg = new StringBuilder();
+
         long stuId = student.getId();
         TestRecord testRecord = new TestRecord();
         Object timeSession = session.getAttribute(TimeConstant.BEGIN_START_TIME);
@@ -1540,6 +1540,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         testRecord.setCourseId(courseId);
         testRecord.setUnitId(unitId);
 
+        StringBuilder msg = new StringBuilder().append(genre).append(studyModel);
+        ;
+        // 奖励金币数
+        int gold = 0;
         if ("已学测试".equals(genre) || "生词测试".equals(genre) || "熟词测试".equals(genre) || genre.contains("五维测试")
                 || genre.contains("生句测试") || genre.contains("熟句测试")) {
             if (point < 80) {
@@ -1554,8 +1558,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             List<TestRecord> testRecords = testRecordMapper.selectMaxPointByStudyModel(stuId, courseId, genre, studyModel);
             if (testRecords.size() == 0) {
                 initTestCenterBetterCount(point, testRecord);
-                msg.append("id 为 ").append(stuId).append(" 的学生在 测试中心 -> ");
-                decideFiveD(point, genre, student, msg, studyModel, testRecord);
+                gold = decideFiveD(point, student, testRecord);
             } else {
                 TestRecord preTestRecord = testRecords.get(0);
                 if (preTestRecord.getPoint() < point) {
@@ -1564,8 +1567,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     } else {
                         testRecord.setBetterCount(preTestRecord.getBetterCount());
                     }
-                    msg.append("id 为 ").append(stuId).append(" 的学生在 测试中心 -> ");
-                    decideFiveD(point, genre, student, msg, studyModel, testRecord);
+                    gold = decideFiveD(point, student, testRecord);
                 }
             }
         } else if ("已学测试".equals(genre) || "生词测试".equals(genre) || "熟词测试".equals(genre) || "熟句测试".equals(genre) || "生句测试".equals(genre)) {
@@ -1573,8 +1575,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             List<TestRecord> testRecords = testRecordMapper.selectMaxPointByStudyModel(stuId, courseId, genre, studyModel);
             if (testRecords.size() == 0) {
                 initTestCenterBetterCount(point, testRecord);
-                msg.append("id 为 ").append(stuId).append(" 的学生在 测试中心 -> ");
-                decideLearnedUnKnown(point, genre, student, msg, studyModel, testRecord);
+                gold = decideLearnedUnKnown(point, student, testRecord);
             } else {
                 TestRecord preTestRecord = testRecords.get(0);
                 if (preTestRecord.getPoint() < point) {
@@ -1583,20 +1584,15 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     } else {
                         testRecord.setBetterCount(preTestRecord.getBetterCount());
                     }
-                    msg.append("id 为 ").append(stuId).append(" 的学生在 测试中心 -> ");
-                    decideLearnedUnKnown(point, genre, student, msg, studyModel, testRecord);
+                    gold = decideLearnedUnKnown(point, student, testRecord);
                 }
             }
         }
 
-        studentMapper.updateByPrimaryKeySelective(student);
+        studentMapper.updateById(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         if (msg.length() > 0) {
-            logger.info(msg.toString());
-            RunLog runLog = new RunLog(stuId, 4, msg.toString(), new Date());
-            runLog.setUnitId(student.getUnitId());
-            runLog.setCourseId(student.getCourseId());
-            runLogMapper.insert(runLog);
+            SaveGoldLog.saveStudyGoldLog(stuId, msg.toString(), gold);
         }
         return testRecord;
     }
@@ -1619,15 +1615,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
      * 判断 已学测试 和 生词测试 或者“熟词测试” 奖励金
      *
      * @param point
-     * @param genre
      * @param student
-     * @param msg
-     * @param studyModel
      * @param testRecord
      */
-    private void decideLearnedUnKnown(Integer point, String genre, Student student, StringBuilder msg, String
-            studyModel, TestRecord testRecord) {
-        msg.append(genre).append(studyModel);
+    private int decideLearnedUnKnown(Integer point, Student student, TestRecord testRecord) {
         int gold = 0;
         if (point < 90 && point >= 80) {
             // 奖励2金币
@@ -1639,26 +1630,21 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
             testRecord.setAwardGold(0);
         }
         int addGold = testGoldUtil.addGold(student, gold);
-        addGold=StudentGoldAdditionUtil.getGoldAddition(student,gold+0.0).intValue();
+        addGold = StudentGoldAdditionUtil.getGoldAddition(student, gold + 0.0).intValue();
 
         student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), addGold));
         testRecord.setAwardGold(addGold);
-        msg.append(" 中获得#").append(addGold).append("#金币。");
+        return addGold;
     }
 
     /**
      * 判断五维测试奖励金
      *
      * @param point
-     * @param genre
      * @param student
-     * @param msg
-     * @param studyModel
      * @param testRecord
      */
-    private void decideFiveD(Integer point, String genre, Student student, StringBuilder msg, String
-            studyModel, TestRecord testRecord) {
-        msg.append(genre).append(studyModel);
+    private int decideFiveD(Integer point, Student student, TestRecord testRecord) {
         int gold = 0;
         if (point < 90 && point >= 80) {
             // 奖励10金币
@@ -1671,7 +1657,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         testRecord.setAwardGold(gold);
         int addGold = testGoldUtil.addGold(student, gold);
         student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), addGold));
-        msg.append(" 中获得#").append(addGold).append("#金币。");
+        return addGold;
     }
 
 }

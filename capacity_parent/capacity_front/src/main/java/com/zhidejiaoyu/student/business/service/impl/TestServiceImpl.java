@@ -11,7 +11,6 @@ import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
 import com.zhidejiaoyu.common.constant.*;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.constant.study.StudyModelConstant;
-import com.zhidejiaoyu.common.constant.study.TestGenreConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.common.dto.phonetic.UnitTestDto;
@@ -41,6 +40,7 @@ import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
 import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.student.business.learn.common.SaveTeksData;
 import com.zhidejiaoyu.student.business.service.TestService;
+import com.zhidejiaoyu.student.common.SaveGoldLog;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -225,7 +225,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
             student.setEnergy(awardEnergy);
             studentMapper.updateById(student);
-            super.saveRunLog(student, 4, "在学前游戏测试中奖励#" + awardGold + "#枚金币");
+            SaveGoldLog.saveStudyGoldLog(student.getId(), GenreConstant.BEFORE_LEARN_GAME_TEST, awardGold);
         }
 
         TestResultVo vo = new TestResultVo();
@@ -1503,7 +1503,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         // 判断是否是首次测试
         boolean isFirst = false;
         TestRecord testRecord = testRecordMapper.selectByStudentIdAndUnitId(student.getId(),
-                dto.getUnitId(), TestGenreConstant.UNIT_TEST, PhoneticSymbolServiceImpl.STUDY_MODEL);
+                dto.getUnitId(), GenreConstant.UNIT_TEST, PhoneticSymbolServiceImpl.STUDY_MODEL);
         if (testRecord != null) {
             isFirst = true;
         }
@@ -1513,7 +1513,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord = new TestRecord();
         testRecord.setStudentId(student.getId());
         testRecord.setUnitId(dto.getUnitId());
-        testRecord.setGenre(TestGenreConstant.UNIT_TEST);
+        testRecord.setGenre(GenreConstant.UNIT_TEST);
         Date date = new Date();
         saveTestRecordTime(testRecord, session, date);
         testRecord.setPoint(point);
@@ -1536,7 +1536,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setExplain(message);
 
         vo.setMsg(message);
-        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, TestGenreConstant.UNIT_TEST));
+        vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, GenreConstant.UNIT_TEST));
         vo.setGold(getBonusGold(student, goldCount));
         //获取测试有效次数
         int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),

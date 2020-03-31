@@ -20,6 +20,7 @@ import com.zhidejiaoyu.common.vo.syntax.game.GameVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.TestServiceImpl;
 import com.zhidejiaoyu.student.business.syntax.service.SyntaxGameService;
+import com.zhidejiaoyu.student.common.SaveGoldLog;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -203,7 +204,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
             student.setEnergy(awardEnergy);
             studentMapper.updateById(student);
-            super.saveRunLog(student, 4, "在语法游戏中奖励#" + awardGold + "#枚金币");
+            SaveGoldLog.saveStudyGoldLog(student.getId(), SyntaxModelNameConstant.GAME, awardGold);
         }
 
         TestResultVo vo = new TestResultVo();

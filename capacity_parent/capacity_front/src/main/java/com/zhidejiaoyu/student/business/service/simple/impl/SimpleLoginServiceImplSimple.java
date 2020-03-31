@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.mapper.GoldLogMapper;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
@@ -15,6 +16,7 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.index.service.impl.IndexServiceImpl;
+import com.zhidejiaoyu.student.common.SaveGoldLog;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import com.zhidejiaoyu.common.constant.PetImageConstant;
 import com.zhidejiaoyu.student.business.service.simple.SimpleLoginServiceSimple;
@@ -24,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -87,6 +90,9 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     @Autowired
     private MedalAwardAsync medalAwardAsync;
 
+    @Resource
+    private GoldLogMapper goldLogMapper;
+
     @Override
     @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
@@ -102,9 +108,9 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
             Award award = simpleAwardMapper.selectByAwardContentTypeAndType(studentId, 2, 12);
             if (award == null || award.getCanGet() == 2) {
                 // 首次修改密码
-                student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), 10));
-                RunLog runLog = new RunLog(student.getId(), 4, "学生首次修改密码，奖励#10#金币", new Date());
-                runLogMapper.insert(runLog);
+                int gold = 10;
+                student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
+                SaveGoldLog.saveStudyGoldLog(student.getId(), "首次修改密码", gold);
 
                 // 首次修改密码奖励
                 goldAwardAsync.dailyAward(student, 12);
@@ -424,8 +430,8 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         this.getMyLevelInfo(map, myGold, redisOpt);
 
         // 获取今日获得金币
-        List<String> list = runLogMapper.getStudentGold(DateUtil.formatYYYYMMDD(new Date()), studentId);
-        IndexServiceImpl.getTodayGold(map, list);
+        Integer todayGold = goldLogMapper.sumTodayAddGold(student.getId());
+        map.put("myThisGold", todayGold == null ? 0 : todayGold);
 
         return ServerResponse.createBySuccess(map);
     }

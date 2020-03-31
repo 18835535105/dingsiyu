@@ -2,14 +2,13 @@ package com.zhidejiaoyu.student.business.index.service.impl;
 
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.mapper.RunLogMapper;
+import com.zhidejiaoyu.common.mapper.GoldLogMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.VocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.DurationUtil;
-import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.index.service.IndexService;
@@ -23,12 +22,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author: wuchenxi
@@ -42,7 +37,7 @@ public class IndexServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabula
     private RedisOpt redisOpt;
 
     @Resource
-    private RunLogMapper runLogMapper;
+    private GoldLogMapper goldLogMapper;
 
     @Resource
     private StudentMapper studentMapper;
@@ -102,29 +97,8 @@ public class IndexServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabula
      * @param studentId
      */
     private double getTodayGold(Long studentId) {
-        List<String> list = runLogMapper.getStudentGold(DateUtil.formatYYYYMMDD(new Date()), studentId);
-        return getTodayGold(new HashMap<>(16), list);
-    }
-
-    /**
-     * 封装今日得到的金币数
-     *
-     * @param map
-     * @param list
-     */
-    public static double getTodayGold(Map<String, Object> map, List<String> list) {
-        double count = 0.0;
-        String regex = "#(.*)#";
-        Pattern pattern = Pattern.compile(regex);
-        for (String str : list) {
-            // 匹配类
-            Matcher matcher = pattern.matcher(str);
-            while (matcher.find()) {
-                count += Double.parseDouble(matcher.group(1));
-            }
-        }
-        map.put("myThisGold", count);
-        return count;
+        Integer todayGold = goldLogMapper.sumTodayAddGold(studentId);
+        return todayGold == null ? 0.0 : todayGold;
     }
 
     /**
