@@ -22,10 +22,4 @@ public interface QuartzStudyCalendarService extends BaseQuartzService {
      * 每日新增打卡机点赞记录数据
      */
     void initPunchRecord();
-
-
-    /**
-     * 将runLog中的金币记录迁移到GoldLog中
-     */
-    void runLogToGoldLog();
 }
