@@ -22,4 +22,18 @@
         </foreach>
         )
     </delete>
+
+    <select id="selectGoldByStudentIdAndDate" parameterType="map" resultType="integer">
+        select
+        <if test="type==1">
+            sum(gold_add)
+        </if>
+        <if test="type==2">
+            sum(gold_reduce)
+        </if>
+        from gold_log
+        where student_id=#{studentId}
+        and to_days(create_time)= to_days(#{date})
+    </select>
+
 </mapper>

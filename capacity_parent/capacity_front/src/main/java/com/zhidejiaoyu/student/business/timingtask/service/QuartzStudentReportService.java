@@ -24,14 +24,4 @@ public interface QuartzStudentReportService {
      */
     void exportStudentPay();
 
-    /**
-     * 获取学生每日摘要
-     */
-    void getStudentDailyLearning();
-
-    /**
-     * 整合每日学生金币增加数据
-     */
-    void getGoldAdd();
-
 }
