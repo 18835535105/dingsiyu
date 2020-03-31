@@ -416,7 +416,7 @@
     </delete>
 
     <select id="selectLoginStudentId" resultType="long" parameterType="map">
-        select operate_user_id from run_log where to_days(create_time)=to_days(#{day})
+        select operate_user_id from run_log where to_days(create_time)=to_days(#{day}) group by operate_user_id
     </select>
 
     <select id="selectGoldByStudentIdAndDate" parameterType="map" resultMap="BaseResultMap">
@@ -433,7 +433,7 @@
         select
         <include refid="Base_Column_List"></include>
         from run_log
-        where  `type`=#{type}
+        where `type`=#{type}
         and to_days(create_time)=to_days(#{date})
     </select>
     <select id="selectLoginTimeByStudentIdAndDate" parameterType="map" resultType="date">
