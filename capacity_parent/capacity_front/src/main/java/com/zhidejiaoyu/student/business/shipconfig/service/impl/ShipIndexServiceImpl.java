@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.student.business.shipconfig.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.constant.PetImageConstant;
 import com.zhidejiaoyu.common.constant.redis.SourcePowerKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.Student;
@@ -250,7 +250,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void initRank() {
-        List<Student> students = studentMapper.selectList(null);
+        List<Student> students = studentMapper.selectList(new QueryWrapper<Student>().isNotNull("head_url"));
         for (Student student : students) {
             if (student.getTeacherId() == null) {
                 continue;
