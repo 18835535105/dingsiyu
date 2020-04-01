@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.redis.SourcePowerKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.StudentExpansion;
-import com.zhidejiaoyu.common.pojo.StudentSkin;
-import com.zhidejiaoyu.common.pojo.SyntheticRewardsList;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
@@ -26,10 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -59,6 +53,20 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Resource
     private SourcePowerRankOpt sourcePowerRankOpt;
 
+    @Resource
+    private MedalMapper medalMapper;
+
+    /**
+     * 强化度对应的中文等级
+     */
+    private static final Map<Integer, String> DEGREE = new HashMap<>(16);
+
+    static {
+        DEGREE.put(1, "普通");
+        DEGREE.put(2, "精英");
+        DEGREE.put(3, "传奇");
+    }
+
     @Override
     public ServerResponse<Object> index() {
         Student student = super.getStudent();
@@ -66,18 +74,18 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(studentId);
 
         // 皮肤
-        StudentSkin studentSkin = studentSkinMapper.selectUseSkinByStudentId(studentId);
+        IndexVO.Info skinInfo = getSkinInfo(studentId);
 
         // 勋章图片
-        List<String> medalImgList = this.getMedalImgList(studentExpansion);
+        List<IndexVO.Info> medalInfos = this.getMedalImgList(studentExpansion);
 
         // 学生装备的飞船及装备信息
         List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
         if (CollectionUtils.isEmpty(equipments)) {
             // 学生还没有装备数据
             return ServerResponse.createBySuccess(IndexVO.builder()
-                    .skinImgUrl(studentSkin == null ? "" : GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()))
-                    .medalUrl(medalImgList)
+                    .skinInfo(skinInfo)
+                    .medalInfos(medalInfos)
                     .build());
         }
 
@@ -92,18 +100,38 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
         return ServerResponse.createBySuccess(IndexVO.builder()
                 .sourcePoser(studentExpansion.getSourcePower())
-                .skinImgUrl(studentSkin == null ? "" : GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()))
-                .medalUrl(medalImgList)
-                .armorUrl(indexVO.getArmorUrl())
-                .missileUrl(indexVO.getMissileUrl())
-                .shipUrl(indexVO.getShipUrl())
-                .weaponsUrl(indexVO.getWeaponsUrl())
-                .heroImgUrl(indexVO.getHeroImgUrl())
-                .sourceUrl(syntheticRewardsList == null ? "" : GetOssFile.getPublicObjectUrl(syntheticRewardsList.getImgUrl()))
+                .skinInfo(skinInfo)
+                .medalInfos(medalInfos)
+                .armorInfo(indexVO.getArmorInfo())
+                .missileInfo(indexVO.getMissileInfo())
+                .shipInfo(indexVO.getShipInfo())
+                .weaponsInfo(indexVO.getWeaponsInfo())
+                .heroImgInfo(indexVO.getHeroImgInfo())
+                .sourceInfo(getSourceInfo(syntheticRewardsList))
                 .baseValue(baseValue)
                 .stateOfWeek(stateOfWeek)
                 .radar(radar)
                 .build());
+    }
+
+    public IndexVO.Info getSourceInfo(SyntheticRewardsList syntheticRewardsList) {
+        if (syntheticRewardsList != null) {
+            return IndexVO.Info.builder().id(Long.valueOf(syntheticRewardsList.getId()))
+                    .url(GetOssFile.getPublicObjectUrl(syntheticRewardsList.getImgUrl()))
+                    .explain(syntheticRewardsList.getName())
+                    .build();
+        }
+        return null;
+    }
+
+    public IndexVO.Info getSkinInfo(Long studentId) {
+        StudentSkin studentSkin = studentSkinMapper.selectUseSkinByStudentId(studentId);
+        if (studentSkin != null) {
+            return IndexVO.Info.builder().id(Long.valueOf(studentSkin.getId()))
+                    .url(GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()))
+                    .explain(studentSkin.getSkinName()).build();
+        }
+        return null;
     }
 
     /**
@@ -324,25 +352,37 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
     public IndexVO getIndexVoTmp(List<Map<String, Object>> equipments) {
         IndexVO indexVO = new IndexVO();
+        StringBuilder explain = new StringBuilder();
         if (CollectionUtils.isNotEmpty(equipments)) {
             equipments.forEach(map -> {
+                explain.setLength(0);
+
                 Integer type = (Integer) map.get("type");
+                Long id = (Long) map.get("id");
                 String imgUrl = GetOssFile.getPublicObjectUrl((String) map.get("imgUrl"));
+
+                this.getExplain(explain, map);
+
+                IndexVO.Info info = IndexVO.Info.builder()
+                        .id(id)
+                        .url(imgUrl)
+                        .explain(StringUtils.removeEnd(explain.toString(), "，"))
+                        .build();
                 switch (type) {
                     case EquipmentTypeConstant.SHIP:
-                        indexVO.setShipUrl(imgUrl);
+                        indexVO.setShipInfo(info);
                         break;
                     case EquipmentTypeConstant.WEAPONS:
-                        indexVO.setWeaponsUrl(imgUrl);
+                        indexVO.setWeaponsInfo(info);
                         break;
                     case EquipmentTypeConstant.MISSILE:
-                        indexVO.setMissileUrl(imgUrl);
+                        indexVO.setMissileInfo(info);
                         break;
                     case EquipmentTypeConstant.ARMOR:
-                        indexVO.setArmorUrl(imgUrl);
+                        indexVO.setArmorInfo(info);
                         break;
                     case EquipmentTypeConstant.HERO:
-                        indexVO.setHeroImgUrl(imgUrl);
+                        indexVO.setHeroImgInfo(info);
                         break;
                     default:
                 }
@@ -351,11 +391,57 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         return indexVO;
     }
 
-    public List<String> getMedalImgList(StudentExpansion studentExpansion) {
+    public void getExplain(StringBuilder explain, Map<String, Object> map) {
+        explain.append(map.get("name").toString()).append("，")
+                .append(DEGREE.get(map.get("degree"))).append("，");
+        if (map.get("sourceForce") != null && (int) map.get("sourceForce") != 0) {
+            explain.append("源分+").append((int) map.get("sourceForce")).append("，");
+        }
+        if (map.get("sourceForceAttack") != null && (int) map.get("sourceForceAttack") != 0) {
+            explain.append("源分攻击+").append((int) map.get("sourceForceAttack")).append("，");
+        }
+        if (map.get("commonAttack") != null && (int) map.get("commonAttack") != 0) {
+            explain.append("普通攻击+").append((int) map.get("commonAttack")).append("，");
+        }
+        if (map.get("durability") != null && (int) map.get("durability") != 0) {
+            explain.append("耐久度+").append((int) map.get("durability")).append("，");
+        }
+        if (map.get("hitRate") != null && (double) map.get("hitRate") != 0.0) {
+            explain.append("命中率+").append((double) map.get("hitRate")).append("，");
+        }
+        if (map.get("mobility") != null && (int) map.get("mobility") != 0) {
+            explain.append("机动力+").append((int) map.get("mobility")).append("，");
+        }
+    }
+
+    public List<IndexVO.Info> getMedalImgList(StudentExpansion studentExpansion) {
         String medalNo = studentExpansion.getMedalNo();
         if (StringUtils.isEmpty(medalNo)) {
             return null;
         }
-        return Arrays.asList(medalNo.split(","));
+
+        List<Long> medalIdList = Arrays.stream(medalNo.split(",")).map(Long::parseLong).collect(Collectors.toList());
+
+        List<Medal> medals = medalMapper.selectBatchIds(medalIdList);
+
+        List<IndexVO.Info> medalInfos = new ArrayList<>(medals.size());
+
+        medalIdList.forEach(id -> {
+            for (Medal medal : medals) {
+                if (Objects.equals(medal.getId(), id)) {
+                    String[] explainArr = medal.getMarkedWords().split("点亮");
+                    String explain = StringUtils.removeEnd(explainArr[1].trim(), "。") + "，"
+                            + StringUtils.removeEnd(explainArr[0].trim(), "，");
+
+                    medalInfos.add(IndexVO.Info.builder()
+                            .id(id)
+                            .url(GetOssFile.getPublicObjectUrl(medal.getChildImgUrl()))
+                            .explain(explain)
+                            .build());
+                }
+            }
+        });
+
+        return medalInfos;
     }
 }
