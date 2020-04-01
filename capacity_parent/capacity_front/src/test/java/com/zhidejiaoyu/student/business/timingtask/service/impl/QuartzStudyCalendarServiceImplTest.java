@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.timingtask.service.impl;
 
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzStudyCalendarService;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -18,4 +19,8 @@ public class QuartzStudyCalendarServiceImplTest {
     @Resource
     private QuartzStudyCalendarService quartzStudyCalendarService;
 
+    @Test
+    public void initLearningDetails() {
+        quartzStudyCalendarService.initLearningDetails();
+    }
 }

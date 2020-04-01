@@ -333,11 +333,10 @@
         )
     </delete>
     <select id="selectDayTimeByStudentId" parameterType="map" resultType="integer">
-        select
-         sum(online_time)
-         from duration
-         where student_id =#{studentId}
-         group by TO_DAYS(login_time)
+        select sum(online_time)
+        from duration
+        where student_id = #{studentId}
+        group by TO_DAYS(login_time)
     </select>
 
     <select id="selectValidTimeByStudentIds" resultType="map" parameterType="map">
@@ -354,13 +353,48 @@
     </select>
 
     <select id="selectLoginTimeByStudentIdAndDate" resultType="date" parameterType="map">
-        select
-        login_time
+        select login_time
         from duration
-        where student_id =#{studentId}
-        and to_days(login_time)=to_days(#{date})
+        where student_id = #{studentId}
+          and to_days(login_time) = to_days(#{date})
         order by login_time
         limit 1
+    </select>
+    <select id="selectByLearningDetails" resultType="java.util.Map" parameterType="map">
+        select
+        sum(valid_time) validTime,
+        sum(online_time) onlineTime,
+        learning_model learningModel
+        from duration
+        where student_id = #{learningDetails.studentId}
+        and to_days(login_time) = to_days(#{date})
+        and course_id = #{learningDetails.courseId}
+        and unit_id = #{learningDetails.unitId}
+        and `group` = #{learningDetails.group}
+        and study_model in (
+        <if test="learningDetails.type == 1">
+            /*单词模块*/
+            0,1,2,3,4,10,11,12,13,27,35,36
+        </if>
+        <if test="learningDetails.type == 2">
+            /*句型模块*/
+            5,6,7
+        </if>
+        <if test="learningDetails.type == 3">
+            /*课文模块*/
+            28,29
+        </if>
+        <if test="learningDetails.type == 4">
+            /*字母、音标模块*/
+            30,31,32,33
+        </if>
+        <if test="learningDetails.type == 5">
+            /*语法模块*/
+        </if>
+        )
+        and learning_model is not null
+        and `group` is not null
+        group by learning_model
     </select>
 
 

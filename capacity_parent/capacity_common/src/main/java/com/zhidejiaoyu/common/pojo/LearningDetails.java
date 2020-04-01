@@ -1,12 +1,14 @@
 package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import java.time.LocalDateTime;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -59,6 +61,7 @@ public class LearningDetails implements Serializable {
     /**
      * group分类
      */
+    @TableField("`group`")
     private Integer group;
 
     /**
@@ -79,12 +82,12 @@ public class LearningDetails implements Serializable {
     /**
      * 学习时间
      */
-    private LocalDateTime studyTime;
+    private Date studyTime;
 
     /**
      * 创建时间
      */
-    private LocalDateTime createTime;
+    private Date createTime;
 
 
 }

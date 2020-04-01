@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -56,4 +57,12 @@ public interface LearnHistoryMapper extends BaseMapper<LearnHistory> {
     Map<Long, Map<Long, Object>> countUnitByStudentIdAndCourseIds(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds, @Param("type") int type);
 
     List<Long> selectWordListBystudentId(@Param("studentId") long studentId);
+
+    /**
+     * 获取指定日期学习过的记录
+     *
+     * @param date
+     * @return
+     */
+    List<LearnHistory> selectByUpdateTime(@Param("date") Date date);
 }

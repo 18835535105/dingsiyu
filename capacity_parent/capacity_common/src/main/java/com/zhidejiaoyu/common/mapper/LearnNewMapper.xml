@@ -17,6 +17,9 @@
     <sql id="base_sql">
         id, student_id, course_id, unit_id, `group`, easy_or_hard, model_type, update_time
     </sql>
+    <sql id="more_table_sql">
+        ln.id, ln.student_id, ln.course_id, ln.unit_id, ln.`group`, ln.easy_or_hard, ln.model_type, ln.update_time
+    </sql>
     <sql id="getByType">
         <if test="type==1">
             v.id,
@@ -158,7 +161,20 @@
     </select>
 
     <select id="getUnitIdByStudentIdAndType" parameterType="map" resultType="long">
-        select unit_id from learn_new where student_id=#{studentId} and `model_type` =#{type}
+        select unit_id
+        from learn_new
+        where student_id = #{studentId}
+          and `model_type` = #{type}
+    </select>
+    <select id="selectByUpdateTime" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="more_table_sql"/>
+        FROM
+        learn_new ln,
+        learn_extend le
+        WHERE
+        ln.id = le.learn_id
+        AND TO_DAYS(le.update_time) = TO_DAYS(#{date})
     </select>
 
 </mapper>

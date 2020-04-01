@@ -1,19 +1,15 @@
 package com.zhidejiaoyu.student.business.timingtask.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.GoldLog;
-import com.zhidejiaoyu.common.pojo.PunchRecord;
-import com.zhidejiaoyu.common.pojo.RunLog;
-import com.zhidejiaoyu.common.pojo.StudentDailyLearning;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzStudyCalendarService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -41,14 +37,33 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
 
     @Resource
     private StudentDailyLearningMapper studentDailyLearningMapper;
+
     @Resource
     private ClockInMapper clockInMapper;
+
     @Resource
     private PunchRecordMapper punchRecordMapper;
+
     @Resource
     private RunLogMapper runLogMapper;
+
     @Resource
     private DurationMapper durationMapper;
+
+    @Resource
+    private LearnNewMapper learnNewMapper;
+
+    @Resource
+    private LearnHistoryMapper learnHistoryMapper;
+
+    @Resource
+    private CourseNewMapper courseNewMapper;
+
+    @Resource
+    private UnitNewMapper unitNewMapper;
+
+    @Resource
+    private LearningDetailsMapper learningDetailsMapper;
 
     /**
      * 每天 0：02 分执行
@@ -58,21 +73,21 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
         if (checkPort(port)) {
             return;
         }
-        log.info("初始化学习日历开始....");
+        log.info("定时任务 -> 初始化学习日历开始....");
         this.initStudentDailyLearning();
         this.initLearningDetails();
         this.initPunchRecord();
-        log.info("初始化学习日历结束！");
+        log.info("定时任务 -> 初始化学习日历结束！");
     }
 
     @Override
     public void initStudentDailyLearning() {
         Date beforeDaysDate = DateUtil.getBeforeDaysDate(new Date(), 1);
         //获取昨日登入的学生
-        getStudentDily(beforeDaysDate);
+        getStudentDaily(beforeDaysDate);
     }
 
-    private void getStudentDily(Date beforeDaysDate) {
+    private void getStudentDaily(Date beforeDaysDate) {
         log.info("定时任务 -> 统计学生详情开始。");
         List<Long> studentIds = runLogMapper.selectLoginStudentId(beforeDaysDate);
         if (studentIds != null && studentIds.size() > 0) {
@@ -118,7 +133,111 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
 
     @Override
     public void initLearningDetails() {
+        log.info("定时任务 -> 统计每日新增学习详情页数据开始...");
+        Date beforeDaysDate = DateUtil.getBeforeDaysDate(new Date(), 1);
+        // 正在学习的课程
+        List<LearnNew> learnNews = learnNewMapper.selectByUpdateTime(beforeDaysDate);
+        // 已经学习的课程
+        List<LearnHistory> learnHistories = learnHistoryMapper.selectByUpdateTime(beforeDaysDate);
 
+        // 合并相同 类型+课程+单元+group 数据
+        Map<String, LearningDetails> map = new HashMap<>(16);
+        StringBuilder sb = new StringBuilder();
+        learnNews.forEach(learnNew -> this.packageMap(beforeDaysDate, map, sb, learnNew));
+
+        learnHistories.forEach(learnHistory -> this.packageMap(beforeDaysDate, map, sb, learnHistory));
+
+        // 从时长表中获取 类型+课程+单元+group 数据
+        Date now = new Date();
+        map.forEach((key, value) -> {
+            List<Map<String, Object>> durationList = durationMapper.selectByLearningDetails(value, beforeDaysDate);
+            if (CollectionUtils.isNotEmpty(durationList)) {
+                for (Map<String, Object> stringObjectMap : durationList) {
+                    Object validTime = stringObjectMap.get("validTime");
+                    Object onlineTime = stringObjectMap.get("onlineTime");
+                    Object learningModel = stringObjectMap.get("learningModel");
+                    value.setValidTime(validTime == null ? 0 : Long.parseLong(validTime.toString()));
+                    value.setOnlineTime(onlineTime == null ? 0 : Long.parseLong(onlineTime.toString()));
+                    value.setLearningModel(Integer.parseInt(learningModel.toString()));
+
+                    CourseNew courseNew = courseNewMapper.selectById(value.getCourseId());
+                    UnitNew unitNew = unitNewMapper.selectById(value.getUnitId());
+
+                    value.setCourseName(courseNew.getCourseName());
+                    value.setUnitName(unitNew.getUnitName());
+                    value.setCreateTime(now);
+                    learningDetailsMapper.insert(value);
+                }
+            }
+        });
+
+        log.info("定时任务 -> 统计每日新增学习详情页数据结束");
+    }
+
+    public void packageMap(Date beforeDaysDate, Map<String, LearningDetails> map, StringBuilder sb, Object object) {
+        sb.setLength(0);
+        Long courseId;
+        Long unitId;
+        Integer group;
+        Long studentId;
+        Integer learnType;
+
+        LearningDetails learningDetails = new LearningDetails();
+        if (object instanceof LearnNew) {
+            LearnNew learnNew = (LearnNew) object;
+            courseId = learnNew.getCourseId();
+            unitId = learnNew.getUnitId();
+            group = learnNew.getGroup();
+            studentId = learnNew.getStudentId();
+            learnType = this.getLearnNewType(learnNew.getModelType());
+        } else {
+            LearnHistory learnHistory = (LearnHistory) object;
+            courseId = learnHistory.getCourseId();
+            unitId = learnHistory.getUnitId();
+            group = learnHistory.getGroup();
+            studentId = learnHistory.getStudentId();
+            learnType = this.getLearnHistoryType(learnHistory.getType());
+        }
+
+        learningDetails.setCourseId(courseId);
+        learningDetails.setUnitId(unitId);
+        learningDetails.setGroup(group);
+        learningDetails.setStudyTime(beforeDaysDate);
+        learningDetails.setStudentId(studentId);
+        learningDetails.setType(learnType);
+
+        sb.append(learnType).append(courseId).append(unitId).append(group);
+        map.put(sb.toString(), learningDetails);
+    }
+
+    private Integer getLearnHistoryType(Integer type) {
+        switch (type) {
+            case 1:
+                return 1;
+            case 2:
+                return 2;
+            case 3:
+                return 5;
+            case 4:
+                return 3;
+            default:
+                return null;
+        }
+    }
+
+    private Integer getLearnNewType(Integer modelType) {
+        switch (modelType) {
+            case 1:
+                return 1;
+            case 2:
+                return 2;
+            case 3:
+                return 3;
+            case 4:
+                return 5;
+            default:
+                return null;
+        }
     }
 
     @Override
@@ -133,7 +252,7 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
         Map<Long, Map<String, Object>> studentMap = testRecordMapper.selectByGenreAndDate(GenreConstant.SMALLAPP_GENRE, beforeDaysDate);
         Set<Long> longs = studentMap.keySet();
         if (longs.size() > 0) {
-            List<Long> list = new ArrayList(longs);
+            List<Long> list = new ArrayList<>(longs);
             Map<Long, Map<String, Object>> longMapMap1 = worshipMapper.selectByStudentIdsAndDate(list, beforeDaysDate);
             list.forEach(studentId -> {
                 PunchRecord punchRecord = new PunchRecord();
@@ -148,11 +267,7 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
                     punchRecord.setOiling(0);
                 }
                 punchRecord.setCreatTime(LocalDateTime.now());
-                if (map != null) {
-                    punchRecord.setPoint(map.get("count") != null ? Integer.parseInt(map.get("count").toString()) : 0);
-                } else {
-                    punchRecord.setPoint(0);
-                }
+                punchRecord.setPoint(map.get("count") != null ? Integer.parseInt(map.get("count").toString()) : 0);
 
                 punchRecordMapper.insert(punchRecord);
             });
