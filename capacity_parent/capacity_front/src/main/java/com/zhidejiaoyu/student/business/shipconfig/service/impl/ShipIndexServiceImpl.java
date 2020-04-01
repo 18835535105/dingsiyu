@@ -318,6 +318,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 .myRank(rank)
                 .total(studentCount)
                 .rankInfoList(collect)
+                .pages((int) Math.ceil(studentCount * 1.0 / PageUtil.getPageSize()))
                 .build());
     }
 
