@@ -289,7 +289,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     }
 
     public static void setOneKeyGroup(LearnNew learnNew) {
-        HttpUtil.getHttpSession().setAttribute(SessionConstant.ONE_KEY_GROUP, learnNew.getGroup());
+        HttpSession session = HttpUtil.getHttpSession();
+        Integer group = learnNew.getGroup();
+        session.setAttribute(SessionConstant.ONE_KEY_GROUP, group);
+        session.setAttribute(SessionConstant.STUDY_GROUP, group);
     }
 
 

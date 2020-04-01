@@ -329,7 +329,10 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     }
 
     public static void setFreeGroup(LearnNew learnNew) {
-        HttpUtil.getHttpSession().setAttribute(SessionConstant.FREE_GROUP, learnNew.getGroup());
+        HttpSession session = HttpUtil.getHttpSession();
+        Integer group = learnNew.getGroup();
+        session.setAttribute(SessionConstant.FREE_GROUP, group);
+        session.setAttribute(SessionConstant.STUDY_GROUP, group);
     }
 
     private void judgeCourseCcie(NodeDto dto) {
