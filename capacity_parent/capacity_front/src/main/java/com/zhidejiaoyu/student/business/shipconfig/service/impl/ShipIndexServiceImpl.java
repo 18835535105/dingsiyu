@@ -394,23 +394,29 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     public void getExplain(StringBuilder explain, Map<String, Object> map) {
         explain.append(map.get("name").toString()).append("，")
                 .append(DEGREE.get(map.get("degree"))).append("，");
-        if (map.get("sourceForce") != null && (int) map.get("sourceForce") != 0) {
-            explain.append("源分+").append((int) map.get("sourceForce")).append("，");
+        int sourceForce = (int) map.get("sourceForce");
+        if (map.get("sourceForce") != null && sourceForce != 0) {
+            explain.append("源分次数").append(sourceForce > 0 ? "+" : "").append(sourceForce).append("，");
         }
-        if (map.get("sourceForceAttack") != null && (int) map.get("sourceForceAttack") != 0) {
-            explain.append("源分攻击+").append((int) map.get("sourceForceAttack")).append("，");
+        int sourceForceAttack = (int) map.get("sourceForceAttack");
+        if (map.get("sourceForceAttack") != null && sourceForceAttack != 0) {
+            explain.append("源分攻击+").append(sourceForceAttack > 0 ? "+" : "").append(sourceForceAttack).append("，");
         }
-        if (map.get("commonAttack") != null && (int) map.get("commonAttack") != 0) {
-            explain.append("普通攻击+").append((int) map.get("commonAttack")).append("，");
+        int commonAttack = (int) map.get("commonAttack");
+        if (map.get("commonAttack") != null && commonAttack != 0) {
+            explain.append("普通攻击+").append(commonAttack > 0 ? "+" : "").append(commonAttack).append("，");
         }
-        if (map.get("durability") != null && (int) map.get("durability") != 0) {
-            explain.append("耐久度+").append((int) map.get("durability")).append("，");
+        int durability = (int) map.get("durability");
+        if (map.get("durability") != null && durability != 0) {
+            explain.append("耐久度+").append(durability > 0 ? "+" : "").append(durability).append("，");
         }
-        if (map.get("hitRate") != null && (double) map.get("hitRate") != 0.0) {
-            explain.append("命中率+").append((double) map.get("hitRate")).append("，");
+        double hitRate = (double) map.get("hitRate");
+        if (map.get("hitRate") != null && hitRate != 0.0) {
+            explain.append("命中率+").append(hitRate > 0 ? "+" : "").append(hitRate * 100).append("%，");
         }
-        if (map.get("mobility") != null && (int) map.get("mobility") != 0) {
-            explain.append("机动力+").append((int) map.get("mobility")).append("，");
+        int mobility = (int) map.get("mobility");
+        if (map.get("mobility") != null && mobility != 0) {
+            explain.append("机动力+").append(mobility > 0 ? "+" : "").append(mobility).append("，");
         }
     }
 
