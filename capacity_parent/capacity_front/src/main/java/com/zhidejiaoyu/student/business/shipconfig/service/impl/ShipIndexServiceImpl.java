@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.shipconfig.constant.EquipmentTypeConstant;
+import com.zhidejiaoyu.student.business.shipconfig.dto.ShipConfigInfoDTO;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.util.CalculateUtil;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
@@ -197,8 +198,6 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         studentExpansionMapper.updateById(studentExpansion);
         return ServerResponse.createBySuccess();
     }
-
-
 
     /**
      * 获取各项最大值（基础值）
@@ -405,11 +404,42 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     }
 
     @Override
-    public void getExplain(StringBuilder explain, Map<String, Object> map) {
-        explain.append(map.get("name").toString()).append("，")
-                .append(DEGREE.get(map.get("degree"))).append("，");
-        int sourceForce = (int) map.get("sourceForce");
-        if (map.get("sourceForce") != null && sourceForce != 0) {
+    public ShipConfigInfoDTO getShipConfigInfoDTO(Map<String, Object> map) {
+        int degree = map.get("degree") == null ? 0 : (int) map.get("degree");
+        String name = map.get("name") == null ? "" : map.get("name").toString();
+        int sourceForce = map.get("sourceForce") == null ? 0 : (int) map.get("sourceForce");
+        int sourceForceAttack = map.get("sourceForceAttack") == null ? 0 : (int) map.get("sourceForceAttack");
+        int commonAttack = map.get("commonAttack") == null ? 0 : (int) map.get("commonAttack");
+        int durability = map.get("durability") == null ? 0 : (int) map.get("durability");
+        double hitRate = map.get("hitRate") == null ? 0.0D : (double) map.get("hitRate");
+        int mobility = map.get("mobility") == null ? 0 : (int) map.get("mobility");
+
+        return ShipConfigInfoDTO.builder()
+                .baseValue(IndexVO.BaseValue.builder()
+                        .source(sourceForce)
+                        .sourceAttack(sourceForceAttack)
+                        .attack(commonAttack)
+                        .durability(durability)
+                        .hitRate(hitRate)
+                        .move(mobility)
+                        .build())
+                .name(name)
+                .degree(degree)
+                .build();
+    }
+
+    /**
+     * 获取配置说明文字
+     *
+     * @param shipConfigInfoDTO
+     * @return
+     */
+    public static String getExplain(ShipConfigInfoDTO shipConfigInfoDTO) {
+        StringBuilder explain = new StringBuilder();
+        explain.append(shipConfigInfoDTO.getName()).append("，")
+                .append(DEGREE.get(shipConfigInfoDTO.getDegree())).append("，");
+        int sourceForce = shipConfigInfoDTO.getBaseValue().getSource();
+        if (sourceForce != 0) {
             explain.append("源分次数").append(sourceForce > 0 ? "+" : "").append(sourceForce).append("，");
         }
         int sourceForceAttack = (int) map.get("sourceForceAttack");
