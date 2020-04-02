@@ -78,7 +78,9 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
         if (studentIds != null && studentIds.size() > 0) {
             //获取学生今日学习时常
             Map<String, Map<String, Object>> studentLoginMap = durationMapper.selectValidTimeByStudentIds(studentIds, beforeDaysDate);
+            //是否打卡
             Map<Long, Map<String, Object>> longMapMap = clockInMapper.selectByStudentIds(studentIds, beforeDaysDate);
+            //点赞数量
             Map<Long, Map<String, Object>> longMapMap1 = worshipMapper.selectByStudentIdsAndDate(studentIds, beforeDaysDate);
             studentIds.forEach(studentId -> {
                 StudentDailyLearning studentDailyLearning = new StudentDailyLearning();
