@@ -84,7 +84,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
         Map<Object, Object> retrun = new HashMap<>();
         Map<Integer, Object> maps1 = new HashMap<>();
         for (Map<String, Object> ma : maps) {
-            Integer finalName = (Integer) AwardUtil.getMaps((String) ma.get("finalName"));
+            Integer finalName = (Integer) AwardUtil.getIndexByName((String) ma.get("finalName"));
             maps1.put(finalName, ma);
         }
         List<SyntheticRewardsList> gloveOrFlower = simpleSyntheticRewardsListMapper.getGloveOrFlower(studentId);
@@ -101,7 +101,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                     if (o == null) {
                         Map<String, Object> setMap = new HashMap<>();
                         setMap.put("finalName", AwardUtil.getAward(i));
-                        setMap.put("number", AwardUtil.getNumber(i));
+                        setMap.put("number", AwardUtil.getBonusByIndex(i));
                         setMap.put("count", 0);
                         setMap.put("finalNameInteger", i);
                         setMap.put("isEnter", false);
@@ -111,7 +111,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                         Map<String, Object> setMap = new HashMap<>();
                         HashMap o1 = (HashMap) maps1.get(i);
                         setMap.put("finalName", o1.get("finalName"));
-                        setMap.put("number", AwardUtil.getNumber(i));
+                        setMap.put("number", AwardUtil.getBonusByIndex(i));
                         setMap.put("count", o1.get("count"));
                         setMap.put("finalNameInteger", i);
                         setMap.put("isEnter", false);
@@ -121,12 +121,12 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 } else {
                     Map<String, Object> setMap = new HashMap<>();
                     setMap.put("finalName", AwardUtil.getAward(i));
-                    setMap.put("number", AwardUtil.getNumber(i));
+                    setMap.put("number", AwardUtil.getBonusByIndex(i));
                     setMap.put("count", 6);
                     setMap.put("finalNameInteger", i);
                     setMap.put("isEnter", false);
-                    setMap.put("isWear", student.getBonusExpires() != null
-                            && student.getBonusExpires().getTime() >= System.currentTimeMillis() ? false : true);
+                    setMap.put("isWear", student.getBonusExpires() == null
+                            || student.getBonusExpires().getTime() < System.currentTimeMillis());
                     retrun.put(i, setMap);
                 }
             }
@@ -143,7 +143,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                     if (o == null) {
                         Map<String, Object> setMap = new HashMap<>();
                         setMap.put("finalName", AwardUtil.getAward(i));
-                        setMap.put("number", AwardUtil.getNumber(i));
+                        setMap.put("number", AwardUtil.getBonusByIndex(i));
                         setMap.put("count", 0);
                         setMap.put("finalNameInteger", i);
                         setMap.put("isEnter", false);
@@ -153,7 +153,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                         Map<String, Object> setMap = new HashMap<>();
                         HashMap o1 = (HashMap) maps1.get(i);
                         setMap.put("finalName", o1.get("finalName"));
-                        setMap.put("number", AwardUtil.getNumber(i));
+                        setMap.put("number", AwardUtil.getBonusByIndex(i));
                         setMap.put("count", o1.get("count"));
                         setMap.put("finalNameInteger", i);
                         setMap.put("isEnter", false);
@@ -163,12 +163,12 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 } else {
                     Map<String, Object> setMap = new HashMap<>();
                     setMap.put("finalName", AwardUtil.getAward(i));
-                    setMap.put("number", AwardUtil.getNumber(i));
+                    setMap.put("number", AwardUtil.getBonusByIndex(i));
                     setMap.put("count", 5);
                     setMap.put("finalNameInteger", i);
                     setMap.put("isEnter", false);
-                    setMap.put("isWear", student.getBonusExpires() != null
-                            && student.getBonusExpires().getTime() >= System.currentTimeMillis() ? false : true);
+                    setMap.put("isWear", student.getBonusExpires() == null
+                            || student.getBonusExpires().getTime() < System.currentTimeMillis());
                     retrun.put(i, setMap);
                 }
 
@@ -201,7 +201,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 if (endTime.getTime() > System.currentTimeMillis()) {
                     map.put("status", 2);
                     map.put("beUseing", true);
-                    map.put("nameId", AwardUtil.getMaps((String) map.get("name")));
+                    map.put("nameId", AwardUtil.getIndexByName((String) map.get("name")));
                     map.put("time", (endTime.getTime() - System.currentTimeMillis()) / 1000);
                     map.put("type", 1);
                     map.put("imgUrl", GetOssFile.getPublicObjectUrl(map.get("imgUrl").toString()));
@@ -217,14 +217,14 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                     map.put("imgUrl", GetOssFile.getPublicObjectUrl(map.get("imgUrl").toString()));
                     map.put("beUseing", false);
                     if (((Long) map.get("useNumber")).equals((Long) map.get("count"))) {
-                        map.put("nameId", AwardUtil.getMaps((String) map.get("name")));
+                        map.put("nameId", AwardUtil.getIndexByName((String) map.get("name")));
                         map.put("type", 1);
                         list.add(map);
                     }
                 }
             } else {
                 map.put("status", 1);
-                Integer count = ((Long) map.get("count")).intValue();
+                int count = ((Long) map.get("count")).intValue();
                 map.put("imgUrl", GetOssFile.getPublicObjectUrl(map.get("imgUrl").toString()));
                 if (count == 1) {
                     map.put("time", 48 + "小时0分0秒");
@@ -232,7 +232,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                     map.put("time", (48 * count) + "小时0分0秒");
                 }
                 map.put("beUseing", false);
-                map.put("nameId", AwardUtil.getMaps((String) map.get("name")));
+                map.put("nameId", AwardUtil.getIndexByName((String) map.get("name")));
                 map.put("type", 1);
                 list.add(map);
             }
@@ -323,7 +323,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 syntheticRewardsList = syntheticRewardsLists.get(0);
                 //放置返回信息
                 map.put("name", name);
-                map.put("message", "得到的金币加成" + AwardUtil.getNumber(nameInteger) + "%");
+                map.put("message", "得到的金币加成" + AwardUtil.getBonusByIndex(nameInteger) + "%");
                 map.put("createName", syntheticRewardsList.getCreateTime());
                 map.put("time", (48 * count) + "小时0分0秒");
                 Date date = student.getBonusExpires();
@@ -387,10 +387,10 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                     map.put("time", 48 + "小时00分00秒");
                 }
             }
-            map.put("syntheticInteger", AwardUtil.getMaps(synthetic.getName()));
+            map.put("syntheticInteger", AwardUtil.getIndexByName(synthetic.getName()));
             map.put("type", "gloveOrFlower");
             map.put("name", synthetic.getName());
-            map.put("message", "得到的金币加成" + AwardUtil.getNumber(Integer.parseInt(AwardUtil.getMaps(synthetic.getName()).toString())) + "%");
+            map.put("message", "得到的金币加成" + AwardUtil.getBonusByIndex(Integer.parseInt(AwardUtil.getIndexByName(synthetic.getName()).toString())) + "%");
             map.put("createTime", synthetic.getCreateTime());
             gloveOrFlowerList.add(map);
         }
@@ -415,7 +415,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 map.put("state", false);
             }
             map.put("type", "skin");
-            map.put("skinIngter", AwardUtil.getMaps(studentSkin.getSkinName()));
+            map.put("skinIngter", AwardUtil.getIndexByName(studentSkin.getSkinName()));
             if (studentSkin.getEndTime() == null) {
                 map.put("endTime", "30天");
                 map.put("isUse", false);

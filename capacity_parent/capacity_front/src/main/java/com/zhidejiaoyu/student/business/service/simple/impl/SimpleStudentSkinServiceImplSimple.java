@@ -243,7 +243,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
             //皮肤地址
             maps.put("imgUrl", GetOssFile.getPublicObjectUrl(studentSkin.getImgUrl()));
             //皮肤对应编号
-            maps.put("nameId", AwardUtil.getMaps(studentSkin.getSkinName()));
+            maps.put("nameId", AwardUtil.getIndexByName(studentSkin.getSkinName()));
             //皮肤使用状态
             if (studentSkin.getState() == 1) {
                 //正在使用的皮肤状态
@@ -374,7 +374,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         if (studentSkin != null) {
             if (studentSkin.getEndTime().getTime() > System.currentTimeMillis()) {
                 //使用时间大于当前时间储存皮肤编号
-                map.put("skinId", AwardUtil.getMaps(studentSkin.getSkinName()));
+                map.put("skinId", AwardUtil.getIndexByName(studentSkin.getSkinName()));
             } else {
                 //当前无使用皮肤返回0
                 map.put("skinId", 0);

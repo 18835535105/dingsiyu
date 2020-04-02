@@ -1104,10 +1104,10 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
                     map.put("time", 48 + "小时00分00秒");
                 }
             }
-            map.put("syntheticInteger", AwardUtil.getMaps(synthetic.getName()));
+            map.put("syntheticInteger", AwardUtil.getIndexByName(synthetic.getName()));
             map.put("type", "gloveOrFlower");
             map.put("name", synthetic.getName());
-            map.put("message", "得到的金币加成" + AwardUtil.getNumber(Integer.parseInt(AwardUtil.getMaps(synthetic.getName()).toString())) + "%");
+            map.put("message", "得到的金币加成" + AwardUtil.getBonusByIndex(Integer.parseInt(AwardUtil.getIndexByName(synthetic.getName()).toString())) + "%");
             map.put("createTime", synthetic.getCreateTime());
             gloveOrFlowerList.add(map);
         }
@@ -1119,7 +1119,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         }
         resultMap.put("gloveOrFlower", gloveOrFlowerList);
         List<Map<String, Object>> skinList = new ArrayList<>();
-        List<StudentSkin> studentSkins = studentSkinMapper.selSkinByStudentIdIsHave(studentId.longValue());
+        List<StudentSkin> studentSkins = studentSkinMapper.selSkinByStudentIdIsHave(studentId);
         for (StudentSkin studentSkin : studentSkins) {
             if (studentSkin.getState() == 1) {
                 Map<String, Object> skinMap = new HashMap<>();
@@ -1138,7 +1138,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
                 map.put("state", false);
             }
             map.put("type", "skin");
-            map.put("skinIngter", AwardUtil.getMaps(studentSkin.getSkinName()));
+            map.put("skinIngter", AwardUtil.getIndexByName(studentSkin.getSkinName()));
             map.put("id", studentSkin.getId());
             if (studentSkin.getEndTime() == null) {
                 map.put("endTime", "30天");
