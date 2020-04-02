@@ -37,6 +37,8 @@ public interface EquipmentMapper extends BaseMapper<Equipment> {
      */
     List<Map<String, Object>> selectUsedByStudentId(@Param("studentId") Long studentId);
 
+    List<Map<String, Object>> selectByStudentId(@Param("studentId") Long studentId);
+
     List<Equipment> selectAll();
 
 

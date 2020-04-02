@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.shipconfig.service;
 
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.BaseService;
 
 import javax.servlet.http.HttpSession;
@@ -15,4 +16,6 @@ public interface ShipAddEquipmentService extends BaseService<Student> {
     Object wearEquipment(HttpSession session, Long equipmentId);
 
     void updateLeaderBoards(Student student);
+
+    ServerResponse<Object> getEquipmentNexLevlInfromation(Long equipmentId, HttpSession session);
 }

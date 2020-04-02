@@ -1,6 +1,8 @@
 package com.zhidejiaoyu.student.business.shipconfig.controller;
 
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,6 +58,12 @@ public class ShipAddEquipmentController {
     public Object wearEquipment(HttpSession session, Long equipmentId){
         return shipAddEquipmentService.wearEquipment(session,equipmentId);
     }
+
+    @RequestMapping("/getEquipmentNexLevlInfromation")
+    public ServerResponse<Object> getEquipmentNexLevlInfromation(Long equipmentId,HttpSession session) {
+        return shipAddEquipmentService.getEquipmentNexLevlInfromation(equipmentId,session);
+    }
+
 
 
 }

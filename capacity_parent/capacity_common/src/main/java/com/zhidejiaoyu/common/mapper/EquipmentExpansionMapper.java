@@ -29,4 +29,6 @@ public interface EquipmentExpansionMapper extends BaseMapper<EquipmentExpansion>
     List<Map<String,Object>> selectAllUrlByType(@Param("type")Integer type);
 
     String selectUrlByEquipmentIdAndType(@Param("equipmentId") Long equipmentId,@Param("degree") Integer intensificationDegree);
+
+    Map<String, Object> selectByEquipmentIdAndLevel(@Param("equipmentId") Long equipmentId,@Param("degree") int level);
 }

@@ -11,10 +11,12 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
+import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.util.CalculateUtil;
 import com.zhidejiaoyu.student.business.shipconfig.vo.EquipmentExperienceVo;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -47,6 +49,8 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     private TestRecordMapper testRecordMapper;
     @Resource
     private EquipmentExpansionMapper equipmentExpansionMapper;
+    @Resource
+    private ShipIndexService shipIndexService;
 
 
     @Override
@@ -134,11 +138,14 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         Map<Long, StudentEquipment> studentEquiments = studentEquipmentMapper.selectByStudentIdAndType(student.getId(), type);
         //获取全部装备的图片
         List<Map<String, Object>> urlList = equipmentExpansionMapper.selectAllUrlByType(type);
+        List<Map<String, Object>> maps = equipmentMapper.selectByStudentId(student.getId());
+        Map<Long, List<Map<String, Object>>> equMap =
+                maps.stream().collect(Collectors.groupingBy(map -> Long.parseLong(map.get("id").toString())));
         //获取经验值
         EquipmentExperienceVo empiricalValue = getEmpiricalValue(student.getId(), type);
         //将装备图片分组
         Map<Long, List<Map<String, Object>>> equipmentMap = urlList.stream().collect(Collectors.groupingBy(ment -> Long.parseLong(ment.get("equipmentId").toString())));
-        List<Map<String, Object>> equSort = getEquSort(studentEquiments, equipment, empiricalValue, returnMap, type);
+        List<Map<String, Object>> equSort = getEquSort(studentEquiments, equipment, empiricalValue, returnMap, type, equMap);
         getImgUrl(equSort, equipmentMap, returnMap);
         return returnMap;
     }
@@ -196,7 +203,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
      */
     private List<Map<String, Object>> getEquSort(Map<Long, StudentEquipment> studentEquiments, List<Equipment> equipments,
                                                  EquipmentExperienceVo empiricalValue, Map<String, Object> returnMap,
-                                                 Integer type) {
+                                                 Integer type, Map<Long, List<Map<String, Object>>> informationMap) {
         //获取当前类型经验值
         int empValue = 0;
         //当前等级
@@ -232,6 +239,16 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             }
             getReturnMap(equipment, equMap, false, true, 1, 2);
             StudentEquipment studentEquipment = studentEquiments.get(equipment.getId());
+            List<Map<String, Object>> maps = informationMap.get(equipment.getId());
+            Map<String, Object> equInforMap;
+            if (maps != null && maps.size() > 0) {
+                equInforMap = maps.get(0);
+            } else {
+                equInforMap = equipmentExpansionMapper.selectByEquipmentIdAndLevel(equipment.getId(), 1);
+            }
+            StringBuilder stringBuilder = new StringBuilder();
+            shipIndexService.getExplain(stringBuilder, equInforMap);
+            equMap.put("information", stringBuilder);
             if (studentEquipment != null) {
                 //是否开启
                 equMap.put("open", true);
@@ -310,6 +327,26 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         //获取pk值
         StudentExpansion expansion = studentExpansionMapper.selectByStudentId(student.getId());
         sourcePowerRankOpt.optSourcePowerRank(student, sourceForceAttack, expansion.getStudyPower());
+    }
+
+    @Override
+    public ServerResponse<Object> getEquipmentNexLevlInfromation(Long equipmentId, HttpSession session) {
+        Long studentId = getStudentId(session);
+        //获取当前装备学生是否拥有
+        StudentEquipment studentEquipment = studentEquipmentMapper.selectByStudentIdAndEquipmentId(studentId, equipmentId);
+        Map<String, Object> equInforMap;
+        if (studentEquipment != null) {
+            if (studentEquipment.getIntensificationDegree() >= 3) {
+                equInforMap = equipmentExpansionMapper.selectByEquipmentIdAndLevel(equipmentId, 3);
+            } else {
+                equInforMap = equipmentExpansionMapper.selectByEquipmentIdAndLevel(equipmentId, studentEquipment.getIntensificationDegree() + 1);
+            }
+        } else {
+            equInforMap = equipmentExpansionMapper.selectByEquipmentIdAndLevel(equipmentId,  1);
+        }
+        StringBuilder builder = new StringBuilder();
+        shipIndexService.getExplain(builder, equInforMap);
+        return ServerResponse.createBySuccess(builder.toString());
     }
 
     public static void addEquipment(List<Long> equipmentIds, Long studentId, StudentEquipmentMapper studentEquipmentMapper) {

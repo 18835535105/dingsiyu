@@ -43,5 +43,22 @@
         where intensification_degree=#{degree}
         and equipment_id=#{equipmentId}
     </select>
+    <select id="selectByEquipmentIdAndLevel" parameterType="map" resultType="map">
+        select ee.id,
+               e.name,
+               ee.img_url             imgUrl,
+               ee.durability,
+               ee.common_attack       commonAttack,
+               ee.source_force_attack sourceForceAttack,
+               ee.source_force        sourceForce,
+               ee.hit_rate            hitRate,
+               ee.mobility,
+               ee.intensification_degree degree
+        from   equipment e
+                 join equipment_expansion ee on e.id = ee.equipment_id
+        where
+             e.id=#{equipmentId}
+            and ee.intensification_degree = #{degree}
+    </select>
 
 </mapper>

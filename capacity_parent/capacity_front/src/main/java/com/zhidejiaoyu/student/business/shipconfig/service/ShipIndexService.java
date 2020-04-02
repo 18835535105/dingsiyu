@@ -6,6 +6,7 @@ import com.zhidejiaoyu.student.business.service.BaseService;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 
@@ -64,8 +65,10 @@ public interface ShipIndexService extends BaseService<Student> {
     /**
      * 保存学生选择的勋章
      *
-     * @param medalId   id之间用英文,隔开
+     * @param medalId id之间用英文,隔开
      * @return
      */
     ServerResponse<Object> saveMedal(String medalId);
+
+    void getExplain(StringBuilder explain, Map<String, Object> map);
 }

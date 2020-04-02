@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -196,6 +197,8 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         studentExpansionMapper.updateById(studentExpansion);
         return ServerResponse.createBySuccess();
     }
+
+
 
     /**
      * 获取各项最大值（基础值）
@@ -401,6 +404,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         return indexVO;
     }
 
+    @Override
     public void getExplain(StringBuilder explain, Map<String, Object> map) {
         explain.append(map.get("name").toString()).append("，")
                 .append(DEGREE.get(map.get("degree"))).append("，");
