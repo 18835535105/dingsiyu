@@ -60,4 +60,12 @@ public interface ShipIndexService extends BaseService<Student> {
      * @return
      */
     IndexVO.BaseValue getStateOfWeek(Long studentId);
+
+    /**
+     * 保存学生选择的勋章
+     *
+     * @param medalId   id之间用英文,隔开
+     * @return
+     */
+    ServerResponse<Object> saveMedal(String medalId);
 }

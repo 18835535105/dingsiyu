@@ -187,6 +187,16 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         return this.getStateOfWeek(studentId, baseValue);
     }
 
+    @Override
+    public ServerResponse<Object> saveMedal(String medalId) {
+
+        Long studentId = getStudentId();
+        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(studentId);
+        studentExpansion.setMedalNo(medalId);
+        studentExpansionMapper.updateById(studentExpansion);
+        return ServerResponse.createBySuccess();
+    }
+
     /**
      * 获取各项最大值（基础值）
      *
