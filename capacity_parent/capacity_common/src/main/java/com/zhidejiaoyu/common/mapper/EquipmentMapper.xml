@@ -52,7 +52,6 @@
                  join equipment_expansion ee on e.id = ee.equipment_id
                  join student_equipment se on e.id = se.equipment_id
             and se.student_id = #{studentId}
-            and e.id=#{equmentId}
             and ee.intensification_degree = se.intensification_degree
 
     </select>
