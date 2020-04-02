@@ -342,7 +342,6 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         } else {
             equInforMap = equipmentExpansionMapper.selectByEquipmentIdAndLevel(equipmentId,  1);
         }
-        StringBuilder builder = new StringBuilder();
         return ServerResponse.createBySuccess(shipIndexService.getShipConfigInfoDTO( equInforMap));
     }
 
