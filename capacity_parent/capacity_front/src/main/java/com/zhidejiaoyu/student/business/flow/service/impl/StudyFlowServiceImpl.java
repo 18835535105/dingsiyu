@@ -131,6 +131,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             dto.setGroup(1);
         }
         dto.setStudyFlowNew(studyFlowNew);
+        session.setAttribute(SessionConstant.STUDY_GROUP, dto.getGroup());
         dto.setSession(session);
 
         // 判断单词游戏
@@ -288,7 +289,10 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     }
 
     public static void setOneKeyGroup(LearnNew learnNew) {
-        HttpUtil.getHttpSession().setAttribute(SessionConstant.ONE_KEY_GROUP, learnNew.getGroup());
+        HttpSession session = HttpUtil.getHttpSession();
+        Integer group = learnNew.getGroup();
+        session.setAttribute(SessionConstant.ONE_KEY_GROUP, group);
+        session.setAttribute(SessionConstant.STUDY_GROUP, group);
     }
 
 

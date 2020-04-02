@@ -2,7 +2,6 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Medal;
-import com.zhidejiaoyu.common.pojo.MedalExample;
 import com.zhidejiaoyu.common.pojo.Student;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -40,15 +39,6 @@ public interface MedalMapper extends BaseMapper<Medal> {
      * @return
      */
     List<Medal> selectChildrenIdByParentId(@Param("parentId") int parentId);
-
-    /**
-     * 获取学生新领取的勋章图片路径
-     *
-     * @param student
-     * @return
-     */
-    @Select("select child_img_url url from medal m, award a where m.id = a.medal_type and a.student_id = #{student.id} and get_flag = 1 order by a.id desc")
-    List<String> selectLastMedalUrl(@Param("student") Student student);
 
     /**
      * 查询父id下的所有子id

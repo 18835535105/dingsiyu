@@ -18,14 +18,17 @@
         e.id, e.name, e.type, e.level,e.empirical_value,e.grade
     </sql>
     <select id="selectUsedByStudentId" resultType="map" parameterType="map">
-        select e.type,
+        select ee.id,
+               e.type,
+               e.name,
                ee.img_url             imgUrl,
                ee.durability,
                ee.common_attack       commonAttack,
                ee.source_force_attack sourceForceAttack,
                ee.source_force        sourceForce,
                ee.hit_rate            hitRate,
-               ee.mobility
+               ee.mobility,
+               ee.intensification_degree degree
         from equipment e
                  join equipment_expansion ee on e.id = ee.equipment_id
                  join student_equipment se on e.id = se.equipment_id

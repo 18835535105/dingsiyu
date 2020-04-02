@@ -20,7 +20,7 @@ public class QuartzStudyCalendarServiceImplTest {
     private QuartzStudyCalendarService quartzStudyCalendarService;
 
     @Test
-    public void runLogToGoldLog() {
-        quartzStudyCalendarService.runLogToGoldLog();
+    public void initLearningDetails() {
+        quartzStudyCalendarService.initLearningDetails();
     }
 }

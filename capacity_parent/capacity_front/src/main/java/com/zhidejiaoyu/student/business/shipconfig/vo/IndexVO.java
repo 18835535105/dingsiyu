@@ -23,44 +23,44 @@ public class IndexVO implements Serializable {
     private Integer sourcePoser;
 
     /**
-     * 武器图片路径
+     * 武器信息
      */
-    private String weaponsUrl;
+    private Info weaponsInfo;
 
     /**
-     * 装甲图片路径
+     * 装甲信息
      */
-    private String armorUrl;
+    private Info armorInfo;
 
     /**
-     * 飞船图片路径
+     * 飞船信息
      */
-    private String shipUrl;
+    private Info shipInfo;
 
     /**
-     * 导弹图片路径
+     * 导弹信息
      */
-    private String missileUrl;
+    private Info missileInfo;
 
     /**
-     * 资源图片路径
+     * 资源信息
      */
-    private String sourceUrl;
+    private Info sourceInfo;
 
     /**
-     * 勋章图片地址
+     * 勋章信息
      */
-    private List<String> medalUrl;
+    private List<Info> medalInfos;
 
     /**
-     * 背景图片地址
+     * 背景信息
      */
-    private String skinImgUrl;
+    private Info skinInfo;
 
     /**
-     * 英雄图片地址
+     * 英雄信息
      */
-    private String heroImgUrl;
+    private Info heroImgInfo;
 
     /**
      * 各项最大值
@@ -76,6 +76,24 @@ public class IndexVO implements Serializable {
      * 雷达图
      */
     private Radar radar;
+
+    /**
+     * 各个数据信息
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Info {
+        private Long id;
+
+        private String url;
+
+        /**
+         * 说明
+         */
+        private String explain;
+    }
 
     /**
      * 各项最大值

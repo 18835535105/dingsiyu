@@ -32,4 +32,9 @@ public interface SessionConstant {
      */
     String STUDY_FLAG = "STUDY_FLAG";
 
+    /**
+     * 学生正在学习的单元group序号
+     */
+    String STUDY_GROUP = "STUDY_GROUP";
+
 }

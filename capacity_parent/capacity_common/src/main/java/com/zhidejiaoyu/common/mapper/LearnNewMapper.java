@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -99,8 +100,17 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
 
     /**
      * 根据学生id和类型获取单元id
+     *
      * @param studentId
      * @param type
      */
-    List<Long> getUnitIdByStudentIdAndType(@Param("studentId") Long studentId,@Param("type") int type);
+    List<Long> getUnitIdByStudentIdAndType(@Param("studentId") Long studentId, @Param("type") int type);
+
+    /**
+     * 获取指定日期学习的记录
+     *
+     * @param date
+     * @return
+     */
+    List<LearnNew> selectByUpdateTime(Date date);
 }

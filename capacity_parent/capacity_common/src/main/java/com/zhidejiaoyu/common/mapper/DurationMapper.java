@@ -19,18 +19,6 @@ import java.util.Map;
 @Repository
 public interface DurationMapper extends BaseMapper<Duration> {
 
-    int deleteByExample(DurationExample example);
-
-    int deleteByPrimaryKey(Long id);
-
-    int insertSelective(Duration record);
-
-    int updateByExample(@Param("record") Duration record, @Param("example") DurationExample example);
-
-    int updateByPrimaryKeySelective(Duration record);
-
-    int updateByPrimaryKey(Duration record);
-
     /**
      * 根据学生id删除
      *
@@ -231,7 +219,16 @@ public interface DurationMapper extends BaseMapper<Duration> {
     List<Integer> selectDayTimeByStudentId(@Param("studentId") long studentId);
 
     @MapKey("studentId")
-    Map<String,Map<String,Object>> selectValidTimeByStudentIds(@Param("studentIds") List<Long> studentIds,@Param("date") Date date);
+    Map<String, Map<String, Object>> selectValidTimeByStudentIds(@Param("studentIds") List<Long> studentIds, @Param("date") Date date);
 
-    Date selectLoginTimeByStudentIdAndDate(@Param("studentId") Long studentId,@Param("date") Date date);
+    Date selectLoginTimeByStudentIdAndDate(@Param("studentId") Long studentId, @Param("date") Date date);
+
+    /**
+     * 查询指定日期学生学习时间详情
+     * todo: 类型还有待确认
+     * @param learningDetails
+     * @param date
+     * @return
+     */
+    List<Map<String, Object>> selectByLearningDetails(@Param("learningDetails") LearningDetails learningDetails, @Param("date") Date date);
 }

@@ -32,6 +32,11 @@ public class RankVO implements Serializable {
      */
     private Long total;
 
+    /**
+     * 总页数
+     */
+    private Integer pages;
+
     @Data
     @Builder
     @AllArgsConstructor

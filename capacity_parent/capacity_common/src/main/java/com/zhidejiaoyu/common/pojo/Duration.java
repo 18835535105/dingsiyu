@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -72,6 +73,9 @@ public class Duration extends Model<Duration> {
      * 学习模式 1，一键学习，2， 自由学习
      */
     private Integer learningModel;
+
+    @TableField("`group`")
+    private Integer group;
 
     @Override
     protected Serializable pkVal() {

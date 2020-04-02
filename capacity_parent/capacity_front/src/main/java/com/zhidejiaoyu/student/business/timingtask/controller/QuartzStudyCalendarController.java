@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.student.business.timingtask.controller;
 
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzStudyCalendarService;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,12 +16,4 @@ public class QuartzStudyCalendarController {
 
     @Resource
     private QuartzStudyCalendarService quartzStudyCalendarService;
-
-    /**
-     *  将runLog中的金币记录迁移到GoldLog中
-     */
-    @GetMapping("/runLogToGoldLog")
-    public void runLogToGoldLog() {
-        quartzStudyCalendarService.runLogToGoldLog();
-    }
 }

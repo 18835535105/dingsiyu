@@ -2,7 +2,9 @@ package com.zhidejiaoyu.student.business.shipconfig.controller;
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,5 +45,19 @@ public class ShipIndexController {
             type = 1;
         }
         return shipIndexService.rank(type);
+    }
+
+    /**
+     * 保存学生选择的勋章
+     *
+     * @param medalId   id之间用英文,隔开
+     * @return
+     */
+    @PostMapping("/saveMedal")
+    public ServerResponse<Object> saveMedal(String medalId) {
+        if (StringUtils.isEmpty(medalId)) {
+            return ServerResponse.createByError(400, "medalId can't be null!");
+        }
+        return shipIndexService.saveMedal(medalId);
     }
 }

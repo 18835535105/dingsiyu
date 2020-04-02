@@ -4,7 +4,6 @@ package com.zhidejiaoyu.common.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,11 +18,13 @@ import java.util.List;
  */
 @Repository
 public interface StudentExpansionMapper extends BaseMapper<StudentExpansion> {
-
-    @Update("update student_expansion set is_look=1 where id=#{studentId}")
-    Integer updateByIsLook(Long studentId);
-
-    StudentExpansion selectByStudentId(Long challengerStudentId);
+    /**
+     * 根据学生id查询扩展信息
+     *
+     * @param studentId
+     * @return
+     */
+    StudentExpansion selectByStudentId(Long studentId);
 
     /**
      * 查询学校下所有学生的扩展信息
