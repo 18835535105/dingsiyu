@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.shipconfig.service;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.BaseService;
+import com.zhidejiaoyu.student.business.shipconfig.dto.ShipConfigInfoDTO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 
@@ -70,5 +71,5 @@ public interface ShipIndexService extends BaseService<Student> {
      */
     ServerResponse<Object> saveMedal(String medalId);
 
-    void getExplain(StringBuilder explain, Map<String, Object> map);
+     ShipConfigInfoDTO getShipConfigInfoDTO(Map<String, Object> map);
 }

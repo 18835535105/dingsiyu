@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -364,21 +363,21 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
     public IndexVO getIndexVoTmp(List<Map<String, Object>> equipments) {
         IndexVO indexVO = new IndexVO();
-        StringBuilder explain = new StringBuilder();
         if (CollectionUtils.isNotEmpty(equipments)) {
             equipments.forEach(map -> {
-                explain.setLength(0);
 
                 Integer type = (Integer) map.get("type");
                 Long id = (Long) map.get("id");
                 String imgUrl = GetOssFile.getPublicObjectUrl((String) map.get("imgUrl"));
 
-                this.getExplain(explain, map);
+                ShipConfigInfoDTO shipConfigInfoDTO = this.getShipConfigInfoDTO(map);
+
+                String explain = getExplain(shipConfigInfoDTO);
 
                 IndexVO.Info info = IndexVO.Info.builder()
                         .id(id)
                         .url(imgUrl)
-                        .explain(StringUtils.removeEnd(explain.toString(), "，"))
+                        .explain(explain)
                         .build();
                 switch (type) {
                     case EquipmentTypeConstant.SHIP:
@@ -442,26 +441,27 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         if (sourceForce != 0) {
             explain.append("源分次数").append(sourceForce > 0 ? "+" : "").append(sourceForce).append("，");
         }
-        int sourceForceAttack = (int) map.get("sourceForceAttack");
-        if (map.get("sourceForceAttack") != null && sourceForceAttack != 0) {
-            explain.append("源分攻击+").append(sourceForceAttack > 0 ? "+" : "").append(sourceForceAttack).append("，");
+        int sourceForceAttack = shipConfigInfoDTO.getBaseValue().getSourceAttack();
+        if (sourceForceAttack != 0) {
+            explain.append("源分攻击").append(sourceForceAttack > 0 ? "+" : "").append(sourceForceAttack).append("，");
         }
-        int commonAttack = (int) map.get("commonAttack");
-        if (map.get("commonAttack") != null && commonAttack != 0) {
-            explain.append("普通攻击+").append(commonAttack > 0 ? "+" : "").append(commonAttack).append("，");
+        int commonAttack = shipConfigInfoDTO.getBaseValue().getAttack();
+        if (commonAttack != 0) {
+            explain.append("普通攻击").append(commonAttack > 0 ? "+" : "").append(commonAttack).append("，");
         }
-        int durability = (int) map.get("durability");
-        if (map.get("durability") != null && durability != 0) {
-            explain.append("耐久度+").append(durability > 0 ? "+" : "").append(durability).append("，");
+        int durability = shipConfigInfoDTO.getBaseValue().getDurability();
+        if (durability != 0) {
+            explain.append("耐久度").append(durability > 0 ? "+" : "").append(durability).append("，");
         }
-        double hitRate = (double) map.get("hitRate");
-        if (map.get("hitRate") != null && hitRate != 0.0) {
-            explain.append("命中率+").append(hitRate > 0 ? "+" : "").append(hitRate * 100).append("%，");
+        double hitRate = shipConfigInfoDTO.getBaseValue().getHitRate();
+        if (hitRate != 0.0) {
+            explain.append("命中率").append(hitRate > 0 ? "+" : "").append(hitRate * 100).append("%，");
         }
-        int mobility = (int) map.get("mobility");
-        if (map.get("mobility") != null && mobility != 0) {
-            explain.append("机动力+").append(mobility > 0 ? "+" : "").append(mobility).append("，");
+        int mobility = shipConfigInfoDTO.getBaseValue().getMove();
+        if (mobility != 0) {
+            explain.append("机动力").append(mobility > 0 ? "+" : "").append(mobility).append("，");
         }
+        return StringUtils.removeEnd(explain.toString(), "，");
     }
 
     public List<IndexVO.Info> getMedalImgList(StudentExpansion studentExpansion) {

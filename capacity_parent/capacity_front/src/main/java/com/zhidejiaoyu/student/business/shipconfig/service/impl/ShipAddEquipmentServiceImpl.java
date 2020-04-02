@@ -246,9 +246,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             } else {
                 equInforMap = equipmentExpansionMapper.selectByEquipmentIdAndLevel(equipment.getId(), 1);
             }
-            StringBuilder stringBuilder = new StringBuilder();
-            shipIndexService.getExplain(stringBuilder, equInforMap);
-            equMap.put("information", stringBuilder);
+            equMap.put("information", shipIndexService.getShipConfigInfoDTO( equInforMap));
             if (studentEquipment != null) {
                 //是否开启
                 equMap.put("open", true);
@@ -345,8 +343,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             equInforMap = equipmentExpansionMapper.selectByEquipmentIdAndLevel(equipmentId,  1);
         }
         StringBuilder builder = new StringBuilder();
-        shipIndexService.getExplain(builder, equInforMap);
-        return ServerResponse.createBySuccess(builder.toString());
+        return ServerResponse.createBySuccess(shipIndexService.getShipConfigInfoDTO( equInforMap));
     }
 
     public static void addEquipment(List<Long> equipmentIds, Long studentId, StudentEquipmentMapper studentEquipmentMapper) {
