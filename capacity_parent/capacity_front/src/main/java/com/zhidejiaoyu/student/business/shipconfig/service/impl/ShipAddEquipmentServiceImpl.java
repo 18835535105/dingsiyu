@@ -460,7 +460,6 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                     addEquipment.remove(studentMentId);
                 }
             });
-
         }
         return addEquipment;
     }
