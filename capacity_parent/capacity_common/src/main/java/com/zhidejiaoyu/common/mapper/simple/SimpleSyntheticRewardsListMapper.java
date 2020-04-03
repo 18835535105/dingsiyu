@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper.simple;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.SyntheticRewardsList;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.HashMap;
@@ -31,7 +32,6 @@ public interface SimpleSyntheticRewardsListMapper extends BaseMapper<SyntheticRe
      * @return
      */
     List<HashMap<String,Object>> selListMap(Map map);
-
 
     /**
      * 查找学生 名称下的所有name数量
@@ -68,5 +68,6 @@ public interface SimpleSyntheticRewardsListMapper extends BaseMapper<SyntheticRe
 
     SyntheticRewardsList getIsUse(Integer studentId, String name);
 
-    List<String> getHaveGloveOrFlower(Integer studentId, Integer sex);
+    Map<String,Object> getHaveGloveOrFlower(@Param("studentId") Long studentId,@Param("type") Integer sex);
+
 }
