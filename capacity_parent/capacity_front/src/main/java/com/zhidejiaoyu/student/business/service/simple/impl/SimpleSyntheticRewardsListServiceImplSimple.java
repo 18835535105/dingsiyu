@@ -130,7 +130,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 setMap.put("isEnter", false);
                 setMap.put("isWear", false);
                 setMap.put("isUse", false);
-                setMap.put("isSynthesis", false);
+                setMap.put("isSynthesis", true);
                 setMap.put("time", 48 + "小时0分0秒");
                 retrun.put(i, setMap);
             } else {
@@ -141,7 +141,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 setMap.put("count", o1.get("count"));
                 setMap.put("finalNameInteger", i);
                 setMap.put("isEnter", false);
-                setMap.put("isUse", false);
+                setMap.put("isUse", true);
                 setMap.put("isSynthesis", false);
                 setMap.put("isWear", false);
                 setMap.put("time", 48 + "小时0分0秒");
@@ -154,7 +154,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
             setMap.put("finalNameInteger", i);
             setMap.put("message", "得到的金币加成" + AwardUtil.getBonusByIndex(i) + "%");
             setMap.put("isEnter", false);
-            setMap.put("isSynthesis", true);
+            setMap.put("isSynthesis", false);
             if (haveGloveOrFlower != null) {
                 String name = haveGloveOrFlower.get("name").toString();
                 setMap.put("isUse", false);
