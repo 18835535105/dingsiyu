@@ -151,6 +151,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         radar.setHitRate(Math.min(1.5, BigDecimalUtil.mul(stateOfWeek.getHitRate(), baseValue.getHitRate(), 2)));
         radar.setMove(Math.min(500, stateOfWeek.getMove() * baseValue.getMove()));
         radar.setSource(Math.min(10000, stateOfWeek.getSource() * baseValue.getSource()));
+        radar.setSourceAttack(stateOfWeek.getSourceAttack() * baseValue.getSourceAttack());
         return radar;
     }
 
