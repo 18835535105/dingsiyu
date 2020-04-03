@@ -91,7 +91,7 @@ public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRe
                 if (endTime.getTime() > System.currentTimeMillis()) {
                     map.put("status", 2);
                     map.put("beUseing", true);
-                    map.put("nameId", AwardUtil.getMaps((String) map.get("name")));
+                    map.put("nameId", AwardUtil.getIndexByName((String) map.get("name")));
                     map.put("time", (endTime.getTime() - System.currentTimeMillis()) / 1000);
                     map.put("type", 1);
                     list.add(map);
@@ -105,22 +105,22 @@ public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRe
                         map.put("time", (48 * count) + "小时0分0秒");
                     }
                     map.put("beUseing", false);
-                    if ((Long) map.get("useNumber") != (Long) map.get("count")) {
-                        map.put("nameId", AwardUtil.getMaps((String) map.get("name")));
+                    if (!map.get("useNumber").equals(map.get("count"))) {
+                        map.put("nameId", AwardUtil.getIndexByName((String) map.get("name")));
                         map.put("type", 1);
                         list.add(map);
                     }
                 }
             } else {
                 map.put("status", 1);
-                Integer count = ((Long) map.get("count")).intValue();
+                int count = ((Long) map.get("count")).intValue();
                 if (count == 1) {
                     map.put("time", 48 + "小时0分0秒");
                 } else {
                     map.put("time", (48 * count) + "小时0分0秒");
                 }
                 map.put("beUseing", false);
-                map.put("nameId", AwardUtil.getMaps((String) map.get("name")));
+                map.put("nameId", AwardUtil.getIndexByName((String) map.get("name")));
                 map.put("type", 1);
                 list.add(map);
             }
@@ -207,7 +207,7 @@ public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRe
                 syntheticRewardsList = syntheticRewardsLists.get(0);
                 //放置返回信息
                 map.put("name", name);
-                map.put("message", "得到的金币加成" + AwardUtil.getNumber(nameInteger) + "%");
+                map.put("message", "得到的金币加成" + AwardUtil.getBonusByIndex(nameInteger) + "%");
                 map.put("createName", syntheticRewardsList.getCreateTime());
                 Date date = student.getBonusExpires();
                 if (date != null) {
@@ -270,11 +270,11 @@ public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRe
                     map.put("time", 48);
                 }
             }
-            map.put("syntheticInteger", AwardUtil.getMaps(synthetic.getName()));
+            map.put("syntheticInteger", AwardUtil.getIndexByName(synthetic.getName()));
             map.put("time", 48);
             map.put("type", "gloveOrFlower");
             map.put("name", synthetic.getName());
-            map.put("message", "得到的金币加成" + AwardUtil.getNumber(Integer.parseInt(AwardUtil.getMaps(synthetic.getName()).toString())) + "%");
+            map.put("message", "得到的金币加成" + AwardUtil.getBonusByIndex(Integer.parseInt(AwardUtil.getIndexByName(synthetic.getName()).toString())) + "%");
             map.put("createTime", synthetic.getCreateTime());
             gloveOrFlowerList.add(map);
         }
@@ -308,7 +308,7 @@ public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRe
             }
 
             map.put("type", "skin");
-            map.put("skinIngter", AwardUtil.getMaps(studentSkin.getSkinName()));
+            map.put("skinIngter", AwardUtil.getIndexByName(studentSkin.getSkinName()));
             map.put("time",(studentSkin.getEndTime().getTime() - System.currentTimeMillis()) / 1000);
             map.put("id", studentSkin.getId());
             map.put("name", studentSkin.getSkinName());
