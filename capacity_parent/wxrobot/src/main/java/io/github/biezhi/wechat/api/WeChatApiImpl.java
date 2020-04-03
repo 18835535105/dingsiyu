@@ -393,9 +393,9 @@ public class WeChatApiImpl implements WeChatApi {
             if (matcher.find()) {
                 if (!"0".equals(matcher.group(1))) {
                     log.debug("Unexpected sync check result: {}", response.getRawBody());
-                    return new SyncCheckRet(RetCode.parse(Integer.valueOf(matcher.group(1))), 0);
+                    return new SyncCheckRet(RetCode.parse(Integer.parseInt(matcher.group(1))), 0);
                 }
-                return new SyncCheckRet(RetCode.parse(Integer.valueOf(matcher.group(1))), Integer.valueOf(matcher.group(2)));
+                return new SyncCheckRet(RetCode.parse(Integer.parseInt(matcher.group(1))), Integer.parseInt(matcher.group(2)));
             }
             return new SyncCheckRet(RetCode.UNKNOWN, 0);
         } catch (Exception e) {

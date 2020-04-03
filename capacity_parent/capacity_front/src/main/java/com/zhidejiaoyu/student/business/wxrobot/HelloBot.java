@@ -1,22 +1,24 @@
 package com.zhidejiaoyu.student.business.wxrobot;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.gson.JsonObject;
+import com.aliyuncs.DefaultAcsClient;
+import com.aliyuncs.alimt.model.v20181012.TranslateECommerceRequest;
+import com.aliyuncs.alimt.model.v20181012.TranslateECommerceResponse;
+import com.aliyuncs.exceptions.ClientException;
+import com.aliyuncs.http.MethodType;
+import com.aliyuncs.profile.DefaultProfile;
+import com.zhidejiaoyu.aliyuncommon.constant.AliyunInfoConstant;
 import io.github.biezhi.wechat.WeChatBot;
 import io.github.biezhi.wechat.api.annotation.Bind;
 import io.github.biezhi.wechat.api.constant.Config;
 import io.github.biezhi.wechat.api.enums.MsgType;
 import io.github.biezhi.wechat.api.model.WeChatMessage;
-import io.github.biezhi.wechat.utils.OkHttpUtils;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Call;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.methods.RequestBuilder;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.regex.Pattern;
 
 /**
@@ -32,52 +34,64 @@ public class HelloBot extends WeChatBot {
         super(config);
     }
 
+    public static String zhToEn(String text) {
+
+        String regionId = "cn-hangzhou";
+        DefaultProfile profile = DefaultProfile.getProfile(regionId, AliyunInfoConstant.accessKeyId, AliyunInfoConstant.accessKeySecret);
+        DefaultAcsClient client = new DefaultAcsClient(profile);
+
+        try {
+            TranslateECommerceRequest eCommerceRequest = new TranslateECommerceRequest();
+            eCommerceRequest.setScene("title");
+            // 设置请求方式，POST
+            eCommerceRequest.setMethod(MethodType.POST);
+            //翻译文本的格式
+            eCommerceRequest.setFormatType("text");
+            //源语言
+            eCommerceRequest.setSourceLanguage("zh");
+            //原文
+            eCommerceRequest.setSourceText(URLEncoder.encode(text, "UTF-8"));
+            //目标语言
+            eCommerceRequest.setTargetLanguage("en");
+
+            TranslateECommerceResponse acsResponse = client.getAcsResponse(eCommerceRequest);
+            int success = 200;
+            if (acsResponse.getCode() == success) {
+                return acsResponse.getData().getTranslated();
+            }
+            log.warn("机器翻译未能正确翻译，错误信息{}", acsResponse.toString());
+        } catch (UnsupportedEncodingException | ClientException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
     @Bind(msgType = MsgType.TEXT)
-    public void handleText(WeChatMessage message) throws IOException {
-
-
+    public void handleText(WeChatMessage message) throws UnsupportedEncodingException {
         log.info(JSONObject.toJSONString(message));
-        log.info(message.toString());
+
 //        群名称/用户昵称
         message.getName();
 
-
         if (StringUtils.isNotEmpty(message.getName())) {
             if (message.isAtMe()) {
-                log.info("接收到 [{}] 的消息: {}", message.getName(), message.getText());
+                String text = message.getText();
+                log.info("接收到 [{}] 的消息: {}", message.getName(), text);
 
-                if (COMPILE.matcher(message.getText()).matches()) {
+                String replaceText = StringUtils.trim(text).replace(" ", "");
+                if (COMPILE.matcher(replaceText).matches()) {
                     // 纯英文读出来
-                    String url = "https://fanyi.baidu.com/gettts?lan=en&spd=3&source=web&text=" + message.getText();
-                    OkHttpClient okHttpClient = OkHttpUtils.configureToIgnoreCertificate(new OkHttpClient.Builder()).build();
-                    Request request = new Request.Builder().url(url)
-                            .get()
-                            .build();
-                    Call call = okHttpClient.newCall(request);
-                    Response response = call.execute();
-
-
+                    String url = "https://dict.youdao.com/dictvoice?type=2&audio=" + text;
+                    this.sendMsg(message.getFromUserName(), url);
                 } else {
                     // 其他的翻译成英文
+                    this.sendMsg(message.getFromUserName(), zhToEn(replaceText));
                 }
-
-                this.sendMsg(message.getFromUserName(), "自动回复: " + message.getText());
             }
-
         }
     }
 
-    public static void main(String[] args) throws IOException {
-//        new HelloBot(Config.me().autoLogin(true).showTerminal(true)).start();
-
-        String url = "https://fanyi.baidu.com/gettts?lan=en&spd=3&source=web&text=hello";
-        OkHttpClient okHttpClient = OkHttpUtils.configureToIgnoreCertificate(new OkHttpClient.Builder()).build();
-        Request request = new Request.Builder()
-                .url(url)
-                .get()
-                .build();
-        Call call = okHttpClient.newCall(request);
-        Response response = call.execute();
-        System.out.println(JSONObject.toJSONString(response.body()));
+    public static void main(String[] args) {
+        new HelloBot(Config.me().autoLogin(true).showTerminal(true)).start();
     }
 }

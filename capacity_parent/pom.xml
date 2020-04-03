@@ -22,6 +22,7 @@
         <module>aliyun-vod</module>
         <module>aliyun-common</module>
         <module>wxrobot</module>
+        <module>aliyun-translate</module>
     </modules>
 
 

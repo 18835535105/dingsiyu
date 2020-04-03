@@ -9,9 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>aliyun-oss</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <artifactId>aliyun-translate</artifactId>
+    <description>阿里云机器翻译</description>
 
     <dependencies>
         <dependency>
@@ -20,12 +19,11 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
-
         <dependency>
-            <groupId>com.aliyun.oss</groupId>
-            <artifactId>aliyun-sdk-oss</artifactId>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-alimt</artifactId>
+            <version>1.0.3</version>
         </dependency>
-
     </dependencies>
 
 
