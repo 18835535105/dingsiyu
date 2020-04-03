@@ -141,7 +141,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 setMap.put("count", o1.get("count"));
                 setMap.put("finalNameInteger", i);
                 setMap.put("isEnter", false);
-                setMap.put("isUse", true);
+                setMap.put("isUse", false);
                 setMap.put("isSynthesis", false);
                 setMap.put("isWear", false);
                 setMap.put("time", 48 + "小时0分0秒");
