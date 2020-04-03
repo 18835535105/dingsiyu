@@ -75,7 +75,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
         String nickname = student.getNickname();
         String headUrl = GetOssFile.getPublicObjectUrl(student.getHeadUrl());
-        int gold = Integer.parseInt(student.getSystemGold().toString());
+        int gold = (int) Math.floor(student.getSystemGold());
 
         Long studentId = student.getId();
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(studentId);
