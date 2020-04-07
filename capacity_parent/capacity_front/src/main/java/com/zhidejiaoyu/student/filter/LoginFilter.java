@@ -64,7 +64,7 @@ public class LoginFilter implements Filter {
 
         String url = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
 
-        if (urlMap.containsKey(url) || url.contains("/druid") || url.contains("/smallApp")) {
+        if (urlMap.containsKey(url) || url.contains("/druid") || url.contains("/smallApp") || url.contains("/translate")) {
             // 不拦截登录和退出接口
             doFilter(chain, httpServletRequest, httpServletResponse, url);
 
