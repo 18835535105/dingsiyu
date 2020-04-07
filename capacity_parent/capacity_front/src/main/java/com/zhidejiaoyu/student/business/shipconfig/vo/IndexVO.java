@@ -17,6 +17,12 @@ import java.util.List;
 @AllArgsConstructor
 public class IndexVO implements Serializable {
 
+    private String nickname;
+
+    private String headUrl;
+
+    private Integer gold;
+
     /**
      * 源分战力值
      */

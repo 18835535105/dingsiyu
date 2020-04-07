@@ -72,6 +72,11 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Override
     public ServerResponse<Object> index() {
         Student student = super.getStudent();
+
+        String nickname = student.getNickname();
+        String headUrl = GetOssFile.getPublicObjectUrl(student.getHeadUrl());
+        int gold = (int) Math.floor(student.getSystemGold());
+
         Long studentId = student.getId();
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(studentId);
 
@@ -86,6 +91,9 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         if (CollectionUtils.isEmpty(equipments)) {
             // 学生还没有装备数据
             return ServerResponse.createBySuccess(IndexVO.builder()
+                    .nickname(nickname)
+                    .headUrl(headUrl)
+                    .gold(gold)
                     .skinInfo(skinInfo)
                     .medalInfos(medalInfos)
                     .build());
@@ -101,6 +109,9 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         SyntheticRewardsList syntheticRewardsList = syntheticRewardsListMapper.selectUseGloveOrFlower(studentId);
 
         return ServerResponse.createBySuccess(IndexVO.builder()
+                .nickname(nickname)
+                .headUrl(headUrl)
+                .gold(gold)
                 .sourcePoser(studentExpansion.getSourcePower())
                 .skinInfo(skinInfo)
                 .medalInfos(medalInfos)

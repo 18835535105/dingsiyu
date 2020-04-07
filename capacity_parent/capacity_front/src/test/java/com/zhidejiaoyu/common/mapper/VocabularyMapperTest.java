@@ -86,7 +86,7 @@ public class VocabularyMapperTest extends BaseTest {
             if (file.exists()) {
                 log.info("更新第{}个单词{}", num, word);
                 num++;
-                vocabulary.setReadUrl("audio/word_audio/" + word + ".wav");
+                vocabulary.setReadUrl("audio/word/" + word + ".wav");
                 simpleVocabularyMapper.updateById(vocabulary);
             }
         }
