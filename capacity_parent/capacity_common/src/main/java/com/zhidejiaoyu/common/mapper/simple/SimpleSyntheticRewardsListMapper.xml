@@ -4,15 +4,15 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.SyntheticRewardsList">
-        <id column="id" property="id" />
-        <result column="student_id" property="studentId" />
-        <result column="type" property="type" />
-        <result column="name" property="name" />
-        <result column="img_url" property="imgUrl" />
-        <result column="use_state" property="useState" />
-        <result column="use_time" property="useTime" />
-        <result column="use_end_time" property="useEndTime" />
-        <result column="create_time" property="createTime" />
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="type" property="type"/>
+        <result column="name" property="name"/>
+        <result column="img_url" property="imgUrl"/>
+        <result column="use_state" property="useState"/>
+        <result column="use_time" property="useTime"/>
+        <result column="use_end_time" property="useEndTime"/>
+        <result column="create_time" property="createTime"/>
     </resultMap>
 
     <sql id="Result_Base">
@@ -20,7 +20,8 @@
     </sql>
 
     <select id="getGloveOrFlower" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="Result_Base"></include> from synthetic_rewards_list where student_id = #{studentId} and type!=3 and (use_end_time is null or use_end_time>now()) group by name
+        select <include refid="Result_Base"></include> from synthetic_rewards_list where student_id = #{studentId} and
+        type!=3 and (use_end_time is null or use_end_time>now()) group by name
     </select>
 
     <select id="selListMap" parameterType="java.util.HashMap" resultType="java.util.HashMap">
@@ -50,14 +51,21 @@
     </select>
 
     <select id="getUseGloveOrFlower" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="Result_Base"></include> from synthetic_rewards_list where student_id=#{studentId} and use_end_time>now() and use_state=1 limit 1
+        select <include refid="Result_Base"></include> from synthetic_rewards_list where student_id=#{studentId} and
+        use_end_time>now() and use_state=1 limit 1
     </select>
 
     <select id="getIsUse" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="Result_Base"></include> from synthetic_rewards_list where student_id=#{studentId} and use_end_time is null and name=#{name} limit 1
+        select <include refid="Result_Base"></include> from synthetic_rewards_list where student_id=#{studentId} and
+        use_end_time is null and name=#{name} limit 1
     </select>
 
-    <select id="getHaveGloveOrFlower" parameterType="map" resultType="string">
-        select name  where synthetic_rewards_list where student_id=#{studentId} and type=#{type} and (use_end_time is null or use_end_time>now())
+    <select id="getHaveGloveOrFlower" parameterType="map" resultType="map">
+        select name,use_end_time time
+         from synthetic_rewards_list
+          where student_id=#{studentId}
+          and type=#{type}
+          and  use_end_time>now()
+          limit 1
     </select>
 </mapper>

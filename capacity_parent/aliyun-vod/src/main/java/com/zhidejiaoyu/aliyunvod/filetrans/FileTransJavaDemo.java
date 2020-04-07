@@ -159,7 +159,12 @@ public class FileTransJavaDemo {
         return result;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
+//        transTextToAudio();
+        splitStarWithFile();
+    }
+
+    public static void transTextToAudio() {
         final String accessKeyId = AliyunInfoConstant.accessKeyId;
         final String accessKeySecret = AliyunInfoConstant.accessKeySecret;
         final String appKey = "7tCOZLl5ZGQ7XP06";
@@ -246,16 +251,21 @@ public class FileTransJavaDemo {
      * 重命名文件，去除文件名中的*
      */
     public static void splitStarWithFile() {
-        String filePath = "";
+        String filePath = "/var/tmp/wav_new/";
         File file = new File(filePath);
         File[] files = file.listFiles();
-        for (File file1 : files) {
+        int length = files.length;
+        for (int i = 0; i < length; i++) {
+            File file1 = files[i];
             String name = file1.getName();
-            String[] split = name.split("\\*");
+            String[] split = name.split("_");
 
-            String newFileName = filePath + "/" + split[1];
+            String newFileName = "/var/tmp/audio/" + split[1].replace("  ", " ");
 
-            file1.renameTo(new File(newFileName));
+            boolean b = file1.renameTo(new File(newFileName));
+            if (b) {
+                System.out.println("文件:" + filePath + name + "重命名到->" + newFileName + " 成功");
+            }
         }
     }
 }

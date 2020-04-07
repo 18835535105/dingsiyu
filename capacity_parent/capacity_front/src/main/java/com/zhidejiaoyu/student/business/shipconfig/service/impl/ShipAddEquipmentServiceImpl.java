@@ -246,7 +246,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             } else {
                 equInforMap = equipmentExpansionMapper.selectByEquipmentIdAndLevel(equipment.getId(), 1);
             }
-            equMap.put("information", shipIndexService.getShipConfigInfoDTO( equInforMap));
+            equMap.put("information", shipIndexService.getShipConfigInfoDTO(equInforMap));
             if (studentEquipment != null) {
                 //是否开启
                 equMap.put("open", true);
@@ -277,6 +277,8 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         //强化等级
         equMap.put("enhancementGrade", grade);
         equMap.put("wear", wear.equals(1));
+        Map<String, Object> map = equipmentExpansionMapper.selectByEquipmentIdAndLevel(ment.getId(), grade);
+        equMap.put("information", shipIndexService.getShipConfigInfoDTO(map));
     }
 
     /**
@@ -340,9 +342,9 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                 equInforMap = equipmentExpansionMapper.selectByEquipmentIdAndLevel(equipmentId, studentEquipment.getIntensificationDegree() + 1);
             }
         } else {
-            equInforMap = equipmentExpansionMapper.selectByEquipmentIdAndLevel(equipmentId,  1);
+            equInforMap = equipmentExpansionMapper.selectByEquipmentIdAndLevel(equipmentId, 1);
         }
-        return ServerResponse.createBySuccess(shipIndexService.getShipConfigInfoDTO( equInforMap));
+        return ServerResponse.createBySuccess(shipIndexService.getShipConfigInfoDTO(equInforMap));
     }
 
     public static void addEquipment(List<Long> equipmentIds, Long studentId, StudentEquipmentMapper studentEquipmentMapper) {
@@ -458,7 +460,6 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                     addEquipment.remove(studentMentId);
                 }
             });
-
         }
         return addEquipment;
     }

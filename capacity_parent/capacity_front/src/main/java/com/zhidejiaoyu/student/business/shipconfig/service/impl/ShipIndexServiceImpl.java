@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.constant.redis.SourcePowerKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
+import com.zhidejiaoyu.common.utils.AwardUtil;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -71,6 +72,11 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Override
     public ServerResponse<Object> index() {
         Student student = super.getStudent();
+
+        String nickname = student.getNickname();
+        String headUrl = GetOssFile.getPublicObjectUrl(student.getHeadUrl());
+        int gold = (int) Math.floor(student.getSystemGold());
+
         Long studentId = student.getId();
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(studentId);
 
@@ -85,6 +91,9 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         if (CollectionUtils.isEmpty(equipments)) {
             // 学生还没有装备数据
             return ServerResponse.createBySuccess(IndexVO.builder()
+                    .nickname(nickname)
+                    .headUrl(headUrl)
+                    .gold(gold)
                     .skinInfo(skinInfo)
                     .medalInfos(medalInfos)
                     .build());
@@ -100,6 +109,9 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         SyntheticRewardsList syntheticRewardsList = syntheticRewardsListMapper.selectUseGloveOrFlower(studentId);
 
         return ServerResponse.createBySuccess(IndexVO.builder()
+                .nickname(nickname)
+                .headUrl(headUrl)
+                .gold(gold)
                 .sourcePoser(studentExpansion.getSourcePower())
                 .skinInfo(skinInfo)
                 .medalInfos(medalInfos)
@@ -117,9 +129,10 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
     public IndexVO.Info getSourceInfo(SyntheticRewardsList syntheticRewardsList) {
         if (syntheticRewardsList != null) {
+            String name = syntheticRewardsList.getName();
             return IndexVO.Info.builder().id(Long.valueOf(syntheticRewardsList.getId()))
                     .url(GetOssFile.getPublicObjectUrl(syntheticRewardsList.getImgUrl()))
-                    .explain(syntheticRewardsList.getName())
+                    .explain(name + "，得到的金币加成" + AwardUtil.getBonusByName(name) + "%")
                     .build();
         }
         return null;
@@ -149,6 +162,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         radar.setHitRate(Math.min(1.5, BigDecimalUtil.mul(stateOfWeek.getHitRate(), baseValue.getHitRate(), 2)));
         radar.setMove(Math.min(500, stateOfWeek.getMove() * baseValue.getMove()));
         radar.setSource(Math.min(10000, stateOfWeek.getSource() * baseValue.getSource()));
+        radar.setSourceAttack(stateOfWeek.getSourceAttack() * baseValue.getSourceAttack());
         return radar;
     }
 
