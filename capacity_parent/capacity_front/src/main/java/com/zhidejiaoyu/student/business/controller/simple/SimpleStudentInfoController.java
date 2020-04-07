@@ -161,7 +161,7 @@ public class SimpleStudentInfoController extends BaseController {
         if (userId == null) {
             return ServerResponse.createByErrorMessage("userId can't be null!");
         }
-        return simpleStudentInfoServiceSimple.worship(session, userId);
+        return studentInfoService.worship(session, userId);
     }
 
     /**

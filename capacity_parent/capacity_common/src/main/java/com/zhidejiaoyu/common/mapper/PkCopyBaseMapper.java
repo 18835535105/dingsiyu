@@ -15,5 +15,4 @@ import java.util.List;
  */
 public interface PkCopyBaseMapper extends BaseMapper<PkCopyBase> {
 
-    List<PkCopyBase> selectAll();
 }

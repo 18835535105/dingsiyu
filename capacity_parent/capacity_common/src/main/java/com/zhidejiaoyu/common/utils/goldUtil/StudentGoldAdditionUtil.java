@@ -16,6 +16,13 @@ public class StudentGoldAdditionUtil {
 
     private static final double GLOVESADDITION = 1.2;
 
+    /**
+     * 获取加成后的金币数
+     *
+     * @param student
+     * @param gold
+     * @return
+     */
     public static Double getGoldAddition(Student student, Double gold) {
         Date date = new Date();
         if (student.getBonusExpires() != null && student.getBonusExpires().getTime() >= date.getTime()) {
@@ -24,6 +31,13 @@ public class StudentGoldAdditionUtil {
         return gold;
     }
 
+    /**
+     * 获取加成后的金币数
+     *
+     * @param student
+     * @param gold
+     * @return
+     */
     public static Double getGoldAddition(Student student, Integer gold) {
         if (gold == null) {
             throw new IllegalArgumentException("gold can't be null");

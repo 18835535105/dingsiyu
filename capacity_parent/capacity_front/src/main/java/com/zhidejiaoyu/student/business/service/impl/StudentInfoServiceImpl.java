@@ -25,6 +25,7 @@ import com.zhidejiaoyu.common.vo.student.level.ChildMedalVo;
 import com.zhidejiaoyu.common.vo.student.level.LevelVo;
 import com.zhidejiaoyu.student.business.service.StudentInfoService;
 import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.redis.WorshipRedisOpt;
 import com.zhidejiaoyu.student.common.validTime.GetValidTimeTip;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -32,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -39,8 +41,6 @@ import java.util.concurrent.ExecutorService;
 @Slf4j
 @Service
 public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements StudentInfoService {
-
-    private RunLog runLog;
 
     @Autowired
     private StudentMapper studentMapper;
@@ -84,6 +84,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     @Autowired
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
 
+    @Resource
+    private WorshipRedisOpt worshipRedisOpt;
+
     @Override
     @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
@@ -109,7 +112,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
                     : ServerResponse.createByErrorMessage("信息完善失败！");
         } catch (Exception e) {
             log.error("id为{}的学生{}完善个人信息失败！", studentInfo.getId(), studentInfo.getStudentName(), e);
-            runLog = new RunLog(3, "id为" + studentInfo.getId() + "的学生" + studentInfo.getStudentName()
+            RunLog runLog = new RunLog(3, "id为" + studentInfo.getId() + "的学生" + studentInfo.getStudentName()
                     + "完善个人信息失败！",
                     new Date());
             runLogMapper.insert(runLog);
@@ -224,20 +227,10 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     public ServerResponse<String> worship(HttpSession session, Long userId) {
         Student student = getStudent(session);
 
-        // 查询用户上次的膜拜信息
-        List<Worship> worships = worshipMapper.selectSevenDaysInfoByStudent(student);
-        if (worships.size() > 0) {
-            // 上次膜拜时间
-            Date lastWorshipTime = worships.get(0).getWorshipTime();
-            if (Objects.equals(DateUtil.formatYYYYMMDD(lastWorshipTime), DateUtil.formatYYYYMMDD(new Date()))) {
-                // 今天已经膜拜过其他人
-                return ServerResponse.createByErrorCodeMessage(ResponseCode.TIME_LESS_ONE_DAY.getCode(), ResponseCode.TIME_LESS_ONE_DAY.getMsg());
-            }
-            long count = worships.stream().filter(worship -> worship.getStudentIdByWorship().equals(userId)).count();
-            if (count > 0) {
-                // 本周已膜拜过该同学，不能再次膜拜
-                return ServerResponse.createByErrorCodeMessage(ResponseCode.TIME_LESS_ONE_WEEK.getCode(), ResponseCode.TIME_LESS_ONE_WEEK.getMsg());
-            }
+        Map<String, Long> todayByWorshipedStudentIds = worshipRedisOpt.getTodayByWorshipedStudentIds(student.getId());
+        if (todayByWorshipedStudentIds.containsKey(String.valueOf(userId))) {
+            // 今天已经膜拜过该同学
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.TIME_LESS_ONE_DAY.getCode(), ResponseCode.TIME_LESS_ONE_DAY.getMsg());
         }
 
         List<Medal> children = medalMapper.selectChildrenIdByParentId(92);
@@ -258,7 +251,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         Student byWorship = studentMapper.selectByPrimaryKey(userId);
         if (lastFirstCount == 0) {
             byWorship.setWorshipFirstTime(new Date());
-            studentMapper.updateByPrimaryKeySelective(byWorship);
+            studentMapper.updateById(byWorship);
 
             List<Student> list = new ArrayList<>();
             list.add(byWorship);
@@ -283,18 +276,18 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             // 将之前第一名的学生的勋章第一名标识删去
             list.forEach(student1 -> {
                 student1.setWorshipFirstTime(null);
-                studentMapper.updateByPrimaryKey(student1);
+                studentMapper.updateById(student1);
             });
 
             // 当前被膜拜的学生膜拜次数为全国最高,为其加上标识
             byWorship.setWorshipFirstTime(new Date());
-            studentMapper.updateByPrimaryKeySelective(byWorship);
+            studentMapper.updateById(byWorship);
         } else if (canGetCount < children.size() && count + 1 == lastFirstCount) {
             // 当前被膜拜的学生成为全国并列第一名
             // 计算上个第一名保持的时间
             StudentExample studentExample = new StudentExample();
             studentExample.createCriteria().andWorshipFirstTimeIsNotNull();
-            List<Student> list = studentMapper.selectByExample(studentExample);
+            List<Student> list = studentMapper.selectList(new QueryWrapper<Student>().isNotNull("worship_first_time"));
             toAward(children, byWorship, list, complete, totalPlan);
         }
 
@@ -304,6 +297,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         worship.setStudentIdWorship(student.getId());
         worship.setWorshipTime(new Date());
         worshipMapper.insert(worship);
+        worshipRedisOpt.saveTodayWorshipedStudentId(student.getId(), userId);
 
         executorService.execute(() -> {
             // 众望所归勋章

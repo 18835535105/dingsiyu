@@ -53,5 +53,10 @@ public class RankVO implements Serializable {
         private Integer sourcePower;
 
         private String headUrl;
+
+        /**
+         * 是否可以被膜拜
+         */
+        private Boolean canWorship;
     }
 }

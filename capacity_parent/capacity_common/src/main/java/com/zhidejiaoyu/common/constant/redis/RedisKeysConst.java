@@ -146,4 +146,12 @@ public interface RedisKeysConst {
      * value=当前校区副本是否已挑战陈宫
      */
     String SCHOOL_COPY_AWARD_MARK = "SCHOOL_COPY_AWARD_MARK:";
+
+    /**
+     * 当天被膜拜的学生id
+     * key=BY_WORSHIPED_TODAY:yyyy-MM-dd
+     * field=当前学生id
+     * value:hashMap（key=value=被膜拜的学生id）
+     */
+    String BY_WORSHIPED_TODAY = "BY_WORSHIPED_TODAY:";
 }
