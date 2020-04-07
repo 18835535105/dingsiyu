@@ -33,4 +33,6 @@ public interface ShipTestService extends BaseService<Student> {
      * @return
      */
     ServerResponse<Object> getSchoolCopyInfo(Long bossId);
+
+    Object getTrainingGround();
 }

@@ -111,4 +111,9 @@ public class ShipTestController {
         return shipTestService.saveSingleTesting(session, bossId, bloodVolume);
     }
 
+    @RequestMapping("/getTrainingGround")
+    public Object getTrainingGround() {
+        return shipTestService.getTrainingGround();
+    }
+
 }

@@ -278,6 +278,18 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                 .build());
     }
 
+    /**
+     * 获得所有装备数据
+     *
+     * @return
+     */
+    @Override
+    public Object getTrainingGround() {
+        //获得所有装备名称
+
+        return null;
+    }
+
     private void saveStudentGold(Student student) {
         Double goldAddition = StudentGoldAdditionUtil.getGoldAddition(student, AWARD_GOLD);
         studentMapper.updateBySystemGold(goldAddition, student.getId());
