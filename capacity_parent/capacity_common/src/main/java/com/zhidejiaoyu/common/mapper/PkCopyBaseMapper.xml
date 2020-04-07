@@ -19,4 +19,12 @@
         <result column="img_url" property="imgUrl" />
     </resultMap>
 
+    <sql id="base_sql">
+        id,name,level_name,type,challenge_cycle,person_num,durability,common_attack,source_force_attack,source_force,hit_rate,mobility,img_url
+    </sql>
+
+    <select id="selectAll" resultMap="BaseResultMap" >
+        select <include refid="base_sql"></include> from pk_copy_base
+    </select>
+
 </mapper>

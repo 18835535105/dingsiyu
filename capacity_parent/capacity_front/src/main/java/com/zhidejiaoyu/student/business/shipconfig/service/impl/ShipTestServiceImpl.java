@@ -16,6 +16,8 @@ import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipTestService;
+import com.zhidejiaoyu.student.business.shipconfig.vo.EquipmentEquipmentExperienceVo;
+import com.zhidejiaoyu.student.business.shipconfig.vo.EquipmentExperienceVo;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.PkInfoVO;
 import com.zhidejiaoyu.student.common.SaveGoldLog;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements ShipTestService {
@@ -66,6 +69,12 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
 
     @Resource
     private EquipmentMapper equipmentMapper;
+
+    @Resource
+    private EquipmentExpansionMapper equipmentExpansionMapper;
+
+    @Resource
+    private PkCopyBaseMapper pkCopyBaseMapper;
 
     /**
      * @param session
@@ -285,9 +294,43 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      */
     @Override
     public Object getTrainingGround() {
+        Map<String, Object> returnMap = new HashMap<>();
+        Map<Integer, List<EquipmentEquipmentExperienceVo>> pkMap = new HashMap<>();
         //获得所有装备名称
-
-        return null;
+        List<Equipment> equipment = equipmentMapper.selectAll();
+        List<EquipmentExpansion> equipmentExpansions = equipmentExpansionMapper.selectAll();
+        Map<Integer, List<Equipment>> collect = equipment.stream().collect(Collectors.groupingBy(ment -> ment.getType()));
+        Map<Long, List<EquipmentExpansion>> collect1 = equipmentExpansions.stream().collect(Collectors.groupingBy(ment -> ment.getEquipmentId()));
+        Set<Integer> integers = collect.keySet();
+        List<PkCopyBase> pkCopyBases = pkCopyBaseMapper.selectAll();
+        integers.forEach(number -> {
+            List<Equipment> equipments = collect.get(number);
+            equipments.forEach(ment -> {
+                List<EquipmentEquipmentExperienceVo> equipmentEquipmentExperienceVos = pkMap.get(number);
+                EquipmentEquipmentExperienceVo vo = new EquipmentEquipmentExperienceVo();
+                if (equipmentEquipmentExperienceVos == null) {
+                    equipmentEquipmentExperienceVos = new ArrayList<>();
+                }
+                vo.setId(ment.getId());
+                vo.setEmpiricalValue(ment.getEmpiricalValue());
+                vo.setLevel(ment.getLevel());
+                vo.setGrade(ment.getGrade());
+                vo.setName(ment.getName());
+                vo.setType(ment.getType());
+                List<EquipmentExpansion> equipmentExpansions1 = collect1.get(ment.getId());
+                vo.setExperienceMap(new HashMap<>());
+                equipmentExpansions1.forEach(expan -> {
+                    Map<Integer, EquipmentExpansion> experienceMap = vo.getExperienceMap();
+                    expan.setImgUrl(getImg(expan.getImgUrl()));
+                    experienceMap.put(expan.getIntensificationDegree(), expan);
+                });
+                equipmentEquipmentExperienceVos.add(vo);
+                pkMap.put(number, equipmentEquipmentExperienceVos);
+            });
+        });
+        returnMap.put("pkEqu", pkMap);
+        returnMap.put("bossEqu", pkCopyBases);
+        return returnMap;
     }
 
     private void saveStudentGold(Student student) {

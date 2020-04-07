@@ -60,5 +60,8 @@
              e.id=#{equipmentId}
             and ee.intensification_degree = #{degree}
     </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include> from equipment_expansion
+    </select>
 
 </mapper>
