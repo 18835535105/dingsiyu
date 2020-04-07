@@ -53,10 +53,6 @@ public enum ResponseCode {
      * 时间不足24小时
      */
     TIME_LESS_ONE_DAY(900, "TIME_LESS_ONE_DAY"),
-    /**
-     * 时间不足一周
-     */
-    TIME_LESS_ONE_WEEK(901, "TIME_LESS_ONE_WEEK"),
 
     /**
      * 未查询到数据

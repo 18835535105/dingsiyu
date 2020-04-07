@@ -84,6 +84,11 @@ public class IndexVO implements Serializable {
     private Radar radar;
 
     /**
+     * 被膜拜总次数
+     */
+    private Integer byWorshipedCount;
+
+    /**
      * 各个数据信息
      */
     @Data

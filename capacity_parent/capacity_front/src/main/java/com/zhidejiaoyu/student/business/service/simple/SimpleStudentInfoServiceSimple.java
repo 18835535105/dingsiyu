@@ -16,15 +16,6 @@ import java.util.Map;
 public interface SimpleStudentInfoServiceSimple extends SimpleBaseService<Student> {
 
     /**
-     * 膜拜
-     *
-     * @param session
-     * @param userId  被膜拜人的id
-     * @return
-     */
-    ServerResponse<String> worship(HttpSession session, Long userId);
-
-    /**
      * 验证原密码是否正确
      *
      * @param nowPassword   当前密码
