@@ -162,6 +162,8 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 if (AwardUtil.getAward(i).equals(name)) {
                     setMap.put("isUse", true);
                     setMap.put("time", student.getBonusExpires().getTime() - System.currentTimeMillis());
+                }else{
+                    setMap.put("time", 48 + "小时0分0秒");
                 }
             } else {
                 setMap.put("isWear", true);
