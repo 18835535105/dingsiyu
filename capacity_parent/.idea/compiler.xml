@@ -9,7 +9,6 @@
         <outputRelativeToContentRoot value="true" />
         <module name="capacity_common" />
         <module name="aliyun-oss" />
-        <module name="aliyun-translate" />
         <module name="capacity_front" />
         <module name="aliyun-vod" />
         <module name="wechat-api" />
@@ -17,6 +16,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="aliyun-translate" target="1.8" />
       <module name="guns-admin" target="1.8" />
       <module name="guns-core" target="1.8" />
       <module name="spring-boot-admin-server" target="1.8" />
