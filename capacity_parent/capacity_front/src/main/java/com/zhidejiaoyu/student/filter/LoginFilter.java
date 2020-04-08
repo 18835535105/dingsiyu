@@ -41,6 +41,9 @@ public class LoginFilter implements Filter {
         urlMap.put("/ec/login/judge", "/ec/login/judge");
         urlMap.put("/ec/login/loginOut", "/ec/login/loginOut");
         urlMap.put("/ec/login/validateCode", "/ec/login/validateCode");
+
+        urlMap.put("/ec/quartz/robot/getDailyState", "/ec/quartz/robot/getDailyState");
+        urlMap.put("/quartz/robot/getDailyState", "/quartz/robot/getDailyState");
     }
 
     @Resource

@@ -2,6 +2,8 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.ClockIn;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO;
+import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
@@ -47,5 +49,14 @@ public interface ClockInMapper extends BaseMapper<ClockIn> {
 
 
     @MapKey("studentIds")
-    Map<Long, Map<String,Object>> selectByStudentIds(@Param("studentIds") List<Long> studentIds, @Param("date") Date date);
+    Map<Long, Map<String, Object>> selectByStudentIds(@Param("studentIds") List<Long> studentIds, @Param("date") Date date);
+
+    /**
+     * 查询指定日期指定学生的打卡记录
+     *
+     * @param account 学生账号
+     * @param date    打卡日期
+     * @return
+     */
+    List<DailyStateVO> selectByStudentAccount(@Param("account") String[] account, @Param("date") Date date);
 }

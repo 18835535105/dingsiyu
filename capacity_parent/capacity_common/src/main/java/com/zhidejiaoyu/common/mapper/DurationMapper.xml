@@ -300,6 +300,29 @@
         group by TO_DAYS(d.login_time)
         order by d.login_time desc
     </select>
+
+    <select id="selectDailyStateVOLearnDateAndOnlineTime"
+            resultType="com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO">
+        select
+        s.student_name studentName,
+        d.student_id studentId,
+        s.account,
+        sum(d.online_time) onlineTime,
+        date_format(d.login_time, '%Y-%m-%d') learnDate
+        from duration d,
+        student s
+        where d.student_id = s.id
+        and s.account in (
+        <foreach collection="account" separator="," item="c">
+            #{c}
+        </foreach>
+        )
+        and d.valid_time &lt;> 0
+        and to_days(d.login_time) = to_days(now())
+        group by d.student_id
+        order by d.login_time desc
+    </select>
+
     <select id="selectDurationInfos" resultType="com.zhidejiaoyu.common.vo.smallapp.studyinfo.DurationInfoVO"
             parameterType="map">
         select online_time onlineTime,
@@ -313,6 +336,19 @@
         )
         order by login_time desc
     </select>
+
+    <select id="selectTodayDurationInfos"
+            resultType="com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO">
+        select online_time                         onlineTime,
+               date_format(login_time, '%Y-%m-%d') learnDate,
+               study_model                         studyModel
+        from duration
+        where student_id = #{studentId}
+          and valid_time &lt;> 0
+          and to_days(login_time) = to_days(now())
+        order by login_time desc
+    </select>
+
     <select id="selectLastStudyEfficiency" resultType="java.lang.Double" parameterType="map">
         select sum(d.valid_time) / sum(d.online_time)
         from duration d,
@@ -396,6 +432,10 @@
         and `group` is not null
         group by learning_model
     </select>
-
+    <select id="selectAvgOnlineTime" resultType="java.lang.Double">
+        select sum(online_time) / count(DISTINCT student_id)
+        from duration
+        where TO_DAYS(login_time) = TO_DAYS(now())
+    </select>
 
 </mapper>

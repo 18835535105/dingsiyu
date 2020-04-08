@@ -229,7 +229,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      * @param durationInfos   各个日期具体的学习时长
      * @return
      */
-    public List<DurationInfoVO> packageResultList(List<DurationInfoVO> durationInfoVos,
+    private List<DurationInfoVO> packageResultList(List<DurationInfoVO> durationInfoVos,
                                                   List<DurationInfoVO> durationInfos) {
         // 各个学习日期所有的具体学习时长记录
         Map<String, List<DurationInfoVO>> collect = durationInfos
@@ -261,7 +261,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 return;
             }
 
-            String learnDate = this.getLearnDate(k);
+            String learnDate = getLearnDate(k);
             result.add(DurationInfoVO.builder()
                     .learnDate(learnDate)
                     .onlineTime(stringListMap.get(k).get(0).getOnlineTime() / 60)
@@ -272,7 +272,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         return result;
     }
 
-    public String getLearnDate(String k) {
+    public static String getLearnDate(String k) {
         String[] split = k.split("-");
 
         return split[0] + "年" + split[1] + "月" + split[2] + "日";

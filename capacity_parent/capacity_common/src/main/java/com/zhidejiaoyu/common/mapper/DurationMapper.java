@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.vo.SeniorityVo;
+import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO;
 import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DurationInfoVO;
 import com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolDetail;
 import com.zhidejiaoyu.common.pojo.*;
@@ -200,6 +201,14 @@ public interface DurationMapper extends BaseMapper<Duration> {
     List<DurationInfoVO> selectLearnDateAndOnlineTime(@Param("studentId") Long studentId);
 
     /**
+     * 查询所有学生的学习日期及在线时长
+     *
+     * @param account
+     * @return
+     */
+    List<DailyStateVO> selectDailyStateVOLearnDateAndOnlineTime(@Param("account") String[] account);
+
+    /**
      * 查询指定日期的学习时长及学习模块
      *
      * @param studentId
@@ -207,6 +216,14 @@ public interface DurationMapper extends BaseMapper<Duration> {
      * @return
      */
     List<DurationInfoVO> selectDurationInfos(@Param("studentId") Long studentId, @Param("learnDateList") List<String> learnDateList);
+
+    /**
+     * 获取学生当天的学习时长及学习模块
+     *
+     * @param studentId
+     * @return
+     */
+    List<DailyStateVO> selectTodayDurationInfos(@Param("studentId") Long studentId);
 
     /**
      * 查询学生最后一次的学习效率
@@ -226,9 +243,17 @@ public interface DurationMapper extends BaseMapper<Duration> {
     /**
      * 查询指定日期学生学习时间详情
      * todo: 类型还有待确认
+     *
      * @param learningDetails
      * @param date
      * @return
      */
     List<Map<String, Object>> selectByLearningDetails(@Param("learningDetails") LearningDetails learningDetails, @Param("date") Date date);
+
+    /**
+     * 统计所有学生今天在线时长的平均值
+     *
+     * @return
+     */
+    Double selectAvgOnlineTime();
 }

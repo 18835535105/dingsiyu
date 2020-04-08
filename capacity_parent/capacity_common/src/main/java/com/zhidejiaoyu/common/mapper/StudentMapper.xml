@@ -930,5 +930,14 @@
         </foreach>
         )
     </select>
+    <select id="selectByAccounts" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from student where account in (
+        <foreach collection="accountArr" separator="," item="account">
+            #{account}
+        </foreach>
+        )
+    </select>
 
 </mapper>

@@ -323,4 +323,12 @@ public interface StudentMapper extends BaseMapper<Student> {
      */
     @MapKey("studentId")
     Map<Long, Map<String, Object>> selectSourcePowerRankByIds(@Param("studentIds") List<Long> studentIds);
+
+    /**
+     * 查询学生id
+     *
+     * @param accountArr
+     * @return
+     */
+    List<Student> selectByAccounts(@Param("accountArr") String[] accountArr);
 }
