@@ -14,8 +14,10 @@ import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.smallapp.dto.GetLimitQRCodeDTO;
 import com.zhidejiaoyu.student.business.smallapp.serivce.SmallProgramTestService;
 import com.zhidejiaoyu.student.business.smallapp.util.CreateWxQrCodeUtil;
+import com.zhidejiaoyu.student.common.SaveGoldLog;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -47,6 +49,8 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     @Resource
     private TestRecordMapper testRecordMapper;
 
+    @Resource
+    private ClockInMapper clockInMapper;
 
     @Override
     public Object getTest(HttpSession session, String openId) {
@@ -111,16 +115,18 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Object saveTest(Integer point, HttpSession session, String openId) {
         Student student = studentMapper.selectByOpenId(openId);
         Map<String, Object> returnMap = new HashMap<>();
         Date startDate = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
         Date date = new Date();
+        Long studentId = student.getId();
         if (point > 80) {
             TestRecord testRecord = new TestRecord();
             testRecord.setGenre(GenreConstant.SMALLAPP_GENRE);
             testRecord.setStudyModel(StudyModelConstant.SMALLAPP_STUDY_MODEL);
-            testRecord.setStudentId(student.getId());
+            testRecord.setStudentId(studentId);
             testRecord.setTestEndTime(date);
             testRecord.setTestStartTime(startDate);
             returnMap.put("point", point);
@@ -128,11 +134,15 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         } else {
             returnMap.put("point", 0);
         }
-        student.setSystemGold(student.getSystemGold() + 50);
-        String msg = "id为：" + student.getId() + "的学生在[" + GenreConstant.SMALLAPP_GENRE
-                + "]模块下的单元闯关测试中闯关成功，获得#" + 50 + "#枚金币";
-        super.saveRunLog(student, 4, null, null, msg);
+
+        int awardGold = 50;
+        student.setSystemGold(student.getSystemGold() + awardGold);
         studentMapper.updateById(student);
+
+        SaveGoldLog.saveStudyGoldLog(studentId, GenreConstant.SMALLAPP_GENRE, awardGold);
+
+        this.saveClockIn(studentId);
+
         Integer adminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
         ShareConfig shareConfig = shareConfigMapper.selectByAdminId(adminId);
         if (shareConfig == null) {
@@ -143,10 +153,33 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             returnMap.put("word", shareConfig.getImgWord());
         }
         returnMap.put("gold", student.getSystemGold().intValue());
-        returnMap.put("studentId", student.getId());
+        returnMap.put("studentId", studentId);
         returnMap.put("studentName", student.getNickname());
         returnMap.put("headPortrait", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
         return returnMap;
+    }
+
+    /**
+     * 保存打卡记录
+     *
+     * @param studentId
+     */
+    public void saveClockIn(Long studentId) {
+        int count = clockInMapper.countTodayInfoByStudentId(studentId);
+
+        if (count > 0) {
+            return;
+        }
+
+        Integer maxCardDays = clockInMapper.selectLastCardDaysByStudentId(studentId);
+
+        clockInMapper.insert(ClockIn.builder()
+                .type(1)
+                .studentId(studentId)
+                .createTime(new Date())
+                .cardTime(new Date())
+                .cardDays(maxCardDays == null ? 1 : (maxCardDays + 1))
+                .build());
     }
 
     @Override

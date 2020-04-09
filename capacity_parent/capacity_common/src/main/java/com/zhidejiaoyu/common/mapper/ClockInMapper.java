@@ -1,11 +1,11 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.zhidejiaoyu.common.pojo.ClockIn;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO;
+import com.zhidejiaoyu.common.pojo.ClockIn;
 import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.Date;
 import java.util.List;
@@ -59,4 +59,22 @@ public interface ClockInMapper extends BaseMapper<ClockIn> {
      * @return
      */
     List<DailyStateVO> selectByStudentAccount(@Param("account") String[] account, @Param("date") Date date);
+
+    /**
+     * 查询当前学生最后一次记录的连续打卡天数
+     *
+     * @param studentId
+     * @return
+     */
+    @Select("select card_days from clock_in where student_id = #{studentId} order by create_time desc limit 1")
+    Integer selectLastCardDaysByStudentId(@Param("studentId") Long studentId);
+
+    /**
+     * 统计今天学生是否已经打卡
+     *
+     * @param studentId
+     * @return
+     */
+    @Select("select count(id) from clock_in where student_id = #{studentId} and to_days(now()) = to_days(create_time)")
+    int countTodayInfoByStudentId(@Param("studentId") Long studentId);
 }
