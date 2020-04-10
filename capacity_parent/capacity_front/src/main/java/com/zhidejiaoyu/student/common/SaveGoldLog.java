@@ -65,7 +65,7 @@ public class SaveGoldLog {
      * @param gold      金币减少数量
      */
     public static void saveReplenishGoldLog(Long studentId, String reason, int gold) throws RuntimeException {
-        executorService.execute(() -> saveGoldLog(studentId, reason, gold, 5));
+        executorService.execute(() -> saveGoldLog(studentId, reason, -gold, 5));
     }
 
     private static void saveGoldLog(Long studentId, String reason, int gold, int type) {
