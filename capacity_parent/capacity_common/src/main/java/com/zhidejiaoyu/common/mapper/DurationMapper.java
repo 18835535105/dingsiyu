@@ -201,12 +201,13 @@ public interface DurationMapper extends BaseMapper<Duration> {
     List<DurationInfoVO> selectLearnDateAndOnlineTime(@Param("studentId") Long studentId);
 
     /**
-     * 查询所有学生的学习日期及在线时长
+     * 查询所有学生的学习日期及在线时长（排除已打卡的学生）
      *
      * @param account
+     * @param clockInStudentIds 已打卡的学生id
      * @return
      */
-    List<DailyStateVO> selectDailyStateVOLearnDateAndOnlineTime(@Param("account") String[] account);
+    List<DailyStateVO> selectDailyStateVOLearnDateAndOnlineTime(@Param("account") String[] account, @Param("studentIds") List<Long> clockInStudentIds);
 
     /**
      * 查询指定日期的学习时长及学习模块
@@ -256,4 +257,15 @@ public interface DurationMapper extends BaseMapper<Duration> {
      * @return
      */
     Double selectAvgOnlineTime();
+
+    /**
+     * 获取学生本周的在线时长信息
+     *
+     * @param accountArr
+     * @param startDay   本周起始时间
+     * @param endDay     本手结束时间
+     * @return
+     */
+    @MapKey("studentId")
+    Map<Long, Map<String, Object>> selectWeekOnlineTime(@Param("accountArr") String[] accountArr, @Param("startDay") Date startDay, @Param("endDay") Date endDay);
 }

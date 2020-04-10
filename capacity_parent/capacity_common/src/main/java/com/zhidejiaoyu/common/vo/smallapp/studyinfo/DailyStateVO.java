@@ -16,10 +16,22 @@ public class DailyStateVO extends DurationInfoVO {
 
     private String studentName;
 
-    /**
-     * 是否已打卡
-     */
-    private Boolean card;
+    private String msg;
 
-    private String petName;
+    private String msg1;
+
+    /**
+     * 学段
+     */
+    private String phase;
+
+    /**
+     * 学习进度，本周在现时长/4小时
+     */
+    private String studyProgress;
+
+    /**
+     * 连续签到天数
+     */
+    private Integer cardDays;
 }
