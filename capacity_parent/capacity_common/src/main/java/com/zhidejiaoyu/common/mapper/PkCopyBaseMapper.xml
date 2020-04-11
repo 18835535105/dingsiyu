@@ -4,19 +4,26 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.PkCopyBase">
-        <id column="id" property="id" />
-        <result column="name" property="name" />
-        <result column="level_name" property="levelName" />
-        <result column="type" property="type" />
-        <result column="challenge_cycle" property="challengeCycle" />
-        <result column="person_num" property="personNum" />
-        <result column="durability" property="durability" />
-        <result column="common_attack" property="commonAttack" />
-        <result column="source_force_attack" property="sourceForceAttack" />
-        <result column="source_force" property="sourceForce" />
-        <result column="hit_rate" property="hitRate" />
-        <result column="mobility" property="mobility" />
-        <result column="img_url" property="imgUrl" />
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="level_name" property="levelName"/>
+        <result column="type" property="type"/>
+        <result column="challenge_cycle" property="challengeCycle"/>
+        <result column="person_num" property="personNum"/>
+        <result column="durability" property="durability"/>
+        <result column="common_attack" property="commonAttack"/>
+        <result column="source_force_attack" property="sourceForceAttack"/>
+        <result column="source_force" property="sourceForce"/>
+        <result column="hit_rate" property="hitRate"/>
+        <result column="mobility" property="mobility"/>
+        <result column="img_url" property="imgUrl"/>
+        <result column="gold" property="gold"/>
+        <result column="max_award_count" property="maxAwardCount"/>
+        <result column="school_gold" property="schoolGold"/>
     </resultMap>
 
+    <sql id="base_sql">
+        id,`name`,level_name,type,challenge_cycle,person_num,durability,common_attack,source_force_attack,source_force,
+        hit_rate,mobility,img_url ,gold, max_award_count, school_gold
+    </sql>
 </mapper>

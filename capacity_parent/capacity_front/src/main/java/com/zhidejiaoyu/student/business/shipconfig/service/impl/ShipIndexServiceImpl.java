@@ -19,6 +19,7 @@ import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.util.CalculateUtil;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.RankVO;
+import com.zhidejiaoyu.student.common.redis.WorshipRedisOpt;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -58,6 +59,12 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Resource
     private MedalMapper medalMapper;
 
+    @Resource
+    private WorshipMapper worshipMapper;
+
+    @Resource
+    private WorshipRedisOpt worshipRedisOpt;
+
     /**
      * 强化度对应的中文等级
      */
@@ -80,6 +87,9 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         Long studentId = student.getId();
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(studentId);
 
+        // 学生被膜拜总次数
+        int byWorshipCount = worshipMapper.countByWorship(studentId);
+
         // 皮肤
         IndexVO.Info skinInfo = getSkinInfo(studentId);
 
@@ -96,6 +106,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                     .gold(gold)
                     .skinInfo(skinInfo)
                     .medalInfos(medalInfos)
+                    .byWorshipedCount(byWorshipCount)
                     .build());
         }
 
@@ -124,6 +135,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 .baseValue(baseValue)
                 .stateOfWeek(stateOfWeek)
                 .radar(radar)
+                .byWorshipedCount(byWorshipCount)
                 .build());
     }
 
@@ -327,17 +339,15 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
             // 校区排行（全部学生）
             // 我在校区的排行
             String key = SourcePowerKeysConst.SCHOOL_RANK + schoolAdminId;
-            long rank = sourcePowerRankOpt.getRank(key, student.getId());
 
             List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, null);
-            return this.packageRankVO(key, rank, studentIds);
+            return this.packageRankVO(key, studentIds, student);
         } else {
             // 全国排行（前50名）
             String key = SourcePowerKeysConst.COUNTRY_RANK;
-            long rank = sourcePowerRankOpt.getRank(key, student.getId());
             List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, 50);
 
-            return this.packageRankVO(key, rank, studentIds);
+            return this.packageRankVO(key, studentIds, student);
         }
     }
 
@@ -351,8 +361,12 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         return this.getRadar(baseValue, stateOfWeek);
     }
 
-    public ServerResponse<Object> packageRankVO(String key, long rank, List<Long> studentIds) {
+    public ServerResponse<Object> packageRankVO(String key, List<Long> studentIds, Student student) {
         Map<Long, Map<String, Object>> infoMap = studentMapper.selectSourcePowerRankByIds(studentIds);
+        long rank = sourcePowerRankOpt.getRank(key, student.getId());
+
+        // 学生今天已膜拜的学生
+        Map<String, Long> byWorshipedStudentMap = worshipRedisOpt.getTodayByWorshipedStudentIds(student.getId());
 
         List<RankVO.RankInfo> collect = studentIds.stream().map(id -> {
             Map<String, Object> map = infoMap.get(id);
@@ -361,6 +375,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                     .sourcePower(map == null || map.get("sourcePower") == null ? 0 : (int) map.get("sourcePower"))
                     .headUrl(map == null || map.get("headUrl") == null ? "" : GetOssFile.getPublicObjectUrl(map.get("headUrl").toString()))
                     .studentId(id)
+                    .canWorship(!byWorshipedStudentMap.containsKey(String.valueOf(id)))
                     .build();
         }).collect(Collectors.toList());
 
@@ -468,7 +483,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
             explain.append("耐久度").append(durability > 0 ? "+" : "").append(durability).append("，");
         }
         double hitRate = shipConfigInfoDTO.getBaseValue().getHitRate();
-        if (hitRate != 0.0) {
+        if (Objects.equals(hitRate, 0.0)) {
             explain.append("命中率").append(hitRate > 0 ? "+" : "").append(hitRate * 100).append("%，");
         }
         int mobility = shipConfigInfoDTO.getBaseValue().getMove();

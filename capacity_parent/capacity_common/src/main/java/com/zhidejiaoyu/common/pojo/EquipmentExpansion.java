@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author zdjy
@@ -49,7 +49,7 @@ public class EquipmentExpansion extends Model<EquipmentExpansion> {
     /**
      * 命中率
      */
-    private Integer hitRate;
+    private Double hitRate;
     /**
      * 机动力
      */

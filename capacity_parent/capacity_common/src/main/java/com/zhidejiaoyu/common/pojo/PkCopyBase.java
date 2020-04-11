@@ -75,6 +75,28 @@ public class PkCopyBase extends Model<PkCopyBase> {
      */
     private String imgUrl;
 
+    /**
+     * 奖励金币数
+     * <ul>
+     *     <li>单人副本挑战成功后才奖励</li>
+     *     <li>校区副本只要参与挑战就有奖励</li>
+     * </ul>
+     */
+    private Integer gold;
+
+    /**
+     * 每周最多奖励次数
+     * <ul>
+     *     <li>校区副本每周只有周六周日奖励</li>
+     * </ul>
+     */
+    private Integer maxAwardCount;
+
+    /**
+     * 挑战成功后放入校区金币工厂的金币数
+     * 只有校区副本挑战成功才有奖励j
+     */
+    private Integer schoolGold;
 
     @Override
     protected Serializable pkVal() {

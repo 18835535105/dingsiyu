@@ -16,6 +16,7 @@ import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipTestService;
+import com.zhidejiaoyu.student.business.shipconfig.vo.EquipmentEquipmentExperienceVo;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.PkInfoVO;
 import com.zhidejiaoyu.student.common.SaveGoldLog;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements ShipTestService {
@@ -52,8 +54,6 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     private SourcePowerRankOpt sourcePowerRankOpt;
     @Resource
     private StudentEquipmentMapper studentEquipmentMapper;
-    @Resource
-    private RunLogMapper runLogMapper;
 
     @Resource
     private PkCopyStateMapper pkCopyStateMapper;
@@ -66,6 +66,12 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
 
     @Resource
     private EquipmentMapper equipmentMapper;
+
+    @Resource
+    private EquipmentExpansionMapper equipmentExpansionMapper;
+
+    @Resource
+    private PkCopyBaseMapper pkCopyBaseMapper;
 
     /**
      * @param session
@@ -278,9 +284,55 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                 .build());
     }
 
+    /**
+     * 获得所有装备数据
+     *
+     * @return
+     */
+    @Override
+    public Object getTrainingGround() {
+        Map<String, Object> returnMap = new HashMap<>(16);
+        Map<Integer, List<EquipmentEquipmentExperienceVo>> pkMap = new HashMap<>(16);
+        //获得所有装备名称
+        List<Equipment> equipment = equipmentMapper.selectAll();
+        List<EquipmentExpansion> equipmentExpansions = equipmentExpansionMapper.selectAll();
+        Map<Integer, List<Equipment>> collect = equipment.stream().collect(Collectors.groupingBy(Equipment::getType));
+        Map<Long, List<EquipmentExpansion>> collect1 = equipmentExpansions.stream().collect(Collectors.groupingBy(EquipmentExpansion::getEquipmentId));
+        Set<Integer> integers = collect.keySet();
+        List<PkCopyBase> pkCopyBases = pkCopyBaseMapper.selectList(null);
+        integers.forEach(number -> {
+            List<Equipment> equipments = collect.get(number);
+            equipments.forEach(ment -> {
+                List<EquipmentEquipmentExperienceVo> equipmentEquipmentExperienceVos = pkMap.get(number);
+                EquipmentEquipmentExperienceVo vo = new EquipmentEquipmentExperienceVo();
+                if (equipmentEquipmentExperienceVos == null) {
+                    equipmentEquipmentExperienceVos = new ArrayList<>();
+                }
+                vo.setId(ment.getId());
+                vo.setEmpiricalValue(ment.getEmpiricalValue());
+                vo.setLevel(ment.getLevel());
+                vo.setGrade(ment.getGrade());
+                vo.setName(ment.getName());
+                vo.setType(ment.getType());
+                List<EquipmentExpansion> equipmentExpansions1 = collect1.get(ment.getId());
+                vo.setExperienceMap(new HashMap<>(16));
+                equipmentExpansions1.forEach(expansion -> {
+                    Map<Integer, EquipmentExpansion> experienceMap = vo.getExperienceMap();
+                    expansion.setImgUrl(getImg(expansion.getImgUrl()));
+                    experienceMap.put(expansion.getIntensificationDegree(), expansion);
+                });
+                equipmentEquipmentExperienceVos.add(vo);
+                pkMap.put(number, equipmentEquipmentExperienceVos);
+            });
+        });
+        returnMap.put("pkEqu", pkMap);
+        returnMap.put("bossEqu", pkCopyBases);
+        return returnMap;
+    }
+
     private void saveStudentGold(Student student) {
         Double goldAddition = StudentGoldAdditionUtil.getGoldAddition(student, AWARD_GOLD);
-        studentMapper.updateBySystemGold(goldAddition, student.getId());
+        studentMapper.updateBySystemGold(BigDecimalUtil.add(goldAddition, student.getSystemGold()), student.getId());
         SaveGoldLog.saveStudyGoldLog(student.getId(), "飞船个人挑战", Integer.parseInt(goldAddition.toString()));
     }
 
@@ -373,6 +425,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
          */
         PkCopyState pkCopyState = pkCopyStateMapper.selectBySchoolAdminIdAndPkCopyBaseId(schoolAdminId, copyId);
         PkCopyBase pkCopyBase = pkCopyRedisOpt.getPkCopyBaseById(copyId);
+
         // 剩余耐久度
         int durability;
         Date nowTime = new Date();
@@ -387,7 +440,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                     .updateTime(nowTime)
                     .build());
 
-            this.savePkSchoolCopyAward(copyId, schoolAdminId, durability);
+            this.savePkSchoolCopyAward(pkCopyBase, schoolAdminId, durability);
             this.saveGauntlet(copyId, student, pkCopyBase, durability, nowTime);
         } else if (pkCopyState.getDurability() > 0) {
             durability = pkCopyState.getDurability() - reduceDurability;
@@ -396,9 +449,15 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
             pkCopyState.setUpdateTime(nowTime);
             pkCopyStateMapper.updateById(pkCopyState);
 
-            this.savePkSchoolCopyAward(copyId, schoolAdminId, durability);
+            this.savePkSchoolCopyAward(pkCopyBase, schoolAdminId, durability);
             this.saveGauntlet(copyId, student, pkCopyBase, durability, nowTime);
         }
+
+        Double goldAddition = StudentGoldAdditionUtil.getGoldAddition(student, pkCopyBase.getGold());
+        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldAddition));
+        studentMapper.updateById(student);
+
+        SaveGoldLog.saveStudyGoldLog(student.getId(), "参与校区副本挑战", (int) Math.floor(goldAddition));
 
         return ServerResponse.createBySuccess();
     }
@@ -417,19 +476,12 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                 .build());
     }
 
-    public void savePkSchoolCopyAward(Long copyId, Integer schoolAdminId, Integer durability) {
+    public void savePkSchoolCopyAward(PkCopyBase pkCopyBase, Integer schoolAdminId, Integer durability) {
+        Long copyId = pkCopyBase.getId();
         boolean flag = pkCopyRedisOpt.judgeSchoolCopyAward(schoolAdminId, copyId);
         if (durability <= 0 && flag) {
-            pkCopyRedisOpt.markSchoolCopyAward(schoolAdminId, copyId);
-            // 挑战成功，对校区内所有挑战该副本的学生奖励金币
-            Set<Long> schoolCopyStudentInfoSet = pkCopyRedisOpt.getSchoolCopyStudentInfo(schoolAdminId, copyId);
-            for (Long studentId : schoolCopyStudentInfoSet) {
-                Student student1 = studentMapper.selectById(studentId);
-                Double goldBonus = StudentGoldAdditionUtil.getGoldAddition(student1, AWARD_GOLD);
-                student1.setSystemGold(BigDecimalUtil.add(student1.getSystemGold(), goldBonus));
-                studentMapper.updateById(student1);
-                SaveGoldLog.saveStudyGoldLog(student1.getId(), "校区副本挑战胜利", Integer.parseInt(goldBonus.toString()));
-            }
+            // todo:校区金币工厂增加金币
+
         }
     }
 
@@ -445,11 +497,8 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         String beforeTime = DateUtil.beforeHoursTime(1);
         Date parse = DateUtil.parse(beforeTime, DateUtil.YYYYMMDDHHMMSS);
         int count = gauntletMapper.getCountByStudentIdAndTime(student.getId(), date, parse);
-        if (count >= 5) {
-            return 1;
-        } else {
-            return 2;
-        }
+        int maxCount = 5;
+        return count >= maxCount ? 1 : 2;
     }
 
     /**

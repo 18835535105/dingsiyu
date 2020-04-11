@@ -3,6 +3,8 @@ package com.zhidejiaoyu.common.mapper;
 import com.zhidejiaoyu.common.pojo.PkCopyBase;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 /**
  * <p>
  *  Mapper 接口
