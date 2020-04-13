@@ -25,7 +25,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarService {
-
+    final String schoolMsg = "校区排行金币奖励";
+    final String allMsg = "全国排行金币奖励";
     @Value("${quartz.port}")
     private int port;
 
@@ -73,6 +74,10 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
     private SourcePowerRankOpt sourcePowerRankOpt;
     @Resource
     private GauntletMapper gauntletMapper;
+    @Resource
+    private SchoolGoldFactoryMapper schoolGoldFactoryMapper;
+    @Resource
+    private StudentMapper studentMapper;
 
     /**
      * 每天 0：02 分执行
@@ -271,7 +276,6 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
         String theSpacifiedDateStr = DateUtil.formatYYYYMMDD(theSpecifiedDate);
         if (theSpacifiedDateStr.equals(isNowDate)) {
             startDate = DateUtil.minTime(DateUtil.getTheSpecifiedDate(date, 1));
-
             endDate = DateUtil.maxTime(theSpecifiedDate);
         } else {
             //获取当月最后日期
@@ -283,28 +287,121 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
             }
         }
         //获取当天时间是否为奖励发放日期
-        if (startDate != null && endDate != null) {
+        if (startDate != null) {
             //获取校区学生排行
             //获取校管id
             List<Long> adminids = teacherMapper.selectAllAdminId();
             startDateStr = DateUtil.formatYYYYMMDDHHMMSS(startDate);
             endDateStr = DateUtil.formatYYYYMMDDHHMMSS(endDate);
-            adminids.forEach(adminid -> {
+            for (Long adminid : adminids) {
                 String key = SourcePowerKeysConst.SCHOOL_RANK + adminid;
-                List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, 0L, null, null);
+                long memberSize = sourcePowerRankOpt.getMemberSize(key);
+                List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, 0L, memberSize, null);
                 //获取校区学生是否在当前区间段pk
-                List<Map<String, Object>> longMapMap =
-                        gauntletMapper.countByStudentIdsAndStartDateAndEndDate(studentIds, startDateStr, endDateStr);
-                List<Map<String, Object>> collect = longMapMap.stream().filter(map ->
-                        map.get("count") != null && Integer.parseInt(map.get("count").toString()) > 0)
-                        .collect(Collectors.toList());
-                List<Long> getStudentIds=new ArrayList<>();
-                studentIds.forEach(studentId->{
+                List<Long> getStudentIds = getHaveStudentId(startDateStr, endDateStr, studentIds);
+                //获取校区奖励金币
+                if (getStudentIds.size() > 0) {
+                    getSchoolGold(adminid, getStudentIds);
+                }
+            }
+            String key = SourcePowerKeysConst.COUNTRY_RANK;
+            List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, 0L, 3L, null);
+            if (studentIds.size() > 0) {
+                for (int i = 0; i < studentIds.size(); i++) {
+                    Long aLong = studentIds.get(i);
+                    if (i == 0) {
+                        getStudentGold(aLong, 1000.0, allMsg);
+                    }
+                    if (i == 1) {
+                        getStudentGold(aLong, 800.0, allMsg);
+                    }
+                    if (i == 2) {
+                        getStudentGold(aLong, 500.0, allMsg);
+                    }
+                }
+            }
 
-                });
-            });
         }
 
+    }
+
+    private void getSchoolGold(Long adminid, List<Long> getStudentIds) {
+        //获取校区金币
+        SchoolGoldFactory schoolGoldFactory = schoolGoldFactoryMapper.selectByAdminId(adminid);
+        if (schoolGoldFactory != null && schoolGoldFactory.getGold() != null && schoolGoldFactory.getGold() > 0) {
+            Double gold = schoolGoldFactory.getGold();
+            Double firstGold = schoolGoldFactory.getGold() * 0.2;
+            Double secondGold = schoolGoldFactory.getGold() * 0.15;
+            Double thirdGold = schoolGoldFactory.getGold() * 0.10;
+            Double fourthGold = schoolGoldFactory.getGold() * 0.08;
+            Double fifthGold = schoolGoldFactory.getGold() * 0.05;
+            Double supGold = schoolGoldFactory.getGold() - firstGold - secondGold - thirdGold - fourthGold - fifthGold;
+            for (int i = 0; i < getStudentIds.size(); i++) {
+                Long aLong = getStudentIds.get(i);
+                if (i == 0) {
+                    getStudentGold(aLong, firstGold, schoolMsg);
+                    gold -= firstGold;
+                }
+                if (i == 1) {
+                    getStudentGold(aLong, secondGold, schoolMsg);
+                    gold -= secondGold;
+                }
+                if (i == 2) {
+                    getStudentGold(aLong, thirdGold, schoolMsg);
+                    gold -= thirdGold;
+                }
+                if (i == 3) {
+                    getStudentGold(aLong, fourthGold, schoolMsg);
+                    gold -= fourthGold;
+                }
+                if (i == 4) {
+                    getStudentGold(aLong, fifthGold, schoolMsg);
+                    gold -= fifthGold;
+                }
+                if (i > 4) {
+                    getStudentGold(aLong, supGold / getStudentIds.size() - 5, schoolMsg);
+                    gold = 0.0;
+                }
+            }
+            schoolGoldFactory.setGold(gold);
+            schoolGoldFactoryMapper.updateById(schoolGoldFactory);
+        }
+    }
+
+    private void getStudentGold(Long studentId, Double gold, String msg) {
+        Student student = studentMapper.selectById(studentId);
+        student.setSystemGold(student.getSystemGold() + gold);
+        GoldLog goldLog = new GoldLog();
+        goldLog.setCreateTime(new Date());
+        goldLog.setType(1);
+        goldLog.setGoldAdd(gold.intValue());
+        goldLog.setOperatorId(studentId.intValue());
+        goldLog.setStudentId(studentId);
+        goldLog.setReadFlag(0);
+        goldLog.setReason(msg);
+        goldLogMapper.insert(goldLog);
+    }
+
+    private List<Long> getHaveStudentId(String startDateStr, String endDateStr, List<Long> studentIds) {
+        List<Map<String, Object>> longMapMap =
+                gauntletMapper.countByStudentIdsAndStartDateAndEndDate(studentIds, startDateStr, endDateStr);
+        List<Map<String, Object>> collect = longMapMap.stream().filter(map ->
+                map.get("count") != null && Integer.parseInt(map.get("count").toString()) > 0)
+                .collect(Collectors.toList());
+        List<Long> haveStudentIds = new ArrayList<>();
+        List<Long> getStudentIds = new ArrayList<>();
+        collect.forEach(map -> {
+            haveStudentIds.add(Long.parseLong(map.get("studentId").toString()));
+        });
+        studentIds.forEach(studentId -> {
+            for (Long haveStudentId : haveStudentIds) {
+                if (studentId.equals(haveStudentId)) {
+                    getStudentIds.add(studentId);
+                    return;
+                }
+            }
+        });
+        return getStudentIds;
     }
 
     private void getPushRecord(Date beforeDaysDate) {
