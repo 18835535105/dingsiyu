@@ -77,4 +77,13 @@ public interface ClockInMapper extends BaseMapper<ClockIn> {
      */
     @Select("select count(id) from clock_in where student_id = #{studentId} and to_days(now()) = to_days(create_time)")
     int countTodayInfoByStudentId(@Param("studentId") Long studentId);
+
+    /**
+     * 学生打卡天数
+     *
+     * @param studentId
+     * @return
+     */
+    @Select("select count(id) from clock_in where student_id = #{studentId}")
+    int countByStudentId(@Param("studentId") Long studentId);
 }

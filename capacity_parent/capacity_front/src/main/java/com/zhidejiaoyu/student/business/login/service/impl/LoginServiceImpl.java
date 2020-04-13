@@ -10,16 +10,18 @@ import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
-import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
-import com.zhidejiaoyu.common.utils.*;
+import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.DurationUtil;
+import com.zhidejiaoyu.common.utils.MacIpUtil;
+import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.locationUtil.LocationUtil;
 import com.zhidejiaoyu.common.utils.locationUtil.LongitudeAndLatitude;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import com.zhidejiaoyu.student.business.login.service.LoginService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.format.DateTimeFormat;
@@ -87,9 +89,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Resource
     private SysUserMapper sysUserMapper;
-
-    @Resource
-    private SourcePowerRankOpt sourcePowerRankOpt;
 
     /**
      * 账号关闭状态
@@ -186,9 +185,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
             // 判断学生是否是在加盟校半径 1 公里外登录
             final String finalIp = ip;
-            executorService.execute(() -> {
-                this.isOtherLocation(stu, finalIp);
-            });
+            executorService.execute(() -> this.isOtherLocation(stu, finalIp));
 
             // 正常登陆
             log.info("学生[{} -> {} -> {}]登录成功。", stu.getId(), stu.getAccount(), stu.getStudentName());
