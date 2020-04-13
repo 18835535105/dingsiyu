@@ -929,7 +929,7 @@
         </foreach>
         )
     </delete>
-    <select id="selectByStudentIdAndGenreAndStudyModel">
+    <select id="selectByStudentIdAndGenreAndStudyModel" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="Base_Column_List"/>
         from test_record
