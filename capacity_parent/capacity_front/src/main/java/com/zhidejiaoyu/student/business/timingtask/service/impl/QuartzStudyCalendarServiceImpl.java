@@ -260,14 +260,17 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
     public void rankingAward() {
         //获取当前时间
         Date date = new Date();
-        Date startDate;
-        Date endDate;
+        Date startDate=null;
+        Date endDate=null;
         String isNowDate = DateUtil.formatYYYYMMDD(date);
+        String startDateStr;
+        String endDateStr;
         //获取当月日期15号
         Date theSpecifiedDate = DateUtil.getTheSpecifiedDate(date, 15);
         String theSpacifiedDateStr = DateUtil.formatYYYYMMDD(theSpecifiedDate);
         if (theSpacifiedDateStr.equals(isNowDate)) {
             startDate =DateUtil.minTime(DateUtil.getTheSpecifiedDate(date, 1)) ;
+
             endDate =  DateUtil.maxTime(theSpecifiedDate);
         } else {
             //获取当月最后日期
@@ -283,11 +286,13 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
             //获取校区学生排行
             //获取校管id
             List<Long> adminids = teacherMapper.selectAllAdminId();
+            startDateStr=DateUtil.formatYYYYMMDDHHMMSS(startDate);
+            endDateStr=DateUtil.formatYYYYMMDDHHMMSS(endDate);
             adminids.forEach(adminid -> {
                 String key = SourcePowerKeysConst.SCHOOL_RANK + adminid;
                 List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, 0L, null, null);
                 //获取校区学生是否在当前区间段pk
-                gauntletMapper.countByStudentIdsAndStartDateAndEndDate(studentIds, startDate, endDate);
+                gauntletMapper.countByStudentIdsAndStartDateAndEndDate(studentIds, startDateStr, endDateStr);
             });
         }
 
