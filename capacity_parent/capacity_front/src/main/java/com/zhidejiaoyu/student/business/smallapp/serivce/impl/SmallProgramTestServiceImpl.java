@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.smallapp.dto.GetLimitQRCodeDTO;
@@ -46,6 +47,8 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     private ShareConfigMapper shareConfigMapper;
     @Resource
     private TestRecordMapper testRecordMapper;
+    @Resource
+    private BaiduSpeak baiduSpeak;
 
 
     @Override
@@ -66,6 +69,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
                 listMap.put("wordId", vocabulary.getId());
                 listMap.put("word", vocabulary.getWord());
                 listMap.put("wordChinese", vocabulary.getWordChinese());
+                listMap.put("listenUtrl", baiduSpeak.getLanguagePath(vocabulary.getReadUrl()));
                 maps.add(listMap);
             });
         }
