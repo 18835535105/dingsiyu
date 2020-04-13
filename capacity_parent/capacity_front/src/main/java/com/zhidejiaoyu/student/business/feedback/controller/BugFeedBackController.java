@@ -1,7 +1,14 @@
 package com.zhidejiaoyu.student.business.feedback.controller;
 
+import com.zhidejiaoyu.common.pojo.BugFeedback;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.feedback.service.BugFeedBackService;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 /**
  * bug反馈
@@ -12,4 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/bug/feedback")
 public class BugFeedBackController {
+
+    @Resource
+    private BugFeedBackService bugFeedBackService;
+
+    @PostMapping("/saveBugBack")
+    public Object saveBugBack(HttpSession session, BugFeedback feedback) {
+        bugFeedBackService.saveBugBack(session,feedback);
+        return ServerResponse.createBySuccess();
+    }
+
+
 }

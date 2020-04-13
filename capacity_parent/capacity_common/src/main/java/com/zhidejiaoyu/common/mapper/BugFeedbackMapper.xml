@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.BugFeedbackMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.BugFeedback">
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="study_model" property="studyModel"/>
+        <result column="study_content" property="studyContent"/>
+        <result column="reason" property="reason"/>
+        <result column="fixed" property="fixed"/>
+        <result column="create_time" property="createTime"/>
+        <result column="fixed_time" property="fixedTime"/>
+    </resultMap>
+
+    <select id="countByStudentIdAndDate" resultType="int" parameterType="map">
+        select count(id) from bug_feedback where student_id =#{studentId} and to_days(create_time) = to_days(#{date})
+    </select>
+
+</mapper>
