@@ -76,6 +76,12 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
                 listMap.put("listenUtrl", baiduSpeak.getLanguagePath(vocabulary.getWord()));
                 maps.add(listMap);
             });
+        } else {
+            List<Map<String, Object>> ListMap = new ArrayList<>();
+            maps.forEach(map -> {
+                map.put("listenUtrl", baiduSpeak.getLanguagePath(map.get("word").toString()));
+                ListMap.add(map);
+            });
         }
         returnMap.put("gold", student.getSystemGold().intValue());
         //获取单词id
