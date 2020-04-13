@@ -12,6 +12,8 @@
         <result column="fixed" property="fixed"/>
         <result column="create_time" property="createTime"/>
         <result column="fixed_time" property="fixedTime"/>
+        <result column="coure_id" property="courseId"/>
+        <result column="unit_id" property="unitId"/>
     </resultMap>
 
     <select id="countByStudentIdAndDate" resultType="int" parameterType="map">

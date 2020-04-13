@@ -61,5 +61,9 @@ public class BugFeedback implements Serializable {
      */
     private LocalDateTime fixedTime;
 
+    private Long courseId;
+
+    private Long unitId;
+
 
 }
