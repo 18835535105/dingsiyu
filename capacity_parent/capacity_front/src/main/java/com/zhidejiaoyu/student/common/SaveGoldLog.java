@@ -57,6 +57,17 @@ public class SaveGoldLog {
         executorService.execute(() -> saveGoldLog(studentId, reason, -gold, 2));
     }
 
+    /**
+     * 保存补卡金币减少日志
+     *
+     * @param studentId
+     * @param reason    减少原因
+     * @param gold      金币减少数量
+     */
+    public static void saveReplenishGoldLog(Long studentId, String reason, int gold) throws RuntimeException {
+        executorService.execute(() -> saveGoldLog(studentId, reason, -gold, 5));
+    }
+
     private static void saveGoldLog(Long studentId, String reason, int gold, int type) {
         goldLogMapper.insert(GoldLog.builder()
                 .studentId(studentId)

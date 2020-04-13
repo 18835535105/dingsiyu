@@ -41,6 +41,9 @@ public class LoginFilter implements Filter {
         urlMap.put("/ec/login/judge", "/ec/login/judge");
         urlMap.put("/ec/login/loginOut", "/ec/login/loginOut");
         urlMap.put("/ec/login/validateCode", "/ec/login/validateCode");
+
+        urlMap.put("/ec/quartz/robot/getDailyState", "/ec/quartz/robot/getDailyState");
+        urlMap.put("/quartz/robot/getDailyState", "/quartz/robot/getDailyState");
     }
 
     @Resource
@@ -64,7 +67,7 @@ public class LoginFilter implements Filter {
 
         String url = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
 
-        if (urlMap.containsKey(url) || url.contains("/druid") || url.contains("/smallApp")) {
+        if (urlMap.containsKey(url) || url.contains("/druid") || url.contains("/smallApp") || url.contains("/translate")) {
             // 不拦截登录和退出接口
             doFilter(chain, httpServletRequest, httpServletResponse, url);
 

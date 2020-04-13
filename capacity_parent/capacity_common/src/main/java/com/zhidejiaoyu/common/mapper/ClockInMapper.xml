@@ -14,6 +14,9 @@
     <sql id="base_sql">
         id, student_id, card_days, card_time, type, create_time
     </sql>
+    <sql id="more_table_sql">
+        c.id, c.student_id, c.card_days, c.card_time, c.type, c.create_time
+    </sql>
     <select id="selectByStudentIdWithCurrentMonth" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="base_sql"/>
@@ -43,6 +46,24 @@
             #{studentId}
         </foreach>
         )
+    </select>
+    <select id="selectByStudentAccount" resultType="com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO">
+        select s.account,
+        s.id studentId,
+        s.student_name studentName,
+        c.card_days cardDays,
+        se.phase,
+        sum(d.online_time) onlineTime
+        from clock_in c
+        join student s on c.student_id = s.id
+        join student_expansion se on s.id = se.student_id
+        join duration d on s.id = d.student_id and to_days(d.login_time) = to_days(now())
+        and s.account in (
+        <foreach collection="account" item="c" separator=",">
+            #{c}
+        </foreach>
+        ) and to_days(c.card_time) = to_days(#{date})
+        group by s.id
     </select>
 
 </mapper>

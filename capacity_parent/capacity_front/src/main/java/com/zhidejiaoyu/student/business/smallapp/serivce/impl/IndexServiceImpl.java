@@ -3,10 +3,11 @@ package com.zhidejiaoyu.student.business.smallapp.serivce.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.mapper.PrizeExchangeListMapper;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.pojo.Adsense;
+import com.zhidejiaoyu.common.pojo.ClockIn;
+import com.zhidejiaoyu.common.pojo.PrizeExchangeList;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -19,11 +20,11 @@ import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.smallapp.dto.PrizeDTO;
 import com.zhidejiaoyu.student.business.smallapp.serivce.IndexService;
 import com.zhidejiaoyu.student.business.smallapp.vo.PrizeVO;
-import com.zhidejiaoyu.student.business.smallapp.vo.StateVO;
 import com.zhidejiaoyu.student.business.smallapp.vo.TotalDataVO;
 import com.zhidejiaoyu.student.business.smallapp.vo.index.AdsensesVO;
 import com.zhidejiaoyu.student.business.smallapp.vo.index.CardVO;
 import com.zhidejiaoyu.student.business.smallapp.vo.index.IndexVO;
+import com.zhidejiaoyu.student.common.SaveGoldLog;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -53,16 +54,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     private StudentMapper studentMapper;
 
     @Resource
-    private GoldLogMapper goldLogMapper;
-
-    @Resource
     private DurationMapper durationMapper;
-
-    @Resource
-    private TestRecordMapper testRecordMapper;
-
-    @Resource
-    private LearnNewMapper learnNewMapper;
 
     @Resource
     private PrizeExchangeListMapper prizeExchangeListMapper;
@@ -119,19 +111,11 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                     .type(2)
                     .build());
 
-            goldLogMapper.insert(GoldLog.builder()
-                    .createTime(now)
-                    .goldAdd(0)
-                    .goldReduce(reduceGold)
-                    .operatorId(student.getId().intValue())
-                    .readFlag(2)
-                    .reason("补签")
-                    .studentId(student.getId())
-                    .build());
-
             student.setSystemGold(BigDecimalUtil.sub(student.getSystemGold(), reduceGold));
             student.setOfflineGold(BigDecimalUtil.add(student.getOfflineGold(), reduceGold));
             studentMapper.updateById(student);
+
+            SaveGoldLog.saveReplenishGoldLog(student.getId(), "补签", reduceGold);
 
             return ServerResponse.createBySuccess();
         }
@@ -229,7 +213,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      * @param durationInfos   各个日期具体的学习时长
      * @return
      */
-    public List<DurationInfoVO> packageResultList(List<DurationInfoVO> durationInfoVos,
+    private List<DurationInfoVO> packageResultList(List<DurationInfoVO> durationInfoVos,
                                                   List<DurationInfoVO> durationInfos) {
         // 各个学习日期所有的具体学习时长记录
         Map<String, List<DurationInfoVO>> collect = durationInfos
@@ -261,7 +245,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 return;
             }
 
-            String learnDate = this.getLearnDate(k);
+            String learnDate = getLearnDate(k);
             result.add(DurationInfoVO.builder()
                     .learnDate(learnDate)
                     .onlineTime(stringListMap.get(k).get(0).getOnlineTime() / 60)
@@ -272,7 +256,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         return result;
     }
 
-    public String getLearnDate(String k) {
+    public static String getLearnDate(String k) {
         String[] split = k.split("-");
 
         return split[0] + "年" + split[1] + "月" + split[2] + "日";

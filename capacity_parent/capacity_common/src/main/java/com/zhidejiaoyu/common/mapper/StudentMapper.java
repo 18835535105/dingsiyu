@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExample;
+import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -323,4 +324,12 @@ public interface StudentMapper extends BaseMapper<Student> {
      */
     @MapKey("studentId")
     Map<Long, Map<String, Object>> selectSourcePowerRankByIds(@Param("studentIds") List<Long> studentIds);
+
+    /**
+     * 查询学生id
+     *
+     * @param accountArr
+     * @return
+     */
+    List<DailyStateVO> selectByAccounts(@Param("accountArr") String[] accountArr);
 }

@@ -68,7 +68,7 @@ public class GoldLog extends Model<GoldLog> {
     private Integer readFlag;
 
     /**
-     * 增减类型；1 学习奖励 2 奖品兑换 3 教师奖励 4 教师处罚
+     * 增减类型；1 学习奖励 2 奖品兑换 3 教师奖励 4 教师处罚 5 补签
      */
     private Integer type;
 

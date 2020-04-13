@@ -466,16 +466,18 @@ public class DateUtil implements Serializable {
 
     /**
      * 获得几天后的时间
+     *
      * @param date
      * @param days
      * @return
      */
     public static Date getLastDaysDate(Date date, int days) {
-        Calendar now =Calendar.getInstance();
+        Calendar now = Calendar.getInstance();
         now.setTime(date);
-        now.set(Calendar.DATE,now.get(Calendar.DATE)+days);
+        now.set(Calendar.DATE, now.get(Calendar.DATE) + days);
         return now.getTime();
     }
+
     /**
      * 获取几天前的日期字符串
      *
@@ -504,10 +506,24 @@ public class DateUtil implements Serializable {
         return cal.get(Calendar.MONTH) + 1;
     }
 
-    public static LocalDateTime getLocalDateTime(Date date){
+    public static LocalDateTime getLocalDateTime(Date date) {
         Instant instant = date.toInstant();
         ZoneId zoneId = ZoneId.systemDefault();
-        return  instant.atZone(zoneId).toLocalDateTime();
+        return instant.atZone(zoneId).toLocalDateTime();
+    }
+
+    /**
+     * 获取当前周的第几天的日期
+     * 比如当前周的第一天日期
+     *
+     * @param day 一周中的第几天
+     * @return
+     */
+    public static Date getDateOfWeekDay(int day) {
+        if (day < 1 || day > 7) {
+            throw new IllegalArgumentException("参数不能在1-7之外！");
+        }
+        return new DateTime().withDayOfWeek(day).toDate();
     }
 
     private DateUtil() {

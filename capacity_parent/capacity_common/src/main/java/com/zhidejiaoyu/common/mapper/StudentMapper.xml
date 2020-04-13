@@ -930,5 +930,18 @@
         </foreach>
         )
     </select>
+    <select id="selectByAccounts" resultType="com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO"
+            parameterType="map">
+        select
+        s.id studentId,
+        se.phase,
+        s.student_name studentName,
+        s.account
+        from student s, student_expansion se where s.id = se.student_id and s.account in (
+        <foreach collection="accountArr" separator="," item="account">
+            #{account}
+        </foreach>
+        )
+    </select>
 
 </mapper>
