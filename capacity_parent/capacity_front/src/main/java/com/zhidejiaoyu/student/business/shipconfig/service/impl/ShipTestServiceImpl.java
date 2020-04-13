@@ -388,7 +388,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         //获取pk信息
         int pkGames = gauntletMapper.getPkGames(student.getId(), 1);
         int winPkGames = gauntletMapper.getPkGames(student.getId(), 2);
-        double win = Math.floor(1.0 * pkGames / winPkGames * 100);
+        double win = Math.floor(1.0 * winPkGames / pkGames * 100);
         //pk场数
         returnMap.put("pkGames", pkGames);
         //pk胜率
