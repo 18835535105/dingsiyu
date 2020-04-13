@@ -5,9 +5,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.BaseService;
 import com.zhidejiaoyu.student.business.shipconfig.dto.ShipConfigInfoDTO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
-import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +22,7 @@ public interface ShipIndexService extends BaseService<Student> {
      *
      * @return
      */
-    ServerResponse<Object> index();
+    ServerResponse<IndexVO> index();
 
     /**
      * 源分战力排行
@@ -71,5 +69,14 @@ public interface ShipIndexService extends BaseService<Student> {
      */
     ServerResponse<Object> saveMedal(String medalId);
 
-     ShipConfigInfoDTO getShipConfigInfoDTO(Map<String, Object> map);
+    ShipConfigInfoDTO getShipConfigInfoDTO(Map<String, Object> map);
+
+    /**
+     * 查看其他人的飞船配置页面
+     *
+     * @param studentId
+     * @return
+     */
+    ServerResponse<Object> otherIndex(Long studentId);
+
 }
