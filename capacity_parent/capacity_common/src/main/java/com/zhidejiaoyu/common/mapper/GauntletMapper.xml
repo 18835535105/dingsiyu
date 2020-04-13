@@ -285,6 +285,17 @@
           and challenger_student_id = #{studentId}
           and be_challenger_student_id = #{bossId}
           and to_days(create_time) = to_days(now())
+          and point is not null
+    </select>
+    <select id="countByStudentIdsAndStartDateAndEndDate" parameterType="map" resultType="map">
+        select count(id) `count`,challenger_student_id studentId
+        from gauntlet
+        where
+        challenger_student_id = #{studentId}
+          and create_time >= #{startDate}
+          and create_time &lt;= #{endDate}
+          and point is not null
+          group by challenger_student_id
     </select>
 
 </mapper>

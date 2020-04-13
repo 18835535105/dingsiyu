@@ -182,7 +182,13 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
      */
     int countByStudentIdAndBossId(@Param("studentId") Long studentId, @Param("bossId") Long bossId, @Param("type") Integer type);
 
-    @MapKey("studentIds")
-    Map<Long,Map<String,Object>> countByStudentIdsAndStartDateAndEndDate(@Param("studentIds") List<Long> studentIds, @Param("startDate") String startDate,@Param("endDate")String endDate);
+    /**
+     * 获取学生指定日期间的PK数量
+     * @param studentIds
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    List< Map<String, Object>>  countByStudentIdsAndStartDateAndEndDate(@Param("studentIds") List<Long> studentIds, @Param("startDate") String startDate,@Param("endDate")String endDate);
 
 }

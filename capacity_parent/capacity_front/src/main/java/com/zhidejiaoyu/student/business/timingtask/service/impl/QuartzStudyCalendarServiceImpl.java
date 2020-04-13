@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author: wuchenxi
@@ -260,8 +261,8 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
     public void rankingAward() {
         //获取当前时间
         Date date = new Date();
-        Date startDate=null;
-        Date endDate=null;
+        Date startDate = null;
+        Date endDate = null;
         String isNowDate = DateUtil.formatYYYYMMDD(date);
         String startDateStr;
         String endDateStr;
@@ -269,16 +270,16 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
         Date theSpecifiedDate = DateUtil.getTheSpecifiedDate(date, 15);
         String theSpacifiedDateStr = DateUtil.formatYYYYMMDD(theSpecifiedDate);
         if (theSpacifiedDateStr.equals(isNowDate)) {
-            startDate =DateUtil.minTime(DateUtil.getTheSpecifiedDate(date, 1)) ;
+            startDate = DateUtil.minTime(DateUtil.getTheSpecifiedDate(date, 1));
 
-            endDate =  DateUtil.maxTime(theSpecifiedDate);
+            endDate = DateUtil.maxTime(theSpecifiedDate);
         } else {
             //获取当月最后日期
             Date lastDayToMonth = DateUtil.getLastDayToMonth(date);
             theSpacifiedDateStr = DateUtil.formatYYYYMMDD(lastDayToMonth);
             if (theSpacifiedDateStr.equals(isNowDate)) {
-                startDate =DateUtil.minTime(theSpecifiedDate) ;
-                endDate =  DateUtil.maxTime(lastDayToMonth);
+                startDate = DateUtil.minTime(theSpecifiedDate);
+                endDate = DateUtil.maxTime(lastDayToMonth);
             }
         }
         //获取当天时间是否为奖励发放日期
@@ -286,13 +287,21 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
             //获取校区学生排行
             //获取校管id
             List<Long> adminids = teacherMapper.selectAllAdminId();
-            startDateStr=DateUtil.formatYYYYMMDDHHMMSS(startDate);
-            endDateStr=DateUtil.formatYYYYMMDDHHMMSS(endDate);
+            startDateStr = DateUtil.formatYYYYMMDDHHMMSS(startDate);
+            endDateStr = DateUtil.formatYYYYMMDDHHMMSS(endDate);
             adminids.forEach(adminid -> {
                 String key = SourcePowerKeysConst.SCHOOL_RANK + adminid;
                 List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, 0L, null, null);
                 //获取校区学生是否在当前区间段pk
-                gauntletMapper.countByStudentIdsAndStartDateAndEndDate(studentIds, startDateStr, endDateStr);
+                List<Map<String, Object>> longMapMap =
+                        gauntletMapper.countByStudentIdsAndStartDateAndEndDate(studentIds, startDateStr, endDateStr);
+                List<Map<String, Object>> collect = longMapMap.stream().filter(map ->
+                        map.get("count") != null && Integer.parseInt(map.get("count").toString()) > 0)
+                        .collect(Collectors.toList());
+                List<Long> getStudentIds=new ArrayList<>();
+                studentIds.forEach(studentId->{
+
+                });
             });
         }
 

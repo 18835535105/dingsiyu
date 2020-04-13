@@ -239,6 +239,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("subject", map.get("wordChinese"));
             returnMap.put("answer", map.get("word"));
+            returnMap.put("listenUtrl", map.get("listenUtrl").toString());
             returnList.add(returnMap);
         });
 
@@ -258,6 +259,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             chineses.add(wordChinese);
             Map<String, Object> returnMap = new HashMap<>();
             returnMap.put("subject", map.get("word").toString());
+            returnMap.put("listenUtrl", map.get("listenUtrl").toString());
             List<Map<String, Object>> optionList = new ArrayList<>();
             for (String chinese : chineses) {
                 Map<String, Object> booleanMap = new HashMap<>();
