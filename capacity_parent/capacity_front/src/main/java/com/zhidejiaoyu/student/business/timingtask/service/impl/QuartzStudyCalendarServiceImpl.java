@@ -91,6 +91,7 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
         this.initStudentDailyLearning();
         this.initLearningDetails();
         this.initPunchRecord();
+        this.rankingAward();
         log.info("定时任务 -> 初始化学习日历结束！");
     }
 
