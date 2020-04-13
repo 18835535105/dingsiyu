@@ -73,7 +73,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
                 listMap.put("wordId", vocabulary.getId());
                 listMap.put("word", vocabulary.getWord());
                 listMap.put("wordChinese", vocabulary.getWordChinese());
-                listMap.put("listenUtrl", baiduSpeak.getLanguagePath(vocabulary.getReadUrl()));
+                listMap.put("listenUtrl", baiduSpeak.getLanguagePath(vocabulary.getWord()));
                 maps.add(listMap);
             });
         }
