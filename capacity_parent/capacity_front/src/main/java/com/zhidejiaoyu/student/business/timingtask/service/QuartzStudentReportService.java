@@ -24,4 +24,9 @@ public interface QuartzStudentReportService {
      */
     void exportStudentPay();
 
+    /**
+     * 每日4:15点统计昨日校区添加金币量
+     */
+    void exportSchoolGold();
+
 }

@@ -378,6 +378,20 @@ public class DateUtil implements Serializable {
     }
 
     /**
+     * 获取某一季度指定日期
+     *
+     * @param date
+     * @param day
+     * @return
+     */
+    public static Date getTheSpecifiedDate(Date date, int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        return calendar.getTime();
+    }
+
+    /**
      * 按指定长度解析报文
      *
      * @param msg
@@ -410,8 +424,6 @@ public class DateUtil implements Serializable {
      * @return
      */
     public static String getCurrentDay(String format) {
-//			Calendar calendar = Calendar.getInstance();
-//			Date date = calendar.getTime();
         Date date = new Date(System.currentTimeMillis());
         String currdate = new SimpleDateFormat(format).format(date);
         return currdate;
@@ -428,10 +440,20 @@ public class DateUtil implements Serializable {
         Instant instant = date.toInstant();
         ZoneId zoneId = ZoneId.systemDefault();
         LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
-        ;
         LocalDateTime endOfDay = localDateTime.with(LocalTime.MAX);
         return Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant());
 
+    }
+
+    /**
+     * 获取某日最小时间
+     * @param date
+     * @return
+     */
+    public static Date minTime(Date date) {
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), ZoneId.systemDefault());
+        LocalDateTime startOfDay = localDateTime.with(LocalTime.MIN);
+        return Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     /**
@@ -466,15 +488,14 @@ public class DateUtil implements Serializable {
 
     /**
      * 获得几天后的时间
-     *
      * @param date
      * @param days
      * @return
      */
     public static Date getLastDaysDate(Date date, int days) {
-        Calendar now = Calendar.getInstance();
+        Calendar now =Calendar.getInstance();
         now.setTime(date);
-        now.set(Calendar.DATE, now.get(Calendar.DATE) + days);
+        now.set(Calendar.DATE,now.get(Calendar.DATE)+days);
         return now.getTime();
     }
 
@@ -506,6 +527,26 @@ public class DateUtil implements Serializable {
         return cal.get(Calendar.MONTH) + 1;
     }
 
+    /**
+     * 获取某月最后一天
+     *
+     * @param date
+     * @return
+     */
+    public static Date getLastDayToMonth(Date date) {
+        //获取当前月最后一天
+        Calendar ca = Calendar.getInstance();
+        ca.setTime(date);
+        ca.set(Calendar.DAY_OF_MONTH, ca.getActualMaximum(Calendar.DAY_OF_MONTH));
+        return ca.getTime();
+    }
+
+    /**
+     * 将Date转换为LocalDateTime
+     *
+     * @param date
+     * @return
+     */
     public static LocalDateTime getLocalDateTime(Date date) {
         Instant instant = date.toInstant();
         ZoneId zoneId = ZoneId.systemDefault();

@@ -2,19 +2,21 @@ package com.zhidejiaoyu.student.business.timingtask.service.impl;
 
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.zhidejiaoyu.aliyunoss.putObject.OssUpload;
-import com.zhidejiaoyu.common.constant.test.GenreConstant;
-import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolDetail;
-import com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolSummary;
 import com.zhidejiaoyu.common.constant.FileConstant;
 import com.zhidejiaoyu.common.excelmodel.student.ExportRechargePayCardCountModel;
 import com.zhidejiaoyu.common.excelmodel.student.ExportRechargePayCardModel;
 import com.zhidejiaoyu.common.excelmodel.student.ExportStudentOnlineTimeWithSchoolDetail;
 import com.zhidejiaoyu.common.excelmodel.student.ExportStudentOnlineTimeWithSchoolSummary;
 import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.pojo.ReceiveEmail;
+import com.zhidejiaoyu.common.pojo.SchoolGoldFactory;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.StudentHours;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.excelUtil.easyexcel.ExcelUtil;
 import com.zhidejiaoyu.common.utils.excelUtil.easyexcel.ExcelWriterFactory;
+import com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolDetail;
+import com.zhidejiaoyu.common.vo.student.studentinfowithschool.StudentInfoSchoolSummary;
 import com.zhidejiaoyu.student.business.mail.Mail;
 import com.zhidejiaoyu.student.business.mail.service.MailService;
 import com.zhidejiaoyu.student.business.timingtask.service.BaseQuartzService;
@@ -33,7 +35,6 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,6 +69,15 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
 
     @Resource
     private ReceiveEmailMapper receiveEmailMapper;
+
+    @Resource
+    private TeacherMapper teacherMapper;
+
+    @Resource
+    private GoldLogMapper goldLogMapper;
+
+    @Resource
+    private SchoolGoldFactoryMapper schoolGoldFactoryMapper;
 
     //    @Scheduled(cron = "0 0 1 * * ?")
     @Override
@@ -149,6 +159,36 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
         this.sendEmail(fileName);
 
         log.info("定时任务 -> 统计各校区学生充课信息完成。");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @Scheduled(cron = "0 15 4 * * ?")
+    public void exportSchoolGold() {
+        if (checkPort(port)) {
+            return;
+        }
+        log.info("定时任务 -> 统计各校区每日增加金币数开始。");
+        //获取多有校管id
+        List<Long> adminIds = teacherMapper.selectAllAdminId();
+        adminIds.forEach(adminId -> {
+            Integer integer = goldLogMapper.selectGoldByAdminIdAndDate(adminId, DateUtil.getBeforeDaysDate(new Date(), 1));
+            if (integer != null) {
+                Double gold = integer * 0.1;
+                SchoolGoldFactory schoolGoldFactory = schoolGoldFactoryMapper.selectByAdminId(adminId);
+                if (schoolGoldFactory != null) {
+                    schoolGoldFactory.setGold(schoolGoldFactory.getGold() + gold);
+                    schoolGoldFactoryMapper.updateById(schoolGoldFactory);
+                } else {
+                    schoolGoldFactory = new SchoolGoldFactory();
+                    schoolGoldFactory.setGold(gold);
+                    schoolGoldFactory.setSchoolAdminId(adminId);
+                    schoolGoldFactoryMapper.insert(schoolGoldFactory);
+                }
+            }
+
+        });
+        log.info("定时任务 -> 统计各校区每日增加金币数完成。");
     }
 
     private ExcelWriterFactory getSizePayCardModel(Date time, Long adminId, String fileName) {

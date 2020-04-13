@@ -4,9 +4,21 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.SchoolGoldFactory">
-        <id column="id" property="id" />
-        <result column="school_admin_id" property="schoolAdminId" />
-        <result column="gold" property="gold" />
+        <id column="id" property="id"/>
+        <result column="school_admin_id" property="schoolAdminId"/>
+        <result column="gold" property="gold"/>
     </resultMap>
+
+    <sql id="base_sql">
+        id,school_admin_id,gold
+    </sql>
+
+    <select id="selectByAdminId" parameterType="long" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"></include>
+        from school_gold_factory
+        where school_admin_id=#{adminId}
+        limit 1
+    </select>
 
 </mapper>

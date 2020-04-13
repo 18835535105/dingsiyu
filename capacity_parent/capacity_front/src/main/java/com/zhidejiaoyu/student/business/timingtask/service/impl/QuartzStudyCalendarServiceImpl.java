@@ -1,8 +1,10 @@
 package com.zhidejiaoyu.student.business.timingtask.service.impl;
 
+import com.zhidejiaoyu.common.constant.redis.SourcePowerKeysConst;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzStudyCalendarService;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +66,12 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
 
     @Resource
     private LearningDetailsMapper learningDetailsMapper;
+    @Resource
+    private TeacherMapper teacherMapper;
+    @Resource
+    private SourcePowerRankOpt sourcePowerRankOpt;
+    @Resource
+    private GauntletMapper gauntletMapper;
 
     /**
      * 每天 0：02 分执行
@@ -246,6 +254,43 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
     public void initPunchRecord() {
         Date beforeDaysDate = DateUtil.getBeforeDaysDate(new Date(), 1);
         getPushRecord(beforeDaysDate);
+    }
+
+    @Override
+    public void rankingAward() {
+        //获取当前时间
+        Date date = new Date();
+        Date startDate;
+        Date endDate;
+        String isNowDate = DateUtil.formatYYYYMMDD(date);
+        //获取当月日期15号
+        Date theSpecifiedDate = DateUtil.getTheSpecifiedDate(date, 15);
+        String theSpacifiedDateStr = DateUtil.formatYYYYMMDD(theSpecifiedDate);
+        if (theSpacifiedDateStr.equals(isNowDate)) {
+            startDate =DateUtil.minTime(DateUtil.getTheSpecifiedDate(date, 1)) ;
+            endDate =  DateUtil.maxTime(theSpecifiedDate);
+        } else {
+            //获取当月最后日期
+            Date lastDayToMonth = DateUtil.getLastDayToMonth(date);
+            theSpacifiedDateStr = DateUtil.formatYYYYMMDD(lastDayToMonth);
+            if (theSpacifiedDateStr.equals(isNowDate)) {
+                startDate =DateUtil.minTime(theSpecifiedDate) ;
+                endDate =  DateUtil.maxTime(lastDayToMonth);
+            }
+        }
+        //获取当天时间是否为奖励发放日期
+        if (startDate != null && endDate != null) {
+            //获取校区学生排行
+            //获取校管id
+            List<Long> adminids = teacherMapper.selectAllAdminId();
+            adminids.forEach(adminid -> {
+                String key = SourcePowerKeysConst.SCHOOL_RANK + adminid;
+                List<Long> studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, 0L, null, null);
+                //获取校区学生是否在当前区间段pk
+                gauntletMapper.countByStudentIdsAndStartDateAndEndDate(studentIds, startDate, endDate);
+            });
+        }
+
     }
 
     private void getPushRecord(Date beforeDaysDate) {

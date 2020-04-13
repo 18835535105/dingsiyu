@@ -32,4 +32,11 @@ public interface GoldLogMapper extends BaseMapper<GoldLog> {
     Integer sumTodayAddGold(@Param("studentId") Long studentId);
 
     Integer selectGoldByStudentIdAndDate(@Param("studentId") Long studentId,@Param("date") Date date,@Param("type") int type);
+
+    /**
+     * 根据校管id获取学生每日增加的金币
+     * @param adminId
+     * @param date
+     */
+    Integer selectGoldByAdminIdAndDate(@Param("adminId") Long adminId,@Param("date") Date date);
 }

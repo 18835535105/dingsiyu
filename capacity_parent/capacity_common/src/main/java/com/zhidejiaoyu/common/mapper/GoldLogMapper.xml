@@ -37,4 +37,12 @@
         and to_days(create_time)= to_days(#{date})
     </select>
 
+    <select id="selectGoldByAdminIdAndDate" resultType="integer" parameterType="map">
+        select sum(gold_add) from gold_log where
+        student_id in (select id from student where teacher_id =#{adminId} or teacher_id in (
+            select teacher_id from teacher where school_admin_id = #{adminId} and teacher_id is not null
+        ))
+        and to_days(create_time)= to_days(#{date})
+    </select>
+
 </mapper>

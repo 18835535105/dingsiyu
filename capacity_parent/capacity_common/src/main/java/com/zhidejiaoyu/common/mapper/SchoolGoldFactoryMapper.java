@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.common.pojo.SchoolGoldFactory;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +14,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface SchoolGoldFactoryMapper extends BaseMapper<SchoolGoldFactory> {
 
+    SchoolGoldFactory selectByAdminId(@Param("adminId") Long adminId);
 }

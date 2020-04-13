@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Gauntlet;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -180,5 +181,8 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
      * @return
      */
     int countByStudentIdAndBossId(@Param("studentId") Long studentId, @Param("bossId") Long bossId, @Param("type") Integer type);
+
+    @MapKey("studentIds")
+    Map<Long,Map<String,Object>> countByStudentIdsAndStartDateAndEndDate(@Param("studentIds") List<Long> studentIds, @Param("startDate") Date startDate,@Param("endDate")Date endDate);
 
 }

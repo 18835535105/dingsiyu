@@ -49,11 +49,18 @@
     </select>
 
     <select id="selectTeacherBySchoolAdminId" resultMap="BaseResultMap" parameterType="map">
-         select <include refid="base_sql"></include>
+        select
+        <include refid="base_sql"></include>
         from teacher
         where teacher_id = #{teacherId}
-           or school_admin_id = #{teacherId}
+        or school_admin_id = #{teacherId}
         limit 1
+    </select>
+    <select id="selectAllAdminId" parameterType="map" resultType="long">
+        select
+        school_admin_id
+        from teacher
+        group by school_admin_id
     </select>
 
 </mapper>

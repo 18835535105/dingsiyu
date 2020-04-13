@@ -33,7 +33,7 @@ public class SchoolGoldFactory implements Serializable {
     /**
      * 金币数量
      */
-    private Integer gold;
+    private Double gold;
 
 
 }
