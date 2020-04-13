@@ -187,8 +187,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 判断学生是否是在加盟校半径 1 公里外登录
             final String finalIp = ip;
             executorService.execute(() -> {
-                // 判断是否已初始化登录即可领取的飞船，如果未初始化，进行初始化
-                redisOpt.initShip(stu.getId());
                 this.isOtherLocation(stu, finalIp);
             });
 
@@ -401,9 +399,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         if (count <= 1) {
             executorService.execute(() -> {
 
-                // 初始化飞船信息
-                redisOpt.initShip(stu.getId());
-
                 // 招生账号每日首次登陆初始化 50 个能量供体验抽奖
                 this.addEnergy(stu);
 
@@ -479,9 +474,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 initRankInfo(student);
 
                 initStudentExpansion(student);
-
-                // 初始化源分战力排行
-                sourcePowerRankOpt.optSourcePowerRank(student, 0, 100);
             });
         }
     }
