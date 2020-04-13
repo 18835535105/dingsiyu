@@ -18,6 +18,8 @@ import com.zhidejiaoyu.student.business.shipconfig.dto.ShipConfigInfoDTO;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.util.CalculateUtil;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
+import com.zhidejiaoyu.student.business.shipconfig.vo.OtherStudentRankVO;
+import com.zhidejiaoyu.student.business.shipconfig.vo.OtherStudentShipIndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.RankVO;
 import com.zhidejiaoyu.student.common.redis.WorshipRedisOpt;
 import org.apache.commons.collections.CollectionUtils;
@@ -65,6 +67,9 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Resource
     private WorshipRedisOpt worshipRedisOpt;
 
+    @Resource
+    private GauntletMapper gauntletMapper;
+
     /**
      * 强化度对应的中文等级
      */
@@ -77,18 +82,35 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     }
 
     @Override
-    public ServerResponse<Object> index() {
+    public ServerResponse<IndexVO> index() {
         Student student = super.getStudent();
+        return this.getIndexInfo(student, true);
+
+    }
+
+    /**
+     * 获取指定学生飞船配置首页面数据
+     *
+     * @param student 学生信息
+     * @param mySelf  <ul>
+     *                <li>true：查看当前学生自己的</li>
+     *                <li>false：查看其它指定学生的</li>
+     *                </ul>
+     * @return
+     */
+    public ServerResponse<IndexVO> getIndexInfo(Student student, boolean mySelf) {
+        Long studentId = student.getId();
+        // 学生被膜拜总次数
+        int byWorshipCount = 0;
+        if (mySelf) {
+            byWorshipCount = worshipMapper.countByWorship(studentId);
+        }
 
         String nickname = student.getNickname();
         String headUrl = GetOssFile.getPublicObjectUrl(student.getHeadUrl());
         int gold = (int) Math.floor(student.getSystemGold());
 
-        Long studentId = student.getId();
         StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(studentId);
-
-        // 学生被膜拜总次数
-        int byWorshipCount = worshipMapper.countByWorship(studentId);
 
         // 皮肤
         IndexVO.Info skinInfo = getSkinInfo(studentId);
@@ -115,9 +137,14 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
         IndexVO.StateOfWeek stateOfWeek = this.getStateOfWeek(studentId, baseValue);
 
-        IndexVO.Radar radar = this.getRadar(baseValue, stateOfWeek);
-
+        // 资源
         SyntheticRewardsList syntheticRewardsList = syntheticRewardsListMapper.selectUseGloveOrFlower(studentId);
+
+        // 雷达图数据
+        IndexVO.Radar radar = null;
+        if (mySelf) {
+            radar = this.getRadar(indexVO.getBaseValue(), indexVO.getStateOfWeek());
+        }
 
         return ServerResponse.createBySuccess(IndexVO.builder()
                 .nickname(nickname)
@@ -453,6 +480,53 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                         .build())
                 .name(name)
                 .degree(degree)
+                .build();
+    }
+
+    @Override
+    public ServerResponse<Object> otherIndex(Long studentId) {
+        Student student = studentMapper.selectById(studentId);
+        ServerResponse<IndexVO> indexInfo = this.getIndexInfo(student, false);
+        String successRate = this.getSuccessRate(studentId);
+
+        return ServerResponse.createBySuccess(OtherStudentShipIndexVO.builder()
+                .index(indexInfo.getData())
+                .rank(this.otherRank(student))
+                .successRate(successRate)
+                .build());
+    }
+
+    /**
+     * pk胜率
+     *
+     * @param studentId
+     * @return
+     */
+    private String getSuccessRate(Long studentId) {
+        int totalPkCount = gauntletMapper.getPkGames(studentId, 1);
+        int winPkCount = gauntletMapper.getPkGames(studentId, 2);
+        if (winPkCount == 0 || totalPkCount == 0) {
+            return 0 + "%";
+        }
+        double win = Math.floor(1.0 * winPkCount / totalPkCount * 100);
+        return ((int) win) + "%";
+    }
+
+    private OtherStudentRankVO otherRank(Student student) {
+
+        String key;
+        // 我在校区的排行
+        Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
+        key = SourcePowerKeysConst.SCHOOL_RANK + schoolAdminId;
+        long schoolRank = sourcePowerRankOpt.getRank(key, student.getId());
+
+        // 我在全国排行
+        key = SourcePowerKeysConst.COUNTRY_RANK;
+        long countryRank = sourcePowerRankOpt.getRank(key, student.getId());
+
+        return OtherStudentRankVO.builder()
+                .schoolRank(schoolRank)
+                .countryRank(countryRank)
                 .build();
     }
 

@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.business.shipconfig.controller;
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
+import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,8 +30,22 @@ public class ShipIndexController {
      * @return
      */
     @GetMapping("/index")
-    public ServerResponse<Object> index() {
+    public ServerResponse<IndexVO> index() {
         return shipIndexService.index();
+    }
+
+    /**
+     * 查看其他人的飞船配置页面
+     *
+     * @param studentId 指定学生id
+     * @return
+     */
+    @GetMapping("/other/index")
+    public ServerResponse<Object> otherIndex(Long studentId) {
+        if (studentId == null) {
+            return ServerResponse.createByError(400, "studentId can't be null!");
+        }
+        return shipIndexService.otherIndex(studentId);
     }
 
     /**
@@ -50,7 +65,7 @@ public class ShipIndexController {
     /**
      * 保存学生选择的勋章
      *
-     * @param medalId   id之间用英文,隔开
+     * @param medalId id之间用英文,隔开
      * @return
      */
     @PostMapping("/saveMedal")
