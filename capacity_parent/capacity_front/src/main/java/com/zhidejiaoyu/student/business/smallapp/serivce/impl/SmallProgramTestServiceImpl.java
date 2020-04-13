@@ -160,6 +160,10 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         returnMap.put("studentId", studentId);
         returnMap.put("studentName", student.getNickname());
         returnMap.put("headPortrait", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
+
+        // 打卡天数（非连续打卡天数）
+        int cardDays = clockInMapper.countByStudentId(student.getId());
+        returnMap.put("cardDays", cardDays);
         return returnMap;
     }
 
