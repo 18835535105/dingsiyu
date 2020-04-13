@@ -1,8 +1,9 @@
-package com.zhidejiaoyu.student.business.service;
+package com.zhidejiaoyu.student.business.feedback.service;
 
 import com.zhidejiaoyu.common.pojo.MessageBoard;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.feedbackvo.FeedBackInfoVO;
+import com.zhidejiaoyu.student.business.service.BaseService;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
