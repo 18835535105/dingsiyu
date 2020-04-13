@@ -143,7 +143,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         // 雷达图数据
         IndexVO.Radar radar = null;
         if (mySelf) {
-            radar = this.getRadar(indexVO.getBaseValue(), indexVO.getStateOfWeek());
+            radar = this.getRadar(baseValue, stateOfWeek);
         }
 
         return ServerResponse.createBySuccess(IndexVO.builder()
@@ -419,42 +419,40 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
     public IndexVO getIndexVoTmp(List<Map<String, Object>> equipments) {
         IndexVO indexVO = new IndexVO();
-        if (CollectionUtils.isNotEmpty(equipments)) {
-            equipments.forEach(map -> {
+        equipments.forEach(map -> {
 
-                Integer type = (Integer) map.get("type");
-                Long id = (Long) map.get("id");
-                String imgUrl = GetOssFile.getPublicObjectUrl((String) map.get("imgUrl"));
+            Integer type = (Integer) map.get("type");
+            Long id = (Long) map.get("id");
+            String imgUrl = GetOssFile.getPublicObjectUrl((String) map.get("imgUrl"));
 
-                ShipConfigInfoDTO shipConfigInfoDTO = this.getShipConfigInfoDTO(map);
+            ShipConfigInfoDTO shipConfigInfoDTO = this.getShipConfigInfoDTO(map);
 
-                String explain = getExplain(shipConfigInfoDTO);
+            String explain = getExplain(shipConfigInfoDTO);
 
-                IndexVO.Info info = IndexVO.Info.builder()
-                        .id(id)
-                        .url(imgUrl)
-                        .explain(explain)
-                        .build();
-                switch (type) {
-                    case EquipmentTypeConstant.SHIP:
-                        indexVO.setShipInfo(info);
-                        break;
-                    case EquipmentTypeConstant.WEAPONS:
-                        indexVO.setWeaponsInfo(info);
-                        break;
-                    case EquipmentTypeConstant.MISSILE:
-                        indexVO.setMissileInfo(info);
-                        break;
-                    case EquipmentTypeConstant.ARMOR:
-                        indexVO.setArmorInfo(info);
-                        break;
-                    case EquipmentTypeConstant.HERO:
-                        indexVO.setHeroImgInfo(info);
-                        break;
-                    default:
-                }
-            });
-        }
+            IndexVO.Info info = IndexVO.Info.builder()
+                    .id(id)
+                    .url(imgUrl)
+                    .explain(explain)
+                    .build();
+            switch (type) {
+                case EquipmentTypeConstant.SHIP:
+                    indexVO.setShipInfo(info);
+                    break;
+                case EquipmentTypeConstant.WEAPONS:
+                    indexVO.setWeaponsInfo(info);
+                    break;
+                case EquipmentTypeConstant.MISSILE:
+                    indexVO.setMissileInfo(info);
+                    break;
+                case EquipmentTypeConstant.ARMOR:
+                    indexVO.setArmorInfo(info);
+                    break;
+                case EquipmentTypeConstant.HERO:
+                    indexVO.setHeroImgInfo(info);
+                    break;
+                default:
+            }
+        });
         return indexVO;
     }
 
