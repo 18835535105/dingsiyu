@@ -24,8 +24,8 @@ public class BugFeedBackController {
     private BugFeedBackService bugFeedBackService;
 
     @PostMapping("/saveBugBack")
-    public Object saveBugBack(HttpSession session, BugFeedback feedback) {
-        bugFeedBackService.saveBugBack(session,feedback);
+    public Object saveBugBack(HttpSession session, BugFeedback feedback,Long vocaId) {
+        bugFeedBackService.saveBugBack(session,feedback,vocaId);
         return ServerResponse.createBySuccess();
     }
 

@@ -15,5 +15,5 @@ public interface BugFeedBackService extends BaseService<BugFeedback> {
      * @param session
      * @param feedback
      */
-    void saveBugBack(HttpSession session, BugFeedback feedback);
+    void saveBugBack(HttpSession session, BugFeedback feedback,Long vocaId);
 }

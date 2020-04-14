@@ -21,6 +21,8 @@ import java.util.Map;
  */
 public interface StudyCapacityMapper extends BaseMapper<StudyCapacity> {
 
+     void deleteByTypeAndvocaId(@Param("list") List<Integer> listType,@Param("vocaId") Long vocaId) ;
+
     /**
      * 查询达到黄金记忆点的语法
      *
