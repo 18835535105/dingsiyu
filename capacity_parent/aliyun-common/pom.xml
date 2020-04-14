@@ -15,7 +15,6 @@
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-core</artifactId>
-            <version>${aliyun-java-sdk-core}</version>
         </dependency>
 
         <dependency>

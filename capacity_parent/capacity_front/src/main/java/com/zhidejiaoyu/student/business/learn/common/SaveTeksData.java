@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.TeksService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.business.service.impl.TeksServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +34,6 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private SaveData saveData;
     @Resource
     private TeacherMapper teacherMapper;
-    private Integer modelType = 3;
 
     public Object getStudyModel(Long unitId, Long studentId, Integer easyOrHard, Integer type) {
         //查看课文数据是否保存过
@@ -44,6 +44,7 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         }*/
         //获取单元下需要学习的group
         //获取当前单元下的learnId
+        int modelType = 3;
         LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard, modelType);
         if (type.equals(11)) {
             return getTeksAuditionData(unitId, learnNews.getGroup());
@@ -87,7 +88,7 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 //将遍历的数据放入到
                 Map<String, Object> map = new HashMap<>();
                 map.put("chinese", teks1.getParaphrase());
-                map.put("pronunciation", baiduSpeak.getSentencePath(teks1.getSentence().replace("#", " ").replace("$", "")));
+                map.put("pronunciation", baiduSpeak.getSentencePath(teks1.getSentence()));
                 map.put("id", teks1.getId());
                 String[] sentenceList = teks1.getSentence().trim().split(" ");
                 teksService.getList(sentenceList, map);
@@ -120,8 +121,8 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         if (teks.size() > 0) {
             List<TeksNew> resultTeks = new ArrayList<>();
             for (TeksNew teks1 : teks) {
-                teks1.setPronunciation(baiduSpeak.getSentencePath(teks1.getSentence().replace("#", " ").replace("$", "")));
-                teks1.setSentence(teks1.getSentence().replace("#", " ").replace("$", ""));
+                teks1.setPronunciation(baiduSpeak.getSentencePath(teks1.getSentence()));
+                teks1.setSentence(TeksServiceImpl.replace(teks1.getSentence()));
                 resultTeks.add(teks1);
             }
             return ServerResponse.createBySuccess(resultTeks);
@@ -139,9 +140,9 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         learnExtend.setLearnTime(new Date());
         learnExtend.setUpdateTime(new Date());
         learnExtend.setFlowName(flow.getFlowName());
-        if(student.getTeacherId()!=null){
+        if (student.getTeacherId() != null) {
             Integer teacherId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
-            if(teacherId == null){
+            if (teacherId != null) {
                 learnExtend.setSchoolAdminId(teacherId.longValue());
             }
         }
