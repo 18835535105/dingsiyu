@@ -190,7 +190,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
                 if (CollectionUtils.isNotEmpty(gradeList)) {
                     // 当前版本中小于或等于当前年级的所有课程id
-                    List<Long> courseIds = courseNewMapper.selectByGradeListAndVersionAndGrade(versionVO.getVersion(), gradeList);
+                    List<Long> courseIds = courseNewMapper.selectByGradeListAndVersionAndGrade(version, gradeList);
                     if (CollectionUtils.isEmpty(courseIds)) {
                         return;
                     }
@@ -217,10 +217,33 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             // 查询指定课程数据
             CourseNew courseNew = courseNewMapper.selectById(courseId);
             String finalTargetVersion = courseNew.getVersion();
-            versionVos.forEach(versionVO -> versionVO.setSelected(Objects.equals(finalTargetVersion, versionVO.getVersion())));
+            versionVos.forEach(versionVO -> {
+                String version = versionVO.getVersion();
+                boolean flag = Objects.equals(finalTargetVersion, version);
+                versionVO.setSelected(flag);
+                if (flag) {
+                    versionVOList.add(versionVO);
+                    List<String> gradeList = GradeUtil.smallThanCurrentAllPhase(finalTargetVersion, grade);
+                    smallCourseIds.addAll(courseNewMapper.selectByGradeListAndVersionAndGrade(finalTargetVersion, gradeList));
+                    return;
+                }
 
-            List<String> gradeList = GradeUtil.smallThanCurrentAllPhase(finalTargetVersion, grade);
-            smallCourseIds.addAll(courseNewMapper.selectByGradeListAndVersionAndGrade(finalTargetVersion, gradeList));
+                List<String> gradeList = GradeUtil.smallThanCurrentAllPhase(version, grade);
+
+                if (CollectionUtils.isNotEmpty(gradeList)) {
+                    // 当前版本中小于或等于当前年级的所有课程id
+                    List<Long> courseIds = courseNewMapper.selectByGradeListAndVersionAndGrade(version, gradeList);
+                    if (CollectionUtils.isEmpty(courseIds)) {
+                        return;
+                    }
+                }
+                if (CollectionUtils.isNotEmpty(gradeList)) {
+                    versionVOList.add(versionVO);
+                }
+            });
+
+            versionVos.clear();
+            versionVos.addAll(versionVOList);
         }
         return smallCourseIds;
     }
