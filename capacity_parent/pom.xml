@@ -83,7 +83,10 @@
         <!--阿里云sdk-->
         <alinyun-skd-oss.version>3.4.2</alinyun-skd-oss.version>
         <aliyun-java-sdk-core>4.3.3</aliyun-java-sdk-core>
-        <aliyun-java-sdk-vod>2.15.5</aliyun-java-sdk-vod>
+        <aliyun-java-sdk-vod>2.15.8</aliyun-java-sdk-vod>
+
+        <!--二维码工具-->
+        <zxing-javase.version>3.4.0</zxing-javase.version>
 
         <spring-boot-starter-ahas-sentinel-client.version>1.4.0</spring-boot-starter-ahas-sentinel-client.version>
 
@@ -96,6 +99,18 @@
                 <groupId>com.aliyun.oss</groupId>
                 <artifactId>aliyun-sdk-oss</artifactId>
                 <version>${alinyun-skd-oss.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>aliyun-java-sdk-vod</artifactId>
+                <version>${aliyun-java-sdk-vod}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>aliyun-java-sdk-core</artifactId>
+                <version>${aliyun-java-sdk-core}</version>
             </dependency>
 
             <dependency>
@@ -241,6 +256,13 @@
                 <groupId>com.alibaba.csp</groupId>
                 <artifactId>spring-boot-starter-ahas-sentinel-client</artifactId>
                 <version>${spring-boot-starter-ahas-sentinel-client.version}</version>
+            </dependency>
+
+            <!--二维码工具-->
+            <dependency>
+                <groupId>com.google.zxing</groupId>
+                <artifactId>javase</artifactId>
+                <version>${zxing-javase.version}</version>
             </dependency>
 
         </dependencies>

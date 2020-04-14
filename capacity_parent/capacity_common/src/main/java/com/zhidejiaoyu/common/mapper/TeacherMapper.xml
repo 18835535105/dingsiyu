@@ -50,7 +50,7 @@
 
     <select id="selectTeacherBySchoolAdminId" resultMap="BaseResultMap" parameterType="map">
         select
-        <include refid="base_sql"></include>
+        <include refid="base_sql"/>
         from teacher
         where teacher_id = #{teacherId}
         or school_admin_id = #{teacherId}

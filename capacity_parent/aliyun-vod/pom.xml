@@ -16,7 +16,6 @@
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
-            <version>3.3.0</version>
         </dependency>
         <dependency>
             <groupId>com.zdjy</groupId>
@@ -27,7 +26,6 @@
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-vod</artifactId>
-            <version>${aliyun-java-sdk-vod}</version>
         </dependency>
 
         <dependency>

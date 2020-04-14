@@ -51,12 +51,19 @@ public interface TeksService extends BaseService<Teks> {
      * @param session
      * @return
      */
-    ServerResponse<Object> addData(TestRecord testRecord, HttpSession session,Long flowId);
+    ServerResponse<Object> addData(TestRecord testRecord, HttpSession session, Long flowId);
 
     ServerResponse<Object> selHistoryPronunciation(Integer unitId, HttpSession session);
 
     ServerResponse<Object> isHistoryPronunciation(Integer unitId, HttpSession session);
 
+    /**
+     * 好声音获取课文
+     *
+     * @param unitId
+     * @param session
+     * @return
+     */
     ServerResponse<Object> selSpeakTeksByUnitId(Long unitId, HttpSession session);
 
     ServerResponse<Object> selHistoryByCountAndUnitId(Integer count, Integer unitId, HttpSession session);
@@ -74,7 +81,10 @@ public interface TeksService extends BaseService<Teks> {
     ServerResponse<Object> getUnitStatus(Long courseId, HttpSession session);
 
     void getList(String[] split, Map<String, Object> map);
+
     void getListTeks(List<Object> resultTeks, TeksNew teks);
+
     ServerResponse<Object> getReturnTestTeks(List<TeksNew> teks, List<TeksNew> addTeks);
+
     ServerResponse<Object> getTeks(List<TeksNew> teks);
 }
