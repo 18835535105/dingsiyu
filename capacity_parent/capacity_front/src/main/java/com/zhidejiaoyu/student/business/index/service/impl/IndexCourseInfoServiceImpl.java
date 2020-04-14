@@ -128,15 +128,9 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
         // 判断配置的课程中是否有学生所在的版本
         long count = canStudyCourseNews.stream().filter(courseNew -> Objects.equals(student.getVersion(), courseNew.getVersion())).count();
-        String targetVersion = this.getTargetVersion(courseId, count, versionVos);
+        String grade = student.getGrade();
+        List<Long> smallCourseIds = this.getSmallCourseIds(courseId, count, versionVos, grade);
 
-        List<String> gradeList = GradeUtil.smallThanCurrentAllPhase(targetVersion, student.getGrade());
-
-        List<Long> smallCourseIds = new ArrayList<>();
-        if (gradeList.size() > 1) {
-            // 当前版本中小于或等于当前年级的所有课程id
-            smallCourseIds.addAll(courseNewMapper.selectByGradeListAndVersionAndGrade(targetVersion, gradeList));
-        }
 
         // 其他年级
         List<CourseVO> previousGrade = new ArrayList<>();
@@ -152,7 +146,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                         .currentGrade(null)
                         .previousGrade(null)
                         .versions(versionVos)
-                        .InGrade(student.getGrade())
+                        .InGrade(grade)
                         .build());
             }
 
@@ -171,33 +165,64 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                 .currentGrade(currentGrade)
                 .previousGrade(previousGrade)
                 .versions(versionVos)
-                .InGrade(student.getGrade())
+                .InGrade(grade)
                 .build());
     }
 
     /**
-     * 获取最终页面被选中的版本信息
+     * 获取当前版本小于或等于学生年级的课程id
+     * 获取最终页面被选中的版本信息（只展示有课程信息的版本）
      *
      * @param courseId
      * @param count
      * @param versionVos
+     * @param grade      学生所在年级
      * @return
      */
-    private String getTargetVersion(Long courseId, long count, List<VersionVO> versionVos) {
-        String targetVersion;
+    private List<Long> getSmallCourseIds(Long courseId, long count, List<VersionVO> versionVos, String grade) {
+        List<VersionVO> versionVOList = new ArrayList<>();
+        List<Long> smallCourseIds = new ArrayList<>();
         if (courseId == null) {
-            if (count == 0 && CollectionUtils.isNotEmpty(versionVos)) {
-                targetVersion = versionVos.get(0).getVersion();
-                versionVos.get(0).setSelected(true);
-            } else {
-                targetVersion = versionVos.stream().filter(VersionVO::getSelected).map(VersionVO::getVersion).collect(Collectors.joining());
+            // 首次进入首页面
+            versionVos.forEach(versionVO -> {
+                String version = versionVO.getVersion();
+                List<String> gradeList = GradeUtil.smallThanCurrentAllPhase(version, grade);
+
+                if (CollectionUtils.isNotEmpty(gradeList)) {
+                    // 当前版本中小于或等于当前年级的所有课程id
+                    List<Long> courseIds = courseNewMapper.selectByGradeListAndVersionAndGrade(versionVO.getVersion(), gradeList);
+                    if (CollectionUtils.isEmpty(courseIds)) {
+                        return;
+                    }
+                    /*
+                    如果有学生所在的版本，将学生所在版本置为默认选中版本
+                    如果没有学生所在版本，将第一个有课程信息的版本置为选中版本
+                     */
+                    boolean flag = (count == 0 && CollectionUtils.isEmpty(smallCourseIds)) || versionVO.getSelected();
+                    if (flag) {
+                        smallCourseIds.addAll(courseIds);
+                    }
+                }
+                if (CollectionUtils.isNotEmpty(gradeList)) {
+                    versionVOList.add(versionVO);
+                }
+            });
+
+            versionVos.clear();
+            if (count == 0 && CollectionUtils.isNotEmpty(versionVOList)) {
+                versionVOList.get(0).setSelected(true);
             }
+            versionVos.addAll(versionVOList);
         } else {
+            // 查询指定课程数据
             CourseNew courseNew = courseNewMapper.selectById(courseId);
-            targetVersion = courseNew.getVersion();
-            versionVos.forEach(versionVO -> versionVO.setSelected(Objects.equals(targetVersion, versionVO.getVersion())));
+            String finalTargetVersion = courseNew.getVersion();
+            versionVos.forEach(versionVO -> versionVO.setSelected(Objects.equals(finalTargetVersion, versionVO.getVersion())));
+
+            List<String> gradeList = GradeUtil.smallThanCurrentAllPhase(finalTargetVersion, grade);
+            smallCourseIds.addAll(courseNewMapper.selectByGradeListAndVersionAndGrade(finalTargetVersion, gradeList));
         }
-        return targetVersion;
+        return smallCourseIds;
     }
 
     /**
