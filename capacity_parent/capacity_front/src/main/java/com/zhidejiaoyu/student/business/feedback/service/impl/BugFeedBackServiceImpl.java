@@ -38,15 +38,18 @@ public class BugFeedBackServiceImpl extends BaseServiceImpl<BugFeedbackMapper, B
             feedback.setCreateTime(LocalDateTime.now());
             bugFeedbackMapper.insert(feedback);
         }
-        if(type!=null){
+        if (type != null) {
             List<Integer> listType = getListType(type);
             studyCapacityMapper.deleteByTypeAndvocaId(listType, vocaId);
         }
     }
 
     private Integer getType(String studyModel) {
+        if (studyModel == null) {
+            return null;
+        }
         Integer integer = Integer.parseInt(studyModel);
-        boolean flag=(integer >= 0 && integer <= 3) || (integer >= 14 && integer <= 22)
+        boolean flag = (integer >= 0 && integer <= 3) || (integer >= 14 && integer <= 22)
                 || integer == 27 || integer == 26;
         if (flag) {
             return 1;
