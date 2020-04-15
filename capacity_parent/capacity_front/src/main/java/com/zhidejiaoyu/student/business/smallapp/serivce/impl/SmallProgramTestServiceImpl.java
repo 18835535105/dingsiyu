@@ -91,7 +91,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         });
         List<Map<String, Object>> getMaps = new ArrayList<>();
         getMaps.addAll(maps);
-       /* if (getMaps.size() < 15) {
+        if (getMaps.size() < 15) {
             while (getMaps.size() < 15) {
                 for (Map<String, Object> map : maps) {
                     if (getMaps.size() < 15) {
@@ -103,20 +103,8 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             }
         }else {
             getMaps = getMaps.subList(0, 15);
-        }*/
-        if (getMaps.size() < 2) {
-            while (getMaps.size() < 2) {
-                for (Map<String, Object> map : maps) {
-                    if (getMaps.size() < 2) {
-                        getMaps.add(map);
-                    } else {
-                        break;
-                    }
-                }
-            }
-        } else {
-            getMaps = getMaps.subList(0, 2);
         }
+
         returnMap.put("optionList", getOptionList(getMaps, vocabularyIds));
         returnMap.put("writeList", getWriteList(getMaps));
         //更新获取单词复习数量
