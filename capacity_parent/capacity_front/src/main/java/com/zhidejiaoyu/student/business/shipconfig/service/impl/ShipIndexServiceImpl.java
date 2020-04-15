@@ -379,13 +379,20 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     }
 
     @Override
-    public IndexVO.Radar getRadar(Long studentId) {
+    public IndexVO.MyState getBaseState(Long studentId) {
         List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
+        IndexVO indexVO = this.getIndexVoTmp(equipments);
         IndexVO.BaseValue baseValue = this.getBaseValue(equipments);
 
         IndexVO.StateOfWeek stateOfWeek = this.getStateOfWeek(studentId, baseValue);
 
-        return this.getRadar(baseValue, stateOfWeek);
+        return IndexVO.MyState.builder()
+                .armorInfo(indexVO.getArmorInfo())
+                .missileInfo(indexVO.getMissileInfo())
+                .shipInfo(indexVO.getShipInfo())
+                .weaponsInfo(indexVO.getWeaponsInfo())
+                .radar(this.getRadar(baseValue, stateOfWeek))
+                .build();
     }
 
     public ServerResponse<Object> packageRankVO(String key, List<Long> studentIds, Student student) {
