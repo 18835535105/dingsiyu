@@ -36,6 +36,11 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     public static final String COUNT = "count";
 
     /**
+     * 年级、label的映射
+     */
+    public static final Map<String, String> MAPPING = new HashMap<>(16);
+
+    /**
      * 语法模块type值
      */
     private static final int SYNTAX_MODEL_TYPE = 3;
@@ -57,6 +62,37 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
     @Resource
     private SyntaxUnitMapper syntaxUnitMapper;
+
+    static {
+        MAPPING.put(GradeNameConstant.FIRST_GRADE, "one");
+        MAPPING.put(GradeNameConstant.SECOND_GRADE, "two");
+        MAPPING.put(GradeNameConstant.WRITE_GRADE, "two");
+        MAPPING.put(GradeNameConstant.FOURTH_GRADE, "four");
+        MAPPING.put(GradeNameConstant.FIFTH_GRADE, "five");
+        MAPPING.put(GradeNameConstant.SIXTH_GRADE, "six");
+        MAPPING.put(GradeNameConstant.SEVENTH_GRADE, "seven");
+        MAPPING.put(GradeNameConstant.EIGHTH_GRADE, "eight");
+        MAPPING.put(GradeNameConstant.NINTH_GRADE, "nine");
+        MAPPING.put(GradeNameConstant.SENIOR_ONE, "ten");
+        MAPPING.put(GradeNameConstant.SENIOR_TWO, "eleven");
+        MAPPING.put(GradeNameConstant.SENIOR_THREE, "twelve");
+        MAPPING.put(GradeNameConstant.HIGH, "gaozhong");
+
+        MAPPING.put(GradeNameConstant.VOLUME_1, "up");
+        MAPPING.put(GradeNameConstant.VOLUME_2, "down");
+        // 全册
+        MAPPING.put(GradeNameConstant.FULL_VOLUME, "quance");
+        // 必修
+        MAPPING.put(GradeNameConstant.REQUIRED_ONE, "bixiuyi");
+        MAPPING.put(GradeNameConstant.REQUIRED_TWO, "bixiuer");
+        MAPPING.put(GradeNameConstant.REQUIRED_THREE, "bixiusan");
+        MAPPING.put(GradeNameConstant.REQUIRED_FOUR, "bixiusi");
+        MAPPING.put(GradeNameConstant.REQUIRED_FIVE, "bixiuwu");
+        // 选修
+        MAPPING.put(GradeNameConstant.ELECTIVE_SIX, "xuanxiuliu");
+        MAPPING.put(GradeNameConstant.ELECTIVE_SEVEN, "xuanxiuba");
+        MAPPING.put(GradeNameConstant.ELECTIVE_EIGHT, "xuanxiuba");
+    }
 
     @Override
     public ServerResponse<CourseInfoVO> getStudyCourse(Integer type, Long courseId) {
@@ -212,7 +248,6 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             if (count == 0 && CollectionUtils.isNotEmpty(versionVOList)) {
                 versionVOList.get(0).setSelected(true);
             }
-            versionVos.addAll(versionVOList);
         } else {
             // 查询指定课程数据
             CourseNew courseNew = courseNewMapper.selectById(courseId);
@@ -243,8 +278,8 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             });
 
             versionVos.clear();
-            versionVos.addAll(versionVOList);
         }
+        versionVos.addAll(versionVOList);
         return smallCourseIds;
     }
 
@@ -389,55 +424,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
      * @return
      */
     public static String getGradeAndLabelEnglishName(String grade, String label) {
-        String grade1 = null;
-        String label1 = null;
-        if (grade == null) {
-            grade1 = "one";
-        }
-        if (GradeNameConstant.FIRST_GRADE.equals(grade)) {
-            grade1 = "one";
-        }
-        if (GradeNameConstant.SECOND_GRADE.equals(grade)) {
-            grade1 = "two";
-        }
-        if (GradeNameConstant.WRITE_GRADE.equals(grade)) {
-            grade1 = "three";
-        }
-        if (GradeNameConstant.FOURTH_GRADE.equals(grade)) {
-            grade1 = "four";
-        }
-        if (GradeNameConstant.FIFTH_GRADE.equals(grade)) {
-            grade1 = "five";
-        }
-        if (GradeNameConstant.SIXTH_GRADE.equals(grade)) {
-            grade1 = "six";
-        }
-        if (GradeNameConstant.SEVENTH_GRADE.equals(grade)) {
-            grade1 = "seven";
-        }
-        if (GradeNameConstant.EIGHTH_GRADE.equals(grade)) {
-            grade1 = "eight";
-        }
-        if (GradeNameConstant.NINTH_GRADE.equals(grade)) {
-            grade1 = "nine";
-        }
-
-        if (GradeNameConstant.SENIOR_ONE.equals(grade)) {
-            grade1 = "ten";
-        }
-        if (GradeNameConstant.SENIOR_TWO.equals(grade)) {
-            grade1 = "eleven";
-        }
-        if (GradeNameConstant.SENIOR_THREE.equals(grade)) {
-            grade1 = "twelve";
-        }
-        if (GradeNameConstant.VOLUME_1.equals(label)) {
-            label1 = "up";
-        }
-        if (GradeNameConstant.VOLUME_2.equals(label)) {
-            label1 = "down";
-        }
-        return grade1 + "-" + label1;
+        return MAPPING.get(grade) + "-" + MAPPING.get(label);
     }
 }
 

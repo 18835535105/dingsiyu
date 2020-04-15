@@ -25,5 +25,15 @@ public interface GradeNameConstant {
 
     String VOLUME_1 = "上册";
     String VOLUME_2 = "下册";
-    String Full_VOLUME = "全册";
+    String FULL_VOLUME = "全册";
+
+    String REQUIRED_ONE = "必修一";
+    String REQUIRED_TWO = "必修二";
+    String REQUIRED_THREE = "必修三";
+    String REQUIRED_FOUR = "必修四";
+    String REQUIRED_FIVE = "必修五";
+
+    String ELECTIVE_SIX = "选修六";
+    String ELECTIVE_SEVEN = "选修七";
+    String ELECTIVE_EIGHT = "选修八";
 }
