@@ -1,8 +1,8 @@
 package com.zhidejiaoyu.common.config;
 
+import com.alibaba.csp.ahas.shaded.com.alibaba.acm.shaded.com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.spring.stat.DruidStatInterceptor;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.JdkRegexpMethodPointcut;

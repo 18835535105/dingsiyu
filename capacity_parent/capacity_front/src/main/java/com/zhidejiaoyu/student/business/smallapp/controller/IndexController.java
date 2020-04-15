@@ -108,7 +108,7 @@ public class IndexController extends BaseController {
             throw new ServiceException("openId can't be null");
         }
         Long studentId = smallAppIndexService.getStudentId(openId);
-        IndexVO.Radar radar = shipIndexService.getRadar(studentId);
+        IndexVO.MyState radar = shipIndexService.getBaseState(studentId);
         return ServerResponse.createBySuccess(radar);
     }
 

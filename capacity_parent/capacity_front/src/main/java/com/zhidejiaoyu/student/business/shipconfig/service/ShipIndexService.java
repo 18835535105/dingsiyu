@@ -38,7 +38,7 @@ public interface ShipIndexService extends BaseService<Student> {
      * @param studentId
      * @return
      */
-    IndexVO.Radar getRadar(Long studentId);
+    IndexVO.MyState getBaseState(Long studentId);
 
     /**
      * 获取各项战力值

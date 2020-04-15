@@ -167,4 +167,39 @@ public class IndexVO implements Serializable {
     public static class Radar extends BaseValue {
     }
 
+    /**
+     * 小程序雷达图信息
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @EqualsAndHashCode(callSuper = false)
+    public static class MyState {
+        /**
+         * 雷达图信息
+         */
+        private Radar radar;
+
+        /**
+         * 武器信息
+         */
+        private Info weaponsInfo;
+
+        /**
+         * 装甲信息
+         */
+        private Info armorInfo;
+
+        /**
+         * 飞船信息
+         */
+        private Info shipInfo;
+
+        /**
+         * 导弹信息
+         */
+        private Info missileInfo;
+
+    }
 }
