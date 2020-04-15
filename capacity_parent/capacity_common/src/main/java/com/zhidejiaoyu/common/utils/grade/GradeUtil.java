@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.common.utils.grade;
 
+import com.zhidejiaoyu.common.constant.GradeNameConstant;
+
 import java.util.*;
 
 /**
@@ -10,18 +12,20 @@ import java.util.*;
  */
 public class GradeUtil {
 
+    private static final String REN_JIAO_BAN_VERSION = "人教版";
+
     /**
      * 通用小学年级
      */
     private static final String[] SMALL_GRADE = {"一年级", "二年级", "三年级", "四年级", "五年级", "六年级"};
 
     /**
-     * 通用小学年级
+     * 通用初中年级
      */
     private static final String[] MIDDLE_GRADE = {"七年级", "八年级", "九年级"};
 
     /**
-     * 通用小学年级
+     * 通用高中年级
      */
     private static final String[] HIGH_GRADE = {"高一", "高二", "高三"};
 
@@ -29,6 +33,11 @@ public class GradeUtil {
      * 通用全部年级
      */
     private static final String[] NORMAL_GRADE = {"一年级", "二年级", "三年级", "四年级", "五年级", "六年级", "七年级", "八年级", "九年级", "高一", "高二", "高三"};
+
+    /**
+     * 人教版
+     */
+    private static final String[] REN_JIAO_BAN = {"七年级", "八年级", "九年级", "高中"};
 
     /**
      * 全学段年级
@@ -59,7 +68,7 @@ public class GradeUtil {
      * 版本名与年级数据嘴硬（不区分学段）
      */
     private static Map<String, String[]> ALL_PHASE_VERSION_GRADE;
-    
+
     static {
         initVersionGrade();
 
@@ -93,6 +102,14 @@ public class GradeUtil {
      * @return
      */
     public static List<String> smallThanCurrentAllPhase(String version, String grade) {
+
+        // 人教版特殊年级处理
+        if (Objects.equals(REN_JIAO_BAN_VERSION, version)) {
+            if (Objects.equals(grade, GradeNameConstant.SENIOR_ONE) || Objects.equals(grade, GradeNameConstant.SENIOR_TWO) || Objects.equals(grade, GradeNameConstant.SENIOR_THREE)) {
+                grade =GradeNameConstant.HIGH;
+            }
+        }
+
         String[] gradeArr = ALL_PHASE_VERSION_GRADE.get(version);
         if (gradeArr != null) {
             return getGradeList(grade, gradeArr);
@@ -118,6 +135,7 @@ public class GradeUtil {
         ALL_PHASE_VERSION_GRADE.put("剑桥少儿英语（西安交大版）", JIANQIAO);
         ALL_PHASE_VERSION_GRADE.put("新概念经典版（中学）", MIDDLE_SCHOOL);
         ALL_PHASE_VERSION_GRADE.put("剑桥英语青少版", IN_THE_WHOLE_PERIOD);
+        ALL_PHASE_VERSION_GRADE.put(REN_JIAO_BAN_VERSION, REN_JIAO_BAN);
 
         ALL_PHASE_VERSION_GRADE.put("一年级", NORMAL_GRADE);
         ALL_PHASE_VERSION_GRADE.put("二年级", NORMAL_GRADE);
@@ -159,5 +177,9 @@ public class GradeUtil {
     }
 
     private GradeUtil() {
+    }
+
+    public static void main(String[] args) {
+        System.out.println(GradeUtil.smallThanCurrentAllPhase("人教版", "高三"));
     }
 }

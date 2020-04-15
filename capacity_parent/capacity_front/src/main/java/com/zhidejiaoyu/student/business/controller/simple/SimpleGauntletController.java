@@ -106,7 +106,8 @@ public class SimpleGauntletController {
      * @param session session
      * @return
      */
-    @RequestMapping("/getCourse")
+    @Deprecated
+//    @RequestMapping("/getCourse")
     public ServerResponse<Object> getCourse(HttpSession session) {
         return gauntletService.getCourse(session);
     }

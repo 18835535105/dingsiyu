@@ -112,6 +112,7 @@ public class PriorityUtil {
      * 年级转换为对应的数字
      */
     private static void initGradeToNum() {
+        GRADE_TO_NUM.put("小学", 1);
         GRADE_TO_NUM.put("一年级", 1);
         GRADE_TO_NUM.put("二年级", 2);
         GRADE_TO_NUM.put("三年级", 3);
@@ -119,10 +120,12 @@ public class PriorityUtil {
         GRADE_TO_NUM.put("五年级", 5);
         GRADE_TO_NUM.put("六年级", 6);
 
+        GRADE_TO_NUM.put("初中", 7);
         GRADE_TO_NUM.put("七年级", 7);
         GRADE_TO_NUM.put("八年级", 8);
         GRADE_TO_NUM.put("九年级", 9);
 
+        GRADE_TO_NUM.put("高中", 10);
         GRADE_TO_NUM.put("高一", 10);
         GRADE_TO_NUM.put("高二", 11);
         GRADE_TO_NUM.put("高三", 12);
