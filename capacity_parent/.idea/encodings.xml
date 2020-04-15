@@ -3,10 +3,16 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/aliyun-common" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/aliyun-common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/aliyun-oss" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/aliyun-oss/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/aliyun-translate" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/aliyun-translate/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/aliyun-vod" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/aliyun-vod/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/capacity_common" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/capacity_common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/capacity_front" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/capacity_front/src/main/java" charset="UTF-8" />
   </component>
 </project>
