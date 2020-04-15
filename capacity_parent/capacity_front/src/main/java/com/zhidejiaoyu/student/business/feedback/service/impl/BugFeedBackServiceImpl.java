@@ -35,6 +35,7 @@ public class BugFeedBackServiceImpl extends BaseServiceImpl<BugFeedbackMapper, B
         int count = bugFeedbackMapper.countByStudentIdAndDate(student.getId(), new Date());
         if (count < 5) {
             feedback.setFixed(1);
+            feedback.setStudentId(student.getId());
             feedback.setCreateTime(LocalDateTime.now());
             bugFeedbackMapper.insert(feedback);
         }
