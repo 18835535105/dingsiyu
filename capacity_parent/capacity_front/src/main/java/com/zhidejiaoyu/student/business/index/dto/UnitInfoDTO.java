@@ -15,7 +15,7 @@ public class UnitInfoDTO {
     private Long courseId;
 
     /**
-     * 1：单词；2：句型；3：语法；4：课文
+     * 1：单词；2：句型；3：语法；4：课文；5：金币试卷
      */
     @NotNull(message = "type can't be null!")
     private Integer type;
