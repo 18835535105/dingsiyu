@@ -11,13 +11,13 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class SaveGoldLogTest {
+public class GoldLogUtilTest {
 
     @Test
     public void saveRunLog() {
 
-        SaveGoldLog.saveStudyGoldLog(7846L, "金币增加", 23);
-        SaveGoldLog.saveStudyGoldLog(7846L, "金币增加", 0);
-        SaveGoldLog.saveStudyGoldLog(7846L, "金币减少", -12);
+        GoldLogUtil.saveStudyGoldLog(7846L, "金币增加", 23);
+        GoldLogUtil.saveStudyGoldLog(7846L, "金币增加", 0);
+        GoldLogUtil.saveStudyGoldLog(7846L, "金币减少", -12);
     }
 }

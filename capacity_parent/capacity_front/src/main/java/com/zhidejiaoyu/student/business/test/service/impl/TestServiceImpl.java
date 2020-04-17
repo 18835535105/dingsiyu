@@ -42,7 +42,7 @@ import com.zhidejiaoyu.student.business.learn.common.SaveTeksData;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.PhoneticSymbolServiceImpl;
 import com.zhidejiaoyu.student.business.test.service.TestService;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -227,7 +227,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
             student.setEnergy(awardEnergy);
             studentMapper.updateById(student);
-            SaveGoldLog.saveStudyGoldLog(student.getId(), GenreConstant.BEFORE_LEARN_GAME_TEST, awardGold);
+            GoldLogUtil.saveStudyGoldLog(student.getId(), GenreConstant.BEFORE_LEARN_GAME_TEST, awardGold);
         }
 
         TestResultVo vo = new TestResultVo();
@@ -1097,7 +1097,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             model = 2;
         }
         // 根据不同分数奖励学生金币
-        Integer goldCount = 0;
+        int goldCount = 0;
         int addEnergy = 0;
         if (!redisOpt.isRepeatSubmit(student.getId(), (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME))) {
             //saveTestLearnAndCapacity.saveTestAndCapacity(correctWord, errorWord, correctWordId, errorWordId, session, unitId, classify);

@@ -24,7 +24,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.level.ChildMedalVo;
 import com.zhidejiaoyu.common.vo.student.level.LevelVo;
 import com.zhidejiaoyu.student.business.service.StudentInfoService;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.redis.WorshipRedisOpt;
 import com.zhidejiaoyu.student.common.validTime.GetValidTimeTip;
 import lombok.extern.slf4j.Slf4j;
@@ -189,7 +189,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
             int gold = 10;
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
-            SaveGoldLog.saveStudyGoldLog(student.getId(), "首次修改密码", gold);
+            GoldLogUtil.saveStudyGoldLog(student.getId(), "首次修改密码", gold);
         }
     }
 
@@ -218,7 +218,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         tip = "恭喜获得" + gold + "枚金币，已收入囊中。";
         log.info("id为 " + student.getId() + " 的学生在 " + DateUtil.DateTime(new Date()) + " 首次完善信息达 " + scale * 100 + "%，奖励金币#" + gold + "#枚！");
 
-        SaveGoldLog.saveStudyGoldLog(student.getId(), "首次完善信息", gold);
+        GoldLogUtil.saveStudyGoldLog(student.getId(), "首次完善信息", gold);
         return tip;
     }
 

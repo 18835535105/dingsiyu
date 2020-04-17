@@ -11,7 +11,7 @@ import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -133,7 +133,7 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
         student.setSystemGold(student.getSystemGold() + gold);
         student.setEnergy(student.getEnergy() + enger);
         studentMapper.updateById(student);
-        SaveGoldLog.saveStudyGoldLog(student.getId(), "句型游戏", gold);
+        GoldLogUtil.saveStudyGoldLog(student.getId(), "句型游戏", gold);
         Map<String, Object> resultMap = new HashMap<>();
         if (total < PointConstant.EIGHTY) {
             resultMap.put("petSay", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));

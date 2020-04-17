@@ -6,16 +6,14 @@ import com.zhidejiaoyu.common.mapper.simple.SimpleConsumeMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleRunLogMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleStudentMapper;
 import com.zhidejiaoyu.common.pojo.Consume;
-import com.zhidejiaoyu.common.pojo.RunLog;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.student.business.service.simple.SimpleConsumeServiceSimple;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
-import java.util.Date;
 
 /**
  * <p>
@@ -117,7 +115,7 @@ public class SimpleConsumeServiceImplSimple extends SimpleBaseServiceImpl<Simple
         consume.setState(state);
         consume.setStudentId(studentId);
 
-        SaveGoldLog.saveStudyGoldLog(Long.valueOf(studentId), "抽奖获得", number);
+        GoldLogUtil.saveStudyGoldLog(Long.valueOf(studentId), "抽奖获得", number);
         return consume;
     }
 

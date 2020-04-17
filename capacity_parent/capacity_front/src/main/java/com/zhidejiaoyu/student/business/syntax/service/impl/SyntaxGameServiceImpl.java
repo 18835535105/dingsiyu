@@ -20,7 +20,7 @@ import com.zhidejiaoyu.common.vo.syntax.game.GameVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.test.service.impl.TestServiceImpl;
 import com.zhidejiaoyu.student.business.syntax.service.SyntaxGameService;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -204,7 +204,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
             student.setEnergy(awardEnergy);
             studentMapper.updateById(student);
-            SaveGoldLog.saveStudyGoldLog(student.getId(), SyntaxModelNameConstant.GAME, awardGold);
+            GoldLogUtil.saveStudyGoldLog(student.getId(), SyntaxModelNameConstant.GAME, awardGold);
         }
 
         TestResultVo vo = new TestResultVo();

@@ -27,7 +27,7 @@ import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
 import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
 import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
 import com.zhidejiaoyu.student.business.test.service.impl.TestServiceImpl;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.SaveTestLearnAndCapacity;
 import com.zhidejiaoyu.common.constant.PetMP3Constant;
 import com.zhidejiaoyu.common.dto.WordUnitTestDTO;
@@ -1593,7 +1593,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         studentMapper.updateById(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         if (msg.length() > 0) {
-            SaveGoldLog.saveStudyGoldLog(stuId, msg.toString(), gold);
+            GoldLogUtil.saveStudyGoldLog(stuId, msg.toString(), gold);
         }
         return testRecord;
     }

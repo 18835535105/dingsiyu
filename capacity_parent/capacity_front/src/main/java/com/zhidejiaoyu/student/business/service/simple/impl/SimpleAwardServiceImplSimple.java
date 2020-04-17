@@ -15,7 +15,7 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.simple.SimpleAwardServiceSimple;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -425,7 +425,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                     }
                     // 保存领取奖励日志
                     try {
-                        SaveGoldLog.saveStudyGoldLog(student.getId(), awardType ,awardGold);
+                        GoldLogUtil.saveStudyGoldLog(student.getId(), awardType ,awardGold);
                         getLevel(session);
                     } catch (Exception e) {
                         log.error("id为[{}]的学生在领取[{}]中[{}]奖励时保存日志出错！", student.getId(), awardType, awardContent, e);

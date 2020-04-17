@@ -11,7 +11,7 @@ import com.zhidejiaoyu.student.business.service.simple.SimpleConsumeServiceSimpl
 import com.zhidejiaoyu.student.business.service.simple.SimpleDrawRecordServiceSimple;
 import com.zhidejiaoyu.student.business.service.simple.SimpleStudentSkinServiceSimple;
 import com.zhidejiaoyu.student.business.service.simple.SimpleSyntheticRewardsListServiceSimple;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.redis.AwardRedisOpt;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -191,10 +191,10 @@ public class SimpleDrawRecordServiceImplSimple extends SimpleBaseServiceImpl<Sim
                     //金币信息放入runlog中
                     if (type == 2) {
                         consumeService.addConsume(1, 2, session);
-                        SaveGoldLog.saveStudyGoldLog(student.getId(), "抽奖", 2);
+                        GoldLogUtil.saveStudyGoldLog(student.getId(), "抽奖", 2);
                     } else {
                         consumeService.addConsume(1, 5, session);
-                        SaveGoldLog.saveStudyGoldLog(student.getId(), "抽奖", 5);
+                        GoldLogUtil.saveStudyGoldLog(student.getId(), "抽奖", 5);
                     }
                     resultInt[0] = 1;
                     return resultInt;

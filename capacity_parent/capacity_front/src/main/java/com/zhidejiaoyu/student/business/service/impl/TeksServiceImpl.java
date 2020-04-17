@@ -24,7 +24,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.student.business.learn.common.SaveTeksData;
 import com.zhidejiaoyu.student.business.service.TeksService;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -847,7 +847,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         }
         if (goldCount > 0) {
             try {
-                SaveGoldLog.saveStudyGoldLog(student.getId(), reason, goldCount);
+                GoldLogUtil.saveStudyGoldLog(student.getId(), reason, goldCount);
             } catch (RuntimeException e) {
                 log.error("保存学生[{} - {} - {}]日志出错！msg=[{}]", student.getId(), student.getAccount(), student.getStudentName(), msg, e);
             }

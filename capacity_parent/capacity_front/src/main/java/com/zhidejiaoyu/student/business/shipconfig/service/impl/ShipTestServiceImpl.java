@@ -19,7 +19,7 @@ import com.zhidejiaoyu.student.business.shipconfig.service.ShipTestService;
 import com.zhidejiaoyu.student.business.shipconfig.vo.EquipmentEquipmentExperienceVo;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.PkInfoVO;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.redis.PkCopyRedisOpt;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
@@ -333,7 +333,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     private void saveStudentGold(Student student) {
         Double goldAddition = StudentGoldAdditionUtil.getGoldAddition(student, AWARD_GOLD);
         studentMapper.updateBySystemGold(BigDecimalUtil.add(goldAddition, student.getSystemGold()), student.getId());
-        SaveGoldLog.saveStudyGoldLog(student.getId(), "飞船个人挑战", Integer.parseInt(goldAddition.toString()));
+        GoldLogUtil.saveStudyGoldLog(student.getId(), "飞船个人挑战", Integer.parseInt(goldAddition.toString()));
     }
 
 
@@ -461,7 +461,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldAddition));
         studentMapper.updateById(student);
 
-        SaveGoldLog.saveStudyGoldLog(student.getId(), "参与校区副本挑战", (int) Math.floor(goldAddition));
+        GoldLogUtil.saveStudyGoldLog(student.getId(), "参与校区副本挑战", (int) Math.floor(goldAddition));
 
         return ServerResponse.createBySuccess();
     }

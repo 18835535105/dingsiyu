@@ -15,7 +15,7 @@ import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.smallapp.dto.GetLimitQRCodeDTO;
 import com.zhidejiaoyu.student.business.smallapp.serivce.SmallProgramTestService;
 import com.zhidejiaoyu.student.business.smallapp.util.CreateWxQrCodeUtil;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -137,7 +137,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         student.setSystemGold(student.getSystemGold() + awardGold);
         studentMapper.updateById(student);
 
-        SaveGoldLog.saveStudyGoldLog(studentId, GenreConstant.SMALLAPP_GENRE, awardGold);
+        GoldLogUtil.saveStudyGoldLog(studentId, GenreConstant.SMALLAPP_GENRE, awardGold);
 
         this.saveClockIn(studentId);
 

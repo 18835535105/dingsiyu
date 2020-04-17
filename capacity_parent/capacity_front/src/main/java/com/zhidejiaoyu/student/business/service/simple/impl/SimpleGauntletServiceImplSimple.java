@@ -15,7 +15,7 @@ import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.LevelUtil;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import com.zhidejiaoyu.student.business.game.service.impl.GameServiceImpl;
 import com.zhidejiaoyu.student.business.service.simple.SimpleIGauntletServiceSimple;
@@ -451,7 +451,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
                         winnerStudent.setSystemGold(winnerStudent.getSystemGold() + goldChallenge);
                         simpleStudentMapper.updateById(winnerStudent);
 
-                        SaveGoldLog.saveStudyGoldLog(gauntlet.getChallengerStudentId(), "pk对战", goldChallenge);
+                        GoldLogUtil.saveStudyGoldLog(gauntlet.getChallengerStudentId(), "pk对战", goldChallenge);
                     }
                 } else {
                     //被挑战人分数大于挑战人分数
@@ -780,7 +780,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         }
         simpleStudentMapper.updateById(winnerStudent);
 
-        SaveGoldLog.saveStudyGoldLog(winnerStudentId, "pk对战胜利", winnerGold);
+        GoldLogUtil.saveStudyGoldLog(winnerStudentId, "pk对战胜利", winnerGold);
         //失败人
         StudentExpansion beChallengeStudentExpansion = simpleStudentExpansionMapper.selectByStudentId(failStudentId);
         if (challengeStudentExpansion.getStudyPower() - study < 0) {
@@ -797,7 +797,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         }
         simpleStudentMapper.updateById(failStudent);
 
-        SaveGoldLog.saveStudyGoldLog(failStudentId, "pk对战失败", failGold);
+        GoldLogUtil.saveStudyGoldLog(failStudentId, "pk对战失败", failGold);
     }
 
 

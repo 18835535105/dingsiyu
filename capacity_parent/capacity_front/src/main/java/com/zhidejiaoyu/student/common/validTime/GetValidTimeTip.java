@@ -13,7 +13,7 @@ import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -104,7 +104,7 @@ public class GetValidTimeTip {
         learnCount = simpleLearnMapper.countByExample(learnExample);
         if (learnCount >= condition * (awardCount + 1)) {
             sb.append("在").append(learnType).append("模块本次新学熟词大于等于").append(condition).append("个单词");
-            SaveGoldLog.saveStudyGoldLog(student.getId(), sb.toString(), 1);
+            GoldLogUtil.saveStudyGoldLog(student.getId(), sb.toString(), 1);
             return 1;
         }
         return 0;
@@ -130,7 +130,7 @@ public class GetValidTimeTip {
         if (count == 0 && minute >= condition) {
             sb.append("在").append(learnType).append("模块学习过程中有效时长大于等于30分钟");
 
-            SaveGoldLog.saveStudyGoldLog(student.getId(), sb.toString(), 5);
+            GoldLogUtil.saveStudyGoldLog(student.getId(), sb.toString(), 5);
             return 5;
         }
         return 0;
@@ -159,7 +159,7 @@ public class GetValidTimeTip {
         learnCount = simpleLearnMapper.countByExample(learnExample);
         if (learnCount >= condition * (awardCount + 1)) {
             sb.append("在").append(learnType).append("模块本次登录新学大于等于").append(condition).append("个单词");
-            SaveGoldLog.saveStudyGoldLog(student.getId(), sb.toString(), 1);
+            GoldLogUtil.saveStudyGoldLog(student.getId(), sb.toString(), 1);
             return 1;
         }
         return 0;
@@ -216,7 +216,7 @@ public class GetValidTimeTip {
         learnCount = learnMapper.countByExample(learnExample);
         if (learnCount >= condition * (awardCount + 1)) {
             sb.append("在").append(learnType).append("模块本次新学熟词大于等于").append(condition).append("个单词");
-            SaveGoldLog.saveStudyGoldLog(student.getId(), sb.toString(), 1);
+            GoldLogUtil.saveStudyGoldLog(student.getId(), sb.toString(), 1);
             return 1;
         }
         return 0;
@@ -242,7 +242,7 @@ public class GetValidTimeTip {
         if (count == 0 && minute >= condition) {
             sb.append("在").append(learnType).append("模块学习过程中有效时长大于等于30分钟");
 
-            SaveGoldLog.saveStudyGoldLog(student.getId(), sb.toString(), 5);
+            GoldLogUtil.saveStudyGoldLog(student.getId(), sb.toString(), 5);
             return 5;
         }
         return 0;
@@ -271,7 +271,7 @@ public class GetValidTimeTip {
         learnCount = learnMapper.countByExample(learnExample);
         if (learnCount >= condition * (awardCount + 1)) {
             sb.append("在").append(learnType).append("模块本次登录新学大于等于").append(condition).append("个单词");
-            SaveGoldLog.saveStudyGoldLog(student.getId(), sb.toString(), 1);
+            GoldLogUtil.saveStudyGoldLog(student.getId(), sb.toString(), 1);
             return 1;
         }
         return 0;

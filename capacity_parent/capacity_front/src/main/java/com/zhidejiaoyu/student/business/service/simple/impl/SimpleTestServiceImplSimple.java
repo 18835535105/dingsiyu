@@ -33,7 +33,7 @@ import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResultUtil;
 import com.zhidejiaoyu.common.vo.testVo.SentenceTestResultVO;
 import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
 import com.zhidejiaoyu.student.business.test.service.impl.TestServiceImpl;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.SaveLearnAndCapacity;
 import com.zhidejiaoyu.common.constant.PetImageConstant;
 import com.zhidejiaoyu.common.constant.PetMP3Constant;
@@ -689,10 +689,10 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         if (model == null) {
             msg = "id为：" + student.getId() + "的学生在" + simpleCommonMethod.getTestType(wordUnitTestDTO.getClassify())
                     + " 模块下的单元闯关测试中首次闯关成功，获得#" + gold + "#枚金币";
-            SaveGoldLog.saveStudyGoldLog(student.getId(), GenreConstant.UNIT_TEST, (int) gold);
+            GoldLogUtil.saveStudyGoldLog(student.getId(), GenreConstant.UNIT_TEST, (int) gold);
         } else {
             msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + gold + "#枚金币";
-            SaveGoldLog.saveStudyGoldLog(student.getId(), model, (int) gold);
+            GoldLogUtil.saveStudyGoldLog(student.getId(), model, (int) gold);
         }
         LOGGER.info(msg);
         return (int) Math.floor(gold);
