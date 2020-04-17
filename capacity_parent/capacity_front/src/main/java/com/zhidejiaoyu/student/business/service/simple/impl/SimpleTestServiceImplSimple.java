@@ -32,7 +32,7 @@ import com.zhidejiaoyu.common.vo.simple.testVo.SimpleTestResultVO;
 import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResultUtil;
 import com.zhidejiaoyu.common.vo.testVo.SentenceTestResultVO;
 import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
-import com.zhidejiaoyu.student.business.service.impl.TestServiceImpl;
+import com.zhidejiaoyu.student.business.test.service.impl.TestServiceImpl;
 import com.zhidejiaoyu.student.common.SaveGoldLog;
 import com.zhidejiaoyu.student.common.SaveLearnAndCapacity;
 import com.zhidejiaoyu.common.constant.PetImageConstant;

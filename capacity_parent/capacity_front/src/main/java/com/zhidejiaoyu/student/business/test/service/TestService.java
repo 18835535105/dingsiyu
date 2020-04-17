@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.service;
+package com.zhidejiaoyu.student.business.test.service;
 
 import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.vo.testVo.TestDetailVo;
@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
 import com.zhidejiaoyu.common.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.common.dto.phonetic.UnitTestDto;
 import com.zhidejiaoyu.common.vo.TestResultVo;
+import com.zhidejiaoyu.student.business.service.BaseService;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;

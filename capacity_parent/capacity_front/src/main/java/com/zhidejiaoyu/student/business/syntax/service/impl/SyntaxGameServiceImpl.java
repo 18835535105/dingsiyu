@@ -18,7 +18,7 @@ import com.zhidejiaoyu.common.vo.TestResultVo;
 import com.zhidejiaoyu.common.vo.syntax.game.GameSelect;
 import com.zhidejiaoyu.common.vo.syntax.game.GameVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
-import com.zhidejiaoyu.student.business.service.impl.TestServiceImpl;
+import com.zhidejiaoyu.student.business.test.service.impl.TestServiceImpl;
 import com.zhidejiaoyu.student.business.syntax.service.SyntaxGameService;
 import com.zhidejiaoyu.student.common.SaveGoldLog;
 import lombok.extern.slf4j.Slf4j;
