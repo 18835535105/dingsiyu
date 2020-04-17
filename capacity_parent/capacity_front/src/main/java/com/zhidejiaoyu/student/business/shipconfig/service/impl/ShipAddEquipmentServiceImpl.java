@@ -228,15 +228,20 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         List<Map<String, Object>> returnList = new ArrayList<>();
         for (Equipment equipment : equipments) {
             Map<String, Object> equMap = new HashMap<>();
-            if (currentLevelFalg) {
-                nextLevel = equipment.getLevel();
-                nextLevelValue = equipment.getEmpiricalValue();
-                currentLevelFalg = false;
-            }
-            if (equipment.getEmpiricalValue() <= empValue) {
-                currentLevel = equipment.getLevel();
+            if (type != 5) {
+                if (currentLevelFalg) {
+                    nextLevel = equipment.getLevel();
+                    nextLevelValue = equipment.getEmpiricalValue();
+                    currentLevelFalg = false;
+                }
+                if (equipment.getEmpiricalValue() <= empValue) {
+                    currentLevel = equipment.getLevel();
+                    currentLevelFalg = true;
+                }
+            } else {
                 currentLevelFalg = true;
             }
+
             getReturnMap(equipment, equMap, false, true, 1, 2);
             StudentEquipment studentEquipment = studentEquiments.get(equipment.getId());
             List<Map<String, Object>> maps = informationMap.get(equipment.getId());
