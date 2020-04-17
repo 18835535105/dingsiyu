@@ -4,11 +4,26 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.TestStore">
-        <id column="id" property="id" />
-        <result column="title" property="title" />
-        <result column="content" property="content" />
-        <result column="type" property="type" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="type" property="type"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
+    <sql id="more_table_sql">
+        ts.id, ts.title, ts.content, ts.type, ts.update_time
+    </sql>
+    <select id="selectSubjectsByUnitId" resultType="com.zhidejiaoyu.common.vo.goldtestvo.GoldTestVO"
+            parameterType="map">
+        select ts.title,
+               ts.content,
+               ts.type,
+               ta.`select`,
+               ta.answer,
+               ta.analysis
+        from unit_test_store uts
+                 join test_store ts on uts.test_store_id = ts.id
+                 join test_answer ta on ts.id = ta.test_store_id
+    </select>
 
 </mapper>

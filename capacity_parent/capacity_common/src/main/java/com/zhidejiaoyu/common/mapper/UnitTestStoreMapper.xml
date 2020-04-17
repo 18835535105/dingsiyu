@@ -4,10 +4,18 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.UnitTestStore">
-        <id column="id" property="id" />
-        <result column="unit_id" property="unitId" />
-        <result column="test_store_id" property="testStoreId" />
-        <result column="update_time" property="updateTime" />
+        <id column="id" property="id"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="test_store_id" property="testStoreId"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
+    <sql id="base_sql">
+        id, unit_id, test_store_id, update_time
+    </sql>
+    <select id="selectByUnitId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from unit_test_store where unit_id = #{unitId} order by update_time desc limit 1
+    </select>
 
 </mapper>

@@ -1,16 +1,18 @@
 package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import java.time.LocalDateTime;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author zdjy
@@ -21,9 +23,9 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class TestAnswer implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -34,6 +36,7 @@ public class TestAnswer implements Serializable {
     /**
      * 选项
      */
+    @TableField("`select`")
     private String select;
 
     /**
