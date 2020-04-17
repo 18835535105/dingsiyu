@@ -319,6 +319,8 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                 equipmentExpansions1.forEach(expansion -> {
                     Map<Integer, EquipmentExpansion> experienceMap = vo.getExperienceMap();
                     expansion.setImgUrl(getImg(expansion.getImgUrl()));
+                    expansion.setName(ment.getName());
+                    expansion.setGrade(ment.getGrade());
                     experienceMap.put(expansion.getIntensificationDegree(), expansion);
                 });
                 equipmentEquipmentExperienceVos.add(vo);
@@ -388,9 +390,9 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         //获取pk信息
         int pkGames = gauntletMapper.getPkGames(student.getId(), 1);
         int winPkGames = gauntletMapper.getPkGames(student.getId(), 2);
-        double win =0;
-        if(pkGames!=0){
-            win= Math.floor(1.0 * winPkGames / pkGames * 100);
+        double win = 0;
+        if (pkGames != 0) {
+            win = Math.floor(1.0 * winPkGames / pkGames * 100);
         }
 
         //pk场数

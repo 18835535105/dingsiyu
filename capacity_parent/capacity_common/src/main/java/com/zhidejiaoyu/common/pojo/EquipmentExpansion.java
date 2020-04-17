@@ -1,11 +1,13 @@
 package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.checkerframework.framework.qual.ConditionalPostconditionAnnotation;
 
 import java.io.Serializable;
 
@@ -66,6 +68,19 @@ public class EquipmentExpansion extends Model<EquipmentExpansion> {
      * 左侧图片地址
      */
     private String leftImgUrl;
+
+    /**
+     *飞船名 不参加书库操作
+     * @return
+     */
+    @TableField(exist = false)
+    private String name;
+    /**
+     * 飞船等级 不参加书库操作
+     * @return
+     */
+    @TableField(exist = false)
+    private String grade;
 
 
     @Override
