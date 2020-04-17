@@ -155,7 +155,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     public Object wearEquipment(HttpSession session, Long equipmentId, Integer type, String imgUrl) {
         Student student = getStudent(session);
         Equipment equipment = equipmentMapper.selectById(equipmentId);
-        updateUseEqu(type, student, equipment);
+        updateUseEqu(student, equipment);
         if (type == 5) {
             student.setPartUrl(student.getPartUrl() == null ? student.getPartUrl() : student.getPartUrl().replace(AliyunInfoConst.host, ""));
             student.setPetName(equipment.getName());
@@ -165,9 +165,9 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     }
 
     @Override
-    public void updateUseEqu(Integer type, Student student, Equipment equipment) {
+    public void updateUseEqu(Student student, Equipment equipment) {
         //获取全部同类型装备id
-        List<Equipment> equipments = equipmentMapper.selectByType(type);
+        List<Equipment> equipments = equipmentMapper.selectByType(equipment.getType());
         List<Long> equipmentIds = new ArrayList<>();
         equipments.forEach(ment -> equipmentIds.add(ment.getId()));
         //修改学生装备状态
