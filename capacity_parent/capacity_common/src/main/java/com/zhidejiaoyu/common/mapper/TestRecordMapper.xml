@@ -971,11 +971,24 @@
         and to_days(test_start_time)=to_days(#{date})
     </select>
     <select id="selectByGenreAndDate" resultType="map" parameterType="map">
-        select
-        student_id studentId,test_start_time time,point
+        select student_id      studentId,
+               test_start_time time,
+               point
         from test_record
-        where genre=#{genre}
-        and to_days(test_start_time)=to_days(#{date})
+        where genre = #{genre}
+          and to_days(test_start_time) = to_days(#{date})
         group by student_id
+    </select>
+    <select id="countGoldTestByStudentIdAndCourseIds" resultType="java.util.Map" parameterType="map">
+        select course_id courseId, count(distinct unit_id) count
+        from test_record
+        where student_id = #{studentId}
+        and course_id in (
+        <foreach collection="courseIds" separator="," item="courseId">
+            #{courseId}
+        </foreach>
+        )
+        and genre = '金币试卷测试'
+        group by course_id
     </select>
 </mapper>

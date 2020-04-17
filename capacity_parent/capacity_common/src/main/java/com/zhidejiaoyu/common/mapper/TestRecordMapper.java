@@ -359,10 +359,20 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
     int selectFractionByStudentId(@Param("studentId") long studentId);
 
     @MapKey("studentId")
-    Map<Long,Map<String,Object>> selectByStudentIdsAndGenreAndDate(@Param("studentIds") List<Long> studentIds,
-                                                                     @Param("genre") String smallappGenre,@Param("date") Date beforeDaysDate);
+    Map<Long, Map<String, Object>> selectByStudentIdsAndGenreAndDate(@Param("studentIds") List<Long> studentIds,
+                                                                     @Param("genre") String smallappGenre, @Param("date") Date beforeDaysDate);
 
     @MapKey("studentId")
-    Map<Long,Map<String,Object>> selectByGenreAndDate(@Param("genre") String genre,@Param("date") Date date);
+    Map<Long, Map<String, Object>> selectByGenreAndDate(@Param("genre") String genre, @Param("date") Date date);
+
+    /**
+     * 获取各个课程下已经参与过金币试卷测试的单元数
+     *
+     * @param studentId
+     * @param courseIds
+     * @return
+     */
+    @MapKey("courseId")
+    Map<Long, Map<Long, Object>> countGoldTestByStudentIdAndCourseIds(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds);
 }
 

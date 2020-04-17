@@ -16,5 +16,5 @@ public interface GenreConstant {
 
     String SMALLAPP_GENRE = "飞行测试";
 
-    String GOLD_TEST = "金币试卷";
+    String GOLD_TEST = "金币试卷测试";
 }
