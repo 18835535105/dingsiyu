@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -80,6 +81,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         addEquipmentByType(collect.get(3), studentEquipmentIds, empiricalValue.getMissileExperience(), returnList, addIdList, map, null);
         //添加装备需要的物品
         addEquipmentByType(collect.get(4), studentEquipmentIds, empiricalValue.getArmorExperience(), returnList, addIdList, map, null);
+        addEquipmentPeople(collect.get(5),student.getId());
         if (addIdList.size() > 0) {
             addEquipment(addIdList, student.getId(), studentEquipmentMapper);
         }
@@ -88,6 +90,23 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         } else {
             return ServerResponse.createBySuccess();
         }
+
+    }
+
+    private void addEquipmentPeople(List<Equipment> equipments, Long studentId) {
+        equipments.forEach(equipment -> {
+            StudentEquipment studentEquipment = studentEquipmentMapper.selectByStudentIdAndEquipmentId(equipment.getId(), studentId);
+            if (studentEquipment == null) {
+                studentEquipment = new StudentEquipment();
+                studentEquipment.setIntensificationDegree(1);
+                studentEquipment.setStudentId(studentId);
+                studentEquipment.setEquipmentId(equipment.getId());
+                studentEquipment.setType(5);
+                studentEquipment.setCreateTime(new Date());
+                studentEquipmentMapper.insert(studentEquipment);
+            }
+        });
+
 
     }
 
