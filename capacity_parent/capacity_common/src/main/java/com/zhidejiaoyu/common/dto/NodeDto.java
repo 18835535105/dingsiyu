@@ -2,6 +2,7 @@ package com.zhidejiaoyu.common.dto;
 
 import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
 import com.zhidejiaoyu.common.pojo.StudyFlowNew;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -100,4 +101,9 @@ public class NodeDto {
      * false:走 nextFalseFlow 节点
      */
     private String trueFlow;
+
+    /**
+     * 非请求参数
+     */
+    private StudentStudyPlanNew studentStudyPlanNew;
 }

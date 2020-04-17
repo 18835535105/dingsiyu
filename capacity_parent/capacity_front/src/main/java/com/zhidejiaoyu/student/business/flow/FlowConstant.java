@@ -13,6 +13,11 @@ public interface FlowConstant {
      */
 
     /**
+     * 金币试卷节点
+     */
+    long GOLD_TEST = 145;
+
+    /**
      * 学前游戏（简单流程）
      */
     long BEFORE_GROUP_GAME_EASY = 138;

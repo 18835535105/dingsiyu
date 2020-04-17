@@ -11,6 +11,7 @@ import com.zhidejiaoyu.common.pojo.StudentFlowNew;
 import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.HashMap;
@@ -137,7 +138,7 @@ public class InitData {
      * @param studentStudyPlanNew
      * @param modelType           学习的模块
      */
-    public LearnNew saveLearn(StudentStudyPlanNew studentStudyPlanNew, int modelType) {
+    public LearnNew saveLearn(@Nonnull StudentStudyPlanNew studentStudyPlanNew, int modelType) {
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentStudyPlanNew.getStudentId(),
                 studentStudyPlanNew.getUnitId(), studentStudyPlanNew.getEasyOrHard(), modelType);
         if (learnNew == null) {

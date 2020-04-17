@@ -351,6 +351,14 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
                     .finalLevel(basePriority - PriorityUtil.HARD_NUM + errorPriority + timePriority)
                     .build();
             studentStudyPlanNews.add(hardStudentStudyPlan);
+
+            StudentStudyPlanNew goldTestStudyPlan = studentStudyPlanNewBuilder
+                    .easyOrHard(3)
+                    .baseLevel(basePriority - PriorityUtil.HARD_NUM - PriorityUtil.GOLD_TEST_NUM)
+                    .flowId(FlowConstant.GOLD_TEST)
+                    .finalLevel(basePriority - PriorityUtil.HARD_NUM - PriorityUtil.GOLD_TEST_NUM + errorPriority + timePriority)
+                    .build();
+            studentStudyPlanNews.add(goldTestStudyPlan);
         }
 
         this.saveBatch(studentStudyPlanNews);

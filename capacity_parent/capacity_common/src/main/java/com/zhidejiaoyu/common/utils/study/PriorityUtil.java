@@ -32,6 +32,11 @@ public class PriorityUtil {
     public static final int HARD_NUM = 30;
 
     /**
+     * 金币试卷基础值=困难基础值-50
+     */
+    public static final int GOLD_TEST_NUM = 50;
+
+    /**
      * 各个年级对应的基础优先级
      */
     public static final Map<String, Integer> BASE_PRIORITY = new HashMap<>(16);

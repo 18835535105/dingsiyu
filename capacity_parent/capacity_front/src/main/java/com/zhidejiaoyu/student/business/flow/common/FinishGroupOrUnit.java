@@ -429,14 +429,18 @@ public class FinishGroupOrUnit {
         return null;
     }
 
+    public FlowVO finishGoldTest(NodeDto dto) {
+        NodeDto nodeDto = this.getNextFlowInfo(dto);
+        return packageFlowVO.packageFlowVO(nodeDto.getStudyFlowNew(), nodeDto.getStudent(), nodeDto.getUnitId());
+    }
+
     /**
-     * 一键学习单元完成操作
+     * 获取下一个优先级信息
      *
      * @param dto
      * @return
      */
-    private FlowVO finishOneKeyUnit(NodeDto dto) {
-
+    public NodeDto getNextFlowInfo(NodeDto dto) {
         // 更新优先级表中的变化优先级
         StudentStudyPlanNew oldMaxFinalLevel = this.getMaxFinalLevelStudentStudyPlanNew(dto);
         this.updateLevel(dto, oldMaxFinalLevel);
@@ -444,26 +448,43 @@ public class FinishGroupOrUnit {
         Student student = dto.getStudent();
         Long studentId = student.getId();
 
-        logOpt.saveOpenUnitLog(student, dto.getUnitId());
-
-        // 根据优先级初始化学习表数据
         StudentStudyPlanNew maxStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
+
         Long flowId = maxStudentStudyPlanNew.getFlowId();
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(flowId);
+        return NodeDto.builder()
+                .student(dto.getStudent())
+                .studyFlowNew(studyFlowNew)
+                .unitId(maxStudentStudyPlanNew.getUnitId())
+                .studentStudyPlanNew(maxStudentStudyPlanNew)
+                .build();
+    }
 
+    /**
+     * 一键学习单元完成操作
+     *
+     * @param dto
+     * @return
+     */
+    public FlowVO finishOneKeyUnit(NodeDto dto) {
+        NodeDto nodeDto = this.getNextFlowInfo(dto);
+
+        // 根据优先级初始化学习表数据
+        StudyFlowNew studyFlowNew = nodeDto.getStudyFlowNew();
         Integer modelType = FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(studyFlowNew.getFlowName());
-        LearnNew learnNew = initData.saveLearn(maxStudentStudyPlanNew, modelType);
+        LearnNew learnNew = initData.saveLearn(nodeDto.getStudentStudyPlanNew(), modelType);
 
         // 将当前单元的已学习记录状态置为已完成
-        learnHistoryMapper.updateStateByStudentIdAndUnitId(studentId, dto.getUnitId(), 2);
+        Student student = nodeDto.getStudent();
+        learnHistoryMapper.updateStateByStudentIdAndUnitId(student.getId(), dto.getUnitId(), 2);
 
         initData.initStudentFlow(NodeDto.builder()
                 .student(dto.getStudent())
-                .nodeId(flowId)
+                .nodeId(nodeDto.getStudentStudyPlanNew().getFlowId())
                 .learnNew(learnNew)
                 .build());
 
-        return packageFlowVO.packageFlowVO(studyFlowNew, student, maxStudentStudyPlanNew.getUnitId());
+        return packageFlowVO.packageFlowVO(studyFlowNew, student, nodeDto.getUnitId());
     }
 
     /**
