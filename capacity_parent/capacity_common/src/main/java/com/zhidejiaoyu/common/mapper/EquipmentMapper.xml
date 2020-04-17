@@ -87,4 +87,8 @@
         and stuEqu.type=1
     </select>
 
+    <select id="selectByName" parameterType="map" resultMap="BaseResultMap">
+        select <include refid="base_sql"></include>  from equipment where name=#{name} limit 1
+    </select>
+
 </mapper>

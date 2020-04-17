@@ -54,4 +54,6 @@ public interface EquipmentMapper extends BaseMapper<Equipment> {
      * @return
      */
      EquipmentVo selectNameAndGradeByStudentId(@Param("studentId") Long studentId, @Param("type")int type);
+
+    Equipment selectByName(@Param("name") String name);
 }

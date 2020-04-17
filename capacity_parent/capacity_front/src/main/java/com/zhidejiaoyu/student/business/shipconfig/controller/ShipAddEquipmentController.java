@@ -34,6 +34,7 @@ public class ShipAddEquipmentController {
 
     /**
      * 强化装备
+     *
      * @param session
      * @param equipmentId
      * @return
@@ -47,23 +48,22 @@ public class ShipAddEquipmentController {
      * 装备界面
      */
     @GetMapping("/getEquipmentInterface")
-    public Object getEquipmentInterface(HttpSession session,Integer type){
-        return shipAddEquipmentService.getEquipmentInterface(session,type);
+    public Object getEquipmentInterface(HttpSession session, Integer type) {
+        return shipAddEquipmentService.getEquipmentInterface(session, type);
     }
 
     /**
      * 穿戴装备
      */
     @PostMapping("/WearEquipment")
-    public Object wearEquipment(HttpSession session, Long equipmentId){
-        return shipAddEquipmentService.wearEquipment(session,equipmentId);
+    public Object wearEquipment(HttpSession session, Long equipmentId, Integer type, String imgUrl) {
+        return shipAddEquipmentService.wearEquipment(session, equipmentId,type,imgUrl);
     }
 
     @RequestMapping("/getEquipmentNexLevlInfromation")
-    public ServerResponse<Object> getEquipmentNexLevlInfromation(Long equipmentId,HttpSession session) {
-        return shipAddEquipmentService.getEquipmentNexLevlInfromation(equipmentId,session);
+    public ServerResponse<Object> getEquipmentNexLevlInfromation(Long equipmentId, HttpSession session) {
+        return shipAddEquipmentService.getEquipmentNexLevlInfromation(equipmentId, session);
     }
-
 
 
 }
