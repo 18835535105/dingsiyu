@@ -83,7 +83,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         student.setEnergy(currentStudent.getEnergy());
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         Equipment equipment = equipmentMapper.selectByName(student.getPetName());
-        shipAddEquipmentService.updateUseEqu(5,student,equipment);
+        shipAddEquipmentService.updateUseEqu(student,equipment);
         return ServerResponse.createBySuccess();
     }
 
