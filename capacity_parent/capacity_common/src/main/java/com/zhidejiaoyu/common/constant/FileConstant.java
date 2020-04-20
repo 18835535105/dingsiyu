@@ -72,4 +72,9 @@ public interface FileConstant {
      * 副本挑战图片路径
      */
     String COPY_IMG = "/static/img/ship-config/base_info/copy/";
+
+    /**
+     * 金币测试图片路径
+     */
+    String TEST_STORE_IMG="imgs/testImg/";
 }
