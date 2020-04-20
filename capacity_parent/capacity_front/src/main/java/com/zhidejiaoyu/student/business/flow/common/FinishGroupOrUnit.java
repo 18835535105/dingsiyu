@@ -351,6 +351,8 @@ public class FinishGroupOrUnit {
                 return isEasy ? FlowConstant.FREE_TEKS_LISTEN : FlowConstant.FREE_TEKS_TRAIN;
             case 5:
                 return isEasy ? FlowConstant.FREE_SYNTAX_GAME : FlowConstant.FREE_SYNTAX_WRITE;
+            case 6:
+                return FlowConstant.GOLD_TEST;
             default:
                 return null;
         }
