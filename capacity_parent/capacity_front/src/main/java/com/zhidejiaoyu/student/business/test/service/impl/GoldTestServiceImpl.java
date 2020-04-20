@@ -1,7 +1,9 @@
 package com.zhidejiaoyu.student.business.test.service.impl;
 
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
+import com.zhidejiaoyu.common.constant.FileConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
@@ -67,23 +69,12 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
         collect.forEach((type, list) -> {
             GoldTestVO goldTestVO = list.get(0);
             List<GoldTestSubjectsVO.Subjects> subjects = new ArrayList<>(list.size());
-            if (StringUtils.isEmpty(goldTestVO.getContent())) {
-                // 说明不是英语文章
-                packageSubjects(list, subjects);
-                vos.add(GoldTestSubjectsVO.builder()
-                        .type(goldTestVO.getType())
-                        .subjects(subjects)
-                        .build());
-            } else {
-                // 说明是英语文章
-                // 说明不是英语文章
-                packageSubjects(list, subjects);
-                vos.add(GoldTestSubjectsVO.builder()
-                        .type(goldTestVO.getType())
-                        .subjects(subjects)
-                        .content(goldTestVO.getContent().split("\n"))
-                        .build());
-            }
+            packageSubjects(list, subjects);
+            vos.add(GoldTestSubjectsVO.builder()
+                    .type(goldTestVO.getType())
+                    .subjects(subjects)
+                    .content(StringUtils.isEmpty(goldTestVO.getContent()) ? new String[0] : goldTestVO.getContent().split("\n"))
+                    .build());
         });
         return ServerResponse.createBySuccess(vos);
     }
@@ -95,12 +86,47 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
      * @param subjects
      */
     public void packageSubjects(ArrayList<GoldTestVO> list, List<GoldTestSubjectsVO.Subjects> subjects) {
-        list.forEach(vo -> subjects.add(GoldTestSubjectsVO.Subjects.builder()
-                .title(vo.getTitle().contains("$&$") ? vo.getTitle() : vo.getTitle() + "$&$")
-                .selects(StringUtils.isEmpty(vo.getSelect()) ? new String[0] : vo.getSelect().split("\\$&\\$"))
-                .analysis(vo.getAnalysis())
-                .answer(vo.getAnswer())
-                .build()));
+        list.forEach(vo -> {
+
+            if (StringUtils.isNotEmpty(vo.getTitle()) && vo.getTitle().contains("&&TP")) {
+                StringBuilder sb = getImgUrl(vo.getTitle());
+                vo.setTitle(sb.toString());
+            }
+            if (StringUtils.isNotEmpty(vo.getSelect()) && vo.getSelect().contains("&&TP")) {
+                StringBuilder sb = getImgUrl(vo.getSelect());
+                vo.setSelect(sb.toString());
+            }
+
+            String[] title = new String[0];
+            if (StringUtils.isNotEmpty(vo.getTitle())) {
+                title = vo.getTitle().split("\\n");
+                for (int i = 0; i < title.length; i++) {
+                    if (!title[i].contains("$&$")) {
+                        title[i] += "$&$";
+                    }
+                }
+            }
+
+            subjects.add(GoldTestSubjectsVO.Subjects.builder()
+                    .title(title)
+                    .selects(StringUtils.isEmpty(vo.getSelect()) ? Collections.emptyList() : Arrays.asList(vo.getSelect().split("\\$&\\$")))
+                    .analysis(StringUtils.isNotEmpty(vo.getAnalysis()) ? vo.getAnalysis().split("\\n") : new String[0])
+                    .answer(StringUtils.isNotEmpty(vo.getAnswer()) ? vo.getAnswer().split("\\n") : new String[0])
+                    .build());
+        });
+    }
+
+    public StringBuilder getImgUrl(String str) {
+        String[] split = str.split("&&");
+        StringBuilder sb = new StringBuilder();
+        for (String s : split) {
+            if (s.contains("TP")) {
+                sb.append("&&").append(GetOssFile.getPublicObjectUrl(FileConstant.TEST_STORE_IMG)).append(s.substring(2)).append(".png").append("&&");
+            } else {
+                sb.append(s);
+            }
+        }
+        return sb;
     }
 
     @Override

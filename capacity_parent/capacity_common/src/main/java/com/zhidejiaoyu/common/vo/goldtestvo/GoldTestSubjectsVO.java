@@ -44,22 +44,22 @@ public class GoldTestSubjectsVO implements Serializable {
         /**
          * 题目
          */
-        private String title;
+        private String[] title;
 
         /**
          * 选项列表
          */
-        private String[] selects;
+        private List<String> selects;
 
         /**
          * 答案
          */
-        private String answer;
+        private String[] answer;
 
         /**
          * 解析
          */
-        private String analysis;
+        private String[] analysis;
     }
 
 }
