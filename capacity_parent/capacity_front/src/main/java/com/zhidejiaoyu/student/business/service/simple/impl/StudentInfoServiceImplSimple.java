@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.common.mapper.EquipmentMapper;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
 import com.zhidejiaoyu.common.vo.simple.studentInfoVo.ChildMedalVo;
@@ -15,11 +16,13 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.simple.SimpleStudentInfoServiceSimple;
+import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
@@ -49,6 +52,12 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     @Autowired
     private MedalAwardAsync medalAwardAsync;
 
+    @Resource
+    private EquipmentMapper equipmentMapper;
+
+    @Resource
+    private ShipAddEquipmentService shipAddEquipmentService;
+
     @Override
     public ServerResponse<String> judgeOldPassword(String nowPassword, String oldPassword) {
 
@@ -73,6 +82,8 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         student.setDiamond(currentStudent.getDiamond());
         student.setEnergy(currentStudent.getEnergy());
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
+        Equipment equipment = equipmentMapper.selectByName(student.getPetName());
+        shipAddEquipmentService.updateUseEqu(student,equipment);
         return ServerResponse.createBySuccess();
     }
 

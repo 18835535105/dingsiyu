@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.shipconfig.service.impl;
 
+import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.Equipment;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -79,6 +81,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         addEquipmentByType(collect.get(3), studentEquipmentIds, empiricalValue.getMissileExperience(), returnList, addIdList, map, null);
         //添加装备需要的物品
         addEquipmentByType(collect.get(4), studentEquipmentIds, empiricalValue.getArmorExperience(), returnList, addIdList, map, null);
+        addEquipmentPeople(collect.get(5),student.getId());
         if (addIdList.size() > 0) {
             addEquipment(addIdList, student.getId(), studentEquipmentMapper);
         }
@@ -87,6 +90,23 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         } else {
             return ServerResponse.createBySuccess();
         }
+
+    }
+
+    private void addEquipmentPeople(List<Equipment> equipments, Long studentId) {
+        equipments.forEach(equipment -> {
+            StudentEquipment studentEquipment = studentEquipmentMapper.selectByStudentIdAndEquipmentId(equipment.getId(), studentId);
+            if (studentEquipment == null) {
+                studentEquipment = new StudentEquipment();
+                studentEquipment.setIntensificationDegree(1);
+                studentEquipment.setStudentId(studentId);
+                studentEquipment.setEquipmentId(equipment.getId());
+                studentEquipment.setType(5);
+                studentEquipment.setCreateTime(new Date());
+                studentEquipmentMapper.insert(studentEquipment);
+            }
+        });
+
 
     }
 
@@ -151,20 +171,30 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     }
 
     @Override
-    public Object wearEquipment(HttpSession session, Long equipmentId) {
+    public Object wearEquipment(HttpSession session, Long equipmentId, Integer type, String imgUrl) {
         Student student = getStudent(session);
         Equipment equipment = equipmentMapper.selectById(equipmentId);
+        updateUseEqu(student, equipment);
+        if (type == 5) {
+            student.setPartUrl(student.getPartUrl() == null ? student.getPartUrl() : student.getPartUrl().replace(AliyunInfoConst.host, ""));
+            student.setPetName(equipment.getName());
+            studentMapper.updateById(student);
+        }
+        return ServerResponse.createBySuccess();
+    }
+
+    @Override
+    public void updateUseEqu(Student student, Equipment equipment) {
         //获取全部同类型装备id
         List<Equipment> equipments = equipmentMapper.selectByType(equipment.getType());
         List<Long> equipmentIds = new ArrayList<>();
         equipments.forEach(ment -> equipmentIds.add(ment.getId()));
         //修改学生装备状态
         studentEquipmentMapper.updateTypeByEquipmentId(equipmentIds, student.getId());
-        StudentEquipment studentEquipment = studentEquipmentMapper.selectByStudentIdAndEquipmentId(student.getId(), equipmentId);
+        StudentEquipment studentEquipment = studentEquipmentMapper.selectByStudentIdAndEquipmentId(student.getId(), equipment.getId());
         studentEquipment.setType(1);
         studentEquipmentMapper.updateById(studentEquipment);
         updateLeaderBoards(student);
-        return ServerResponse.createBySuccess();
     }
 
     /**
@@ -228,15 +258,20 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         List<Map<String, Object>> returnList = new ArrayList<>();
         for (Equipment equipment : equipments) {
             Map<String, Object> equMap = new HashMap<>();
-            if (currentLevelFalg) {
-                nextLevel = equipment.getLevel();
-                nextLevelValue = equipment.getEmpiricalValue();
-                currentLevelFalg = false;
-            }
-            if (equipment.getEmpiricalValue() <= empValue) {
-                currentLevel = equipment.getLevel();
+            if (type != 5) {
+                if (currentLevelFalg) {
+                    nextLevel = equipment.getLevel();
+                    nextLevelValue = equipment.getEmpiricalValue();
+                    currentLevelFalg = false;
+                }
+                if (equipment.getEmpiricalValue() <= empValue) {
+                    currentLevel = equipment.getLevel();
+                    currentLevelFalg = true;
+                }
+            } else {
                 currentLevelFalg = true;
             }
+
             getReturnMap(equipment, equMap, false, true, 1, 2);
             StudentEquipment studentEquipment = studentEquiments.get(equipment.getId());
             List<Map<String, Object>> maps = informationMap.get(equipment.getId());
