@@ -114,6 +114,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
 
         TestResultVo testResultVo = new TestResultVo();
         TestRecord testRecord = new TestRecord();
+        testRecord.setPoint(dto.getPoint());
 
         String testMessage = TestServiceImpl.getTestMessage(student, testResultVo, testRecord, PointConstant.EIGHTY, petSayUtil);
         double goldAddition = 0;
@@ -134,7 +135,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
         testRecord.setCourseId(dto.getCourseId());
         testRecord.setErrorCount(dto.getErrorCount());
         testRecord.setGenre(GenreConstant.GOLD_TEST);
-        testRecord.setPoint(dto.getPoint());
+
         testRecord.setQuantity(dto.getErrorCount() + dto.getRightCount());
         testRecord.setRightCount(dto.getRightCount());
         testRecord.setStudentId(student.getId());
