@@ -88,28 +88,30 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
     public void packageSubjects(ArrayList<GoldTestVO> list, List<GoldTestSubjectsVO.Subjects> subjects) {
         list.forEach(vo -> {
 
-            if (StringUtils.isNotEmpty(vo.getTitle()) && vo.getTitle().contains("&&TP")) {
-                StringBuilder sb = getImgUrl(vo.getTitle());
+            String title = vo.getTitle();
+            String pictureSplit = "&&TP";
+            if (StringUtils.isNotEmpty(title) && title.contains(pictureSplit)) {
+                StringBuilder sb = getImgUrl(title);
                 vo.setTitle(sb.toString());
             }
-            if (StringUtils.isNotEmpty(vo.getSelect()) && vo.getSelect().contains("&&TP")) {
-                StringBuilder sb = getImgUrl(vo.getSelect());
+            String select = vo.getSelect();
+            if (StringUtils.isNotEmpty(select) && select.contains(pictureSplit)) {
+                StringBuilder sb = getImgUrl(select);
                 vo.setSelect(sb.toString());
             }
 
-            String[] title = new String[0];
-            if (StringUtils.isNotEmpty(vo.getTitle())) {
-                title = vo.getTitle().split("\\n");
-                for (int i = 0; i < title.length; i++) {
-                    if (!title[i].contains("$&$")) {
-                        title[i] += "$&$";
-                    }
+            String[] titleArr = new String[0];
+            if (StringUtils.isNotEmpty(title)) {
+                String spaceSplit = "$&$";
+                if (!title.contains(spaceSplit)) {
+                    title += spaceSplit;
                 }
+                titleArr = title.split("\\n");
             }
 
             subjects.add(GoldTestSubjectsVO.Subjects.builder()
-                    .title(replaceArrayStr(title))
-                    .selects(StringUtils.isEmpty(vo.getSelect()) ? Collections.emptyList() : Arrays.asList(replaceArrayStr(vo.getSelect().split("\\$&\\$"))))
+                    .title(replaceArrayStr(titleArr))
+                    .selects(StringUtils.isEmpty(select) ? Collections.emptyList() : Arrays.asList(replaceArrayStr(select.split("\\$&\\$"))))
                     .analysis(StringUtils.isNotEmpty(vo.getAnalysis()) ? replaceArrayStr(vo.getAnalysis().split("\\n")) : new String[0])
                     .answer(StringUtils.isNotEmpty(vo.getAnswer()) ? replaceArrayStr(vo.getAnswer().split("\\n")) : new String[0])
                     .build());
