@@ -116,7 +116,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
                     .title(replaceArrayStr(titleArr))
                     .selects(StringUtils.isEmpty(select) ? Collections.emptyList() : Arrays.asList(replaceArrayStr(select.split("\\$&\\$"))))
                     .analysis(StringUtils.isNotEmpty(vo.getAnalysis()) ? replaceArrayStr(vo.getAnalysis().split("\\n")) : new String[0])
-                    .answer(StringUtils.isNotEmpty(vo.getAnswer()) ? replaceArrayStr(vo.getAnswer().split("\\n")) : new String[0])
+                    .answer(StringUtils.isNotEmpty(vo.getAnswer()) ? replaceArrayStr(vo.getAnswer().replace("#", "").split("\\n")) : new String[0])
                     .build());
         });
     }
