@@ -91,17 +91,18 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
             String title = vo.getTitle();
             String pictureSplit = "&&TP";
             if (StringUtils.isNotEmpty(title) && title.contains(pictureSplit)) {
-                StringBuilder sb = getImgUrl(title);
-                vo.setTitle(sb.toString());
+                vo.setTitle(getImgUrl(title));
             }
             String select = vo.getSelect();
             if (StringUtils.isNotEmpty(select) && select.contains(pictureSplit)) {
-                StringBuilder sb = getImgUrl(select);
-                vo.setSelect(sb.toString());
+                vo.setSelect(getImgUrl(select));
             }
 
             String[] titleArr = new String[0];
             if (StringUtils.isNotEmpty(title)) {
+                if (title.contains(pictureSplit)) {
+                    title = getImgUrl(title);
+                }
                 String spaceSplit = "$&$";
                 if (!title.contains(spaceSplit)) {
                     title += spaceSplit;
@@ -134,7 +135,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
      * @param str
      * @return
      */
-    public StringBuilder getImgUrl(String str) {
+    public String getImgUrl(String str) {
         String[] split = str.split("&&");
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
@@ -144,7 +145,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
                 sb.append(s);
             }
         }
-        return sb;
+        return sb.toString();
     }
 
     @Override
