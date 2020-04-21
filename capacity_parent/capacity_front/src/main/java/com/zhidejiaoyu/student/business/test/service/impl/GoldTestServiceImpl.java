@@ -73,7 +73,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
             vos.add(GoldTestSubjectsVO.builder()
                     .type(goldTestVO.getType())
                     .subjects(subjects)
-                    .content(StringUtils.isEmpty(goldTestVO.getContent()) ? new String[0] : goldTestVO.getContent().split("\n"))
+                    .content(StringUtils.isEmpty(goldTestVO.getContent()) ? new String[0] : replaceArrayStr(goldTestVO.getContent().split("\n")))
                     .build());
         });
         return ServerResponse.createBySuccess(vos);
@@ -108,14 +108,30 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
             }
 
             subjects.add(GoldTestSubjectsVO.Subjects.builder()
-                    .title(title)
-                    .selects(StringUtils.isEmpty(vo.getSelect()) ? Collections.emptyList() : Arrays.asList(vo.getSelect().split("\\$&\\$")))
-                    .analysis(StringUtils.isNotEmpty(vo.getAnalysis()) ? vo.getAnalysis().split("\\n") : new String[0])
-                    .answer(StringUtils.isNotEmpty(vo.getAnswer()) ? vo.getAnswer().split("\\n") : new String[0])
+                    .title(replaceArrayStr(title))
+                    .selects(StringUtils.isEmpty(vo.getSelect()) ? Collections.emptyList() : Arrays.asList(replaceArrayStr(vo.getSelect().split("\\$&\\$"))))
+                    .analysis(StringUtils.isNotEmpty(vo.getAnalysis()) ? replaceArrayStr(vo.getAnalysis().split("\\n")) : new String[0])
+                    .answer(StringUtils.isNotEmpty(vo.getAnswer()) ? replaceArrayStr(vo.getAnswer().split("\\n")) : new String[0])
                     .build());
         });
     }
 
+    /**
+     * 将数组中的 \n 符号替换为空字符
+     *
+     * @param string
+     * @return
+     */
+    public String[] replaceArrayStr(String[] string) {
+        return Arrays.stream(string).map(str -> str.replace("\\n", "").replace("\n", "").trim()).toArray(String[]::new);
+    }
+
+    /**
+     * 拼接测试题图片url
+     *
+     * @param str
+     * @return
+     */
     public StringBuilder getImgUrl(String str) {
         String[] split = str.split("&&");
         StringBuilder sb = new StringBuilder();
@@ -184,7 +200,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
 
     public static void main(String[] args) {
         System.out.println(Arrays.toString("123 $&$ 41323".split("\\$&\\$")));
-
+        System.out.println("arer \n".replace("\\n", ""));
         System.out.println(Arrays.toString("args \\n\n 123".split("\n")));
     }
 }
