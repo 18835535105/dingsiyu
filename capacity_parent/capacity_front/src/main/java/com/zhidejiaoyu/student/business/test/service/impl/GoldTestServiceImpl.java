@@ -87,6 +87,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
      */
     public void packageSubjects(ArrayList<GoldTestVO> list, List<GoldTestSubjectsVO.Subjects> subjects) {
         list.forEach(vo -> {
+            // 图片标识符
             String pictureSplit = "&&TP";
 
             String select = vo.getSelect();
@@ -97,6 +98,9 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
             String title = vo.getTitle();
             String[] titleArr = new String[0];
             if (StringUtils.isNotEmpty(title)) {
+                if (Objects.equals(vo.getType(), "连词成句")) {
+                    title = replaceStr(title);
+                }
                 if (title.contains(pictureSplit)) {
                     title = getImgUrl(title);
                 }
@@ -123,7 +127,20 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
      * @return
      */
     public String[] replaceArrayStr(String[] string) {
-        return Arrays.stream(string).map(str -> str.replace("\\n", "").replace("\n", "").trim()).toArray(String[]::new);
+        return Arrays.stream(string).map(this::replaceStr).toArray(String[]::new);
+    }
+
+    /**
+     * 将字符串中的 \n 符号替换为空字符
+     *
+     * @param str
+     * @return
+     */
+    private String replaceStr(String str) {
+        if (StringUtils.isEmpty(str) || !str.contains("\n")) {
+            return str;
+        }
+        return str.replace("\\n", "").replace("\n", "").trim();
     }
 
     /**
