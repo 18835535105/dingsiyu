@@ -137,10 +137,10 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
      * @return
      */
     private String replaceStr(String str) {
-        if (StringUtils.isEmpty(str) || !str.contains("\n")) {
+        if (StringUtils.isEmpty(str)) {
             return str;
         }
-        return str.replace("\\n", "").replace("\n", "").trim();
+        return str.replace("\\n", "").replace("\n", "").replace("\t", "").trim();
     }
 
     /**
