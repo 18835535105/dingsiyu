@@ -15,7 +15,8 @@
     </sql>
     <select id="selectSubjectsByUnitId" resultType="com.zhidejiaoyu.common.vo.goldtestvo.GoldTestVO"
             parameterType="map">
-        select ts.title,
+        select ts.id,
+               ts.title,
                ts.content,
                ts.type,
                ta.`select`,

@@ -112,6 +112,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
             }
 
             subjects.add(GoldTestSubjectsVO.Subjects.builder()
+                    .id(vo.getId())
                     .title(replaceArrayStr(titleArr))
                     .selects(StringUtils.isEmpty(select) ? Collections.emptyList() : Arrays.asList(replaceArrayStr(select.split("\\$&\\$"))))
                     .analysis(StringUtils.isNotEmpty(vo.getAnalysis()) ? replaceArrayStr(vo.getAnalysis().split("\\n")) : new String[0])
@@ -121,7 +122,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
     }
 
     /**
-     * 将数组中的 \n 符号替换为空字符
+     * 将数组中的 \n,\t 符号替换为空字符
      *
      * @param string
      * @return
@@ -131,7 +132,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
     }
 
     /**
-     * 将字符串中的 \n 符号替换为空字符
+     * 将字符串中的 \n，\t 符号替换为空字符
      *
      * @param str
      * @return

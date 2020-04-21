@@ -42,6 +42,11 @@ public class GoldTestSubjectsVO implements Serializable {
     public static class Subjects {
 
         /**
+         * 题目id
+         */
+        private Long id;
+
+        /**
          * 题目
          */
         private String[] title;

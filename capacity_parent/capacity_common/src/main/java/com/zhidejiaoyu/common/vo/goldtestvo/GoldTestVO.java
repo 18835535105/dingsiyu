@@ -12,6 +12,11 @@ import lombok.Data;
 public class GoldTestVO {
 
     /**
+     * 每道题的id
+     */
+    private Long id;
+
+    /**
      * 题目
      */
     private String title;
