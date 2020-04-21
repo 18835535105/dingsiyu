@@ -87,17 +87,14 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
      */
     public void packageSubjects(ArrayList<GoldTestVO> list, List<GoldTestSubjectsVO.Subjects> subjects) {
         list.forEach(vo -> {
-
-            String title = vo.getTitle();
             String pictureSplit = "&&TP";
-            if (StringUtils.isNotEmpty(title) && title.contains(pictureSplit)) {
-                vo.setTitle(getImgUrl(title));
-            }
+
             String select = vo.getSelect();
             if (StringUtils.isNotEmpty(select) && select.contains(pictureSplit)) {
-                vo.setSelect(getImgUrl(select));
+                select = getImgUrl(select);
             }
 
+            String title = vo.getTitle();
             String[] titleArr = new String[0];
             if (StringUtils.isNotEmpty(title)) {
                 if (title.contains(pictureSplit)) {
