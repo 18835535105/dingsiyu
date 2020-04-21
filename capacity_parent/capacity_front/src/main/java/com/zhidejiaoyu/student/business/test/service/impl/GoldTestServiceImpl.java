@@ -128,7 +128,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
      * @return
      */
     public String[] replaceArrayStr(String[] string) {
-        return Arrays.stream(string).map(this::replaceStr).toArray(String[]::new);
+        return Arrays.stream(string).map(this::replaceStr).filter(StringUtils::isNotEmpty).toArray(String[]::new);
     }
 
     /**
