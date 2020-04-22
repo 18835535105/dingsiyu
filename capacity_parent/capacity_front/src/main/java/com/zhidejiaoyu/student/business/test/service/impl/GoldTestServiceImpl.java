@@ -108,15 +108,15 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
                 if (!title.contains(spaceSplit)) {
                     title += spaceSplit;
                 }
-                titleArr = replaceN(title);
+                titleArr = replaceN(title).split("\\n");
             }
 
             subjects.add(GoldTestSubjectsVO.Subjects.builder()
                     .id(vo.getId())
                     .title(replaceArrayStr(titleArr))
                     .selects(StringUtils.isEmpty(select) ? Collections.emptyList() : Arrays.asList(replaceArrayStr(select.split("\\$&\\$"))))
-                    .analysis(StringUtils.isNotEmpty(vo.getAnalysis()) ? replaceArrayStr(replaceN(vo.getAnalysis())) : new String[0])
-                    .answer(StringUtils.isNotEmpty(vo.getAnswer()) ? replaceArrayStr(replaceN(vo.getAnswer().replace("#", ""))) : new String[0])
+                    .analysis(StringUtils.isNotEmpty(vo.getAnalysis()) ? replaceArrayStr(replaceN(vo.getAnalysis()).split("\\n")) : new String[0])
+                    .answer(StringUtils.isNotEmpty(vo.getAnswer()) ? replaceArrayStr(replaceN(vo.getAnswer()).split("#")) : new String[0])
                     .build());
         });
     }
@@ -127,8 +127,8 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
      * @param str
      * @return
      */
-    private String[] replaceN(String str) {
-        return str.replace("\\n", "##").replace("\n", "").split("##");
+    private String replaceN(String str) {
+        return str.replace("\\n", "##").replace("\n", "").replace("##", "\\n");
     }
 
     /**
