@@ -108,17 +108,27 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
                 if (!title.contains(spaceSplit)) {
                     title += spaceSplit;
                 }
-                titleArr = title.split("\\n");
+                titleArr = replaceN(title);
             }
 
             subjects.add(GoldTestSubjectsVO.Subjects.builder()
                     .id(vo.getId())
                     .title(replaceArrayStr(titleArr))
                     .selects(StringUtils.isEmpty(select) ? Collections.emptyList() : Arrays.asList(replaceArrayStr(select.split("\\$&\\$"))))
-                    .analysis(StringUtils.isNotEmpty(vo.getAnalysis()) ? replaceArrayStr(vo.getAnalysis().split("\\n")) : new String[0])
-                    .answer(StringUtils.isNotEmpty(vo.getAnswer()) ? replaceArrayStr(vo.getAnswer().replace("#", "").split("\\n")) : new String[0])
+                    .analysis(StringUtils.isNotEmpty(vo.getAnalysis()) ? replaceArrayStr(replaceN(vo.getAnalysis())) : new String[0])
+                    .answer(StringUtils.isNotEmpty(vo.getAnswer()) ? replaceArrayStr(replaceN(vo.getAnswer().replace("#", ""))) : new String[0])
                     .build());
         });
+    }
+
+    /**
+     * 替换掉数据中手动换行符
+     *
+     * @param str
+     * @return
+     */
+    private String[] replaceN(String str) {
+        return str.replace("\\n", "##").replace("\n", "").split("##");
     }
 
     /**
