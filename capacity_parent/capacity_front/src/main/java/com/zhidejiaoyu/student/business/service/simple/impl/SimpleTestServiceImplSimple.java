@@ -6,15 +6,14 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.constant.test.GenreConstant;
-import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
-import com.zhidejiaoyu.common.vo.simple.testVo.TestDetailVo;
-import com.zhidejiaoyu.common.vo.simple.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
-import com.zhidejiaoyu.common.constant.TestAwardGoldConstant;
-import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.*;
+import com.zhidejiaoyu.common.constant.study.PointConstant;
+import com.zhidejiaoyu.common.constant.test.GenreConstant;
+import com.zhidejiaoyu.common.dto.WordUnitTestDTO;
+import com.zhidejiaoyu.common.mapper.StudentExpansionMapper;
+import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.TestRecordMapper;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -24,62 +23,40 @@ import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.study.simple.SimpleCommonMethod;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.PictureUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.TestGoldUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
+import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
+import com.zhidejiaoyu.common.utils.math.MathUtil;
+import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
+import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
-import com.zhidejiaoyu.common.vo.simple.testVo.SimpleTestResultVO;
+import com.zhidejiaoyu.common.utils.simple.SimpleCcieUtil;
 import com.zhidejiaoyu.common.utils.simple.testUtil.SimpleTestResultUtil;
+import com.zhidejiaoyu.common.vo.TestResultVo;
+import com.zhidejiaoyu.common.vo.simple.testVo.SimpleTestResultVO;
+import com.zhidejiaoyu.common.vo.simple.testVo.TestDetailVo;
+import com.zhidejiaoyu.common.vo.simple.testVo.TestRecordVo;
 import com.zhidejiaoyu.common.vo.testVo.SentenceTestResultVO;
-import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
+import com.zhidejiaoyu.student.business.service.simple.SimpleTestServiceSimple;
+import com.zhidejiaoyu.student.business.shipconfig.service.impl.ShipAddEquipmentServiceImpl;
 import com.zhidejiaoyu.student.business.test.service.impl.TestServiceImpl;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.SaveLearnAndCapacity;
-import com.zhidejiaoyu.common.constant.PetImageConstant;
-import com.zhidejiaoyu.common.constant.PetMP3Constant;
-import com.zhidejiaoyu.common.dto.WordUnitTestDTO;
-import com.zhidejiaoyu.student.business.service.simple.SimpleTestServiceSimple;
-import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
-import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
-import com.zhidejiaoyu.common.utils.simple.SimpleCcieUtil;
-import com.zhidejiaoyu.common.vo.TestResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @Slf4j
 @Service
 public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTestRecordMapper, TestRecord> implements SimpleTestServiceSimple {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(SimpleTestServiceImplSimple.class);
-
-    /**
-     * 50分
-     */
-    private static final int FIVE = 50;
-    /**
-     * 60分
-     */
-    private static final int SIX = 60;
-    /**
-     * 80
-     */
-    private static final int PASS = 80;
-    /**
-     * 90
-     */
-    private static final int NINETY_POINT = 90;
-    /**
-     * 100
-     */
-    private static final int FULL_MARK = 100;
 
     @Autowired
     private TestRecordMapper testRecordMapper;
@@ -91,7 +68,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     private SimpleVocabularyMapper vocabularyMapper;
 
     @Autowired
-    private SimpleStudentMapper simpleStudentMapper;
+    private StudentMapper studentMapper;
 
     @Autowired
     private SimpleTestResultUtil simpleTestResultUtil;
@@ -144,6 +121,9 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     @Autowired
     private TestGoldUtil testGoldUtil;
 
+    @Resource
+    private StudentExpansionMapper studentExpansionMapper;
+
     /**
      * 学前测试/学后测试,从课程取50道题
      * 保存的时候只保存测试记录
@@ -171,7 +151,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         }
 
         // 随机取50道题 / 100道题
-        List<Vocabulary> vocabularies = null;
+        List<Vocabulary> vocabularies;
         // 学前测试/学后测试
         if (typeModel != 3) {
             vocabularies = vocabularyMapper.getRandomCourseThirty(courseId);
@@ -181,7 +161,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         }
 
         // 处理结果
-        List<SimpleTestResultVO> testResults = null;
+        List<SimpleTestResultVO> testResults;
         if (typeModel != 3) {
             testResults = simpleTestResultUtil.getWordTestesForCourse(type, vocabularies.size(), vocabularies, courseId);
         } else {
@@ -267,7 +247,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Map<String, Object>> saveGameTestRecord(HttpSession session, TestRecord testRecord) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
+        Student student = super.getStudent();
 
         // 存放响应的 提示语，推送课程名称，奖励金币数
         Map<String, Object> map = new HashMap<>(16);
@@ -309,7 +289,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     private void createGameTestRecord(TestRecord testRecord, Student student, Map<String, Object> map) {
         testRecord.setExplain("游戏测试次数#1#");
         String msg;
-        if (testRecord.getPoint() >= PASS) {
+        if (testRecord.getPoint() >= PointConstant.EIGHTY) {
             msg = "恭喜你旗开得胜，祝未来勇闯天涯！";
             map.put("tip", msg);
             testRecord.setExplain(testRecord.getExplain() + msg);
@@ -331,7 +311,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         int count = simpleTestRecordMapper.insert(testRecord);
         if (count == 0) {
             String errMsg = "id为 " + student.getId() + " 的学生 " + student.getStudentName() + " 游戏测试记录保存失败！";
-            LOGGER.error(errMsg);
+            log.error(errMsg);
             RunLog runLog = new RunLog(2, errMsg, new Date());
             runLogMapper.insertSelective(runLog);
         }
@@ -351,7 +331,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
         testRecord.setExplain("游戏测试次数#2#");
         String msg;
-        if (testRecord.getPoint() >= PASS) {
+        if (testRecord.getPoint() >= PointConstant.EIGHTY) {
             msg = "恭喜你旗开得胜，祝未来勇闯天涯！";
             map.put("tip", msg);
             testRecord.setExplain(testRecord.getExplain() + msg);
@@ -383,7 +363,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         int count = simpleTestRecordMapper.updateByPrimaryKeySelective(testRecord);
         if (count == 0) {
             String errMsg = "id为 " + student.getId() + " 的学生 " + student.getStudentName() + " 更新游戏测试记录失败！";
-            LOGGER.error(errMsg);
+            log.error(errMsg);
             RunLog runLog = new RunLog(2, errMsg, new Date());
             runLogMapper.insert(runLog);
         }
@@ -399,17 +379,17 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     private int award(Student student, TestRecord testRecord) {
         int point = testRecord.getPoint();
         int goldCount = 0;
-        if (point >= PASS && point < NINETY_POINT) {
+        if (point >= PointConstant.EIGHTY && point < PointConstant.NINETY) {
             goldCount = 10;
             this.saveLog(student, goldCount, null, "游戏测试");
-        } else if (point >= NINETY_POINT && point < FULL_MARK) {
+        } else if (point >= PointConstant.NINETY && point < PointConstant.HUNDRED) {
             goldCount = 20;
             this.saveLog(student, goldCount, null, "游戏测试");
-        } else if (point == FULL_MARK) {
+        } else if (point == PointConstant.HUNDRED) {
             goldCount = 30;
             this.saveLog(student, goldCount, null, "游戏测试");
         }
-        simpleStudentMapper.updateByPrimaryKeySelective(student);
+        studentMapper.updateById(student);
 
         return goldCount;
     }
@@ -423,9 +403,6 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      * @return 解锁单元提示语
      */
     private String unlockNextUnit(Student student, Long courseId, Long unitId, Integer type) {
-        // 查看当前单元的所有模块是否都已完成单元闯关测试
-        int count = simpleTestRecordMapper.selectByUnitId(student.getId(), unitId, type);
-
         // 开启下一单元
         return unlockUnit(student, courseId, unitId, type);
     }
@@ -470,7 +447,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     public ServerResponse<List<SimpleTestResultVO>> getWordUnitTest(HttpSession session, Long unitId,
                                                                     Boolean isTrue, int typeModel, boolean example, Integer model) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        student = simpleStudentMapper.selectById(student.getId());
+        student = studentMapper.selectById(student.getId());
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
         String studyModel = null;
@@ -557,6 +534,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         Long testId;
         int goldCount = 0;
         int addEnergy = 0;
+        String awardStr = "";
         if (testRecord == null) {
 
             isFirst = true;
@@ -584,6 +562,8 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             goldCount = this.saveLog(student, goldCount, wordUnitTestDTO, "单元闯关测试");*/
 
             testRecord = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, goldCount);
+
+            awardStr = this.updateCashCoupon(student, point);
         }
 
         TestResultVo vo = new TestResultVo();
@@ -606,7 +586,8 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         vo.setGold(goldCount);
         vo.setTestId(testId);
         vo.setEnergy(addEnergy);
-        simpleStudentMapper.updateByPrimaryKeySelective(student);
+        vo.setAwardStr(awardStr);
+        studentMapper.updateById(student);
         getLevel(session);
         session.removeAttribute("token");
 
@@ -616,12 +597,12 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     private String getMsg(Student student, TestResultVo vo, Integer classify, TestRecord testRecord, Integer point) {
         String msg;
         if (classify == 8 || classify == 9) {
-            if (point < FIVE) {
+            if (point < PointConstant.FIFTY) {
                 msg = "很遗憾，闯关失败。但是，绊脚石乃是进身之阶。";
                 vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.AFTER_UNIT_FIRST_LEVEL));
                 vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
                 testRecord.setPass(2);
-            } else if (point < FULL_MARK) {
+            } else if (point < PointConstant.HUNDRED) {
                 msg = "闯关成功。彪悍的人生不需要解释！";
                 vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.AFTER_UNIT_SECOND_LEVEL));
                 vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
@@ -634,9 +615,9 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             }
             // 单词辩音, 词组辩音
         } else if (classify == 1 || classify == 2) {
-            msg = packageMsg(student, vo, point, SIX, testRecord);
+            msg = packageMsg(student, vo, point, PointConstant.SIXTY, testRecord);
         } else {
-            msg = packageMsg(student, vo, point, PASS, testRecord);
+            msg = packageMsg(student, vo, point, PointConstant.EIGHTY, testRecord);
         }
         return msg;
     }
@@ -658,7 +639,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.AFTER_UNIT_FIRST_LEVEL));
             vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
             testRecord.setPass(2);
-        } else if (point < FULL_MARK) {
+        } else if (point < PointConstant.HUNDRED) {
             msg = "闯关成功。彪悍的人生不需要解释。";
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.AFTER_UNIT_SECOND_LEVEL));
             vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
@@ -694,7 +675,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             msg = "id为：" + student.getId() + "的学生在" + model + " 模块下，获得#" + gold + "#枚金币";
             GoldLogUtil.saveStudyGoldLog(student.getId(), model, (int) gold);
         }
-        LOGGER.info(msg);
+        log.info(msg);
         return (int) Math.floor(gold);
     }
 
@@ -728,11 +709,11 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      */
     private int getGoldCount(WordUnitTestDTO wordUnitTestDTO, Student student, int point) {
         int goldCount = 0;
-        if (point >= PASS) {
-            if (point < FULL_MARK) {
+        if (point >= PointConstant.EIGHTY) {
+            if (point < PointConstant.HUNDRED) {
                 goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_FULL;
                 this.saveLog(student, goldCount, wordUnitTestDTO, null);
-            } else if (point == FULL_MARK) {
+            } else if (point == PointConstant.HUNDRED) {
                 goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
                 this.saveLog(student, goldCount, wordUnitTestDTO, null);
             }
@@ -766,7 +747,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         }
         TestRecord testRecord = new TestRecord();
         // 首次测试大于或等于80分，超过历史最高分次数 +1
-        if (point >= PASS) {
+        if (point >= PointConstant.EIGHTY) {
             testRecord.setBetterCount(1);
         } else {
             testRecord.setBetterCount(0);
@@ -791,11 +772,11 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     }
 
     private void getUnitTestMsg(TestRecord testRecord, int point) {
-        if (point >= 0 && point < PASS) {
+        if (point >= 0 && point < PointConstant.EIGHTY) {
             testRecord.setExplain("很遗憾，闯关失败，再接再厉。");
-        } else if (point >= PASS && point < FULL_MARK) {
+        } else if (point >= PointConstant.EIGHTY && point < PointConstant.HUNDRED) {
             testRecord.setExplain("闯关成功，独孤求败！");
-        } else if (point == FULL_MARK) {
+        } else if (point == PointConstant.HUNDRED) {
             testRecord.setExplain("恭喜你刷新了纪录！");
         }
     }
@@ -804,7 +785,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     public ServerResponse<Map<String, Object>> getSentenceUnitTest(HttpSession session, Long unitId, String studyModel,
                                                                    Boolean isSure) {
         Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        student = simpleStudentMapper.selectById(student.getId());
+        student = studentMapper.selectById(student.getId());
         session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
 
         // 获取当前单元下的所有例句
@@ -916,11 +897,12 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         String studyModel = matchStudyModel(modelType);
 
         TestResultVo vo = new TestResultVo();
+        Integer testRecordPoint = testRecord.getPoint();
         if (Objects.equals(typeModel, "单元前测")) {
             TestRecord preUnitTest = simpleTestRecordMapper.selectByStudentIdAndUnitId(student.getId(), testRecord.getUnitId(), "单元前测", studyModel);
             if (preUnitTest != null) {
                 // 当前单元已有单元前测测试记录，不再保存奖励和测试记录
-                int point = testRecord.getPoint();
+                int point = testRecordPoint;
                 getPreSchoolTestGold(testRecord, modelType, student, typeModel, vo, point);
 
                 vo.setGold(0);
@@ -939,7 +921,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             testRecord.setStudyModel(studyModel);
         }
         testRecord.setGenre(typeModel);
-        int point = testRecord.getPoint();
+        int point = testRecordPoint;
         //获取单元闯关获取的能量数量
         int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
                 studyModel, typeModel);
@@ -969,18 +951,46 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         testRecord.setType(1);
         simpleTestRecordMapper.insert(testRecord);
 
+        // 更新代金券数量
+        String awardStr = this.updateCashCoupon(student, testRecordPoint);
+
         // 保存测试记录详情
         if (testDetail != null) {
             this.saveTestDetail(testDetail, testRecord.getId(), modelType, student);
         }
 
+        vo.setAwardStr(awardStr);
         vo.setGold(gold);
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, typeModel));
         vo.setTestId(testRecord.getId());
         vo.setEnergy(addEnergy);
-        simpleStudentMapper.updateByPrimaryKeySelective(student);
+        studentMapper.updateById(student);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         return ServerResponse.createBySuccess(vo);
+    }
+
+    /**
+     * 更新代金券数量
+     *
+     * @param student
+     * @param point   得分
+     * @return 奖励提示语
+     */
+    public String updateCashCoupon(Student student, Integer point) {
+        if (point >= PointConstant.SIXTY) {
+            StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
+            if (studentExpansion.getCashCoupon() >= 200) {
+                return "";
+            }
+
+            int random = MathUtil.getRandom(10, 20);
+            studentExpansion.setCashCoupon(studentExpansion.getCashCoupon() + random);
+            studentExpansionMapper.updateById(studentExpansion);
+
+            String shipInfo = ShipAddEquipmentServiceImpl.getTestAddEquipment(student.getId());
+            return StringUtils.removeEnd(String.format("报名代金券x%d，%s", random, shipInfo), "，");
+        }
+        return "";
     }
 
     @Override

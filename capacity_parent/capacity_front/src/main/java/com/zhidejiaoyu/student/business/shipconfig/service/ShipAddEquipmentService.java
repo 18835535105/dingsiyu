@@ -21,11 +21,4 @@ public interface ShipAddEquipmentService extends BaseService<Student> {
      void updateUseEqu(Student student, Equipment equipment);
 
     ServerResponse<Object> getEquipmentNexLevlInfromation(Long equipmentId, HttpSession session);
-
-    /**
-     * 分数足够添加的飞船物品
-     * @param studentId
-     * @return
-     */
-    String getTestAddEqu(Long studentId);
 }

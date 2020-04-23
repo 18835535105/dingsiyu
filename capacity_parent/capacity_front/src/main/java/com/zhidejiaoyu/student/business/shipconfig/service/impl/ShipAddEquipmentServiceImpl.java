@@ -16,18 +16,22 @@ import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.util.CalculateUtil;
 import com.zhidejiaoyu.student.business.shipconfig.vo.EquipmentExperienceVo;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 
 @Service
 public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements ShipAddEquipmentService {
+
+    private static RedisOpt redisOptStatic;
+    private static EquipmentMapper equipmentMapperStatic;
+    private static StudentEquipmentMapper studentEquipmentMapperStatic;
 
     @Resource
     private StudentEquipmentMapper studentEquipmentMapper;
@@ -54,6 +58,12 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     @Resource
     private ShipIndexService shipIndexService;
 
+    @PostConstruct
+    public void init() {
+        redisOptStatic = this.redisOpt;
+        equipmentMapperStatic = this.equipmentMapper;
+        studentEquipmentMapperStatic = this.studentEquipmentMapper;
+    }
 
     @Override
     public Object queryAddStudentEquipment(HttpSession session) {
@@ -382,19 +392,22 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         return ServerResponse.createBySuccess(shipIndexService.getShipConfigInfoDTO(equInforMap));
     }
 
-    @Override
-    public String getTestAddEqu(Long studentId) {
-        List<Equipment> equipment = equipmentMapper.selectIdByTypeAndLevel(1, 1);
-        StudentEquipment studentEquipment = studentEquipmentMapper.selectByStudentIdAndEquipmentId(studentId, equipment.get(0).getId());
+    /**
+     * 分数足够添加的飞船物品
+     *
+     * @param studentId
+     * @return
+     */
+    public static String getTestAddEquipment(Long studentId) {
+        List<Equipment> equipment = equipmentMapperStatic.selectIdByTypeAndLevel(1, 1);
+        StudentEquipment studentEquipment = studentEquipmentMapperStatic.selectByStudentIdAndEquipmentId(studentId, equipment.get(0).getId());
         if (studentEquipment == null) {
             StringBuilder builder = new StringBuilder();
-            redisOpt.initShip(studentId);
-            equipment.forEach(equ -> {
-                builder.append(equ.getName() + "X1，");
-            });
-            return builder.toString();
+            redisOptStatic.initShip(studentId);
+            equipment.forEach(equ -> builder.append(equ.getName()).append("X1，"));
+            return StringUtils.removeEnd(builder.toString(), "，");
         }
-        return null;
+        return "";
     }
 
     public static void addEquipment(List<Long> equipmentIds, Long studentId, StudentEquipmentMapper studentEquipmentMapper) {
