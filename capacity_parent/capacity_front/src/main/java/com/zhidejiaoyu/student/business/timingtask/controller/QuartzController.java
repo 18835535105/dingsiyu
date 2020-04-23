@@ -64,6 +64,9 @@ public class QuartzController {
         return ServerResponse.createBySuccess();
     }
 
+    /**
+     * 每天 00:30:00 更新学生全校日排行记录
+     */
     @PostMapping("/updateRank")
     public ServerResponse<Object> updateRank() {
         quartzService.updateRank();

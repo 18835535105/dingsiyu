@@ -683,7 +683,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 if (studyModelList == null || studyModelList.size() == 0) {
                     studyModelList = collect.get(1L);
                 }
-                if(studyModelList!=null){
+                if (studyModelList != null) {
                     for (Map<String, Object> returnMap : studyModelList) {
                         String garde = returnMap.get("garde").toString();
                         if (garde.equals(grade)) {
@@ -719,25 +719,11 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                     }
                     //获取数量
                     int addNumber = PriorityUtil.calculateTimeOfChange(number);
-                    StudentStudyPlanNew plan = new StudentStudyPlanNew();
-                    plan.setCourseId(courseId);
-                    plan.setStudentId(studentId);
-                    plan.setGroup(1);
-                    plan.setUnitId(unitId);
-                    plan.setUpdateTime(new Date());
-                    plan.setComplete(1);
-                    plan.setCurrentStudyCount(0);
-                    plan.setTotalStudyCount(0);
-                    plan.setEasyOrHard(70);
-                    //70,79
-                    plan.setBaseLevel(PriorityUtil.getEasyOrHard(grade, 1));
-                    plan.setBaseLevel(1);
-                    plan.setTimeLevel(addNumber);
-                    plan.setFinalLevel(plan.getBaseLevel() + plan.getTimeLevel() + plan.getErrorLevel());
+                    StudentStudyPlanNew plan = getStudentStudyPlanNew(grade, studentId, unitId, courseId, addNumber, 70L, 1, 0);
                     studentStudyPlanNewMapper.insert(plan);
-                    plan.setBaseLevel(PriorityUtil.getEasyOrHard(grade, 2));
-                    plan.setEasyOrHard(79);
-                    plan.setFinalLevel(plan.getBaseLevel() + plan.getTimeLevel() + plan.getErrorLevel());
+                    plan = getStudentStudyPlanNew(grade, studentId, unitId, courseId, addNumber, 79L, 2, 100);
+                    studentStudyPlanNewMapper.insert(plan);
+                    plan = getStudentStudyPlanNew(grade, studentId, unitId, courseId, addNumber, 145L, 3, 150);
                     studentStudyPlanNewMapper.insert(plan);
                 }
             }
@@ -745,6 +731,27 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
 
         log.info("根据school_time配置更新学生课程完成。。。");
     }
+
+    private StudentStudyPlanNew getStudentStudyPlanNew(String grade, Long studentId, Long unitId, Long courseId, int addNumber, long flowId, int type, int reduce) {
+        StudentStudyPlanNew plan = new StudentStudyPlanNew();
+        plan.setCourseId(courseId);
+        plan.setStudentId(studentId);
+        plan.setGroup(1);
+        plan.setUnitId(unitId);
+        plan.setUpdateTime(new Date());
+        plan.setComplete(1);
+        plan.setCurrentStudyCount(0);
+        plan.setTotalStudyCount(0);
+        plan.setEasyOrHard(type);
+        plan.setBaseLevel(PriorityUtil.getEasyOrHard(grade, type) - reduce);
+        plan.setErrorLevel(1);
+        plan.setTimeLevel(addNumber);
+        plan.setFinalLevel(plan.getBaseLevel() + plan.getTimeLevel() + plan.getErrorLevel());
+        //70,79,143
+        plan.setFlowId(flowId);
+        return plan;
+    }
+
 
     /**
      * 删除学生相关记录

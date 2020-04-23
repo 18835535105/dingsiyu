@@ -81,7 +81,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         addEquipmentByType(collect.get(3), studentEquipmentIds, empiricalValue.getMissileExperience(), returnList, addIdList, map, null);
         //添加装备需要的物品
         addEquipmentByType(collect.get(4), studentEquipmentIds, empiricalValue.getArmorExperience(), returnList, addIdList, map, null);
-        addEquipmentPeople(collect.get(5),student.getId());
+        addEquipmentPeople(collect.get(5), student.getId());
         if (addIdList.size() > 0) {
             addEquipment(addIdList, student.getId(), studentEquipmentMapper);
         }
@@ -101,7 +101,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                 studentEquipment.setIntensificationDegree(1);
                 studentEquipment.setStudentId(studentId);
                 studentEquipment.setEquipmentId(equipment.getId());
-                studentEquipment.setType(5);
+                studentEquipment.setType(2);
                 studentEquipment.setCreateTime(new Date());
                 studentEquipmentMapper.insert(studentEquipment);
             }
@@ -380,6 +380,21 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             equInforMap = equipmentExpansionMapper.selectByEquipmentIdAndLevel(equipmentId, 1);
         }
         return ServerResponse.createBySuccess(shipIndexService.getShipConfigInfoDTO(equInforMap));
+    }
+
+    @Override
+    public String getTestAddEqu(Long studentId) {
+        List<Equipment> equipment = equipmentMapper.selectIdByTypeAndLevel(1, 1);
+        StudentEquipment studentEquipment = studentEquipmentMapper.selectByStudentIdAndEquipmentId(studentId, equipment.get(0).getId());
+        if (studentEquipment == null) {
+            StringBuilder builder = new StringBuilder();
+            redisOpt.initShip(studentId);
+            equipment.forEach(equ -> {
+                builder.append(equ.getName() + "X1，");
+            });
+            return builder.toString();
+        }
+        return null;
     }
 
     public static void addEquipment(List<Long> equipmentIds, Long studentId, StudentEquipmentMapper studentEquipmentMapper) {
