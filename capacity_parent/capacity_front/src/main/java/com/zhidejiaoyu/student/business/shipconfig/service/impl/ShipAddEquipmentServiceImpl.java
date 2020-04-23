@@ -101,7 +101,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                 studentEquipment.setIntensificationDegree(1);
                 studentEquipment.setStudentId(studentId);
                 studentEquipment.setEquipmentId(equipment.getId());
-                studentEquipment.setType(5);
+                studentEquipment.setType(2);
                 studentEquipment.setCreateTime(new Date());
                 studentEquipmentMapper.insert(studentEquipment);
             }
