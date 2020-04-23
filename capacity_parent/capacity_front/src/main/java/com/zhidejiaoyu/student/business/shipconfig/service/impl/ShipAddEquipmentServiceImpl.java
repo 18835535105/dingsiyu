@@ -81,7 +81,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         addEquipmentByType(collect.get(3), studentEquipmentIds, empiricalValue.getMissileExperience(), returnList, addIdList, map, null);
         //添加装备需要的物品
         addEquipmentByType(collect.get(4), studentEquipmentIds, empiricalValue.getArmorExperience(), returnList, addIdList, map, null);
-        addEquipmentPeople(collect.get(5),student.getId());
+        addEquipmentPeople(collect.get(5), student.getId());
         if (addIdList.size() > 0) {
             addEquipment(addIdList, student.getId(), studentEquipmentMapper);
         }
@@ -380,6 +380,32 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             equInforMap = equipmentExpansionMapper.selectByEquipmentIdAndLevel(equipmentId, 1);
         }
         return ServerResponse.createBySuccess(shipIndexService.getShipConfigInfoDTO(equInforMap));
+    }
+
+    @Override
+    public Object getTestAddEqu(Long studentId) {
+        List<Equipment> equipment = equipmentMapper.selectIdByTypeAndLevel(1, 1);
+        StudentEquipment studentEquipment = studentEquipmentMapper.selectByStudentIdAndEquipmentId(studentId, equipment.get(0).getId());
+        if (studentEquipment == null) {
+            List<Map<String, Object>> returnList = new ArrayList<>();
+            equipment.forEach(equ -> {
+                StudentEquipment studentEquipment1 = new StudentEquipment();
+                studentEquipment1.setCreateTime(new Date());
+                studentEquipment1.setType(1);
+                studentEquipment1.setEquipmentId(equ.getId());
+                studentEquipment1.setIntensificationDegree(1);
+                studentEquipment1.setStudentId(studentId);
+                studentEquipmentMapper.insert(studentEquipment1);
+                String imgUrl = equipmentExpansionMapper.selectUrlByEquipmentIdAndType(equ.getId(), 1);
+                Map<String, Object> stuMap = new HashMap<>();
+                stuMap.put("name", equ.getName());
+                stuMap.put("id", equ.getId());
+                stuMap.put("imgUrl", GetOssFile.getPublicObjectUrl(imgUrl));
+                returnList.add(stuMap);
+            });
+            return returnList;
+        }
+        return null;
     }
 
     public static void addEquipment(List<Long> equipmentIds, Long studentId, StudentEquipmentMapper studentEquipmentMapper) {
