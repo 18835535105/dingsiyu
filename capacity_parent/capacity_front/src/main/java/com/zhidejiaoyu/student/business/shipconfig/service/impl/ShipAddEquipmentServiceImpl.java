@@ -383,27 +383,16 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     }
 
     @Override
-    public Object getTestAddEqu(Long studentId) {
+    public String getTestAddEqu(Long studentId) {
         List<Equipment> equipment = equipmentMapper.selectIdByTypeAndLevel(1, 1);
         StudentEquipment studentEquipment = studentEquipmentMapper.selectByStudentIdAndEquipmentId(studentId, equipment.get(0).getId());
         if (studentEquipment == null) {
-            List<Map<String, Object>> returnList = new ArrayList<>();
+            StringBuilder builder = new StringBuilder();
+            redisOpt.initShip(studentId);
             equipment.forEach(equ -> {
-                StudentEquipment studentEquipment1 = new StudentEquipment();
-                studentEquipment1.setCreateTime(new Date());
-                studentEquipment1.setType(1);
-                studentEquipment1.setEquipmentId(equ.getId());
-                studentEquipment1.setIntensificationDegree(1);
-                studentEquipment1.setStudentId(studentId);
-                studentEquipmentMapper.insert(studentEquipment1);
-                String imgUrl = equipmentExpansionMapper.selectUrlByEquipmentIdAndType(equ.getId(), 1);
-                Map<String, Object> stuMap = new HashMap<>();
-                stuMap.put("name", equ.getName());
-                stuMap.put("id", equ.getId());
-                stuMap.put("imgUrl", GetOssFile.getPublicObjectUrl(imgUrl));
-                returnList.add(stuMap);
+                builder.append(equ.getName() + "X1，");
             });
-            return returnList;
+            return builder.toString();
         }
         return null;
     }

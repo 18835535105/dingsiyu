@@ -27,5 +27,5 @@ public interface ShipAddEquipmentService extends BaseService<Student> {
      * @param studentId
      * @return
      */
-    Object getTestAddEqu(Long studentId);
+    String getTestAddEqu(Long studentId);
 }
