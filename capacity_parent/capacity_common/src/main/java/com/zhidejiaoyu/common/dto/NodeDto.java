@@ -56,7 +56,7 @@ public class NodeDto {
     private Integer group;
 
     /**
-     * 2：单词；3：句型；4：课文；5：语法
+     * 2：单词；3：句型；4：课文；5：语法；6：金币试卷
      */
     private Integer modelType;
 

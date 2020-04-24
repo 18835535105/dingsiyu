@@ -247,6 +247,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             // 查询学生最高优先级数据
             maxFinalLevelStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
 
+            maxFinalLevelStudentStudyPlanNew = finishGroupOrUnit.judgeHasGoldTest(dto, maxFinalLevelStudentStudyPlanNew);
+
             studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId,
                     maxFinalLevelStudentStudyPlanNew.getUnitId(), maxFinalLevelStudentStudyPlanNew.getEasyOrHard());
         }

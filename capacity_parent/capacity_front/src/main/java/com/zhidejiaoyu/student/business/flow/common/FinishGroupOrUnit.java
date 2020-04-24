@@ -60,9 +60,6 @@ public class FinishGroupOrUnit {
     private LearnExtendMapper learnExtendMapper;
 
     @Resource
-    private LogOpt logOpt;
-
-    @Resource
     private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
 
     @Resource
@@ -79,6 +76,9 @@ public class FinishGroupOrUnit {
 
     @Resource
     private SyntaxUnitMapper syntaxUnitMapper;
+
+    @Resource
+    private UnitTestStoreMapper unitTestStoreMapper;
 
     @Resource
     private RedisOpt redisOpt;
@@ -431,6 +431,12 @@ public class FinishGroupOrUnit {
         return null;
     }
 
+    /**
+     * 完成金币试卷模块，初始化下个优先级学习数据
+     *
+     * @param dto
+     * @return
+     */
     public FlowVO finishGoldTest(NodeDto dto) {
         NodeDto nodeDto = this.getNextFlowInfo(dto);
         return packageFlowVO.packageFlowVO(nodeDto.getStudyFlowNew(), nodeDto.getStudent(), nodeDto.getUnitId());
@@ -451,6 +457,7 @@ public class FinishGroupOrUnit {
         Long studentId = student.getId();
 
         StudentStudyPlanNew maxStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
+        maxStudentStudyPlanNew = this.judgeHasGoldTest(dto, maxStudentStudyPlanNew);
 
         Long flowId = maxStudentStudyPlanNew.getFlowId();
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(flowId);
@@ -460,6 +467,25 @@ public class FinishGroupOrUnit {
                 .unitId(maxStudentStudyPlanNew.getUnitId())
                 .studentStudyPlanNew(maxStudentStudyPlanNew)
                 .build();
+    }
+
+    /**
+     * 获取下一个优先级数据
+     *
+     * @param dto
+     * @param maxStudentStudyPlanNew
+     */
+    public StudentStudyPlanNew judgeHasGoldTest(NodeDto dto, StudentStudyPlanNew maxStudentStudyPlanNew) {
+        if (maxStudentStudyPlanNew.getEasyOrHard() == 3) {
+            // 如果是金币试卷流程，判断当前单元是否可以测试，如果不可以测试初始化下个优先级
+            int count = unitTestStoreMapper.countByUnitId(maxStudentStudyPlanNew.getUnitId());
+            if (count == 0) {
+                this.updateLevel(dto, maxStudentStudyPlanNew);
+                maxStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(dto.getStudent().getId());
+                this.judgeHasGoldTest(dto, maxStudentStudyPlanNew);
+            }
+        }
+        return maxStudentStudyPlanNew;
     }
 
     /**
