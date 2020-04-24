@@ -980,6 +980,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setStudyModel("bug反馈记录");
         testRecord.setGenre("bug反馈");
         testRecord.setType(2);
+        testRecord.setPoint(90);
         testRecord.setStudentId(student.getId());
         Map<String, Object> resultMap = new HashMap<>(16);
         resultMap.put("energy", 0);
