@@ -972,6 +972,23 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         return getObjectServerResponse(session, wordUnitTestDTO, student, testRecord);
     }
 
+    @Override
+    public ServerResponse saveBugTest(HttpSession session, TestRecord testRecord) {
+        Student student = getStudent(session);
+        saveTestRecordTime(testRecord, session, new Date());
+        testRecord.setTestEndTime(new Date());
+        testRecord.setStudyModel("bug反馈记录");
+        testRecord.setGenre("bug反馈");
+        testRecord.setType(2);
+        testRecord.setStudentId(student.getId());
+        Map<String, Object> resultMap = new HashMap<>(16);
+        resultMap.put("energy", 0);
+        resultMap.put("gold", 0);
+        getTestRecord(student, testRecord, 90, resultMap);
+        resultMap.put("isBug", true);
+        return ServerResponse.createBySuccess(resultMap);
+    }
+
 
     private ServerResponse<Object> getObjectServerResponse(HttpSession session, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord) {
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
@@ -983,6 +1000,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 testRecord.getStudyModel(), testRecord.getGenre());
         resultMap.put("energy", getEnergy(student, wordUnitTestDTO.getPoint(), number));
         resultMap.put("gold", testRecord.getAwardGold());
+        getTestRecord(student, testRecord, point, resultMap);
+        studentMapper.updateById(student);
+        return ServerResponse.createBySuccess(resultMap);
+    }
+
+    private void getTestRecord(Student student, TestRecord testRecord, Integer point, Map<String, Object> resultMap) {
         if (point < PointConstant.EIGHTY) {
             resultMap.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
             resultMap.put("text", "很遗憾，闯关失败，再接再厉。");
@@ -1003,8 +1026,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         resultMap.put("imgUrl", AliyunInfoConst.host + student.getPartUrl());
 
         testRecordMapper.insert(testRecord);
-        studentMapper.updateById(student);
-        return ServerResponse.createBySuccess(resultMap);
     }
 
     @Override

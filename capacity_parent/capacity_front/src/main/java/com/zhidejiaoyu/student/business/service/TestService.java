@@ -146,4 +146,6 @@ public interface TestService extends BaseService<TestRecord> {
     Object saveLetterAfterLearning(HttpSession session, TestRecord testRecord);
 
     Object saveReadTest(HttpSession session, TestRecord testRecord);
+
+    ServerResponse saveBugTest(HttpSession session, TestRecord testRecord);
 }
