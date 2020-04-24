@@ -127,6 +127,23 @@ public class TestController {
     }
 
     /**
+     * 保存bug反馈测试接口
+     *
+     * @param session
+     * @param testRecord
+     * @return
+     */
+    @PostMapping("/saveBugTest")
+    public ServerResponse saveBugTest(HttpSession session, TestRecord testRecord,
+                                      BindingResult bindingResult) {
+        String msg = ValidateUtil.validate(bindingResult);
+        if ("ok".equals(msg)) {
+            return testService.saveBugTest(session, testRecord);
+        }
+        return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), msg);
+    }
+
+    /**
      * 保存单元测试记录，学习记录，更新记忆追踪数据（包括单词和例句单元测试）
      *
      * @param session
