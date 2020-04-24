@@ -1,16 +1,18 @@
 package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author zdjy
@@ -37,13 +39,14 @@ public class BugFeedback implements Serializable {
     private String studyModel;
 
     /**
-     * 学习内容（保存学生反馈bug时的所有响应数据），用于问题排查 
+     * 学习内容（保存学生反馈bug时的所有响应数据），用于问题排查
      */
     private String studyContent;
 
     /**
      * 问题原因
      */
+    @Length(max = 1000, min = 20, message = "bug描述字符个数不能少于20个，不能大于1000个")
     private String reason;
 
     /**
