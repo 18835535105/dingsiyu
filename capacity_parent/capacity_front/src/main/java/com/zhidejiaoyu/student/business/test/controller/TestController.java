@@ -135,7 +135,7 @@ public class TestController {
      */
     @PostMapping("/saveBugTest")
     public ServerResponse saveBugTest(HttpSession session, TestRecord testRecord,
-                                      BindingResult bindingResult, String testDetail) {
+                                      BindingResult bindingResult) {
         String msg = ValidateUtil.validate(bindingResult);
         if ("ok".equals(msg)) {
             return testService.saveBugTest(session, testRecord);
