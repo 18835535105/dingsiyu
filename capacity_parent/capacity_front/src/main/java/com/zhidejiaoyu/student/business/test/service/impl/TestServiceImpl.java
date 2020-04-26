@@ -985,11 +985,11 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setPoint(90);
         testRecord.setStudentId(student.getId());
         Map<String, Object> resultMap = new HashMap<>(16);
-        resultMap.put("energy", 0);
-        resultMap.put("gold", 0);
-        getTestRecord(student, testRecord, 90, resultMap);
-        resultMap.put("isBug", true);
-        return ServerResponse.createBySuccess(resultMap);
+        TestResultVo testResultVo = new TestResultVo();
+        testResultVo.setEnergy(0);
+        testResultVo.setGold(0);
+        getTestRecord(student, testRecord, 90, resultMap, testResultVo);
+        return ServerResponse.createBySuccess(testRecord);
     }
 
 
@@ -1003,32 +1003,61 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                 testRecord.getStudyModel(), testRecord.getGenre());
         resultMap.put("energy", getEnergy(student, wordUnitTestDTO.getPoint(), number));
         resultMap.put("gold", testRecord.getAwardGold());
-        getTestRecord(student, testRecord, point, resultMap);
+        getTestRecord(student, testRecord, point, resultMap, null);
         studentMapper.updateById(student);
         return ServerResponse.createBySuccess(resultMap);
     }
 
-    private void getTestRecord(Student student, TestRecord testRecord, Integer point, Map<String, Object> resultMap) {
+    private void getTestRecord(Student student, TestRecord testRecord, Integer point, Map<String, Object> resultMap, TestResultVo testResultVo) {
         if (point < PointConstant.EIGHTY) {
             resultMap.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
             resultMap.put("text", "很遗憾，闯关失败，再接再厉。");
             resultMap.put("backMsg", new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
             testRecord.setPass(2);
+            if (testResultVo != null) {
+                getTestResultVo(testResultVo,
+                        petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY), new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"},
+                        "很遗憾，闯关失败，再接再厉。");
+            }
         } else if (point < PointConstant.NINETY) {
             resultMap.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
             resultMap.put("text", "闯关成功，独孤求败！");
             resultMap.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
             testRecord.setPass(1);
+            if (testResultVo != null) {
+                getTestResultVo(testResultVo,
+                        petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED),
+                        new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"},
+                        "闯关成功，独孤求败！");
+            }
         } else {
             resultMap.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
             resultMap.put("text", "恭喜你刷新了纪录！");
             resultMap.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
             testRecord.setPass(1);
+            if (testResultVo != null) {
+                getTestResultVo(testResultVo,
+                        petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED),
+                        new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"},
+                        "恭喜你刷新了纪录！");
+            }
         }
         resultMap.put("point", point);
         resultMap.put("imgUrl", AliyunInfoConst.host + student.getPartUrl());
+        if (testResultVo != null) {
+            testResultVo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
+            testResultVo.setImgUrl(AliyunInfoConst.host + student.getPartUrl());
+        }
 
         testRecordMapper.insert(testRecord);
+    }
+
+    private void getTestResultVo(TestResultVo testResultVo, String listenStr, String[] backMsg, String msg) {
+        testResultVo.setPetSay(listenStr);
+        testResultVo.setPetName(listenStr);
+        testResultVo.setBackMsg(backMsg);
+        testResultVo.setMsg(msg);
+        testResultVo.setText(msg);
     }
 
     @Override

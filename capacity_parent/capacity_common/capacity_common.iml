@@ -20,6 +20,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="aliyun-common" />
     <orderEntry type="module" module-name="aliyun-oss" />
     <orderEntry type="module" module-name="aliyun-common" />
     <orderEntry type="library" name="Maven: com.aliyun:aliyun-java-sdk-core:4.3.3" level="project" />
