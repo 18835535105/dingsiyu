@@ -24,10 +24,12 @@ public interface SchoolTimeMapper extends BaseMapper<SchoolTime> {
      * @param type
      * @param month
      * @param week
+     * @param gradeList
      * @return
      */
     SchoolTime selectByUserIdAndTypeAndMonthAndWeek(@Param("userId") Long userId, @Param("type") int type,
-                                                    @Param("month") Integer month, @Param("week") Integer week);
+                                                    @Param("month") Integer month, @Param("week") Integer week,
+                                                    @Param("gradeList") List<String> gradeList);
 
     /**
      * 获取当前周的数据
