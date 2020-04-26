@@ -222,6 +222,8 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
             throw new ServiceException("重复提交摸底测试记录！");
         }
 
+        studentStudyPlanNewMapper.deleteByStudentId(student.getId());
+
         // 测试结果
         List<SaveSubjectsDTO.Result> resultList = dto.getResultList();
 

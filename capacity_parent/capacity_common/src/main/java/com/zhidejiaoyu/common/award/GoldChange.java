@@ -36,7 +36,7 @@ public class GoldChange {
             goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
         }
         if (student.getBonusExpires() != null) {
-            goldCount=StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0).intValue();
+            goldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount).intValue();
         }
         return goldCount;
     }
