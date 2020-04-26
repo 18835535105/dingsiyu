@@ -90,6 +90,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         HttpSession httpSession = HttpUtil.getHttpSession();
         httpSession.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         Student student = super.getStudent(httpSession);
+        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
 
         // 当前月份
         DateTime dateTime = new DateTime();
@@ -97,16 +98,18 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
         // 当前月的第几周
         int weekOfMonth = DateUtil.getWeekOfMonth(dateTime.toDate());
 
-        ServerResponse<List<SubjectsVO>> response = this.getStudentPlanResult(student, monthOfYear, weekOfMonth);
+        List<String> gradeList = GradeUtil.smallThanCurrentAllPhase(studentExpansion.getPhase(), student.getGrade());
+
+        ServerResponse<List<SubjectsVO>> response = this.getStudentPlanResult(student, monthOfYear, weekOfMonth, gradeList);
         if (response != null) {
             return response;
         }
 
-        response = this.getSchoolPlanResult(student, monthOfYear, weekOfMonth);
+        response = this.getSchoolPlanResult(student, monthOfYear, weekOfMonth, gradeList);
         if (response != null) {
             return response;
         }
-        response = this.getBasePlanResult(monthOfYear, weekOfMonth);
+        response = this.getBasePlanResult(monthOfYear, weekOfMonth, gradeList);
         if (response != null) {
             return response;
         }
@@ -118,24 +121,25 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
      * 获取总部的测试题
      *
      * @param monthOfYear
+     * @param gradeList
      * @return
      */
-    public ServerResponse<List<SubjectsVO>> getBasePlanResult(int monthOfYear, int weekOfMonth) {
+    public ServerResponse<List<SubjectsVO>> getBasePlanResult(int monthOfYear, int weekOfMonth, List<String> gradeList) {
         SchoolTime schoolTime;
         // 当前月中小于或等于当前周的最大周数据
-        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(1L, 1, monthOfYear, weekOfMonth);
+        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(1L, 1, monthOfYear, weekOfMonth, gradeList);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
         }
 
         // 小于或等于当前月的最大月、最大周数据
-        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(1L, 1, monthOfYear, null);
+        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(1L, 1, monthOfYear, null, gradeList);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
         }
 
         // 查看学生最大月、最大周数据
-        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(1L, 1, null, null);
+        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(1L, 1, null, null, gradeList);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
         }
@@ -148,27 +152,28 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
      * @param student
      * @param monthOfYear
      * @param weekOfMonth
+     * @param gradeList
      * @return
      */
-    public ServerResponse<List<SubjectsVO>> getSchoolPlanResult(Student student, int monthOfYear, int weekOfMonth) {
+    public ServerResponse<List<SubjectsVO>> getSchoolPlanResult(Student student, int monthOfYear, int weekOfMonth, List<String> gradeList) {
         SchoolTime schoolTime;
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
 
         if (schoolAdminId != null) {
             // 当前月中小于或等于当前周的最大周数据
-            schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek((long) schoolAdminId, 1, monthOfYear, weekOfMonth);
+            schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek((long) schoolAdminId, 1, monthOfYear, weekOfMonth, gradeList);
             if (schoolTime != null) {
                 return this.getSubjectsResult(schoolTime);
             }
 
             // 小于或等于当前月的最大月、最大周数据
-            schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek((long) schoolAdminId, 1, monthOfYear, null);
+            schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek((long) schoolAdminId, 1, monthOfYear, null, gradeList);
             if (schoolTime != null) {
                 return this.getSubjectsResult(schoolTime);
             }
 
             // 查看学生最大月、最大周数据
-            schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek((long) schoolAdminId, 1, null, null);
+            schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek((long) schoolAdminId, 1, null, null, gradeList);
             if (schoolTime != null) {
                 return this.getSubjectsResult(schoolTime);
             }
@@ -182,23 +187,24 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
      * @param student
      * @param monthOfYear
      * @param weekOfMonth
+     * @param gradeList
      * @return
      */
-    public ServerResponse<List<SubjectsVO>> getStudentPlanResult(Student student, int monthOfYear, int weekOfMonth) {
+    public ServerResponse<List<SubjectsVO>> getStudentPlanResult(Student student, int monthOfYear, int weekOfMonth, List<String> gradeList) {
         // 当前月中小于或等于当前周的最大周数据
-        SchoolTime schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(student.getId(), 2, monthOfYear, weekOfMonth);
+        SchoolTime schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(student.getId(), 2, monthOfYear, weekOfMonth, gradeList);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
         }
 
         // 小于或等于当前月的最大月、最大周数据
-        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(student.getId(), 2, monthOfYear, null);
+        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(student.getId(), 2, monthOfYear, null, gradeList);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
         }
 
         // 查看学生最大月、最大周数据
-        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(student.getId(), 2, null, null);
+        schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(student.getId(), 2, null, null, gradeList);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
         }
