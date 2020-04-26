@@ -1,8 +1,8 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.zhidejiaoyu.common.pojo.StudentFlowNew;
 import com.zhidejiaoyu.common.pojo.StudentStudyPlanNew;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -41,6 +41,13 @@ public interface StudentStudyPlanNewMapper extends BaseMapper<StudentStudyPlanNe
     StudentStudyPlanNew selectMaxFinalByStudentId(@Param("studentId") Long studentId);
 
 
+    List<Long> getCourseIdAndGradeList(@Param("studentId") Long studentId, @Param("gradeList") List<String> gradeList);
 
-    List<Long> getCourseIdAndGradeList(@Param("studentId") Long studentId,@Param("gradeList") List<String> gradeList);
+    /**
+     * 删除学生的优先级
+     *
+     * @param studentId
+     */
+    @Delete("delete from student_study_plan_new where student_id = #{studentId}")
+    void deleteByStudentId(@Param("studentId") Long studentId);
 }

@@ -8,6 +8,7 @@ import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
+import com.zhidejiaoyu.common.award.GoldChange;
 import com.zhidejiaoyu.common.constant.*;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.constant.study.StudyModelConstant;
@@ -348,7 +349,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         //获取历史最高分
         int goldCount = 0;
         if (point > integer) {
-            goldCount = this.getGold(point);
+            goldCount = GoldChange.getWordUnitTestGold(student, point);
             this.saveLog(student, goldCount, null, "字母单元闯关测试");
             if (student.getBonusExpires() != null) {
                 if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
@@ -372,24 +373,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         getMessage(student, vo, testRecord, point, 100);
         studentMapper.updateById(student);
         return ServerResponse.createBySuccess(vo);
-    }
-
-    private int getGold(Integer point) {
-        int goldCount;
-        if (point < PointConstant.SIXTY) {
-            goldCount = 0;
-        } else if (point < PointConstant.SEVENTY) {
-            goldCount = TestAwardGoldConstant.UNIT_TEST_SIXTY_TO_SEVENTY;
-        } else if (point < PointConstant.EIGHTY) {
-            goldCount = TestAwardGoldConstant.UNIT_TEST_SEVENTY_TO_EIGHTY;
-        } else if (point < PointConstant.NINETY) {
-            goldCount = TestAwardGoldConstant.UNIT_TEST_EIGHTY_TO_NINETY;
-        } else if (point < PointConstant.HUNDRED) {
-            goldCount = TestAwardGoldConstant.UNIT_TEST_NINETY_TO_FULL;
-        } else {
-            goldCount = TestAwardGoldConstant.UNIT_TEST_FULL;
-        }
-        return goldCount;
     }
 
     @Override
@@ -449,7 +432,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             integer = 0;
         }
         if (integer < point) {
-            goldCount = this.getGold(point);
+            goldCount = GoldChange.getWordUnitTestGold(student, point);
         }
         this.saveLog(student, goldCount, null, "字母学后测试");
         if (student.getBonusExpires() != null) {
@@ -1645,7 +1628,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     }
 
     private int getGoldCount(WordUnitTestDTO wordUnitTestDTO, Student student, int point) {
-        int goldCount = this.getGold(point);
+        int goldCount = GoldChange.getWordUnitTestGold(student, point);
         this.saveLog(student, goldCount, wordUnitTestDTO, null);
         return goldCount;
     }
