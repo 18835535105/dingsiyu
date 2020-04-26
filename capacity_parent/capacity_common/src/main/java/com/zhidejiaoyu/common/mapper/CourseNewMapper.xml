@@ -74,6 +74,10 @@
         <if test="type == 4">
             join unit_teks_new uvn on uvn.unit_id = u.id
         </if>
+        <!--含有金币试卷的课程-->
+        <if test="type == 5">
+            join unit_test_store uts on uts.unit_id = u.id
+        </if>
         and c.id in (
         <foreach collection="courseIds" separator="," item="courseId">
             #{courseId}

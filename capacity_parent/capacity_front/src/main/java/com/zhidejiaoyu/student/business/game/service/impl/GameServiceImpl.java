@@ -19,7 +19,7 @@ import com.zhidejiaoyu.common.vo.game.GameOneVo;
 import com.zhidejiaoyu.common.vo.game.GameTwoVo;
 import com.zhidejiaoyu.student.business.game.service.GameService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -281,7 +281,7 @@ public class GameServiceImpl extends BaseServiceImpl<GameStoreMapper, GameStore>
             studentMapper.updateById(student);
             session.setAttribute(UserConstant.CURRENT_STUDENT, student);
             try {
-                SaveGoldLog.saveStudyGoldLog(student.getId(), gameStore.getGameName(), gameScore.getAwardGold());
+                GoldLogUtil.saveStudyGoldLog(student.getId(), gameStore.getGameName(), gameScore.getAwardGold());
             } catch (Exception e) {
                 log.error("保存学生[{} - {} - {}]游戏[{}]结果出错！需要奖励[{}]枚金币！", student.getId(), student.getAccount(),
                         student.getStudentName(), gameStore.getGameName(), gameScore.getAwardGold(), e);

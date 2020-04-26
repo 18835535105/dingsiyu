@@ -25,7 +25,7 @@ public class TeksServiceImplTest {
 
     @Test
     public void testGetList() {
-        String[] split = "Cairo, 2 p. m..".split(" ");
+        String[] split = "Sure, \" I am the student.\"".split(" ");
         Map<String, Object> map = new HashMap<>(16);
         teksService.getList(split, map);
         log.info(map.toString());

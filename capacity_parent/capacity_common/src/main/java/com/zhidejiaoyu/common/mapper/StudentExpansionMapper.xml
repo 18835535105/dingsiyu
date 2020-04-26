@@ -18,15 +18,18 @@
         <result column="medal_no" property="medalNo"/>
         <result column="source_power" property="sourcePower"/>
         <result column="ranking" property="ranking"/>
+        <result column="cash_coupon" property="cashCoupon"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, student_id, study_power , `level` ,is_look, audio_status, test_gold_add, pk_explain, better_three_time, `phase`,guide,medal_no, source_power,ranking
+        id, student_id, study_power , `level` ,is_look, audio_status, test_gold_add, pk_explain, better_three_time,
+        `phase`,guide,medal_no, source_power,ranking, cash_coupon
     </sql>
 
     <sql id="more_table_column">
-        se.id, se.student_id, se.study_power , se.level , se.is_look, se.audio_status, se.test_gold_add, se.pk_explain, se.better_three_time,se.phase, se.medal_no, se.source_power
+        se.id, se.student_id, se.study_power , se.level , se.is_look, se.audio_status, se.test_gold_add, se.pk_explain,
+        se.better_three_time,se.phase, se.medal_no, se.source_power, se.cash_coupon
     </sql>
 
     <select id="selectByStudentId" parameterType="long" resultMap="BaseResultMap">

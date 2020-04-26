@@ -60,9 +60,6 @@ public class FinishGroupOrUnit {
     private LearnExtendMapper learnExtendMapper;
 
     @Resource
-    private LogOpt logOpt;
-
-    @Resource
     private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
 
     @Resource
@@ -79,6 +76,9 @@ public class FinishGroupOrUnit {
 
     @Resource
     private SyntaxUnitMapper syntaxUnitMapper;
+
+    @Resource
+    private UnitTestStoreMapper unitTestStoreMapper;
 
     @Resource
     private RedisOpt redisOpt;
@@ -351,6 +351,8 @@ public class FinishGroupOrUnit {
                 return isEasy ? FlowConstant.FREE_TEKS_LISTEN : FlowConstant.FREE_TEKS_TRAIN;
             case 5:
                 return isEasy ? FlowConstant.FREE_SYNTAX_GAME : FlowConstant.FREE_SYNTAX_WRITE;
+            case 6:
+                return FlowConstant.GOLD_TEST;
             default:
                 return null;
         }
@@ -430,13 +432,23 @@ public class FinishGroupOrUnit {
     }
 
     /**
-     * 一键学习单元完成操作
+     * 完成金币试卷模块，初始化下个优先级学习数据
      *
      * @param dto
      * @return
      */
-    private FlowVO finishOneKeyUnit(NodeDto dto) {
+    public FlowVO finishGoldTest(NodeDto dto) {
+        NodeDto nodeDto = this.getNextFlowInfo(dto);
+        return packageFlowVO.packageFlowVO(nodeDto.getStudyFlowNew(), nodeDto.getStudent(), nodeDto.getUnitId());
+    }
 
+    /**
+     * 获取下一个优先级信息
+     *
+     * @param dto
+     * @return
+     */
+    public NodeDto getNextFlowInfo(NodeDto dto) {
         // 更新优先级表中的变化优先级
         StudentStudyPlanNew oldMaxFinalLevel = this.getMaxFinalLevelStudentStudyPlanNew(dto);
         this.updateLevel(dto, oldMaxFinalLevel);
@@ -444,26 +456,63 @@ public class FinishGroupOrUnit {
         Student student = dto.getStudent();
         Long studentId = student.getId();
 
-        logOpt.saveOpenUnitLog(student, dto.getUnitId());
-
-        // 根据优先级初始化学习表数据
         StudentStudyPlanNew maxStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
+        maxStudentStudyPlanNew = this.judgeHasGoldTest(dto, maxStudentStudyPlanNew);
+
         Long flowId = maxStudentStudyPlanNew.getFlowId();
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(flowId);
+        return NodeDto.builder()
+                .student(dto.getStudent())
+                .studyFlowNew(studyFlowNew)
+                .unitId(maxStudentStudyPlanNew.getUnitId())
+                .studentStudyPlanNew(maxStudentStudyPlanNew)
+                .build();
+    }
 
+    /**
+     * 获取下一个优先级数据
+     *
+     * @param dto
+     * @param maxStudentStudyPlanNew
+     */
+    public StudentStudyPlanNew judgeHasGoldTest(NodeDto dto, StudentStudyPlanNew maxStudentStudyPlanNew) {
+        if (maxStudentStudyPlanNew.getEasyOrHard() == 3) {
+            // 如果是金币试卷流程，判断当前单元是否可以测试，如果不可以测试初始化下个优先级
+            int count = unitTestStoreMapper.countByUnitId(maxStudentStudyPlanNew.getUnitId());
+            if (count == 0) {
+                this.updateLevel(dto, maxStudentStudyPlanNew);
+                maxStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(dto.getStudent().getId());
+                this.judgeHasGoldTest(dto, maxStudentStudyPlanNew);
+            }
+        }
+        return maxStudentStudyPlanNew;
+    }
+
+    /**
+     * 一键学习单元完成操作
+     *
+     * @param dto
+     * @return
+     */
+    public FlowVO finishOneKeyUnit(NodeDto dto) {
+        NodeDto nodeDto = this.getNextFlowInfo(dto);
+
+        // 根据优先级初始化学习表数据
+        StudyFlowNew studyFlowNew = nodeDto.getStudyFlowNew();
         Integer modelType = FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(studyFlowNew.getFlowName());
-        LearnNew learnNew = initData.saveLearn(maxStudentStudyPlanNew, modelType);
+        LearnNew learnNew = initData.saveLearn(nodeDto.getStudentStudyPlanNew(), modelType);
 
         // 将当前单元的已学习记录状态置为已完成
-        learnHistoryMapper.updateStateByStudentIdAndUnitId(studentId, dto.getUnitId(), 2);
+        Student student = nodeDto.getStudent();
+        learnHistoryMapper.updateStateByStudentIdAndUnitId(student.getId(), dto.getUnitId(), 2);
 
         initData.initStudentFlow(NodeDto.builder()
                 .student(dto.getStudent())
-                .nodeId(flowId)
+                .nodeId(nodeDto.getStudentStudyPlanNew().getFlowId())
                 .learnNew(learnNew)
                 .build());
 
-        return packageFlowVO.packageFlowVO(studyFlowNew, student, maxStudentStudyPlanNew.getUnitId());
+        return packageFlowVO.packageFlowVO(studyFlowNew, student, nodeDto.getUnitId());
     }
 
     /**

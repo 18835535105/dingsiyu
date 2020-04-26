@@ -524,13 +524,13 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 maps.forEach(map -> {
                     long studyUnit = Long.parseLong(map.get("unitId").toString());
                     long easyOrHard = Long.parseLong(map.get("easyOrHard").toString());
-                    int count = errorLearnLogMapper.selectCountByStudentIdAndUnitIdAndEasyOrHard
+                    int errCount = errorLearnLogMapper.selectCountByStudentIdAndUnitIdAndEasyOrHard
                             (studentId, studyUnit, easyOrHard);
                     Map<String, Object> studyMap = allUnitStudyCount.get(studyUnit);
                     if (studyMap != null) {
                         if (studyMap.get("count") != null) {
                             int studyCount = Integer.parseInt(studyMap.get("count").toString());
-                            double studyDouble = 1.0 * count / studyCount;
+                            double studyDouble = 1.0 * errCount / studyCount;
                             if (isMap.size() == 0) {
                                 isMap.put("unitId", studyUnit);
                                 isMap.put("easyOrHard", easyOrHard);

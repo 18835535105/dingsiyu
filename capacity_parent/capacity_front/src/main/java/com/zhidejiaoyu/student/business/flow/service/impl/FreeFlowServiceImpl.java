@@ -120,6 +120,12 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         Student student = super.getStudent(session);
         dto.setStudent(student);
 
+        if (dto.getModelType() == 6) {
+            // 金币试卷模块
+            StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(FlowConstant.GOLD_TEST);
+            this.packageFlowVO(studyFlowNew, student, dto.getUnitId());
+        }
+
         if (dto.getNodeId() == null) {
             return this.getIndexNodeResponse(dto);
         }

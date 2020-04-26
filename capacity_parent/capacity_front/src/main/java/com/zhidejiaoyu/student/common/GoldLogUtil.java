@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutorService;
  */
 @Slf4j
 @Component
-public class SaveGoldLog {
+public class GoldLogUtil {
 
     private static ExecutorService executorService;
     private static GoldLogMapper goldLogMapper;
@@ -79,6 +79,9 @@ public class SaveGoldLog {
                 .createTime(new Date())
                 .type(type)
                 .build());
+    }
+
+    private GoldLogUtil() {
     }
 
 }

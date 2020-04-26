@@ -45,6 +45,11 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
      */
     private static final int SYNTAX_MODEL_TYPE = 3;
 
+    /**
+     * 金币试卷type值
+     */
+    private static final int GOLD_TEST = 5;
+
     @Resource
     private CourseConfigMapper courseConfigMapper;
 
@@ -62,6 +67,9 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
     @Resource
     private SyntaxUnitMapper syntaxUnitMapper;
+
+    @Resource
+    private TestRecordMapper testRecordMapper;
 
     static {
         MAPPING.put(GradeNameConstant.FIRST_GRADE, "one");
@@ -189,8 +197,15 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             // 各个课程下所有单元个数
             Map<Long, Map<Long, Object>> unitCountInCourse = courseNewMapper.countUnitByIds(courseIds, type);
 
-            // 各个课程下已学习单元个数
-            Map<Long, Map<Long, Object>> learnUnitCountInCourse = learnHistoryMapper.countUnitByStudentIdAndCourseIds(student.getId(), courseIds, type);
+            Map<Long, Map<Long, Object>> learnUnitCountInCourse;
+            Long studentId = student.getId();
+            if (type == GOLD_TEST) {
+                // 各个课程下已参与过金币试卷测试单元个数
+                learnUnitCountInCourse = testRecordMapper.countGoldTestByStudentIdAndCourseIds(studentId, courseIds);
+            } else {
+                // 各个课程下已学习单元个数
+                learnUnitCountInCourse = learnHistoryMapper.countUnitByStudentIdAndCourseIds(studentId, courseIds, type);
+            }
 
             List<CourseNew> courseNews = courseNewMapper.selectBatchIds(smallCourseIds);
 

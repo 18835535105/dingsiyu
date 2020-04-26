@@ -14,6 +14,12 @@ public class MailServiceTest extends BaseTest {
 
     @Test
     public void sendSimpleMail() {
+        mailService.sendSimpleMail(Mail.builder()
+                .to(new String[]{"763396567@qq.com"})
+                .filePath(FileConstant.TMP_EXCEL + "充课卡详情表1573024991962.xlsx")
+                .subject("测试")
+                .content("测试")
+                .build());
     }
 
     @Test

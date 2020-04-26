@@ -108,6 +108,11 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             return this.getIndexNodeResponse(dto);
         }
 
+        if (Objects.equals(dto.getNodeId(), FlowConstant.GOLD_TEST)) {
+            // 金币试卷节点，初始化下一个优先级数据
+            return ServerResponse.createBySuccess(finishGroupOrUnit.finishGoldTest(dto));
+        }
+
         StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(dto.getNodeId());
 
         if (studyFlowNew == null) {
@@ -241,6 +246,8 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         if (studentFlowNew == null) {
             // 查询学生最高优先级数据
             maxFinalLevelStudentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(studentId);
+
+            maxFinalLevelStudentStudyPlanNew = finishGroupOrUnit.judgeHasGoldTest(dto, maxFinalLevelStudentStudyPlanNew);
 
             studentFlowNew = studentFlowNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(studentId,
                     maxFinalLevelStudentStudyPlanNew.getUnitId(), maxFinalLevelStudentStudyPlanNew.getEasyOrHard());

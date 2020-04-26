@@ -24,7 +24,7 @@ import com.zhidejiaoyu.student.business.smallapp.vo.TotalDataVO;
 import com.zhidejiaoyu.student.business.smallapp.vo.index.AdsensesVO;
 import com.zhidejiaoyu.student.business.smallapp.vo.index.CardVO;
 import com.zhidejiaoyu.student.business.smallapp.vo.index.IndexVO;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -115,7 +115,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             student.setOfflineGold(BigDecimalUtil.add(student.getOfflineGold(), reduceGold));
             studentMapper.updateById(student);
 
-            SaveGoldLog.saveReplenishGoldLog(student.getId(), "补签", reduceGold);
+            GoldLogUtil.saveReplenishGoldLog(student.getId(), "补签", reduceGold);
 
             return ServerResponse.createBySuccess();
         }

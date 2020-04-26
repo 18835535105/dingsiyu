@@ -15,4 +15,6 @@ public interface GenreConstant {
     String BEFORE_LEARN_GAME_TEST = "学前游戏测试";
 
     String SMALLAPP_GENRE = "飞行测试";
+
+    String GOLD_TEST = "金币试卷测试";
 }

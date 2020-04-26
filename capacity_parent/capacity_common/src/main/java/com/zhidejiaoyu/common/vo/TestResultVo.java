@@ -60,4 +60,9 @@ public class TestResultVo implements Serializable {
      * 分数
      */
     private Integer point;
+
+    /**
+     * 绝招好课测试，奖励代金券、飞船等信息说明文字
+     */
+    private String awardStr;
 }

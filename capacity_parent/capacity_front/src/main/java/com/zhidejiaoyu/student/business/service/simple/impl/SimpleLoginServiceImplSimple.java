@@ -15,8 +15,7 @@ import com.zhidejiaoyu.common.utils.ValidateCode;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.business.index.service.impl.IndexServiceImpl;
-import com.zhidejiaoyu.student.common.SaveGoldLog;
+import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import com.zhidejiaoyu.common.constant.PetImageConstant;
 import com.zhidejiaoyu.student.business.service.simple.SimpleLoginServiceSimple;
@@ -110,7 +109,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
                 // 首次修改密码
                 int gold = 10;
                 student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
-                SaveGoldLog.saveStudyGoldLog(student.getId(), "首次修改密码", gold);
+                GoldLogUtil.saveStudyGoldLog(student.getId(), "首次修改密码", gold);
 
                 // 首次修改密码奖励
                 goldAwardAsync.dailyAward(student, 12);

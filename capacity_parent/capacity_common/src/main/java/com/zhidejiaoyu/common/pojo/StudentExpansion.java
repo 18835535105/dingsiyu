@@ -80,6 +80,11 @@ public class StudentExpansion extends Model<StudentExpansion> {
      */
     private Long ranking;
 
+    /**
+     * 代金券数量
+     */
+    private Integer cashCoupon;
+
     @Override
     protected Serializable pkVal() {
         return this.id;

@@ -10,7 +10,7 @@ import com.zhidejiaoyu.common.vo.TestResultVo;
 import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
 import com.zhidejiaoyu.common.vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.vo.testVo.TestResultVO;
-import com.zhidejiaoyu.student.business.service.TestService;
+import com.zhidejiaoyu.student.business.test.service.TestService;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;

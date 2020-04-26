@@ -69,7 +69,7 @@ public class IndexController {
     /**
      * 获取各个年级课程数据
      *
-     * @param type     1：单词；2：句型；3：语法；4：课文
+     * @param type     1：单词；2：句型；3：语法；4：课文；5：金币试卷
      * @param courseId 课程id，用于查询课程版本
      * @return
      */

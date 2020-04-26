@@ -19,5 +19,6 @@ public class FlowNameToLearnModelType {
         FLOW_NEW_TO_LEARN_MODEL_TYPE.put("流程4", 2);
         FLOW_NEW_TO_LEARN_MODEL_TYPE.put("流程5", 3);
         FLOW_NEW_TO_LEARN_MODEL_TYPE.put("流程6", 4);
+        FLOW_NEW_TO_LEARN_MODEL_TYPE.put("流程7", 5);
     }
 }

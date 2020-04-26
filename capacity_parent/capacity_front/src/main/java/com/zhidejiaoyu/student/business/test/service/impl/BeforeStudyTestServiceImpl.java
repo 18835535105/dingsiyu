@@ -26,7 +26,6 @@ import com.zhidejiaoyu.common.vo.TestResultVo;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import com.zhidejiaoyu.student.business.flow.FlowConstant;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
-import com.zhidejiaoyu.student.business.service.impl.TestServiceImpl;
 import com.zhidejiaoyu.student.business.test.constant.TestConstant;
 import com.zhidejiaoyu.student.business.test.service.BeforeStudyTestService;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
@@ -357,6 +356,14 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
                     .finalLevel(basePriority - PriorityUtil.HARD_NUM + errorPriority + timePriority)
                     .build();
             studentStudyPlanNews.add(hardStudentStudyPlan);
+
+            StudentStudyPlanNew goldTestStudyPlan = studentStudyPlanNewBuilder
+                    .easyOrHard(3)
+                    .baseLevel(basePriority - PriorityUtil.HARD_NUM - PriorityUtil.GOLD_TEST_NUM)
+                    .flowId(FlowConstant.GOLD_TEST)
+                    .finalLevel(basePriority - PriorityUtil.HARD_NUM - PriorityUtil.GOLD_TEST_NUM + errorPriority + timePriority)
+                    .build();
+            studentStudyPlanNews.add(goldTestStudyPlan);
         }
 
         this.saveBatch(studentStudyPlanNews);

@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.student.business.feedback.service.BugFeedBackService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -28,6 +29,7 @@ public class BugFeedBackServiceImpl extends BaseServiceImpl<BugFeedbackMapper, B
     private StudyCapacityMapper studyCapacityMapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveBugBack(HttpSession session, BugFeedback feedback, Long vocaId) {
         Integer type = getType(feedback.getStudyModel());
 
@@ -49,7 +51,7 @@ public class BugFeedBackServiceImpl extends BaseServiceImpl<BugFeedbackMapper, B
         if (studyModel == null) {
             return null;
         }
-        Integer integer = Integer.parseInt(studyModel);
+        int integer = Integer.parseInt(studyModel);
         boolean flag = (integer >= 0 && integer <= 3) || (integer >= 14 && integer <= 22)
                 || integer == 27 || integer == 26;
         if (flag) {
