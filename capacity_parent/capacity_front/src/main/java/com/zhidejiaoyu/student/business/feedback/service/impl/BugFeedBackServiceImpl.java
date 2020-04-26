@@ -41,7 +41,7 @@ public class BugFeedBackServiceImpl extends BaseServiceImpl<BugFeedbackMapper, B
             feedback.setCreateTime(LocalDateTime.now());
             bugFeedbackMapper.insert(feedback);
         }
-        if (type != null) {
+        if (type != null && vocaId != null) {
             List<Integer> listType = getListType(type);
             studyCapacityMapper.deleteByTypeAndvocaId(listType, vocaId);
         }
