@@ -28,11 +28,16 @@ public class BugFeedBackController {
     private BugFeedBackService bugFeedBackService;
 
     @PostMapping("/saveBugBack")
-    public Object saveBugBack(HttpSession session, @Valid BugFeedback feedback, Long vocaId) {
+    public Object saveBugBack(HttpSession session, @Valid BugFeedback feedback, String vocaId) {
         /*if (vocaId == null) {
             return ServerResponse.createByErrorCodeMessage(400, "vocaId不能为空");
         }*/
-        bugFeedBackService.saveBugBack(session, feedback, vocaId);
+        if (vocaId == null || vocaId.equals("")) {
+            bugFeedBackService.saveBugBack(session, feedback, null);
+        } else {
+            bugFeedBackService.saveBugBack(session, feedback, Long.parseLong(vocaId));
+        }
+
         return ServerResponse.createBySuccess();
     }
 
