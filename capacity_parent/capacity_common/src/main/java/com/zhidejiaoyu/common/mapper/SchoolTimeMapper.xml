@@ -69,7 +69,7 @@
         select count(id) from school_time where type=2 and user_id=#{studentId}
     </select>
     <select id="selectByGradeAndLabel" parameterType="map" resultType="int">
-        select count(id) from school_time plan
+        select count(course.id) from school_time plan
         join course_new course on plan.course_id = course.id
         where (course.grade =#{grade} or course.grade_ext =#{grade})
         and (course.label=#{label} or course.label_ext=#{label})
