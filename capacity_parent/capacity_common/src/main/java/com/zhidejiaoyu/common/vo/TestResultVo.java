@@ -39,12 +39,6 @@ public class TestResultVo implements Serializable {
      */
     private String petSay;
 
-    private String petName;
-
-    private String text;
-
-    private String imgUrl;
-
     /**
      * 奖励能量数
      */

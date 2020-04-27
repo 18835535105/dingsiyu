@@ -32,6 +32,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
 import com.zhidejiaoyu.common.utils.testUtil.TestSentenceUtil;
+import com.zhidejiaoyu.common.vo.TeksTestResultVo;
 import com.zhidejiaoyu.common.vo.TestResultVo;
 import com.zhidejiaoyu.common.vo.game.StrengthGameVo;
 import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
@@ -968,7 +969,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecord.setPoint(90);
         testRecord.setStudentId(student.getId());
         Map<String, Object> resultMap = new HashMap<>(16);
-        TestResultVo testResultVo = new TestResultVo();
+        TeksTestResultVo testResultVo = new TeksTestResultVo();
         testResultVo.setEnergy(0);
         testResultVo.setGold(0);
         getTestRecord(student, testRecord, 90, resultMap, testResultVo);
@@ -991,7 +992,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         return ServerResponse.createBySuccess(resultMap);
     }
 
-    private void getTestRecord(Student student, TestRecord testRecord, Integer point, Map<String, Object> resultMap, TestResultVo testResultVo) {
+    private void getTestRecord(Student student, TestRecord testRecord, Integer point, Map<String, Object> resultMap, TeksTestResultVo testResultVo) {
         if (point < PointConstant.EIGHTY) {
             resultMap.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
             resultMap.put("text", "很遗憾，闯关失败，再接再厉。");
@@ -1035,7 +1036,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testRecordMapper.insert(testRecord);
     }
 
-    private void getTestResultVo(TestResultVo testResultVo, String listenStr, String[] backMsg, String msg) {
+    private void getTestResultVo(TeksTestResultVo testResultVo, String listenStr, String[] backMsg, String msg) {
         testResultVo.setPetSay(listenStr);
         testResultVo.setPetName(listenStr);
         testResultVo.setBackMsg(backMsg);
