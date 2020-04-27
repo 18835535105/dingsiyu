@@ -948,19 +948,21 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         Long unitId = dto.getUnitId() == null ? null : dto.getUnitId()[0];
         long courseId = dto.getCourseId();
         int classify = dto.getClassify();
+        String failureBackMsg = "别气馁，已经超越了" + TestPointUtil.getPercentage(point) + "的同学，继续努力吧！";
+        String successBackMsg = "恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！";
         switch (genre) {
             // 没有该模块
             case "测试复习":
                 if (point < 80) {
                     msg = "闯关失败，请再接再厉！";
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.CAPACITY_REVIEW_LESS_EIGHTY));
-                    vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+                    vo.setBackMsg(failureBackMsg);
                     testRecord.setPass(2);
                 } else {
                     msg = "真让人刮目相看！继续学习吧！";
                     vo.setPetSay(petSayUtil.getMP3Url(petName, PetMP3Constant.CAPACITY_REVIEW_EIGHTY_TO_HUNDRED));
                     ccieUtil.saveCcieTest(student, 6, classify, courseId, unitId, point);
-                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    vo.setBackMsg(successBackMsg);
                     testRecord.setPass(1);
                 }
                 vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "智能复习测试"));
@@ -975,10 +977,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     ccieUtil.saveCcieTest(student, 3, classify, courseId, unitId, point);
                 }
                 if (point < 90) {
-                    vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+                    vo.setBackMsg(failureBackMsg);
                     testRecord.setPass(2);
                 } else {
-                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    vo.setBackMsg(successBackMsg);
                     testRecord.setPass(1);
                 }
 
@@ -995,10 +997,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     ccieUtil.saveCcieTest(student, 4, classify, courseId, unitId, point);
                 }
                 if (point < 90) {
-                    vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+                    vo.setBackMsg(failureBackMsg);
                     testRecord.setPass(2);
                 } else {
-                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    vo.setBackMsg(successBackMsg);
                     testRecord.setPass(1);
                 }
 
@@ -1015,10 +1017,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     ccieUtil.saveCcieTest(student, 5, classify, courseId, unitId, point);
                 }
                 if (point < 90) {
-                    vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+                    vo.setBackMsg(failureBackMsg);
                     testRecord.setPass(2);
                 } else {
-                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    vo.setBackMsg(successBackMsg);
                     testRecord.setPass(1);
                 }
 
@@ -1035,10 +1037,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     ccieUtil.saveCcieTest(student, 4, classify, courseId, unitId, point);
                 }
                 if (point < 90) {
-                    vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+                    vo.setBackMsg(failureBackMsg);
                     testRecord.setPass(2);
                 } else {
-                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    vo.setBackMsg(successBackMsg);
                     testRecord.setPass(1);
                 }
 
@@ -1055,10 +1057,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     ccieUtil.saveCcieTest(student, 5, classify, courseId, unitId, point);
                 }
                 if (point < 90) {
-                    vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+                    vo.setBackMsg(failureBackMsg);
                     testRecord.setPass(2);
                 } else {
-                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    vo.setBackMsg(successBackMsg);
                     testRecord.setPass(1);
                 }
 
@@ -1074,10 +1076,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
                     ccieUtil.saveCcieTest(student, 6, -1, courseId, unitId, point);
                 }
                 if (point < 90) {
-                    vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+                    vo.setBackMsg(failureBackMsg);
                     testRecord.setPass(2);
                 } else {
-                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    vo.setBackMsg(successBackMsg);
                     testRecord.setPass(1);
                 }
                 msg = point < 90 ? "你的测试未成功，请再接再厉！" : "赞！VERY GOOD!记得学而时习之哦！";

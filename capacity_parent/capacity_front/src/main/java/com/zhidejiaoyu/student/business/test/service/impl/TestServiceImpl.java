@@ -656,30 +656,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         return null;
     }
 
-    /**
-     * 根据成绩计算金币奖励
-     *
-     * @param student    当前学生
-     * @param testRecord 测试成绩
-     * @return 学生奖励金币数
-     */
-    private int award(Student student, TestRecord testRecord) {
-        int point = testRecord.getPoint();
-        int goldCount = 0;
-        if (point >= PointConstant.EIGHTY && point < PointConstant.NINETY) {
-            goldCount = 3;
-            this.saveLog(student, goldCount, null, "游戏测试");
-        } else if (point >= PointConstant.NINETY && point < PointConstant.HUNDRED) {
-            goldCount = 5;
-            this.saveLog(student, goldCount, null, "游戏测试");
-        } else if (point == PointConstant.HUNDRED) {
-            goldCount = 10;
-            this.saveLog(student, goldCount, null, "游戏测试");
-        }
-        studentMapper.updateById(student);
-        return goldCount;
-    }
-
     @Override
     public ServerResponse<Map<String, Object>> getLevelTest(HttpSession session) {
         Student student = getStudent(session);
@@ -1007,27 +983,18 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             testRecord.setPass(1);
         }
         if (testResultVo != null) {
-            getTestResultVo(testResultVo,
-                    " ",
-                    " ",
-                    "很遗憾，闯关失败，再接再厉。");
-        }
-        resultMap.put("point", point);
-        resultMap.put("imgUrl", AliyunInfoConst.host + student.getPartUrl());
-        if (testResultVo != null) {
+            testResultVo.setPetSay("");
+            testResultVo.setPetName("");
+            testResultVo.setBackMsg("");
+            testResultVo.setMsg("很遗憾，闯关失败，再接再厉。");
+            testResultVo.setText("很遗憾，闯关失败，再接再厉。");
             testResultVo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
             testResultVo.setImgUrl(AliyunInfoConst.host + student.getPartUrl());
         }
+        resultMap.put("point", point);
+        resultMap.put("imgUrl", AliyunInfoConst.host + student.getPartUrl());
 
         testRecordMapper.insert(testRecord);
-    }
-
-    private void getTestResultVo(TeksTestResultVo testResultVo, String listenStr, String backMsg, String msg) {
-        testResultVo.setPetSay(listenStr);
-        testResultVo.setPetName(listenStr);
-        testResultVo.setBackMsg(backMsg);
-        testResultVo.setMsg(msg);
-        testResultVo.setText(msg);
     }
 
     @Override
@@ -1372,20 +1339,23 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     public static String getTestMessage(Student student, TestResultVo vo, TestRecord testRecord, int pass, PetSayUtil petSayUtil) {
         String msg;
-        if (testRecord.getPoint() < pass) {
+        Integer point = testRecord.getPoint();
+        String failureBackMsg = "别气馁，已经超越了" + TestPointUtil.getPercentage(point) + "的同学，继续努力吧！";
+        String successBackMsg = "恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！";
+        if (point < pass) {
             msg = "很遗憾，闯关失败，再接再厉。";
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
-            vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(testRecord.getPoint()), "的同学，继续努力吧！"});
+            vo.setBackMsg(failureBackMsg);
             testRecord.setPass(2);
-        } else if (testRecord.getPoint() < PointConstant.HUNDRED) {
+        } else if (point < PointConstant.HUNDRED) {
             msg = "闯关成功，独孤求败！";
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
-            vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(testRecord.getPoint()), "的同学，再接再励！"});
+            vo.setBackMsg(successBackMsg);
             testRecord.setPass(1);
         } else {
             msg = "恭喜你刷新了纪录！";
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
-            vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(testRecord.getPoint()), "的同学，再接再励！"});
+            vo.setBackMsg(successBackMsg);
             testRecord.setPass(1);
         }
         return msg;

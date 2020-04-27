@@ -596,21 +596,23 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
     private String getMsg(Student student, TestResultVo vo, Integer classify, TestRecord testRecord, Integer point) {
         String msg;
+        String failureBackMsg = "别气馁，已经超越了" + TestPointUtil.getPercentage(point) + "的同学，继续努力吧！";
+        String successBackMsg = "恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！";
         if (classify == 8 || classify == 9) {
             if (point < PointConstant.FIFTY) {
                 msg = "很遗憾，闯关失败。但是，绊脚石乃是进身之阶。";
                 vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.AFTER_UNIT_FIRST_LEVEL));
-                vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+                vo.setBackMsg(failureBackMsg);
                 testRecord.setPass(2);
             } else if (point < PointConstant.HUNDRED) {
                 msg = "闯关成功。彪悍的人生不需要解释！";
                 vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.AFTER_UNIT_SECOND_LEVEL));
-                vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                vo.setBackMsg(successBackMsg);
                 testRecord.setPass(1);
             } else {
                 msg = "恭喜你刷新了记录。果然是经天纬地之才！";
                 vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.AFTER_UNIT_THIRD_LEVEL));
-                vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                vo.setBackMsg(successBackMsg);
                 testRecord.setPass(1);
             }
             // 单词辩音, 词组辩音
@@ -634,20 +636,22 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      */
     private String packageMsg(Student student, TestResultVo vo, Integer point, int pass, TestRecord testRecord) {
         String msg;
+        String failureBackMsg = "别气馁，已经超越了" + TestPointUtil.getPercentage(point) + "的同学，继续努力吧！";
+        String successBackMsg = "恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！";
         if (point < pass) {
             msg = "很遗憾，闯关失败。但是，绊脚石乃是进身之阶。";
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.AFTER_UNIT_FIRST_LEVEL));
-            vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+            vo.setBackMsg(failureBackMsg);
             testRecord.setPass(2);
         } else if (point < PointConstant.HUNDRED) {
             msg = "闯关成功。彪悍的人生不需要解释。";
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.AFTER_UNIT_SECOND_LEVEL));
-            vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+            vo.setBackMsg(successBackMsg);
             testRecord.setPass(1);
         } else {
             msg = "恭喜你刷新了记录。果然是经天纬地之才！";
             vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.AFTER_UNIT_THIRD_LEVEL));
-            vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+            vo.setBackMsg(successBackMsg);
             testRecord.setPass(1);
         }
         return msg;
@@ -1065,20 +1069,21 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
     private int getPreSchoolTestGold(TestRecord testRecord, int modelType, Student student, String typeModel, TestResultVo vo, int point) {
         int gold = 0;
-
+        String failureBackMsg = "别气馁，已经超越了" + TestPointUtil.getPercentage(point) + "的同学，继续努力吧！";
+        String successBackMsg = "恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！";
         if ("学后测试".equals(typeModel)) {
             if (point < 80) {
                 vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.COURSE_TEST_LESS_EIGHTY));
                 testRecord.setExplain("你和优秀的人差的不是智商，是努力。");
                 vo.setMsg("你和优秀的人差的不是智商，是努力。");
-                vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+                vo.setBackMsg(failureBackMsg);
                 testRecord.setPass(2);
             } else {
                 gold = 5;
                 vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.COURSE_TEST_EIGHTY_TO_HUNDRED));
                 testRecord.setExplain("谁都不能阻止你成为优秀的人！");
                 vo.setMsg("谁都不能阻止你成为优秀的人！");
-                vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                vo.setBackMsg(successBackMsg);
                 testRecord.setPass(1);
             }
         }
@@ -1090,7 +1095,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
                     packageUnPassTestRecordVo(testRecord, student, vo, point);
                 } else {
                     gold = getGold(testRecord, student, vo, point);
-                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    vo.setBackMsg(successBackMsg);
                     testRecord.setPass(1);
                 }
             } else if (modelType == 1 || modelType == 2) {
@@ -1099,7 +1104,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
                     packageUnPassTestRecordVo(testRecord, student, vo, point);
                 } else {
                     gold = getGold(testRecord, student, vo, point);
-                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    vo.setBackMsg(successBackMsg);
                     testRecord.setPass(1);
                 }
             } else {
@@ -1107,7 +1112,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
                     packageUnPassTestRecordVo(testRecord, student, vo, point);
                 } else {
                     gold = getGold(testRecord, student, vo, point);
-                    vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+                    vo.setBackMsg(successBackMsg);
                     testRecord.setPass(1);
                 }
             }
@@ -1118,7 +1123,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
                 testRecord.setExplain("学海攀崖，尽力而为，曙光必见。");
                 vo.setMsg("学海攀崖，尽力而为，曙光必见。");
                 vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.WORD_TEST_LESS_EIGHTY));
-                vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+                vo.setBackMsg(failureBackMsg);
                 testRecord.setPass(2);
             } else if (point < 90) {
                 gold = 5;
@@ -1151,7 +1156,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         testRecord.setExplain("测试失败，有潜力的人总是厚积薄发。");
         vo.setMsg("测试失败，有潜力的人总是厚积薄发。");
         vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.BEFORE_UNIT_FIRST_LEVEL));
-        vo.setBackMsg(new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
+        vo.setBackMsg("别气馁，已经超越了" + TestPointUtil.getPercentage(point) + "的同学，继续努力吧！");
         testRecord.setPass(2);
     }
 
@@ -1159,7 +1164,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         testRecord.setExplain("这成绩，可真是绝顶到家了！");
         vo.setMsg("这成绩，可真是绝顶到家了！");
         vo.setPetSay(petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.WORD_TEST_EIGHTY_TO_HUNDRED));
-        vo.setBackMsg(new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
+        vo.setBackMsg("恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！");
         testRecord.setPass(1);
     }
 
