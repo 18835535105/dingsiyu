@@ -973,7 +973,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         testResultVo.setEnergy(0);
         testResultVo.setGold(0);
         getTestRecord(student, testRecord, 90, resultMap, testResultVo);
-        return ServerResponse.createBySuccess(testRecord);
+        return ServerResponse.createBySuccess(testResultVo);
     }
 
 
