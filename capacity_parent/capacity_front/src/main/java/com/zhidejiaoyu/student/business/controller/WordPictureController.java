@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * 单词模块的看图学习
@@ -50,10 +48,10 @@ public class WordPictureController {
                                                      @RequestParam(required = false) String token){
         Assert.notNull(unitId, "parameter: \"unitId\" can not be blank");
 
-        Object object = session.getAttribute("token");
-        if (object == null || !Objects.equals(object.toString(), token)) {
-            return ServerResponse.createBySuccess(new ArrayList<>());
-        }
+//        Object object = session.getAttribute("token");
+//        if (object == null || !Objects.equals(object.toString(), token)) {
+//            return ServerResponse.createBySuccess(new ArrayList<>());
+//        }
 
         return wordPictureService.getWordPicUnitTest(session, unitId, courseId, isTrue);
     }

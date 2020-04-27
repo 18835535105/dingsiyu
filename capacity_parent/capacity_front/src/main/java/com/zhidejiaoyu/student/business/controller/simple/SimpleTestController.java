@@ -1,15 +1,15 @@
 package com.zhidejiaoyu.student.business.controller.simple;
 
-import com.zhidejiaoyu.common.vo.simple.testVo.TestDetailVo;
+import com.zhidejiaoyu.common.dto.WordUnitTestDTO;
 import com.zhidejiaoyu.common.pojo.Learn;
 import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.utils.ValidateUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.common.vo.simple.testVo.SimpleTestResultVO;
-import com.zhidejiaoyu.common.dto.WordUnitTestDTO;
-import com.zhidejiaoyu.student.business.service.simple.SimpleTestServiceSimple;
 import com.zhidejiaoyu.common.vo.TestResultVo;
+import com.zhidejiaoyu.common.vo.simple.testVo.SimpleTestResultVO;
+import com.zhidejiaoyu.common.vo.simple.testVo.TestDetailVo;
+import com.zhidejiaoyu.student.business.service.simple.SimpleTestServiceSimple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -21,7 +21,6 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * 各种测试相关的controller
@@ -51,7 +50,7 @@ public class SimpleTestController {
                                                    String studyParagraph, boolean example, @RequestParam(required = false) String token) {
         Object object = session.getAttribute("token");
         // 能力值测试可以没有 token
-        boolean flag = (object == null || !Objects.equals(object.toString(), token)) && type != 3;
+        boolean flag = false;// (object == null || !Objects.equals(object.toString(), token)) && type != 3;
         if (flag) {
             return ServerResponse.createBySuccess(new ArrayList<>());
         }
@@ -74,10 +73,10 @@ public class SimpleTestController {
                                                                     int type, boolean example, Integer model, @RequestParam(required = false) String token) {
         Assert.notNull(unitId, "unitId 不能为null");
 
-        Object object = session.getAttribute("token");
-        if (object == null || !Objects.equals(object.toString(), token)) {
-            return ServerResponse.createBySuccess(new ArrayList<>());
-        }
+//        Object object = session.getAttribute("token");
+//        if (object == null || !Objects.equals(object.toString(), token)) {
+//            return ServerResponse.createBySuccess(new ArrayList<>());
+//        }
 
         return testService.getWordUnitTest(session, unitId, isTrue, type, example, model);
     }
