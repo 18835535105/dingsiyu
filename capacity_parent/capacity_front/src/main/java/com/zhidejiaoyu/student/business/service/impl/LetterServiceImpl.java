@@ -29,31 +29,31 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> implements LetterService {
 
-    @Autowired
+    @Resource
     private CapacityStudentUnitMapper capacityStudentUnitMapper;
-    @Autowired
-    private StudentStudyPlanMapper studentStudyPlanMapper;
-    @Autowired
+    @Resource
     private LetterUnitMapper letterUnitMapper;
-    @Autowired
+    @Resource
     private LearnMapper learnMapper;
-    @Autowired
+    @Resource
     private LetterPairMapper letterPairMapper;
-    @Autowired
+    @Resource
     private LetterMapper letterMapper;
-    @Autowired
+    @Resource
     private LetterWriteMapper letterWriteMapper;
-    @Autowired
+    @Resource
     private TestRecordMapper testRecordMapper;
-    @Autowired
+    @Resource
     private PlayerMapper playerMapper;
-    @Autowired
+    @Resource
     private LetterVocabularyMapper letterVocabularyMapper;
-    @Autowired
+    @Resource
     private BaiduSpeak baiduSpeak;
     @Resource
     private TestMemoryStrength testMemoryStrength;
 
+    private static Long minId=1L;
+    private static Long maxId=4L;
     /**
      * 获取字母单元
      *
@@ -72,22 +72,8 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
             map.put("study", capacityStudentUnit.getUnitId());
             map.put("list", getLetterUnites(letterUnits, studentId));
         } else {
-            //查询学习计划信息
-            StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selLetterByStudentId(studentId);
-            //如果没有学习计划返回
-            if (studentStudyPlan == null) {
-                map.put("study", 0);
-                Map<String, Object> returnMap = new HashMap<>();
-                returnMap.put("id", 0);
-                returnMap.put("unitName", "暂无课程");
-                returnMap.put("isOpen", true);
-                List<Object> list = new ArrayList<>();
-                list.add(returnMap);
-                map.put("list", list);
-                return ServerResponse.createBySuccess(map);
-            }
-            List<LetterUnit> letterUnits = letterUnitMapper.selLetterUnit(studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());
-            map.put("study", studentStudyPlan.getStartUnitId());
+            List<LetterUnit> letterUnits = letterUnitMapper.selLetterUnit(minId, maxId);
+            map.put("study", minId);
             map.put("list", getLetterUnites(letterUnits, studentId));
         }
         return ServerResponse.createBySuccess(map);
@@ -130,12 +116,9 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         if (unitId == null) {
             CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selLetterByStudentId(studentId);
             if (capacityStudentUnit != null) {
-                unitId = capacityStudentUnit.getStartunit();
+                unitId = capacityStudentUnit.getUnitId();
             } else {
-                StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selLetterByStudentId(studentId);
-                if (studentStudyPlan != null) {
-                    unitId = studentStudyPlan.getStartUnitId();
-                }
+                unitId = minId;
             }
         }
         //根据unitId查询单元信息
@@ -170,8 +153,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                 map.put("LettersBreakThrough", false);
             }
             //查看说有单元闯关是否完成
-            StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selLetterByStudentId(studentId);
-            List<LetterUnit> letterUnits = letterUnitMapper.selLetterUnit(studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());
+            List<LetterUnit> letterUnits = letterUnitMapper.selLetterUnit(minId, maxId);
             if (letterUnits != null && letterUnits.size() > 0) {
                 List<Integer> letterUnitIds = new ArrayList<>();
                 for (LetterUnit letterUnit : letterUnits) {
@@ -205,11 +187,6 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     @Override
     public Object getLetterListen(Long unitId, HttpSession session) {
         //查看字母播放器全部数据
-        Long studentId = getStudentId(session);
-        StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selLetterStudyByStudentAndUnitId(studentId, unitId);
-        if (studentStudyPlan == null) {
-            return ServerResponse.createByError(400, "您没有当前课程请按正确路径进入");
-        }
         List<Letter> byUnitId = letterMapper.getByUnitId(unitId);
         Map<String, Object> map = new HashMap<>();
         map.put("list", byUnitId);
@@ -264,13 +241,6 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
     @Override
     public Object getLetterPair(Long unitId, HttpSession session) {
         Long studentId = getStudentId(session);
-        /*//查看是否已经学习完当前的模块
-        Integer letterPairCount = letterPairMapper.selCountStudyLetter(unitId, studentId);
-
-        if (countByUnitId <= letterPairCount) {
-            return ServerResponse.createBySuccess(600, "无学习");
-        }*/
-
         Map<String, Object> map = new HashMap<>();
         //查看黄金记忆点单词
         LetterPair letterPair = letterPairMapper.selPushLetter(unitId, studentId);

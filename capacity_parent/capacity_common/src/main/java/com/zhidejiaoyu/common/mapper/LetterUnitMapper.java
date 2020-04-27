@@ -33,4 +33,11 @@ public interface LetterUnitMapper extends BaseMapper<LetterUnit> {
      * @return
      */
     LetterUnit selectNextUnitId(@Param("unitId") Long unitId);
+
+    /**
+     * 获取字母单元最大最小id
+     * @param type 1，最小单元 2，最大单元
+     * @return
+     */
+    Long selectMinIdOrMaxId(int type);
 }
