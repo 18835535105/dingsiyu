@@ -963,7 +963,8 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             this.saveTestDetail(testDetail, testRecord.getId(), modelType, student);
         }
 
-        vo.setAwardStr(awardStr);
+        //vo.setAwardStr(awardStr);
+        vo.setAwardStr(StringUtils.removeEnd(String.format("报名代金券x%d，%s", 50, 2), "，"));
         vo.setGold(gold);
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, typeModel));
         vo.setTestId(testRecord.getId());
