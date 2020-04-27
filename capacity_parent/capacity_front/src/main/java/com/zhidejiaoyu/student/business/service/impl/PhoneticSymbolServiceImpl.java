@@ -37,20 +37,23 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
     @Autowired
     private PhoneticSymbolMapper phoneticSymbolMapper;
     @Autowired
-    private StudentStudyPlanMapper studentStudyPlanMapper;
-    @Autowired
     private LearnMapper learnMapper;
     @Autowired
     private RedisOpt redisOpt;
     @Autowired
     private TestRecordMapper testRecordMapper;
 
+    private static final Long minId = 1L;
+    private static final Long maxId = 11L;
+
     @Override
     public Object getSymbolUnit(HttpSession session) {
         Student student = getStudent(session);
-        StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selSymbolByStudentId(student.getId());
         List<Object> list = new ArrayList<>();
         Map<String, Object> map = new HashMap<>();
+       /* StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selSymbolByStudentId(student.getId());
+
+        ;
         if (studentStudyPlan == null) {
             map.put("study", 0);
             Map<String, Object> returnMap = new HashMap<>();
@@ -60,7 +63,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
             list.add(returnMap);
             map.put("list", list);
             return ServerResponse.createBySuccess(map);
-        }
+        }*/
         //获取当前学习的课程
         CapacityStudentUnit capacityStudentUnit = capacityStudentUnitMapper.selectByStudentIdAndType(student.getId(), 5);
         if (capacityStudentUnit != null) {
@@ -72,36 +75,35 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         /**
          * 获取单元开启信息
          */
-        if (studentStudyPlan != null) {
-            //获取单元
-            List<LetterUnit> letterUnits = letterUnitMapper.selSymbolUnit(studentStudyPlan.getStartUnitId(), studentStudyPlan.getEndUnitId());
-            Boolean isTrue = true;
-            if (map.get("study") == null) {
-                if (letterUnits != null && letterUnits.size() > 0) {
-                    map.put("study", letterUnits.get(0).getId());
-                }
-            }
-            for (LetterUnit letterUnit : letterUnits) {
-                Map<String, Object> returnMap = new HashMap<>();
-                returnMap.put("id", letterUnit.getId());
-                returnMap.put("unitName", letterUnit.getUnitName());
-                Integer point = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), letterUnit.getId().longValue(), 11);
-                if (isTrue) {
-                    returnMap.put("isOpen", true);
-                    if (point != null) {
-                        if (point < 60) {
-                            isTrue = false;
-                        }
-                    } else {
-                        isTrue = false;
-                    }
-
-                } else {
-                    returnMap.put("isOpen", false);
-                }
-                list.add(returnMap);
+        //获取单元
+        List<LetterUnit> letterUnits = letterUnitMapper.selSymbolUnit(minId, maxId);
+        Boolean isTrue = true;
+        if (map.get("study") == null) {
+            if (letterUnits != null && letterUnits.size() > 0) {
+                map.put("study", letterUnits.get(0).getId());
             }
         }
+        for (LetterUnit letterUnit : letterUnits) {
+            Map<String, Object> returnMap = new HashMap<>();
+            returnMap.put("id", letterUnit.getId());
+            returnMap.put("unitName", letterUnit.getUnitName());
+            Integer point = testRecordMapper.selectUnitTestMaxPointByStudyModel(student.getId(), letterUnit.getId().longValue(), 11);
+            if (isTrue) {
+                returnMap.put("isOpen", true);
+                if (point != null) {
+                    if (point < 60) {
+                        isTrue = false;
+                    }
+                } else {
+                    isTrue = false;
+                }
+
+            } else {
+                returnMap.put("isOpen", false);
+            }
+            list.add(returnMap);
+        }
+
         map.put("list", list);
         return ServerResponse.createBySuccess(map);
     }
@@ -120,8 +122,7 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
             if (capacityStudentUnit != null) {
                 unitId = capacityStudentUnit.getUnitId().intValue();
             } else {
-                StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selSymbolByStudentId(student.getId());
-                unitId = studentStudyPlan.getStartUnitId().intValue();
+                unitId = minId.intValue();
             }
         }
         List<String> symbolsList = phoneticSymbolMapper.selSymbolByUnitId(unitId);
@@ -207,9 +208,8 @@ public class PhoneticSymbolServiceImpl extends BaseServiceImpl<PhoneticSymbolMap
         } else {
             capacityStudentUnit = new CapacityStudentUnit();
             capacityStudentUnit.setUnitId(unitId.longValue());
-            StudentStudyPlan studentStudyPlan = studentStudyPlanMapper.selSymbolByStudentId(studentId);
-            capacityStudentUnit.setStartunit(studentStudyPlan.getStartUnitId());
-            capacityStudentUnit.setEndunit(studentStudyPlan.getEndUnitId());
+            capacityStudentUnit.setStartunit(minId);
+            capacityStudentUnit.setEndunit(maxId);
             capacityStudentUnitMapper.insert(capacityStudentUnit);
         }
         return ServerResponse.createBySuccess(returnList);
