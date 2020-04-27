@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.common.vo;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,7 +11,6 @@ import java.io.Serializable;
  * @date 2018/7/5
  */
 @Data
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class TestResultVo implements Serializable {
     /**
      * 奖励金币数
