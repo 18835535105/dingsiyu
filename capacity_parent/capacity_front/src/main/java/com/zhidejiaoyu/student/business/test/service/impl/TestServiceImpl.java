@@ -1009,7 +1009,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (testResultVo != null) {
             getTestResultVo(testResultVo,
                     "",
-                    "恭喜你，已经超过"+ TestPointUtil.getPercentage(point)+ "的同学，再接再励！",
+                    "",
                     "很遗憾，闯关失败，再接再厉。");
         }
         resultMap.put("point", point);
