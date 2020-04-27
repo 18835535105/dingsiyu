@@ -98,9 +98,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     private TestRecordInfoMapper testRecordInfoMapper;
 
     @Autowired
-    private StudentFlowMapper studentFlowMapper;
-
-    @Autowired
     private RedisOpt redisOpt;
 
     @Autowired
@@ -998,33 +995,22 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             resultMap.put("text", "很遗憾，闯关失败，再接再厉。");
             resultMap.put("backMsg", new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"});
             testRecord.setPass(2);
-            if (testResultVo != null) {
-                getTestResultVo(testResultVo,
-                        petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY), new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(point), "的同学，继续努力吧！"},
-                        "很遗憾，闯关失败，再接再厉。");
-            }
         } else if (point < PointConstant.NINETY) {
             resultMap.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
             resultMap.put("text", "闯关成功，独孤求败！");
             resultMap.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
             testRecord.setPass(1);
-            if (testResultVo != null) {
-                getTestResultVo(testResultVo,
-                        petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED),
-                        new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"},
-                        "闯关成功，独孤求败！");
-            }
         } else {
             resultMap.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
             resultMap.put("text", "恭喜你刷新了纪录！");
             resultMap.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"});
             testRecord.setPass(1);
-            if (testResultVo != null) {
-                getTestResultVo(testResultVo,
-                        petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED),
-                        new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(point), "的同学，再接再励！"},
-                        "恭喜你刷新了纪录！");
-            }
+        }
+        if (testResultVo != null) {
+            getTestResultVo(testResultVo,
+                    "",
+                    new String[]{},
+                    "很遗憾，闯关失败，再接再厉。");
         }
         resultMap.put("point", point);
         resultMap.put("imgUrl", AliyunInfoConst.host + student.getPartUrl());
