@@ -1008,8 +1008,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         }
         if (testResultVo != null) {
             getTestResultVo(testResultVo,
-                    "",
-                    "",
+                    " ",
+                    " ",
                     "很遗憾，闯关失败，再接再厉。");
         }
         resultMap.put("point", point);
