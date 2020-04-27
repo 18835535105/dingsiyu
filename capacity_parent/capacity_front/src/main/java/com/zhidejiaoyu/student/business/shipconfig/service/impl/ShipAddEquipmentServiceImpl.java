@@ -404,7 +404,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         if (studentEquipment == null) {
             StringBuilder builder = new StringBuilder();
             redisOptStatic.initShip(studentId);
-            equipment.forEach(equ -> builder.append(equ.getName()).append("X1，"));
+            equipment.forEach(equ -> builder.append(equ.getName()).append("，"));
             return StringUtils.removeEnd(builder.toString(), "，");
         }
         return "";
