@@ -114,9 +114,14 @@ public interface RedisKeysConst {
     String FIRST_FALSE_ADD = "FIRST_FALSE_ADD";
 
     /**
-     * 微信 access_token key 值
+     * 微信小程序 access_token key 值
      */
-    String WECHAT_ACCESS_TOKEN = "WECHAT_ACCESS_TOKEN";
+    String SMALL_APP_WECHAT_ACCESS_TOKEN = "SMALL_APP_WECHAT_ACCESS_TOKEN";
+
+    /**
+     * 微信公众号 access_token key 值
+     */
+    String PUBLIC_ACCOUNT_WECHAT_ACCESS_TOKEN = "PUBLIC_ACCOUNT_WECHAT_ACCESS_TOKEN";
 
     /**
      * 标识学生已经初始化了飞船信息

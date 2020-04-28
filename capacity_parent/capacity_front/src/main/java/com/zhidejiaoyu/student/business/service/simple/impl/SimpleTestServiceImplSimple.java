@@ -993,7 +993,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             studentExpansionMapper.updateById(studentExpansion);
 
             String shipInfo = ShipAddEquipmentServiceImpl.getTestAddEquipment(student.getId());
-            return StringUtils.removeEnd(String.format("报名代金券x%d，%s", random, shipInfo), "，");
+            return StringUtils.removeEnd(String.format("%d$$%s", random, shipInfo), "，");
         }
         return "";
     }
