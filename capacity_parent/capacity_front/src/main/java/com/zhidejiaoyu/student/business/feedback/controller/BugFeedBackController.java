@@ -28,7 +28,7 @@ public class BugFeedBackController {
     private BugFeedBackService bugFeedBackService;
 
     @PostMapping("/saveBugBack")
-    public Object saveBugBack(HttpSession session, @Valid BugFeedback feedback, String vocaId) {
+    public Object saveBugBack(HttpSession session, @Valid BugFeedback feedback, String vocaId, BindingResult result) {
         /*if (vocaId == null) {
             return ServerResponse.createByErrorCodeMessage(400, "vocaId不能为空");
         }*/
