@@ -344,12 +344,14 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         // 如果学习模块改变，修改learnNew中的modelType值
         int modelType = FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(nextStudyFlowNew.getFlowName());
         LearnNew learnNew = dto.getLearnNew();
-        if (!Objects.equals(modelType, learnNew.getModelType())) {
-            learnNew.setModelType(modelType);
-            learnNewMapper.updateById(learnNew);
-        }
+        if (learnNew != null) {
+            if (!Objects.equals(modelType, learnNew.getModelType())) {
+                learnNew.setModelType(modelType);
+                learnNewMapper.updateById(learnNew);
+            }
 
-        studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(nextStudyFlowNew.getId(), learnNew.getId());
+            studentFlowNewMapper.updateFlowIdByStudentIdAndUnitIdAndType(nextStudyFlowNew.getId(), learnNew.getId());
+        }
 
         return ServerResponse.createBySuccess(flowVO);
     }
