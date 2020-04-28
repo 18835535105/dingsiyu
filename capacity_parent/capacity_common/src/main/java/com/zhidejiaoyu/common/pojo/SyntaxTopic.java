@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
@@ -47,6 +48,7 @@ public class SyntaxTopic extends Model<SyntaxTopic> {
     /**
      * 选择题
      */
+    @TableField("`option`")
     private String option;
     /**
      * 选语法解析

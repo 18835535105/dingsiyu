@@ -66,18 +66,18 @@
     <select id="selectIdAndNameByCourseId" resultType="java.util.Map" parameterType="map">
         select u.id unitId, u.unit_name unitName from unit_new u
         <if test="type == 1">
-            left join unit_vocabulary_new uvn on uvn.unit_id = u.id
+            join unit_vocabulary_new uvn on uvn.unit_id = u.id
         </if>
         <if test="type == 2">
-            left join unit_sentence_new usn on usn.unit_id = u.id
+            join unit_sentence_new usn on usn.unit_id = u.id
         </if>
 
         <if test="type == 4">
-            left join unit_teks_new utn on utn.unit_id = u.id
+            join unit_teks_new utn on utn.unit_id = u.id
         </if>
 
         <if test="type == 5">
-            left join unit_test_store uts on u.id = uts.unit_id
+            join unit_test_store uts on u.id = uts.unit_id
         </if>
         where u.course_id = #{courseId}
         group by u.id
