@@ -967,29 +967,26 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
 
     private void getTestRecord(Student student, TestRecord testRecord, Integer point, Map<String, Object> resultMap, TeksTestResultVo testResultVo) {
         if (point < PointConstant.EIGHTY) {
-            resultMap.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
-            resultMap.put("text", "很遗憾，闯关失败，再接再厉。");
+            resultMap.put("petSay", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
+            resultMap.put("msg", "很遗憾，闯关失败，再接再厉。");
             resultMap.put("backMsg", "别气馁，已经超越了"+TestPointUtil.getPercentage(point)+"的同学，继续努力吧！");
             testRecord.setPass(2);
         } else if (point < PointConstant.NINETY) {
-            resultMap.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
-            resultMap.put("text", "闯关成功，独孤求败！");
+            resultMap.put("petSay", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
+            resultMap.put("msg", "闯关成功，独孤求败！");
             resultMap.put("backMsg", "恭喜你，已经超过"+ TestPointUtil.getPercentage(point)+"的同学，再接再励！");
             testRecord.setPass(1);
         } else {
-            resultMap.put("petName", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
-            resultMap.put("text", "恭喜你刷新了纪录！");
+            resultMap.put("petSay", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
+            resultMap.put("msg", "恭喜你刷新了纪录！");
             resultMap.put("backMsg", "恭喜你，已经超过"+TestPointUtil.getPercentage(point)+"的同学，再接再励！");
             testRecord.setPass(1);
         }
         if (testResultVo != null) {
             testResultVo.setPetSay("");
-            testResultVo.setPetName("");
             testResultVo.setBackMsg("");
             testResultVo.setMsg("很遗憾，闯关失败，再接再厉。");
-            testResultVo.setText("很遗憾，闯关失败，再接再厉。");
             testResultVo.setPetUrl(AliyunInfoConst.host + student.getPartUrl());
-            testResultVo.setImgUrl(AliyunInfoConst.host + student.getPartUrl());
         }
         resultMap.put("point", point);
         resultMap.put("imgUrl", AliyunInfoConst.host + student.getPartUrl());
