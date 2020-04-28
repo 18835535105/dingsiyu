@@ -21,15 +21,24 @@
         select count(id)
         from course_config
         where user_id = #{userId}
-          and type = #{type}
+          and `type` = #{type}
     </select>
 
+    <select id="selectByTypeAndUserIdAndCourseId" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"/>
+        from course_config
+        where user_id = #{adminId}
+          and `type` = #{type}
+          and course_id=#{courseId}
+          limit 1
+    </select>
     <select id="selectByUserIdAndTypeAndOneKeyLearn" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="base_sql"/>
         from course_config
         where user_id = #{userId}
-        and type = #{type}
+        and `type` = #{type}
     </select>
     <select id="selectByUserId" parameterType="map" resultType="long">
         select

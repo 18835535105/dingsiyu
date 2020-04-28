@@ -33,4 +33,6 @@ public interface CourseConfigMapper extends BaseMapper<CourseConfig> {
      * @param userId
      */
     int countByUserIdAndType(@Param("userId") Long userId, @Param("type") int type);
+
+    CourseConfig selectByTypeAndUserIdAndCourseId(@Param("type") int type,@Param("adminId") Long adminId,@Param("courseId") Long courseId);
 }

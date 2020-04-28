@@ -89,6 +89,9 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     private RankOpt rankOpt;
 
     @Resource
+    private CourseConfigMapper courseConfigMapper;
+
+    @Resource
     private TestRecordMapper testRecordMapper;
     @Resource
     private TestRecordInfoMapper testRecordInfoMapper;
@@ -676,6 +679,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
             if (count > 0) {
                 //获取学生添加的计划
                 studentMap = schoolTimeMapper.selectByMonthAndWeekAndStudentId(month, week, studentId);
+
             } else {
                 //如果没有获取学生可能添加的计划
                 List<Map<String, Object>> studyModelList = collect.get(adminId);
@@ -725,6 +729,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                     studentStudyPlanNewMapper.insert(plan);
                     plan = getStudentStudyPlanNew(grade, studentId, unitId, courseId, addNumber, 145L, 3, 150);
                     studentStudyPlanNewMapper.insert(plan);
+
                 }
             }
         });
