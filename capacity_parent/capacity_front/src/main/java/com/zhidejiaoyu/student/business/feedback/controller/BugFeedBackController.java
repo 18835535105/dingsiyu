@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.feedback.controller;
 import com.zhidejiaoyu.common.pojo.BugFeedback;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.feedback.service.BugFeedBackService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,10 +30,7 @@ public class BugFeedBackController {
 
     @PostMapping("/saveBugBack")
     public Object saveBugBack(HttpSession session, @Valid BugFeedback feedback, String vocaId, BindingResult result) {
-        /*if (vocaId == null) {
-            return ServerResponse.createByErrorCodeMessage(400, "vocaId不能为空");
-        }*/
-        if (vocaId == null || vocaId.equals("")) {
+        if (StringUtils.isEmpty(vocaId)) {
             bugFeedBackService.saveBugBack(session, feedback, null);
         } else {
             bugFeedBackService.saveBugBack(session, feedback, Long.parseLong(vocaId));
