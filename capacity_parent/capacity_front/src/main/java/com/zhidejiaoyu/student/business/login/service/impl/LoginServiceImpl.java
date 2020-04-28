@@ -160,6 +160,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             result.put("studentName", stu.getStudentName());
             // 头像
             result.put("headUrl", AliyunInfoConst.host + stu.getHeadUrl());
+            result.put("schoolName", stu.getSchoolName());
 
             // 记录登录信息
             String ip = saveLoginRunLog(stu);
