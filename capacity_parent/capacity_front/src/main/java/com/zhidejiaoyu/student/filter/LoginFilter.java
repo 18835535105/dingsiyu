@@ -67,7 +67,8 @@ public class LoginFilter implements Filter {
 
         String url = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
 
-        if (urlMap.containsKey(url) || url.contains("/druid") || url.contains("/smallApp") || url.contains("/translate")) {
+        if (urlMap.containsKey(url) || url.contains("/druid") || url.contains("/smallApp") || url.contains("/translate")
+                || url.contains("/publicAccount")) {
             // 不拦截登录和退出接口
             doFilter(chain, httpServletRequest, httpServletResponse, url);
 
@@ -115,9 +116,9 @@ public class LoginFilter implements Filter {
      * @param request
      * @param response
      * @param session
+     * @return <code>true</code>账号同时在其他地点登录 <code>false</code> 其他情况
      * @throws ServletException
      * @throws IOException
-     * @return <code>true</code>账号同时在其他地点登录 <code>false</code> 其他情况
      */
     private Boolean toMultipleLoginTip(HttpServletRequest request, HttpServletResponse response, HttpSession session)
             throws ServletException, IOException {
