@@ -152,7 +152,10 @@ public class CalculateUtil {
      * @return
      */
     public static double getSourceAttack(IndexVO.BaseValue baseValue, Long studentId, String beforeSevenDaysDateStr, String endDateStr) {
-        double avg = testRecordMapper.selectScoreAvgByStartDateAndEndDate(studentId, beforeSevenDaysDateStr, endDateStr);
+        Double avg = testRecordMapper.selectScoreAvgByStartDateAndEndDate(studentId, beforeSevenDaysDateStr, endDateStr);
+        if (avg == null) {
+            avg = 0.0D;
+        }
         return baseValue.getSourceAttack() * (0.5 + avg * 1.0 / 100);
     }
 
