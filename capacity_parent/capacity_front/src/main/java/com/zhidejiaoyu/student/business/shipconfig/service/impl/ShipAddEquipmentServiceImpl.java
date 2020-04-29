@@ -107,25 +107,25 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     private List<String> getReturnStr(List<Map<String, Object>> returnList) {
         Map<Integer, List<Map<String, Object>>> groupMap =
                 returnList.stream().collect(Collectors.groupingBy(map -> Integer.parseInt(map.get("type").toString())));
-        List<String> returnStr=new ArrayList<>();
+        List<String> returnStr = new ArrayList<>();
         List<Map<String, Object>> shipMap = groupMap.get(1);
         if (shipMap != null && shipMap.size() > 0) {
-            String shipStr="新增飞船x"+shipMap.size();
+            String shipStr = "新增飞船x" + shipMap.size();
             returnStr.add(shipStr);
         }
         List<Map<String, Object>> armsMap = groupMap.get(2);
         if (armsMap != null && armsMap.size() > 0) {
-            String armsStr="新增武器x"+armsMap.size();
+            String armsStr = "新增武器x" + armsMap.size();
             returnStr.add(armsStr);
         }
         List<Map<String, Object>> missileMap = groupMap.get(3);
         if (missileMap != null && missileMap.size() > 0) {
-            String missileStr="新增导弹x"+missileMap.size();
+            String missileStr = "新增导弹x" + missileMap.size();
             returnStr.add(missileStr);
         }
         List<Map<String, Object>> armorMap = groupMap.get(4);
         if (armorMap != null && armorMap.size() > 0) {
-            String armorStr="新增装甲x"+armorMap.size();
+            String armorStr = "新增装甲x" + armorMap.size();
             returnStr.add(armorStr);
         }
         return returnStr;
@@ -133,7 +133,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
 
     private void addEquipmentPeople(List<Equipment> equipments, Long studentId) {
         equipments.forEach(equipment -> {
-            StudentEquipment studentEquipment = studentEquipmentMapper.selectByStudentIdAndEquipmentId(equipment.getId(), studentId);
+            StudentEquipment studentEquipment = studentEquipmentMapper.selectByStudentIdAndEquipmentId(studentId, equipment.getId());
             if (studentEquipment == null) {
                 studentEquipment = new StudentEquipment();
                 studentEquipment.setIntensificationDegree(1);
