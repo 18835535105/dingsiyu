@@ -125,7 +125,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         }
         List<Map<String, Object>> armorMap = groupMap.get(4);
         if (armorMap != null && armorMap.size() > 0) {
-            String armorStr="新增飞船x"+armorMap.size();
+            String armorStr="新增装甲x"+armorMap.size();
             returnStr.add(armorStr);
         }
         return returnStr;
