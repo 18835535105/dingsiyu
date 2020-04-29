@@ -126,15 +126,16 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         dto.setEasyOrHard(easyOrHard);
         LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(),
                 dto.getUnitId(), dto.getEasyOrHard(), FlowNameToLearnModelType.FLOW_NEW_TO_LEARN_MODEL_TYPE.get(studyFlowNew.getFlowName()));
-        if (learnNew != null) {
-            // 如果学生有当前单元的学习记录，删除其学习详情，防止学生重新学习该单元时获取不到题目
-            studyCapacityMapper.deleteByStudentIdAndUnitIdAndGroup(student.getId(), dto.getUnitId(), learnNew.getGroup());
-            learnExtendMapper.deleteByLearnId(learnNew.getId());
-            dto.setGroup(learnNew.getGroup());
-            dto.setLearnNew(learnNew);
-        } else {
-            dto.setGroup(1);
+        if (learnNew == null) {
+            learnNew = initData.saveLearnNew(dto, 1, dto.getModelType());
         }
+
+        // 如果学生有当前单元的学习记录，删除其学习详情，防止学生重新学习该单元时获取不到题目
+        studyCapacityMapper.deleteByStudentIdAndUnitIdAndGroup(student.getId(), dto.getUnitId(), learnNew.getGroup());
+        learnExtendMapper.deleteByLearnId(learnNew.getId());
+
+        dto.setGroup(learnNew.getGroup());
+        dto.setLearnNew(learnNew);
         dto.setStudyFlowNew(studyFlowNew);
         session.setAttribute(SessionConstant.STUDY_GROUP, dto.getGroup());
         dto.setSession(session);
