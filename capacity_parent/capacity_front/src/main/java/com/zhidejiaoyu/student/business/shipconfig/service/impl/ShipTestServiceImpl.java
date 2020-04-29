@@ -91,18 +91,17 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         IndexVO.BaseValue battle = equipmentMap.getBattle();
         battle.setAttack(25);
         equipmentMap.setBattle(battle);
-        return ServerResponse.createBySuccess(PkInfoVO.builder()
+       /* return ServerResponse.createBySuccess(PkInfoVO.builder()
                 .challenged(equipmentMap)
                 .originator(equipmentMap)
                 .subject(getSubject(student.getId()))
-                .build());
+                .build());*/
         //正确的数据
-       /* return ServerResponse.createBySuccess(PkInfoVO.builder()
+        return ServerResponse.createBySuccess(PkInfoVO.builder()
                 .challenged(getEquipmentMap(studentId))
                 .originator(getEquipmentMap(student.getId()))
                 .subject(getSubject(student.getId()))
-                .build());*/
-
+                .build());
     }
 
     /**
