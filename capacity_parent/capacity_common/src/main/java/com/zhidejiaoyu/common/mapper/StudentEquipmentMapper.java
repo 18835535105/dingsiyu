@@ -41,19 +41,25 @@ public interface StudentEquipmentMapper extends BaseMapper<StudentEquipment> {
      * 查询正在使用的右侧装备图片
      *
      * @param studentId
+     * @param type
      * @return
      */
-    String selectImgUrlByStudentId(@Param("studentId") Long studentId,@Param("type")Integer type);
+    String selectImgUrlByStudentId(@Param("studentId") Long studentId, @Param("type") Integer type);
 
     /**
      * 查询正在使用的左侧装备图片
      *
      * @param studentId
+     * @param type
      * @return
      */
-    String selectLeftUrlByStudentIdAndType(@Param("studentId") Long studentId,@Param("type")Integer type);
+    String selectLeftUrlByStudentIdAndType(@Param("studentId") Long studentId, @Param("type") Integer type);
 
-
-
-
+    /**
+     * 统计学生已装备的飞船个数
+     *
+     * @param studentId
+     * @return
+     */
+    int countEquipmentShipByStudentId(@Param("studentId") Long studentId);
 }
