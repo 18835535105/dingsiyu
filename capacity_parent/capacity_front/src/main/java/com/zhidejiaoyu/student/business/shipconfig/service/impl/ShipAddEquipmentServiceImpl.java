@@ -186,7 +186,8 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         Equipment equipment = equipmentMapper.selectById(equipmentId);
         updateUseEqu(student, equipment);
         if (type == 5) {
-            student.setPartUrl(student.getPartUrl() == null ? student.getPartUrl() : student.getPartUrl().replace(AliyunInfoConst.host, ""));
+
+            student.setPartUrl(imgUrl.replace(AliyunInfoConst.host, ""));
             student.setPetName(equipment.getName());
             studentMapper.updateById(student);
         }
@@ -366,8 +367,8 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     public void updateLeaderBoards(Student student) {
         //获取更新后的源分战力
         Date date = new Date();
-        String beforeSevenDaysDateStr = DateUtil.getBeforeDayDateStr(date, 7, DateUtil.YYYYMMDD);
-        String now = DateUtil.formatDate(new Date(), DateUtil.YYYYMMDD);
+        String beforeSevenDaysDateStr = DateUtil.getBeforeDayDateStr(date, 7, DateUtil.YYYYMMDDHHMMSS);
+        String now = DateUtil.formatDate(new Date(), DateUtil.YYYYMMDDHHMMSS);
         Integer sourceForceAttack = CalculateUtil.getSourcePoint(student.getId(), beforeSevenDaysDateStr, now);
         //获取pk值
         StudentExpansion expansion = studentExpansionMapper.selectByStudentId(student.getId());

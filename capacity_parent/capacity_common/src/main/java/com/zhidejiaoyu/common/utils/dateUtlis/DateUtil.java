@@ -507,7 +507,7 @@ public class DateUtil implements Serializable {
      * @return
      */
     public static String getBeforeDayDateStr(Date date, int days, String format) {
-        return formatDate(getBeforeWeekDate(date, days), format);
+        return formatDate(getBeforeDaysDate(date, days), format);
     }
 
     /**

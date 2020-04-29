@@ -32,8 +32,9 @@
         from equipment e
                  join equipment_expansion ee on e.id = ee.equipment_id
                  join student_equipment se on e.id = se.equipment_id
-            and se.student_id = #{studentId} and se.type = 1
-            and ee.intensification_degree = se.intensification_degree
+                 and ee.intensification_degree = se.intensification_degree
+            where se.student_id = #{studentId} and se.type = 1
+
 
     </select>
     <select id="selectByStudentId" resultType="map" parameterType="map">
