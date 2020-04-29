@@ -969,17 +969,17 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         if (point < PointConstant.EIGHTY) {
             resultMap.put("petSay", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
             resultMap.put("msg", "很遗憾，闯关失败，再接再厉。");
-            resultMap.put("backMsg", "别气馁，已经超越了"+TestPointUtil.getPercentage(point)+"的同学，继续努力吧！");
+            resultMap.put("backMsg", "别气馁，已经超越了" + TestPointUtil.getPercentage(point) + "的同学，继续努力吧！");
             testRecord.setPass(2);
         } else if (point < PointConstant.NINETY) {
             resultMap.put("petSay", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
             resultMap.put("msg", "闯关成功，独孤求败！");
-            resultMap.put("backMsg", "恭喜你，已经超过"+ TestPointUtil.getPercentage(point)+"的同学，再接再励！");
+            resultMap.put("backMsg", "恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！");
             testRecord.setPass(1);
         } else {
             resultMap.put("petSay", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
             resultMap.put("msg", "恭喜你刷新了纪录！");
-            resultMap.put("backMsg", "恭喜你，已经超过"+TestPointUtil.getPercentage(point)+"的同学，再接再励！");
+            resultMap.put("backMsg", "恭喜你，已经超过" + TestPointUtil.getPercentage(point) + "的同学，再接再励！");
             testRecord.setPass(1);
         }
         if (testResultVo != null) {
@@ -1133,19 +1133,15 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             }
         }
 
+        Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount);
+        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), doubleGoldCount));
+        studentMapper.updateById(student);
+
         vo.setMsg(msg);
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, "单元闯关测试"));
-        if (student.getBonusExpires() != null) {
-            Double doubleGoldCount = StudentGoldAdditionUtil.getGoldAddition(student, goldCount + 0.0);
-            if (student.getBonusExpires().getTime() > System.currentTimeMillis()) {
-
-                student.setSystemGold(student.getSystemGold() + doubleGoldCount);
-                goldCount = goldCount + doubleGoldCount.intValue();
-            }
-        }
         vo.setGold(goldCount);
         vo.setEnergy(addEnergy);
-        studentMapper.updateById(student);
+
         getLevel(session);
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);

@@ -350,10 +350,6 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
             if (student.getTeacherId() == null) {
                 continue;
             }
-            int count = studentEquipmentMapper.countEquipmentShipByStudentId(student.getId());
-            if (count == 0) {
-                continue;
-            }
             sourcePowerRankOpt.optSourcePowerRank(student, 0, 100);
         }
     }
