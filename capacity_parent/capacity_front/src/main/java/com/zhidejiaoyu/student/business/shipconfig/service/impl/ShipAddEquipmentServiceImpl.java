@@ -185,7 +185,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         Student student = getStudent(session);
         Equipment equipment = equipmentMapper.selectById(equipmentId);
         updateUseEqu(student, equipment);
-        if (type == 5) {
+        if (type != null && type == 5) {
 
             student.setPartUrl(imgUrl.replace(AliyunInfoConst.host, ""));
             student.setPetName(equipment.getName());
