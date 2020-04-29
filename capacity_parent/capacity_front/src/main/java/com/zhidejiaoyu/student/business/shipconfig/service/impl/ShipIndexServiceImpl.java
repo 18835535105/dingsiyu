@@ -70,6 +70,9 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Resource
     private GauntletMapper gauntletMapper;
 
+    @Resource
+    private StudentEquipmentMapper studentEquipmentMapper;
+
     /**
      * 强化度对应的中文等级
      */
@@ -347,6 +350,10 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
             if (student.getTeacherId() == null) {
                 continue;
             }
+            int count = studentEquipmentMapper.countEquipmentShipByStudentId(student.getId());
+            if (count == 0) {
+                continue;
+            }
             sourcePowerRankOpt.optSourcePowerRank(student, 0, 100);
         }
     }
@@ -396,6 +403,16 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     }
 
     public ServerResponse<Object> packageRankVO(String key, List<Long> studentIds, Student student) {
+
+        if (CollectionUtils.isEmpty(studentIds)) {
+            return ServerResponse.createBySuccess(RankVO.builder()
+                    .myRank("-")
+                    .total(0L)
+                    .rankInfoList(Collections.emptyList())
+                    .pages(0)
+                    .build());
+        }
+
         Map<Long, Map<String, Object>> infoMap = studentMapper.selectSourcePowerRankByIds(studentIds);
         long rank = sourcePowerRankOpt.getRank(key, student.getId());
 
@@ -417,7 +434,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         long studentCount = sourcePowerRankOpt.getMemberSize(key);
 
         return ServerResponse.createBySuccess(RankVO.builder()
-                .myRank(rank)
+                .myRank(rank == -1 ? "-" : String.valueOf(rank))
                 .total(studentCount)
                 .rankInfoList(collect)
                 .pages((int) Math.ceil(studentCount * 1.0 / PageUtil.getPageSize()))

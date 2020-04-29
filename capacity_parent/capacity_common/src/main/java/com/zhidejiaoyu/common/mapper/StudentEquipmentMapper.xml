@@ -82,5 +82,14 @@
           and stuEq.student_id = #{studentId}
           and stuEq.type = 1
     </select>
+    <select id="countEquipmentShipByStudentId" resultType="java.lang.Integer">
+        select count(se.id)
+        from student_equipment se,
+             equipment e
+        where se.equipment_id = e.id
+          and e.type = 1
+          and se.student_id = #{studentId}
+          and se.type = 1
+    </select>
 
 </mapper>

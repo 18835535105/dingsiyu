@@ -25,7 +25,7 @@ public class RankVO implements Serializable {
     /**
      * 我的排名
      */
-    private Long myRank;
+    private String myRank;
 
     /**
      * 参与排行总人数
