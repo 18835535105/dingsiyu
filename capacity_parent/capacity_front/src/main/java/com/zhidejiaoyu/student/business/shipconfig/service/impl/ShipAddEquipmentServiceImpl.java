@@ -96,11 +96,39 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             addEquipment(addIdList, student.getId(), studentEquipmentMapper);
         }
         if (returnList.size() > 0) {
-            return ServerResponse.createBySuccess(returnList);
+            List<String> returnStr = getReturnStr(returnList);
+            return ServerResponse.createBySuccess(returnStr);
         } else {
             return ServerResponse.createBySuccess();
         }
 
+    }
+
+    private List<String> getReturnStr(List<Map<String, Object>> returnList) {
+        Map<Integer, List<Map<String, Object>>> groupMap =
+                returnList.stream().collect(Collectors.groupingBy(map -> Integer.parseInt(map.get("type").toString())));
+        List<String> returnStr=new ArrayList<>();
+        List<Map<String, Object>> shipMap = groupMap.get(1);
+        if (shipMap != null && shipMap.size() > 0) {
+            String shipStr="新增飞船x"+shipMap.size();
+            returnStr.add(shipStr);
+        }
+        List<Map<String, Object>> armsMap = groupMap.get(2);
+        if (armsMap != null && armsMap.size() > 0) {
+            String armsStr="新增武器x"+armsMap.size();
+            returnStr.add(armsStr);
+        }
+        List<Map<String, Object>> missileMap = groupMap.get(3);
+        if (missileMap != null && missileMap.size() > 0) {
+            String missileStr="新增导弹x"+missileMap.size();
+            returnStr.add(missileStr);
+        }
+        List<Map<String, Object>> armorMap = groupMap.get(4);
+        if (armorMap != null && armorMap.size() > 0) {
+            String armorStr="新增飞船x"+armorMap.size();
+            returnStr.add(armorStr);
+        }
+        return returnStr;
     }
 
     private void addEquipmentPeople(List<Equipment> equipments, Long studentId) {
@@ -482,6 +510,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                 if (equipment != null) {
                     Map<String, Object> map = new HashMap<>();
                     map.put("name", equipment.getName());
+                    map.put("type", equipment.getType());
                     //imgMap.get(addId).get("imgUrl").toString()
                     Map<String, Object> map1 = imgMap.get(addId);
                     map.put("url", GetOssFile.getPublicObjectUrl(map1.get("imgUrl").toString()));
