@@ -203,7 +203,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         EquipmentExperienceVo empiricalValue = getEmpiricalValue(student.getId(), type);
         //将装备图片分组
         Map<Long, List<Map<String, Object>>> equipmentMap = urlList.stream().collect(Collectors.groupingBy(ment -> Long.parseLong(ment.get("equipmentId").toString())));
-        List<Map<String, Object>> equSort = getEquSort(studentEquiments, equipment, empiricalValue, returnMap, type, equMap);
+        List<Map<String, Object>> equSort = getEquSort(studentEquiments, equipment, empiricalValue, returnMap, type, equMap,student);
         getImgUrl(equSort, equipmentMap, returnMap);
         return returnMap;
     }
@@ -272,7 +272,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
      */
     private List<Map<String, Object>> getEquSort(Map<Long, StudentEquipment> studentEquiments, List<Equipment> equipments,
                                                  EquipmentExperienceVo empiricalValue, Map<String, Object> returnMap,
-                                                 Integer type, Map<Long, List<Map<String, Object>>> informationMap) {
+                                                 Integer type, Map<Long, List<Map<String, Object>>> informationMap,Student student) {
         //获取当前类型经验值
         int empValue = 0;
         //当前等级
@@ -340,6 +340,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         returnMap.put("currentLevel", currentLevel);
         returnMap.put("nextLevel", nextLevel);
         returnMap.put("percentage", 1.0 * empValue / nextLevelValue);
+        returnMap.put("gold",student.getSystemGold());
         return returnList;
     }
 
