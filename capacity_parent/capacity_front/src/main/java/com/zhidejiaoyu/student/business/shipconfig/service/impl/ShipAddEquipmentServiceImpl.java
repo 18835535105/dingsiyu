@@ -183,7 +183,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         //获取装备图片
         returnMap.put("imgUrl", GetOssFile.getPublicObjectUrl(equipmentExpansionMapper.selectUrlByEquipmentIdAndType(equipmentId,
                 studentEquipment.getIntensificationDegree() > 3 ? 3 : studentEquipment.getIntensificationDegree())));
-        returnMap.put("gold",student.getSystemGold());
+        returnMap.put("gold", student.getSystemGold());
         return ServerResponse.createBySuccess(returnMap);
     }
 
@@ -204,7 +204,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         EquipmentExperienceVo empiricalValue = getEmpiricalValue(student.getId(), type);
         //将装备图片分组
         Map<Long, List<Map<String, Object>>> equipmentMap = urlList.stream().collect(Collectors.groupingBy(ment -> Long.parseLong(ment.get("equipmentId").toString())));
-        List<Map<String, Object>> equSort = getEquSort(studentEquiments, equipment, empiricalValue, returnMap, type, equMap,student);
+        List<Map<String, Object>> equSort = getEquSort(studentEquiments, equipment, empiricalValue, returnMap, type, equMap, student);
         getImgUrl(equSort, equipmentMap, returnMap);
         return returnMap;
     }
@@ -273,7 +273,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
      */
     private List<Map<String, Object>> getEquSort(Map<Long, StudentEquipment> studentEquiments, List<Equipment> equipments,
                                                  EquipmentExperienceVo empiricalValue, Map<String, Object> returnMap,
-                                                 Integer type, Map<Long, List<Map<String, Object>>> informationMap,Student student) {
+                                                 Integer type, Map<Long, List<Map<String, Object>>> informationMap, Student student) {
         //获取当前类型经验值
         int empValue = 0;
         //当前等级
@@ -340,8 +340,9 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         }
         returnMap.put("currentLevel", currentLevel);
         returnMap.put("nextLevel", nextLevel);
-        returnMap.put("percentage", 1.0 * empValue / nextLevelValue);
-        returnMap.put("gold",student.getSystemGold());
+        double number = 1.0 * empValue / nextLevelValue;
+        returnMap.put("percentage", number > 1 ? 1 : number);
+        returnMap.put("gold", student.getSystemGold());
         return returnList;
     }
 
@@ -376,7 +377,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         }
         if (student.getSystemGold() > gold) {
             student.setSystemGold(student.getSystemGold() - gold);
-            student.setOfflineGold(student.getOfflineGold()+gold);
+            student.setOfflineGold(student.getOfflineGold() + gold);
             studentMapper.updateById(student);
             return 1;
         } else {
