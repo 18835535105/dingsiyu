@@ -183,6 +183,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         //获取装备图片
         returnMap.put("imgUrl", GetOssFile.getPublicObjectUrl(equipmentExpansionMapper.selectUrlByEquipmentIdAndType(equipmentId,
                 studentEquipment.getIntensificationDegree() > 3 ? 3 : studentEquipment.getIntensificationDegree())));
+        returnMap.put("gold",student.getSystemGold());
         return ServerResponse.createBySuccess(returnMap);
     }
 
@@ -375,6 +376,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         }
         if (student.getSystemGold() > gold) {
             student.setSystemGold(student.getSystemGold() - gold);
+            student.setOfflineGold(student.getOfflineGold()+gold);
             studentMapper.updateById(student);
             return 1;
         } else {
