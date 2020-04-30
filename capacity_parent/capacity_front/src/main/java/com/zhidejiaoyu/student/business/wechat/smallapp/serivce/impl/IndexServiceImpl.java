@@ -93,6 +93,12 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
         Student student = studentMapper.selectByOpenId(openId);
 
+        String today = DateUtil.formatYYYYMMDD(new Date());
+        if (Objects.equals(today, date)) {
+            // 如果补打日期是今天，不让补卡
+            return ServerResponse.createByErrorMessage("请前往执行飞行任务！");
+        }
+
         // 补签需要消耗的金币数
         int reduceGold = 50;
 
