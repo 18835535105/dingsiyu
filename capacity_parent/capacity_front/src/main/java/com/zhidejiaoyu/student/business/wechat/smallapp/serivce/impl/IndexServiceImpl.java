@@ -103,7 +103,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         int reduceGold = 50;
 
         if (student.getSystemGold() < reduceGold) {
-            return ServerResponse.createByError(400, "金币不足！");
+            return ServerResponse.createByError(402, "金币不足！");
         }
 
         Date now = new Date();
