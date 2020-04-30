@@ -70,9 +70,6 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Resource
     private GauntletMapper gauntletMapper;
 
-    @Resource
-    private StudentEquipmentMapper studentEquipmentMapper;
-
     /**
      * 强化度对应的中文等级
      */
@@ -262,6 +259,18 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
      */
     @Override
     public IndexVO.BaseValue getBaseValue(List<Map<String, Object>> equipments) {
+
+        if (CollectionUtils.isEmpty(equipments)) {
+            return IndexVO.BaseValue.builder()
+                    .attack(0)
+                    .durability(0)
+                    .hitRate(0.0D)
+                    .move(0)
+                    .source(0)
+                    .sourceAttack(0)
+                    .build();
+        }
+
         IndexVO.BaseValue baseValue = new IndexVO.BaseValue();
         equipments.forEach(map -> {
             // 攻击力
