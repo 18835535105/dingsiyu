@@ -129,7 +129,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 setMap.put("finalNameInteger", i);
                 setMap.put("isEnter", false);
                 setMap.put("isWear", false);
-                setMap.put("isHave",false);
+                setMap.put("isHave", false);
                 setMap.put("isUse", false);
                 setMap.put("isSynthesis", true);
                 setMap.put("time", 48 + "小时0分0秒");
@@ -142,7 +142,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 setMap.put("count", o1.get("count"));
                 setMap.put("finalNameInteger", i);
                 setMap.put("isEnter", false);
-                setMap.put("isHave",false);
+                setMap.put("isHave", false);
                 setMap.put("isUse", false);
                 setMap.put("isSynthesis", false);
                 setMap.put("isWear", false);
@@ -156,7 +156,7 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
             setMap.put("finalNameInteger", i);
             setMap.put("message", "得到的金币加成" + AwardUtil.getBonusByIndex(i) + "%");
             setMap.put("isEnter", false);
-            setMap.put("isHave",true);
+            setMap.put("isHave", true);
             setMap.put("isSynthesis", false);
             if (haveGloveOrFlower != null) {
                 String name = haveGloveOrFlower.get("name").toString();
@@ -164,8 +164,8 @@ public class SimpleSyntheticRewardsListServiceImplSimple extends SimpleBaseServi
                 setMap.put("isWear", false);
                 if (AwardUtil.getAward(i).equals(name)) {
                     setMap.put("isUse", true);
-                    setMap.put("time", student.getBonusExpires().getTime() - System.currentTimeMillis());
-                }else{
+                    setMap.put("time", student.getBonusExpires().getTime() - System.currentTimeMillis() / 1000);
+                } else {
                     setMap.put("time", 48 + "小时0分0秒");
                 }
             } else {
