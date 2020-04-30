@@ -40,7 +40,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @param unitId
      * @return
      */
-    List<Vocabulary> selectByUnitIdAndGroup(@Param("unitId") Long unitId,@Param("group") Integer group);
+    List<Vocabulary> selectByUnitIdAndGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
 
     /**
      * 根据单词id查询该单词的中文意思
@@ -186,7 +186,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
 
     List<Map<String, Object>> getWordIdNewByCourse(@Param("correctWordId") Long correctWordId, @Param("unidId") Long unidId);
 
-    List<Vocabulary> getWordPicAll(@Param("unitId") Long unitId,@Param("group") Integer group);
+    List<Vocabulary> getWordPicAll(@Param("unitId") Long unitId, @Param("group") Integer group);
 
     List<Vocabulary> getWordIdByCourseAll(@Param("courseId") Long courseId);
 
@@ -238,7 +238,7 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      * @param unitId
      * @return
      */
-    List<Vocabulary> selectWordVoice(@Param("unitId") Long unitId,@Param("group") Integer group);
+    List<Vocabulary> selectWordVoice(@Param("unitId") Long unitId, @Param("group") Integer group);
 
     /**
      * 查询单词本中单词播放机还未学习的单词
@@ -394,7 +394,10 @@ public interface VocabularyMapper extends BaseMapper<Vocabulary> {
      */
     List<SubjectsVO> selectSubjectsVOByUnitIds(@Param("unitIds") List<Long> unitIds);
 
-    Vocabulary selectOneWordNotInIdsNew(@Param("wordIds") List<Long> wordIds,@Param("unitId") Long unitId,
+    List<SubjectsVO> selectSubjectsVO();
+
+
+    Vocabulary selectOneWordNotInIdsNew(@Param("wordIds") List<Long> wordIds, @Param("unitId") Long unitId,
                                         @Param("group") Integer group);
 
     List<String> selectChineseByNotVocabularyIds(@Param("wordIds") List<Long> vocabularyIds);

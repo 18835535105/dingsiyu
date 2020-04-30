@@ -416,6 +416,9 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         //获取pk值
         StudentExpansion expansion = studentExpansionMapper.selectByStudentId(student.getId());
         sourcePowerRankOpt.optSourcePowerRank(student, sourceForceAttack, expansion.getStudyPower());
+        Double score = Double.parseDouble(sourceForceAttack + "." + expansion.getStudyPower());
+        expansion.setSourcePower(score.intValue());
+        studentExpansionMapper.updateById(expansion);
     }
 
     @Override

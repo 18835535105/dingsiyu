@@ -87,10 +87,10 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
             return ServerResponse.createByError(401, "挑战次数达到上限");
         }
         //用完就删除
-        PkInfoVO.Challenged equipmentMap = getEquipmentMap(student.getId());
+       /* PkInfoVO.Challenged equipmentMap = getEquipmentMap(student.getId());
         IndexVO.BaseValue battle = equipmentMap.getBattle();
         battle.setAttack(25);
-        equipmentMap.setBattle(battle);
+        equipmentMap.setBattle(battle);*/
        /* return ServerResponse.createBySuccess(PkInfoVO.builder()
                 .challenged(equipmentMap)
                 .originator(equipmentMap)
@@ -512,12 +512,13 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      * @param studentId
      * @return
      */
-    private List<SubjectsVO> getSubject(Long studentId) {
+    private List<SubjectsVO>    getSubject(Long studentId) {
         //1，获取单元
         List<Long> unitIds = learnNewMapper.getUnitIdByStudentIdAndType(studentId, 1);
         //2,获取单元题目
+        List<SubjectsVO> subjectsVos ;
         if (unitIds != null && unitIds.size() > 0) {
-            List<SubjectsVO> subjectsVos = vocabularyMapper.selectSubjectsVOByUnitIds(unitIds);
+             subjectsVos = vocabularyMapper.selectSubjectsVOByUnitIds(unitIds);
             //题目够15到截取，不够的话 循环添加
             int subjectNum = 15;
             if (subjectsVos.size() > subjectNum) {
@@ -534,15 +535,16 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                 }
                 subjectsVos = subjectsVos1;
             }
-            List<SubjectsVO> returnList = new ArrayList<>();
-            subjectsVos.forEach(vo -> {
-                vo.setReadUrl(GetOssFile.getPublicObjectUrl(vo.getReadUrl()));
-                returnList.add(vo);
-            });
-            Collections.shuffle(returnList);
-            return returnList;
+        }else{
+            subjectsVos = vocabularyMapper.selectSubjectsVO();
         }
-        return Collections.emptyList();
+        List<SubjectsVO> returnList = new ArrayList<>();
+        subjectsVos.forEach(vo -> {
+            vo.setReadUrl(GetOssFile.getPublicObjectUrl(vo.getReadUrl()));
+            returnList.add(vo);
+        });
+        Collections.shuffle(returnList);
+        return returnList;
     }
 
 

@@ -814,6 +814,18 @@
         )
         and v.id = uvn.vocabulary_id
     </select>
+    <select id="selectSubjectsVO"
+            resultType="com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO" parameterType="map">
+        select
+        v.read_url readUrl,
+        v.word_chinese wordChinese,
+        v.word
+        from vocabulary v
+        where
+        length(word) &lt; 15
+        order by rand()
+        limit 15
+    </select>
     <select id="selectChineseByNotVocabularyIds" resultType="string" parameterType="map">
         select
         word_chinese
