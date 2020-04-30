@@ -328,9 +328,12 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                     //是否可强化
                     equMap.put("strengthen", false);
                 }
+                equMap.put("strengthenGold", useStrengthenGold(equipment.getLevel(), studentEquipment.getIntensificationDegree()));
                 //强化等级
                 equMap.put("enhancementGrade", studentEquipment.getIntensificationDegree());
                 equMap.put("wear", studentEquipment.getType().equals(1));
+            } else {
+                equMap.put("strengthenGold", useStrengthenGold(equipment.getLevel(), 1));
             }
             returnList.add(equMap);
         }
@@ -365,23 +368,10 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
      */
     private Integer addEquipmentGold(Student student, Integer lv, Integer strengthen) {
         //计算所需金币
-        double gold = 0;
-        if (strengthen.equals(1)) {
-            gold = 50 * 1.2 * (lv - 1);
-            if (gold == 0.0) {
-                gold = 50;
-            }
-        }
-        if (strengthen.equals(2)) {
-            gold = 100 * 1.2 * (lv - 1);
-            if (gold == 0.0) {
-                gold = 100;
-            }
-        }
+        double gold = useStrengthenGold(lv, strengthen);
         if (strengthen >= 3) {
             return 3;
         }
-
         if (student.getSystemGold() > gold) {
             student.setSystemGold(student.getSystemGold() - gold);
             studentMapper.updateById(student);
@@ -389,6 +379,26 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         } else {
             return 2;
         }
+    }
+
+    private Double useStrengthenGold(Integer lv, Integer strengthen) {
+        Double gold = 0.0;
+        if (strengthen >= 3) {
+            return 0.0;
+        }
+        if (strengthen.equals(1)) {
+            gold = 50 * 1.2 * (lv - 1);
+            if (gold == 0.0) {
+                gold = 50.0;
+            }
+        }
+        if (strengthen.equals(2)) {
+            gold = 100 * 1.2 * (lv - 1);
+            if (gold == 0.0) {
+                gold = 100.0;
+            }
+        }
+        return gold;
     }
 
     @Override
