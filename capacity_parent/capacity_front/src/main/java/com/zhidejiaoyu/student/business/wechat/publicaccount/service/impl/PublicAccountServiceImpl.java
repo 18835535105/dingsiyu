@@ -2,6 +2,10 @@ package com.zhidejiaoyu.student.business.wechat.publicaccount.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.zhidejiaoyu.common.exception.ServiceException;
+import com.zhidejiaoyu.common.utils.MacIpUtil;
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
+import com.zhidejiaoyu.common.utils.locationUtil.LocationUtil;
+import com.zhidejiaoyu.common.utils.locationUtil.LongitudeAndLatitude;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.PublicAccountConstant;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.service.PublicAccountService;
@@ -11,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 /**
@@ -24,6 +27,9 @@ public class PublicAccountServiceImpl implements PublicAccountService {
 
     @Resource
     private RestTemplate restTemplate;
+
+    @Resource
+    private LocationUtil locationUtil;
 
     @Override
     public ServerResponse<Object> authorization(HttpServletRequest request) {
@@ -42,5 +48,19 @@ public class PublicAccountServiceImpl implements PublicAccountService {
             throw new ServiceException("微信公众号授权失败！");
         }
         return ServerResponse.createBySuccess(parseMap.get("openid"));
+    }
+
+    @Override
+    public ServerResponse<Object> getCard(String cardName) {
+        try {
+            String ip = MacIpUtil.getIpAddr(HttpUtil.getHttpServletRequest());
+            LongitudeAndLatitude longitudeAndLatitude = locationUtil.getLongitudeAndLatitude(ip);
+
+            // todo:获取地址名，拼接 地址/cadName返回给前端图片路径，如果没有找到指定的地址，返回共有的海报
+
+        } catch (Exception e) {
+            log.error("获取学生登录IP地址出错，error=[{}]", e.getMessage());
+        }
+        return null;
     }
 }

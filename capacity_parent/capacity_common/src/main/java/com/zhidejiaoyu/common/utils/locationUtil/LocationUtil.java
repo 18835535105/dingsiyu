@@ -84,7 +84,7 @@ public class LocationUtil {
     }
 
     /**
-     * 根据 id 获取精确位置
+     * 根据 ip 获取精确位置
      *
      * @param ip
      * @return

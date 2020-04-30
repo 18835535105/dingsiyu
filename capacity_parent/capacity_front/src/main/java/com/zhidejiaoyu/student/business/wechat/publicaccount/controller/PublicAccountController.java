@@ -49,4 +49,15 @@ public class PublicAccountController {
     public ServerResponse<Object> openid(HttpServletRequest request) {
         return publicAccountService.authorization(request);
     }
+
+    /**
+     * 扫描卡片后返回校区海报
+     *
+     * @param cardName  卡片名
+     * @return
+     */
+    @GetMapping("/getCard")
+    public ServerResponse<Object> getCard(String cardName) {
+        return publicAccountService.getCard(cardName);
+    }
 }
