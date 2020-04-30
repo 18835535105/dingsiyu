@@ -184,6 +184,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         returnMap.put("imgUrl", GetOssFile.getPublicObjectUrl(equipmentExpansionMapper.selectUrlByEquipmentIdAndType(equipmentId,
                 studentEquipment.getIntensificationDegree() > 3 ? 3 : studentEquipment.getIntensificationDegree())));
         returnMap.put("gold", student.getSystemGold());
+        returnMap.put("strengthenGold", useStrengthenGold(equipment.getLevel(), studentEquipment.getIntensificationDegree()));
         return ServerResponse.createBySuccess(returnMap);
     }
 
