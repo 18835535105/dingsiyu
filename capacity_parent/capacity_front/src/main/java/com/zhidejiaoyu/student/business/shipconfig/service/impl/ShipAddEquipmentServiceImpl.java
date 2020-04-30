@@ -162,17 +162,17 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         StudentEquipment studentEquipment = studentEquipmentMapper.selectByStudentIdAndEquipmentId(student.getId(), equipmentId);
         //判断学生是否含有该装备
         if (studentEquipment == null) {
-            return ServerResponse.createByError(500, "未获得该装备");
+            return ServerResponse.createByError(400, "未获得该装备");
         }
         //获取装备等级
         Equipment equipment = equipmentMapper.selectById(equipmentId);
         //添加装备，扣除学生金币
         Integer flag = addEquipmentGold(student, equipment.getLevel(), studentEquipment.getIntensificationDegree());
         if (flag.equals(2)) {
-            return ServerResponse.createByError(500, "金币不足");
+            return ServerResponse.createByError(400, "金币不足");
         }
         if (flag.equals(3)) {
-            return ServerResponse.createByError(500, "装备以强化到最高级");
+            return ServerResponse.createByError(400, "装备以强化到最高级");
         }
         studentEquipment.setIntensificationDegree(studentEquipment.getIntensificationDegree() + 1);
         studentEquipmentMapper.updateById(studentEquipment);
