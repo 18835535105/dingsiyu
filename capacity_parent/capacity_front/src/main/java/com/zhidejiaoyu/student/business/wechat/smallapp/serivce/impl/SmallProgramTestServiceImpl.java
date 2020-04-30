@@ -9,6 +9,7 @@ import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -173,14 +174,15 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             return;
         }
 
-        Integer maxCardDays = clockInMapper.selectLastCardDaysByStudentId(studentId);
+        Date yesterday = DateUtil.getBeforeDaysDate(new Date(), 1);
+        Integer cardDays = clockInMapper.selectCardDaysByStudentIdAndCardTime(studentId, yesterday);
 
         clockInMapper.insert(ClockIn.builder()
                 .type(1)
                 .studentId(studentId)
                 .createTime(new Date())
                 .cardTime(new Date())
-                .cardDays(maxCardDays == null ? 1 : (maxCardDays + 1))
+                .cardDays(cardDays == null ? 1 : (cardDays + 1))
                 .build());
     }
 

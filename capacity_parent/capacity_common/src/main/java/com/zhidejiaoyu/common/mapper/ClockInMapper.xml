@@ -29,7 +29,7 @@
         select card_days
         from clock_in
         where student_id = #{studentId}
-        order by create_time desc
+        order by card_time desc
         limit 1
     </select>
     <select id="countByStudentIdAndCardTime" resultType="java.lang.Integer" parameterType="map">

@@ -61,13 +61,14 @@ public interface ClockInMapper extends BaseMapper<ClockIn> {
     List<DailyStateVO> selectByStudentAccount(@Param("account") String[] account, @Param("date") Date date);
 
     /**
-     * 查询当前学生最后一次记录的连续打卡天数
+     * 查询当前学生指定日期的连续打卡天数
      *
      * @param studentId
+     * @param date
      * @return
      */
-    @Select("select card_days from clock_in where student_id = #{studentId} order by create_time desc limit 1")
-    Integer selectLastCardDaysByStudentId(@Param("studentId") Long studentId);
+    @Select("select card_days from clock_in where student_id = #{studentId} and to_days(card_time) = to_days(#{date}) order by card_time desc limit 1")
+    Integer selectCardDaysByStudentIdAndCardTime(@Param("studentId") Long studentId, @Param("date") Date date);
 
     /**
      * 统计今天学生是否已经打卡
@@ -75,7 +76,7 @@ public interface ClockInMapper extends BaseMapper<ClockIn> {
      * @param studentId
      * @return
      */
-    @Select("select count(id) from clock_in where student_id = #{studentId} and to_days(now()) = to_days(create_time)")
+    @Select("select count(id) from clock_in where student_id = #{studentId} and to_days(now()) = to_days(card_time)")
     int countTodayInfoByStudentId(@Param("studentId") Long studentId);
 
     /**
