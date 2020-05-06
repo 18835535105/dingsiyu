@@ -92,7 +92,6 @@ public class GoldCoinFactoryServiceImpl extends BaseServiceImpl<StudentMapper, S
         vo.setPages(count % PageUtil.getPageSize() > 0 ? count / PageUtil.getPageSize() + 1 : count / PageUtil.getPageSize());
         List<GoldCoinFactoryGoldList.GoldList> returnList = new ArrayList<>();
         if (maps.size() > 0) {
-            DecimalFormat df=new DecimalFormat("#.0");
             maps.forEach(map -> {
                 returnList.add(
                         GoldCoinFactoryGoldList.GoldList.builder()
