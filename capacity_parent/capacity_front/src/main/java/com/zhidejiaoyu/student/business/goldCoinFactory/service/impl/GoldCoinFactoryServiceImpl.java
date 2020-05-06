@@ -86,7 +86,9 @@ public class GoldCoinFactoryServiceImpl extends BaseServiceImpl<StudentMapper, S
         }
         PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
         List<Map<String, Object>> maps = goldLogMapper.selectGoldByAdminIdAndStartDateAndEndTime(schoolAdminId, DateUtil.formatYYYYMMDDHHMMSS(startDate), DateUtil.formatYYYYMMDDHHMMSS(endDate));
-        vo.setSize(goldLogMapper.countByAdminIdAndStartDateAndEndTime(schoolAdminId, DateUtil.formatYYYYMMDDHHMMSS(startDate), DateUtil.formatYYYYMMDDHHMMSS(endDate)));
+        int count = goldLogMapper.countByAdminIdAndStartDateAndEndTime(schoolAdminId, DateUtil.formatYYYYMMDDHHMMSS(startDate), DateUtil.formatYYYYMMDDHHMMSS(endDate));
+        vo.setSize(count);
+        vo.setPages(count % PageUtil.getPageSize() > 0 ? count / PageUtil.getPageSize() + 1 : count / PageUtil.getPageSize());
         List<GoldCoinFactoryGoldList.GoldList> returnList = new ArrayList<>();
         if (maps.size() > 0) {
             maps.forEach(map -> {

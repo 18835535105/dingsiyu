@@ -17,6 +17,7 @@ import java.util.List;
 public class GoldCoinFactoryGoldList {
 
     private Integer size;
+    private Integer pages;
 
     private List<GoldList> returnList;
 
