@@ -195,9 +195,9 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         Student student = studentMapper.selectByOpenId(openId);
 
         // 签到信息
-        String currentMonth = DateUtil.getCurrentDay(DateUtil.YYYYMM);
-        List<ClockIn> clockIns = clockInMapper.selectByStudentIdWithCurrentMonth(student.getId(), currentMonth);
-
+        //String currentMonth = DateUtil.getCurrentDay(DateUtil.YYYYMM);
+        //List<ClockIn> clockIns = clockInMapper.selectByStudentIdWithCurrentMonth(student.getId(), currentMonth);
+        List<ClockIn> clockIns = clockInMapper.selectByStudentId(student.getId());
         Integer cardDays = clockInMapper.selectLaseCardDays(student.getId());
 
         return ServerResponse.createBySuccess(CardVO.builder()
@@ -220,7 +220,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      * @return
      */
     private List<DurationInfoVO> packageResultList(List<DurationInfoVO> durationInfoVos,
-                                                  List<DurationInfoVO> durationInfos) {
+                                                   List<DurationInfoVO> durationInfos) {
         // 各个学习日期所有的具体学习时长记录
         Map<String, List<DurationInfoVO>> collect = durationInfos
                 .stream()

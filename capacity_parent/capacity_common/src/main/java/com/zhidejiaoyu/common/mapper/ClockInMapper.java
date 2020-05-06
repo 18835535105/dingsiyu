@@ -31,6 +31,15 @@ public interface ClockInMapper extends BaseMapper<ClockIn> {
     List<ClockIn> selectByStudentIdWithCurrentMonth(@Param("studentId") Long studentId, @Param("currentMonth") String currentMonth);
 
     /**
+     * 查询学生全部的签到信息
+     *
+     * @param studentId
+     * @return
+     */
+    List<ClockIn> selectByStudentId(@Param("studentId") Long studentId);
+
+
+    /**
      * 查询连续打卡天数
      *
      * @param studentId
