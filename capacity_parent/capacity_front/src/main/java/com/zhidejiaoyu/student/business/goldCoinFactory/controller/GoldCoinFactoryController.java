@@ -22,5 +22,10 @@ public class GoldCoinFactoryController extends BaseController {
         return goldCoinFactoryService.getList(session);
     }
 
+    @RequestMapping("index")
+    public Object index(HttpSession session){
+        return goldCoinFactoryService.getIndex(session);
+    }
+
 
 }

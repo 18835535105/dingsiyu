@@ -7,13 +7,18 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * 各个数据信息
+ */
 @Data
-public class GoldCoinFactoryListVo {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class GoldCoinFactoryGoldList {
 
-    private Long time;
-    private Integer gold;
+    private Integer size;
+
     private List<GoldList> returnList;
-    private int size;
 
     /**
      * 各个数据信息
@@ -36,4 +41,3 @@ public class GoldCoinFactoryListVo {
     }
 
 }
-

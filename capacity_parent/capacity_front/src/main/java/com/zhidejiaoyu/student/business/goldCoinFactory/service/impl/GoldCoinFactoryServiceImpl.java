@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.student.business.goldCoinFactory.service.impl;
 
 import com.github.pagehelper.PageHelper;
-import com.zhidejiaoyu.common.dto.rank.RankDto;
 import com.zhidejiaoyu.common.mapper.GoldLogMapper;
 import com.zhidejiaoyu.common.mapper.SchoolGoldFactoryMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
@@ -11,7 +10,8 @@ import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.student.business.goldCoinFactory.service.GoldCoinFactoryService;
-import com.zhidejiaoyu.student.business.goldCoinFactory.vo.GoldCoinFactoryListVo;
+import com.zhidejiaoyu.student.business.goldCoinFactory.vo.GoldCoinFactoryGoldList;
+import com.zhidejiaoyu.student.business.goldCoinFactory.vo.GoldCoinFactoryGoldVo;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +33,20 @@ public class GoldCoinFactoryServiceImpl extends BaseServiceImpl<StudentMapper, S
     @Override
     public Object getList(HttpSession session) {
         Date date = new Date();
-        GoldCoinFactoryListVo vo = new GoldCoinFactoryListVo();
+        GoldCoinFactoryGoldList vo = new GoldCoinFactoryGoldList();
+        //获取距离奖励公布时间
+        Student student = getStudent(session);
+        //获取校长id
+        Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
+
+        getReturnList(schoolAdminId, date, vo);
+        return vo;
+    }
+
+    @Override
+    public Object getIndex(HttpSession session) {
+        Date date = new Date();
+        GoldCoinFactoryGoldVo vo = new GoldCoinFactoryGoldVo();
         //获取距离奖励公布时间
         vo.setTime(getDateLong(date));
         Student student = getStudent(session);
@@ -46,12 +59,10 @@ public class GoldCoinFactoryServiceImpl extends BaseServiceImpl<StudentMapper, S
         } else {
             vo.setGold(0);
         }
-        getReturnList(schoolAdminId, date, vo);
-
         return vo;
     }
 
-    private void getReturnList(Integer schoolAdminId, Date date, GoldCoinFactoryListVo vo) {
+    private void getReturnList(Integer schoolAdminId, Date date, GoldCoinFactoryGoldList vo) {
         //获取搜索数据的时间
         Date startDate;
         Date endDate;
@@ -76,11 +87,11 @@ public class GoldCoinFactoryServiceImpl extends BaseServiceImpl<StudentMapper, S
         PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
         List<Map<String, Object>> maps = goldLogMapper.selectGoldByAdminIdAndStartDateAndEndTime(schoolAdminId, DateUtil.formatYYYYMMDDHHMMSS(startDate), DateUtil.formatYYYYMMDDHHMMSS(endDate));
         vo.setSize(goldLogMapper.countByAdminIdAndStartDateAndEndTime(schoolAdminId, DateUtil.formatYYYYMMDDHHMMSS(startDate), DateUtil.formatYYYYMMDDHHMMSS(endDate)));
-        List<GoldCoinFactoryListVo.GoldList> returnList = new ArrayList<>();
+        List<GoldCoinFactoryGoldList.GoldList> returnList = new ArrayList<>();
         if (maps.size() > 0) {
             maps.forEach(map -> {
                 returnList.add(
-                        GoldCoinFactoryListVo.GoldList.builder()
+                        GoldCoinFactoryGoldList.GoldList.builder()
                                 .model(map.get("model").toString())
                                 .studentName(map.get("studentName").toString())
                                 .getGold(Integer.parseInt(map.get("gold").toString()) * 0.1 + "")

@@ -8,4 +8,6 @@ import javax.servlet.http.HttpSession;
 
 public interface GoldCoinFactoryService extends BaseService<Student> {
     Object getList(HttpSession session);
+
+    Object getIndex(HttpSession session);
 }
