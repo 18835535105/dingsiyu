@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -31,12 +32,36 @@ public interface GoldLogMapper extends BaseMapper<GoldLog> {
     @Select("select sum(gold_add) from gold_log where student_id = #{studentId} and type = 1 and TO_DAYS(create_time) = TO_DAYS(now()) ")
     Integer sumTodayAddGold(@Param("studentId") Long studentId);
 
-    Integer selectGoldByStudentIdAndDate(@Param("studentId") Long studentId,@Param("date") Date date,@Param("type") int type);
+    Integer selectGoldByStudentIdAndDate(@Param("studentId") Long studentId, @Param("date") Date date, @Param("type") int type);
 
     /**
      * 根据校管id获取学生每日增加的金币
+     *
      * @param adminId
      * @param date
      */
-    Integer selectGoldByAdminIdAndDate(@Param("adminId") Long adminId,@Param("date") Date date);
+    Integer selectGoldByAdminIdAndDate(@Param("adminId") Long adminId, @Param("date") Date date);
+
+    /**
+     * 获取指定日期内校管下学生添加金币信息
+     *
+     * @param schoolAdminId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    List<Map<String, Object>> selectGoldByAdminIdAndStartDateAndEndTime(@Param("adminId") Integer schoolAdminId,
+                                                                        @Param("startTime") String startTime, @Param("endTime") String endTime);
+
+    /**
+     * 获取指定日期内校管下学生添加金币数量
+     *
+     * @param schoolAdminId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    int countByAdminIdAndStartDateAndEndTime(@Param("adminId") Integer schoolAdminId,
+                                             @Param("startTime") String startTime, @Param("endTime") String endTime);
+
 }

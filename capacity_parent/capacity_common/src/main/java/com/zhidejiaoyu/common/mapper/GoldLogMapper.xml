@@ -15,6 +15,10 @@
         <result column="type" property="type"/>
     </resultMap>
 
+    <sql id="base_sql">
+        id,operator_id,student_id,gold_add,gold_reduce,reason,create_time,read_flag,`type`
+    </sql>
+
     <delete id="deleteByStudentIds" parameterType="map">
         delete from gold_log
         where student_id in (
@@ -43,6 +47,35 @@
             select teacher_id from teacher where school_admin_id = #{adminId} and teacher_id is not null
         ))
         and to_days(create_time)= to_days(#{date})
+    </select>
+
+    <select id="selectGoldByAdminIdAndStartDateAndEndTime" resultType="map" parameterType="map">
+        select
+        stu.student_name studentName,
+        gold.reason model,
+        gold.gold_add gold,
+        gold.create_time createTime
+        from gold_log gold join student stu on stu.id=gold.student_id
+        where
+        gold.student_id in (select id from student where teacher_id =#{adminId} or teacher_id in (
+            select teacher_id from teacher where school_admin_id = #{adminId} and teacher_id is not null
+        ))
+        and gold.create_time >= #{startTime}
+        and gold.create_time &lt;= #{endTime}
+        and gold.type = 1
+        order by gold.create_time desc
+    </select>
+    <select id="countByAdminIdAndStartDateAndEndTime" resultType="int" parameterType="map">
+        select
+        count(gold.id)
+        from gold_log gold
+        where
+        gold.student_id in (select id from student where teacher_id =#{adminId} or teacher_id in (
+            select teacher_id from teacher where school_admin_id = #{adminId} and teacher_id is not null
+        ))
+        and gold.create_time >= #{startTime}
+        and gold.create_time &lt;= #{endTime}
+        and gold.type = 1
     </select>
 
 </mapper>
