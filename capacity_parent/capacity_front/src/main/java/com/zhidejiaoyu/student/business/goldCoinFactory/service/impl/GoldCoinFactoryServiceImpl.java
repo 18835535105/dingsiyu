@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -91,12 +92,13 @@ public class GoldCoinFactoryServiceImpl extends BaseServiceImpl<StudentMapper, S
         vo.setPages(count % PageUtil.getPageSize() > 0 ? count / PageUtil.getPageSize() + 1 : count / PageUtil.getPageSize());
         List<GoldCoinFactoryGoldList.GoldList> returnList = new ArrayList<>();
         if (maps.size() > 0) {
+            DecimalFormat df=new DecimalFormat("#.0");
             maps.forEach(map -> {
                 returnList.add(
                         GoldCoinFactoryGoldList.GoldList.builder()
                                 .model(map.get("model").toString())
                                 .studentName(map.get("studentName").toString())
-                                .getGold(Integer.parseInt(map.get("gold").toString()) * 0.1 + "")
+                                .getGold(String.format("%.1f",Integer.parseInt(map.get("gold").toString()) * 0.1))
                                 .studyTime(DateUtil.formatYYYYMMDD((Date) map.get("createTime"))).build());
 
             });
