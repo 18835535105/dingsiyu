@@ -17,4 +17,12 @@ public interface PublicAccountService {
      * @return
      */
     ServerResponse<Object> authorization(HttpServletRequest request);
+
+    /**
+     * 扫描卡片后返回校区海报
+     *
+     * @param cardName
+     * @return
+     */
+    ServerResponse<Object> getCard(String cardName);
 }
