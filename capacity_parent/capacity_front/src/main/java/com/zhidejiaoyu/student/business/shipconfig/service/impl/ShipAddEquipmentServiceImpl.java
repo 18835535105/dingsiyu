@@ -335,6 +335,21 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                 equMap.put("enhancementGrade", studentEquipment.getIntensificationDegree());
                 equMap.put("wear", studentEquipment.getType().equals(1));
             } else {
+                long number = (equipment.getEmpiricalValue() - empValue);
+                if (type.equals(1)) {
+                    number /= 3600;
+                    equMap.put("levelValue", "还差" + number + "小时在线时常解锁");
+                }
+                if (type.equals(2)) {
+                    equMap.put("levelValue", "还差学习" + number + "单词解锁");
+                }
+                if (type.equals(3)) {
+                    equMap.put("levelValue", "还差积累" + number + "成绩解锁");
+                }
+                if (type.equals(4)) {
+                    number /= 3600;
+                    equMap.put("levelValue", "还差" + number + "小时有效时常解锁");
+                }
                 equMap.put("strengthenGold", useStrengthenGold(equipment.getLevel(), 1));
             }
             returnList.add(equMap);
