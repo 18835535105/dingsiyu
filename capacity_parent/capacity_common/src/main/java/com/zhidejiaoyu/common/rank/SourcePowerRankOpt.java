@@ -52,4 +52,15 @@ public class SourcePowerRankOpt extends BaseRankOpt {
         }
     }
 
+    /**
+     * 获取指定学生的源分战力值
+     *
+     * @param key
+     * @param studentId
+     * @return 整数部分是源分战力值，小数部分是PK值
+     */
+    public double getStudentScore(String key, Long studentId) {
+        Double score = redisTemplate.opsForZSet().score(key, studentId);
+        return score == null ? 0.0D : score;
+    }
 }

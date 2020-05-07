@@ -921,14 +921,10 @@
         limit 1
     </select>
     <select id="selectSourcePowerRankByIds" resultType="java.util.Map" parameterType="map">
-        select s.id studentId, se.source_power sourcePower, s.nickname nickName, s.head_url headUrl
-        from student s join
-        student_expansion se
-        on s.id = se.student_id and s.id in (
-        <foreach collection="studentIds" item="id" separator=",">
-            #{id}
+        <foreach collection="studentIds" item="id" separator=" union all ">
+            select s.id studentId, s.nickname nickName, s.head_url headUrl
+            from student s where s.id = #{id}
         </foreach>
-        )
     </select>
     <select id="selectByAccounts" resultType="com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO"
             parameterType="map">
