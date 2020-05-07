@@ -306,9 +306,9 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 int sourceForce = Integer.parseInt(sourceForce1.toString());
                 int sourceForceAttack = Integer.parseInt(map.get("sourceForceAttack").toString());
                 if (baseValue.getSource() == null) {
-                    baseValue.setSource(sourceForce * sourceForceAttack);
+                    baseValue.setSource(sourceForce);
                 } else {
-                    baseValue.setSource(baseValue.getSource() + sourceForce * sourceForceAttack);
+                    baseValue.setSource(baseValue.getSource() + sourceForce);
                 }
 
                 // 源分攻击
