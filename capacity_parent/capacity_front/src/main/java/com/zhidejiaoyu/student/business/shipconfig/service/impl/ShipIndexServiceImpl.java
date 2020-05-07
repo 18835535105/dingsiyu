@@ -425,10 +425,11 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         Map<String, Long> byWorshipedStudentMap = worshipRedisOpt.getTodayByWorshipedStudentIds(student.getId());
 
         List<RankVO.RankInfo> collect = studentIds.stream().map(id -> {
+            double score = sourcePowerRankOpt.getStudentScore(key, id);
             Map<String, Object> map = infoMap.get(id);
             return RankVO.RankInfo.builder()
                     .nickName(map == null || map.get("nickName") == null ? "默认姓名" : String.valueOf(map.get("nickName")))
-                    .sourcePower(map == null || map.get("sourcePower") == null ? 0 : (int) map.get("sourcePower"))
+                    .sourcePower((int) Math.floor(score))
                     .headUrl(map == null || map.get("headUrl") == null ? "" : GetOssFile.getPublicObjectUrl(map.get("headUrl").toString()))
                     .studentId(id)
                     .canWorship(!byWorshipedStudentMap.containsKey(String.valueOf(id)))
