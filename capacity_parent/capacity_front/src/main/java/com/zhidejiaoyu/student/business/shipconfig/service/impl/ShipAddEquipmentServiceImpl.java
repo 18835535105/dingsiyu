@@ -167,7 +167,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         //获取装备等级
         Equipment equipment = equipmentMapper.selectById(equipmentId);
         //添加装备，扣除学生金币
-        Integer flag = addEquipmentGold(student, equipment.getLevel(), studentEquipment.getIntensificationDegree());
+        Integer flag = addEquipmentGold(student, equipment.getLevel(), studentEquipment.getIntensificationDegree(), equipment);
         if (flag.equals(2)) {
             return ServerResponse.createByError(400, "金币不足");
         }
@@ -184,7 +184,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         returnMap.put("imgUrl", GetOssFile.getPublicObjectUrl(equipmentExpansionMapper.selectUrlByEquipmentIdAndType(equipmentId,
                 studentEquipment.getIntensificationDegree() > 3 ? 3 : studentEquipment.getIntensificationDegree())));
         returnMap.put("gold", student.getSystemGold());
-        returnMap.put("strengthenGold", useStrengthenGold(equipment.getLevel(), studentEquipment.getIntensificationDegree()));
+        returnMap.put("strengthenGold", useStrengthenGold(equipment.getLevel(), studentEquipment.getIntensificationDegree(), equipment));
         return ServerResponse.createBySuccess(returnMap);
     }
 
@@ -330,14 +330,14 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                     //是否可强化
                     equMap.put("strengthen", false);
                 }
-                equMap.put("strengthenGold", useStrengthenGold(equipment.getLevel(), studentEquipment.getIntensificationDegree()));
+                equMap.put("strengthenGold", useStrengthenGold(equipment.getLevel(), studentEquipment.getIntensificationDegree(), equipment));
                 //强化等级
                 equMap.put("enhancementGrade", studentEquipment.getIntensificationDegree());
                 equMap.put("wear", studentEquipment.getType().equals(1));
             } else {
                 long number = (equipment.getEmpiricalValue() - empValue);
                 getLevelValue(type, equMap, number, "levelValue", null);
-                equMap.put("strengthenGold", useStrengthenGold(equipment.getLevel(), 1));
+                equMap.put("strengthenGold", useStrengthenGold(equipment.getLevel(), 1, equipment));
             }
             returnList.add(equMap);
         }
@@ -376,7 +376,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         if (type.equals(3)) {
             if (nextValue == null) {
                 equMap.put(levelValue, "还差积累" + number + "成绩解锁");
-            }else{
+            } else {
                 equMap.put(levelValue, "还差积累" + number + "成绩到达lv" + nextValue);
             }
         }
@@ -384,7 +384,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             number /= 3600;
             if (nextValue == null) {
                 equMap.put(levelValue, "还差" + number + "小时有效时常解锁");
-            }else{
+            } else {
                 equMap.put(levelValue, "还差" + number + "小时有效时常到达lv" + nextValue);
             }
         }
@@ -413,12 +413,15 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
      * @param strengthen 强化度
      * @return
      */
-    private Integer addEquipmentGold(Student student, Integer lv, Integer strengthen) {
-        //计算所需金币
-        double gold = useStrengthenGold(lv, strengthen);
+    private Integer addEquipmentGold(Student student, Integer lv, Integer strengthen, Equipment equipment) {
+        double gold = 0;
         if (strengthen >= 3) {
             return 3;
         }
+
+        //计算所需金币
+        gold = useStrengthenGold(lv, strengthen, equipment);
+
         if (student.getSystemGold() > gold) {
             student.setSystemGold(student.getSystemGold() - gold);
             student.setOfflineGold(student.getOfflineGold() + gold);
@@ -429,21 +432,48 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         }
     }
 
-    private Double useStrengthenGold(Integer lv, Integer strengthen) {
+    private Double useStrengthenGold(Integer lv, Integer strengthen, Equipment equipment) {
         double gold = 0.0;
         if (strengthen >= 3) {
             return 0.0;
         }
-        if (strengthen.equals(1)) {
-            gold = 50 * 1.2 * (lv - 1);
-            if (gold == 0.0) {
-                gold = 50.0;
+        if (equipment.getType().equals(5)) {
+            if (equipment.getName().contains("大明白") || equipment.getName().contains("威士顿")) {
+                if (strengthen == 1) {
+                    gold = 300;
+                }
+                if (strengthen == 2) {
+                    gold = 800;
+                }
             }
-        }
-        if (strengthen.equals(2)) {
-            gold = 100 * 1.2 * (lv - 1);
-            if (gold == 0.0) {
-                gold = 100.0;
+            if (equipment.getName().contains("李唐心")) {
+                if (strengthen == 1) {
+                    gold = 800;
+                }
+                if (strengthen == 2) {
+                    gold = 1000;
+                }
+            }
+            if (equipment.getName().contains("无名")) {
+                if (strengthen == 1) {
+                    gold = 750;
+                }
+                if (strengthen == 2) {
+                    gold = 1000;
+                }
+            }
+        } else {
+            if (strengthen.equals(1)) {
+                gold = 50 * 1.2 * (lv - 1);
+                if (gold == 0.0) {
+                    gold = 50.0;
+                }
+            }
+            if (strengthen.equals(2)) {
+                gold = 100 * 1.2 * (lv - 1);
+                if (gold == 0.0) {
+                    gold = 100.0;
+                }
             }
         }
         return gold;
