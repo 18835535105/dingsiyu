@@ -336,20 +336,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                 equMap.put("wear", studentEquipment.getType().equals(1));
             } else {
                 long number = (equipment.getEmpiricalValue() - empValue);
-                if (type.equals(1)) {
-                    number /= 3600;
-                    equMap.put("levelValue", "还差" + number + "小时在线时常解锁");
-                }
-                if (type.equals(2)) {
-                    equMap.put("levelValue", "还差学习" + number + "单词解锁");
-                }
-                if (type.equals(3)) {
-                    equMap.put("levelValue", "还差积累" + number + "成绩解锁");
-                }
-                if (type.equals(4)) {
-                    number /= 3600;
-                    equMap.put("levelValue", "还差" + number + "小时有效时常解锁");
-                }
+                getLevelValue(type, equMap, number, "levelValue", null);
                 equMap.put("strengthenGold", useStrengthenGold(equipment.getLevel(), 1));
             }
             returnList.add(equMap);
@@ -357,9 +344,50 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         returnMap.put("currentLevel", currentLevel);
         returnMap.put("nextLevel", nextLevel);
         double number = 1.0 * empValue / nextLevelValue;
+        long levelValue = nextLevelValue - empValue;
+        if (levelValue < 0) {
+            returnMap.put("progressBarValue", "已到最大等级");
+        } else {
+            getLevelValue(type, returnMap, levelValue, "progressBarValue", nextLevel);
+        }
+
         returnMap.put("percentage", number > 1 ? 1 : number);
         returnMap.put("gold", student.getSystemGold());
         return returnList;
+    }
+
+    private void getLevelValue(Integer type, Map<String, Object> equMap, long number, String levelValue, Integer nextValue) {
+        if (type.equals(1)) {
+            number /= 3600;
+            if (nextValue == null) {
+                equMap.put(levelValue, "还差" + number + "小时在线时常解锁");
+            } else {
+                equMap.put(levelValue, "还差" + number + "小时到达" + nextValue + "lv");
+            }
+
+        }
+        if (type.equals(2)) {
+            if (nextValue == null) {
+                equMap.put(levelValue, "还差学习" + number + "单词解锁");
+            } else {
+                equMap.put(levelValue, "还差学习" + number + "单词到达" + nextValue + "lv");
+            }
+        }
+        if (type.equals(3)) {
+            if (nextValue == null) {
+                equMap.put(levelValue, "还差积累" + number + "成绩解锁");
+            }else{
+                equMap.put(levelValue, "还差积累" + number + "成绩到达" + nextValue + "lv");
+            }
+        }
+        if (type.equals(4)) {
+            number /= 3600;
+            if (nextValue == null) {
+                equMap.put(levelValue, "还差" + number + "小时有效时常解锁");
+            }else{
+                equMap.put(levelValue, "还差" + number + "小时有效时常到达" + nextValue + "lv");
+            }
+        }
     }
 
     private void getReturnMap(Equipment ment, Map<String, Object> equMap, boolean openFlag, boolean strengthen, Integer grade, Integer wear) {
