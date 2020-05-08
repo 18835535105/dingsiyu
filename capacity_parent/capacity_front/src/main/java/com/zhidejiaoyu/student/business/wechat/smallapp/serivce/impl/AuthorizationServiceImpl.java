@@ -42,12 +42,19 @@ public class AuthorizationServiceImpl extends BaseServiceImpl<StudentMapper, Stu
         String currentOpenid = dto.getOpenId();
         // 判断当前用户是否已绑定队长账号
         Student checkStudent = studentMapper.selectByOpenId(currentOpenid);
-        if (checkStudent != null) {
+        String account = dto.getAccount().trim();
+        if (checkStudent != null && !Objects.equals(checkStudent.getAccount(), account)) {
             log.warn("openid=[{}]的用户已绑定学生账号[{}]，无法再次绑定其他学生账号！", currentOpenid, checkStudent.getAccount());
             return ServerResponse.createBySuccess(401, "您已绑定其他队长账号！");
         }
 
-        Student student = studentMapper.selectByAccount(dto.getAccount().trim());
+        if (checkStudent != null && Objects.equals(checkStudent.getAccount(), account)) {
+            // 当前用户已经绑定过当前队长账号，无需再次绑定
+            log.info("openid=[{}]的用户已绑定学生账号[{}]，无需再次绑定，验证通过！", currentOpenid, checkStudent.getAccount());
+            return ServerResponse.createBySuccess();
+        }
+
+        Student student = studentMapper.selectByAccount(account);
         if (student == null || !Objects.equals(student.getPassword(), dto.getPassword().trim())) {
             return ServerResponse.createByError(400, "账号或密码输入错误！");
         }

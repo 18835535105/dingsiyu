@@ -216,7 +216,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
         stateOfWeek.setDurability(CalculateUtil.getDurability(baseValue.getDurability(), studentId, beforeSevenDaysDateStr, now));
         stateOfWeek.setHitRate(CalculateUtil.getHitRate(baseValue.getHitRate(), studentId, beforeSevenDaysDateStr, now));
         stateOfWeek.setMove(CalculateUtil.getMove(baseValue.getMove(), studentId, beforeSevenDaysDateStr, now));
-        stateOfWeek.setSource(CalculateUtil.getSource(baseValue, studentId, beforeSevenDaysDateStr, now));
+        stateOfWeek.setSource(baseValue.getSource());
         stateOfWeek.setSourceAttack((int) CalculateUtil.getSourceAttack(baseValue, studentId, beforeSevenDaysDateStr, now));
 
         return stateOfWeek;
@@ -329,10 +329,10 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 if (baseValue.getHitRate() == null) {
                     baseValue.setHitRate(hitRate);
                 } else {
-                    baseValue.setHitRate(baseValue.getHitRate() + hitRate);
+                    baseValue.setHitRate(BigDecimalUtil.add(baseValue.getHitRate(), hitRate));
                 }
             } else {
-                baseValue.setHitRate(0.0);
+                baseValue.setHitRate(0.0D);
             }
 
             // 机动力
@@ -348,6 +348,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 baseValue.setMove(0);
             }
         });
+
         return baseValue;
     }
 
@@ -514,13 +515,19 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Override
     public ServerResponse<Object> otherIndex(Long studentId) {
         Student student = studentMapper.selectById(studentId);
+        // 学生装备的飞船及装备信息
+        List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
+
         ServerResponse<IndexVO> indexInfo = this.getIndexInfo(student, false);
+        IndexVO.BaseValue baseValue = this.getBaseValue(equipments);
+        IndexVO.StateOfWeek stateOfWeek = this.getStateOfWeek(studentId, baseValue);
         String successRate = this.getSuccessRate(studentId);
 
         return ServerResponse.createBySuccess(OtherStudentShipIndexVO.builder()
                 .index(indexInfo.getData())
                 .rank(this.otherRank(student))
                 .successRate(successRate)
+                .radar(this.getRadar(baseValue, stateOfWeek))
                 .build());
     }
 

@@ -129,20 +129,6 @@ public class CalculateUtil {
     }
 
     /**
-     * 源分状态 源分攻击状态*源分
-     *
-     * @param baseValue
-     * @param studentId
-     * @param beforeSevenDaysDateStr
-     * @param endDateStr
-     * @return
-     */
-    public static int getSource(IndexVO.BaseValue baseValue, Long studentId, String beforeSevenDaysDateStr, String endDateStr) {
-        double sourceAttack = getSourceAttack(baseValue, studentId, beforeSevenDaysDateStr, endDateStr);
-        return Math.min(30000, (int) (sourceAttack * baseValue.getSource()));
-    }
-
-    /**
      * 源分攻击状态 源分攻击基础值*(50%+本周平均成绩/100)
      *
      * @param baseValue
@@ -186,8 +172,8 @@ public class CalculateUtil {
         double hitRate = getHitRate(baseValue.getHitRate(), studentId, beforeSevenDaysDateStr, endDateStr);
         // 获取机动力
         int move = getMove(baseValue.getMove(), studentId, beforeSevenDaysDateStr, endDateStr);
-        // 获取源分
-        int source = getSource(baseValue, studentId, beforeSevenDaysDateStr, endDateStr);
+        // 获取源分次数
+        int source = baseValue.getSource();
         return (int) ((durability + attack * 10 + baseValue.getSourceAttack() * source) * (hitRate + move / 10000) * (hitRate + move / 10000));
     }
 
