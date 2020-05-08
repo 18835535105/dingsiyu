@@ -59,6 +59,10 @@ public class AuthorizationServiceImpl extends BaseServiceImpl<StudentMapper, Stu
             return ServerResponse.createByError(400, "账号或密码输入错误！");
         }
 
+        if (StringUtils.isEmpty(student.getHeadUrl())) {
+            return ServerResponse.createByError(400, "夺分系统未登录过，请先登陆夺分系统！");
+        }
+
         String openid = student.getOpenid();
         String splitCode = ",";
         if (StringUtils.isNotEmpty(openid) && openid.split(splitCode).length >= 3) {
