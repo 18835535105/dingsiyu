@@ -127,7 +127,7 @@ public class QuartzStudyCalendarServiceImpl implements QuartzStudyCalendarServic
                     Integer consumption = goldLogMapper.selectGoldByStudentIdAndDate(studentId, date, 2);
                     studentDailyLearning.setGoldAdd(goldAdd == null ? 0 : goldAdd);
                     studentDailyLearning.setGoldConsumption(consumption == null ? 0 : consumption);
-                    //获取学习有效时常
+                    //获取学习有效时长
                     Map<String, Object> validTime = studentLoginMap.get(studentId);
                     studentDailyLearning.setValidTime(validTime != null ?
                             Integer.parseInt(validTime.get("validTime").toString()) : 0);

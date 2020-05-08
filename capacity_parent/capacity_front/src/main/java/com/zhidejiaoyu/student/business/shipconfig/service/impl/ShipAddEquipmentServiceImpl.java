@@ -384,9 +384,9 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         if (type.equals(4)) {
             number /= 3600;
             if (nextValue == null) {
-                equMap.put(levelValue, "还差" + number + "小时有效时常解锁");
+                equMap.put(levelValue, "还差" + number + "小时有效时长解锁");
             } else {
-                equMap.put(levelValue, "还差" + number + "小时有效时常到达lv" + nextValue);
+                equMap.put(levelValue, "还差" + number + "小时有效时长到达lv" + nextValue);
             }
         }
     }

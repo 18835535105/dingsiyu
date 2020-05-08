@@ -67,7 +67,7 @@
         <include refid="base_sql"/>
         from equipment
         where `type` =#{type}
-        order by level , id asc
+        order by level , id
     </select>
 
     <select id="selectIdByTypeAndLevel" resultMap="BaseResultMap" parameterType="map">
