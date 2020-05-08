@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.shipconfig.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.redis.SourcePowerKeysConst;
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
@@ -392,17 +393,30 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     }
 
     @Override
-    public IndexVO.MyState getBaseState(Long studentId) {
+    public IndexVO.MyState getBaseState(String openId) {
+        Student student = studentMapper.selectByOpenId(openId);
+        if (student == null) {
+            throw new ServiceException("未查询到学生信息！");
+        }
+        Long studentId = student.getId();
         List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
         IndexVO indexVO = this.getIndexVoTmp(equipments);
         IndexVO.BaseValue baseValue = this.getBaseValue(equipments);
 
         IndexVO.StateOfWeek stateOfWeek = this.getStateOfWeek(studentId, baseValue);
 
+        String shipName = "";
+        IndexVO.Info shipInfo = indexVO.getShipInfo();
+        if (shipInfo != null) {
+            shipName = shipInfo.getExplain().split("，")[0];
+        }
+
         return IndexVO.MyState.builder()
+                .petUrl(GetOssFile.getPublicObjectUrl(student.getPartUrl()))
+                .shipName(shipName)
                 .armorInfo(indexVO.getArmorInfo())
                 .missileInfo(indexVO.getMissileInfo())
-                .shipInfo(indexVO.getShipInfo())
+                .shipInfo(shipInfo)
                 .weaponsInfo(indexVO.getWeaponsInfo())
                 .radar(this.getRadar(baseValue, stateOfWeek))
                 .build();

@@ -35,10 +35,10 @@ public interface ShipIndexService extends BaseService<Student> {
     /**
      * 获取学生雷达图数据
      *
-     * @param studentId
      * @return
+     * @param openId
      */
-    IndexVO.MyState getBaseState(Long studentId);
+    IndexVO.MyState getBaseState(String openId);
 
     /**
      * 获取各项战力值
