@@ -329,10 +329,10 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 if (baseValue.getHitRate() == null) {
                     baseValue.setHitRate(hitRate);
                 } else {
-                    baseValue.setHitRate(baseValue.getHitRate() + hitRate);
+                    baseValue.setHitRate(BigDecimalUtil.add(baseValue.getHitRate(), hitRate));
                 }
             } else {
-                baseValue.setHitRate(0.0);
+                baseValue.setHitRate(0.0D);
             }
 
             // 机动力
@@ -348,6 +348,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 baseValue.setMove(0);
             }
         });
+
         return baseValue;
     }
 
