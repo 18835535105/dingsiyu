@@ -107,8 +107,7 @@ public class IndexController extends BaseController {
         if (StringUtils.isEmpty(openId)) {
             throw new ServiceException("openId can't be null");
         }
-        Long studentId = smallAppIndexService.getStudentId(openId);
-        IndexVO.MyState radar = shipIndexService.getBaseState(studentId);
+        IndexVO.MyState radar = shipIndexService.getBaseState(openId);
         return ServerResponse.createBySuccess(radar);
     }
 
