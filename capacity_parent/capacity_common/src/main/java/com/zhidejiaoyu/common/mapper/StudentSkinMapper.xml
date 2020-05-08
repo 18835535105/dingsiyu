@@ -9,8 +9,8 @@
         <result column="skin_name" property="skinName"/>
         <result column="end_time" property="endTime"/>
         <result column="state" property="state"/>
-        <result column="create_time" property="createTime"></result>
-        <result column="img_url" property="imgUrl"></result>
+        <result column="create_time" property="createTime"/>
+        <result column="img_url" property="imgUrl"/>
     </resultMap>
 
     <sql id="Base_Column_List">
