@@ -48,7 +48,7 @@ public class ControllerLogAop {
             }
             String url = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
             if (StringUtils.isNotEmpty(url) && url.contains("/smallApp")) {
-                this.printSmallAppLog(startTime, maxTime, url, httpServletRequest);
+                this.printSmallAppLog(startTime, maxTime, url);
             } else {
                 this.printLearnSystemLog(startTime, maxTime, httpSession, url);
             }
@@ -89,17 +89,15 @@ public class ControllerLogAop {
      * @param startTime
      * @param maxTime
      * @param url
-     * @param httpServletRequest
      */
-    private void printSmallAppLog(long startTime, long maxTime, String url, HttpServletRequest httpServletRequest) {
-        String openId = httpServletRequest.getParameter("openId");
+    private void printSmallAppLog(long startTime, long maxTime, String url) {
         long time = System.currentTimeMillis() - startTime;
         if (time > maxTime) {
-            log.warn("openid=[{}] 访问接口：[{}], 用时：[{}], thread：[{}] param=[{}]",
-                    openId, url, time + " ms", Thread.currentThread().getName(), HttpUtil.getParams());
+            log.warn("访问接口：[{}], 用时：[{}], thread：[{}] param=[{}]",
+                    url, time + " ms", Thread.currentThread().getName(), HttpUtil.getParams());
         } else {
-            log.info("openid=[{}] 访问接口：[{}], 用时：[{}], thread：[{}] param=[{}]",
-                    openId, url, time + " ms", Thread.currentThread().getName(), HttpUtil.getParams());
+            log.info("访问接口：[{}], 用时：[{}], thread：[{}] param=[{}]",
+                    url, time + " ms", Thread.currentThread().getName(), HttpUtil.getParams());
         }
     }
 }
