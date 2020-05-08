@@ -356,7 +356,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      */
     Double selectScoreAvgByStartDateAndEndDate(@Param("studentId") Long studentId, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
-    int selectFractionByStudentId(@Param("studentId") long studentId);
+    Integer selectFractionByStudentId(@Param("studentId") long studentId);
 
     @MapKey("studentId")
     Map<Long, Map<String, Object>> selectByStudentIdsAndGenreAndDate(@Param("studentIds") List<Long> studentIds,

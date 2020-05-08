@@ -336,7 +336,10 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                 equMap.put("wear", studentEquipment.getType().equals(1));
             } else {
                 long number = (equipment.getEmpiricalValue() - empValue);
-                getLevelValue(type, equMap, number, "levelValue", null);
+                if (!type.equals(5)) {
+                    getLevelValue(type, equMap, number, "levelValue", null);
+                }
+
                 equMap.put("strengthenGold", useStrengthenGold(equipment.getLevel(), 1, equipment));
             }
             returnList.add(equMap);
@@ -345,12 +348,13 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         returnMap.put("nextLevel", nextLevel);
         double number = 1.0 * empValue / nextLevelValue;
         long levelValue = nextLevelValue - empValue;
-        if (levelValue < 0) {
-            returnMap.put("progressBarValue", "已到最大等级");
-        } else {
-            getLevelValue(type, returnMap, levelValue, "progressBarValue", nextLevel);
+        if (!type.equals(5)) {
+            if (levelValue < 0) {
+                returnMap.put("progressBarValue", "已到最大等级");
+            } else {
+                getLevelValue(type, returnMap, levelValue, "progressBarValue", nextLevel);
+            }
         }
-
         returnMap.put("percentage", number > 1 ? 1 : number);
         returnMap.put("gold", student.getSystemGold());
         return returnList;
@@ -572,7 +576,13 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             vo.setWeaponExperience(indexMap.size());
         }
         if (type.equals(0) || type.equals(3)) {
-            vo.setMissileExperience(testRecordMapper.selectFractionByStudentId(studentId));
+            Integer i = testRecordMapper.selectFractionByStudentId(studentId);
+            if(i==null){
+                vo.setMissileExperience(0);
+            }else{
+                vo.setMissileExperience(testRecordMapper.selectFractionByStudentId(studentId));
+            }
+
         }
         if (type.equals(0) || type.equals(4)) {
             vo.setArmorExperience(durationMapper.selectValidTimeByStudentId(studentId).intValue());

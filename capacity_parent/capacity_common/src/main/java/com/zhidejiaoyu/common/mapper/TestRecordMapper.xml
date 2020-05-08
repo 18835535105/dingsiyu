@@ -955,7 +955,7 @@
           and test_end_time >= #{startTime}
           and test_end_time &lt;= #{endTime}
     </select>
-    <select id="selectFractionByStudentId" parameterType="map" resultType="int">
+    <select id="selectFractionByStudentId" parameterType="map" resultType="integer">
         select sum(point)
         from test_record
         where student_id = #{studentId}
