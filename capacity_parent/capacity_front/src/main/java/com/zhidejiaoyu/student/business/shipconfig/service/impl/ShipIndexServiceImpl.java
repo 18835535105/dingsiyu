@@ -514,13 +514,19 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
     @Override
     public ServerResponse<Object> otherIndex(Long studentId) {
         Student student = studentMapper.selectById(studentId);
+        // 学生装备的飞船及装备信息
+        List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
+
         ServerResponse<IndexVO> indexInfo = this.getIndexInfo(student, false);
+        IndexVO.BaseValue baseValue = this.getBaseValue(equipments);
+        IndexVO.StateOfWeek stateOfWeek = this.getStateOfWeek(studentId, baseValue);
         String successRate = this.getSuccessRate(studentId);
 
         return ServerResponse.createBySuccess(OtherStudentShipIndexVO.builder()
                 .index(indexInfo.getData())
                 .rank(this.otherRank(student))
                 .successRate(successRate)
+                .radar(this.getRadar(baseValue, stateOfWeek))
                 .build());
     }
 

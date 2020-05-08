@@ -402,7 +402,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     }
 
     private Double useStrengthenGold(Integer lv, Integer strengthen) {
-        Double gold = 0.0;
+        double gold = 0.0;
         if (strengthen >= 3) {
             return 0.0;
         }
@@ -423,17 +423,17 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
 
     @Override
     public void updateLeaderBoards(Student student) {
-        //获取更新后的源分战力
+        // 获取更新后的源分战力
         Date date = new Date();
         String beforeSevenDaysDateStr = DateUtil.getBeforeDayDateStr(date, 7, DateUtil.YYYYMMDDHHMMSS);
         String now = DateUtil.formatDate(new Date(), DateUtil.YYYYMMDDHHMMSS);
         Integer sourceForceAttack = CalculateUtil.getSourcePoint(student.getId(), beforeSevenDaysDateStr, now);
-        //获取pk值
+        // 获取pk值
         StudentExpansion expansion = studentExpansionMapper.selectByStudentId(student.getId());
-        sourcePowerRankOpt.optSourcePowerRank(student, sourceForceAttack, expansion.getStudyPower());
-        Double score = Double.parseDouble(sourceForceAttack + "." + expansion.getStudyPower());
-        expansion.setSourcePower(score.intValue());
+        expansion.setSourcePower(sourceForceAttack);
         studentExpansionMapper.updateById(expansion);
+
+        sourcePowerRankOpt.optSourcePowerRank(student, sourceForceAttack, expansion.getStudyPower());
     }
 
     @Override
