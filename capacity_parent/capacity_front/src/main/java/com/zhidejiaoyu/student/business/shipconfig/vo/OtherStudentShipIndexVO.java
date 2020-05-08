@@ -32,4 +32,9 @@ public class OtherStudentShipIndexVO implements Serializable {
      * pk胜率
      */
     private String successRate;
+
+    /**
+     * 雷达图信息
+     */
+    private IndexVO.Radar radar;
 }
