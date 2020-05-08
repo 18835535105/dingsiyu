@@ -12,7 +12,7 @@ import java.util.Date;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author zdjy
@@ -70,7 +70,7 @@ public class LearningDetails implements Serializable {
     private Long onlineTime;
 
     /**
-     * 有效时常
+     * 有效时长
      */
     private Long validTime;
 

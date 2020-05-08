@@ -46,24 +46,58 @@ public class ControllerLogAop {
                 log.warn("request 或者 session 为空！不影响程序运行！");
                 return;
             }
-            Object object = httpSession.getAttribute(UserConstant.CURRENT_STUDENT);
-            if (object != null) {
-                String url = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
-                Student student = (Student) object;
-                long time = System.currentTimeMillis() - startTime;
-                // 保存好声音的接口不打印 warn 级别日志
-                if (time > maxTime && StringUtils.isNotEmpty(url) && !url.contains("/voice/")) {
-                    log.warn("学生[{} -> {} -> {}] 访问接口：[{}], 用时：[{}], thread：[{}] param=[{}]",
-                            student.getId(), student.getAccount(), student.getStudentName(),
-                            url, time + " ms", Thread.currentThread().getName(), HttpUtil.getParams());
-                } else {
-                    log.info("学生[{} -> {} -> {}] 访问接口：[{}], 用时：[{}], thread：[{}] param=[{}]",
-                            student.getId(), student.getAccount(), student.getStudentName(),
-                            url, time + " ms", Thread.currentThread().getName(), HttpUtil.getParams());
-                }
+            String url = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
+            if (StringUtils.isNotEmpty(url) && url.contains("/smallApp")) {
+                this.printSmallAppLog(startTime, maxTime, url);
+            } else {
+                this.printLearnSystemLog(startTime, maxTime, httpSession, url);
             }
         } catch (Exception e) {
             log.error("记录 log 出错！ errMsg=[{}]", e.getMessage());
+        }
+    }
+
+    /**
+     * 打印学习系统请求日志
+     *
+     * @param startTime
+     * @param maxTime
+     * @param httpSession
+     * @param url
+     */
+    private void printLearnSystemLog(long startTime, long maxTime, HttpSession httpSession, String url) {
+        Object object = httpSession.getAttribute(UserConstant.CURRENT_STUDENT);
+        if (object != null) {
+            Student student = (Student) object;
+            long time = System.currentTimeMillis() - startTime;
+            // 保存好声音的接口不打印 warn 级别日志
+            if (time > maxTime && StringUtils.isNotEmpty(url) && !url.contains("/voice/")) {
+                log.warn("学生[{} -> {} -> {}] 访问接口：[{}], 用时：[{}], thread：[{}] param=[{}]",
+                        student.getId(), student.getAccount(), student.getStudentName(),
+                        url, time + " ms", Thread.currentThread().getName(), HttpUtil.getParams());
+            } else {
+                log.info("学生[{} -> {} -> {}] 访问接口：[{}], 用时：[{}], thread：[{}] param=[{}]",
+                        student.getId(), student.getAccount(), student.getStudentName(),
+                        url, time + " ms", Thread.currentThread().getName(), HttpUtil.getParams());
+            }
+        }
+    }
+
+    /**
+     * 打印小程序请求日志
+     *
+     * @param startTime
+     * @param maxTime
+     * @param url
+     */
+    private void printSmallAppLog(long startTime, long maxTime, String url) {
+        long time = System.currentTimeMillis() - startTime;
+        if (time > maxTime) {
+            log.warn("访问接口：[{}], 用时：[{}], thread：[{}] param=[{}]",
+                    url, time + " ms", Thread.currentThread().getName(), HttpUtil.getParams());
+        } else {
+            log.info("访问接口：[{}], 用时：[{}], thread：[{}] param=[{}]",
+                    url, time + " ms", Thread.currentThread().getName(), HttpUtil.getParams());
         }
     }
 }

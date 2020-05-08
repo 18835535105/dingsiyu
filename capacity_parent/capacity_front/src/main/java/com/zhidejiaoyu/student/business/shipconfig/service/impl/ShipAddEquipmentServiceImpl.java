@@ -18,6 +18,7 @@ import com.zhidejiaoyu.student.business.shipconfig.vo.EquipmentExperienceVo;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -211,12 +212,12 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Object wearEquipment(HttpSession session, Long equipmentId, Integer type, String imgUrl) {
         Student student = getStudent(session);
         Equipment equipment = equipmentMapper.selectById(equipmentId);
         updateUseEqu(student, equipment);
         if (type != null && type == 5) {
-
             student.setPartUrl(imgUrl.replace(AliyunInfoConst.host, ""));
             student.setPetName(equipment.getName());
             studentMapper.updateById(student);
@@ -387,9 +388,9 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         if (type.equals(4)) {
             number /= 3600;
             if (nextValue == null) {
-                equMap.put(levelValue, "还差" + number + "小时有效时常解锁");
+                equMap.put(levelValue, "还差" + number + "小时有效时长解锁");
             } else {
-                equMap.put(levelValue, "还差" + number + "小时有效时常到达lv" + nextValue);
+                equMap.put(levelValue, "还差" + number + "小时有效时长到达lv" + nextValue);
             }
         }
     }
@@ -418,7 +419,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
      * @return
      */
     private Integer addEquipmentGold(Student student, Integer lv, Integer strengthen, Equipment equipment) {
-        double gold = 0;
+        double gold;
         if (strengthen >= 3) {
             return 3;
         }
@@ -450,7 +451,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
                     gold = 800;
                 }
             }
-            if (equipment.getName().contains("李唐心")) {
+            if (equipment.getName().contains("李糖心")) {
                 if (strengthen == 1) {
                     gold = 800;
                 }
