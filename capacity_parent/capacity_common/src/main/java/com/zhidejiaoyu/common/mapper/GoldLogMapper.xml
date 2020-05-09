@@ -63,6 +63,7 @@
         and gold.create_time >= #{startTime}
         and gold.create_time &lt;= #{endTime}
         and gold.type = 1
+        and gold.gold_add > 1
         order by gold.create_time desc
     </select>
     <select id="countByAdminIdAndStartDateAndEndTime" resultType="int" parameterType="map">
