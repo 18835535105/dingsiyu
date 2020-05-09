@@ -59,6 +59,9 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Resource
     private PrizeExchangeListMapper prizeExchangeListMapper;
 
+    @Resource
+    private RunLogMapper runLogMapper;
+
     @Override
     public ServerResponse<Object> index(String openId) {
         Student student = studentMapper.selectByOpenId(openId);
@@ -194,17 +197,32 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     public ServerResponse<Object> cardInfo(String openId) {
         Student student = studentMapper.selectByOpenId(openId);
 
-        // 签到信息
-        //String currentMonth = DateUtil.getCurrentDay(DateUtil.YYYYMM);
-        //List<ClockIn> clockIns = clockInMapper.selectByStudentIdWithCurrentMonth(student.getId(), currentMonth);
-        List<ClockIn> clockIns = clockInMapper.selectByStudentId(student.getId());
-        Integer cardDays = clockInMapper.selectLaseCardDays(student.getId());
+        // 10天前的日期，10天内学生没有登陆过系统不允许打卡
+        Date date = new Date();
+        Date beforeDaysDate = DateUtil.getBeforeDaysDate(date, 10);
+        Long studentId = student.getId();
+        int loginCount = runLogMapper.countLoginByLastDays(studentId, beforeDaysDate);
+
+        // 查询学生今天是否已经打过卡，如果打过卡不允许再次打卡
+        int todayCardCount = clockInMapper.countTodayInfoByStudentId(studentId);
+
+        boolean canCard = true;
+        String msg = "";
+        if (loginCount == 0 || todayCardCount > 0) {
+            canCard = false;
+            msg = todayCardCount == 0 ? "您已经10天未进行学习，请登陆夺分系统学习才可以继续打卡。" : "您今天已经打卡，无需再次打卡！";
+        }
+
+        List<ClockIn> clockIns = clockInMapper.selectByStudentId(studentId);
+        Integer cardDays = clockInMapper.selectLaseCardDays(studentId);
 
         return ServerResponse.createBySuccess(CardVO.builder()
                 .cardDays(cardDays == null ? 0 : cardDays)
                 .infos(clockIns.stream()
                         .map(clockIn -> DateUtil.formatDate(clockIn.getCardTime(), DateUtil.YYYYMMDD))
                         .collect(Collectors.toList()))
+                .canCard(canCard)
+                .msg(msg)
                 .build());
     }
 

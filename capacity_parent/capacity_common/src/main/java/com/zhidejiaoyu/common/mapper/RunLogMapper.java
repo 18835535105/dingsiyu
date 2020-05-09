@@ -138,11 +138,23 @@ public interface RunLogMapper extends BaseMapper<RunLog> {
 
     /**
      * 根据日期和类型获取每日信息
+     *
      * @param beforeDaysDate
      * @param type
      * @return
      */
     List<RunLog> selectByDateAndType(@Param("date") Date beforeDaysDate, @Param("type") int type);
 
-    Date selectLoginTimeByStudentIdAndDate(@Param("studentId") Long studentId,@Param("date") Date beforeDaysDate);
+    Date selectLoginTimeByStudentIdAndDate(@Param("studentId") Long studentId, @Param("date") Date beforeDaysDate);
+
+    /**
+     * 统计指定日期至今天学生登录系统次数
+     *
+     * @param studentId
+     * @param beforeDaysDate
+     * @return
+     */
+    @Select("select count(id) from run_log where operate_user_id = #{studentId} and type = 1 " +
+            "and to_days(create_time) >= to_days(#{beforeDaysDate})")
+    int countLoginByLastDays(@Param("studentId") Long studentId, @Param("beforeDaysDate") Date beforeDaysDate);
 }
