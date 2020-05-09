@@ -363,13 +363,22 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
 
     private void getLevelValue(Integer type, Map<String, Object> equMap, long number, String levelValue, Integer nextValue) {
         if (type.equals(1)) {
-            number /= 3600;
-            if (nextValue == null) {
-                equMap.put(levelValue, "还差" + number + "小时在线时常解锁");
+            long size = number / 3600;
+            if (size <= 0) {
+                number /= 60;
+                if (nextValue == null) {
+                    equMap.put(levelValue, "还差" + number + "分钟在线时常解锁");
+                } else {
+                    equMap.put(levelValue, "还差" + number + "分钟在线时常到达lv" + nextValue);
+                }
             } else {
-                equMap.put(levelValue, "还差" + number + "小时到达lv" + nextValue);
+                number /= 3600;
+                if (nextValue == null) {
+                    equMap.put(levelValue, "还差" + number + "小时在线时常解锁");
+                } else {
+                    equMap.put(levelValue, "还差" + number + "小时在线时常到达lv" + nextValue);
+                }
             }
-
         }
         if (type.equals(2)) {
             if (nextValue == null) {
@@ -386,11 +395,21 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             }
         }
         if (type.equals(4)) {
-            number /= 3600;
-            if (nextValue == null) {
-                equMap.put(levelValue, "还差" + number + "小时有效时长解锁");
+            long size = number / 3600;
+            if (size <= 0) {
+                number /= 60;
+                if (nextValue == null) {
+                    equMap.put(levelValue, "还差" + number + "分钟有效时长解锁");
+                } else {
+                    equMap.put(levelValue, "还差" + number + "分钟有效时长到达lv" + nextValue);
+                }
             } else {
-                equMap.put(levelValue, "还差" + number + "小时有效时长到达lv" + nextValue);
+                number /= 3600;
+                if (nextValue == null) {
+                    equMap.put(levelValue, "还差" + number + "小时有效时长解锁");
+                } else {
+                    equMap.put(levelValue, "还差" + number + "小时有效时长到达lv" + nextValue);
+                }
             }
         }
     }
@@ -578,9 +597,9 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         }
         if (type.equals(0) || type.equals(3)) {
             Integer i = testRecordMapper.selectFractionByStudentId(studentId);
-            if(i==null){
+            if (i == null) {
                 vo.setMissileExperience(0);
-            }else{
+            } else {
                 vo.setMissileExperience(testRecordMapper.selectFractionByStudentId(studentId));
             }
 

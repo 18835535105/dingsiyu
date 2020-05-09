@@ -374,5 +374,14 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      */
     @MapKey("courseId")
     Map<Long, Map<Long, Object>> countGoldTestByStudentIdAndCourseIds(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds);
+
+    /**
+     * 查询当前模块当天是否已经测试
+     * @param studentId
+     * @param genre
+     * @param date
+     * @return
+     */
+    Integer selectByStudentIdAndGenreAndEndTime(@Param("studentId") Long studentId, @Param("genre") String genre, @Param("date") Date date);
 }
 

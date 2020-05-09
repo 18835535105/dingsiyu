@@ -58,10 +58,17 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
 
     @Override
     public Object getTest(HttpSession session, String openId) {
+        Student student = studentMapper.selectByOpenId(openId);
+        /*Integer integer = testRecordMapper.selectByStudentIdAndGenreAndEndTime(student.getId(), GenreConstant.SMALLAPP_GENRE, new Date());
+        if(integer!=null && integer>1){
+            return ServerResponse.createByError(400,"今天已经挑战成功");
+        }
+*/
         if (session.getAttribute(TimeConstant.BEGIN_START_TIME) == null) {
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         }
-        Student student = studentMapper.selectByOpenId(openId);
+
+
         List<Map<String, Object>> maps = errorLearnLogMapper.selectVocabularyByStudentId(student.getId());
         Map<String, Object> returnMap = new HashMap<>();
         if (maps.size() == 0) {
@@ -102,7 +109,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
                     }
                 }
             }
-        }else {
+        } else {
             getMaps = getMaps.subList(0, 15);
         }
 

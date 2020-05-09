@@ -991,4 +991,11 @@
         and genre = '金币试卷测试'
         group by course_id
     </select>
+    <select id="selectByStudentIdAndGenreAndEndTime" parameterType="map" resultType="integer">
+        select count(id) from test_record
+        where student_id = #{studentId}
+        and genre = #{genre}
+        and to_days(test_end_time) = to_days(#{date})
+    </select>
+
 </mapper>
