@@ -534,7 +534,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         Long testId;
         int goldCount = 0;
         int addEnergy = 0;
-        String awardStr = "";
+        TestResultVo.AwardInfo awardInfo = null;
         if (testRecord == null) {
 
             isFirst = true;
@@ -563,7 +563,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
 
             testRecord = this.saveTestRecord(courseId, student, session, wordUnitTestDTO, goldCount);
 
-            awardStr = this.updateCashCoupon(student, point);
+            awardInfo = this.updateCashCoupon(student, point);
         }
 
         TestResultVo vo = new TestResultVo();
@@ -586,7 +586,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         vo.setGold(goldCount);
         vo.setTestId(testId);
         vo.setEnergy(addEnergy);
-        vo.setAwardStr(awardStr);
+        vo.setAwardInfo(awardInfo);
         studentMapper.updateById(student);
         getLevel(session);
         session.removeAttribute("token");
@@ -956,14 +956,14 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         simpleTestRecordMapper.insert(testRecord);
 
         // 更新代金券数量
-        String awardStr = this.updateCashCoupon(student, testRecordPoint);
+        TestResultVo.AwardInfo awardInfo = this.updateCashCoupon(student, testRecordPoint);
 
         // 保存测试记录详情
         if (testDetail != null) {
             this.saveTestDetail(testDetail, testRecord.getId(), modelType, student);
         }
 
-        vo.setAwardStr(awardStr);
+        vo.setAwardInfo(awardInfo);
         //vo.setAwardStr(StringUtils.removeEnd(String.format("报名代金券x%d，%s", 50, "飞船*1"), "，"));
         vo.setGold(gold);
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, typeModel));
@@ -981,21 +981,26 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
      * @param point   得分
      * @return 奖励提示语
      */
-    public String updateCashCoupon(Student student, Integer point) {
+    public TestResultVo.AwardInfo updateCashCoupon(Student student, Integer point) {
         if (point >= PointConstant.SIXTY) {
             StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
             if (studentExpansion.getCashCoupon() >= 200) {
-                return "";
+                return new TestResultVo.AwardInfo();
             }
 
             int random = MathUtil.getRandom(10, 20);
             studentExpansion.setCashCoupon(studentExpansion.getCashCoupon() + random);
             studentExpansionMapper.updateById(studentExpansion);
 
-            String shipInfo = ShipAddEquipmentServiceImpl.getTestAddEquipment(student.getId());
-            return StringUtils.removeEnd(String.format("%d$$%s", random, shipInfo), "，");
+            List<Map<String, String>> equipments = ShipAddEquipmentServiceImpl.getTestAddEquipment(student.getId());
+
+           return TestResultVo.AwardInfo.builder()
+                    .equipmentList(equipments)
+                    .voucher(random)
+                    .build();
+
         }
-        return "";
+        return new TestResultVo.AwardInfo();
     }
 
     @Override

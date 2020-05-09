@@ -1,8 +1,13 @@
 package com.zhidejiaoyu.common.vo;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 测试结果页响应数据
@@ -62,5 +67,24 @@ public class TestResultVo implements Serializable {
     /**
      * 绝招好课测试，奖励代金券、飞船等信息说明文字
      */
-    private String awardStr;
+    private AwardInfo awardInfo;
+
+    /**
+     * 绝招好课测试，代金券、飞船等信息
+     */
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AwardInfo {
+        /**
+         * 奖励代金券个数
+         */
+        private Integer voucher;
+
+        /**
+         * 奖励飞船信息
+         */
+        List<Map<String, String>> equipmentList;
+    }
 }
