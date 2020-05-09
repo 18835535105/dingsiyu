@@ -23,45 +23,53 @@
     </sql>
 
     <select id="selectLvOneAllUrl" resultType="map">
-        select
-        equipment_id equipmentId,img_url imgUrl
+        select equipment_id equipmentId,
+               img_url      imgUrl
         from equipment_expansion
-        where intensification_degree=1
+        where intensification_degree = 1
     </select>
     <select id="selectAllUrlByType" resultType="map" parameterType="map">
-        select
-        exp.equipment_id equipmentId,exp.img_url imgUrl,exp.intensification_degree degree
+        select exp.equipment_id           equipmentId,
+               exp.img_url                imgUrl,
+               exp.intensification_degree degree
         from equipment_expansion exp
-        join equipment equ
-        on exp.equipment_id = equ.id
-        where equ.type=#{type}
+                 join equipment equ
+                      on exp.equipment_id = equ.id
+        where equ.type = #{type}
     </select>
     <select id="selectUrlByEquipmentIdAndType" parameterType="map" resultType="string">
-        select
-        img_url
+        select img_url
         from equipment_expansion
-        where intensification_degree=#{degree}
-        and equipment_id=#{equipmentId}
+        where intensification_degree = #{degree}
+          and equipment_id = #{equipmentId}
     </select>
     <select id="selectByEquipmentIdAndLevel" parameterType="map" resultType="map">
         select ee.id,
                e.name,
-               ee.img_url             imgUrl,
+               ee.img_url                imgUrl,
                ee.durability,
-               ee.common_attack       commonAttack,
-               ee.source_force_attack sourceForceAttack,
-               ee.source_force        sourceForce,
-               ee.hit_rate            hitRate,
+               ee.common_attack          commonAttack,
+               ee.source_force_attack    sourceForceAttack,
+               ee.source_force           sourceForce,
+               ee.hit_rate               hitRate,
                ee.mobility,
                ee.intensification_degree degree
-        from   equipment e
+        from equipment e
                  join equipment_expansion ee on e.id = ee.equipment_id
-        where
-             e.id=#{equipmentId}
-            and ee.intensification_degree = #{degree}
+        where e.id = #{equipmentId}
+          and ee.intensification_degree = #{degree}
     </select>
     <select id="selectAll" resultMap="BaseResultMap">
-        select <include refid="base_sql"></include> from equipment_expansion
+        select
+        <include refid="base_sql"/>
+        from equipment_expansion
+    </select>
+    <select id="selectOneByEquipmentId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from equipment_expansion
+        where equipment_id = #{equipmentId}
+        limit 1
     </select>
 
 </mapper>

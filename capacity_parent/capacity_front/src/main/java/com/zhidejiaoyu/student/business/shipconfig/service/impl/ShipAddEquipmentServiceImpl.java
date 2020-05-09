@@ -3,10 +3,7 @@ package com.zhidejiaoyu.student.business.shipconfig.service.impl;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.Equipment;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.StudentEquipment;
-import com.zhidejiaoyu.common.pojo.StudentExpansion;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -16,7 +13,6 @@ import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.util.CalculateUtil;
 import com.zhidejiaoyu.student.business.shipconfig.vo.EquipmentExperienceVo;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +29,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     private static RedisOpt redisOptStatic;
     private static EquipmentMapper equipmentMapperStatic;
     private static StudentEquipmentMapper studentEquipmentMapperStatic;
+    private static EquipmentExpansionMapper equipmentExpansionMapperStatic;
 
     @Resource
     private StudentEquipmentMapper studentEquipmentMapper;
@@ -64,6 +61,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         redisOptStatic = this.redisOpt;
         equipmentMapperStatic = this.equipmentMapper;
         studentEquipmentMapperStatic = this.studentEquipmentMapper;
+        equipmentExpansionMapperStatic = equipmentExpansionMapper;
     }
 
     @Override
@@ -540,18 +538,22 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
      * 分数足够添加的飞船物品
      *
      * @param studentId
-     * @return
+     * @return 奖励的飞船名称和飞船图片
      */
-    public static String getTestAddEquipment(Long studentId) {
-        List<Equipment> equipment = equipmentMapperStatic.selectIdByTypeAndLevel(1, 1);
-        StudentEquipment studentEquipment = studentEquipmentMapperStatic.selectByStudentIdAndEquipmentId(studentId, equipment.get(0).getId());
+    public static List<Map<String, String>> getTestAddEquipment(Long studentId) {
+        List<Equipment> equipmentList = equipmentMapperStatic.selectIdByTypeAndLevel(1, 1);
+        StudentEquipment studentEquipment = studentEquipmentMapperStatic.selectByStudentIdAndEquipmentId(studentId, equipmentList.get(0).getId());
         if (studentEquipment == null) {
-            StringBuilder builder = new StringBuilder();
             redisOptStatic.initShip(studentId);
-            equipment.forEach(equ -> builder.append(equ.getName()).append("，"));
-            return StringUtils.removeEnd(builder.toString(), "，");
+            return equipmentList.stream().map(equipment -> {
+                EquipmentExpansion equipmentExpansion = equipmentExpansionMapperStatic.selectOneByEquipmentId(equipment.getId());
+                Map<String, String> map = new HashMap<>(16);
+                map.put("name", equipment.getName());
+                map.put("url", GetOssFile.getPublicObjectUrl(equipmentExpansion.getImgUrl()));
+                return map;
+            }).collect(Collectors.toList());
         }
-        return "";
+        return Collections.emptyList();
     }
 
     public static void addEquipment(List<Long> equipmentIds, Long studentId, StudentEquipmentMapper studentEquipmentMapper) {
@@ -586,14 +588,14 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             vo.setShipExperience(timeIndex);
         }
         if (type.equals(0) || type.equals(2)) {
-            //获取所有已学单词数据
+            // 获取所有已学单词数据
             List<Long> learnList = learnExtendMapper.selectWordListByStudentId(studentId);
-            //获取历史记录单词学习数
-            List<Long> historyList = learnHistoryMapper.selectWordListBystudentId(studentId);
-            Map<Long, Long> indexMap = new HashMap<>();
-            learnList.forEach(wordId -> indexMap.put(wordId, wordId));
-            historyList.forEach(wordId -> indexMap.put(wordId, wordId));
-            vo.setWeaponExperience(indexMap.size());
+            // 获取历史记录单词学习数
+            List<Long> historyList = learnHistoryMapper.selectWordListByStudentId(studentId);
+
+            Set<Long> set = new HashSet<>(learnList);
+            set.addAll(historyList);
+            vo.setWeaponExperience(set.size());
         }
         if (type.equals(0) || type.equals(3)) {
             Integer i = testRecordMapper.selectFractionByStudentId(studentId);

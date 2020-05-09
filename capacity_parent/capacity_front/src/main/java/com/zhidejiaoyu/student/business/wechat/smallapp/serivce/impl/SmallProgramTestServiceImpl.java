@@ -2,14 +2,18 @@ package com.zhidejiaoyu.student.business.wechat.smallapp.serivce.impl;
 
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.aliyunoss.putObject.OssUpload;
+import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.FileConstant;
 import com.zhidejiaoyu.common.constant.TimeConstant;
+import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -94,11 +98,8 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         returnMap.put("gold", student.getSystemGold().intValue());
         //获取单词id
         List<Long> vocabularyIds = new ArrayList<>();
-        maps.forEach(map -> {
-            vocabularyIds.add(Long.parseLong(map.get("wordId").toString()));
-        });
-        List<Map<String, Object>> getMaps = new ArrayList<>();
-        getMaps.addAll(maps);
+        maps.forEach(map -> vocabularyIds.add(Long.parseLong(map.get("wordId").toString())));
+        List<Map<String, Object>> getMaps = new ArrayList<>(maps);
         if (getMaps.size() < 15) {
             while (getMaps.size() < 15) {
                 for (Map<String, Object> map : maps) {
@@ -122,13 +123,14 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @GoldChangeAnnotation
     public Object saveTest(Integer point, HttpSession session, String openId) {
         Student student = studentMapper.selectByOpenId(openId);
         Map<String, Object> returnMap = new HashMap<>();
         Date startDate = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
         Date date = new Date();
         Long studentId = student.getId();
-        if (point > 80) {
+        if (point > PointConstant.EIGHTY) {
             TestRecord testRecord = new TestRecord();
             testRecord.setGenre(GenreConstant.SMALLAPP_GENRE);
             testRecord.setStudyModel(StudyModelConstant.SMALLAPP_STUDY_MODEL);
@@ -141,13 +143,11 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             returnMap.put("point", 0);
         }
 
-        int awardGold = 50;
-        student.setSystemGold(student.getSystemGold() + awardGold);
-        studentMapper.updateById(student);
-
-        GoldLogUtil.saveStudyGoldLog(studentId, GenreConstant.SMALLAPP_GENRE, awardGold);
-
-        this.saveClockIn(studentId);
+        int count = clockInMapper.countTodayInfoByStudentId(studentId);
+        if (count == 0) {
+            this.saveClockIn(studentId);
+            this.awardGold(student);
+        }
 
         Integer adminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
         ShareConfig shareConfig = shareConfigMapper.selectByAdminId(adminId);
@@ -170,16 +170,35 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     }
 
     /**
+     * 奖励金币
+     *
+     * @param student
+     */
+    public void awardGold(Student student) {
+
+        Long studentId = student.getId();
+
+        Integer cardDays1 = clockInMapper.selectLaseCardDays(studentId);
+
+        int awardGold = 50;
+        if (cardDays1 != null && cardDays1 >= 3) {
+            // 连续打卡大于等于3天，额外奖励20金币
+            awardGold += 20;
+        }
+        // 金币加成
+        Double goldAddition = StudentGoldAdditionUtil.getGoldAddition(student, awardGold);
+        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldAddition));
+        studentMapper.updateById(student);
+
+        GoldLogUtil.saveStudyGoldLog(studentId, GenreConstant.SMALLAPP_GENRE, (int) Math.floor(goldAddition));
+    }
+
+    /**
      * 保存打卡记录
      *
      * @param studentId
      */
     public void saveClockIn(Long studentId) {
-        int count = clockInMapper.countTodayInfoByStudentId(studentId);
-
-        if (count > 0) {
-            return;
-        }
 
         Date yesterday = DateUtil.getBeforeDaysDate(new Date(), 1);
         Integer cardDays = clockInMapper.selectCardDaysByStudentIdAndCardTime(studentId, yesterday);

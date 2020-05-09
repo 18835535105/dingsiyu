@@ -176,6 +176,17 @@ public class IndexVO implements Serializable {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = false)
     public static class MyState {
+
+        /**
+         * 宠物路径
+         */
+        private String petUrl;
+
+        /**
+         * 飞船名称
+         */
+        private String shipName;
+
         /**
          * 雷达图信息
          */

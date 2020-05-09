@@ -29,4 +29,18 @@ public class CardVO implements Serializable {
      * 签到信息
      */
     private List<String> infos;
+
+    /**
+     * 能否打卡
+     * <ul>
+     * <li>true：可以打卡</li>
+     * <li>false：不能打卡</li>
+     * </ul>
+     */
+    private Boolean canCard;
+
+    /**
+     * 不能打卡原因
+     */
+    private String msg;
 }
