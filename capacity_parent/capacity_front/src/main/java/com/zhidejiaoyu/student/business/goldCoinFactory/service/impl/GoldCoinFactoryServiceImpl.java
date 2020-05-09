@@ -49,7 +49,7 @@ public class GoldCoinFactoryServiceImpl extends BaseServiceImpl<StudentMapper, S
         Date date = new Date();
         GoldCoinFactoryGoldVo vo = new GoldCoinFactoryGoldVo();
         //获取距离奖励公布时间
-        vo.setTime(getDateLong(date));
+        vo.setTime(getDateLong(date) / 1000);
         Student student = getStudent(session);
         //获取校长id
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
@@ -97,7 +97,7 @@ public class GoldCoinFactoryServiceImpl extends BaseServiceImpl<StudentMapper, S
                         GoldCoinFactoryGoldList.GoldList.builder()
                                 .model(map.get("model").toString())
                                 .studentName(map.get("studentName").toString())
-                                .getGold(String.format("%.1f",Integer.parseInt(map.get("gold").toString()) * 0.1))
+                                .getGold(String.format("%.1f", Integer.parseInt(map.get("gold").toString()) * 0.1))
                                 .studyTime(DateUtil.formatYYYYMMDD((Date) map.get("createTime"))).build());
 
             });
