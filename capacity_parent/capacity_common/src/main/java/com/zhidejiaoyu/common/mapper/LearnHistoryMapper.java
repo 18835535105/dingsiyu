@@ -56,7 +56,7 @@ public interface LearnHistoryMapper extends BaseMapper<LearnHistory> {
     @MapKey("courseId")
     Map<Long, Map<Long, Object>> countUnitByStudentIdAndCourseIds(@Param("studentId") Long studentId, @Param("courseIds") List<Long> courseIds, @Param("type") int type);
 
-    List<Long> selectWordListBystudentId(@Param("studentId") long studentId);
+    List<Long> selectWordListByStudentId(@Param("studentId") long studentId);
 
     /**
      * 获取指定日期学习过的记录

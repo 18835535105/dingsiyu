@@ -569,14 +569,14 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             vo.setShipExperience(timeIndex);
         }
         if (type.equals(0) || type.equals(2)) {
-            //获取所有已学单词数据
+            // 获取所有已学单词数据
             List<Long> learnList = learnExtendMapper.selectWordListByStudentId(studentId);
-            //获取历史记录单词学习数
-            List<Long> historyList = learnHistoryMapper.selectWordListBystudentId(studentId);
-            Map<Long, Long> indexMap = new HashMap<>();
-            learnList.forEach(wordId -> indexMap.put(wordId, wordId));
-            historyList.forEach(wordId -> indexMap.put(wordId, wordId));
-            vo.setWeaponExperience(indexMap.size());
+            // 获取历史记录单词学习数
+            List<Long> historyList = learnHistoryMapper.selectWordListByStudentId(studentId);
+
+            Set<Long> set = new HashSet<>(learnList);
+            set.addAll(historyList);
+            vo.setWeaponExperience(set.size());
         }
         if (type.equals(0) || type.equals(3)) {
             Integer i = testRecordMapper.selectFractionByStudentId(studentId);
