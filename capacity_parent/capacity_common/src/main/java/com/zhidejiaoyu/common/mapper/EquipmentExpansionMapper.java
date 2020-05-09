@@ -26,11 +26,19 @@ public interface EquipmentExpansionMapper extends BaseMapper<EquipmentExpansion>
     @MapKey("equipmentId")
     Map<Long, Map<String, Object>> selectLvOneAllUrl();
 
-    List<Map<String,Object>> selectAllUrlByType(@Param("type")Integer type);
+    List<Map<String, Object>> selectAllUrlByType(@Param("type") Integer type);
 
-    String selectUrlByEquipmentIdAndType(@Param("equipmentId") Long equipmentId,@Param("degree") Integer intensificationDegree);
+    String selectUrlByEquipmentIdAndType(@Param("equipmentId") Long equipmentId, @Param("degree") Integer intensificationDegree);
 
-    Map<String, Object> selectByEquipmentIdAndLevel(@Param("equipmentId") Long equipmentId,@Param("degree") int level);
+    Map<String, Object> selectByEquipmentIdAndLevel(@Param("equipmentId") Long equipmentId, @Param("degree") int level);
 
     List<EquipmentExpansion> selectAll();
+
+    /**
+     * 查询一条记录
+     *
+     * @param equipmentId
+     * @return
+     */
+    EquipmentExpansion selectOneByEquipmentId(Long equipmentId);
 }
