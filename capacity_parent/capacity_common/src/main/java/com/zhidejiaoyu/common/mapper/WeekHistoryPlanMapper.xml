@@ -23,8 +23,8 @@
         <include refid="base_sql"></include>
         from week_history_plan
         where
-        start_time >= #{times}
-        and end_time &lt;= #{times}
+        start_time &lt;= #{time}
+        and end_time >= #{time}
     </select>
     <select id="selectByTimeAndStudentId" parameterType="map" resultMap="BaseResultMap">
         select
@@ -32,8 +32,8 @@
         from week_history_plan
         where
         student_id=#{studentId}
-        and start_time >= #{times}
-        and end_time &lt;= #{times}
+        and start_time &lt;= #{date}
+        and end_time >= #{date}
     </select>
 
 </mapper>

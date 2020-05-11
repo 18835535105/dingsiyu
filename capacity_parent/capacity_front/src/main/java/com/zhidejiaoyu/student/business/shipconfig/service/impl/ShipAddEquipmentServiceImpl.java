@@ -59,7 +59,7 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     @Resource
     private WeekHistoryPlanMapper weekHistoryPlanMapper;
     @Resource
-    private UnlockEquipmentMapper unlockEquipmentMapper;
+    private TotalHistoryPlanMapper totalHistoryPlanMapper;
 
     @PostConstruct
     public void init() {
@@ -611,86 +611,103 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     }
 
     private EquipmentExperienceVo getEmpiricalValue(long studentId, Integer type) {
-        UnlockEquipment unlockEquipment = unlockEquipmentMapper.selectByStudentId(studentId);
+        TotalHistoryPlan totalHistoryPlan = totalHistoryPlanMapper.selectByStudentId(studentId);
         String date = DateUtil.formatYYYYMMDDHHMMSS(new Date());
         WeekHistoryPlan weekHistoryPlan = weekHistoryPlanMapper.selectByTimeAndStudentId(date, studentId);
         EquipmentExperienceVo vo = new EquipmentExperienceVo();
         if (type.equals(0) || type.equals(1)) {
             //获取每天在线时常
-            int maxTime = EquipmentTypeConstant.ONLINE_TIME_MAX;
-            Long onlineTime = weekHistoryPlan.getOnlineTime();
-            Long empValue = getEmpValue(studentId, 1, date);
-            int timeIndex = 0;
-            if (onlineTime != null) {
-                empValue += onlineTime;
-                if (empValue > maxTime) {
-                    timeIndex = maxTime;
-                } else {
-                    timeIndex = empValue.intValue();
-                }
-            } else {
-                if (empValue > maxTime) {
-                    timeIndex = maxTime;
-                } else {
-                    timeIndex = empValue.intValue();
-                }
-            }
-            Long totalOnlineTime = unlockEquipment.getTotalOnlineTime();
+            int timeIndex = getTime(studentId, date, weekHistoryPlan, EquipmentTypeConstant.ONLINE_TIME_MAX, 1);
+            Long totalOnlineTime = totalHistoryPlan.getTotalOnlineTime();
             if (totalOnlineTime != null) {
                 timeIndex += totalOnlineTime.intValue();
             }
             vo.setShipExperience(timeIndex);
         }
         if (type.equals(0) || type.equals(2)) {
+
+            Integer totalWord = totalHistoryPlan.getTotalWord();
             int maxWord = EquipmentTypeConstant.WORD_MAX;
-            Integer totalWord = unlockEquipment.getTotalWord();
             Integer word = weekHistoryPlan.getWord();
             Long empValue = getEmpValue(studentId, 2, date);
             int wordSize = 0;
-            if (word != null) {
-                wordSize = word + empValue.intValue();
-                if (wordSize > maxWord) {
-                    wordSize = maxWord;
-                }
-            } else {
-                if (empValue > maxWord) {
-                    wordSize = maxWord;
-                } else {
-                    wordSize = empValue.intValue();
-                }
-            }
+            wordSize = getWordAnPoint(maxWord, empValue, word);
             if (totalWord != null) {
                 wordSize += totalWord;
             }
             vo.setWeaponExperience(wordSize);
         }
         if (type.equals(0) || type.equals(3)) {
+
+            Integer totalPoint = totalHistoryPlan.getTotalPoint();
             int MaxPonit = EquipmentTypeConstant.POINT_MAX;
-            Integer totalPoint = unlockEquipment.getTotalPoint();
             Long empValue = getEmpValue(studentId, 3, date);
             Integer point = weekHistoryPlan.getPoint();
             Integer returnPoint = 0;
-            if (point != null) {
-                returnPoint = point + empValue.intValue();
-                if (returnPoint > MaxPonit) {
-                    returnPoint = MaxPonit;
-                }
-            } else {
-                if (empValue > MaxPonit) {
-                    returnPoint = MaxPonit;
-                } else {
-                    returnPoint = empValue.intValue();
-                }
-            }
+            returnPoint = getWordAnPoint(MaxPonit, empValue, point);
             if (totalPoint != null) {
                 returnPoint += totalPoint;
             }
             vo.setMissileExperience(returnPoint);
         }
         if (type.equals(0) || type.equals(4)) {
-            vo.setArmorExperience(durationMapper.selectValidTimeByStudentId(studentId).intValue());
+            //获取每天在线时常
+
+            Long totalOnlineTime = totalHistoryPlan.getTotalOnlineTime();
+            int timeIndex = getTime(studentId, date, weekHistoryPlan, EquipmentTypeConstant.VALID_TIME_MAX, 4);
+
+            if (totalOnlineTime != null) {
+                timeIndex += totalOnlineTime.intValue();
+            }
+            vo.setArmorExperience(timeIndex);
         }
         return vo;
+    }
+
+    @Override
+    public Integer getWordAnPoint(int maxPonit, Long empValue, Integer point) {
+        Integer returnPoint;
+        if (point != null) {
+            returnPoint = point + empValue.intValue();
+            if (returnPoint > maxPonit) {
+                returnPoint = maxPonit;
+            }
+        } else {
+            if (empValue > maxPonit) {
+                returnPoint = maxPonit;
+            } else {
+                returnPoint = empValue.intValue();
+            }
+        }
+        return returnPoint;
+    }
+
+    @Override
+    public Integer getTime(long studentId, String date, WeekHistoryPlan weekHistoryPlan, int validTimeMax, int type) {
+        int maxTime = validTimeMax;
+        Long time = 0L;
+        if (type == 1) {
+            time = weekHistoryPlan.getOnlineTime();
+        } else {
+            time = weekHistoryPlan.getValidTime();
+        }
+        Long empValue = getEmpValue(studentId, type, date);
+        int timeIndex = 0;
+        if (time != null) {
+            empValue += time;
+            if (empValue > maxTime) {
+                timeIndex = maxTime;
+            } else {
+                timeIndex = empValue.intValue();
+            }
+        } else {
+            if (empValue > maxTime) {
+                timeIndex = maxTime;
+            } else {
+                timeIndex = empValue.intValue();
+            }
+        }
+        return timeIndex;
     }
 
     /**

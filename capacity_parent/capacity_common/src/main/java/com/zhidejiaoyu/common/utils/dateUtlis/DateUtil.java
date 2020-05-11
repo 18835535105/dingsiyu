@@ -567,6 +567,29 @@ public class DateUtil implements Serializable {
         return new DateTime().withDayOfWeek(day).toDate();
     }
 
+    /**
+     * 获取本周的第一天
+     * @return String
+     * **/
+    public static Date getWeekStart(){
+        Calendar cal=Calendar.getInstance();
+        cal.add(Calendar.WEEK_OF_MONTH, 0);
+        cal.set(Calendar.DAY_OF_WEEK, 2);
+        Date time=cal.getTime();
+        return time;
+    }
+    /**
+     * 获取本周的最后一天
+     * @return String
+     * **/
+    public static Date getWeekEnd(){
+        Calendar cal=Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_WEEK, cal.getActualMaximum(Calendar.DAY_OF_WEEK));
+        cal.add(Calendar.DAY_OF_WEEK, 1);
+        Date time=cal.getTime();
+        return time;
+    }
+
     private DateUtil() {
     }
 

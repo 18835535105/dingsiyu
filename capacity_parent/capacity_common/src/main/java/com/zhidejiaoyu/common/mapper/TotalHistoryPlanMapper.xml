@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zhidejiaoyu.common.mapper.UnlockEquipmentMapper">
+<mapper namespace="com.zhidejiaoyu.common.mapper.TotalHistoryPlanMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.UnlockEquipment">
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.TotalHistoryPlan">
         <id column="id" property="id"/>
         <result column="student_id" property="studentId"/>
         <result column="total_online_time" property="totalOnlineTime"/>
@@ -19,7 +19,7 @@
     <select id="selectByStudentId" parameterType="map" resultMap="BaseResultMap">
         select
         <include refid="base_sql"></include>
-        from unlock_equipment
+        from total_history_plan
         where
         student_id=#{studentId}
     </select>

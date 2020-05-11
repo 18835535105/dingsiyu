@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.zhidejiaoyu.common.pojo.UnlockEquipment;
+import com.zhidejiaoyu.common.pojo.TotalHistoryPlan;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -12,7 +12,7 @@ import org.apache.ibatis.annotations.Param;
  * @author zdjy
  * @since 2020-05-11
  */
-public interface UnlockEquipmentMapper extends BaseMapper<UnlockEquipment> {
+public interface TotalHistoryPlanMapper extends BaseMapper<TotalHistoryPlan> {
 
-    UnlockEquipment selectByStudentId(@Param("studentId") long studentId);
+    TotalHistoryPlan selectByStudentId(@Param("studentId") long studentId);
 }

@@ -1,9 +1,12 @@
 package com.zhidejiaoyu.student.business.timingtask.service.impl;
 
 import com.zhidejiaoyu.common.mapper.PkCopyStateMapper;
+import com.zhidejiaoyu.common.mapper.TotalHistoryPlanMapper;
 import com.zhidejiaoyu.common.mapper.WeekHistoryPlanMapper;
 import com.zhidejiaoyu.common.pojo.WeekHistoryPlan;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.student.business.shipconfig.constant.EquipmentTypeConstant;
+import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
 import com.zhidejiaoyu.student.business.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzShipService;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +18,9 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author: wuchenxi
@@ -32,6 +38,12 @@ public class QuartzShipServiceImpl implements QuartzShipService, BaseQuartzServi
 
     @Resource
     private WeekHistoryPlanMapper weekHistoryPlanMapper;
+
+    @Resource
+    private TotalHistoryPlanMapper totalHistoryPlanMapper;
+
+    @Resource
+    private ShipAddEquipmentService shipAddEquipmentService;
 
     /**
      * 每天 0：15 分执行
@@ -53,7 +65,40 @@ public class QuartzShipServiceImpl implements QuartzShipService, BaseQuartzServi
     public void weekUnclock() {
         String times = DateUtil.getBeforeDayDateStr(new Date(), 1, DateUtil.YYYYMMDDHHMMSS);
         List<WeekHistoryPlan> weekHistoryPlans = weekHistoryPlanMapper.selectAllByTime(times);
+        Map<Long, List<WeekHistoryPlan>> collect = weekHistoryPlans.stream().collect(Collectors.groupingBy(plan -> plan.getStudentId()));
+        Set<Long> longs = collect.keySet();
+        longs.forEach(studentId -> {
+            List<WeekHistoryPlan> weekHistoryPlans1 = collect.get(studentId);
+            if (weekHistoryPlans1.size() > 0) {
+                totalHistoryPlanMapper.selectByStudentId(studentId);
+                WeekHistoryPlan weekHistoryPlan = weekHistoryPlans1.get(0);
+                /**
+                 * 添加时常
+                 */
+                weekHistoryPlan.setOnlineTime(
+                        shipAddEquipmentService.getTime(studentId, times, weekHistoryPlan, EquipmentTypeConstant.ONLINE_TIME_MAX, 1).longValue());
+                /**
+                 * 添加单词
+                 */
+                long wordValue = shipAddEquipmentService.getEmpValue(studentId, 3, times);
+                weekHistoryPlan.setWord(
+                        shipAddEquipmentService.getWordAnPoint(EquipmentTypeConstant.WORD_MAX, wordValue, weekHistoryPlan.getWord()));
 
+                /**
+                 * 添加分数
+                 */
+                long pointValue = shipAddEquipmentService.getEmpValue(studentId, 3, times);
+                weekHistoryPlan.setPoint(
+                        shipAddEquipmentService.getWordAnPoint(EquipmentTypeConstant.POINT_MAX, pointValue, weekHistoryPlan.getPoint()));
+                /**
+                 * 添加有效时常
+                 */
+                weekHistoryPlan.setValidTime(
+                        shipAddEquipmentService.getTime(studentId, times, weekHistoryPlan, EquipmentTypeConstant.VALID_TIME_MAX, 4).longValue());
+
+                weekHistoryPlanMapper.updateById(weekHistoryPlan);
+            }
+        });
     }
 
     @Override

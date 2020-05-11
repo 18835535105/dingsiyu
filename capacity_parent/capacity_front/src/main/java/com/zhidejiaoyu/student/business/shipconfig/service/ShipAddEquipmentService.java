@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.business.shipconfig.service;
 
 import com.zhidejiaoyu.common.pojo.Equipment;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.WeekHistoryPlan;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.BaseService;
 import com.zhidejiaoyu.student.business.shipconfig.vo.EquipmentExperienceVo;
@@ -31,5 +32,9 @@ public interface ShipAddEquipmentService extends BaseService<Student> {
      * @return
      */
     long getEmpValue(Long studentId, Integer type, String date);
+
+    Integer getWordAnPoint(int maxPonit, Long empValue, Integer point);
+
+    Integer getTime(long studentId, String date, WeekHistoryPlan weekHistoryPlan, int validTimeMax, int type);
 
 }

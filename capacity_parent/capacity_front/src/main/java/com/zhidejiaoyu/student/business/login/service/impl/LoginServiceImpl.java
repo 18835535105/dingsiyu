@@ -105,6 +105,12 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
      */
     private static final int FREEZE = 3;
 
+    @Resource
+    private TotalHistoryPlanMapper totalHistoryPlanMapper;
+
+    @Resource
+    private WeekHistoryPlanMapper weekHistoryPlanMapper;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> loginJudge(String account, String password) {
@@ -187,10 +193,35 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 判断学生是否是在加盟校半径 1 公里外登录
             final String finalIp = ip;
             executorService.execute(() -> this.isOtherLocation(stu, finalIp));
-
+            addUnclock(stu);
             // 正常登陆
             log.info("学生[{} -> {} -> {}]登录成功。", stu.getId(), stu.getAccount(), stu.getStudentName());
             return ServerResponse.createBySuccess("1", result);
+        }
+    }
+
+    private void addUnclock(Student stu) {
+        TotalHistoryPlan totalHistoryPlan = totalHistoryPlanMapper.selectByStudentId(stu.getId());
+        if (totalHistoryPlan == null) {
+            totalHistoryPlan = new TotalHistoryPlan();
+            totalHistoryPlan.setStudentId(stu.getId());
+            totalHistoryPlan.setTotalPoint(0);
+            totalHistoryPlan.setTotalOnlineTime(0L);
+            totalHistoryPlan.setTotalWord(0);
+            totalHistoryPlan.setTotalVaildTime(0L);
+            totalHistoryPlanMapper.insert(totalHistoryPlan);
+        }
+        WeekHistoryPlan weekHistoryPlan = weekHistoryPlanMapper.selectByTimeAndStudentId(DateUtil.formatYYYYMMDDHHMMSS(new Date()), stu.getId());
+        if (weekHistoryPlan == null) {
+            weekHistoryPlan = new WeekHistoryPlan();
+            weekHistoryPlan.setValidTime(0L);
+            weekHistoryPlan.setWord(0);
+            weekHistoryPlan.setOnlineTime(0L);
+            weekHistoryPlan.setPoint(0);
+            weekHistoryPlan.setStudentId(stu.getId());
+            weekHistoryPlan.setEndTime(DateUtil.maxTime(DateUtil.getWeekEnd()));
+            weekHistoryPlan.setStartTime(DateUtil.minTime(DateUtil.getWeekStart()));
+            weekHistoryPlanMapper.insert(weekHistoryPlan);
         }
     }
 
