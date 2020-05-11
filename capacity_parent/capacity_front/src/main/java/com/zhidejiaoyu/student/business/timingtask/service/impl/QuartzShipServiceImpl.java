@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.timingtask.service.impl;
 import com.zhidejiaoyu.common.mapper.PkCopyStateMapper;
 import com.zhidejiaoyu.common.mapper.TotalHistoryPlanMapper;
 import com.zhidejiaoyu.common.mapper.WeekHistoryPlanMapper;
+import com.zhidejiaoyu.common.pojo.TotalHistoryPlan;
 import com.zhidejiaoyu.common.pojo.WeekHistoryPlan;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.student.business.shipconfig.constant.EquipmentTypeConstant;
@@ -68,10 +69,10 @@ public class QuartzShipServiceImpl implements QuartzShipService, BaseQuartzServi
         Map<Long, List<WeekHistoryPlan>> collect = weekHistoryPlans.stream().collect(Collectors.groupingBy(plan -> plan.getStudentId()));
         Set<Long> longs = collect.keySet();
         longs.forEach(studentId -> {
-            List<WeekHistoryPlan> weekHistoryPlans1 = collect.get(studentId);
-            if (weekHistoryPlans1.size() > 0) {
+            List<WeekHistoryPlan> plans = collect.get(studentId);
+            if (plans.size() > 0) {
                 totalHistoryPlanMapper.selectByStudentId(studentId);
-                WeekHistoryPlan weekHistoryPlan = weekHistoryPlans1.get(0);
+                WeekHistoryPlan weekHistoryPlan = plans.get(0);
                 /**
                  * 添加时常
                  */
@@ -103,7 +104,27 @@ public class QuartzShipServiceImpl implements QuartzShipService, BaseQuartzServi
 
     @Override
     public void totalUnclock() {
-
+        Date weekStart = DateUtil.minTime(DateUtil.getWeekStart());
+        Date date = DateUtil.minTime(new Date());
+        if (weekStart.getTime() != date.getTime()) {
+            return;
+        }
+        String times = DateUtil.getBeforeDayDateStr(new Date(), 1, DateUtil.YYYYMMDDHHMMSS);
+        List<WeekHistoryPlan> weekHistoryPlans = weekHistoryPlanMapper.selectAllByTime(times);
+        Map<Long, List<WeekHistoryPlan>> collect = weekHistoryPlans.stream().collect(Collectors.groupingBy(plan -> plan.getStudentId()));
+        Set<Long> longs = collect.keySet();
+        longs.forEach(studentId -> {
+            List<WeekHistoryPlan> plans = collect.get(studentId);
+            if (plans.size() > 0) {
+                WeekHistoryPlan weekHistoryPlan = plans.get(0);
+                TotalHistoryPlan totalHistoryPlan = totalHistoryPlanMapper.selectByStudentId(studentId);
+                totalHistoryPlan.setTotalVaildTime(totalHistoryPlan.getTotalOnlineTime() + weekHistoryPlan.getOnlineTime());
+                totalHistoryPlan.setTotalOnlineTime(totalHistoryPlan.getTotalVaildTime() + weekHistoryPlan.getValidTime());
+                totalHistoryPlan.setTotalPoint(totalHistoryPlan.getTotalPoint() + weekHistoryPlan.getPoint());
+                totalHistoryPlan.setTotalWord(totalHistoryPlan.getTotalWord() + weekHistoryPlan.getWord());
+                totalHistoryPlanMapper.updateById(totalHistoryPlan);
+            }
+        });
     }
 
     @Override

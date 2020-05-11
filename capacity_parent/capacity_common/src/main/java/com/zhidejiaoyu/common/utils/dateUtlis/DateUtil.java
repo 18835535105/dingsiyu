@@ -447,6 +447,7 @@ public class DateUtil implements Serializable {
 
     /**
      * 获取某日最小时间
+     *
      * @param date
      * @return
      */
@@ -488,14 +489,15 @@ public class DateUtil implements Serializable {
 
     /**
      * 获得几天后的时间
+     *
      * @param date
      * @param days
      * @return
      */
     public static Date getLastDaysDate(Date date, int days) {
-        Calendar now =Calendar.getInstance();
+        Calendar now = Calendar.getInstance();
         now.setTime(date);
-        now.set(Calendar.DATE,now.get(Calendar.DATE)+days);
+        now.set(Calendar.DATE, now.get(Calendar.DATE) + days);
         return now.getTime();
     }
 
@@ -569,24 +571,27 @@ public class DateUtil implements Serializable {
 
     /**
      * 获取本周的第一天
+     *
      * @return String
-     * **/
-    public static Date getWeekStart(){
-        Calendar cal=Calendar.getInstance();
+     **/
+    public static Date getWeekStart() {
+        Calendar cal = Calendar.getInstance();
         cal.add(Calendar.WEEK_OF_MONTH, 0);
         cal.set(Calendar.DAY_OF_WEEK, 2);
-        Date time=cal.getTime();
+        Date time = cal.getTime();
         return time;
     }
+
     /**
      * 获取本周的最后一天
+     *
      * @return String
-     * **/
-    public static Date getWeekEnd(){
-        Calendar cal=Calendar.getInstance();
+     **/
+    public static Date getWeekEnd() {
+        Calendar cal = Calendar.getInstance();
         cal.set(Calendar.DAY_OF_WEEK, cal.getActualMaximum(Calendar.DAY_OF_WEEK));
         cal.add(Calendar.DAY_OF_WEEK, 1);
-        Date time=cal.getTime();
+        Date time = cal.getTime();
         return time;
     }
 
@@ -596,6 +601,4 @@ public class DateUtil implements Serializable {
     public static void main(String[] args) {
         System.out.println(beforeHoursTime(1));
     }
-
-
 }
