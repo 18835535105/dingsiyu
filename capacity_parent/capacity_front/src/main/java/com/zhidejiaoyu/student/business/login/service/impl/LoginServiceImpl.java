@@ -176,7 +176,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
             // 一个账户只能登陆一台
             judgeMultipleLogin(stu);
-
+            addUnclock(stu);
             // 2.判断是否需要完善个人信息
             if (!StringUtils.isNotBlank(stu.getHeadUrl())) {
 
@@ -193,7 +193,6 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 判断学生是否是在加盟校半径 1 公里外登录
             final String finalIp = ip;
             executorService.execute(() -> this.isOtherLocation(stu, finalIp));
-            addUnclock(stu);
             // 正常登陆
             log.info("学生[{} -> {} -> {}]登录成功。", stu.getId(), stu.getAccount(), stu.getStudentName());
             return ServerResponse.createBySuccess("1", result);
