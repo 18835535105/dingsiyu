@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.PrizeConfigService;
 import org.springframework.stereotype.Service;
@@ -95,7 +96,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         map.put("point", testRecord.getPoint());
         map.put("imgUrl", imgUrl);
         map.put("studentId", student.getId());
-        return map;
+        return ServerResponse.createBySuccess(map);
     }
 
     private Integer getPrize(List<PrizeConfig> prizeConfigs) {
