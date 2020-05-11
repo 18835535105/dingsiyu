@@ -960,6 +960,20 @@
         from test_record
         where student_id = #{studentId}
     </select>
+    <select id="selectFractionByStudentIdAndDate" parameterType="map" resultType="integer">
+        select sum(point)
+        from test_record
+        where student_id = #{studentId}
+        <if test="date!='' and date!=null">
+            and to_days(test_start_time)=to_days(now());
+        </if>
+        <if test="date=='' or date==null">
+            and to_days(test_start_time)=to_days(#{date})
+        </if>
+
+    </select>
+
+
     <select id="selectByStudentIdsAndGenreAndDate" parameterType="map" resultType="map">
         select student_id studentId,point point,test_start_time creatTime from test_record
         where student_id in (

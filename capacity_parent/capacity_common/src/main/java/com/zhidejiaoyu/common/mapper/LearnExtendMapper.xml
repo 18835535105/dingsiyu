@@ -122,6 +122,21 @@
         where learn.student_id =#{studentId}
         and learnEx.study_model like concat('%','慧','%')
     </select>
+    <select id="selectWordListByStudentIdAndDate" parameterType="map" resultType="long">
+        select
+        distinct learnEx.word_id
+        from learn_extend learnEx
+        join learn_new learn
+        on learnEx.learn_id =learn.id
+        where learn.student_id =#{studentId}
+        and learnEx.study_model like concat('%','慧','%')
+        <if test="date!='' and date!=null">
+            and to_days(learnEx.learn_time)=to_days(now());
+        </if>
+        <if test="date=='' or date==null">
+            and to_days(learnEx.learn_time)=to_days(#{date})
+        </if>
+    </select>
 
 
 </mapper>

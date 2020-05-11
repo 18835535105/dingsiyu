@@ -457,5 +457,28 @@
         and to_days(d.login_time) &lt;= to_days(#{endDay})
         group by d.student_id
     </select>
+    <select id="selectByStudentIdAndDate" parameterType="map" resultType="long">
+        select sum(online_time)
+        from duration
+        where student_id = #{studentId}
+        <if test="date!='' and date!=null">
+            and to_days(login_time)=to_days(now());
+        </if>
+        <if test="date=='' or date==null">
+            and to_days(login_time)=to_days(#{date})
+        </if>
+    </select>
+    <select id="selectValidTimeByStudentIdAndDate" parameterType="map" resultType="long">
+        select sum(valid_time)
+        from duration
+        where student_id = #{studentId}
+        <if test="date!='' and date!=null">
+            and to_days(login_time)=to_days(now());
+        </if>
+        <if test="date=='' or date==null">
+            and to_days(login_time)=to_days(#{date})
+        </if>
+    </select>
+
 
 </mapper>

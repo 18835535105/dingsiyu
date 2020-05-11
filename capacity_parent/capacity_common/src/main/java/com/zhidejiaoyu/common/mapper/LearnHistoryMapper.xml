@@ -79,6 +79,20 @@
                       on his.unit_id = uv.unit_id and his.`group` = uv.`group`
         where his.student_id = #{studentId}
     </select>
+    <select id="selectWordListByStudentIdAndDate" parameterType="map" resultType="long">
+        select DISTINCT uv.vocabulary_id
+        from learn_history his
+        join unit_vocabulary_new uv
+        on his.unit_id = uv.unit_id and his.`group` = uv.`group`
+        where his.student_id = #{studentId}
+        <if test="date!='' and date!=null">
+            and to_days(his.update_time)=to_days(now());
+        </if>
+        <if test="date=='' or date==null">
+            and to_days(his.update_time)=to_days(#{date})
+        </if>
+    </select>
+
     <select id="selectByUpdateTime" resultMap="BaseResultMap" parameterType="map">
         SELECT
         <include refid="base_sql"/>

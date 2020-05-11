@@ -1,6 +1,9 @@
 package com.zhidejiaoyu.student.business.timingtask.service.impl;
 
 import com.zhidejiaoyu.common.mapper.PkCopyStateMapper;
+import com.zhidejiaoyu.common.mapper.WeekHistoryPlanMapper;
+import com.zhidejiaoyu.common.pojo.WeekHistoryPlan;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.student.business.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.business.timingtask.service.QuartzShipService;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +13,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author: wuchenxi
@@ -24,6 +29,37 @@ public class QuartzShipServiceImpl implements QuartzShipService, BaseQuartzServi
 
     @Resource
     private PkCopyStateMapper pkCopyStateMapper;
+
+    @Resource
+    private WeekHistoryPlanMapper weekHistoryPlanMapper;
+
+    /**
+     * 每天 0：15 分执行
+     */
+    @Scheduled(cron = "0 15 0 * * ?")
+    public void initStudyCalendar() {
+        if (checkPort(port)) {
+            return;
+        }
+        log.info("定时任务 -> 初始化修改每日解锁进度开始....");
+        this.weekUnclock();
+        log.info("定时任务 -> 初始化修改每日解锁进度结束！");
+        log.info("定时任务 -> 初始化修改解锁进度开始....");
+        this.totalUnclock();
+        log.info("定时任务 -> 初始化修改解锁进度结束！");
+    }
+
+    @Override
+    public void weekUnclock() {
+        String times = DateUtil.getBeforeDayDateStr(new Date(), 1, DateUtil.YYYYMMDDHHMMSS);
+        List<WeekHistoryPlan> weekHistoryPlans = weekHistoryPlanMapper.selectAllByTime(times);
+
+    }
+
+    @Override
+    public void totalUnclock() {
+
+    }
 
     @Override
     @Scheduled(cron = "0 2 0 * * ?")

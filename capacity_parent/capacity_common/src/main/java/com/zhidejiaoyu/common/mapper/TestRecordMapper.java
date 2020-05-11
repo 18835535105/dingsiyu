@@ -383,5 +383,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      * @return
      */
     Integer selectByStudentIdAndGenreAndEndTime(@Param("studentId") Long studentId, @Param("genre") String genre, @Param("date") Date date);
+
+    Integer selectFractionByStudentIdAndDate(@Param("studentId") Long studentId,@Param("date") String date);
 }
 

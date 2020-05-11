@@ -58,6 +58,7 @@
                `time`.user_id                                                                       userId,
                if(course.grade_ext = null or course.grade_ext = '', course.grade_ext, course.grade) grade,
                if(course.label_ext = null or course.label_ext = '', course.label_ext, course.label) label,
+                `time`.`grade`                                                                       timeGrade,
                `time`.type                                                                          `type`
         from school_time `time`
                  join course_new course on course.id = `time`.course_id

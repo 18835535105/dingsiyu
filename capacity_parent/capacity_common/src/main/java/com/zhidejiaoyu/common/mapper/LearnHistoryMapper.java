@@ -65,4 +65,6 @@ public interface LearnHistoryMapper extends BaseMapper<LearnHistory> {
      * @return
      */
     List<LearnHistory> selectByUpdateTime(@Param("date") Date date);
+
+    List<Long> selectWordListByStudentIdAndDate(@Param("studentId") Long studentId,@Param("date") String date);
 }

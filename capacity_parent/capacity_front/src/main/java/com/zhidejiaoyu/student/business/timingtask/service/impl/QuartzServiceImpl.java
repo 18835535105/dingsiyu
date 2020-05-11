@@ -689,10 +689,18 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 }
                 if (studyModelList != null) {
                     for (Map<String, Object> returnMap : studyModelList) {
-                        String garde = returnMap.get("garde").toString();
-                        if (garde.equals(grade)) {
-                            studentMap = returnMap;
+                        String garde = returnMap.get("grade").toString();
+                        String timeGrade = returnMap.get("timeGrade").toString();
+                        if (garde.equals("高中")) {
+                            if (timeGrade.equals(grade)) {
+                                studentMap = returnMap;
+                            }
+                        } else {
+                            if (garde.equals(grade)) {
+                                studentMap = returnMap;
+                            }
                         }
+
                     }
                 }
             }
