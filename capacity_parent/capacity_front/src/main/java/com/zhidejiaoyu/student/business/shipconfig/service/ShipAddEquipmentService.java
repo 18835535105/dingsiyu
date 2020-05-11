@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.pojo.Equipment;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.BaseService;
+import com.zhidejiaoyu.student.business.shipconfig.vo.EquipmentExperienceVo;
 
 import javax.servlet.http.HttpSession;
 
@@ -18,7 +19,17 @@ public interface ShipAddEquipmentService extends BaseService<Student> {
 
     void updateLeaderBoards(Student student);
 
-     void updateUseEqu(Student student, Equipment equipment);
+    void updateUseEqu(Student student, Equipment equipment);
 
     ServerResponse<Object> getEquipmentNexLevlInfromation(Long equipmentId, HttpSession session);
+
+    /**
+     * 计算指定日期数据数量
+     * @param studentId
+     * @param type
+     * @param date
+     * @return
+     */
+    long getEmpValue(Long studentId, Integer type, String date);
+
 }

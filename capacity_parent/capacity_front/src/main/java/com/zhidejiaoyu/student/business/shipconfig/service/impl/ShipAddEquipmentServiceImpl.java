@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.business.shipconfig.constant.EquipmentTypeConstant;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.util.CalculateUtil;
@@ -55,6 +56,10 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     private EquipmentExpansionMapper equipmentExpansionMapper;
     @Resource
     private ShipIndexService shipIndexService;
+    @Resource
+    private WeekHistoryPlanMapper weekHistoryPlanMapper;
+    @Resource
+    private UnlockEquipmentMapper unlockEquipmentMapper;
 
     @PostConstruct
     public void init() {
@@ -534,6 +539,42 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         return ServerResponse.createBySuccess(shipIndexService.getShipConfigInfoDTO(equInforMap));
     }
 
+    @Override
+    public long getEmpValue(Long studentId, Integer type, String date) {
+        if (type.equals(1)) {
+            Long integers = durationMapper.selectByStudentIdAndDate(studentId, date);
+            if (integers == null) {
+                return 0;
+            }
+            return integers;
+        }
+        if (type.equals(2)) {
+            // 获取所有已学单词数据
+            List<Long> learnList = learnExtendMapper.selectWordListByStudentIdAndDate(studentId, date);
+            // 获取历史记录单词学习数
+            List<Long> historyList = learnHistoryMapper.selectWordListByStudentIdAndDate(studentId, date);
+            Set<Long> set = new HashSet<>(learnList);
+            set.addAll(historyList);
+            return set.size();
+        }
+        if (type.equals(3)) {
+            Integer point = testRecordMapper.selectFractionByStudentIdAndDate(studentId, date);
+            if (point == null) {
+                return 0L;
+            } else {
+                return point;
+            }
+        }
+        if (type.equals(4)) {
+            Long aLong = durationMapper.selectValidTimeByStudentIdAndDate(studentId, date);
+            if (aLong == null) {
+                return 0L;
+            }
+            return aLong;
+        }
+        return 0;
+    }
+
     /**
      * 分数足够添加的飞船物品
      *
@@ -570,41 +611,81 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
     }
 
     private EquipmentExperienceVo getEmpiricalValue(long studentId, Integer type) {
+        UnlockEquipment unlockEquipment = unlockEquipmentMapper.selectByStudentId(studentId);
+        String date = DateUtil.formatYYYYMMDDHHMMSS(new Date());
+        WeekHistoryPlan weekHistoryPlan = weekHistoryPlanMapper.selectByTimeAndStudentId(date, studentId);
         EquipmentExperienceVo vo = new EquipmentExperienceVo();
         if (type.equals(0) || type.equals(1)) {
             //获取每天在线时常
-            int maxTime = 60 * 60 * 4;
-            List<Integer> integers = durationMapper.selectDayTimeByStudentId(studentId);
+            int maxTime = EquipmentTypeConstant.ONLINE_TIME_MAX;
+            Long onlineTime = weekHistoryPlan.getOnlineTime();
+            Long empValue = getEmpValue(studentId, 1, date);
             int timeIndex = 0;
-            for (Integer time : integers) {
-                if (time == null) {
-                    time = 0;
+            if (onlineTime != null) {
+                empValue += onlineTime;
+                if (empValue > maxTime) {
+                    timeIndex = maxTime;
+                } else {
+                    timeIndex = empValue.intValue();
                 }
-                if (time > maxTime) {
-                    time = maxTime;
+            } else {
+                if (empValue > maxTime) {
+                    timeIndex = maxTime;
+                } else {
+                    timeIndex = empValue.intValue();
                 }
-                timeIndex += time;
+            }
+            Long totalOnlineTime = unlockEquipment.getTotalOnlineTime();
+            if (totalOnlineTime != null) {
+                timeIndex += totalOnlineTime.intValue();
             }
             vo.setShipExperience(timeIndex);
         }
         if (type.equals(0) || type.equals(2)) {
-            // 获取所有已学单词数据
-            List<Long> learnList = learnExtendMapper.selectWordListByStudentId(studentId);
-            // 获取历史记录单词学习数
-            List<Long> historyList = learnHistoryMapper.selectWordListByStudentId(studentId);
-
-            Set<Long> set = new HashSet<>(learnList);
-            set.addAll(historyList);
-            vo.setWeaponExperience(set.size());
+            int maxWord = EquipmentTypeConstant.WORD_MAX;
+            Integer totalWord = unlockEquipment.getTotalWord();
+            Integer word = weekHistoryPlan.getWord();
+            Long empValue = getEmpValue(studentId, 2, date);
+            int wordSize = 0;
+            if (word != null) {
+                wordSize = word + empValue.intValue();
+                if (wordSize > maxWord) {
+                    wordSize = maxWord;
+                }
+            } else {
+                if (empValue > maxWord) {
+                    wordSize = maxWord;
+                } else {
+                    wordSize = empValue.intValue();
+                }
+            }
+            if (totalWord != null) {
+                wordSize += totalWord;
+            }
+            vo.setWeaponExperience(wordSize);
         }
         if (type.equals(0) || type.equals(3)) {
-            Integer i = testRecordMapper.selectFractionByStudentId(studentId);
-            if (i == null) {
-                vo.setMissileExperience(0);
+            int MaxPonit = EquipmentTypeConstant.POINT_MAX;
+            Integer totalPoint = unlockEquipment.getTotalPoint();
+            Long empValue = getEmpValue(studentId, 3, date);
+            Integer point = weekHistoryPlan.getPoint();
+            Integer returnPoint = 0;
+            if (point != null) {
+                returnPoint = point + empValue.intValue();
+                if (returnPoint > MaxPonit) {
+                    returnPoint = MaxPonit;
+                }
             } else {
-                vo.setMissileExperience(testRecordMapper.selectFractionByStudentId(studentId));
+                if (empValue > MaxPonit) {
+                    returnPoint = MaxPonit;
+                } else {
+                    returnPoint = empValue.intValue();
+                }
             }
-
+            if (totalPoint != null) {
+                returnPoint += totalPoint;
+            }
+            vo.setMissileExperience(returnPoint);
         }
         if (type.equals(0) || type.equals(4)) {
             vo.setArmorExperience(durationMapper.selectValidTimeByStudentId(studentId).intValue());
@@ -679,5 +760,6 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         }
         return addEquipment;
     }
+
 
 }

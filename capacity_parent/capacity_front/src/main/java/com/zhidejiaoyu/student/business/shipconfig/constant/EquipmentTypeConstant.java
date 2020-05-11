@@ -32,5 +32,21 @@ public interface EquipmentTypeConstant {
      * 英雄类型
      */
     int HERO = 5;
+    /**
+     * 每周最大时常
+     */
+    int ONLINE_TIME_MAX=60*60*8;
+    /**
+     * 每周最大有效时常
+     */
+    int VALID_TIME_MAX=60*60*8;
+    /**
+     * 每周最大单词学习数
+     */
+    int WORD_MAX=100;
+    /**
+     * 每周最大分数
+     */
+    int POINT_MAX =2000;
 
 }
