@@ -100,17 +100,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         List<Long> vocabularyIds = new ArrayList<>();
         maps.forEach(map -> vocabularyIds.add(Long.parseLong(map.get("wordId").toString())));
         List<Map<String, Object>> getMaps = new ArrayList<>(maps);
-        if (getMaps.size() < 15) {
-            while (getMaps.size() < 15) {
-                for (Map<String, Object> map : maps) {
-                    if (getMaps.size() < 15) {
-                        getMaps.add(map);
-                    } else {
-                        break;
-                    }
-                }
-            }
-        } else {
+        if (getMaps.size() > 15) {
             getMaps = getMaps.subList(0, 15);
         }
 
