@@ -16,5 +16,5 @@ import java.util.List;
  */
 public interface PrizeConfigMapper extends BaseMapper<PrizeConfig> {
 
-    List<PrizeConfig> selectByAdminId(@Param("amdinId") Long adminId);
+    List<PrizeConfig> selectByAdminId(@Param("adminId") Long adminId);
 }
