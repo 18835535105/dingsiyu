@@ -14,10 +14,12 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.WordCompletionStudyVo;
 import com.zhidejiaoyu.common.vo.WordWriteStudyVo;
 import com.zhidejiaoyu.common.vo.study.MemoryStudyVo;
+import com.zhidejiaoyu.student.business.service.ErrorLearnLogService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.common.StudyCapacityLearn;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,7 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * 保存数据结构储存接口
@@ -59,13 +62,14 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private BaiduSpeak baiduSpeak;
     @Resource
     private RedisOpt redisOpt;
-    @Resource
-    private ErrorLearnLogMapper errorLearnLogMapper;
 
     @Resource
     private WordMemoryDifficulty wordMemoryDifficulty;
 
-    private Integer modelType=1;
+    @Resource
+    private ErrorLearnLogService errorLearnLogService;
+
+    private final Integer modelType = 1;
     /**
      * 以字母或数字结尾
      */
@@ -78,7 +82,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         this.judgeIsFirstStudy(session, student);
         boolean firstStudy = redisOpt.getGuideModel(studentId, studyModel);
         //获取当前单元下的learnId
-        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard,modelType);
+        LearnNew learnNews = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studentId, unitId, easyOrHard, modelType);
         // 查询学生当前单元下已学习单词的个数，即学习进度
         Integer plan = learnExtendMapper.countLearnWord(learnNews.getId(), unitId, learnNews.getGroup(), studyModel);
         // 获取当前单元下的所有单词的总个数
@@ -103,14 +107,14 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
 
     public boolean saveVocabularyModel(Student student, HttpSession session, Long unitId,
                                        Long wordId, boolean isTrue, Integer plan,
-                                       Integer total, Long flowId, Integer easyOrHard, Integer type, String studyModel,Integer model) {
+                                       Integer total, Long flowId, Integer easyOrHard, Integer type, String studyModel, Integer model) {
 
         Date now = DateUtil.parseYYYYMMDDHHMMSS(new Date());
         Long studentId = student.getId();
         judgeIsFirstStudy(session, student);
 
         //获取学生学习当前模块的learn_id
-        List<Long> learnIds = learnNewMapper.selectIdByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard,model);
+        List<Long> learnIds = learnNewMapper.selectIdByStudentIdAndUnitIdAndEasyOrHard(studentId, unitId, easyOrHard, model);
         //如果有多余的删除
         Long learnId = learnIds.get(0);
         if (learnIds.size() > 1) {
@@ -146,13 +150,13 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         }
         LearnExtend learnExtend = new LearnExtend();
         //获取校长id
-        if(student.getTeacherId()==null){
+        if (student.getTeacherId() == null) {
             learnExtend.setSchoolAdminId(null);
-        }else{
+        } else {
             Integer integer = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
-            if(integer==null){
+            if (integer == null) {
                 learnExtend.setSchoolAdminId(1L);
-            }else{
+            } else {
                 learnExtend.setSchoolAdminId(Long.parseLong(teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId()).toString()));
             }
 
@@ -180,7 +184,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 learnExtend.setFirstIsKnow(0);
                 // 单词不认识将该单词记入记忆追踪中
                 studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, false, type);
-                saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, learnExtend.getWordId());
+                saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, new Long[]{learnExtend.getWordId()});
             }
             int count = learnExtendMapper.insert(learnExtend);
             // 统计初出茅庐勋章
@@ -196,7 +200,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, true, type);
             } else {
                 studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, false, type);
-                saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, learnExtends.get(0).getWordId());
+                saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, new Long[]{learnExtends.get(0).getWordId()});
             }
             // 计算记忆难度
             int memoryDifficult = wordMemoryDifficulty.getMemoryDifficulty(studyCapacity);
@@ -298,14 +302,13 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         wordCompletionStudyVo.setWordCount(longValue1);
         wordCompletionStudyVo.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
         Map<String, Object> returnMap = new HashMap<>();
-        getStudyWordComplets(vocabulary.getWord(), returnMap,wordCompletionStudyVo);
+        getStudyWordComplets(vocabulary.getWord(), returnMap, wordCompletionStudyVo);
         wordCompletionStudyVo.setWords(returnMap);
         return wordCompletionStudyVo;
     }
 
-    private void getStudyWordComplets(String word, Map<String, Object> returnMap,WordCompletionStudyVo wordCompletionStudyVo) {
+    private void getStudyWordComplets(String word, Map<String, Object> returnMap, WordCompletionStudyVo wordCompletionStudyVo) {
         char[] chars = word.toCharArray();
-        word = word.trim();
         List<Integer> letterList = new ArrayList<>();
         int starti = 0;
         List<String> strList = new ArrayList<>();
@@ -313,7 +316,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
             strList.add(ch + "");
         }
         for (String letter : strList) {
-            if (Pattern.matches(END_MATCH, letter) && !letter.equals(" ")) {
+            if (Pattern.matches(END_MATCH, letter) && !" ".equals(letter)) {
                 letterList.add(starti);
             }
             starti++;
@@ -422,22 +425,27 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
 
     public Vocabulary getVocabulary(Long unitId, Student student, Integer group, String studyModel) {
         // 查询学习记录本模块学习过的所有单词id
-        List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel,modelType);
+        List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel, modelType);
         return vocabularyMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);
     }
 
-    public void saveErrorLearnLog(Long unitId, int type, int easyOrHard, String studyModel, LearnNew learnNew, Long wordId) {
-        ErrorLearnLog errorLearnLog = new ErrorLearnLog();
-        errorLearnLog.setEasyOrHard(easyOrHard);
-        errorLearnLog.setGroup(learnNew.getGroup());
-        errorLearnLog.setStudentId(learnNew.getStudentId());
-        errorLearnLog.setStudyModel(studyModel);
-        errorLearnLog.setGroup(learnNew.getGroup());
-        errorLearnLog.setType(type);
-        errorLearnLog.setUnitId(unitId);
-        errorLearnLog.setUpdateTime(new Date());
-        errorLearnLog.setWordId(wordId);
-        errorLearnLogMapper.insert(errorLearnLog);
+    public void saveErrorLearnLog(Long unitId, int type, int easyOrHard, String studyModel, LearnNew learnNew, Long[] wordIds) {
+        List<ErrorLearnLog> collect = Arrays.stream(wordIds).map(wordId -> {
+            ErrorLearnLog errorLearnLog = new ErrorLearnLog();
+            errorLearnLog.setEasyOrHard(easyOrHard);
+            errorLearnLog.setGroup(learnNew.getGroup());
+            errorLearnLog.setStudentId(learnNew.getStudentId());
+            errorLearnLog.setStudyModel(studyModel);
+            errorLearnLog.setGroup(learnNew.getGroup());
+            errorLearnLog.setType(type);
+            errorLearnLog.setUnitId(unitId);
+            errorLearnLog.setUpdateTime(new Date());
+            errorLearnLog.setWordId(wordId);
+            return errorLearnLog;
+        }).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(collect)) {
+            errorLearnLogService.saveBatch(collect);
+        }
     }
 
 }

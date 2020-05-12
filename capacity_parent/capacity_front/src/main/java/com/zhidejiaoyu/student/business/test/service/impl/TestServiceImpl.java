@@ -10,7 +10,10 @@ import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
 import com.zhidejiaoyu.common.award.GoldChange;
-import com.zhidejiaoyu.common.constant.*;
+import com.zhidejiaoyu.common.constant.PetImageConstant;
+import com.zhidejiaoyu.common.constant.PetMP3Constant;
+import com.zhidejiaoyu.common.constant.TimeConstant;
+import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.constant.study.StudyModelConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
@@ -1176,9 +1179,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             }
             LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, easyOrHard, modelType);
 
-            for (Long errorId : errorIds) {
-                saveData.saveErrorLearnLog(unitId, getModelInteger(classify), easyOrHard, getModel(classify), learnNew, errorId);
-            }
+            saveData.saveErrorLearnLog(unitId, getModelInteger(classify), easyOrHard, getModel(classify), learnNew, errorIds);
         }
     }
 
