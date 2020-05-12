@@ -82,7 +82,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         }
         returnMap.put("obtain", studentPayConfig.getObtain());
         returnMap.put("campus", teacher.getSchool().replace("体验中心", "校区"));
-        return returnMap;
+        return ServerResponse.createBySuccess(returnMap);
     }
 
     @Override
