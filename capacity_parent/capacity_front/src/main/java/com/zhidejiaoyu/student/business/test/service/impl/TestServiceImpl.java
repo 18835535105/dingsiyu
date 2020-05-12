@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.business.test.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
@@ -135,9 +136,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         // 获取当前学生信息
         Student student = getStudent(session);
         // 查询当前学生游戏测试的次数，如果已经测试两次不再允许游戏测试
-        TestRecordExample example = new TestRecordExample();
-        example.createCriteria().andStudentIdEqualTo(student.getId()).andGenreEqualTo("学前游戏测试");
-        List<TestRecord> records = testRecordMapper.selectByExample(example);
+        List<TestRecord> records = testRecordMapper.selectList(new QueryWrapper<TestRecord>()
+                .eq("student_id", student.getId())
+                .eq("genre", "学前游戏测试"));
         Integer point = null;
         if (records.size() > 0) {
             TestRecord testRecord = records.get(0);

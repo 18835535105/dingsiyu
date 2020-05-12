@@ -1,13 +1,12 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.TestRecord;
+import com.zhidejiaoyu.common.pojo.TestRecordInfo;
 import com.zhidejiaoyu.common.vo.SeniorityVo;
 import com.zhidejiaoyu.common.vo.testVo.TestDetailVo;
 import com.zhidejiaoyu.common.vo.testVo.TestRecordVo;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.TestRecord;
-import com.zhidejiaoyu.common.pojo.TestRecordExample;
-import com.zhidejiaoyu.common.pojo.TestRecordInfo;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -20,26 +19,6 @@ import java.util.Map;
 
 @Repository
 public interface TestRecordMapper extends BaseMapper<TestRecord> {
-    int countByExample(TestRecordExample example);
-
-    int deleteByExample(TestRecordExample example);
-
-    int deleteByPrimaryKey(Long id);
-
-    int insertSelective(TestRecord record);
-
-    List<TestRecord> selectByExample(TestRecordExample example);
-
-    TestRecord selectByPrimaryKey(Long id);
-
-    int updateByExampleSelective(@Param("record") TestRecord record, @Param("example") TestRecordExample example);
-
-    int updateByExample(@Param("record") TestRecord record, @Param("example") TestRecordExample example);
-
-    int updateByPrimaryKeySelective(TestRecord record);
-
-    int updateByPrimaryKey(TestRecord record);
-
     @Delete("delete from test_record where student_id = #{studentId}")
     int deleteByStudentId(Long studentId);
 
