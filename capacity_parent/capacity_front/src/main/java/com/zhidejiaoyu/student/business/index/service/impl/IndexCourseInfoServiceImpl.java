@@ -17,6 +17,7 @@ import com.zhidejiaoyu.student.business.index.vo.course.CourseInfoVO;
 import com.zhidejiaoyu.student.business.index.vo.course.CourseVO;
 import com.zhidejiaoyu.student.business.index.vo.course.VersionVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
  * @author: wuchenxi
  * @date: 2019/12/27 13:41:41
  */
+@Slf4j
 @Service
 public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapper, CourseConfig> implements IndexCourseInfoService {
 
@@ -103,7 +105,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     }
 
     @Override
-    public ServerResponse<CourseInfoVO> getStudyCourse(Integer type, Long courseId) {
+    public ServerResponse<Object> getStudyCourse(Integer type, Long courseId) {
         Student student = super.getStudent(HttpUtil.getHttpSession());
 
         // 查询学生可自由学习的课程
@@ -153,7 +155,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
      * @param courseId      用于查询版本名称
      * @return
      */
-    private ServerResponse<CourseInfoVO> packageCourse(Student student, List<CourseConfig> courseConfigs, int type, Long courseId) {
+    private ServerResponse<Object> packageCourse(Student student, List<CourseConfig> courseConfigs, int type, Long courseId) {
 
         // 过滤出能够学习单词的课程id
         List<Long> courseIds = courseConfigs.stream()
@@ -162,7 +164,8 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                 .collect(Collectors.toList());
 
         if (CollectionUtils.isEmpty(courseIds)) {
-            throw new ServiceException(300, "未查询到可以学习的课程！");
+            log.warn("学生[{}-{}-{}]未查询到可以学习的课程！type=[{}]", student.getId(), student.getAccount(), student.getStudentName(), type);
+            return ServerResponse.createByError(300, "未查询到可以学习的课程！");
         }
 
         // 获取学生可以学习的版本集合

@@ -19,7 +19,7 @@ public interface IndexCourseInfoService extends BaseService<CourseConfig> {
      * @param courseId 课程id，用于查询课程版本
      * @return
      */
-    ServerResponse<CourseInfoVO> getStudyCourse(Integer type, Long courseId);
+    ServerResponse<Object> getStudyCourse(Integer type, Long courseId);
 
     /**
      * 获取当前单元下所有单元信息

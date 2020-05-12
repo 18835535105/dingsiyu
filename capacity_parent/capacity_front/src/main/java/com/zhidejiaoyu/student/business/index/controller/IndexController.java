@@ -5,7 +5,6 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.index.dto.UnitInfoDTO;
 import com.zhidejiaoyu.student.business.index.service.IndexCourseInfoService;
 import com.zhidejiaoyu.student.business.index.service.IndexService;
-import com.zhidejiaoyu.student.business.index.vo.course.CourseInfoVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -74,7 +73,7 @@ public class IndexController {
      * @return
      */
     @GetMapping("/getStudyCourse")
-    public ServerResponse<CourseInfoVO> getStudyCourse(Integer type, Long courseId) {
+    public ServerResponse<Object> getStudyCourse(Integer type, Long courseId) {
         if (type == null) {
             throw new ServiceException("获取年级课程数据出错！type=null!");
         }
