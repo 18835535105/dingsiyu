@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 各种测试相关的controller
@@ -63,10 +65,10 @@ public class TestController {
                                                               @RequestParam(required = false) String token) {
         Assert.notNull(unitId, "unitId 不能为null");
 
-//        Object object = session.getAttribute("token");
-//        if (object == null || !Objects.equals(object.toString(), token)) {
-//            return ServerResponse.createBySuccess(new ArrayList<>());
-//        }
+        Object object = session.getAttribute("token");
+        if (object == null || !Objects.equals(object.toString(), token)) {
+            return ServerResponse.createBySuccess(new ArrayList<>());
+        }
 
         return StringUtils.isEmpty(studyModel) ? ServerResponse.createByErrorMessage("studyModel can't be null!")
                 : testService.getWordUnitTest(session, unitId, studyModel, isTrue);

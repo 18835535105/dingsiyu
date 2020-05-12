@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.utils;
 
 import javax.servlet.http.HttpSession;
+import java.util.Objects;
 
 /**
  * @author wuchenxi
@@ -21,6 +22,6 @@ public class TokenUtil {
      */
     public static Boolean checkToken(HttpSession session, String token) {
         Object object = session.getAttribute("token");
-        return true;// !(object == null || !Objects.equals(object.toString(), token));
+        return !(object == null || !Objects.equals(object.toString(), token));
     }
 }
