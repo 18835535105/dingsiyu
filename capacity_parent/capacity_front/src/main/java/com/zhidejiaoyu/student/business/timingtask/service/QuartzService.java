@@ -66,7 +66,13 @@ public interface QuartzService {
      */
     void updateWelfareAccountToOutOfDate();
 
+    /**
+     * 更新学生学习优先级
+     */
     void calculateRateOfChange();
 
+    /**
+     * 添加学生学习每日课程
+     */
     void addStudyByWeek();
 }

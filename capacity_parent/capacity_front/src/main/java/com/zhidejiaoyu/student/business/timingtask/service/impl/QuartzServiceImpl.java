@@ -165,6 +165,12 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     private LearnNewMapper learnNewMapper;
     @Resource
     private StudentFlowNewMapper studentFlowNewMapper;
+    @Resource
+    private WeekHistoryPlanMapper weekHistoryPlanMapper;
+    @Resource
+    private TotalHistoryPlanMapper totalHistoryPlanMapper;
+    @Resource
+    private StudentEquipmentMapper studentEquipmentMapper;
 
     /**
      * 每日 00:10:00 更新提醒消息中学生账号到期提醒
@@ -411,6 +417,11 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
                 gauntletMapper.deleteByChallengerStudentIdsOrBeChallengerStudentIds(studentIds);
                 // 删除学生勋章、奖励
                 awardMapper.deleteByStudentIds(studentIds);
+                weekHistoryPlanMapper.deleteByStudentIds(studentIds);
+                totalHistoryPlanMapper.deleteByStudentIds(studentIds);
+                learnNewMapper.deleteByStudentIds(studentIds);
+                learnHistoryMapper.deleteByStudentIds(studentIds);
+                studentEquipmentMapper.deleteByStudentIds(studentIds);
                 recycleBinMapper.deleteByStudentIds(studentIds);
                 this.resetRecord(studentIds);
                 studentMapper.deleteByIds(studentIds);

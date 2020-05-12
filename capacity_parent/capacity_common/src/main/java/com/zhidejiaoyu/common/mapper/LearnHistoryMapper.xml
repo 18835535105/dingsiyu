@@ -92,6 +92,14 @@
             and to_days(his.update_time)=to_days(#{date})
         </if>
     </select>
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from learn_history
+        where student_id in (
+        <foreach collection="studentIds" item="studentId" separator=",">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 
     <select id="selectByUpdateTime" resultMap="BaseResultMap" parameterType="map">
         SELECT

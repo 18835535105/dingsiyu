@@ -23,5 +23,12 @@
         where
         student_id=#{studentId}
     </select>
-
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from total_history_plan
+        where student_id in (
+        <foreach collection="studentIds" item="studentId" separator=",">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 </mapper>

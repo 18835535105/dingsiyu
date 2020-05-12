@@ -113,4 +113,6 @@ public interface LearnNewMapper extends BaseMapper<LearnNew> {
      * @return
      */
     List<LearnNew> selectByUpdateTime(Date date);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIds);
 }

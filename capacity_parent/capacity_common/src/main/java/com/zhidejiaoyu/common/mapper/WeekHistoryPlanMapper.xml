@@ -35,5 +35,13 @@
         and start_time &lt;= #{date}
         and end_time >= #{date}
     </select>
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from week_history_plan
+        where student_id in (
+        <foreach collection="studentIds" item="studentId" separator=",">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 
 </mapper>

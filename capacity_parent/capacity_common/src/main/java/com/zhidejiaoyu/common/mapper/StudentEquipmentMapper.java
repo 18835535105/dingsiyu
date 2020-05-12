@@ -62,4 +62,6 @@ public interface StudentEquipmentMapper extends BaseMapper<StudentEquipment> {
      * @return
      */
     int countEquipmentShipByStudentId(@Param("studentId") Long studentId);
+
+    void deleteByStudentIds(@Param("studentIds") List<Long> studentIds);
 }

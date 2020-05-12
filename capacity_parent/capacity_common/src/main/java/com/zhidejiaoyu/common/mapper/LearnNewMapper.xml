@@ -176,5 +176,13 @@
         ln.id = le.learn_id
         AND TO_DAYS(le.update_time) = TO_DAYS(#{date})
     </select>
+    <delete id="deleteByStudentIds" parameterType="map">
+        delete from learn_new
+        where student_id in (
+        <foreach collection="studentIds" item="studentId" separator=",">
+            #{studentId}
+        </foreach>
+        )
+    </delete>
 
 </mapper>
