@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.wechat.smallapp.serivce.impl;
 
+import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.mapper.*;
@@ -96,6 +97,8 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         map.put("point", testRecord.getPoint());
         map.put("imgUrl", imgUrl);
         map.put("studentId", student.getId());
+        map.put("studentName", student.getNickname());
+        map.put("headPortrait", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
         return ServerResponse.createBySuccess(map);
     }
 
