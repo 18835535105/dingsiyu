@@ -67,10 +67,10 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         JoinSchool joinSchool = joinSchoolMapper.selectByUserId(adminId.intValue());
         returnMap.put("adress", joinSchool==null?"北京市海淀区上地国际创业园":joinSchool.getAddress());
         SysUser sysUser = sysUserMapper.selectById(adminId);
-        StringBuilder sb = new StringBuilder().append(sysUser.getPhone()).append("（").append(sysUser.getName().substring(0, 1)).append("老师）");
+        StringBuilder sb = new StringBuilder().append(sysUser.getPhone()).append("（").append(sysUser.getName().substring(0, 1)).append("老师）").append("$&$");
         SysUser teacherUser = sysUserMapper.selectById(student.getTeacherId());
         if (teacherUser.getAccount().contains("js")) {
-            sb.append("$&$").append(sysUser.getPhone()).append("（").append(sysUser.getName().substring(0, 1)).append("老师）");
+            sb.append(sysUser.getPhone()).append("（").append(sysUser.getName().substring(0, 1)).append("老师）");
         }
         Teacher teacher = teacherMapper.selectTeacherBySchoolAdminId(adminId.intValue());
         returnMap.put("adminPhone", sb.toString());
