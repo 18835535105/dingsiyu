@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.business.test.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
@@ -9,7 +10,10 @@ import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.annotation.TestChangeAnnotation;
 import com.zhidejiaoyu.common.award.GoldChange;
-import com.zhidejiaoyu.common.constant.*;
+import com.zhidejiaoyu.common.constant.PetImageConstant;
+import com.zhidejiaoyu.common.constant.PetMP3Constant;
+import com.zhidejiaoyu.common.constant.TimeConstant;
+import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.study.PointConstant;
 import com.zhidejiaoyu.common.constant.study.StudyModelConstant;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
@@ -135,9 +139,9 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         // 获取当前学生信息
         Student student = getStudent(session);
         // 查询当前学生游戏测试的次数，如果已经测试两次不再允许游戏测试
-        TestRecordExample example = new TestRecordExample();
-        example.createCriteria().andStudentIdEqualTo(student.getId()).andGenreEqualTo("学前游戏测试");
-        List<TestRecord> records = testRecordMapper.selectByExample(example);
+        List<TestRecord> records = testRecordMapper.selectList(new QueryWrapper<TestRecord>()
+                .eq("student_id", student.getId())
+                .eq("genre", "学前游戏测试"));
         Integer point = null;
         if (records.size() > 0) {
             TestRecord testRecord = records.get(0);
@@ -1175,9 +1179,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             }
             LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, easyOrHard, modelType);
 
-            for (Long errorId : errorIds) {
-                saveData.saveErrorLearnLog(unitId, getModelInteger(classify), easyOrHard, getModel(classify), learnNew, errorId);
-            }
+            saveData.saveErrorLearnLog(unitId, getModelInteger(classify), easyOrHard, getModel(classify), learnNew, errorIds);
         }
     }
 

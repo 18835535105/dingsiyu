@@ -41,10 +41,17 @@
         from teacher where school_admin_id = #{schoolAdminId}
     </select>
     <select id="selectSchoolAdminIdByTeacherId" resultType="java.lang.Integer" parameterType="map">
-        select school_admin_id
-        from teacher
-        where teacher_id = #{teacherId}
-           or school_admin_id = #{teacherId}
+        select t.school_admin_id
+        from (
+                 select school_admin_id
+                 from teacher
+                 where teacher_id = #{teacherId}
+                 group by school_admin_id
+                 union all
+                 select school_admin_id
+                 from teacher
+                 where school_admin_id = #{teacherId}
+                 group by school_admin_id) t
         limit 1
     </select>
 
@@ -57,8 +64,7 @@
         limit 1
     </select>
     <select id="selectAllAdminId" parameterType="map" resultType="long">
-        select
-        school_admin_id
+        select school_admin_id
         from teacher
         group by school_admin_id
     </select>
