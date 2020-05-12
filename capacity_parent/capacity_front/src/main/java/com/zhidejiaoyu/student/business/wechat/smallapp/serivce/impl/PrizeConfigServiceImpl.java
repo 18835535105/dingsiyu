@@ -65,7 +65,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         prizeConfig.setPrizeCount(prizeConfig.getPrizeCount() - 1);
         prizeConfigMapper.updateById(prizeConfig);
         JoinSchool joinSchool = joinSchoolMapper.selectByUserId(adminId.intValue());
-        returnMap.put("adress", joinSchool.getAddress());
+        returnMap.put("adress", joinSchool==null?"北京市海淀区上地国际创业园":joinSchool.getAddress());
         SysUser sysUser = sysUserMapper.selectById(adminId);
         StringBuilder sb = new StringBuilder().append(sysUser.getPhone()).append("（").append(sysUser.getName().substring(0, 1)).append("老师）");
         SysUser teacherUser = sysUserMapper.selectById(student.getTeacherId());
@@ -132,8 +132,8 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         } else if (anInt == 0) {
             anInt = 1;
         }
-        Random random = new Random(anInt);
-        int obtainNum = random.nextInt();
+        Random random = new Random();
+        int obtainNum = random.nextInt(anInt);
         prizeList.forEach(map -> {
             Integer maxInt = map.get("maxInt");
             Integer minInt = map.get("minInt");

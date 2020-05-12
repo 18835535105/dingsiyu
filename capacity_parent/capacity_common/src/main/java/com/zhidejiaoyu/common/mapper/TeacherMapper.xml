@@ -52,8 +52,8 @@
         select
         <include refid="base_sql"/>
         from teacher
-        where teacher_id = #{teacherId}
-        or school_admin_id = #{teacherId}
+        where teacher_id = #{schoolAdminId}
+        or school_admin_id = #{schoolAdminId}
         limit 1
     </select>
     <select id="selectAllAdminId" parameterType="map" resultType="long">
