@@ -207,7 +207,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     public Object getQRCode(String openId, String weChatName, String weChatImgUrl) {
 
         byte[] qrCode = CreateWxQrCodeUtil.createQRCode(GetLimitQRCodeDTO.builder()
-                .path("./pages/support2/support?openid=" + openId + "&weChatName=" + weChatName + "&weChatImgUrl=" + weChatImgUrl)
+                .path("pages/support2/support?openid=" + openId + "&weChatName=" + weChatName + "&weChatImgUrl=" + weChatImgUrl)
                 .build());
 
         String fileName = System.currentTimeMillis() + ".png";
