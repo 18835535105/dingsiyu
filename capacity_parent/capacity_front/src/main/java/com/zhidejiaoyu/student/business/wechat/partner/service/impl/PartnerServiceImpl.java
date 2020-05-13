@@ -139,32 +139,44 @@ public class PartnerServiceImpl extends BaseServiceImpl<StudentMapper, Student> 
 
     private Map<Integer, Integer> getPartnerMap(SavePartnerVo savePartnerVo) {
         Map<Integer, Integer> map = new HashMap<>();
+        if(savePartnerVo.getTotalSorce()==null){
+            savePartnerVo.setTotalSorce(0);
+        }
         if (savePartnerVo.getBusiness() != null && savePartnerVo.getBusiness() > 0) {
             map.put(1, savePartnerVo.getBusiness());
+            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getBusiness());
         }
         if (savePartnerVo.getSale() != null && savePartnerVo.getSale() > 0) {
             map.put(2, savePartnerVo.getSale());
+            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getSale());
         }
         if (savePartnerVo.getAdministration() != null && savePartnerVo.getAdministration() > 0) {
             map.put(3, savePartnerVo.getAdministration());
+            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getAdministration());
         }
         if (savePartnerVo.getInnovate() != null && savePartnerVo.getInnovate() > 0) {
             map.put(4, savePartnerVo.getInnovate());
+            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getInnovate());
         }
         if (savePartnerVo.getPrimordialMind() != null && savePartnerVo.getPrimordialMind() > 0) {
             map.put(5, savePartnerVo.getPrimordialMind());
+            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getPrimordialMind());
         }
         if (savePartnerVo.getPrincipal() != null && savePartnerVo.getPrincipal() > 0) {
             map.put(6, savePartnerVo.getPrincipal());
+            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getPrincipal());
         }
         if (savePartnerVo.getPerfectBalance() != null && savePartnerVo.getPerfectBalance() > 0) {
             map.put(7, savePartnerVo.getPerfectBalance());
+            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getPerfectBalance());
         }
         if (savePartnerVo.getToWorkHard() != null && savePartnerVo.getToWorkHard() > 0) {
             map.put(8, savePartnerVo.getToWorkHard());
+            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getToWorkHard());
         }
         if (savePartnerVo.getDownToEarth() != null && savePartnerVo.getDownToEarth() > 0) {
             map.put(9, savePartnerVo.getDownToEarth());
+            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getDownToEarth());
         }
         return map;
     }
