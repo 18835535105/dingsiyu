@@ -60,6 +60,8 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
 
     @Resource
     private ClockInMapper clockInMapper;
+    @Resource
+    private WeChatMapper weChatMapper;
 
     @Override
     public Object getTest(HttpSession session, String openId) {
@@ -206,8 +208,21 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     @Override
     public Object getQRCode(String openId, String weChatName, String weChatImgUrl) {
         // .path("pages/support2/support?openid=" + openId + "&weChatName=" + weChatName + "&weChatImgUrl=" + weChatImgUrl)
+        WeChat weChat = weChatMapper.selectByOpenId(openId);
+        if(weChat==null){
+            weChat = new WeChat();
+            weChat.setOpenId(openId);
+            weChat.setWeChatImgUrl(weChatImgUrl);
+            weChat.setWeChatName(weChatName);
+            weChatMapper.insert(weChat);
+        }else{
+            weChat.setWeChatName(weChatName);
+            weChat.setWeChatImgUrl(weChatImgUrl);
+            weChatMapper.updateById(weChat);
+        }
+
         byte[] qrCode = CreateWxQrCodeUtil.createQRCode(GetLimitQRCodeDTO.builder()
-                .path("pages/support2/support?scene=" + URLEncoder.encode("openid=" + openId + "&weChatName=" + weChatName + "&weChatImgUrl=" + weChatImgUrl))
+                .path("pages/support2/support?scene=" + URLEncoder.encode("openid=" + openId))
                 .build());
         String fileName = System.currentTimeMillis() + ".png";
         String pathname = FileConstant.QR_CODE + fileName;

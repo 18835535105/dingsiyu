@@ -24,7 +24,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"partner"};
+        String[] tableName = {"we_chat"};
 
         /*
          * 配置：

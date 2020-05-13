@@ -32,6 +32,8 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
     private ShareConfigMapper shareConfigMapper;
     @Resource
     private JoinSchoolMapper joinSchoolMapper;
+    @Resource
+    private WeChatMapper weChatMapper;
 
     @Override
     public Object getPrizeConfig(String openId, Long adminId, Long studentId, String weChatimgUrl, String weChatName) {
@@ -65,7 +67,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         prizeConfig.setPrizeCount(prizeConfig.getPrizeCount() - 1);
         prizeConfigMapper.updateById(prizeConfig);
         JoinSchool joinSchool = joinSchoolMapper.selectByUserId(adminId.intValue());
-        returnMap.put("adress", joinSchool==null?"北京市海淀区上地国际创业园":joinSchool.getAddress());
+        returnMap.put("adress", joinSchool == null ? "北京市海淀区上地国际创业园" : joinSchool.getAddress());
         SysUser sysUser = sysUserMapper.selectById(adminId);
         StringBuilder sb = new StringBuilder().append(sysUser.getPhone()).append("（").append(sysUser.getName().substring(0, 1)).append("老师）").append("-");
         SysUser teacherUser = sysUserMapper.selectById(student.getTeacherId());
@@ -91,11 +93,14 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         Integer adminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
         TestRecord testRecord = testRecordMapper.selectByStudentIdAndGenreAndStudyModel(student.getId(), GenreConstant.SMALLAPP_GENRE, StudyModelConstant.SMALLAPP_STUDY_MODEL);
         String imgUrl = shareConfigMapper.selectImgByAdminId(adminId);
+        WeChat weChat = weChatMapper.selectByOpenId(openId);
         Map<String, Object> map = new HashMap<>();
         map.put("adminId", adminId);
         map.put("weChatList", studentPayConfigMapper.selectWeChatNameAndWeChatImgUrlByStudentId(student.getId()));
         map.put("point", testRecord.getPoint());
         map.put("imgUrl", imgUrl);
+        map.put("weChatName", weChat.getWeChatName());
+        map.put("weChatImgUrl", weChat.getWeChatImgUrl());
         map.put("studentId", student.getId());
         map.put("studentName", student.getNickname());
         map.put("headPortrait", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
