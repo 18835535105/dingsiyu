@@ -22,6 +22,7 @@ import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.SmallProgramTest
 import com.zhidejiaoyu.student.business.wechat.smallapp.util.CreateWxQrCodeUtil;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.propertyeditors.URIEditor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -206,13 +207,12 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     public Object getQRCode(String openId, String weChatName, String weChatImgUrl) {
 
         byte[] qrCode = CreateWxQrCodeUtil.createQRCode(GetLimitQRCodeDTO.builder()
-                .path("openid=" + openId + "&weChatName=" + weChatName + "&weChatImgUrl=" + weChatImgUrl)
+                .path("./pages/support2/support?openid=" + openId + "&weChatName=" + weChatName + "&weChatImgUrl=" + weChatImgUrl)
                 .build());
 
         String fileName = System.currentTimeMillis() + ".png";
         String pathname = FileConstant.QR_CODE + fileName;
         File file = new File(pathname);
-
         try (OutputStream outputStream = new FileOutputStream(file)) {
             outputStream.write(qrCode);
             outputStream.flush();
