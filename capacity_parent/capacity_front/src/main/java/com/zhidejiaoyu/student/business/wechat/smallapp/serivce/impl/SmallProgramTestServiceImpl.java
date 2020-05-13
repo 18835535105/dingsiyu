@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -207,9 +206,8 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     public Object getQRCode(String openId, String weChatName, String weChatImgUrl) {
 
         byte[] qrCode = CreateWxQrCodeUtil.createQRCode(GetLimitQRCodeDTO.builder()
-                .path("pages/support2/support?sence=" + URLEncoder.encode("openid=" + openId + "&weChatName=" + weChatName + "&weChatImgUrl=" + weChatImgUrl))
+                .path("pages/support2/support?openid=" + openId + "&weChatName=" + weChatName + "&weChatImgUrl=" + weChatImgUrl)
                 .build());
-
         String fileName = System.currentTimeMillis() + ".png";
         String pathname = FileConstant.QR_CODE + fileName;
         File file = new File(pathname);
