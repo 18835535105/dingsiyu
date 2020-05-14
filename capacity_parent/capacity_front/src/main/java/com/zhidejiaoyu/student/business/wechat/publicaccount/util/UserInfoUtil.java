@@ -1,0 +1,75 @@
+package com.zhidejiaoyu.student.business.wechat.publicaccount.util;
+
+import com.alibaba.fastjson.JSON;
+import com.zhidejiaoyu.common.exception.ServiceException;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.PublicAccountConstant;
+import com.zhidejiaoyu.student.business.wechat.smallapp.vo.AccessTokenVO;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
+/**
+ * 微信公众号授权用户信息
+ *
+ * @author: wuchenxi
+ * @date: 2020/5/14 15:43:43
+ */
+@Component
+public class UserInfoUtil {
+
+
+    private static RestTemplate restTemplate;
+
+    @Resource
+    private RestTemplate restTemplateTmp;
+
+    @PostConstruct
+    public void init() {
+        restTemplate = this.restTemplateTmp;
+    }
+
+
+    /**
+     * 获取微信公众号授权 access_token
+     *
+     * @return
+     */
+    public static AccessTokenVO getPublicAccountAuthAccessTokenVO(String code) {
+        String forObject = restTemplate.getForObject(PublicAccountConstant.getAuthAccessTokenApiUrl(code), String.class);
+        AccessTokenVO accessTokenVo = JSON.parseObject(forObject, AccessTokenVO.class);
+        if (accessTokenVo == null) {
+            throw new ServiceException("获取微信公众号 access_token 失败！");
+        }
+//        String refreshAuthAccessTokenApiUrl = PublicAccountConstant.getRefreshAuthAccessTokenApiUrl(accessTokenVo.getRefresh_token());
+//        forObject = restTemplate.getForObject(refreshAuthAccessTokenApiUrl, String.class);
+//        accessTokenVo = JSON.parseObject(forObject, AccessTokenVO.class);
+//        if (accessTokenVo == null) {
+//            throw new ServiceException("获取微信公众号 access_token 失败！");
+//        }
+        return accessTokenVo;
+    }
+
+    /**
+     * 获取微信公众号授权access_token
+     *
+     * @param code
+     * @return
+     */
+    public static String getPublicAccountAuthAccessToken(String code) {
+        AccessTokenVO publicAccountAuthAccessTokenVO = getPublicAccountAuthAccessTokenVO(code);
+        return publicAccountAuthAccessTokenVO.getAccess_token();
+    }
+
+    /**
+     * 获取微信公众号openid
+     *
+     * @param code
+     * @return
+     */
+    public static String getPublicAccountOpenId(String code) {
+        AccessTokenVO publicAccountAuthAccessTokenVO = getPublicAccountAuthAccessTokenVO(code);
+        return publicAccountAuthAccessTokenVO.getOpenid();
+    }
+}

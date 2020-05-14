@@ -7,15 +7,17 @@ import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.locationUtil.LocationUtil;
 import com.zhidejiaoyu.common.utils.locationUtil.LongitudeAndLatitude;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.common.vo.UserInfoVO;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.PublicAccountConstant;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.service.PublicAccountService;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.util.UserInfoUtil;
+import com.zhidejiaoyu.student.business.wechat.smallapp.vo.AccessTokenVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
 /**
  * @author: wuchenxi
@@ -32,22 +34,9 @@ public class PublicAccountServiceImpl implements PublicAccountService {
     private LocationUtil locationUtil;
 
     @Override
-    public ServerResponse<Object> authorization(HttpServletRequest request) {
-        String code = request.getParameter("code");
-
-        String forObject = restTemplate.getForObject(PublicAccountConstant.AUTHORIZATION_API_URL +
-                        "appid=" + PublicAccountConstant.APP_ID +
-                        "&secret=" + PublicAccountConstant.SECRET +
-                        "&code=" + code +
-                        "&grant_type=authorization_code",
-                String.class);
-        Object parseObject = JSON.parse(forObject);
-        Map<String, Object> parseMap = parseObject == null ? null :  (Map<String, Object>) parseObject;
-        if (parseMap == null || parseMap.get("openid") == null) {
-            log.error("授权失败，授权响应信息：[{}]", parseMap);
-            throw new ServiceException("微信公众号授权失败！");
-        }
-        return ServerResponse.createBySuccess(parseMap.get("openid"));
+    public ServerResponse<Object> getOpenId(String code) {
+        String publicAccountOpenId = UserInfoUtil.getPublicAccountOpenId(code);
+        return ServerResponse.createBySuccess(publicAccountOpenId);
     }
 
     @Override
@@ -62,5 +51,21 @@ public class PublicAccountServiceImpl implements PublicAccountService {
             log.error("获取学生登录IP地址出错，error=[{}]", e.getMessage());
         }
         return null;
+    }
+
+    @Override
+    public ServerResponse<Object> getUserInfo() {
+        String code = HttpUtil.getHttpServletRequest().getParameter("code");
+        AccessTokenVO publicAccountAuthAccessTokenVO = UserInfoUtil.getPublicAccountAuthAccessTokenVO(code);
+        String userInfoApiUrl = PublicAccountConstant.getUserInfoApiUrl(publicAccountAuthAccessTokenVO.getAccess_token(), publicAccountAuthAccessTokenVO.getOpenid());
+        ResponseEntity<String> forEntity = restTemplate.getForEntity(userInfoApiUrl, String.class);
+        UserInfoVO userInfoVO = JSON.parseObject(forEntity.getBody(), UserInfoVO.class);
+
+        if (userInfoVO == null) {
+            log.error("获取公众号用户信息失败, body = null！");
+            throw new ServiceException("获取公众号用户信息失败！");
+        }
+
+        return ServerResponse.createBySuccess(userInfoVO);
     }
 }

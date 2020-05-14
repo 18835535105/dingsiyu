@@ -19,4 +19,11 @@ public class AccessTokenVO {
      * 凭证有效时间，单位：秒
      */
     private Long expires_in;
+
+    /**
+     * 刷新token所需参数
+     */
+    private String refresh_token;
+
+    private String openid;
 }

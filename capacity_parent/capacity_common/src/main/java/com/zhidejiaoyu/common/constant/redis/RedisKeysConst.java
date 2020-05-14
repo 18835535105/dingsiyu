@@ -119,10 +119,9 @@ public interface RedisKeysConst {
     String SMALL_APP_WECHAT_ACCESS_TOKEN = "SMALL_APP_WECHAT_ACCESS_TOKEN";
 
     /**
-     * 微信公众号 access_token key 值
+     * 微信公众号基础支持 access_token
      */
     String PUBLIC_ACCOUNT_WECHAT_ACCESS_TOKEN = "PUBLIC_ACCOUNT_WECHAT_ACCESS_TOKEN";
-
     /**
      * 标识学生已经初始化了飞船信息
      */

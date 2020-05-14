@@ -117,6 +117,13 @@ xfyun:
     APP_ID: 5ad993bd
     API_KEY: 60583ec028e09315c880a3b0cd3026b0
 
+# 公众号配置信息
+gongzhonghao:
+  appId: wx991c0b0330281fd1
+  secret: e512f4eae621183834ba2376a63eaa8e
+  redirect:
+    # 微信授权结束后跳转的路径
+    partner: https://27d37487.ngrok.io/partner
 ---
 # 开发环境
 spring:
@@ -232,4 +239,11 @@ ahas:
 project:
   name: yydz-prd
 
+# 公众号配置信息
+gongzhonghao:
+  appId: wx876660e0c4b48729
+  secret: 99c6d530ec67582061c731b43e6a2448
+  redirect:
+    # 微信授权结束后跳转的路径
+    partner: https://shell.yydz100.com/partner
 ---

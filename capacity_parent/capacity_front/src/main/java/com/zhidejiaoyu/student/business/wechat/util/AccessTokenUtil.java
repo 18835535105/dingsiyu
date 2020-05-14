@@ -57,7 +57,7 @@ public class AccessTokenUtil {
     }
 
     /**
-     * 获取微信公众号 access_token
+     * 获取微信公众号基础支持的 access_token
      *
      * @return
      */

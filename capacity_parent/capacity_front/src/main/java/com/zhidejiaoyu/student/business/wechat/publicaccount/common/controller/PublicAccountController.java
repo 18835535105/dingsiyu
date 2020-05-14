@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.wechat.publicaccount.controller;
+package com.zhidejiaoyu.student.business.wechat.publicaccount.common.controller;
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.service.PublicAccountService;
@@ -41,23 +41,34 @@ public class PublicAccountController {
     }
 
     /**
-     * 微信公众号授权，获取用户openId
+     * 获取用户openId
      *
      * @param request
      */
-    @RequestMapping("/authorization")
+    @RequestMapping("/getOpenId")
     public ServerResponse<Object> openid(HttpServletRequest request) {
-        return publicAccountService.authorization(request);
+        String code = request.getParameter("code");
+        return publicAccountService.getOpenId(code);
     }
 
     /**
      * 扫描卡片后返回校区海报
      *
-     * @param cardName  卡片名
+     * @param cardName 卡片名
      * @return
      */
     @GetMapping("/getCard")
     public ServerResponse<Object> getCard(String cardName) {
         return publicAccountService.getCard(cardName);
+    }
+
+    /**
+     * 获取用户信息
+     *
+     * @return
+     */
+    @GetMapping("/getUserInfo")
+    public ServerResponse<Object> getUserInfo() {
+        return publicAccountService.getUserInfo();
     }
 }
