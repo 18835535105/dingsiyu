@@ -1,9 +1,9 @@
-package com.zhidejiaoyu.student.business.wechat.publicaccount.common.controller;
+package com.zhidejiaoyu.student.business.wechat.publicaccount.auth.controller;
 
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.business.wechat.publicaccount.common.vo.UserInfoVO;
-import com.zhidejiaoyu.student.business.wechat.publicaccount.service.PublicAccountService;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.auth.vo.UserInfoVO;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.auth.service.PublicAccountService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -2,7 +2,7 @@ package com.zhidejiaoyu.student.business.wechat.publicaccount.util;
 
 import com.alibaba.fastjson.JSON;
 import com.zhidejiaoyu.common.exception.ServiceException;
-import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.PublicAccountConstant;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.ApiConstant;
 import com.zhidejiaoyu.student.business.wechat.smallapp.vo.AccessTokenVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -39,7 +39,7 @@ public class UserInfoUtil {
      * @return
      */
     public static AccessTokenVO getPublicAccountAuthAccessTokenVO(String code) {
-        String forObject = restTemplate.getForObject(PublicAccountConstant.getAuthAccessTokenApiUrl(code), String.class);
+        String forObject = restTemplate.getForObject(ApiConstant.getAuthAccessTokenApi(code), String.class);
         AccessTokenVO accessTokenVo = JSON.parseObject(forObject, AccessTokenVO.class);
         log.info("公众号授权结果：{}", forObject);
         if (accessTokenVo == null) {

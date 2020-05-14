@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.wechat.publicaccount.service.impl;
+package com.zhidejiaoyu.student.business.wechat.publicaccount.auth.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.zhidejiaoyu.common.exception.ServiceException;
@@ -7,9 +7,9 @@ import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.locationUtil.LocationUtil;
 import com.zhidejiaoyu.common.utils.locationUtil.LongitudeAndLatitude;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.business.wechat.publicaccount.common.vo.UserInfoVO;
-import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.PublicAccountConstant;
-import com.zhidejiaoyu.student.business.wechat.publicaccount.service.PublicAccountService;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.auth.service.PublicAccountService;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.auth.vo.UserInfoVO;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.ApiConstant;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.util.UserInfoUtil;
 import com.zhidejiaoyu.student.business.wechat.smallapp.vo.AccessTokenVO;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +56,7 @@ public class PublicAccountServiceImpl implements PublicAccountService {
     @Override
     public ServerResponse<Object> getUserInfo(String code) {
         AccessTokenVO publicAccountAuthAccessTokenVO = UserInfoUtil.getPublicAccountAuthAccessTokenVO(code);
-        String userInfoApiUrl = PublicAccountConstant.getUserInfoApiUrl(publicAccountAuthAccessTokenVO.getAccess_token(), publicAccountAuthAccessTokenVO.getOpenid());
+        String userInfoApiUrl = ApiConstant.getUserInfoApi(publicAccountAuthAccessTokenVO.getAccess_token(), publicAccountAuthAccessTokenVO.getOpenid());
         ResponseEntity<String> forEntity = restTemplate.getForEntity(userInfoApiUrl, String.class);
         UserInfoVO userInfoVO = JSON.parseObject(forEntity.getBody(), UserInfoVO.class);
 

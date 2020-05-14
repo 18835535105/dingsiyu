@@ -1,9 +1,10 @@
-package com.zhidejiaoyu.student.business.wechat.publicaccount.common.controller;
+package com.zhidejiaoyu.student.business.wechat.publicaccount.menu.controller;
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.PublicAccountConstant;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.ApiConstant;
 import com.zhidejiaoyu.student.business.wechat.util.AccessTokenUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,9 @@ import java.util.Objects;
 @RequestMapping("/publicAccount/menu")
 public class MenuApiController {
 
+    @Value("${studyUrl}")
+    private String studyUrl;
+
     @Resource
     private RestTemplate restTemplate;
 
@@ -34,6 +38,7 @@ public class MenuApiController {
     @ResponseBody
     @PostMapping("/create")
     public ServerResponse<Object> createMenu() {
+        String redirectUrl = studyUrl + "/ec/publicAccount/userInfo/getUserInfo";
         String menu = "{\n" +
                 "     \"button\":[\n" +
                 "     {\t\n" +
@@ -47,7 +52,7 @@ public class MenuApiController {
                 "           {\t\n" +
                 "               \"type\":\"view\",\n" +
                 "               \"name\":\"搜索\",\n" +
-                "               \"url\":\"" + PublicAccountConstant.getAuthPageApiUrl() + "\"\n" +
+                "               \"url\":\"" + ApiConstant.getAuthPageApi(redirectUrl) + "\"\n" +
                 "            },\n" +
                 "            {\n" +
                 "               \"type\":\"click\",\n" +
@@ -58,7 +63,7 @@ public class MenuApiController {
                 " }";
 
         String publicAccountAccessToken = AccessTokenUtil.getPublicAccountAccessToken();
-        String createMenuApiUrl = PublicAccountConstant.getCreateMenuApiUrl(publicAccountAccessToken);
+        String createMenuApiUrl = ApiConstant.getCreateMenuApi(publicAccountAccessToken);
 
         Map map = restTemplate.postForObject(createMenuApiUrl, menu, Map.class);
         if (Objects.equals(String.valueOf(map.get("errcode")), "0")) {

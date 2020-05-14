@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.wechat.publicaccount.service;
+package com.zhidejiaoyu.student.business.wechat.publicaccount.auth.service;
 
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 

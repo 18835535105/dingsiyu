@@ -2,7 +2,7 @@ package com.zhidejiaoyu.student.business.wechat.util;
 
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.exception.ServiceException;
-import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.PublicAccountConstant;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.ApiConstant;
 import com.zhidejiaoyu.student.business.wechat.smallapp.constant.SmallAppApiConstant;
 import com.zhidejiaoyu.student.business.wechat.smallapp.vo.AccessTokenVO;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -65,7 +65,7 @@ public class AccessTokenUtil {
         String key = RedisKeysConst.PUBLIC_ACCOUNT_WECHAT_ACCESS_TOKEN;
         String accessToken = getAccessTokenFromRedis(key);
         if (accessToken == null) {
-            AccessTokenVO accessTokenVo = restTemplate.getForObject(PublicAccountConstant.GET_ACCESS_TOKEN_API, AccessTokenVO.class);
+            AccessTokenVO accessTokenVo = restTemplate.getForObject(ApiConstant.getAccessTokenApi(), AccessTokenVO.class);
             if (accessTokenVo == null) {
                 throw new ServiceException("获取微信公众号 access_token 失败！");
             }
