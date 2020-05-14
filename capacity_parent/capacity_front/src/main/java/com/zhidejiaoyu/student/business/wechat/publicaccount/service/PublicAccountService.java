@@ -27,7 +27,8 @@ public interface PublicAccountService {
     /**
      * 获取用户信息
      *
+     * @param code
      * @return
      */
-    ServerResponse<Object> getUserInfo();
+    ServerResponse<Object> getUserInfo(String code);
 }

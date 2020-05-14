@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.wechat.publicaccount.common.controller;
 
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.service.PublicAccountService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -69,6 +70,7 @@ public class PublicAccountController {
      */
     @GetMapping("/getUserInfo")
     public ServerResponse<Object> getUserInfo() {
-        return publicAccountService.getUserInfo();
+        String code = HttpUtil.getHttpServletRequest().getParameter("code");
+        return publicAccountService.getUserInfo(code);
     }
 }

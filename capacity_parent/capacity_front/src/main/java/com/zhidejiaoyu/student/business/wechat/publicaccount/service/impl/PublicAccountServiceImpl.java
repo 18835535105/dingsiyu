@@ -54,8 +54,7 @@ public class PublicAccountServiceImpl implements PublicAccountService {
     }
 
     @Override
-    public ServerResponse<Object> getUserInfo() {
-        String code = HttpUtil.getHttpServletRequest().getParameter("code");
+    public ServerResponse<Object> getUserInfo(String code) {
         AccessTokenVO publicAccountAuthAccessTokenVO = UserInfoUtil.getPublicAccountAuthAccessTokenVO(code);
         String userInfoApiUrl = PublicAccountConstant.getUserInfoApiUrl(publicAccountAuthAccessTokenVO.getAccess_token(), publicAccountAuthAccessTokenVO.getOpenid());
         ResponseEntity<String> forEntity = restTemplate.getForEntity(userInfoApiUrl, String.class);

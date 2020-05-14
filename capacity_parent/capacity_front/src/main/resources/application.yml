@@ -122,7 +122,7 @@ gongzhonghao:
   appId: wx991c0b0330281fd1
   secret: e512f4eae621183834ba2376a63eaa8e
   redirect:
-    # 微信授权结束后跳转的路径
+    # 微信授权结束后跳转到合伙人测试页面的路径
     partner: https://test.shell.yydz100.com/partner
 ---
 # 开发环境

@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.wechat.publicaccount.common.controller;
 
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.common.vo.UserInfoVO;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.service.PublicAccountService;
@@ -28,7 +29,8 @@ public class UserInfoController {
 
     @GetMapping("/getUserInfo")
     public String getUserInfo() {
-        ServerResponse<Object> userInfo = publicAccountService.getUserInfo();
+        String code = HttpUtil.getHttpServletRequest().getParameter("code");
+        ServerResponse<Object> userInfo = publicAccountService.getUserInfo(code);
         UserInfoVO userInfoVO = (UserInfoVO) userInfo.getData();
 
         return "redirect:" + redirectUrl + "?openId=" + userInfoVO.getOpenid() +
