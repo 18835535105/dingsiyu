@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.PublicAccountConstant;
 import com.zhidejiaoyu.student.business.wechat.smallapp.vo.AccessTokenVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,6 +17,7 @@ import javax.annotation.Resource;
  * @author: wuchenxi
  * @date: 2020/5/14 15:43:43
  */
+@Slf4j
 @Component
 public class UserInfoUtil {
 
@@ -39,15 +41,10 @@ public class UserInfoUtil {
     public static AccessTokenVO getPublicAccountAuthAccessTokenVO(String code) {
         String forObject = restTemplate.getForObject(PublicAccountConstant.getAuthAccessTokenApiUrl(code), String.class);
         AccessTokenVO accessTokenVo = JSON.parseObject(forObject, AccessTokenVO.class);
+        log.info("公众号授权结果：{}", forObject);
         if (accessTokenVo == null) {
             throw new ServiceException("获取微信公众号 access_token 失败！");
         }
-//        String refreshAuthAccessTokenApiUrl = PublicAccountConstant.getRefreshAuthAccessTokenApiUrl(accessTokenVo.getRefresh_token());
-//        forObject = restTemplate.getForObject(refreshAuthAccessTokenApiUrl, String.class);
-//        accessTokenVo = JSON.parseObject(forObject, AccessTokenVO.class);
-//        if (accessTokenVo == null) {
-//            throw new ServiceException("获取微信公众号 access_token 失败！");
-//        }
         return accessTokenVo;
     }
 

@@ -123,7 +123,7 @@ gongzhonghao:
   secret: e512f4eae621183834ba2376a63eaa8e
   redirect:
     # 微信授权结束后跳转的路径
-    partner: https://27d37487.ngrok.io/partner
+    partner: https://test.shell.yydz100.com/partner
 ---
 # 开发环境
 spring:

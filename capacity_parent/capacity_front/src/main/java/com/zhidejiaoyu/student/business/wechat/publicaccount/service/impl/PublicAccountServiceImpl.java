@@ -61,6 +61,7 @@ public class PublicAccountServiceImpl implements PublicAccountService {
         ResponseEntity<String> forEntity = restTemplate.getForEntity(userInfoApiUrl, String.class);
         UserInfoVO userInfoVO = JSON.parseObject(forEntity.getBody(), UserInfoVO.class);
 
+        log.info("公众号授权获取用户信息结果：{}", forEntity.getBody());
         if (userInfoVO == null) {
             log.error("获取公众号用户信息失败, body = null！");
             throw new ServiceException("获取公众号用户信息失败！");

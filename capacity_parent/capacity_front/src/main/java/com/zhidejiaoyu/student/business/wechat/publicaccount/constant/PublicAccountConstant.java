@@ -75,7 +75,7 @@ public class PublicAccountConstant {
      * @throws UnsupportedEncodingException
      */
     public static String getAuthPageApiUrl() {
-        String redirectUrl = "https://27d37487.ngrok.io/ec/publicAccount/userInfo/getUserInfo";
+        String redirectUrl = "https://test.shell.yydz100.com/ec/publicAccount/userInfo/getUserInfo";
         try {
             return "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + APP_ID + "&redirect_uri=" + URLEncoder.encode(redirectUrl, "utf-8") + "&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect";
         } catch (UnsupportedEncodingException e) {
