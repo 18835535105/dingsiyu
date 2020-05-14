@@ -2,16 +2,16 @@ package com.zhidejiaoyu.common.utils.language;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.zhidejiaoyu.common.vo.read.WordInfoVo;
 import com.zhidejiaoyu.common.exception.ServiceException;
-import com.zhidejiaoyu.common.utils.http.HttpClientUtil;
+import com.zhidejiaoyu.common.vo.read.WordInfoVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -44,11 +44,11 @@ public class YouDaoTranslate {
     @Value("${youdao.md5Key}")
     private String md5Key;
 
-    @Autowired
+    @Resource
     private BaiduSpeak baiduSpeak;
 
-    @Autowired
-    private HttpClientUtil httpClientUtil;
+    @Resource
+    private RestTemplate restTemplate;
 
     /**
      * 获取单词详细信息
@@ -157,12 +157,7 @@ public class YouDaoTranslate {
         params.put("sign", sign);
         params.put("salt", salt);
         params.put("appKey", appKey);
-        String result = null;
-        try {
-            result = httpClientUtil.post(youdaoUrl, params);
-        } catch (IOException e) {
-            log.error("调用有道翻译接口获取单词翻译信息出错！word=[{}]", text, e);
-        }
+        String result = restTemplate.postForObject(youdaoUrl, params, String.class);
         return JSONObject.parseObject(result);
     }
 
