@@ -1,0 +1,51 @@
+
+spring:
+  profiles: prd
+  servlet:
+    multipart:
+      file-size-threshold: 15MB
+  datasource:
+    url: jdbc:mysql://${ip}:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai
+    username: root
+    password: zhide8800
+  redis:
+    host: ${ip}
+    port: 6379
+    password: zhide2018
+server:
+  port: 9082
+  tomcat:
+    max-threads: 512
+    min-spare-threads: 20
+    max-connections: 512
+logging:
+  config: classpath:logback-prd.xml
+
+ip: 39.106.181.151
+studyUrl: https://www.yydz100.com
+adminDomin: https://admin.duizhang100.cn/dept
+
+# 跨域地址
+cross:
+  url: '*'
+
+# 需要执行定时任务的服务器ip和端口
+quartz:
+  ip: ${ip}
+  port: 9082
+
+# sentinel配置
+ahas:
+  namespace: prd
+  license: 05a8f00991ce4f36b8b7596c469ff105
+project:
+  name: yydz-prd
+
+# 公众号配置信息
+gongzhonghao:
+  appId: wx876660e0c4b48729
+  secret: 99c6d530ec67582061c731b43e6a2448
+  redirect:
+    # 微信授权结束后跳转的路径
+    partner: ${studyUrl}/partner
+

@@ -1,0 +1,43 @@
+
+# 开发环境
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:mysql://${ip}:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: zdjy
+    password: zdjy
+  redis:
+    host: ${ip}
+    port: 6380
+    password: zdjy
+
+server:
+  port: 8083
+
+ip: 123.56.142.84
+#ip: 192.168.0.2
+studyUrl: https://test.shell.yydz100.com
+adminDomin: http://localhost:9999
+
+logging:
+  level:
+    com:
+      zhidejiaoyu:
+        student: debug
+        common:
+          mapper: debug
+
+cross:
+  url: http://192.168.0.*:5000
+
+# 定时任务执行端口
+quartz:
+  port: 8083
+
+# 公众号配置信息
+gongzhonghao:
+  appId: wx991c0b0330281fd1
+  secret: e512f4eae621183834ba2376a63eaa8e
+  redirect:
+    # 微信授权结束后跳转到合伙人测试页面的路径
+    partner: ${studyUrl}/partner
