@@ -31,6 +31,8 @@ public class UserInfoController {
         ServerResponse<Object> userInfo = publicAccountService.getUserInfo();
         UserInfoVO userInfoVO = (UserInfoVO) userInfo.getData();
 
-        return "redirect:" + redirectUrl + "?openId=" + userInfoVO.getOpenid() + "&headimgurl=" + userInfoVO.getHeadimgurl();
+        return "redirect:" + redirectUrl + "?openId=" + userInfoVO.getOpenid() +
+                "&headimgurl=" + userInfoVO.getHeadimgurl() +
+                "&nickname=" + userInfoVO.getNickname();
     }
 }
