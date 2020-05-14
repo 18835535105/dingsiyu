@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.wechat.partner.constant;
+package com.zhidejiaoyu.student.business.wechat.publicaccount.partner.constant;
 
 /**
  * 合伙人

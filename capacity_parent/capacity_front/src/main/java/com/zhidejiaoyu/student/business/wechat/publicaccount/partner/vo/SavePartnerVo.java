@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.student.business.wechat.partner.vo;
+package com.zhidejiaoyu.student.business.wechat.publicaccount.partner.vo;
 
 import lombok.Data;
 

@@ -1,7 +1,7 @@
-package com.zhidejiaoyu.student.business.wechat.partner.controller;
+package com.zhidejiaoyu.student.business.wechat.publicaccount.partner.controller;
 
-import com.zhidejiaoyu.student.business.wechat.partner.service.PartnerService;
-import com.zhidejiaoyu.student.business.wechat.partner.vo.SavePartnerVo;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.service.PartnerService;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.vo.SavePartnerVo;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
