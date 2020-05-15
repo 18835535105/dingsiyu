@@ -27,6 +27,11 @@ public class UserInfoController {
     @Resource
     private PublicAccountService publicAccountService;
 
+    /**
+     * 微信公众号授权后跳转到合伙人测试页面
+     *
+     * @return
+     */
     @GetMapping("/getUserInfo")
     public String getUserInfo() {
         String code = HttpUtil.getHttpServletRequest().getParameter("code");
@@ -35,6 +40,7 @@ public class UserInfoController {
 
         return "redirect:" + redirectUrl + "?openId=" + userInfoVO.getOpenid() +
                 "&headimgurl=" + userInfoVO.getHeadimgurl() +
-                "&nickname=" + userInfoVO.getNickname();
+                "&nickname=" + userInfoVO.getNickname() +
+                "&";
     }
 }
