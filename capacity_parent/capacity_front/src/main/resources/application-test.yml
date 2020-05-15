@@ -27,8 +27,8 @@ quartz:
 
 # 公众号配置信息
 gongzhonghao:
-  appId: wx991c0b0330281fd1
-  secret: e512f4eae621183834ba2376a63eaa8e
+  appId: wx876660e0c4b48729
+  secret: 99c6d530ec67582061c731b43e6a2448
   redirect:
-    # 微信授权结束后跳转到合伙人测试页面的路径
+    # 微信授权结束后跳转的路径
     partner: ${studyUrl}/partner
