@@ -40,7 +40,6 @@ public class UserInfoController {
 
         return "redirect:" + redirectUrl + "?openId=" + userInfoVO.getOpenid() +
                 "&headimgurl=" + userInfoVO.getHeadimgurl() +
-                "&nickname=" + userInfoVO.getNickname() +
-                "&blank=blank";
+                "&nickname=" + userInfoVO.getNickname();
     }
 }
