@@ -1,9 +1,9 @@
-package com.zhidejiaoyu.student.business.wechat.publicaccount.partner.vo;
+package com.zhidejiaoyu.student.business.wechat.publicaccount.partner.dto;
 
 import lombok.Data;
 
 @Data
-public class SavePartnerDto {
+public class SavePartnerDTO {
 
     private String imgUrl;
 
@@ -55,9 +55,9 @@ public class SavePartnerDto {
     private Integer downToEarth;
 
     /**
-     * 全部分数
+     * 全部分数（非前端传参）
      */
-    private Integer totalSorce;
+    private Integer totalScore;
 
 
 }

@@ -40,9 +40,6 @@ public class JudgeWordPicture {
 
         // 当前单元含有图片的单词个数，如果大于零，执行正常流程，否则跳过单词图鉴模块
         int pictureCount = unitVocabularyNewMapper.countPicture(unitId, dto.getGroup());
-        if (pictureCount > 0) {
-            return true;
-        }
-        return false;
+        return pictureCount > 0;
     }
 }

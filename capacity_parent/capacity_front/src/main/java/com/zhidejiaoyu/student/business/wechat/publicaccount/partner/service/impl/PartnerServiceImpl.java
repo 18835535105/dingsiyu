@@ -1,14 +1,12 @@
 package com.zhidejiaoyu.student.business.wechat.publicaccount.partner.service.impl;
 
 import com.zhidejiaoyu.common.mapper.PartnerMapper;
-import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.pojo.Partner;
-import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.constant.PartnerConstant;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.service.PartnerService;
-import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.vo.SavePartnerDto;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.dto.SavePartnerDTO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -17,7 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class PartnerServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements PartnerService {
+public class PartnerServiceImpl extends BaseServiceImpl<PartnerMapper, Partner> implements PartnerService {
 
     @Resource
     private PartnerMapper partnerMapper;
@@ -29,7 +27,7 @@ public class PartnerServiceImpl extends BaseServiceImpl<StudentMapper, Student> 
      * @return
      */
     @Override
-    public Object savePartner(SavePartnerDto savePartnerDto) {
+    public Object savePartner(SavePartnerDTO savePartnerDto) {
         //判断账号是否已经有过测试
         Integer integer = partnerMapper.countByOpenId(savePartnerDto.getOpenId());
         if (integer != null && integer > 0) {
@@ -40,7 +38,7 @@ public class PartnerServiceImpl extends BaseServiceImpl<StudentMapper, Student> 
         //计算最高5个排行奖励
         partnerMap = getRanking(partnerMap);
         //计算经济价值
-        Integer economicFalseValue = getEconomicFalseValue(partnerMap, savePartnerDto.getTotalSorce());
+        Integer economicFalseValue = getEconomicFalseValue(partnerMap, savePartnerDto.getTotalScore());
         //计算超过人数
         Double overPopulation = getOverPopulation(economicFalseValue);
         //保存结果
@@ -48,19 +46,20 @@ public class PartnerServiceImpl extends BaseServiceImpl<StudentMapper, Student> 
         return ServerResponse.createBySuccess();
     }
 
-    private void savePartnerMapper(Map<Integer, Integer> partnerMap, SavePartnerDto savePartnerDto,
+    private void savePartnerMapper(Map<Integer, Integer> partnerMap, SavePartnerDTO savePartnerDto,
                                    Integer economicFalseValue, Double overPopulation) {
-        Set<Integer> integers = partnerMap.keySet();
-        for (Integer i : integers) {
-            Partner partner = new Partner();
-            partner.setEconomicValue(economicFalseValue);
-            partner.setImgUrl(savePartnerDto.getImgUrl());
-            partner.setOpenId(savePartnerDto.getOpenId());
-            partner.setOverPerson(overPopulation);
-            partner.setTotalSorce(savePartnerDto.getTotalSorce());
-            partner.setType(getType(i));
-            partnerMapper.insert(partner);
-        }
+        this.saveBatch(partnerMap.keySet()
+                .stream()
+                .map(key -> {
+                    Partner partner = new Partner();
+                    partner.setEconomicValue(economicFalseValue);
+                    partner.setImgUrl(savePartnerDto.getImgUrl());
+                    partner.setOpenId(savePartnerDto.getOpenId());
+                    partner.setOverPerson(overPopulation);
+                    partner.setTotalSorce(savePartnerDto.getTotalScore());
+                    partner.setType(getType(key));
+                    return partner;
+                }).collect(Collectors.toList()));
     }
 
     /**
@@ -76,21 +75,21 @@ public class PartnerServiceImpl extends BaseServiceImpl<StudentMapper, Student> 
      * 计算经济价值
      *
      * @param partnerMap
-     * @param totalSorce
+     * @param totalScore
      */
-    private Integer getEconomicFalseValue(Map<Integer, Integer> partnerMap, Integer totalSorce) {
+    private Integer getEconomicFalseValue(Map<Integer, Integer> partnerMap, Integer totalScore) {
 
-        Integer economicFalseValue = 0;
+        int economicFalseValue = 0;
         Set<Integer> integers = partnerMap.keySet();
         for (Integer key : integers) {
-            economicFalseValue += getEconomicFalseValueFormula(key, partnerMap.get(key), totalSorce).intValue();
+            economicFalseValue += getEconomicFalseValueFormula(key, partnerMap.get(key), totalScore).intValue();
         }
         return economicFalseValue;
     }
 
-    private Double getEconomicFalseValueFormula(Integer key, Integer integer, Integer totalSorce) {
+    private Double getEconomicFalseValueFormula(Integer key, Integer integer, Integer totalScore) {
         //公式（类型得分/个人总分）*类型价值。
-        Double proportion = integer * 1.0 / totalSorce;
+        Double proportion = integer * 1.0 / totalScore;
         if (key.equals(1)) {
             return proportion * PartnerConstant.BUSINESS;
         }
@@ -122,62 +121,78 @@ public class PartnerServiceImpl extends BaseServiceImpl<StudentMapper, Student> 
     }
 
     private Map<Integer, Integer> getRanking(Map<Integer, Integer> partnerMap) {
-        Map<Integer, Integer> returnMap = new HashMap<>();
-        List<Map.Entry<Integer, Integer>> list = new ArrayList<Map.Entry<Integer, Integer>>(partnerMap.size());
-        list.addAll(partnerMap.entrySet());
-        List<Integer> keys = list.stream()
+        Map<Integer, Integer> returnMap = new HashMap<>(16);
+        List<Map.Entry<Integer, Integer>> list = new ArrayList<>(partnerMap.entrySet());
+        list.stream()
                 .sorted(Comparator.comparing(Map.Entry<Integer, Integer>::getValue).reversed())
-                .map(Map.Entry<Integer, Integer>::getKey)
-                .collect(Collectors.toList());
-        for (int i = 0; i < keys.size(); i++) {
-            if (i < 5) {
-                returnMap.put(keys.get(i), partnerMap.get(keys.get(i)));
-            }
-        }
+                .limit(5)
+                .forEach(entry -> {
+                    Integer key = entry.getKey();
+                    // 得分
+                    Integer score = partnerMap.get(key);
+                    returnMap.put(key, score == null ? 0 : score);
+                });
         return returnMap;
     }
 
-    private Map<Integer, Integer> getPartnerMap(SavePartnerDto savePartnerDto) {
-        Map<Integer, Integer> map = new HashMap<>();
-        if(savePartnerDto.getTotalSorce()==null){
-            savePartnerDto.setTotalSorce(0);
+    private Map<Integer, Integer> getPartnerMap(SavePartnerDTO savePartnerDto) {
+        Map<Integer, Integer> map = new HashMap<>(16);
+        int totalScore = 0;
+
+        Integer business = savePartnerDto.getBusiness();
+        if (business != null && business > 0) {
+            map.put(1, business);
+            totalScore += business;
         }
-        if (savePartnerDto.getBusiness() != null && savePartnerDto.getBusiness() > 0) {
-            map.put(1, savePartnerDto.getBusiness());
-            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getBusiness());
+
+        Integer sale = savePartnerDto.getSale();
+        if (sale != null && sale > 0) {
+            map.put(2, sale);
+            totalScore += sale;
         }
-        if (savePartnerDto.getSale() != null && savePartnerDto.getSale() > 0) {
-            map.put(2, savePartnerDto.getSale());
-            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getSale());
+
+        Integer administration = savePartnerDto.getAdministration();
+        if (administration != null && administration > 0) {
+            map.put(3, administration);
+            totalScore += administration;
         }
-        if (savePartnerDto.getAdministration() != null && savePartnerDto.getAdministration() > 0) {
-            map.put(3, savePartnerDto.getAdministration());
-            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getAdministration());
+
+        Integer innovate = savePartnerDto.getInnovate();
+        if (innovate != null && innovate > 0) {
+            map.put(4, innovate);
+            totalScore += innovate;
         }
-        if (savePartnerDto.getInnovate() != null && savePartnerDto.getInnovate() > 0) {
-            map.put(4, savePartnerDto.getInnovate());
-            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getInnovate());
+
+        Integer primordialMind = savePartnerDto.getPrimordialMind();
+        if (primordialMind != null && primordialMind > 0) {
+            map.put(5, primordialMind);
+            totalScore += primordialMind;
         }
-        if (savePartnerDto.getPrimordialMind() != null && savePartnerDto.getPrimordialMind() > 0) {
-            map.put(5, savePartnerDto.getPrimordialMind());
-            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getPrimordialMind());
+
+        Integer principal = savePartnerDto.getPrincipal();
+        if (principal != null && principal > 0) {
+            map.put(6, principal);
+            totalScore += principal;
         }
-        if (savePartnerDto.getPrincipal() != null && savePartnerDto.getPrincipal() > 0) {
-            map.put(6, savePartnerDto.getPrincipal());
-            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getPrincipal());
+
+        Integer perfectBalance = savePartnerDto.getPerfectBalance();
+        if (perfectBalance != null && perfectBalance > 0) {
+            map.put(7, perfectBalance);
+            totalScore += perfectBalance;
         }
-        if (savePartnerDto.getPerfectBalance() != null && savePartnerDto.getPerfectBalance() > 0) {
-            map.put(7, savePartnerDto.getPerfectBalance());
-            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getPerfectBalance());
+
+        Integer toWorkHard = savePartnerDto.getToWorkHard();
+        if (toWorkHard != null && toWorkHard > 0) {
+            map.put(8, toWorkHard);
+            totalScore += toWorkHard;
         }
-        if (savePartnerDto.getToWorkHard() != null && savePartnerDto.getToWorkHard() > 0) {
-            map.put(8, savePartnerDto.getToWorkHard());
-            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getToWorkHard());
+
+        Integer downToEarth = savePartnerDto.getDownToEarth();
+        if (downToEarth != null && downToEarth > 0) {
+            map.put(9, downToEarth);
+            totalScore += downToEarth;
         }
-        if (savePartnerDto.getDownToEarth() != null && savePartnerDto.getDownToEarth() > 0) {
-            map.put(9, savePartnerDto.getDownToEarth());
-            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getDownToEarth());
-        }
+        savePartnerDto.setTotalScore(totalScore);
         return map;
     }
 
