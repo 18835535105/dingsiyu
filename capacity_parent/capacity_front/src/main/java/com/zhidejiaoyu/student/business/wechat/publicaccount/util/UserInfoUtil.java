@@ -41,7 +41,7 @@ public class UserInfoUtil {
     public static AccessTokenVO getPublicAccountAuthAccessTokenVO(String code) {
         String forObject = restTemplate.getForObject(ApiConstant.getAuthAccessTokenApi(code), String.class);
         AccessTokenVO accessTokenVo = JSON.parseObject(forObject, AccessTokenVO.class);
-        log.info("公众号授权结果：{}", forObject);
+        log.info("code={}, 公众号授权结果：{}", code, forObject);
         if (accessTokenVo == null) {
             throw new ServiceException("获取微信公众号 access_token 失败！");
         }
