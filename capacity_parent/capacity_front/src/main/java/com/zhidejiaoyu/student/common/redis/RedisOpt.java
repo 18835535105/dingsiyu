@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.mapper.simple.SimpleCourseMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.student.business.shipconfig.service.impl.ShipAddEquipmentServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -71,7 +72,15 @@ public class RedisOpt {
      */
     public boolean getTestBeforeStudy(Long studentId) {
         StudentExpansion expansion = studentExpansionMapper.selectByStudentId(studentId);
-        String phase = expansion.getPhase();
+        String phase;
+        if (StringUtils.isEmpty(expansion.getPhase())) {
+            expansion.setPhase("小学");
+            studentExpansionMapper.updateById(expansion);
+            phase = "小学";
+        } else {
+            phase = expansion.getPhase();
+        }
+
         Object o = redisTemplate.opsForHash().get(RedisKeysConst.TEST_BEFORE_STUDY + studentId, phase);
 
         if (o != null) {
