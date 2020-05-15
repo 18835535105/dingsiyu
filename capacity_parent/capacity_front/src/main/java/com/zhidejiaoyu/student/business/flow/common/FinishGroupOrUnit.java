@@ -299,7 +299,8 @@ public class FinishGroupOrUnit {
         if (Objects.equals(dto.getStudyFlowNew().getFlowName(), FlowConstant.FLOW_SIX)) {
             return ServerResponse.createBySuccess(ResponseCode.UNIT_FINISH);
         }
-        StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(student.getId(), dto.getUnitId(), dto.getEasyOrHard());
+        Integer easyOrHard = dto.getEasyOrHard();
+        StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectByStudentIdAndUnitIdAndEasyOrHard(student.getId(), dto.getUnitId(), easyOrHard);
         if (studentStudyPlanNew == null) {
             CourseNew courseNew = courseNewMapper.selectByUnitId(dto.getUnitId());
             // 说明当前课程还没有优先级，初始化当前课程的优先级
@@ -308,7 +309,7 @@ public class FinishGroupOrUnit {
             int basePriority = PriorityUtil.getBasePriority(student.getGrade(), grade, label, 0);
             int timePriority = PriorityUtil.BASE_TIME_PRIORITY;
 
-            boolean isEasy = dto.getEasyOrHard() == 1;
+            boolean isEasy = easyOrHard == 1;
             studentStudyPlanNewMapper.insert(StudentStudyPlanNew.builder()
                     .studentId(student.getId())
                     .complete(1)
@@ -322,8 +323,8 @@ public class FinishGroupOrUnit {
                     .unitId(dto.getUnitId())
                     .finalLevel(isEasy ? basePriority + 1 + timePriority : basePriority - PriorityUtil.HARD_NUM + 1 + timePriority)
                     .baseLevel(isEasy ? basePriority : basePriority - PriorityUtil.HARD_NUM)
-                    .easyOrHard(dto.getEasyOrHard())
-                    .flowId(FlowConstant.FREE_BEFORE_GROUP_GAME)
+                    .easyOrHard(easyOrHard)
+                    .flowId(easyOrHard == 1 ? FlowConstant.FREE_BEFORE_GROUP_GAME_EASY : FlowConstant.FREE_BEFORE_GROUP_GAME_HARD)
                     .build());
         } else {
             // 已有当前课程的优先级，更新优先级
@@ -344,7 +345,7 @@ public class FinishGroupOrUnit {
         boolean isEasy = Objects.equals(easyOrHard, 1);
         switch (type) {
             case 2:
-                return FlowConstant.FREE_BEFORE_GROUP_GAME;
+                return isEasy ? FlowConstant.FREE_BEFORE_GROUP_GAME_EASY : FlowConstant.FREE_BEFORE_GROUP_GAME_HARD;
             case 3:
                 return isEasy ? FlowConstant.FREE_SENTENCE_GAME : FlowConstant.FREE_SENTENCE_WRITE;
             case 4:

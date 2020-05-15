@@ -86,9 +86,14 @@ public interface FlowConstant {
      * 自由学习
      */
     /**
-     * 学前游戏
+     * 学前游戏（简单流程）
      */
-    long FREE_BEFORE_GROUP_GAME = 139;
+    long FREE_BEFORE_GROUP_GAME_EASY = 139;
+
+    /**
+     * 学前游戏（难流程）
+     */
+    long FREE_BEFORE_GROUP_GAME_HARD = 146;
 
     /**
      * 单词播放机

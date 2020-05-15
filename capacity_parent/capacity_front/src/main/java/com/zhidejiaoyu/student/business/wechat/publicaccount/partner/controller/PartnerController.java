@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
+/**
+ * 微信公众号合伙人测试
+ */
 @RestController
 @RequestMapping("/smallApp/partner")
 public class PartnerController {

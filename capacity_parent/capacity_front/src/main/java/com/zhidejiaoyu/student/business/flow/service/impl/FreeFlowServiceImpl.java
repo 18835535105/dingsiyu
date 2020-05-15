@@ -228,7 +228,9 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
      * @return
      */
     public ServerResponse<Object> judgeBeforeGame(NodeDto dto) {
-        if (Objects.equals(dto.getNodeId(), FlowConstant.FREE_BEFORE_GROUP_GAME)) {
+        Long nodeId = dto.getNodeId();
+        if (Objects.equals(nodeId, FlowConstant.FREE_BEFORE_GROUP_GAME_EASY)
+                || Objects.equals(nodeId, FlowConstant.FREE_BEFORE_GROUP_GAME_HARD)) {
             Long studentId = dto.getStudent().getId();
             boolean isEasy = dto.getEasyOrHard() == 1;
             if (dto.getGrade() == PointConstant.HUNDRED) {
@@ -286,21 +288,27 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             setFreeGroup(learnNew);
 
             StudyFlowNew studyFlowNew = studyFlowNewMapper.selectByLearnId(learnNew.getId());
-            if (studyFlowNew != null) {
-                FlowVO flowVO;
-                if (Objects.equals(studyFlowNew.getFlowName(), FlowConstant.FLOW_SIX)) {
-                    flowVO = packageFlowVO.packageSyntaxFlowVO(NodeDto.builder()
-                            .student(student)
-                            .unitId(unitId)
-                            .lastUnit(false)
-                            .studyFlowNew(studyFlowNew)
-                            .build());
-                } else {
-                    flowVO = this.packageFlowVO(studyFlowNew, student, unitId);
-                }
-                return ServerResponse.createBySuccess(flowVO);
+
+            if (studyFlowNew == null) {
+                return this.getFlowVoServerResponse(learnNew, modelType, student);
             }
-            return this.getFlowVoServerResponse(learnNew, modelType, student);
+
+            FlowVO flowVO;
+            if (Objects.equals(studyFlowNew.getFlowName(), FlowConstant.FLOW_SIX)) {
+                flowVO = packageFlowVO.packageSyntaxFlowVO(NodeDto.builder()
+                        .student(student)
+                        .unitId(unitId)
+                        .lastUnit(false)
+                        .studyFlowNew(studyFlowNew)
+                        .build());
+            } else {
+                if (studyFlowNew.getExplain().contains("一键学习")) {
+                    // 如果当前流程节点是一键学习的，查找其对应的自由学习的节点
+                    studyFlowNew = studyFlowNewMapper.selectById(studyFlowNew.getMatch());
+                }
+                flowVO = this.packageFlowVO(studyFlowNew, student, unitId);
+            }
+            return ServerResponse.createBySuccess(flowVO);
         }
 
         if (Objects.equals(dto.getModelType(), 5)) {

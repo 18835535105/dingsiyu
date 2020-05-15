@@ -1,13 +1,13 @@
 package com.zhidejiaoyu.common.pojo;
 
-import java.io.Serializable;
-
-
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.*;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -52,6 +52,12 @@ public class StudyFlowNew extends Model<StudyFlowNew> {
      * 90：是否大于或等于90分；80：是否大于或等于80分；3：是否大于等于50分小于80分
      */
     private Integer type;
+
+    @TableField("`explain`")
+    private String explain;
+
+    @TableField("`match`")
+    private Long match;
 
     @Override
     protected Serializable pkVal() {

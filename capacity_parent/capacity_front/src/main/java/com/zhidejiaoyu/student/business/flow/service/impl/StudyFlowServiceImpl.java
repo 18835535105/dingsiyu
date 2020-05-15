@@ -273,7 +273,12 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
                     .learnNew(learnNew)
                     .build());
         } else {
-            studyFlowNew = studyFlowNewMapper.selectById(studentFlowNew.getCurrentFlowId());
+            studyFlowNew = this.getStudyFlowNew(studentFlowNew.getCurrentFlowId());
+            if (!Objects.equals(studentFlowNew.getCurrentFlowId(), studyFlowNew.getId())) {
+                // 将学生正在学习的节点更新为对应的一键学习流程节点
+                studentFlowNew.setCurrentFlowId(studyFlowNew.getId());
+                studentFlowNewMapper.updateById(studentFlowNew);
+            }
             learnNew = learnNewMapper.selectById(studentFlowNew.getLearnId());
         }
         FlowVO vo;
@@ -294,6 +299,21 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         setOneKeyGroup(learnNew);
 
         return ServerResponse.createBySuccess(vo);
+    }
+
+    /**
+     * 获取流程节点，如果是自由学习流程，跳转到对应的一键学习流程
+     *
+     * @param flowId
+     * @return
+     */
+    public StudyFlowNew getStudyFlowNew(Long flowId) {
+        StudyFlowNew studyFlowNew = studyFlowNewMapper.selectById(flowId);
+
+        if (studyFlowNew.getExplain().contains("自由学习")) {
+            studyFlowNew = studyFlowNewMapper.selectById(studyFlowNew.getMatch());
+        }
+        return studyFlowNew;
     }
 
     public static void setOneKeyGroup(LearnNew learnNew) {
