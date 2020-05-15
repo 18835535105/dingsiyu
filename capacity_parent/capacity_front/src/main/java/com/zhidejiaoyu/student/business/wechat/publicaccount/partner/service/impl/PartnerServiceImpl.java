@@ -8,7 +8,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.constant.PartnerConstant;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.service.PartnerService;
-import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.vo.SavePartnerVo;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.vo.SavePartnerDto;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -25,39 +25,39 @@ public class PartnerServiceImpl extends BaseServiceImpl<StudentMapper, Student> 
     /**
      * 保存数据  商业大佬1 销售大咖2 管理专家3 创新4 初心5 校长6 完美均衡7 发奋8 踏实9
      *
-     * @param savePartnerVo
+     * @param savePartnerDto
      * @return
      */
     @Override
-    public Object savePartner(SavePartnerVo savePartnerVo) {
+    public Object savePartner(SavePartnerDto savePartnerDto) {
         //判断账号是否已经有过测试
-        Integer integer = partnerMapper.countByOpenId(savePartnerVo.getOpenId());
+        Integer integer = partnerMapper.countByOpenId(savePartnerDto.getOpenId());
         if (integer != null && integer > 0) {
-            partnerMapper.deleteByOpenId(savePartnerVo.getOpenId());
+            partnerMapper.deleteByOpenId(savePartnerDto.getOpenId());
         }
         //获取map集合
-        Map<Integer, Integer> partnerMap = getPartnerMap(savePartnerVo);
+        Map<Integer, Integer> partnerMap = getPartnerMap(savePartnerDto);
         //计算最高5个排行奖励
         partnerMap = getRanking(partnerMap);
         //计算经济价值
-        Integer economicFalseValue = getEconomicFalseValue(partnerMap, savePartnerVo.getTotalSorce());
+        Integer economicFalseValue = getEconomicFalseValue(partnerMap, savePartnerDto.getTotalSorce());
         //计算超过人数
         Double overPopulation = getOverPopulation(economicFalseValue);
         //保存结果
-        savePartnerMapper(partnerMap, savePartnerVo, economicFalseValue, overPopulation);
+        savePartnerMapper(partnerMap, savePartnerDto, economicFalseValue, overPopulation);
         return ServerResponse.createBySuccess();
     }
 
-    private void savePartnerMapper(Map<Integer, Integer> partnerMap, SavePartnerVo savePartnerVo,
+    private void savePartnerMapper(Map<Integer, Integer> partnerMap, SavePartnerDto savePartnerDto,
                                    Integer economicFalseValue, Double overPopulation) {
         Set<Integer> integers = partnerMap.keySet();
         for (Integer i : integers) {
             Partner partner = new Partner();
             partner.setEconomicValue(economicFalseValue);
-            partner.setImgUrl(savePartnerVo.getImgUrl());
-            partner.setOpenId(savePartnerVo.getOpenId());
+            partner.setImgUrl(savePartnerDto.getImgUrl());
+            partner.setOpenId(savePartnerDto.getOpenId());
             partner.setOverPerson(overPopulation);
-            partner.setTotalSorce(savePartnerVo.getTotalSorce());
+            partner.setTotalSorce(savePartnerDto.getTotalSorce());
             partner.setType(getType(i));
             partnerMapper.insert(partner);
         }
@@ -137,46 +137,46 @@ public class PartnerServiceImpl extends BaseServiceImpl<StudentMapper, Student> 
         return returnMap;
     }
 
-    private Map<Integer, Integer> getPartnerMap(SavePartnerVo savePartnerVo) {
+    private Map<Integer, Integer> getPartnerMap(SavePartnerDto savePartnerDto) {
         Map<Integer, Integer> map = new HashMap<>();
-        if(savePartnerVo.getTotalSorce()==null){
-            savePartnerVo.setTotalSorce(0);
+        if(savePartnerDto.getTotalSorce()==null){
+            savePartnerDto.setTotalSorce(0);
         }
-        if (savePartnerVo.getBusiness() != null && savePartnerVo.getBusiness() > 0) {
-            map.put(1, savePartnerVo.getBusiness());
-            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getBusiness());
+        if (savePartnerDto.getBusiness() != null && savePartnerDto.getBusiness() > 0) {
+            map.put(1, savePartnerDto.getBusiness());
+            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getBusiness());
         }
-        if (savePartnerVo.getSale() != null && savePartnerVo.getSale() > 0) {
-            map.put(2, savePartnerVo.getSale());
-            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getSale());
+        if (savePartnerDto.getSale() != null && savePartnerDto.getSale() > 0) {
+            map.put(2, savePartnerDto.getSale());
+            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getSale());
         }
-        if (savePartnerVo.getAdministration() != null && savePartnerVo.getAdministration() > 0) {
-            map.put(3, savePartnerVo.getAdministration());
-            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getAdministration());
+        if (savePartnerDto.getAdministration() != null && savePartnerDto.getAdministration() > 0) {
+            map.put(3, savePartnerDto.getAdministration());
+            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getAdministration());
         }
-        if (savePartnerVo.getInnovate() != null && savePartnerVo.getInnovate() > 0) {
-            map.put(4, savePartnerVo.getInnovate());
-            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getInnovate());
+        if (savePartnerDto.getInnovate() != null && savePartnerDto.getInnovate() > 0) {
+            map.put(4, savePartnerDto.getInnovate());
+            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getInnovate());
         }
-        if (savePartnerVo.getPrimordialMind() != null && savePartnerVo.getPrimordialMind() > 0) {
-            map.put(5, savePartnerVo.getPrimordialMind());
-            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getPrimordialMind());
+        if (savePartnerDto.getPrimordialMind() != null && savePartnerDto.getPrimordialMind() > 0) {
+            map.put(5, savePartnerDto.getPrimordialMind());
+            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getPrimordialMind());
         }
-        if (savePartnerVo.getPrincipal() != null && savePartnerVo.getPrincipal() > 0) {
-            map.put(6, savePartnerVo.getPrincipal());
-            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getPrincipal());
+        if (savePartnerDto.getPrincipal() != null && savePartnerDto.getPrincipal() > 0) {
+            map.put(6, savePartnerDto.getPrincipal());
+            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getPrincipal());
         }
-        if (savePartnerVo.getPerfectBalance() != null && savePartnerVo.getPerfectBalance() > 0) {
-            map.put(7, savePartnerVo.getPerfectBalance());
-            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getPerfectBalance());
+        if (savePartnerDto.getPerfectBalance() != null && savePartnerDto.getPerfectBalance() > 0) {
+            map.put(7, savePartnerDto.getPerfectBalance());
+            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getPerfectBalance());
         }
-        if (savePartnerVo.getToWorkHard() != null && savePartnerVo.getToWorkHard() > 0) {
-            map.put(8, savePartnerVo.getToWorkHard());
-            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getToWorkHard());
+        if (savePartnerDto.getToWorkHard() != null && savePartnerDto.getToWorkHard() > 0) {
+            map.put(8, savePartnerDto.getToWorkHard());
+            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getToWorkHard());
         }
-        if (savePartnerVo.getDownToEarth() != null && savePartnerVo.getDownToEarth() > 0) {
-            map.put(9, savePartnerVo.getDownToEarth());
-            savePartnerVo.setTotalSorce(savePartnerVo.getTotalSorce()+savePartnerVo.getDownToEarth());
+        if (savePartnerDto.getDownToEarth() != null && savePartnerDto.getDownToEarth() > 0) {
+            map.put(9, savePartnerDto.getDownToEarth());
+            savePartnerDto.setTotalSorce(savePartnerDto.getTotalSorce()+ savePartnerDto.getDownToEarth());
         }
         return map;
     }

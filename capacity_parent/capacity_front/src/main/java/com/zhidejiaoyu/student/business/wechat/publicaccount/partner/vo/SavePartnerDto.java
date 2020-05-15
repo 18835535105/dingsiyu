@@ -3,7 +3,7 @@ package com.zhidejiaoyu.student.business.wechat.publicaccount.partner.vo;
 import lombok.Data;
 
 @Data
-public class SavePartnerVo {
+public class SavePartnerDto {
 
     private String imgUrl;
 

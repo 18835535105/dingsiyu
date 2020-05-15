@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.student.business.wechat.publicaccount.partner.controller;
 
 import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.service.PartnerService;
-import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.vo.SavePartnerVo;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.partner.vo.SavePartnerDto;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,8 +15,8 @@ public class PartnerController {
     private PartnerService partnerService;
 
     @RequestMapping("/savePartner")
-    public Object savePartner(SavePartnerVo savePartnerVo){
-        return  partnerService.savePartner(savePartnerVo);
+    public Object savePartner(SavePartnerDto savePartnerDto){
+        return  partnerService.savePartner(savePartnerDto);
     }
 
 
