@@ -133,7 +133,7 @@ public class SimpleCommonMethod implements Serializable {
         String[] typeStr = {"单词辨音", "词组辨音", "快速单词", "快速词组", "词汇考点", "快速句型", "语法辨析", "单词默写", "词组默写"};
         if (classify == null) {
             log.error("classify = null");
-            return null;
+            return "快速单词";
         }
         if (classify <= typeStr.length) {
             return typeStr[classify - 1];
