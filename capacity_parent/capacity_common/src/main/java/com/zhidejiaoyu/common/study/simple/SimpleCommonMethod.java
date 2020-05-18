@@ -138,7 +138,7 @@ public class SimpleCommonMethod implements Serializable {
         if (classify <= typeStr.length) {
             return typeStr[classify - 1];
         }
-        return null;
+        return "快速单词";
     }
 
     /**
