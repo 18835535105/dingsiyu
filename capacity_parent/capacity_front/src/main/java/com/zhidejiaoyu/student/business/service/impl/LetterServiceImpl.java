@@ -244,7 +244,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
         Map<String, Object> map = new HashMap<>();
         //查看黄金记忆点单词
         LetterPair letterPair = letterPairMapper.selPushLetter(unitId, studentId);
-        Letter studyLetter = null;
+        Letter studyLetter;
         if (letterPair == null) {
             //查看当前单元已经学过的单词
             List<Long> longs = letterPairMapper.selAllStudyLetter(unitId, studentId);

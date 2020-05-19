@@ -3,7 +3,6 @@ package com.zhidejiaoyu.student.business.shipconfig.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.redis.SourcePowerKeysConst;
-import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
@@ -15,6 +14,7 @@ import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.shipconfig.constant.EquipmentTypeConstant;
+import com.zhidejiaoyu.student.business.shipconfig.constant.FileConstant;
 import com.zhidejiaoyu.student.business.shipconfig.dto.ShipConfigInfoDTO;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.util.CalculateUtil;
@@ -394,10 +394,7 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
 
     @Override
     public IndexVO.MyState getBaseState(String openId) {
-        Student student = studentMapper.selectByOpenId(openId);
-        if (student == null) {
-            throw new ServiceException("未查询到学生信息！");
-        }
+        Student student = getStudentByOpenId(openId, studentMapper);
         Long studentId = student.getId();
         List<Map<String, Object>> equipments = equipmentMapper.selectUsedByStudentId(studentId);
         IndexVO indexVO = this.getIndexVoTmp(equipments);
@@ -420,6 +417,17 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
                 .weaponsInfo(indexVO.getWeaponsInfo())
                 .radar(this.getRadar(baseValue, stateOfWeek))
                 .build();
+    }
+
+    public static Student getStudentByOpenId(String openId, StudentMapper studentMapper) {
+        Student student = studentMapper.selectByOpenId(openId);
+        if (student == null) {
+            student = studentMapper.selectById(9575L);
+            student.setStudentName("未登录");
+            student.setHeadUrl(FileConstant.NO_LOGIN_IMG_URL);
+            student.setSystemGold(0.0D);
+        }
+        return student;
     }
 
     public ServerResponse<Object> packageRankVO(String key, List<Long> studentIds, Student student) {

@@ -17,6 +17,7 @@ import com.zhidejiaoyu.common.utils.page.PageVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DurationInfoVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.business.shipconfig.service.impl.ShipIndexServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.smallapp.dto.PrizeDTO;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.IndexService;
 import com.zhidejiaoyu.student.business.wechat.smallapp.vo.PrizeVO;
@@ -64,10 +65,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Override
     public ServerResponse<Object> index(String openId) {
-        Student student = studentMapper.selectByOpenId(openId);
-        if (student == null) {
-            return ServerResponse.createByError(400, "用户还未绑定学生账号！");
-        }
+        Student student = ShipIndexServiceImpl.getStudentByOpenId(openId, studentMapper);
 
         // 头部公有数据
         TotalDataVO totalDataVO = this.getTotalVo(student);
@@ -94,7 +92,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Transactional(rollbackFor = Exception.class)
     public ServerResponse<Object> replenish(String date, String openId) {
 
-        Student student = studentMapper.selectByOpenId(openId);
+        Student student = ShipIndexServiceImpl.getStudentByOpenId(openId, studentMapper);
 
         String today = DateUtil.formatYYYYMMDD(new Date());
         if (Objects.equals(today, date)) {
@@ -135,8 +133,8 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Override
     public ServerResponse<Object> record(String openId) {
-
-        Long studentId = this.getStudentId(openId);
+        Student student = ShipIndexServiceImpl.getStudentByOpenId(openId, studentMapper);
+        Long studentId = student.getId();
 
         PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
         // 查询有学习记录的在线时长与学习日期
@@ -169,7 +167,7 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
     @Override
     public ServerResponse<Object> prize(PrizeDTO dto) {
 
-        Student student = studentMapper.selectByOpenId(dto.getOpenId());
+        Student student = ShipIndexServiceImpl.getStudentByOpenId(dto.getOpenId(), studentMapper);
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
 
         PageHelper.startPage(PageUtil.getPageNum(), PageUtil.getPageSize());
@@ -224,12 +222,6 @@ public class IndexServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
                 .canCard(canCard)
                 .msg(msg)
                 .build());
-    }
-
-    @Override
-    public Long getStudentId(String openId) {
-        Student student = studentMapper.selectByOpenId(openId);
-        return student.getId();
     }
 
     /**
