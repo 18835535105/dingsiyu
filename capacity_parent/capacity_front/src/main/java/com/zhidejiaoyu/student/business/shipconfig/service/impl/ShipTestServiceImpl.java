@@ -512,15 +512,15 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      * @param studentId
      * @return
      */
-    private List<SubjectsVO>    getSubject(Long studentId) {
+    private List<SubjectsVO> getSubject(Long studentId) {
         //1，获取单元
         List<Long> unitIds = learnNewMapper.getUnitIdByStudentIdAndType(studentId, 1);
         //2,获取单元题目
         List<SubjectsVO> subjectsVos ;
         if (unitIds != null && unitIds.size() > 0) {
              subjectsVos = vocabularyMapper.selectSubjectsVOByUnitIds(unitIds);
-            //题目够15到截取，不够的话 循环添加
-            int subjectNum = 15;
+            //题目够30到截取，不够的话 循环添加
+            int subjectNum = 30;
             if (subjectsVos.size() > subjectNum) {
                 Collections.shuffle(subjectsVos);
                 subjectsVos = subjectsVos.subList(0, subjectNum);
