@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.pojo.Course;
 import com.zhidejiaoyu.common.pojo.CourseExample;
 import com.zhidejiaoyu.common.pojo.Unit;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -226,20 +227,21 @@ public interface SimpleCourseMapper extends BaseMapper<Course> {
     @Select("select course_name from course where id = (select course_id from unit where id = #{unitId})")
     String selectCourseNameByUnitId(@Param("unitId") Long unitId);
 
-	List<Map<String, Object>> courseLearnInfo(Long studentId);
+    List<Map<String, Object>> courseLearnInfo(Long studentId);
 
-	@Select("select count(*) from unit where course_id = #{id}")
-	Integer countUnitAnnotation(@Param("id") Long id);
+    @Select("select count(*) from unit where course_id = #{id}")
+    Integer countUnitAnnotation(@Param("id") Long id);
 
-	Map<String, Object> postStudentByCourse(@Param("courseId") Integer courseId);
+    Map<String, Object> postStudentByCourse(@Param("courseId") Integer courseId);
 
-	/**
+    /**
      * 去重获取所有教材版本
      *
      * @return
      */
     @Select("select distinct(c.version) from course c where c.delStatus = 1")
     List<String> getVersionsStatus();
+
     /**
      * 去重获取所有学段
      *
@@ -247,13 +249,15 @@ public interface SimpleCourseMapper extends BaseMapper<Course> {
      */
     @Select("select distinct(c.study_paragraph) from course c where c.delStatus = 1")
     List<String> getStudyParagraphStatus();
+
     /**
      * 去重获取所有年级
      *
      * @return
      */
     @Select("select distinct(c.grade) from course c where c.delStatus = 1")
-	List<String> getGradesStatus();
+    List<String> getGradesStatus();
+
     /**
      * 去重获取所有标签
      *
@@ -261,7 +265,7 @@ public interface SimpleCourseMapper extends BaseMapper<Course> {
      * @return
      */
     @Select("select distinct(c.label) from course c where c.delStatus = 1")
-	List<String> getLabelsStatus();
+    List<String> getLabelsStatus();
 
     /**
      * 查看这个课程下是否存在单词
@@ -270,7 +274,8 @@ public interface SimpleCourseMapper extends BaseMapper<Course> {
      * @return
      */
     @Select("select a.id FROM unit a JOIN unit_vocabulary b ON a.id = b.unit_id JOIN vocabulary c ON b.vocabulary_id = c.id AND c.delStatus = 1 AND a.course_id = #{id} LIMIT 0,1")
-	Integer showSelectWord(@Param("id") int id);
+    Integer showSelectWord(@Param("id") int id);
+
     /**
      * 查看这个课程下是否存在例句
      *
@@ -278,18 +283,18 @@ public interface SimpleCourseMapper extends BaseMapper<Course> {
      * @return
      */
     @Select("select a.id FROM unit a JOIN unit_sentence b ON a.id = b.unit_id JOIN sentence c ON b.sentence_id = c.id AND a.course_id = #{id} LIMIT 0,1 ")
-	Integer showSelectSentence(@Param("id") int id);
+    Integer showSelectSentence(@Param("id") int id);
 
-	Map<String, Object> selectCourseVersion(@Param("id") Long id);
+    Map<String, Object> selectCourseVersion(@Param("id") Long id);
 
-	/**
-	 * 根据id获取课程拼接名
-	 *
-	 * @param course_id
-	 * @return
-	 */
-	@Select("select course_name from course where id = #{id}")
-	String selectByCourseName(@Param("id") String course_id);
+    /**
+     * 根据id获取课程拼接名
+     *
+     * @param course_id
+     * @return
+     */
+    @Select("select course_name from course where id = #{id}")
+    String selectByCourseName(@Param("id") String course_id);
 
     /**
      * 查询课程下所有单元信息及单元内单词数量
@@ -300,10 +305,19 @@ public interface SimpleCourseMapper extends BaseMapper<Course> {
     @Select("SELECT count(uv.vocabulary_id) wordCount, u.unit_name unitName, u.id unitId FROM unit u, unit_vocabulary uv, vocabulary v WHERE u.id = uv.unit_id AND v.id =uv.vocabulary_id AND v.delStatus = 1 AND u.course_id = #{courseId} GROUP BY u.id")
     List<Map<String, Object>> getAllUnitInfos(@Param("courseId") Long courseId);
 
-	List<Map> getSimpleCourseByStudentIdByType(@Param("studentId") long studentId, @Param("type") String type);
+    List<Map> getSimpleCourseByStudentIdByType(@Param("studentId") long studentId, @Param("type") String type);
 
-	@Select("select id from course where id = #{courseId} AND version like '%${end}'")
-	Long getApologySoundModelBycourseId(Long courseId, String end);
+    /**
+     * 获取初学试炼学生指定学段可学习的课程
+     *
+     * @param studentId
+     * @param phase
+     * @return
+     */
+    List<Map<String, Object>> getSimpleCourseByStudentIdByPhase(@Param("studentId") Long studentId, @Param("phase") String phase);
+
+    @Select("select id from course where id = #{courseId} AND version like '%${end}'")
+    Long getApologySoundModelBycourseId(Long courseId, String end);
 
     /**
      * 获取学生所有课程
@@ -317,7 +331,7 @@ public interface SimpleCourseMapper extends BaseMapper<Course> {
      * 获取学生指定模块下的所有课程
      *
      * @param stuId
-     * @param typeStr   模块名
+     * @param typeStr 模块名
      * @return key 课程id
      * value 课程名称
      */
@@ -330,7 +344,7 @@ public interface SimpleCourseMapper extends BaseMapper<Course> {
      * @return
      */
     @MapKey("id")
-	Map<Long, Map<Long, Object>> unitsWordSum(@Param("courseId") long courseId);
+    Map<Long, Map<Long, Object>> unitsWordSum(@Param("courseId") long courseId);
 
-    List<Map<String,Object>> getCourseByIds(@Param("courseIds") List<Long> courseIds);
+    List<Map<String, Object>> getCourseByIds(@Param("courseIds") List<Long> courseIds);
 }

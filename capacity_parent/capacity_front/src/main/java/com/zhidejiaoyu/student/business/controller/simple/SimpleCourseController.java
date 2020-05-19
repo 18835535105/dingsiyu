@@ -42,14 +42,13 @@ public class SimpleCourseController {
      *	展示的课程和分配的课程和模块相关
      *		默认正在学习的课程state:true
      *
-     * @param typeStr 9个模块中某个模块名
-     * @param type 9个模块id
+     * @param phase 学段，小学、初中、高中
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "/getSimpleCourse")
-    public ServerResponse<Object> getSimpleCourseAll(HttpSession session, String typeStr, int type){
-    	return courseService.getSimpleCourseAll(session, typeStr, type);
+    public ServerResponse<Object> getSimpleCourseAll(HttpSession session, String phase){
+    	return courseService.getSimpleCourse(session, phase);
     }
 
     /**

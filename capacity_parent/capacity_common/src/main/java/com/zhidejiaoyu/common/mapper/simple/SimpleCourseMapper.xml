@@ -194,7 +194,8 @@
         where id = #{id,jdbcType=BIGINT}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from course
+        delete
+        from course
         where id = #{id,jdbcType=BIGINT}
     </delete>
     <delete id="deleteByExample"
@@ -379,13 +380,12 @@
     </resultMap>
     <select id="selectListCourseName" parameterType="int"
             resultMap="selectListCourseNameMap">
-        select
-            unit_name,
-            unit_index,
-            id
+        select unit_name,
+               unit_index,
+               id
         from unit
         where course_id = #{id}
-        and delStatus = 1
+          and delStatus = 1
     </select>
 
     <resultMap type="com.zhidejiaoyu.common.pojo.Course" id="showcoursenameMap">
@@ -393,32 +393,33 @@
         <result column="course_name" property="courseName"/>
     </resultMap>
     <select id="showcoursename" resultMap="showcoursenameMap">
-        select
-            id,
-            course_name
+        select id,
+               course_name
         from course
-        where `status` = 1 and delStatus = 1;
+        where `status` = 1
+          and delStatus = 1;
     </select>
 
     <select id="showWordName" parameterType="java.lang.Integer" resultType="java.util.Map">
-        select
-            id,
-            unit_name
+        select id,
+               unit_name
         from unit
         where course_id = #{id}
-        and delStatus = 1
+          and delStatus = 1
     </select>
 
     <select id="chooseGradeToLabel" parameterType="com.zhidejiaoyu.common.pojo.Course"
             resultType="Map">
-        select
-			b.id,
-			b.label,
-			b.course_name AS courseName,
-			c.id AS unitId,
-			c.unit_name AS unitName
-		from student a INNER JOIN course b on a.version = b.version join unit c ON b.id = c.course_id
- 			and a.id = #{id} and b.grade = #{grade} and b.delStatus = 1 and b.`status` = 1 GROUP BY b.id
+        select b.id,
+               b.label,
+               b.course_name AS courseName,
+               c.id          AS unitId,
+               c.unit_name   AS unitName
+        from student a
+                 INNER JOIN course b on a.version = b.version
+                 join unit c ON b.id = c.course_id
+            and a.id = #{id} and b.grade = #{grade} and b.delStatus = 1 and b.`status` = 1
+        GROUP BY b.id
     </select>
     <select id="selectByStudentId" resultMap="BaseResultMap" parameterType="java.lang.Long">
         SELECT
@@ -498,33 +499,33 @@
         ORDER BY b.id DESC
     </select>
 
-	<select id="postStudentByCourse" parameterType="map" resultType="map">
-		select b.id, a.course_name, a.grade, a.version, a.label, b.unit_name from course a JOIN unit b ON a.id = b.course_id
- 		AND a.id = #{courseId} LIMIT 0,1
-	</select>
+    <select id="postStudentByCourse" parameterType="map" resultType="map">
+        select b.id, a.course_name, a.grade, a.version, a.label, b.unit_name
+        from course a
+                 JOIN unit b ON a.id = b.course_id
+            AND a.id = #{courseId}
+        LIMIT 0,1
+    </select>
 
-	<select id="selectCourseVersion" parameterType="map" resultType="map">
-		select grade, version, label, study_paragraph from course where id = #{id}
-	</select>
+    <select id="selectCourseVersion" parameterType="map" resultType="map">
+        select grade, version, label, study_paragraph
+        from course
+        where id = #{id}
+    </select>
 
-	<select id="getSimpleCourseByStudentIdByType" parameterType="map" resultType="map">
-		SELECT
-              b.id,
-              b.version
-		FROM
-			student_unit a JOIN course b ON a.course_id = b.id
-		AND a.student_id = #{studentId}
-		AND a.course_id IN (
-			SELECT
-				id
-			FROM
-				course
-			WHERE
-				version LIKE concat('%', #{type})
-		)
-		GROUP BY
-			b.id
-	</select>
+    <select id="getSimpleCourseByStudentIdByType" parameterType="map" resultType="map">
+        SELECT b.id,
+               b.version
+        FROM student_unit a
+                 JOIN course b ON a.course_id = b.id
+            AND a.student_id = #{studentId}
+            AND a.course_id IN (
+                SELECT id
+                FROM course
+                WHERE version LIKE concat('%', #{type})
+            )
+        GROUP BY b.id
+    </select>
 
     <select id="selectAllCourseByStuIdAndType" resultType="java.util.Map" parameterType="map">
         select c.id, c.version
@@ -537,11 +538,15 @@
         order by c.id asc
     </select>
     <select id="unitsWordSum" parameterType="map" resultType="map">
-    	select a.id AS id, count(c.id) AS sum
-    		from
-    	unit a, unit_vocabulary b, vocabulary c
-    		where
-    	a.id = b.unit_id AND b.vocabulary_id = c.id AND a.course_id = #{courseId} AND c.delStatus = 1 GROUP BY a.id
+        select a.id AS id, count(c.id) AS sum
+        from unit a,
+             unit_vocabulary b,
+             vocabulary c
+        where a.id = b.unit_id
+          AND b.vocabulary_id = c.id
+          AND a.course_id = #{courseId}
+          AND c.delStatus = 1
+        GROUP BY a.id
     </select>
     <select id="getStudentCourseAllByStudentId" resultType="java.lang.String" parameterType="map">
         select DISTINCT(a.version)
@@ -555,5 +560,15 @@
             #{courseId}
         </foreach>
         )
+    </select>
+    <select id="getSimpleCourseByStudentIdByPhase" resultType="java.util.Map" parameterType="map">
+        SELECT b.id,
+               b.version
+        FROM student_unit a
+                 JOIN course b ON a.course_id = b.id
+            AND a.student_id = #{studentId}
+            and b.version LIKE '%快速单词'
+            and b.study_paragraph = #{phase}
+        GROUP BY b.id
     </select>
 </mapper>

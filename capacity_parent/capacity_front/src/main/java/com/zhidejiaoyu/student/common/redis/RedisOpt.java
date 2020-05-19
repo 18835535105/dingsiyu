@@ -127,19 +127,19 @@ public class RedisOpt {
     /**
      * 获取当前学生当前模块关联的所有课程, 返回id,version
      */
-    public List<Map> getCourseListInType(Long studentId, String typeStr) {
-        String hKey = RedisKeysConst.ALL_COURSE_WITH_STUDENT_IN_TYPE + studentId + ":" + typeStr;
-        List<Map> courseList;
+    public List<Map<String, Object>> getCourseListWithPhase(Long studentId, String phase) {
+        String hKey = RedisKeysConst.ALL_COURSE_WITH_STUDENT_IN_TYPE + studentId + ":" + phase;
+        List<Map<String, Object>> courseList;
         Object object = getRedisObject(hKey);
         if (object == null) {
-            courseList = getCourses(studentId, typeStr);
+            courseList = getCourses(studentId, phase);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, hKey, courseList);
         } else {
             try {
-                courseList = (List<Map>) object;
+                courseList = (List<Map<String, Object>>) object;
             } catch (Exception e) {
-                log.error("类型转换错误, object=[{}], studentId=[{}], typeStr=[{}], error=[{}]", object, studentId, typeStr, e.getMessage());
-                courseList = getCourses(studentId, typeStr);
+                log.error("类型转换错误, object=[{}], studentId=[{}], typeStr=[{}], error=[{}]", object, studentId, phase, e.getMessage());
+                courseList = getCourses(studentId, phase);
             }
         }
         return courseList;
@@ -149,12 +149,11 @@ public class RedisOpt {
      * 截取冲刺版字符串
      *
      * @param studentId
-     * @param typeStr
+     * @param phase
      * @return
      */
-    private List<Map> getCourses(Long studentId, String typeStr) {
-        List<Map> courseList;
-        courseList = simpleCourseMapper.getSimpleCourseByStudentIdByType(studentId, typeStr);
+    private List<Map<String, Object>> getCourses(Long studentId, String phase) {
+        List<Map<String, Object>> courseList = simpleCourseMapper.getSimpleCourseByStudentIdByPhase(studentId, phase);
         if (courseList.size() > 0) {
             courseList.forEach(c -> {
                 if (c.get("version") != null && c.get("version").toString().contains("冲刺版")) {
