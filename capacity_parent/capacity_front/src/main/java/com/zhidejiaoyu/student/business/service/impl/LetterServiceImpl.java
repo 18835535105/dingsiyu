@@ -9,8 +9,8 @@ import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.LetterService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -363,6 +363,7 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Object saveLetterPair(LetterPair letterPair, HttpSession session, Boolean falg) {
         Long studentId = getStudentId(session);
         try {
@@ -374,10 +375,8 @@ public class LetterServiceImpl extends BaseServiceImpl<LetterMapper, Letter> imp
                     pair.setPush(push);
                     pair.setMemoryStrength(testMemoryStrength.getMemoryStrength(pair.getMemoryStrength(), falg));
                     letterPairMapper.updateById(pair);
-                    return ServerResponse.createBySuccess();
-                } else {
-                    return ServerResponse.createBySuccess();
                 }
+                return ServerResponse.createBySuccess();
             }
             Learn learn = new Learn();
             learn.setStudentId(studentId);
