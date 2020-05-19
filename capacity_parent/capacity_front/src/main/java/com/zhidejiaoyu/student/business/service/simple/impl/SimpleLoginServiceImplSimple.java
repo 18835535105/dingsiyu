@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.GoldLogMapper;
+import com.zhidejiaoyu.common.mapper.StudentExpansionMapper;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
@@ -51,9 +52,6 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
-    private SimpleRunLogMapper runLogMapper;
-
-    @Autowired
     private SimpleDurationMapper simpleDurationMapper;
 
     @Autowired
@@ -91,6 +89,9 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
 
     @Resource
     private GoldLogMapper goldLogMapper;
+
+    @Resource
+    private StudentExpansionMapper studentExpansionMapper;
 
     @Override
     @GoldChangeAnnotation
@@ -160,9 +161,9 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         result.put("hasCapacityWord", count > 0);
 
         // 有效时长  !
-        Integer valid = (int) DurationUtil.getTodayValidTime(session);
+        int valid = (int) DurationUtil.getTodayValidTime(session);
         // 在线时长 !
-        Integer online = (int) DurationUtil.getTodayOnlineTime(session);
+        int online = (int) DurationUtil.getTodayOnlineTime(session);
         // 今日学习效率 !
         if (valid >= online) {
             logger.error("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, student);
@@ -175,54 +176,20 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         result.put("online", online);
         result.put("valid", valid);
 
-        // 所有模块正在学习的课程id
-        Map<Integer, Map<String, Long>> allCourse = simpleSimpleStudentUnitMapper.getAllUnit(student.getId());
-        // 对应模块的课程id
-        int courseId = 0;
+        StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(studentId);
+        // 获得的总代金券
+        result.put("voucher", studentExpansion == null ? 0 : studentExpansion.getCashCoupon());
 
         for (int i = 1; i <= 9; i++) {
-
             Map<String, Object> resultMap = new HashMap<>(16);
             // 当前模块未开启
             resultMap.put("open", false);
-
-            // 1.获取模块对应在学的单元id
-            if (allCourse.containsKey(i)) {
-                courseId = allCourse.get(i).get("course_id") == null ? 0 : allCourse.get(i).get("course_id").intValue();
-                // 当前模块已开启
-                resultMap.put("open", true);
-            }
-
-            // 课程下一共有多少单词 /.
-            int countWord = redisOpt.wordCountInCourse((long) courseId);
-
-            // 课程已学 ./
-            Integer sum = learnMapper.selectCourseWordNumberByStudentId(studentId, courseId, i);
-
-            //-- 4.某课程某模块学习速度;
-            Integer sumValid = simpleDurationMapper.valid_timeIndex(studentId, courseId, i + 13);
-            if (sumValid == null) {
-                sumValid = 0;
-            }
-            int speed = (int) (BigDecimalUtil.div(sum, sumValid) * 3600);
-
             // 继续学习状态
             resultMap.put("state", 2);
-            resultMap.put("sum", sum + "");
-            resultMap.put("countWord", countWord + "");
+            resultMap.put("sum", "0");
+            resultMap.put("countWord", "0");
             // 速度
-            resultMap.put("speed", speed + "");
-
-            // 3.开始学习状态
-            if (sum == 0) {
-                // learn表是否有数据
-                Integer status = learnMapper.getModelLearnInfo(studentId, testModelStr(i));
-                if (status == null) {
-                    // 开始学习
-                    resultMap.put("state", 1);
-                }
-            }
-            courseId = 0;
+            resultMap.put("speed", "0");
             result.put(i + "", resultMap);
         }
 
