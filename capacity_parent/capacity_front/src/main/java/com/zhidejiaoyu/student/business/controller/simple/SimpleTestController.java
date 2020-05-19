@@ -94,7 +94,7 @@ public class SimpleTestController {
      */
     @PostMapping("/savePreSchoolTest")
     public ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, String testDetail,
-                                                          TestRecord testRecord, int type, int typeModel) {
+                                                          TestRecord testRecord, Integer type, Integer typeModel) {
         return testService.savePreSchoolTest(session, testRecord, type, typeModel, testDetail);
     }
 

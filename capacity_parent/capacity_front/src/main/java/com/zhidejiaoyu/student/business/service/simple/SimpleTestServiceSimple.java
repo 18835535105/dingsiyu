@@ -74,7 +74,7 @@ public interface SimpleTestServiceSimple extends SimpleBaseService<TestRecord> {
 
     ServerResponse<Object> showRecord(String course_id, HttpSession session, Integer page, Integer rows);
 
-	ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, TestRecord testRecord, int type, int typeModel, String testDetail);
+	ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, TestRecord testRecord, Integer type, Integer typeModel, String testDetail);
 
 	ServerResponse<Object> getTestPaper(long courseId, int typeOne, int typeTwo, String[] unitId);
 

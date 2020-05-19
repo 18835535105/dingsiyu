@@ -886,8 +886,8 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     @GoldChangeAnnotation
     @TestChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, TestRecord testRecord, int type,
-                                                          int modelType, String testDetail) {
+    public ServerResponse<TestResultVo> savePreSchoolTest(HttpSession session, TestRecord testRecord, Integer type,
+                                                          Integer modelType, String testDetail) {
         Student student = super.getStudent(session);
         // 学生需要更新的信息
         if (StringUtils.isEmpty(student.getPetName())) {
