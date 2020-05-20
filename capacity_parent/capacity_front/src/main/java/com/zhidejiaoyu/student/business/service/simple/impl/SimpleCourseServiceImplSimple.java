@@ -490,26 +490,19 @@ public class SimpleCourseServiceImplSimple extends SimpleBaseServiceImpl<SimpleC
         }
     }
 
-    /**
-     * 学习页的课程列表 - 精简版
-     * 展示的课程和分配的课程和模块相关
-     * 默认正在学习的课程state:true
-     *
-     * @return
-     */
     @Override
-    public ServerResponse<Object> getSimpleCourseAll(HttpSession session, String typeStr, int type) {
+    public ServerResponse<Object> getSimpleCourse(HttpSession session, String phase) {
         Long studentId = super.getStudentId(session);
         // 1.获取当前学生当前模块关联的所有课程, 返回id,version
-        List<Map> courseList = redisOpt.getCourseListInType(studentId, typeStr);
+        List<Map<String, Object>> courseList = redisOpt.getCourseListWithPhase(studentId, phase);
 
         // 2.获取选择模块正在学习的课程id
-        Long courseId = simpleSimpleStudentUnitMapper.getCourseIdByTypeToStudent(studentId, type);
+        Long courseId = simpleSimpleStudentUnitMapper.getCourseIdByTypeToStudent(studentId, 3);
 
         int a = 0;
 
         // 3.设置默认状态
-        for (Map course : courseList) {
+        for (Map<String, Object> course : courseList) {
             if (course.get("id").equals(courseId)) {
                 // 正在学习的课程
                 course.put("state", true);

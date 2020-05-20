@@ -54,11 +54,4 @@ public interface IndexService extends BaseService<Student> {
      */
     ServerResponse<Object> cardInfo(String openId);
 
-    /**
-     * 获取学生id
-     *
-     * @param openId
-     * @return
-     */
-    Long getStudentId(String openId);
 }
