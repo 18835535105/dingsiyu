@@ -461,10 +461,10 @@
         select sum(online_time)
         from duration
         where student_id = #{studentId}
-        <if test="date!='' and date!=null">
+        <if test="date=='' or date==null">
             and to_days(login_time)=to_days(now());
         </if>
-        <if test="date=='' or date==null">
+        <if test="date!='' and date!=null">
             and to_days(login_time)=to_days(#{date})
         </if>
     </select>
@@ -472,10 +472,10 @@
         select sum(valid_time)
         from duration
         where student_id = #{studentId}
-        <if test="date!='' and date!=null">
+        <if test="date=='' or date == null">
             and to_days(login_time)=to_days(now());
         </if>
-        <if test="date=='' or date==null">
+        <if test="date!='' and date != null">
             and to_days(login_time)=to_days(#{date})
         </if>
     </select>

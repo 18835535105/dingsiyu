@@ -71,7 +71,6 @@ public class QuartzShipServiceImpl implements QuartzShipService, BaseQuartzServi
         longs.forEach(studentId -> {
             List<WeekHistoryPlan> plans = collect.get(studentId);
             if (plans.size() > 0) {
-                totalHistoryPlanMapper.selectByStudentId(studentId);
                 WeekHistoryPlan weekHistoryPlan = plans.get(0);
                 /**
                  * 添加时常

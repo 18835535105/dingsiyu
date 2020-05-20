@@ -130,10 +130,10 @@
         on learnEx.learn_id =learn.id
         where learn.student_id =#{studentId}
         and learnEx.study_model like concat('%','慧','%')
-        <if test="date!='' and date!=null">
+        <if test="date=='' or date==null">
             and to_days(learnEx.learn_time)=to_days(now());
         </if>
-        <if test="date=='' or date==null">
+        <if test="date!='' and date!=null">
             and to_days(learnEx.learn_time)=to_days(#{date})
         </if>
     </select>

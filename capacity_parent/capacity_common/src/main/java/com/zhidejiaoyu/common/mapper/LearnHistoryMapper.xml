@@ -85,10 +85,10 @@
         join unit_vocabulary_new uv
         on his.unit_id = uv.unit_id and his.`group` = uv.`group`
         where his.student_id = #{studentId}
-        <if test="date!='' and date!=null">
+        <if test="date=='' or date==null">
             and to_days(his.update_time)=to_days(now());
         </if>
-        <if test="date=='' or date==null">
+        <if test="date!='' and date!=null">
             and to_days(his.update_time)=to_days(#{date})
         </if>
     </select>
