@@ -597,6 +597,7 @@
         select sum(point)
         from test_record
         where student_id = #{studentId}
+        and point>0
         <if test="date=='' or date==null">
             and to_days(test_start_time)=to_days(now());
         </if>
