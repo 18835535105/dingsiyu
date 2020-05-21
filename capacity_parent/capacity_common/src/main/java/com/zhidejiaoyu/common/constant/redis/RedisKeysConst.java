@@ -158,4 +158,13 @@ public interface RedisKeysConst {
      * value:hashMap（key=value=被膜拜的学生id）
      */
     String BY_WORSHIPED_TODAY = "BY_WORSHIPED_TODAY:";
+
+    /**
+     * 记录各个校区可以挑战的副本信息
+     * String 类型
+     * key=SCHOOL_PK_BASE_INFO
+     * field:schoolAdminId
+     * value:bossId
+     */
+    String SCHOOL_PK_BASE_INFO = "SCHOOL_PK_BASE_INFO:";
 }

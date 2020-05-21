@@ -35,4 +35,11 @@ public interface ShipTestService extends BaseService<Student> {
     ServerResponse<Object> getSchoolCopyInfo(Long bossId);
 
     Object getTrainingGround();
+
+    /**
+     * 获取学生可以挑战的校区副本
+     *
+     * @return
+     */
+    ServerResponse<Object> getCanSchoolCopyInfo();
 }

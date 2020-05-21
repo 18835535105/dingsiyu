@@ -85,7 +85,7 @@ public class PkCopyRedisOpt {
      * @param schoolAdminId
      * @param pkCopyBaseId
      * @return <ul>
-     * <li>true:以挑战成功，金币奖励已发放</li>
+     * <li>true:已挑战成功，金币奖励已发放</li>
      * <li>false：未挑战成功，如果挑战成功可以发放金币奖励</li>
      * </ul>
      */
@@ -113,5 +113,29 @@ public class PkCopyRedisOpt {
             return (PkCopyBase) redisTemplate.opsForHash().get(key, pkCopyBaseId);
         }
         return (PkCopyBase) o;
+    }
+
+    /**
+     * 获取校区可挑战的副本id
+     *
+     * @param schoolAdminId
+     * @return
+     */
+    public Long getSchoolBossIdBySchoolAdminId(Integer schoolAdminId) {
+        String key = RedisKeysConst.SCHOOL_PK_BASE_INFO;
+        Object o = redisTemplate.opsForHash().get(key, schoolAdminId);
+        return o == null ? null : Long.parseLong(o.toString());
+    }
+
+    /**
+     * 存储校区可挑战的副本id
+     *
+     * @param schoolAdminId
+     * @param bossId
+     */
+    public void saveCanSchoolBossId(Integer schoolAdminId, Long bossId) {
+        String key = RedisKeysConst.SCHOOL_PK_BASE_INFO;
+        redisTemplate.opsForHash().put(key, schoolAdminId, bossId);
+        redisTemplate.expire(key, 2, TimeUnit.DAYS);
     }
 }

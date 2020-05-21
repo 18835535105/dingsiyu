@@ -57,6 +57,16 @@ public class ShipTestController {
     }
 
     /**
+     * 获取学生可以挑战的校区副本
+     *
+     * @return
+     */
+    @GetMapping("/getCanSchoolCopyInfo")
+    public ServerResponse<Object> getCanSchoolCopyInfo() {
+        return shipTestService.getCanSchoolCopyInfo();
+    }
+
+    /**
      * 保存校区副本挑战信息
      *
      * @param bossId      挑战的副本id
