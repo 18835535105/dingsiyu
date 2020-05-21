@@ -69,17 +69,17 @@ public class LearnNewController extends BaseController {
      * 获取学习内容
      *
      * @param session
-     * @param getModel   模块  1，单词图鉴 3，慧记忆 4，会听写
-     *                   5，慧默写 6，单词游戏 7，句型翻译 8，句型听力 9，音译练习
-     *                   10，句型默写 11，课文试听 12，课文训练 13，闯关测试 14，课文跟读
-     *                   15，读语法 16，选语法 17，写语法 18，语法游戏 19，句型游戏
-     * @param difficulty 1：普通模式；2：暴走模式
+     * @param getModel 模块  1，单词图鉴 3，慧记忆 4，会听写
+     *                 5，慧默写 6，单词游戏 7，句型翻译 8，句型听力 9，音译练习
+     *                 10，句型默写 11，课文试听 12，课文训练 13，闯关测试 14，课文跟读
+     *                 15，读语法 16，选语法 17，写语法 18，语法游戏 19，句型游戏
+     * @param type     1：普通模式；2：暴走模式
      * @return
      */
     @RequestMapping("/getStudy")
-    public Object getStudy(HttpSession session, Integer getModel, Long unitId, Integer difficulty) {
+    public Object getStudy(HttpSession session, Integer getModel, Long unitId, Integer type) {
         IStudyService iStudyService = map.get(getModel);
-        return iStudyService.getStudy(session, unitId, difficulty);
+        return iStudyService.getStudy(session, unitId, type);
     }
 
     /**

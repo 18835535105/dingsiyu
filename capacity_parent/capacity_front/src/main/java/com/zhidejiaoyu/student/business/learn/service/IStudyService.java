@@ -7,8 +7,14 @@ import javax.servlet.http.HttpSession;
 
 public interface IStudyService extends IService<LearnNew> {
 
-
-    Object getStudy(HttpSession session, Long unitId, Integer difficulty);
+    /**
+     * 获取学习内容
+     *
+     * @param session
+     * @param type    1：普通模式；2：暴走模式
+     * @return
+     */
+    Object getStudy(HttpSession session, Long unitId, Integer type);
 
     /**
      * @param session

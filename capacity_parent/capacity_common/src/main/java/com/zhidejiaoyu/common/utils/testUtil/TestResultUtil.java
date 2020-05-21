@@ -633,6 +633,10 @@ public class TestResultUtil implements Serializable {
      *
      * @param sentence
      * @param exampleDisturb 例句英文干扰项  为空时无干扰项
+     * @param type           是否是暴走模式<ul>
+     *                       <li>1：非暴走模式</li>
+     *                       <li>2：暴走模式</li>
+     *                       </ul>
      * @return
      */
     public void getOrderEnglishList(SentenceTranslateVo sentenceTranslateVo, String sentence, String exampleDisturb, Integer type) {
