@@ -1,9 +1,7 @@
 package com.zhidejiaoyu.student.business.shipconfig.service.impl;
 
-import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.FileConstant;
-import com.zhidejiaoyu.common.constant.pet.PetImgUrlConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
