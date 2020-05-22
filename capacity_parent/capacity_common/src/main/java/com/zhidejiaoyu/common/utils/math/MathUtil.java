@@ -23,6 +23,17 @@ public class MathUtil {
     }
 
     /**
+     * 获取指定范围内的随机数 [begin, end]
+     *
+     * @param begin 随机数最小值
+     * @param end   随机数最大值
+     * @return
+     */
+    public static int getRandom(long begin, long end) {
+        return getRandom((int) begin, (int) end);
+    }
+
+    /**
      * 获取指定范围内的随机数 (begin, end]
      *
      * @param begin 随机数最小值
@@ -35,9 +46,13 @@ public class MathUtil {
 
 
     public static void main(String[] args) {
-        for (int i = 0; i < 100; i++) {
-            System.out.println(MathUtil.getRandom(2, 3));
+//        for (int i = 0; i < 100; i++) {
+//            System.out.println(MathUtil.getRandom(2, 3));
+//        }
+        for (int i = 0; i < 10; i++) {
+            System.out.println(MathUtil.getRandom(8, 10));
         }
+
     }
 
 }

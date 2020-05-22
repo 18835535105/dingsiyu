@@ -332,4 +332,12 @@ public interface StudentMapper extends BaseMapper<Student> {
      * @return
      */
     List<DailyStateVO> selectByAccounts(@Param("accountArr") String[] accountArr);
+
+    /**
+     * 统计当前校区下所有学生个数
+     *
+     * @param schoolAdminId
+     * @return
+     */
+    int countBySchoolAdminId(@Param("schoolAdminId") Integer schoolAdminId);
 }

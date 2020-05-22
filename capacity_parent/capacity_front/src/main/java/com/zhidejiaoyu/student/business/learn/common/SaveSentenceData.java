@@ -51,8 +51,19 @@ public class SaveSentenceData {
     private CommonMethod commonMethod;
     @Resource
     private RedisOpt redisOpt;
-    private Integer modelType=2;
+    private final Integer modelType = 2;
 
+    /**
+     * @param session
+     * @param unitId
+     * @param difficulty 1:普通模式；2：暴走模式
+     * @param student
+     * @param studentId
+     * @param studyModel
+     * @param easyOrHard
+     * @param type
+     * @return
+     */
     public ServerResponse<Object> getStudyModel(HttpSession session, Long unitId, Integer difficulty, Student student,
                                                 Long studentId, String studyModel, Integer easyOrHard, Integer type) {
         boolean firstStudy = redisOpt.getGuideModel(studentId, studyModel);
@@ -88,7 +99,7 @@ public class SaveSentenceData {
         }
         if (type == 7) {
             SentenceTranslateVo sentenceTranslateVo = saveSentenceData.getSentenceTranslateVo(plan.longValue(), firstStudy,
-                    sentenceCount.longValue(), type, sentence);
+                    sentenceCount.longValue(), difficulty, sentence);
             sentenceTranslateVo.setStudyNew(true);
             return ServerResponse.createBySuccess(sentenceTranslateVo);
         }
@@ -111,7 +122,7 @@ public class SaveSentenceData {
      * @param plan          进度
      * @param firstStudy    是否是第一次学习
      * @param sentenceCount 当前单元例句总数
-     * @param type
+     * @param type          1：普通模式；2：暴走模式
      * @return 例句翻译学习页面展示信息
      */
 
@@ -203,7 +214,7 @@ public class SaveSentenceData {
 
     private Sentence getSentence(Long unitId, Student student, Integer group, String studyModel) {
         // 查询学习记录本模块学习过的所有单词id
-        List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel,modelType);
+        List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel, modelType);
         return sentenceMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);
     }
 }

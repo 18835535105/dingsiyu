@@ -939,5 +939,16 @@
         </foreach>
         )
     </select>
+    <select id="countBySchoolAdminId" resultType="java.lang.Integer" parameterType="map">
+        select count(distinct t.id)
+        from (
+                 select id
+                 from student
+                 where teacher_id = 299
+                 union all
+                 select id
+                 from student
+                 where teacher_id in (select teacher_id from teacher where school_admin_id = 299)) t
+    </select>
 
 </mapper>

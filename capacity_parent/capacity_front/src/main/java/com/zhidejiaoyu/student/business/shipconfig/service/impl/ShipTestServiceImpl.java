@@ -9,8 +9,10 @@ import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
+import com.zhidejiaoyu.common.utils.math.MathUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.ship.EquipmentVo;
+import com.zhidejiaoyu.common.vo.ship.SchoolPkBaseInfoVO;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
@@ -21,6 +23,7 @@ import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import com.zhidejiaoyu.student.business.shipconfig.vo.PkInfoVO;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.redis.PkCopyRedisOpt;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +33,7 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student> implements ShipTestService {
 
@@ -72,6 +76,9 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
 
     @Resource
     private PkCopyBaseMapper pkCopyBaseMapper;
+
+    @Resource
+    private SchoolGoldFactoryMapper schoolGoldFactoryMapper;
 
     /**
      * @param session
@@ -252,10 +259,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     public ServerResponse<Object> getSchoolCopyInfo(Long bossId) {
 
         // 判断当前日期是否可以挑战校区副本
-        int dayOfWeek = new DateTime().dayOfWeek().get();
-        final int saturday = 6;
-        final int sunday = 7;
-        if (dayOfWeek != saturday && dayOfWeek != sunday) {
+        if (canPkSchoolCopy()) {
             return ServerResponse.createBySuccess(400, "校区副本只有周六周日才开放挑战！");
         }
 
@@ -329,6 +333,53 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         returnMap.put("pkEqu", pkMap);
         returnMap.put("bossEqu", pkCopyBases);
         return returnMap;
+    }
+
+    @Override
+    public ServerResponse<Object> getCanSchoolCopyInfo() {
+        if (canPkSchoolCopy()) {
+            log.info("校区副本只有周六周日才开放挑战！");
+            return ServerResponse.createBySuccess();
+        }
+
+        Student student = super.getStudent();
+        Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
+
+        int count = studentMapper.countBySchoolAdminId(schoolAdminId);
+
+        Long bossId = pkCopyRedisOpt.getSchoolBossIdBySchoolAdminId(schoolAdminId);
+        if (bossId == null) {
+            List<SchoolPkBaseInfoVO> schoolPkBaseInfoVos = pkCopyBaseMapper.selectSchoolPkBaseInfoByType(2, count);
+            int random = MathUtil.getRandom(schoolPkBaseInfoVos.get(0).getId(), schoolPkBaseInfoVos.get(schoolPkBaseInfoVos.size() - 1).getId());
+            bossId = (long) random;
+            pkCopyRedisOpt.saveCanSchoolBossId(schoolAdminId, bossId);
+        }
+
+        boolean success = pkCopyRedisOpt.judgeSchoolCopyAward(schoolAdminId, bossId);
+        if (success) {
+            // 以挑战成功，不能再次挑战
+            return ServerResponse.createBySuccess();
+        }
+
+        PkCopyBase pkCopyBase = pkCopyRedisOpt.getPkCopyBaseById(bossId);
+        return ServerResponse.createBySuccess(SchoolPkBaseInfoVO.builder()
+                .id(pkCopyBase.getId())
+                .name(pkCopyBase.getName())
+                .imgUrl(GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl()))
+                .build());
+    }
+
+    /**
+     * 判断是否可以进行校区副本挑战
+     *
+     * @return
+     */
+    public boolean canPkSchoolCopy() {
+        // 判断当前日期是否可以挑战校区副本
+        int dayOfWeek = new DateTime().dayOfWeek().get();
+        final int saturday = 6;
+        final int sunday = 7;
+        return dayOfWeek != saturday && dayOfWeek != sunday;
     }
 
     private void saveStudentGold(Student student) {
@@ -484,9 +535,13 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     public void savePkSchoolCopyAward(PkCopyBase pkCopyBase, Integer schoolAdminId, Integer durability) {
         Long copyId = pkCopyBase.getId();
         boolean flag = pkCopyRedisOpt.judgeSchoolCopyAward(schoolAdminId, copyId);
-        if (durability <= 0 && flag) {
-            // todo:校区金币工厂增加金币
-
+        if (durability <= 0 && !flag) {
+            pkCopyRedisOpt.markSchoolCopyAward(schoolAdminId, pkCopyBase.getId());
+            Integer gold = pkCopyBase.getGold();
+            schoolGoldFactoryMapper.insert(SchoolGoldFactory.builder()
+                    .gold(gold == null ? 0D : Double.parseDouble(gold.toString()))
+                    .schoolAdminId(Long.parseLong(schoolAdminId.toString()))
+                    .build());
         }
     }
 
@@ -516,9 +571,9 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         //1，获取单元
         List<Long> unitIds = learnNewMapper.getUnitIdByStudentIdAndType(studentId, 1);
         //2,获取单元题目
-        List<SubjectsVO> subjectsVos ;
+        List<SubjectsVO> subjectsVos;
         if (unitIds != null && unitIds.size() > 0) {
-             subjectsVos = vocabularyMapper.selectSubjectsVOByUnitIds(unitIds);
+            subjectsVos = vocabularyMapper.selectSubjectsVOByUnitIds(unitIds);
             //题目够30到截取，不够的话 循环添加
             int subjectNum = 30;
             if (subjectsVos.size() > subjectNum) {
@@ -535,7 +590,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                 }
                 subjectsVos = subjectsVos1;
             }
-        }else{
+        } else {
             subjectsVos = vocabularyMapper.selectSubjectsVO();
         }
         List<SubjectsVO> returnList = new ArrayList<>();
