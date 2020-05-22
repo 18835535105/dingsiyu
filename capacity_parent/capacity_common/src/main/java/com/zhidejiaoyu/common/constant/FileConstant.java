@@ -77,4 +77,11 @@ public interface FileConstant {
      * 金币测试图片路径
      */
     String TEST_STORE_IMG="imgs/testImg/";
+
+     interface PetNameConstant{
+        String DAMINGBAI="/static/img/edit-user-msg/tips1-1.png";
+        String LITANGXIN="/static/img/edit-user-msg/tips-3.png";
+        String WUMING="/static/img/edit-user-msg/tips-4.png";
+        String WEISIDUN="/static/img/edit-user-msg/tips-2.png";
+    }
 }

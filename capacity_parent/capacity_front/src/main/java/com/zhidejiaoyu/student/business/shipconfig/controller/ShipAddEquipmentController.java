@@ -56,8 +56,8 @@ public class ShipAddEquipmentController {
      * 穿戴装备
      */
     @PostMapping("/WearEquipment")
-    public Object wearEquipment(HttpSession session, Long equipmentId, Integer type, String imgUrl) {
-        return shipAddEquipmentService.wearEquipment(session, equipmentId,type,imgUrl);
+    public Object wearEquipment(HttpSession session, Long equipmentId, Integer type, String petName) {
+        return shipAddEquipmentService.wearEquipment(session, equipmentId,type,petName);
     }
 
     @RequestMapping("/getEquipmentNexLevlInfromation")

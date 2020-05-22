@@ -2,6 +2,8 @@ package com.zhidejiaoyu.student.business.shipconfig.service.impl;
 
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.common.constant.FileConstant;
+import com.zhidejiaoyu.common.constant.pet.PetImgUrlConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
@@ -216,16 +218,32 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object wearEquipment(HttpSession session, Long equipmentId, Integer type, String imgUrl) {
+    public Object wearEquipment(HttpSession session, Long equipmentId, Integer type, String petName) {
         Student student = getStudent(session);
         Equipment equipment = equipmentMapper.selectById(equipmentId);
         updateUseEqu(student, equipment);
         if (type != null && type == 5) {
-            student.setPartUrl(imgUrl.replace(AliyunInfoConst.host, ""));
+            student.setPartUrl(getPetImgUrl(petName));
             student.setPetName(equipment.getName());
             studentMapper.updateById(student);
         }
         return ServerResponse.createBySuccess();
+    }
+
+    private String getPetImgUrl(String petName) {
+        if (petName.contains("大明白")) {
+            return FileConstant.PetNameConstant.DAMINGBAI;
+        }
+        if (petName.contains("威士顿")) {
+            return FileConstant.PetNameConstant.WEISIDUN;
+        }
+        if (petName.contains("无名")) {
+            return FileConstant.PetNameConstant.WUMING;
+        }
+        if (petName.contains("李糖心")) {
+            return FileConstant.PetNameConstant.LITANGXIN;
+        }
+        return null;
     }
 
     @Override
