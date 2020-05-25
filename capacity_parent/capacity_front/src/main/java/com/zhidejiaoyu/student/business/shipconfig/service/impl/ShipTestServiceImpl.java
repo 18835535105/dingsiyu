@@ -370,11 +370,11 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
 
         boolean success = pkCopyRedisOpt.judgeSchoolCopyAward(schoolAdminId, bossId);
         PkCopyBase pkCopyBase = pkCopyRedisOpt.getPkCopyBaseById(bossId);
-
-        if (canPkSchoolCopy()) {
-            // 非周六日，不挑战
-            return null;
-        }
+// todo:测试完之后放开
+//        if (canPkSchoolCopy()) {
+//            // 非周六日，不挑战
+//            return null;
+//        }
         if (success) {
             // 挑战成功
             Date parse = DateUtil.parse(DateUtil.formatYYYYMMDD(DateUtil.getWeekEnd()) + " 23:59:59", DateUtil.YYYYMMDDHHMMSS);
