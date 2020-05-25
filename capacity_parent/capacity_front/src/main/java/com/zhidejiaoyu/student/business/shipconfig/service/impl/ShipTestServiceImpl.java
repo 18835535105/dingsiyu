@@ -340,12 +340,12 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
 
         PkBaseInfoVO pkBaseInfoVO = new PkBaseInfoVO();
 
-
         Student student = super.getStudent();
         List<PkBaseInfoVO.CopyInfoVO> personPkInfo = this.getPersonPkInfo(student);
         pkBaseInfoVO.setPersonCopyInfo(personPkInfo);
 
-        this.getSchoolPkInfo(pkBaseInfoVO, student);
+        PkBaseInfoVO.CopyInfoVO schoolPkInfo = this.getSchoolPkInfo(student);
+        pkBaseInfoVO.setSchoolPkCopyInfo(schoolPkInfo);
 
         return ServerResponse.createBySuccess(pkBaseInfoVO);
     }
@@ -353,10 +353,9 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     /**
      * 学生校区副本挑战信息
      *
-     * @param pkBaseInfoVO
      * @param student
      */
-    public void getSchoolPkInfo(PkBaseInfoVO pkBaseInfoVO, Student student) {
+    private PkBaseInfoVO.CopyInfoVO getSchoolPkInfo(Student student) {
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
 
         int count = studentMapper.countBySchoolAdminId(schoolAdminId);
@@ -374,13 +373,14 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
 
         if (canPkSchoolCopy()) {
             // 非周六日，不挑战
-            pkBaseInfoVO.setSchoolPkCopyInfo(null);
-        } else if (success) {
+            return null;
+        }
+        if (success) {
             // 挑战成功
             Date parse = DateUtil.parse(DateUtil.formatYYYYMMDD(DateUtil.getWeekEnd()) + " 23:59:59", DateUtil.YYYYMMDDHHMMSS);
             long countDown = (parse == null ? System.currentTimeMillis() : parse.getTime() - System.currentTimeMillis()) / 1000;
 
-            pkBaseInfoVO.setSchoolPkCopyInfo(PkBaseInfoVO.CopyInfoVO.builder()
+            return PkBaseInfoVO.CopyInfoVO.builder()
                     .id(bossId)
                     .totalDurability(pkCopyBase.getDurability())
                     .surplusDurability(0)
@@ -389,27 +389,26 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                     .name(pkCopyBase.getName())
                     .imgUrl(GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl()))
                     .countDown(countDown)
-                    .build());
-        } else {
-            Date parse = DateUtil.parse(DateUtil.formatYYYYMMDD(DateUtil.getWeekEnd()) + " 23:59:59", DateUtil.YYYYMMDDHHMMSS);
-            long countDown = (parse == null ? System.currentTimeMillis() : parse.getTime() - System.currentTimeMillis()) / 1000;
-
-            // 学生本周挑战校区副本次数
-            Integer copyCount = pkCopyStateMapper.countThisWeekSchoolCopyByStudentIdAndPkCopyBaseId(student.getId(), bossId);
-
-            Integer schoolCopySurplusDurability = pkCopyRedisOpt.getSchoolCopySurplusDurability(schoolAdminId, bossId);
-
-            pkBaseInfoVO.setSchoolPkCopyInfo(PkBaseInfoVO.CopyInfoVO.builder()
-                    .id(bossId)
-                    .totalDurability(pkCopyBase.getDurability())
-                    .surplusDurability(schoolCopySurplusDurability == null ? pkCopyBase.getDurability() : schoolCopySurplusDurability)
-                    .totalCount(pkCopyBase.getChallengeCycle())
-                    .surplusCount(Math.max(0,pkCopyBase.getChallengeCycle() - (copyCount == null ? 0 : count)))
-                    .name(pkCopyBase.getName())
-                    .imgUrl(GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl()))
-                    .countDown(countDown)
-                    .build());
+                    .build();
         }
+        Date parse = DateUtil.parse(DateUtil.formatYYYYMMDD(DateUtil.getWeekEnd()) + " 23:59:59", DateUtil.YYYYMMDDHHMMSS);
+        long countDown = (parse == null ? System.currentTimeMillis() : parse.getTime() - System.currentTimeMillis()) / 1000;
+
+        // 学生本周挑战校区副本次数
+        Integer copyCount = pkCopyStateMapper.countThisWeekSchoolCopyByStudentIdAndPkCopyBaseId(student.getId(), bossId);
+
+        Integer schoolCopySurplusDurability = pkCopyRedisOpt.getSchoolCopySurplusDurability(schoolAdminId, bossId);
+
+        return PkBaseInfoVO.CopyInfoVO.builder()
+                .id(bossId)
+                .totalDurability(pkCopyBase.getDurability())
+                .surplusDurability(schoolCopySurplusDurability == null ? pkCopyBase.getDurability() : schoolCopySurplusDurability)
+                .totalCount(pkCopyBase.getChallengeCycle())
+                .surplusCount(Math.max(0, pkCopyBase.getChallengeCycle() - (copyCount == null ? 0 : count)))
+                .name(pkCopyBase.getName())
+                .imgUrl(GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl()))
+                .countDown(countDown)
+                .build();
     }
 
     /**
@@ -418,19 +417,19 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      * @param student
      * @return
      */
-    public List<PkBaseInfoVO.CopyInfoVO> getPersonPkInfo(Student student) {
+    private List<PkBaseInfoVO.CopyInfoVO> getPersonPkInfo(Student student) {
         List<Map<String, Object>> personPkInfos = pkCopyBaseMapper.selectPersonPkInfoByStudentId(student.getId());
         return personPkInfos.stream().map(personPkInfo -> {
             // 总挑战次数
-            int challengeCycle = Integer.parseInt(personPkInfo.get("challengeCycle").toString());
+            int challengeCycle = personPkInfo.get("challengeCycle") == null ? 0 : Integer.parseInt(personPkInfo.get("challengeCycle").toString());
             // 剩余挑战次数
-            int count = Integer.parseInt(personPkInfo.get("count").toString());
+            int count = personPkInfo.get("count") == null ? 0 : Integer.parseInt(personPkInfo.get("count").toString());
             // 副本名称
             String name = String.valueOf(personPkInfo.get("name"));
             // 副本图片路径
             String imgUrl = GetOssFile.getPublicObjectUrl(String.valueOf(personPkInfo.get("imgUrl")));
             // 副本id
-            long id = Long.parseLong(personPkInfo.get("id").toString());
+            long id = personPkInfo.get("id") == null ? 0 : Long.parseLong(personPkInfo.get("id").toString());
 
             return PkBaseInfoVO.CopyInfoVO.builder()
                     .id(id)
