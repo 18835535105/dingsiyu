@@ -48,28 +48,36 @@ public class PkInfoVO implements Serializable {
     @Builder
     public static class BossPoll {
 
+        /**
+         * 飞船数据
+         */
+        private EquipmentVo shipEquipment;
+        /**
+         * 装甲数据
+         */
+        private EquipmentVo armorEquipment;
 
+        /**
+         * 导弹数据
+         */
+        private EquipmentVo missileEquipment;
+        /**
+         * 武器数据
+         */
+        private EquipmentVo armsEquipment;
         /**
          * 战斗数据
          */
         private IndexVO.BaseValue battle;
 
         /**
-         * 图片名
+         * 学生头像
          */
-        private String imgUrl;
+        private String hardImg;
         /**
-         * 装备名
+         * 学生昵称
          */
-        private String name;
-        /**
-         * 装备等级
-         */
-        private Integer degree;
-        /**
-         * 飞船型号
-         */
-        private String grade;
+        private String nickName;
 
     }
 

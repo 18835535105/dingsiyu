@@ -186,9 +186,8 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      */
     private PkInfoVO.BossPoll getBossEquipment(PkCopyBase pkCopyBase) {
         return PkInfoVO.BossPoll.builder()
-                .imgUrl(getImg(pkCopyBase.getImgUrl()))
-                .grade(pkCopyBase.getLevelName())
-                .name(pkCopyBase.getName())
+                .hardImg(getImg(pkCopyBase.getImgUrl()))
+                .nickName(pkCopyBase.getName())
                 .battle(IndexVO.BaseValue.builder()
                         .attack(pkCopyBase.getCommonAttack())
                         .durability(pkCopyBase.getDurability())
@@ -196,6 +195,12 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                         .move(pkCopyBase.getMobility())
                         .source(pkCopyBase.getSourceForce())
                         .sourceAttack(pkCopyBase.getSourceForceAttack())
+                        .build())
+                .shipEquipment(EquipmentVo.builder()
+                        .equipmentName(pkCopyBase.getName())
+                        .id(pkCopyBase.getId().intValue())
+                        .imgUrl(getImg(pkCopyBase.getImgUrl()))
+                        .grade(pkCopyBase.getLevelName())
                         .build())
                 .build();
     }
