@@ -173,7 +173,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
 
         return ServerResponse.createBySuccess(PkInfoVO.builder()
                 .originator(getEquipmentMap(studentId))
-                .boss(getBossEquipment(pkCopyBase))
+                .challenged(getBossEquipment(pkCopyBase))
                 .subject(getSubject(studentId))
                 .build());
     }
@@ -184,8 +184,8 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      * @param pkCopyBase
      * @return
      */
-    private PkInfoVO.BossPoll getBossEquipment(PkCopyBase pkCopyBase) {
-        return PkInfoVO.BossPoll.builder()
+    private PkInfoVO.Challenged getBossEquipment(PkCopyBase pkCopyBase) {
+        return PkInfoVO.Challenged.builder()
                 .hardImg(getImg(pkCopyBase.getImgUrl()))
                 .nickName(pkCopyBase.getName())
                 .battle(IndexVO.BaseValue.builder()
@@ -287,7 +287,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
 
         return ServerResponse.createBySuccess(PkInfoVO.builder()
                 .originator(getEquipmentMap(studentId))
-                .boss(getBossEquipment(pkCopyBase))
+                .challenged(getBossEquipment(pkCopyBase))
                 .subject(getSubject(studentId))
                 .build());
     }
