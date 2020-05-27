@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -79,6 +80,9 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
 
     @Resource
     private SchoolGoldFactoryMapper schoolGoldFactoryMapper;
+
+    @Resource
+    private BossHurtMapper bossHurtMapper;
 
     /**
      * @param session
@@ -215,6 +219,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         gauntlet.setChallengerStudentId(student.getId());
         gauntlet.setType(2);
         gauntlet.setCreateTime(new Date());
+        this.saveBloodVolume(student.getId(), bloodVolume);
         //如果有信息，在这里减少学量
         if (pkCopyState != null) {
             bloodVolume = pkCopyState.getDurability() - bloodVolume;
@@ -254,6 +259,14 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
             gauntletMapper.insert(gauntlet);
         }
         return ServerResponse.createBySuccess();
+    }
+
+    private void saveBloodVolume(Long studentId, Integer bloodVolume) {
+        BossHurt bossHurt = new BossHurt();
+        bossHurt.setHurtNum(bloodVolume);
+        bossHurt.setStudentId(studentId);
+        bossHurt.setCreateTime(LocalDateTime.now());
+        bossHurtMapper.insert(bossHurt);
     }
 
     public static void main(String[] args) {
@@ -551,7 +564,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
 
         Student student = super.getStudent();
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
-
+        this.saveBloodVolume(student.getId(),reduceDurability);
         pkCopyRedisOpt.saveSchoolCopyStudentInfo(schoolAdminId, copyId, student.getId());
 
         /*
