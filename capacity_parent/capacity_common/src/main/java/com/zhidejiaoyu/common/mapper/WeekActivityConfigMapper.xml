@@ -4,12 +4,26 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.WeekActivityConfig">
-        <id column="id" property="id" />
-        <result column="week_activity_id" property="weekActivityId" />
-        <result column="activity_name" property="activityName" />
-        <result column="activity_date_str" property="activityDateStr" />
-        <result column="activity_date_begin" property="activityDateBegin" />
-        <result column="activity_date_end" property="activityDateEnd" />
+        <id column="id" property="id"/>
+        <result column="week_activity_id" property="weekActivityId"/>
+        <result column="activity_name" property="activityName"/>
+        <result column="activity_date_str" property="activityDateStr"/>
+        <result column="activity_date_begin" property="activityDateBegin"/>
+        <result column="activity_date_end" property="activityDateEnd"/>
     </resultMap>
+
+    <sql id="base_sql">
+        id, week_activity_id, activity_name, activity_date_str, activity_date_begin, activity_date_end
+    </sql>
+
+
+    <select id="selectCurrentWeekConfig" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from week_activity_config
+        where activity_date_end >= now()
+        and activity_date_begin &lt;= now()
+        limit 1
+    </select>
 
 </mapper>

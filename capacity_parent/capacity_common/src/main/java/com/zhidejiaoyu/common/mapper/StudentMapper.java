@@ -274,6 +274,14 @@ public interface StudentMapper extends BaseMapper<Student> {
     List<Long> selectNotDeleteIdsBySchoolAdminId(@Param("schoolAdminId") Integer schoolAdminId);
 
     /**
+     * 查询当前学校所有不是删除状态的学生信息
+     *
+     * @param schoolAdminId
+     * @return
+     */
+    List<Student> selectNotDeleteBySchoolAdminId(@Param("schoolAdminId") Integer schoolAdminId);
+
+    /**
      * 查询教师下所有学生
      *
      * @param teacherId

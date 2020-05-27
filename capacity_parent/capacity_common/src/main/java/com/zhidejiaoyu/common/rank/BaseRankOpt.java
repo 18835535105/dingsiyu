@@ -53,7 +53,7 @@ public class BaseRankOpt {
      * @param start   起始索引
      * @param end     结束索引
      * @param showNum 排行需要展示的数据量，为空时表示展示所有
-     * @return
+     * @return 学生id
      */
     public List<Long> getReverseRangeMembersBetweenStartAndEnd(String key, Long start, Long end, Integer showNum) {
         Set<ZSetOperations.TypedTuple<Object>> typedTuples;

@@ -22,7 +22,7 @@ public class QuartWeekActivityController {
     private QuartWeekActivityService quartWeekActivityService;
 
     /**
-     * 每周一0点初始化校区活动排行
+     * 每周一0点奖励前10名学生并初始化校区活动排行
      *
      * @return
      */

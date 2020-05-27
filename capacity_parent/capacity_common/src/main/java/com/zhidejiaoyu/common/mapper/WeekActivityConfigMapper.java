@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.zhidejiaoyu.common.pojo.WeekActivityConfig;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.WeekActivityConfig;
 
 /**
  * <p>
@@ -13,4 +13,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface WeekActivityConfigMapper extends BaseMapper<WeekActivityConfig> {
 
+    /**
+     * 获取本周的活动配置信息
+     *
+     * @return
+     */
+    WeekActivityConfig selectCurrentWeekConfig();
 }
