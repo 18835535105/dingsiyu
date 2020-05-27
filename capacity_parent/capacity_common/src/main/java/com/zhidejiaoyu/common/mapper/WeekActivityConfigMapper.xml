@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.WeekActivityConfigMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.WeekActivityConfig">
+        <id column="id" property="id" />
+        <result column="week_activity_id" property="weekActivityId" />
+        <result column="activity_name" property="activityName" />
+        <result column="activity_date_str" property="activityDateStr" />
+        <result column="activity_date_begin" property="activityDateBegin" />
+        <result column="activity_date_end" property="activityDateEnd" />
+    </resultMap>
+
+</mapper>

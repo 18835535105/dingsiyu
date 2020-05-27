@@ -129,6 +129,7 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
             testRecord.setStudyModel(StudyModelConstant.SMALLAPP_STUDY_MODEL);
             testRecord.setStudentId(studentId);
             testRecord.setTestEndTime(date);
+            testRecord.setPoint(point);
             testRecord.setTestStartTime(startDate);
             returnMap.put("point", point);
             testRecordMapper.insert(testRecord);
