@@ -40,32 +40,40 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         //判断当前openId是否已经领取过今日的奖品
         Date date = new Date();
         Map<String, Object> returnMap = new HashMap<>();
-        Long payconfigId;
+        Long payconfigId = 0L;
         StudentPayConfig studentPayConfig = studentPayConfigMapper.selectByWenXiIdAndDate(openId, date);
         Student student = studentMapper.selectById(studentId);
         if (studentPayConfig == null) {
             //获取学校奖品数据
             List<PrizeConfig> prizeConfigs = prizeConfigMapper.selectByAdminId(adminId);
-            payconfigId = this.getPrize(prizeConfigs).longValue();
-            //获取图片
-            studentPayConfig = new StudentPayConfig()
-                    .setCreateTime(date)
-                    .setPrizeConfigId(payconfigId)
-                    .setWenXinId(openId)
-                    .setObtain("" + date.getTime() + new Random(1000).nextInt())
-                    .setWeChatImgUrl(weChatimgUrl)
-                    .setWeChatName(weChatName)
-                    .setStudentId(studentId);
-            studentPayConfigMapper.insert(studentPayConfig);
-            student.setSystemGold(student.getSystemGold() + 5);
-            studentMapper.updateById(student);
+            if (prizeConfigs.size() > 0) {
+                payconfigId = this.getPrize(prizeConfigs).longValue();
+                //获取图片
+                studentPayConfig = new StudentPayConfig()
+                        .setCreateTime(date)
+                        .setPrizeConfigId(payconfigId)
+                        .setWenXinId(openId)
+                        .setObtain("" + date.getTime() + new Random(1000).nextInt())
+                        .setWeChatImgUrl(weChatimgUrl)
+                        .setWeChatName(weChatName)
+                        .setStudentId(studentId);
+                studentPayConfigMapper.insert(studentPayConfig);
+                student.setSystemGold(student.getSystemGold() + 5);
+                studentMapper.updateById(student);
+            }
+
         } else {
             payconfigId = studentPayConfig.getPrizeConfigId();
         }
-        PrizeConfig prizeConfig = prizeConfigMapper.selectById(payconfigId);
-        returnMap.put("prizeName", prizeConfig.getPrizeCount() > 0 ? prizeConfig.getPrizeName() : "谢谢惠顾");
-        prizeConfig.setPrizeCount(prizeConfig.getPrizeCount() - 1);
-        prizeConfigMapper.updateById(prizeConfig);
+        if (payconfigId > 0) {
+            PrizeConfig prizeConfig = prizeConfigMapper.selectById(payconfigId);
+            returnMap.put("prizeName", prizeConfig.getPrizeCount() > 0 ? prizeConfig.getPrizeName() : "谢谢惠顾");
+            prizeConfig.setPrizeCount(prizeConfig.getPrizeCount() - 1);
+            prizeConfigMapper.updateById(prizeConfig);
+        } else {
+            returnMap.put("prizeName", "谢谢惠顾");
+        }
+
         JoinSchool joinSchool = joinSchoolMapper.selectByUserId(adminId.intValue());
         returnMap.put("adress", joinSchool == null ? "北京市海淀区上地国际创业园" : joinSchool.getAddress());
         SysUser sysUser = sysUserMapper.selectById(adminId);
