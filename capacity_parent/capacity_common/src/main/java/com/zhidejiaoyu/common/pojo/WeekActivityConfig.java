@@ -2,11 +2,13 @@ package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
-import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -21,15 +23,15 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class WeekActivityConfig implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
-      @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
 
     /**
      * 每周活动id
      */
-    private Long weekActivityId;
+    private Integer weekActivityId;
 
     /**
      * 活动名称
@@ -44,12 +46,12 @@ public class WeekActivityConfig implements Serializable {
     /**
      * 活动开始时间
      */
-    private LocalDateTime activityDateBegin;
+    private Date activityDateBegin;
 
     /**
      * 活动结束时间
      */
-    private LocalDateTime activityDateEnd;
+    private Date activityDateEnd;
 
 
 }

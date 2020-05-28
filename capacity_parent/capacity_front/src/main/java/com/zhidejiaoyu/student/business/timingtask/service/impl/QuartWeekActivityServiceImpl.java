@@ -1,6 +1,8 @@
 package com.zhidejiaoyu.student.business.timingtask.service.impl;
 
+import com.zhidejiaoyu.common.constant.GoldLogReasonConstant;
 import com.zhidejiaoyu.common.constant.redis.WeekActivityRedisKeysConst;
+import com.zhidejiaoyu.common.mapper.KnownWordsMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.TeacherMapper;
 import com.zhidejiaoyu.common.mapper.WeekActivityConfigMapper;
@@ -54,6 +56,9 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
     @Resource
     private WeekActivityRankService weekActivityRankService;
 
+    @Resource
+    private KnownWordsMapper knownWordsMapper;
+
     /**
      * 排行名次与奖励的金币对应关系
      */
@@ -99,14 +104,13 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
                     student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
                     studentMapper.updateById(student);
 
-                    GoldLogUtil.saveStudyGoldLog(student.getId(), "每周活动排行奖励", awardGold);
+                    GoldLogUtil.saveStudyGoldLog(student.getId(), GoldLogReasonConstant.WEEK_ACTIVITY_RANK, awardGold);
                 }
             }
 
+            // 保存总排行数据
             int schoolAdminId = Math.toIntExact(schoolAdmin);
             List<Student> students = studentMapper.selectNotDeleteBySchoolAdminId(schoolAdminId);
-
-            // 保存总排行数据
             if (CollectionUtils.isNotEmpty(students)) {
                 List<WeekActivityRank> collect = students.parallelStream().map(student -> {
                     Double score = redisTemplate.opsForZSet().score(key, student.getId());
@@ -128,6 +132,14 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
             redisTemplate.opsForZSet().remove(key, studentIds);
             weekActivityRankOpt.init(schoolAdminId, studentIds);
         });
+
+        // 清空学生上个活动完成进度缓存
+        String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_LIST;
+        redisTemplate.opsForHash().delete(key);
+
+        // 清空熟词表数据
+        knownWordsMapper.delete(null);
+
         log.info("初始化每周活动排行结束.");
 
     }

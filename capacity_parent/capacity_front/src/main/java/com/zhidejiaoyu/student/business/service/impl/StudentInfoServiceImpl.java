@@ -87,6 +87,9 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     @Resource
     private WorshipRedisOpt worshipRedisOpt;
 
+    @Resource
+    private WeekActivityConfigMapper weekActivityConfigMapper;
+
     @Override
     @GoldChangeAnnotation
     @Transactional(rollbackFor = Exception.class)
@@ -396,6 +399,17 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
 
         // 熟词句相关勋章
         medalAwardAsync.tryHand(student, this.getModel(classify));
+
+        // 记录每周活动学习时长
+        WeekActivityConfig weekActivityConfig = weekActivityConfigMapper.selectCurrentWeekConfig();
+
+        if (weekActivityConfig.getWeekActivityId() == 1) {
+            // 统计学生熟词数
+        }
+
+        if (weekActivityConfig.getWeekActivityId() == 2) {
+
+        }
     }
 
     private int getModel(Integer classify) {

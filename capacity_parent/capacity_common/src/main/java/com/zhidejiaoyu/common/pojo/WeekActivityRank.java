@@ -27,7 +27,7 @@ public class WeekActivityRank implements Serializable {
     private static final long serialVersionUID=1L;
 
       @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    private Integer id;
 
     /**
      * 学生id
@@ -37,7 +37,7 @@ public class WeekActivityRank implements Serializable {
     /**
      * 活动id
      */
-    private Long weekActivityConfigId;
+    private Integer weekActivityConfigId;
 
     /**
      * 活动期间完成内容

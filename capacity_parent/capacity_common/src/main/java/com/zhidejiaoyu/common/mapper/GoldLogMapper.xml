@@ -42,41 +42,65 @@
     </select>
 
     <select id="selectGoldByAdminIdAndDate" resultType="integer" parameterType="map">
-        select sum(gold_add) from gold_log where
-        student_id in (select id from student where teacher_id =#{adminId} or teacher_id in (
-            select teacher_id from teacher where school_admin_id = #{adminId} and teacher_id is not null
-        ))
-        and to_days(create_time)= to_days(#{date})
+        select sum(gold_add)
+        from gold_log
+        where student_id in (select id
+                             from student
+                             where teacher_id = #{adminId}
+                                or teacher_id in (
+                                 select teacher_id
+                                 from teacher
+                                 where school_admin_id = #{adminId}
+                                   and teacher_id is not null
+                             ))
+          and to_days(create_time) = to_days(#{date})
     </select>
 
     <select id="selectGoldByAdminIdAndStartDateAndEndTime" resultType="map" parameterType="map">
-        select
-        stu.student_name studentName,
-        gold.reason model,
-        gold.gold_add gold,
-        gold.create_time createTime
-        from gold_log gold join student stu on stu.id=gold.student_id
-        where
-        gold.student_id in (select id from student where teacher_id =#{adminId} or teacher_id in (
-            select teacher_id from teacher where school_admin_id = #{adminId} and teacher_id is not null
-        ))
-        and gold.create_time >= #{startTime}
-        and gold.create_time &lt;= #{endTime}
-        and gold.type = 1
-        and gold.gold_add > 1
+        select stu.student_name studentName,
+               gold.reason      model,
+               gold.gold_add    gold,
+               gold.create_time createTime
+        from gold_log gold
+                 join student stu on stu.id = gold.student_id
+        where gold.student_id in (select id
+                                  from student
+                                  where teacher_id = #{adminId}
+                                     or teacher_id in (
+                                      select teacher_id
+                                      from teacher
+                                      where school_admin_id = #{adminId}
+                                        and teacher_id is not null
+                                  ))
+          and gold.create_time >= #{startTime}
+          and gold.create_time &lt;= #{endTime}
+          and gold.type = 1
+          and gold.gold_add > 1
         order by gold.create_time desc
     </select>
     <select id="countByAdminIdAndStartDateAndEndTime" resultType="int" parameterType="map">
-        select
-        count(gold.id)
+        select count(gold.id)
         from gold_log gold
-        where
-        gold.student_id in (select id from student where teacher_id =#{adminId} or teacher_id in (
-            select teacher_id from teacher where school_admin_id = #{adminId} and teacher_id is not null
-        ))
-        and gold.create_time >= #{startTime}
-        and gold.create_time &lt;= #{endTime}
-        and gold.type = 1
+        where gold.student_id in (select id
+                                  from student
+                                  where teacher_id = #{adminId}
+                                     or teacher_id in (
+                                      select teacher_id
+                                      from teacher
+                                      where school_admin_id = #{adminId}
+                                        and teacher_id is not null
+                                  ))
+          and gold.create_time >= #{startTime}
+          and gold.create_time &lt;= #{endTime}
+          and gold.type = 1
+    </select>
+    <select id="selectGoldContributeByBeginTimeAndEndTime" resultType="java.lang.Integer" parameterType="map">
+        select sum(gold_add)
+        from gold_log
+        where student_id = #{studentId}
+          and create_time >= #{beginTime}
+          and create_time &lt;= #{endTime}
+          and reason not in ('每周活动排行奖励', '每周活动完成任务')
     </select>
 
 </mapper>

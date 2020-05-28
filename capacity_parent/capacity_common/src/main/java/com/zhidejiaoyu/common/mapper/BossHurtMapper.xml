@@ -4,10 +4,17 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.BossHurt">
-        <id column="id" property="id" />
-        <result column="student_id" property="studentId" />
-        <result column="hurt_num" property="hurtNum" />
-        <result column="create_time" property="createTime" />
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="hurt_num" property="hurtNum"/>
+        <result column="create_time" property="createTime"/>
     </resultMap>
+    <select id="selectHurtNumByBeginDateAndEndDate" resultType="java.lang.Integer" parameterType="map">
+        select sum(hurt_num)
+        from boss_hurt
+        where student_id = #{studentId}
+          and create_time >= #{beginDate}
+          and create_time &lt;= #{endDate}
+    </select>
 
 </mapper>

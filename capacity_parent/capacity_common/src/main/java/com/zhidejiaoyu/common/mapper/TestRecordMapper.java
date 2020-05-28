@@ -356,6 +356,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
 
     /**
      * 查询当前模块当天是否已经测试
+     *
      * @param studentId
      * @param genre
      * @param date
@@ -363,6 +364,26 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      */
     Integer selectByStudentIdAndGenreAndEndTime(@Param("studentId") Long studentId, @Param("genre") String genre, @Param("date") Date date);
 
-    Integer selectFractionByStudentIdAndDate(@Param("studentId") Long studentId,@Param("date") String date);
+    Integer selectFractionByStudentIdAndDate(@Param("studentId") Long studentId, @Param("date") String date);
+
+    /**
+     * 统计学生指定日期内成绩总和
+     *
+     * @param studentId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    Integer selectTotalPointByBeginDateAndEndDate(@Param("studentId") Long studentId, @Param("beginDate") Date beginDate, @Param("endDate") Date endDate);
+
+    /**
+     * 查看学生指定日期内金币测试最高分
+     *
+     * @param studentId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    Integer selectGoldTestMaxPointByBeginDateAndEndDate(@Param("studentId") Long studentId, @Param("beginDate") Date beginDate, @Param("endDate") Date endDate);
 }
 

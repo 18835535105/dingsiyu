@@ -2,7 +2,6 @@ package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Gauntlet;
-import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -170,7 +169,17 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
      * @param type      1,胜利场数 2，总场数
      * @return
      */
-    int getPkGames(@Param("studentId") Long studentId,@Param("type") int type);
+    int getPkGames(@Param("studentId") Long studentId, @Param("type") int type);
+
+    /**
+     * 统计学生PK胜利场次（不算副本）
+     *
+     * @param studentId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    int countWinCount(@Param("studentId") Long studentId, @Param("beginDate") Date beginDate, @Param("endDate") Date endDate);
 
     /**
      * 统计学生今天挑战的指定内容的次数
@@ -184,11 +193,12 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
 
     /**
      * 获取学生指定日期间的PK数量
+     *
      * @param studentIds
      * @param startDate
      * @param endDate
      * @return
      */
-    List< Map<String, Object>>  countByStudentIdsAndStartDateAndEndDate(@Param("studentIds") List<Long> studentIds, @Param("startDate") String startDate,@Param("endDate")String endDate);
+    List<Map<String, Object>> countByStudentIdsAndStartDateAndEndDate(@Param("studentIds") List<Long> studentIds, @Param("startDate") String startDate, @Param("endDate") String endDate);
 
 }

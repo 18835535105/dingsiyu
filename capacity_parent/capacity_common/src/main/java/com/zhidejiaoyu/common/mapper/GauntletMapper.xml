@@ -278,6 +278,17 @@
             and challenge_status=1
         </if>
     </select>
+
+    <select id="countWinCount" resultType="int" parameterType="map">
+        select count(id)
+        from gauntlet
+        where challenger_student_id = #{studentId}
+          and `type` = 1
+          and challenge_status = 1
+          and create_time &lt;= #{endDate}
+          and create_time >= #{beginDate}
+    </select>
+
     <select id="countByStudentIdAndBossId" parameterType="map" resultType="int">
         select count(id)
         from gauntlet
@@ -288,14 +299,13 @@
           and challenger_point is not null
     </select>
     <select id="countByStudentIdsAndStartDateAndEndDate" parameterType="map" resultType="map">
-        select count(id) `count`,challenger_student_id studentId
+        select count(id) `count`, challenger_student_id studentId
         from gauntlet
-        where
-        challenger_student_id = #{studentId}
+        where challenger_student_id = #{studentId}
           and create_time >= #{startDate}
           and create_time &lt;= #{endDate}
           and challenger_point is not null
-          group by challenger_student_id
+        group by challenger_student_id
     </select>
 
 </mapper>

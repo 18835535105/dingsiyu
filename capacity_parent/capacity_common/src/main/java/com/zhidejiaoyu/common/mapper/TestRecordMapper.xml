@@ -640,10 +640,26 @@
         group by course_id
     </select>
     <select id="selectByStudentIdAndGenreAndEndTime" parameterType="map" resultType="integer">
-        select count(id) from test_record
+        select count(id)
+        from test_record
         where student_id = #{studentId}
-        and genre = #{genre}
-        and to_days(test_end_time) = to_days(#{date})
+          and genre = #{genre}
+          and to_days(test_end_time) = to_days(#{date})
+    </select>
+    <select id="selectTotalPointByBeginDateAndEndDate" resultType="java.lang.Integer" parameterType="map">
+        select sum(point)
+        from test_record
+        where student_id = #{studentId}
+          and test_start_time >= #{beginDate}
+          and test_start_time &lt;= #{endDate}
+    </select>
+    <select id="selectGoldTestMaxPointByBeginDateAndEndDate" resultType="java.lang.Integer" parameterType="map">
+        select max(point)
+        from test_record
+        where student_id = #{studentId}
+          and test_start_time >= #{beginDate}
+          and test_start_time &lt;= #{endDate}
+          and genre = '金币试卷测试'
     </select>
 
 </mapper>

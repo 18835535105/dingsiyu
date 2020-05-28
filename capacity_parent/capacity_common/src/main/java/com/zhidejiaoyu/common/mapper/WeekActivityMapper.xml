@@ -6,6 +6,9 @@
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.WeekActivity">
         <id column="id" property="id" />
         <result column="name" property="name" />
+        <result column="plan_one" property="planOne" />
+        <result column="plan_two" property="planTwo" />
+        <result column="plan_three" property="planThree" />
     </resultMap>
 
 </mapper>

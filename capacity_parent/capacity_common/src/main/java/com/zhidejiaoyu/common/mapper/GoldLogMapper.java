@@ -64,4 +64,13 @@ public interface GoldLogMapper extends BaseMapper<GoldLog> {
     int countByAdminIdAndStartDateAndEndTime(@Param("adminId") Integer schoolAdminId,
                                              @Param("startTime") String startTime, @Param("endTime") String endTime);
 
+    /**
+     * 查询指定日期范围内学生贡献到金币工厂的金币数量
+     *
+     * @param studentId
+     * @param beginTime
+     * @param endTime
+     * @return
+     */
+    Integer selectGoldContributeByBeginTimeAndEndTime(@Param("studentId") Long studentId, @Param("beginTime") Date beginTime, @Param("endTime") Date endTime);
 }
