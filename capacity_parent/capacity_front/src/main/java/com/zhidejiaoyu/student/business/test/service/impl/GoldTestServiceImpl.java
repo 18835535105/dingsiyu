@@ -14,6 +14,7 @@ import com.zhidejiaoyu.common.mapper.TestStoreMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.pojo.TestStore;
+import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
@@ -57,6 +58,9 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
 
     @Resource
     private StudentMapper studentMapper;
+
+    @Resource
+    private WeekActivityRankOpt weekActivityRankOpt;
 
     @Override
     public ServerResponse<Object> getTest(Long unitId) {
@@ -223,6 +227,8 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
         studentMapper.updateById(student);
 
         GoldLogUtil.saveStudyGoldLog(student.getId(), GenreConstant.GOLD_TEST, BigDecimalUtil.convertsToInt(goldAddition));
+
+        weekActivityRankOpt.updateWeekActivitySchoolRank(student);
 
         session.setAttribute(UserConstant.CURRENT_STUDENT, student);
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);

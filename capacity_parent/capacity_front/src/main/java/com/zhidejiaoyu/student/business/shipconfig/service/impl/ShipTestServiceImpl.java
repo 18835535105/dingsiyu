@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.constant.redis.SourcePowerKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
+import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -83,6 +84,9 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
 
     @Resource
     private BossHurtMapper bossHurtMapper;
+
+    @Resource
+    private WeekActivityRankOpt weekActivityRankOpt;
 
     /**
      * @param session
@@ -258,6 +262,9 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
             pkCopyStateMapper.insert(pkCopyState);
             gauntletMapper.insert(gauntlet);
         }
+
+        weekActivityRankOpt.updateWeekActivitySchoolRank(student);
+
         return ServerResponse.createBySuccess();
     }
 
@@ -499,6 +506,8 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
             if (beChallengedStudent.getStudyPower() > expansion.getStudyPower()) {
                 expansion.setStudyPower(expansion.getStudyPower() + 10);
             }
+            // 更新每周活动pk胜利次数
+            weekActivityRankOpt.updateWeekActivitySchoolRank(student);
         } else {
             gauntlet.setChallengeStatus(2);
             gauntlet.setBeChallengerStatus(1);
@@ -607,6 +616,8 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         studentMapper.updateById(student);
 
         GoldLogUtil.saveStudyGoldLog(student.getId(), "参与校区副本挑战", (int) Math.floor(goldAddition));
+
+        weekActivityRankOpt.updateWeekActivitySchoolRank(student);
 
         return ServerResponse.createBySuccess();
     }

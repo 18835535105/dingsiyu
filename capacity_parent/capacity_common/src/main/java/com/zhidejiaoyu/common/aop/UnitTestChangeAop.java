@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -16,6 +17,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
@@ -46,6 +48,9 @@ public class UnitTestChangeAop {
 
     @Autowired
     private MedalAwardAsync medalAwardAsync;
+
+    @Resource
+    private WeekActivityRankOpt weekActivityRankOpt;
 
     @Pointcut("@annotation(com.zhidejiaoyu.common.annotation.TestChangeAnnotation)")
     public void testPoint() {
@@ -107,6 +112,10 @@ public class UnitTestChangeAop {
                 // 学霸崛起勋章计算
                 medalAwardAsync.superStudent(student);
             }
+
+            // 更新学生测试总成绩排行
+            weekActivityRankOpt.updateWeekActivitySchoolRank(student);
+
         }
     }
 }

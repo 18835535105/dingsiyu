@@ -31,4 +31,14 @@ public class ActivityAwardController extends BaseController {
     public ServerResponse<Object> awardList() {
         return activityAwardService.awardList();
     }
+
+    /**
+     * 校区活动排名
+     *
+     * @return
+     */
+    @GetMapping("/rank")
+    public ServerResponse<Object> rank() {
+        return activityAwardService.rank();
+    }
 }

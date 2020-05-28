@@ -62,19 +62,19 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
     /**
      * 排行名次与奖励的金币对应关系
      */
-    private static final Map<Integer, Integer> AWARD_GOLD_MAP = new HashMap<>(16);
+    public static final Map<Integer, Integer> AWARD_GOLD_MAP = new HashMap<>(16);
 
     static {
-        AWARD_GOLD_MAP.put(1, 500);
-        AWARD_GOLD_MAP.put(2, 300);
-        AWARD_GOLD_MAP.put(3, 200);
+        AWARD_GOLD_MAP.put(0, 500);
+        AWARD_GOLD_MAP.put(1, 300);
+        AWARD_GOLD_MAP.put(2, 200);
+        AWARD_GOLD_MAP.put(3, 100);
         AWARD_GOLD_MAP.put(4, 100);
-        AWARD_GOLD_MAP.put(5, 100);
+        AWARD_GOLD_MAP.put(5, 50);
         AWARD_GOLD_MAP.put(6, 50);
         AWARD_GOLD_MAP.put(7, 50);
         AWARD_GOLD_MAP.put(8, 50);
         AWARD_GOLD_MAP.put(9, 50);
-        AWARD_GOLD_MAP.put(10, 50);
     }
 
     @Override
@@ -92,6 +92,14 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
 
         log.info("初始化每周活动排行开始....");
         schoolAdmins.parallelStream().filter(Objects::nonNull).forEach(schoolAdmin -> {
+
+            int schoolAdminId = Math.toIntExact(schoolAdmin);
+            List<Student> students = studentMapper.selectNotDeleteBySchoolAdminId(schoolAdminId);
+            if (CollectionUtils.isNotEmpty(students)) {
+                // 校区下没有学生直接跳过
+                return;
+            }
+
             String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_SCHOOL_RANK + schoolAdmin;
 
             // 校区每周活动排行前十名奖励发放
@@ -100,7 +108,7 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
                 int size = betterTenStudentIds.size();
                 for (int i = 0; i < size; i++) {
                     Student student = studentMapper.selectById(betterTenStudentIds.get(i));
-                    Integer awardGold = AWARD_GOLD_MAP.get(i + 1);
+                    Integer awardGold = AWARD_GOLD_MAP.get(i);
                     student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
                     studentMapper.updateById(student);
 
@@ -109,8 +117,6 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
             }
 
             // 保存总排行数据
-            int schoolAdminId = Math.toIntExact(schoolAdmin);
-            List<Student> students = studentMapper.selectNotDeleteBySchoolAdminId(schoolAdminId);
             if (CollectionUtils.isNotEmpty(students)) {
                 List<WeekActivityRank> collect = students.parallelStream().map(student -> {
                     Double score = redisTemplate.opsForZSet().score(key, student.getId());
@@ -135,7 +141,8 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
 
         // 清空学生上个活动完成进度缓存
         String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_LIST;
-        redisTemplate.opsForHash().delete(key);
+        Set<Object> keys = redisTemplate.opsForHash().keys(key);
+        redisTemplate.opsForHash().delete(key, keys);
 
         // 清空熟词表数据
         knownWordsMapper.delete(null);

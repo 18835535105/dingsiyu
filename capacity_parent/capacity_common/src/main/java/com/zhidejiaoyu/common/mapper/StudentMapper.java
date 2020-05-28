@@ -115,15 +115,6 @@ public interface StudentMapper extends BaseMapper<Student> {
     Map<Long, Map<String, Object>> selectLevelByStuId(@Param("student") Student student, @Param("flag") int flag, @Param("schoolAdminId") Integer schoolAdminId);
 
     /**
-     * 查询当前这些学生的排名
-     *
-     * @param students 学生id集合
-     * @return
-     */
-    @MapKey("id")
-    Map<Long, Map<Long, String>> selectRankByStudentIds(@Param("students") List<Student> students);
-
-    /**
      * 学生的信息, 证书, 膜拜
      *
      * @param model
@@ -133,16 +124,13 @@ public interface StudentMapper extends BaseMapper<Student> {
      */
     List<Map<String, Object>> selectSeniority(@Param("model") String model, @Param("teacherId") Long teacherId, @Param("classId") Long classId);
 
-    @MapKey("id")
-    Map<Long, Map<Long, Object>> selectxz();
-
     Map<String, Object> getCourseIdAndUnitId(@Param("studentId") long studentId);
 
     @Select("select system_gold from student where id = #{studentId}")
-    Integer getSystem_gold(Long studentId);
+    Integer selectSystemGold(Long studentId);
 
     @Update("update student set system_gold = #{i} where id = #{studentId}")
-    int updateBySystem_gold(@Param("i") int i, @Param("studentId") Long studentId);
+    int updateSystemGoldByStudentId(@Param("i") int i, @Param("studentId") Long studentId);
 
     @Update("update student set system_gold = #{gold} where id = #{studentId}")
     int updateBySystemGold(@Param("gold") double gold, @Param("studentId") Long studentId);
@@ -223,6 +211,15 @@ public interface StudentMapper extends BaseMapper<Student> {
     @MapKey("id")
     Map<Long, Map<Long, String>> selectHeadUrlMapByStudentId(@Param("studentIds") List<Long> studentIds);
 
+    /**
+     * 查询指定学生的昵称
+     *
+     * @param studentIds
+     * @return
+     */
+    @MapKey("id")
+    Map<Long, Map<Long, String>> selectNicknameMapByStudentId(@Param("studentIds") List<Long> studentIds);
+
     Integer getVocabularyCountByStudent(@Param("studentId") Long studentId);
 
     Integer getSentenceCountByStudent(@Param("studentId") Long studentId);
@@ -264,14 +261,6 @@ public interface StudentMapper extends BaseMapper<Student> {
      * @return
      */
     List<Student> selectBySchoolAdminId(@Param("schoolAdminId") Integer schoolAdminId);
-
-    /**
-     * 查询当前学校所有不是删除状态的学生id
-     *
-     * @param schoolAdminId
-     * @return
-     */
-    List<Long> selectNotDeleteIdsBySchoolAdminId(@Param("schoolAdminId") Integer schoolAdminId);
 
     /**
      * 查询当前学校所有不是删除状态的学生信息

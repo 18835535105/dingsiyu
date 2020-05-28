@@ -11,6 +11,7 @@ import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
@@ -62,6 +63,9 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     private ClockInMapper clockInMapper;
     @Resource
     private WeChatMapper weChatMapper;
+
+    @Resource
+    private WeekActivityRankOpt weekActivityRankOpt;
 
     @Override
     public Object getTest(HttpSession session, String openId) {
@@ -160,6 +164,10 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
         // 打卡天数（非连续打卡天数）
         int cardDays = clockInMapper.countByStudentId(student.getId());
         returnMap.put("cardDays", cardDays);
+
+        // 更新每周活动连续打卡奖励进度
+        weekActivityRankOpt.updateWeekActivitySchoolRank(student);
+
         return returnMap;
     }
 

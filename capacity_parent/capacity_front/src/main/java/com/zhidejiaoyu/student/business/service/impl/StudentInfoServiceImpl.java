@@ -15,6 +15,7 @@ import com.zhidejiaoyu.common.dto.EndValidTimeDto;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
+import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.DurationUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -88,7 +89,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
     private WorshipRedisOpt worshipRedisOpt;
 
     @Resource
-    private WeekActivityConfigMapper weekActivityConfigMapper;
+    private WeekActivityRankOpt weekActivityRankOpt;
 
     @Override
     @GoldChangeAnnotation
@@ -401,15 +402,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         medalAwardAsync.tryHand(student, this.getModel(classify));
 
         // 记录每周活动学习时长
-        WeekActivityConfig weekActivityConfig = weekActivityConfigMapper.selectCurrentWeekConfig();
-
-        if (weekActivityConfig.getWeekActivityId() == 1) {
-            // 统计学生熟词数
-        }
-
-        if (weekActivityConfig.getWeekActivityId() == 2) {
-
-        }
+        weekActivityRankOpt.updateWeekActivitySchoolRank(student);
     }
 
     private int getModel(Integer classify) {

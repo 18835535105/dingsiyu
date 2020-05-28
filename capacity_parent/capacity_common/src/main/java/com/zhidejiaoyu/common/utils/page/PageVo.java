@@ -11,12 +11,12 @@ import java.util.List;
  * @date 2019-07-25
  */
 @Data
-public class PageVo {
+public class PageVo<T> {
 
     /**
      * 数据
      */
-    private List rows;
+    private List<T> rows;
 
     /**
      * 总页数
@@ -30,7 +30,7 @@ public class PageVo {
 
     public PageVo () {}
 
-    public PageVo (List rows, Integer pages, Long total) {
+    public PageVo (List<T> rows, Integer pages, Long total) {
         this.rows = rows;
         this.pages = pages;
         this.total = total;

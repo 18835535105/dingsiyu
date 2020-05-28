@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
 import com.zhidejiaoyu.common.study.memorydifficulty.WordMemoryDifficulty;
 import com.zhidejiaoyu.common.utils.PictureUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -73,6 +74,9 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private ErrorLearnLogService errorLearnLogService;
 
     private final Integer modelType = 1;
+
+    @Resource
+    private WeekActivityRankOpt weekActivityRankOpt;
     /**
      * 以字母或数字结尾
      */
@@ -187,6 +191,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                         .studentId(studentId)
                         .wordId(wordId)
                         .build());
+                weekActivityRankOpt.updateWeekActivitySchoolRank(student);
             } else {
                 learnExtend.setStatus(0);
                 learnExtend.setFirstIsKnow(0);
@@ -224,6 +229,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                         .studentId(studentId)
                         .wordId(wordId)
                         .build());
+                weekActivityRankOpt.updateWeekActivitySchoolRank(student);
             }
             currentLearn.setStatus(status);
             currentLearn.setUpdateTime(now);

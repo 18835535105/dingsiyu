@@ -5,6 +5,8 @@ import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author wuchenxi
@@ -22,8 +24,9 @@ public class PageUtil {
         if (request == null) {
             return 1;
         }
-        if (StringUtils.isNotEmpty(request.getParameter("pageNum"))) {
-            return Integer.parseInt(request.getParameter("pageNum"));
+        String pageNum = "pageNum";
+        if (StringUtils.isNotEmpty(request.getParameter(pageNum))) {
+            return Integer.parseInt(request.getParameter(pageNum));
         }
         return 1;
     }
@@ -38,8 +41,9 @@ public class PageUtil {
         if (request == null) {
             return 20;
         }
-        if (StringUtils.isNotEmpty(request.getParameter("pageSize"))) {
-            return Integer.parseInt(request.getParameter("pageSize"));
+        String pageSize = "pageSize";
+        if (StringUtils.isNotEmpty(request.getParameter(pageSize))) {
+            return Integer.parseInt(request.getParameter(pageSize));
         }
         return 20;
     }
@@ -50,11 +54,25 @@ public class PageUtil {
      * @param info
      * @return
      */
-    public static PageVo packagePage(PageInfo info) {
+    public static <T> PageVo<T> packagePage(PageInfo<T> info) {
         if (info == null) {
-            return new PageVo();
+            return new PageVo<>();
         }
 
-        return new PageVo(info.getList(), info.getPages(), info.getTotal());
+        return new PageVo<>(info.getList(), info.getPages(), info.getTotal());
+    }
+
+    /**
+     * 封装响应的分页数据
+     *
+     * @param list  数据列表
+     * @param total 数据总量
+     * @return
+     */
+    public static <T> PageVo<T> packagePage(List<T> list, Long total) {
+        if (list == null) {
+            list = Collections.emptyList();
+        }
+        return new PageVo<>(list, (int) Math.ceil(total * 1.0 / PageUtil.getPageSize()), total);
     }
 }

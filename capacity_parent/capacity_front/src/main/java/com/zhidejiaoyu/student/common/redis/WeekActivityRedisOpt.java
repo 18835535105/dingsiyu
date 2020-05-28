@@ -33,7 +33,7 @@ public class WeekActivityRedisOpt {
     /**
      * 不同活动的id与提示语之间的对应关系
      */
-    private static final Map<Integer, String> CONDITION_MAP = new HashMap<>(16);
+    public static final Map<Integer, String> CONDITION_MAP = new HashMap<>(16);
 
     static {
         AWARD_GOLD_MAP.put(0, 10);

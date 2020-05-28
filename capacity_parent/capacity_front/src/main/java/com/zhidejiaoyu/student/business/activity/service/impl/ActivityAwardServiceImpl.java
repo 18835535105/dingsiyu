@@ -1,20 +1,28 @@
 package com.zhidejiaoyu.student.business.activity.service.impl;
 
+import com.zhidejiaoyu.common.constant.redis.WeekActivityRedisKeysConst;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.WeekActivity;
 import com.zhidejiaoyu.common.pojo.WeekActivityConfig;
+import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
+import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.page.PageUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.activity.service.ActivityAwardService;
 import com.zhidejiaoyu.student.business.activity.vo.AwardListVO;
+import com.zhidejiaoyu.student.business.activity.vo.RankVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.business.timingtask.service.impl.QuartWeekActivityServiceImpl;
 import com.zhidejiaoyu.student.common.redis.WeekActivityRedisOpt;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: wuchenxi
@@ -53,6 +61,12 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
     @Resource
     private BossHurtMapper bossHurtMapper;
 
+    @Resource
+    private WeekActivityRankOpt weekActivityRankOpt;
+
+    @Resource
+    private StudentMapper studentMapper;
+
     @Override
     public ServerResponse<Object> awardList() {
         WeekActivityConfig weekActivityConfig = weekActivityConfigMapper.selectCurrentWeekConfig();
@@ -61,10 +75,7 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
         }
 
         WeekActivity weekActivity = weekActivityMapper.selectById(weekActivityConfig.getWeekActivityId());
-
-        Date sunday = DateUtil.getDateOfWeekDay(7);
-        Date parse = DateUtil.parse(DateUtil.formatYYYYMMDD(sunday) + " 15:00:00", DateUtil.YYYYMMDDHHMMSS);
-        long countDown = parse == null ? 0L : (parse.getTime() - System.currentTimeMillis()) / 1000;
+        long countDown = (weekActivityConfig.getActivityDateEnd().getTime() - System.currentTimeMillis()) / 1000;
 
         AwardListVO.AwardListVOBuilder awardListVoBuilder = AwardListVO.builder()
                 .countDown(Math.max(0, countDown))
@@ -102,6 +113,48 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
         }
     }
 
+    @Override
+    public ServerResponse<Object> rank() {
+
+        WeekActivityConfig weekActivityConfig = weekActivityConfigMapper.selectCurrentWeekConfig();
+        if (weekActivityConfig == null) {
+            return ServerResponse.createBySuccess();
+        }
+
+        Student student = super.getStudent();
+        Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
+
+        int pageNum = PageUtil.getPageNum();
+        int pageSize = PageUtil.getPageSize();
+        long startIndex = (pageNum - 1) * pageSize;
+        long endIndex = startIndex + pageSize;
+
+        String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_SCHOOL_RANK + schoolAdminId;
+        List<Long> studentIds = weekActivityRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, null);
+
+        Map<Long, Map<Long, String>> studentIdMap = studentMapper.selectNicknameMapByStudentId(studentIds);
+
+        int size = studentIds.size();
+        List<RankVO.RankInfo> vos = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            RankVO.RankInfo info = new RankVO.RankInfo();
+            Long studentId = studentIds.get(i);
+            double activityPlan = weekActivityRankOpt.getActivityPlan(schoolAdminId, studentId);
+            info.setNickname(studentIdMap.get(studentId).get("nickname"));
+            if (startIndex == 0) {
+                Integer awardGold = QuartWeekActivityServiceImpl.AWARD_GOLD_MAP.get(i);
+                info.setAwardGold(awardGold == null ? 0 : awardGold);
+            } else {
+                info.setAwardGold(0);
+            }
+            info.setComplete(WeekActivityRedisOpt.CONDITION_MAP.get(weekActivityConfig.getWeekActivityId()).replace("$&$", String.valueOf((int) activityPlan)));
+            vos.add(info);
+        }
+
+        long memberSize = weekActivityRankOpt.getMemberSize(key);
+        return ServerResponse.createBySuccess(PageUtil.packagePage(vos, memberSize));
+    }
+
     /**
      * boss伤害累积值
      *
@@ -111,9 +164,9 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
      */
     private List<AwardListVO.ActivityList> bossHurt(WeekActivity weekActivity, WeekActivityConfig weekActivityConfig) {
         Long studentId = super.getStudentId();
-        Integer cardDays = bossHurtMapper.selectHurtNumByBeginDateAndEndDate(studentId,
+        Integer bossHurt = bossHurtMapper.selectHurtNumByBeginDateAndEndDate(studentId,
                 weekActivityConfig.getActivityDateBegin(), weekActivityConfig.getActivityDateEnd());
-        return weekActivityRedisOpt.getActivityList(studentId, cardDays, weekActivity);
+        return weekActivityRedisOpt.getActivityList(studentId, bossHurt, weekActivity);
     }
 
     /**
@@ -210,6 +263,5 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
         int count = knownWordsMapper.countByStudentId(studentId);
         return weekActivityRedisOpt.getActivityList(studentId, count, weekActivity);
     }
-
 
 }

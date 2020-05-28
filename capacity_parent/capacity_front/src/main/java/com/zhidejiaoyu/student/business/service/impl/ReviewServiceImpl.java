@@ -498,10 +498,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // true 扣除一金币
         if (isTrue) {
             // 1.查询学生剩余金币
-            Integer gold = studentMapper.getSystem_gold(studentId);
+            Integer gold = studentMapper.selectSystemGold(studentId);
             if (gold != null && gold > 0) {
                 // 扣除1金币
-                int state = studentMapper.updateBySystem_gold((gold - 1), studentId);
+                int state = studentMapper.updateSystemGoldByStudentId((gold - 1), studentId);
             } else {
                 // 金币不足
                 return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
@@ -682,10 +682,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // true 扣除一金币
         if (isTrue) {
             // 1.查询学生剩余金币
-            Integer gold = studentMapper.getSystem_gold(studentId);
+            Integer gold = studentMapper.selectSystemGold(studentId);
             if (gold != null && gold > 0) {
                 // 扣除1金币
-                studentMapper.updateBySystem_gold((gold - 1), studentId);
+                studentMapper.updateSystemGoldByStudentId((gold - 1), studentId);
             } else {
                 // 金币不足
                 return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");
@@ -1280,10 +1280,10 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         // true 扣除一金币
         if (isTrue) {
             // 1.查询学生剩余金币
-            Integer gold = studentMapper.getSystem_gold(studentId);
+            Integer gold = studentMapper.selectSystemGold(studentId);
             if (gold != null && gold > 0) {
                 // 扣除1金币
-                int state = studentMapper.updateBySystem_gold((gold - 1), studentId);
+                int state = studentMapper.updateSystemGoldByStudentId((gold - 1), studentId);
             } else {
                 // 金币不足
                 return ServerResponse.createBySuccess(GoldResponseCode.LESS_GOLD.getCode(), "金币不足");

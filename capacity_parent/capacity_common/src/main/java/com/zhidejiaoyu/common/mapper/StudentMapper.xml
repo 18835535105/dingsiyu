@@ -588,35 +588,6 @@
         ORDER BY
         system_gold + offline_gold DESC
     </select>
-    <select id="selectRankByStudentIds" resultType="java.util.Map" parameterType="map">
-        SELECT
-        s.id id,
-        CASE
-        WHEN @preRank = s.system_gold THEN
-        @curRank
-        WHEN @preRank := s.system_gold THEN
-        @curRank :=@curRank + 1
-        END AS `rank`
-        FROM
-        student s,
-        (
-        SELECT
-        @curRank := 0 ,@preRank := NULL
-        ) r
-        <where>
-            <foreach collection="students" item="student" separator="or" open="(" close=")">
-                s.id = #{student.id}
-                AND s.province = #{student.province}
-                AND s.area = #{student.area}
-                AND s.city = #{student.city}
-                AND s.school_name = #{student.schoolName}
-                AND s.grade = #{student.grade}
-                AND s.squad = #{student.squad}
-            </foreach>
-        </where>
-        ORDER BY
-        system_gold DESC
-    </select>
 
     <sql id="selectSeniority_model_sql">
         <!-- 本班 -->
@@ -660,21 +631,6 @@
         ) w
         <include refid="selectSeniority_model_sql"/>
         GROUP BY s.id
-    </select>
-    <select id="selectxz" resultType="map">
-        select t.sid           id,
-               count(t.sid) AS xz
-        from (select s.id                 sid,
-                     count(m.parent_name) tc,
-                     m.parent_name        p
-              from student s,
-                   award a,
-                   medal m
-              where a.medal_type = m.id
-                and a.get_flag = 1
-                and s.id = a.student_id
-              GROUP BY m.parent_name, s.id) t
-        where t.tc % 5 = 0
     </select>
 
     <select id="getCourseIdAndUnitId" parameterType="map" resultType="map">
@@ -767,6 +723,15 @@
         </foreach>
         )
     </select>
+
+    <select id="selectNicknameMapByStudentId" resultType="java.util.Map" parameterType="map">
+        select id, nickname from student where id in (
+        <foreach collection="studentIds" separator="," item="id">
+            #{id}
+        </foreach>
+        )
+    </select>
+
     <select id="getVocabularyCountByStudent" parameterType="map" resultType="integer">
         select ((select count(listen.id)
                  from capacity_listen listen,
@@ -860,18 +825,18 @@
         <include refid="more_table_List"/>
         from student s join teacher t on s.teacher_id = t.teacher_id and t.school_admin_id = #{schoolAdminId}
     </select>
-    <select id="selectNotDeleteIdsBySchoolAdminId" resultType="java.lang.Long" parameterType="map">
-        select s.id
-        from student s
-                 join teacher t
-                      on s.teacher_id = t.teacher_id and t.school_admin_id = #{schoolAdminId} and s.status &lt;> 3
-    </select>
 
     <select id="selectNotDeleteBySchoolAdminId" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="more_table_List"/>
         from student s
-        join teacher t on s.teacher_id = t.teacher_id and t.school_admin_id = #{schoolAdminId} and s.status &lt;> 3
+        join teacher t on s.teacher_id = t.teacher_id and t.school_admin_id = 561 and s.status &lt;> 3
+        union all
+        select
+        <include refid="more_table_List"/>
+        from
+        student s
+        join teacher t on s.teacher_id = t.school_admin_id and t.school_admin_id = 561 and s.status &lt;> 3
     </select>
     <select id="selectByTeacherId" resultMap="BaseResultMap" parameterType="map">
         select

@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.rank.RankOpt;
+import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -15,6 +16,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Objects;
@@ -44,6 +46,9 @@ public class GoldChangeAop {
 
     @Autowired
     private RankOpt rankOpt;
+
+    @Resource
+    private WeekActivityRankOpt weekActivityRankOpt;
 
     private Double systemGold = null;
 
@@ -79,6 +84,8 @@ public class GoldChangeAop {
                 medalAwardAsync.theFirst(student);
 
                 rankOpt.optGoldRank(student);
+
+                weekActivityRankOpt.updateWeekActivitySchoolRank(student);
             }
         } catch (Exception e) {
             log.error("学生[{} - {} - {}] 操作错误！", student.getId(), student.getAccount(), student.getStudentName(), e);
