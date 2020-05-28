@@ -55,7 +55,7 @@ public class ApiConstant {
         try {
             return "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + ConfigConstant.APP_ID + "&redirect_uri=" + URLEncoder.encode(redirectUrl, "utf-8") + "&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect";
         } catch (UnsupportedEncodingException e) {
-          log.error("urlEncoder编码出错！", e);
+            log.error("urlEncoder编码出错！", e);
         }
         return null;
     }
@@ -68,5 +68,14 @@ public class ApiConstant {
      */
     public static String getRefreshAuthAccessTokenApi(String refreshToken) {
         return "https://api.weixin.qq.com/sns/oauth2/refresh_token?appid=" + ConfigConstant.APP_ID + "&grant_type=refresh_token&refresh_token=" + refreshToken;
+    }
+
+    /**
+     * 获得jsapi_ticket
+     *
+     * @return
+     */
+    public static String getJSAPITicket(String accessToken) {
+        return "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=jsapi";
     }
 }

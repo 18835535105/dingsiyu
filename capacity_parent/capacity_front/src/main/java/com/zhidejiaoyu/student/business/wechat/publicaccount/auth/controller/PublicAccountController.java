@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.wechat.publicaccount.auth.controller;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.auth.service.PublicAccountService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,6 +40,20 @@ public class PublicAccountController {
                         @RequestParam(name = "nonce", required = false) String nonce,
                         @RequestParam(name = "echostr", required = false) String echostr) {
         return echostr;
+    }
+
+    /**
+     * 获取JS-SDK配置数据
+     *
+     * @param url 当前页面路径
+     * @return
+     */
+    @GetMapping("/getConfig")
+    public ServerResponse<Object> getConfig(String url) {
+        if (StringUtils.isNotEmpty(url)) {
+            url = url.split("#")[0];
+        }
+        return publicAccountService.getConfig(url);
     }
 
     /**

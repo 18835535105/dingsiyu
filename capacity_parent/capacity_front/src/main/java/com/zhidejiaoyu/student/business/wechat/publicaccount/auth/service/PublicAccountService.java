@@ -31,4 +31,12 @@ public interface PublicAccountService {
      * @return
      */
     ServerResponse<Object> getUserInfo(String code);
+
+    /**
+     * 获取JS-SDK配置数据
+     *
+     * @return
+     * @param url
+     */
+    ServerResponse<Object> getConfig(String url);
 }
