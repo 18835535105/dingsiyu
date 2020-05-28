@@ -47,7 +47,7 @@ public class ControllerLogAop {
                 return;
             }
             String url = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
-            if (StringUtils.isNotEmpty(url) && url.contains("/smallApp")) {
+            if (StringUtils.isNotEmpty(url) && (url.contains("/smallApp") || url.contains("publicAccount"))) {
                 this.printSmallAppLog(startTime, maxTime, url);
             } else {
                 this.printLearnSystemLog(startTime, maxTime, httpSession, url);
