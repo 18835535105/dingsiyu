@@ -12,7 +12,7 @@ import java.util.Date;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author zdjy
@@ -40,7 +40,7 @@ public class LearnExtend extends Model<LearnExtend> {
      */
     private Long wordId;
     /**
-     * 掌握状态：0:生词;2:熟词；
+     * 掌握状态：0:生词;1:熟词；
      */
     private Integer status;
     private Date learnTime;
