@@ -33,6 +33,8 @@ public class Partner implements Serializable {
     @TableField("openId")
     private String openId;
 
+    private String nickname;
+
     /**
      * 头像地址
      */
