@@ -9,6 +9,8 @@ public class SavePartnerDTO {
 
     private String openId;
 
+    private String nickname;
+
     /**
      * 商业大佬分数
      */

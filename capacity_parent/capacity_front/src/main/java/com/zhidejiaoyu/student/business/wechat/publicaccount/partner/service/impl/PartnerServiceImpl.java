@@ -58,6 +58,7 @@ public class PartnerServiceImpl extends BaseServiceImpl<PartnerMapper, Partner> 
                     partner.setOverPerson(overPopulation);
                     partner.setTotalSorce(savePartnerDto.getTotalScore());
                     partner.setType(getType(key));
+                    partner.setNickname(savePartnerDto.getNickname());
                     return partner;
                 }).collect(Collectors.toList()));
     }
