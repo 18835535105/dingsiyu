@@ -48,6 +48,7 @@ public class PartnerServiceImpl extends BaseServiceImpl<PartnerMapper, Partner> 
 
     private void savePartnerMapper(Map<Integer, Integer> partnerMap, SavePartnerDTO savePartnerDto,
                                    Integer economicFalseValue, Double overPopulation) {
+        Date date = new Date();
         this.saveBatch(partnerMap.keySet()
                 .stream()
                 .map(key -> {
@@ -59,6 +60,7 @@ public class PartnerServiceImpl extends BaseServiceImpl<PartnerMapper, Partner> 
                     partner.setTotalSorce(savePartnerDto.getTotalScore());
                     partner.setType(getType(key));
                     partner.setNickname(savePartnerDto.getNickname());
+                    partner.setCreateTime(date);
                     return partner;
                 }).collect(Collectors.toList()));
     }

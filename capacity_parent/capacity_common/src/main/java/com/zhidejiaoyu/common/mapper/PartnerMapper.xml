@@ -12,6 +12,7 @@
         <result column="type" property="type"/>
         <result column="economic_value" property="economicValue"/>
         <result column="over_person" property="overPerson"/>
+        <result column="create_time" property="createTime"/>
     </resultMap>
 
     <select id="countByOpenId" parameterType="map" resultType="integer">
