@@ -3,10 +3,12 @@ package com.zhidejiaoyu.student.business.index.service.impl;
 import com.zhidejiaoyu.common.mapper.CapacityStudentUnitMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
 import com.zhidejiaoyu.common.mapper.StudentStudyPlanMapper;
+import com.zhidejiaoyu.common.mapper.WeekActivityConfigMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleStudentUnitMapper;
 import com.zhidejiaoyu.common.pojo.CapacityStudentUnit;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentStudyPlan;
+import com.zhidejiaoyu.common.pojo.WeekActivityConfig;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.index.service.ModelService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
@@ -33,6 +35,9 @@ public class ModelServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Resource
     private SimpleStudentUnitMapper simpleStudentUnitMapper;
+
+    @Resource
+    private WeekActivityConfigMapper weekActivityConfigMapper;
 
     @Resource
     private RedisOpt redisOpt;
@@ -63,11 +68,21 @@ public class ModelServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             case 8:
                 //智能流程
                 return this.judgeTestBeforeStudy(studentId);
+            case 9:
+                // 判断本周是否有活动
+                return this.judgeWeekActivity();
             default:
                 Map<String, Boolean> map = new HashMap<>(16);
                 map.put("isHave", false);
                 return ServerResponse.createBySuccess(map);
         }
+    }
+
+    private ServerResponse<Map<String, Boolean>> judgeWeekActivity() {
+        Map<String, Boolean> map = new HashMap<>(16);
+        WeekActivityConfig weekActivityConfig = weekActivityConfigMapper.selectCurrentWeekConfig();
+        map.put("isHave", weekActivityConfig != null);
+        return ServerResponse.createBySuccess(map);
     }
 
     /**
