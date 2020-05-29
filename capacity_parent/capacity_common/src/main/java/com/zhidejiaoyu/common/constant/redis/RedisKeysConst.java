@@ -122,6 +122,12 @@ public interface RedisKeysConst {
      * 微信公众号基础支持 access_token
      */
     String PUBLIC_ACCOUNT_WECHAT_ACCESS_TOKEN = "PUBLIC_ACCOUNT_WECHAT_ACCESS_TOKEN";
+
+    /**
+     * 微信公众号jsapi_ticket
+     */
+    String PUBLIC_JS_API_TICKET = "PUBLIC_JS_API_TICKET";
+
     /**
      * 标识学生已经初始化了飞船信息
      */
