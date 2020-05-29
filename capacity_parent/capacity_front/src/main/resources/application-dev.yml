@@ -16,8 +16,8 @@ server:
 
 ip: 123.56.142.84
 #ip: 192.168.0.2
-studyUrl: https://test.shell.yydz100.com
-adminDomin: http://localhost:9999
+studyUrl: https://dev.shell.yydz100.com
+adminDomin: http://dev.admin.yydz100.com/dept
 
 logging:
   level:
