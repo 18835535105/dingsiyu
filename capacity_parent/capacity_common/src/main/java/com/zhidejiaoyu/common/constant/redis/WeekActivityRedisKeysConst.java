@@ -26,4 +26,10 @@ public interface WeekActivityRedisKeysConst {
      * value:com.zhidejiaoyu.student.business.activity.vo.AwardListVO.ActivityList
      */
     String WEEK_ACTIVITY_LIST = "WEEK_ACTIVITY_LIST";
+
+    /**
+     * 记录上一个活动配置id
+     * 数据类型：string
+     */
+    String LAST_ACTIVITY_CONFIG_ID = "LAST_ACTIVITY_CONFIG_ID";
 }
