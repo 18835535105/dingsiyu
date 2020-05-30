@@ -61,9 +61,9 @@ public class ShipTestController {
      *
      * @return
      */
-    @GetMapping("/getCanSchoolCopyInfo")
-    public ServerResponse<Object> getCanSchoolCopyInfo() {
-        return shipTestService.getCanSchoolCopyInfo();
+    @GetMapping("/getCanCopyInfo")
+    public ServerResponse<Object> getCanCopyInfo() {
+        return shipTestService.getCanCopyInfo();
     }
 
     /**

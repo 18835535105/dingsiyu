@@ -26,10 +26,10 @@
         id,`name`,level_name,type,challenge_cycle,person_num,durability,common_attack,source_force_attack,source_force,
         hit_rate,mobility,img_url ,gold, max_award_count, school_gold
     </sql>
-    <select id="selectSchoolPkBaseInfoByType" resultType="com.zhidejiaoyu.common.vo.ship.SchoolPkBaseInfoVO" parameterType="map">
-        select id, name, img_url imgUrl
+    <select id="selectSchoolPkBaseInfoByCount" resultType="map" parameterType="map">
+        select id, name, img_url imgUrl, durability
         from pk_copy_base
-        where type = #{type}
+        where type = 2
         <if test="studentCount &lt; 30">
             and person_num = 1
         </if>
@@ -37,5 +37,15 @@
             and person_num = 2
         </if>
         order by id
+    </select>
+    <select id="selectPersonPkInfoByStudentId" resultType="java.util.Map" parameterType="map">
+        select pcb.id, pcb.challenge_cycle challengeCycle, count(pcs.id) count, pcb.name, pcb.img_url imgUrl
+        from pk_copy_base pcb
+                 left join pk_copy_state pcs
+                           on pcb.id = pcs.pk_copy_base_id
+                               and pcs.student_id = #{studentId}
+                               and to_days(pcs.update_time) = to_days(now())
+        where pcb.type = 1
+        group by pcb.id
     </select>
 </mapper>

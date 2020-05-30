@@ -12,7 +12,7 @@ import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.math.MathUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.ship.EquipmentVo;
-import com.zhidejiaoyu.common.vo.ship.SchoolPkBaseInfoVO;
+import com.zhidejiaoyu.common.vo.ship.PkBaseInfoVO;
 import com.zhidejiaoyu.common.vo.testVo.beforestudytest.SubjectsVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
@@ -336,43 +336,119 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
     }
 
     @Override
-    public ServerResponse<Object> getCanSchoolCopyInfo() {
-        if (canPkSchoolCopy()) {
-            log.info("校区副本只有周六周日才开放挑战！");
-            return ServerResponse.createBySuccess();
-        }
+    public ServerResponse<Object> getCanCopyInfo() {
+
+        PkBaseInfoVO pkBaseInfoVO = new PkBaseInfoVO();
+
 
         Student student = super.getStudent();
+        List<PkBaseInfoVO.CopyInfoVO> personPkInfo = this.getPersonPkInfo(student);
+        pkBaseInfoVO.setPersonCopyInfo(personPkInfo);
+
+        this.getSchoolPkInfo(pkBaseInfoVO, student);
+
+        return ServerResponse.createBySuccess(pkBaseInfoVO);
+    }
+
+    /**
+     * 学生校区副本挑战信息
+     *
+     * @param pkBaseInfoVO
+     * @param student
+     */
+    public void getSchoolPkInfo(PkBaseInfoVO pkBaseInfoVO, Student student) {
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
 
         int count = studentMapper.countBySchoolAdminId(schoolAdminId);
 
         Long bossId = pkCopyRedisOpt.getSchoolBossIdBySchoolAdminId(schoolAdminId);
         if (bossId == null) {
-            List<SchoolPkBaseInfoVO> schoolPkBaseInfoVos = pkCopyBaseMapper.selectSchoolPkBaseInfoByType(2, count);
-            int random = MathUtil.getRandom(schoolPkBaseInfoVos.get(0).getId(), schoolPkBaseInfoVos.get(schoolPkBaseInfoVos.size() - 1).getId());
+            List<Map<String, Object>> pkBaseInfoVos = pkCopyBaseMapper.selectSchoolPkBaseInfoByCount(count);
+            int random = MathUtil.getRandom(Integer.parseInt(pkBaseInfoVos.get(0).get("id").toString()), Integer.parseInt(pkBaseInfoVos.get(pkBaseInfoVos.size() - 1).get("id").toString()));
             bossId = (long) random;
             pkCopyRedisOpt.saveCanSchoolBossId(schoolAdminId, bossId);
         }
 
         boolean success = pkCopyRedisOpt.judgeSchoolCopyAward(schoolAdminId, bossId);
-        if (success) {
-            // 以挑战成功，不能再次挑战
-            return ServerResponse.createBySuccess();
-        }
-
         PkCopyBase pkCopyBase = pkCopyRedisOpt.getPkCopyBaseById(bossId);
-        return ServerResponse.createBySuccess(SchoolPkBaseInfoVO.builder()
-                .id(pkCopyBase.getId())
-                .name(pkCopyBase.getName())
-                .imgUrl(GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl()))
-                .build());
+
+        if (canPkSchoolCopy()) {
+            // 非周六日，不挑战
+            pkBaseInfoVO.setSchoolPkCopyInfo(null);
+        } else if (success) {
+            // 挑战成功
+            Date parse = DateUtil.parse(DateUtil.formatYYYYMMDD(DateUtil.getWeekEnd()) + " 23:59:59", DateUtil.YYYYMMDDHHMMSS);
+            long countDown = (parse == null ? System.currentTimeMillis() : parse.getTime() - System.currentTimeMillis()) / 1000;
+
+            pkBaseInfoVO.setSchoolPkCopyInfo(PkBaseInfoVO.CopyInfoVO.builder()
+                    .id(bossId)
+                    .totalDurability(pkCopyBase.getDurability())
+                    .surplusDurability(0)
+                    .totalCount(pkCopyBase.getChallengeCycle())
+                    .surplusCount(0)
+                    .name(pkCopyBase.getName())
+                    .imgUrl(GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl()))
+                    .countDown(countDown)
+                    .build());
+        } else {
+            Date parse = DateUtil.parse(DateUtil.formatYYYYMMDD(DateUtil.getWeekEnd()) + " 23:59:59", DateUtil.YYYYMMDDHHMMSS);
+            long countDown = (parse == null ? System.currentTimeMillis() : parse.getTime() - System.currentTimeMillis()) / 1000;
+
+            // 学生本周挑战校区副本次数
+            Integer copyCount = pkCopyStateMapper.countThisWeekSchoolCopyByStudentIdAndPkCopyBaseId(student.getId(), bossId);
+
+            Integer schoolCopySurplusDurability = pkCopyRedisOpt.getSchoolCopySurplusDurability(schoolAdminId, bossId);
+
+            pkBaseInfoVO.setSchoolPkCopyInfo(PkBaseInfoVO.CopyInfoVO.builder()
+                    .id(bossId)
+                    .totalDurability(pkCopyBase.getDurability())
+                    .surplusDurability(schoolCopySurplusDurability == null ? pkCopyBase.getDurability() : schoolCopySurplusDurability)
+                    .totalCount(pkCopyBase.getChallengeCycle())
+                    .surplusCount(Math.max(0,pkCopyBase.getChallengeCycle() - (copyCount == null ? 0 : count)))
+                    .name(pkCopyBase.getName())
+                    .imgUrl(GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl()))
+                    .countDown(countDown)
+                    .build());
+        }
+    }
+
+    /**
+     * 获取学生单人副本挑战信息
+     *
+     * @param student
+     * @return
+     */
+    public List<PkBaseInfoVO.CopyInfoVO> getPersonPkInfo(Student student) {
+        List<Map<String, Object>> personPkInfos = pkCopyBaseMapper.selectPersonPkInfoByStudentId(student.getId());
+        return personPkInfos.stream().map(personPkInfo -> {
+            // 总挑战次数
+            int challengeCycle = Integer.parseInt(personPkInfo.get("challengeCycle").toString());
+            // 剩余挑战次数
+            int count = Integer.parseInt(personPkInfo.get("count").toString());
+            // 副本名称
+            String name = String.valueOf(personPkInfo.get("name"));
+            // 副本图片路径
+            String imgUrl = GetOssFile.getPublicObjectUrl(String.valueOf(personPkInfo.get("imgUrl")));
+            // 副本id
+            long id = Long.parseLong(personPkInfo.get("id").toString());
+
+            return PkBaseInfoVO.CopyInfoVO.builder()
+                    .id(id)
+                    .imgUrl(imgUrl)
+                    .name(name)
+                    .surplusCount(Math.max(challengeCycle - count, 0))
+                    .totalCount(challengeCycle)
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     /**
      * 判断是否可以进行校区副本挑战
      *
-     * @return
+     * @return <ul>
+     * <li>true：不可挑战</li>
+     * <li>false：可挑战</li>
+     * </ul>
      */
     public boolean canPkSchoolCopy() {
         // 判断当前日期是否可以挑战校区副本
@@ -536,7 +612,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         Long copyId = pkCopyBase.getId();
         boolean flag = pkCopyRedisOpt.judgeSchoolCopyAward(schoolAdminId, copyId);
         if (durability <= 0 && !flag) {
-            pkCopyRedisOpt.markSchoolCopyAward(schoolAdminId, pkCopyBase.getId());
+            pkCopyRedisOpt.markSchoolCopyAward(schoolAdminId, pkCopyBase.getId(), durability);
             Integer gold = pkCopyBase.getGold();
             schoolGoldFactoryMapper.insert(SchoolGoldFactory.builder()
                     .gold(gold == null ? 0D : Double.parseDouble(gold.toString()))
@@ -601,6 +677,5 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         Collections.shuffle(returnList);
         return returnList;
     }
-
 
 }

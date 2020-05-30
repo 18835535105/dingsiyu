@@ -591,14 +591,14 @@ public class DateUtil implements Serializable {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.DAY_OF_WEEK, cal.getActualMaximum(Calendar.DAY_OF_WEEK));
         cal.add(Calendar.DAY_OF_WEEK, 1);
-        Date time = cal.getTime();
-        return time;
+        return cal.getTime();
     }
 
     private DateUtil() {
     }
 
     public static void main(String[] args) {
-        System.out.println(beforeHoursTime(1));
+
+        System.out.println(getWeekEnd());
     }
 }

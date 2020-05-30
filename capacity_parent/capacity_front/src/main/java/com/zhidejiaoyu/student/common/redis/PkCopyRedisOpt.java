@@ -71,11 +71,12 @@ public class PkCopyRedisOpt {
      *
      * @param schoolAdminId 校管id
      * @param pkCopyBaseId  副本id
+     * @param durability
      * @return
      */
-    public void markSchoolCopyAward(Integer schoolAdminId, Long pkCopyBaseId) {
+    public void markSchoolCopyAward(Integer schoolAdminId, Long pkCopyBaseId, Integer durability) {
         String key = RedisKeysConst.SCHOOL_COPY_AWARD_MARK + schoolAdminId;
-        redisTemplate.opsForHash().put(key, pkCopyBaseId, true);
+        redisTemplate.opsForHash().put(key, pkCopyBaseId, durability);
         redisTemplate.expire(key, 2, TimeUnit.DAYS);
     }
 
@@ -92,7 +93,20 @@ public class PkCopyRedisOpt {
     public boolean judgeSchoolCopyAward(Integer schoolAdminId, Long pkCopyBaseId) {
         String key = RedisKeysConst.SCHOOL_COPY_AWARD_MARK + schoolAdminId;
         Object o = redisTemplate.opsForHash().get(key, pkCopyBaseId);
-        return o != null;
+        return o != null && Integer.parseInt(o.toString()) <= 0;
+    }
+
+    /**
+     * 获取校区副本剩余耐久度
+     *
+     * @param schoolAdminId
+     * @param pkCopyBaseId
+     * @return
+     */
+    public Integer getSchoolCopySurplusDurability(Integer schoolAdminId, Long pkCopyBaseId) {
+        String key = RedisKeysConst.SCHOOL_COPY_AWARD_MARK + schoolAdminId;
+        Object o = redisTemplate.opsForHash().get(key, pkCopyBaseId);
+        return o == null ? null : Integer.parseInt(o.toString());
     }
 
     /**

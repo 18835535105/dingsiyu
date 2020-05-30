@@ -41,5 +41,5 @@ public interface ShipTestService extends BaseService<Student> {
      *
      * @return
      */
-    ServerResponse<Object> getCanSchoolCopyInfo();
+    ServerResponse<Object> getCanCopyInfo();
 }

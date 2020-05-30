@@ -1,8 +1,6 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.zhidejiaoyu.ZdjyFrontApplication;
-import com.zhidejiaoyu.common.vo.ship.SchoolPkBaseInfoVO;
-import junit.framework.TestCase;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * @author: wuchenxi
@@ -26,7 +23,7 @@ public class PkCopyBaseMapperTest {
 
     @Test
     public void selectSchoolPkBaseInfoByType() {
-        List<SchoolPkBaseInfoVO> schoolPkBaseInfoVOS = pkCopyBaseMapper.selectSchoolPkBaseInfoByType(2, 100);
-        log.info("schoolPkBaseInfoVOS={}", schoolPkBaseInfoVOS.toString());
+//        List<PkBaseInfoVO> pkBaseInfoVOS = pkCopyBaseMapper.selectSchoolPkBaseInfoByType(2, 100);
+//        log.info("schoolPkBaseInfoVOS={}", pkBaseInfoVOS.toString());
     }
 }
