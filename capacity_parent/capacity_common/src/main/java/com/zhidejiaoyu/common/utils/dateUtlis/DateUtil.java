@@ -29,6 +29,8 @@ public class DateUtil implements Serializable {
 
     public static final String YYYYMMDD = "yyyy-MM-dd";
 
+    public static final String SLASHYYYYMM = "yyyy/MM/dd";
+
     public static final String YYYYMMDDHHMMSS = "yyyy-MM-dd HH:mm:ss";
 
     private static final String YYYY = "yyyy";
