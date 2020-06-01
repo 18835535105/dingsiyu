@@ -208,7 +208,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                         .equipmentName(pkCopyBase.getName())
                         .id(pkCopyBase.getId().intValue())
                         .imgUrl(getImg(pkCopyBase.getImgUrl()))
-                        .grade(pkCopyBase.getLevelName())
+                        .grade("1")
                         .build())
                 .build();
     }
