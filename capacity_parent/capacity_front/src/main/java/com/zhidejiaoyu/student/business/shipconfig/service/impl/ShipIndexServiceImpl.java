@@ -361,7 +361,12 @@ public class ShipIndexServiceImpl extends BaseServiceImpl<StudentMapper, Student
             if (student.getTeacherId() == null) {
                 continue;
             }
-            sourcePowerRankOpt.optSourcePowerRank(student, 0, 100);
+            StudentExpansion studentExpansion = studentExpansionMapper.selectByStudentId(student.getId());
+            int sourcePower = 0;
+            if (studentExpansion != null && studentExpansion.getSourcePower() != null) {
+                sourcePower = studentExpansion.getSourcePower();
+            }
+            sourcePowerRankOpt.optSourcePowerRank(student, sourcePower, 100);
         }
     }
 
