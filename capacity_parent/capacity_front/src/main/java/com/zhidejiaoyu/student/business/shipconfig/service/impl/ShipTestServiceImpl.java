@@ -194,7 +194,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      */
     private PkInfoVO.Challenged getBossEquipment(PkCopyBase pkCopyBase) {
         return PkInfoVO.Challenged.builder()
-                .hardImg(getImg(pkCopyBase.getImgUrl()))
+                .hardImg(GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl()))
                 .nickName(pkCopyBase.getName())
                 .battle(IndexVO.BaseValue.builder()
                         .attack(pkCopyBase.getCommonAttack())
@@ -573,7 +573,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
 
         Student student = super.getStudent();
         Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
-        this.saveBloodVolume(student.getId(),reduceDurability);
+        this.saveBloodVolume(student.getId(), reduceDurability);
         pkCopyRedisOpt.saveSchoolCopyStudentInfo(schoolAdminId, copyId, student.getId());
 
         /*
