@@ -21,6 +21,7 @@ import com.zhidejiaoyu.common.utils.locationUtil.LongitudeAndLatitude;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.login.service.LoginService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -80,6 +81,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
     @Resource
     private LocationUtil locationUtil;
+
+    @Resource
+    private ShipAddEquipmentService shipAddEquipmentService;
 
     @Resource
     private RedisOpt redisOpt;
@@ -177,6 +181,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             // 一个账户只能登陆一台
             judgeMultipleLogin(stu);
             addUnclock(stu);
+            getStudentEqument(stu);
             // 2.判断是否需要完善个人信息
             if (!StringUtils.isNotBlank(stu.getHeadUrl())) {
 
@@ -197,6 +202,12 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
             log.info("学生[{} -> {} -> {}]登录成功。", stu.getId(), stu.getAccount(), stu.getStudentName());
             return ServerResponse.createBySuccess("1", result);
         }
+    }
+
+    private void getStudentEqument(Student stu) {
+        List<Map<String, Object>> returnList = new ArrayList<>();
+        List<Long> addIdList = new ArrayList<>();
+        shipAddEquipmentService.getStudentEqu(stu, returnList, addIdList);
     }
 
     private void addUnclock(Student stu) {

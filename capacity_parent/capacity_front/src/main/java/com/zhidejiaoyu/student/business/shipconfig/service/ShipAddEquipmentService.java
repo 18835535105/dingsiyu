@@ -8,6 +8,8 @@ import com.zhidejiaoyu.student.business.service.BaseService;
 import com.zhidejiaoyu.student.business.shipconfig.vo.EquipmentExperienceVo;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
+import java.util.Map;
 
 public interface ShipAddEquipmentService extends BaseService<Student> {
     Object queryAddStudentEquipment(HttpSession session);
@@ -21,6 +23,8 @@ public interface ShipAddEquipmentService extends BaseService<Student> {
     void updateLeaderBoards(Student student);
 
     void updateUseEqu(Student student, Equipment equipment);
+
+    void getStudentEqu(Student student, List<Map<String, Object>> returnList, List<Long> addIdList);
 
     ServerResponse<Object> getEquipmentNexLevlInfromation(Long equipmentId, HttpSession session);
 

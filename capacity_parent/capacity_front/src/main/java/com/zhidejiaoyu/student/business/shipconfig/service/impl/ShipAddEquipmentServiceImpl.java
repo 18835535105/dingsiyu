@@ -74,6 +74,21 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         Student student = getStudent(session);
         List<Map<String, Object>> returnList = new ArrayList<>();
         List<Long> addIdList = new ArrayList<>();
+        getStudentEqu(student, returnList, addIdList);
+        if (addIdList.size() > 0) {
+            addEquipment(addIdList, student.getId(), studentEquipmentMapper);
+        }
+        if (returnList.size() > 0) {
+            List<String> returnStr = getReturnStr(returnList);
+            return ServerResponse.createBySuccess(returnStr);
+        } else {
+            return ServerResponse.createBySuccess();
+        }
+
+    }
+
+    @Override
+    public void getStudentEqu(Student student, List<Map<String, Object>> returnList, List<Long> addIdList) {
         //获取等级开启奖品
         //判断是否通过摸底测试
         boolean flag = redisOpt.getTestBeforeStudy(student.getId());
@@ -96,16 +111,6 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
         //添加装备需要的物品
         addEquipmentByType(collect.get(4), studentEquipmentIds, empiricalValue.getArmorExperience(), returnList, addIdList, map, null);
         addEquipmentPeople(collect.get(5), student.getId());
-        if (addIdList.size() > 0) {
-            addEquipment(addIdList, student.getId(), studentEquipmentMapper);
-        }
-        if (returnList.size() > 0) {
-            List<String> returnStr = getReturnStr(returnList);
-            return ServerResponse.createBySuccess(returnStr);
-        } else {
-            return ServerResponse.createBySuccess();
-        }
-
     }
 
     private List<String> getReturnStr(List<Map<String, Object>> returnList) {
