@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.mapper.simple.SimpleCourseMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.student.business.shipconfig.service.impl.ShipAddEquipmentServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -137,6 +138,9 @@ public class RedisOpt {
         } else {
             try {
                 courseList = (List<Map<String, Object>>) object;
+                if (CollectionUtils.isEmpty(courseList)) {
+                    courseList = getCourses(studentId, phase);
+                }
             } catch (Exception e) {
                 log.error("类型转换错误, object=[{}], studentId=[{}], typeStr=[{}], error=[{}]", object, studentId, phase, e.getMessage());
                 courseList = getCourses(studentId, phase);
