@@ -194,7 +194,7 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      */
     private PkInfoVO.Challenged getBossEquipment(PkCopyBase pkCopyBase) {
         return PkInfoVO.Challenged.builder()
-                .hardImg(GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl()))
+                .hardImg(GetOssFile.getPublicObjectUrl(pkCopyBase.getImgUrl().replace("png","jpg")))
                 .nickName(pkCopyBase.getName())
                 .battle(IndexVO.BaseValue.builder()
                         .attack(pkCopyBase.getCommonAttack())

@@ -281,16 +281,17 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
         //获取学生对象
         Student student = getStudent(session);
         String name = AwardUtil.getAward(skinInteger);
-        if (student.getDiamond() == null) {
-            return ServerResponse.createByError(300, "钻石不足，幸运大转盘等你来获取属于你的幸运大礼！");
-        }
-        if (student.getDiamond() < 50) {
-            return ServerResponse.createByError(300, "钻石不足，幸运大转盘等你来获取属于你的幸运大礼！");
-        }
         if (type == 1) {
             //使用功能
             //获取是否有已经使用的皮肤
-
+            if (dateInteger == 1) {
+                if (student.getDiamond() == null) {
+                    return ServerResponse.createByError(300, "钻石不足，幸运大转盘等你来获取属于你的幸运大礼！");
+                }
+                if (student.getDiamond() < 50) {
+                    return ServerResponse.createByError(300, "钻石不足，幸运大转盘等你来获取属于你的幸运大礼！");
+                }
+            }
             StudentSkin aLong = simpleStudentSkinMapper.selUseSkinByStudentId(student.getId());
             if (aLong != null) {
                 //当学生使用皮肤不为空则修改已使用皮肤状态
@@ -318,7 +319,6 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 } else {
                     studentSkin1.setState(1);
                     simpleStudentSkinMapper.updUseSkin(studentSkin1);
-
                 }
             } else {
                 //使用皮肤
