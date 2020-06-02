@@ -173,4 +173,41 @@ public interface RedisKeysConst {
      * value:bossId
      */
     String SCHOOL_PK_BASE_INFO = "SCHOOL_PK_BASE_INFO:";
+
+    /**
+     * 记录学生每日单词的错误记录
+     * String类型
+     * key=ERROR_WORD
+     * field:wordId
+     * value:错误次数
+     */
+    String ERROR_WORD="ERROR_WORD:";
+
+    /**
+     * 记录学生每日句型的错误记录
+     * String类型
+     * key=ERROR_SENTENCE
+     * field:sentenceId
+     * value:错误次数
+     */
+    String ERROR_SENTENCE="ERROR_SENTENCE:";
+
+    /**
+     * 记录学生每日课文的错误记录
+     * String类型
+     * key=ERROR_TEKS
+     * field:teksId
+     * value:错误次数
+     */
+    String ERROR_TEKS="ERROR_TEKS:";
+
+    /**
+     * 记录学生每日语法的错误记录
+     * String类型
+     * key=ERROR_SYNTAX
+     * field:wordId
+     * value:错误次数
+     */
+    String ERROR_SYNTAX="ERROR_SYNTAX:";
+
 }

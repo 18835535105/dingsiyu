@@ -35,7 +35,7 @@ public class WordCompletionServiceImpl extends BaseServiceImpl<LearnNewMapper, L
 
 
     @Override
-    public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId) {
+    public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId, Long[] errorId) {
         Student student = getStudent(session);
         if (saveData.saveVocabularyModel(student, session, unitId, wordId, isTrue, plan, total,
                 flowId, easyOrHard, type, studyModel, modelType)) {

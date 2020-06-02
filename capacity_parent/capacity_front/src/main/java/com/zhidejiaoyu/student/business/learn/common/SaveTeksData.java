@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.student.business.learn.common;
 
+import com.zhidejiaoyu.common.config.RedisConfig;
+import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
@@ -7,6 +9,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.TeksService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.TeksServiceImpl;
+import com.zhidejiaoyu.student.common.CurrentDayOfStudyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +37,8 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private SaveData saveData;
     @Resource
     private TeacherMapper teacherMapper;
+
+    private static final String TEKS = "TEKS";
 
     public Object getStudyModel(Long unitId, Long studentId, Integer easyOrHard, Integer type) {
         //查看课文数据是否保存过
@@ -150,8 +155,17 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         learnExtendMapper.insert(learnExtend);
     }
 
-    public void saveStudy(HttpSession session, Long unitId, Long flowId, String studyModel, Integer easyOrHard) {
+    public void saveStudy(HttpSession session, Long unitId, Long flowId, String studyModel, Integer easyOrHard, Long[] errorId) {
         Student student = getStudent(session);
         insertLearnExtend(flowId, unitId, student, studyModel, easyOrHard, 3);
+        saveErrorTeks(errorId);
+    }
+
+    private void saveErrorTeks(Long[] errorId) {
+        if (errorId != null && errorId.length > 0) {
+            for (Long error : errorId) {
+                CurrentDayOfStudyUtil.saveSessionCurrent(RedisKeysConst.ERROR_TEKS, error);
+            }
+        }
     }
 }
