@@ -8,6 +8,7 @@
         <result column="student_id" property="studentId" />
         <result column="qr_code_num" property="qrCodeNum" />
         <result column="img_url" property="imgUrl" />
+        <result column="gold" property="gold" />
         <result column="valid_time" property="validTime" />
         <result column="online_time" property="onlineTime" />
         <result column="study_model" property="studyModel" />
