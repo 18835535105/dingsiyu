@@ -43,6 +43,11 @@ public class CurrentDayOfStudy implements Serializable {
     private String imgUrl;
 
     /**
+     * 当天获取的总金币数
+     */
+    private Integer gold;
+
+    /**
      * 有效时常
      */
     private Integer validTime;
