@@ -123,12 +123,55 @@
                       learn_history lh
                  where lh.student_id = #{studentId}
                    and lh.`type` = 1
-                   and lh.unit_id = uvn.unit_id
+                   and lh.unit_id = uvn.unit_id) t
+    </select>
+
+    <select id="countLearnedSentenceCount" resultType="java.lang.Integer" parameterType="map">
+        select count(DISTINCT t.wordId)
+        from (
+                 select DISTINCT le.word_id wordId
+                 from learn_new ln2,
+                      learn_extend le
+                 where ln2.student_id = #{studentId}
+                   and ln2.model_type = 2
+                   and le.learn_id = ln2.id
                  union all
-                 select DISTINCT vocabulary_id wordId
-                 from learn l
-                 where l.student_id = #{studentId}
-                   and vocabulary_id is not null) t
+                 select distinct(usn.sentence_id) wordId
+                 from learn_history lh,
+                      unit_sentence_new usn
+                 where lh.student_id = #{studentId}
+                   and lh.unit_id = usn.unit_id
+                   and lh.type = 2) t
+    </select>
+
+    <select id="countLearnedSyntaxCount" resultType="java.lang.Integer" parameterType="map">
+        select count(distinct t.unitId)
+        from (select distinct (le.word_id) unitId
+              from learn_new ln,
+                   learn_extend le
+              where ln.student_id = 9575
+                and ln.id = le.learn_id
+                and ln.model_type = 4
+              union all
+              select distinct(sutn.topic_id) unitId
+              from learn_history lh,
+                   syntax_unit_topic_new sutn
+              where lh.student_id = 9575
+                and lh.unit_id = sutn.unit_id
+                and lh.type = 3) t
+    </select>
+
+    <select id="countLearnedTextCount" resultType="java.lang.Integer" parameterType="map">
+        select count(distinct t.unitId)
+        from (select distinct (ln.unit_id) unitId
+              from learn_new ln
+              where ln.student_id = #{studentId}
+                and ln.model_type = 3
+              union all
+              select distinct(lh.unit_id) unitId
+              from learn_history lh
+              where lh.student_id = #{studentId}
+                and lh.type = 4) t
     </select>
     <select id="countLearnedWordCountByStartDateAndEndDate" resultType="java.lang.Integer" parameterType="map">
         select count(DISTINCT t.wordId)
