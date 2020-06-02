@@ -24,21 +24,15 @@ public interface RunLogMapper extends BaseMapper<RunLog> {
 
     int insertSelective(RunLog record);
 
-    List<RunLog> selectByExampleWithBLOBs(RunLogExample example);
-
     List<RunLog> selectByExample(RunLogExample example);
 
     RunLog selectByPrimaryKey(Long id);
 
     int updateByExampleSelective(@Param("record") RunLog record, @Param("example") RunLogExample example);
 
-    int updateByExampleWithBLOBs(@Param("record") RunLog record, @Param("example") RunLogExample example);
-
     int updateByExample(@Param("record") RunLog record, @Param("example") RunLogExample example);
 
     int updateByPrimaryKeySelective(RunLog record);
-
-    int updateByPrimaryKeyWithBLOBs(RunLog record);
 
     int updateByPrimaryKey(RunLog record);
 
@@ -157,4 +151,12 @@ public interface RunLogMapper extends BaseMapper<RunLog> {
     @Select("select count(id) from run_log where operate_user_id = #{studentId} and type = 1 " +
             "and to_days(create_time) >= to_days(#{beforeDaysDate})")
     int countLoginByLastDays(@Param("studentId") Long studentId, @Param("beforeDaysDate") Date beforeDaysDate);
+
+    /**
+     * 查询学生首次登陆系统时间
+     *
+     * @param studentId
+     * @return
+     */
+    Date selectFirstLoginTimeByStudentId(@Param("studentId") Long studentId);
 }

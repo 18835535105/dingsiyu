@@ -385,5 +385,14 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
      * @return
      */
     Integer selectGoldTestMaxPointByBeginDateAndEndDate(@Param("studentId") Long studentId, @Param("beginDate") Date beginDate, @Param("endDate") Date endDate);
+
+    /**
+     * 统计学生总测试题个数
+     *
+     * @param studentId
+     * @return
+     */
+    @Select("select sum(quantity) from test_record where student_id = #{studentId}")
+    int countTotalSubjects(@Param("studentId") Long studentId);
 }
 

@@ -27,6 +27,7 @@ public class CreateQrCodeUtil {
 
     /**
      * 生成二维码
+     *
      * @param text 内容，可以是链接或者文本
      * @param path 生成的二维码位置
      */
@@ -36,9 +37,10 @@ public class CreateQrCodeUtil {
 
     /**
      * 生成二维码
-     * @param text 内容，可以是链接或者文本
-     * @param path 生成的二维码位置
-     * @param width 宽度，默认300
+     *
+     * @param text   内容，可以是链接或者文本
+     * @param path   生成的二维码位置
+     * @param width  宽度，默认300
      * @param height 高度，默认300
      * @param format 生成的二维码格式，默认png
      */
@@ -48,10 +50,10 @@ public class CreateQrCodeUtil {
             // 得到文件对象
             File file = new File(path);
             // 判断目标文件所在的目录是否存在
-            if(!file.getParentFile().exists()) {
+            if (!file.getParentFile().exists()) {
                 // 如果目标文件所在的目录不存在，则创建父目录
                 log.info("目标文件所在目录不存在，准备创建它！");
-                if(!file.getParentFile().mkdirs()) {
+                if (!file.getParentFile().mkdirs()) {
                     log.info("创建目标文件所在目录失败！");
                     return;
                 }
