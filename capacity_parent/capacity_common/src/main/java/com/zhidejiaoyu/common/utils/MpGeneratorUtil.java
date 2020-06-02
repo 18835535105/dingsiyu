@@ -24,7 +24,7 @@ public class MpGeneratorUtil {
     }
 
     private static void create() {
-        String[] tableName = {"sys_config"};
+        String[] tableName = {"current_day_of_study"};
 
         /*
          * 配置：

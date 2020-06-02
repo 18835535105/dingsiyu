@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhidejiaoyu.common.mapper.CurrentDayOfStudyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.CurrentDayOfStudy">
+        <id column="id" property="id" />
+        <result column="student_id" property="studentId" />
+        <result column="qr_code_num" property="qrCodeNum" />
+        <result column="img_url" property="imgUrl" />
+        <result column="valid_time" property="validTime" />
+        <result column="online_time" property="onlineTime" />
+        <result column="study_model" property="studyModel" />
+        <result column="word" property="word" />
+        <result column="sentence" property="sentence" />
+        <result column="text" property="text" />
+        <result column="syntax" property="syntax" />
+        <result column="test" property="test" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+</mapper>
