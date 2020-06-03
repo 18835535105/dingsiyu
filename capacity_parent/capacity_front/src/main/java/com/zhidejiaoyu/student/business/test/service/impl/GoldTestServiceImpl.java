@@ -172,7 +172,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
             if (s.contains("TP")) {
-                sb.append("&&").append(GetOssFile.getPublicObjectUrl(FileConstant.TEST_STORE_IMG)).append(StringUtils.trim(s.substring(2))).append(".png").append("&&");
+                sb.append("&&").append(GetOssFile.getPublicObjectUrl(FileConstant.TEST_STORE_IMG)).append(StringUtils.trim(s).substring(2)).append(".png").append("&&");
             } else {
                 sb.append(s);
             }
