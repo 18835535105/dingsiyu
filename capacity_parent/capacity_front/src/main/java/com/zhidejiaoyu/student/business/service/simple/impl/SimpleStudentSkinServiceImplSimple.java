@@ -202,6 +202,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                         if (state == 1) {
                             setMap.put("use", true);
                         }
+                        setMap.put("time", date.getTime() - System.currentTimeMillis());
                     } else {
                         setMap.put("have", true);
                     }
