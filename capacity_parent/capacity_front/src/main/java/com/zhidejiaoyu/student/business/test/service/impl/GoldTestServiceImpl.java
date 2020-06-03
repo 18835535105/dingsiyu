@@ -45,6 +45,11 @@ import java.util.stream.Collectors;
 @Service
 public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestStore> implements GoldTestService {
 
+    /**
+     * 图片标识符
+     */
+    private static final String PICTURE_SPLIT = "&&TP";
+
     @Resource
     private TestStoreMapper testStoreMapper;
 
@@ -78,10 +83,21 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
             vos.add(GoldTestSubjectsVO.builder()
                     .type(goldTestVO.getType())
                     .subjects(subjects)
-                    .content(StringUtils.isEmpty(goldTestVO.getContent()) ? new String[0] : replaceArrayStr(goldTestVO.getContent().split("\n")))
+                    .content(getContent(goldTestVO))
                     .build());
         });
         return ServerResponse.createBySuccess(vos);
+    }
+
+    public String[] getContent(GoldTestVO goldTestVO) {
+        String content = goldTestVO.getContent();
+        if (StringUtils.isEmpty(content)) {
+            return new String[0];
+        }
+        if (content.contains(PICTURE_SPLIT)) {
+            content = getImgUrl(content);
+        }
+        return replaceArrayStr(content.split("\n"));
     }
 
     /**
@@ -92,11 +108,8 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
      */
     public void packageSubjects(ArrayList<GoldTestVO> list, List<GoldTestSubjectsVO.Subjects> subjects) {
         list.forEach(vo -> {
-            // 图片标识符
-            String pictureSplit = "&&TP";
-
             String select = vo.getSelect();
-            if (StringUtils.isNotEmpty(select) && select.contains(pictureSplit)) {
+            if (StringUtils.isNotEmpty(select) && select.contains(PICTURE_SPLIT)) {
                 select = getImgUrl(select);
             }
 
@@ -106,7 +119,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
                 if (Objects.equals(vo.getType(), "连词成句")) {
                     title = replaceStr(title);
                 }
-                if (title.contains(pictureSplit)) {
+                if (title.contains(PICTURE_SPLIT)) {
                     title = getImgUrl(title);
                 }
                 String spaceSplit = "$&$";
