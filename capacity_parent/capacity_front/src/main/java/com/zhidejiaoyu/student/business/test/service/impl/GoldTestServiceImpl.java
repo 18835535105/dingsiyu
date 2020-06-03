@@ -168,7 +168,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
      * @return
      */
     public String getImgUrl(String str) {
-        String[] split = str.split("&&");
+        String[] split = StringUtils.trim(str).split("&&");
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
             if (s.contains("TP")) {
