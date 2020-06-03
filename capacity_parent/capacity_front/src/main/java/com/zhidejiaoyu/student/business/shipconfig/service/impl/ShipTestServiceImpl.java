@@ -222,7 +222,8 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         gauntlet.setBeChallengerStudentId(bossId);
         gauntlet.setChallengerStudentId(student.getId());
         gauntlet.setType(2);
-        gauntlet.setCreateTime(new Date());
+        Date now = new Date();
+        gauntlet.setCreateTime(now);
         this.saveBloodVolume(student.getId(), bloodVolume);
         //如果有信息，在这里减少学量
         if (pkCopyState != null) {
@@ -238,12 +239,14 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
                 gauntlet.setBeChallengerStatus(1);
                 pkCopyState.setDurability(bloodVolume);
             }
+            pkCopyState.setUpdateTime(now);
             pkCopyStateMapper.updateById(pkCopyState);
         } else {
             pkCopyState = new PkCopyState();
             pkCopyState.setStudentId(student.getId());
             pkCopyState.setType(1);
-            pkCopyState.setCreateTime(new Date());
+            pkCopyState.setCreateTime(now);
+            pkCopyState.setUpdateTime(now);
             pkCopyState.setPkCopyBaseId(bossId);
             pkCopyState.setSchoolAdminId(TeacherInfoUtil.getSchoolAdminId(student));
             PkCopyBase pkCopyBase = pkCopyRedisOpt.getPkCopyBaseById(bossId);
