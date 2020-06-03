@@ -155,17 +155,8 @@ public class SaveTeksData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         learnExtendMapper.insert(learnExtend);
     }
 
-    public void saveStudy(HttpSession session, Long unitId, Long flowId, String studyModel, Integer easyOrHard, Long[] errorId) {
+    public void saveStudy(HttpSession session, Long unitId, Long flowId, String studyModel, Integer easyOrHard) {
         Student student = getStudent(session);
         insertLearnExtend(flowId, unitId, student, studyModel, easyOrHard, 3);
-        saveErrorTeks(errorId);
-    }
-
-    private void saveErrorTeks(Long[] errorId) {
-        if (errorId != null && errorId.length > 0) {
-            for (Long error : errorId) {
-                CurrentDayOfStudyUtil.saveSessionCurrent(RedisKeysConst.ERROR_TEKS, error);
-            }
-        }
     }
 }

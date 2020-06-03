@@ -149,4 +149,6 @@ public interface TestService extends BaseService<TestRecord> {
     Object saveReadTest(HttpSession session, TestRecord testRecord);
 
     ServerResponse saveBugTest(HttpSession session, TestRecord testRecord);
+
+    void saveCurrent(HttpSession session, String errorTestInfo);
 }

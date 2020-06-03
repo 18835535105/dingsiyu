@@ -181,7 +181,7 @@ public interface RedisKeysConst {
      * field:wordId
      * value:错误次数
      */
-    String ERROR_WORD="ERROR_WORD:";
+    String ERROR_WORD = "ERROR_WORD:";
 
     /**
      * 记录学生每日句型的错误记录
@@ -190,7 +190,7 @@ public interface RedisKeysConst {
      * field:sentenceId
      * value:错误次数
      */
-    String ERROR_SENTENCE="ERROR_SENTENCE:";
+    String ERROR_SENTENCE = "ERROR_SENTENCE:";
 
     /**
      * 记录学生每日课文的错误记录
@@ -199,7 +199,7 @@ public interface RedisKeysConst {
      * field:teksId
      * value:错误次数
      */
-    String ERROR_TEKS="ERROR_TEKS:";
+    String ERROR_TEKS = "ERROR_TEKS:";
 
     /**
      * 记录学生每日语法的错误记录
@@ -208,6 +208,16 @@ public interface RedisKeysConst {
      * field:wordId
      * value:错误次数
      */
-    String ERROR_SYNTAX="ERROR_SYNTAX:";
+    String ERROR_SYNTAX = "ERROR_SYNTAX:";
+
+    /**
+     * 记录学生每日测试的错误记录
+     * String类型
+     * key=ERROR_SYNTAX
+     * field:wordId
+     * value:错误次数
+     */
+    String ERROR_TEST = "ERROR_TEST:";
+
 
 }

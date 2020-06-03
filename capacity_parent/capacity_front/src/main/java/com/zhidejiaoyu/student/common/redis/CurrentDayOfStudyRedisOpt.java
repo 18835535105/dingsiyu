@@ -32,5 +32,45 @@ public class CurrentDayOfStudyRedisOpt {
         }
     }
 
+    /**
+     * 保存测试下的错误信息
+     */
+    public void saveTestStudyCurrent(Long studentId, String errorTestInfo) {
+        if (errorTestInfo != null && errorTestInfo.length() > 0) {
+            Object o = redisTemplate.opsForHash().get(RedisKeysConst.ERROR_TEST + studentId, 1);
+            String errorTestInfo1;
+            if (o == null) {
+                errorTestInfo1 = getErrorTestInfo(errorTestInfo, null);
+
+            } else {
+                String testInfo = o.toString();
+                errorTestInfo1 = getErrorTestInfo(errorTestInfo, testInfo);
+            }
+            redisTemplate.opsForHash().put(RedisKeysConst.ERROR_TEST + studentId, 1, errorTestInfo1);
+        }
+    }
+
+    private String getErrorTestInfo(String errorTestInfo, String testInfo) {
+        StringBuilder builder = new StringBuilder();
+        String[] split = errorTestInfo.split("##");
+        for (String str : split) {
+            String[] suStr = str.split("&&");
+            if (suStr.length > 0) {
+                if (suStr.length > 1) {
+                    builder.append(suStr[0]).append("&&").append(suStr[1]).append("##");
+                } else {
+                    builder.append(suStr[0]).append("##");
+                }
+            }
+        }
+        if (testInfo == null) {
+            testInfo = builder.toString();
+        } else {
+            testInfo += builder.toString();
+        }
+        return testInfo;
+
+    }
+
 
 }
