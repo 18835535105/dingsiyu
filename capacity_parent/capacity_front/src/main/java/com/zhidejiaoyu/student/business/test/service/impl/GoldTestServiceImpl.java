@@ -16,6 +16,7 @@ import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.pojo.TestStore;
 import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
@@ -168,11 +169,11 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
      * @return
      */
     public String getImgUrl(String str) {
-        String[] split = StringUtils.trim(str).split("&&");
+        String[] split = StringUtil.trim(str).split("&&");
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
             if (s.contains("TP")) {
-                sb.append("&&").append(GetOssFile.getPublicObjectUrl(FileConstant.TEST_STORE_IMG)).append(StringUtils.trim(s).substring(2)).append(".png").append("&&");
+                sb.append("&&").append(GetOssFile.getPublicObjectUrl(FileConstant.TEST_STORE_IMG)).append(StringUtil.trim(s).substring(2)).append(".png").append("&&");
             } else {
                 sb.append(s);
             }
