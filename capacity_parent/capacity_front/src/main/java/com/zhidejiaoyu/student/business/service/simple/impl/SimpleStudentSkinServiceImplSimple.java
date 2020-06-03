@@ -163,11 +163,27 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 setMap.put("have", true);
                 Map<String, Object> haveSkinMap = (Map<String, Object>) o;
                 int state = Integer.parseInt(haveSkinMap.get("state").toString());
+                Object endTime = haveSkinMap.get("endTime");
+                if (endTime == null) {
+                    setMap.put("time", "30天");
+                    setMap.put("isUse", false);
+                } else {
+                    Date date = (Date) endTime;
+                    if (date.getTime() < System.currentTimeMillis()) {
+                        setMap.put("isUse", false);
+                        setMap.put("time", "30天");
+                    } else {
+                        setMap.put("isUse", true);
+                        setMap.put("time", date.getTime() - System.currentTimeMillis());
+                    }
+                }
                 //是否正在使用
                 setMap.put("use", state == 1 ? true : false);
                 //合成碎片数量
                 setMap.put("count", 3);
             } else {
+                setMap.put("time", "30天");
+                setMap.put("isUse", false);
                 //未拥有皮肤
                 setMap.put("isHave", false);
                 //是否可试用

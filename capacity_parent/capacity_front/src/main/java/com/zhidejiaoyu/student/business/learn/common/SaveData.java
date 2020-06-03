@@ -1,14 +1,17 @@
 package com.zhidejiaoyu.student.business.learn.common;
 
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
+import com.zhidejiaoyu.common.config.RedisConfig;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
 import com.zhidejiaoyu.common.study.memorydifficulty.WordMemoryDifficulty;
 import com.zhidejiaoyu.common.utils.PictureUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -17,7 +20,9 @@ import com.zhidejiaoyu.common.vo.WordWriteStudyVo;
 import com.zhidejiaoyu.common.vo.study.MemoryStudyVo;
 import com.zhidejiaoyu.student.business.service.ErrorLearnLogService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.common.CurrentDayOfStudyUtil;
 import com.zhidejiaoyu.student.common.StudyCapacityLearn;
+import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -65,6 +70,9 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private RedisOpt redisOpt;
 
     @Resource
+    private CurrentDayOfStudyRedisOpt currentDayOfStudyRedisOpt;
+
+    @Resource
     private KnownWordsMapper knownWordsMapper;
 
     @Resource
@@ -81,6 +89,9 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
      * 以字母或数字结尾
      */
     private static final String END_MATCH = ".*[a-zA-Z]$";
+
+    private static final String VOCABULARY = "VOCABULARY";
+    private static final String SENTENCE = "SENTENCE";
 
 
     public Object getStudyWord(HttpSession session, Long unitId, Student student,
@@ -197,6 +208,28 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 learnExtend.setFirstIsKnow(0);
                 // 单词不认识将该单词记入记忆追踪中
                 studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, false, type);
+                Long feldId = 0L;
+                if (model.equals(1)) {
+                    feldId = CurrentDayOfStudyUtil.getSessionCurrent(VOCABULARY);
+                }
+                if (model.equals(2)) {
+                    feldId = CurrentDayOfStudyUtil.getSessionCurrent(SENTENCE);
+                }
+                if (feldId.equals(0L)) {
+                    if (model.equals(1)) {
+                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_WORD, studentId, wordId);
+                    }
+                    if (model.equals(2)) {
+                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_SENTENCE, studentId, wordId);
+                    }
+                } else {
+                    if (model.equals(1)) {
+                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_WORD, studentId, feldId);
+                    }
+                    if (model.equals(2)) {
+                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_SENTENCE, studentId, feldId);
+                    }
+                }
                 saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, new Long[]{learnExtend.getWordId()});
             }
             int count = learnExtendMapper.insert(learnExtend);
@@ -326,6 +359,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         Map<String, Object> returnMap = new HashMap<>();
         getStudyWordComplets(vocabulary.getWord(), returnMap, wordCompletionStudyVo);
         wordCompletionStudyVo.setWords(returnMap);
+        CurrentDayOfStudyUtil.saveSessionCurrent(VOCABULARY, vocabulary.getId());
         return wordCompletionStudyVo;
     }
 
@@ -373,7 +407,6 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     }
 
     private MemoryStudyVo getMemoryStudyVo(String word, String syllable, Long plan, boolean firstStudy, Long wordCount, int memoryDifficulty, double memoryStrength, Long vocabularyId, Vocabulary vocabulary, Long unitId, String wordChinese, Boolean studyNew) {
-
         MemoryStudyVo memoryStudyVo = new MemoryStudyVo();
         memoryStudyVo.setWordId(vocabularyId);
         memoryStudyVo.setMemoryDifficulty(memoryDifficulty);
@@ -390,8 +423,10 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         memoryStudyVo.setEngine(PerceiveEngineUtil.getPerceiveEngine(memoryDifficulty, memoryStrength));
         memoryStudyVo.setWordChineseList(this.getChinese(unitId, vocabularyId, wordChinese));
         memoryStudyVo.setImgUrl(PictureUtil.getPictureByUnitId(vocabulary, unitId));
+        CurrentDayOfStudyUtil.saveSessionCurrent(VOCABULARY, vocabularyId);
         return memoryStudyVo;
     }
+
 
     private WordWriteStudyVo getWordWriteStudyVo(boolean firstStudy, Vocabulary vocabulary, double memoryStrength, String wordChinese, long l, long l2, boolean studyNew) {
         WordWriteStudyVo wordWriteStudyVo = new WordWriteStudyVo();
@@ -407,6 +442,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         wordWriteStudyVo.setFirstStudy(firstStudy);
         wordWriteStudyVo.setWordCount(l2);
         wordWriteStudyVo.setReadUrl(baiduSpeak.getLanguagePath(vocabulary.getWord()));
+        CurrentDayOfStudyUtil.saveSessionCurrent(VOCABULARY, vocabulary.getId());
         return wordWriteStudyVo;
     }
 

@@ -28,8 +28,8 @@ public class TextAuditionServiceImpl extends BaseServiceImpl<LearnNewMapper, Lea
     }
 
     @Override
-    public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId) {
-        saveTeksData.saveStudy(session, unitId, flowId,studyModel,easyOrHard);
+    public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId, Long[] errorIds) {
+        saveTeksData.saveStudy(session, unitId, flowId, studyModel, easyOrHard);
         return ServerResponse.createBySuccess();
     }
 }

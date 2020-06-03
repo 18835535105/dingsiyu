@@ -49,6 +49,7 @@ import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.PhoneticSymbolServiceImpl;
 import com.zhidejiaoyu.student.business.test.service.TestService;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
+import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -126,6 +127,8 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
     private UnitNewMapper unitNewMapper;
     @Resource
     private LearnNewMapper learnNewMapper;
+    @Resource
+    private CurrentDayOfStudyRedisOpt currentDayOfStudyRedisOpt;
 
 
     /**
@@ -953,6 +956,12 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
         return ServerResponse.createBySuccess(testResultVo);
     }
 
+    @Override
+    public void saveCurrent(HttpSession session, String errorTestInfo) {
+        Student student = getStudent(session);
+        currentDayOfStudyRedisOpt.saveTestStudyCurrent(student.getId(), errorTestInfo);
+    }
+
 
     private ServerResponse<Object> getObjectServerResponse(HttpSession session, WordUnitTestDTO wordUnitTestDTO, Student student, TestRecord testRecord) {
         session.removeAttribute(TimeConstant.BEGIN_START_TIME);
@@ -1398,7 +1407,6 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
                     testRecordInfo.setWord(chinese);
                     testRecordInfo.setAnswer(word);
                 }
-
                 testRecordInfo.setTestId(testRecordId);
                 testRecordInfo.setSelected(selected[0]);
                 testRecordInfos.add(testRecordInfo);
