@@ -425,7 +425,6 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
             Integer nextUnitIndex = currentUnitIndex + 1;
             Long wordNextUnitId = unitMapper.selectNextUnitIndexByCourseId(courseId, nextUnitIndex);
 
-            // Unit unit = unitMapper.selectByPrimaryKey(wordNextUnitId);
             // 根据学生id，课程id和下一个单元id开启下个单元
             simpleStudentUnitMapper.updateStatus(student.getId(), courseId, wordNextUnitId, type);
             // 保存到学生当前学习哪个课程,单元
@@ -964,7 +963,6 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         }
 
         vo.setAwardInfo(awardInfo);
-        //vo.setAwardStr(StringUtils.removeEnd(String.format("报名代金券x%d，%s", 50, "飞船*1"), "，"));
         vo.setGold(gold);
         vo.setPetUrl(PetUrlUtil.getTestPetUrl(student, point, typeModel));
         vo.setTestId(testRecord.getId());
@@ -1007,7 +1005,7 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
     public Object skipTest(Integer courseId, Integer unitId, Integer type, Integer model, HttpSession session) {
         String studyModel = matchStudyModel(model);
         Student student = getStudent(session);
-        if (courseId == null || unitId == null || type == null || model == null) {
+        if (courseId == null || unitId == null || type == null) {
             return ServerResponse.createByError(500, "数据异常+" + courseId + "   " + unitId + "  " + type + "   " + model);
         }
         if (type == 2) {
@@ -1034,40 +1032,9 @@ public class SimpleTestServiceImplSimple extends SimpleBaseServiceImpl<SimpleTes
         testRecord.setQuantity(0);
         testRecord.setPoint(-1);
         testRecord.setStudentId(student.getId());
-        /*if (type == 1) {*/
         testRecord.setGenre("单元前测");
-       /* } else if (type == 2) {
-            testRecord.setGenre("单元闯关测试");
-        } else if (type == 3) {
-            testRecord.setGenre("学前测试");
-        }*/
-        /*if (type == 2) {
-            TestRecord lookTest = simpleTestRecordMapper.selectByStudentIdAndUnitId(student.getId(),
-                    unitId.longValue(), "单元闯关测试", studyModel);
-            List<Unit> units = unitMapper.selectUnitsByCourseId(courseId.longValue());
-            if (units != null && units.size() > 0) {
-                int unitSize = 0;
-                for (int i = 0; i < units.size(); i++) {
-                    if (units.get(i).getId().equals(unitId.longValue())) {
-                        unitSize = i;
-                    }
-                }
-                if (lookTest == null) {
-                    this.unlockNextUnit(student, courseId.longValue(), unitId.longValue(), model);
-                }
-                simpleTestRecordMapper.updateByStudentAndUnitId(student.getId(), unitId.longValue());
-                simpleTestRecordMapper.insert(testRecord);
-                if (unitSize != units.size() - 1) {
-                    return ServerResponse.createBySuccess(units.get(unitSize + 1).getId());
-                } else {
-                    return ServerResponse.createBySuccess(unitId);
-                }
-
-            }
-        } else if(type==1){*/
         learnMapper.updateTypeByStudentIdAndUnitId(student.getId(), unitId.longValue(), studyModel);
         simpleSimpleCapacityMapper.deleteByStudenIdByUnitId(student.getId(), unitId.longValue(), model);
-        /*}*/
         simpleTestRecordMapper.insert(testRecord);
         return ServerResponse.createBySuccess(unitId);
     }
