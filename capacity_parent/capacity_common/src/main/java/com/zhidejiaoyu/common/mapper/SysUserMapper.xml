@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.SysUser">
         <id column="id" property="id" />
         <result column="avatar" property="avatar" />
+        <result column="openid" property="openid" />
         <result column="account" property="account" />
         <result column="password" property="password" />
         <result column="salt" property="salt" />

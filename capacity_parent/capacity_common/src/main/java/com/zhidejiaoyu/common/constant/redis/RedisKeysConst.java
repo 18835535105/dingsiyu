@@ -124,6 +124,11 @@ public interface RedisKeysConst {
     String PUBLIC_ACCOUNT_WECHAT_ACCESS_TOKEN = "PUBLIC_ACCOUNT_WECHAT_ACCESS_TOKEN";
 
     /**
+     * 企业微信 access_token
+     */
+    String QY_WECHAT_ACCESS_TOKEN = "QY_WECHAT_ACCESS_TOKEN";
+
+    /**
      * 微信公众号jsapi_ticket
      */
     String PUBLIC_JS_API_TICKET = "PUBLIC_JS_API_TICKET";
