@@ -79,7 +79,6 @@ public class GrowReportServiceImpl implements GrowReportService {
         int sentenceCount = learnMapper.countByStudentId(student.getId(), 2);
         learnSuperviseVO.setSentenceCount(sentenceCount);
 
-        // todo：已学课文，已学口语
 
         // 已学知识点
         int learnedCount = wordCount + sentenceCount;
@@ -160,10 +159,8 @@ public class GrowReportServiceImpl implements GrowReportService {
                         packageSentenceResultVo(student, phase, unitIds, learnResultVO);
                         break;
                     case 2:
-                        // todo:封装课文相关学习成果
                         break;
                     case 3:
-                        // todo:封装口语句型相关学习成果
                         break;
                     default:
                 }

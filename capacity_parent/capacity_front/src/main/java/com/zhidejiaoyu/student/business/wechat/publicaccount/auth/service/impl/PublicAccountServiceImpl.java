@@ -50,7 +50,7 @@ public class PublicAccountServiceImpl implements PublicAccountService {
             String ip = MacIpUtil.getIpAddr(HttpUtil.getHttpServletRequest());
             LongitudeAndLatitude longitudeAndLatitude = locationUtil.getLongitudeAndLatitude(ip);
 
-            // todo:获取地址名，拼接 地址/cadName返回给前端图片路径，如果没有找到指定的地址，返回共有的海报
+            // todo:获取地址名，拼接 地址/cardName返回给前端图片路径，如果没有找到指定的地址，返回共有的海报
 
         } catch (Exception e) {
             log.error("获取学生登录IP地址出错，error=[{}]", e.getMessage());

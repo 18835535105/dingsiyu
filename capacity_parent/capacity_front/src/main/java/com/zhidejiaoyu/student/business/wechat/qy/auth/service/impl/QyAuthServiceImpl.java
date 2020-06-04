@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.wechat.qy.auth.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.zhidejiaoyu.common.constant.CookieConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
@@ -14,8 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author: wuchenxi
@@ -30,7 +34,14 @@ public class QyAuthServiceImpl implements QyAuthService {
 
     @Override
     public ServerResponse<Object> getUserInfo() {
-        String code = HttpUtil.getHttpServletRequest().getParameter("code");
+        HttpServletRequest httpServletRequest = HttpUtil.getHttpServletRequest();
+
+        ServerResponse<Object> fromCookie = getAuthInfoFromCookie(httpServletRequest);
+        if (fromCookie != null) {
+            return fromCookie;
+        }
+
+        String code = httpServletRequest.getParameter("code");
         String userInfoApi = QyApiConstant.getUserInfoApi(code);
         String forObject = restTemplate.getForObject(userInfoApi, String.class);
 
@@ -52,10 +63,44 @@ public class QyAuthServiceImpl implements QyAuthService {
                 log.error("企业微信userId转换openid失败！msg={}", s);
                 throw new ServiceException("企业微信userId转换openid失败!msg=" + s);
             }
-            String  openid = userIdToOpenidVO.getOpenid();
+            String openid = userIdToOpenidVO.getOpenid();
             userInfoVO.setOpenId(openid);
         }
 
+        addAuthCookie(userInfoVO);
+
         return ServerResponse.createBySuccess(userInfoVO);
+    }
+
+    /**
+     * 从cookie中获取授权信息，如果已有授权信息，不再进行网页授权验证；
+     * 如果没有授权信息，进行网页授权验证
+     *
+     * @param httpServletRequest
+     * @return
+     */
+    public ServerResponse<Object> getAuthInfoFromCookie(HttpServletRequest httpServletRequest) {
+        Cookie[] cookies = httpServletRequest.getCookies();
+        for (Cookie cookie : cookies) {
+            if (Objects.equals(cookie.getName(), CookieConstant.QY_WX_USER_INFO)) {
+                String value = cookie.getValue();
+                UserInfoVO userInfoVO = JSONObject.parseObject(value, UserInfoVO.class);
+                return ServerResponse.createBySuccess(userInfoVO);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 将授权信息保存到cookie中，提升下次授权的速度
+     *
+     * @param userInfoVO
+     */
+    public void addAuthCookie(UserInfoVO userInfoVO) {
+        Cookie cookie = new Cookie(CookieConstant.QY_WX_USER_INFO, JSONObject.toJSONString(userInfoVO));
+        // todo:测试的时候先设为0秒
+//        cookie.setMaxAge(3600);
+        cookie.setMaxAge(3600);
+        HttpUtil.getResponse().addCookie(cookie);
     }
 }
