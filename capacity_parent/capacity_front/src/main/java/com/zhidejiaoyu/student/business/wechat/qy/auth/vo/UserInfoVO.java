@@ -2,6 +2,8 @@ package com.zhidejiaoyu.student.business.wechat.qy.auth.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 企业微信授权获取的用户信息
  *
@@ -10,7 +12,7 @@ import lombok.Data;
  * @see <a href="https://work.weixin.qq.com/api/doc/90000/90135/91023">参考文档</a>
  */
 @Data
-public class UserInfoVO {
+public class UserInfoVO implements Serializable {
 
     private Integer errcode;
     private String errmsg;

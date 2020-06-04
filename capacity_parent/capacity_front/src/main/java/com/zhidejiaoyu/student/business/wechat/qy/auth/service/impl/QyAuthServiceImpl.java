@@ -17,6 +17,9 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -81,12 +84,16 @@ public class QyAuthServiceImpl implements QyAuthService {
      */
     public ServerResponse<Object> getAuthInfoFromCookie(HttpServletRequest httpServletRequest) {
         Cookie[] cookies = httpServletRequest.getCookies();
-        for (Cookie cookie : cookies) {
-            if (Objects.equals(cookie.getName(), CookieConstant.QY_WX_USER_INFO)) {
-                String value = cookie.getValue();
-                UserInfoVO userInfoVO = JSONObject.parseObject(value, UserInfoVO.class);
-                return ServerResponse.createBySuccess(userInfoVO);
+        try {
+            for (Cookie cookie : cookies) {
+                if (Objects.equals(cookie.getName(), CookieConstant.QY_WX_USER_INFO)) {
+                    String value = cookie.getValue();
+                    UserInfoVO userInfoVO = JSONObject.parseObject(URLDecoder.decode(value, "utf-8"), UserInfoVO.class);
+                    return ServerResponse.createBySuccess(userInfoVO);
+                }
             }
+        } catch (Exception e) {
+            log.error("从cookie获取企业微信网页授权信息失败!", e);
         }
         return null;
     }
@@ -97,10 +104,14 @@ public class QyAuthServiceImpl implements QyAuthService {
      * @param userInfoVO
      */
     public void addAuthCookie(UserInfoVO userInfoVO) {
-        Cookie cookie = new Cookie(CookieConstant.QY_WX_USER_INFO, JSONObject.toJSONString(userInfoVO));
-        // todo:测试的时候先设为0秒
-//        cookie.setMaxAge(3600);
-        cookie.setMaxAge(3600);
-        HttpUtil.getResponse().addCookie(cookie);
+        try {
+            Cookie cookie = new Cookie(CookieConstant.QY_WX_USER_INFO, URLEncoder.encode(JSONObject.toJSONString(userInfoVO), "utf-8"));
+            // todo:测试的时候先设为0秒
+            cookie.setMaxAge(0);
+            HttpUtil.getResponse().addCookie(cookie);
+        } catch (UnsupportedEncodingException e) {
+            log.error("保存企业微信网页授权数据到cookie失败！", e);
+        }
+
     }
 }
