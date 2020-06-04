@@ -77,16 +77,29 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
 
         List<GoldTestSubjectsVO> vos = new ArrayList<>(goldTestVoS.size());
         collect.forEach((type, list) -> {
-            GoldTestVO goldTestVO = list.get(0);
-            List<GoldTestSubjectsVO.Subjects> subjects = new ArrayList<>(list.size());
-            packageSubjects(list, subjects);
-            vos.add(GoldTestSubjectsVO.builder()
-                    .type(goldTestVO.getType())
-                    .subjects(subjects)
-                    .content(getContent(goldTestVO))
-                    .build());
+            // 根据测试内容分组，比如阅读理解类型，有可能一个类型有多篇阅读文章，需要通过内容再次分组后进行处理
+            LinkedHashMap<String, ArrayList<GoldTestVO>> collect1 = list.stream()
+                    .filter(l -> StringUtil.isNotEmpty(l.getContent()))
+                    .collect(Collectors.groupingBy(GoldTestVO::getContent, LinkedHashMap::new, Collectors.toCollection(ArrayList::new)));
+            if (collect1.size() > 1) {
+                collect1.forEach((key, value) -> packageGoldTestSubjectsVO(vos, value));
+            } else {
+                packageGoldTestSubjectsVO(vos, list);
+            }
+
         });
         return ServerResponse.createBySuccess(vos);
+    }
+
+    public void packageGoldTestSubjectsVO(List<GoldTestSubjectsVO> vos, ArrayList<GoldTestVO> value) {
+        GoldTestVO goldTestVO = value.get(0);
+        List<GoldTestSubjectsVO.Subjects> subjects = new ArrayList<>(value.size());
+        packageSubjects(value, subjects);
+        vos.add(GoldTestSubjectsVO.builder()
+                .type(goldTestVO.getType())
+                .subjects(subjects)
+                .content(getContent(goldTestVO))
+                .build());
     }
 
     public String[] getContent(GoldTestVO goldTestVO) {
@@ -250,9 +263,9 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
     }
 
     public static void main(String[] args) {
-//        System.out.println(Arrays.toString("123 $&$ 41323".split("\\$&\\$")));
-//        System.out.println("arer \n".replace("\\n", ""));
-//        System.out.println(Arrays.toString("args \\n\n 123".split("\n")));
+        System.out.println(Arrays.toString("123 $&$ 41323".split("\\$&\\$")));
+        System.out.println("arer \n".replace("\\n", ""));
+        System.out.println(Arrays.toString("args \\n\n 123".split("\n")));
 
 
         String s = "1. It's on the first floor.  $&$\\n\n 2. No, it isn't. It's cold today.  $&$\\n\n 3. It's 3:30. It's time for PE class.  $&$\\n\n 4. It's hot and sunny. $&$\\n\n 5. Yes, it's a beautiful garden. $&$\n \n";
