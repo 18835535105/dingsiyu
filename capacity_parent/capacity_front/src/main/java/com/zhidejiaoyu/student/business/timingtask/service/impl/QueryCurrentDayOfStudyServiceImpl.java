@@ -12,6 +12,7 @@ import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -42,6 +43,7 @@ public class QueryCurrentDayOfStudyServiceImpl implements BaseQuartzService, Que
     private CurrentDayOfStudyRedisOpt currentDayOfStudyRedisOpt;
 
     @Override
+    @Scheduled(cron = "0 0 5 * * ?")
     public void saveCurrentDayOfStudy() {
         if (checkPort(port)) {
             return;
