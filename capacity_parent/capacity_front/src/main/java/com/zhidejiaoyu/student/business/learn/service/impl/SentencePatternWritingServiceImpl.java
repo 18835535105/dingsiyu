@@ -8,6 +8,7 @@ import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.student.business.learn.common.SaveSentenceData;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,8 @@ public class SentencePatternWritingServiceImpl extends BaseServiceImpl<LearnNewM
     private SaveData saveData;
     @Resource
     private SaveSentenceData saveSentenceData;
+    @Resource
+    private CurrentDayOfStudyRedisOpt currentDayOfStudyRedisOpt;
     private Integer type = 10;
     private Integer easyOrHard = 2;
     private String studyModel = "例句默写";
@@ -30,8 +33,8 @@ public class SentencePatternWritingServiceImpl extends BaseServiceImpl<LearnNewM
     @Override
     public Object getStudy(HttpSession session, Long unitId, Integer difficulty) {
         Student student = getStudent(session);
-        Long studentId = student.getId();
-        return saveSentenceData.getStudyModel(session, unitId, difficulty, student, studentId, studyModel, easyOrHard, type);
+        currentDayOfStudyRedisOpt.saveStudyModel(student.getId(), studyModel, unitId);
+        return saveSentenceData.getStudyModel(session, unitId, difficulty, student, student.getId(), studyModel, easyOrHard, type);
     }
 
     @Override

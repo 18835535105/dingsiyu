@@ -11,6 +11,7 @@ import com.zhidejiaoyu.common.vo.DictationVo;
 import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,8 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
     @Resource
     private BaiduSpeak baiduSpeak;
     @Resource
+    private CurrentDayOfStudyRedisOpt currentDayOfStudyRedisOpt;
+    @Resource
     private RedisOpt redisOpt;
     private Integer type = 4;
     private Integer easyOrHard = 2;
@@ -50,6 +53,7 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
     public Object getStudy(HttpSession session, Long unitId, Integer difficulty) {
         // 获取当前学生信息
         Student student = getStudent(session);
+        currentDayOfStudyRedisOpt.saveStudyModel(student.getId(), studyModel, unitId);
         Long studentId = student.getId();
         Map<String, Object> map = new HashMap<>();
         saveData.judgeIsFirstStudy(session, student);

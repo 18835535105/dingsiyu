@@ -7,6 +7,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.learn.common.SaveTeksData;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -16,7 +17,8 @@ import javax.servlet.http.HttpSession;
 public class TextTrainingServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnNew> implements IStudyService {
     @Resource
     private SaveTeksData saveTeksData;
-
+    @Resource
+    private CurrentDayOfStudyRedisOpt currentDayOfStudyRedisOpt;
     private Integer type = 12;
     private Integer easyOrHard = 2;
     private String studyModel = "课文训练";
@@ -24,8 +26,8 @@ public class TextTrainingServiceImpl extends BaseServiceImpl<LearnNewMapper, Lea
     @Override
     public Object getStudy(HttpSession session, Long unitId, Integer difficulty) {
         Student student = getStudent(session);
-        Long studentId = student.getId();
-        return saveTeksData.getStudyModel(unitId, studentId, easyOrHard, type);
+        currentDayOfStudyRedisOpt.saveStudyModel(student.getId(), studyModel, unitId);
+        return saveTeksData.getStudyModel(unitId, student.getId(), easyOrHard, type);
     }
 
     @Override

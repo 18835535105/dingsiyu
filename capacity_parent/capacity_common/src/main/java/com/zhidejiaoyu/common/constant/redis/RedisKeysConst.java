@@ -219,5 +219,12 @@ public interface RedisKeysConst {
      */
     String ERROR_TEST = "ERROR_TEST:";
 
-
+    /**
+     * 记录学生每日学习的模块记录
+     * String类型
+     * key=ERROR_SYNTAX
+     * field:wordId
+     * value:错误次数
+     */
+    String STUDY_MODEL="STUDY_MODEL";
 }

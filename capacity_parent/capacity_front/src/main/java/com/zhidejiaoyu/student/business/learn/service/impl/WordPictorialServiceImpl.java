@@ -16,6 +16,7 @@ import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.service.impl.ReviewServiceImpl;
+import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,10 +47,10 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
     private SaveData saveData;
     @Resource
     private RedisOpt redisOpt;
-
+    @Resource
+    private CurrentDayOfStudyRedisOpt currentDayOfStudyRedisOpt;
     @Resource
     private LearnExtendMapper learnExtendMapper;
-
     @Resource
     private WordMemoryDifficulty wordMemoryDifficulty;
 
@@ -63,6 +64,7 @@ public class WordPictorialServiceImpl extends BaseServiceImpl<LearnNewMapper, Le
     public Object getStudy(HttpSession session, Long unitId, Integer difficulty) {
         Student student = getStudent(session);
         Long studentId = student.getId();
+        currentDayOfStudyRedisOpt.saveStudyModel(student.getId(), studyModel, unitId);
         // 判断学生是否在本系统首次学习，如果是记录首次学习时间
         saveData.judgeIsFirstStudy(session, student);
         //获取当前单元下的learnId

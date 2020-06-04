@@ -92,5 +92,4 @@ public class CurrentDayOfStudy implements Serializable {
      */
     private Date createTime;
 
-
 }

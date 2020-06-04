@@ -4,20 +4,32 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.CurrentDayOfStudy">
-        <id column="id" property="id" />
-        <result column="student_id" property="studentId" />
-        <result column="qr_code_num" property="qrCodeNum" />
-        <result column="img_url" property="imgUrl" />
-        <result column="gold" property="gold" />
-        <result column="valid_time" property="validTime" />
-        <result column="online_time" property="onlineTime" />
-        <result column="study_model" property="studyModel" />
-        <result column="word" property="word" />
-        <result column="sentence" property="sentence" />
-        <result column="text" property="text" />
-        <result column="syntax" property="syntax" />
-        <result column="test" property="test" />
-        <result column="create_time" property="createTime" />
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="qr_code_num" property="qrCodeNum"/>
+        <result column="img_url" property="imgUrl"/>
+        <result column="gold" property="gold"/>
+        <result column="valid_time" property="validTime"/>
+        <result column="online_time" property="onlineTime"/>
+        <result column="study_model" property="studyModel"/>
+        <result column="word" property="word"/>
+        <result column="sentence" property="sentence"/>
+        <result column="text" property="text"/>
+        <result column="syntax" property="syntax"/>
+        <result column="test" property="test"/>
+        <result column="create_time" property="createTime"/>
     </resultMap>
+
+    <sql id="base_sql">
+        id,student_id,qr_code_num,img_url,gold,valid_time,online_time,study_model,word,sentence,text,syntax,test,create_time
+    </sql>
+
+    <select id="selectByDate" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="base_sql"></include>
+        from current_day_of_study
+        where
+        to_days(#{date})=to_days(create_times)
+    </select>
 
 </mapper>
