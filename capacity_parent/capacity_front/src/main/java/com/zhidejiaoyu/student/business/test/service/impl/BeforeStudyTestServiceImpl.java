@@ -132,7 +132,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
             return this.getSubjectsResult(schoolTime);
         }
 
-        // 小于或等于当前月的最大月、最大周数据
+        // 小于当前月的最大月、最大周数据
         schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(1L, 1, monthOfYear, null, gradeList);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
@@ -166,7 +166,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
                 return this.getSubjectsResult(schoolTime);
             }
 
-            // 小于或等于当前月的最大月、最大周数据
+            // 小于当前月的最大月、最大周数据
             schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek((long) schoolAdminId, 1, monthOfYear, null, gradeList);
             if (schoolTime != null) {
                 return this.getSubjectsResult(schoolTime);
@@ -197,7 +197,7 @@ public class BeforeStudyTestServiceImpl extends BaseServiceImpl<StudentStudyPlan
             return this.getSubjectsResult(schoolTime);
         }
 
-        // 小于或等于当前月的最大月、最大周数据
+        // 小于当前月的最大月、最大周数据
         schoolTime = schoolTimeMapper.selectByUserIdAndTypeAndMonthAndWeek(student.getId(), 2, monthOfYear, null, gradeList);
         if (schoolTime != null) {
             return this.getSubjectsResult(schoolTime);
