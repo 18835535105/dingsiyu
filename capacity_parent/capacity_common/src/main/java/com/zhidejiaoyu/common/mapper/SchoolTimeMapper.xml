@@ -35,19 +35,19 @@
             and month = #{month}
             and week &lt;= #{week}
             and type = #{type}
-            order by week desc
+            order by week desc, course_id desc
         </if>
 
         <!-- 小于或等于当前月的最大月、最大周数据 -->
         <if test="week == null and month != null">
             and month &lt;= #{month}
             and type = #{type}
-            order by month desc, week desc
+            order by month desc, week desc, course_id desc
         </if>
 
         <if test="week == null and month == null">
             and type = #{type}
-            order by month desc, week desc
+            order by month desc, week desc, course_id desc
         </if>
         limit 1
     </select>
