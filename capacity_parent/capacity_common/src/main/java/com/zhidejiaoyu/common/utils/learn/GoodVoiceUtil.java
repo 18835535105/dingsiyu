@@ -1,7 +1,7 @@
 package com.zhidejiaoyu.common.utils.learn;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.csp.ahas.shaded.com.alibaba.fastjson.JSONArray;
+import com.alibaba.csp.ahas.shaded.com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.utils.language.SpeechEvaluation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
