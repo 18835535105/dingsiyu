@@ -29,7 +29,7 @@
         <include refid="base_sql"></include>
         from current_day_of_study
         where
-        to_days(#{date})=to_days(create_times)
+        to_days(#{date})=to_days(create_time)
     </select>
 
 </mapper>

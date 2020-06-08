@@ -15,11 +15,10 @@ public class CurrentDayOfStudyController extends BaseController {
     @Resource
     private CurrentDayOfStudyService currentDayOfStudyService;
 
-
     @RequestMapping("/getCurrentDayOfStudy")
     public Object getCurrentDayOfStudy(HttpSession session) {
         return currentDayOfStudyService.getCurrentDayOfStudy(session);
     }
 
-
 }
+
