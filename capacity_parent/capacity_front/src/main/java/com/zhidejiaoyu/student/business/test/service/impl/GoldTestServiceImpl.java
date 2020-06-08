@@ -126,20 +126,27 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
                 select = getImgUrl(select);
             }
 
-            String title = vo.getTitle();
+            String[] answer = StringUtils.isNotEmpty(vo.getAnswer()) ? replaceArrayStr(replaceN(vo.getAnswer()).split("#")) : new String[0];
+
+            StringBuilder title = new StringBuilder(vo.getTitle());
             String[] titleArr = new String[0];
-            if (StringUtils.isNotEmpty(title)) {
+            if (StringUtils.isNotEmpty(title.toString())) {
                 if (Objects.equals(vo.getType(), "连词成句")) {
-                    title = replaceStr(title);
+                    title = new StringBuilder(replaceStr(title.toString()));
                 }
-                if (title.contains(PICTURE_SPLIT)) {
-                    title = getImgUrl(title);
+                if (title.toString().contains(PICTURE_SPLIT)) {
+                    title = new StringBuilder(getImgUrl(title.toString()));
                 }
                 String spaceSplit = "$&$";
-                if (!title.contains(spaceSplit)) {
-                    title += spaceSplit;
+                int count = StringUtils.countMatches(title.toString(), spaceSplit);
+
+                int length = answer.length;
+                if (count != length) {
+                    for (int i = 0; i < length - count; i++) {
+                        title.append(spaceSplit);
+                    }
                 }
-                titleArr = replaceN(title).split("\n");
+                titleArr = replaceN(title.toString()).split("\n");
             }
 
             subjects.add(GoldTestSubjectsVO.Subjects.builder()
@@ -147,7 +154,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
                     .title(replaceArrayStr(titleArr))
                     .selects(StringUtils.isEmpty(select) ? Collections.emptyList() : Arrays.asList(replaceArrayStr(select.split("\\$&\\$"))))
                     .analysis(StringUtils.isNotEmpty(vo.getAnalysis()) ? replaceArrayStr(replaceN(vo.getAnalysis()).split("\n")) : new String[0])
-                    .answer(StringUtils.isNotEmpty(vo.getAnswer()) ? replaceArrayStr(replaceN(vo.getAnswer()).split("#")) : new String[0])
+                    .answer(answer)
                     .build());
         });
     }

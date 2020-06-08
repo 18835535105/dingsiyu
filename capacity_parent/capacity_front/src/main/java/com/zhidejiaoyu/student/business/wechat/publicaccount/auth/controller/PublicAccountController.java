@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.wechat.publicaccount.auth.controller;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.auth.service.PublicAccountService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author: wuchenxi
  * @date: 2020/4/28 10:32:32
  */
+@Slf4j
 @RestController
 @RequestMapping("/publicAccount")
 public class PublicAccountController {

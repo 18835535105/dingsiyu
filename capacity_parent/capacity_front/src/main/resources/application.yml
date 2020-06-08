@@ -7,7 +7,6 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: Asia/Chongqing
-
   datasource:
     druid:
       # 初始化时建立物理连接的个
@@ -58,6 +57,9 @@ spring:
             class: javax.net.ssl.SSLSocketFactory
           starttls:
             enable: true
+  mvc:
+    servlet:
+      load-on-startup: 1
 # 发送者邮箱
 mail:
   fromMail:

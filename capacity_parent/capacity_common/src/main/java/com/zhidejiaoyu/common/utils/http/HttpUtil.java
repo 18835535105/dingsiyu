@@ -19,7 +19,7 @@ public class HttpUtil {
     public static HttpServletRequest getHttpServletRequest() {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (requestAttributes == null) {
-            return null;
+            throw new IllegalArgumentException("获取request失败！");
         }
         return ((ServletRequestAttributes) requestAttributes).getRequest();
     }

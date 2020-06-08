@@ -30,6 +30,12 @@ public class SysUser extends Model<SysUser> {
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
+
+    /**
+     * 绑定的企业微信openid
+     */
+    private String openid;
+
     /**
      * 头像
      */
