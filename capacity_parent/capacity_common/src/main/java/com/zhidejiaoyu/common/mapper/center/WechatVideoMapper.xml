@@ -41,10 +41,10 @@
                 )
             </if>
             <if test="nextGrade != null and nextGrade != ''">
-                or grade = #{nextGrade}
+                or (grade = #{nextGrade} and label = '上册')
             </if>
         </where>
-        group by label
+        group by grade, label
         order by create_time, name
     </select>
     <select id="selectByGradeAndLabel"

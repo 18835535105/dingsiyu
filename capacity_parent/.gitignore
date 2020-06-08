@@ -37,3 +37,6 @@ hs_err_pid*
 /aliyun-common/bin
 
 /.idea
+/aliyun-common/aliyun-common.iml
+/aliyun-translate/aliyun-translate.iml
+/aliyun-vod/aliyun-vod.iml
