@@ -37,5 +37,5 @@ qywx:
   appId: wwe6e0ef9e01f6d6aa
   secret: pxf5D_K3F9jFPwRTksCRXERkar3rOdOLmyYfImmv11o
   redirect:
-  # 微信授权结束后跳转到合伙人测试页面的路径
-  # partner: ${studyUrl}/partner
+    # 企业微信登录地址
+    login: ${studyUrl}/qy/login

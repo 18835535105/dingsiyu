@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.pojo.SysUser;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.student.business.wechat.qy.auth.service.QyAuthService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,9 @@ import javax.annotation.Resource;
 @Controller
 @RequestMapping("/qy/auth")
 public class QyAuthController {
+
+    @Value("${qywx.redirect.login}")
+    private String loginUrl;
 
     @Resource
     private QyAuthService qyAuthService;
@@ -36,7 +40,7 @@ public class QyAuthController {
 
         String url = HttpUtil.getHttpServletRequest().getParameter("url");
         if (StringUtil.isEmpty(sysUser.getAccount())) {
-            url = "http://dev.shell.yydz100.com/qy/login";
+            url = loginUrl;
         }
 
         return "redirect:" + url + "?openid=" + sysUser.getOpenid();
