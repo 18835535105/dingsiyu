@@ -3,9 +3,10 @@ package com.zhidejiaoyu.student.business.wechat.qy.auth.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.constant.CookieConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
+import com.zhidejiaoyu.common.mapper.SysUserMapper;
+import com.zhidejiaoyu.common.pojo.SysUser;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
-import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.wechat.qy.auth.service.QyAuthService;
 import com.zhidejiaoyu.student.business.wechat.qy.auth.vo.UserIdToOpenidVO;
 import com.zhidejiaoyu.student.business.wechat.qy.auth.vo.UserInfoVO;
@@ -35,11 +36,14 @@ public class QyAuthServiceImpl implements QyAuthService {
     @Resource
     private RestTemplate restTemplate;
 
+    @Resource
+    private SysUserMapper sysUserMapper;
+
     @Override
-    public ServerResponse<Object> getUserInfo() {
+    public SysUser getUserInfo() {
         HttpServletRequest httpServletRequest = HttpUtil.getHttpServletRequest();
 
-        ServerResponse<Object> fromCookie = getAuthInfoFromCookie(httpServletRequest);
+        SysUser fromCookie = getAuthInfoFromCookie(httpServletRequest);
         if (fromCookie != null) {
             return fromCookie;
         }
@@ -71,8 +75,7 @@ public class QyAuthServiceImpl implements QyAuthService {
         }
 
         addAuthCookie(userInfoVO);
-
-        return ServerResponse.createBySuccess(userInfoVO);
+        return getSysUser(userInfoVO);
     }
 
     /**
@@ -82,20 +85,29 @@ public class QyAuthServiceImpl implements QyAuthService {
      * @param httpServletRequest
      * @return
      */
-    public ServerResponse<Object> getAuthInfoFromCookie(HttpServletRequest httpServletRequest) {
+    public SysUser getAuthInfoFromCookie(HttpServletRequest httpServletRequest) {
         Cookie[] cookies = httpServletRequest.getCookies();
         try {
             for (Cookie cookie : cookies) {
                 if (Objects.equals(cookie.getName(), CookieConstant.QY_WX_USER_INFO)) {
                     String value = cookie.getValue();
                     UserInfoVO userInfoVO = JSONObject.parseObject(URLDecoder.decode(value, "utf-8"), UserInfoVO.class);
-                    return ServerResponse.createBySuccess(userInfoVO);
+                    return getSysUser(userInfoVO);
                 }
             }
         } catch (Exception e) {
             log.error("从cookie获取企业微信网页授权信息失败!", e);
         }
         return null;
+    }
+
+    public SysUser getSysUser(UserInfoVO userInfoVO) {
+        SysUser sysUser = sysUserMapper.selectByOpenId(userInfoVO.getOpenId());
+        if (sysUser == null) {
+            sysUser = new SysUser();
+            sysUser.setOpenid(userInfoVO.getOpenId());
+        }
+        return sysUser;
     }
 
     /**
