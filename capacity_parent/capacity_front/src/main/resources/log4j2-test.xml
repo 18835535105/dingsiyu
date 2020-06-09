@@ -29,7 +29,7 @@
         <!-- RollingFile 滚动输出日志到文件 -->
         <!-- 输出 warn 及更高优先级的 log 到 LOG_FILE_PATH 目录下的 warn.log 文件  -->
         <!-- filePattern 指定 warn.log 文件大于 size 大小时候文件处理规则, %d 日期;%i 编号(最大为下方设置的 max 值) -->
-        <RollingFile name="RollingFileWarn" fileName="log/student-capacity.%d.%i-warn.log"
+        <RollingFile name="RollingFileWarn" fileName="${LOG_FILE_PATH}/warn.%d.%i.log"
                      filePattern="${LOG_FILE_PATH}/%d{yyyy-MM-dd}/WARN_${LOG_FILE_NAME}_%i.log.gz">
             <PatternLayout pattern="${LOG_PATTERN}" />
             <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
@@ -43,7 +43,7 @@
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
         <!-- 输出 error 及更高优先级的 log 到 LOG_FILE_PATH 目录下的 error.log 文件  -->
-        <RollingFile name="RollingFileError" fileName="${LOG_FILE_PATH}/student-capacity-error.%d.%i.log"
+        <RollingFile name="RollingFileError" fileName="${LOG_FILE_PATH}/error.%d.%i.log"
                      filePattern="${LOG_FILE_PATH}/%d{yyyy-MM-dd}/ERROR_${LOG_FILE_NAME}_%i.log.gz">
             <PatternLayout pattern="${LOG_PATTERN}" />
             <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
@@ -54,7 +54,7 @@
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
         <!-- 输出 info 及更高优先级的 log 到 LOG_FILE_PATH 目录下的 info.log 文件  -->
-        <RollingFile name="RollingFileInfo" fileName="${LOG_FILE_PATH}/student-capacity-info.%d.%i.log"
+        <RollingFile name="RollingFileInfo" fileName="${LOG_FILE_PATH}/info.%d.%i.log"
                      filePattern="${LOG_FILE_PATH}/%d{yyyy-MM-dd}/Info_${LOG_FILE_NAME}_%i.log.gz">
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
