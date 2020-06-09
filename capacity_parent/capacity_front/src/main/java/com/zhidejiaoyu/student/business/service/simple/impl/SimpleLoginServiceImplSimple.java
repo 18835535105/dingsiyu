@@ -5,13 +5,14 @@ import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.award.GoldAwardAsync;
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
-import com.zhidejiaoyu.common.constant.PetImageConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.GoldLogMapper;
 import com.zhidejiaoyu.common.mapper.StudentExpansionMapper;
-import com.zhidejiaoyu.common.mapper.simple.*;
+import com.zhidejiaoyu.common.mapper.simple.SimpleAwardMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleCapacityStudentUnitMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleLearnMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleStudentMapper;
 import com.zhidejiaoyu.common.pojo.Award;
-import com.zhidejiaoyu.common.pojo.CapacityReview;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
@@ -22,15 +23,13 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.simple.SimpleLoginServiceSimple;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -42,11 +41,10 @@ import java.util.Map;
  * @author qizhentao
  * @version 1.0
  */
+@Slf4j
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleStudentMapper, Student> implements SimpleLoginServiceSimple {
-
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private SimpleStudentMapper simpleStudentMapper;
@@ -148,7 +146,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         int online = (int) DurationUtil.getTodayOnlineTime(session);
         // 今日学习效率 !
         if (valid >= online) {
-            logger.error("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, student);
+            log.error("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, student);
             valid = online - 1;
             result.put("efficiency", "99%");
         } else {

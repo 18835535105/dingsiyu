@@ -5,17 +5,16 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.mapper.EquipmentMapper;
-import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
-import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
-import com.zhidejiaoyu.common.vo.simple.studentInfoVo.ChildMedalVo;
-import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.mapper.EquipmentMapper;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.dateUtlis.WeekUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
-import com.zhidejiaoyu.student.business.service.simple.SimpleStudentInfoServiceSimple;
+import com.zhidejiaoyu.common.vo.simple.studentInfoVo.ChildMedalVo;
+import com.zhidejiaoyu.student.business.service.simple.SimpleStudentInfoService;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipAddEquipmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,17 +27,13 @@ import java.util.*;
 
 @Slf4j
 @Service
-public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleStudentMapper, Student> implements SimpleStudentInfoServiceSimple {
+public class SimpleStudentInfoServiceImpl extends SimpleBaseServiceImpl<SimpleStudentMapper, Student> implements SimpleStudentInfoService {
 
     @Autowired
     private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
     private SimpleRunLogMapper runLogMapper;
-
-
-    @Autowired
-    private SimpleAwardMapper simpleAwardMapper;
 
     @Autowired
     private SimpleWorshipMapper worshipMapper;
@@ -48,9 +43,6 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
 
     @Autowired
     private SimpleStudentExpansionMapper simpleStudentExpansionMapper;
-
-    @Autowired
-    private MedalAwardAsync medalAwardAsync;
 
     @Resource
     private EquipmentMapper equipmentMapper;
@@ -77,7 +69,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         }
         student.setPartUrl(student.getPartUrl() == null ? student.getPartUrl() : student.getPartUrl().replace(AliyunInfoConst.host, ""));
         student.setHeadUrl(student.getHeadUrl() == null ? student.getHeadUrl() : student.getHeadUrl().replace(AliyunInfoConst.host, ""));
-        simpleStudentMapper.updateByPrimaryKeySelective(student);
+        simpleStudentMapper.updateById(student);
         student = simpleStudentMapper.selectById(currentStudent.getId());
         student.setDiamond(currentStudent.getDiamond());
         student.setEnergy(currentStudent.getEnergy());
@@ -112,7 +104,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         if (stuId == null) {
             student = getStudent(session);
         } else {
-            student = simpleStudentMapper.selectByPrimaryKey(stuId);
+            student = simpleStudentMapper.selectById(stuId);
         }
         ChildMedalVo childMedalInfo = getChildMedalInfo(student, medalId);
         return ServerResponse.createBySuccess(childMedalInfo);
@@ -124,7 +116,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         if (stuId == null) {
             student = getStudent(session);
         } else {
-            student = simpleStudentMapper.selectByPrimaryKey(stuId);
+            student = simpleStudentMapper.selectById(stuId);
         }
         PageHelper.startPage(pageNum, pageSize);
         List<Map<String, Object>> medalImgUrlList = simpleMedalMapper.selectMedalImgUrl(student);
@@ -143,7 +135,7 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
     }
 
     @Override
-    public ServerResponse optBackMusic(HttpSession session, Integer status) {
+    public ServerResponse<Object> optBackMusic(HttpSession session, Integer status) {
         Long studentId = super.getStudentId(session);
         StudentExpansion studentExpansion = simpleStudentExpansionMapper.selectByStudentId(studentId);
         if (studentExpansion == null){
@@ -221,102 +213,4 @@ public class StudentInfoServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         childMedalVo.setContent(sb.toString());
         return childMedalVo;
     }
-
-    private void toAward(List<Medal> children, Student byWorship, List<Student> list, int[] complete, int[] totalPlan) {
-        if (list.size() > 0) {
-            Date worshipFirstTime = list.get(0).getWorshipFirstTime();
-            int day = this.getDay(worshipFirstTime);
-
-            award(list, children, day, complete, totalPlan);
-
-            // 当前被膜拜的学生膜拜次数为全国最高,为其加上标识
-            byWorship.setWorshipFirstTime(new Date());
-            simpleStudentMapper.updateByPrimaryKeySelective(byWorship);
-        }
-    }
-
-    private void award(List<Student> list, List<Medal> children, int day, int[] complete, int[] totalPlan) {
-        // 奖励之前第一名应得的勋章
-        List<Award> awards;
-        for (Student aList : list) {
-            awards = simpleAwardMapper.selectMedalByStudentIdAndMedalType(aList, children);
-            int count = (int) awards.stream().filter(award1 -> award1.getCanGet() == 1).count();
-            // 只有问鼎天下子勋章没有都可领取时才进行勋章点亮操作，如果其子勋章已经全部都能够领取无操作
-            if (count != children.size()) {
-                for (int i = 0; i < children.size(); i++) {
-                    if (day < totalPlan[i]) {
-                        complete[i] = day;
-                    } else {
-                        complete[i] = totalPlan[i];
-                    }
-                }
-                this.packageOrderMedal(aList, complete, children, awards, totalPlan);
-            }
-        }
-    }
-
-    private void packageOrderMedal(Student student, int[] complete, List<Medal> children, List<Award> awards, int[] totalPlan) {
-        Award award;
-        Medal medal;
-        if (awards.size() == 0) {
-            for (int i = 0; i < children.size(); i++) {
-                award = new Award();
-                medal = children.get(i);
-
-                award.setType(3);
-                award.setStudentId(student.getId());
-
-                setAwardState(complete, totalPlan, award, i);
-                award.setMedalType(medal.getId());
-                // 保存award获取其id
-                simpleAwardMapper.insert(award);
-            }
-        } else {
-            // 不是第一次查看勋章只需更新勋章是否可领取状态即可
-            for (int i = 0; i < children.size(); i++) {
-                // 有需要更新的奖励数据
-                award = awards.get(i);
-                if (award.getCanGet() != 1 && complete[i] == totalPlan[i]) {
-                    award.setCanGet(1);
-                    awards.add(award);
-                }
-            }
-            awards.forEach(item -> simpleAwardMapper.updateByPrimaryKeySelective(item));
-        }
-    }
-
-    /**
-     * 设置奖励可领取状态和领取状态
-     *
-     * @param complete
-     * @param totalPlan
-     * @param award
-     * @param i
-     */
-    private static void setAwardState(int[] complete, int[] totalPlan, Award award, int i) {
-        if (complete[i] == totalPlan[i]) {
-            // 当前任务完成
-            award.setGetFlag(2);
-            award.setCanGet(1);
-            award.setCurrentPlan(totalPlan[i]);
-        } else {
-            award.setGetFlag(2);
-            award.setCanGet(2);
-            award.setCurrentPlan(complete[i]);
-        }
-        award.setTotalPlan(totalPlan[i]);
-    }
-
-    /**
-     * 计算指定日期距今天的天数
-     *
-     * @param worshipFirstTime
-     * @return
-     */
-    private int getDay(Date worshipFirstTime) {
-        long date = worshipFirstTime.getTime();
-        long now = System.currentTimeMillis();
-        return (int) ((now - date) / 86400000);
-    }
-
 }
