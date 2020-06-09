@@ -95,12 +95,13 @@ public class CurrentDayOfStudyRedisOpt {
     }
 
     private String getErrorTestInfo(String errorTestInfo, String testInfo) {
-        StringBuilder builder = new StringBuilder();
-        String[] split = errorTestInfo.split("##");
         if (testInfo == null) {
             testInfo = new String();
         }
+        StringBuilder builder = new StringBuilder(testInfo);
+        String[] split = errorTestInfo.split("##");
         for (String str : split) {
+            testInfo = builder.toString();
             if (!testInfo.contains(str)) {
                 String[] suStr = str.split("&&");
                 if (suStr.length > 0) {
@@ -112,8 +113,7 @@ public class CurrentDayOfStudyRedisOpt {
                 }
             }
         }
-        testInfo += builder.toString();
-        return testInfo;
+        return builder.toString();
 
     }
 
