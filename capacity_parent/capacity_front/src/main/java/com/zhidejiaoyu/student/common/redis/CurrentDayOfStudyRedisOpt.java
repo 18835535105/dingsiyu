@@ -97,21 +97,22 @@ public class CurrentDayOfStudyRedisOpt {
     private String getErrorTestInfo(String errorTestInfo, String testInfo) {
         StringBuilder builder = new StringBuilder();
         String[] split = errorTestInfo.split("##");
+        if (testInfo == null) {
+            testInfo = new String();
+        }
         for (String str : split) {
-            String[] suStr = str.split("&&");
-            if (suStr.length > 0) {
-                if (suStr.length > 1) {
-                    builder.append(suStr[0]).append("&&").append(suStr[1]).append("##");
-                } else {
-                    builder.append(suStr[0]).append("##");
+            if (!testInfo.contains(str)) {
+                String[] suStr = str.split("&&");
+                if (suStr.length > 0) {
+                    if (suStr.length > 1) {
+                        builder.append(suStr[0]).append("&&").append(suStr[1]).append("##");
+                    } else {
+                        builder.append(suStr[0]).append("##");
+                    }
                 }
             }
         }
-        if (testInfo == null) {
-            testInfo = builder.toString();
-        } else {
-            testInfo += builder.toString();
-        }
+        testInfo += builder.toString();
         return testInfo;
 
     }
