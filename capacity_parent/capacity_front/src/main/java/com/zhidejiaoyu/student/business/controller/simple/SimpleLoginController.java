@@ -7,11 +7,12 @@ import com.zhidejiaoyu.student.business.service.simple.SimpleLoginServiceSimple;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -43,17 +44,6 @@ public class SimpleLoginController {
     public ServerResponse<Object> indexDate(HttpSession session) {
         return loginService.index(session);
     }
-
-    /**
-     * 首页数据(例句首页)
-     *
-     * @return 首页需要展示的数据
-     */
-    @RequestMapping("/sentenceIndex")
-    public ServerResponse<Object> sentenceIndex(HttpSession session) {
-        return loginService.sentenceIndex(session);
-    }
-
 
     /**
      * 修改密码
@@ -123,29 +113,4 @@ public class SimpleLoginController {
         session.invalidate();
     }
 
-    /**
-     * 生成验证码
-     */
-    @PostMapping("/validateCode")
-    public void getValidateCode(HttpSession session, HttpServletResponse response) throws IOException {
-        loginService.getValidateCode(session, response);
-    }
-
-    /**
-     * 判断学生是否可以学习智能版课程
-     *
-     * @param session
-     * @return
-     */
-    @GetMapping("/hasCapacity")
-    public ServerResponse hasCapacity(HttpSession session) {
-        Student student = (Student) session.getAttribute(UserConstant.CURRENT_STUDENT);
-        boolean hasCapacity = loginService.hasCapacityCourse(student);
-        if (hasCapacity) {
-            Map<String, Boolean> map = new HashMap<>(16);
-            map.put("capacity", true);
-            return ServerResponse.createBySuccess(map);
-        }
-        return ServerResponse.createBySuccess();
-    }
 }
