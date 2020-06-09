@@ -13,7 +13,7 @@ import java.util.Map;
  * @author wuchenxi
  * @date 2018年5月8日
  */
-public interface SimpleStudentInfoServiceSimple extends SimpleBaseService<Student> {
+public interface SimpleStudentInfoService extends SimpleBaseService<Student> {
 
     /**
      * 验证原密码是否正确

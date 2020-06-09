@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.student.business.wechat.qy.auth.service;
 
-import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.pojo.SysUser;
 
 /**
  * 企业微信授权、用户信息获取
@@ -15,5 +15,5 @@ public interface QyAuthService {
      *
      * @return
      */
-    ServerResponse<Object> getUserInfo();
+    SysUser getUserInfo();
 }

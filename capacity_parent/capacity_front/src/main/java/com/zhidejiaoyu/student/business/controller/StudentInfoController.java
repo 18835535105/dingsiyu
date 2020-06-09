@@ -11,7 +11,7 @@ import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.dto.EndValidTimeDto;
 import com.zhidejiaoyu.student.business.service.StudentInfoService;
-import com.zhidejiaoyu.student.business.service.simple.SimpleStudentInfoServiceSimple;
+import com.zhidejiaoyu.student.business.service.simple.SimpleStudentInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -41,7 +41,7 @@ public class StudentInfoController extends BaseController {
     private StudentInfoService studentInfoService;
 
     @Autowired
-    private SimpleStudentInfoServiceSimple simpleStudentInfoServiceSimple;
+    private SimpleStudentInfoService simpleStudentInfoService;
 
     /**
      * 完善学生信息、修改学生信息时获取学生信息
@@ -90,7 +90,7 @@ public class StudentInfoController extends BaseController {
      */
     @PostMapping("/updateStudentInfo")
     public ServerResponse<String> updateStudentInfo(HttpSession session, Student student) {
-        return simpleStudentInfoServiceSimple.updateStudentInfo(session, student);
+        return simpleStudentInfoService.updateStudentInfo(session, student);
     }
 
     /**
@@ -152,7 +152,7 @@ public class StudentInfoController extends BaseController {
      * @param student
      * @return
      */
-    private ServerResponse<String> checkStudentCommon(Student student) {
+    public static ServerResponse<String> checkStudentCommon(Student student) {
         int maxNameLength = 20;
         int minNameLength = 2;
 
@@ -185,7 +185,7 @@ public class StudentInfoController extends BaseController {
      * @param maxPasswordLength
      * @return
      */
-    private ServerResponse<String> validOldPassword(String oldPassword, String nowPassword, int minPasswordLength, int maxPasswordLength) {
+    public static ServerResponse<String> validOldPassword(String oldPassword, String nowPassword, int minPasswordLength, int maxPasswordLength) {
         boolean validOldPassword = StringUtils.isNotEmpty(oldPassword)
                 && (oldPassword.length() < minPasswordLength || oldPassword.length() > maxPasswordLength);
         if (validOldPassword) {
