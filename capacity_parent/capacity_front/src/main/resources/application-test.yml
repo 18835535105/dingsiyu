@@ -12,7 +12,7 @@ spring:
     password: zdjy
 
 logging:
-  config: classpath:logback-test.xml
+  config: classpath:log4j2-test.xml
 
 ip: 123.56.142.84
 #ip: 192.168.0.2
