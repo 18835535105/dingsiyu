@@ -24,9 +24,6 @@ import java.util.List;
 public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapper, CurrentDayOfStudy> implements CurrentDayOfStudyService {
 
     @Resource
-    private CurrentDayOfStudyMapper currentDayOfStudyMapper;
-
-    @Resource
     private DurationMapper durationMapper;
 
     @Resource
@@ -47,9 +44,9 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         } else {
             vo.setGold(0);
         }
-        Long vaildTime = durationMapper.selectValidTimeByStudentIdAndDate(student.getId(), dateStr);
-        if (vaildTime != null && vaildTime > 0) {
-            vo.setValidTime(vaildTime.intValue());
+        Long validTime = durationMapper.selectValidTimeByStudentIdAndDate(student.getId(), dateStr);
+        if (validTime != null && validTime > 0) {
+            vo.setValidTime(validTime.intValue());
         } else {
             vo.setValidTime(0);
         }
@@ -65,8 +62,8 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         vo.setStudyModel(getReturnList(errorStudyModel));
         String errorWord = currentDayOfStudyRedisOpt.getTestStudyCurrent(RedisKeysConst.ERROR_WORD, student.getId(), 1);
         vo.setWord(getReturnList(errorWord));
-        String errorSenten = currentDayOfStudyRedisOpt.getTestStudyCurrent(RedisKeysConst.ERROR_SENTENCE, student.getId(), 2);
-        vo.setSentence(getReturnList(errorSenten));
+        String errorSentence = currentDayOfStudyRedisOpt.getTestStudyCurrent(RedisKeysConst.ERROR_SENTENCE, student.getId(), 2);
+        vo.setSentence(getReturnList(errorSentence));
         String errorSyntax = currentDayOfStudyRedisOpt.getTestStudyCurrent(RedisKeysConst.ERROR_SYNTAX, student.getId(), 3);
         vo.setSyntax(getReturnList(errorSyntax));
         return ServerResponse.createBySuccess(vo);
@@ -74,7 +71,7 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
 
     private List<String> getReturnList(String errorTest) {
         String[] split = errorTest.split("##");
-        if (split != null && split.length > 0) {
+        if (split.length > 0) {
             return Arrays.asList(split);
         }
         return null;

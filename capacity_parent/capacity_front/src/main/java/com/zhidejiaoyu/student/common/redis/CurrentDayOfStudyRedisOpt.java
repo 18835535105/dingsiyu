@@ -18,6 +18,9 @@ import javax.annotation.Resource;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 学生当日飞行记录详情
+ */
 @Slf4j
 @Component
 public class CurrentDayOfStudyRedisOpt {
