@@ -69,7 +69,7 @@
     <!-- 在 Loggers 引入 Appender 使其生效 -->
     <loggers>
         <!-- Logger 节点用来单独指定 package 包下的 class 的日志输出格式等信息 -->
-        <logger level="info" additivity="false">
+        <logger level="info">
             <!-- additivity="false" 只在自定义的Appender中进行输出 -->
             <AppenderRef ref="Console"/>
         </logger >
