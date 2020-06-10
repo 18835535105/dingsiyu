@@ -26,10 +26,18 @@
 
     <select id="selectByDate" parameterType="map" resultMap="BaseResultMap">
         select
-        <include refid="base_sql"></include>
+        <include refid="base_sql"/>
         from current_day_of_study
         where
         to_days(#{date})=to_days(create_time)
+    </select>
+    <select id="selectByStudentIdAndQrCodeNum" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="base_sql"/>
+        from current_day_of_study
+        where student_id = #{studentId}
+        and qr_code_num = #{num}
+        limit 1
     </select>
 
 </mapper>

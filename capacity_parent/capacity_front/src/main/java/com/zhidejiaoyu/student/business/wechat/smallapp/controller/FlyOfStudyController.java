@@ -35,16 +35,33 @@ public class FlyOfStudyController {
      */
     @GetMapping("/getStudyInfo")
     public ServerResponse<Object> getStudyInfo(String openId, Integer num) {
+        checkParam(openId, num);
+        if (num == -1) {
+            return flyOfStudyService.getTotalStudyInfo(openId);
+        }
+        return flyOfStudyService.getStudyInfo(openId, num);
+    }
+
+    private void checkParam(String openId, Integer num) {
         if (StringUtil.isEmpty(openId)) {
             throw new ServiceException("openId can't be null!");
         }
         if (num == null) {
             throw new ServiceException("num can't be null!");
         }
-        if (num == -1) {
-            return flyOfStudyService.getTotalStudyInfo(openId);
-        }
-        return flyOfStudyService.getStudyInfo(openId, num);
+    }
+
+    /**
+     * 获取学生指定二维码对应的照片信息
+     *
+     * @param openId
+     * @param num   查询指定序号对应的日期拍摄的照片
+     * @return
+     */
+    @GetMapping("/getStudentInfo")
+    public ServerResponse<Object> getStudentInfo(String openId, Integer num) {
+        checkParam(openId, num);
+        return flyOfStudyService.getStudentInfo(openId, num);
     }
 
 }

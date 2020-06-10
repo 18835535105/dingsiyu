@@ -26,4 +26,13 @@ public interface FlyOfStudyService extends BaseService<CurrentDayOfStudy> {
      * @return
      */
     ServerResponse<Object> getStudyInfo(String openId, Integer num);
+
+    /**
+     * 获取学生指定二维码对应的照片信息
+     *
+     * @param openId
+     * @param num   查询指定序号对应的日期拍摄的照片
+     * @return
+     */
+    ServerResponse<Object> getStudentInfo(String openId, Integer num);
 }
