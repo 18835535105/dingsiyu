@@ -236,5 +236,5 @@ public interface RedisKeysConst {
      * field:wordId
      * value:错误次数
      */
-    String STUDY_MODEL="STUDY_MODEL";
+    String STUDY_MODEL="STUDY_MODEL:";
 }
