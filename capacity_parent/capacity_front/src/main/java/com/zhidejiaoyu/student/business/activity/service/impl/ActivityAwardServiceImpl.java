@@ -23,6 +23,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author: wuchenxi
@@ -147,6 +148,7 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
             } else {
                 info.setAwardGold(0);
             }
+            info.setMe(Objects.equals(studentId, student.getId()));
             info.setComplete(WeekActivityRedisOpt.CONDITION_MAP.get(weekActivityConfig.getWeekActivityId()).replace("$&$", String.valueOf((int) activityPlan)));
             vos.add(info);
         }
