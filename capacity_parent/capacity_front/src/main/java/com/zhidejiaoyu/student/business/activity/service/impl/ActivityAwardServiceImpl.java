@@ -157,6 +157,28 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
         return ServerResponse.createBySuccess(PageUtil.packagePage(vos, memberSize));
     }
 
+    @Override
+    public ServerResponse<Object> getAward(Integer awardGold) {
+        Student student = super.getStudent();
+
+        WeekActivityConfig weekActivityConfig = weekActivityConfigMapper.selectCurrentWeekConfig();
+        if (weekActivityConfig == null) {
+            return ServerResponse.createBySuccess();
+        }
+        WeekActivity weekActivity = weekActivityMapper.selectById(weekActivityConfig.getWeekActivityId());
+
+        List<AwardListVO.ActivityList> activityList = weekActivityRedisOpt.getActivityList(student.getId(), 0, weekActivity);
+
+        for (AwardListVO.ActivityList list : activityList) {
+            if (Objects.equals(list.getAwardGold(), awardGold)) {
+                list.setCanGet(3);
+            }
+        }
+
+        weekActivityRedisOpt.updateAwardList(student.getId(), activityList);
+        return ServerResponse.createBySuccess();
+    }
+
     /**
      * boss伤害累积值
      *
