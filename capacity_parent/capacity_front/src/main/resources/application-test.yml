@@ -19,9 +19,6 @@ ip: 123.56.142.84
 studyUrl: https://test.shell.yydz100.com
 adminDomin: http://test.admin.yydz100.com/dept
 
-cross:
-  url: http://192.168.0.*:5000
-
 quartz:
   port: 8083
 

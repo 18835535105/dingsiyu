@@ -25,10 +25,6 @@ ip: 39.106.181.151
 studyUrl: https://www.yydz100.com
 adminDomin: https://admin.duizhang100.cn/dept
 
-# 跨域地址
-cross:
-  url: '*'
-
 # 需要执行定时任务的服务器ip和端口
 quartz:
   ip: ${ip}
