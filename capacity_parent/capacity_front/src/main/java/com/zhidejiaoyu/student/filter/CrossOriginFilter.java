@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.filter;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
@@ -17,6 +18,7 @@ import java.io.IOException;
 @Slf4j
 @Component
 @WebFilter
+@Order(1)
 public class CrossOriginFilter implements Filter {
 
     @Override
