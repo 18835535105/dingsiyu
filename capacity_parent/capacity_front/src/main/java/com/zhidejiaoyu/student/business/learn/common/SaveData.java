@@ -230,7 +230,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                         currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_SENTENCE, studentId, feldId);
                     }
                 }
-                saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, new Long[]{learnExtend.getWordId()});
+                saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, new Long[]{learnExtend.getWordId()}, null);
             }
             int count = learnExtendMapper.insert(learnExtend);
             // 统计初出茅庐勋章
@@ -246,7 +246,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, true, type);
             } else {
                 studyCapacity = studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, false, type);
-                saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, new Long[]{learnExtends.get(0).getWordId()});
+                saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, new Long[]{learnExtends.get(0).getWordId()}, null);
             }
             // 计算记忆难度
             int memoryDifficult = wordMemoryDifficulty.getMemoryDifficulty(studyCapacity);
@@ -481,14 +481,41 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         return null;
     }
 
+    /**
+     * 获取单词学习信息
+     *
+     * @param unitId     单元
+     * @param student    学生数据
+     * @param group      组数
+     * @param studyModel 类型
+     * @return
+     */
     public Vocabulary getVocabulary(Long unitId, Student student, Integer group, String studyModel) {
         // 查询学习记录本模块学习过的所有单词id
         List<Long> wordIds = learnExtendMapper.selectByUnitIdAndStudentIdAndType(unitId, student.getId(), studyModel, modelType);
         return vocabularyMapper.selectOneWordNotInIdsNew(wordIds, unitId, group);
     }
 
-    public void saveErrorLearnLog(Long unitId, int type, int easyOrHard, String studyModel, LearnNew learnNew, Long[] wordIds) {
+    /**
+     * 保存错误信息
+     *
+     * @param unitId     单元id
+     * @param type       类型
+     * @param easyOrHard 难易
+     * @param studyModel 类型中文
+     * @param learnNew   learnNew
+     * @param wordIds    单词id数组
+     * @param isSave     是否保存错题信息
+     */
+    public void saveErrorLearnLog(Long unitId, int type, int easyOrHard, String studyModel, LearnNew learnNew, Long[] wordIds, Integer isSave) {
         List<ErrorLearnLog> collect = Arrays.stream(wordIds).map(wordId -> {
+            if (isSave != null && isSave.equals(1)) {
+                if (studyModel.contains("例句")) {
+                    currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_SENTENCE, learnNew.getStudentId(), wordId);
+                } else {
+                    currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_WORD, learnNew.getStudentId(), wordId);
+                }
+            }
             ErrorLearnLog errorLearnLog = new ErrorLearnLog();
             errorLearnLog.setEasyOrHard(easyOrHard);
             errorLearnLog.setGroup(learnNew.getGroup());

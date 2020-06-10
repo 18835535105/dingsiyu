@@ -1188,7 +1188,7 @@ public class TestServiceImpl extends BaseServiceImpl<TestRecordMapper, TestRecor
             }
             LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(student.getId(), unitId, easyOrHard, modelType);
 
-            saveData.saveErrorLearnLog(unitId, getModelInteger(classify), easyOrHard, getModel(classify), learnNew, errorIds);
+            saveData.saveErrorLearnLog(unitId, getModelInteger(classify), easyOrHard, getModel(classify), learnNew, errorIds,1);
         }
     }
 
