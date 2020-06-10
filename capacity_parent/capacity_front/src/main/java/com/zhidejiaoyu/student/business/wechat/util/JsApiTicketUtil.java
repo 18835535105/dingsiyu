@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.ApiConstant;
+import com.zhidejiaoyu.student.business.wechat.qy.constant.QyApiConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -44,27 +45,46 @@ public class JsApiTicketUtil {
      *
      * @return
      */
-    public static String getJsApiTicket() {
+    public static String getPublicAccountJsApiTicket() {
         String key = RedisKeysConst.PUBLIC_JS_API_TICKET;
         Object o = redisTemplate.opsForValue().get(key);
         if (o == null) {
-            String publicAccountAccessToken = AccessTokenUtil.getPublicAccountAccessToken();
-            String url = ApiConstant.getJSAPITicket(publicAccountAccessToken);
-            String response = restTemplate.getForObject(url, String.class);
-
-            JSONObject jsonObject = JSON.parseObject(response);
-
-            if (jsonObject.getInteger("errcode") != 0) {
-                log.error("获取ticket失败！");
-                return "";
-            }
-
-            String ticket = jsonObject.getString("ticket");
-            redisTemplate.opsForValue().set(key, ticket);
-            redisTemplate.expire(key, 2, TimeUnit.HOURS);
-            return ticket;
+            String url = ApiConstant.getJSAPITicket();
+            return getTicket(key, url);
         }
 
         return String.valueOf(o);
+    }
+
+    /**
+     * 获取微信公众号的凭证
+     *
+     * @return
+     */
+    public static String getQyJsApiTicket() {
+        String key = RedisKeysConst.QY_JS_API_TICKET;
+        Object o = redisTemplate.opsForValue().get(key);
+        if (o == null) {
+            String url = QyApiConstant.getJSAPITicket();
+            return getTicket(key, url);
+        }
+
+        return String.valueOf(o);
+    }
+
+    public static String getTicket(String key, String url) {
+        String response = restTemplate.getForObject(url, String.class);
+
+        JSONObject jsonObject = JSON.parseObject(response);
+
+        if (jsonObject.getInteger("errcode") != 0) {
+            log.error("获取ticket失败！");
+            return "";
+        }
+
+        String ticket = jsonObject.getString("ticket");
+        redisTemplate.opsForValue().set(key, ticket);
+        redisTemplate.expire(key, 2, TimeUnit.HOURS);
+        return ticket;
     }
 }

@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.wechat.publicaccount.constant;
 
+import com.zhidejiaoyu.student.business.wechat.util.AccessTokenUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.UnsupportedEncodingException;
@@ -75,7 +76,8 @@ public class ApiConstant {
      *
      * @return
      */
-    public static String getJSAPITicket(String accessToken) {
-        return "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=jsapi";
+    public static String getJSAPITicket() {
+        String publicAccountAccessToken = AccessTokenUtil.getPublicAccountAccessToken();
+        return "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=" + publicAccountAccessToken + "&type=jsapi";
     }
 }

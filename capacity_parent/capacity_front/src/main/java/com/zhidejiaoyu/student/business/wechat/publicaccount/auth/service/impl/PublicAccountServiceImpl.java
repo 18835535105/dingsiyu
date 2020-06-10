@@ -11,12 +11,12 @@ import com.zhidejiaoyu.student.business.wechat.publicaccount.auth.service.Public
 import com.zhidejiaoyu.student.business.wechat.publicaccount.auth.vo.ConfigVO;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.auth.vo.UserInfoVO;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.ApiConstant;
-import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.ConfigConstant;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.util.UserInfoUtil;
 import com.zhidejiaoyu.student.business.wechat.smallapp.vo.AccessTokenVO;
 import com.zhidejiaoyu.student.business.wechat.util.JsApiTicketUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -75,26 +75,24 @@ public class PublicAccountServiceImpl implements PublicAccountService {
     }
 
     @Override
-    public ServerResponse<Object> getConfig(String currentUrl) {
+    public ServerResponse<Object> getConfig(String currentUrl, String appId) {
+
+        if (StringUtils.isNotEmpty(currentUrl)) {
+            currentUrl = currentUrl.split("#")[0];
+        }
 
         long timeStamp = System.currentTimeMillis() / 1000;
         String nonceStr = UUID.randomUUID().toString();
 
         // 获取签名
-        String string1 = "jsapi_ticket=" + JsApiTicketUtil.getJsApiTicket()
+        String string1 = "jsapi_ticket=" + JsApiTicketUtil.getPublicAccountJsApiTicket()
                 + "&noncestr=" + nonceStr
                 + "&timestamp=" + timeStamp
                 + "&url=" + currentUrl;
         String signature = DigestUtils.sha1Hex(string1);
-        log.info("string1={}", string1);
-        log.info("jsapi_ticket={}", JsApiTicketUtil.getJsApiTicket());
-        log.info("noncestr={}", nonceStr);
-        log.info("timestamp={}", timeStamp);
-        log.info("url={}", currentUrl);
-        log.info("signature={}", signature);
 
         ConfigVO configVO = new ConfigVO();
-        configVO.setAppId(ConfigConstant.APP_ID);
+        configVO.setAppId(appId);
         configVO.setTimestamp(timeStamp);
         configVO.setNonceStr(nonceStr);
         configVO.setSignature(signature);
@@ -109,7 +107,4 @@ public class PublicAccountServiceImpl implements PublicAccountService {
 }
 
 
-//jsapi_ticket=kgt8ON7yVITDhtdwci0qefd58moX9kYv1PoEfRE7KBwKlgbHD55vQnhPT48sJVdUKG2xMGI-Qm3KeQjHbLJAiA&noncestr=dee49b25-20d4-45ae-b968-9a85170cba8a&timestamp=1590723489998&url=https://test.shell.yydz100.com/partner/?openId=o7jCDw8qXrGFQ1McqPb5h0Ye2PoQ&headimgurl=http://thirdwx.qlogo.cn/mmopen/vi_32/rwXoHxiaKh0JDFiaEP3WjuLQsdPOg5CszmSpQczTiaxsicicoMhZmf2hguoicTcdNapBY4gXx8HT97gckc9O62896SlQ/132&nickname=转角的天空╭(╯ε╰)╮&blank=blank&from=groupmessage
-//jsapi_ticket=kgt8ON7yVITDhtdwci0qefd58moX9kYv1PoEfRE7KBwKlgbHD55vQnhPT48sJVdUKG2xMGI-Qm3KeQjHbLJAiA&noncestr=fc224cc5-474a-445f-a533-6366095bc30c&timestamp=1590722886&url=https://test.shell.yydz100.com/partner/?openId=o7jCDw8qXrGFQ1McqPb5h0Ye2PoQ&headimgurl=http://thirdwx.qlogo.cn/mmopen/vi_32/rwXoHxiaKh0JDFiaEP3WjuLQsdPOg5CszmSpQczTiaxsicicoMhZmf2hguoicTcdNapBY4gXx8HT97gckc9O62896SlQ/132&nickname=转角的天空╭(╯ε╰)╮&blank=blank&from=groupmessage
-//jsapi_ticket=kgt8ON7yVITDhtdwci0qefd58moX9kYv1PoEfRE7KBwKlgbHD55vQnhPT48sJVdUKG2xMGI-Qm3KeQjHbLJAiA&noncestr=dee49b25-20d4-45ae-b968-9a85170cba8a&timestamp=1590723489&url=https://test.shell.yydz100.com/partner/?openId=o7jCDw8qXrGFQ1McqPb5h0Ye2PoQ&headimgurl=http://thirdwx.qlogo.cn/mmopen/vi_32/rwXoHxiaKh0JDFiaEP3WjuLQsdPOg5CszmSpQczTiaxsicicoMhZmf2hguoicTcdNapBY4gXx8HT97gckc9O62896SlQ/132&nickname=转角的天空╭(╯ε╰)╮&blank=blank&from=groupmessage
 

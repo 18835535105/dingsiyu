@@ -3,8 +3,8 @@ package com.zhidejiaoyu.student.business.wechat.publicaccount.auth.controller;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.auth.service.PublicAccountService;
+import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.ConfigConstant;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,10 +52,7 @@ public class PublicAccountController {
      */
     @GetMapping("/getConfig")
     public ServerResponse<Object> getConfig(String url) {
-        if (StringUtils.isNotEmpty(url)) {
-            url = url.split("#")[0];
-        }
-        return publicAccountService.getConfig(url);
+        return publicAccountService.getConfig(url, ConfigConstant.APP_ID);
     }
 
     /**
