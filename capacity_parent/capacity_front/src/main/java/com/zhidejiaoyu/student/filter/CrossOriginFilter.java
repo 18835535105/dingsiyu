@@ -27,12 +27,6 @@ public class CrossOriginFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        log.info("CrossOriginFilter:{}", "HttpServletResponse httpServletResponse = (HttpServletResponse) response;\n" +
-                "        httpServletResponse.setHeader(\"Access-Control-Allow-Origin\", \"*\");\n" +
-                "        httpServletResponse.setHeader(\"Access-Control-Allow-Methods\", \"POST, GET, OPTIONS, DELETE\");\n" +
-                "        httpServletResponse.setHeader(\"Access-Control-Max-Age\", \"0\");\n" +
-                "        httpServletResponse.setHeader(\"Access-Control-Allow-Headers\", \"Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId,token\");\n" +
-                "        httpServletResponse.setHeader(\"Access-Control-Allow-Credentials\", \"true\");");
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
         httpServletResponse.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");

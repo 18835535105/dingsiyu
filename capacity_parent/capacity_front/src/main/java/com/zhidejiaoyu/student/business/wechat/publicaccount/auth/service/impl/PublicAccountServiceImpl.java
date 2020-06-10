@@ -90,6 +90,15 @@ public class PublicAccountServiceImpl implements PublicAccountService {
                 + "&url=" + currentUrl;
         String signature = DigestUtils.sha1Hex(string1);
 
+        if (log.isDebugEnabled()) {
+            log.debug("string1={}", string1);
+            log.debug("jsapi_ticket={}", jsApiTicket);
+            log.debug("noncestr={}", nonceStr);
+            log.debug("timestamp={}", timeStamp);
+            log.debug("url={}", currentUrl);
+            log.debug("signature={}", signature);
+        }
+
         ConfigVO configVO = new ConfigVO();
         configVO.setAppId(appId);
         configVO.setTimestamp(timeStamp);
