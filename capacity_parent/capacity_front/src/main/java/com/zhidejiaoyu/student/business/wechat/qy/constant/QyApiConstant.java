@@ -45,7 +45,7 @@ public class QyApiConstant {
      *
      * @return
      */
-    public static String getJSAPITicket() {
+    public static String getJsApiTicket() {
         String qyAccessToken = AccessTokenUtil.getQyAccessToken();
         return "https://qyapi.weixin.qq.com/cgi-bin/get_jsapi_ticket?access_token=" + qyAccessToken;
     }

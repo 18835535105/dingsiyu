@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.auth.service.PublicAccountService;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.ConfigConstant;
+import com.zhidejiaoyu.student.business.wechat.util.JsApiTicketUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,7 +53,7 @@ public class PublicAccountController {
      */
     @GetMapping("/getConfig")
     public ServerResponse<Object> getConfig(String url) {
-        return publicAccountService.getConfig(url, ConfigConstant.APP_ID);
+        return publicAccountService.getConfig(url, ConfigConstant.APP_ID, JsApiTicketUtil.getPublicAccountJsApiTicket());
     }
 
     /**

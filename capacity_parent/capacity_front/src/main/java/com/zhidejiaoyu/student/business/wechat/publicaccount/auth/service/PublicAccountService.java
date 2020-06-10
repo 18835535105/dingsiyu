@@ -38,6 +38,7 @@ public interface PublicAccountService {
      * @return
      * @param appId
      * @param url
+     * @param jsApiTicket
      */
-    ServerResponse<Object> getConfig(String url, String appId);
+    ServerResponse<Object> getConfig(String url, String appId, String jsApiTicket);
 }

@@ -57,7 +57,7 @@ public class JsApiTicketUtil {
     }
 
     /**
-     * 获取微信公众号的凭证
+     * 获取企业微信的凭证
      *
      * @return
      */
@@ -65,14 +65,14 @@ public class JsApiTicketUtil {
         String key = RedisKeysConst.QY_JS_API_TICKET;
         Object o = redisTemplate.opsForValue().get(key);
         if (o == null) {
-            String url = QyApiConstant.getJSAPITicket();
+            String url = QyApiConstant.getJsApiTicket();
             return getTicket(key, url);
         }
 
         return String.valueOf(o);
     }
 
-    public static String getTicket(String key, String url) {
+    private static String getTicket(String key, String url) {
         String response = restTemplate.getForObject(url, String.class);
 
         JSONObject jsonObject = JSON.parseObject(response);

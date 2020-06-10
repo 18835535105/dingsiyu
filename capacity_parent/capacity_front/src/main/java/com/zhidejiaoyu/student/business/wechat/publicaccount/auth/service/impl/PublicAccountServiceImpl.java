@@ -13,7 +13,6 @@ import com.zhidejiaoyu.student.business.wechat.publicaccount.auth.vo.UserInfoVO;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.ApiConstant;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.util.UserInfoUtil;
 import com.zhidejiaoyu.student.business.wechat.smallapp.vo.AccessTokenVO;
-import com.zhidejiaoyu.student.business.wechat.util.JsApiTicketUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
@@ -75,7 +74,7 @@ public class PublicAccountServiceImpl implements PublicAccountService {
     }
 
     @Override
-    public ServerResponse<Object> getConfig(String currentUrl, String appId) {
+    public ServerResponse<Object> getConfig(String currentUrl, String appId, String jsApiTicket) {
 
         if (StringUtils.isNotEmpty(currentUrl)) {
             currentUrl = currentUrl.split("#")[0];
@@ -85,7 +84,7 @@ public class PublicAccountServiceImpl implements PublicAccountService {
         String nonceStr = UUID.randomUUID().toString();
 
         // 获取签名
-        String string1 = "jsapi_ticket=" + JsApiTicketUtil.getPublicAccountJsApiTicket()
+        String string1 = "jsapi_ticket=" + jsApiTicket
                 + "&noncestr=" + nonceStr
                 + "&timestamp=" + timeStamp
                 + "&url=" + currentUrl;
