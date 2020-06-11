@@ -126,14 +126,4 @@ public class IndexController extends BaseController {
         return smallAppIndexService.prize(dto);
     }
 
-    /**
-     * 初始化源分战力排行
-     *
-     * @return
-     */
-    @PostMapping("/initRank")
-    public ServerResponse<Object> initRank() {
-        shipIndexService.initRank();
-        return ServerResponse.createBySuccess();
-    }
 }
