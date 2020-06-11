@@ -57,4 +57,14 @@ public class ActivityAwardController extends BaseController {
         }
         return activityAwardService.getAward(awardGold);
     }
+
+    /**
+     * 统计可领取奖励个数
+     *
+     * @return
+     */
+    @GetMapping("/getAwardCount")
+    public ServerResponse<Object> getAwardCount() {
+        return activityAwardService.getAwardCount();
+    }
 }

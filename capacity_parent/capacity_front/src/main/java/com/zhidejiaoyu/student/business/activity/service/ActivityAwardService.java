@@ -33,4 +33,11 @@ public interface ActivityAwardService extends BaseService<WeekActivity> {
      * @return
      */
     ServerResponse<Object> getAward(Integer awardGold);
+
+    /**
+     * 统计可领取奖励个数
+     *
+     * @return
+     */
+    ServerResponse<Object> getAwardCount();
 }
