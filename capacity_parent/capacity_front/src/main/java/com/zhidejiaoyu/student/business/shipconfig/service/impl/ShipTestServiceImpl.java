@@ -307,7 +307,6 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
         if (pkCopyState != null) {
             pkCopyBase.setDurability(pkCopyState.getDurability());
         }
-
         return ServerResponse.createBySuccess(PkInfoVO.builder()
                 .originator(getEquipmentMap(studentId))
                 .challenged(getBossEquipment(pkCopyBase))
