@@ -91,17 +91,17 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         MAPPING.put(GradeNameConstant.VOLUME_1, "up");
         MAPPING.put(GradeNameConstant.VOLUME_2, "down");
         // 全册
-        MAPPING.put(GradeNameConstant.FULL_VOLUME, "quance");
+//        MAPPING.put(GradeNameConstant.FULL_VOLUME, "quance");
         // 必修
-        MAPPING.put(GradeNameConstant.REQUIRED_ONE, "bixiuyi");
-        MAPPING.put(GradeNameConstant.REQUIRED_TWO, "bixiuer");
-        MAPPING.put(GradeNameConstant.REQUIRED_THREE, "bixiusan");
-        MAPPING.put(GradeNameConstant.REQUIRED_FOUR, "bixiusi");
-        MAPPING.put(GradeNameConstant.REQUIRED_FIVE, "bixiuwu");
+//        MAPPING.put(GradeNameConstant.REQUIRED_ONE, "bixiuyi");
+//        MAPPING.put(GradeNameConstant.REQUIRED_TWO, "bixiuer");
+//        MAPPING.put(GradeNameConstant.REQUIRED_THREE, "bixiusan");
+//        MAPPING.put(GradeNameConstant.REQUIRED_FOUR, "bixiusi");
+//        MAPPING.put(GradeNameConstant.REQUIRED_FIVE, "bixiuwu");
         // 选修
-        MAPPING.put(GradeNameConstant.ELECTIVE_SIX, "xuanxiuliu");
-        MAPPING.put(GradeNameConstant.ELECTIVE_SEVEN, "xuanxiuba");
-        MAPPING.put(GradeNameConstant.ELECTIVE_EIGHT, "xuanxiuba");
+//        MAPPING.put(GradeNameConstant.ELECTIVE_SIX, "xuanxiuliu");
+//        MAPPING.put(GradeNameConstant.ELECTIVE_SEVEN, "xuanxiuba");
+//        MAPPING.put(GradeNameConstant.ELECTIVE_EIGHT, "xuanxiuba");
     }
 
     @Override
