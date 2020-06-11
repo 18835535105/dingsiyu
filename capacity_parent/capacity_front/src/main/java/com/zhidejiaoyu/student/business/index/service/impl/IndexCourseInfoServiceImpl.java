@@ -211,8 +211,11 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             }
 
             List<CourseNew> courseNews = courseNewMapper.selectBatchIds(smallCourseIds);
-
-            courseNews.forEach(courseNew -> packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, courseNew));
+            // 匹配不到年级和上下册的课程不展示
+            courseNews.stream().filter(courseNew -> MAPPING.containsKey(courseNew.getGrade()) && MAPPING.containsKey(courseNew.getLabel())
+                    // 一年级、二年级课程还没有图片，不展示
+                    && !Objects.equals(courseNew.getGrade().trim(), "一年级") && !Objects.equals(courseNew.getGrade().trim(), "二年级"))
+                    .forEach(courseNew -> packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, courseNew));
         }
 
         return ServerResponse.createBySuccess(CourseInfoVO.builder()
