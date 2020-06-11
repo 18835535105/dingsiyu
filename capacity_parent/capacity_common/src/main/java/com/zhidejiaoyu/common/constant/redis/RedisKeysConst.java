@@ -124,9 +124,19 @@ public interface RedisKeysConst {
     String PUBLIC_ACCOUNT_WECHAT_ACCESS_TOKEN = "PUBLIC_ACCOUNT_WECHAT_ACCESS_TOKEN";
 
     /**
+     * 企业微信 access_token
+     */
+    String QY_WECHAT_ACCESS_TOKEN = "QY_WECHAT_ACCESS_TOKEN";
+
+    /**
      * 微信公众号jsapi_ticket
      */
     String PUBLIC_JS_API_TICKET = "PUBLIC_JS_API_TICKET";
+
+    /**
+     * 企业微信jsapi_ticket
+     */
+    String QY_JS_API_TICKET = "QY_JS_API_TICKET";
 
     /**
      * 标识学生已经初始化了飞船信息
@@ -173,4 +183,58 @@ public interface RedisKeysConst {
      * value:bossId
      */
     String SCHOOL_PK_BASE_INFO = "SCHOOL_PK_BASE_INFO:";
+
+    /**
+     * 记录学生每日单词的错误记录
+     * String类型
+     * key=ERROR_WORD
+     * field:wordId
+     * value:错误次数
+     */
+    String ERROR_WORD = "ERROR_WORD:";
+
+    /**
+     * 记录学生每日句型的错误记录
+     * String类型
+     * key=ERROR_SENTENCE
+     * field:sentenceId
+     * value:错误次数
+     */
+    String ERROR_SENTENCE = "ERROR_SENTENCE:";
+
+    /**
+     * 记录学生每日课文的错误记录
+     * String类型
+     * key=ERROR_TEKS
+     * field:teksId
+     * value:错误次数
+     */
+    String ERROR_TEKS = "ERROR_TEKS:";
+
+    /**
+     * 记录学生每日语法的错误记录
+     * String类型
+     * key=ERROR_SYNTAX
+     * field:wordId
+     * value:错误次数
+     */
+    String ERROR_SYNTAX = "ERROR_SYNTAX:";
+
+    /**
+     * 记录学生每日测试的错误记录
+     * String类型
+     * key=ERROR_SYNTAX
+     * field:wordId
+     * value:错误次数
+     */
+    String ERROR_TEST = "ERROR_TEST:";
+
+    /**
+     * 记录学生每日学习的模块记录
+     * String类型
+     * key=ERROR_SYNTAX
+     * field:wordId
+     * value:错误次数
+     */
+    String STUDY_MODEL="STUDY_MODEL:";
 }

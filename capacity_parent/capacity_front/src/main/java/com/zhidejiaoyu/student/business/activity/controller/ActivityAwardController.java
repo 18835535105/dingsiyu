@@ -1,9 +1,11 @@
 package com.zhidejiaoyu.student.business.activity.controller;
 
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.activity.service.ActivityAwardService;
 import com.zhidejiaoyu.student.business.controller.BaseController;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,5 +42,29 @@ public class ActivityAwardController extends BaseController {
     @GetMapping("/rank")
     public ServerResponse<Object> rank() {
         return activityAwardService.rank();
+    }
+
+    /**
+     * 领取奖励
+     *
+     * @param awardGold 奖励金币数
+     * @return
+     */
+    @PostMapping("/getAward")
+    public ServerResponse<Object> getAward(Integer awardGold) {
+        if (awardGold == null) {
+            throw new ServiceException(400, "awardGold can't be null!");
+        }
+        return activityAwardService.getAward(awardGold);
+    }
+
+    /**
+     * 统计可领取奖励个数
+     *
+     * @return
+     */
+    @GetMapping("/getAwardCount")
+    public ServerResponse<Object> getAwardCount() {
+        return activityAwardService.getAwardCount();
     }
 }

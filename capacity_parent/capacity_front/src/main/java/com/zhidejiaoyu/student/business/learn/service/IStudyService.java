@@ -31,7 +31,7 @@ public interface IStudyService extends IService<LearnNew> {
      * @param flowId
      * @return
      */
-    Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId);
+    Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId, Long[] errorId);
 
 
 }

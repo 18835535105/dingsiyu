@@ -175,7 +175,6 @@ public class SimpleMemoryServiceImplSimple extends SimpleBaseServiceImpl<SimpleV
                 return ServerResponse.createBySuccess(302, "当前选择课程已学习完毕，可以重新学习，温故知新哦。");
             }
 
-            // todo: 2019-08-10 可删除该日志
             if (simpleCapacityVo == null) {
                 log.error("排查 NPE 问题，查询新单词为空！plan=[{}], wordCount=[{}], testId=[{}]", plan, wordCount, testId);
             }

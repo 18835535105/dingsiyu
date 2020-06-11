@@ -3,9 +3,7 @@ package com.zhidejiaoyu.student.business.service.simple;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
 
 /**
  * 登陆业务接口层
@@ -26,17 +24,6 @@ public interface SimpleLoginServiceSimple extends SimpleBaseService<Student> {
 
     ServerResponse<Object> index(HttpSession session);
 
-    ServerResponse<Object> sentenceIndex(HttpSession session);
-
     ServerResponse<Object> clickPortrait(HttpSession session);
 
-    void getValidateCode(HttpSession session, HttpServletResponse response) throws IOException;
-
-    /**
-     * 判断学生是否可以学习智能版课程
-     *
-     * @param student
-     * @return
-     */
-    boolean hasCapacityCourse(Student student);
 }

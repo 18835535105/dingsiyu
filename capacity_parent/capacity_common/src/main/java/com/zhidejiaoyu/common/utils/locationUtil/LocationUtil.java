@@ -1,6 +1,6 @@
 package com.zhidejiaoyu.common.utils.locationUtil;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.csp.ahas.shaded.com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

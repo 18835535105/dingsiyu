@@ -42,12 +42,12 @@ public class ControllerLogAop {
             long maxTime = 2000;
             HttpSession httpSession = HttpUtil.getHttpSession();
             HttpServletRequest httpServletRequest = HttpUtil.getHttpServletRequest();
-            if (httpSession == null || httpServletRequest == null) {
+            if (httpSession == null) {
                 log.warn("request 或者 session 为空！不影响程序运行！");
                 return;
             }
             String url = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
-            if (StringUtils.isNotEmpty(url) && (url.contains("/smallApp") || url.contains("publicAccount"))) {
+            if (StringUtils.isNotEmpty(url) && (url.contains("/smallApp") || url.contains("publicAccount") || url.contains("/qy"))) {
                 this.printSmallAppLog(startTime, maxTime, url);
             } else {
                 this.printLearnSystemLog(startTime, maxTime, httpSession, url);

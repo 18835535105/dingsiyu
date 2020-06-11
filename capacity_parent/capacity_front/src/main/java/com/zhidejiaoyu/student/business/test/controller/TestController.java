@@ -319,4 +319,17 @@ public class TestController {
         return testService.saveReadTest(session, testRecord);
     }
 
+    /**
+     * 保存错误的测试结果
+     * @param session
+     * @param errorTestInfo
+     * @return
+     */
+    @RequestMapping("/saveCurrent")
+    public Object saveCurrent(HttpSession session,String errorTestInfo) {
+        testService.saveCurrent(session,errorTestInfo);
+        return ServerResponse.createBySuccess();
+    }
+
+
 }

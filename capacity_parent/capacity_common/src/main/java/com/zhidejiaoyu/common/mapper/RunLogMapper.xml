@@ -79,23 +79,6 @@
     <sql id="Blob_Column_List">
         log_content
     </sql>
-    <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs"
-            parameterType="com.zhidejiaoyu.common.pojo.RunLogExample">
-        select
-        <if test="distinct">
-            distinct
-        </if>
-        <include refid="Base_Column_List"/>
-        ,
-        <include refid="Blob_Column_List"/>
-        from run_log
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-        <if test="orderByClause != null">
-            order by ${orderByClause}
-        </if>
-    </select>
     <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.RunLogExample">
         select
         <if test="distinct">
@@ -119,7 +102,8 @@
         where id = #{id,jdbcType=BIGINT}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from run_log
+        delete
+        from run_log
         where id = #{id,jdbcType=BIGINT}
     </delete>
     <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.RunLogExample">
@@ -235,7 +219,10 @@
         from run_log where operate_user_id = #{studentId} and type = #{type} and unit_id = #{unitId} order by id desc
     </select>
     <select id="getCountXZByStudentId" resultType="java.lang.Integer" parameterType="map">
-        select count(id) FROM run_log where type = 7 and operate_user_id = #{studentId}
+        select count(id)
+        FROM run_log
+        where type = 7
+          and operate_user_id = #{studentId}
     </select>
     <select id="getGoldByStudentId" resultType="java.util.Map" parameterType="map">
         select operate_user_id AS studentId, SUM(substring_index(t.s,'#',1)) AS jb from (SELECT operate_user_id,
@@ -281,7 +268,10 @@
     </select>
 
     <select id="getMapKeyStudentrunLog" resultType="java.util.Map">
-        select operate_user_id as id, COUNT(*) as count  from run_log where type = 7 GROUP BY operate_user_id
+        select operate_user_id as id, COUNT(*) as count
+        from run_log
+        where type = 7
+        GROUP BY operate_user_id
     </select>
     <select id="selectLastRunLogByOperateUserId" resultMap="BaseResultMap" parameterType="map">
         select
@@ -337,19 +327,6 @@
             <include refid="Update_By_Example_Where_Clause"/>
         </if>
     </update>
-    <update id="updateByExampleWithBLOBs" parameterType="map">
-        update run_log
-        set id = #{record.id,jdbcType=BIGINT},
-        operate_user_id = #{record.operateUserId,jdbcType=BIGINT},
-        course_id = #{record.courseId,jdbcType=BIGINT},
-        unit_id = #{record.unitId,jdbcType=BIGINT},
-        type = #{record.type,jdbcType=INTEGER},
-        create_time = #{record.createTime,jdbcType=TIMESTAMP},
-        log_content = #{record.logContent,jdbcType=LONGVARCHAR}
-        <if test="_parameter != null">
-            <include refid="Update_By_Example_Where_Clause"/>
-        </if>
-    </update>
     <update id="updateByExample" parameterType="map">
         update run_log
         set id = #{record.id,jdbcType=BIGINT},
@@ -386,23 +363,13 @@
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
-    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.zhidejiaoyu.common.pojo.RunLog">
-        update run_log
-        set operate_user_id = #{operateUserId,jdbcType=BIGINT},
-            course_id = #{courseId,jdbcType=BIGINT},
-            unit_id = #{unitId,jdbcType=BIGINT},
-            type = #{type,jdbcType=INTEGER},
-            create_time = #{createTime,jdbcType=TIMESTAMP},
-            log_content = #{logContent,jdbcType=LONGVARCHAR}
-        where id = #{id,jdbcType=BIGINT}
-    </update>
     <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.RunLog">
         update run_log
         set operate_user_id = #{operateUserId,jdbcType=BIGINT},
-            course_id = #{courseId,jdbcType=BIGINT},
-            unit_id = #{unitId,jdbcType=BIGINT},
-            type = #{type,jdbcType=INTEGER},
-            create_time = #{createTime,jdbcType=TIMESTAMP}
+            course_id       = #{courseId,jdbcType=BIGINT},
+            unit_id         = #{unitId,jdbcType=BIGINT},
+            type            = #{type,jdbcType=INTEGER},
+            create_time     = #{createTime,jdbcType=TIMESTAMP}
         where id = #{id,jdbcType=BIGINT}
     </update>
 
@@ -416,33 +383,40 @@
     </delete>
 
     <select id="selectLoginStudentId" resultType="long" parameterType="map">
-        select operate_user_id from run_log where to_days(create_time)=to_days(#{day}) group by operate_user_id
+        select operate_user_id
+        from run_log
+        where to_days(create_time) = to_days(#{day})
+        group by operate_user_id
     </select>
 
     <select id="selectGoldByStudentIdAndDate" parameterType="map" resultMap="BaseResultMap">
-        select
-        log_content
+        select log_content
         from run_log
-        where
-        operate_user_id=#{studentId}
-        and `type`=#{type}
-        and to_days(create_time)=to_days(#{date})
+        where operate_user_id = #{studentId}
+          and `type` = #{type}
+          and to_days(create_time) = to_days(#{date})
     </select>
 
     <select id="selectByDateAndType" parameterType="map" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List"></include>
+        <include refid="Base_Column_List"/>
         from run_log
         where `type`=#{type}
         and to_days(create_time)=to_days(#{date})
     </select>
     <select id="selectLoginTimeByStudentIdAndDate" parameterType="map" resultType="date">
-        select
-        create_time
+        select create_time
         from run_log
-        where  `type`= 1
-        and to_days(create_time)=to_days(#{date})
-        and operate_user_id=#{studentId}
+        where `type` = 1
+          and to_days(create_time) = to_days(#{date})
+          and operate_user_id = #{studentId}
+        limit 1
+    </select>
+    <select id="selectFirstLoginTimeByStudentId" resultType="java.util.Date" parameterType="map">
+        select create_time
+        from run_log
+        where operate_user_id = #{studentId}
+          and `type` = 1
         limit 1
     </select>
 

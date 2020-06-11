@@ -12,6 +12,7 @@ import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
+import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -118,7 +119,7 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
     }
 
     @Override
-    public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId) {
+    public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId, Long[] errorId) {
         Student student = getStudent(session);
         Integer gold = 0;
         Integer enger = 0;

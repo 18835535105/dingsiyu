@@ -64,9 +64,7 @@ public class CatchException {
     @ResponseBody
     public ServerResponse<Object> constraintViolationException(ConstraintViolationException e) {
         HttpServletRequest httpServletRequest = HttpUtil.getHttpServletRequest();
-        if (httpServletRequest != null) {
-            packageLogMsg(e, httpServletRequest);
-        }
+        packageLogMsg(e, httpServletRequest);
         return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), new ArrayList<>(e.getConstraintViolations()).get(0).getMessageTemplate());
     }
 

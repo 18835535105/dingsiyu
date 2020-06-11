@@ -16,6 +16,7 @@ import com.zhidejiaoyu.common.pojo.TestRecord;
 import com.zhidejiaoyu.common.pojo.TestStore;
 import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
@@ -44,6 +45,11 @@ import java.util.stream.Collectors;
 @Service
 public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestStore> implements GoldTestService {
 
+    /**
+     * 图片标识符
+     */
+    private static final String PICTURE_SPLIT = "&&TP";
+
     @Resource
     private TestStoreMapper testStoreMapper;
 
@@ -71,16 +77,40 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
 
         List<GoldTestSubjectsVO> vos = new ArrayList<>(goldTestVoS.size());
         collect.forEach((type, list) -> {
-            GoldTestVO goldTestVO = list.get(0);
-            List<GoldTestSubjectsVO.Subjects> subjects = new ArrayList<>(list.size());
-            packageSubjects(list, subjects);
-            vos.add(GoldTestSubjectsVO.builder()
-                    .type(goldTestVO.getType())
-                    .subjects(subjects)
-                    .content(StringUtils.isEmpty(goldTestVO.getContent()) ? new String[0] : replaceArrayStr(goldTestVO.getContent().split("\n")))
-                    .build());
+            // 根据测试内容分组，比如阅读理解类型，有可能一个类型有多篇阅读文章，需要通过内容再次分组后进行处理
+            LinkedHashMap<String, ArrayList<GoldTestVO>> collect1 = list.stream()
+                    .filter(l -> StringUtil.isNotEmpty(l.getContent()))
+                    .collect(Collectors.groupingBy(GoldTestVO::getContent, LinkedHashMap::new, Collectors.toCollection(ArrayList::new)));
+            if (collect1.size() > 1) {
+                collect1.forEach((key, value) -> packageGoldTestSubjectsVO(vos, value));
+            } else {
+                packageGoldTestSubjectsVO(vos, list);
+            }
+
         });
         return ServerResponse.createBySuccess(vos);
+    }
+
+    public void packageGoldTestSubjectsVO(List<GoldTestSubjectsVO> vos, ArrayList<GoldTestVO> value) {
+        GoldTestVO goldTestVO = value.get(0);
+        List<GoldTestSubjectsVO.Subjects> subjects = new ArrayList<>(value.size());
+        packageSubjects(value, subjects);
+        vos.add(GoldTestSubjectsVO.builder()
+                .type(goldTestVO.getType())
+                .subjects(subjects)
+                .content(getContent(goldTestVO))
+                .build());
+    }
+
+    public String[] getContent(GoldTestVO goldTestVO) {
+        String content = goldTestVO.getContent();
+        if (StringUtils.isEmpty(content)) {
+            return new String[0];
+        }
+        if (content.contains(PICTURE_SPLIT)) {
+            content = getImgUrl(content);
+        }
+        return replaceArrayStr(content.split("\n"));
     }
 
     /**
@@ -91,28 +121,32 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
      */
     public void packageSubjects(ArrayList<GoldTestVO> list, List<GoldTestSubjectsVO.Subjects> subjects) {
         list.forEach(vo -> {
-            // 图片标识符
-            String pictureSplit = "&&TP";
-
             String select = vo.getSelect();
-            if (StringUtils.isNotEmpty(select) && select.contains(pictureSplit)) {
+            if (StringUtils.isNotEmpty(select) && select.contains(PICTURE_SPLIT)) {
                 select = getImgUrl(select);
             }
 
-            String title = vo.getTitle();
+            String[] answer = StringUtils.isNotEmpty(vo.getAnswer()) ? replaceArrayStr(replaceN(vo.getAnswer()).split("#")) : new String[0];
+
+            StringBuilder title = new StringBuilder(vo.getTitle());
             String[] titleArr = new String[0];
-            if (StringUtils.isNotEmpty(title)) {
+            if (StringUtils.isNotEmpty(title.toString())) {
                 if (Objects.equals(vo.getType(), "连词成句")) {
-                    title = replaceStr(title);
+                    title = new StringBuilder(replaceStr(title.toString()));
                 }
-                if (title.contains(pictureSplit)) {
-                    title = getImgUrl(title);
+                if (title.toString().contains(PICTURE_SPLIT)) {
+                    title = new StringBuilder(getImgUrl(title.toString()));
                 }
                 String spaceSplit = "$&$";
-                if (!title.contains(spaceSplit)) {
-                    title += spaceSplit;
+                int count = StringUtils.countMatches(title.toString(), spaceSplit);
+
+                int length = answer.length;
+                if (count != length) {
+                    for (int i = 0; i < length - count; i++) {
+                        title.append(spaceSplit);
+                    }
                 }
-                titleArr = replaceN(title).split("\n");
+                titleArr = replaceN(title.toString()).split("\n");
             }
 
             subjects.add(GoldTestSubjectsVO.Subjects.builder()
@@ -120,7 +154,7 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
                     .title(replaceArrayStr(titleArr))
                     .selects(StringUtils.isEmpty(select) ? Collections.emptyList() : Arrays.asList(replaceArrayStr(select.split("\\$&\\$"))))
                     .analysis(StringUtils.isNotEmpty(vo.getAnalysis()) ? replaceArrayStr(replaceN(vo.getAnalysis()).split("\n")) : new String[0])
-                    .answer(StringUtils.isNotEmpty(vo.getAnswer()) ? replaceArrayStr(replaceN(vo.getAnswer()).split("#")) : new String[0])
+                    .answer(answer)
                     .build());
         });
     }
@@ -168,11 +202,11 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
      * @return
      */
     public String getImgUrl(String str) {
-        String[] split = str.split("&&");
+        String[] split = StringUtil.trim(str).split("&&");
         StringBuilder sb = new StringBuilder();
         for (String s : split) {
             if (s.contains("TP")) {
-                sb.append("&&").append(GetOssFile.getPublicObjectUrl(FileConstant.TEST_STORE_IMG)).append(s.substring(2)).append(".png").append("&&");
+                sb.append("&&").append(GetOssFile.getPublicObjectUrl(FileConstant.TEST_STORE_IMG)).append(StringUtil.trim(s).substring(2)).append(".png").append("&&");
             } else {
                 sb.append(s);
             }
@@ -236,9 +270,9 @@ public class GoldTestServiceImpl extends BaseServiceImpl<TestStoreMapper, TestSt
     }
 
     public static void main(String[] args) {
-//        System.out.println(Arrays.toString("123 $&$ 41323".split("\\$&\\$")));
-//        System.out.println("arer \n".replace("\\n", ""));
-//        System.out.println(Arrays.toString("args \\n\n 123".split("\n")));
+        System.out.println(Arrays.toString("123 $&$ 41323".split("\\$&\\$")));
+        System.out.println("arer \n".replace("\\n", ""));
+        System.out.println(Arrays.toString("args \\n\n 123".split("\n")));
 
 
         String s = "1. It's on the first floor.  $&$\\n\n 2. No, it isn't. It's cold today.  $&$\\n\n 3. It's 3:30. It's time for PE class.  $&$\\n\n 4. It's hot and sunny. $&$\\n\n 5. Yes, it's a beautiful garden. $&$\n \n";

@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.server.TestResponseCode;
 import com.zhidejiaoyu.common.utils.testUtil.TestResultUtil;
 import com.zhidejiaoyu.common.vo.student.SentenceTranslateVo;
+import com.zhidejiaoyu.student.common.CurrentDayOfStudyUtil;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -49,6 +50,8 @@ public class SaveSentenceData {
     private TestResultUtil testResultUtil;
     @Resource
     private CommonMethod commonMethod;
+
+    private static final String SENTENCE = "SENTENCE";
     @Resource
     private RedisOpt redisOpt;
     private final Integer modelType = 2;
@@ -163,6 +166,7 @@ public class SaveSentenceData {
 
     private SentenceTranslateVo getSentenceTranslateVo(Long plan, boolean firstStudy, Long sentenceCount, Integer type, Sentence sentence) {
         SentenceTranslateVo sentenceTranslateVo = getSentenceTranslateVos(plan, firstStudy, sentenceCount, sentence, 0.0);
+        CurrentDayOfStudyUtil.saveSessionCurrent(SENTENCE, sentenceTranslateVo.getId());
         int nextInt = new Random().nextInt(10);
         if (nextInt > 2) {
             testResultUtil.getOrderEnglishList(sentenceTranslateVo, sentence.getCentreExample(), sentence.getExampleDisturb(), type);
@@ -174,6 +178,7 @@ public class SaveSentenceData {
 
     private ServerResponse<Object> getSentenceTranslateVoServerResponse(boolean firstStudy, Long plan, Long sentenceCount, Sentence sentence, Integer type) {
         SentenceTranslateVo sentenceTranslateVo = getSentenceTranslateVos(plan, firstStudy, sentenceCount, sentence, 0.0);
+        CurrentDayOfStudyUtil.saveSessionCurrent(SENTENCE, sentenceTranslateVo.getId());
         testResultUtil.getOrderEnglishList(sentenceTranslateVo, sentence.getCentreExample(), sentence.getExampleDisturb(), type);
         sentenceTranslateVo.setStudyNew(true);
         return ServerResponse.createBySuccess(sentenceTranslateVo);
@@ -195,6 +200,7 @@ public class SaveSentenceData {
 
     private SentenceTranslateVo getListenSentenceVo(Sentence sentence, boolean firstStudy, Long plan, double memoryStrength, Long sentenceCount, Integer type) {
         SentenceTranslateVo sentenceTranslateVo = getSentenceTranslateVos(plan, firstStudy, sentenceCount, sentence, memoryStrength);
+        CurrentDayOfStudyUtil.saveSessionCurrent(SENTENCE, sentenceTranslateVo.getId());
         sentenceTranslateVo.setStudyNew(false);
         testResultUtil.getOrderEnglishList(sentenceTranslateVo, sentence.getCentreExample(), sentence.getTranslateDisturb(), type);
         return sentenceTranslateVo;
@@ -202,6 +208,7 @@ public class SaveSentenceData {
 
     private SentenceTranslateVo getSentenceVo(Sentence sentence, boolean firstStudy, Long plan, double memoryStrength, Long sentenceCount, Integer type) {
         SentenceTranslateVo sentenceTranslateVo = getSentenceTranslateVos(plan, firstStudy, sentenceCount, sentence, memoryStrength);
+        CurrentDayOfStudyUtil.saveSessionCurrent(SENTENCE, sentenceTranslateVo.getId());
         sentenceTranslateVo.setStudyNew(false);
         sentenceTranslateVo.setEnglishList(commonMethod.getEnglishList(sentence.getCentreExample()));
         if (type == 2) {

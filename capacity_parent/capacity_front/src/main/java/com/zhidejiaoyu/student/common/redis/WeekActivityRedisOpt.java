@@ -100,4 +100,15 @@ public class WeekActivityRedisOpt {
         redisTemplate.opsForHash().put(key, studentId, activityLists);
         return activityLists;
     }
+
+    /**
+     * 更新奖品领取状态
+     *
+     * @param studentId
+     * @param list
+     */
+    public void updateAwardList(Long studentId, List<AwardListVO.ActivityList> list) {
+        String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_LIST;
+        redisTemplate.opsForHash().put(key, studentId, list);
+    }
 }

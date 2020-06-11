@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.student.business.syntax.savelearn;
 
 import com.zhidejiaoyu.common.constant.TimeConstant;
+import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.dto.syntax.SaveSyntaxDTO;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
@@ -8,6 +9,7 @@ import com.zhidejiaoyu.common.study.GoldMemoryTime;
 import com.zhidejiaoyu.common.study.memorystrength.SyntaxMemoryStrength;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.common.CurrentDayOfStudyUtil;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -111,6 +113,7 @@ public class SaveLearnInfo {
             this.initStudyCapacity(learnExtend, learnNew, type);
             learnExtend.setStatus(0);
             learnExtend.setFirstIsKnow(0);
+            CurrentDayOfStudyUtil.saveSessionCurrent(RedisKeysConst.ERROR_SYNTAX, learnExtend.getWordId());
         }
         learnExtendMapper.insert(learnExtend);
     }

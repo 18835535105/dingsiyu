@@ -4,21 +4,28 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.SysUser">
-        <id column="id" property="id" />
-        <result column="avatar" property="avatar" />
-        <result column="account" property="account" />
-        <result column="password" property="password" />
-        <result column="salt" property="salt" />
-        <result column="name" property="name" />
-        <result column="birthday" property="birthday" />
-        <result column="sex" property="sex" />
-        <result column="email" property="email" />
-        <result column="phone" property="phone" />
-        <result column="roleid" property="roleid" />
-        <result column="deptid" property="deptid" />
-        <result column="status" property="status" />
-        <result column="createtime" property="createtime" />
-        <result column="version" property="version" />
+        <id column="id" property="id"/>
+        <result column="avatar" property="avatar"/>
+        <result column="openid" property="openid"/>
+        <result column="account" property="account"/>
+        <result column="password" property="password"/>
+        <result column="salt" property="salt"/>
+        <result column="name" property="name"/>
+        <result column="birthday" property="birthday"/>
+        <result column="sex" property="sex"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="roleid" property="roleid"/>
+        <result column="deptid" property="deptid"/>
+        <result column="status" property="status"/>
+        <result column="createtime" property="createtime"/>
+        <result column="version" property="version"/>
     </resultMap>
+    <select id="selectByOpenId" resultMap="BaseResultMap" parameterType="map">
+        select id, account, name, openid
+        from sys_user
+        where openid = #{openId}
+        limit 1
+    </select>
 
 </mapper>

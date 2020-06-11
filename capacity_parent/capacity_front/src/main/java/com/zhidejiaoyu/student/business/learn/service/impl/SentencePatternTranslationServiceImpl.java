@@ -8,6 +8,7 @@ import com.zhidejiaoyu.student.business.learn.common.SaveData;
 import com.zhidejiaoyu.student.business.learn.common.SaveSentenceData;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
+import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,8 @@ public class SentencePatternTranslationServiceImpl extends BaseServiceImpl<Learn
     private SaveData saveData;
     @Resource
     private SaveSentenceData saveSentenceData;
+    @Resource
+    private CurrentDayOfStudyRedisOpt currentDayOfStudyRedisOpt;
     private Integer type = 7;
     private Integer easyOrHard = 1;
     private String studyModel = "例句翻译";
@@ -30,15 +33,14 @@ public class SentencePatternTranslationServiceImpl extends BaseServiceImpl<Learn
 
     @Override
     public Object getStudy(HttpSession session, Long unitId, Integer difficulty) {
-
         Student student = getStudent(session);
-        Long studentId = student.getId();
-        return saveSentenceData.getStudyModel(session, unitId, difficulty, student, studentId, studyModel, easyOrHard, type);
+        currentDayOfStudyRedisOpt.saveStudyModel(student.getId(), studyModel, unitId);
+        return saveSentenceData.getStudyModel(session, unitId, difficulty, student, student.getId(), studyModel, easyOrHard, type);
     }
 
 
     @Override
-    public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId) {
+    public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId, Long[] errorId) {
         Student student = getStudent(session);
         if (saveData.saveVocabularyModel(student, session, unitId, wordId, isTrue, plan, total,
                 flowId, easyOrHard, type, studyModel,modelType)) {

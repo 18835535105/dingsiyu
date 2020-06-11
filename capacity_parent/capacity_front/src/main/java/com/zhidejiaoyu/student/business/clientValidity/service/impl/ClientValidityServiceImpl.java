@@ -24,10 +24,8 @@ public class ClientValidityServiceImpl implements ClientValidityService {
 
         SysConfig sysConfig = sysConfigMapper.selectByExplain(clientValidityTimeStr);
         if (sysConfig != null) {
-            Date updateTime = sysConfig.getUpdateTime();
-            String date = DateUtil.formatDate(updateTime, DateUtil.SLASHYYYYMM);
-            return ServerResponse.createBySuccess(date);
+            return ServerResponse.createBySuccess(sysConfig.getContent());
         }
-        return null;
+        return ServerResponse.createBySuccess();
     }
 }

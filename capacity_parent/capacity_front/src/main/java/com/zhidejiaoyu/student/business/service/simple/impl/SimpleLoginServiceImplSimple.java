@@ -8,29 +8,28 @@ import com.zhidejiaoyu.common.award.MedalAwardAsync;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.mapper.GoldLogMapper;
 import com.zhidejiaoyu.common.mapper.StudentExpansionMapper;
-import com.zhidejiaoyu.common.mapper.simple.*;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.mapper.simple.SimpleAwardMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleCapacityStudentUnitMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleLearnMapper;
+import com.zhidejiaoyu.common.mapper.simple.SimpleStudentMapper;
+import com.zhidejiaoyu.common.pojo.Award;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.DurationUtil;
-import com.zhidejiaoyu.common.utils.ValidateCode;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.LearnTimeUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.student.business.service.simple.SimpleLoginServiceSimple;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
-import com.zhidejiaoyu.common.constant.PetImageConstant;
-import com.zhidejiaoyu.student.business.service.simple.SimpleLoginServiceSimple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -42,38 +41,19 @@ import java.util.Map;
  * @author qizhentao
  * @version 1.0
  */
+@Slf4j
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleStudentMapper, Student> implements SimpleLoginServiceSimple {
-
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private SimpleStudentMapper simpleStudentMapper;
 
     @Autowired
-    private SimpleDurationMapper simpleDurationMapper;
-
-    @Autowired
-    private SimpleTestRecordMapper simpleTestRecordMapper;
-
-    @Autowired
     private SimpleLearnMapper learnMapper;
 
     @Autowired
-    private SimpleUnitVocabularyMapper simpleUnitVocabularyMapper;
-
-    @Autowired
     private SimpleAwardMapper simpleAwardMapper;
-
-    @Autowired
-    private SimpleCapacityReviewMapper capacityMapper;
-
-    @Autowired
-    private SimpleUnitMapper unitMapper;
-
-    @Autowired
-    private SimpleSimpleStudentUnitMapper simpleSimpleStudentUnitMapper;
 
     @Autowired
     private RedisOpt redisOpt;
@@ -166,7 +146,7 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
         int online = (int) DurationUtil.getTodayOnlineTime(session);
         // 今日学习效率 !
         if (valid >= online) {
-            logger.error("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, student);
+            log.error("有效时长大于或等于在线时长：validTime=[{}], onlineTime=[{}], student=[{}]", valid, online, student);
             valid = online - 1;
             result.put("efficiency", "99%");
         } else {
@@ -195,174 +175,6 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
 
         // 值得元老勋章
         medalAwardAsync.oldMan(student);
-
-        return ServerResponse.createBySuccess(result);
-    }
-
-    /**
-     * 需要测试的模块
-     *
-     * @param type 1:单词辨音; 2:词组辨音; 3:快速单词; 4:快速词组; 5:词汇考点; 6:快速句型; 7:语法辨析; 8单词默写; 9:词组默写;
-     */
-    private boolean testModel(int type) {
-        if (type == 1 || type == 2 || type == 3 || type == 4 || type == 6 || type == 8 || type == 9) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private String testModelStr(int type) {
-        if (type == 1) {
-            return "单词辨音";
-        } else if (type == 2) {
-            return "词组辨音";
-        } else if (type == 3) {
-            return "快速单词";
-        } else if (type == 4) {
-            return "快速词组";
-        } else if (type == 5) {
-            return "词汇考点";
-        } else if (type == 6) {
-            return "快速句型";
-        } else if (type == 7) {
-            return "语法辨析";
-        } else if (type == 8) {
-            return "单词默写";
-        } else {
-            return "词组默写";
-        }
-    }
-
-    /**
-     * 例句首页数据
-     */
-    @Override
-    public ServerResponse<Object> sentenceIndex(HttpSession session) {
-
-        // 学生id
-        Student student = super.getStudent(session);
-        Long studentId = student.getId();
-
-        // 封装返回数据
-        Map<String, Object> result = new HashMap<>(16);
-
-        Integer role = student.getRole();
-        // 业务员
-        if (role == 2) {
-            result.put("role", "2");
-            // 学生
-        } else {
-            result.put("role", "1");
-        }
-
-        // 学生id
-        result.put("student_id", studentId);
-        // 当前例句所学课程id
-        result.put("course_id", student.getSentenceCourseId());
-        // 当前例句所学课程名
-        result.put("course_name", student.getSentenceCourseName());
-        // 当前例句所学单元id
-        result.put("unit_id", student.getSentenceUnitId());
-        // 当前例句所学单元名
-        // result.put("unit_name", stu.getSentenceUnitName());
-        // 根据单元id查询单元名
-        result.put("unit_name", unitMapper.getUnitNameByUnitId(student.getSentenceUnitId().longValue()));
-        // 账号
-        result.put("account", student.getAccount());
-        // 姓名
-        result.put("studentName", student.getStudentName());
-        // 头像
-        result.put("headUrl", AliyunInfoConst.host + student.getHeadUrl());
-
-        // 有效时长  !
-        int valid = (int) DurationUtil.getTodayValidTime(session);
-        // 在线时长 !
-        int online = (int) DurationUtil.getTodayOnlineTime(session);
-        result.put("online", LearnTimeUtil.validOnlineTime(online));
-        result.put("valid", LearnTimeUtil.validOnlineTime(valid));
-        // 今日学习效率 !
-        String efficiency = LearnTimeUtil.efficiency(valid, online);
-        result.put("efficiency", efficiency);
-
-        // i参数 1=慧记忆，2=慧听写，3=慧默写，4=例句听力，5=例句翻译，6=例句默写
-        //-- 1.查询学生当前单词模块学的那个单元
-        Integer unitId = student.getSentenceUnitId();
-
-        // 一共有多少单词/.
-        Long countWord = simpleUnitVocabularyMapper.selectWordCountByUnitId((long) unitId);
-
-        for (int i = 4; i < 7; i++) {
-            Map<String, Object> a = new HashMap<String, Object>();
-            //-- 如果 2 = NULL 就跳过4步执行5步   condition = 3(方框为空)
-            //-- 如果 2 != NULL 执行4步跳过第5步 , 如果第2步>=80 condition = 1(方框为√), 如果第3步<80 condition = 2(方框为×)
-
-            //-- 2.某学生某单元某模块得了多少分
-            //select point from test_record where student_id = #{} and unit_id = #{} and genre = '单元闯关测试' and study_model = '慧记忆'
-            Integer point = simpleTestRecordMapper.selectPoint(studentId, unitId, "单元闯关测试", i);
-
-            //-- 3.某学生某单元某模块单词学了多少 ./
-            //select COUNT(id) from learn where student_id = #{} and unit_id = #{} and study_model = '慧记忆' GROUP BY vocabulary_id
-            Integer sum = learnMapper.selectNumberByStudentId(studentId, unitId, i);
-
-            if (point != null && sum != null) {
-                //-- 4.某学生某单元某模块学习速度;  单词已学个数/(有效时长m/3600)
-                //select SUM(valid_time) from duration where unit_id = 1 and student_id = 1 and study_model = '慧记忆'
-                Integer sumValid = simpleDurationMapper.valid_timeIndex(studentId, unitId, i);
-
-                Integer speed = (int) (BigDecimalUtil.div(sum, sumValid) * 3600);
-                a.put("point", point + ""); // 分数
-                a.put("speed", speed + ""); // 速度
-                if (point >= 80) {       // 方框状态
-                    a.put("condition", 1);
-                } else {
-                    a.put("condition", 2);
-                }
-                a.put("sum", ""); // ./
-                a.put("countWord", ""); // /.
-            } else {
-                a.put("sum", sum + ""); // ./
-                a.put("countWord", countWord + ""); // /.
-                a.put("condition", 3); // 方框状态
-                a.put("point", ""); // 分数
-                // 计算学习速度
-                Integer sumValid = simpleDurationMapper.valid_timeIndex(studentId, unitId, i);
-                Integer speed = (int) (BigDecimalUtil.div(sum, sumValid == null ? 0 : sumValid) * 3600);
-                a.put("speed", speed); // 速度
-            }
-
-            result.put(i + "", a);
-        }
-
-        // 封装返回的数据 - 智能记忆智能复习数量
-        // 当前时间
-        SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String datetime = s.format(new Date());
-
-        CapacityReview cr = new CapacityReview();
-        cr.setUnit_id(Long.valueOf(unitId));
-        cr.setStudent_id(Long.valueOf(studentId));
-        cr.setPush(datetime);
-        // 听力模块许复习量
-        cr.setClassify("4");
-        Integer d = capacityMapper.countCapacity_memory(cr);
-        // 翻译模块许复习量
-        cr.setClassify("5");
-        Integer e = capacityMapper.countCapacity_memory(cr);
-        // 默写模块许复习量
-        cr.setClassify("6");
-        Integer f = capacityMapper.countCapacity_memory(cr);
-        result.put("amount4", d);
-        result.put("amount5", e);
-        result.put("amount6", f);
-        // 是否需要隐藏学习模块
-        if (d >= 10 || e >= 10 || f >= 10) {
-            result.put("hide", true);
-            //宠物图片
-            result.put("partWGUrl", PetImageConstant.WIN);
-        } else {
-            result.put("hide", false);
-        }
 
         return ServerResponse.createBySuccess(result);
     }
@@ -443,25 +255,6 @@ public class SimpleLoginServiceImplSimple extends SimpleBaseServiceImpl<SimpleSt
             myrecord = levelGold;
             j++;
         }
-    }
-
-    @Override
-    public boolean hasCapacityCourse(Student student) {
-        int count = simpleCapacityStudentUnitMapper.countByType(student, 1);
-        return count > 0;
-    }
-
-    @Override
-    public void getValidateCode(HttpSession session, HttpServletResponse response) throws IOException {
-        response.setContentType("image/jpeg");
-        response.setHeader("Pragma", "no-cache");
-        response.setHeader("Cache-Control", "no-cache");
-        response.setDateHeader("Expires", 0);
-        ValidateCode vCode = new ValidateCode(150, 40, 4, 150);
-        session.removeAttribute("validateCode");
-        vCode.write(response.getOutputStream());
-        session.setAttribute("validateCode", vCode.getCode());
-        vCode.write(response.getOutputStream());
     }
 
 }

@@ -12,15 +12,12 @@ spring:
     password: zdjy
 
 logging:
-  config: classpath:logback-test.xml
+  config: classpath:log4j2-test.xml
 
 ip: 123.56.142.84
 #ip: 192.168.0.2
 studyUrl: https://test.shell.yydz100.com
 adminDomin: http://test.admin.yydz100.com/dept
-
-cross:
-  url: http://192.168.0.*:5000
 
 quartz:
   port: 8083
@@ -32,3 +29,10 @@ gongzhonghao:
   redirect:
     # 微信授权结束后跳转的路径
     partner: ${studyUrl}/partner
+
+qywx:
+  appId: wwe6e0ef9e01f6d6aa
+  secret: pxf5D_K3F9jFPwRTksCRXERkar3rOdOLmyYfImmv11o
+  redirect:
+    # 企业微信登录地址
+    login: ${studyUrl}/qy/login

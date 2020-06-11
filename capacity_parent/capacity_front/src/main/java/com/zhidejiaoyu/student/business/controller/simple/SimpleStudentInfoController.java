@@ -1,22 +1,22 @@
 package com.zhidejiaoyu.student.business.controller.simple;
 
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
-import com.zhidejiaoyu.common.vo.simple.studentInfoVo.ChildMedalVo;
 import com.zhidejiaoyu.common.constant.TimeConstant;
+import com.zhidejiaoyu.common.dto.EndValidTimeDto;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.simple.studentInfoVo.ChildMedalVo;
 import com.zhidejiaoyu.student.business.controller.BaseController;
-import com.zhidejiaoyu.common.dto.EndValidTimeDto;
+import com.zhidejiaoyu.student.business.controller.StudentInfoController;
 import com.zhidejiaoyu.student.business.service.StudentInfoService;
-import com.zhidejiaoyu.student.business.service.simple.SimpleStudentInfoServiceSimple;
+import com.zhidejiaoyu.student.business.service.simple.SimpleStudentInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
@@ -34,7 +34,7 @@ import static com.zhidejiaoyu.student.business.controller.StudentInfoController.
 public class SimpleStudentInfoController extends BaseController {
 
     @Autowired
-    private SimpleStudentInfoServiceSimple simpleStudentInfoServiceSimple;
+    private SimpleStudentInfoService simpleStudentInfoService;
 
     @Autowired
     private StudentInfoService studentInfoService;
@@ -48,7 +48,6 @@ public class SimpleStudentInfoController extends BaseController {
     public ServerResponse<Student> getStudentInfo(HttpSession session, @RequestParam(value = "studentId", required = false) Long studentId) {
         Student student = super.getStudent(session);
         if (StringUtils.isNotEmpty(student.getPetName()) && studentId == null) {
-//            session.invalidate();
             // 学生已经完善过信息，不可重复完善信息
             return ServerResponse.createByError(443,"您已经完善过个人信息，不可再次执行该操作！");
         }
@@ -67,14 +66,14 @@ public class SimpleStudentInfoController extends BaseController {
      */
     @PostMapping("/updateStudentInfo")
     public ServerResponse<String> updateStudentInfo(HttpSession session, Student student) {
-        ServerResponse<String> stringServerResponse = checkStudentCommon(student);
+        ServerResponse<String> stringServerResponse = StudentInfoController.checkStudentCommon(student);
         if (stringServerResponse != null) {
             return stringServerResponse;
         }
         if (StringUtils.isNotEmpty(student.getQq()) && student.getQq().length() > 13) {
             student.setQq("");
         }
-        return simpleStudentInfoServiceSimple.updateStudentInfo(session, student);
+        return simpleStudentInfoService.updateStudentInfo(session, student);
     }
 
     /**
@@ -90,63 +89,11 @@ public class SimpleStudentInfoController extends BaseController {
         String password = student.getPassword();
         int minPasswordLength = 6;
         int maxPasswordLength = 10;
-        ServerResponse<String> stringServerResponse = validOldPassword(oldPassword, password, minPasswordLength, maxPasswordLength);
+        ServerResponse<String> stringServerResponse = StudentInfoController.validOldPassword(oldPassword, password, minPasswordLength, maxPasswordLength);
         if (stringServerResponse != null) {
             return stringServerResponse;
         }
-        return simpleStudentInfoServiceSimple.judgeOldPassword(password, oldPassword);
-    }
-
-    /**
-     * 学生信息公共验证部分
-     *
-     * @param student
-     * @return
-     */
-    private ServerResponse<String> checkStudentCommon(Student student) {
-        int maxNameLength = 20;
-        int minNameLength = 2;
-
-        if (student.getStudentName().trim().length() > maxNameLength || student.getStudentName().trim().length() < minNameLength) {
-            return ServerResponse.createByErrorMessage("姓名长度限制在 2-20 之间!请重新输入!");
-        }
-
-        // 验证出生日期在 1970至今的日期
-        String birthDate = student.getBirthDate();
-        if (StringUtils.isNotEmpty(birthDate)) {
-            try {
-                Date birth = new SimpleDateFormat("yyyy-MM-dd").parse(birthDate);
-                Date beginDate = new SimpleDateFormat("yyyy-MM-dd").parse("1970-01-01 00:00:00");
-                if (birth.getTime() < beginDate.getTime() || birth.getTime() > System.currentTimeMillis()) {
-                    return ServerResponse.createByErrorMessage("出生日期不合法！");
-                }
-            } catch (Exception e) {
-                log.error("保存学生 {} -> {} 信息时验证出生日期合法性出错！", student.getId(), student.getStudentName(), e.getMessage(), e);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * 验证旧密码是否合法
-     *
-     * @param oldPassword
-     * @param nowPassword
-     * @param minPasswordLength
-     * @param maxPasswordLength
-     * @return
-     */
-    private ServerResponse<String> validOldPassword(String oldPassword, String nowPassword, int minPasswordLength, int maxPasswordLength) {
-        boolean validOldPassword = StringUtils.isNotEmpty(oldPassword)
-                && (oldPassword.length() < minPasswordLength || oldPassword.length() > maxPasswordLength);
-        if (validOldPassword) {
-            return ServerResponse.createByErrorMessage("旧密码长度必须是6~10个字符！");
-        }
-        // 验证原密码是否正确
-        if (StringUtils.isNotBlank(oldPassword) && !oldPassword.equals(nowPassword)) {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.PASSWORD_ERROR.getCode(), ResponseCode.PASSWORD_ERROR.getMsg());
-        }
-        return null;
+        return simpleStudentInfoService.judgeOldPassword(password, oldPassword);
     }
 
     /**
@@ -199,7 +146,7 @@ public class SimpleStudentInfoController extends BaseController {
     public ServerResponse<Map<String, Object>> getWorship(HttpSession session, @RequestParam(required = false, defaultValue = "1") Integer type,
                                                           @RequestParam(required = false, defaultValue = "1") Integer pageNum,
                                                           @RequestParam(required = false, defaultValue = "18") Integer pageSize) {
-        return simpleStudentInfoServiceSimple.getWorship(session, type, pageNum, pageSize);
+        return simpleStudentInfoService.getWorship(session, type, pageNum, pageSize);
     }
 
     /**
@@ -215,7 +162,7 @@ public class SimpleStudentInfoController extends BaseController {
         if (medalId == null) {
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getMsg());
         }
-        return simpleStudentInfoServiceSimple.getChildMedal(session, stuId, medalId);
+        return simpleStudentInfoService.getChildMedal(session, stuId, medalId);
     }
 
     /**
@@ -231,7 +178,7 @@ public class SimpleStudentInfoController extends BaseController {
     public ServerResponse<Map<String, Object>> getAllMedal(HttpSession session, @RequestParam(required = false) Long stuId,
                                                            @RequestParam(required = false, defaultValue = "1") Integer pageNum,
                                                            @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
-        return simpleStudentInfoServiceSimple.getAllMedal(session, stuId, pageNum, pageSize);
+        return simpleStudentInfoService.getAllMedal(session, stuId, pageNum, pageSize);
     }
 
     /**
@@ -241,12 +188,12 @@ public class SimpleStudentInfoController extends BaseController {
      * @param status  1:打开音乐；2：关闭音乐
      * @return
      */
-    @PostMapping("/optBackMusic")
+//    @PostMapping("/optBackMusic")
     public ServerResponse optBackMusic(HttpSession session, Integer status) {
         if (status == null || status < 1 || status > 2) {
             status = 1;
         }
-        return simpleStudentInfoServiceSimple.optBackMusic(session, status);
+        return simpleStudentInfoService.optBackMusic(session, status);
     }
 
     /**
@@ -255,9 +202,9 @@ public class SimpleStudentInfoController extends BaseController {
      * @param session
      * @return
      */
-    @GetMapping("/getBackMusicStatus")
+//    @GetMapping("/getBackMusicStatus")
     public ServerResponse<Map<String, Integer>> getBackMusicStatus(HttpSession session) {
-        return simpleStudentInfoServiceSimple.getBackMusicStatus(session);
+        return simpleStudentInfoService.getBackMusicStatus(session);
     }
 
     /**
@@ -267,6 +214,6 @@ public class SimpleStudentInfoController extends BaseController {
      */
 //    @PostMapping("/deleteRepeatLogoutLogs")
     public Object deleteRepeatLogoutLogs() {
-        return simpleStudentInfoServiceSimple.deleteRepeatLogoutLogs();
+        return simpleStudentInfoService.deleteRepeatLogoutLogs();
     }
 }

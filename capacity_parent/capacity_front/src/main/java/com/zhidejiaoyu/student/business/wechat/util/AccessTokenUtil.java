@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.wechat.util;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.student.business.wechat.publicaccount.constant.ApiConstant;
+import com.zhidejiaoyu.student.business.wechat.qy.constant.QyApiConstant;
 import com.zhidejiaoyu.student.business.wechat.smallapp.constant.SmallAppApiConstant;
 import com.zhidejiaoyu.student.business.wechat.smallapp.vo.AccessTokenVO;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -68,6 +69,26 @@ public class AccessTokenUtil {
             AccessTokenVO accessTokenVo = restTemplate.getForObject(ApiConstant.getAccessTokenApi(), AccessTokenVO.class);
             if (accessTokenVo == null) {
                 throw new ServiceException("获取微信公众号 access_token 失败！");
+            }
+            String token = accessTokenVo.getAccess_token();
+            saveAccessTokenToRedis(token, key);
+            return token;
+        }
+        return accessToken;
+    }
+
+    /**
+     * 获取企业微信 access_token
+     *
+     * @return
+     */
+    public static String getQyAccessToken() {
+        String key = RedisKeysConst.QY_WECHAT_ACCESS_TOKEN;
+        String accessToken = getAccessTokenFromRedis(key);
+        if (accessToken == null) {
+            AccessTokenVO accessTokenVo = restTemplate.getForObject(QyApiConstant.getAccessTokenApi(), AccessTokenVO.class);
+            if (accessTokenVo == null) {
+                throw new ServiceException("获取企业微信 access_token 失败！");
             }
             String token = accessTokenVo.getAccess_token();
             saveAccessTokenToRedis(token, key);

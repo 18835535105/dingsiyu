@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * 微信公众号用户西悉尼
+ * 微信公众号用户信息
  *
  * @author: wuchenxi
  * @date: 2020/5/14 10:51:51

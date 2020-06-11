@@ -31,19 +31,25 @@ public class LoginFilter implements Filter {
     /**
      * 需要忽略过滤的路径
      */
-    private static Map<String, String> urlMap;
+    private static final Map<String, String> URL_MAP;
+
+    /**
+     * 路径中如果包含该数组里的字段，放行
+     */
+    private static final String[] INCLUDE_URL_ARR = new String[]{"/druid", "/smallApp", "/translate", "/publicAccount",
+            "/clientValidity", "/qy"};
 
     static {
-        urlMap = new HashMap<>(16);
-        urlMap.put("/login/judge", "/login/judge");
-        urlMap.put("/login/loginOut", "/login/loginOut");
-        urlMap.put("/login/validateCode", "/login/validateCode");
-        urlMap.put("/ec/login/judge", "/ec/login/judge");
-        urlMap.put("/ec/login/loginOut", "/ec/login/loginOut");
-        urlMap.put("/ec/login/validateCode", "/ec/login/validateCode");
+        URL_MAP = new HashMap<>(16);
+        URL_MAP.put("/login/judge", "/login/judge");
+        URL_MAP.put("/login/loginOut", "/login/loginOut");
+        URL_MAP.put("/login/validateCode", "/login/validateCode");
+        URL_MAP.put("/ec/login/judge", "/ec/login/judge");
+        URL_MAP.put("/ec/login/loginOut", "/ec/login/loginOut");
+        URL_MAP.put("/ec/login/validateCode", "/ec/login/validateCode");
 
-        urlMap.put("/ec/quartz/robot/getDailyState", "/ec/quartz/robot/getDailyState");
-        urlMap.put("/quartz/robot/getDailyState", "/quartz/robot/getDailyState");
+        URL_MAP.put("/ec/quartz/robot/getDailyState", "/ec/quartz/robot/getDailyState");
+        URL_MAP.put("/quartz/robot/getDailyState", "/quartz/robot/getDailyState");
     }
 
     @Resource
@@ -67,8 +73,7 @@ public class LoginFilter implements Filter {
 
         String url = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
 
-        if (urlMap.containsKey(url) || url.contains("/druid") || url.contains("/smallApp") || url.contains("/translate")
-                || url.contains("/publicAccount") || url.contains("/clientValidity")) {
+        if (URL_MAP.containsKey(url) || checkIgnoreInclude(url)) {
             // 不拦截登录和退出接口
             doFilter(chain, httpServletRequest, httpServletResponse, url);
 
@@ -80,6 +85,15 @@ public class LoginFilter implements Filter {
             request.getRequestDispatcher("/login/toLogin/false").forward(request, response);
         }
 
+    }
+
+    private boolean checkIgnoreInclude(String url) {
+        for (String s : INCLUDE_URL_ARR) {
+            if (url.contains(s)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

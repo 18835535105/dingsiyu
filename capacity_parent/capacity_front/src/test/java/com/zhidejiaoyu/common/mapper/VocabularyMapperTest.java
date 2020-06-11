@@ -3,10 +3,12 @@ package com.zhidejiaoyu.common.mapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.zhidejiaoyu.BaseTest;
+import com.zhidejiaoyu.aliyunoss.DoesObjectExist;
 import com.zhidejiaoyu.common.mapper.simple.SimpleVocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Vocabulary;
 import com.zhidejiaoyu.common.vo.simple.SimpleCapacityVo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -90,7 +92,23 @@ public class VocabularyMapperTest extends BaseTest {
                 simpleVocabularyMapper.updateById(vocabulary);
             }
         }
+    }
 
 
+    @Test
+    public void judgeWordReadUrl() {
+
+        List<Vocabulary> vocabularies = vocabularyMapper.selectList(new QueryWrapper<Vocabulary>().isNotNull("read_url")
+                .ne("read_url", "")
+                .notLike("word", "【")
+                .notLike("word", " ")
+                .gt("id", 12609));
+        vocabularies.parallelStream().filter(vocabulary -> StringUtils.isNotEmpty(vocabulary.getReadUrl())).forEach(vocabulary -> {
+            log.info("id={}, word={}", vocabulary.getId(), vocabulary.getWord());
+            boolean b = DoesObjectExist.doesObjectExist(vocabulary.getReadUrl());
+            if (!b) {
+                log.error("word={}读音不存在,", vocabulary.getWord());
+            }
+        });
     }
 }

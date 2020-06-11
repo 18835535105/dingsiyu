@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.PrizeConfigService;
+import com.zhidejiaoyu.student.business.wechat.smallapp.vo.ReturnAdminVo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -34,6 +35,12 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
     private JoinSchoolMapper joinSchoolMapper;
     @Resource
     private WeChatMapper weChatMapper;
+    @Resource
+    private DurationMapper durationMapper;
+    @Resource
+    private LearnNewMapper learnNewMapper;
+    @Resource
+    private LearnHistoryMapper learnHistoryMapper;
 
     @Override
     public Object getPrizeConfig(String openId, Long adminId, Long studentId, String weChatimgUrl, String weChatName) {
@@ -102,17 +109,23 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         TestRecord testRecord = testRecordMapper.selectByStudentIdAndGenreAndStudyModel(student.getId(), GenreConstant.SMALLAPP_GENRE, StudyModelConstant.SMALLAPP_STUDY_MODEL);
         String imgUrl = shareConfigMapper.selectImgByAdminId(adminId);
         WeChat weChat = weChatMapper.selectByOpenId(openId);
-        Map<String, Object> map = new HashMap<>();
-        map.put("adminId", adminId);
-        map.put("weChatList", studentPayConfigMapper.selectWeChatNameAndWeChatImgUrlByStudentId(student.getId()));
-        map.put("point", testRecord.getPoint());
-        map.put("imgUrl", imgUrl);
-        map.put("weChatName", weChat.getWeChatName());
-        map.put("weChatImgUrl", weChat.getWeChatImgUrl());
-        map.put("studentId", student.getId());
-        map.put("studentName", student.getNickname());
-        map.put("headPortrait", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
-        return ServerResponse.createBySuccess(map);
+        Long vaildTime = durationMapper.selectValidTimeByStudentId(student.getId());
+        int wordCount = learnNewMapper.countLearnedWordCount(student.getId());
+        ReturnAdminVo returnAdminVo = ReturnAdminVo.builder()
+                .adminId(adminId.longValue())
+                .gold(student.getSystemGold() + student.getOfflineGold())
+                .vaildTime(vaildTime)
+                .headPortrait(GetOssFile.getPublicObjectUrl(student.getHeadUrl()))
+                .imgUrl(imgUrl)
+                .wordCount(wordCount)
+                .weChatList(studentPayConfigMapper.selectWeChatNameAndWeChatImgUrlByStudentId(student.getId()))
+                .point(testRecord.getPoint())
+                .weChatName(weChat.getWeChatName())
+                .weChatImgUrl(weChat.getWeChatImgUrl())
+                .studentId(student.getId())
+                .studentName(student.getNickname())
+                .build();
+        return ServerResponse.createBySuccess(returnAdminVo);
     }
 
     private Integer getPrize(List<PrizeConfig> prizeConfigs) {
