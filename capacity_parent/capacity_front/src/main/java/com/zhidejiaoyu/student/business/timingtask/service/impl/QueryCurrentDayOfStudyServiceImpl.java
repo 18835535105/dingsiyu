@@ -48,6 +48,7 @@ public class QueryCurrentDayOfStudyServiceImpl implements BaseQuartzService, Que
         if (checkPort(port)) {
             return;
         }
+        log.info("定时任务 -> 智慧飞信信息记录保存开始....");
         //1查询保存昨日智慧飞信信息记录
         String dateStr = DateUtil.beforeHoursTime(4);
         List<CurrentDayOfStudy> currentDayOfStudies = currentDayOfStudyMapper.selectByDate(dateStr);
@@ -66,6 +67,7 @@ public class QueryCurrentDayOfStudyServiceImpl implements BaseQuartzService, Que
             currentDayOfStudyRedisOpt.deleteStudy(study.getStudentId());
             currentDayOfStudyMapper.updateById(study);
         });
+        log.info("定时任务 -> 智慧飞信信息记录保存结束....");
 
     }
 
