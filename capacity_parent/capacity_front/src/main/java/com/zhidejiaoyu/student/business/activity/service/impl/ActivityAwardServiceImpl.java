@@ -20,10 +20,7 @@ import com.zhidejiaoyu.student.common.redis.WeekActivityRedisOpt;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author: wuchenxi
@@ -161,13 +158,7 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
     public ServerResponse<Object> getAward(Integer awardGold) {
         Student student = super.getStudent();
 
-        WeekActivityConfig weekActivityConfig = weekActivityConfigMapper.selectCurrentWeekConfig();
-        if (weekActivityConfig == null) {
-            return ServerResponse.createBySuccess();
-        }
-        WeekActivity weekActivity = weekActivityMapper.selectById(weekActivityConfig.getWeekActivityId());
-
-        List<AwardListVO.ActivityList> activityList = weekActivityRedisOpt.getActivityList(student.getId(), 0, weekActivity);
+        List<AwardListVO.ActivityList> activityList = getActivityLists(student);
 
         for (AwardListVO.ActivityList list : activityList) {
             if (Objects.equals(list.getAwardGold(), awardGold)) {
@@ -177,6 +168,30 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
 
         weekActivityRedisOpt.updateAwardList(student.getId(), activityList);
         return ServerResponse.createBySuccess();
+    }
+
+    public List<AwardListVO.ActivityList> getActivityLists(Student student) {
+        WeekActivityConfig weekActivityConfig = weekActivityConfigMapper.selectCurrentWeekConfig();
+        if (weekActivityConfig == null) {
+            throw new ServiceException("本周没有活动！");
+        }
+        WeekActivity weekActivity = weekActivityMapper.selectById(weekActivityConfig.getWeekActivityId());
+
+        return weekActivityRedisOpt.getActivityList(student.getId(), 0, weekActivity);
+    }
+
+    @Override
+    public ServerResponse<Object> getAwardCount() {
+        Student student = super.getStudent();
+
+        List<AwardListVO.ActivityList> activityList = getActivityLists(student);
+
+        long count = activityList.stream().filter(activityList1 -> Objects.equals(activityList1.getCanGet(), 2)).count();
+
+        Map<String, Long> map = new HashMap<>(16);
+        map.put("count", count);
+
+        return ServerResponse.createBySuccess(map);
     }
 
     /**

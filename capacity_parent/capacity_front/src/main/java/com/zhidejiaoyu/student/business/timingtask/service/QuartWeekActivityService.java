@@ -7,7 +7,7 @@ package com.zhidejiaoyu.student.business.timingtask.service;
 public interface QuartWeekActivityService {
 
     /**
-     * 每周一0点奖励前10名学生并初始化校区活动排行
+     * 每周一0点5分奖励前10名学生并初始化校区活动排行
      */
     void init();
 }
