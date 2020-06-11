@@ -1,13 +1,13 @@
 package com.zhidejiaoyu.student.business.wechat.smallapp.serivce.impl;
 
 import com.alibaba.excel.util.StringUtils;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.FlyOfStudyService;
@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author: wuchenxi
@@ -79,13 +81,10 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
     public ServerResponse<Object> getStudyInfo(String openId, Integer num) {
         Student student = studentMapper.selectByOpenId(openId);
         if (student == null) {
-            return ServerResponse.createByError(400, "您还未绑定队长账号，不能使用该功能！");
+            return ServerResponse.createByError(ResponseCode.NO_BIND);
         }
 
-        CurrentDayOfStudy currentDayOfStudy = currentDayOfStudyMapper.selectOne(new QueryWrapper<CurrentDayOfStudy>()
-                .eq("student_id", student.getId())
-                .eq("qr_code_num", num));
-
+        CurrentDayOfStudy currentDayOfStudy = currentDayOfStudyMapper.selectByStudentIdAndQrCodeNum(student.getId(), num);
 
         if (currentDayOfStudy == null) {
             return ServerResponse.createByError(400, "未查询到当前二维码的学习信息！");
@@ -104,5 +103,21 @@ public class FlyOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfStudyMapp
                 .totalValidTime(currentDayOfStudy.getValidTime())
                 .imgUrl(GetOssFile.getPublicObjectUrl(currentDayOfStudy.getImgUrl()))
                 .build());
+    }
+
+    @Override
+    public ServerResponse<Object> getStudentInfo(String openId, Integer num) {
+        Student student = studentMapper.selectByOpenId(openId);
+        if (student == null) {
+            return ServerResponse.createByError(ResponseCode.NO_BIND);
+        }
+        CurrentDayOfStudy currentDayOfStudy = currentDayOfStudyMapper.selectByStudentIdAndQrCodeNum(student.getId(), num);
+        if (currentDayOfStudy != null) {
+            Map<String, String> urlMap = new HashMap<>(16);
+            urlMap.put("url", GetOssFile.getPublicObjectUrl(currentDayOfStudy.getImgUrl()));
+            return ServerResponse.createBySuccess(urlMap);
+        }
+
+        return ServerResponse.createByError(301, "未查询到图片！");
     }
 }

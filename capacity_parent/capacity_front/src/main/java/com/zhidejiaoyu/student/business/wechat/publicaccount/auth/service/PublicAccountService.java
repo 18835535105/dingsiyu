@@ -36,7 +36,9 @@ public interface PublicAccountService {
      * 获取JS-SDK配置数据
      *
      * @return
+     * @param appId
      * @param url
+     * @param jsApiTicket
      */
-    ServerResponse<Object> getConfig(String url);
+    ServerResponse<Object> getConfig(String url, String appId, String jsApiTicket);
 }

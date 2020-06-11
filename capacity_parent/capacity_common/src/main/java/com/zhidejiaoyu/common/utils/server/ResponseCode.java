@@ -11,23 +11,36 @@ public enum ResponseCode {
      * 响应成功
      */
     SUCCESS(200, "SUCCESS"),
+
     /**
-     * 响应失败
+     * 原密码输入错误
      */
-    ERROR(500, "FAIL"),
+    PASSWORD_ERROR(300, "PASSWORD_ERROR"),
+
     /**
      * 参数非法
      */
     ILLEGAL_ARGUMENT(400, "ILLEGAL_ARGUMENT"),
 
     /**
+     * 未查询到数据
+     */
+    NO_DATA(400, "未查询到数据！"),
+
+    /**
      * 无权限访问
      */
     FORBIDDEN(403, "FORBIDDEN"),
+
     /**
-     * 原密码输入错误
+     * 未绑定微信小程序、微信公众号、企业微信等
      */
-    PASSWORD_ERROR(300, "PASSWORD_ERROR"),
+    NO_BIND(407, "NO_BIND"),
+
+    /**
+     * 响应失败
+     */
+    ERROR(500, "FAIL"),
 
     /**
      * 本单元已学完
@@ -52,12 +65,7 @@ public enum ResponseCode {
     /**
      * 时间不足24小时
      */
-    TIME_LESS_ONE_DAY(900, "TIME_LESS_ONE_DAY"),
-
-    /**
-     * 未查询到数据
-     */
-    NO_DATA(400, "未查询到数据！");
+    TIME_LESS_ONE_DAY(900, "TIME_LESS_ONE_DAY");
 
 
     private Integer code;

@@ -830,13 +830,13 @@
         select
         <include refid="more_table_List"/>
         from student s
-        join teacher t on s.teacher_id = t.teacher_id and t.school_admin_id = 561 and s.status &lt;> 3
+        join teacher t on s.teacher_id = t.teacher_id and t.school_admin_id = #{schoolAdminId} and s.status &lt;> 3
         union all
         select
         <include refid="more_table_List"/>
         from
         student s
-        join teacher t on s.teacher_id = t.school_admin_id and t.school_admin_id = 561 and s.status &lt;> 3
+        join teacher t on s.teacher_id = t.school_admin_id and t.school_admin_id = #{schoolAdminId} and s.status &lt;> 3
     </select>
     <select id="selectByTeacherId" resultMap="BaseResultMap" parameterType="map">
         select

@@ -39,4 +39,14 @@ public class QyApiConstant {
         String qyAccessToken = AccessTokenUtil.getQyAccessToken();
         return "https://qyapi.weixin.qq.com/cgi-bin/user/convert_to_openid?access_token=" + qyAccessToken;
     }
+
+    /**
+     * 获得jsapi_ticket
+     *
+     * @return
+     */
+    public static String getJsApiTicket() {
+        String qyAccessToken = AccessTokenUtil.getQyAccessToken();
+        return "https://qyapi.weixin.qq.com/cgi-bin/get_jsapi_ticket?access_token=" + qyAccessToken;
+    }
 }

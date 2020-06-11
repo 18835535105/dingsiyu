@@ -49,6 +49,14 @@ public class RankVO implements Serializable {
          * 奖励金币数
          */
         private Integer awardGold;
+
+        /**
+         * 当前记录是不是我自己的<ul>
+         * <li>true：是我自己</li>
+         * <li>false：不是我自己</li>
+         * </ul>
+         */
+        private Boolean me;
     }
 
 

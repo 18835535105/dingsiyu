@@ -134,6 +134,11 @@ public interface RedisKeysConst {
     String PUBLIC_JS_API_TICKET = "PUBLIC_JS_API_TICKET";
 
     /**
+     * 企业微信jsapi_ticket
+     */
+    String QY_JS_API_TICKET = "QY_JS_API_TICKET";
+
+    /**
      * 标识学生已经初始化了飞船信息
      */
     String INIT_SHIP = "INIT_SHIP:";
@@ -231,5 +236,5 @@ public interface RedisKeysConst {
      * field:wordId
      * value:错误次数
      */
-    String STUDY_MODEL="STUDY_MODEL";
+    String STUDY_MODEL="STUDY_MODEL:";
 }

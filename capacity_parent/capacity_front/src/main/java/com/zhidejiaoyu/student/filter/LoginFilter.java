@@ -33,6 +33,12 @@ public class LoginFilter implements Filter {
      */
     private static final Map<String, String> URL_MAP;
 
+    /**
+     * 路径中如果包含该数组里的字段，放行
+     */
+    private static final String[] INCLUDE_URL_ARR = new String[]{"/druid", "/smallApp", "/translate", "/publicAccount",
+            "/clientValidity", "/qy"};
+
     static {
         URL_MAP = new HashMap<>(16);
         URL_MAP.put("/login/judge", "/login/judge");
@@ -67,8 +73,7 @@ public class LoginFilter implements Filter {
 
         String url = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
 
-        if (URL_MAP.containsKey(url) || url.contains("/druid") || url.contains("/smallApp") || url.contains("/translate")
-                || url.contains("/publicAccount") || url.contains("/clientValidity") || url.contains("/qy") ) {
+        if (URL_MAP.containsKey(url) || checkIgnoreInclude(url)) {
             // 不拦截登录和退出接口
             doFilter(chain, httpServletRequest, httpServletResponse, url);
 
@@ -80,6 +85,15 @@ public class LoginFilter implements Filter {
             request.getRequestDispatcher("/login/toLogin/false").forward(request, response);
         }
 
+    }
+
+    private boolean checkIgnoreInclude(String url) {
+        for (String s : INCLUDE_URL_ARR) {
+            if (url.contains(s)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -23,6 +23,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author: wuchenxi
@@ -147,12 +148,35 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
             } else {
                 info.setAwardGold(0);
             }
+            info.setMe(Objects.equals(studentId, student.getId()));
             info.setComplete(WeekActivityRedisOpt.CONDITION_MAP.get(weekActivityConfig.getWeekActivityId()).replace("$&$", String.valueOf((int) activityPlan)));
             vos.add(info);
         }
 
         long memberSize = weekActivityRankOpt.getMemberSize(key);
         return ServerResponse.createBySuccess(PageUtil.packagePage(vos, memberSize));
+    }
+
+    @Override
+    public ServerResponse<Object> getAward(Integer awardGold) {
+        Student student = super.getStudent();
+
+        WeekActivityConfig weekActivityConfig = weekActivityConfigMapper.selectCurrentWeekConfig();
+        if (weekActivityConfig == null) {
+            return ServerResponse.createBySuccess();
+        }
+        WeekActivity weekActivity = weekActivityMapper.selectById(weekActivityConfig.getWeekActivityId());
+
+        List<AwardListVO.ActivityList> activityList = weekActivityRedisOpt.getActivityList(student.getId(), 0, weekActivity);
+
+        for (AwardListVO.ActivityList list : activityList) {
+            if (Objects.equals(list.getAwardGold(), awardGold)) {
+                list.setCanGet(3);
+            }
+        }
+
+        weekActivityRedisOpt.updateAwardList(student.getId(), activityList);
+        return ServerResponse.createBySuccess();
     }
 
     /**
