@@ -534,7 +534,6 @@ public class RedisOpt {
                 equipmentIds.add(1L);
                 equipmentIds.add(2L);
                 equipmentIds.add(3L);
-
                 ShipAddEquipmentServiceImpl.addEquipment(equipmentIds, studentId, studentEquipmentMapper);
             }
             redisTemplate.opsForValue().set(key, true);

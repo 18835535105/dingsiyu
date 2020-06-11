@@ -75,4 +75,15 @@ public class ShipIndexController {
         }
         return shipIndexService.saveMedal(medalId);
     }
+
+    /**
+     * 初始化源分战力排行
+     *
+     * @return
+     */
+    @PostMapping("/initRank")
+    public ServerResponse<Object> initRank() {
+        shipIndexService.initRank();
+        return ServerResponse.createBySuccess();
+    }
 }

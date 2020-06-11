@@ -83,6 +83,7 @@
         <alinyun-skd-oss.version>3.4.2</alinyun-skd-oss.version>
         <aliyun-java-sdk-core>4.3.3</aliyun-java-sdk-core>
         <aliyun-java-sdk-vod>2.15.8</aliyun-java-sdk-vod>
+        <aliyun-java-sdk-alimt.version>1.1.1</aliyun-java-sdk-alimt.version>
 
         <!--二维码工具-->
         <zxing-javase.version>3.4.0</zxing-javase.version>
@@ -104,6 +105,12 @@
                 <groupId>com.aliyun</groupId>
                 <artifactId>aliyun-java-sdk-vod</artifactId>
                 <version>${aliyun-java-sdk-vod}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>aliyun-java-sdk-alimt</artifactId>
+                <version>${aliyun-java-sdk-alimt.version}</version>
             </dependency>
 
             <dependency>
