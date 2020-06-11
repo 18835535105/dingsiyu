@@ -70,17 +70,11 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     @Override
     public Object getTest(HttpSession session, String openId) {
         Student student = studentMapper.selectByOpenId(openId);
-        /*Integer integer = testRecordMapper.selectByStudentIdAndGenreAndEndTime(student.getId(), GenreConstant.SMALLAPP_GENRE, new Date());
-        if(integer!=null && integer>1){
-            return ServerResponse.createByError(400,"今天已经挑战成功");
-        }
-*/
         if (session.getAttribute(TimeConstant.BEGIN_START_TIME) == null) {
             session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
         }
-
-
         List<Map<String, Object>> maps = errorLearnLogMapper.selectVocabularyByStudentId(student.getId());
+
         Map<String, Object> returnMap = new HashMap<>();
         if (maps.size() == 0) {
             //获取优先级最大的单元
@@ -96,10 +90,10 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
                 maps.add(listMap);
             });
         } else {
-            List<Map<String, Object>> ListMap = new ArrayList<>();
+            List<Map<String, Object>> mapList = new ArrayList<>();
             maps.forEach(map -> {
                 map.put("listenUtrl", baiduSpeak.getLanguagePath(map.get("word").toString()));
-                ListMap.add(map);
+                mapList.add(map);
             });
         }
         returnMap.put("gold", student.getSystemGold().intValue());
@@ -218,13 +212,13 @@ public class SmallProgramTestServiceImpl extends BaseServiceImpl<StudentMapper, 
     public Object getQRCode(String openId, String weChatName, String weChatImgUrl) {
         // .path("pages/support2/support?openid=" + openId + "&weChatName=" + weChatName + "&weChatImgUrl=" + weChatImgUrl)
         WeChat weChat = weChatMapper.selectByOpenId(openId);
-        if(weChat==null){
+        if (weChat == null) {
             weChat = new WeChat();
             weChat.setOpenId(openId);
             weChat.setWeChatImgUrl(weChatImgUrl);
             weChat.setWeChatName(weChatName);
             weChatMapper.insert(weChat);
-        }else{
+        } else {
             weChat.setWeChatName(weChatName);
             weChat.setWeChatImgUrl(weChatImgUrl);
             weChatMapper.updateById(weChat);
