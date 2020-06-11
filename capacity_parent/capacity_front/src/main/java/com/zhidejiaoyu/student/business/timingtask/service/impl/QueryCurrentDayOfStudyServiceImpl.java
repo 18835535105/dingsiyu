@@ -9,7 +9,6 @@ import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.student.business.timingtask.service.BaseQuartzService;
 import com.zhidejiaoyu.student.business.timingtask.service.QueryCurrentDayOfStudyService;
 import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
-import com.zhidejiaoyu.student.common.redis.RedisOpt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -54,8 +53,8 @@ public class QueryCurrentDayOfStudyServiceImpl implements BaseQuartzService, Que
         currentDayOfStudies.forEach(study -> {
             Integer gold = goldLogMapper.selectGoldByStudentIdAndDate(study.getStudentId(), DateUtil.parseYYYYMMDDHHMMSS(dateStr), 1);
             study.setGold(gold);
-            Long vaildTime = durationMapper.selectValidTimeByStudentIdAndDate(study.getStudentId(), dateStr);
-            study.setValidTime(vaildTime.intValue());
+            Long validTime = durationMapper.selectValidTimeByStudentIdAndDate(study.getStudentId(), dateStr);
+            study.setValidTime(validTime.intValue());
             Long onlineTime = durationMapper.selectByStudentIdAndDate(study.getStudentId(), dateStr);
             study.setOnlineTime(onlineTime.intValue());
             study.setTest(currentDayOfStudyRedisOpt.getStudyModelAndTestStudyCurrent(RedisKeysConst.ERROR_TEST, study.getStudentId()));
