@@ -8,6 +8,7 @@ import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
+import com.zhidejiaoyu.common.study.memorydifficulty.SyntaxMemoryDifficulty;
 import com.zhidejiaoyu.common.study.memorydifficulty.WordMemoryDifficulty;
 import com.zhidejiaoyu.common.utils.PictureUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
@@ -85,6 +86,9 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
 
     @Resource
     private WeekActivityRankOpt weekActivityRankOpt;
+
+    @Resource
+    private SyntaxMemoryDifficulty syntaxMemoryDifficulty;
     /**
      * 以字母或数字结尾
      */
@@ -317,7 +321,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private ServerResponse<Object> returnGoldWord(StudyCapacity studyCapacity, Long plan, boolean firstStudy,
                                                   Long wordCount, Integer type) {
         // 计算当前单词的记忆难度
-        int memoryDifficulty = wordMemoryDifficulty.getMemoryDifficulty(studyCapacity);
+        int memoryDifficulty = syntaxMemoryDifficulty.getMemoryDifficulty(studyCapacity);
         // 计算当前单词的记忆强度
         double memoryStrength = studyCapacity.getMemoryStrength();
         Long vocabularyId = studyCapacity.getWordId();
