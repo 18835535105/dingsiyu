@@ -86,9 +86,6 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
 
     @Resource
     private WeekActivityRankOpt weekActivityRankOpt;
-
-    @Resource
-    private SyntaxMemoryDifficulty syntaxMemoryDifficulty;
     /**
      * 以字母或数字结尾
      */
@@ -253,7 +250,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, new Long[]{learnExtends.get(0).getWordId()}, null);
             }
             // 计算记忆难度
-            int memoryDifficult = syntaxMemoryDifficulty.getMemoryDifficulty(studyCapacity);
+            int memoryDifficult = wordMemoryDifficulty.getMemoryDifficulty(studyCapacity);
             // 更新学习记录
             currentLearn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
             session.removeAttribute(TimeConstant.BEGIN_START_TIME);
@@ -321,7 +318,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
     private ServerResponse<Object> returnGoldWord(StudyCapacity studyCapacity, Long plan, boolean firstStudy,
                                                   Long wordCount, Integer type) {
         // 计算当前单词的记忆难度
-        int memoryDifficulty = syntaxMemoryDifficulty.getMemoryDifficulty(studyCapacity);
+        int memoryDifficulty = wordMemoryDifficulty.getMemoryDifficulty(studyCapacity);
         // 计算当前单词的记忆强度
         double memoryStrength = studyCapacity.getMemoryStrength();
         Long vocabularyId = studyCapacity.getWordId();
