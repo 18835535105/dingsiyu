@@ -212,9 +212,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
             List<CourseNew> courseNews = courseNewMapper.selectBatchIds(smallCourseIds);
             // 匹配不到年级和上下册的课程不展示
-            courseNews.stream().filter(courseNew -> MAPPING.containsKey(courseNew.getGrade()) && MAPPING.containsKey(courseNew.getLabel())
-                    // 一年级、二年级课程还没有图片，不展示
-                    && !Objects.equals(courseNew.getGrade().trim(), "一年级") && !Objects.equals(courseNew.getGrade().trim(), "二年级"))
+            courseNews.stream().filter(courseNew -> checkCanShowPicture(courseNew.getGrade(), courseNew.getLabel()))
                     .forEach(courseNew -> packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, courseNew));
         }
 
@@ -359,6 +357,11 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             String grade = map.get("grade").toString();
             String label = map.get("label").toString();
 
+            // 匹配不到年级和上下册的课程不展示
+            if (!checkCanShowPicture(grade, label)) {
+                return;
+            }
+
             SyntaxCourse syntaxCourse = SyntaxCourse.builder()
                     .id(courseId)
                     .grade(grade)
@@ -367,6 +370,21 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
             this.packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, syntaxCourse);
         });
+    }
+
+    /**
+     * 检测当前课程是否有图片
+     *
+     * @param grade
+     * @param label
+     * @return <ul>
+     * <li>true：有图片 </li>
+     * <li>false：没有图片</li>
+     * </ul>
+     */
+    private boolean checkCanShowPicture(String grade, String label) {
+        return !(!MAPPING.containsKey(grade) || !MAPPING.containsKey(label)
+                || Objects.equals(grade, "一年级") || Objects.equals(grade, "二年级"));
     }
 
     /**
