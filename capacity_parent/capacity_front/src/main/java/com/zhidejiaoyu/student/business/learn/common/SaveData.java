@@ -253,7 +253,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, new Long[]{learnExtends.get(0).getWordId()}, null);
             }
             // 计算记忆难度
-            int memoryDifficult = wordMemoryDifficulty.getMemoryDifficulty(studyCapacity);
+            int memoryDifficult = syntaxMemoryDifficulty.getMemoryDifficulty(studyCapacity);
             // 更新学习记录
             currentLearn.setLearnTime((Date) session.getAttribute(TimeConstant.BEGIN_START_TIME));
             session.removeAttribute(TimeConstant.BEGIN_START_TIME);
