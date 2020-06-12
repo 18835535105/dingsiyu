@@ -143,7 +143,7 @@ public class SimpleExhumationServiceImplSimple extends SimpleBaseServiceImpl<Sim
         //获取未使用的碎片id
         List<Integer> integers = simpleExhumationMapper.selSkinExhumationId(selmap);
         if (integers.size() < number) {
-            return ServerResponse.createByError(400,"碎片不足");
+            return ServerResponse.createByError(300,"碎片不足");
         }
         //使用碎片
         for (int i = 0; i < number; i++) {
