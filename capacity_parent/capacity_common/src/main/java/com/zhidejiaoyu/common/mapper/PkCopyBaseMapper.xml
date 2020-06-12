@@ -39,13 +39,35 @@
         order by id
     </select>
     <select id="selectPersonPkInfoByStudentId" resultType="java.util.Map" parameterType="map">
-        select pcb.id, pcb.challenge_cycle challengeCycle, count(pcs.id) count, pcb.name, pcb.img_url imgUrl
-        from pk_copy_base pcb
-                 left join pk_copy_state pcs
-                           on pcb.id = pcs.pk_copy_base_id
-                               and pcs.student_id = #{studentId}
-                               and to_days(pcs.update_time) = to_days(now())
-        where pcb.type = 1
-        group by pcb.id
+        select t.id,
+               t.challengeCycle,
+               t.count,
+               t.name,
+               t.imgUrl
+        from (select pcb.id,
+                     pcb.challenge_cycle challengeCycle,
+                     count(pcs.id)       count,
+                     pcb.name,
+                     pcb.img_url         imgUrl
+              from pk_copy_base pcb
+                       left join pk_copy_state pcs
+                                 on pcb.id = pcs.pk_copy_base_id
+                                     and pcs.student_id = #{studentId}
+                                     and to_days(pcs.update_time) = to_days(now())
+              where pcb.type = 1
+              group by pcb.id
+              union all
+              select pcb.id,
+                     pcb.challenge_cycle challengeCycle,
+                     count(pcs.id)       count,
+                     pcb.name,
+                     pcb.img_url         imgUrl
+              from pk_copy_base pcb
+                       left join pk_copy_state pcs
+                                 on pcb.id = pcs.pk_copy_base_id
+                                     and pcs.student_id = #{studentId}
+                                     and pcs.update_time >= #{firstDayOfWeek}
+              where pcb.type = 3
+              group by pcb.id) t
     </select>
 </mapper>
