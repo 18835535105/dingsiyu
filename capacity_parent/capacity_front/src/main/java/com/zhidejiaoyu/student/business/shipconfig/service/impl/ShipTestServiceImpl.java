@@ -444,11 +444,12 @@ public class ShipTestServiceImpl extends BaseServiceImpl<StudentMapper, Student>
      * @return
      */
     private List<PkBaseInfoVO.CopyInfoVO> getPersonPkInfo(Student student) {
-        List<Map<String, Object>> personPkInfos = pkCopyBaseMapper.selectPersonPkInfoByStudentId(student.getId());
+
+        List<Map<String, Object>> personPkInfos = pkCopyBaseMapper.selectPersonPkInfoByStudentId(student.getId(), DateUtil.getDateOfWeekDay(1));
         return personPkInfos.stream().map(personPkInfo -> {
             // 总挑战次数
             int challengeCycle = personPkInfo.get("challengeCycle") == null ? 0 : Integer.parseInt(personPkInfo.get("challengeCycle").toString());
-            // 剩余挑战次数
+            // 已挑战次数
             int count = personPkInfo.get("count") == null ? 0 : Integer.parseInt(personPkInfo.get("count").toString());
             // 副本名称
             String name = String.valueOf(personPkInfo.get("name"));

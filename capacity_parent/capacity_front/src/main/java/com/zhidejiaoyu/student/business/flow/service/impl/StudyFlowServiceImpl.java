@@ -90,6 +90,9 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     @Resource
     private RedisOpt redisOpt;
 
+    @Resource
+    private JudgeSentenceGame judgeSentenceGame;
+
     /**
      * 节点学完, 把下一节初始化到student_flow表, 并把下一节点返回
      *
@@ -147,7 +150,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         }
 
         // 判断句型游戏
-        response = this.judgeSentenceGame(dto);
+        response = judgeSentenceGame.judgeSentenceGame(dto);
         if (response != null) {
             return response;
         }
@@ -175,30 +178,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     }
 
     /**
-     * 如果当前节点是句型游戏测试，判断下个节点
-     *
-     * @param dto
-     * @return
-     */
-    private ServerResponse<Object> judgeSentenceGame(NodeDto dto) {
-        if (Objects.equals(dto.getNodeId(), FlowConstant.SENTENCE_GAME)) {
-            if (dto.getGrade() == PointConstant.HUNDRED) {
-                // 全部答对
-                return this.toAnotherFlow(dto, (int) FlowConstant.SENTENCE_TRANSLATE);
-            }
-
-            if (dto.getGrade() >= PointConstant.SIXTY && dto.getGrade() < PointConstant.HUNDRED) {
-                return this.toAnotherFlow(dto, (int) FlowConstant.YIN_YI_EXERCISE_TWO);
-            }
-
-            if (dto.getGrade() < PointConstant.SIXTY) {
-                return this.toAnotherFlow(dto, (int) FlowConstant.YIN_YI_EXERCISE_ONE);
-            }
-        }
-        return null;
-    }
-
-    /**
      * 如果当前节点是学前游戏测试，判断下个节点
      *
      * @param dto
@@ -211,7 +190,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             boolean isEasy = dto.getEasyOrHard() == 1;
             if (dto.getGrade() == PointConstant.HUNDRED) {
                 // 全部答对
-                return isEasy ? this.toAnotherFlow(dto, (int) FlowConstant.SENTENCE_TRANSLATE) : this.toAnotherFlow(dto, (int) FlowConstant.LETTER_WRITE);
+                return isEasy ? this.toAnotherFlow(dto, (int) FlowConstant.SENTENCE_GAME) : this.toAnotherFlow(dto, (int) FlowConstant.LETTER_WRITE);
             }
 
             if (dto.getGrade() >= PointConstant.EIGHTY) {

@@ -96,10 +96,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
     private SaveTestLearnAndCapacity saveTestLearnAndCapacity;
 
     @Autowired
-    private RunLogMapper runLogMapper;
-    @Autowired
     private TestRecordInfoMapper testRecordInfoMapper;
-
 
     @Autowired
     private SentenceListenMapper sentenceListenMapper;
@@ -820,7 +817,7 @@ public class ReviewServiceImpl extends BaseServiceImpl<CapacityMemoryMapper, Cap
         int number = 0;
         if (uID != null) {
             number = testRecordMapper.selCount(student.getId(), courseId, unitId[0],
-                    commonMethod.getTestType(classify), genre);
+                    commonMethod.getTestType(classify), genre, null);
         }
         vo.setEnergy(getEnergy(student, point, number));
 

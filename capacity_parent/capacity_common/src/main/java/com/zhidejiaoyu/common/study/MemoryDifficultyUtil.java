@@ -18,9 +18,12 @@ import java.util.List;
  *
  * @author wuchenxi
  * @date 2018年5月11日
+ * @see com.zhidejiaoyu.common.study.memorydifficulty.IMemoryDifficulty
+ * @deprecated
  */
 @Slf4j
 @Component
+@Deprecated
 public class MemoryDifficultyUtil {
 
     @Resource

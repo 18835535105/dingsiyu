@@ -28,7 +28,7 @@ public interface TestService extends BaseService<TestRecord> {
      * @param session
      * @return
      */
-    ServerResponse<Map<String, Object>> getGameSubject(HttpSession session,Long unitId);
+    ServerResponse<Map<String, Object>> getGameSubject(HttpSession session, Long unitId);
 
     /**
      * 保存学生游戏测试记录，并根据学生游戏测试的成绩推送不同课程或者进入等级测试
@@ -61,6 +61,7 @@ public interface TestService extends BaseService<TestRecord> {
 
     /**
      * 保存单元测试记录，学习记录，更新记忆追踪数据(包括单词和例句单元测试)
+     *
      * @param session
      * @param wordUnitTestDTO 需要保存的数据的参数
      * @param testDetail
@@ -69,6 +70,7 @@ public interface TestService extends BaseService<TestRecord> {
 
     /**
      * 保存句子测试记录，学习记录，更新记忆追踪数据(包括单词和例句单元测试)
+     *
      * @param session
      * @param wordUnitTestDTO 需要保存的数据的参数
      * @param testDetail
@@ -80,12 +82,12 @@ public interface TestService extends BaseService<TestRecord> {
      *
      * @param session
      * @param unitId
-     * @param type 1:普通模式；2：暴走模式
+     * @param type    1:普通模式；2：暴走模式
      * @param pageNum
      * @return
      */
     ServerResponse<List<SentenceTranslateVo>> getSentenceUnitTest(HttpSession session, Long unitId,
-                                                                  Integer type, Integer pageNum,Integer studyModel);
+                                                                  Integer type, Integer pageNum, Integer studyModel);
 
     /**
      * @param course_id
@@ -101,10 +103,11 @@ public interface TestService extends BaseService<TestRecord> {
 
     /**
      * 获取例句单元测试
+     *
      * @param unitId
      * @return
      */
-    ServerResponse<Object> gitUnitSentenceTest(HttpSession session,Long unitId,Integer type);
+    ServerResponse<Object> gitUnitSentenceTest(HttpSession session, Long unitId, Integer type);
 
     /**
      * 音译测试（音译测试）
@@ -127,7 +130,7 @@ public interface TestService extends BaseService<TestRecord> {
 
     ServerResponse<Object> saveCapTeksTest(HttpSession session, WordUnitTestDTO wordUnitTestDTO);
 
-    ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session,Long unitId);
+    ServerResponse<Map<String, Object>> getStrengthGame(HttpSession session, Long unitId);
 
     /**
      * 保存单元闯关测试记录
@@ -138,7 +141,7 @@ public interface TestService extends BaseService<TestRecord> {
      */
     ServerResponse savePhoneticSymbolUnitTest(HttpSession session, UnitTestDto unitId);
 
-    Object getLetterUnitEntry(HttpSession session,Long unitId);
+    Object getLetterUnitEntry(HttpSession session, Long unitId);
 
     Object saveLetterUnitEntry(HttpSession session, TestRecord testRecord);
 
@@ -151,4 +154,15 @@ public interface TestService extends BaseService<TestRecord> {
     ServerResponse saveBugTest(HttpSession session, TestRecord testRecord);
 
     void saveCurrent(HttpSession session, String errorTestInfo);
+
+    /**
+     * 获取单元group
+     *
+     * @param unitId
+     * @param studentId
+     * @param easyOrHard 难易程度
+     * @param type       1：单词；2：句型；3：课文；4：语法
+     * @return
+     */
+    Integer getGroup(Long unitId, Long studentId, Integer easyOrHard, Integer type);
 }

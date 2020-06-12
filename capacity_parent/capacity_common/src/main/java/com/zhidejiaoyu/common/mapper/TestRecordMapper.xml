@@ -538,6 +538,9 @@
         <if test=" unitId!=null and unitId!=''">
             and unit_id=#{unitId}
         </if>
+        <if test="group!=null and group!=''">
+            and group =#{group}
+        </if>
         and study_model=#{studyModel}
         and point>=60
     </select>

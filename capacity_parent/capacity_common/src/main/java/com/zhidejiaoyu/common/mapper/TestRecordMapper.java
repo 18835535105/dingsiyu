@@ -289,7 +289,7 @@ public interface TestRecordMapper extends BaseMapper<TestRecord> {
 
     Integer selectReadCountByCourseId(@Param("courseId") long courseId);
 
-    int selCount(@Param("studentId") Long studenId, @Param("courseId") Long courseId, @Param("unitId") Long unitId, @Param("studyModel") String studyModel, @Param("genre") String genre);
+    int selCount(@Param("studentId") Long studenId, @Param("courseId") Long courseId, @Param("unitId") Long unitId, @Param("studyModel") String studyModel, @Param("genre") String genre, @Param("group") Integer group);
 
     /**
      * 查询学生获得 100 分的测试记录
