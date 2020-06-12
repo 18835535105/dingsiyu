@@ -84,6 +84,9 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     @Resource
     private RedisOpt redisOpt;
 
+    @Resource
+    private JudgeSentenceGame judgeSentenceGame;
+
     /**
      * 流程名称与 studyCapacity 中 type 的映射
      */
@@ -169,7 +172,7 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         }
 
         // 判断句型游戏下个节点
-        res = judgeSentenceGame(dto);
+        res = judgeSentenceGame.judgeSentenceGame(dto);
         if (res != null) {
             return res;
         }
@@ -195,30 +198,6 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
         }
         // 判断下个节点
         return judgeNextNode.judgeNextNode(dto, this);
-    }
-
-    /**
-     * 如果当前节点是句型游戏测试，判断下个节点
-     *
-     * @param dto
-     * @return
-     */
-    private ServerResponse<Object> judgeSentenceGame(NodeDto dto) {
-        if (Objects.equals(dto.getNodeId(), FlowConstant.FREE_SENTENCE_GAME)) {
-            if (dto.getGrade() == PointConstant.HUNDRED) {
-                // 全部答对
-                return this.toAnotherFlow(dto, (int) FlowConstant.FREE_SENTENCE_TRANSLATE);
-            }
-
-            if (dto.getGrade() >= PointConstant.SIXTY && dto.getGrade() < PointConstant.HUNDRED) {
-                return this.toAnotherFlow(dto, (int) FlowConstant.FREE_YIN_YI_EXERCISE_TWO);
-            }
-
-            if (dto.getGrade() < PointConstant.SIXTY) {
-                return this.toAnotherFlow(dto, (int) FlowConstant.FREE_YIN_YI_EXERCISE_ONE);
-            }
-        }
-        return null;
     }
 
     /**
