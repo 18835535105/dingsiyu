@@ -24,6 +24,7 @@ import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.student.sentence.CourseUnitVo;
 import com.zhidejiaoyu.student.business.learn.common.SaveTeksData;
 import com.zhidejiaoyu.student.business.service.TeksService;
+import com.zhidejiaoyu.student.business.test.service.TestService;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -141,6 +142,8 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
     private SaveTeksData saveTeksData;
     @Resource
     private LearnNewMapper learnNewMapper;
+    @Resource
+    private TestService testService;
 
 
     @Override
@@ -727,6 +730,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         //学生对象
         Student student = super.getStudent(session);
         saveTeksData.insertLearnExtend(flowId, testRecord.getUnitId(), student, "课文训练", 2, 3);
+        Integer group = testService.getGroup(testRecord.getUnitId(), student.getId(), 2, 3);
         final String model = "课文默写测试";
         //测试开始时间
         //测试结束时间
@@ -760,7 +764,7 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
             student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), gold));
         }
         // 封装响应数据
-        Map<String, Object> map = packageResultMap(student, wordUnitTestDTO, point, goldCount, testRecord, model);
+        Map<String, Object> map = packageResultMap(student, wordUnitTestDTO, point, goldCount, testRecord, model, group);
         student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldCount));
         studentMapper.updateById(student);
         int insert = testRecordMapper.insert(testRecord);
@@ -854,10 +858,11 @@ public class TeksServiceImpl extends BaseServiceImpl<TeksMapper, Teks> implement
         }
     }
 
-    private Map<String, Object> packageResultMap(Student student, WordUnitTestDTO wordUnitTestDTO, Integer point, Integer goldCount, TestRecord testRecord, String model) {
+    private Map<String, Object> packageResultMap(Student student, WordUnitTestDTO wordUnitTestDTO, Integer point,
+                                                 Integer goldCount, TestRecord testRecord, String model, Integer group) {
         Map<String, Object> map = new HashMap<>(16);
         int number = testRecordMapper.selCount(student.getId(), testRecord.getCourseId(), testRecord.getUnitId(),
-                testRecord.getStudyModel(), model);
+                testRecord.getStudyModel(), model, group);
         int energy = super.getEnergy(student, wordUnitTestDTO.getPoint(), number);
         map.put("energy", energy);
         map.put("gold", goldCount);
