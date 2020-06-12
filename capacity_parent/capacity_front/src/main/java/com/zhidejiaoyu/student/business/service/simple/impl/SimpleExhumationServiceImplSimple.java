@@ -37,12 +37,13 @@ public class SimpleExhumationServiceImplSimple extends SimpleBaseServiceImpl<Sim
     private SimpleStudentSkinServiceSimple studentSkinService;
 
     @Override
-    public int addExhumation(String name, String imgUrl, int type, Date date,Integer studentId,String finalName) {
-        return simpleExhumationMapper.insert(getExhumation(name,imgUrl,type,date,studentId,finalName));
+    public int addExhumation(String name, String imgUrl, int type, Date date, Integer studentId, String finalName) {
+        return simpleExhumationMapper.insert(getExhumation(name, imgUrl, type, date, studentId, finalName));
     }
 
     /**
      * 根据学生id查询学生下的信息
+     *
      * @param studentId
      * @return
      */
@@ -53,6 +54,7 @@ public class SimpleExhumationServiceImplSimple extends SimpleBaseServiceImpl<Sim
 
     /**
      * 使用碎片换区手套 印记
+     *
      * @param nameInage
      * @param finalNameInage
      * @param finalImgUrl
@@ -70,47 +72,47 @@ public class SimpleExhumationServiceImplSimple extends SimpleBaseServiceImpl<Sim
         //获取最终合成物名称
         String finalName = AwardUtil.getAward(finalNameInage);
         //查看碎片数量
-        Map<String,Object> selmap=new HashMap<>();
-        selmap.put("name",name);
-        selmap.put("studentId",student.getId());
+        Map<String, Object> selmap = new HashMap<>();
+        selmap.put("name", name);
+        selmap.put("studentId", student.getId());
         List<Integer> integers = simpleExhumationMapper.selExhumationId(selmap);
         //查看每个手套碎片合成的数量
-        Map<String,Object> selMap=new HashMap<>();
-        selMap.put("name",name);
-        selMap.put("finalName",finalName);
-        selMap.put("studentId",student.getId());
-        Integer count= simpleExhumationMapper.selExhumationCountByNameAndFinalName(selMap);
-        if(nameInage ==4){
-            if(count != null){
-                if(count+number>6){
-                    return ServerResponse.createByError(300,"放入数量过多");
+        Map<String, Object> selMap = new HashMap<>();
+        selMap.put("name", name);
+        selMap.put("finalName", finalName);
+        selMap.put("studentId", student.getId());
+        Integer count = simpleExhumationMapper.selExhumationCountByNameAndFinalName(selMap);
+        if (nameInage == 4) {
+            if (count != null) {
+                if (count + number > 6) {
+                    return ServerResponse.createByError(300, "放入数量过多");
                 }
-            }else if(number>6){
-                return ServerResponse.createByError(300,"放入数量过多");
+            } else if (number > 6) {
+                return ServerResponse.createByError(300, "放入数量过多");
             }
-        }else if(nameInage==5){
-            if(count != null){
-                if(count+number>5){
-                    return ServerResponse.createByError(300,"放入数量过多");
+        } else if (nameInage == 5) {
+            if (count != null) {
+                if (count + number > 5) {
+                    return ServerResponse.createByError(300, "放入数量过多");
                 }
-            }else if(number>5){
-                return ServerResponse.createByError(300,"放入数量过多");
+            } else if (number > 5) {
+                return ServerResponse.createByError(300, "放入数量过多");
             }
         }
-        for(int i=0;i<number;i++){
-            Map<String,Object> map=new HashMap<>();
-            map.put("finalName",finalName);
-            map.put("id",integers.get(i));
+        for (int i = 0; i < number; i++) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("finalName", finalName);
+            map.put("id", integers.get(i));
             simpleExhumationMapper.updExhumationFinalNameById(map);
         }
         //type==1时说明可以合成手套或花瓣
-        if(type==1){
-            if(nameInage==4){
+        if (type == 1) {
+            if (nameInage == 4) {
                 //合成花瓣
-                synService.addSynthetic(finalName,finalImgUrl,2,student.getId().intValue(),0);
-            }else  if(nameInage==5){
+                synService.addSynthetic(finalName, finalImgUrl, 2, student.getId().intValue(), 0);
+            } else if (nameInage == 5) {
                 //合成手套
-                synService.addSynthetic(finalName,finalImgUrl,1,student.getId().intValue(),0);
+                synService.addSynthetic(finalName, finalImgUrl, 1, student.getId().intValue(), 0);
             }
         }
         return ServerResponse.createBySuccess("成功");
@@ -118,6 +120,7 @@ public class SimpleExhumationServiceImplSimple extends SimpleBaseServiceImpl<Sim
 
     /**
      * 皮肤碎片换取皮肤
+     *
      * @param session
      * @param nameInteger
      * @param finalNameInteger
@@ -134,29 +137,32 @@ public class SimpleExhumationServiceImplSimple extends SimpleBaseServiceImpl<Sim
         String finalName = AwardUtil.getAward(finalNameInteger);
         //获取学生信息
         Student student = getStudent(session);
-        Map<String,Object> selmap=new HashMap<>();
-        selmap.put("name",name);
-        selmap.put("studentId",student.getId());
+        Map<String, Object> selmap = new HashMap<>();
+        selmap.put("name", name);
+        selmap.put("studentId", student.getId());
         //获取未使用的碎片id
         List<Integer> integers = simpleExhumationMapper.selSkinExhumationId(selmap);
+        if (integers.size() < number) {
+            ServerResponse.createByError(400,"碎片不足");
+        }
         //使用碎片
-        for(int i=0;i<number;i++){
-            Map<String,Object> map=new HashMap<>();
-            map.put("finalName",finalName);
-            map.put("id",integers.get(i));
+        for (int i = 0; i < number; i++) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("finalName", finalName);
+            map.put("id", integers.get(i));
             simpleExhumationMapper.updExhumationFinalNameById(map);
         }
         //当合成最终皮肤时添加皮肤
-        if(type==1){
-            synService.addSynthetic(finalName,finalImageUrl,3,student.getId().intValue(),0);
-            studentSkinService.addStudentSkin(finalName,student.getId().intValue(),null,finalImageUrl);
+        if (type == 1) {
+            synService.addSynthetic(finalName, finalImageUrl, 3, student.getId().intValue(), 0);
+            studentSkinService.addStudentSkin(finalName, student.getId().intValue(), null, finalImageUrl);
         }
         return ServerResponse.createBySuccess("成功");
     }
 
 
-    private Exhumation getExhumation(String name, String imgUrl, int type, Date date, Integer studentId, String finalName){
-        Exhumation exhumation=new Exhumation();
+    private Exhumation getExhumation(String name, String imgUrl, int type, Date date, Integer studentId, String finalName) {
+        Exhumation exhumation = new Exhumation();
         exhumation.setCreateTime(date);
         exhumation.setImgUrl(imgUrl);
         exhumation.setState(0);
