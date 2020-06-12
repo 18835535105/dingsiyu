@@ -160,7 +160,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                 //是否拥有
                 setMap.put("isHave", true);
                 //是否可试用
-                setMap.put("have", true);
+                setMap.put("have", false);
                 Map<String, Object> haveSkinMap = (Map<String, Object>) o;
                 int state = Integer.parseInt(haveSkinMap.get("state").toString());
                 Object endTime = haveSkinMap.get("endTime");
@@ -198,7 +198,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                         setMap.put("use", false);
                     }
                     if (System.currentTimeMillis() < date.getTime()) {
-                        setMap.put("have", true);
+                        setMap.put("have", false);
                         if (state == 1) {
                             setMap.put("use", true);
                         }
@@ -208,7 +208,7 @@ public class SimpleStudentSkinServiceImplSimple extends SimpleBaseServiceImpl<Si
                         setMap.put("have", true);
                     }
                 } else {
-                    setMap.put("have", false);
+                    setMap.put("have", true);
                     //是否正在使用
                     setMap.put("use", false);
                 }
