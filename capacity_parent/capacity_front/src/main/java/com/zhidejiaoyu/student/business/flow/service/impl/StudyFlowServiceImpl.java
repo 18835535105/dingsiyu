@@ -190,7 +190,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
             boolean isEasy = dto.getEasyOrHard() == 1;
             if (dto.getGrade() == PointConstant.HUNDRED) {
                 // 全部答对
-                return isEasy ? this.toAnotherFlow(dto, (int) FlowConstant.SENTENCE_TRANSLATE) : this.toAnotherFlow(dto, (int) FlowConstant.LETTER_WRITE);
+                return isEasy ? this.toAnotherFlow(dto, (int) FlowConstant.SENTENCE_GAME) : this.toAnotherFlow(dto, (int) FlowConstant.LETTER_WRITE);
             }
 
             if (dto.getGrade() >= PointConstant.EIGHTY) {
