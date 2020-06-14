@@ -699,7 +699,7 @@
         SELECT
         distinct
         v.id, v.word, uv.word_chinese
-        FROM vocabulary v, unit_vocabulary_new uv, unit u, course c
+        FROM vocabulary v, unit_vocabulary_new uv, unit_new u, course_new c
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = c.id and c.study_paragraph = #{studyParagraph}
         <if test="ignoreList.size > 0">
@@ -780,8 +780,8 @@
 
     <select id="selectByJointName" resultMap="BaseResultMap" parameterType="map">
         select v.word, uv.word_chinese
-        from unit u,
-             unit_vocabulary uv,
+        from unit_new u,
+             unit_vocabulary_new uv,
              vocabulary v
         where u.id = uv.unit_id
           and v.id = uv.vocabulary_id
@@ -791,7 +791,7 @@
     <select id="countPicture" resultType="java.lang.Integer">
         select count(v.id)
         from vocabulary v,
-             unit_vocabulary uv
+             unit_vocabulary_new uv
         where uv.unit_id = #{unitId}
           and uv.vocabulary_id = v.id
           and (v.small_picture_url is not null
