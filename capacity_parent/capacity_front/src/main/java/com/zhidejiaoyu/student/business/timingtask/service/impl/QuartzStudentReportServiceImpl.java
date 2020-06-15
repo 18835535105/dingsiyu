@@ -79,7 +79,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
     @Resource
     private SchoolGoldFactoryMapper schoolGoldFactoryMapper;
 
-    //    @Scheduled(cron = "0 0 1 * * ?")
+    @Scheduled(cron = "0 0 1 * * ?")
     @Override
     public void exportStudentWithSchool() {
         if (checkPort(port)) {
@@ -133,7 +133,7 @@ public class QuartzStudentReportServiceImpl implements QuartzStudentReportServic
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-//    @Scheduled(cron = "0 15 1 * * ?")
+    @Scheduled(cron = "0 15 1 * * ?")
     public void exportStudentPay() {
         if (checkPort(port)) {
             return;

@@ -991,7 +991,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         // 充值卡时间
         int cardNo = 100;
 
-        Student student = studentMapper.selectByPrimaryKey(studentId);
+        Student student = studentMapper.selectById(studentId);
         // 学生账号
         String account = student.getAccount();
         // 查询学生账号到期时间

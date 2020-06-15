@@ -3,6 +3,7 @@
 <mapper namespace="com.zhidejiaoyu.common.mapper.StudentMapper">
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.Student">
         <id column="id" property="id" jdbcType="BIGINT"/>
+        <id column="uuid" property="uuid"/>
         <id column="teacher_id" property="teacherId"/>
         <id column="class_id" property="classId"/>
         <result column="account" property="account" jdbcType="VARCHAR"/>
@@ -118,6 +119,7 @@
     </sql>
     <sql id="Base_Column_List">
         id,
+uuid,
         account,
         password,
         teacher_id,
@@ -173,6 +175,7 @@
     </sql>
     <sql id="more_table_List">
         s.id,
+s.uuid,
         s.account,
         s.password,
         s.teacher_id,
@@ -226,26 +229,6 @@
         s.show_capacity,
         s.openid
     </sql>
-    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.StudentExample">
-        select
-        <if test="distinct">
-            distinct
-        </if>
-        <include refid="Base_Column_List"/>
-        from student
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-        <if test="orderByClause != null">
-            order by ${orderByClause}
-        </if>
-    </select>
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
-        select
-        <include refid="Base_Column_List"/>
-        from student
-        where id = #{id,jdbcType=BIGINT}
-    </select>
     <delete id="deleteByPrimaryKeys" parameterType="map">
         update student set `status` = 3 where id in (
         <foreach collection="ids" separator="," item="id">
