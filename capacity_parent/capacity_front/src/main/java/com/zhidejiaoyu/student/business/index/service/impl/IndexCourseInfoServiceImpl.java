@@ -83,25 +83,25 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
         MAPPING.put(GradeNameConstant.SEVENTH_GRADE, "seven");
         MAPPING.put(GradeNameConstant.EIGHTH_GRADE, "eight");
         MAPPING.put(GradeNameConstant.NINTH_GRADE, "nine");
-        MAPPING.put(GradeNameConstant.SENIOR_ONE, "ten");
-        MAPPING.put(GradeNameConstant.SENIOR_TWO, "eleven");
-        MAPPING.put(GradeNameConstant.SENIOR_THREE, "twelve");
+        MAPPING.put(GradeNameConstant.SENIOR_ONE, "gaoyi");
+        MAPPING.put(GradeNameConstant.SENIOR_TWO, "gaoer");
+        MAPPING.put(GradeNameConstant.SENIOR_THREE, "gaosan");
         MAPPING.put(GradeNameConstant.HIGH, "gaozhong");
 
         MAPPING.put(GradeNameConstant.VOLUME_1, "up");
         MAPPING.put(GradeNameConstant.VOLUME_2, "down");
         // 全册
-//        MAPPING.put(GradeNameConstant.FULL_VOLUME, "quance");
+        MAPPING.put(GradeNameConstant.FULL_VOLUME, "quance");
         // 必修
-//        MAPPING.put(GradeNameConstant.REQUIRED_ONE, "bixiuyi");
-//        MAPPING.put(GradeNameConstant.REQUIRED_TWO, "bixiuer");
-//        MAPPING.put(GradeNameConstant.REQUIRED_THREE, "bixiusan");
-//        MAPPING.put(GradeNameConstant.REQUIRED_FOUR, "bixiusi");
-//        MAPPING.put(GradeNameConstant.REQUIRED_FIVE, "bixiuwu");
+        MAPPING.put(GradeNameConstant.REQUIRED_ONE, "bixiu1");
+        MAPPING.put(GradeNameConstant.REQUIRED_TWO, "bixiu2");
+        MAPPING.put(GradeNameConstant.REQUIRED_THREE, "bixiu3");
+        MAPPING.put(GradeNameConstant.REQUIRED_FOUR, "bixiu4");
+        MAPPING.put(GradeNameConstant.REQUIRED_FIVE, "bixiu5");
         // 选修
-//        MAPPING.put(GradeNameConstant.ELECTIVE_SIX, "xuanxiuliu");
-//        MAPPING.put(GradeNameConstant.ELECTIVE_SEVEN, "xuanxiuba");
-//        MAPPING.put(GradeNameConstant.ELECTIVE_EIGHT, "xuanxiuba");
+        MAPPING.put(GradeNameConstant.ELECTIVE_SIX, "xuanxiu6");
+        MAPPING.put(GradeNameConstant.ELECTIVE_SEVEN, "xuanxiu7");
+        MAPPING.put(GradeNameConstant.ELECTIVE_EIGHT, "xuanxiu8");
     }
 
     @Override
@@ -212,8 +212,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
             List<CourseNew> courseNews = courseNewMapper.selectBatchIds(smallCourseIds);
             // 匹配不到年级和上下册的课程不展示
-            courseNews.stream().filter(courseNew -> checkCanShowPicture(courseNew.getGrade(), courseNew.getLabel()))
-                    .forEach(courseNew -> packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, courseNew));
+            courseNews.forEach(courseNew -> packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, courseNew));
         }
 
         return ServerResponse.createBySuccess(CourseInfoVO.builder()
@@ -357,11 +356,6 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             String grade = map.get("grade").toString();
             String label = map.get("label").toString();
 
-            // 匹配不到年级和上下册的课程不展示
-            if (!checkCanShowPicture(grade, label)) {
-                return;
-            }
-
             SyntaxCourse syntaxCourse = SyntaxCourse.builder()
                     .id(courseId)
                     .grade(grade)
@@ -370,21 +364,6 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
             this.packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, syntaxCourse);
         });
-    }
-
-    /**
-     * 检测当前课程是否有图片
-     *
-     * @param grade
-     * @param label
-     * @return <ul>
-     * <li>true：有图片 </li>
-     * <li>false：没有图片</li>
-     * </ul>
-     */
-    private boolean checkCanShowPicture(String grade, String label) {
-        return !(!MAPPING.containsKey(grade) || !MAPPING.containsKey(label)
-                || Objects.equals(grade, "一年级") || Objects.equals(grade, "二年级"));
     }
 
     /**
