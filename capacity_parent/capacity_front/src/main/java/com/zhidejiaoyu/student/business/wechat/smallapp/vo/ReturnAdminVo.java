@@ -29,7 +29,7 @@ public class ReturnAdminVo {
     /**
      * 学习获取金币数
      */
-    private Double gold;
+    private Integer gold;
     /**
      * 点赞微信信息
      */

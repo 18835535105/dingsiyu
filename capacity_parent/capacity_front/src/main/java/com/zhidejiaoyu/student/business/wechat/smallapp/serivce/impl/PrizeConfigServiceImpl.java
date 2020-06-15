@@ -113,7 +113,7 @@ public class PrizeConfigServiceImpl extends BaseServiceImpl<PrizeConfigMapper, P
         int wordCount = learnNewMapper.countLearnedWordCount(student.getId());
         ReturnAdminVo returnAdminVo = ReturnAdminVo.builder()
                 .adminId(adminId.longValue())
-                .gold(student.getSystemGold() + student.getOfflineGold())
+                .gold(student.getSystemGold().intValue() + student.getOfflineGold().intValue())
                 .vaildTime(vaildTime)
                 .headPortrait(GetOssFile.getPublicObjectUrl(student.getHeadUrl()))
                 .imgUrl(imgUrl)
