@@ -5,7 +5,7 @@ spring:
     multipart:
       file-size-threshold: 15MB
   datasource:
-    url: jdbc:mysql://${ip}:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai
     username: root
     password: zhide8800
   redis:
