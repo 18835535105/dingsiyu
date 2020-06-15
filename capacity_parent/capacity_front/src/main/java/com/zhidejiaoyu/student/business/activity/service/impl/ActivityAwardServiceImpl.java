@@ -158,7 +158,10 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
     public ServerResponse<Object> getAward(Integer awardGold) {
         Student student = super.getStudent();
 
-        List<AwardListVO.ActivityList> activityList = getActivityLists(student);
+        List<AwardListVO.ActivityList> activityList = this.getActivityLists(student);
+        if (activityList == null) {
+            return ServerResponse.createByError(300, "本周没有活动!");
+        }
 
         for (AwardListVO.ActivityList list : activityList) {
             if (Objects.equals(list.getAwardGold(), awardGold)) {
@@ -173,7 +176,7 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
     public List<AwardListVO.ActivityList> getActivityLists(Student student) {
         WeekActivityConfig weekActivityConfig = weekActivityConfigMapper.selectCurrentWeekConfig();
         if (weekActivityConfig == null) {
-            throw new ServiceException(300, "本周没有活动！");
+            return null;
         }
         WeekActivity weekActivity = weekActivityMapper.selectById(weekActivityConfig.getWeekActivityId());
 
@@ -184,7 +187,10 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
     public ServerResponse<Object> getAwardCount() {
         Student student = super.getStudent();
 
-        List<AwardListVO.ActivityList> activityList = getActivityLists(student);
+        List<AwardListVO.ActivityList> activityList = this.getActivityLists(student);
+        if (activityList == null) {
+            return ServerResponse.createByError(300, "本周没有活动!");
+        }
 
         long count = activityList.stream().filter(activityList1 -> Objects.equals(activityList1.getCanGet(), 2)).count();
 
