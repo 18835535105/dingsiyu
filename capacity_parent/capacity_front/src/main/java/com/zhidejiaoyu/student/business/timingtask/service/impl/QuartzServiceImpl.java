@@ -258,7 +258,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-//    @Scheduled(cron = "0 20 0 * * ?")
+    @Scheduled(cron = "0 20 0 * * ?")
     @Override
     public void updateEnergy() {
         if (checkPort(port)) {
@@ -273,7 +273,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-//    @Scheduled(cron = "0 30 0 * * ?")
+    @Scheduled(cron = "0 30 0 * * ?")
     @Override
     public void updateFrozen() {
         if (checkPort(port)) {
@@ -292,7 +292,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-//    @Scheduled(cron = "0 5 0 1 * ? ")
+    @Scheduled(cron = "0 5 0 1 * ? ")
     @Override
     public void updateClassMonthRank() {
         if (checkPort(port)) {
@@ -376,7 +376,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     }
 
     @Override
-//    @Scheduled(cron = "0 5 0 * * 1")
+    @Scheduled(cron = "0 5 0 * * 1")
     public void deleteStudentLocation() {
         if (checkPort(port)) {
             return;
@@ -390,7 +390,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
      * 每天清楚体验账号到期60天的账号
      */
     @Override
-//    @Scheduled(cron = "0 15 2 * * ?")
+    @Scheduled(cron = "0 15 2 * * ?")
     public void deleteExperienceAccount() {
         if (checkPort(port)) {
             return;
@@ -438,7 +438,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
 
 
     @Override
-//    @Scheduled(cron = "0 15 1 * * ?")
+    @Scheduled(cron = "0 15 1 * * ?")
     public void saveRecycleBin() {
         if (checkPort(port)) {
             return;
@@ -1208,7 +1208,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
     }
 
     @Override
-//    @Scheduled(cron = "0 0 2 * * ? ")
+    @Scheduled(cron = "0 0 2 * * ? ")
     public void deleteSessionMap() {
         if (checkPort(port)) {
             return;
@@ -1234,7 +1234,7 @@ public class QuartzServiceImpl implements QuartzService, BaseQuartzService {
 
 
     @Override
-//    @Scheduled(cron = "0 10 0 * * ? ")
+    @Scheduled(cron = "0 10 0 * * ? ")
     public void deleteDrawRedis() {
         if (checkPort(port)) {
             return;
