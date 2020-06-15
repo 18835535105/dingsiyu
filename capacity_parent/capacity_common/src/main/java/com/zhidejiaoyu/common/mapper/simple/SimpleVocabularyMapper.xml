@@ -297,7 +297,7 @@
         distinct
         <include refid="unite_Column_List"/>
         FROM vocabulary
-        v, unit_vocabulary uv
+        v, unit_vocabulary_new uv
         where uv.unit_id = #{unitId}
         AND v.id
         =
