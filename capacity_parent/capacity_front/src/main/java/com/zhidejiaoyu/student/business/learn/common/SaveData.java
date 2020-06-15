@@ -1,7 +1,6 @@
 package com.zhidejiaoyu.student.business.learn.common;
 
 import com.zhidejiaoyu.common.award.MedalAwardAsync;
-import com.zhidejiaoyu.common.config.RedisConfig;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
@@ -11,7 +10,6 @@ import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
 import com.zhidejiaoyu.common.study.memorydifficulty.WordMemoryDifficulty;
 import com.zhidejiaoyu.common.utils.PictureUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
-import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.learn.PerceiveEngineUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;

@@ -36,9 +36,9 @@ public class SyntaxMemoryDifficulty extends CheckMemoryDifficultyParam implement
             easyOrHard = 2;
         }
         //获取当前learnId
-        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studyCapacity.getStudentId(), studyCapacity.getUnitId(), easyOrHard,4);
+        LearnNew learnNew = learnNewMapper.selectByStudentIdAndUnitIdAndEasyOrHardAndModelType(studyCapacity.getStudentId(), studyCapacity.getUnitId(), easyOrHard, 4);
         // 获取当前学习次数
-        Integer studyCount=learnExtendMapper.countByLearnIdAndWordIdAndType(learnNew.getId(),studyCapacity.getWordId());
+        Integer studyCount = learnExtendMapper.countByLearnIdAndWordIdAndType(learnNew.getId(), studyCapacity.getWordId());
         if (studyCapacity.getFaultTime() > studyCount) {
             studyCount = studyCapacity.getFaultTime() + 1;
         }
