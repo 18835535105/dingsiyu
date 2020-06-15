@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.common.constant.redis;
 
+import com.zhidejiaoyu.common.constant.ServerNoConstant;
+
 /**
  * redis key 命名常量类
  *
@@ -11,16 +13,16 @@ public interface RedisKeysConst {
     /**
      * 清学版redis缓存数据 key
      */
-    String PREFIX = "simple_student";
+    String PREFIX = "simple_student:" + ServerNoConstant.SERVER_NO;
 
     /**
      * 摸底测试
      */
-    String TEST_BEFORE_STUDY = "TEST_BEFORE_STUDY:";
+    String TEST_BEFORE_STUDY = "TEST_BEFORE_STUDY:" + ServerNoConstant.SERVER_NO + ":";
     /**
      * 学生已经学习过的模块
      */
-    String LOOK_GUIDE = "LOOK_GUIDE:";
+    String LOOK_GUIDE = "LOOK_GUIDE:" + ServerNoConstant.SERVER_NO + ":";
     /**
      * 当前课程下每个单元的单词总数量
      * 数据结构hash key - WORD_COUNT_WITH_UNIT_IN_COURSE:课程id
@@ -31,87 +33,87 @@ public interface RedisKeysConst {
      * 当前课程下所有的单词数
      * 数据结构hash key - WORD_COUNT_WITH_COURSE:课程id
      */
-    String WORD_COUNT_WITH_COURSE = "word_count_with_course:";
+    String WORD_COUNT_WITH_COURSE = "word_count_with_course:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
      * 当前课程下所有的单词数
      * 数据结构hash key - WORD_COUNT_WITH_COURSE:课程id
      */
-    String DRAW_COUNT_WITH_NAME = "draw_count_with_name:";
+    String DRAW_COUNT_WITH_NAME = "draw_count_with_name:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
      * 当前单元下所有单词数
      * 数据结构hash key - WORD_COUNT_WITH_UNIT:单元id
      */
-    String WORD_COUNT_WITH_UNIT = "word_count_with_unit:";
+    String WORD_COUNT_WITH_UNIT = "word_count_with_unit:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
      * 当前学生当前模块下所有课程信息
      * key - All_COURSE_WITH_STUDENT_IN_TYPE:学生id:模块名称
      */
-    String ALL_COURSE_WITH_STUDENT_IN_TYPE = "all_course_with_student_in_type:";
+    String ALL_COURSE_WITH_STUDENT_IN_TYPE = "all_course_with_student_in_type:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
      * 所有等级信息
      */
-    String ALL_LEVEL = "all_level";
+    String ALL_LEVEL = "all_level:" + ServerNoConstant.SERVER_NO;
 
     /**
      * 统计在线人数
      */
-    String ZSET_ONLINE_USER = "ZSET_ONLINE_USER";
+    String ZSET_ONLINE_USER = "ZSET_ONLINE_USER:" + ServerNoConstant.SERVER_NO;
 
     /**
      * 用于存储学生时长信息及学生信息
      */
-    String SESSION_MAP = "SESSION_MAP";
+    String SESSION_MAP = "SESSION_MAP:" + ServerNoConstant.SERVER_NO;
 
     /**
      * 存储学生 id 与其 sessionId 对应关系
      */
-    String LOGIN_SESSION = "LOGIN_SESSION";
+    String LOGIN_SESSION = "LOGIN_SESSION:" + ServerNoConstant.SERVER_NO;
 
     /**
      * 当前单元下所有单词信息
      */
-    String WORD_INFO_IN_UNIT = "WORD_INFO_IN_UNIT:";
+    String WORD_INFO_IN_UNIT = "WORD_INFO_IN_UNIT:" + ServerNoConstant.SERVER_NO + ":";
     /**
      * 当前单元下所有分组信息
      */
-    String WORD_INFO_IN_UNIT_GROUP = "WORD_INFO_IN_GROUP:";
+    String WORD_INFO_IN_UNIT_GROUP = "WORD_INFO_IN_GROUP:" + ServerNoConstant.SERVER_NO + ":";
 
-    String SENTENCE_INFO_IN_UNIT = "SENTENCE_INFO_IN_UNIT:";
+    String SENTENCE_INFO_IN_UNIT = "SENTENCE_INFO_IN_UNIT:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
      * 学生保存测试记录时记录学生 id 及开始测试时间；学生再次保存测试记录时验证是不是重复
      * key: TEST_SUBMIT:studentId  value:学生测试开始时间
      */
-    String TEST_SUBMIT = "TEST_SUBMIT";
+    String TEST_SUBMIT = "TEST_SUBMIT:" + ServerNoConstant.SERVER_NO;
 
     /**
      * 存储音节信息
      */
-    String PHONETIC_SYMBOL = "PHONETIC_SYMBOL";
+    String PHONETIC_SYMBOL = "PHONETIC_SYMBOL:" + ServerNoConstant.SERVER_NO;
 
     /**
      * 存储学生是否是第一次登录信息
      */
-    String FIRST_LOGIN = "FIRST_LOGIN";
+    String FIRST_LOGIN = "FIRST_LOGIN:" + ServerNoConstant.SERVER_NO;
 
     /**
      * 被标记为异地登录被挤掉的 sessionId
      */
-    String MULTIPLE_LOGIN_SESSION_ID = "MULTIPLE_LOGIN_SESSION_ID:";
+    String MULTIPLE_LOGIN_SESSION_ID = "MULTIPLE_LOGIN_SESSION_ID:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
      * 学生是否已充值标识，有记录的学生id说明已经充值过
      */
-    String IS_PAID = "IS_PAID";
+    String IS_PAID = "IS_PAID:" + ServerNoConstant.SERVER_NO;
 
     /**
      * 用于标识学生指定的group中的单词首次答错是否需要额外增加50%的记忆强度
      */
-    String FIRST_FALSE_ADD = "FIRST_FALSE_ADD";
+    String FIRST_FALSE_ADD = "FIRST_FALSE_ADD:" + ServerNoConstant.SERVER_NO;
 
     /**
      * 微信小程序 access_token key 值
@@ -141,7 +143,7 @@ public interface RedisKeysConst {
     /**
      * 标识学生已经初始化了飞船信息
      */
-    String INIT_SHIP = "INIT_SHIP:";
+    String INIT_SHIP = "INIT_SHIP:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
      * 副本基本信息缓存
@@ -157,15 +159,15 @@ public interface RedisKeysConst {
      * field=副本id
      * value=参加挑战的学生id集合
      */
-    String SCHOOL_COPY = "SCHOOL_COPY:";
+    String SCHOOL_COPY = "SCHOOL_COPY:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
      * 记录校区指定副本是否挑战成功
      * key=SCHOOL_COPY_AWARD_MARK:校管id
      * field=副本id
-     * value=当前校区副本是否已挑战陈宫
+     * value=当前校区副本是否已挑战成功
      */
-    String SCHOOL_COPY_AWARD_MARK = "SCHOOL_COPY_AWARD_MARK:";
+    String SCHOOL_COPY_AWARD_MARK = "SCHOOL_COPY_AWARD_MARK:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
      * 当天被膜拜的学生id
@@ -173,7 +175,7 @@ public interface RedisKeysConst {
      * field=当前学生id
      * value:hashMap（key=value=被膜拜的学生id）
      */
-    String BY_WORSHIPED_TODAY = "BY_WORSHIPED_TODAY:";
+    String BY_WORSHIPED_TODAY = "BY_WORSHIPED_TODAY:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
      * 记录各个校区可以挑战的副本信息
@@ -182,7 +184,7 @@ public interface RedisKeysConst {
      * field:schoolAdminId
      * value:bossId
      */
-    String SCHOOL_PK_BASE_INFO = "SCHOOL_PK_BASE_INFO:";
+    String SCHOOL_PK_BASE_INFO = "SCHOOL_PK_BASE_INFO:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
      * 记录学生每日单词的错误记录
@@ -191,7 +193,7 @@ public interface RedisKeysConst {
      * field:wordId
      * value:错误次数
      */
-    String ERROR_WORD = "ERROR_WORD:";
+    String ERROR_WORD = "ERROR_WORD:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
      * 记录学生每日句型的错误记录
@@ -200,7 +202,7 @@ public interface RedisKeysConst {
      * field:sentenceId
      * value:错误次数
      */
-    String ERROR_SENTENCE = "ERROR_SENTENCE:";
+    String ERROR_SENTENCE = "ERROR_SENTENCE:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
      * 记录学生每日课文的错误记录
@@ -209,7 +211,7 @@ public interface RedisKeysConst {
      * field:teksId
      * value:错误次数
      */
-    String ERROR_TEKS = "ERROR_TEKS:";
+    String ERROR_TEKS = "ERROR_TEKS:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
      * 记录学生每日语法的错误记录
@@ -218,7 +220,7 @@ public interface RedisKeysConst {
      * field:wordId
      * value:错误次数
      */
-    String ERROR_SYNTAX = "ERROR_SYNTAX:";
+    String ERROR_SYNTAX = "ERROR_SYNTAX:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
      * 记录学生每日测试的错误记录
@@ -227,7 +229,7 @@ public interface RedisKeysConst {
      * field:wordId
      * value:错误次数
      */
-    String ERROR_TEST = "ERROR_TEST:";
+    String ERROR_TEST = "ERROR_TEST:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
      * 记录学生每日学习的模块记录
@@ -236,5 +238,5 @@ public interface RedisKeysConst {
      * field:wordId
      * value:错误次数
      */
-    String STUDY_MODEL="STUDY_MODEL:";
+    String STUDY_MODEL = "STUDY_MODEL:" + ServerNoConstant.SERVER_NO + ":";
 }
