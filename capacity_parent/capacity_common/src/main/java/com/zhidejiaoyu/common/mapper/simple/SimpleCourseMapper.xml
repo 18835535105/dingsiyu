@@ -565,7 +565,7 @@
         SELECT b.id,
                b.version
         FROM student_unit a
-                 JOIN course b ON a.course_id = b.id
+                 JOIN course_new b ON a.course_id = b.id
             AND a.student_id = #{studentId}
             and b.version LIKE '%快速单词'
             and b.study_paragraph = #{phase}
