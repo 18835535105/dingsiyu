@@ -54,14 +54,17 @@ public class ZdjyFrontApplication {
         if (StringUtil.isEmpty(ServerNoConstant.SERVER_NO)) {
             SysConfig sysConfig = sysConfigMapper.selectByExplain("服务器编号");
             if (sysConfig == null) {
+                log.info("当前服务器还没有编号，正在生成编号...");
                 sysConfig = new SysConfig();
                 sysConfig.setContent(IdUtil.getId());
                 sysConfig.setExplain("当前服务器编号，用于区分各个不同服务器，禁止手动变更！");
                 sysConfig.setUpdateTime(new Date());
                 sysConfigMapper.insert(sysConfig);
+                log.info("服务器编号生成成功，serverNo={}", sysConfig.getContent());
+            } else {
+                ServerNoConstant.SERVER_NO = sysConfig.getContent();
+                log.info("初始化当前服务器已有编号，serverNo={}", sysConfig.getContent());
             }
-            ServerNoConstant.SERVER_NO = sysConfig.getContent();
-            log.info("初始化当前服务器编号，serverNo={}", sysConfig.getContent());
         }
     }
 
