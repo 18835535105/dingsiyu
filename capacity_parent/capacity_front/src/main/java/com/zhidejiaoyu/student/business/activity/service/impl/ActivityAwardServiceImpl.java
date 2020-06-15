@@ -173,7 +173,7 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
     public List<AwardListVO.ActivityList> getActivityLists(Student student) {
         WeekActivityConfig weekActivityConfig = weekActivityConfigMapper.selectCurrentWeekConfig();
         if (weekActivityConfig == null) {
-            throw new ServiceException("本周没有活动！");
+            throw new ServiceException(300, "本周没有活动！");
         }
         WeekActivity weekActivity = weekActivityMapper.selectById(weekActivityConfig.getWeekActivityId());
 

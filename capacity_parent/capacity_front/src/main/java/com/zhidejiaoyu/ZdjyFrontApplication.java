@@ -63,7 +63,7 @@ public class ZdjyFrontApplication {
                 log.info("服务器编号生成成功，serverNo={}", sysConfig.getContent());
             } else {
                 ServerNoConstant.SERVER_NO = sysConfig.getContent();
-                log.info("初始化当前服务器已有编号，serverNo={}", sysConfig.getContent());
+                log.info("当前服务器已有编号，serverNo={}", sysConfig.getContent());
             }
         }
     }
