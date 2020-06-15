@@ -1,5 +1,7 @@
 package com.zhidejiaoyu.common.constant.redis;
 
+import com.zhidejiaoyu.common.constant.ServerNoConstant;
+
 /**
  * 源分战力排行缓存key
  *
@@ -16,5 +18,5 @@ public interface SourcePowerKeysConst {
     /**
      * 校区排行
      */
-    String SCHOOL_RANK = "SOURCE_POWER_SCHOOL_RANK:";
+    String SCHOOL_RANK = "SOURCE_POWER_SCHOOL_RANK:" + ServerNoConstant.SERVER_NO + ":";
 }

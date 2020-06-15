@@ -2,9 +2,8 @@ package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -29,6 +28,8 @@ public class Student extends Model<Student> {
 
     @TableId(type = IdType.AUTO)
     private Long id;
+
+    private String uuid;
 
     /**
      * 老师id

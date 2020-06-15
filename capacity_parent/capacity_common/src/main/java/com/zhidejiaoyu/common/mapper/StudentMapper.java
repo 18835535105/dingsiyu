@@ -1,9 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.StudentExample;
 import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -11,29 +9,12 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 @Repository
 public interface StudentMapper extends BaseMapper<Student> {
-    /**
-     * @param example
-     * @return
-     * @see com.baomidou.mybatisplus.core.mapper.BaseMapper#selectList(Wrapper)
-     */
-    @Deprecated
-    List<Student> selectByExample(StudentExample example);
-
-    /**
-     * @param id
-     * @return
-     * @see com.baomidou.mybatisplus.core.mapper.BaseMapper#selectById(Serializable)
-     */
-    @Deprecated
-    Student selectByPrimaryKey(Long id);
-
     /**
      * @param record
      * @return

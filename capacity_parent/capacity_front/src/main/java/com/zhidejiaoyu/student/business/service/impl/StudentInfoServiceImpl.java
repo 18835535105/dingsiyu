@@ -252,7 +252,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         if (lastFirstCount == null) {
             lastFirstCount = 0;
         }
-        Student byWorship = studentMapper.selectByPrimaryKey(userId);
+        Student byWorship = studentMapper.selectById(userId);
         if (lastFirstCount == 0) {
             byWorship.setWorshipFirstTime(new Date());
             studentMapper.updateById(byWorship);
@@ -271,7 +271,8 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             // 计算上个第一名保持的时间
             StudentExample studentExample = new StudentExample();
             studentExample.createCriteria().andWorshipFirstTimeIsNotNull().andIdNotEqualTo(userId);
-            List<Student> list = studentMapper.selectByExample(studentExample);
+            List<Student> list = studentMapper.selectList(new QueryWrapper<Student>()
+                    .isNotNull("worship_first_time").ne("id", userId));
 
             if (list.size() > 0) {
                 toAward(children, byWorship, list, complete, totalPlan);
@@ -525,7 +526,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         if (stuId == null) {
             student = getStudent(session);
         } else {
-            student = studentMapper.selectByPrimaryKey(stuId);
+            student = studentMapper.selectById(stuId);
         }
 
         Integer sex = student.getSex();
@@ -553,7 +554,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         if (stuId == null) {
             student = getStudent(session);
         } else {
-            student = studentMapper.selectByPrimaryKey(stuId);
+            student = studentMapper.selectById(stuId);
         }
         PageHelper.startPage(pageNum, pageSize);
         List<Map<String, Object>> medalImgUrlList = medalMapper.selectMedalImgUrl(student);
@@ -577,7 +578,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         if (stuId == null) {
             student = getStudent(session);
         } else {
-            student = studentMapper.selectByPrimaryKey(stuId);
+            student = studentMapper.selectById(stuId);
         }
         ChildMedalVo childMedalInfo = getChildMedalInfo(student, medalId);
         return ServerResponse.createBySuccess(childMedalInfo);

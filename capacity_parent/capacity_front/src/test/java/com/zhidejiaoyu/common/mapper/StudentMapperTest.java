@@ -13,7 +13,7 @@ public class StudentMapperTest extends BaseTest {
 
     @Test
     public void testSelectByPrimaryKey() {
-        System.out.println(studentMapper.selectByPrimaryKey(7846L).toString());
+        System.out.println(studentMapper.selectById(7846L).toString());
     }
 
     @Test

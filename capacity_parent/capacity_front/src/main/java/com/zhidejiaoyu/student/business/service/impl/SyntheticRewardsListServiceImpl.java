@@ -167,7 +167,7 @@ public class SyntheticRewardsListServiceImpl extends BaseServiceImpl<SyntheticRe
         student.setBonusExpires(time);
         studentMapper.updateByPrimaryKey(student);
         //查找修改后的信息
-        Student student1 = studentMapper.selectByPrimaryKey(student.getId());
+        Student student1 = studentMapper.selectById(student.getId());
         //将修改后的信息放入session中
         session.setAttribute(UserConstant.CURRENT_STUDENT, student1);
         //正常结束返回

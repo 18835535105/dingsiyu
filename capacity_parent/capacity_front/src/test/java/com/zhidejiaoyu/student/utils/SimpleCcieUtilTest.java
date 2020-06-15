@@ -21,7 +21,7 @@ public class SimpleCcieUtilTest extends BaseTest {
 
     @Test
     public void saveCcieTest() {
-        Student student = studentMapper.selectByPrimaryKey(3155L);
+        Student student = studentMapper.selectById(3155L);
         //ccieUtil.saveCcieTest(student, 1, 1, 1);
     }
 }
