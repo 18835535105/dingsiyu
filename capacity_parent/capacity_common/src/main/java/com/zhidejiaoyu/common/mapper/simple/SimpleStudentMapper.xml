@@ -686,7 +686,7 @@
     <select id="learnUnitsWordSum" parameterType="map" resultType="map">
         select a.unit_id AS id, count(a.id) AS sum
         from learn a
-                 JOIN vocabulary b ON a.vocabulary_id = b.id
+        JOIN vocabulary b ON a.vocabulary_id = b.id
         where a.student_id = #{studentId}
           and a.course_id = #{courseId}
           AND b.delStatus = 1

@@ -47,6 +47,9 @@ public class RedisOpt {
     private SimpleCourseMapper simpleCourseMapper;
 
     @Resource
+    private CourseNewMapper courseNewMapper;
+
+    @Resource
     private StudentExpansionMapper studentExpansionMapper;
 
     @Resource
@@ -182,14 +185,14 @@ public class RedisOpt {
         Object object = getRedisObject(unitWordSumKey);
         Map<Long, Map<Long, Object>> unitWordSum;
         if (object == null) {
-            unitWordSum = simpleCourseMapper.unitsWordSum(courseId);
+            unitWordSum = courseNewMapper.unitsWordSum(courseId);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, unitWordSumKey, unitWordSum);
         } else {
             try {
                 unitWordSum = (Map<Long, Map<Long, Object>>) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], courseId=[{}], error=[{}]", object, courseId, e.getMessage());
-                unitWordSum = simpleCourseMapper.unitsWordSum(courseId);
+                unitWordSum = courseNewMapper.unitsWordSum(courseId);
                 log.error("重新查询数据：unitWordSum=[{}]", unitWordSum);
             }
         }

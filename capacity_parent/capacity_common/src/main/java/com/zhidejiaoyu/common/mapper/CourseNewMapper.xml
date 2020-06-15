@@ -113,5 +113,17 @@
         order by id
     </select>
 
+    <select id="unitsWordSum" parameterType="map" resultType="map">
+        select a.id AS id, count(c.id) AS sum
+        from unit_new a,
+             unit_vocabulary_new b,
+             vocabulary c
+        where a.id = b.unit_id
+          AND b.vocabulary_id = c.id
+          AND a.course_id = #{courseId}
+          AND c.delStatus = 1
+        GROUP BY a.id
+    </select>
+
 
 </mapper>

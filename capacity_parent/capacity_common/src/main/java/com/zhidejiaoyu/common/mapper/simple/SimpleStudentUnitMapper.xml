@@ -283,15 +283,15 @@
     <select id="getSimpleUnitByStudentIdByCourseId" parameterType="map" resultType="map">
         select b.id, b.unit_name, a.word_status
         from student_unit a
-                 JOIN unit b ON a.unit_id = b.id
+                 JOIN unit_new b ON a.unit_id = b.id
             AND a.student_id = #{studentId}
             AND a.course_id = #{courseId}
         group by b.id
     </select>
     <select id="getOpenUnitId" parameterType="map" resultType="map">
     	select u.id, if(count(distinct v.id) &lt;= count(distinct l.id), 1, 2) isAll
-		from unit u,
-		     unit_vocabulary uv,
+		from unit_new u,
+		     unit_vocabulary_new uv,
 		     vocabulary v,
 		     learn l,
 		     student_unit su
