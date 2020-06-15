@@ -16,10 +16,11 @@
 
     <select id="selectByExplain" resultMap="BaseResultMap" parameterType="map">
         select
-        <include refid="base_sql"></include>
+        <include refid="base_sql"/>
         from sys_config
         where
         `explain` like concat('%',concat(#{explain},'%'))
+        limit 1
     </select>
 
 </mapper>
