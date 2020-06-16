@@ -63,7 +63,7 @@ public class DictationServiceImpl extends BaseServiceImpl<LearnNewMapper, LearnN
         // 查询学生当前单元下已学习单词的个数，即学习进度
         Integer plan = learnExtendMapper.countLearnWord(learnNews.getId(), unitId, learnNews.getGroup(), studyModel);
         // 获取当前单元下的所有单词的总个数
-        Integer wordCount = unitVocabularyNewMapper.countByUnitId(unitId, learnNews.getGroup());
+        Integer wordCount = unitVocabularyNewMapper.countByUnitIdAndGroup(unitId, learnNews.getGroup());
         DictationVo vo = new DictationVo();
         if (wordCount == 0) {
             log.error("单元 {} 下没有单词信息！", unitId);

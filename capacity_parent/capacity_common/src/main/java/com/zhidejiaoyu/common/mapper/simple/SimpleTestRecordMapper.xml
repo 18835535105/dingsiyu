@@ -324,8 +324,8 @@
                if (a.genre = '学后测试', '全部', u.unit_name) unitName,
                IFNULL(a.award_gold, 0) awardGold
         from test_record a
-                 left join course c on a.course_id = c.id
-                 left join unit u on u.id = a.unit_id
+                 left join course_new c on a.course_id = c.id
+                 left join unit_new u on u.id = a.unit_id
                  left join student_unit su on su.unit_id = a.unit_id
         where su.type = 2
           and a.point >= 0
@@ -553,7 +553,7 @@
         select unit_id,
                id
         from test_record
-        where unit_id in (select id from unit where course_id = #{courseId})
+        where unit_id in (select id from unit_new where course_id = #{courseId})
           AND student_id = #{studentId}
           AND genre = '单元闯关测试'
           and type = 1
@@ -572,8 +572,8 @@
                t.point                                                              score,
                t.study_model                                                        isWrite
         from test_record t
-                 LEFT JOIN course c on t.course_id = c.id
-                 LEFT JOIN unit u on t.unit_id = u.id
+                 LEFT JOIN course_new c on t.course_id = c.id
+                 LEFT JOIN unit_new u on t.unit_id = u.id
                  LEFT JOIN student s on s.id = t.student_id
         where t.id = #{testId}
           and s.id = #{stuId}

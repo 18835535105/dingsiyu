@@ -3,15 +3,14 @@ package com.zhidejiaoyu.common.mapper;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.Worship;
 import com.zhidejiaoyu.common.pojo.WorshipExample;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface WorshipMapper {
@@ -47,6 +46,7 @@ public interface WorshipMapper {
 
     /**
      * 查询上一个被膜拜的最高次数
+     *
      * @return
      */
     @Select("select DISTINCT count(w.id) from worship w,student s where w.student_id_by_worship = s.id and s.worship_first_time is not null GROUP BY s.id ")
@@ -55,7 +55,7 @@ public interface WorshipMapper {
     int getCountWorshipByStudentId(@Param("studentId") Long studentId);
 
     @MapKey("id")
-    Map<Long,Map<String,Long>> getMapKeyStudentWorship();
+    Map<Long, Map<String, Long>> getMapKeyStudentWorship();
 
     /**
      * 本周我被膜拜的次数
@@ -86,5 +86,5 @@ public interface WorshipMapper {
     int countByWorship(@Param("studentId") Long studentId);
 
     @MapKey("studentId")
-    Map<Long,Map<String,Object>> selectByStudentIdsAndDate(@Param("studentIds") List<Long> studentIds,@Param("date") Date beforeDaysDate);
+    Map<Long, Map<String, Object>> selectByStudentIdsAndDate(@Param("studentIds") List<Long> studentIds, @Param("date") Date beforeDaysDate);
 }

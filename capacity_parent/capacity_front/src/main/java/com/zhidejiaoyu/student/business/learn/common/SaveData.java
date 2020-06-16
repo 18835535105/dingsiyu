@@ -102,7 +102,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         // 查询学生当前单元下已学习单词的个数，即学习进度
         Integer plan = learnExtendMapper.countLearnWord(learnNews.getId(), unitId, learnNews.getGroup(), studyModel);
         // 获取当前单元下的所有单词的总个数
-        Integer wordCount = unitVocabularyNewMapper.countByUnitId(unitId, learnNews.getGroup());
+        Integer wordCount = unitVocabularyNewMapper.countByUnitIdAndGroup(unitId, learnNews.getGroup());
         if (wordCount == 0) {
             log.error("单元 {} 下没有单词信息！", unitId);
             return ServerResponse.createByErrorMessage("当前单元下没有单词！");
@@ -206,14 +206,14 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 learnExtend.setFirstIsKnow(0);
                 // 单词不认识将该单词记入记忆追踪中
                 studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, false, type);
-                Long feldId = 0L;
+                long field = 0L;
                 if (model.equals(1)) {
-                    feldId = CurrentDayOfStudyUtil.getSessionCurrent(VOCABULARY);
+                    field = CurrentDayOfStudyUtil.getSessionCurrent(VOCABULARY);
                 }
                 if (model.equals(2)) {
-                    feldId = CurrentDayOfStudyUtil.getSessionCurrent(SENTENCE);
+                    field = CurrentDayOfStudyUtil.getSessionCurrent(SENTENCE);
                 }
-                if (feldId.equals(0L)) {
+                if (field == 0L) {
                     if (model.equals(1)) {
                         currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_WORD, studentId, wordId);
                     }
@@ -222,10 +222,10 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                     }
                 } else {
                     if (model.equals(1)) {
-                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_WORD, studentId, feldId);
+                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_WORD, studentId, field);
                     }
                     if (model.equals(2)) {
-                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_SENTENCE, studentId, feldId);
+                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_SENTENCE, studentId, field);
                     }
                 }
                 saveErrorLearnLog(unitId, type, easyOrHard, studyModel, learnNew, new Long[]{learnExtend.getWordId()}, null);

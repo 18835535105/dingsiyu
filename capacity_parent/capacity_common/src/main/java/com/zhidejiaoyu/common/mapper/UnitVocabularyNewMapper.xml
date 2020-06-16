@@ -46,5 +46,74 @@
         where unit_id = #{unitId}
           and `group` = #{group}
     </select>
-
+    <select id="selectWordChineseMapByUnitIdAndWordIds" resultType="java.util.Map" parameterType="map">
+        SELECT
+        vocabulary_id id,
+        word_chinese wordChinese
+        FROM
+        unit_vocabulary_new
+        WHERE
+        unit_id = #{unitId}
+        and vocabulary_id in (
+        <foreach collection="idSet" separator="," item="id">
+            #{id}
+        </foreach>
+        )
+    </select>
+    <select id="selectWordChineseMapByCourseIdIdAndWordIds" resultType="java.util.Map" parameterType="map">
+        SELECT
+        vocabulary_id id,
+        word_chinese wordChinese
+        FROM
+        unit_vocabulary_new
+        WHERE
+        unit_id IN (
+        SELECT id
+        FROM
+        unit_new
+        WHERE
+        course_id = #{courseId}
+        )
+        AND vocabulary_id IN (
+        <foreach collection="idSet" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </select>
+    <select id="selectWordChineseMapByCourseIdIdAndWordIds5DTest" resultType="java.util.Map" parameterType="map">
+        SELECT
+        vocabulary_id id,
+        word_chinese wordChinese
+        FROM
+        unit_vocabulary_new
+        WHERE
+        unit_id IN (
+        SELECT
+        b.id
+        FROM
+        course_new a
+        JOIN unit_new b ON a.id = b.course_id
+        AND a.version like '${start}%' AND a.version like '%${end}'
+        )
+        AND vocabulary_id
+        IN (
+        <foreach collection="idSet" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </select>
+    <select id="countTotalWordMapByUnitIds" resultType="java.util.Map" parameterType="map">
+        select unit_id unitId, count(vocabulary_id) count from unit_vocabulary_new where unit_id in (
+        <foreach collection="unitIds" separator="," item="unitId">
+            #{unitId}
+        </foreach>
+        )
+        group by unit_id
+    </select>
+    <select id="selectWordChineseMapByUnitId" resultType="java.util.Map" parameterType="java.lang.Long">
+        SELECT vocabulary_id id,
+               word_chinese  wordChinese
+        FROM unit_vocabulary_new
+        WHERE unit_id = #{unitId}
+    </select>
 </mapper>

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -88,8 +89,8 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
     @Autowired
     private StudentSkinMapper studentSkinMapper;
 
-    @Autowired
-    private RestTemplate restTemplate;
+    @Resource
+    private CourseNewMapper courseNewMapper;
 
     /**
      * 消息通知
@@ -376,7 +377,7 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
             resultMap.put("picCount", picCount); // 单词图鉴总数
 
             // 获取课程下所有单元id
-            List<Map<String, Object>> allUnit = unitMapper.allUnit(courseId.intValue());
+            List<Map<String, Object>> allUnit = unitMapper.selectIdAndUnitNameByCourseId(courseId.intValue());
             // 当前课程单词模块所学单元id
             Integer wordMax = studentUnitMapper.maxUnitIdByWordByCourseIdByStudentIdBy(courseId, studentId);
             // 当前课程例句模块所学单元id
@@ -928,9 +929,9 @@ public class PersonalCentreServiceImpl extends BaseServiceImpl<StudentMapper, St
         if (model == 0) {
             count = unitMapper.countWordPicByUnitid(unitId.toString());
         } else if (model < 4 && model > 0) {
-            count = unitMapper.countWordByUnitid(unitId.toString());
+            count = unitMapper.countWordByUnitId(unitId.toString());
         } else {
-            count = unitMapper.countSentenceByUnitid(unitId.toString());
+            count = unitMapper.countSentenceByUnitId(unitId.toString());
         }
 
         // 根据单元id 查询课程单元名

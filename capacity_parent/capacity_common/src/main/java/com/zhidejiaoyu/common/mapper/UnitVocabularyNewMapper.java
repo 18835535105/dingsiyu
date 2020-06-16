@@ -1,12 +1,15 @@
 package com.zhidejiaoyu.common.mapper;
 
-import com.zhidejiaoyu.common.pojo.UnitVocabularyNew;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.zhidejiaoyu.common.pojo.UnitVocabularyNew;
 import com.zhidejiaoyu.common.vo.beforelearngame.VocabularyVO;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -50,10 +53,26 @@ public interface UnitVocabularyNewMapper extends BaseMapper<UnitVocabularyNew> {
     int countWordPictureByUnitId(@Param("unitId") Long unitId, @Param("group") Integer group);
 
     @Select("select count(id) from unit_vocabulary_new where unit_id=#{unitId} and `group` =#{group}")
-    int countByUnitId(@Param("unitId") Long unitId, @Param("group") Integer group);
+    int countByUnitIdAndGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
+
+    /**
+     * 获取当前单元下的所有不是删除状态单词的总个数
+     *
+     * @param unitId
+     * @return
+     */
+    @Select("select count(distinct uv.vocabulary_id) from unit_vocabulary_new uv where uv.unit_id=#{unitId}")
+    Long countByUnitId(Long unitId);
 
     List<String> selectInterferenceTerm(@Param("unitId") Long unitId, @Param("wordId") Long vocabularyId, @Param("chinese") String wordChinese);
 
+    /**
+     * 根据单元id和单词id查找单词的释义
+     *
+     * @param unitId
+     * @param wordId
+     * @return
+     */
     @Select("select word_chinese from unit_vocabulary_new where unit_id=#{unitId} and vocabulary_id =#{wordId}")
     String selectWordChineseByUnitIdAndWordId(@Param("unitId") Long unitId, @Param("wordId") Long wordId);
 
@@ -74,4 +93,64 @@ public interface UnitVocabularyNewMapper extends BaseMapper<UnitVocabularyNew> {
      * @return
      */
     List<VocabularyVO> selectByUnitIdAndGroup(@Param("unitId") Long unitId, @Param("group") Integer group);
+
+    /**
+     * 查询当前课程下所有单词数
+     *
+     * @param courseId
+     * @return
+     */
+    @Select("SELECT count(DISTINCT(b.vocabulary_id)) FROm unit_new a JOIN unit_vocabulary_new b ON a.id = b.unit_id AND a.course_id = #{courseId}")
+    int countAllCountWordByCourse(Long courseId);
+
+    /**
+     * 查询指定单元一批单词的释义
+     *
+     * @param unitId
+     * @param idSet  单词id集合
+     * @return map key:单词id， map:key:单词id，value：单词释义
+     */
+    @MapKey("id")
+    Map<Long, Map<Long, String>> selectWordChineseMapByUnitIdAndWordIds(@Param("unitId") Long unitId, @Param("idSet") Set<Long> idSet);
+
+
+    /**
+     * 查询当前课程一批单词的释义
+     *
+     * @param courseId 当前课程id
+     * @param idSet    单词id集合
+     * @return map key:单词id， map:key:单词id，value：单词释义
+     */
+    @MapKey("id")
+    Map<Long, Map<Long, String>> selectWordChineseMapByCourseIdIdAndWordIds(@Param("courseId") Long courseId, @Param("idSet") Set<Long> idSet);
+
+    @MapKey("id")
+    Map<Long, Map<Long, String>> selectWordChineseMapByCourseIdIdAndWordIds5DTest(@Param("idSet") Set<Long> idSet, @Param("start") String start, @Param("end") String end);
+
+    /**
+     * 查询各个单元的总单词数
+     *
+     * @param unitIds
+     * @return
+     */
+    @MapKey("unitId")
+    Map<Long, Map<Long, Long>> countTotalWordMapByUnitIds(@Param("unitIds") List<Long> unitIds);
+
+    /**
+     * 获取当前课程下的所有不是删除状态单词的总个数
+     *
+     * @param courseId
+     * @return
+     */
+    @Select("select count(distinct uv.vocabulary_id) from unit_vocabulary_new uv, unit_new u where u.id = uv.unit_id and u.course_id = #{courseId}")
+    Long countByCourseId(Long courseId);
+
+    /**
+     * 根据单元id查询出当前单元的所有单词
+     *
+     * @param unitId
+     * @return key：单词id value: map  key:单词id，value：单词释义
+     */
+    @MapKey("id")
+    Map<Long, Map<Long, String>> selectWordChineseMapByUnitId(@Param("unitId") Long unitId);
 }

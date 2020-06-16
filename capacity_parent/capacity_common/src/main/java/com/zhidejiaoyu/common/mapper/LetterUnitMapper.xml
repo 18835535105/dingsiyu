@@ -18,7 +18,7 @@
 
     <select id="selSymbolUnit" parameterType="map" resultMap="BaseResultMap">
         select
-        <include refid="base_sql"></include>
+        <include refid="base_sql"/>
         from letter_unit unit
         join phonetic_symbol symbol
         on unit.id=symbol.unit_id
@@ -31,7 +31,7 @@
         <include refid="sql"/>
         from letter_unit
         where id > #{unitId}
-        order by id asc
+        order by id
         limit 1
     </select>
 
@@ -49,7 +49,7 @@
 
     <select id="selLetterUnit" parameterType="map" resultMap="BaseResultMap">
         select
-        <include refid="base_sql"></include>
+        <include refid="base_sql"/>
         from letter_unit unit
         join letter letter
         on unit.id=letter.unit_id
@@ -59,7 +59,7 @@
     </select>
     <select id="selLetterAllUnit" resultMap="BaseResultMap">
         select
-        <include refid="base_sql"></include>
+        <include refid="base_sql"/>
         from letter_unit unit
         join letter letter
         on unit.id=letter.unit_id
@@ -67,7 +67,7 @@
     </select>
     <select id="selLetterTreasure" parameterType="map" resultMap="BaseResultMap">
         select
-        <include refid="base_sql"></include>
+        <include refid="base_sql"/>
         from letter_unit unit
         join letter_vocabulary voc
         on unit.id=voc.unit_id

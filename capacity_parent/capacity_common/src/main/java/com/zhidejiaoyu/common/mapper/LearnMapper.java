@@ -488,8 +488,6 @@ public interface LearnMapper extends BaseMapper<Learn> {
     @Select("SELECT COUNT(DISTINCT example_id) FROM learn where student_id = #{studentId} AND example_id is not NULL AND `status` = 1")
     int labelGraspExamplesByStudentId(@Param("studentId") Long studentId);
 
-    Integer learnCourseCountSentence(@Param("studentId") Long studentId, @Param("model") int model, @Param("courseId") Long courseId);
-
     /**
      * 查询学生已学的单元ids
      *

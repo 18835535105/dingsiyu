@@ -297,7 +297,7 @@
         distinct
         <include refid="unite_Column_List"/>
         FROM vocabulary
-        v, unit_vocabulary uv
+        v, unit_vocabulary_new uv
         where uv.unit_id = #{unitId}
         AND v.id
         =
@@ -358,7 +358,7 @@
         c.classify,
         c.centreExample, c.centreTranslate, c.tallExample, c.tallTranslate,
         c.explain_
-        from unit a INNER JOIN unit_vocabulary b on a.id = b.unit_id
+        from unit_new a INNER JOIN unit_vocabulary_new b on a.id = b.unit_id
         INNER JOIN vocabulary c on b.vocabulary_id = c.id
         <where>
             <if test="course_id != null and course_id != '' ">
@@ -409,7 +409,7 @@
 
     <delete id="delUnit_vocabulary" parameterType="com.zhidejiaoyu.common.pojo.UnitVocabulary">
         delete
-        from unit_vocabulary
+        from unit_vocabulary_new
         where vocabulary_id = #{vocabularyId} ${str}
     </delete>
 
@@ -420,7 +420,7 @@
                uv.word_chinese,
                v.syllable
         FROM vocabulary v,
-             unit_vocabulary uv
+             unit_vocabulary_new uv
         WHERE v.id = uv.vocabulary_id
           AND uv.unit_id = #{unit_id}
           AND v.delStatus = 1
@@ -434,7 +434,7 @@
     </select>
     <select id="countByCourseId" resultType="java.lang.Integer" parameterType="map">
         select count(uv.vocabulary_id)
-        from vocabulary v, unit_vocabulary uv, unit u
+        from vocabulary v, unit_vocabulary_new uv, unit_new u
         where v.id = uv.vocabulary_id and v.delStatus = 1
         and uv.unit_id = u.id and u.course_id = #{courseId}
         <if test="flag == 1">
@@ -460,9 +460,9 @@
         <include refid="unite_Column_List"/>
         FROM
         vocabulary v,
-        unit_vocabulary uv,
-        course c,
-        unit u
+        unit_vocabulary_new uv,
+        course_new c,
+        unit_new u
         WHERE
         v.id = uv.vocabulary_id
         AND uv.unit_id = u.id
@@ -515,7 +515,8 @@
         </if>
     </sql>
     <select id="countUnitWeek" parameterType="map" resultType="Integer">
-        SELECT COUNT(*) FROM unit a JOIN unit_vocabulary b ON a.id = b.unit_id AND a.course_id = #{course_id} AND a.id =
+        SELECT COUNT(*) FROM unit_new a JOIN unit_vocabulary_new b ON a.id = b.unit_id AND a.course_id = #{course_id}
+        AND a.id =
         (select MAX(unit_id) from learn where student_id = #{studentId} AND course_id = #{course_id}
         <include refid="study_model_sql"/>
         AND<include refid="countCourseStudyModel_sql"/>)
@@ -538,7 +539,7 @@
         <include refid="unite_Column_List"/>
         FROM
         vocabulary v,
-        unit_vocabulary uv
+        unit_vocabulary_new uv
         WHERE
         v.delStatus = 1
         AND uv.vocabulary_id = v.id
@@ -563,7 +564,7 @@
         SELECT
         distinct
         <include refid="unite_Column_List"/>
-        FROM vocabulary v, unit_vocabulary uv, unit u
+        FROM vocabulary v, unit_vocabulary_new uv, unit_new u
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = #{courseId}
     </select>
@@ -617,9 +618,9 @@
         distinct
         <include refid="unite_Column_List"/>
         FROM
-        unit_vocabulary uv,
+        unit_vocabulary_new uv,
         vocabulary v,
-        unit u
+        unit_new u
         WHERE
         v.id = uv.vocabulary_id
         AND v.delStatus = 1
@@ -651,7 +652,7 @@
 
     <select id="selectUnitIdsNotInIds" resultType="java.lang.Long" parameterType="map">
         select unit_id
-        from unit_vocabulary
+        from unit_vocabulary_new
         where vocabulary_id = #{nv.vocabularyId} ${nv.str}
     </select>
 
@@ -664,7 +665,7 @@
         c.classify,
         c.centreExample, c.centreTranslate, c.tallExample, c.tallTranslate,
         c.explain_
-        from unit a INNER JOIN unit_vocabulary b on a.id = b.unit_id
+        from unit_new a INNER JOIN unit_vocabulary_new b on a.id = b.unit_id
         INNER JOIN vocabulary c on b.vocabulary_id = c.id
         <where>
             c.recordpicurl is not null
@@ -699,8 +700,8 @@
                a.word_chinese,
                a.recordpicurl
         FROM vocabulary a
-                 JOIN unit_vocabulary b ON a.id = b.vocabulary_id
-                 JOIN unit c ON b.unit_id = c.id
+                 JOIN unit_vocabulary_new b ON a.id = b.vocabulary_id
+                 JOIN unit_new c ON b.unit_id = c.id
             AND recordpicurl IS NOT NULL
             AND a.delStatus = 1
             AND b.unit_id &lt;&gt; #{unidId}
@@ -715,7 +716,7 @@
                uv.word_chinese,
                v.recordpicurl
         FROM vocabulary v,
-             unit_vocabulary uv
+             unit_vocabulary_new uv
         WHERE v.id = uv.vocabulary_id
           AND uv.unit_id = #{unitId}
           AND v.recordpicurl is not NULL
@@ -731,7 +732,7 @@
 
     <select id="getWordPicAll" resultMap="BaseResultMap" parameterType="map">
         select b.id, b.word, a.word_chinese, b.recordpicurl
-        from unit_vocabulary a
+        from unit_vocabulary_new a
                  join vocabulary b on a.vocabulary_id = b.id
             and a.unit_id = #{unitId} and b.recordpicurl is not null and b.delStatus = 1;
     </select>
@@ -741,8 +742,8 @@
                a.word_chinese,
                a.recordpicurl
         FROM vocabulary a
-                 JOIN unit_vocabulary b ON a.id = b.vocabulary_id
-                 JOIN unit c ON b.unit_id = c.id
+                 JOIN unit_vocabulary_new b ON a.id = b.vocabulary_id
+                 JOIN unit_new c ON b.unit_id = c.id
             AND recordpicurl IS NOT NULL
             AND a.delStatus = 1
             AND course_id = #{courseId}
@@ -760,7 +761,7 @@
                a.word_chinese,
                a.recordpicurl
         FROM vocabulary a
-                 JOIN unit_vocabulary b ON a.id = b.vocabulary_id
+                 JOIN unit_vocabulary_new b ON a.id = b.vocabulary_id
             AND recordpicurl IS NOT NULL
             AND a.delStatus = 1
             AND a.id &lt;&gt; #{id}
@@ -773,7 +774,7 @@
         distinct
         <include refid="unite_Column_List"/>
         FROM vocabulary
-        v, unit_vocabulary uv
+        v, unit_vocabulary_new uv
         where uv.unit_id = #{unitId}
         AND v.id = uv.vocabulary_id AND v.delStatus = 1
         <if test="studyModel == '单词图鉴'">
@@ -792,9 +793,9 @@
         uv.word_chinese
         FROM
         vocabulary v,
-        unit_vocabulary uv,
-        course c,
-        unit u
+        unit_vocabulary_new uv,
+        course_new c,
+        unit_new u
         WHERE
         v.id = uv.vocabulary_id
         AND uv.unit_id = u.id
@@ -864,7 +865,7 @@
         v.example_chinese,
         v.recordpicurl,
         v.sound_mark AS soundMark
-        from vocabulary v,unit_vocabulary uv
+        from vocabulary v,unit_vocabulary_new uv
         WHERE
         v.id = uv.vocabulary_id
         AND uv.unit_id = #{unitId}
@@ -889,7 +890,7 @@
         c.word_chinese)),
         replace(if(locate('>', c.word_chinese) > 0, replace(c.word_chinese, '>', ')'), c.word_chinese), '&lt;', '('),
         c.word_chinese) AS wordChinese
-        FROM unit a JOIN unit_vocabulary b ON a.id = b.unit_id JOIN vocabulary c ON b.vocabulary_id = c.id
+        FROM unit_new a JOIN unit_vocabulary_new b ON a.id = b.unit_id JOIN vocabulary c ON b.vocabulary_id = c.id
         AND a.course_id = #{courseId} AND c.delStatus = 1
         <if test="unitId != null and unitId != ''">
             AND a.id in ( <foreach collection="unitId" item="id" separator=",">#{id}</foreach> )
@@ -900,7 +901,7 @@
         SELECT
         distinct
         <include refid="unite_Column_List"/>
-        FROM vocabulary v, unit_vocabulary uv, unit u
+        FROM vocabulary v, unit_vocabulary_new uv, unit_new u
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id
         <if test="courseIds.size > 0">
             AND u.course_id in (
@@ -918,8 +919,8 @@
                         v.word                                                                               readUrl,
                         v.sound_mark                                                                         soundMark
         FROM vocabulary v,
-             unit_vocabulary uv,
-             unit u
+             unit_vocabulary_new uv,
+             unit_new u
         WHERE v.delStatus = 1
           AND v.id = uv.vocabulary_id
           AND u.id = uv.unit_id
@@ -956,9 +957,9 @@
                if(v.syllable is null or v.syllable = '', v.word, v.syllable) content,
                v.word                                                        readUrl,
                v.sound_mark                                                  soundMark
-        FROM unit_vocabulary uv,
+        FROM unit_vocabulary_new uv,
              vocabulary v,
-             unit u
+             unit_new u
         WHERE v.id = uv.vocabulary_id
           AND v.delStatus = 1
           AND u.id = uv.unit_id
@@ -978,8 +979,8 @@
                v.word                                                        readUrl,
                v.sound_mark                                                  soundMark
         FROM vocabulary v,
-             unit_vocabulary uv,
-             unit u
+             unit_vocabulary_new uv,
+             unit_new u
         WHERE v.delStatus = 1
           AND v.id = uv.vocabulary_id
           AND u.id = uv.unit_id
@@ -1002,8 +1003,8 @@
                         v.word         readUrl,
                         v.sound_mark   soundMark
         FROM vocabulary v,
-             unit_vocabulary uv,
-             unit u
+             unit_vocabulary_new uv,
+             unit_new u
         WHERE v.delStatus = 1
           AND v.id = uv.vocabulary_id
           AND u.id = uv.unit_id
@@ -1048,9 +1049,9 @@
         v.word readUrl,
         v.sound_mark soundMark
         FROM
-        unit_vocabulary uv,
+        unit_vocabulary_new uv,
         vocabulary v,
-        unit u
+        unit_new u
         WHERE
         v.id = uv.vocabulary_id
         AND v.delStatus = 1
@@ -1087,8 +1088,8 @@
     </select>
     <select id="countWordMapByCourseIds" resultType="java.util.Map" parameterType="map">
         select a.course_id id, count(c.id) count
-        FROM unit a
-        JOIN unit_vocabulary b ON a.id = b.unit_id
+        FROM unit_new a
+        JOIN unit_vocabulary_new b ON a.id = b.unit_id
         JOIN vocabulary c ON b.vocabulary_id = c.id AND c.delStatus = 1 AND a.course_id in (
         <foreach collection="courseIds" item="id" separator=",">
             #{id}
@@ -1100,8 +1101,8 @@
         select v.id, v.word, uv.word_chinese
         from vocabulary v
         <if test="type==1">
-            join unit_vocabulary uv on v.id = uv.vocabulary_id
-            join unit unit on unit.id = uv.unit_id
+            join unit_vocabulary_new uv on v.id = uv.vocabulary_id
+            join unit_new unit on unit.id = uv.unit_id
         </if>
         <if test="type==2">
             join unit_vocabulary_new uv on v.id = uv.vocabulary_id
@@ -1116,7 +1117,7 @@
         SELECT
         <include refid="unite_Column_List"/>
         FROM vocabulary v,
-        <if test="type==1">unit_vocabulary uv, unit u</if>
+        <if test="type==1">unit_vocabulary_new uv, unit u</if>
         <if test="type==2">unit_vocabulary_new uv, unit_new u</if>
         WHERE v.delStatus = 1 AND v.id = uv.vocabulary_id AND u.id = uv.unit_id AND
         u.course_id = #{courseId}
@@ -1134,7 +1135,7 @@
         select
         v.id, v.word, uv.word_chinese
         from vocabulary v,
-        unit_vocabulary uv, unit u
+        unit_vocabulary_new uv, unit u
         where v.id = uv.vocabulary_id and v.delStatus = 1
         and uv.unit_id = u.id and u.joint_name like '%单词%'
         and v.id not in (

@@ -269,8 +269,6 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
         if (canGetCount < children.size() && count + 1 > lastFirstCount) {
             // 当前被膜拜的学生成为全国唯一第一名
             // 计算上个第一名保持的时间
-            StudentExample studentExample = new StudentExample();
-            studentExample.createCriteria().andWorshipFirstTimeIsNotNull().andIdNotEqualTo(userId);
             List<Student> list = studentMapper.selectList(new QueryWrapper<Student>()
                     .isNotNull("worship_first_time").ne("id", userId));
 
@@ -279,10 +277,7 @@ public class StudentInfoServiceImpl extends BaseServiceImpl<StudentMapper, Stude
             }
 
             // 将之前第一名的学生的勋章第一名标识删去
-            list.forEach(student1 -> {
-                student1.setWorshipFirstTime(null);
-                studentMapper.updateById(student1);
-            });
+            list.forEach(student1 -> studentMapper.updateWorshipFirstTimeToNull(student1.getId()));
 
             // 当前被膜拜的学生膜拜次数为全国最高,为其加上标识
             byWorship.setWorshipFirstTime(new Date());

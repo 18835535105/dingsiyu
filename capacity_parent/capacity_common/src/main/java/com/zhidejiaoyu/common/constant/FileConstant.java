@@ -39,6 +39,11 @@ public interface FileConstant {
     String QR_CODE_OSS = "imgs/qr-code/";
 
     /**
+     * 教师上传的学生智慧飞行记录图片地址
+     */
+    String STUDENT_FLY_RECORD = "imgs/student_fly_record/";
+
+    /**
      * 小程序海报图片地址
      */
     String SHARE_CONFIG_IMG = "imgs/shareConfigImg/";
@@ -76,12 +81,12 @@ public interface FileConstant {
     /**
      * 金币测试图片路径
      */
-    String TEST_STORE_IMG="imgs/testImg/";
+    String TEST_STORE_IMG = "imgs/testImg/";
 
-     interface PetNameConstant{
-        String DAMINGBAI="/static/img/edit-user-msg/tips1-1.png";
-        String LITANGXIN="/static/img/edit-user-msg/tips-3.png";
-        String WUMING="/static/img/edit-user-msg/tips-4.png";
-        String WEISIDUN="/static/img/edit-user-msg/tips-2.png";
+    interface PetNameConstant {
+        String DAMINGBAI = "/static/img/edit-user-msg/tips1-1.png";
+        String LITANGXIN = "/static/img/edit-user-msg/tips-3.png";
+        String WUMING = "/static/img/edit-user-msg/tips-4.png";
+        String WEISIDUN = "/static/img/edit-user-msg/tips-2.png";
     }
 }

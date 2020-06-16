@@ -39,6 +39,9 @@ public class StudyCapacityLearn {
     @Resource
     private UnitSentenceNewMapper unitSentenceNewMapper;
 
+    @Resource
+    private UnitVocabularyNewMapper unitVocabularyNewMapper;
+
     /**
      * 保存指定模块的单词学习记录和慧追踪信息
      *
@@ -56,7 +59,7 @@ public class StudyCapacityLearn {
 //        }
             // 通过学生id，单元id和单词id获取当前单词的记忆追踪信息
             StudyCapacity capacity = getCapacityInfo(learn, student, studyModel, vocabulary);
-            String wordChinese = unitVocabularyMapper.selectWordChineseByUnitIdAndWordId(learn.getUnitId(), vocabulary.getId());
+            String wordChinese = unitVocabularyNewMapper.selectWordChineseByUnitIdAndWordId(learn.getUnitId(), vocabulary.getId());
             // 封装记忆追踪信息
             if (wordChinese == null) {
                 wordChinese = vocabulary.getWordChinese();

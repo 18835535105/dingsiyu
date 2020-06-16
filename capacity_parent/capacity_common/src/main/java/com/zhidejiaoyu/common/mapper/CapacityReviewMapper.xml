@@ -338,8 +338,8 @@
     </resultMap>
     <select id="fiveDimensionTest" parameterType="string" resultMap="fiveDimensionTest_Map">
         select c.id, c.word, c.word_chinese
-        from unit a
-                 INNER JOIN unit_vocabulary b on a.id = b.unit_id
+        from unit_new a
+                 INNER JOIN unit_vocabulary_new b on a.id = b.unit_id
                  INNER JOIN vocabulary c on b.vocabulary_id = c.id and a.course_id = #{course_id} and c.delStatus = 1
         LIMIT 0, ${b}
     </select>
@@ -360,8 +360,8 @@
     </select>
     <select id="fiveDimensionTestTwo" parameterType="string" resultMap="fiveDimensionTest_Map">
         select c.id, c.word, c.word_chinese
-        from unit a
-                 INNER JOIN unit_vocabulary b on a.id = b.unit_id
+        from unit_new a
+                 INNER JOIN unit_vocabulary_new b on a.id = b.unit_id
                  INNER JOIN vocabulary c on b.vocabulary_id = c.id and a.course_id = #{course_id} and c.delStatus = 1
         LIMIT ${b},${c}
     </select>
@@ -609,7 +609,7 @@
         from vocabulary a
                  INNER JOIN learn b on a.id = b.vocabulary_id and b.type = 1 and b.unit_id = #{unit_id} and
                                        b.student_id = #{student_id} and b.study_model = #{classifyStr}
-                 INNER JOIN unit_vocabulary uv
+                 INNER JOIN unit_vocabulary_new uv
                             ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id AND a.delStatus = 1
     </select>
     <select id="accrueWordStrOne" resultType="com.zhidejiaoyu.common.pojo.Vocabulary" parameterType="map">
@@ -623,7 +623,7 @@
         from vocabulary a
                  INNER JOIN learn b on a.id = b.vocabulary_id and b.type = 1 and b.unit_id = #{unit_id} and
                                        b.student_id = #{student_id} and b.study_model = #{classifyStr} and b.status = 0
-                 INNER JOIN unit_vocabulary uv
+                 INNER JOIN unit_vocabulary_new uv
                             ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id AND a.delStatus = 1
     </select>
     <select id="ripeWordStrOne" resultType="com.zhidejiaoyu.common.pojo.Vocabulary" parameterType="map">
@@ -637,7 +637,7 @@
         from vocabulary a
                  INNER JOIN learn b on a.id = b.vocabulary_id and b.type = 1 and b.unit_id = #{unit_id} and
                                        b.student_id = #{student_id} and b.study_model = #{classifyStr} and b.status = 1
-                 INNER JOIN unit_vocabulary uv
+                 INNER JOIN unit_vocabulary_new uv
                             ON uv.unit_id = b.unit_id AND uv.vocabulary_id = b.vocabulary_id AND a.delStatus = 1
     </select>
 

@@ -15,11 +15,11 @@ public class CurrentDayOfStudyUtil {
      * 保存学习信息
      *
      * @param attributeStr
-     * @param feldId
+     * @param field
      */
-    public static void saveSessionCurrent(String attributeStr, Long feldId) {
+    public static void saveSessionCurrent(String attributeStr, Long field) {
         HttpSession session = HttpUtil.getHttpSession();
-        session.setAttribute(attributeStr, feldId);
+        session.setAttribute(attributeStr, field);
     }
 
     /**
@@ -28,15 +28,12 @@ public class CurrentDayOfStudyUtil {
      * @param attributeStr
      * @return
      */
-    public static Long getSessionCurrent(String attributeStr) {
-        HttpSession session = HttpUtil.getHttpSession();
-        String feldId = session.getAttribute(attributeStr).toString();
-        if (feldId == null) {
+    public static long getSessionCurrent(String attributeStr) {
+        Object attribute = HttpUtil.getHttpSession().getAttribute(attributeStr);
+        if (attribute == null) {
             return 0L;
-        } else {
-            return Long.parseLong(feldId);
         }
-
+        return Long.parseLong(attribute.toString());
     }
 
 }

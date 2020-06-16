@@ -87,7 +87,7 @@
         select
         c.*
         from
-        unit a JOIN unit_sentence b on a.id = b.unit_id JOIN sentence c on b.sentence_id = c.id
+        unit a JOIN unit_sentence_new b on a.id = b.unit_id JOIN sentence c on b.sentence_id = c.id
         <if test="course_id != null and course_id != '' ">
             AND a.course_id = #{course_id}
         </if>

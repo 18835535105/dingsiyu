@@ -72,180 +72,27 @@
     <sql id="Base_Column_List">
         id, course_id, unit_name, joint_name
     </sql>
-    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.zhidejiaoyu.common.pojo.UnitOneExample">
-        select
-        <if test="distinct">
-            distinct
-        </if>
-        <include refid="Base_Column_List"/>
-        from unit
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-        <if test="orderByClause != null">
-            order by ${orderByClause}
-        </if>
-    </select>
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
-        select
-        <include refid="Base_Column_List"/>
-        from unit
-        where id = #{id,jdbcType=BIGINT}
-    </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from unit
-        where id = #{id,jdbcType=BIGINT}
-    </delete>
-    <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.UnitOneExample">
-        delete from unit
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-    </delete>
 
-    <insert id="insertList" parameterType="java.util.List">
-        insert into unit (id, course_id, unit_name,
-        joint_name,unit_index)
-        values
-        <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.id,jdbcType=BIGINT}, #{item.courseId,jdbcType=BIGINT}, #{item.unitName,jdbcType=VARCHAR},
-            #{item.jointName,jdbcType=VARCHAR},#{item.unitIndex,jdbcType=INTEGER})
-        </foreach>
 
-    </insert>
-
-    <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Unit">
-        insert into unit
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                id,
-            </if>
-            <if test="courseId != null">
-                course_id,
-            </if>
-            <if test="unitName != null">
-                unit_name,
-            </if>
-            <if test="jointName != null">
-                joint_name,
-            </if>
-            <if test="unitIndex != null">
-                unit_index,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id,jdbcType=BIGINT},
-            </if>
-            <if test="courseId != null">
-                #{courseId,jdbcType=BIGINT},
-            </if>
-            <if test="unitName != null">
-                #{unitName,jdbcType=VARCHAR},
-            </if>
-            <if test="jointName != null">
-                #{jointName,jdbcType=VARCHAR},
-            </if>
-            <if test="unitIndex != null">
-                #{unitIndex,jdbcType=INTEGER},
-            </if>
-        </trim>
-    </insert>
-    <select id="countByExample" parameterType="com.zhidejiaoyu.common.pojo.UnitOneExample"
-            resultType="java.lang.Integer">
-        select count(*) from unit
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-    </select>
-    <update id="updateByExampleSelective" parameterType="map">
-        update unit
-        <set>
-            <if test="record.id != null">
-                id = #{record.id,jdbcType=BIGINT},
-            </if>
-            <if test="record.courseId != null">
-                course_id = #{record.courseId,jdbcType=BIGINT},
-            </if>
-            <if test="record.unitName != null">
-                unit_name = #{record.unitName,jdbcType=VARCHAR},
-            </if>
-            <if test="record.jointName != null">
-                joint_name = #{record.jointName,jdbcType=VARCHAR},
-            </if>
-            <if test="record.unitIndex != null">
-                joint_name = #{record.unitIndex,jdbcType=INTEGER},
-            </if>
-        </set>
-        <if test="_parameter != null">
-            <include refid="Update_By_Example_Where_Clause"/>
-        </if>
-    </update>
-    <update id="updateByExample" parameterType="map">
-        update unit
-        set id = #{record.id,jdbcType=BIGINT},
-        course_id = #{record.courseId,jdbcType=BIGINT},
-        unit_name = #{record.unitName,jdbcType=VARCHAR},
-        joint_name = #{record.jointName,jdbcType=VARCHAR},
-        unit_index = #{record.unitIndex,jdbcType=INTEGER},
-        <if test="_parameter != null">
-            <include refid="Update_By_Example_Where_Clause"/>
-        </if>
-    </update>
-    <update id="updateByPrimaryKeySelective" parameterType="com.zhidejiaoyu.common.pojo.Unit">
-        update unit
-        <set>
-            <if test="courseId != null">
-                course_id = #{courseId,jdbcType=BIGINT},
-            </if>
-            <if test="unitName != null">
-                unit_name = #{unitName,jdbcType=VARCHAR},
-            </if>
-            <if test="jointName != null">
-                joint_name = #{jointName,jdbcType=VARCHAR},
-            </if>
-            <if test="unitIndex != null">
-                unit_index = #{unitIndex,jdbcType=INTEGER},
-            </if>
-        </set>
-        where id = #{id,jdbcType=BIGINT}
-    </update>
-    <update id="updateByPrimaryKey" parameterType="com.zhidejiaoyu.common.pojo.Unit">
-        update unit
-        set course_id  = #{courseId,jdbcType=BIGINT},
-            unit_name  = #{unitName,jdbcType=VARCHAR},
-            unit_index = #{record.unitIndex,jdbcType=INTEGER},
-            joint_name = #{jointName,jdbcType=VARCHAR}
-        where id = #{id,jdbcType=BIGINT}
-    </update>
-
-    <select id="getUnitIdByCourseIdAndUnitNumber" parameterType="map" resultType="map">
-        <!-- select id from (select * from unit a LIMIT 0,${unitNumber}) a WHERE course_id = #{courseId} ORDER BY id DESC LIMIT 0,1 -->
-        select a.id, b.course_name, b.version, b.label from (select * from unit a LIMIT 0,${unitNumber}) a JOIN course b
-        ON a.course_id = b.id WHERE course_id=#{courseId} ORDER BY a.id DESC LIMIT 0,1
-    </select>
-
-    <select id="allUnit" parameterType="int" resultType="map">
-        select
-            id,
-            unit_name
-        from unit
-        where course_id = #{id}
+    <select id="selectIdAndUnitNameByCourseId" parameterType="int" resultType="map">
+        select id,
+               unit_name
+        from unit_new
+        where course_id = #{courseId}
     </select>
     <select id="getCourseNameAndUnitName" parameterType="map" resultType="map">
-        SELECT
-            a.course_name,
-            b.unit_name
-        from course a
-            JOIN unit b ON a.id = b.course_id AND a.id = #{courseId} AND b.id = #{unitId}
+        SELECT a.course_name,
+               b.unit_name
+        from course_new a
+                 JOIN unit_new b ON a.id = b.course_id AND a.id = #{courseId} AND b.id = #{unitId}
     </select>
     <select id="selectIdMapByCourseIdAndWordIds" resultType="java.util.Map" parameterType="map">
         SELECT
         uv.vocabulary_id id,
         u.id unitId
         FROM
-        unit u,
-        unit_vocabulary uv,
+        unit_new u,
+        unit_vocabulary_new uv,
         learn l
         WHERE
         uv.unit_id = u.id
@@ -273,33 +120,16 @@
             #{id}
         </foreach>
         )
-        <!--SELECT
-        uv.vocabulary_id id,
-        u.id unitId
-        FROM
-        unit u,
-        unit_vocabulary uv
-        WHERE
-        uv.unit_id = u.id
-        AND u.course_id = #{courseId}
-        AND uv.vocabulary_id IN (
-        <foreach collection="wordIds" item="id" separator=",">
-            #{id}
-        </foreach>
-        )-->
     </select>
 
-    <select id="selectByUnitIdAndUnitName" parameterType="map" resultType="map">
-    	select id, unit_name from unit where course_id = #{courseIdw}
-    </select>
     <select id="selectUnitsByCourseId" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="Base_Column_List"/>
-        from unit where course_id = #{courseId} order by id asc
+        from unit_new where course_id = #{courseId} order by id
     </select>
     <select id="selectByPrimaryKeys" resultMap="BaseResultMap" parameterType="map">
         select *
-        from unit where id in (
+        from unit_new where id in (
         <foreach collection="ids" item="id" separator=",">
             #{id}
         </foreach>
@@ -307,47 +137,24 @@
     </select>
     <select id="selectIdByPhase" resultType="java.lang.Long" parameterType="map">
         SELECT u.id
-        FROM
-            course c,
-            unit u,
-            student_unit su
-        WHERE
-            c.id = u.course_id
-            AND su.unit_id = u.id
-            AND su.student_id = #{student.id}
-            AND c.study_paragraph = #{phase}
-            AND c.`status` = 1
-            AND u.delStatus = 1
-    </select>
-    <select id="getLimitOneByCourseId" parameterType="map" resultType="java.util.Map">
-       select id, unit_name from unit where course_id = #{courseId} LIMIT 0,1
-    </select>
-    <select id="nextUnitId" resultType="java.util.Map" parameterType="map">
-        select id, unit_name from unit where unit_index = (select MAX(unit_index) from unit where id = #{unitId})+1 AND course_id = #{courseId}
+        FROM course_new c,
+             unit_new u,
+             student_unit su
+        WHERE c.id = u.course_id
+          AND su.unit_id = u.id
+          AND su.student_id = #{student.id}
+          AND c.study_paragraph = #{phase}
+          AND c.`status` = 1
+          AND u.delStatus = 1
     </select>
     <select id="selectUnitIdAndUnitNameByCourseIdAndStudentId" resultType="java.util.Map" parameterType="map">
         select u.id, u.unit_name unitName
-        from unit u,
+        from unit_new u,
              student_unit su
         where u.id = su.unit_id
           and u.course_id = #{courseId}
           and su.student_id = #{studentId}
         order by u.id asc
-    </select>
-    <select id="getCourseIdByunitId" resultType="java.lang.Long" parameterType="java.lang.Integer">
-        select course_id from unit where id=#{unitId};
-    </select>
-    <select id="selectByStudentIdAndCourseIdAndStartUnitIdAndEndUnitId" parameterType="java.util.Map"
-            resultType="java.util.Map">
-        select u.id id,count(t.id) number , u.unit_name unitName,u.course_id courseId,course.label label,course.grade grade,course.version version
-        from unit u
-        left join test_record t on u.id=t.unit_id
-        join course course on course.id = u.course_id
-        join teks teks on teks.unit_id=u.id
-        where  (u.id>=#{startUnitId} and u.id &lt;= #{endUnitId})
-        and u.course_id =#{courseId}
-        group by u.id
-        order by u.id asc;
     </select>
 
 
