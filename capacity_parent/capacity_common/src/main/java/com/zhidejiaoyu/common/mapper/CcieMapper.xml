@@ -325,7 +325,7 @@
     <select id="countCourseCcieByCourseId" resultType="java.lang.Integer" parameterType="map">
     select count(c.id)
     from ccie c,
-         unit u
+         unit_new u
     where c.unit_id = u.id
       and u.course_id = #{courseId}
       and c.student_id = #{studentId}

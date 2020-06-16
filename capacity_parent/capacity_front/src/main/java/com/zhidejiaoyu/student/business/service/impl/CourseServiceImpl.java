@@ -485,7 +485,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
 
     @Override
     public ServerResponse<Object> allUnit(Integer courseId) {
-        List<Map<String, Object>> unit = unitMapper.allUnit(courseId);
+        List<Map<String, Object>> unit = unitMapper.selectIdAndUnitNameByCourseId(courseId);
         return ServerResponse.createBySuccess(unit);
     }
 
@@ -560,7 +560,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
 
         if (unitId == null) {
             // 去课程中取出最小单元
-            unitId = unitMapper.getMinUnit(courseId);
+            unitId = unitMapper.selectMinUnitIdByCourseId(courseId);
         }
 
         // 通过单元id和课程id查询出课程名和单元名  course_name, unit_name
@@ -613,7 +613,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
             //int now = 0; // 当前所学单元在listUnit中的索引所在位置
             int now = studentUnitMapper.getCountUnit(courseIdw, studentId) - 1;
             // 2.遍历当前所学课程下所有单元 ->单元id,单元名
-            List<Map<String, Object>> listUnit = unitMapper.selectByUnitIdAndUnitName(courseIdw.intValue());
+            List<Map<String, Object>> listUnit = unitMapper.selectIdAndUnitNameByCourseId(courseIdw.intValue());
 
             for (int i = 0; i < listUnit.size(); i++) {
                 Map<String, Object> map = new LinkedHashMap<>();
@@ -733,7 +733,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
             //int now = 0; // 当前所学单元在listUnit中的索引所在位置
             int now = studentUnitMapper.getCountUnitSentenceStatus(courseIds, studentId) - 1;
             // 2.遍历当前所学课程下所有单元 ->单元id,单元名
-            List<Map<String, Object>> listUnit = unitMapper.selectByUnitIdAndUnitName(courseIds.intValue());
+            List<Map<String, Object>> listUnit = unitMapper.selectIdAndUnitNameByCourseId(courseIds.intValue());
 
             for (int i = 0; i < listUnit.size(); i++) {//listUnit.get(i).get("id"); listUnit.get(i).get("unit_name");
                 Map<String, Object> map = new HashMap<String, Object>();

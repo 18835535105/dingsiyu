@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
@@ -74,6 +75,9 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
     @Autowired
     private StudentStudyPlanMapper studentStudyPlanMapper;
 
+    @Resource
+    private UnitVocabularyNewMapper unitVocabularyNewMapper;
+
     @Override
     public Object getMemoryWord(HttpSession session, Long unitId) {
         Student student = getStudent(session);
@@ -90,7 +94,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
         // 查询学生当前单元下已学习单词的个数，即学习进度
         Long plan = learnMapper.countLearnWord(student.getId(), unitId, "慧记忆");
         // 获取当前单元下的所有单词的总个数
-        Long wordCount = unitVocabularyMapper.countByUnitId(unitId);
+        Long wordCount = unitVocabularyNewMapper.countByUnitId(unitId);
         if (wordCount == 0) {
             log.error("单元 {} 下没有单词信息！", unitId);
             return ServerResponse.createByErrorMessage("当前单元下没有单词！");
@@ -141,7 +145,7 @@ public class MemoryServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabul
             Vocabulary currentStudyWord = vocabularyMapper.selectOneWordNotInIds(wordIds, unitId);
 
             // 查询单词释义
-            String wordChinese = unitVocabularyMapper.selectWordChineseByUnitIdAndWordId(unitId, currentStudyWord.getId());
+            String wordChinese = unitVocabularyNewMapper.selectWordChineseByUnitIdAndWordId(unitId, currentStudyWord.getId());
 
             MemoryStudyVo memoryStudyVo = new MemoryStudyVo();
             memoryStudyVo.setWordId(currentStudyWord.getId());

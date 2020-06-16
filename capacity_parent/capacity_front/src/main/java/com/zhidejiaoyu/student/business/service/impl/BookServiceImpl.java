@@ -71,6 +71,9 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
     @Resource
     private LearnNewMapper learnNewMapper;
 
+    @Resource
+    private UnitVocabularyNewMapper unitVocabularyNewMapper;
+
     private final String WORD_MEMORY = "慧记忆";
     private final String WORD_LISTEN = "慧听写";
     private final String WORD_WRITE = "慧默写";
@@ -183,7 +186,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
      */
     private List<BookVo> getVocabularyBooKVo(List<Vocabulary> vocabularies, Long unitId) {
         List<BookVo> list = new ArrayList<>(vocabularies.size());
-        Map<Long, Map<Long, String>> map = unitVocabularyMapper.selectWordChineseMapByUnitId(unitId);
+        Map<Long, Map<Long, String>> map = unitVocabularyNewMapper.selectWordChineseMapByUnitId(unitId);
         BookVo vo;
         String wordChinese = "";
         for (Vocabulary vocabulary : vocabularies) {
@@ -221,7 +224,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
             notKnow = learnMapper.countNotKnownWord(studentId, unitId, studyModel);
             if (flag) {
                 // 查看单词本摘要信息
-                total = unitVocabularyMapper.countByUnitId(unitId);
+                total = unitVocabularyNewMapper.countByUnitId(unitId);
             } else if (WORD_PICTURE.equals(studyModel)) {
                 // 单词图鉴只查询有图片的单词总个数
                 total = unitVocabularyMapper.countByUnitIdAndStudyModel(unitId, studyModel);
@@ -236,7 +239,7 @@ public class BookServiceImpl extends BaseServiceImpl<VocabularyMapper, Vocabular
             notKnow = learnMapper.countNotKnownWordByCourse(studentId, courseId, studyModel, learnCount);
             if (flag) {
                 // 查看单词本摘要信息
-                total = unitVocabularyMapper.countByCourseId(courseId);
+                total = unitVocabularyNewMapper.countByCourseId(courseId);
             } else if (WORD_PICTURE.equals(studyModel)) {
                 // 单词图鉴只查询有图片的单词总个数
                 total = unitVocabularyMapper.countByCourseIdAndStudyModel(courseId, studyModel);

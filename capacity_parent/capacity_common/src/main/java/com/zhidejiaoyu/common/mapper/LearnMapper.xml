@@ -694,7 +694,7 @@
         FROM
         learn l,
         <if test="model == 0 or model == 1 or model == 2 or model == 3">
-            unit_vocabulary uv
+            unit_vocabulary_new uv
         </if>
         <if test="model == 4 or model == 5 or model == 6">
             unit_sentence us
@@ -918,15 +918,10 @@
         <include refid="countCourseStudyModel_sql"/>
         <include refid="study_model_sql"/>
     </select>
-    <select id="learnCourseCountSentence" parameterType="map" resultType="java.lang.Integer">
-        SELECT count(id) from learn where course_id = #{courseId} AND student_id = #{studentId}
-        <include refid="study_model_sql"/>
-        AND example_id IS not NULL
-    </select>
 
     <select id="selectWordInCurrentCourse" resultType="java.util.Map" parameterType="map">
         select v.word, uv.word_chinese wordChinese
-        from vocabulary v, unit_vocabulary uv, unit u
+        from vocabulary v, unit_vocabulary_new uv, unit_new u
         where v.id = uv.vocabulary_id and v.delStatus = 1
         and uv.unit_id = u.id and u.course_id = #{courseId}
         and v.id not in (
@@ -965,7 +960,7 @@
     </select>
     <select id="selectWordRandomInCourse" resultType="java.util.Map" parameterType="map">
         select v.word, uv.word_chinese wordChinese
-        from vocabulary v, unit_vocabulary uv, unit u
+        from vocabulary v, unit_vocabulary_new uv, unit u
         where v.id = uv.vocabulary_id and v.delStatus = 1
         and uv.unit_id = u.id and u.joint_name like '%单词%'
         <if test="wordIds.size > 0">

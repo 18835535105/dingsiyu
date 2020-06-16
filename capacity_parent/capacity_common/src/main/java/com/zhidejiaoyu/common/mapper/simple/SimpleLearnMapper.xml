@@ -899,7 +899,7 @@
         FROM
         learn l,
         <if test="model == 0 or model == 1 or model == 2 or model == 3">
-            unit_vocabulary uv
+            unit_vocabulary_new uv
         </if>
         <if test="model == 4 or model == 5 or model == 6">
             unit_sentence us
@@ -1041,8 +1041,8 @@
                     AND study_model = '慧默写'
                     AND `status` = 1
             ) w,
-            unit u,
-            course c
+            unit_new u,
+            course_new c
         WHERE
             m.unit_id = l.unit_id
             AND l.unit_id = w.unit_id
@@ -1089,8 +1089,8 @@
                     AND study_model = '例句默写'
                     AND `status` = 1
             ) w,
-            unit u,
-            course c
+            unit_new u,
+            course_new c
         WHERE
             m.unit_id = l.unit_id
             AND l.unit_id = w.unit_id

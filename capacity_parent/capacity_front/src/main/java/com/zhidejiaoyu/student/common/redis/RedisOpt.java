@@ -3,7 +3,6 @@ package com.zhidejiaoyu.student.common.redis;
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.constant.test.GenreConstant;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.mapper.simple.SimpleCourseMapper;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.student.business.shipconfig.service.impl.ShipAddEquipmentServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +27,8 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisOpt {
 
-    @Autowired
-    private UnitVocabularyMapper unitVocabularyMapper;
+    @Resource
+    private UnitVocabularyNewMapper unitVocabularyNewMapper;
 
     @Autowired
     private VocabularyMapper vocabularyMapper;
@@ -42,9 +41,6 @@ public class RedisOpt {
 
     @Autowired
     private PhoneticSymbolMapper phoneticSymbolMapper;
-
-    @Autowired
-    private SimpleCourseMapper simpleCourseMapper;
 
     @Resource
     private CourseNewMapper courseNewMapper;
@@ -160,7 +156,7 @@ public class RedisOpt {
      * @return
      */
     private List<Map<String, Object>> getCourses(Long studentId, String phase) {
-        List<Map<String, Object>> courseList = simpleCourseMapper.getSimpleCourseByStudentIdByPhase(studentId, phase);
+        List<Map<String, Object>> courseList = courseNewMapper.selectIdAndVersionByStudentIdByPhase(studentId, phase);
         if (courseList.size() > 0) {
             courseList.forEach(c -> {
                 if (c.get("version") != null && c.get("version").toString().contains("冲刺版")) {
@@ -185,14 +181,14 @@ public class RedisOpt {
         Object object = getRedisObject(unitWordSumKey);
         Map<Long, Map<Long, Object>> unitWordSum;
         if (object == null) {
-            unitWordSum = courseNewMapper.unitsWordSum(courseId);
+            unitWordSum = courseNewMapper.selectUnitsWordSum(courseId);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, unitWordSumKey, unitWordSum);
         } else {
             try {
                 unitWordSum = (Map<Long, Map<Long, Object>>) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], courseId=[{}], error=[{}]", object, courseId, e.getMessage());
-                unitWordSum = courseNewMapper.unitsWordSum(courseId);
+                unitWordSum = courseNewMapper.selectUnitsWordSum(courseId);
                 log.error("重新查询数据：unitWordSum=[{}]", unitWordSum);
             }
         }
@@ -211,14 +207,14 @@ public class RedisOpt {
         Object object = getRedisObject(wordCountKey);
         long wordCount;
         if (object == null) {
-            wordCount = unitVocabularyMapper.countByUnitId(unitId);
+            wordCount = unitVocabularyNewMapper.countByUnitId(unitId);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, wordCountKey, wordCount);
         } else {
             try {
                 wordCount = (int) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], unitId=[{}], error=[{}]", object, unitId, e.getMessage());
-                wordCount = unitVocabularyMapper.countByUnitId(unitId);
+                wordCount = unitVocabularyNewMapper.countByUnitId(unitId);
                 log.error("重新查询结果：wordCount=[{}]", wordCount);
             }
         }
@@ -243,14 +239,14 @@ public class RedisOpt {
         Object object = getRedisHashObject(hKey);
         int count;
         if (object == null) {
-            count = unitVocabularyMapper.getAllCountWordByCourse(courseId);
+            count = unitVocabularyNewMapper.countAllCountWordByCourse(courseId);
             redisTemplate.opsForHash().put(RedisKeysConst.PREFIX, hKey, count);
         } else {
             try {
                 count = (int) object;
             } catch (Exception e) {
                 log.error("类型转换错误，object=[{}], courseId=[{}], error=[{}]", object, courseId, e.getMessage());
-                count = unitVocabularyMapper.getAllCountWordByCourse(courseId);
+                count = unitVocabularyNewMapper.countAllCountWordByCourse(courseId);
                 log.error("重新查询结果：count=[{}]", count);
             }
         }

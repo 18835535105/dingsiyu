@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
@@ -67,6 +68,9 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
     @Autowired
     private StudentStudyPlanMapper studentStudyPlanMapper;
 
+    @Resource
+    private UnitVocabularyNewMapper unitVocabularyNewMapper;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -89,7 +93,7 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
         // 查询学生当前单元当前模块下已学习单词的个数，即学习进度
         Long plan = learnMapper.countLearnWord(student.getId(), unitId, "慧默写");
         // 获取当前单元下的所有单词的总个数
-        Long wordCount = unitVocabularyMapper.countByUnitId(unitId);
+        Long wordCount = unitVocabularyNewMapper.countByUnitId(unitId);
         if (wordCount == 0) {
             return ServerResponse.createByErrorMessage("当前单元下没有单词！");
         }
@@ -117,7 +121,7 @@ public class WordWriteServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
             WordWriteStudyVo wordWriteStudyVo = new WordWriteStudyVo();
             Vocabulary currentStudyWord = vocabularyMapper.selectOneWordNotInIds(wordIds, unitId);
 
-            String wordChinese = unitVocabularyMapper.selectWordChineseByUnitIdAndWordId(unitId, currentStudyWord.getId());
+            String wordChinese = unitVocabularyNewMapper.selectWordChineseByUnitIdAndWordId(unitId, currentStudyWord.getId());
             String soundMark = StringUtils.isEmpty(currentStudyWord.getSoundMark()) ? "" : currentStudyWord.getSoundMark();
             wordWriteStudyVo.setWordId(currentStudyWord.getId());
             wordWriteStudyVo.setMemoryStrength(0.00);

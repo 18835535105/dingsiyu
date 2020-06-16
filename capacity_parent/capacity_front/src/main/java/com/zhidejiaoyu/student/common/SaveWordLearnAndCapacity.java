@@ -50,6 +50,9 @@ public class SaveWordLearnAndCapacity {
     @Resource
     private StudyMemoryStrength studyMemoryStrength;
 
+    @Resource
+    private UnitVocabularyNewMapper unitVocabularyNewMapper;
+
     /**
      * 保存指定模块的单词学习记录和慧追踪信息
      *
@@ -68,7 +71,7 @@ public class SaveWordLearnAndCapacity {
 
         // 通过学生id，单元id和单词id获取当前单词的记忆追踪信息
         CapacityMemory capacity = getCapacityInfo(learn, student, studyModel, vocabulary);
-        String wordChinese = unitVocabularyMapper.selectWordChineseByUnitIdAndWordId(learn.getUnitId(), vocabulary.getId());
+        String wordChinese = unitVocabularyNewMapper.selectWordChineseByUnitIdAndWordId(learn.getUnitId(), vocabulary.getId());
         // 封装记忆追踪信息
         capacity = packageCapacityInfo(learn, student, isKnown, studyModel, vocabulary, capacity, wordChinese);
         return capacity;

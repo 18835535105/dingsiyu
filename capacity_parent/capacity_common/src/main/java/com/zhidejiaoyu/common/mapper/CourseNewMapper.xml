@@ -112,6 +112,25 @@
         group by version
         order by id
     </select>
+    <select id="selectIdAndVersionByStudentIdByPhase" resultType="java.util.Map" parameterType="map">
+        SELECT b.id,
+               b.version
+        FROM student_unit a
+                 JOIN course_new b ON a.course_id = b.id
+            AND a.student_id = #{studentId}
+            and b.version LIKE '%快速单词'
+            and b.study_paragraph = #{phase}
+        GROUP BY b.id
+    </select>
+    <select id="selectUnitsWordSum" resultType="java.util.Map" parameterType="map">
+        select a.id AS id, count(distinct b.vocabulary_id) AS sum
+        from unit_new a,
+             unit_vocabulary_new b,
+             vocabulary c
+        where a.id = b.unit_id
+          AND a.course_id = #{courseId}
+        GROUP BY a.id
+    </select>
 
     <select id="unitsWordSum" parameterType="map" resultType="map">
         select a.id AS id, count(c.id) AS sum

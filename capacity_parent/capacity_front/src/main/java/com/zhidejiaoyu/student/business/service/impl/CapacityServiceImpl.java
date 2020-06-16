@@ -366,7 +366,7 @@ public class CapacityServiceImpl extends BaseServiceImpl<CapacityWriteMapper, Ca
                 SentenceUnit sentenceUnit = sentenceUnitMapper.selectById(unitId);
                 unitName = sentenceUnit.getUnitName();
             } else {
-                unitName = unitMapper.getUnitNameByUnitId(unitId);
+                unitName = unitMapper.selectUnitNameByUnitId(unitId);
             }
         }
         return unitName;
