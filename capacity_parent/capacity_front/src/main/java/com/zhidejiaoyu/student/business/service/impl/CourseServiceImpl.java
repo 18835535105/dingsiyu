@@ -853,26 +853,6 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseMapper, Course> imp
     }
 
     @Override
-    public ServerResponse<List<Map<String, Object>>> getAllCourses(HttpSession session, Integer type, Boolean flag) {
-        Student student = getStudent(session);
-        List<Map<String, Object>> courseInfo = courseMapper.getAllCourse(student, type);
-        if (courseInfo.size() > 0) {
-            int count = 0;
-            Map<String, Object> map = new HashMap<>(16);
-            for (Map<String, Object> stringObjectMap : courseInfo) {
-                count += Integer.parseInt(stringObjectMap.get("count").toString());
-            }
-            if (flag) {
-                map.put("courseName", "全部课程");
-                map.put("count", count);
-                map.put("courseId", 0);
-                courseInfo.add(0, map);
-            }
-        }
-        return ServerResponse.createBySuccess(courseInfo);
-    }
-
-    @Override
     public ServerResponse<PageInfo<Map<String, Object>>> getUnitPage(HttpSession session, Long courseId, Integer pageNum, Integer pageSize) {
         Student student = getStudent(session);
         PageHelper.startPage(pageNum, pageSize);
