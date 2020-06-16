@@ -326,4 +326,12 @@ public interface StudentMapper extends BaseMapper<Student> {
      * @return
      */
     int countBySchoolAdminId(@Param("schoolAdminId") Integer schoolAdminId);
+
+    /**
+     * 修改全国膜拜最高标识
+     *
+     * @param studentId
+     */
+    @Update("update student set worship_first_time = null where id = #{studentId}")
+    void updateWorshipFirstTimeToNull(@Param("studentId") Long studentId);
 }
