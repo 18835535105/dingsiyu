@@ -84,7 +84,7 @@ public interface LearnExtendMapper extends BaseMapper<LearnExtend> {
      * @param wordId
      * @return
      */
-    Integer countByLearnIdAndWordIdAndType(@Param("learnId") Long learnId, @Param("wordId") Long wordId);
+    Integer selectStudyCountByLearnNewIdAndWordId(@Param("learnId") Long learnId, @Param("wordId") Long wordId);
 
     /**
      * 查询已学习的数据
