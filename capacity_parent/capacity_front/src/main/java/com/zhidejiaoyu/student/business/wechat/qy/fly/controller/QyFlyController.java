@@ -1,7 +1,10 @@
 package com.zhidejiaoyu.student.business.wechat.qy.fly.controller;
 
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
 import com.zhidejiaoyu.student.business.wechat.qy.fly.service.QyFlyService;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,6 +45,21 @@ public class QyFlyController {
             return ServerResponse.createByError(400, "二维码序号不能为空！");
         }
         return qyFlyService.uploadFlyRecord(file, studentId, num);
+    }
+
+    /**
+     * 获取当前教师下的所有学生
+     *
+     * @param openId 教师openId
+     * @param dto    查询条件
+     * @return
+     */
+    @GetMapping("/getStudents")
+    public ServerResponse<Object> getStudents(String openId, SearchStudentDTO dto) {
+        if (StringUtil.isEmpty(openId)) {
+            return ServerResponse.createByError(400, "openId can't be null!");
+        }
+        return qyFlyService.getStudents(openId, dto);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.vo.smallapp.studyinfo.DailyStateVO;
 import org.apache.ibatis.annotations.MapKey;
@@ -334,4 +335,13 @@ public interface StudentMapper extends BaseMapper<Student> {
      */
     @Update("update student set worship_first_time = null where id = #{studentId}")
     void updateWorshipFirstTimeToNull(@Param("studentId") Long studentId);
+
+    /**
+     * 查询教师或者校管下所有学生信息
+     *
+     * @param userId 教师或者校管id
+     * @param dto    查询条件
+     * @return
+     */
+    List<Student> selectByTeacherIdOrSchoolAdminId(@Param("userId") Integer userId, @Param("dto") SearchStudentDTO dto);
 }
