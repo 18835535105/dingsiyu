@@ -2,8 +2,7 @@ package com.zhidejiaoyu.common.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -18,13 +17,16 @@ import java.util.Date;
  * @since 2020-06-02
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class CurrentDayOfStudy implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -35,7 +37,7 @@ public class CurrentDayOfStudy implements Serializable {
     /**
      * 二维码的序号
      */
-    private Long qrCodeNum;
+    private Integer qrCodeNum;
 
     /**
      * 老师拍照上传的图片路径
