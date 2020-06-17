@@ -155,7 +155,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         //          开始
         boolean flag;
         //查看当前数据是否为以前学习过的数据
-        List<StudyCapacity> studyCapacities = studyCapacityMapper.selectByStudentIdAndUnitIdAndWordIdAndType(studentId, unitId, wordId, type);
+        List<StudyCapacity> studyCapacities = studyCapacityMapper.selectByStudentIdAndUnitIdAndWordIdAndType(studentId, getVo.getUnitId(), getVo.getWordId(), getVo.getType());
 
         flag = studyCapacities.size() > 0 && studyCapacities.get(0).getPush().getTime() < System.currentTimeMillis();
 
