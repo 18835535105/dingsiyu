@@ -141,20 +141,13 @@
     </select>
     <select id="countUnitCountByStudentId" resultType="java.lang.Integer" parameterType="map">
         select count(su.id)
-        from student_unit su, course c
+        from student_unit su, course_new c
         where su.student_id = #{student.id} and su.type = 1
         <if test="grade != null and grade != ''">
             and su.course_id = c.id and c.study_paragraph = #{grade}
         </if>
     </select>
     <select id="planSeniority" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
-    <!--
-     select a.student_id, SUM(a.sumUnit) AS countUnit from (select student_id,course_id, SUM(word_status) AS sumUnit FROM student_unit GROUP BY course_id,student_id) a
-     JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
-      AND b.area = #{area}	AND b.school_name = #{school_name} AND b.grade = #{grade} AND b.squad = #{squad}  &#45;&#45; AND b.id = 3169
-	  AND c.study_paragraph = #{study_paragraph} AND c.version = #{version} GROUP BY a.student_id ORDER BY countUnit <if test="haveUnit == 1">ASC</if> <if test="haveUnit == 2">DESC</if>
-        -->
-
         SELECT
         a.student_id,
         a.head_url AS headUrl,
@@ -179,7 +172,7 @@
         u.student_id
         ) a
         JOIN student b ON a.student_id = b.id
-        JOIN course c ON a.course_id = c.id
+        JOIN course_new c ON a.course_id = c.id
         AND c.study_paragraph = #{study_paragraph} AND c.version = #{version}
         AND b.grade = #{grade} AND b.class_id = #{classId}
         GROUP BY
@@ -188,13 +181,6 @@
         countUnit DESC
     </select>
     <select id="planSenioritySchool" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
-        <!--
-        select a.student_id, SUM(a.sumUnit) AS countUnit from (select student_id,course_id, SUM(word_status) AS sumUnit FROM student_unit GROUP BY course_id,student_id) a
-        JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
-        AND b.area = #{area} AND b.school_name = #{school_name}
-        AND c.study_paragraph = #{study_paragraph} AND c.version = #{version} GROUP BY a.student_id ORDER BY countUnit <if test="haveUnit == 1">ASC</if> <if test="haveUnit == 2">DESC</if> LIMIT 50;
-        -->
-
         SELECT
         a.student_id,
         SUM(a.sumUnit) AS countUnit,
@@ -217,7 +203,7 @@
         u.student_id
         ) a
         JOIN student b ON a.student_id = b.id
-        JOIN course c ON a.course_id = c.id
+        JOIN course_new c ON a.course_id = c.id
         AND c.study_paragraph = #{study_paragraph} AND c.version = #{version}
 		AND b.teacher_id = #{teacherId}
         GROUP BY
@@ -227,11 +213,6 @@
         LIMIT 50;
     </select>
     <select id="planSeniorityNationwide" resultType="com.zhidejiaoyu.common.vo.SeniorityVo">
-       <!--
-        select a.student_id, SUM(a.sumUnit) AS countUnit from (select student_id,course_id, SUM(word_status) AS sumUnit FROM student_unit GROUP BY course_id,student_id) a
-        JOIN student b ON a.student_id = b.id JOIN course c ON a.course_id = c.id
-        AND c.study_paragraph = #{study_paragraph} AND c.version = #{version} GROUP BY a.student_id ORDER BY countUnit <if test="haveUnit == 1">ASC</if> <if test="haveUnit == 2">DESC</if> LIMIT 50;
-        -->
         SELECT
         a.student_id,
         SUM(a.sumUnit) AS countUnit,
@@ -254,7 +235,7 @@
         u.student_id
         ) a
         JOIN student b ON a.student_id = b.id
-        JOIN course c ON a.course_id = c.id
+        JOIN course_new c ON a.course_id = c.id
         AND c.study_paragraph = #{study_paragraph}
         AND c.version = #{version}
         GROUP BY
@@ -273,12 +254,12 @@
     <select id="selectCourseInfo" resultType="java.util.Map" parameterType="map">
         select c.id, c.course_name courseName
         from student_unit su,
-             course c
+             course_new c
         where su.course_id = c.id
           and su.student_id = #{studentId}
           and su.type = 1
         group by c.id
-        order by c.id asc
+        order by c.id
     </select>
     <update id="updateStatus" parameterType="map">
         update student_unit

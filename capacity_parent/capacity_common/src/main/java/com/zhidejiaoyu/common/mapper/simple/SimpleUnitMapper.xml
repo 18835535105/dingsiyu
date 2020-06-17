@@ -93,7 +93,8 @@
         where id = #{id,jdbcType=BIGINT}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from unit
+        delete
+        from unit
         where id = #{id,jdbcType=BIGINT}
     </delete>
     <delete id="deleteByExample" parameterType="com.zhidejiaoyu.common.pojo.UnitOneExample">
@@ -103,16 +104,6 @@
         </if>
     </delete>
 
-    <insert id="insertList" parameterType="java.util.List">
-        insert into unit (id, course_id, unit_name,
-        joint_name,unit_index)
-        values
-        <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.id,jdbcType=BIGINT}, #{item.courseId,jdbcType=BIGINT}, #{item.unitName,jdbcType=VARCHAR},
-            #{item.jointName,jdbcType=VARCHAR},#{item.unitIndex,jdbcType=INTEGER})
-        </foreach>
-
-    </insert>
 
     <insert id="insertSelective" parameterType="com.zhidejiaoyu.common.pojo.Unit">
         insert into unit
@@ -219,33 +210,25 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <select id="getUnitIdByCourseIdAndUnitNumber" parameterType="map" resultType="map">
-        <!-- select id from (select * from unit a LIMIT 0,${unitNumber}) a WHERE course_id = #{courseId} ORDER BY id DESC LIMIT 0,1 -->
-        select a.id, b.course_name, b.version, b.label from (select * from unit a LIMIT 0,${unitNumber}) a JOIN course b
-        ON a.course_id = b.id WHERE course_id=#{courseId} ORDER BY a.id DESC LIMIT 0,1
-    </select>
-
     <select id="allUnit" parameterType="int" resultType="map">
-        select
-            id,
-            unit_name
-        from unit
+        select id,
+               unit_name
+        from unit_new
         where course_id = #{id}
     </select>
     <select id="getCourseNameAndUnitName" parameterType="map" resultType="map">
-        SELECT
-            a.course_name,
-            b.unit_name
-        from course a
-            JOIN unit b ON a.id = b.course_id AND a.id = #{courseId} AND b.id = #{unitId}
+        SELECT a.course_name,
+               b.unit_name
+        from course_new a
+                 JOIN unit_new b ON a.id = b.course_id AND a.id = #{courseId} AND b.id = #{unitId}
     </select>
     <select id="selectIdMapByCourseIdAndWordIds" resultType="java.util.Map" parameterType="map">
         SELECT
         uv.vocabulary_id id,
         u.id unitId
         FROM
-        unit u,
-        unit_vocabulary uv,
+        unit_new u,
+        unit_vocabulary_new uv,
         learn l
         WHERE
         uv.unit_id = u.id
@@ -273,65 +256,22 @@
             #{id}
         </foreach>
         )
-        <!--SELECT
-        uv.vocabulary_id id,
-        u.id unitId
-        FROM
-        unit u,
-        unit_vocabulary uv
-        WHERE
-        uv.unit_id = u.id
-        AND u.course_id = #{courseId}
-        AND uv.vocabulary_id IN (
-        <foreach collection="wordIds" item="id" separator=",">
-            #{id}
-        </foreach>
-        )-->
     </select>
 
-    <select id="selectByUnitIdAndUnitName" parameterType="map" resultType="map">
-    	select id, unit_name from unit where course_id = #{courseIdw}
-    </select>
-    <select id="selectUnitsByCourseId" resultMap="BaseResultMap" parameterType="map">
+    <select id="selectFirstUnitByCourseId" parameterType="map" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from unit where course_id = #{courseId} order by id asc
-    </select>
-    <select id="selectByPrimaryKeys" resultMap="BaseResultMap" parameterType="map">
-        select *
-        from unit where id in (
-            <foreach collection="ids" item="id" separator=",">
-                #{id}
-            </foreach>
-        );
-    </select>
-    <select id="selectIdByPhase" resultType="java.lang.Long" parameterType="map">
-        SELECT u.id
-        FROM
-            course c,
-            unit u,
-            student_unit su
-        WHERE
-            c.id = u.course_id
-            AND su.unit_id = u.id
-            AND su.student_id = #{student.id}
-            AND c.study_paragraph = #{phase}
-            AND c.`status` = 1
-            AND u.delStatus = 1
-    </select>
-    <select id="selectFirstUnitByCourseId" parameterType="map" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"/>
-        from unit
+        from unit_new
         where course_id = #{courseId}
-        order by id asc
+        order by id
         limit 1
     </select>
     <select id="selectIdAndUnitNameByCourseIds" resultType="java.util.Map" parameterType="map">
-        select course_id courseId, id, unit_name unitName from unit where course_id in (
-          <foreach collection="courseIds" item="courseId" separator=",">
-              #{courseId}
-          </foreach>
-            )
+        select course_id courseId, id, unit_name unitName from unit_new where course_id in (
+        <foreach collection="courseIds" item="courseId" separator=",">
+            #{courseId}
+        </foreach>
+        )
     </select>
 
 </mapper>

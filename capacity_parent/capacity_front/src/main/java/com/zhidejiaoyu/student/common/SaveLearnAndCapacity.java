@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.common;
 import com.zhidejiaoyu.common.award.DailyAwardAsync;
 import com.zhidejiaoyu.common.constant.TimeConstant;
 import com.zhidejiaoyu.common.constant.UserConstant;
+import com.zhidejiaoyu.common.mapper.UnitVocabularyNewMapper;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.study.GoldMemoryTime;
@@ -49,13 +50,13 @@ public class SaveLearnAndCapacity {
     private SimpleCommonMethod simpleCommonMethod;
 
     @Autowired
-    private SimpleUnitVocabularyMapper simpleUnitVocabularyMapper;
-
-    @Autowired
     private DailyAwardAsync awardAsync;
 
     @Resource
     private StudentRestudyUtil studentRestudyUtil;
+
+    @Resource
+    private UnitVocabularyNewMapper unitVocabularyNewMapper;
 
     /**
      * 学习模块保存指定模块的学习记录和慧追踪信息
@@ -219,7 +220,7 @@ public class SaveLearnAndCapacity {
                 simpleCapacity.setVocabularyId(learn.getVocabularyId());
                 simpleCapacity.setWord(vocabulary.getWord());
 
-                String wordChinese = simpleUnitVocabularyMapper.selectWordChineseByUnitIdAndWordId(learn.getUnitId(), learn.getVocabularyId());
+                String wordChinese = unitVocabularyNewMapper.selectWordChineseByUnitIdAndWordId(learn.getUnitId(), learn.getVocabularyId());
                 if (StringUtils.isNotEmpty(wordChinese)) {
                     simpleCapacity.setWordChinese(wordChinese);
                 } else {

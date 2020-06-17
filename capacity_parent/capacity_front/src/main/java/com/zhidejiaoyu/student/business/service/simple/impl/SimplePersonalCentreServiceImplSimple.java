@@ -6,6 +6,7 @@ import com.github.pagehelper.PageInfo;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.dto.rank.RankDto;
+import com.zhidejiaoyu.common.mapper.UnitVocabularyNewMapper;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
@@ -29,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -64,9 +66,6 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
 
     @Autowired
     private SimpleVocabularyMapper vocabularyMapper;
-
-    @Autowired
-    private SimpleUnitVocabularyMapper simpleUnitVocabularyMapper;
 
     @Autowired
     private SimpleUnitMapper unitMapper;
@@ -106,6 +105,9 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
 
     @Autowired
     private SimpleCommonMethod simpleCommonMethod;
+
+    @Resource
+    private UnitVocabularyNewMapper unitVocabularyNewMapper;
 
     @Autowired
     private RankOpt rankOpt;
@@ -598,7 +600,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
             if (unitIds != null) {
                 List<Long> finalUnitIds = unitIds;
                 Future<Map<Long, Map<Long, Integer>>> unitTestMaxPointMapFuture = executorService.submit(() -> simpleTestRecordMapper.selectUnitTestMaxPointMapByUnitIds(studentId, finalUnitIds, modelName));
-                Future<Map<Long, Map<Long, Long>>> unitTotalWordMapFuture = executorService.submit(() -> simpleUnitVocabularyMapper.countTotalWordMapByUnitIds(finalUnitIds));
+                Future<Map<Long, Map<Long, Long>>> unitTotalWordMapFuture = executorService.submit(() -> unitVocabularyNewMapper.countTotalWordMapByUnitIds(finalUnitIds));
                 Future<Map<Long, Map<Long, Long>>> unitLearnWordMapFuture = executorService.submit(() -> learnMapper.countUnitLearnWordMapByUnitIds(studentId, finalUnitIds, modelName));
                 while (true) {
                     if (unitTestMaxPointMapFuture.isDone() && unitTotalWordMapFuture.isDone() && unitLearnWordMapFuture.isDone()) {
@@ -1355,7 +1357,6 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
 
         }
 
-        int onset = (page - 1 * rows);
         int auto = 0;
 
         // 用于判断当前学生是否在排行里边有排名
@@ -1415,15 +1416,15 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
         Integer unitAllStudyModel = learnMapper.countUnitAllStudyModel(studentId, unitId, model);
         Integer count;
         if (model == 0) {
-            count = unitMapper.countWordPicByUnitid(unitId.toString());
+            count = unitMapper.countWordPicByUnitId(unitId.toString());
         } else if (model < 4 && model > 0) {
-            count = unitMapper.countWordByUnitid(unitId.toString());
+            count = unitMapper.countWordByUnitId(unitId.toString());
         } else {
-            count = unitMapper.countSentenceByUnitid(unitId.toString());
+            count = unitMapper.countSentenceByUnitId(unitId.toString());
         }
 
         // 根据单元id 查询课程单元名
-        String name = unitMapper.getCourseNameByunitId(unitId);
+        String name = unitMapper.getCourseNameByUnitId(unitId);
 
         map.put("toLearn", unitAllStudyModel); // ./
         map.put("countUnit", count); // /.

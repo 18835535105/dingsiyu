@@ -19,11 +19,14 @@
     </sql>
 
     <select id="selTeksByUnitId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
-        select <include refid="Base_Column_List"></include> from teks t where t.unit_id=#{unitId}
+        select
+        <include refid="Base_Column_List"/>
+        from teks t where t.unit_id=#{unitId}
     </select>
 
     <select id="selectUnitIdAndNameByCourseIds" resultType="java.util.Map" parameterType="map">
-        select u.id id,count(t.id) number , u.unit_name unitName,u.course_id courseId,course.label label,course.grade grade,course.version version from unit u
+        select u.id id,count(t.id) number , u.unit_name unitName,u.course_id courseId,course.label label,course.grade
+        grade,course.version version from unit u
         left join test_record t on u.id=t.unit_id
         join student_unit su on su.unit_id =u.id
         join course course on course.id = u.course_id
@@ -39,52 +42,68 @@
         order by u.course_id asc, u.id asc
     </select>
     <select id="getStudentAllCourse" resultType="java.util.Map" parameterType="map">
-     select DISTINCT course.version from student_study_plan ssp
-			join teks_course course on course.id=ssp.course_id
-			where ssp.student_id =#{studentId}
-      and ssp.type=3 group by ssp.course_id
+        select DISTINCT course.version
+        from student_study_plan ssp
+                 join teks_course course on course.id = ssp.course_id
+        where ssp.student_id = #{studentId}
+          and ssp.type = 3
+        group by ssp.course_id
     </select>
 
     <select id="selHistoryPronunciation" resultType="java.util.Map" parameterType="java.util.Map">
-        select  voice.id voiceId, voice.word_id wordId ,teks.id,teks.sentence,teks.paraphrase,voice.score,voice.voice_url url ,voice.create_time time
+        select voice.id          voiceId,
+               voice.word_id     wordId,
+               teks.id,
+               teks.sentence,
+               teks.paraphrase,
+               voice.score,
+               voice.voice_url   url,
+               voice.create_time time
         from teks teks
-        join voice voice on teks.id= voice.word_id
-        where teks.unit_id=#{unitId}
-        and voice.student_id= #{studentId}
-        ORDER BY teks.id,voice.create_time desc
+                 join voice voice on teks.id = voice.word_id
+        where teks.unit_id = #{unitId}
+          and voice.student_id = #{studentId}
+        ORDER BY teks.id, voice.create_time desc
     </select>
 
     <select id="selHistoryByCountAndUnitId" resultType="java.util.Map" parameterType="java.util.Map">
-        select DISTINCT voice.word_id wordId ,teks.id,teks.sentence,teks.paraphrase,voice.score,voice.voice_url url ,voice.create_time time
+        select DISTINCT voice.word_id     wordId,
+                        teks.id,
+                        teks.sentence,
+                        teks.paraphrase,
+                        voice.score,
+                        voice.voice_url   url,
+                        voice.create_time time
         from teks teks
-        join voice voice on teks.id= voice.word_id
-        where teks.unit_id=#{unitId}
-        and voice.student_id= #{studentId}
-        and count= #{count}
+                 join voice voice on teks.id = voice.word_id
+        where teks.unit_id = #{unitId}
+          and voice.student_id = #{studentId}
+          and count = #{count}
         GROUP BY voice.word_id
-        ORDER BY voice.create_time,teks.id desc
+        ORDER BY voice.create_time, teks.id desc
     </select>
 
     <select id="isHistoryPronunciation" resultType="java.lang.Integer" parameterType="java.util.Map">
         select count(voice.id) count
         from teks teks
-        join voice voice on teks.id= voice.word_id
-        where teks.unit_id=#{unitId}
-        and voice.student_id= #{studentId}
+                 join voice voice on teks.id = voice.word_id
+        where teks.unit_id = #{unitId}
+          and voice.student_id = #{studentId}
     </select>
 
     <select id="getTwentyTeks" resultMap="BaseResultMap" parameterType="map">
-        select <include refid="Base_Column_List"></include> from teks t order by rand() limit 20
+        select
+        <include refid="Base_Column_List"/>
+        from teks t order by rand() limit 20
     </select>
 
     <select id="selTeksByCorseId" parameterType="java.util.Map" resultType="java.util.Map">
-       select DISTINCT unit.id from course course
-       join unit unit on unit.course_id=course.id
-       join teks teks on teks.unit_id=unit.id where course.id=#{courseId}
+        select DISTINCT unit.id
+        from course course
+                 join unit unit on unit.course_id = course.id
+                 join teks teks on teks.unit_id = unit.id
+        where course.id = #{courseId}
     </select>
 
-    <select id="selTeksBySentence" parameterType="java.lang.String" resultType="java.lang.Long">
-        select unit_id from Teks where
-    </select>
 
 </mapper>

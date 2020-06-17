@@ -113,7 +113,7 @@ public class DictationServiceImpl extends BaseServiceImpl<VocabularyMapper, Voca
 		map.put("readUrl", baiduSpeak.getLanguagePath(vocabulary.getWord()));
 
 		// 3. count单元表单词有多少个    /.
-		Integer count = unitMapper.countWordByUnitid(unitId);
+		Integer count = unitMapper.countWordByUnitId(unitId);
 		map.put("wordCount", count);
 
 		// 4. 该单元已学单词  ./

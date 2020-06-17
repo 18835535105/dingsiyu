@@ -40,6 +40,9 @@ import java.util.stream.Collectors;
 @Service
 public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentence> implements SentenceService {
 
+    @Resource
+    private UnitVocabularyNewMapper unitVocabularyNewMapper;
+
     @Autowired
     private TestResultUtil testResultUtil;
 
@@ -464,7 +467,7 @@ public class SentenceServiceImpl extends BaseServiceImpl<SentenceMapper, Sentenc
         } else {
             // 将指定单词加入到记忆追踪中
             Vocabulary vocabulary = vocabularyMapper.selectByPrimaryKey(wordId);
-            String wordChinese = unitVocabularyMapper.selectWordChineseByUnitIdAndWordId(unitId, wordId);
+            String wordChinese = unitVocabularyNewMapper.selectWordChineseByUnitIdAndWordId(unitId, wordId);
             capacityListen.setMemoryStrength(0.12);
             capacityListen.setPush(GoldMemoryTime.getGoldMemoryTime(0.12, new Date()));
             capacityListen.setWord(vocabulary.getWord());

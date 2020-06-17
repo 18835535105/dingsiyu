@@ -76,16 +76,6 @@ public interface CourseService extends BaseService<Course> {
     ServerResponse<Object> postUnit(HttpSession session, int unitId, int model);
 
     /**
-     * 获取学生可学习的所有课程及课程下单词/例句数量
-     *
-     * @param session
-     * @param type    1:单词；2：句子
-     * @param flag
-     * @return
-     */
-    ServerResponse<List<Map<String, Object>>> getAllCourses(HttpSession session, Integer type, Boolean flag);
-
-    /**
      * 分页获取当前课程下所有单元信息
      *
      * @param session

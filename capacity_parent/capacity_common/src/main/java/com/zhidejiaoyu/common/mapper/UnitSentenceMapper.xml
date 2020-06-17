@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.zhidejiaoyu.common.mapper.UnitSentenceMapper" >
+<mapper namespace="com.zhidejiaoyu.common.mapper.UnitSentenceMapper">
     <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.UnitSentence">
         <result column="unit_id" property="unitId" jdbcType="BIGINT"/>
         <result column="sentence_id" property="sentenceId" jdbcType="BIGINT"/>
@@ -134,7 +134,7 @@
         )
     </select>
     <select id="selectUnitIdAndNameByCourseIds" resultType="java.util.Map" parameterType="map">
-        select u.id, u.unit_name unitName, u.course_id courseId from unit u, unit_sentence us, student_unit su where
+        select u.id, u.unit_name unitName, u.course_id courseId from unit_new u, unit_sentence_new us, student_unit su where
         su.unit_id = u.id and su.student_id = #{studentId} and su.type = 1 and u.id = us.unit_id and
         u.course_id in (
         <foreach collection="courseIds" separator="," item="courseId">
@@ -167,14 +167,14 @@
         </if>
     </update>
     <select id="selUnitIdAndNameByCourseIdsAndStartUnitIdAndEndUnitId" resultType="java.util.Map" parameterType="map">
-        select course.id courseId , unit.id id,unit.unit_name unitName
+        select course.id courseId, unit.id id, unit.unit_name unitName
         from sentence_course course
-        join sentence_unit unit on course.id=unit.course_id
-        join unit_sentence unsen on unsen.unit_id=unit.id
-        join sentence sen on sen.id=unsen.sentence_id
-        where course.id=#{courseId}
-        and unit.id >= #{startUnitId}
-        and unit.id &lt;=#{endUnitId}
+                 join sentence_unit unit on course.id = unit.course_id
+                 join unit_sentence unsen on unsen.unit_id = unit.id
+                 join sentence sen on sen.id = unsen.sentence_id
+        where course.id = #{courseId}
+          and unit.id >= #{startUnitId}
+          and unit.id &lt;= #{endUnitId}
         group by unit.id
     </select>
 </mapper>

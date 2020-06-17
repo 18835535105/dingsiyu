@@ -79,11 +79,12 @@
         limit #{start}, #{end}
     </select>
 
-    <select id="countByLearnIdAndWordIdAndType" parameterType="map" resultType="int">
-        select count(id)
+    <select id="selectStudyCountByLearnNewIdAndWordId" parameterType="map" resultType="int">
+        select study_count
         from learn_extend
         where word_id = #{wordId}
           and learn_id = #{learnId}
+        limit 1
     </select>
 
     <select id="selectByLearnIdAndWordIdAndType" parameterType="map" resultMap="BaseResultMap">
@@ -114,13 +115,12 @@
           and le.study_model = #{studyModel}
     </select>
     <select id="selectWordListByStudentId" parameterType="map" resultType="long">
-        select
-        distinct learnEx.word_id
+        select distinct learnEx.word_id
         from learn_extend learnEx
-        join learn_new learn
-        on learnEx.learn_id =learn.id
-        where learn.student_id =#{studentId}
-        and learnEx.study_model like concat('%','慧','%')
+                 join learn_new learn
+                      on learnEx.learn_id = learn.id
+        where learn.student_id = #{studentId}
+          and learnEx.study_model like concat('%', '慧', '%')
     </select>
     <select id="selectWordListByStudentIdAndDate" parameterType="map" resultType="long">
         select

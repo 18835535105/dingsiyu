@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.common.utils.simple.testUtil;
 
+import com.zhidejiaoyu.common.mapper.UnitVocabularyNewMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleUnitVocabularyMapper;
 import com.zhidejiaoyu.common.mapper.simple.SimpleVocabularyMapper;
 import com.zhidejiaoyu.common.pojo.Sentence;
@@ -13,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.*;
 
@@ -37,6 +39,9 @@ public class SimpleTestResultUtil implements Serializable {
 
     @Autowired
     private SimpleVocabularyMapper vocabularyMapper;
+
+    @Resource
+    private UnitVocabularyNewMapper unitVocabularyNewMapper;
 
     /**
      *
@@ -167,7 +172,7 @@ public class SimpleTestResultUtil implements Serializable {
         Map<Long, Vocabulary> map = this.getTestVocabulary(subjectNum, target);
         Set<Long> idSet = map.keySet();
 
-        Map<Long, Map<Long, String>> chineseMap = simpleUnitVocabularyMapper.selectWordChineseMapByUnitIdAndWordIds(unitId, idSet);
+        Map<Long, Map<Long, String>> chineseMap = unitVocabularyNewMapper.selectWordChineseMapByUnitIdAndWordIds(unitId, idSet);
 
         Iterator<Long> iterator = idSet.iterator();
         // 根据题型对测试题进行平分,有几个题型就将测试题评分成几份
@@ -200,7 +205,7 @@ public class SimpleTestResultUtil implements Serializable {
         // 随机找出指定数量单词
         Map<Long, Vocabulary> map = this.getTestVocabulary(subjectNum, target);
         Set<Long> idSet = map.keySet();
-        Map<Long, Map<Long, String>> chineseMap = simpleUnitVocabularyMapper.selectWordChineseMapByCourseIdIdAndWordIds(courseId, idSet);
+        Map<Long, Map<Long, String>> chineseMap = unitVocabularyNewMapper.selectWordChineseMapByCourseIdIdAndWordIds(courseId, idSet);
 
 
         Iterator<Long> iterator = idSet.iterator();
@@ -415,7 +420,7 @@ public class SimpleTestResultUtil implements Serializable {
         // 随机找出指定数量单词
         Map<Long, Vocabulary> map = this.getTestVocabulary(subjectNum, target);
         Set<Long> idSet = map.keySet();
-        Map<Long, Map<Long, String>> chineseMap = simpleUnitVocabularyMapper.selectWordChineseMapByCourseIdIdAndWordIds5DTest(idSet, start, end);
+        Map<Long, Map<Long, String>> chineseMap = unitVocabularyNewMapper.selectWordChineseMapByCourseIdIdAndWordIds5DTest(idSet, start, end);
 
         Iterator<Long> iterator = idSet.iterator();
         // 根据题型对测试题进行平分,有几个题型就将测试题评分成几份

@@ -24,21 +24,26 @@
     </sql>
 
     <select id="getVersionByUnitId" parameterType="java.lang.Long" resultType="java.lang.String">
-        select cou.version from course cou join unit unit on cou.id=unit.course_id where unit.id=#{unitId}
+        select cou.version
+        from course_new cou
+                 join unit_new unit on cou.id = unit.course_id
+        where unit.id = #{unitId}
     </select>
 
     <select id="selectCourseByUnitId" resultType="java.util.Map" parameterType="java.lang.Long">
-        select course.id courseId , unit.id unitId , unit.unit_name unitName, course.version,course.label,course.grade
+        select course.id courseId, unit.id unitId, unit.unit_name unitName, course.version, course.label, course.grade
         from sentence_course course
-        join sentence_unit unit on unit.course_id=course.id
-          where unit.id = #{unitId}
-		  limit 1
+                 join sentence_unit unit on unit.course_id = course.id
+        where unit.id = #{unitId}
+        limit 1
     </select>
 
     <select id="getAllVersion" resultType="java.util.Map" parameterType="java.lang.Long">
-      select DISTINCT course.version from student_study_plan ssp
-			join sentence_course course on course.id=ssp.course_id
-			where ssp.student_id =#{studentId}
-      and ssp.type=2 group by ssp.course_id
+        select DISTINCT course.version
+        from student_study_plan ssp
+                 join sentence_course course on course.id = ssp.course_id
+        where ssp.student_id = #{studentId}
+          and ssp.type = 2
+        group by ssp.course_id
     </select>
 </mapper>

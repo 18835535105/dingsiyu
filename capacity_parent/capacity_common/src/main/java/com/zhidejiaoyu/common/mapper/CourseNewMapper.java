@@ -81,11 +81,18 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
     List<CourseNew> selectByIds(@Param("courseIds") List<Long> courseIds);
 
     /**
-     * 课程下每个单元单词总数
+     * @param studentId
+     * @param phase
+     * @return
+     */
+    List<Map<String, Object>> selectIdAndVersionByStudentIdByPhase(@Param("studentId") Long studentId, @Param("phase") String phase);
+
+    /**
+     * 查询课程下各个单元单词数
      *
-     * @param courseId 课程id
+     * @param courseId
      * @return
      */
     @MapKey("id")
-    Map<Long, Map<Long, Object>> unitsWordSum(@Param("courseId") long courseId);
+    Map<Long, Map<Long, Object>> selectUnitsWordSum(long courseId);
 }

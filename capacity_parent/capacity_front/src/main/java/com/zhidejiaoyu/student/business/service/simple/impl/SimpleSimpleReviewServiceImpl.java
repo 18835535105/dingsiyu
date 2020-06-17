@@ -207,7 +207,7 @@ public class SimpleSimpleReviewServiceImpl implements SimpleReviewService {
             map.put("plan", count_); // ./
 
             // count单元表单词有多少个    /.
-    		Integer count = unitMapper.countWordByUnitid(unit_id);
+    		Integer count = unitMapper.countWordByUnitId(unit_id);
     		map.put("wordCount", count); // /.
         }
         // 任务课程-复习, 根据课程查询

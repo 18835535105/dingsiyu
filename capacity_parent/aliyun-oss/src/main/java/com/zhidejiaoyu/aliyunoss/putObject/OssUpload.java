@@ -37,10 +37,10 @@ public class OssUpload {
     }
 
     /**
-     * 单文件上传
+     * 单文件上传，指定文件名
      *
      * @param file
-     * @param dir   oss 存放文件的路径
+     * @param dir      oss 存放文件的路径
      * @param fileName
      * @return
      */
@@ -54,6 +54,17 @@ public class OssUpload {
             return null;
         }
         return dir + fileName;
+    }
+
+    /**
+     * 单文件上传，随机生成文件名
+     *
+     * @param file
+     * @param dir
+     * @return
+     */
+    public static String upload(MultipartFile file, String dir) {
+        return upload(file, dir, null);
     }
 
     /**
@@ -110,9 +121,9 @@ public class OssUpload {
             suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
         }
 
-        if(fileName != null && fileName.trim().length() > 0) {
+        if (fileName != null && fileName.trim().length() > 0) {
             fileName = fileName + suffix;
-        }else {
+        } else {
             fileName = UUID.randomUUID() + suffix;
         }
         return fileName;

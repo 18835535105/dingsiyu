@@ -131,7 +131,7 @@ public class SimpleDictationServiceImpl implements SimpleDictationService {
 		}
 
 		// 3. count单元表单词有多少个    /.
-		Integer count = unitMapper.countWordByUnitid(unit_id);
+		Integer count = unitMapper.countWordByUnitId(unit_id);
 		map.put("wordCount", count);
 
 		// 4. 该单元已学单词  ./

@@ -103,7 +103,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         // 查询学生当前单元下已学习单词的个数，即学习进度
         Integer plan = learnExtendMapper.countLearnWord(learnNews.getId(), unitId, learnNews.getGroup(), studyModel);
         // 获取当前单元下的所有单词的总个数
-        Integer wordCount = unitVocabularyNewMapper.countByUnitId(unitId, learnNews.getGroup());
+        Integer wordCount = unitVocabularyNewMapper.countByUnitIdAndGroup(unitId, learnNews.getGroup());
         if (wordCount == 0) {
             log.error("单元 {} 下没有单词信息！", unitId);
             return ServerResponse.createByErrorMessage("当前单元下没有单词！");
@@ -155,7 +155,7 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
         //          开始
         boolean flag;
         //查看当前数据是否为以前学习过的数据
-        List<StudyCapacity> studyCapacities = studyCapacityMapper.selectByStudentIdAndUnitIdAndWordIdAndType(studentId, getVo.getUnitId(), getVo.getWordId(), getVo.getType());
+        List<StudyCapacity> studyCapacities = studyCapacityMapper.selectByStudentIdAndUnitIdAndWordIdAndType(studentId, unitId, wordId, type);
 
         flag = studyCapacities.size() > 0 && studyCapacities.get(0).getPush().getTime() < System.currentTimeMillis();
 
