@@ -862,7 +862,7 @@ public class SimplePersonalCentreServiceImplSimple extends SimpleBaseServiceImpl
 
         Integer page = rankDto.getPage();
         long startIndex = (long) page == 1 ? 0 : (page - 1) * rows;
-        List<Long> studentIds = rankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, startIndex + rows);
+        List<Long> studentIds = rankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, startIndex + rows, 100);
         if (studentIds.size() > 0) {
             studentIds.forEach(id -> {
                 Map<String, Object> dataMap = new HashMap<>(16);

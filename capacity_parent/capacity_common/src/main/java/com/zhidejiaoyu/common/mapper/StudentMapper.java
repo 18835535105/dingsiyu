@@ -344,4 +344,11 @@ public interface StudentMapper extends BaseMapper<Student> {
      * @return
      */
     List<Student> selectByTeacherIdOrSchoolAdminId(@Param("userId") Integer userId, @Param("dto") SearchStudentDTO dto);
+
+    /**
+     * 查询未被删除的学生信息
+     *
+     * @return
+     */
+    List<Student> selectNotDelete();
 }

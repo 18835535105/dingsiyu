@@ -20,11 +20,12 @@ public interface ActivityAwardService extends BaseService<WeekActivity> {
     ServerResponse<Object> awardList();
 
     /**
-     * 校区活动排名
+     * 活动排名
      *
+     * @param type 1:校区活动排行；2：同服务器排行
      * @return
      */
-    ServerResponse<Object> rank();
+    ServerResponse<Object> rank(Integer type);
 
     /**
      * 领取奖励

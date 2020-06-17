@@ -17,6 +17,7 @@ import com.zhidejiaoyu.student.business.activity.vo.RankVO;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.business.timingtask.service.impl.QuartWeekActivityServiceImpl;
 import com.zhidejiaoyu.student.common.redis.WeekActivityRedisOpt;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -112,7 +113,7 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
     }
 
     @Override
-    public ServerResponse<Object> rank() {
+    public ServerResponse<Object> rank(Integer type) {
 
         WeekActivityConfig weekActivityConfig = weekActivityConfigMapper.selectCurrentWeekConfig();
         if (weekActivityConfig == null) {
@@ -120,15 +121,19 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
         }
 
         Student student = super.getStudent();
-        Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
 
-        int pageNum = PageUtil.getPageNum();
-        int pageSize = PageUtil.getPageSize();
-        long startIndex = (pageNum - 1) * pageSize;
-        long endIndex = startIndex + pageSize;
+        if (type == 1) {
+            // 校区排行
+            return this.getSchoolRank(weekActivityConfig, student);
+        }
 
-        String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_SCHOOL_RANK + schoolAdminId;
-        List<Long> studentIds = weekActivityRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, null);
+        // 同服务器排行
+        return this.getServerRank(weekActivityConfig, student);
+    }
+
+    public ServerResponse<Object> getServerRank(WeekActivityConfig weekActivityConfig, Student student) {
+        String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_SERVER_RANK;
+        List<Long> studentIds = weekActivityRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, 0L, 30L);
 
         Map<Long, Map<Long, String>> studentIdMap = studentMapper.selectNicknameMapByStudentId(studentIds);
 
@@ -137,11 +142,58 @@ public class ActivityAwardServiceImpl extends BaseServiceImpl<WeekActivityMapper
         for (int i = 0; i < size; i++) {
             RankVO.RankInfo info = new RankVO.RankInfo();
             Long studentId = studentIds.get(i);
-            double activityPlan = weekActivityRankOpt.getActivityPlan(schoolAdminId, studentId);
+            double activityPlan = weekActivityRankOpt.getActivityServerPlan(studentId);
             info.setNickname(studentIdMap.get(studentId).get("nickname"));
-            if (startIndex == 0) {
-                Integer awardGold = QuartWeekActivityServiceImpl.AWARD_GOLD_MAP.get(i);
+            if (i < 10) {
+                Integer awardGold = QuartWeekActivityServiceImpl.SERVER_AWARD_GOLD_MAP.get(i);
                 info.setAwardGold(awardGold == null ? 0 : awardGold);
+            } else {
+                info.setAwardGold(0);
+            }
+            info.setMe(Objects.equals(studentId, student.getId()));
+            info.setComplete(WeekActivityRedisOpt.CONDITION_MAP.get(weekActivityConfig.getWeekActivityId()).replace("$&$", String.valueOf((int) activityPlan)));
+            vos.add(info);
+        }
+
+        long memberSize = weekActivityRankOpt.getMemberSize(key);
+        return ServerResponse.createBySuccess(PageUtil.packagePage(vos, memberSize));
+    }
+
+    /**
+     * 获取校区排行
+     *
+     * @param weekActivityConfig
+     * @param student
+     * @return
+     */
+    public ServerResponse<Object> getSchoolRank(WeekActivityConfig weekActivityConfig, Student student) {
+
+        int pageNum = PageUtil.getPageNum();
+        int pageSize = PageUtil.getPageSize();
+        long startIndex = (pageNum - 1) * pageSize;
+        long endIndex = startIndex + pageSize;
+
+        Integer schoolAdminId = TeacherInfoUtil.getSchoolAdminId(student);
+
+        String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_SCHOOL_RANK + schoolAdminId;
+        List<Long> studentIds = weekActivityRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex);
+
+        if (CollectionUtils.isEmpty(studentIds)) {
+           return ServerResponse.createBySuccess(PageUtil.packagePage(Collections.emptyList(), 0L));
+        }
+
+        Map<Long, Map<Long, String>> studentIdMap = studentMapper.selectNicknameMapByStudentId(studentIds);
+
+        int size = studentIds.size();
+        List<RankVO.RankInfo> vos = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            RankVO.RankInfo info = new RankVO.RankInfo();
+            Long studentId = studentIds.get(i);
+            double activityPlan = weekActivityRankOpt.getActivitySchoolPlan(schoolAdminId, studentId);
+            info.setNickname(studentIdMap.get(studentId).get("nickname"));
+            if (i < 10) {
+                Integer awardGold = QuartWeekActivityServiceImpl.SERVER_AWARD_GOLD_MAP.get(i);
+                info.setAwardGold(awardGold == null ? 0 : awardGold  / 2);
             } else {
                 info.setAwardGold(0);
             }

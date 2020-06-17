@@ -61,22 +61,23 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
     private KnownWordsMapper knownWordsMapper;
 
     /**
-     * 排行名次与奖励的金币对应关系
+     * 同服务器排行名次与奖励的金币对应关系，校区排名奖励金币数是该奖励的一半
      */
-    public static final Map<Integer, Integer> AWARD_GOLD_MAP = new HashMap<>(16);
+    public static final Map<Integer, Integer> SERVER_AWARD_GOLD_MAP = new HashMap<>(16);
 
     static {
-        AWARD_GOLD_MAP.put(0, 500);
-        AWARD_GOLD_MAP.put(1, 300);
-        AWARD_GOLD_MAP.put(2, 200);
-        AWARD_GOLD_MAP.put(3, 100);
-        AWARD_GOLD_MAP.put(4, 100);
-        AWARD_GOLD_MAP.put(5, 50);
-        AWARD_GOLD_MAP.put(6, 50);
-        AWARD_GOLD_MAP.put(7, 50);
-        AWARD_GOLD_MAP.put(8, 50);
-        AWARD_GOLD_MAP.put(9, 50);
+        SERVER_AWARD_GOLD_MAP.put(0, 500);
+        SERVER_AWARD_GOLD_MAP.put(1, 300);
+        SERVER_AWARD_GOLD_MAP.put(2, 200);
+        SERVER_AWARD_GOLD_MAP.put(3, 100);
+        SERVER_AWARD_GOLD_MAP.put(4, 100);
+        SERVER_AWARD_GOLD_MAP.put(5, 50);
+        SERVER_AWARD_GOLD_MAP.put(6, 50);
+        SERVER_AWARD_GOLD_MAP.put(7, 50);
+        SERVER_AWARD_GOLD_MAP.put(8, 50);
+        SERVER_AWARD_GOLD_MAP.put(9, 50);
     }
+
 
     @Override
     @Scheduled(cron = "0 5 0 ? * 2 ")
@@ -86,7 +87,6 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
         if (checkPort(port)) {
             return;
         }
-        List<Long> schoolAdmins = teacherMapper.selectAllAdminId();
 
         boolean flag = false;
         Object o = redisTemplate.opsForValue().get(WeekActivityRedisKeysConst.LAST_ACTIVITY_CONFIG_ID);
@@ -97,8 +97,91 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
 
         Date createTime = new Date();
 
-        log.info("初始化每周活动排行开始....");
-        boolean finalFlag = flag;
+        initWeekActivityServerRank(flag, o, createTime);
+
+        initWeekActivitySchoolRank(flag, o, createTime);
+
+        WeekActivityConfig weekActivityConfig = weekActivityConfigMapper.selectCurrentWeekConfig();
+        if (weekActivityConfig != null) {
+            redisTemplate.opsForValue().set(WeekActivityRedisKeysConst.LAST_ACTIVITY_CONFIG_ID, weekActivityConfig.getId());
+        } else {
+            redisTemplate.opsForValue().set(WeekActivityRedisKeysConst.LAST_ACTIVITY_CONFIG_ID, -1);
+        }
+        redisTemplate.expire(WeekActivityRedisKeysConst.LAST_ACTIVITY_CONFIG_ID, 7, TimeUnit.DAYS);
+
+        // 清空学生上个活动完成进度缓存
+        String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_LIST;
+        Set<Object> keys = redisTemplate.opsForHash().keys(key);
+        redisTemplate.opsForHash().delete(key, keys);
+
+        // 清空熟词表数据
+        knownWordsMapper.delete(null);
+        log.info("初始化每周活动校区排行结束.");
+    }
+
+    /**
+     * 初始化同服务器排行
+     *
+     * @param flag
+     * @param o
+     * @param createTime
+     */
+    public void initWeekActivityServerRank(boolean flag, Object o, Date createTime) {
+        log.info("初始化每周活动同服务器排行。。。");
+        String serverKey = WeekActivityRedisKeysConst.WEEK_ACTIVITY_SERVER_RANK;
+        List<Student> serverStudents = studentMapper.selectNotDelete();
+        if (flag) {
+            // 取出前10名需要奖励的学生id
+            List<Long> serverBetterTenStudentIds = weekActivityRankOpt.getReverseRangeMembersBetweenStartAndEnd(serverKey, 0L, 10L, 10);
+            if (CollectionUtils.isNotEmpty(serverBetterTenStudentIds)) {
+                int size = serverBetterTenStudentIds.size();
+                for (int i = 0; i < size; i++) {
+                    Student student = studentMapper.selectById(serverBetterTenStudentIds.get(i));
+                    int awardGold = SERVER_AWARD_GOLD_MAP.get(i);
+                    student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
+                    studentMapper.updateById(student);
+
+                    GoldLogUtil.saveStudyGoldLog(student.getId(), GoldLogReasonConstant.WEEK_ACTIVITY_SERVER_RANK, awardGold);
+                }
+            }
+
+            // 保存总排行数据
+            if (CollectionUtils.isNotEmpty(serverStudents)) {
+                List<WeekActivityRank> collect = serverStudents.parallelStream().map(student -> {
+                    Double score = redisTemplate.opsForZSet().score(serverKey, student.getId());
+
+                    return WeekActivityRank.builder()
+                            .complateCount(score == null ? 0 : (int) Math.round(score))
+                            .createTime(createTime)
+                            .nickName(student.getNickname())
+                            .studentId(student.getId())
+                            .weekActivityConfigId(Integer.parseInt(o.toString()))
+                            .type(2)
+                            .build();
+                }).collect(Collectors.toList());
+
+                weekActivityRankService.saveBatch(collect);
+            }
+        }
+
+        // 初始化排行数据
+        List<Long> serverStudentIds = serverStudents.parallelStream().map(Student::getId).collect(Collectors.toList());
+        redisTemplate.opsForZSet().remove(serverKey, serverStudentIds);
+        weekActivityRankOpt.initServerRank(serverStudentIds);
+
+        log.info("初始化每周活动同服务器排行结束");
+    }
+
+    /**
+     * 初始化校区排行
+     *
+     * @param flag
+     * @param o
+     * @param createTime
+     */
+    public void initWeekActivitySchoolRank(boolean flag, Object o, Date createTime) {
+        log.info("初始化每周活动校区排行开始....");
+        List<Long> schoolAdmins = teacherMapper.selectAllAdminId();
         schoolAdmins.parallelStream().filter(Objects::nonNull).forEach(schoolAdmin -> {
 
             int schoolAdminId = Math.toIntExact(schoolAdmin);
@@ -110,7 +193,7 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
 
             String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_SCHOOL_RANK + schoolAdmin;
 
-            if (finalFlag) {
+            if (flag) {
                 // 如果上周有活动，发放奖励并保存总排行；如果上周没有活动，不做处理
                 // 校区每周活动排行前十名奖励发放
                 List<Long> betterTenStudentIds = weekActivityRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, 0L, 10L, 10);
@@ -118,7 +201,7 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
                     int size = betterTenStudentIds.size();
                     for (int i = 0; i < size; i++) {
                         Student student = studentMapper.selectById(betterTenStudentIds.get(i));
-                        Integer awardGold = AWARD_GOLD_MAP.get(i);
+                        int awardGold = SERVER_AWARD_GOLD_MAP.get(i) / 2;
                         student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), awardGold));
                         studentMapper.updateById(student);
 
@@ -137,6 +220,7 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
                                 .nickName(student.getNickname())
                                 .studentId(student.getId())
                                 .weekActivityConfigId(Integer.parseInt(o.toString()))
+                                .type(1)
                                 .build();
                     }).collect(Collectors.toList());
 
@@ -147,26 +231,7 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
             // 初始化排行数据
             List<Long> studentIds = students.parallelStream().map(Student::getId).collect(Collectors.toList());
             redisTemplate.opsForZSet().remove(key, studentIds);
-            weekActivityRankOpt.init(schoolAdminId, studentIds);
+            weekActivityRankOpt.initSchoolRank(schoolAdminId, studentIds);
         });
-
-        WeekActivityConfig weekActivityConfig = weekActivityConfigMapper.selectCurrentWeekConfig();
-        if (weekActivityConfig != null) {
-            redisTemplate.opsForValue().set(WeekActivityRedisKeysConst.LAST_ACTIVITY_CONFIG_ID, weekActivityConfig.getId());
-        } else {
-            redisTemplate.opsForValue().set(WeekActivityRedisKeysConst.LAST_ACTIVITY_CONFIG_ID, -1);
-        }
-        redisTemplate.expire(WeekActivityRedisKeysConst.LAST_ACTIVITY_CONFIG_ID, 7, TimeUnit.DAYS);
-
-        // 清空学生上个活动完成进度缓存
-        String key = WeekActivityRedisKeysConst.WEEK_ACTIVITY_LIST;
-        Set<Object> keys = redisTemplate.opsForHash().keys(key);
-        redisTemplate.opsForHash().delete(key, keys);
-
-        // 清空熟词表数据
-        knownWordsMapper.delete(null);
-
-        log.info("初始化每周活动排行结束.");
-
     }
 }

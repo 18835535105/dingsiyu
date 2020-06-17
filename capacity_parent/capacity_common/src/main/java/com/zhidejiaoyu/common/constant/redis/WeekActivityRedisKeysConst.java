@@ -21,6 +21,15 @@ public interface WeekActivityRedisKeysConst {
     String WEEK_ACTIVITY_SCHOOL_RANK = "WEEK_ACTIVITY_SCHOOL_RANK:" + ServerNoConstant.SERVER_NO + ":";
 
     /**
+     * 每周活动同服务器排行
+     * 数据类型：zset
+     * key:WEEK_ACTIVITY_SERVER_RANK
+     * field:studentId
+     * score:当前挑战进度
+     */
+    String WEEK_ACTIVITY_SERVER_RANK = "WEEK_ACTIVITY_SERVER_RANK:" + ServerNoConstant.SERVER_NO;
+
+    /**
      * 每周活动各个学生完成情况
      * 数据类型：hash
      * key:WEEK_ACTIVITY_LIST

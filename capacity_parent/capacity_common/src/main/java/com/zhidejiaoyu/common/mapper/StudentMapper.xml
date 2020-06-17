@@ -934,5 +934,10 @@ s.uuid,
             #{dto.accountOrName}, '%'))
         </if>) t group by t.id
     </select>
+    <select id="selectNotDelete" resultMap="BaseResultMap">
+        select
+        <include refid="more_table_List"/>
+        from student s where s.status &lt;> 3
+    </select>
 
 </mapper>

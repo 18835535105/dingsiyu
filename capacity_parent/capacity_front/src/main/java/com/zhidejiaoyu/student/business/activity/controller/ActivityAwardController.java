@@ -4,10 +4,7 @@ import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.activity.service.ActivityAwardService;
 import com.zhidejiaoyu.student.business.controller.BaseController;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -35,13 +32,14 @@ public class ActivityAwardController extends BaseController {
     }
 
     /**
-     * 校区活动排名
+     * 活动排名
      *
+     * @param type 1:校区活动排行；2：同服务器排行
      * @return
      */
     @GetMapping("/rank")
-    public ServerResponse<Object> rank() {
-        return activityAwardService.rank();
+    public ServerResponse<Object> rank(@RequestParam(required = false, defaultValue = "1") Integer type) {
+        return activityAwardService.rank(type);
     }
 
     /**

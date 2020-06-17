@@ -24,9 +24,9 @@ import java.util.Date;
 @Accessors(chain = true)
 public class WeekActivityRank implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
@@ -53,6 +53,11 @@ public class WeekActivityRank implements Serializable {
      * 昵称
      */
     private String nickName;
+
+    /**
+     * 1：校区排行；2：同服务器排行
+     */
+    private Integer type;
 
 
 }

@@ -11,7 +11,13 @@ public interface GoldLogReasonConstant {
     /**
      * 不贡献到校区金币工厂
      */
-    String WEEK_ACTIVITY_RANK = "每周活动排行奖励";
+    String WEEK_ACTIVITY_RANK = "每周活动校区排行奖励";
+
+    /**
+     * 不贡献到校区金币工厂
+     */
+    String WEEK_ACTIVITY_SERVER_RANK = "每周活动同服务器排行奖励";
+
 
     /**
      * 不贡献到校区金币工厂
