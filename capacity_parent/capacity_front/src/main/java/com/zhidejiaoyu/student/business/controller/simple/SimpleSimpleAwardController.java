@@ -70,7 +70,7 @@ public class SimpleSimpleAwardController {
      * 将学生名次表中的数据修改为学生当前的名次
      *
      * @param session
-     * @param type  1：班级排行；2：学校排行；3：全国排行
+     * @param type  1：班级排行；2：学校排行；3：全国排行；4：同服务器排行
      * @return
      */
     @PostMapping("/updateRanking")

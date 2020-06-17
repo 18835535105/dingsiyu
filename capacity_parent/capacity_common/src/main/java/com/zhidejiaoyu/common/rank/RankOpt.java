@@ -63,6 +63,7 @@ public class RankOpt extends BaseRankOpt {
             double gold = BigDecimalUtil.add(student.getOfflineGold(), student.getSystemGold());
             this.addOrUpdate(RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), gold);
             this.addOrUpdate(RankKeysConst.SCHOOL_GOLD_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId(), gold);
+            this.addOrUpdate(RankKeysConst.SERVER_GOLD_RANK, student.getId(), gold);
             this.addOrUpdate(RankKeysConst.COUNTRY_GOLD_RANK, student.getId(), gold);
         } catch (Exception e) {
             log.error("修改 redis 排行中的金币排行信息失败！[{} - {} - {}]", student.getId(), student.getAccount(), student.getStudentName(), e);
@@ -79,6 +80,7 @@ public class RankOpt extends BaseRankOpt {
             //删除学生金币信息
             redisTemplate.opsForZSet().remove(RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
             redisTemplate.opsForZSet().remove(RankKeysConst.SCHOOL_GOLD_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId());
+            redisTemplate.opsForZSet().remove(RankKeysConst.SERVER_GOLD_RANK, student.getId());
             redisTemplate.opsForZSet().remove(RankKeysConst.COUNTRY_GOLD_RANK, student.getId());
         } catch (Exception e) {
             log.error("修改 redis 排行中的金币排行信息失败！[{} - {} - {}]", student.getId(), student.getAccount(), student.getStudentName(), e);
@@ -96,6 +98,7 @@ public class RankOpt extends BaseRankOpt {
             redisTemplate.opsForZSet().remove(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
             redisTemplate.opsForZSet().remove(RankKeysConst.SCHOOL_WORSHIP_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId());
             redisTemplate.opsForZSet().remove(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId());
+            redisTemplate.opsForZSet().remove(RankKeysConst.SERVER_WORSHIP_RANK, student.getId());
         } catch (Exception e) {
             log.error("修改 redis 排行中的金币排行信息失败！[{} - {} - {}]", student.getId(), student.getAccount(), student.getStudentName(), e);
         }
@@ -112,6 +115,7 @@ public class RankOpt extends BaseRankOpt {
             redisTemplate.opsForZSet().remove(RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
             redisTemplate.opsForZSet().remove(RankKeysConst.SCHOOL_MEDAL_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId());
             redisTemplate.opsForZSet().remove(RankKeysConst.COUNTRY_MEDAL_RANK, student.getId());
+            redisTemplate.opsForZSet().remove(RankKeysConst.SERVER_MEDAL_RANK, student.getId());
         } catch (Exception e) {
             log.error("修改 redis 排行中的金币排行信息失败！[{} - {} - {}]", student.getId(), student.getAccount(), student.getStudentName(), e);
         }
@@ -128,6 +132,7 @@ public class RankOpt extends BaseRankOpt {
             redisTemplate.opsForZSet().remove(RankKeysConst.CLASS_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId());
             redisTemplate.opsForZSet().remove(RankKeysConst.SCHOOL_CCIE_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId());
             redisTemplate.opsForZSet().remove(RankKeysConst.COUNTRY_CCIE_RANK, student.getId());
+            redisTemplate.opsForZSet().remove(RankKeysConst.SERVER_CCIE_RANK, student.getId());
         } catch (Exception e) {
             log.error("修改 redis 排行中的金币排行信息失败！[{} - {} - {}]", student.getId(), student.getAccount(), student.getStudentName(), e);
         }
@@ -145,6 +150,7 @@ public class RankOpt extends BaseRankOpt {
             this.addOrUpdate(RankKeysConst.CLASS_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), countCcieByStudentId * 1.0);
             this.addOrUpdate(RankKeysConst.SCHOOL_CCIE_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId(), countCcieByStudentId * 1.0);
             this.addOrUpdate(RankKeysConst.COUNTRY_CCIE_RANK, student.getId(), countCcieByStudentId * 1.0);
+            this.addOrUpdate(RankKeysConst.SERVER_CCIE_RANK, student.getId(), countCcieByStudentId * 1.0);
         } catch (Exception e) {
             log.error("修改 redis 排行中的证书排行信息失败！[{} - {} - {}]", student.getId(), student.getAccount(), student.getStudentName(), e);
         }
@@ -161,6 +167,7 @@ public class RankOpt extends BaseRankOpt {
             this.addOrUpdate(RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), medalCount * 1.0);
             this.addOrUpdate(RankKeysConst.SCHOOL_MEDAL_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId(), medalCount * 1.0);
             this.addOrUpdate(RankKeysConst.COUNTRY_MEDAL_RANK, student.getId(), medalCount * 1.0);
+            this.addOrUpdate(RankKeysConst.SERVER_MEDAL_RANK, student.getId(), medalCount * 1.0);
         } catch (Exception e) {
             log.error("修改 redis 排行中的勋章排行信息失败！[{} - {} - {}]", student.getId(), student.getAccount(), student.getStudentName(), e);
         }
@@ -177,6 +184,7 @@ public class RankOpt extends BaseRankOpt {
             this.addOrUpdate(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), byWorshipCount * 1.0);
             this.addOrUpdate(RankKeysConst.SCHOOL_WORSHIP_RANK + TeacherInfoUtil.getSchoolAdminId(student), student.getId(), byWorshipCount * 1.0);
             this.addOrUpdate(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId(), byWorshipCount * 1.0);
+            this.addOrUpdate(RankKeysConst.SERVER_WORSHIP_RANK, student.getId(), byWorshipCount * 1.0);
         } catch (Exception e) {
             log.error("修改 redis 排行中的勋章排行信息失败！[{} - {} - {}]", student.getId(), student.getAccount(), student.getStudentName(), e);
         }

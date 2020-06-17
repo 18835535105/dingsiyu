@@ -592,18 +592,22 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         double goldCount = BigDecimalUtil.add(student.getOfflineGold(), student.getSystemGold());
         rankOpt.addOrUpdate(RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), goldCount);
         rankOpt.addOrUpdate(RankKeysConst.SCHOOL_GOLD_RANK + schoolAdminId, student.getId(), goldCount);
+        rankOpt.addOrUpdate(RankKeysConst.SERVER_GOLD_RANK, student.getId(), goldCount);
         rankOpt.addOrUpdate(RankKeysConst.COUNTRY_GOLD_RANK, student.getId(), goldCount);
 
         rankOpt.addOrUpdate(RankKeysConst.CLASS_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), 0.0);
         rankOpt.addOrUpdate(RankKeysConst.SCHOOL_CCIE_RANK + schoolAdminId, student.getId(), 0.0);
+        rankOpt.addOrUpdate(RankKeysConst.SERVER_CCIE_RANK, student.getId(), 0.0);
         rankOpt.addOrUpdate(RankKeysConst.COUNTRY_CCIE_RANK, student.getId(), 0.0);
 
         rankOpt.addOrUpdate(RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), 0.0);
         rankOpt.addOrUpdate(RankKeysConst.SCHOOL_MEDAL_RANK + schoolAdminId, student.getId(), 0.0);
+        rankOpt.addOrUpdate(RankKeysConst.SERVER_MEDAL_RANK, student.getId(), 0.0);
         rankOpt.addOrUpdate(RankKeysConst.COUNTRY_MEDAL_RANK, student.getId(), 0.0);
 
         rankOpt.addOrUpdate(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), 0.0);
         rankOpt.addOrUpdate(RankKeysConst.SCHOOL_WORSHIP_RANK + schoolAdminId, student.getId(), 0.0);
+        rankOpt.addOrUpdate(RankKeysConst.SERVER_WORSHIP_RANK, student.getId(), 0.0);
         rankOpt.addOrUpdate(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId(), 0.0);
     }
 

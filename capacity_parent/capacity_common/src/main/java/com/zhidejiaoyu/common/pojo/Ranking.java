@@ -29,6 +29,8 @@ public class Ranking {
      */
     @TableField("gold_school_rank")
     private Integer goldSchoolRank;
+
+    private Integer goldServerRank;
     /**
      * 金币全国排名
      */
@@ -49,6 +51,8 @@ public class Ranking {
      */
     @TableField("worship_school_rank")
     private Integer worshipSchoolRank;
+
+    private Integer worshipServerRank;
     /**
      * 膜拜全国排名
      */

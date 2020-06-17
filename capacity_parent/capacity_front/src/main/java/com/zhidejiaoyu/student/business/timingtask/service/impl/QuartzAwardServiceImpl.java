@@ -87,6 +87,7 @@ public class QuartzAwardServiceImpl implements QuartzAwardService, BaseQuartzSer
             double goldCount = BigDecimalUtil.add(student.getOfflineGold(), student.getSystemGold());
             rankOpt.addOrUpdate(RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), goldCount);
             rankOpt.addOrUpdate(RankKeysConst.SCHOOL_GOLD_RANK + schoolAdminId, student.getId(), goldCount);
+            rankOpt.addOrUpdate(RankKeysConst.SERVER_GOLD_RANK, student.getId(), goldCount);
             rankOpt.addOrUpdate(RankKeysConst.COUNTRY_GOLD_RANK, student.getId(), goldCount);
             log.info("学生[{} - {} - {}] 金币数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), goldCount);
 
@@ -97,6 +98,7 @@ public class QuartzAwardServiceImpl implements QuartzAwardService, BaseQuartzSer
             }
             rankOpt.addOrUpdate(RankKeysConst.CLASS_CCIE_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
             rankOpt.addOrUpdate(RankKeysConst.SCHOOL_CCIE_RANK + schoolAdminId, student.getId(), count * 1.0);
+            rankOpt.addOrUpdate(RankKeysConst.SERVER_CCIE_RANK, student.getId(), count * 1.0);
             rankOpt.addOrUpdate(RankKeysConst.COUNTRY_CCIE_RANK, student.getId(), count * 1.0);
             log.info("学生[{} - {} - {}] 证书个数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
 
@@ -106,6 +108,7 @@ public class QuartzAwardServiceImpl implements QuartzAwardService, BaseQuartzSer
             }
             rankOpt.addOrUpdate(RankKeysConst.CLASS_MEDAL_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
             rankOpt.addOrUpdate(RankKeysConst.SCHOOL_MEDAL_RANK + schoolAdminId, student.getId(), count * 1.0);
+            rankOpt.addOrUpdate(RankKeysConst.SERVER_MEDAL_RANK, student.getId(), count * 1.0);
             rankOpt.addOrUpdate(RankKeysConst.COUNTRY_MEDAL_RANK, student.getId(), count * 1.0);
             log.info("学生[{} - {} - {}] 勋章个数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
 
@@ -115,6 +118,7 @@ public class QuartzAwardServiceImpl implements QuartzAwardService, BaseQuartzSer
             }
             rankOpt.addOrUpdate(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), student.getId(), count * 1.0);
             rankOpt.addOrUpdate(RankKeysConst.SCHOOL_WORSHIP_RANK + schoolAdminId, student.getId(), count * 1.0);
+            rankOpt.addOrUpdate(RankKeysConst.SERVER_WORSHIP_RANK, student.getId(), count * 1.0);
             rankOpt.addOrUpdate(RankKeysConst.COUNTRY_WORSHIP_RANK, student.getId(), count * 1.0);
             log.info("学生[{} - {} - {}] 被膜拜次数：[{}]", student.getId(), student.getAccount(), student.getStudentName(), count);
 
@@ -176,6 +180,11 @@ public class QuartzAwardServiceImpl implements QuartzAwardService, BaseQuartzSer
         this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.COUNTRY_CCIE_RANK + "*"));
         this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.COUNTRY_GOLD_RANK + "*"));
         this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.COUNTRY_MEDAL_RANK + "*"));
+
+        this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.SERVER_WORSHIP_RANK + "*"));
+        this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.SERVER_CCIE_RANK + "*"));
+        this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.SERVER_GOLD_RANK + "*"));
+        this.removeDeletedStudent(redisTemplate.keys(RankKeysConst.SERVER_MEDAL_RANK + "*"));
         log.info("定时清理缓存中冗余的排行信息结束...");
 
     }

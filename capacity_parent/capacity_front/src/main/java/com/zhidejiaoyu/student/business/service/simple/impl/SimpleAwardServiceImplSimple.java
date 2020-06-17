@@ -206,6 +206,14 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 ranking.setWorshipCountryRank(countryWorshipRank == -1 ? 0 : (int) countryWorshipRank);
                 simpleRankingMapper.updateById(ranking);
                 break;
+            case 4:
+                // 更新同服务器排行名次
+                long serverGoldRank = rankOpt.getRank(RankKeysConst.SERVER_GOLD_RANK, studentId);
+                long serverWorshipRank = rankOpt.getRank(RankKeysConst.SERVER_WORSHIP_RANK, studentId);
+                ranking.setGoldCountryRank(serverGoldRank == -1 ? 0 : (int) serverGoldRank);
+                ranking.setWorshipCountryRank(serverWorshipRank == -1 ? 0 : (int) serverWorshipRank);
+                simpleRankingMapper.updateById(ranking);
+                break;
             default:
         }
         return ServerResponse.createBySuccess();
@@ -225,6 +233,8 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
         long classRank = rankOpt.getRank(RankKeysConst.CLASS_GOLD_RANK + student.getTeacherId() + ":" + student.getClassId(), studentId);
         long schoolRank = rankOpt.getRank(RankKeysConst.SCHOOL_GOLD_RANK + TeacherInfoUtil.getSchoolAdminId(student), studentId);
         long countryRank = rankOpt.getRank(RankKeysConst.COUNTRY_GOLD_RANK, studentId);
+        long serverRank = rankOpt.getRank(RankKeysConst.SERVER_GOLD_RANK, studentId);
+
 
         if (ranking != null) {
             // 学生金币班级排行变化名次
@@ -240,15 +250,29 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
             }
 
             // 学生金币学校排行变化名次
+            String isSchool = "isSchool";
             if (ranking.getGoldSchoolRank() == null) {
                 map.put("goldSchoolRank", 0);
-                map.put("isSchool", false);
+                map.put(isSchool, false);
             } else {
                 int changeRank = (int) (ranking.getGoldSchoolRank() - schoolRank);
-                if (map.get("isSchool") != null && !((Boolean) map.get("isSchool"))) {
-                    map.put("isSchool", changeRank != 0);
+                if (map.get(isSchool) != null && !((Boolean) map.get(isSchool))) {
+                    map.put(isSchool, changeRank != 0);
                 }
                 map.put("goldSchoolRank", changeRank);
+            }
+
+            // 学生金币同服务器排行变化名次
+            String isServer = "isServer";
+            if (ranking.getGoldServerRank() == null) {
+                map.put("goldServerRank", 0);
+                map.put(isServer, false);
+            } else {
+                int changeRank = (int) (ranking.getGoldServerRank() - serverRank);
+                if (map.get(isServer) != null && !((Boolean) map.get(isServer))) {
+                    map.put(isServer, changeRank != 0);
+                }
+                map.put("goldServerRank", changeRank);
             }
 
             // 学生金币全国排行变化名次
@@ -262,19 +286,23 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 }
                 map.put("goldCountryRank", changeRank);
             }
+
         } else {
             Ranking rank = new Ranking();
             rank.setStudentId(studentId);
             rank.setGoldClassRank(classRank == -1 ? 0 : (int) classRank);
             rank.setGoldSchoolRank(schoolRank == -1 ? 0 : (int) schoolRank);
             rank.setGoldCountryRank(countryRank == -1 ? 0 : (int) countryRank);
+            rank.setGoldServerRank(serverRank == -1 ? 0 : (int) serverRank);
             simpleRankingMapper.insert(rank);
 
             map.put("goldClassRank", 0);
             map.put("goldSchoolRank", 0);
+            map.put("goldServerRank", 0);
             map.put("goldCountryRank", 0);
             map.put("isClass", false);
             map.put("isSchool", false);
+            map.put("isServer", false);
             map.put("isCountry", false);
         }
     }
@@ -295,6 +323,7 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
 
         long classRank = rankOpt.getRank(RankKeysConst.CLASS_WORSHIP_RANK + student.getTeacherId() + ":" + student.getClassId(), studentId);
         long schoolRank = rankOpt.getRank(RankKeysConst.SCHOOL_WORSHIP_RANK + TeacherInfoUtil.getSchoolAdminId(student), studentId);
+        long serverRank = rankOpt.getRank(RankKeysConst.SERVER_WORSHIP_RANK, studentId);
         long countryRank = rankOpt.getRank(RankKeysConst.COUNTRY_WORSHIP_RANK, studentId);
 
         if (ranking != null) {
@@ -318,6 +347,16 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
                 map.put("isSchool", false);
             }
 
+            // 膜拜同服务器排行变化名次
+            if (ranking.getWorshipServerRank() != null && serverRank != -1) {
+                long change = ranking.getWorshipServerRank() - serverRank;
+                map.put("worshipServerRank", change);
+                map.put("isServer", change != 0);
+            } else {
+                map.put("worshipServerRank", 0);
+                map.put("isServer", false);
+            }
+
             // 膜拜全校排行变化名次
             if (ranking.getWorshipCountryRank() != null && countryRank != -1) {
                 long change = ranking.getWorshipCountryRank() - countryRank;
@@ -338,9 +377,11 @@ public class SimpleAwardServiceImplSimple extends SimpleBaseServiceImpl<SimpleAw
             map.put("isClass", false);
             map.put("isSchool", false);
             map.put("isCountry", false);
+            map.put("isServer", false);
 
             map.put("worshipClassRank", 0);
             map.put("worshipSchoolRank", 0);
+            map.put("worshipServerRank", 0);
             map.put("worshipCountryRank", 0);
         }
     }
