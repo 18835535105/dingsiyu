@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.pojo.StudentExpansion;
 import com.zhidejiaoyu.common.study.TestPointUtil;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
+import com.zhidejiaoyu.student.business.learn.vo.GetVo;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
@@ -48,7 +49,7 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
         Integer group;
         Student student = getStudent(session);
         Long studentId = student.getId();
-        List<Map<String, Object>> getMaps =new ArrayList<>();
+        List<Map<String, Object>> getMaps = new ArrayList<>();
         Map<String, Object> returnMap = new HashMap<>();
         List<Map<String, Object>> returnList = new ArrayList<>();
         //获取当前单元下的group
@@ -115,19 +116,19 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
             return returnMap;
         }
 
-        return null;
+        return returnMap;
     }
 
     @Override
-    public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId, Long[] errorId) {
+    public Object saveStudy(HttpSession session, GetVo getVo) {
         Student student = getStudent(session);
         Integer gold = 0;
         Integer enger = 0;
-        if (total == 100) {
+        if (getVo.getTotal() == 100) {
             gold = 5;
             enger = 3;
         }
-        if (total >= 60) {
+        if (getVo.getTotal() >= 60) {
             gold = 3;
             enger = 2;
         }
@@ -136,22 +137,22 @@ public class SentencePatternGameServiceImpl extends BaseServiceImpl<LearnNewMapp
         studentMapper.updateById(student);
         GoldLogUtil.saveStudyGoldLog(student.getId(), "句型游戏", gold);
         Map<String, Object> resultMap = new HashMap<>();
-        if (total < PointConstant.EIGHTY) {
+        if (getVo.getTotal() < PointConstant.EIGHTY) {
             resultMap.put("petSay", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_LESS_EIGHTY));
             resultMap.put("msg", "很遗憾，闯关失败，再接再厉。");
-            resultMap.put("backMsg", new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(total), "的同学，继续努力吧！"});
-        } else if (total < PointConstant.NINETY) {
+            resultMap.put("backMsg", new String[]{"别气馁，已经超越了", TestPointUtil.getPercentage(getVo.getTotal()), "的同学，继续努力吧！"});
+        } else if (getVo.getTotal() < PointConstant.NINETY) {
             resultMap.put("petSay", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_EIGHTY_TO_HUNDRED));
             resultMap.put("msg", "闯关成功，独孤求败！");
-            resultMap.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(total), "的同学，再接再励！"});
+            resultMap.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(getVo.getTotal()), "的同学，再接再励！"});
         } else {
             resultMap.put("petSay", petSayUtil.getMP3Url(student.getPetName(), PetMP3Constant.UNIT_TEST_HUNDRED));
             resultMap.put("msg", "恭喜你刷新了纪录！");
-            resultMap.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(total), "的同学，再接再励！"});
+            resultMap.put("backMsg", new String[]{"恭喜你，已经超过", TestPointUtil.getPercentage(getVo.getTotal()), "的同学，再接再励！"});
         }
         resultMap.put("energy", enger);
         resultMap.put("gold", gold);
-        resultMap.put("point", total);
+        resultMap.put("point", getVo.getTotal());
         resultMap.put("petUrl", AliyunInfoConst.host + student.getPartUrl());
         return resultMap;
     }

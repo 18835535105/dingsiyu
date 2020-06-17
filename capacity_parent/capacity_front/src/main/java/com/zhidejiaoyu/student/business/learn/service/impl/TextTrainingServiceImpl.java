@@ -6,6 +6,7 @@ import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.learn.common.SaveTeksData;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
+import com.zhidejiaoyu.student.business.learn.vo.GetVo;
 import com.zhidejiaoyu.student.business.service.impl.BaseServiceImpl;
 import com.zhidejiaoyu.student.common.redis.CurrentDayOfStudyRedisOpt;
 import org.springframework.stereotype.Service;
@@ -31,8 +32,8 @@ public class TextTrainingServiceImpl extends BaseServiceImpl<LearnNewMapper, Lea
     }
 
     @Override
-    public Object saveStudy(HttpSession session, Long unitId, Long wordId, boolean isTrue, Integer plan, Integer total, Long courseId, Long flowId, Long[] errorId) {
-        saveTeksData.saveStudy(session, unitId, flowId, studyModel, easyOrHard);
+    public Object saveStudy(HttpSession session, GetVo getVo) {
+        saveTeksData.saveStudy(session, getVo.getUnitId(), getVo.getFlowId(), studyModel, easyOrHard);
         return ServerResponse.createBySuccess();
     }
 }
