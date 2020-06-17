@@ -2,6 +2,7 @@ package com.zhidejiaoyu.student.business.learn.controller;
 
 import com.zhidejiaoyu.student.business.controller.BaseController;
 import com.zhidejiaoyu.student.business.learn.service.IStudyService;
+import com.zhidejiaoyu.student.business.learn.vo.GetVo;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -94,10 +95,9 @@ public class LearnNewController extends BaseController {
      */
     @RequestMapping("/saveStudy")
     public Object saveStudy(HttpSession session, Integer getModel,
-                            Long unitId, Long courseId, Long wordId,
-                            boolean isKnown, Integer plan, Integer total, Long flowId, Long[] errorId) {
+                            GetVo getVo) {
         IStudyService iStudyService = map.get(getModel);
-        return iStudyService.saveStudy(session, unitId, wordId, isKnown, plan, total, courseId, flowId, errorId);
+        return iStudyService.saveStudy(session, getVo);
     }
 
 
