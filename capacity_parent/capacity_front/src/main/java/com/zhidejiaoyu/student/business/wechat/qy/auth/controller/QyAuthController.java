@@ -41,6 +41,7 @@ public class QyAuthController {
         String url = HttpUtil.getHttpServletRequest().getParameter("url");
         if (StringUtil.isEmpty(sysUser.getAccount())) {
             url = loginUrl;
+            return "redirect:" + url + "?openid=" + sysUser.getOpenid() + "&redirect_url=" + url;
         }
 
         return "redirect:" + url + "?openid=" + sysUser.getOpenid();

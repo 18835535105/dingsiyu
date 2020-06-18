@@ -3,6 +3,7 @@ package com.zhidejiaoyu.student.business.wechat.qy.fly.controller;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.dto.wechat.qy.fly.SearchStudentDTO;
+import com.zhidejiaoyu.student.business.currentDayOfStudy.service.CurrentDayOfStudyService;
 import com.zhidejiaoyu.student.business.wechat.qy.fly.service.QyFlyService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +25,9 @@ public class QyFlyController {
 
     @Resource
     private QyFlyService qyFlyService;
+
+    @Resource
+    private CurrentDayOfStudyService currentDayOfStudyService;
 
     /**
      * 上传飞行记录
@@ -60,6 +64,14 @@ public class QyFlyController {
             return ServerResponse.createByError(400, "openId can't be null!");
         }
         return qyFlyService.getStudents(openId, dto);
+    }
+
+    @GetMapping("/getCurrentDayOfStudy")
+    public ServerResponse<Object> getCurrentDayOfStudy(Long studentId) {
+        if (studentId == null) {
+            return ServerResponse.createByError(400, "studentId can't be null!");
+        }
+        return currentDayOfStudyService.getCurrentDayOfStudy(studentId);
     }
 
 }
