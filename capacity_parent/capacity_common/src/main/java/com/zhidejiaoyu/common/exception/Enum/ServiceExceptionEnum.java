@@ -19,7 +19,9 @@ public enum ServiceExceptionEnum implements BaseExceptionEnum {
     /**
      * 用户名或密码不能为空
      */
-    NAME_OR_PASSWORD_CAN_NOT_BE_NULL(500, "用户名或密码不能为空");
+    NAME_OR_PASSWORD_CAN_NOT_BE_NULL(500, "用户名或密码不能为空"),
+
+    NAME_OR_PASSWORD_ERROR(500, "用户名或密码错误！");
 
     /**
      * 异常码
