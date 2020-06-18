@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -59,6 +60,7 @@ public class QyAuthController {
      *
      * @return
      */
+    @ResponseBody
     @PostMapping("/login")
     public ServerResponse<Object> login(@Valid LoginDTO loginDTO, BindingResult result) {
         qyAuthService.login(loginDTO);

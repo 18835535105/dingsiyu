@@ -14,13 +14,6 @@ import javax.validation.constraints.NotNull;
 @Data
 public class LoginDTO {
 
-    /**
-     * 登录成功需要跳转的路径
-     */
-    @NotNull(message = "redirectUrl can't be null!")
-    @NotBlank(message = "redirectUrl can't be null!")
-    private String redirectUrl;
-
     @NotNull(message = "openId can't be null!")
     @NotBlank(message = "openId can't be null!")
     private String openId;
