@@ -391,16 +391,16 @@ public class ShipAddEquipmentServiceImpl extends BaseServiceImpl<StudentMapper, 
             if (size <= 0) {
                 number /= 60;
                 if (nextValue == null) {
-                    equMap.put(levelValue, "还差" + number + "分钟在线时常解锁");
+                    equMap.put(levelValue, "还差" + number + "分钟在线时长解锁");
                 } else {
-                    equMap.put(levelValue, "还差" + number + "分钟在线时常到达lv" + nextValue);
+                    equMap.put(levelValue, "还差" + number + "分钟在线时长到达lv" + nextValue);
                 }
             } else {
                 number /= 3600;
                 if (nextValue == null) {
-                    equMap.put(levelValue, "还差" + number + "小时在线时常解锁");
+                    equMap.put(levelValue, "还差" + number + "小时在线时长解锁");
                 } else {
-                    equMap.put(levelValue, "还差" + number + "小时在线时常到达lv" + nextValue);
+                    equMap.put(levelValue, "还差" + number + "小时在线时长到达lv" + nextValue);
                 }
             }
         }
