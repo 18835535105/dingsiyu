@@ -10,10 +10,7 @@ import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.rank.RankOpt;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.DurationUtil;
-import com.zhidejiaoyu.common.utils.MacIpUtil;
-import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
+import com.zhidejiaoyu.common.utils.*;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.locationUtil.LocationUtil;
@@ -507,6 +504,7 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
         boolean flag = redisOpt.firstLogin(student.getId());
         if (flag) {
             student.setAccountTime(new Date(System.currentTimeMillis() + student.getRank() * 24 * 60 * 60 * 1000L));
+            student.setUuid(IdUtil.getId());
             studentMapper.updateById(student);
 
             executorService.execute(() -> {
@@ -518,6 +516,9 @@ public class LoginServiceImpl extends BaseServiceImpl<StudentMapper, Student> im
 
                 initStudentExpansion(student);
             });
+        } else if (StringUtil.isEmpty(student.getUuid())) {
+            student.setUuid(IdUtil.getId());
+            studentMapper.updateById(student);
         }
     }
 
