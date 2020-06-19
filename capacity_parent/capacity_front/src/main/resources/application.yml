@@ -60,6 +60,9 @@ spring:
   mvc:
     servlet:
       load-on-startup: 1
+  servlet:
+    multipart:
+      max-file-size: 15MB
 # 发送者邮箱
 mail:
   fromMail:
@@ -72,7 +75,6 @@ server:
   servlet:
     session:
       timeout: 30m
-
 mybatis:
   type-aliases-package: com.zhidejiaoyu.common.pojo
 

@@ -60,9 +60,6 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
                     .build());
         });
 
-
-
-
         return ServerResponse.createBySuccess();
     }
 
