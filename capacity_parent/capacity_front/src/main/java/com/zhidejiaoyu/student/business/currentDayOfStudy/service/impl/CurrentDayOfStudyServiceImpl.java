@@ -5,6 +5,7 @@ import com.zhidejiaoyu.common.mapper.CurrentDayOfStudyMapper;
 import com.zhidejiaoyu.common.mapper.DurationMapper;
 import com.zhidejiaoyu.common.mapper.GoldLogMapper;
 import com.zhidejiaoyu.common.pojo.CurrentDayOfStudy;
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.vo.CurrentDayOfStudyVo;
@@ -72,8 +73,11 @@ public class CurrentDayOfStudyServiceImpl extends BaseServiceImpl<CurrentDayOfSt
         return ServerResponse.createBySuccess(vo);
     }
 
-    private List<String> getReturnList(String errorTest) {
-        String[] split = errorTest.split("##");
+    private List<String> getReturnList(String errorInfo) {
+        if (StringUtil.isEmpty(errorInfo)) {
+            return null;
+        }
+        String[] split = errorInfo.split("##");
         if (split.length > 0) {
             return Arrays.asList(split);
         }
