@@ -1,0 +1,49 @@
+ip: 39.106.181.151
+spring:
+  profiles: prd
+  servlet:
+    multipart:
+      file-size-threshold: 15MB
+  datasource:
+    # 第一版系统服务器
+    primary:
+      url: jdbc:mysql://${39.106.181.151}:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      username: zdjy
+      password: zdjy
+    # 服务器1
+    server1:
+      url: jdbc:mysql://${39.102.48.73}:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      username: zdjy
+      password: zdjy
+  redis:
+    host: ${ip}
+    port: 6379
+    password: zhide2018
+server:
+  port: 9000
+  tomcat:
+    max-connections: 512
+    threads:
+      min-spare: 20
+      max: 512
+logging:
+  config: classpath:log4j2-prd.xml
+
+# 公众号配置信息
+gongzhonghao:
+  appId: wx876660e0c4b48729
+  secret: 99c6d530ec67582061c731b43e6a2448
+  redirect:
+    # 微信授权结束后跳转的路径
+    partner: ${studyUrl}/partner
+qywx:
+  appId: wwe6e0ef9e01f6d6aa
+  secret: pxf5D_K3F9jFPwRTksCRXERkar3rOdOLmyYfImmv11o
+  # 授权链接
+  authLink: https://open.weixin.qq.com/connect/oauth2/authorize?appid=${qywx.appId}&redirect_uri=${qywx.redirect.redirect_uri}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect
+  redirect:
+    # 企业微信登录地址
+    login: ${studyUrl}/qy/login
+    # 授权后重定向的回调链接地址
+    redirect_uri: ${studyUrl}/ec/qy/authgetUserInfo
+

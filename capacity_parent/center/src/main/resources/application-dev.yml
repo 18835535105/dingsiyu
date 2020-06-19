@@ -1,0 +1,54 @@
+ip: 123.56.142.84
+# 开发环境
+spring:
+  profiles: dev
+  datasource:
+#    url: jdbc:mysql://123.56.142.84:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+#    username: zdjy
+#    password: zdjy
+    # 开发服务器
+    primary:
+      url: jdbc:mysql://123.56.142.84:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      username: zdjy
+      password: zdjy
+    # 服务器1
+    server1:
+      url: jdbc:mysql://39.102.48.73:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      username: root
+      password: zhide8800
+  redis:
+    host: ${ip}
+    port: 6380
+    password: zdjy
+server:
+  port: 9000
+
+logging:
+  level:
+    com:
+      zhidejiaoyu:
+        student: debug
+        common:
+          mapper: debug
+  config: classpath:log4j2-dev.xml
+
+
+# 公众号配置信息
+gongzhonghao:
+  appId: wx991c0b0330281fd1
+  secret: e512f4eae621183834ba2376a63eaa8e
+  redirect:
+    # 微信授权结束后跳转到合伙人测试页面的路径
+    partner: ${studyUrl}/partner
+
+# 企业微信配置信息
+qywx:
+  appId: wwe6e0ef9e01f6d6aa
+  secret: pxf5D_K3F9jFPwRTksCRXERkar3rOdOLmyYfImmv11o
+  # 授权链接
+  authLink: https://open.weixin.qq.com/connect/oauth2/authorize?appid=${qywx.appId}&redirect_uri=${qywx.redirect.redirect_uri}&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect
+  redirect:
+    # 企业微信登录地址
+    login: ${studyUrl}/qy/login
+    # 授权后重定向的回调链接地址
+    redirect_uri: ${studyUrl}/ec/qy/authgetUserInfo

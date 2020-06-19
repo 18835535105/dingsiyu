@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Log4j2 配置文件 参考 https://www.cnblogs.com/keeya/p/10101547.html  -->
+<!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+<!-- monitorInterval=“N” 自动间隔 N 秒检测配置文件是否修改，有修改则自动重新加载配置 可以不设置  -->
+<!-- status="warn" Log4j2 本身日志输出级别 可以不设置 -->
+<configuration>
+    <!-- 变量配置 -->
+    <Properties>
+        <!-- 日志输出格式 -->
+        <property name="LOG_PATTERN"
+                  value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%-5level} [%t] %highlight{%C.%M(%L)}: %msg%n"/>
+        <!-- 日志输出到文件的路径和文件名 根据项目情况更改 value 值 -->
+        <property name="LOG_FILE_PATH" value="log"/>
+        <property name="LOG_FILE_NAME" value="student-capacity-info.log"/>
+    </Properties>
+    <!-- 定义 appenders -->
+    <appenders>
+        <!-- console 设定 控制台输出 -->
+        <console name="Console" target="SYSTEM_OUT">
+            <!-- 指定 输出格式 默认 %msg%n -->
+            <PatternLayout charset="UTF-8" pattern="${LOG_PATTERN}"/>
+            <!-- onMatch="ACCEPT" 只输出 level 级别及级别优先级更高的 Log , onMismatch="DENY" 其他拒绝输出  -->
+            <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+        </console>
+    </appenders>
+
+    <!-- 在 Loggers 引入 Appender 使其生效 -->
+    <loggers>
+
+        <logger name="com.zhidejiaoyu" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+        </logger>
+        <!-- Logger 节点用来单独指定 package 包下的 class 的日志输出格式等信息 -->
+        <logger name="org.springframework" level="info" additivity="false">
+            <!-- 指定 org.springframework 的 level 及更高优先级的日志只在控制台输出 -->
+            <!-- additivity="false" 只在自定义的Appender中进行输出 -->
+            <AppenderRef ref="Console"/>
+        </logger >
+
+        <Root level="info">
+            <!-- 用来指定项目的 Root 日志规则，如果没有单独指定Logger，那么就会默认使用 Root 日志输出 -->
+            <!-- AppenderRef 用来指定日志输出到哪个 Appender -->
+            <AppenderRef ref="Console"/>
+        </Root>
+    </loggers>
+</configuration>

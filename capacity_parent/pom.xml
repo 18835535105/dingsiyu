@@ -22,6 +22,7 @@
         <module>aliyun-vod</module>
         <module>aliyun-common</module>
         <module>aliyun-translate</module>
+        <module>center</module>
     </modules>
 
 
