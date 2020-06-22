@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 /**
@@ -40,19 +41,24 @@ public class QyFlyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, Curre
     @Resource
     private SysUserMapper sysUserMapper;
 
+    @Resource
+    private ExecutorService executorService;
+
     @Override
     public ServerResponse<Object> uploadFlyRecord(MultipartFile file, Long studentId, Integer num) {
 
         String dir = FileConstant.STUDENT_FLY_RECORD + DateUtil.formatYYYYMMDD(new Date()) + "/";
-        String upload = OssUpload.upload(file, dir, IdUtil.getId());
 
-        this.save(CurrentDayOfStudy.builder()
-                .createTime(new Date())
-                .imgUrl(upload)
-                .qrCodeNum(num)
-                .studentId(studentId)
-                .build());
+        executorService.execute(() -> {
+            String upload = OssUpload.upload(file, dir, IdUtil.getId());
 
+            this.save(CurrentDayOfStudy.builder()
+                    .createTime(new Date())
+                    .imgUrl(upload)
+                    .qrCodeNum(num)
+                    .studentId(studentId)
+                    .build());
+        });
 
         return ServerResponse.createBySuccess();
     }
