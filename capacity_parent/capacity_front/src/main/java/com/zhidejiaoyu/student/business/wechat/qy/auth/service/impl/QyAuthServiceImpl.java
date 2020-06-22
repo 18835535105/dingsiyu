@@ -2,11 +2,14 @@ package com.zhidejiaoyu.student.business.wechat.qy.auth.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.zhidejiaoyu.common.constant.CookieConstant;
+import com.zhidejiaoyu.common.exception.Enum.ServiceExceptionEnum;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.SysUserMapper;
+import com.zhidejiaoyu.common.mapper.TeacherMapper;
 import com.zhidejiaoyu.common.pojo.SysUser;
 import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
+import com.zhidejiaoyu.student.business.wechat.qy.auth.dto.LoginDTO;
 import com.zhidejiaoyu.student.business.wechat.qy.auth.service.QyAuthService;
 import com.zhidejiaoyu.student.business.wechat.qy.auth.vo.UserIdToOpenidVO;
 import com.zhidejiaoyu.student.business.wechat.qy.auth.vo.UserInfoVO;
@@ -38,6 +41,9 @@ public class QyAuthServiceImpl implements QyAuthService {
 
     @Resource
     private SysUserMapper sysUserMapper;
+
+    @Resource
+    private TeacherMapper teacherMapper;
 
     @Override
     public SysUser getUserInfo() {
@@ -76,6 +82,33 @@ public class QyAuthServiceImpl implements QyAuthService {
 
         addAuthCookie(userInfoVO);
         return getSysUser(userInfoVO);
+    }
+
+    @Override
+    public void login(LoginDTO loginDTO) {
+        SysUser sysUser = sysUserMapper.selectByAccount(StringUtil.trim(loginDTO.getAccount()));
+        if (sysUser == null) {
+            throw new ServiceException(ServiceExceptionEnum.NAME_OR_PASSWORD_ERROR);
+        }
+
+        // 如果账号已绑定过企业微信，不可再次被绑定
+        if (StringUtil.isNotEmpty(sysUser.getOpenid())) {
+            throw new ServiceException("该账号已有人绑定，请联系技术中心同事！");
+        }
+
+        String password;
+        if (sysUser.getAccount().contains("xg")) {
+            password = teacherMapper.selectPasswordBySchoolAdminId(sysUser.getId());
+        } else {
+            password = teacherMapper.countByTeacherId(sysUser.getId());
+        }
+
+        if (!Objects.equals(StringUtil.trim(loginDTO.getPassword()), StringUtil.trim(password))) {
+            throw new ServiceException(ServiceExceptionEnum.NAME_OR_PASSWORD_ERROR);
+        }
+
+        sysUser.setOpenid(loginDTO.getOpenId());
+        sysUserMapper.updateById(sysUser);
     }
 
     /**

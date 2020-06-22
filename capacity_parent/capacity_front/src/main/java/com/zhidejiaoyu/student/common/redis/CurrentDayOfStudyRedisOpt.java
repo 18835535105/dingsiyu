@@ -76,7 +76,8 @@ public class CurrentDayOfStudyRedisOpt {
     }
 
     public String getStudyModelAndTestStudyCurrent(String redisStr, Long studentId) {
-        return redisTemplate.opsForHash().get(redisStr + studentId, 1).toString();
+        Object o = redisTemplate.opsForHash().get(redisStr + studentId, 1);
+        return o == null ? "" : o.toString();
     }
 
     /**

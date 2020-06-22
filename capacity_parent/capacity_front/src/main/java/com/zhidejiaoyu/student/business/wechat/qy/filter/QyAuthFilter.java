@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.wechat.qy.filter;
 
+import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.SysUserMapper;
 import com.zhidejiaoyu.common.pojo.SysUser;
 import com.zhidejiaoyu.common.utils.StringUtil;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
+import javax.servlet.annotation.WebInitParam;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -20,8 +22,8 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
-@WebFilter(urlPatterns = "/qy/**")
-public class QyAutoFilter implements Filter {
+@WebFilter(urlPatterns = "/qy/**", initParams = {@WebInitParam(name = "exclusions", value = "/qy/auth")})
+public class QyAuthFilter implements Filter {
 
     @Resource
     private SysUserMapper sysUserMapper;
@@ -44,9 +46,7 @@ public class QyAutoFilter implements Filter {
         if (StringUtil.isNotEmpty(openId)) {
             SysUser sysUser = sysUserMapper.selectByOpenId(openId);
             if (sysUser == null) {
-                log.info("当前用户还未绑定企业微信，即将前往登录页绑定！");
-                response.sendRedirect(authLink);
-                return;
+                throw new ServiceException("当前用户还未绑定企业微信，即将前往登录页绑定！");
             }
         }
         filterChain.doFilter(servletRequest, servletResponse);

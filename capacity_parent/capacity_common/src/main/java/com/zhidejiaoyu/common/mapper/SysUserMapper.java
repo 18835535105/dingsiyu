@@ -21,4 +21,12 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      * @return
      */
     SysUser selectByOpenId(@Param("openId") String openId);
+
+    /**
+     * 通过账号查询用户信息
+     *
+     * @param account
+     * @return
+     */
+    SysUser selectByAccount(String account);
 }

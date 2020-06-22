@@ -27,5 +27,11 @@
         where openid = #{openId}
         limit 1
     </select>
+    <select id="selectByAccount" resultMap="BaseResultMap" parameterType="map">
+        select *
+        from sys_user
+        where account = #{account}
+        limit 1
+    </select>
 
 </mapper>
