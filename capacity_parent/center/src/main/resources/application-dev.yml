@@ -3,10 +3,7 @@ ip: 123.56.142.84
 spring:
   profiles: dev
   datasource:
-#    url: jdbc:mysql://123.56.142.84:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-#    username: zdjy
-#    password: zdjy
-    # 开发服务器
+    # 开发服务器，中台
     primary:
       url: jdbc:mysql://123.56.142.84:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       username: zdjy
@@ -27,7 +24,7 @@ logging:
   level:
     com:
       zhidejiaoyu:
-        student: debug
+        center: debug
         common:
           mapper: debug
   config: classpath:log4j2-dev.xml
