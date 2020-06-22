@@ -79,8 +79,4 @@ public class PublicAccountController {
         return forEntity.getBody();
     }
 
-    public static void main(String[] args) {
-        System.out.println("so that".equals("so that"));
-    }
-
 }
