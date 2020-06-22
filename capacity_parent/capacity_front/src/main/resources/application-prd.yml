@@ -1,4 +1,4 @@
-
+ip: 39.106.181.151
 spring:
   profiles: prd
   servlet:
@@ -21,7 +21,6 @@ server:
 logging:
   config: classpath:log4j2-prd.xml
 
-ip: 39.106.181.151
 studyUrl: https://www.yydz100.com
 adminDomin: https://admin.duizhang100.cn/dept
 

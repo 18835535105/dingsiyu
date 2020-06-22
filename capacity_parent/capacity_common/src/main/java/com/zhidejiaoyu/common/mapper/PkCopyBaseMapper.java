@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhidejiaoyu.common.pojo.PkCopyBase;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,8 @@ public interface PkCopyBaseMapper extends BaseMapper<PkCopyBase> {
      * 查询学生单日副本挑战情况
      *
      * @param studentId
+     * @param firstDayOfWeek 当前周第一天日期
      * @return
      */
-    List<Map<String, Object>> selectPersonPkInfoByStudentId(@Param("studentId") Long studentId);
+    List<Map<String, Object>> selectPersonPkInfoByStudentId(@Param("studentId") Long studentId, @Param("firstDayOfWeek") Date firstDayOfWeek);
 }
