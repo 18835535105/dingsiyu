@@ -79,9 +79,6 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
     private FinishGroupOrUnit finishGroupOrUnit;
 
     @Resource
-    private SyntaxUnitMapper syntaxUnitMapper;
-
-    @Resource
     private RedisOpt redisOpt;
 
     @Resource
@@ -290,24 +287,13 @@ public class FreeFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, Stu
             return ServerResponse.createBySuccess(flowVO);
         }
 
-        if (Objects.equals(dto.getModelType(), 5)) {
-            // 语法模块
-            SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
-            learnNew = initData.saveLearnNew(NodeDto.builder()
-                    .student(student)
-                    .courseId(syntaxUnit.getCourseId())
-                    .unitId(unitId)
-                    .easyOrHard(easyOrHard)
-                    .build(), 1, dto.getModelType() - 1);
-        } else {
-            UnitNew unitNew = unitNewMapper.selectById(unitId);
-            learnNew = initData.saveLearnNew(NodeDto.builder()
-                    .student(student)
-                    .courseId(unitNew.getCourseId())
-                    .unitId(unitId)
-                    .easyOrHard(easyOrHard)
-                    .build(), 1, dto.getModelType() - 1);
-        }
+        UnitNew unitNew = unitNewMapper.selectById(unitId);
+        learnNew = initData.saveLearnNew(NodeDto.builder()
+                .student(student)
+                .courseId(unitNew.getCourseId())
+                .unitId(unitId)
+                .easyOrHard(easyOrHard)
+                .build(), 1, dto.getModelType() - 1);
 
         setFirstFalseAdd(studentId, learnNew, redisOpt);
         setFreeGroup(learnNew);

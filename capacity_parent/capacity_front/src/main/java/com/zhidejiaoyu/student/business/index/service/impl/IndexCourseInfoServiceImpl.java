@@ -6,7 +6,6 @@ import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.CourseConfig;
 import com.zhidejiaoyu.common.pojo.CourseNew;
 import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.SyntaxCourse;
 import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.grade.GradeUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
@@ -63,12 +62,6 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
     @Resource
     private UnitNewMapper unitNewMapper;
-
-    @Resource
-    private SyntaxCourseMapper syntaxCourseMapper;
-
-    @Resource
-    private SyntaxUnitMapper syntaxUnitMapper;
 
     @Resource
     private TestRecordMapper testRecordMapper;
@@ -134,14 +127,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
     @Override
     public ServerResponse<Object> getUnitInfo(UnitInfoDTO dto) {
-
-        List<Map<String, Object>> map;
-        if (dto.getType() == SYNTAX_MODEL_TYPE) {
-            map = syntaxUnitMapper.selectIdAndNameByCourseId(dto.getCourseId());
-        } else {
-            map = unitNewMapper.selectIdAndNameByCourseId(dto.getCourseId(), dto.getType());
-        }
-
+        List<Map<String, Object>> map = unitNewMapper.selectIdAndNameByCourseId(dto.getCourseId(), dto.getType());
         return ServerResponse.createBySuccess(map);
     }
 
@@ -211,11 +197,10 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             }
 
             List<CourseNew> courseNews = courseNewMapper.selectBatchIds(smallCourseIds);
-            // 匹配不到年级和上下册的课程不展示
-            courseNews.stream().filter(courseNew -> checkCanShowPicture(courseNew.getGrade(), courseNew.getLabel()))
-                    .forEach(courseNew -> packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, courseNew));
+            courseNews.forEach(courseNew -> packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, courseNew));
         }
-
+        currentGrade.sort((currentGrade1, currentGrade2) -> (int) (currentGrade1.getCourseId() - currentGrade2.getCourseId()));
+        previousGrade.sort((previousGrade1, previousGrade2) -> (int) (previousGrade1.getCourseId() - previousGrade2.getCourseId()));
         return ServerResponse.createBySuccess(CourseInfoVO.builder()
                 .currentGrade(currentGrade)
                 .previousGrade(previousGrade)
@@ -328,6 +313,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
 
     /**
      * 封装语法课程响应数据
+     * 获取跟课程配置中同年级、上下册的语法数据
      *
      * @param student
      * @param courseIds
@@ -336,7 +322,8 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
      */
     private void packageSyntaxInfoVO(Student student, List<Long> courseIds, List<CourseVO> previousGrade, List<CourseVO> currentGrade) {
         // 获取所有语法课程数据
-        Map<Long, Map<String, Object>> syntaxCourseMap = syntaxCourseMapper.selectByCourseNewIds(courseIds);
+        List<CourseNew> courseNews = courseNewMapper.selectBatchIds(courseIds);
+        Map<Long, Map<String, Object>> syntaxCourseMap = courseNewMapper.selectByCourseNews(courseNews);
 
         List<Long> syntaxCourseIds = new ArrayList<>();
         // 各个课程下所有单元个数
@@ -346,7 +333,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             syntaxCourseIds.add(courseId);
 
             Map<Long, Object> map1 = new HashMap<>(16);
-            map1.put(courseId, map.get("unitCount"));
+            map1.put(courseId, map.get(COUNT));
             unitCountInCourse.put(courseId, map1);
         });
 
@@ -357,34 +344,15 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             String grade = map.get("grade").toString();
             String label = map.get("label").toString();
 
-            // 匹配不到年级和上下册的课程不展示
-            if (!checkCanShowPicture(grade, label)) {
-                return;
-            }
-
-            SyntaxCourse syntaxCourse = SyntaxCourse.builder()
+            CourseNew courseNew = CourseNew.builder()
                     .id(courseId)
                     .grade(grade)
                     .label(label)
+                    .status(1)
                     .build();
 
-            this.packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, syntaxCourse);
+            this.packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, courseNew);
         });
-    }
-
-    /**
-     * 检测当前课程是否有图片
-     *
-     * @param grade
-     * @param label
-     * @return <ul>
-     * <li>true：有图片 </li>
-     * <li>false：没有图片</li>
-     * </ul>
-     */
-    private boolean checkCanShowPicture(String grade, String label) {
-        return !(!MAPPING.containsKey(grade) || !MAPPING.containsKey(label)
-                || Objects.equals(grade, "一年级") || Objects.equals(grade, "二年级"));
     }
 
     /**
@@ -393,37 +361,26 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
      * @param learnUnitCountInCourse
      * @param previousGrade
      * @param currentGrade
-     * @param object
+     * @param courseNew
      */
     private void packageVO(Student student, Map<Long, Map<Long, Object>> unitCountInCourse,
                            Map<Long, Map<Long, Object>> learnUnitCountInCourse,
-                           List<CourseVO> previousGrade, List<CourseVO> currentGrade, Object object) {
-        String grade;
-        Long courseId;
+                           List<CourseVO> previousGrade, List<CourseVO> currentGrade, CourseNew courseNew) {
+        String grade = StringUtils.isNotBlank(courseNew.getGradeExt()) ? courseNew.getGradeExt() : courseNew.getGrade();
+        Long courseId = courseNew.getId();
+
+        CourseVO.CourseVOBuilder courseVoBuilder = CourseVO.builder()
+                .courseId(courseId)
+                .grade(courseNew.getGrade() + "（" + courseNew.getLabel() + "）")
+                .englishGrade(getGradeAndLabelEnglishName(grade, courseNew.getLabel()));
+
         // 单元总个数
         long totalUnitCount;
-        CourseVO.CourseVOBuilder courseVoBuilder;
-        if (object instanceof CourseNew) {
-            CourseNew courseNew = (CourseNew) object;
-
-            grade = StringUtils.isNotBlank(courseNew.getGradeExt()) ? courseNew.getGradeExt() : courseNew.getGrade();
-            courseId = courseNew.getId();
-            courseVoBuilder = CourseVO.builder()
-                    .courseId(courseId)
-                    .grade(courseNew.getGrade() + "（" + courseNew.getLabel() + "）")
-                    .englishGrade(getGradeAndLabelEnglishName(grade, courseNew.getLabel()));
-
-            totalUnitCount = this.getUnitCount(unitCountInCourse, courseId) * 2;
-        } else {
-            SyntaxCourse syntaxCourse = (SyntaxCourse) object;
-
-            grade = syntaxCourse.getGrade();
-            courseId = syntaxCourse.getId();
-            courseVoBuilder = CourseVO.builder()
-                    .courseId(courseId)
-                    .grade(syntaxCourse.getGrade() + "（" + syntaxCourse.getLabel() + "）")
-                    .englishGrade(getGradeAndLabelEnglishName(grade, syntaxCourse.getLabel()));
+        if (Objects.equals(courseNew.getStatus(), 1)) {
+            // 语法
             totalUnitCount = Long.parseLong(unitCountInCourse.get(courseId).get(courseId).toString()) * 2;
+        } else {
+            totalUnitCount = this.getUnitCount(unitCountInCourse, courseId) * 2;
         }
 
         // 已学单元总个数

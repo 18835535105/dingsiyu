@@ -153,11 +153,10 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
 
         //查看慧默写  会听写  单词图鉴是否为上次学习 如果是 删除
         //          开始
-        boolean flag;
         //查看当前数据是否为以前学习过的数据
         List<StudyCapacity> studyCapacities = studyCapacityMapper.selectByStudentIdAndUnitIdAndWordIdAndType(studentId, getVo.getUnitId(), getVo.getWordId(), getVo.getType());
 
-        flag = studyCapacities.size() > 0 && studyCapacities.get(0).getPush().getTime() < System.currentTimeMillis();
+        boolean flag = studyCapacities.size() > 0 && studyCapacities.get(0).getPush().getTime() < System.currentTimeMillis();
 
         if (currentLearn == null && flag) {
             studyCapacityMapper.deleteByStudentIdAndUnitIdAndVocabulary(studentId, getVo.getUnitId(), getVo.getWordId(), getVo.getType());
@@ -205,14 +204,14 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                 learnExtend.setFirstIsKnow(0);
                 // 单词不认识将该单词记入记忆追踪中
                 studyCapacityLearn.saveCapacityMemory(learnNew, learnExtend, student, false, getVo.getType());
-                Long feldId = 0L;
+                Long fieldId = 0L;
                 if (getVo.getModel().equals(1)) {
-                    feldId = CurrentDayOfStudyUtil.getSessionCurrent(VOCABULARY);
+                    fieldId = CurrentDayOfStudyUtil.getSessionCurrent(VOCABULARY);
                 }
                 if (getVo.getModel().equals(2)) {
-                    feldId = CurrentDayOfStudyUtil.getSessionCurrent(SENTENCE);
+                    fieldId = CurrentDayOfStudyUtil.getSessionCurrent(SENTENCE);
                 }
-                if (feldId.equals(0L)) {
+                if (fieldId.equals(0L)) {
                     if (getVo.getModel().equals(1)) {
                         currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_WORD, studentId, getVo.getWordId());
                     }
@@ -221,10 +220,10 @@ public class SaveData extends BaseServiceImpl<LearnNewMapper, LearnNew> {
                     }
                 } else {
                     if (getVo.getModel().equals(1)) {
-                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_WORD, studentId, feldId);
+                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_WORD, studentId, fieldId);
                     }
                     if (getVo.getModel().equals(2)) {
-                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_SENTENCE, studentId, feldId);
+                        currentDayOfStudyRedisOpt.saveStudyCurrent(RedisKeysConst.ERROR_SENTENCE, studentId, fieldId);
                     }
                 }
                 saveErrorLearnLog(getVo.getUnitId(), getVo.getType(), getVo.getEasyOrHard(), getVo.getStudyModel(), learnNew, new Long[]{learnExtend.getWordId()}, null);

@@ -13,6 +13,7 @@ import com.zhidejiaoyu.common.pojo.KnowledgePoint;
 import com.zhidejiaoyu.common.pojo.LearnNew;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejiaoyu.common.pojo.SyntaxTopic;
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -154,7 +155,7 @@ public class LearnSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
 
     public static List<KnowledgePointVO.SyntaxContent> getContent(String content) {
         // 包含【】##内容
-        String[] split = content.split("\\$\\$");
+        String[] split = StringUtil.replaceSpecialSpaceToNormalSpace(content).split("\\$\\$");
         return Arrays.stream(split).filter(StringUtils::isNotEmpty).map(str -> {
             // 分割成【】   内容
             String[] split1 = str.split("##");

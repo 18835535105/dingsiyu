@@ -41,7 +41,7 @@ public class LearnNewController extends BaseController {
     @Resource
     private IStudyService sentencePatternGameService;
 
-    private Map<Integer, IStudyService> map = new HashMap<>();
+    private final Map<Integer, IStudyService> map = new HashMap<>();
 
     @PostConstruct
     private void initMap() {
@@ -94,8 +94,7 @@ public class LearnNewController extends BaseController {
      * @return
      */
     @RequestMapping("/saveStudy")
-    public Object saveStudy(HttpSession session, Integer getModel,
-                            GetVo getVo) {
+    public Object saveStudy(HttpSession session, Integer getModel, GetVo getVo) {
         IStudyService iStudyService = map.get(getModel);
         return iStudyService.saveStudy(session, getVo);
     }

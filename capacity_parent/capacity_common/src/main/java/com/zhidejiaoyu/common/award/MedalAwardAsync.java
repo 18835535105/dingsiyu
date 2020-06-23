@@ -1,6 +1,5 @@
 package com.zhidejiaoyu.common.award;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zhidejiaoyu.common.constant.MedalConstant;
 import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
@@ -66,7 +65,7 @@ public class MedalAwardAsync extends BaseAwardAsync {
     private StudentExpansionMapper studentExpansionMapper;
 
     @Resource
-    private SyntaxCourseMapper syntaxCourseMapper;
+    private CourseNewMapper courseNewMapper;
 
     /**
      * 初出茅庐勋章
@@ -742,9 +741,9 @@ public class MedalAwardAsync extends BaseAwardAsync {
      */
     public void monsterMedal(Student student, Long courseId) {
         Long studentId = student.getId();
-        SyntaxCourse syntaxCourse = syntaxCourseMapper.selectById(courseId);
-        if (syntaxCourse != null) {
-            List<Medal> medals = medalMapper.selectList(new QueryWrapper<Medal>().like("parent_name", syntaxCourse.getGrade() + syntaxCourse.getLabel()));
+        CourseNew courseNew = courseNewMapper.selectById(courseId);
+        if (courseNew != null) {
+            List<Medal> medals = medalMapper.selectList(new QueryWrapper<Medal>().like("parent_name", courseNew.getGrade() + courseNew.getLabel()));
             try {
                 if (!CollectionUtils.isEmpty(medals)) {
                     Award award = awardMapper.selectByStudentIdAndMedalType(studentId, medals.get(0).getId());

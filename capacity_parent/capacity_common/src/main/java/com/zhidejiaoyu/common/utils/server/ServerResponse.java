@@ -1,6 +1,7 @@
 package com.zhidejiaoyu.common.utils.server;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -11,6 +12,7 @@ import java.io.Serializable;
  * @author wuchenxi
  * @date 2018年4月25日 上午11:48:15
  */
+@ToString
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ServerResponse<T> implements Serializable {
 
