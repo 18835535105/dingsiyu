@@ -55,4 +55,15 @@ public class GetVo {
      */
     private Long[] errorId;
 
+    public void setIsKnown(Boolean isKnown) {
+        this.isKnown = isKnown;
+    }
+
+    public Boolean getIsKnown() {
+        return this.isKnown;
+    }
+
+    public Boolean isKnown() {
+        return this.isKnown;
+    }
 }

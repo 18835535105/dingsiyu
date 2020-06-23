@@ -72,6 +72,10 @@
             join unit_sentence_new usn on usn.unit_id = u.id
         </if>
 
+        <if test="type == 3">
+            join syntax_unit_topic_new usn on usn.unit_id = u.id
+        </if>
+
         <if test="type == 4">
             join unit_teks_new utn on utn.unit_id = u.id
         </if>
@@ -83,10 +87,33 @@
         group by u.id
         order by u.id
     </select>
-    <select id="selectMaxUnitByCourseId" resultMap="BaseResultMap" parameterType="map">
+    <select id="selectSyntaxMaxUnitByCourseId" resultMap="BaseResultMap" parameterType="map">
         select
         <include refid="more_table_sql"/>
-        from unit_new un
+        from unit_new un, syntax_unit_topic_new sutn
+        where un.id = sutn.unit_id
+        order by un.id desc
+        limit 1
+    </select>
+    <select id="selectMaxUnitIdByUnitId" resultType="java.lang.Long" parameterType="map">
+        select Max(id)
+        from unit_new
+        where course_id = (select course_id from unit_new where id = #{unitId} limit 1)
+    </select>
+    <select id="selectSyntaxUnitLikeJointName" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from unit_new un, syntax_unit_topic_new sutn
+        where un.id = sutn.unit_id
+        and un.joint_name like concat('%', #{jointName}, '%')
+        group by un.id
+    </select>
+    <select id="selectNextSyntaxUnitByCourseId" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from unit_new un, syntax_unit_topic_new sutn
+        where un.id = sutn.unit_id and un.course_id = #{courseId}
+        and un.id > #{unitId}
         order by un.id desc
         limit 1
     </select>

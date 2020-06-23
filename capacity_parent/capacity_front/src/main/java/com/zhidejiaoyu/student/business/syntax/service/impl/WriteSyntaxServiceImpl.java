@@ -7,14 +7,8 @@ import com.zhidejiaoyu.common.constant.studycapacity.StudyCapacityTypeConstant;
 import com.zhidejiaoyu.common.constant.syntax.SyntaxModelNameConstant;
 import com.zhidejiaoyu.common.dto.syntax.NeedViewDTO;
 import com.zhidejiaoyu.common.dto.syntax.SaveSyntaxDTO;
-import com.zhidejiaoyu.common.mapper.KnowledgePointMapper;
-import com.zhidejiaoyu.common.mapper.LearnExtendMapper;
-import com.zhidejiaoyu.common.mapper.SyntaxTopicMapper;
-import com.zhidejiaoyu.common.mapper.SyntaxUnitMapper;
-import com.zhidejiaoyu.common.pojo.KnowledgePoint;
-import com.zhidejiaoyu.common.pojo.Student;
-import com.zhidejiaoyu.common.pojo.SyntaxTopic;
-import com.zhidejiaoyu.common.pojo.SyntaxUnit;
+import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.server.ResponseCode;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
@@ -64,7 +58,7 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
     private MedalAwardAsync medalAwardAsync;
 
     @Resource
-    private SyntaxUnitMapper syntaxUnitMapper;
+    private UnitNewMapper unitNewMapper;
 
     @Resource
     private LearnExtendMapper learnExtendMapper;
@@ -121,8 +115,8 @@ public class WriteSyntaxServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, S
      */
     private void saveMonsterMedal(Student student, Long unitId) {
         executorService.execute(() -> {
-            SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
-            medalAwardAsync.monsterMedal(student, syntaxUnit.getCourseId());
+            UnitNew unitNew = unitNewMapper.selectById(unitId);
+            medalAwardAsync.monsterMedal(student, unitNew.getCourseId());
         });
     }
 

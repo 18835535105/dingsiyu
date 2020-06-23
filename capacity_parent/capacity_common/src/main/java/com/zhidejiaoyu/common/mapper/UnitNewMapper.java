@@ -72,10 +72,35 @@ public interface UnitNewMapper extends BaseMapper<UnitNew> {
     List<Map<String, Object>> selectIdAndNameByCourseId(@Param("courseId") Long courseId, @Param("type") Integer type);
 
     /**
-     * 查询当前课程最大的单元信息
+     * 查询语法模块当前课程最大的单元信息
      *
      * @param courseId
      * @return
      */
-    UnitNew selectMaxUnitByCourseId(@Param("courseId") Long courseId);
+    UnitNew selectSyntaxMaxUnitByCourseId(@Param("courseId") Long courseId);
+
+    /**
+     * 查询最大单元id
+     *
+     * @param unitId
+     * @return
+     */
+    Long selectMaxUnitIdByUnitId(@Param("unitId") Long unitId);
+
+    /**
+     * 根据jointName模糊查询
+     *
+     * @param jointName
+     * @return
+     */
+    UnitNew selectSyntaxUnitLikeJointName(String jointName);
+
+    /**
+     * 获取语法模块当前课程的下一个单元信息
+     *
+     * @param unitId
+     * @param courseId
+     * @return
+     */
+    UnitNew selectNextSyntaxUnitByCourseId(@Param("unitId") Long unitId, @Param("courseId") Long courseId);
 }
