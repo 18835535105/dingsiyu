@@ -1,8 +1,9 @@
 package com.zhidejioayu.center.business.wechat.publicaccount.partner.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.zhidejiaoyu.common.mapper.PartnerMapper;
-import com.zhidejiaoyu.common.pojo.Partner;
+import com.zhidejiaoyu.common.mapper.center.PartnerMapper;
+import com.zhidejiaoyu.common.pojo.center.Partner;
+import com.zhidejiaoyu.common.utils.IdUtil;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejioayu.center.business.wechat.publicaccount.partner.constant.PartnerConstant;
 import com.zhidejioayu.center.business.wechat.publicaccount.partner.dto.SavePartnerDTO;
@@ -53,6 +54,7 @@ public class PartnerServiceImpl extends ServiceImpl<PartnerMapper, Partner> impl
                 .stream()
                 .map(key -> {
                     Partner partner = new Partner();
+                    partner.setId(IdUtil.getId());
                     partner.setEconomicValue(economicFalseValue);
                     partner.setImgUrl(savePartnerDto.getImgUrl());
                     partner.setOpenId(savePartnerDto.getOpenId());

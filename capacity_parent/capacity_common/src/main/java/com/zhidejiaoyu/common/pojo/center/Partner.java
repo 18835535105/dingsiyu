@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.common.pojo;
+package com.zhidejiaoyu.common.pojo.center;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -11,15 +11,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * <p>
- *
- * </p>
- *
- * @author zdjy
- * @since 2020-05-13
- * @deprecated 放到中台数据库中
+ * @author: wuchenxi
+ * @date: 2020/6/23 17:34:34
  */
-@Deprecated
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
@@ -27,8 +21,8 @@ public class Partner implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    @TableId(value = "id", type = IdType.ASSIGN_UUID)
+    private String id;
 
     /**
      * openId

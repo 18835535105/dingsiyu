@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.common.pojo;
+package com.zhidejiaoyu.common.pojo.center;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

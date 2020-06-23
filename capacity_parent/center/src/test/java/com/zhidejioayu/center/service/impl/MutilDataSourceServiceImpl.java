@@ -1,8 +1,8 @@
 package com.zhidejioayu.center.service.impl;
 
-import com.zhidejiaoyu.common.mapper.ServerConfigMapper;
+import com.zhidejiaoyu.common.mapper.center.ServerConfigMapper;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
-import com.zhidejiaoyu.common.pojo.ServerConfig;
+import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.pojo.Student;
 import com.zhidejioayu.center.mutidatasource.annotion.DataSource;
 import com.zhidejioayu.center.mutidatasource.constant.DataSourceConstant;

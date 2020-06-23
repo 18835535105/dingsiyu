@@ -3,19 +3,19 @@ ip: 123.56.142.84
 spring:
   profiles: dev
   datasource:
-    url: jdbc:mysql://123.56.142.84:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-    username: zdjy
-    password: zdjy
-#    # 开发服务器，中台
-#    primary:
-#      url: jdbc:mysql://123.56.142.84:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-#      username: zdjy
-#      password: zdjy
-#    # 服务器1
-#    server1:
-#      url: jdbc:mysql://39.102.48.73:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-#      username: root
-#      password: zhide8800
+#    url: jdbc:mysql://123.56.142.84:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+#    username: zdjy
+#    password: zdjy
+    # 开发服务器，中台
+    primary:
+      url: jdbc:mysql://123.56.142.84:3306/center?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      username: zdjy
+      password: zdjy
+    # 服务器1
+    server1:
+      url: jdbc:mysql://123.56.142.84:3306/zdjy?useUnicode=true&characterEncoding=utf8&useSSL=false&&useJDBCCompliantTimezoneShift=true&&useLegacyDatetimeCode=false&&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      username: zdjy
+      password: zdjy
   redis:
     host: ${ip}
     port: 6380
