@@ -4,6 +4,7 @@ import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejioayu.center.business.wechat.common.AccessTokenVO;
 import com.zhidejioayu.center.business.wechat.publicaccount.constant.ApiConstant;
+import com.zhidejioayu.center.business.wechat.smallapp.constant.SmallAppApiConstant;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -40,7 +41,7 @@ public class AccessTokenUtil {
      *
      * @return
      */
-    /*public static String getSmallAppAccessToken() {
+    public static String getSmallAppAccessToken() {
         String key = RedisKeysConst.SMALL_APP_WECHAT_ACCESS_TOKEN;
         String accessToken = getAccessTokenFromRedis(key);
         if (accessToken == null) {
@@ -53,7 +54,7 @@ public class AccessTokenUtil {
             return token;
         }
         return accessToken;
-    }*/
+    }
 
     /**
      * 获取微信公众号基础支持的 access_token
