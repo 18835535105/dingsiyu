@@ -138,7 +138,7 @@
     </select>
     <select id="selectByCourseNews" resultType="java.util.Map" parameterType="map">
         select
-        cn.id, cn.grade, cn.label, count(un.id) count
+        cn.id, cn.grade, cn.label, count(DISTINCT un.id) count
         from course_new cn, unit_new un, syntax_unit_topic_new sutn
         where un.course_id = cn.id and sutn.unit_id = un.id
         and (

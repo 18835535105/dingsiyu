@@ -317,8 +317,8 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
      *
      * @param student
      * @param courseIds
-     * @param previousGrade      其他年级
-     * @param currentGrade       当前年级
+     * @param previousGrade 其他年级
+     * @param currentGrade  当前年级
      */
     private void packageSyntaxInfoVO(Student student, List<Long> courseIds, List<CourseVO> previousGrade, List<CourseVO> currentGrade) {
         // 获取所有语法课程数据
@@ -333,7 +333,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
             syntaxCourseIds.add(courseId);
 
             Map<Long, Object> map1 = new HashMap<>(16);
-            map1.put(courseId, map);
+            map1.put(courseId, map.get(COUNT));
             unitCountInCourse.put(courseId, map1);
         });
 
@@ -348,6 +348,7 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                     .id(courseId)
                     .grade(grade)
                     .label(label)
+                    .status(1)
                     .build();
 
             this.packageVO(student, unitCountInCourse, learnUnitCountInCourse, previousGrade, currentGrade, courseNew);
@@ -365,11 +366,8 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
     private void packageVO(Student student, Map<Long, Map<Long, Object>> unitCountInCourse,
                            Map<Long, Map<Long, Object>> learnUnitCountInCourse,
                            List<CourseVO> previousGrade, List<CourseVO> currentGrade, CourseNew courseNew) {
-        String grade;
-        Long courseId;
-
-        grade = StringUtils.isNotBlank(courseNew.getGradeExt()) ? courseNew.getGradeExt() : courseNew.getGrade();
-        courseId = courseNew.getId();
+        String grade = StringUtils.isNotBlank(courseNew.getGradeExt()) ? courseNew.getGradeExt() : courseNew.getGrade();
+        Long courseId = courseNew.getId();
 
         CourseVO.CourseVOBuilder courseVoBuilder = CourseVO.builder()
                 .courseId(courseId)
@@ -377,7 +375,13 @@ public class IndexCourseInfoServiceImpl extends BaseServiceImpl<CourseConfigMapp
                 .englishGrade(getGradeAndLabelEnglishName(grade, courseNew.getLabel()));
 
         // 单元总个数
-        long totalUnitCount = this.getUnitCount(unitCountInCourse, courseId) * 2;
+        long totalUnitCount;
+        if (Objects.equals(courseNew.getStatus(), 1)) {
+            // 语法
+            totalUnitCount = Long.parseLong(unitCountInCourse.get(courseId).get(courseId).toString()) * 2;
+        } else {
+            totalUnitCount = this.getUnitCount(unitCountInCourse, courseId) * 2;
+        }
 
         // 已学单元总个数
         long learnedUnitCount = this.getUnitCount(learnUnitCountInCourse, courseId);

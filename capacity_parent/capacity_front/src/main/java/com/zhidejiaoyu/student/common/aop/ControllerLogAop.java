@@ -34,7 +34,6 @@ public class ControllerLogAop {
         long startTime = System.currentTimeMillis();
         Object proceed = pjp.proceed();
         printLog(startTime);
-        log.info("result={}", proceed.toString());
         return proceed;
     }
 
