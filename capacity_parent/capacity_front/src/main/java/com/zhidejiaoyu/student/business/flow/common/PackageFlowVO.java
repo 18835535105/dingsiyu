@@ -2,10 +2,11 @@ package com.zhidejiaoyu.student.business.flow.common;
 
 import com.zhidejiaoyu.common.dto.NodeDto;
 import com.zhidejiaoyu.common.mapper.CourseNewMapper;
-import com.zhidejiaoyu.common.mapper.SyntaxCourseMapper;
-import com.zhidejiaoyu.common.mapper.SyntaxUnitMapper;
 import com.zhidejiaoyu.common.mapper.UnitNewMapper;
-import com.zhidejiaoyu.common.pojo.*;
+import com.zhidejiaoyu.common.pojo.CourseNew;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.StudyFlowNew;
+import com.zhidejiaoyu.common.pojo.UnitNew;
 import com.zhidejiaoyu.common.utils.TokenUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.vo.flow.FlowVO;
@@ -30,12 +31,6 @@ public class PackageFlowVO {
 
     @Resource
     private CourseNewMapper courseNewMapper;
-
-    @Resource
-    private SyntaxUnitMapper syntaxUnitMapper;
-
-    @Resource
-    private SyntaxCourseMapper syntaxCourseMapper;
 
     /**
      * 封装非语法响应信息
@@ -73,33 +68,29 @@ public class PackageFlowVO {
      * @return
      */
     public FlowVO packageSyntaxFlowVO(NodeDto dto) {
+
         Long unitId = dto.getUnitId();
         Student student = dto.getStudent();
-        StudyFlowNew studyFlowNew = dto.getStudyFlowNew();
         Boolean lastUnit = dto.getLastUnit();
-
-        SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
-        SyntaxCourse syntaxCourse = syntaxCourseMapper.selectById(syntaxUnit.getCourseId());
-
-        String englishGrade = IndexCourseInfoServiceImpl.getGradeAndLabelEnglishName(syntaxCourse.getGrade(), syntaxCourse.getLabel());
-
+        StudyFlowNew studyFlowNew = dto.getStudyFlowNew();
+        UnitNew unitNew = unitNewMapper.selectById(unitId);
+        CourseNew courseNew = courseNewMapper.selectById(unitNew.getCourseId());
         String token = TokenUtil.getToken();
         HttpUtil.getHttpSession().setAttribute("token", token);
 
+        String englishGrade = IndexCourseInfoServiceImpl.getGradeAndLabelEnglishName(courseNew.getGrade(), courseNew.getLabel());
         return FlowVO.builder()
-                .courseId(syntaxCourse.getId())
-                .grade(syntaxCourse.getGrade() + "-" + syntaxCourse.getLabel())
+                .courseId(courseNew.getId())
+                .courseName(courseNew.getCourseName())
                 .id(studyFlowNew.getId())
                 .modelName(studyFlowNew.getModelName())
-                .unitId(syntaxUnit.getId())
-                .unitName(syntaxUnit.getUnitName())
+                .unitId(unitNew.getId())
+                .unitName(unitNew.getUnitName())
                 .token(token)
                 .lastUnit(lastUnit)
                 .englishGrade(englishGrade)
-                .unitIndex(syntaxUnit.getUnitIndex())
+                .unitIndex(unitNew.getUnitIndex())
                 .petName(StringUtils.isEmpty(student.getPetName()) ? "大明白" : student.getPetName())
                 .build();
     }
-
-
 }

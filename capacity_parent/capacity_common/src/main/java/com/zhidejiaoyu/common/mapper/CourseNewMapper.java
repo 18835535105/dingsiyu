@@ -95,4 +95,13 @@ public interface CourseNewMapper extends BaseMapper<CourseNew> {
      */
     @MapKey("id")
     Map<Long, Map<Long, Object>> selectUnitsWordSum(long courseId);
+
+    /**
+     * 获取语法数据
+     *
+     * @param courseNews
+     * @return
+     */
+    @MapKey("id")
+    Map<Long, Map<String, Object>> selectByCourseNews(@Param("courseNews") List<CourseNew> courseNews);
 }

@@ -85,9 +85,6 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
     private FinishGroupOrUnit finishGroupOrUnit;
 
     @Resource
-    private SyntaxUnitMapper syntaxUnitMapper;
-
-    @Resource
     private RedisOpt redisOpt;
 
     @Resource
@@ -262,7 +259,7 @@ public class StudyFlowServiceImpl extends BaseServiceImpl<StudyFlowNewMapper, St
         }
         FlowVO vo;
         if (Objects.equals(studyFlowNew.getFlowName(), FlowConstant.FLOW_SIX)) {
-            Long maxUnitId = syntaxUnitMapper.selectMaxUnitIdByUnitId(learnNew.getUnitId());
+            Long maxUnitId = unitNewMapper.selectMaxUnitIdByUnitId(learnNew.getUnitId());
             boolean isLastUnit = Objects.equals(maxUnitId, learnNew.getUnitId());
             vo = packageFlowVO.packageSyntaxFlowVO(NodeDto.builder()
                     .student(student)

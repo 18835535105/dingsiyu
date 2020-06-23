@@ -49,7 +49,7 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     private SyntaxTopicMapper syntaxTopicMapper;
 
     @Resource
-    private SyntaxUnitMapper syntaxUnitMapper;
+    private UnitNewMapper unitNewMapper;
 
     @Resource
     private StudentStudySyntaxMapper studentStudySyntaxMapper;
@@ -99,8 +99,8 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     }
 
     private void updateStudentStudyPlanToUnComplete(Long unitId, Student student) {
-        SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
-        List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selectByStudentIdAndCourseId(student.getId(), syntaxUnit.getCourseId(), 7);
+        UnitNew unitNew = unitNewMapper.selectById(unitId);
+        List<StudentStudyPlan> studentStudyPlans = studentStudyPlanMapper.selectByStudentIdAndCourseId(student.getId(), unitNew.getCourseId(), 7);
         int competeState = 2;
         if (CollectionUtils.isNotEmpty(studentStudyPlans) && Objects.equals(studentStudyPlans.get(0).getComplete(), competeState)) {
             StudentStudyPlan studentStudyPlan = studentStudyPlans.get(0);
@@ -139,8 +139,8 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
     private List<SyntaxTopic> getSyntaxTopics(Long unitId) {
         List<SyntaxTopic> syntaxTopics = syntaxTopicMapper.selectSelectSyntaxByUnitId(unitId);
         if (CollectionUtils.isEmpty(syntaxTopics)) {
-            SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
-            log.error("语法单元[{} - {}]没有没有选语法题目！", syntaxUnit.getId(), syntaxUnit.getJointName());
+            UnitNew unitNew = unitNewMapper.selectById(unitId);
+            log.error("语法单元[{} - {}]没有没有选语法题目！", unitNew.getId(), unitNew.getJointName());
             throw new ServiceException(500, "未查询到游戏题目！");
         }
         List<SyntaxTopic> result = new ArrayList<>(syntaxTopics);
@@ -316,11 +316,11 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
      * @param unitId 语法单元id
      */
     private void printGetSyntaxGameNoDataLog(Long unitId) {
-        SyntaxUnit syntaxUnit = syntaxUnitMapper.selectById(unitId);
-        if (syntaxUnit == null) {
+        UnitNew unitNew = unitNewMapper.selectById(unitId);
+        if (unitNew == null) {
             log.error("未查询到id=[{}]的语法单元！", unitId);
         } else {
-            log.error("语法单元[{}]没有对应的语法内容！", syntaxUnit.getJointName());
+            log.error("语法单元[{}]没有对应的语法内容！", unitNew.getJointName());
         }
     }
 
