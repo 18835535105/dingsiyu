@@ -32,7 +32,7 @@ logging:
           mapper: debug
   config: classpath:log4j2-dev.xml
 
-
+studyUrl: http://dev.center.duizhang100.cn
 # 公众号配置信息
 gongzhonghao:
   appId: wx991c0b0330281fd1
