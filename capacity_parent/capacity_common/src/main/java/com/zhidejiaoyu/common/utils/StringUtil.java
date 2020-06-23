@@ -52,6 +52,19 @@ public class StringUtil {
         return StringUtils.trim(str).replace(SPECIAL_SPACE, "");
     }
 
+    /**
+     * 将特殊的空格替换为普通空格
+     *
+     * @param str
+     * @return
+     */
+    public static String replaceSpecialSpaceToNormalSpace(String str) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        return str.replace(SPECIAL_SPACE, SPACE);
+    }
+
     public static boolean isEmpty(String str) {
         return StringUtils.isEmpty(str);
     }

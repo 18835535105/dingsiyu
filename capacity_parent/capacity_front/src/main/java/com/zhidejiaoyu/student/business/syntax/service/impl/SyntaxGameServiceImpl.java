@@ -10,6 +10,7 @@ import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.*;
 import com.zhidejiaoyu.common.pojo.*;
 import com.zhidejiaoyu.common.utils.BigDecimalUtil;
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejiaoyu.common.utils.http.HttpUtil;
 import com.zhidejiaoyu.common.utils.pet.PetSayUtil;
 import com.zhidejiaoyu.common.utils.pet.PetUrlUtil;
@@ -93,9 +94,10 @@ public class SyntaxGameServiceImpl extends BaseServiceImpl<SyntaxTopicMapper, Sy
      * @return
      */
     public static String replace(SyntaxTopic syntaxTopic) {
-        return syntaxTopic.getTopic().startsWith("$")
-                ? syntaxTopic.getTopic().replace("$&$", "___ ")
-                : syntaxTopic.getTopic().replace("$&$", " ___ ");
+        String topic = StringUtil.replaceSpecialSpaceToNormalSpace(syntaxTopic.getTopic());
+        return topic.startsWith("$")
+                ? topic.replace("$&$", "___ ")
+                : topic.replace("$&$", " ___ ");
     }
 
     private void updateStudentStudyPlanToUnComplete(Long unitId, Student student) {
