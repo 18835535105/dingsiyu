@@ -201,4 +201,5 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
      */
     List<Map<String, Object>> countByStudentIdsAndStartDateAndEndDate(@Param("studentIds") List<Long> studentIds, @Param("startDate") String startDate, @Param("endDate") String endDate);
 
+    Integer countByStudentIdAndStartDateAndEndDate(@Param("studentId") Long id,@Param("startTime") String startTime,@Param("endTime") String endTime);
 }

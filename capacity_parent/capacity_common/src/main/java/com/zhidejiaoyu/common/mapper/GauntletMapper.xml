@@ -41,8 +41,10 @@
     <select id="selByStudentIdAndFormat" parameterType="map" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from gauntlet where challenger_student_id=#{studentId} and
-        to_days(create_time) = to_days(#{time}) and challenger_point is not null;
+        from gauntlet where challenger_student_id=#{studentId}
+        and
+        to_days(create_time) = to_days(#{time})
+        and challenger_point is not null;
     </select>
 
     <select id="getInformation" parameterType="map" resultType="int">
@@ -304,6 +306,15 @@
         where challenger_student_id = #{studentId}
           and create_time >= #{startDate}
           and create_time &lt;= #{endDate}
+          and challenger_point is not null
+        group by challenger_student_id
+    </select>
+    <select id="countByStudentIdAndStartDateAndEndDate" parameterType="map" resultType="integer">
+        select count(id)
+        from gauntlet
+        where challenger_student_id = #{studentId}
+          and create_time >= #{startTime}
+          and create_time &lt;= #{endTime}
           and challenger_point is not null
         group by challenger_student_id
     </select>
