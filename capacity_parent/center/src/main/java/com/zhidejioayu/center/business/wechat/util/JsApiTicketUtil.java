@@ -77,7 +77,7 @@ public class JsApiTicketUtil {
         JSONObject jsonObject = JSON.parseObject(response);
 
         if (jsonObject.getInteger("errcode") != 0) {
-            log.error("获取ticket失败！");
+            log.error("获取ticket失败！msg={}", response);
             return "";
         }
 
