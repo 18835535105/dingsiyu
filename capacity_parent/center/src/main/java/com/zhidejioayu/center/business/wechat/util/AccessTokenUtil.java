@@ -2,6 +2,7 @@ package com.zhidejioayu.center.business.wechat.util;
 
 import com.zhidejiaoyu.common.constant.redis.RedisKeysConst;
 import com.zhidejiaoyu.common.exception.ServiceException;
+import com.zhidejiaoyu.common.utils.StringUtil;
 import com.zhidejioayu.center.business.wechat.common.AccessTokenVO;
 import com.zhidejioayu.center.business.wechat.publicaccount.constant.ApiConstant;
 import com.zhidejioayu.center.business.wechat.smallapp.constant.SmallAppApiConstant;
@@ -64,9 +65,9 @@ public class AccessTokenUtil {
     public static String getPublicAccountAccessToken() {
         String key = RedisKeysConst.PUBLIC_ACCOUNT_WECHAT_ACCESS_TOKEN;
         String accessToken = getAccessTokenFromRedis(key);
-        if (accessToken == null) {
+        if (StringUtil.isEmpty(accessToken)) {
             AccessTokenVO accessTokenVo = restTemplate.getForObject(ApiConstant.getAccessTokenApi(), AccessTokenVO.class);
-            if (accessTokenVo == null) {
+            if (accessTokenVo == null || StringUtil.isEmpty(accessTokenVo.getAccess_token())) {
                 throw new ServiceException("获取微信公众号 access_token 失败！");
             }
             String token = accessTokenVo.getAccess_token();
