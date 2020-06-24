@@ -1,10 +1,15 @@
 package com.zhidejioayu.center.business.wechat.smallapp.serivce.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.mapper.StudentMapper;
+import com.zhidejiaoyu.common.mapper.center.BusinessUserInfoMapper;
+import com.zhidejiaoyu.common.mapper.center.ServerConfigMapper;
 import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.center.BusinessUserInfo;
+import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejioayu.center.business.wechat.smallapp.constant.SmallAppApiConstant;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.AuthorizationDTO;
@@ -20,7 +25,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Objects;
 
 /**
  * @author: wuchenxi
@@ -36,58 +40,24 @@ public class AuthorizationServiceImpl extends ServiceImpl<StudentMapper, Student
     @Resource
     private RestTemplate restTemplate;
 
+    @Resource
+    private BusinessUserInfoMapper businessUserInfoMapper;
+
+    @Resource
+    private ServerConfigMapper serverConfigMapper;
+
     @Override
     public ServerResponse<Object> bind(BindAccountDTO dto) {
 
         String currentOpenid = dto.getOpenId();
-        // 判断当前用户是否已绑定队长账号
-        Student checkStudent = studentMapper.selectByOpenId(currentOpenid);
-        String account = dto.getAccount().trim();
-        if (checkStudent != null && !Objects.equals(checkStudent.getAccount(), account)) {
-            log.warn("openid=[{}]的用户已绑定学生账号[{}]，无法再次绑定其他学生账号！", currentOpenid, checkStudent.getAccount());
-            return ServerResponse.createBySuccess(401, "您已绑定其他队长账号！");
+        ServerConfig serverConfig = serverConfigMapper.selectStudentServerByOpenid(currentOpenid);
+
+        if (serverConfig != null) {
+            String s = restTemplate.postForObject(serverConfig.getServerUrl() + "/ec/smallApp/authorization/bind", dto, String.class);
+            return JSONObject.parseObject(s, ServerResponse.class);
         }
 
-        if (checkStudent != null && Objects.equals(checkStudent.getAccount(), account)) {
-            // 当前用户已经绑定过当前队长账号，无需再次绑定
-            log.info("openid=[{}]的用户已绑定学生账号[{}]，无需再次绑定，验证通过！", currentOpenid, checkStudent.getAccount());
-            return ServerResponse.createBySuccess();
-        }
-
-        Student student = studentMapper.selectByAccount(account);
-        if (student == null || !Objects.equals(student.getPassword(), dto.getPassword().trim())) {
-            return ServerResponse.createByError(400, "账号或密码输入错误！");
-        }
-
-        if (StringUtils.isEmpty(student.getHeadUrl())) {
-            return ServerResponse.createByError(400, "夺分系统未登录过，请先登陆夺分系统！");
-        }
-
-        String openid = student.getOpenid();
-        String splitCode = ",";
-        if (StringUtils.isNotEmpty(openid) && openid.split(splitCode).length >= 3) {
-            // 已绑定三个小程序，不能绑定
-            return ServerResponse.createByError(400, "英雄学员你好，外部绑定已经超过限额，请联系基地导师解除原有绑定。");
-        }
-
-        if (StringUtils.isEmpty(openid)) {
-            updateOpenId(student, currentOpenid);
-            return ServerResponse.createBySuccess();
-        }
-
-        if (openid.contains(currentOpenid)) {
-            return ServerResponse.createBySuccess();
-        }
-
-        if (openid.endsWith(splitCode)) {
-            openid = openid + currentOpenid;
-        } else {
-            openid = openid + splitCode + currentOpenid;
-        }
-
-        updateOpenId(student, openid);
-
-        return ServerResponse.createBySuccess();
+        throw new ServiceException(400, "中台服务器为查询到openid=" + currentOpenid + "的学生或者校管信息！");
     }
 
     @Override
@@ -109,8 +79,8 @@ public class AuthorizationServiceImpl extends ServiceImpl<StudentMapper, Student
 
         // 验证小程序是否已经绑定队长账号
         String openid = authorizationDTO.getOpenid();
-        Student student = studentMapper.selectByOpenId(openid);
-        if (student == null) {
+        BusinessUserInfo businessUserInfo = businessUserInfoMapper.selectStudentInfoByOpenId(openid);
+        if (businessUserInfo == null) {
             // 当前用户还未绑定队长账号
             return ServerResponse.createBySuccess(501, authorizationVo);
         }

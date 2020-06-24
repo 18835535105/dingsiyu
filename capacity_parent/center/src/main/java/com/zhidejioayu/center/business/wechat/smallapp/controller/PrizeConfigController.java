@@ -1,7 +1,7 @@
 package com.zhidejioayu.center.business.wechat.smallapp.controller;
 
-import com.zhidejiaoyu.student.business.controller.BaseController;
-import com.zhidejiaoyu.student.business.wechat.smallapp.serivce.PrizeConfigService;
+import com.zhidejioayu.center.business.wechat.smallapp.dto.PrizeConfigDTO;
+import com.zhidejioayu.center.business.wechat.smallapp.serivce.PrizeConfigService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,15 +14,15 @@ import javax.annotation.Resource;
  * @date: 2020/2/14 15:42:00
  */
 @RestController
-@RequestMapping("/smallApp/prizeConfig")
-public class PrizeConfigController extends BaseController {
+@RequestMapping("/wechat/smallApp/prizeConfig")
+public class PrizeConfigController {
 
     @Resource
     private PrizeConfigService prizeConfigService;
 
     @RequestMapping("/getPrizeConfig")
-    public Object getPrize(String openId, Long adminId, Long studentId,String weChatimgUrl,String weChatName) {
-        return prizeConfigService.getPrizeConfig(openId, adminId, studentId,weChatimgUrl,weChatName);
+    public Object getPrize(PrizeConfigDTO dto) {
+        return prizeConfigService.getPrizeConfig(dto);
     }
 
 

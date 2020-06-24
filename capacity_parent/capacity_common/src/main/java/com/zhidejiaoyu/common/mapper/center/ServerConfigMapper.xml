@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zhidejiaoyu.common.mapper.center.ServerConfigMapper">
-  <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.center.ServerConfig">
-    <id column="id" jdbcType="VARCHAR" property="id" />
-    <result column="server_no" jdbcType="VARCHAR" property="serverNo" />
-    <result column="server_name" jdbcType="VARCHAR" property="serverName" />
-    <result column="server_ip" jdbcType="VARCHAR" property="serverIp" />
-    <result column="server_url" jdbcType="VARCHAR" property="serverUrl" />
-  </resultMap>
-  <sql id="Base_Column_List">
-    id, server_no, `server_name`, server_ip, server_url
-  </sql>
+    <resultMap id="BaseResultMap" type="com.zhidejiaoyu.common.pojo.center.ServerConfig">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="server_no" jdbcType="VARCHAR" property="serverNo"/>
+        <result column="server_name" jdbcType="VARCHAR" property="serverName"/>
+        <result column="server_ip" jdbcType="VARCHAR" property="serverIp"/>
+        <result column="server_url" jdbcType="VARCHAR" property="serverUrl"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, server_no, `server_name`, server_ip, server_url
+    </sql>
+    <sql id="more_table_sql">
+        sc.id, sc.server_no, sc.`server_name`, sc.server_ip, sc.server_url
+    </sql>
+    <select id="selectStudentServerByOpenid" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="more_table_sql"/>
+        from server_config sc,
+        business_user_info bui
+        where sc.id = bui.server_config_id
+        and bui.openid = #{openid}
+        and bui.account like 'dz%'
+        limit 1
+    </select>
 
 </mapper>

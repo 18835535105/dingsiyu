@@ -4,7 +4,6 @@ import com.zhidejiaoyu.common.exception.ServiceException;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.PrizeDTO;
 import com.zhidejioayu.center.business.wechat.smallapp.serivce.IndexService;
-import com.zhidejioayu.center.business.wechat.smallapp.vo.index.IndexVO;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -31,11 +30,9 @@ public class IndexController {
     @Resource
     private IndexService smallAppIndexService;
 
-    @Resource
 
-
-    @Resource
-    private ShipIndexService shipIndexService;
+//    @Resource
+//    private ShipIndexService shipIndexService;
 
     /**
      * 首页数据
@@ -108,8 +105,9 @@ public class IndexController {
         if (StringUtils.isEmpty(openId)) {
             throw new ServiceException("openId can't be null");
         }
-        IndexVO.MyState radar = shipIndexService.getBaseState(openId);
-        return ServerResponse.createBySuccess(radar);
+//        IndexVO.MyState radar = shipIndexService.getBaseState(openId);
+//        return ServerResponse.createBySuccess(radar);
+        return null;
     }
 
     /**

@@ -89,19 +89,20 @@ public class FlyOfStudyServiceImpl extends ServiceImpl<CurrentDayOfStudyMapper, 
             return ServerResponse.createByError(400, "未查询到当前二维码的学习信息！");
         }
 
-        return ServerResponse.createBySuccess(StudyInfoVO.builder()
-                .contents(currentDayOfStudy.getStudyModel() == null ? new String[0] : currentDayOfStudy.getStudyModel().split("##"))
-                .date(currentDayOfStudy.getCreateTime() == null ? "" : DateUtil.formatYYYYMMDD(currentDayOfStudy.getCreateTime()))
-                .errorSentence(currentDayOfStudy.getSentence() == null ? new String[0] : currentDayOfStudy.getSentence().split("##"))
-                .errorSyntax(currentDayOfStudy.getSyntax() == null ? new String[0] : currentDayOfStudy.getSyntax().split("##"))
-                .errorTest(currentDayOfStudy.getTest() == null ? new String[0] : currentDayOfStudy.getTest().split("##"))
-                .errorText(currentDayOfStudy.getText() == null ? new String[0] : currentDayOfStudy.getText().split("##"))
-                .errorWord(currentDayOfStudy.getWord() == null ? new String[0] : currentDayOfStudy.getWord().split("##"))
-                .totalGold(currentDayOfStudy.getGold())
-                .totalOnlineTime(currentDayOfStudy.getOnlineTime())
-                .totalValidTime(currentDayOfStudy.getValidTime())
-                .imgUrl(GetOssFile.getPublicObjectUrl(currentDayOfStudy.getImgUrl()))
-                .build());
+        return null;
+//        return ServerResponse.createBySuccess(StudyInfoVO.builder()
+//                .contents(currentDayOfStudy.getStudyModel() == null ? new String[0] : currentDayOfStudy.getStudyModel().split("##"))
+//                .date(currentDayOfStudy.getCreateTime() == null ? "" : DateUtil.formatYYYYMMDD(currentDayOfStudy.getCreateTime()))
+//                .errorSentence(currentDayOfStudy.getSentence() == null ? new String[0] : currentDayOfStudy.getSentence().split("##"))
+//                .errorSyntax(currentDayOfStudy.getSyntax() == null ? new String[0] : currentDayOfStudy.getSyntax().split("##"))
+//                .errorTest(currentDayOfStudy.getTest() == null ? new String[0] : currentDayOfStudy.getTest().split("##"))
+//                .errorText(currentDayOfStudy.getText() == null ? new String[0] : currentDayOfStudy.getText().split("##"))
+//                .errorWord(currentDayOfStudy.getWord() == null ? new String[0] : currentDayOfStudy.getWord().split("##"))
+//                .totalGold(currentDayOfStudy.getGold())
+//                .totalOnlineTime(currentDayOfStudy.getOnlineTime())
+//                .totalValidTime(currentDayOfStudy.getValidTime())
+//                .imgUrl(GetOssFile.getPublicObjectUrl(currentDayOfStudy.getImgUrl()))
+//                .build());
     }
 
     @Override

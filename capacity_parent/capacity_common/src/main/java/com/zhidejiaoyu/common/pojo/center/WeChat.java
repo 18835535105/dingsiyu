@@ -1,4 +1,4 @@
-package com.zhidejiaoyu.common.pojo;
+package com.zhidejiaoyu.common.pojo.center;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -15,18 +15,16 @@ import java.io.Serializable;
  *
  * @author zdjy
  * @since 2020-05-13
- * @deprecated 迁移到中台服务
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@Deprecated
 public class WeChat implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
-      @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    @TableId(value = "id", type = IdType.UUID)
+    private String id;
 
     /**
      * openId

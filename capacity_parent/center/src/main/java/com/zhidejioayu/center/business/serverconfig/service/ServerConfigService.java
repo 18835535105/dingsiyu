@@ -9,5 +9,5 @@ import com.zhidejiaoyu.common.pojo.center.ServerConfig;
  */
 public interface ServerConfigService extends IService<ServerConfig> {
 
-    userinfo
+
 }

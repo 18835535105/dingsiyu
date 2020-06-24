@@ -1,6 +1,6 @@
 package com.zhidejioayu.center.business.wechat.smallapp.vo.index;
 
-import com.zhidejiaoyu.student.business.wechat.smallapp.vo.TotalDataVO;
+import com.zhidejioayu.center.business.wechat.smallapp.vo.TotalDataVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

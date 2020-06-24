@@ -1,22 +1,18 @@
 package com.zhidejioayu.center.business.wechat.smallapp.serivce.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
 import com.zhidejiaoyu.aliyunoss.putObject.OssUpload;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.FileConstant;
-import com.zhidejiaoyu.common.constant.TimeConstant;
-import com.zhidejiaoyu.common.constant.study.PointConstant;
-import com.zhidejiaoyu.common.constant.test.GenreConstant;
-import com.zhidejiaoyu.common.constant.test.StudyModelConstant;
 import com.zhidejiaoyu.common.exception.ServiceException;
-import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.rank.WeekActivityRankOpt;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
-import com.zhidejiaoyu.common.utils.goldUtil.StudentGoldAdditionUtil;
-import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
+import com.zhidejiaoyu.common.mapper.StudentMapper;
+import com.zhidejiaoyu.common.mapper.center.ServerConfigMapper;
+import com.zhidejiaoyu.common.mapper.center.WeChatMapper;
+import com.zhidejiaoyu.common.pojo.Student;
+import com.zhidejiaoyu.common.pojo.center.WeChat;
+import com.zhidejiaoyu.common.pojo.center.ServerConfig;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejioayu.center.business.wechat.smallapp.dto.GetLimitQRCodeDTO;
 import com.zhidejioayu.center.business.wechat.smallapp.serivce.SmallProgramTestService;
@@ -24,12 +20,14 @@ import com.zhidejioayu.center.business.wechat.smallapp.util.CreateWxQrCodeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.net.URLEncoder;
-import java.util.*;
 
 /**
  * 首页数据
@@ -42,174 +40,38 @@ import java.util.*;
 public class SmallProgramTestServiceImpl extends ServiceImpl<StudentMapper, Student> implements SmallProgramTestService {
 
     @Resource
-    private StudentMapper studentMapper;
-    @Resource
-    private ErrorLearnLogMapper errorLearnLogMapper;
-    @Resource
-    private VocabularyMapper vocabularyMapper;
-    @Resource
-    private StudentStudyPlanNewMapper studentStudyPlanNewMapper;
-    @Resource
-    private TeacherMapper teacherMapper;
-    @Resource
-    private ShareConfigMapper shareConfigMapper;
-    @Resource
-    private TestRecordMapper testRecordMapper;
-    @Resource
-    private BaiduSpeak baiduSpeak;
+    private ServerConfigMapper serverConfigMapper;
 
     @Resource
-    private ClockInMapper clockInMapper;
+    private RestTemplate restTemplate;
+
     @Resource
     private WeChatMapper weChatMapper;
 
-    @Resource
-    private WeekActivityRankOpt weekActivityRankOpt;
-
     @Override
     public Object getTest(HttpSession session, String openId) {
-        Student student = studentMapper.selectByOpenId(openId);
-        if (session.getAttribute(TimeConstant.BEGIN_START_TIME) == null) {
-            session.setAttribute(TimeConstant.BEGIN_START_TIME, new Date());
-        }
-        List<Map<String, Object>> maps = errorLearnLogMapper.selectVocabularyByStudentId(student.getId());
+        ServerConfig serverConfig = getServerConfig(openId);
 
-        Map<String, Object> returnMap = new HashMap<>();
-        if (maps.size() == 0) {
-            //获取优先级最大的单元
-            StudentStudyPlanNew studentStudyPlanNew = studentStudyPlanNewMapper.selectMaxFinalByStudentId(student.getId());
-            //获取当前单元的单词
-            List<Vocabulary> vocabularies = vocabularyMapper.selectByUnitId(studentStudyPlanNew.getUnitId());
-            vocabularies.forEach(vocabulary -> {
-                Map<String, Object> listMap = new HashMap<>();
-                listMap.put("wordId", vocabulary.getId());
-                listMap.put("word", vocabulary.getWord());
-                listMap.put("wordChinese", vocabulary.getWordChinese());
-                listMap.put("listenUtrl", baiduSpeak.getLanguagePath(vocabulary.getWord()));
-                maps.add(listMap);
-            });
-        } else {
-            List<Map<String, Object>> mapList = new ArrayList<>();
-            maps.forEach(map -> {
-                map.put("listenUtrl", baiduSpeak.getLanguagePath(map.get("word").toString()));
-                mapList.add(map);
-            });
-        }
-        returnMap.put("gold", student.getSystemGold().intValue());
-        //获取单词id
-        List<Long> vocabularyIds = new ArrayList<>();
-        maps.forEach(map -> vocabularyIds.add(Long.parseLong(map.get("wordId").toString())));
-        List<Map<String, Object>> getMaps = new ArrayList<>(maps);
-        if (getMaps.size() > 15) {
-            getMaps = getMaps.subList(0, 15);
-        }
-
-        returnMap.put("optionList", getOptionList(getMaps, vocabularyIds));
-        returnMap.put("writeList", getWriteList(getMaps));
-        //更新获取单词复习数量
-        updateErrorLearnLog(vocabularyIds, student.getId());
-        return returnMap;
+        String forObject = restTemplate.getForObject(serverConfig.getServerUrl() + "/ec/smallApp/test/getTest?openId=" + openId, String.class);
+        return JSONObject.parseObject(forObject, ServerResponse.class);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @GoldChangeAnnotation
     public Object saveTest(Integer point, HttpSession session, String openId) {
-        Student student = studentMapper.selectByOpenId(openId);
-        Map<String, Object> returnMap = new HashMap<>();
-        Date startDate = (Date) session.getAttribute(TimeConstant.BEGIN_START_TIME);
-        Date date = new Date();
-        Long studentId = student.getId();
-        if (point > PointConstant.EIGHTY) {
-            TestRecord testRecord = new TestRecord();
-            testRecord.setGenre(GenreConstant.SMALLAPP_GENRE);
-            testRecord.setStudyModel(StudyModelConstant.SMALLAPP_STUDY_MODEL);
-            testRecord.setStudentId(studentId);
-            testRecord.setTestEndTime(date);
-            testRecord.setPoint(point);
-            testRecord.setTestStartTime(startDate);
-            returnMap.put("point", point);
-            testRecordMapper.insert(testRecord);
-        } else {
-            returnMap.put("point", 0);
-        }
 
-        int count = clockInMapper.countTodayInfoByStudentId(studentId);
-        if (count == 0) {
-            this.saveClockIn(studentId);
-            this.awardGold(student);
-        }
+        ServerConfig serverConfig = getServerConfig(openId);
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>(16);
+        params.add("point", point);
+        params.add("openId", openId);
 
-        Integer adminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
-        ShareConfig shareConfig = shareConfigMapper.selectByAdminId(adminId);
-        if (shareConfig == null) {
-            returnMap.put("img", null);
-            returnMap.put("word", "sfdfssdfsfsdfsdddsdfsdfsdf");
-        } else {
-            returnMap.put("img", GetOssFile.getPublicObjectUrl(shareConfig.getImgUrl()));
-            returnMap.put("word", shareConfig.getImgWord());
-        }
-        returnMap.put("gold", student.getSystemGold().intValue());
-        returnMap.put("studentId", studentId);
-        returnMap.put("studentName", student.getNickname());
-        returnMap.put("headPortrait", GetOssFile.getPublicObjectUrl(student.getHeadUrl()));
-
-        // 打卡天数（非连续打卡天数）
-        int cardDays = clockInMapper.countByStudentId(student.getId());
-        returnMap.put("cardDays", cardDays);
-
-        // 更新每周活动连续打卡奖励进度
-        weekActivityRankOpt.updateWeekActivitySchoolRank(student);
-
-        return returnMap;
-    }
-
-    /**
-     * 奖励金币
-     *
-     * @param student
-     */
-    public void awardGold(Student student) {
-
-        Long studentId = student.getId();
-
-        Integer cardDays1 = clockInMapper.selectLaseCardDays(studentId);
-
-        int awardGold = 50;
-        if (cardDays1 != null && cardDays1 >= 3) {
-            // 连续打卡大于等于3天，额外奖励20金币
-            awardGold += 20;
-        }
-        // 金币加成
-        Double goldAddition = StudentGoldAdditionUtil.getGoldAddition(student, awardGold);
-        student.setSystemGold(BigDecimalUtil.add(student.getSystemGold(), goldAddition));
-        studentMapper.updateById(student);
-
-        GoldLogUtil.saveStudyGoldLog(studentId, GenreConstant.SMALLAPP_GENRE, (int) Math.floor(goldAddition));
-    }
-
-    /**
-     * 保存打卡记录
-     *
-     * @param studentId
-     */
-    public void saveClockIn(Long studentId) {
-
-        Date yesterday = DateUtil.getBeforeDaysDate(new Date(), 1);
-        Integer cardDays = clockInMapper.selectCardDaysByStudentIdAndCardTime(studentId, yesterday);
-
-        clockInMapper.insert(ClockIn.builder()
-                .type(1)
-                .studentId(studentId)
-                .createTime(new Date())
-                .cardTime(new Date())
-                .cardDays(cardDays == null ? 1 : (cardDays + 1))
-                .build());
+        String forObject = restTemplate.postForObject(serverConfig.getServerUrl() + "/ec/smallApp/test/saveTest", params, String.class);
+        return JSONObject.parseObject(forObject, ServerResponse.class);
     }
 
     @Override
     public Object getQRCode(String openId, String weChatName, String weChatImgUrl) {
-        // .path("pages/support2/support?openid=" + openId + "&weChatName=" + weChatName + "&weChatImgUrl=" + weChatImgUrl)
         WeChat weChat = weChatMapper.selectByOpenId(openId);
         if (weChat == null) {
             weChat = new WeChat();
@@ -252,89 +114,12 @@ public class SmallProgramTestServiceImpl extends ServiceImpl<StudentMapper, Stud
         return ServerResponse.createByError(500, "生成小程序码失败！");
     }
 
-    private void updateErrorLearnLog(List<Long> vocabularyIds, Long studentId) {
-        List<ErrorLearnLog> errorLearnLogs = errorLearnLogMapper.selectVocabularyByStudentIdAndVocabularyIds(studentId, vocabularyIds);
-        errorLearnLogs.forEach(log -> {
-            Integer reviewCount = log.getReviewCount();
-            if (reviewCount == null) {
-                log.setReviewCount(1);
-            } else {
-                log.setReviewCount(reviewCount + 1);
-            }
-            errorLearnLogMapper.updateById(log);
-        });
-    }
-
-    private List<Map<String, Object>> getWriteList(List<Map<String, Object>> getMaps) {
-        List<Map<String, Object>> returnList = new ArrayList<>();
-        getMaps.forEach(map -> {
-            Map<String, Object> returnMap = new HashMap<>();
-            returnMap.put("subject", map.get("wordChinese"));
-            returnMap.put("answer", map.get("word"));
-            returnMap.put("listenUtrl", map.get("listenUtrl"));
-            returnList.add(returnMap);
-        });
-
-        return returnList;
-    }
-
-
-    private List<Map<String, Object>> getOptionList(List<Map<String, Object>> getMaps, List<Long> vocabularyIds) {
-        //获取干扰项
-        List<String> strings = vocabularyMapper.selectChineseByNotVocabularyIds(vocabularyIds);
-        List<Map<String, Object>> returnList = new ArrayList<>();
-        getMaps.forEach(map -> {
-            Collections.shuffle(strings);
-
-            String wordChinese = map.get("wordChinese").toString();
-            List<String> chineses = getAnswer(strings, wordChinese);
-            chineses.add(wordChinese);
-            Map<String, Object> returnMap = new HashMap<>();
-            returnMap.put("subject", map.get("word").toString());
-            returnMap.put("listenUtrl", map.get("listenUtrl"));
-            List<Map<String, Object>> optionList = new ArrayList<>();
-            for (String chinese : chineses) {
-                Map<String, Object> booleanMap = new HashMap<>();
-                if (wordChinese.equals(chinese)) {
-                    booleanMap.put("title", chinese);
-                    booleanMap.put("result", true);
-                } else {
-                    booleanMap.put("title", chinese);
-                    booleanMap.put("result", false);
-                }
-                optionList.add(booleanMap);
-            }
-            Collections.shuffle(optionList);
-            returnMap.put("option", optionList);
-            returnList.add(returnMap);
-        });
-
-        return returnList;
-    }
-
-    private List<String> getAnswer(List<String> strings, String wordChinese) {
-        List<String> stringAll = new ArrayList<>(strings);
-        List<String> strings1 = stringAll.subList(0, 3);
-        if (stringAll.size() > 0) {
-            stringAll.remove(wordChinese);
+    public ServerConfig getServerConfig(String openId) {
+        ServerConfig serverConfig = serverConfigMapper.selectStudentServerByOpenid(openId);
+        if (serverConfig == null) {
+            throw new ServiceException(400, "中台服务器为查询到openid=" + openId + "的学生或者校管信息！");
         }
-        /*List<String> removeList = new ArrayList<>();
-        for (String str : strings1) {
-            if (str.equals(wordChinese)) {
-                removeList.add(str);
-            }
-        }
-        if (removeList.size() > 0) {
-            if(strings1.size()>0){
-                stringAll.remove(strings1);
-            }
-            strings1.removeAll(removeList);
-            Collections.shuffle(stringAll);
-            int size = strings1.size();
-            int addSize = 4 - size;
-            strings1.addAll(stringAll.subList(0, addSize));
-        }*/
-        return strings1;
+        return serverConfig;
     }
 
 
