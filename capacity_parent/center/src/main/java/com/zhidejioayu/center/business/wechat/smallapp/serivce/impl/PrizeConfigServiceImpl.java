@@ -44,7 +44,7 @@ public class PrizeConfigServiceImpl extends ServiceImpl<PrizeConfigMapper, Prize
 
         ServerConfig serverConfig = getServerConfig(dto.getOpenId());
 
-        String s = restTemplate.getForObject(serverConfig.getServerUrl() + "/ec/smallApp/prizeConfig/getPrizeConfig", String.class, dto);
+        String s = restTemplate.getForObject(serverConfig.getStudentServerUrl() + "/ec/smallApp/prizeConfig/getPrizeConfig", String.class, dto);
         return JSONObject.parseObject(s, ServerResponse.class);
     }
 
@@ -53,7 +53,7 @@ public class PrizeConfigServiceImpl extends ServiceImpl<PrizeConfigMapper, Prize
 
         ServerConfig serverConfig = getServerConfig(openId);
 
-        String s = restTemplate.getForObject(serverConfig.getServerUrl() + "/ec/smallApp/prizeConfig/getAdmin?openId=" + openId, String.class);
+        String s = restTemplate.getForObject(serverConfig.getStudentServerUrl() + "/ec/smallApp/prizeConfig/getAdmin?openId=" + openId, String.class);
         ServerResponse serverResponse = JSONObject.parseObject(s, ServerResponse.class);
 
         if (serverResponse != null && serverResponse.getStatus() == ResponseCode.SUCCESS.getCode()) {

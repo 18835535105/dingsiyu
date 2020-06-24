@@ -52,7 +52,7 @@ public class SmallProgramTestServiceImpl extends ServiceImpl<StudentMapper, Stud
     public Object getTest(HttpSession session, String openId) {
         ServerConfig serverConfig = getServerConfig(openId);
 
-        String forObject = restTemplate.getForObject(serverConfig.getServerUrl() + "/ec/smallApp/test/getTest?openId=" + openId, String.class);
+        String forObject = restTemplate.getForObject(serverConfig.getStudentServerUrl() + "/ec/smallApp/test/getTest?openId=" + openId, String.class);
         return JSONObject.parseObject(forObject, ServerResponse.class);
     }
 
@@ -66,7 +66,7 @@ public class SmallProgramTestServiceImpl extends ServiceImpl<StudentMapper, Stud
         params.add("point", point);
         params.add("openId", openId);
 
-        String forObject = restTemplate.postForObject(serverConfig.getServerUrl() + "/ec/smallApp/test/saveTest", params, String.class);
+        String forObject = restTemplate.postForObject(serverConfig.getStudentServerUrl() + "/ec/smallApp/test/saveTest", params, String.class);
         return JSONObject.parseObject(forObject, ServerResponse.class);
     }
 

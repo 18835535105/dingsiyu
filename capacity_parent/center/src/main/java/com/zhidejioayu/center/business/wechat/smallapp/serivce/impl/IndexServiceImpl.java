@@ -37,7 +37,7 @@ public class IndexServiceImpl extends ServiceImpl<StudentMapper, Student> implem
 
         ServerConfig serverConfig = getServerConfig(openId);
 
-        String forObject = restTemplate.getForObject(serverConfig.getServerUrl() + "/ec/smallApp/index/index?openId=" + openId, String.class);
+        String forObject = restTemplate.getForObject(serverConfig.getStudentServerUrl() + "/ec/smallApp/index/index?openId=" + openId, String.class);
         return JSONObject.parseObject(forObject, ServerResponse.class);
     }
 
@@ -50,7 +50,7 @@ public class IndexServiceImpl extends ServiceImpl<StudentMapper, Student> implem
         LinkedMultiValueMap<String, Object> params = new LinkedMultiValueMap<>(16);
         params.add("date", date);
         params.add("openId", openId);
-        String s = restTemplate.postForObject(serverConfig.getServerUrl() + "/ec/smallApp/index/replenish", params, String.class);
+        String s = restTemplate.postForObject(serverConfig.getStudentServerUrl() + "/ec/smallApp/index/replenish", params, String.class);
         return JSONObject.parseObject(s, ServerResponse.class);
     }
 
@@ -58,7 +58,7 @@ public class IndexServiceImpl extends ServiceImpl<StudentMapper, Student> implem
     public ServerResponse<Object> record(String openId) {
         ServerConfig serverConfig = getServerConfig(openId);
 
-        String s = restTemplate.getForObject(serverConfig.getServerUrl() + "/ec/smallApp/index/record?openId=" + openId, String.class);
+        String s = restTemplate.getForObject(serverConfig.getStudentServerUrl() + "/ec/smallApp/index/record?openId=" + openId, String.class);
         return JSONObject.parseObject(s, ServerResponse.class);
     }
 
@@ -75,7 +75,7 @@ public class IndexServiceImpl extends ServiceImpl<StudentMapper, Student> implem
 
         ServerConfig serverConfig = getServerConfig(dto.getOpenId());
 
-        String s = restTemplate.getForObject(serverConfig.getServerUrl() + "/ec/smallApp/index/prize", String.class, dto);
+        String s = restTemplate.getForObject(serverConfig.getStudentServerUrl() + "/ec/smallApp/index/prize", String.class, dto);
         return JSONObject.parseObject(s, ServerResponse.class);
     }
 
@@ -84,7 +84,7 @@ public class IndexServiceImpl extends ServiceImpl<StudentMapper, Student> implem
 
         ServerConfig serverConfig = getServerConfig(openId);
 
-        String s = restTemplate.getForObject(serverConfig.getServerUrl() + "/ec/smallApp/index/cardInfo?openId=" + openId, String.class);
+        String s = restTemplate.getForObject(serverConfig.getStudentServerUrl() + "/ec/smallApp/index/cardInfo?openId=" + openId, String.class);
         return JSONObject.parseObject(s, ServerResponse.class);
     }
 

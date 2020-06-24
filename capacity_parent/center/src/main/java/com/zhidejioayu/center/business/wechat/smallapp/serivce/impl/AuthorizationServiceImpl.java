@@ -53,7 +53,7 @@ public class AuthorizationServiceImpl extends ServiceImpl<StudentMapper, Student
         ServerConfig serverConfig = serverConfigMapper.selectStudentServerByOpenid(currentOpenid);
 
         if (serverConfig != null) {
-            String s = restTemplate.postForObject(serverConfig.getServerUrl() + "/ec/smallApp/authorization/bind", dto, String.class);
+            String s = restTemplate.postForObject(serverConfig.getStudentServerUrl() + "/ec/smallApp/authorization/bind", dto, String.class);
             return JSONObject.parseObject(s, ServerResponse.class);
         }
 

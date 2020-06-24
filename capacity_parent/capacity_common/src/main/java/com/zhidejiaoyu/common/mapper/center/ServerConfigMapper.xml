@@ -6,13 +6,14 @@
         <result column="server_no" jdbcType="VARCHAR" property="serverNo"/>
         <result column="server_name" jdbcType="VARCHAR" property="serverName"/>
         <result column="server_ip" jdbcType="VARCHAR" property="serverIp"/>
-        <result column="server_url" jdbcType="VARCHAR" property="serverUrl"/>
+        <result column="student_server_url" jdbcType="VARCHAR" property="studentServerUrl"/>
+        <result column="school_server_url" jdbcType="VARCHAR" property="schoolServerUrl"/>
     </resultMap>
     <sql id="Base_Column_List">
-        id, server_no, `server_name`, server_ip, server_url
+        id, server_no, `server_name`, server_ip, student_server_url, school_server_url
     </sql>
     <sql id="more_table_sql">
-        sc.id, sc.server_no, sc.`server_name`, sc.server_ip, sc.server_url
+        sc.id, sc.server_no, sc.`server_name`, sc.server_ip, sc.student_server_url, sc.school_server_url
     </sql>
     <select id="selectStudentServerByOpenid" resultMap="BaseResultMap" parameterType="map">
         select

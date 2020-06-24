@@ -37,9 +37,14 @@ public class ServerConfig extends Model<ServerConfig> implements Serializable {
     private String serverIp;
 
     /**
-     * 服务器网址url
+     * 学生端服务器网址url
      */
-    private String serverUrl;
+    private String studentServerUrl;
+
+    /**
+     * 教师端服务器网址url
+     */
+    private String schoolServerUrl;
 
     @Override
     protected Serializable pkVal() {
