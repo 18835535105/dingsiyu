@@ -434,6 +434,7 @@
         </if>
         <if test="learningDetails.type == 5">
             /*语法模块*/
+            37,38,39
         </if>
         )
         and learning_model is not null
