@@ -1,5 +1,6 @@
 package com.zhidejiaoyu.student.business.controller.simple;
 
+import com.zhidejiaoyu.common.vo.gauntlet.GauntletSortVo;
 import com.zhidejiaoyu.common.vo.simple.StudentGauntletVo;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.student.business.service.simple.SimpleIGauntletServiceSimple;
@@ -36,8 +37,8 @@ public class SimpleGauntletController {
     @RequestMapping("/getStudentByType")
     public ServerResponse<Map<String, Object>> getStudentByType(HttpSession session, @RequestParam(defaultValue = "1") Integer type,
                                                                 @RequestParam(defaultValue = "1") Integer page, Integer rows,
-                                                                String account) {
-        return gauntletService.getStudentByType(session, type, page, rows, account);
+                                                                String account, GauntletSortVo vo) {
+        return gauntletService.getStudentByType(session, type, page, rows, account, vo);
     }
 
 
@@ -129,7 +130,7 @@ public class SimpleGauntletController {
      * 查询pk排行榜，
      *
      * @param session
-     * @param type 1，本班  2，本校  3，本区
+     * @param type    1，本班  2，本校  3，本区
      * @return
      */
     @RequestMapping("/getRank")

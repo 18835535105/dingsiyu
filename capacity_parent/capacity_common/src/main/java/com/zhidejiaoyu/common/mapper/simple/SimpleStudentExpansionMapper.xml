@@ -83,4 +83,39 @@
         select <include refid="Base_Column_List"></include> from student_expansion
     </select>
 
+    <select id="selectSourcePowerSortByStudentIds" parameterType="map" resultType="long">
+        select
+        student_id
+        from student_expansion
+        where student_id in (
+        <foreach collection="studentIds" item="studentId" separator=",">
+            #{studentId}
+        </foreach>
+        )
+        <if test="sort==1">
+            order by source_power desc
+        </if>
+        <if test="sort==2">
+            order by source_power asc
+        </if>
+        limit #{start},#{end}
+    </select>
+    <select id="selectPkNumSortByStudentIds" parameterType="map" resultType="long">
+        select
+        student_id
+        from student_expansion
+        where student_id in (
+        <foreach collection="studentIds" item="studentId" separator=",">
+            #{studentId}
+        </foreach>
+        )
+        <if test="sort==1">
+            order by study_power desc
+        </if>
+        <if test="sort==2">
+            order by study_power asc
+        </if>
+        limit #{start},#{end}
+    </select>
+
 </mapper>

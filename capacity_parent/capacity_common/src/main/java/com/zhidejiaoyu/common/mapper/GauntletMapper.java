@@ -196,5 +196,10 @@ public interface GauntletMapper extends BaseMapper<Gauntlet> {
      */
     List<Map<String, Object>> countByStudentIdsAndStartDateAndEndDate(@Param("studentIds") List<Long> studentIds, @Param("startDate") String startDate, @Param("endDate") String endDate);
 
-    Integer countByStudentIdAndStartDateAndEndDate(@Param("studentId") Long id,@Param("startTime") String startTime,@Param("endTime") String endTime);
+    Integer countByStudentIdAndStartDateAndEndDate(@Param("studentId") Long id, @Param("startTime") String startTime, @Param("endTime") String endTime);
+
+    List<Long> selectSortByStudentId(@Param("studentIds") List<Long> studentIds, @Param("start") long startIndex,
+                                     @Param("end") long endIndex, @Param("sort") Integer sort);
+
+    List<Long> selectWinnerSortByStudentIds(List<Long> studentIds, long startIndex, long endIndex, Integer winner);
 }

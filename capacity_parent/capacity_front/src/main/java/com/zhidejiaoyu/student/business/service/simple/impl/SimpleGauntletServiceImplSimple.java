@@ -1,36 +1,34 @@
 package com.zhidejiaoyu.student.business.service.simple.impl;
 
-import com.aliyun.oss.internal.OSSUtils;
 import com.github.pagehelper.PageHelper;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.constant.redis.SourcePowerKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
-import com.zhidejiaoyu.common.rank.RankOpt;
-import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
-import com.zhidejiaoyu.common.utils.BigDecimalUtil;
-import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
-import com.zhidejiaoyu.common.utils.grade.GradeUtil;
-import com.zhidejiaoyu.common.utils.page.PageUtil;
-import com.zhidejiaoyu.common.vo.GauntletRankVo;
-import com.zhidejiaoyu.common.vo.simple.StrengthGameVo;
-import com.zhidejiaoyu.common.vo.simple.StudentGauntletVo;
-import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
 import com.zhidejiaoyu.common.mapper.simple.*;
 import com.zhidejiaoyu.common.pojo.*;
-import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
-import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
-import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.rank.RankOpt;
+import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
 import com.zhidejiaoyu.common.utils.LevelUtil;
+import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
+import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
+import com.zhidejiaoyu.common.utils.grade.GradeUtil;
+import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
+import com.zhidejiaoyu.common.utils.page.PageUtil;
+import com.zhidejiaoyu.common.utils.server.ServerResponse;
+import com.zhidejiaoyu.common.vo.GauntletRankVo;
+import com.zhidejiaoyu.common.vo.gauntlet.GauntletSortVo;
+import com.zhidejiaoyu.common.vo.simple.StrengthGameVo;
+import com.zhidejiaoyu.common.vo.simple.StudentGauntletVo;
+import com.zhidejiaoyu.student.business.game.service.impl.GameServiceImpl;
+import com.zhidejiaoyu.student.business.service.simple.SimpleIGauntletServiceSimple;
 import com.zhidejiaoyu.student.business.service.simple.SimplePersonalCentreServiceSimple;
-import com.zhidejiaoyu.student.business.shipconfig.constant.EquipmentTypeConstant;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
 import com.zhidejiaoyu.student.common.GoldLogUtil;
 import com.zhidejiaoyu.student.common.redis.RedisOpt;
-import com.zhidejiaoyu.student.business.game.service.impl.GameServiceImpl;
-import com.zhidejiaoyu.student.business.service.simple.SimpleIGauntletServiceSimple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,7 +106,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
 
 
     @Override
-    public ServerResponse<Map<String, Object>> getStudentByType(HttpSession session, Integer type, Integer page, Integer rows, String account) {
+    public ServerResponse<Map<String, Object>> getStudentByType(HttpSession session, Integer type, Integer page, Integer rows, String account, GauntletSortVo vo) {
         //获取学生
         Student student = getStudent(session);
         //更改过时挑战
@@ -122,22 +120,38 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         if (type == 2) {
             // 校区排行（全部学生）
             // 我在校区的排行
-            String key = SourcePowerKeysConst.SCHOOL_RANK + schoolAdminId;
-            studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, null);
-            long memberSize = sourcePowerRankOpt.getMemberSize(key);
-            returnMap.put("total", memberSize % rows > 0 ? memberSize / rows + 1 : memberSize / rows);
+            studentIds = simpleStudentMapper.selectStudentIdByAdminIdOrAll(schoolAdminId);
+            returnMap.put("total", studentIds.size() % rows > 0 ? studentIds.size() / rows + 1 : studentIds.size() / rows);
+            studentIds = getRankStudent(vo, studentIds, startIndex, endIndex);
         } else {
             // 全国排行（前50名）
-            String key = SourcePowerKeysConst.COUNTRY_RANK;
-            studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, 50);
-            long memberSize = sourcePowerRankOpt.getMemberSize(key);
-            returnMap.put("total", memberSize % rows > 0 ? memberSize / rows + 1 : memberSize / rows);
+            studentIds = simpleStudentMapper.selectStudentIdByAdminIdOrAll(null);
+            returnMap.put("total", studentIds.size() % rows > 0 ? studentIds.size() / rows + 1 : studentIds.size() / rows);
+            studentIds = getRankStudent(vo, studentIds, startIndex, endIndex);
         }
         List<StudentGauntletVo> classOrSchoolStudents = new ArrayList<>();
         getListStudentGauntletVo(classOrSchoolStudents, studentIds);
 
         returnMap.put("data", classOrSchoolStudents);
         return ServerResponse.createBySuccess(returnMap);
+    }
+
+    private List<Long> getRankStudent(GauntletSortVo vo, List<Long> studentIds, long startIndex, long endIndex) {
+        if (vo.getBattle() == null && vo.getPkNum() == null
+                && vo.getSourcePower() == null) {
+            vo.setBattle(1);
+        }
+        if (vo.getBattle() != null) {
+            return gauntletMapper.selectSortByStudentId(studentIds, startIndex, endIndex, vo.getBattle());
+        }
+        if (vo.getSourcePower() != null) {
+            return simpleStudentExpansionMapper.selectSourcePowerSortByStudentIds(studentIds, startIndex, endIndex, vo.getSourcePower());
+        }
+        if (vo.getPkNum() != null) {
+            return simpleStudentExpansionMapper.selectPkNumSortByStudentIds(studentIds, startIndex, endIndex, vo.getPkNum());
+        }
+        return null;
+
     }
 
     private void getListStudentGauntletVo(List<StudentGauntletVo> classOrSchoolStudents, List<Long> studentIds) {

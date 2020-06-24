@@ -1135,6 +1135,20 @@
         where stu.id = #{studentId}
 
     </select>
+    <select id="selectStudentIdByAdminIdOrAll" parameterType="map" resultType="long">
+        select
+        id
+        from student
+        where
+        account_time > now()
+        <if test="schoolAdminId!=null">
+            and
+            (teacher_id in
+            (select teacher_id from teacher where school_admin_id= 295)
+            or teacher_id =295
+            )
+        </if>
+    </select>
 
 
 </mapper>
