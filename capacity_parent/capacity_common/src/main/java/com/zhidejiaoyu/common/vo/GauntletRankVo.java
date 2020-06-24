@@ -11,6 +11,10 @@ public class GauntletRankVo {
      */
     private String studentName;
     /**
+     * 头像
+     */
+    private String headUrl;
+    /**
      * 点赞
      */
     private Long worship;

@@ -1126,6 +1126,7 @@
         exp.study_power pkNum,
         exp.source_power sourcePower,
         stu.province province,
+        stu.head_url headUrl,
         stu.city city,
         stu.area area
         from student stu

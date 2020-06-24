@@ -704,6 +704,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
         List<GauntletRankVo> returnList = new ArrayList<>();
         studentIds.forEach(studentId -> {
             GauntletRankVo gauntletRankVo = simpleStudentMapper.selectGauntletRankVoByStudentId(studentId);
+            gauntletRankVo.setHeadUrl(GetOssFile.getPublicObjectUrl(gauntletRankVo.getHeadUrl()));
             gauntletRankVo.setAddress(gauntletRankVo.getProvince() + "-" + gauntletRankVo.getCity() + "" + gauntletRankVo.getArea());
             gauntletRankVo.setCcie(rankOpt.getScore(RankKeysConst.COUNTRY_CCIE_RANK, studentId) == -1 ? 0 : rankOpt.getScore(RankKeysConst.COUNTRY_CCIE_RANK, studentId));
             gauntletRankVo.setMedal(rankOpt.getScore(RankKeysConst.COUNTRY_MEDAL_RANK, studentId) == -1 ? 0 : rankOpt.getScore(RankKeysConst.COUNTRY_MEDAL_RANK, studentId));
