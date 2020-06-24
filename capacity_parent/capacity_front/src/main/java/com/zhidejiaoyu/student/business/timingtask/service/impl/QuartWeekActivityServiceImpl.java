@@ -80,7 +80,7 @@ public class QuartWeekActivityServiceImpl implements BaseQuartzService, QuartWee
 
 
     @Override
-    @Scheduled(cron = "0 5 0 ? * 2 ")
+    @Scheduled(cron = "0 5 0 * * 1")
     @Transactional(rollbackFor = Exception.class)
     public void init() {
 

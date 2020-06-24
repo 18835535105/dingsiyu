@@ -572,6 +572,15 @@ public class DateUtil implements Serializable {
     }
 
     /**
+     * 获取当前时间是当前周的第几天
+     *
+     * @return 从1开始，周一就是1，周日就是7
+     */
+    public static int getCurrentDayOfWeek() {
+        return new DateTime().dayOfWeek().get();
+    }
+
+    /**
      * 获取本周的第一天
      *
      * @return String
@@ -580,8 +589,7 @@ public class DateUtil implements Serializable {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.WEEK_OF_MONTH, 0);
         cal.set(Calendar.DAY_OF_WEEK, 2);
-        Date time = cal.getTime();
-        return time;
+        return cal.getTime();
     }
 
     /**
