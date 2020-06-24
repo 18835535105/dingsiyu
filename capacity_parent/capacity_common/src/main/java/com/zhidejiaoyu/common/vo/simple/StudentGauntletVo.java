@@ -83,7 +83,6 @@ public class StudentGauntletVo {
      */
     @Data
     @Builder
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Info {
         /**
@@ -119,7 +118,6 @@ public class StudentGauntletVo {
      */
     @Data
     @Builder
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class BaseValue {
         /**
@@ -158,7 +156,6 @@ public class StudentGauntletVo {
      */
     @Data
     @Builder
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class shipName {
         private String name;

@@ -1153,7 +1153,11 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
                 return build;
             }
         }
-        return null;
+        return StudentGauntletVo.shipName
+                .builder()
+                .name(null)
+                .imgUrl(null)
+                .build();
     }
 
 
