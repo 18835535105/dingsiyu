@@ -186,6 +186,18 @@ public class GauntletController {
         return gauntletService.getHeroList(session,type);
     }
 
+    /**
+     * 查询pk排行榜，
+     *
+     * @param session
+     * @param type 1，本班  2，本校  3，本区
+     * @return
+     */
+    @RequestMapping("/getRank")
+    public ServerResponse<Object> getRank(HttpSession session, Integer type) {
+        return gauntletService.getRank(session, type);
+    }
+
 
 
 }

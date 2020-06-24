@@ -103,6 +103,10 @@ public class StudentGauntletVo {
          */
         private shipName missileInfo;
         /**
+         * 导弹信息
+         */
+        private shipName hero;
+        /**
          * 各项最大值
          */
         private BaseValue baseValue;

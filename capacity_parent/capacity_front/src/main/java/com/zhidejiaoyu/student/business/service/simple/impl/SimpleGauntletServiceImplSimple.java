@@ -3,12 +3,16 @@ package com.zhidejiaoyu.student.business.service.simple.impl;
 import com.github.pagehelper.PageHelper;
 import com.zhidejiaoyu.aliyunoss.common.AliyunInfoConst;
 import com.zhidejiaoyu.aliyunoss.getObject.GetOssFile;
+import com.zhidejiaoyu.common.constant.redis.RankKeysConst;
 import com.zhidejiaoyu.common.constant.redis.SourcePowerKeysConst;
 import com.zhidejiaoyu.common.mapper.*;
+import com.zhidejiaoyu.common.rank.RankOpt;
 import com.zhidejiaoyu.common.rank.SourcePowerRankOpt;
+import com.zhidejiaoyu.common.utils.BigDecimalUtil;
 import com.zhidejiaoyu.common.utils.dateUtlis.DateUtil;
 import com.zhidejiaoyu.common.utils.grade.GradeUtil;
 import com.zhidejiaoyu.common.utils.page.PageUtil;
+import com.zhidejiaoyu.common.vo.GauntletRankVo;
 import com.zhidejiaoyu.common.vo.simple.StrengthGameVo;
 import com.zhidejiaoyu.common.vo.simple.StudentGauntletVo;
 import com.zhidejiaoyu.common.annotation.GoldChangeAnnotation;
@@ -18,6 +22,7 @@ import com.zhidejiaoyu.common.utils.TeacherInfoUtil;
 import com.zhidejiaoyu.common.utils.language.BaiduSpeak;
 import com.zhidejiaoyu.common.utils.server.ServerResponse;
 import com.zhidejiaoyu.common.utils.LevelUtil;
+import com.zhidejiaoyu.student.business.service.simple.SimplePersonalCentreServiceSimple;
 import com.zhidejiaoyu.student.business.shipconfig.constant.EquipmentTypeConstant;
 import com.zhidejiaoyu.student.business.shipconfig.service.ShipIndexService;
 import com.zhidejiaoyu.student.business.shipconfig.vo.IndexVO;
@@ -95,6 +100,11 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
     private EquipmentMapper equipmentMapper;
     @Resource
     private ShipIndexService shipIndexService;
+    @Resource
+    private SimplePersonalCentreServiceSimple simplePersonalCentreServiceSimple;
+    @Resource
+    private RankOpt rankOpt;
+
 
     @Override
     public ServerResponse<Map<String, Object>> getStudentByType(HttpSession session, Integer type, Integer page, Integer rows, String account) {
@@ -113,14 +123,14 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
             // 我在校区的排行
             String key = SourcePowerKeysConst.SCHOOL_RANK + schoolAdminId;
             studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, null);
-            List<Long> allStudents = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, 0L, 9999L, null);
-            returnMap.put("total", allStudents.size() % rows > 0 ? allStudents.size() / rows + 1 : allStudents.size() / rows);
+            long memberSize = sourcePowerRankOpt.getMemberSize(key);
+            returnMap.put("total", memberSize % rows > 0 ? memberSize / rows + 1 : memberSize / rows);
         } else {
             // 全国排行（前50名）
             String key = SourcePowerKeysConst.COUNTRY_RANK;
             studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, 50);
-            List<Long> allStudents = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, 0L, 9999L, null);
-            returnMap.put("total", allStudents.size() % rows > 0 ? allStudents.size() / rows + 1 : allStudents.size() / rows);
+            long memberSize = sourcePowerRankOpt.getMemberSize(key);
+            returnMap.put("total", memberSize % rows > 0 ? memberSize / rows + 1 : memberSize / rows);
         }
         List<StudentGauntletVo> classOrSchoolStudents = new ArrayList<>();
         getListStudentGauntletVo(classOrSchoolStudents, studentIds);
@@ -655,6 +665,55 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
     }
 
     @Override
+    public ServerResponse<Object> getRank(HttpSession session, Integer type) {
+        Student student = getStudent(session);
+        List<Long> studentIds = null;
+        int pageNum = PageUtil.getPageNum();
+        int pageSize = PageUtil.getPageSize();
+        long startIndex = (pageNum - 1) * pageSize;
+        long endIndex = startIndex + pageSize;
+        Map<String, Object> map = new HashMap<>();
+        map.put("page", pageNum);
+        map.put("rows", pageSize);
+        Integer schoolAdminId = teacherMapper.selectSchoolAdminIdByTeacherId(student.getTeacherId());
+        if (type.equals(1)) {
+            List<Long> longs = simpleStudentMapper.selectMaxSourceByClassId(student.getClassId(), student.getTeacherId(), null, null);
+            studentIds = simpleStudentMapper.selectMaxSourceByClassId(student.getClassId(), student.getTeacherId(), startIndex, endIndex);
+            map.put("total", longs.size() % pageSize > 0 ? longs.size() / pageSize + 1 : longs.size() / pageSize);
+        } else if (type.equals(2)) {
+            // 校区排行（全部学生）
+            // 我在校区的排行
+            String key = SourcePowerKeysConst.SCHOOL_RANK + schoolAdminId;
+            studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, null);
+            long memberSize = sourcePowerRankOpt.getMemberSize(key);
+            map.put("total", memberSize % pageSize > 0 ? memberSize / pageSize + 1 : memberSize / pageSize);
+        } else {
+
+            String key = SourcePowerKeysConst.COUNTRY_RANK;
+            studentIds = sourcePowerRankOpt.getReverseRangeMembersBetweenStartAndEnd(key, startIndex, endIndex, null);
+            long memberSize = sourcePowerRankOpt.getMemberSize(key);
+            map.put("total", memberSize % pageSize > 0 ? memberSize / pageSize + 1 : memberSize / pageSize);
+        }
+        List<GauntletRankVo> studentRank = getStudentRank(studentIds);
+        map.put("list", studentRank);
+        return ServerResponse.createBySuccess(map);
+    }
+
+    private List<GauntletRankVo> getStudentRank(List<Long> studentIds) {
+        List<GauntletRankVo> returnList = new ArrayList<>();
+        studentIds.forEach(studentId -> {
+            GauntletRankVo gauntletRankVo = simpleStudentMapper.selectGauntletRankVoByStudentId(studentId);
+            gauntletRankVo.setAddress(gauntletRankVo.getProvince() + "-" + gauntletRankVo.getCity() + "" + gauntletRankVo.getArea());
+            gauntletRankVo.setCcie(rankOpt.getScore(RankKeysConst.COUNTRY_CCIE_RANK, studentId) == -1 ? 0 : rankOpt.getScore(RankKeysConst.COUNTRY_CCIE_RANK, studentId));
+            gauntletRankVo.setMedal(rankOpt.getScore(RankKeysConst.COUNTRY_MEDAL_RANK, studentId) == -1 ? 0 : rankOpt.getScore(RankKeysConst.COUNTRY_MEDAL_RANK, studentId));
+            gauntletRankVo.setWorship(rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, studentId) == -1 ? 0 : rankOpt.getScore(RankKeysConst.COUNTRY_WORSHIP_RANK, studentId));
+            simplePersonalCentreServiceSimple.getLevelStr(gauntletRankVo.getGold(), redisOpt.getAllLevel());
+            returnList.add(gauntletRankVo);
+        });
+        return returnList;
+    }
+
+    @Override
     public void getStudy() {
         //批量生成学生账号扩展表信息
         List<Student> all = simpleStudentMapper.getAll();
@@ -812,24 +871,24 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
             if (type == 1) {
                 map.put("type", gauntlet.getChallengeStatus());
                 StudentExpansion expansion = simpleStudentExpansionMapper.selectByStudentId(student.getId());
-                map.put("pkNum",expansion.getStudyPower());
-                map.put("sourcePower",expansion.getSourcePower());
+                map.put("pkNum", gauntlet.getChallengeStudy());
+                map.put("sourcePower", expansion.getSourcePower());
             } else if (type == 2) {
                 map.put("type", gauntlet.getBeChallengerStatus());
                 StudentExpansion expansion = simpleStudentExpansionMapper.selectByStudentId(students.getId());
-                map.put("pkNum",expansion.getStudyPower());
-                map.put("sourcePower",expansion.getSourcePower());
+                map.put("pkNum", gauntlet.getBeChallengeStudy());
+                map.put("sourcePower", expansion.getSourcePower());
             } else if (type == 3) {
                 if (student.getId().equals(studentId)) {
                     StudentExpansion expansion = simpleStudentExpansionMapper.selectByStudentId(student.getId());
-                    map.put("pkNum",expansion.getStudyPower());
-                    map.put("sourcePower",expansion.getSourcePower());
+                    map.put("pkNum", gauntlet.getChallengeStudy());
+                    map.put("sourcePower", expansion.getSourcePower());
                     map.put("type", gauntlet.getChallengeStatus());
                 }
                 if (students.getId().equals(studentId)) {
                     StudentExpansion expansion = simpleStudentExpansionMapper.selectByStudentId(students.getId());
-                    map.put("pkNum",expansion.getStudyPower());
-                    map.put("sourcePower",expansion.getSourcePower());
+                    map.put("pkNum", gauntlet.getBeChallengeStudy());
+                    map.put("sourcePower", expansion.getSourcePower());
                     map.put("type", gauntlet.getBeChallengerStatus());
                 }
             }
@@ -1076,6 +1135,7 @@ public class SimpleGauntletServiceImplSimple extends SimpleBaseServiceImpl<Gaunt
                 .armorInfo(getShipName(equipments, 4))
                 .missileInfo(getShipName(equipments, 3))
                 .weaponsInfo(getShipName(equipments, 2))
+                .hero(getShipName(equipments, 5))
                 .build();
         studentGauntletVo.setShipInfo(build);
 

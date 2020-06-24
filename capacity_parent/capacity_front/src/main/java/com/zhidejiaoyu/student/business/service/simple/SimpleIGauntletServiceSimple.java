@@ -47,4 +47,6 @@ public interface SimpleIGauntletServiceSimple extends SimpleBaseService<Gauntlet
     ServerResponse<Object> closePkExplain(HttpSession session);
 
     ServerResponse<Object> getHeroList(HttpSession session, Integer type);
+
+    ServerResponse<Object> getRank(HttpSession session,Integer type);
 }
